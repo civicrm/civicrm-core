@@ -88,6 +88,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
    * Build the form object.
    */
   public function buildQuickForm() {
+    // FIXME: Some of this code is identical to Confirm.php and should be broken out into a shared function
     $this->assignToTemplate();
     $this->_ccid = $this->get('ccid');
     $productID = $this->get('productID');

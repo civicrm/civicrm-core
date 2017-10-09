@@ -21,17 +21,17 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
-/*
+/**
  * civicrm_handler_field_county.inc
  * Displays County after grabbing the label from the database
  *
  */
 class civicrm_handler_field_county extends civicrm_handler_field_address {
   static $_counties;
-  function construct() {
+  public function construct() {
     parent::construct();
     if (!self::$_counties) {
       if (!civicrm_initialize()) {
@@ -42,7 +42,7 @@ class civicrm_handler_field_county extends civicrm_handler_field_address {
     }
   }
 
-  function render($values) {
+  public function render($values) {
     $sid = $values->{$this->field_alias};
     if (empty($sid) ||
       (int ) $sid <= 0
@@ -53,13 +53,13 @@ class civicrm_handler_field_county extends civicrm_handler_field_address {
     return self::$_counties[$values->{$this->field_alias}];
   }
 
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     return $options;
   }
 
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
   }
-}
 
+}

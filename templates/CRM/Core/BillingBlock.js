@@ -24,6 +24,20 @@
       // Hide the CC type field (redundant)
       $('#credit_card_type, .label', '.crm-container .credit_card_type-section').hide();
 
+      // set the card type value as default if any found
+      var cardtype = $('#credit_card_type').val();
+      if (cardtype) {
+        $.each(CRM.config.creditCardTypes, function(key, value) {
+          // highlight the selected card type icon
+          if (value == cardtype) {
+            $('.crm-container .credit_card_type-section .crm-credit_card_type-icon-' + key).css('opacity', 1);
+          }
+          else {
+            $('.crm-container .credit_card_type-section .crm-credit_card_type-icon-' + key).css('opacity', 0.25);
+          }
+        });
+      }
+
       // Select according to the number entered
       $('.crm-container input#credit_card_number').change(function() {
         var ccnumber = cj(this).val();
@@ -55,22 +69,13 @@
       'unionpay': '62(?:[0-9]{14}|[0-9]{17})'
     };
 
-    var card_values = {
-      'mastercard': 'MasterCard',
-      'visa': 'Visa',
-      'amex': 'Amex',
-      'dinersclub': 'Diners Club',
-      'carteblanche': 'Carte Blanche',
-      'discover': 'Discover',
-      'jcb': 'JCB',
-      'unionpay': 'UnionPay'
-    };
+    var card_values = CRM.config.creditCardTypes;
 
     $.each(card_types, function(key, pattern) {
       if (ccnumber.match('^' + pattern + '$')) {
         var value = card_values[key];
         //$.each(CRM.config.creditCardTypes, function(key2, val) {
-        //  if (value == val) { 
+        //  if (value == val) {
             $('.crm-container .credit_card_type-section .crm-credit_card_type-icon-' + key).css('opacity', 1);
             $('select#credit_card_type').val(value);
             return false;

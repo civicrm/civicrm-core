@@ -17,4 +17,3 @@ function _civicrm_rules_admin_getEntities() {
   // to extend entities to all API entities
   return array('event' => 'Event', 'participant' => 'Participant');
 }
-

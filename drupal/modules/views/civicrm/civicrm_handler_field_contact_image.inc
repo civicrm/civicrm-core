@@ -1,7 +1,7 @@
 <?php
 
 class civicrm_handler_field_contact_image extends views_handler_field {
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['url_only'] = array(
       'default' => FALSE,
@@ -28,7 +28,7 @@ class civicrm_handler_field_contact_image extends views_handler_field {
     return $options;
   }
 
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $directory = $this->get_civi_relative_upload_path();
 
@@ -107,7 +107,7 @@ class civicrm_handler_field_contact_image extends views_handler_field {
     }
   }
 
-  function render($values) {
+  public function render($values) {
     $value = $this->get_value($values);
     if (empty($value)) {
       return;
@@ -142,7 +142,7 @@ class civicrm_handler_field_contact_image extends views_handler_field {
    *
    * @return bool|string
    */
-  function get_civi_relative_upload_path() {
+  public function get_civi_relative_upload_path() {
     civicrm_initialize();
     $wrapper = file_stream_wrapper_get_instance_by_uri('public://');
     $drupal_upload_path = $wrapper->getDirectoryPath();

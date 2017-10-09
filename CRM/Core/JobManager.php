@@ -118,6 +118,17 @@ class CRM_Core_JobManager {
    */
   public function executeJob($job) {
     $this->currentJob = $job;
+
+    // CRM-18231 check if non-production environment.
+    try {
+      CRM_Core_BAO_Setting::isAPIJobAllowedToRun($job->apiParams);
+    }
+    catch (Exception $e) {
+      $this->logEntry('Error while executing ' . $job->name . ': ' . $e->getMessage());
+      $this->currentJob = FALSE;
+      return FALSE;
+    }
+
     $this->logEntry('Starting execution of ' . $job->name);
     $job->saveLastRun();
 

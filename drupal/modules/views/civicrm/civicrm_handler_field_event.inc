@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Field handler for events to provide simple renderer that allows linking
@@ -34,7 +34,7 @@ class civicrm_handler_field_event extends views_handler_field_markup {
   /**
    * Provide link to node option
    */
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $form['link_to_event'] = array(
       '#title' => t('Link this field to its event page'),
@@ -43,7 +43,7 @@ class civicrm_handler_field_event extends views_handler_field_markup {
     );
   }
 
-  function render_link($data, $values) {
+  public function render_link($data, $values) {
     if (!empty($this->options['link_to_event']) && user_access('view event info') && $values->id) {
       return civicrm_views_href($data,
         'civicrm/event/info',
@@ -55,9 +55,9 @@ class civicrm_handler_field_event extends views_handler_field_markup {
     }
   }
 
-  function render($values) {
+  public function render($values) {
     $format = is_numeric($this->format) ? $this->format : $values->{$this->aliases['format']};
     return $this->render_link(check_markup($values->{$this->field_alias}, $format, FALSE), $values);
   }
-}
 
+}

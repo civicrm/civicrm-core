@@ -202,7 +202,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       $batch['item_count'] = CRM_Utils_Array::value('item_count', $value);
       $batch['type'] = CRM_Utils_Array::value('batch_type', $value);
       if (!empty($value['total'])) {
-        $batch['total'] = CRM_Utils_Money::format($value['total']);
+        // CRM-21205
+        $batch['total'] = CRM_Utils_Money::format($value['total'], $value['currency']);
       }
 
       // Compare totals with actuals
@@ -290,6 +291,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
         switch ($batchStatusByName[$values['status_id']]) {
           case 'Open':
+          case 'Reopened':
             CRM_Utils_Array::remove($newLinks, 'reopen', 'download');
             break;
 
@@ -299,6 +301,21 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
           case 'Exported':
             CRM_Utils_Array::remove($newLinks, 'close', 'edit', 'reopen', 'export');
+        }
+        if (!CRM_Batch_BAO_Batch::checkBatchPermission('edit', $values['created_id'])) {
+          CRM_Utils_Array::remove($newLinks, 'edit');
+        }
+        if (!CRM_Batch_BAO_Batch::checkBatchPermission('close', $values['created_id'])) {
+          CRM_Utils_Array::remove($newLinks, 'close', 'export');
+        }
+        if (!CRM_Batch_BAO_Batch::checkBatchPermission('reopen', $values['created_id'])) {
+          CRM_Utils_Array::remove($newLinks, 'reopen');
+        }
+        if (!CRM_Batch_BAO_Batch::checkBatchPermission('export', $values['created_id'])) {
+          CRM_Utils_Array::remove($newLinks, 'export', 'download');
+        }
+        if (!CRM_Batch_BAO_Batch::checkBatchPermission('delete', $values['created_id'])) {
+          CRM_Utils_Array::remove($newLinks, 'delete');
         }
       }
       if (!empty($values['type_id'])) {
@@ -328,6 +345,17 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
         'Batch',
         $values['id']
       );
+      // CRM-21205
+      $values['currency'] = CRM_Core_DAO::singleValueQuery("
+        SELECT GROUP_CONCAT(DISTINCT ft.currency)
+        FROM  civicrm_batch batch
+        JOIN civicrm_entity_batch eb
+          ON batch.id = eb.batch_id
+        JOIN civicrm_financial_trxn ft
+          ON eb.entity_id = ft.id
+        WHERE batch.id = %1
+        GROUP BY batch.id
+      ", array(1 => array($values['id'], 'Positive')));
       $results[$values['id']] = $values;
     }
 
@@ -381,6 +409,15 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       "created_id.sort_name",
       "created_id",
     );
+    if (!CRM_Core_Permission::check("view all manual batches")) {
+      if (CRM_Core_Permission::check("view own manual batches")) {
+        $loggedInContactId = CRM_Core_Session::singleton()->get('userID');
+        $params['created_id'] = $loggedInContactId;
+      }
+      else {
+        $params['created_id'] = 0;
+      }
+    }
     foreach ($return as $field) {
       if (!isset($params[$field])) {
         continue;
@@ -577,10 +614,21 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     else {
       CRM_Core_Error::fatal("Could not locate exporter: $exporterClass");
     }
+    $export = array();
     foreach ($batchIds as $batchId) {
+      // export only batches whose status is set to Exported.
+      $result = civicrm_api3('Batch', 'getcount', array(
+        'id' => $batchId,
+        'status_id' => "Exported",
+      ));
+      if (!$result) {
+        continue;
+      }
       $export[$batchId] = $exporter->generateExportQuery($batchId);
     }
-    $exporter->makeExport($export);
+    if ($export) {
+      $exporter->makeExport($export);
+    }
   }
 
   /**
@@ -773,6 +821,31 @@ WHERE  {$where}
       $batches[$dao->id] = $dao->status_id;
     }
     return $batches;
+  }
+
+  /**
+   * Function to check permission for batch.
+   *
+   * @param string $action
+   * @param int $batchCreatedId
+   *   batch created by contact id
+   *
+   * @return bool
+   */
+  public static function checkBatchPermission($action, $batchCreatedId = NULL) {
+    if (CRM_Core_Permission::check("{$action} all manual batches")) {
+      return TRUE;
+    }
+    if (CRM_Core_Permission::check("{$action} own manual batches")) {
+      $loggedInContactId = CRM_Core_Session::singleton()->get('userID');
+      if ($batchCreatedId == $loggedInContactId) {
+        return TRUE;
+      }
+      elseif (CRM_Utils_System::isNull($batchCreatedId)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }

@@ -1234,8 +1234,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
                 break;
 
               default:
-                // if time is not selected remove time from value
-                $value = substr($value, 0, 10);
+                //If time is not selected remove time from value.
+                $value = $value ? date('Y-m-d', strtotime($value)) : '';
             }
             $customFormat = implode(" ", $customTimeFormat);
           }
@@ -1264,6 +1264,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             }
           }
         }
+        break;
+
+      case 'Link':
+        $display = $display ? "<a href=\"$display\" target=\"_blank\">$display</a>" : $display;
         break;
 
       case 'TextArea':

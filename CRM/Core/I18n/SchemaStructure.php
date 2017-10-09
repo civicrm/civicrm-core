@@ -149,6 +149,8 @@ class CRM_Core_I18n_SchemaStructure {
           'title' => "varchar(64)",
           'help_pre' => "text",
           'help_post' => "text",
+          'cancel_button_text' => "varchar(64)",
+          'submit_button_text' => "varchar(64)",
         ) ,
         'civicrm_uf_field' => array(
           'help_post' => "text",
@@ -537,6 +539,12 @@ class CRM_Core_I18n_SchemaStructure {
             'type' => "TextArea",
             'rows' => "4",
             'cols' => "80",
+          ) ,
+          'cancel_button_text' => array(
+            'type' => "Text",
+          ) ,
+          'submit_button_text' => array(
+            'type' => "Text",
           ) ,
         ) ,
         'civicrm_uf_field' => array(

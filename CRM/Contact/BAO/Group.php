@@ -1016,8 +1016,16 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $values[$object->id]['created_by'] = "<a href='{$contactUrl}'>{$object->created_by}</a>";
       }
 
-      // get group contact count using Contact.GetCount API
-      $values[$object->id]['count'] = civicrm_api3('Contact', 'getcount', array('group' => $object->id));
+      // By default, we try to get a count of the contacts in each group
+      // to display to the user on the Manage Group page. However, if
+      // that will result in the cache being regenerated, then dipslay
+      // "unknown" instead to avoid a long wait for the user.
+      if (CRM_Contact_BAO_GroupContactCache::shouldGroupBeRefreshed($object->id)) {
+        $values[$object->id]['count'] = ts('unknown');
+      }
+      else {
+        $values[$object->id]['count'] = civicrm_api3('Contact', 'getcount', array('group' => $object->id));
+      }
     }
 
     // CRM-16905 - Sort by count cannot be done with sql

@@ -21,9 +21,9 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
-/*
+/**
  * Heavily based on anonymous code contribution. No claim.
  *
  * civicrm_handler_field_event_link.inc
@@ -39,12 +39,12 @@ class civicrm_handler_field_event_link extends views_handler_field {
   /**
    * Constructor to provide additional field to add.
    */
-  function construct() {
+  public function construct() {
     parent::construct();
     $this->additional_fields['id'] = 'id';
   }
 
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['link_to_civicrm_event'] = array('default' => 'none');
     $options['custom_link'] = array('default' => '');
@@ -54,13 +54,13 @@ class civicrm_handler_field_event_link extends views_handler_field {
   /**
    * Provide link to node option
    */
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $form['link_to_civicrm_event'] = array(
       '#type' => 'select',
       '#title' => t('Choose where to link this field'),
       '#options' => array(
-        'none' => t('Don\'t Link this Field'),
+        'none' => t("Don't Link this Field"),
         'page' => t('Link to Event Page'),
         'registration' => t('Link to Event Registration'),
         'config' => t('Link to Event Configuration'),
@@ -84,7 +84,7 @@ class civicrm_handler_field_event_link extends views_handler_field {
    *
    * Data should be made XSS safe prior to calling this function.
    */
-  function render_link($data, $values) {
+  public function render_link($data, $values) {
 
     $link_choice = $this->options['link_to_civicrm_event'];
 
@@ -92,7 +92,6 @@ class civicrm_handler_field_event_link extends views_handler_field {
     if ($link_choice == 'custom') {
       $custom_link = $this->options['custom_link'];
     }
-
 
     switch ($link_choice) {
 
@@ -109,10 +108,9 @@ class civicrm_handler_field_event_link extends views_handler_field {
         // LINKING TO EVENT REGISTRATION PAGE
       case 'registration':
         if (user_access('register for events') && $data !== NULL && $data !== '') {
-       require_once 'CRM/Core/Config.php';
+          require_once 'CRM/Core/Config.php';
           $config = CRM_Core_Config::singleton();
-          if ($enable_cart =
-            CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME, 'enable_cart')) {
+          if ($enable_cart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME, 'enable_cart')) {
             require_once 'CRM/Event/Cart/BAO/EventInCart.php';
             //TODO don't call for every row
             $link = CRM_Event_Cart_BAO_EventInCart::get_registration_link($values->{$this->aliases['id']});
@@ -156,8 +154,8 @@ class civicrm_handler_field_event_link extends views_handler_field {
     }
   }
 
-  function render($values) {
+  public function render($values) {
     return $this->render_link(check_plain($values->{$this->field_alias}), $values);
   }
-}
 
+}

@@ -2213,7 +2213,8 @@ CREATE TABLE `civicrm_menu` (
      `weight` int NOT NULL  DEFAULT 1 COMMENT 'Ordering of the menu items in various blocks.',
      `type` int NOT NULL  DEFAULT 1 COMMENT 'Drupal menu type.',
      `page_type` int NOT NULL  DEFAULT 1 COMMENT 'CiviCRM menu type.',
-     `skipBreadcrumb` tinyint    COMMENT 'skip this url being exposed to breadcrumb' 
+     `skipBreadcrumb` tinyint    COMMENT 'skip this url being exposed to breadcrumb',
+     `module_data` text    COMMENT 'All other menu metadata not stored in other fields' 
 ,
         PRIMARY KEY (`id`)
  
@@ -2240,6 +2241,7 @@ CREATE TABLE `civicrm_navigation` (
      `label` varchar(255)    COMMENT 'Navigation Title',
      `name` varchar(255)    COMMENT 'Internal Name',
      `url` varchar(255)    COMMENT 'url in case of custom navigation link',
+     `icon` varchar(255) NULL  DEFAULT NULL COMMENT 'CSS class name for an icon',
      `permission` varchar(255)    COMMENT 'Permission for menu item',
      `permission_operator` varchar(3)    COMMENT 'Permission Operator',
      `parent_id` int unsigned    COMMENT 'Parent navigation item, used for grouping',
@@ -2723,7 +2725,7 @@ CREATE TABLE `civicrm_subscription_history` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Internal Id',
      `contact_id` int unsigned NOT NULL   COMMENT 'Contact Id',
      `group_id` int unsigned    COMMENT 'Group Id',
-     `date` datetime NOT NULL   COMMENT 'Date of the (un)subscription',
+     `date` timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'Date of the (un)subscription',
      `method` varchar(8)    COMMENT 'How the (un)subscription was triggered',
      `status` varchar(8)    COMMENT 'The state of the contact within the group',
      `tracking` varchar(255)    COMMENT 'IP address or other tracking info' 
@@ -3186,7 +3188,9 @@ CREATE TABLE `civicrm_case` (
      `end_date` date    COMMENT 'Date on which given case ends.',
      `details` text    COMMENT 'Details about the meeting (agenda, notes, etc).',
      `status_id` int unsigned NOT NULL   COMMENT 'Id of case status.',
-     `is_deleted` tinyint   DEFAULT 0  
+     `is_deleted` tinyint   DEFAULT 0 ,
+     `created_date` timestamp NULL  DEFAULT NULL COMMENT 'When was the case was created.',
+     `modified_date` timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When was the case (or closely related entity) was created or modified or deleted.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -3252,7 +3256,7 @@ CREATE TABLE `civicrm_pledge` (
      `max_reminders` int unsigned   DEFAULT 1 COMMENT 'The maximum number of payment reminders to send for any given payment.',
      `initial_reminder_day` int unsigned   DEFAULT 5 COMMENT 'Send initial reminder this many days prior to the payment due date.',
      `additional_reminder_day` int unsigned   DEFAULT 5 COMMENT 'Send additional reminder this many days after last one sent, up to maximum number of reminders.',
-     `status_id` int unsigned    COMMENT 'Implicit foreign key to civicrm_option_values in the contribution_status option group.',
+     `status_id` int unsigned    COMMENT 'Implicit foreign key to civicrm_option_values in the pledge_status option group.',
      `is_test` tinyint   DEFAULT 0 ,
      `campaign_id` int unsigned    COMMENT 'The campaign for which this pledge has been initiated.' 
 ,
@@ -3278,7 +3282,7 @@ CREATE TABLE `civicrm_report_instance` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Report Instance ID',
      `domain_id` int unsigned NOT NULL   COMMENT 'Which Domain is this instance for',
      `title` varchar(255)    COMMENT 'Report Instance Title.',
-     `report_id` varchar(64) NOT NULL   COMMENT 'FK to civicrm_option_value for the report template',
+     `report_id` varchar(512) NOT NULL   COMMENT 'FK to civicrm_option_value for the report template',
      `name` varchar(255)    COMMENT 'when combined with report_id/template uniquely identifies the instance',
      `args` varchar(255)    COMMENT 'arguments that are passed in the url when invoking the instance',
      `description` varchar(255)    COMMENT 'Report Instance description.',
@@ -3498,7 +3502,9 @@ CREATE TABLE `civicrm_uf_group` (
      `name` varchar(64)    COMMENT 'Name of the UF group for directly addressing it in the codebase',
      `created_id` int unsigned    COMMENT 'FK to civicrm_contact, who created this UF group',
      `created_date` datetime    COMMENT 'Date and time this UF group was created.',
-     `is_proximity_search` tinyint   DEFAULT 0 COMMENT 'Should we include proximity search feature in this profile search form?' 
+     `is_proximity_search` tinyint   DEFAULT 0 COMMENT 'Should we include proximity search feature in this profile search form?',
+     `cancel_button_text` varchar(64)   DEFAULT NULL COMMENT 'Custom Text to display on the Cancel button when used in create or edit mode',
+     `submit_button_text` varchar(64)   DEFAULT NULL COMMENT 'Custom Text to display on the submit button on profile edit/create screens' 
 ,
         PRIMARY KEY (`id`)
  
@@ -3750,7 +3756,8 @@ CREATE TABLE `civicrm_mailing` (
      `msg_template_id` int unsigned    COMMENT 'FK to the message template.',
      `override_verp` tinyint   DEFAULT 0 COMMENT 'Should we overrite VERP address in Reply-To',
      `created_id` int unsigned    COMMENT 'FK to Contact ID who first created this mailing',
-     `created_date` timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'Date and time this mailing was created.',
+     `created_date` timestamp NULL  DEFAULT NULL COMMENT 'Date and time this mailing was created.',
+     `modified_date` timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When the mailing (or closely related entity) was created or modified or deleted.',
      `scheduled_id` int unsigned    COMMENT 'FK to Contact ID who scheduled this mailing',
      `scheduled_date` timestamp NULL  DEFAULT NULL COMMENT 'Date and time this mailing was scheduled.',
      `approver_id` int unsigned    COMMENT 'FK to Contact ID who approved this mailing',
@@ -4256,7 +4263,9 @@ CREATE TABLE `civicrm_activity` (
      `campaign_id` int unsigned    COMMENT 'The campaign for which this activity has been triggered.',
      `engagement_level` int unsigned    COMMENT 'Assign a specific level of engagement to this activity. Used for tracking constituents in ladder of engagement.',
      `weight` int    ,
-     `is_star` tinyint   DEFAULT 0 COMMENT 'Activity marked as favorite.' 
+     `is_star` tinyint   DEFAULT 0 COMMENT 'Activity marked as favorite.',
+     `created_date` timestamp NULL  DEFAULT NULL COMMENT 'When was the activity was created.',
+     `modified_date` timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When was the activity (or closely related entity) was created or modified or deleted.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -4398,7 +4407,8 @@ CREATE TABLE `civicrm_price_field_value` (
      `is_default` tinyint   DEFAULT 0 COMMENT 'Is this default price field option',
      `is_active` tinyint   DEFAULT 1 COMMENT 'Is this price field value active',
      `financial_type_id` int unsigned   DEFAULT NULL COMMENT 'FK to Financial Type.',
-     `non_deductible_amount` decimal(20,2) NOT NULL  DEFAULT 0.0 COMMENT 'Portion of total amount which is NOT tax deductible.' 
+     `non_deductible_amount` decimal(20,2) NOT NULL  DEFAULT 0.0 COMMENT 'Portion of total amount which is NOT tax deductible.',
+     `visibility_id` int unsigned   DEFAULT 1 COMMENT 'Implicit FK to civicrm_option_group with name = \'visibility\'' 
 ,
         PRIMARY KEY (`id`)
  
@@ -4570,6 +4580,7 @@ CREATE TABLE `civicrm_contribution` (
      `net_amount` decimal(20,2)    COMMENT 'actual funds transfer amount. total less fees. if processor does not report actual fee during transaction, this is set to total_amount.',
      `trxn_id` varchar(255)    COMMENT 'unique transaction id. may be processor id, bank id + trans id, or account number + check number... depending on payment_method',
      `invoice_id` varchar(255)    COMMENT 'unique invoice id, system generated or passed in',
+     `invoice_number` varchar(255)    COMMENT 'Human readable invoice number',
      `currency` varchar(3)   DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.',
      `cancel_date` datetime    COMMENT 'when was gift cancelled',
      `cancel_reason` text    ,

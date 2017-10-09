@@ -226,6 +226,7 @@ class CRM_Event_Form_EventFees {
 
     // CRM-4395
     if ($contriId = $form->get('onlinePendingContributionId')) {
+      $defaults[$form->_pId]['record_contribution'] = 1;
       $contribution = new CRM_Contribute_DAO_Contribution();
       $contribution->id = $contriId;
       $contribution->find(TRUE);
@@ -447,23 +448,8 @@ SELECT  id, html_type
           $form->assign('showTransactionId', TRUE);
         }
 
-        $status = CRM_Contribute_PseudoConstant::contributionStatus();
-
-        // CRM-14417 suppressing contribution statuses that are NOT relevant to new participant registrations
-        $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-        foreach (array(
-                   'Cancelled',
-                   'Failed',
-                   'In Progress',
-                   'Overdue',
-                   'Refunded',
-                   'Pending refund',
-                 ) as $suppress) {
-          unset($status[CRM_Utils_Array::key($suppress, $statusName)]);
-        }
-
         $form->add('select', 'contribution_status_id',
-          ts('Payment Status'), $status
+          ts('Payment Status'), CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('participant')
         );
 
         $form->add('text', 'check_number', ts('Check Number'),

@@ -45,7 +45,7 @@
             {include file="CRM/Case/Form/Search/Common.tpl"}
 
             <tr>
-               <td colspan="2" class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</td>
+               <td colspan="3" class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</td>
             </tr>
             </table>
         {/strip}

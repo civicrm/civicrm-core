@@ -121,25 +121,19 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    * @return void
    */
   public function run() {
-    // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String',
-      $this, FALSE,
-      'browse'
-    );
-    if ($action & CRM_Core_Action::REVERT) {
-      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
+    $id = $this->getIdAndAction();
+
+    if ($this->_action & CRM_Core_Action::REVERT) {
       CRM_PCP_BAO_PCP::setIsActive($id, 0);
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
     }
-    elseif ($action & CRM_Core_Action::RENEW) {
-      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
+    elseif ($this->_action & CRM_Core_Action::RENEW) {
       CRM_PCP_BAO_PCP::setIsActive($id, 1);
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
     }
-    elseif ($action & CRM_Core_Action::DELETE) {
-      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
+    elseif ($this->_action & CRM_Core_Action::DELETE) {
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1&action=browse'));
       $controller = new CRM_Core_Controller_Simple('CRM_PCP_Form_PCP',
@@ -156,7 +150,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
     $this->browse();
 
     // parent run
-    parent::run();
+    CRM_Core_Page::run();
   }
 
   /**
@@ -220,7 +214,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
       }
     }
 
-    $approvedId = CRM_Core_OptionGroup::getValue('pcp_status', 'Approved', 'name');
+    $approvedId = CRM_Core_PseudoConstant::getKey('CRM_PCP_BAO_PCP', 'status_id', 'Approved');
 
     //check for delete CRM-4418
     $allowToDelete = CRM_Core_Permission::check('delete in CiviContribute');

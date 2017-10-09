@@ -32,13 +32,12 @@
   <div class="crm-clear">
     <div class="crm-summary-row">
       <div class="crm-label">{$form.gender_id.label}</div>
-      <div class="crm-content">{$form.gender_id.html}
-      </div>
+      <div class="crm-content">{$form.gender_id.html}</div>
     </div>
     <div class="crm-summary-row">
       <div class="crm-label">{$form.birth_date.label}</div>
       <div class="crm-content">
-        {include file="CRM/common/jcalendar.tpl" elementName=birth_date}
+        {$form.birth_date.html}
       </div>
     </div>
     <div class="crm-summary-row">
@@ -51,7 +50,7 @@
     <div class="crm-summary-row">
       <div class="crm-label crm-deceased-date">{$form.deceased_date.label}</div>
       <div class="crm-content crm-deceased-date">
-        {include file="CRM/common/jcalendar.tpl" elementName=deceased_date}
+        {$form.deceased_date.html}
       </div>
     </div>
 
@@ -81,7 +80,7 @@ function showDeceasedDate( ) {
   }
 }
 
-cj( function() {
+CRM.$(function($) {
   showDeceasedDate( );
 });
 </script>

@@ -342,6 +342,12 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
         }
       }
 
+      // Skip registration if event_id is NULL
+      if (empty($row['event_id'])) {
+        Civi::log()->warning('Participant record without event ID. You have invalid data in your database!');
+        continue;
+      }
+
       //carry campaign on selectors.
       $row['campaign'] = CRM_Utils_Array::value($result->participant_campaign_id, $allCampaigns);
       $row['campaign_id'] = $result->participant_campaign_id;

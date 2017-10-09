@@ -566,6 +566,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $adminFieldVisible = TRUE;
       }
 
+      $hideAdminValues = TRUE;
+      if (CRM_Core_Permission::check('edit event participants')) {
+        $hideAdminValues = FALSE;
+      }
+
       foreach ($form->_feeBlock as $field) {
         // public AND admin visibility fields are included for back-office registration and back-office change selections
         if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
@@ -583,8 +588,17 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
           //user might modified w/ hook.
           $options = CRM_Utils_Array::value('options', $field);
+          $formClasses = array('CRM_Event_Form_Participant', 'CRM_Event_Form_ParticipantFeeSelection');
+
           if (!is_array($options)) {
             continue;
+          }
+          elseif ($hideAdminValues && !in_array($className, $formClasses)) {
+            foreach ($options as $key => $currentOption) {
+              if ($currentOption['visibility_id'] == CRM_Price_BAO_PriceField::getVisibilityOptionID('admin')) {
+                unset($options[$key]);
+              }
+            }
           }
 
           $optionFullIds = CRM_Utils_Array::value('option_full_ids', $field, array());

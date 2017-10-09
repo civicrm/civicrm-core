@@ -559,7 +559,7 @@ class CRM_Core_SelectValues {
    * @return array
    */
   public static function contributionTokens() {
-    return array(
+    return array_merge(array(
       '{contribution.contribution_id}' => ts('Contribution ID'),
       '{contribution.total_amount}' => ts('Total Amount'),
       '{contribution.fee_amount}' => ts('Fee Amount'),
@@ -583,7 +583,7 @@ class CRM_Core_SelectValues {
       //'{contribution.address_id}' => ts('Address ID'),
       '{contribution.check_number}' => ts('Check Number'),
       '{contribution.campaign}' => ts('Contribution Campaign'),
-    );
+    ), CRM_Utils_Token::getCustomFieldTokens('contribution', TRUE));
   }
 
   /**

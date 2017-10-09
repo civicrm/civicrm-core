@@ -76,7 +76,7 @@
                 {/if}
               {else}
                 {if $totalTaxAmount }
-                     {ts}Total Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney} </strong><br />
+                  {ts 1=$taxTerm}Total %1 Amount{/ts}: <strong>{$totalTaxAmount|crmMoney} </strong><br />
                 {/if}
 		{if $amount}
                     {if $installments}{ts}Installment Amount{/ts}{else}{ts}Total Amount{/ts}{/if}: <strong>{$amount|crmMoney}{if $amount_level } &ndash; {$amount_level}{/if}</strong>
@@ -223,14 +223,12 @@
 {crmRegion name="contribution-confirm-billing-block"}
        {if ($credit_card_number or $bank_account_number)}
         <div class="crm-group credit_card-group">
-            <div class="header-dark">
-            {if $paymentProcessor.payment_type & 2}
-                 {ts}Direct Debit Information{/ts}
-            {else}
-                {ts}Credit Card Information{/ts}
+            {if $paymentFieldsetLabel}
+              <div class="header-dark">
+                {$paymentFieldsetLabel}
+              </div>
             {/if}
-            </div>
-            {if $paymentProcessor.payment_type & 2}
+            {if $paymentProcessor.payment_type == 2}
                 <div class="display-block">
                     {ts}Account Holder{/ts}: {$account_holder}<br />
                     {ts}Bank Account Number{/ts}: {$bank_account_number}<br />
@@ -251,7 +249,7 @@
                 <div class="crm-section no-label credit_card_details-section">
                   <div class="content">{$credit_card_type}</div>
                   <div class="content">{$credit_card_number}</div>
-                  <div class="content">{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}</div>
+                  <div class="content">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
                   <div class="clear"></div>
                 </div>
             {/if}

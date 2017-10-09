@@ -1,4 +1,5 @@
 <?php
+
 namespace CiviDrupal {
 
   use Civi\Test\EndToEndInterface;

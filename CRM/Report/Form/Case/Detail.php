@@ -250,6 +250,21 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
       ),
       'civicrm_activity_last' => array(
         'dao' => 'CRM_Activity_DAO_Activity',
+        'fields' => array(
+          'last_activity_activity_subject' => array(
+            'name' => 'subject',
+            'title' => ts('Subject of the last activity in the case'),
+          ),
+          'last_activity_activity_type' => array(
+            'name' => 'activity_type_id',
+            'title' => ts('Activity type of the last activity'),
+          ),
+          'last_activity_date_time' => array(
+            'name' => 'activity_date_time',
+            'title' => ts('Last Action Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+        ),
         'filters' => array(
           'last_activity_date_time' => array(
             'name' => 'activity_date_time',
@@ -269,6 +284,18 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           'last_completed_activity_type' => array(
             'name' => 'activity_type_id',
             'title' => ts('Activity type of the last completed activity'),
+          ),
+          'last_completed_date_time' => array(
+            'name' => 'activity_date_time',
+            'title' => ts('Last Completed Action Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+        ),
+        'filters' => array(
+          'last_completed_date_time' => array(
+            'name' => 'activity_date_time',
+            'title' => ts('Last Completed Action Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
           ),
         ),
       ),
@@ -335,6 +362,9 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
             if ($fieldName == 'sort_name') {
               $select[] = "GROUP_CONCAT({$field['dbAlias']}  ORDER BY {$field['dbAlias']} )
                                          as {$tableName}_{$fieldName}";
+            }
+            if ($tableName == 'civicrm_activity_last') {
+              $this->_activityLast = TRUE;
             }
             if ($tableName == 'civicrm_activity_last_completed') {
               $this->_activityLastCompleted = TRUE;
@@ -581,9 +611,16 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
       $this->_relField = TRUE;
     }
 
-    if (!empty($this->_params['activity_date_time_relative']) ||
-      !empty($this->_params['activity_date_time_from']) ||
-      CRM_Utils_Array::value('activity_date_time_to', $this->_params)
+    if (!empty($this->_params['last_completed_date_time_relative']) ||
+      !empty($this->_params['last_completed_date_time_from']) ||
+      CRM_Utils_Array::value('last_completed_date_time_to', $this->_params)
+    ) {
+      $this->_activityLastCompleted = TRUE;
+    }
+
+    if (!empty($this->_params['last_activity_date_time_relative']) ||
+      !empty($this->_params['last_activity_date_time_from']) ||
+      CRM_Utils_Array::value('last_activity_date_time_to', $this->_params)
     ) {
       $this->_activityLast = TRUE;
     }
@@ -658,6 +695,12 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         }
         $entryFound = TRUE;
       }
+      if (array_key_exists('civicrm_activity_last_last_activity_activity_subject', $row) &&
+        empty($row['civicrm_activity_last_last_activity_activity_subject'])
+      ) {
+        $rows[$rowNum]['civicrm_activity_last_last_activity_activity_subject'] = ts('(no subject)');
+        $entryFound = TRUE;
+      }
       if (array_key_exists('civicrm_activity_last_completed_last_completed_activity_subject', $row) &&
         empty($row['civicrm_activity_last_completed_last_completed_activity_subject'])
       ) {
@@ -673,6 +716,12 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         );
         $rows[$rowNum]['civicrm_contact_client_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_client_sort_name_hover'] = ts("View Contact Summary for this Contact");
+        $entryFound = TRUE;
+      }
+      if (array_key_exists('civicrm_activity_last_last_activity_activity_type', $row)) {
+        if ($value = $row['civicrm_activity_last_last_activity_activity_type']) {
+          $rows[$rowNum]['civicrm_activity_last_last_activity_activity_type'] = $activityTypes[$value];
+        }
         $entryFound = TRUE;
       }
       if (array_key_exists('civicrm_activity_last_completed_last_completed_activity_type', $row)) {

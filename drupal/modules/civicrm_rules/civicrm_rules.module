@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -32,13 +32,6 @@
  * $Id$
  *
  */
-
-/*
- * Implemenation of hook_enable()
- */
-function civicrm_rules_enable() {
-  db_query("UPDATE {system} SET weight = 110 WHERE name = 'civicrm_rules'");
-}
 
 /**
  * Implement the post hook and fire the corresponding rules event
@@ -60,7 +53,7 @@ function civicrm_rules_civicrm_post($op, $objectName, $objectId, &$objectRef) {
     array('contact' => 'contact')
   );
 
-  if (!in_array(strtolower($objectName), $validObjects, true)) {
+  if (!in_array(strtolower($objectName), $validObjects, TRUE)) {
     return;
   }
 
@@ -193,12 +186,12 @@ FROM   civicrm_mailing
   }
 }
 /**
- * Implementation of hook_permission().
+ * Implements hook_permission().
  */
 function civicrm_rules_permission() {
   return array(
-    'access civicrm rules settings' =>
-    array('title' => t('Access CiviCRM Rules Settings'),
+    'access civicrm rules settings' => array(
+      'title' => t('Access CiviCRM Rules Settings'),
       'description' => t('Access CiviCRM Rules Settings.'),
     ),
   );
@@ -207,8 +200,8 @@ function civicrm_rules_permission() {
 function civicrm_rules_menu() {
 
   $items['admin/config/civicrm/rules'] = array(
-    'title' => t('CiviCRM Rules settings'),
-    'description' => t('CiviCRM Rules Configuration'),
+    'title' => 'CiviCRM Rules settings',
+    'description' => 'CiviCRM Rules Configuration',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('civicrm_rules_admin_settings'),
     'access arguments' => array('access civicrm rules settings'),
@@ -217,4 +210,3 @@ function civicrm_rules_menu() {
   );
   return $items;
 }
-

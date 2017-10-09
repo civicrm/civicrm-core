@@ -21,18 +21,23 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
+
+/**
+ * CiviCRM default views
+ * @return array|null
+ */
 function civicrm_views_default_views() {
   $views = NULL;
 
   if (module_exists('date_views') && module_exists('calendar')) {
-    $view              = new view;
+    $view = new view();
     $view->name = 'civicrm_events';
     $view->description = 'Calendar of CiviCRM Events';
-    $view->tag         = 'civicrm';
-    $view->base_table  = 'civicrm_event';
+    $view->tag = 'civicrm';
+    $view->base_table = 'civicrm_event';
     $view->human_name = 'CiviCRM Events';
-    $view->core        = 7;
+    $view->core = 7;
     $view->api_version = '3.0';
     $view->disabled = TRUE;
 
@@ -575,8 +580,7 @@ function civicrm_views_default_views() {
     $handler->display->display_options['arguments']['id']['default_action'] = 'default';
     $handler->display->display_options['arguments']['id']['exception']['title'] = 'All';
     $handler->display->display_options['arguments']['id']['default_argument_type'] = 'php';
-    $handler->display->display_options['arguments']['id']['default_argument_options']['code'] =
-      '
+    $handler->display->display_options['arguments']['id']['default_argument_options']['code'] = '
         global $user;
 	civicrm_initialize( );
 	$results=civicrm_api("UFMatch","get", array (version => \'3\',\'sequential\' =>\'1\', \'uf_id\' =>$user->uid));
@@ -813,4 +817,3 @@ function civicrm_views_default_views() {
 
   return $views;
 }
-

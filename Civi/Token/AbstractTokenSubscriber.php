@@ -118,22 +118,6 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Get all custom field tokens of $entity
-   *
-   * @param string $entity
-   * @return array $customTokens
-   *   return custom field tokens in array('custom_N' => 'label') format
-   */
-  public function getCustomTokens($entity) {
-    $customTokens = array();
-    foreach (\CRM_Core_BAO_CustomField::getFields($entity) as $id => $info) {
-      $customTokens["custom_$id"] = $info['label'];
-    }
-
-    return $customTokens;
-  }
-
-  /**
    * Alter the query which prepopulates mailing data
    * for scheduled reminders.
    *

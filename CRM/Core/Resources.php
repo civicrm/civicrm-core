@@ -840,6 +840,8 @@ class CRM_Core_Resources {
       array('key' => 'country', 'value' => ts('Country'), 'entity' => 'address'),
       array('key' => 'gender_id', 'value' => ts('Gender')),
       array('key' => 'is_deceased', 'value' => ts('Deceased')),
+      array('key' => 'contact_id', 'value' => ts('Contact ID'), 'type' => 'text'),
+      array('key' => 'external_identifier', 'value' => ts('External ID'), 'type' => 'text'),
       array('key' => 'source', 'value' => ts('Contact Source'), 'type' => 'text'),
     );
 

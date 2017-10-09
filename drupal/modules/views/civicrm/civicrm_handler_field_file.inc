@@ -21,15 +21,15 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
-/*
-   / * Unchanged anonymous code contribution. No claim.
-   *
-   * civicrm_handler_field_custom_file.inc
-   * Displays File field uri instead of id.
-   *
-   */
+/**
+ * Unchanged anonymous code contribution. No claim.
+ *
+ * civicrm_handler_field_custom_file.inc
+ * Displays File field uri instead of id.
+ *
+ */
 
 /**
  * Field handler to provide acess control for the File field
@@ -37,13 +37,13 @@
  * @ingroup civicrm_field_handlers
  */
 class civicrm_handler_field_custom_file extends views_handler_field {
-  function construct() {
+  public function construct() {
     parent::construct();
     civicrm_initialize();
     $this->additional_fields['entity_id'] = 'entity_id';
   }
 
-  function render($values) {
+  public function render($values) {
     $value = $values->{$this->field_alias};
     if (!is_null($value)) {
       $path = 'civicrm/file';
@@ -59,20 +59,19 @@ class civicrm_handler_field_custom_file extends views_handler_field {
           'uri'
         );
 
-        $path = sprintf('%s/imagefile',$path);
+        $path = sprintf('%s/imagefile', $path);
       }
-        $entityField = $this->aliases['entity_id'];
-        $url = CRM_Utils_System::url($path,
-          "id={$value}&eid={$values->$entityField}",
-          TRUE, FALSE, FALSE, TRUE
-        );
-        return CRM_Utils_System::url($path,
-          "id={$value}&eid={$values->$entityField}",
-          TRUE, FALSE, FALSE, TRUE
-        );
+      $entityField = $this->aliases['entity_id'];
+      $url = CRM_Utils_System::url($path,
+        "id={$value}&eid={$values->$entityField}",
+        TRUE, FALSE, FALSE, TRUE
+      );
+      return CRM_Utils_System::url($path,
+        "id={$value}&eid={$values->$entityField}",
+        TRUE, FALSE, FALSE, TRUE
+      );
     }
     return NULL;
   }
+
 }
-
-

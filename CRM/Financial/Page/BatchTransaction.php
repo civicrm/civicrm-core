@@ -97,6 +97,7 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
     $this->assign('action', $action);
 
     self::$_entityID = CRM_Utils_Request::retrieve('bid', 'Positive');
+    $statusID = NULL;
     if (isset(self::$_entityID)) {
       $statusID = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'status_id');
     }

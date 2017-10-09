@@ -241,11 +241,24 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
     $contact = CRM_Contact_BAO_Contact::getTableName();
     $email = CRM_Core_BAO_Email::getTableName();
 
+    $selectClauses = array(
+      "$contact.display_name as display_name",
+      "$contact.id as contact_id",
+      "$email.email as email",
+      ($is_distinct) ? "MIN({$open}.time_stamp) as date" : "{$open}.time_stamp as date",
+    );
+
+    if ($is_distinct) {
+      $groupBy = " GROUP BY $queue.id ";
+      $select = CRM_Contact_BAO_Query::appendAnyValueToSelect($selectClauses, "$queue.id");
+    }
+    else {
+      $groupBy = '';
+      $select = " SELECT " . implode(', ', $selectClauses);
+    }
+
     $query = "
-            SELECT      $contact.display_name as display_name,
-                        $contact.id as contact_id,
-                        $email.email as email,
-                        $open.time_stamp as date
+            $select
             FROM        $contact
             INNER JOIN  $queue
                     ON  $queue.contact_id = $contact.id
@@ -268,9 +281,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
       $query .= " AND $contact.id = " . CRM_Utils_Type::escape($contact_id, 'Integer');
     }
 
-    if ($is_distinct) {
-      $query .= " GROUP BY $queue.id, $open.time_stamp ";
-    }
+    $query .= $groupBy;
 
     $orderBy = "sort_name ASC, {$open}.time_stamp DESC";
     if ($sort) {
@@ -289,6 +300,7 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
       //Added "||$rowCount" to avoid displaying all records on first page
       $query .= ' LIMIT ' . CRM_Utils_Type::escape($offset, 'Integer') . ', ' . CRM_Utils_Type::escape($rowCount, 'Integer');
     }
+
     $dao->query($query);
 
     $results = array();

@@ -97,7 +97,8 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
 
     foreach ($batchStatus as $batchStatusId) {
       if ($batchStatusId == $this->_exportStatusId) {
-        CRM_Core_Error::fatal(ts('You cannot exported the batches which were exported earlier.'));
+        $url = CRM_Core_Session::singleton()->readUserContext();
+        CRM_Core_Error::statusBounce(ts('You cannot export batches which have already been exported.'), $url);
       }
     }
 

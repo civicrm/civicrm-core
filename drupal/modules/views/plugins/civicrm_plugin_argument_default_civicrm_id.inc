@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
@@ -22,19 +21,21 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
-
-/**
- * @file
- * Contains a plugin to extract CiviCRM IDs from the URL.
  */
 
+/**
+ * @file Contains a plugin to extract CiviCRM IDs from the URL.
+ */
+
+/**
+ * Class civicrm_plugin_argument_default_civicrm_id
+ */
 class civicrm_plugin_argument_default_civicrm_id extends views_plugin_argument_default {
 
   /**
    * List the options relevant for this plugin.
    */
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['id_type'] = array('default' => 'Contact');
     return $options;
@@ -43,7 +44,7 @@ class civicrm_plugin_argument_default_civicrm_id extends views_plugin_argument_d
   /**
    * Provide the default form for setting options.
    */
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $form['id_type'] = array(
       '#type' => 'select',
@@ -61,7 +62,7 @@ class civicrm_plugin_argument_default_civicrm_id extends views_plugin_argument_d
   /**
    * Get the default argument.
    */
-  function get_argument() {
+  public function get_argument() {
 
     switch ($this->options['id_type']) {
 

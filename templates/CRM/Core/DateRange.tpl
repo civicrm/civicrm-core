@@ -26,6 +26,9 @@
 {*this is included inside a table row*}
 {assign var=relativeName   value=$fieldName|cat:"_relative"}
 <td colspan=2>
+  {if $label}
+   {ts}{$label}{/ts}<br />
+  {/if}
   {$form.$relativeName.html}<br />
   <span class="crm-absolute-date-range">
     <span class="crm-absolute-date-from">

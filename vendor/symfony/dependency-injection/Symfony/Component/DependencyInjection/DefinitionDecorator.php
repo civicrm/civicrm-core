@@ -78,6 +78,16 @@ class DefinitionDecorator extends Definition
 
     /**
      * {@inheritdoc}
+     */
+    public function setFactory($callable)
+    {
+        $this->changes['factory'] = true;
+
+        return parent::setFactory($callable);
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * @api
      */
@@ -158,6 +168,16 @@ class DefinitionDecorator extends Definition
         $this->changes['lazy'] = true;
 
         return parent::setLazy($boolean);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDecoratedService($id, $renamedId = null)
+    {
+        $this->changes['decorated_service'] = true;
+
+        return parent::setDecoratedService($id, $renamedId);
     }
 
     /**

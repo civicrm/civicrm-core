@@ -177,7 +177,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $this->add('text', 'icon', ts('Icon'), array('class' => 'crm-icon-picker', 'title' => ts('Choose Icon'), 'allowClear' => TRUE));
     }
 
-    if ($this->_gName == 'activity_status') {
+    if (in_array($this->_gName, array('activity_status', 'case_status'))) {
       $this->add('color', 'color', ts('Color'));
     }
 
@@ -222,17 +222,22 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       );
     }
 
-    $required = FALSE;
-    if ($this->_gName == 'custom_search') {
-      $required = TRUE;
+    if ($this->_gName == 'activity_status') {
+      $this->add('select',
+        'filter',
+        ts('Status Type'),
+        array(
+          CRM_Activity_BAO_Activity::INCOMPLETE => ts('Incomplete'),
+          CRM_Activity_BAO_Activity::COMPLETED => ts('Completed'),
+          CRM_Activity_BAO_Activity::CANCELLED => ts('Cancelled'),
+        )
+      );
     }
-    elseif ($this->_gName == 'redaction_rule' || $this->_gName == 'engagement_index') {
-      if ($this->_gName == 'redaction_rule') {
-        $this->add('checkbox',
-          'filter',
-          ts('Regular Expression?')
-        );
-      }
+    if ($this->_gName == 'redaction_rule') {
+      $this->add('checkbox',
+        'filter',
+        ts('Regular Expression?')
+      );
     }
     if ($this->_gName == 'participant_listing') {
       $this->add('text',
@@ -246,7 +251,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $this->add('wysiwyg', 'description',
         ts('Description'),
         array('rows' => 4, 'cols' => 80),
-        $required
+        $this->_gName == 'custom_search'
       );
     }
 

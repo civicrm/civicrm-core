@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Field handler to provide a human-readable CiviCRM component name
@@ -29,10 +29,9 @@
  * @ingroup civicrm_field_handlers
  */
 class civicrm_handler_field_component extends views_handler_field {
-  function render($values) {
+  public function render($values) {
     $value = $this->get_value($values);
     return CRM_Core_Component::getComponentName($value);
   }
+
 }
-
-

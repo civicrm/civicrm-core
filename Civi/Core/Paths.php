@@ -30,6 +30,7 @@ class Paths {
    * Class constructor.
    */
   public function __construct() {
+    $paths = $this;
     $this
       ->register('civicrm.root', function () {
         return \CRM_Core_Config::singleton()->userSystem->getCiviSourceStorage();
@@ -54,6 +55,24 @@ class Paths {
       })
       ->register('civicrm.files', function () {
         return \CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
+      })
+      ->register('wp.frontend.base', function () {
+        return array('url' => CIVICRM_UF_BASEURL);
+      })
+      ->register('wp.frontend', function () use ($paths) {
+        $config = \CRM_Core_Config::singleton();
+        $suffix = defined('CIVICRM_UF_WP_BASEPAGE') ? CIVICRM_UF_WP_BASEPAGE : $config->wpBasePage;
+        return array(
+          'url' => $paths->getVariable('wp.frontend.base', 'url') . $suffix,
+        );
+      })
+      ->register('wp.backend.base', function () {
+        return array('url' => CIVICRM_UF_BASEURL . 'wp-admin/');
+      })
+      ->register('wp.backend', function () use ($paths) {
+        return array(
+          'url' => $paths->getVariable('wp.backend.base', 'url') . 'admin.php',
+        );
       })
       ->register('cms', function () {
         return array(

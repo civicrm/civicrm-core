@@ -207,10 +207,11 @@ abstract class CRM_Utils_Hook {
       $this->commonIncluded = TRUE;
 
       $config = CRM_Core_Config::singleton();
-      if (!empty($config->customPHPPathDir) &&
-        file_exists("{$config->customPHPPathDir}/civicrmHooks.php")
-      ) {
-        @include_once "civicrmHooks.php";
+      if (!empty($config->customPHPPathDir)) {
+        $civicrmHooksFile = CRM_Utils_File::addTrailingSlash($config->customPHPPathDir) . 'civicrmHooks.php';
+        if (file_exists($civicrmHooksFile)) {
+          @include_once $civicrmHooksFile;
+        }
       }
 
       if (!empty($fnPrefix)) {
@@ -2132,11 +2133,12 @@ abstract class CRM_Utils_Hook {
    *
    * @code
    * function example_civicrm_alterAngular($angular) {
-   *   $angular->add(ChangeSet::create('mychanges')
+   *   $changeSet = \Civi\Angular\ChangeSet::create('mychanges')
    *     ->alterHtml('~/crmMailing/EditMailingCtrl/2step.html', function(phpQueryObject $doc) {
    *       $doc->find('[ng-form="crmMailingSubform"]')->attr('cat-stevens', 'ts(\'wild world\')');
    *     })
    *   );
+   *   $angular->add($changeSet);
    * }
    * @endCode
    */

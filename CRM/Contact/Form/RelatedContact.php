@@ -55,6 +55,13 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
   public $_contactId;
 
   /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {

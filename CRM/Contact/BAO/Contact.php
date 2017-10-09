@@ -151,16 +151,11 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       $params['source'] = $params['contact_source'];
     }
 
-    // Fix for preferred communication method.
-    $prefComm = CRM_Utils_Array::value('preferred_communication_method', $params, '');
-    if ($prefComm && is_array($prefComm)) {
+    if (isset($params['preferred_communication_method']) && is_array($params['preferred_communication_method'])) {
+      CRM_Utils_Array::formatArrayKeys($params['preferred_communication_method']);
+      $contact->preferred_communication_method = CRM_Utils_Array::implodePadded($params['preferred_communication_method']);
       unset($params['preferred_communication_method']);
-
-      CRM_Utils_Array::formatArrayKeys($prefComm);
-      $prefComm = CRM_Utils_Array::implodePadded($prefComm);
     }
-
-    $contact->preferred_communication_method = $prefComm;
 
     $allNull = $contact->copyValues($params);
 
@@ -356,9 +351,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     //add website
     CRM_Core_BAO_Website::create($params['website'], $contact->id, $skipDelete);
 
-    //get userID from session
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
+    $userID = CRM_Core_Session::singleton()->get('userID');
     // add notes
     if (!empty($params['note'])) {
       if (is_array($params['note'])) {
@@ -432,13 +425,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       'name'
     );
 
-    if (!$config->doNotResetCache) {
-      // Note: doNotResetCache flag is currently set by import contact process and merging,
-      // since resetting and
-      // rebuilding cache could be expensive (for many contacts). We might come out with better
-      // approach in future.
-      CRM_Contact_BAO_Contact_Utils::clearContactCaches($contact->id);
-    }
+    CRM_Contact_BAO_Contact_Utils::clearContactCaches();
 
     if ($invokeHooks) {
       if ($isEdit) {
@@ -2651,10 +2638,9 @@ AND       civicrm_openid.is_primary = 1";
       $contactDefaults = $defaultGreetings[$contact->contact_type];
     }
 
-    // note that contact object not always has required greeting related
-    // fields that are required to calculate greeting and
-    // also other fields used in tokens etc,
-    // hence we need to retrieve it again.
+    // The contact object has not always required the
+    // fields that are required to calculate greetings
+    // so we need to retrieve it again.
     if ($contact->_query !== FALSE) {
       $contact->find(TRUE);
     }
@@ -3284,51 +3270,6 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
   }
 
   /**
-   * Generate triggers to update the timestamp.
-   *
-   * The corresponding civicrm_contact row is updated on insert/update/delete
-   * to a table that extends civicrm_contact.
-   * Don't regenerate triggers for all such tables if only asked for one table.
-   *
-   * @param array $info
-   *   Reference to the array where generated trigger information is being stored
-   * @param string|null $reqTableName
-   *   Name of the table for which triggers are being generated, or NULL if all tables
-   * @param array $relatedTableNames
-   *   Array of all core or all custom table names extending civicrm_contact
-   * @param string $contactRefColumn
-   *   'contact_id' if processing core tables, 'entity_id' if processing custom tables
-   *
-   * @link https://issues.civicrm.org/jira/browse/CRM-15602
-   * @see triggerInfo
-   */
-  public static function generateTimestampTriggers(&$info, $reqTableName, $relatedTableNames, $contactRefColumn) {
-    // Safety
-    $contactRefColumn = CRM_Core_DAO::escapeString($contactRefColumn);
-    // If specific related table requested, just process that one
-    if (in_array($reqTableName, $relatedTableNames)) {
-      $relatedTableNames = array($reqTableName);
-    }
-
-    // If no specific table requested (include all related tables),
-    // or a specific related table requested (as matched above)
-    if (empty($reqTableName) || in_array($reqTableName, $relatedTableNames)) {
-      $info[] = array(
-        'table' => $relatedTableNames,
-        'when' => 'AFTER',
-        'event' => array('INSERT', 'UPDATE'),
-        'sql' => "\nUPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.$contactRefColumn;\n",
-      );
-      $info[] = array(
-        'table' => $relatedTableNames,
-        'when' => 'AFTER',
-        'event' => array('DELETE'),
-        'sql' => "\nUPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = OLD.$contactRefColumn;\n",
-      );
-    }
-  }
-
-  /**
    * Get a list of triggers for the contact table.
    *
    * @see hook_civicrm_triggerInfo
@@ -3349,37 +3290,17 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
       }
     }
 
-    // Update timestamp for civicrm_contact itself
-    if ($tableName == NULL || $tableName == self::getTableName()) {
-      $info[] = array(
-        'table' => array(self::getTableName()),
-        'when' => 'BEFORE',
-        'event' => array('INSERT'),
-        'sql' => "\nSET NEW.created_date = CURRENT_TIMESTAMP;\n",
-      );
-    }
-
-    // Update timestamp when modifying closely related core tables
-    $relatedTables = array(
-      'civicrm_address',
-      'civicrm_email',
-      'civicrm_im',
-      'civicrm_phone',
-      'civicrm_website',
-    );
-    self::generateTimestampTriggers($info, $tableName, $relatedTables, 'contact_id');
-
-    // Update timestamp when modifying related custom-data tables
-    $customGroupTables = array();
-    $customGroupDAO = CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity('Contact');
-    $customGroupDAO->is_multiple = 0;
-    $customGroupDAO->find();
-    while ($customGroupDAO->fetch()) {
-      $customGroupTables[] = $customGroupDAO->table_name;
-    }
-    if (!empty($customGroupTables)) {
-      self::generateTimestampTriggers($info, $tableName, $customGroupTables, 'entity_id');
-    }
+    // Modifications to these records should update the contact timestamps.
+    \Civi\Core\SqlTrigger\TimestampTriggers::create('civicrm_contact', 'Contact')
+      ->setRelations(array(
+          array('table' => 'civicrm_address', 'column' => 'contact_id'),
+          array('table' => 'civicrm_email', 'column' => 'contact_id'),
+          array('table' => 'civicrm_im', 'column' => 'contact_id'),
+          array('table' => 'civicrm_phone', 'column' => 'contact_id'),
+          array('table' => 'civicrm_website', 'column' => 'contact_id'),
+        )
+      )
+      ->alterTriggerInfo($info, $tableName);
 
     // Update phone table to populate phone_numeric field
     if (!$tableName || $tableName == 'civicrm_phone') {
@@ -3585,6 +3506,25 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
       return NULL;
     }
     return $ids[0];
+  }
+
+  /**
+   * Check if a field is associated with an entity that has a location type.
+   *
+   * (ie. is an address, phone, email etc field).
+   *
+   * @param string $fieldTitle
+   *   Title of the field (not the name - create a new function for that if required).
+   *
+   * @return bool
+   */
+  public static function isFieldHasLocationType($fieldTitle) {
+    foreach (CRM_Contact_BAO_Contact::importableFields() as $key => $field) {
+      if ($field['title'] === $fieldTitle) {
+        return CRM_Utils_Array::value('hasLocationType', $field);
+      }
+    }
+    return FALSE;
   }
 
 }

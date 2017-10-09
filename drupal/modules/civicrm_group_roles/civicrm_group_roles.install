@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 // $Id: civicrm_group_roles.module,v 1.1.4.2 2008/10/14 00:20:36 matt2000 Exp $
 
@@ -31,23 +31,23 @@
  */
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function civicrm_group_roles_install() {
-
-  $here = l(t('here'), 'admin/config/civicrm/civicrm_group_roles/add_rule');
-  drupal_set_message(t('CiviGroup Roles Sync installed. You will need to specify sync rules !1.', array('!1' => $here)));
+  $t = get_t();
+  $here = l($t('here'), 'admin/config/civicrm/civicrm_group_roles/add_rule');
+  drupal_set_message($t('CiviGroup Roles Sync installed. You will need to specify sync rules !1.', array('!1' => $here)));
 }
 
 /**
- * Implementation of hook_enable().
+ * Implements hook_enable().
  */
 function civicrm_group_roles_enable() {
   db_query("UPDATE {system} SET weight = 110 WHERE name = 'civicrm_group_roles'");
 }
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function civicrm_group_roles_schema() {
   $schema['civicrm_group_roles_rules'] = array(
@@ -74,13 +74,8 @@ function civicrm_group_roles_schema() {
 }
 
 /**
- * Implementation of hook_uninstall().
- */
-function civicrm_group_roles_uninstall() {}
-
-/**
  * Update CiviGroup Roles Sync module weight to be greater than CiviCRM's.
  */
 function civicrm_group_roles_update_7400(&$sandbox) {
-    db_query("UPDATE {system} SET weight = 101 WHERE name = 'civicrm_group_roles'");
+  db_query("UPDATE {system} SET weight = 101 WHERE name = 'civicrm_group_roles'");
 }

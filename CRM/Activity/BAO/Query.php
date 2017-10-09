@@ -75,12 +75,10 @@ class CRM_Activity_BAO_Query {
     }
 
     if (!empty($query->_returnProperties['activity_status_id'])) {
-      $query->_select['activity_status_id'] = 'activity_status.value as activity_status_id';
+      $query->_select['activity_status_id'] = 'civicrm_activity.status_id as activity_status_id';
       $query->_element['activity_status_id'] = 1;
       $query->_tables['civicrm_activity'] = 1;
-      $query->_tables['activity_status'] = 1;
       $query->_whereTables['civicrm_activity'] = 1;
-      $query->_whereTables['activity_status'] = 1;
     }
 
     if (!empty($query->_returnProperties['activity_status'])) {
@@ -249,7 +247,7 @@ class CRM_Activity_BAO_Query {
 
       case 'activity_role':
         CRM_Contact_BAO_Query::$_activityRole = $values[2];
-        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+        $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
         $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
         $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -401,7 +399,7 @@ class CRM_Activity_BAO_Query {
         break;
 
       case 'source_contact':
-        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+        $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
         $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $from = "
         LEFT JOIN civicrm_activity_contact ac
@@ -573,6 +571,33 @@ class CRM_Activity_BAO_Query {
         }
       }
     }
+
+    return $properties;
+  }
+
+  /**
+   * Get the list of fields required to populate the selector.
+   *
+   * The default return properties array returns far too many fields for 'everyday use. Every field you add to this array
+   * kills a small kitten so add carefully.
+   */
+  public static function selectorReturnProperties() {
+    $properties = array(
+      'activity_id' => 1,
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'sort_name' => 1,
+      'display_name' => 1,
+      'activity_type_id' => 1,
+      'activity_subject' => 1,
+      'activity_date_time' => 1,
+      'activity_status_id' => 1,
+      'source_contact' => 1,
+      'source_record_id' => 1,
+      'activity_is_test' => 1,
+      'activity_campaign_id' => 1,
+      'activity_engagement_level' => 1,
+    );
 
     return $properties;
   }

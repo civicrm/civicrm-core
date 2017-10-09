@@ -40,6 +40,10 @@ abstract class AbstractFrameReflower
      */
     protected $_min_max_cache;
 
+    /**
+     * AbstractFrameReflower constructor.
+     * @param Frame $frame
+     */
     function __construct(Frame $frame)
     {
         $this->_frame = $frame;
@@ -68,7 +72,8 @@ abstract class AbstractFrameReflower
         $cb = $frame->get_containing_block();
         $style = $frame->get_style();
 
-        if (!$frame->is_in_flow()) {
+        // Margins of float/absolutely positioned/inline-block elements do not collapse.
+        if (!$frame->is_in_flow() || $frame->is_inline_block()) {
             return;
         }
 
@@ -103,45 +108,76 @@ abstract class AbstractFrameReflower
 
         if ($n) {
             $n_style = $n->get_style();
-            $b = max($b, $n_style->length_in_pt($n_style->margin_top, $cb["h"]));
+            $b = max($b, (float)$n_style->length_in_pt($n_style->margin_top, $cb["h"]));
             $n_style->margin_top = "0pt";
             $style->margin_bottom = $b . "pt";
         }
 
-        // Collapse our first child's margin
-        /*$f = $this->_frame->get_first_child();
-        if ( $f && !$f->is_block() ) {
-          while ( $f = $f->get_next_sibling() ) {
-            if ( $f->is_block() ) {
-              break;
+        // Collapse our first child's margin, if there is no border or padding
+        if ($style->get_border_top_width() == 0 && $style->length_in_pt($style->padding_top) == 0) {
+            $f = $this->_frame->get_first_child();
+            if ( $f && !$f->is_block() ) {
+                while ( $f = $f->get_next_sibling() ) {
+                    if ( $f->is_block() ) {
+                        break;
+                    }
+
+                    if ( !$f->get_first_child() ) {
+                        $f = null;
+                        break;
+                    }
+                }
             }
 
-            if ( !$f->get_first_child() ) {
-              $f = null;
-              break;
+            // Margin are collapsed only between block elements
+            if ($f) {
+                $f_style = $f->get_style();
+                $t = max($t, (float)$f_style->length_in_pt($f_style->margin_top, $cb["h"]));
+                $style->margin_top = $t."pt";
+                $f_style->margin_top = "0pt";
             }
-          }
         }
 
-        // Margin are collapsed only between block elements
-        if ( $f ) {
-          $f_style = $f->get_style();
-          $t = max($t, $f_style->length_in_pt($f_style->margin_top, $cb["h"]));
-          $style->margin_top = $t."pt";
-          $f_style->margin_bottom = "0pt";
-        }*/
+        // Collapse our last child's margin, if there is no border or padding
+        if ($style->get_border_bottom_width() == 0 && $style->length_in_pt($style->padding_bottom) == 0) {
+            $l = $this->_frame->get_last_child();
+            if ($l && !$l->is_block()) {
+                while ( $l = $l->get_prev_sibling() ) {
+                    if ( $l->is_block() ) {
+                        break;
+                    }
+
+                    if ( !$l->get_last_child() ) {
+                        $l = null;
+                        break;
+                    }
+                }
+            }
+
+            // Margin are collapsed only between block elements
+            if ($l) {
+                $l_style = $l->get_style();
+                $b = max($b, (float)$l_style->length_in_pt($l_style->margin_bottom, $cb["h"]));
+                $style->margin_bottom = $b."pt";
+                $l_style->margin_bottom = "0pt";
+            }
+        }
     }
 
-    //........................................................................
-
+    /**
+     * @param Block|null $block
+     * @return mixed
+     */
     abstract function reflow(Block $block = null);
 
-    //........................................................................
-
-    // Required for table layout: Returns an array(0 => min, 1 => max, "min"
-    // => min, "max" => max) of the minimum and maximum widths of this frame.
-    // This provides a basic implementation.  Child classes should override
-    // this if necessary.
+    /**
+     * Required for table layout: Returns an array(0 => min, 1 => max, "min"
+     * => min, "max" => max) of the minimum and maximum widths of this frame.
+     * This provides a basic implementation.  Child classes should override
+     * this if necessary.
+     *
+     * @return array|null
+     */
     function get_min_max_width()
     {
         if (!is_null($this->_min_max_cache)) {
@@ -159,7 +195,7 @@ abstract class AbstractFrameReflower
             $style->margin_right);
 
         $cb_w = $this->_frame->get_containing_block("w");
-        $delta = $style->length_in_pt($dims, $cb_w);
+        $delta = (float)$style->length_in_pt($dims, $cb_w);
 
         // Handle degenerate case
         if (!$this->_frame->get_first_child()) {
@@ -182,7 +218,6 @@ abstract class AbstractFrameReflower
 
             // Add all adjacent inline widths together to calculate max width
             while ($iter->valid() && in_array($iter->current()->get_style()->display, Style::$INLINE_TYPES)) {
-
                 $child = $iter->current();
 
                 $minmax = $child->get_min_max_width();
@@ -195,7 +230,6 @@ abstract class AbstractFrameReflower
 
                 $inline_max += $minmax["max"];
                 $iter->next();
-
             }
 
             if ($inline_max > 0) $high[] = $inline_max;
@@ -205,7 +239,6 @@ abstract class AbstractFrameReflower
                 list($low[], $high[]) = $iter->current()->get_min_max_width();
                 continue;
             }
-
         }
         $min = count($low) ? max($low) : 0;
         $max = count($high) ? max($high) : 0;
@@ -214,9 +247,13 @@ abstract class AbstractFrameReflower
         // content.  If the width is a percentage ignore it for now.
         $width = $style->width;
         if ($width !== "auto" && !Helpers::is_percent($width)) {
-            $width = $style->length_in_pt($width, $cb_w);
-            if ($min < $width) $min = $width;
-            if ($max < $width) $max = $width;
+            $width = (float)$style->length_in_pt($width, $cb_w);
+            if ($min < $width) {
+                $min = $width;
+            }
+            if ($max < $width) {
+                $max = $width;
+            }
         }
 
         $min += $delta;
@@ -257,7 +294,6 @@ abstract class AbstractFrameReflower
      */
     protected function _parse_quotes()
     {
-
         // Matches quote types
         $re = '/(\'[^\']*\')|(\"[^\"]*\")/';
 
@@ -287,7 +323,6 @@ abstract class AbstractFrameReflower
      */
     protected function _parse_content()
     {
-
         // Matches generated content
         $re = "/\n" .
             "\s(counters?\\([^)]*\\))|\n" .
@@ -310,7 +345,6 @@ abstract class AbstractFrameReflower
         $text = "";
 
         foreach ($matches as $match) {
-
             if (isset($match[2]) && $match[2] !== "") {
                 $match[1] = $match[2];
             }
@@ -324,7 +358,6 @@ abstract class AbstractFrameReflower
             }
 
             if (isset($match[1]) && $match[1] !== "") {
-
                 // counters?(...)
                 $match[1] = mb_strtolower(trim($match[1]));
 
@@ -371,10 +404,8 @@ abstract class AbstractFrameReflower
                             array_unshift($tmp, $p->counter_value($counter_id, $type));
                         }
                         $p = $p->lookup_counter_frame($counter_id);
-
                     }
                     $text .= implode($string, $tmp);
-
                 } else {
                     // countertops?
                     continue;
@@ -397,7 +428,6 @@ abstract class AbstractFrameReflower
                 } else if ($match[7] === "no-close-quote") {
                     // FIXME:
                 } else if (mb_strpos($match[7], "attr(") === 0) {
-
                     $i = mb_strpos($match[7], ")");
                     if ($i === false) {
                         continue;
@@ -436,12 +466,12 @@ abstract class AbstractFrameReflower
             $frame->increment_counters($increment);
         }
 
-        if ($style->content && !$frame->get_first_child() && $frame->get_node()->nodeName === "dompdf_generated") {
+        if ($style->content && $frame->get_node()->nodeName === "dompdf_generated") {
             $content = $this->_parse_content();
             // add generated content to the font subset
             // FIXME: This is currently too late because the font subset has already been generated.
             //        See notes in issue #750.
-            if ($frame->get_dompdf()->get_option("enable_font_subsetting") && $frame->get_dompdf()->get_canvas() instanceof CPDF) {
+            if ($frame->get_dompdf()->getOptions()->getIsFontSubsettingEnabled() && $frame->get_dompdf()->get_canvas() instanceof CPDF) {
                 $frame->get_dompdf()->get_canvas()->register_string_subset($style->font_family, $content);
             }
 
@@ -456,5 +486,15 @@ abstract class AbstractFrameReflower
             Factory::decorate_frame($new_frame, $frame->get_dompdf(), $frame->get_root());
             $frame->append_child($new_frame);
         }
+    }
+
+    /**
+     * Determine current frame width based on contents
+     *
+     * @return float
+     */
+    public function calculate_auto_width()
+    {
+        return $this->_frame->get_margin_width();
     }
 }

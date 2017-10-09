@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Implementation of hook_drush_command().
+ * Implements hook_drush_command().
  *
  * In this hook, you specify which commands your
  * drush module makes available, what it does and
@@ -12,16 +12,13 @@
  *
  * @See drush_parse_command() for a list of recognized keys.
  *
- * @return
- *   An associative array describing your command(s).
  */
 function civicrm_member_roles_drush_command() {
   $items = array();
   // the key in the $items array is the name of the command.
   $items['civicrm-member-role-sync'] = array(
     'description' => 'Run CiviCRM Member Role Sync',
-    'examples' =>
-    array(
+    'examples' => array(
       'drush civicrm-member-role-sync --uid=8',
       'drush civicrm-member-role-sync --contact_id=89',
     ),

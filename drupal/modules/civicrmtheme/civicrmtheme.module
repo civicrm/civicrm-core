@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -53,7 +53,7 @@ function civicrmtheme_list_themes() {
 }
 
 /**
- * Implementation of hook_form_alter().
+ * Implements hook_form_alter().
  */
 function civicrmtheme_form_system_themes_admin_form_alter(&$form, $form_state) {
   // Define a fieldset for civicrm theme setting section
@@ -98,7 +98,7 @@ function civicrmtheme_system_themes_admin_form_submit($form, &$form_state) {
 }
 
 /**
- * Implementation of hook_custom_theme().
+ * Implements hook_custom_theme().
  */
 function civicrmtheme_custom_theme() {
   if (arg(0) != 'civicrm') {
@@ -135,4 +135,3 @@ function civicrmtheme_custom_theme() {
     return $admin_theme;
   }
 }
-

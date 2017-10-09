@@ -23,8 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="crm-demographic-content" {if $permission EQ 'edit'} class="crm-inline-edit" data-edit-params='{ldelim}"cid": "{$contactId}", "class_name": "CRM_Contact_Form_Inline_Demographics"{rdelim}'{/if}>
-  <div class="crm-clear" {if $permission EQ 'edit'}title="{ts}Edit demographics{/ts}"{/if}>
+<div id="crm-demographic-content" {if $permission EQ 'edit'} class="crm-inline-edit" data-dependent-fields='["#crm-contactname-content"]' data-edit-params='{ldelim}"cid": "{$contactId}", "class_name": "CRM_Contact_Form_Inline_Demographics"{rdelim}'{/if}>
+  <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts}Edit demographics{/ts}"{/if}>
     {if $permission EQ 'edit'}
     <div class="crm-edit-help">
       <span class="crm-i fa-pencil"></span> {ts}Edit demographics{/ts}
@@ -34,14 +34,12 @@
       <div class="crm-label">{ts}Gender{/ts}</div>
       <div class="crm-content crm-contact-gender_display">{$gender_display}</div>
     </div>
+
     <div class="crm-summary-row">
-      <div class="crm-label">{ts}Date of birth{/ts}</div>
+      <div class="crm-label">{ts}Date of Birth{/ts}</div>
       <div class="crm-content crm-contact-birth_date_display">
-          {if $birthDateViewFormat}
-            {$birth_date_display|crmDate:$birthDateViewFormat}
-          {else}
-            {$birth_date_display|crmDate}
-          {/if}
+         {assign var="date_format" value = $fields.birth_date.smarty_view_format}
+         {$birth_date|crmDate:$date_format}
           &nbsp;
       </div>
     </div>
@@ -50,11 +48,7 @@
           <div class="crm-summary-row">
             <div class="crm-label">{ts}Date Deceased{/ts}</div>
             <div class="crm-content crm-contact-deceased_date_display">
-            {if $birthDateViewFormat}
-              {$deceased_date_display|crmDate:$birthDateViewFormat}
-            {else}
-              {$deceased_date_display|crmDate}
-             {/if}
+              {$deceased_date}
             </div>
           </div>
         {else}

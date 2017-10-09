@@ -1,0 +1,92 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+ */
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2017
+ * $Id$
+ *
+ */
+
+/**
+ * Implemenation of hook_enable.  Use to synchronise with pre-existing groups
+ */
+function civicrm_og_sync_enable() {
+  db_query("UPDATE {system} SET weight = 110 WHERE name = 'civicrm_og_sync'");
+
+  if (!civicrm_initialize()) {
+    return;
+  }
+
+  if (function_exists('og_get_group_ids')) {
+    $ogGroupIds = og_get_group_ids('node');
+  }
+  else {
+    $ogGroupIds = og_get_all_group('node');
+  }
+
+  // FIX ME
+  $subscribers = array();
+  // $subscribers = og_get_group_ids('user');
+
+  foreach ($ogGroupIds as $nid => $gid) {
+    $node = node_load($gid);
+    $title = trim($node->title);
+    // length of 49 so that the admin group can fit ': administrator' afterwards within 64 char field
+    $params = array(
+      'name' => substr(trim($title), 0, 49),
+      'title' => $title,
+      'is_active' => 1,
+      'og_id' => $gid,
+    );
+
+    _civicrm_og_sync_skip_process_request(TRUE);
+
+    // add the group
+    require_once 'CRM/Bridge/OG/Drupal.php';
+    CRM_Bridge_OG_Drupal::nodeapi($params, 'add');
+
+    // add the subscribers
+    foreach ($subscribers as $uid) {
+      $is_admin = FALSE;
+      if ($uid == $node->uid) {
+        $is_admin = TRUE;
+      }
+
+      $addToGroupParams = array(
+        'og_id' => $gid,
+        'uf_id' => $uid,
+        'is_active' => 1,
+        'is_admin' => $is_admin,
+      );
+
+      // add contact in group
+      CRM_Bridge_OG_Drupal::og($addToGroupParams, 'add');
+    }
+  }
+}

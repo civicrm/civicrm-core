@@ -22,14 +22,14 @@ class calendar_plugin_row_civicrm extends calendar_plugin_row {
   // Basic properties that let the row style follow relationships.
   var $base_table = '';
   var $base_field = 'id';
-  function construct() {
+  public function construct() {
     parent::construct();
     if (!civicrm_initialize()) {
       return;
     }
     $this->base_table = $this->definition['base'][0];
   }
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['date_fields'] = array('default' => array());
     $options['calendar_date_link'] = array('default' => '');
@@ -45,7 +45,7 @@ class calendar_plugin_row_civicrm extends calendar_plugin_row {
   /**
    * Provide a form for setting options.
    */
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
     $form['markup']['#markup'] = t("The calendar row plugin will format view results as calendar items. Make sure this display has a 'Calendar' format and uses a 'Date' contextual filter, or this plugin will not work correctly.");
@@ -65,9 +65,9 @@ class calendar_plugin_row_civicrm extends calendar_plugin_row {
       '#type' => 'value',
       '#value' => '',
     );
-    }
+  }
 
-  function pre_render($values) {
+  public function pre_render($values) {
 
     $ids = array();
     foreach ($values as $row) {
@@ -81,7 +81,7 @@ class calendar_plugin_row_civicrm extends calendar_plugin_row {
     // Sadly neither DAO nor API allows you to load multiple at once eg node_load_multiple()
     foreach ($ids as $key => $id) {
       require_once str_replace('_', DIRECTORY_SEPARATOR, $this->definition['dao class']) . '.php';
-      $dao = New $this->definition['dao class'];
+      $dao = New $this->definition['dao class']();
       $dao->id = $id;
       $dao->find();
       $dao->fetch();
@@ -91,7 +91,6 @@ class calendar_plugin_row_civicrm extends calendar_plugin_row {
       }
       $dao->release();
     }
-
 
     // Identify the date argument and fields that apply to this view.
     // Preload the Date Views field info for each field, keyed by the
@@ -122,7 +121,7 @@ class calendar_plugin_row_civicrm extends calendar_plugin_row {
     }
   }
 
-  function render($row) {
+  public function render($row) {
     global $base_url;
     $date_info = $this->date_argument->view->date_info;
     $id = $row->{$this->field_alias};
@@ -222,5 +221,5 @@ class calendar_plugin_row_civicrm extends calendar_plugin_row {
     }
     return $rows;
   }
-}
 
+}

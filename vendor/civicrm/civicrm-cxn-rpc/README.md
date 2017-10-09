@@ -11,7 +11,7 @@ parties:
    called `SaveTheWhales.org`.
  * "Applications" are online properties with value-added services. They
    supplement the sites.  There are only a few applications, and they must
-   certified to go live.  In the tests and comments, we will refer to an
+   be certified to go live.  In the tests and comments, we will refer to an
    example service called `AddressCleanup.com`.
  * An arbiter ("Directory Service" and "Certificate Authority") which
    publishes and certifies a list of available applications. In the
@@ -24,37 +24,58 @@ certifying the application's public-key) and revocation (by revoking the
 application's public-key) but cannot participate in any other
 data-exchanges.
 
+Test suite
+----------
+
+The test suite for `civicrm-cxn-rpc` is implemented in PHPUnit. It is
+generallly executed with PHPUnit 4, e.g.
+
+```
+git clone https://github.com/civicrm/civicrm-cxn-rpc
+cd civicrm-cxn-rpc
+composer install
+phpunit4
+```
+
 Protocol v0.2
 -------------
 
-There are three substantive messages which may be exchanged:
+CiviConnect Protocol v0.2 defines the major use-cases and message-exchanges among sites, applications, and arbiters. The use-cases are:
 
- * [AppMetasMessage](src/Message/AppMetasMessage.php) (`cxn.civicrm.org` => `SaveTheWhales.org`)
-   * Use case: A CiviCRM site connects to `cxn.civicrm.org` and requests a list of available applications.
-   * Payload: The list of applications includes the title, description, registration URL, and X.509 certificate for each.
-   * Crypto: The payload and ttl are signed by `cxn.civicrm.org` (RSA, 2048-bit key) and transferred in plaintext.
- * [RegistrationMessage](src/Message/RegistrationMessage.php) (`SaveTheWhales.org` => `AddressCleanup.com`)
-   * Use case: A CiviCRM site registers with an application.
-   * Payload: The registration includes a unique identifer for the connection, a shared secret, and a callback URL. (More discussion below.)
+ *  _Registration Use-Case_: A site (`SaveTheWhales.org`) creates a new connection to an application (`AddressCleanup.com`) by POSTing a `RegistrationMessage`. `AddressCleanup.com` responds with a `StdMessage`.
+ * _CiviCRM API Use-Case_: An application (`AddressCleanup.com`) reads or writes records on a CiviCRM site (`SaveTheWhales.org`) by POSTing a `StdMessage`. `SaveTheWhales.org` responds with a `StdMessage`.
+  * _Service Discovery Use-Case_: A site (`SaveTheWhales.org`) gets a list of available applications by sending a basic HTTP GET request to the arbiter's directory service (`https://cxn.civicrm.org/cxn/apps`). The arbiter responds with an `AppMetasMessage`.
+
+The most important message types are:
+
+ * [`RegistrationMessage`](src/Message/RegistrationMessage.php) (`SaveTheWhales.org` => `AddressCleanup.com`)
+   * _Use-Case_: Registration Use-Case
+   * _Payload_: The registration includes a unique identifer for the connection, a shared secret, and a callback URL. (More discussion below.)
    * Crypto: A temporary secret is generated and encrypted with the application's public key (RSA-2048). The payload is encrypted (AES-CBC), dated (ttl), and signed (HMAC-SHA256) using the secret. (See also: [AesHelper](src/AesHelper.php), StdMessage)
    * Note: The registration *request* uses RegistrationMessage, but the *acknowledgement* uses StdMessage.
- * [StdMessage](src/Message/StdMessage.php) (`AddressCleanup.com` => `SaveTheWhales.org`)
-   * Use case: Any other secure message exchange between site and application.
-   * Use case (typical): An application sends an API call to a site. The site returns a response.
-   * Payload (typical): An entity+action+params tuple (as in Civi APIv3).
-   * Crypto: The shared-secret is used to generate an AES encryption key and HMAC signing key. The payload and ttl are encrypted with AES-CBC (256-bit), and the ciphertext is signed with HMAC-SHA256. (See also: [AesHelper](src/AesHelper.php)) The same scheme is used for requests and responses.
-      * For *requests*, the application's latest cert is transmitted and validated to ensure that the application is still trusted by the arbiter.
+ * [`StdMessage`](src/Message/StdMessage.php) (`AddressCleanup.com` => `SaveTheWhales.org`)
+   * _Use-Case_: Registration Use-Case, CiviCRM API Use-Case
+   * _Payload_: Varies
+   * _Payload (CiviCRM API Request)_: An entity+action+params tuple (as in Civi APIv3).
+   * _Crypto_: The shared-secret is used to generate an AES encryption key and HMAC signing key. The payload and ttl are encrypted with AES-CBC (256-bit), and the ciphertext is signed with HMAC-SHA256. (See also: [AesHelper](src/AesHelper.php)) The same scheme is used for requests and responses.
+    * _Note_: When an application POSTs a `StdMessage`, it includes a copy of the latest cert. It is validated by the recipient to ensure that the application is still trusted by the arbiter.
+ * [`AppMetasMessage`](src/Message/AppMetasMessage.php) (`cxn.civicrm.org` => `SaveTheWhales.org`)
+   * _Use-Case_: Service Discovery Use-Case
+   * _Payload_: The list of applications includes the title, description, registration URL, and X.509 certificate for each.
+   * _Crypto_: The payload and ttl are signed by `cxn.civicrm.org` (RSA, 2048-bit key) and transferred in plaintext.
 
 Additionally, there are two non-substantive message types. They should *not* be used for major activity but may assist in advisory error-reports:
 
- * [InsecureMessage](src/Message/InsecureMessage.php)
-   * Use case: A server (RegistrationServer or ApiServer) receives an incoming message but cannot authenticate or decrypt it. The server responds with a NACK using InsecureMessage.
-   * Payload: An error message.
-   * Crypto: Unencrypted and unsigned.
- * [GarbledMessage](src/Message/GarbledMessage.php)
-   * Use case: A client (RegistrationClient or ApiClient) receives a response but cannot decode it. (Ex: The server was buggy or badly configured, and PHP error messages were dumped into the ciphertext.)
-   * Payload: Unknown
-   * Crypto: Unknown
+ * [`InsecureMessage`](src/Message/InsecureMessage.php)
+   * _Use-Case_: A server (`RegistrationServer` or `ApiServer`) receives an incoming message but cannot authenticate or decrypt it. The server must respond with a NACK, but it lacks sufficient information to securely communicate it. It sends an `InsecureMessage`.
+   * _Payload_: An error message.
+   * _Crypto_: Unencrypted and unsigned.
+ * [`GarbledMessage`](src/Message/GarbledMessage.php)
+   * _Use-Case_: A client (`RegistrationClient` or `ApiClient`) receives a response but cannot decode it.
+      * (Ex: The server was buggy or badly configured, and PHP error messages were dumped into the ciphertext.)
+      * (Ex: A man-in-the-middle interfered with the message transmission.)
+   * _Payload_: Unknown
+   * _Crypto_: Unknown
 
 Some considerations:
 
@@ -66,7 +87,7 @@ Some considerations:
 Protocol v0.2: RegistrationMessage
 ----------------------------------
 
-The RegistrationMessage format is used whenever the site (`SaveTheWhales.org`) sends a message to the application (`AddressCleanup.com`). The most common case is to send a `Cxn.register` request.
+The `RegistrationMessage` format is used whenever a site (`SaveTheWhales.org`) sends a message to an application (`AddressCleanup.com`). The most common case is to send a `Cxn.register` request.
 
 The message data includes the following keys:
 
@@ -96,9 +117,8 @@ Protocol v0.1
 
 Never published or completed. Broadly, the v0.1 protocol relied on certificates for both client and server, and used RSA to encrypt all messages. v0.1 had a few issues:
 
- * If the certificate authority were compromised, then the high trust placed in the CA could be abused to imitate both client and server, enabling man-in-the-middle attacks against existing connections.
+ * If the certificate authority were compromised, then the high trust placed in the CA could be abused to compromise existing connections.
  * Using RSA for everything meant that the crypto was slower for typical API calls.
- * RSA seems to be best when combined with session-key negotiaion (e.g DH) but I don't remember the details of DH well enough to use/adapt it (without delaying the schedule).
 
 Base Classes
 ------------

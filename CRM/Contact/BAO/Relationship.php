@@ -1234,7 +1234,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    *   to return only permissioned Contact
    * @param array $params
    * @param bool $includeTotalCount
-   *   Include a total count of relationships
+   *   Should we return a count of total accessable relationships
+   *
    * @return array|int
    *   relationship records
    */
@@ -1294,7 +1295,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     else {
 
       if ($includeTotalCount) {
-        $values['total_relationships'] = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM ({$queryString}) as r");
+        $values['total_relationships'] = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM ({$queryString}) AS r");
       }
 
       $mask = NULL;
@@ -2077,7 +2078,7 @@ AND cc.sort_name LIKE '%$name%'";
 
     $contactRelationships = array();
     $params['total'] = $relationships['total_relationships'];
-    unset ($relationships['total_relationships']);
+    unset($relationships['total_relationships']);
     if (!empty($relationships)) {
 
       // format params

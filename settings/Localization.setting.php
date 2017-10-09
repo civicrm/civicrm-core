@@ -142,6 +142,9 @@ return array(
     'pseudoconstant' => array(
       'callback' => 'CRM_Admin_Form_Setting_Localization::getCurrencySymbols',
     ),
+    'on_change' => array(
+      'CRM_Admin_Form_Setting_Localization::onChangeDefaultCurrency',
+    ),
   ),
   'defaultContactCountry' => array(
     'group_name' => 'Localization Preferences',

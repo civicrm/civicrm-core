@@ -849,8 +849,13 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       $params = array('id' => $memType);
       $membershipType = array();
       if (CRM_Member_BAO_MembershipType::retrieve($params, $membershipType)) {
-        $memberTypesSameParentOrg = CRM_Member_BAO_MembershipType::getMembershipTypesByOrg($membershipType['member_of_contact_id']);
-        $memberTypesSameParentOrgList = implode(',', array_keys($memberTypesSameParentOrg));
+        $memberTypesSameParentOrg = civicrm_api3('MembershipType', 'get', array(
+          'member_of_contact_id' => $membershipType['member_of_contact_id'],
+          'options' => array(
+            'limit' => 0,
+          ),
+        ));
+        $memberTypesSameParentOrgList = implode(',', array_keys(CRM_Utils_Array::value('values', $memberTypesSameParentOrg, array())));
         $dao->whereAdd('membership_type_id IN (' . $memberTypesSameParentOrgList . ')');
       }
     }
@@ -1344,9 +1349,11 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @throws \CRM_Core_Exception
    */
   public static function createRelatedMemberships(&$params, &$dao, $reset = FALSE) {
+    // CRM-4213 check for loops, using static variable to record contacts already processed.
     static $relatedContactIds = array();
     if ($reset) {
-      // not sure why a static var is in use here - we need a way to reset it from the test suite
+      // We need a way to reset this static variable from the test suite.
+      // @todo consider replacing with Civi::$statics but note reset now used elsewhere: CRM-17723.
       $relatedContactIds = array();
       return FALSE;
     }
@@ -1388,12 +1395,12 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
       );
     }
 
-    // check for loops. CRM-4213
-    // remove repeated related contacts, which already inherited membership.
-    $relatedContactIds[$membership->contact_id] = TRUE;
+    // CRM-4213, CRM-19735 check for loops, using static variable to record contacts already processed.
+    // Remove repeated related contacts, which already inherited membership of this type.
+    $relatedContactIds[$membership->contact_id][$membership->membership_type_id] = TRUE;
     foreach ($allRelatedContacts as $cid => $status) {
-      if (empty($relatedContactIds[$cid])) {
-        $relatedContactIds[$cid] = TRUE;
+      if (empty($relatedContactIds[$cid]) || empty($relatedContactIds[$cid][$membership->membership_type_id])) {
+        $relatedContactIds[$cid][$membership->membership_type_id] = TRUE;
 
         //don't create membership again for owner contact.
         $nestedRelationship = FALSE;
@@ -1477,6 +1484,9 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         //CRM-16857: Do not create multiple line-items for inherited membership through priceset.
         unset($params['lineItems']);
         unset($params['line_item']);
+
+        // CRM-20966: Do not create membership_payment record for inherited membership.
+        unset($params['relate_contribution_id']);
 
         if (($params['status_id'] == $deceasedStatusId) || ($params['status_id'] == $expiredStatusId)) {
           // related membership is not active so does not count towards maximum

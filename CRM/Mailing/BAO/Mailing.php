@@ -1600,10 +1600,18 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     ) {
       $params['replyto_email'] = $params['from_email'];
     }
-
     $mailing->copyValues($params);
 
+    // CRM-20892 Unset Modifed Date here so that MySQL can correctly set an updated modfied date.
+    unset($mailing->modified_date);
     $result = $mailing->save();
+
+    // CRM-20892 Re find record after saing so we can set the updated modified date in the result.
+    $mailing->find(TRUE);
+
+    if (isset($mailing->modified_date)) {
+      $result->modified_date = $mailing->modified_date;
+    }
 
     if (!empty($ids['mailing'])) {
       CRM_Utils_Hook::post('edit', 'Mailing', $mailing->id, $mailing);
@@ -1787,7 +1795,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       // Populate the recipients.
       if (empty($params['_skip_evil_bao_auto_recipients_'])) {
         // check if it's sms
-        $mode = $mailing->sms_provider_id ? 'sms' : NULL;
+        $mode = $mailing->sms_provider_id && $mailing->sms_provider_id != 'null' ? 'sms' : NULL;
         self::getRecipients($job->id, $mailing->id, TRUE, $mailing->dedupe_email, $mode);
       }
       // Schedule the job now that it has recipients.

@@ -98,7 +98,7 @@ class CRM_Utils_Mail_EmailProcessor {
     $found = FALSE;
     while ($dao->fetch()) {
       $found = TRUE;
-      self::_process(FALSE, $dao, $is_create_activities);
+      self::_process(FALSE, $dao, TRUE);
     }
     if (!$found) {
       CRM_Core_Error::fatal(ts('No mailboxes have been configured for Email to Activity Processing'));
@@ -136,7 +136,7 @@ class CRM_Utils_Mail_EmailProcessor {
     $emailActivityTypeId
       = (defined('EMAIL_ACTIVITY_TYPE_ID') && EMAIL_ACTIVITY_TYPE_ID)
       ? EMAIL_ACTIVITY_TYPE_ID
-      : CRM_Core_OptionGroup::getValue('activity_type', 'Inbound Email', 'name');
+      : CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email');
 
     if (!$emailActivityTypeId) {
       CRM_Core_Error::fatal(ts('Could not find a valid Activity Type ID for Inbound Email'));
