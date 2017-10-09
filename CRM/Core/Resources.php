@@ -528,6 +528,9 @@ class CRM_Core_Resources {
     $patterns = (array) $patterns;
     $files = array();
     foreach ($patterns as $pattern) {
+      if (preg_match(';^(assetBuilder|ext)://;', $pattern)) {
+        $files[] = $pattern;
+      }
       if (CRM_Utils_File::isAbsolute($pattern)) {
         // Absolute path.
         $files = array_merge($files, (array) glob($pattern, $flags));
