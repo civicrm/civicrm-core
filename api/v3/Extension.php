@@ -421,5 +421,7 @@ function _civicrm_api3_getKeys($params, $key = 'keys') {
     }
     return explode(API_V3_EXTENSION_DELIMITER, $params[$key]);
   }
-  throw new API_Exception("Missing required parameter: key, keys, or path");
+  else {
+    return array();
+  }
 }
