@@ -51,6 +51,12 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   protected $_gLabel;
 
   /**
+   * Is this Option Group Domain Specific
+   * @var bool
+   */
+  protected $_domainSpecific = FALSE;
+
+  /**
    * Pre-process
    */
   public function preProcess() {
@@ -164,13 +170,19 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'label'),
       TRUE
     );
-
+    $domainSpecificOptionGroups = array('from_email_address');
+    $this->_domainSpecific = in_array($this->_gName, $domainSpecificOptionGroups) ? TRUE : FALSE;
     if ($this->_gName != 'activity_type') {
       $this->add('text',
         'value',
         ts('Value'),
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'),
         TRUE
+      );
+      $this->addRule('value',
+        ts('This Value already exists in the database for this option group. Please select a different Value.'),
+        'optionExists',
+        array('CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'value', $this->_domainSpecific)
       );
     }
     else {
@@ -187,12 +199,10 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         'addressee',
       )) && !$isReserved
     ) {
-      $domainSpecificOptionGroups = array('from_email_address');
-      $domainSpecific = in_array($this->_gName, $domainSpecificOptionGroups) ? TRUE : FALSE;
       $this->addRule('label',
-        ts('This Label already exists in the database for this option group. Please select a different Value.'),
+        ts('This Label already exists in the database for this option group. Please select a different Label.'),
         'optionExists',
-        array('CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'label', $domainSpecific)
+        array('CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'label', $this->_domainSpecific)
       );
     }
 
