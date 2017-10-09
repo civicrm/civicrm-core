@@ -170,8 +170,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'label'),
       TRUE
     );
-    $domainSpecificOptionGroups = array('from_email_address');
-    $this->_domainSpecific = in_array($this->_gName, $domainSpecificOptionGroups) ? TRUE : FALSE;
+
+    $this->_domainSpecific = in_array($this->_gName, CRM_Core_OptionGroup::$_domainIDGroups) ? TRUE : FALSE;
     if ($this->_gName != 'activity_type') {
       $this->add('text',
         'value',
