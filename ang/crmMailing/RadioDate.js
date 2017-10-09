@@ -5,6 +5,7 @@
     return {
       require: 'ngModel',
       link: function($scope, element, attrs, ngModel) {
+        var lastAlert = null;
 
         var schedule = $scope[attrs.crmMailingRadioDate] = {
           mode: 'now',
@@ -63,9 +64,13 @@
               date = [year, month, day].join('-');
               time = [hours, minutes, "00"].join(':');
               currentDate = date + ' ' + time;
-              ngModel.$setValidity('dateTimeInThePast', !($(this).val().length && submittedDate < currentDate));
-              if ($(this).val().length && submittedDate < currentDate) {
-                crmUiAlert({
+              var isInPast = ($(this).val().length && submittedDate < currentDate);
+              ngModel.$setValidity('dateTimeInThePast', !isInPast);
+              if (lastAlert && lastAlert.isOpen) {
+                lastAlert.close();
+              }
+              if (isInPast) {
+                lastAlert = crmUiAlert({
                   text: ts('The scheduled date and time is in the past'),
                   title: ts('Error')
                 });
