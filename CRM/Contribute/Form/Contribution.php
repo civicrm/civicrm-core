@@ -1697,7 +1697,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $formValues += CRM_Contribute_BAO_ContributionSoft::getSoftContribution($contribution->id);
 
         // to get 'from email id' for send receipt
-        $this->fromEmailId = $formValues['from_email_address'];
+        $this->fromEmailId = CRM_Utils_Array::value('from_email_address', $formValues);
         if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $formValues)) {
           $this->statusMessage[] = ts('A receipt has been emailed to the contributor.');
         }

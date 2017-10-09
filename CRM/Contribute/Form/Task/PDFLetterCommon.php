@@ -23,7 +23,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       $returnProperties['email'] = $returnProperties['on_hold'] = $returnProperties['is_deceased'] = $returnProperties['do_not_email'] = 1;
       $emailParams = array(
         'subject' => $formValues['subject'],
-        'from' => $formValues['from_email_address'],
       );
       // We need display_name for emailLetter() so add to returnProperties here
       $returnProperties['display_name'] = 1;
