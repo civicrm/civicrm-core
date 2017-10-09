@@ -1,5 +1,5 @@
 {if !$membershipMode}
-  {if $accessContribution && $action != 2}
+  {if $accessContribution && ($action != 2 or (!$rows.0.contribution_id AND !$softCredit) or $onlinePendingContributionId)}
     <table>
       <tr class="crm-{$formClass}-form-block-contribution-contact">
         <td class="label">{$form.is_different_contribution_contact.label}</td>
