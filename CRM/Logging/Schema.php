@@ -705,7 +705,15 @@ COLS;
     $query = preg_replace("/^CREATE TABLE `$table`/i", "CREATE TABLE `{$this->db}`.log_$table", $query);
     $query = preg_replace("/ AUTO_INCREMENT/i", '', $query);
     $query = preg_replace("/^  [^`].*$/m", '', $query);
-    $engine = strtoupper(CRM_Utils_Array::value('engine', $this->logTableSpec[$table], 'ARCHIVE'));
+
+    //Check if archive engine is supported by the db, else use innodb for the log tables.
+    $engineQuery = CRM_Core_DAO::executeQuery("SHOW ENGINES");
+    $supportedEngines = array();
+    while ($engineQuery->fetch()) {
+      $supportedEngines[$engineQuery->Engine] = $engineQuery->Support;
+    }
+    $defaultEngine = empty($supportedEngines['ARCHIVE']) ? "INNODB" : 'ARCHIVE';
+    $engine = strtoupper(CRM_Utils_Array::value('engine', $this->logTableSpec[$table], $defaultEngine));
     $engine .= " " . CRM_Utils_Array::value('engine_config', $this->logTableSpec[$table]);
     $query = preg_replace("/^\) ENGINE=[^ ]+ /im", ') ENGINE=' . $engine . ' ', $query);
 
