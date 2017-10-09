@@ -249,7 +249,7 @@ class CRM_Contact_Form_Task_EmailCommon {
 
     $form->add('text', 'subject', ts('Subject'), 'size=50 maxlength=254', TRUE);
 
-    $form->add('select', 'fromEmailAddress', ts('From'), $form->_fromEmails, TRUE, array('class' => 'crm-select2 huge'));
+    $form->add('select', 'from_email_address', ts('From'), $form->_fromEmails, TRUE);
 
     CRM_Mailing_BAO_Mailing::commonCompose($form);
 
@@ -389,7 +389,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   public static function submit(&$form, $formValues) {
     self::saveMessageTemplate($formValues);
 
-    $from = CRM_Utils_Array::value($formValues['fromEmailAddress'], $form->_emails);
+    $from = CRM_Utils_Array::value($formValues['from_email_address'], $form->_emails);
     $subject = $formValues['subject'];
 
     // CRM-13378: Append CC and BCC information at the end of Activity Details and format cc and bcc fields
