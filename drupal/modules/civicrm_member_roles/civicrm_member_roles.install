@@ -11,19 +11,14 @@
  */
 
 /**
- * Implementation of hook_install().
- */
-function civicrm_member_roles_install() {}
-
-/*
- * Implemenation of hook_enable()
+ * Implements hook_enable().
  */
 function civicrm_member_roles_enable() {
   db_query("UPDATE {system} SET weight = 110 WHERE name = 'civicrm_member_roles'");
 }
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function civicrm_member_roles_schema() {
   $schema['civicrm_member_roles_rules'] = array(
@@ -54,7 +49,7 @@ function civicrm_member_roles_schema() {
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function civicrm_member_roles_uninstall() {
   variable_del('civicrm_member_roles_sync_method');
@@ -73,12 +68,15 @@ function civicrm_member_roles_update_7400() {
       case '0':
         variable_set('civicrm_member_roles_sync_method', array('login'));
         break;
+
       case '1':
         variable_set('civicrm_member_roles_sync_method', array('cron'));
         break;
+
       case '2':
         variable_set('civicrm_member_roles_sync_method', array());
         break;
+
       case '3':
         variable_set('civicrm_member_roles_sync_method', array('update'));
         break;

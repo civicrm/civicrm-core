@@ -610,8 +610,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Retrieve all Membership Types associated.
-   * with an Organization
+   * @deprecated Please use the Membership API
+   * Retrieve all Membership Types associated with an Organization
    *
    * @param int $orgID
    *   Id of Organization.
@@ -620,15 +620,14 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *   array of the details of membership types
    */
   public static function getMembershipTypesByOrg($orgID) {
-    $membershipTypes = array();
-    $dao = new CRM_Member_DAO_MembershipType();
-    $dao->member_of_contact_id = $orgID;
-    $dao->find();
-    while ($dao->fetch()) {
-      $membershipTypes[$dao->id] = array();
-      CRM_Core_DAO::storeValues($dao, $membershipTypes[$dao->id]);
-    }
-    return $membershipTypes;
+    Civi::log()->warning('Deprecated function getMembershipTypesByOrg, please user membership_type api', array('civi.tag' => 'deprecated'));
+    $memberTypesSameParentOrg = civicrm_api3('MembershipType', 'get', array(
+      'member_of_contact_id' => $orgID,
+      'options' => array(
+        'limit' => 0,
+      ),
+    ));
+    return CRM_Utils_Array::value('values', $memberTypesSameParentOrg, array());
   }
 
   /**

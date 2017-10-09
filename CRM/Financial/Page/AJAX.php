@@ -255,9 +255,10 @@ class CRM_Financial_Page_AJAX {
       3 => 'amount',
       4 => 'trxn_id',
       5 => 'transaction_date',
-      6 => 'payment_method',
-      7 => 'status',
-      8 => 'name',
+      6 => 'receive_date',
+      7 => 'payment_method',
+      8 => 'status',
+      9 => 'name',
     );
 
     $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -287,6 +288,7 @@ class CRM_Financial_Page_AJAX {
       'contact_a.contact_type',
       'contact_a.contact_sub_type',
       'civicrm_financial_trxn.trxn_date as transaction_date',
+      'civicrm_contribution.receive_date as receive_date',
       'civicrm_financial_type.name',
       'civicrm_financial_trxn.currency as currency',
       'civicrm_financial_trxn.status_id as status',
@@ -298,7 +300,8 @@ class CRM_Financial_Page_AJAX {
       'sort_name' => ts('Contact Name'),
       'amount' => ts('Amount'),
       'trxn_id' => ts('Trxn ID'),
-      'transaction_date' => ts('Received'),
+      'transaction_date' => ts('Transaction Date'),
+      'receive_date' => ts('Received'),
       'payment_method' => ts('Payment Method'),
       'status' => ts('Status'),
       'name' => ts('Type'),
@@ -372,6 +375,9 @@ class CRM_Financial_Page_AJAX {
           $row[$financialItem->id][$columnKey] = CRM_Utils_Money::format($financialItem->$columnKey, $financialItem->currency);
         }
         elseif ($columnKey == 'transaction_date' && $financialItem->$columnKey) {
+          $row[$financialItem->id][$columnKey] = CRM_Utils_Date::customFormat($financialItem->$columnKey);
+        }
+        elseif ($columnKey == 'receive_date' && $financialItem->$columnKey) {
           $row[$financialItem->id][$columnKey] = CRM_Utils_Date::customFormat($financialItem->$columnKey);
         }
         elseif ($columnKey == 'status' && $financialItem->$columnKey) {
@@ -450,6 +456,7 @@ class CRM_Financial_Page_AJAX {
       'amount',
       'trxn_id',
       'transaction_date',
+      'receive_date',
       'payment_method',
       'status',
       'name',

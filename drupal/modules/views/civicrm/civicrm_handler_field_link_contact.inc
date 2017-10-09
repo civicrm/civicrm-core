@@ -21,14 +21,16 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
-/*
+/**
  * Copyright (C) 2009 James Rakich
  * Licensed to CiviCRM under the Academic Free License version 3.0.
+ */
+
+/**
+ * civicrm_handler_field_link_contact
  *
- *
- * civicrm_handler_field_link_contact.inc
  * Completely customizable text that can be linked to numerous places related to the activity.
  * View, Edit and Delete Pages, as well as a custom Drupal Link with the Contact ID appended,
  * which is great for linking to other views using contact or other base tables.
@@ -43,12 +45,12 @@ class civicrm_handler_field_link_contact extends views_handler_field {
   /**
    * Constructor to provide additional field to add.
    */
-  function construct() {
+  public function construct() {
     parent::construct();
     $this->additional_fields['id'] = 'id';
   }
 
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['link_to_civicrm_contact'] = array('default' => 'view');
     $options['custom_link'] = array('default' => '');
@@ -56,7 +58,7 @@ class civicrm_handler_field_link_contact extends views_handler_field {
     return $options;
   }
 
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $form['link_to_civicrm_contact'] = array(
       '#type' => 'select',
@@ -88,13 +90,12 @@ class civicrm_handler_field_link_contact extends views_handler_field {
     );
   }
 
-  function render_link($data, $values) {
+  public function render_link($data, $values) {
     $link_text = $this->options['link_text'];
     $link_choice = $this->options['link_to_civicrm_contact'];
     if ($link_choice == 'custom') {
       $custom_link = $this->options['custom_link'];
     }
-
 
     switch ($link_choice) {
 
@@ -137,13 +138,13 @@ class civicrm_handler_field_link_contact extends views_handler_field {
     }
   }
 
-  function query() {
+  public function query() {
     $this->ensure_my_table();
     $this->add_additional_fields();
   }
 
-  function render($values) {
+  public function render($values) {
     return $this->render_link(check_plain(property_exists($values, $this->field_alias)), $values);
   }
-}
 
+}

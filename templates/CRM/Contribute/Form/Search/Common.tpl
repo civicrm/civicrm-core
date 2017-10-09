@@ -71,8 +71,8 @@
     </div>
   </td>
   <td>
-    {$form.invoice_id.label} <br />
-    {$form.invoice_id.html}
+    {$form.invoice_number.label} <br />
+    {$form.invoice_number.html}
   </td>
 </tr>
 <tr>

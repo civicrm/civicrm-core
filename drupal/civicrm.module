@@ -156,8 +156,8 @@ function civicrm_initialize() {
   }
   _civicrm_registerClassLoader();
 
-  static $initialized = FALSE;
-  static $failure = FALSE;
+  $initialized = &drupal_static('civicrm_initialize', FALSE);
+  $failure = &drupal_static('civicrm_initialize_failure', FALSE);
 
   if ($failure) {
     return FALSE;
@@ -687,7 +687,7 @@ function civicrm_user_form_validate($form, &$form_state) {
   // lets suppress key generation for all validation also
   civicrm_key_disable();
 
-  static $validated = FALSE;
+  $validated = &drupal_static(__FUNCTION__, FALSE);
 
   if ($validated) {
     return;

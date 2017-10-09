@@ -44,7 +44,15 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
-  protected $_customGroupExtends = array('Membership', 'Contribution');
+  protected $_customGroupExtends = array(
+    'Membership',
+    'Contribution',
+    'Contact',
+    'Individual',
+    'Household',
+    'Organization',
+  );
+
   protected $_customGroupGroupBy = FALSE;
 
   /**

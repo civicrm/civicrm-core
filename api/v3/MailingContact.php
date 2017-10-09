@@ -159,10 +159,12 @@ GROUP BY   m.id
     }
     $select = implode(', ', $select);
 
-    $orderBy = 'ORDER BY j.start_date DESC';
+    $orderBy = 'ORDER BY MIN(j.start_date) DESC';
     if ($sort) {
       $orderBy = "ORDER BY $sort";
     }
+
+    $groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns(array_keys($fields), "m.id");
 
     $sql = "
 SELECT     $select
@@ -174,7 +176,7 @@ INNER JOIN civicrm_mailing_event_queue meq ON meq.job_id = j.id
 WHERE      j.is_test = 0
 AND        meq.contact_id = %1
            $whereClause
-GROUP BY   m.id
+{$groupBy}
 {$orderBy}
 ";
 

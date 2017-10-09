@@ -371,9 +371,10 @@ ALTER TABLE {$tableName}
    * @param string $tableName
    * @param string $columnName
    * @param bool $l18n
+   * @param bool $isUpgradeMode
    *
    */
-  public static function dropColumn($tableName, $columnName, $l18n = FALSE) {
+  public static function dropColumn($tableName, $columnName, $l18n = FALSE, $isUpgradeMode = FALSE) {
     if (self::checkIfFieldExists($tableName, $columnName)) {
       $sql = "ALTER TABLE $tableName DROP COLUMN $columnName";
       if ($l18n) {
@@ -386,7 +387,7 @@ ALTER TABLE {$tableName}
       $domain->find(TRUE);
       if ($domain->locales) {
         $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
-        CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+        CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, $isUpgradeMode);
       }
     }
   }
@@ -701,10 +702,14 @@ MODIFY      {$columnName} varchar( $length )
   /**
    * Compare the indices specified in the XML files with those in the DB.
    *
+   * @param bool $dropFalseIndices
+   *  If set - this function deletes false indices present in the DB which mismatches the expected
+   *  values of xml file so that civi re-creates them with correct values using createMissingIndices() function.
+   *
    * @return array
    *   index specifications
    */
-  public static function getMissingIndices() {
+  public static function getMissingIndices($dropFalseIndices = FALSE) {
     $requiredSigs = $existingSigs = array();
     // Get the indices defined (originally) in the xml files
     $requiredIndices = CRM_Core_DAO_AllCoreTables::indices();
@@ -723,6 +728,21 @@ MODIFY      {$columnName} varchar( $length )
 
     // Compare
     $missingSigs = array_diff($requiredSigs, $existingSigs);
+
+    //CRM-20774 - Drop index key which exist in db but the value varies.
+    $existingKeySigs = array_intersect_key($missingSigs, $existingSigs);
+    if ($dropFalseIndices && !empty($existingKeySigs)) {
+      foreach ($existingKeySigs as $sig) {
+        $sigParts = explode('::', $sig);
+        foreach ($requiredIndices[$sigParts[0]] as $index) {
+          if ($index['sig'] == $sig && !empty($index['name'])) {
+            self::dropIndexIfExists($sigParts[0], $index['name']);
+            continue;
+          }
+        }
+      }
+    }
+
     // Get missing indices
     $missingIndices = array();
     foreach ($missingSigs as $sig) {

@@ -90,23 +90,9 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
   /**
    * Run the page.
    *
-   * This method is called after the page is created. It checks for the
-   * type of action and executes that action.
-   * Finally it calls the parent's run method.
+   * Set the breadcrumb before beginning the standard page run.
    */
   public function run() {
-    // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String',
-      // default to 'browse'
-      $this, FALSE, 'browse'
-    );
-
-    // assign vars to templates
-    $this->assign('action', $action);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE, 0
-    );
-
     // set breadcrumb to append to admin/access
     $breadCrumb = array(
       array(
@@ -117,24 +103,6 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
       ),
     );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
-    // what action to take ?
-    if ($action & (CRM_Core_Action::ADD | CRM_Core_Action::DELETE)) {
-      $this->edit($action, $id);
-    }
-
-    if ($action & (CRM_Core_Action::UPDATE)) {
-      $this->edit($action, $id);
-
-      if (isset($id)) {
-        $aclName = CRM_Core_DAO::getFieldValue('CRM_ACL_DAO_ACL', $id);
-        CRM_Utils_System::setTitle(ts('Edit ACL -  %1', array(1 => $aclName)));
-      }
-    }
-
-    // finally browse the acl's
-    if ($action & CRM_Core_Action::BROWSE) {
-      $this->browse();
-    }
 
     // parent run
     return parent::run();
@@ -193,22 +161,22 @@ ORDER BY entity_id
 
       switch ($acl[$dao->id]['object_table']) {
         case 'civicrm_saved_search':
-          $acl[$dao->id]['object'] = $group[$acl[$dao->id]['object_id']];
+          $acl[$dao->id]['object'] = CRM_Utils_Array::value($acl[$dao->id]['object_id'], $group);
           $acl[$dao->id]['object_name'] = ts('Group');
           break;
 
         case 'civicrm_uf_group':
-          $acl[$dao->id]['object'] = $ufGroup[$acl[$dao->id]['object_id']];
+          $acl[$dao->id]['object'] = CRM_Utils_Array::value($acl[$dao->id]['object_id'], $ufGroup);
           $acl[$dao->id]['object_name'] = ts('Profile');
           break;
 
         case 'civicrm_custom_group':
-          $acl[$dao->id]['object'] = $customGroup[$acl[$dao->id]['object_id']];
+          $acl[$dao->id]['object'] = CRM_Utils_Array::value($acl[$dao->id]['object_id'], $customGroup);
           $acl[$dao->id]['object_name'] = ts('Custom Group');
           break;
 
         case 'civicrm_event':
-          $acl[$dao->id]['object'] = $event[$acl[$dao->id]['object_id']];
+          $acl[$dao->id]['object'] = CRM_Utils_Array::value($acl[$dao->id]['object_id'], $event);
           $acl[$dao->id]['object_name'] = ts('Event');
           break;
       }
@@ -267,6 +235,28 @@ ORDER BY entity_id
    */
   public function userContext($mode = NULL) {
     return 'civicrm/acl';
+  }
+
+  /**
+   * Edit an ACL.
+   *
+   * @param int $mode
+   *   What mode for the form ?.
+   * @param int $id
+   *   Id of the entity (for update, view operations).
+   * @param bool $imageUpload
+   *   Not used in this case, but extended from CRM_Core_Page_Basic.
+   * @param bool $pushUserContext
+   *   Not used in this case, but extended from CRM_Core_Page_Basic.
+   */
+  public function edit($mode, $id = NULL, $imageUpload = FALSE, $pushUserContext = TRUE) {
+    if ($mode & (CRM_Core_Action::UPDATE)) {
+      if (isset($id)) {
+        $aclName = CRM_Core_DAO::getFieldValue('CRM_ACL_DAO_ACL', $id);
+        CRM_Utils_System::setTitle(ts('Edit ACL &ndash; %1', array(1 => $aclName)));
+      }
+    }
+    parent::edit($mode, $id, $imageUpload, $pushUserContext);
   }
 
 }

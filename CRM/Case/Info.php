@@ -245,4 +245,40 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     }
   }
 
+  /**
+   * @return array
+   *   Array(string $value => string $label).
+   */
+  public static function getRedactOptions() {
+    return array(
+      'default' => ts('Default'),
+      '0' => ts('Do not redact emails'),
+      '1' => ts('Redact emails'),
+    );
+  }
+
+  /**
+   * @return array
+   *   Array(string $value => string $label).
+   */
+  public static function getMultiClientOptions() {
+    return array(
+      'default' => ts('Default'),
+      '0' => ts('Single client per case'),
+      '1' => ts('Multiple client per case'),
+    );
+  }
+
+  /**
+   * @return array
+   *   Array(string $value => string $label).
+   */
+  public static function getSortOptions() {
+    return array(
+      'default' => ts('Default'),
+      '0' => ts('Definition order'),
+      '1' => ts('Alphabetical order'),
+    );
+  }
+
 }

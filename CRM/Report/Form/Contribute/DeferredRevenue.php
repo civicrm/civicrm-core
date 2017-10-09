@@ -384,6 +384,13 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
    */
   public function groupBy() {
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_financial_account']}.id,  {$this->_aliases['civicrm_financial_account_1']}.id, {$this->_aliases['civicrm_financial_item']}.id";
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect(
+      $this->_selectClauses,
+      array(
+        "{$this->_aliases['civicrm_financial_account_1']}.id",
+        "{$this->_aliases['civicrm_financial_item']}.id",
+      )
+    );
   }
 
   /**

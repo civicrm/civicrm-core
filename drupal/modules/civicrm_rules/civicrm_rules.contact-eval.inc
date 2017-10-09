@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -144,4 +144,3 @@ function civicrm_rules_options_list() {
   $settings['groups'] = _civicrm_get_groups();
   return $settings;
 }
-

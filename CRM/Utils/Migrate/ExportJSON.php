@@ -449,7 +449,7 @@ AND    entity_table = 'civicrm_contact'
    */
   public function activity(&$contactIDs, &$additionalContacts) {
     static $_activitiesHandled = array();
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     $ids = implode(',', $contactIDs);

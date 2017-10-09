@@ -29,13 +29,10 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
  */
 
 /**
- * This class helps to print the labels for contacts
- *
+ * This class helps to print the labels for contacts.
  */
 class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
 
@@ -83,9 +80,6 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
 
   /**
    * Build the form object.
-   *
-   *
-   * @return void
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Make Name Badges'));
@@ -111,9 +105,6 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   *
-   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);

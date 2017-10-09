@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -52,10 +52,10 @@ function civicrm_rules_condition_participant_role($entityobj, $roleIDs) {
   return TRUE;
 }
 
-/*
- *get node related via cck  - this relies on there being a field called civicrm_event.
- *If you use this field on more than one event type it will load the last one (not something you should do)
- *I wanted to do it using a civicrm_event cck type but got a bit stuck.
+/**
+ * get node related via cck  - this relies on there being a field called civicrm_event.
+ * If you use this field on more than one event type it will load the last one (not something you should do)
+ * I wanted to do it using a civicrm_event cck type but got a bit stuck.
  */
 function civicrm_rules_events_argument_civicrm_eventnode($participantobj) {
   if (!module_exists('field') || !isset($participantobj['participant'])) {
@@ -66,15 +66,15 @@ function civicrm_rules_events_argument_civicrm_eventnode($participantobj) {
   $eventID = $participant->event_id;
   $results = db_select('field_config_instance', 'i')
     ->fields('i', array('field_name', 'entity_type', 'bundle'))
-    ->condition('field_name',  '%'.db_like('civicrm_event'), 'LIKE')
+    ->condition('field_name', '%' . db_like('civicrm_event'), 'LIKE')
     ->execute()
     ->fetchAllAssoc('id');
-  foreach($results as $result) {
+  foreach ($results as $result) {
     $nid = db_select('field_data_' . $result->field_name, 'fd')
       ->fields('fd', array('entity_id'))
       ->condition('bundle', $result->bundle, '=')
       ->condition($result->field_name . '_value', $eventID, '=')
-      ->condition('entity_type',  $result->entity_type, '=')
+      ->condition('entity_type', $result->entity_type, '=')
       ->execute()
       ->fetchAssoc();
     return $nid['entity_id'];
@@ -94,4 +94,3 @@ function civicrm_rules_events_argument_civicrm_contactID_load_user($entityobj) {
   }
   return NULL;
 }
-

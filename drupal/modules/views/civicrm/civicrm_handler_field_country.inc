@@ -21,10 +21,10 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
-/*
+/**
  * Heavily based on anonymous code contribution. No claim.
  *
  * civicrm_handler_field_country.inc
@@ -34,7 +34,7 @@
 class civicrm_handler_field_country extends civicrm_handler_field_address {
   static $_countries;
   static $_countries_full;
-  function construct() {
+  public function construct() {
     parent::construct();
     if (!self::$_countries) {
       if (!civicrm_initialize()) {
@@ -46,7 +46,7 @@ class civicrm_handler_field_country extends civicrm_handler_field_address {
     }
   }
 
-  function render($values) {
+  public function render($values) {
     $sid = $values->{$this->field_alias};
     if (empty($sid) ||
       (int ) $sid <= 0
@@ -62,13 +62,13 @@ class civicrm_handler_field_country extends civicrm_handler_field_address {
     }
   }
 
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['country_display'] = array('default' => '');
     return $options;
   }
 
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $form['country_display'] = array(
       '#type' => 'radios',
@@ -78,5 +78,5 @@ class civicrm_handler_field_country extends civicrm_handler_field_address {
       '#default_value' => $this->options['country_display'],
     );
   }
-}
 
+}

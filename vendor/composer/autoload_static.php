@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInita288f404cef1fb6e72cf5dc6d74b004a
+class ComposerStaticInit361f07f7a0661a74efa4ce29aec22b4e
 {
     public static $files = array (
         'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
@@ -22,6 +22,10 @@ class ComposerStaticInita288f404cef1fb6e72cf5dc6d74b004a
         array (
             'PhpOffice\\PhpWord\\' => 18,
             'PhpOffice\\Common\\' => 17,
+        ),
+        'F' => 
+        array (
+            'FontLib\\' => 8,
         ),
         'D' => 
         array (
@@ -53,6 +57,10 @@ class ComposerStaticInita288f404cef1fb6e72cf5dc6d74b004a
         'PhpOffice\\Common\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoffice/common/src/Common',
+        ),
+        'FontLib\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phenx/php-font-lib/src/FontLib',
         ),
         'Dompdf\\' => 
         array (
@@ -106,6 +114,10 @@ class ComposerStaticInita288f404cef1fb6e72cf5dc6d74b004a
             array (
                 0 => __DIR__ . '/..' . '/phenx/php-svg-lib/src',
             ),
+            'Sabberworm\\CSS' => 
+            array (
+                0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/lib',
+            ),
         ),
         'P' => 
         array (
@@ -140,10 +152,6 @@ class ComposerStaticInita288f404cef1fb6e72cf5dc6d74b004a
         ),
         'F' => 
         array (
-            'FontLib\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/phenx/php-font-lib/src',
-            ),
             'File' => 
             array (
                 0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
@@ -323,10 +331,10 @@ class ComposerStaticInita288f404cef1fb6e72cf5dc6d74b004a
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInita288f404cef1fb6e72cf5dc6d74b004a::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInita288f404cef1fb6e72cf5dc6d74b004a::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInita288f404cef1fb6e72cf5dc6d74b004a::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInita288f404cef1fb6e72cf5dc6d74b004a::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit361f07f7a0661a74efa4ce29aec22b4e::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit361f07f7a0661a74efa4ce29aec22b4e::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit361f07f7a0661a74efa4ce29aec22b4e::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit361f07f7a0661a74efa4ce29aec22b4e::$classMap;
 
         }, null, ClassLoader::class);
     }

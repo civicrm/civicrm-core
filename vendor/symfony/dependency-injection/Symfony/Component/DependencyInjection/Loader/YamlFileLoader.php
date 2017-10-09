@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Yaml\Parser as YamlParser;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -74,7 +75,7 @@ class YamlFileLoader extends FileLoader
      */
     public function supports($resource, $type = null)
     {
-        return is_string($resource) && 'yml' === pathinfo($resource, PATHINFO_EXTENSION);
+        return is_string($resource) && in_array(pathinfo($resource, PATHINFO_EXTENSION), array('yml', 'yaml'), true);
     }
 
     /**
@@ -186,6 +187,19 @@ class YamlFileLoader extends FileLoader
             $definition->setAbstract($service['abstract']);
         }
 
+        if (isset($service['factory'])) {
+            if (is_string($service['factory'])) {
+                if (strpos($service['factory'], ':') !== false && strpos($service['factory'], '::') === false) {
+                    $parts = explode(':', $service['factory']);
+                    $definition->setFactory(array($this->resolveServices('@'.$parts[0]), $parts[1]));
+                } else {
+                    $definition->setFactory($service['factory']);
+                }
+            } else {
+                $definition->setFactory(array($this->resolveServices($service['factory'][0]), $service['factory'][1]));
+            }
+        }
+
         if (isset($service['factory_class'])) {
             $definition->setFactoryClass($service['factory_class']);
         }
@@ -275,6 +289,10 @@ class YamlFileLoader extends FileLoader
      */
     protected function loadFile($file)
     {
+        if (!class_exists('Symfony\Component\Yaml\Parser')) {
+            throw new RuntimeException('Unable to load YAML config files as the Symfony Yaml Component is not installed.');
+        }
+
         if (!stream_is_local($file)) {
             throw new InvalidArgumentException(sprintf('This is not a local file "%s".', $file));
         }
@@ -310,7 +328,7 @@ class YamlFileLoader extends FileLoader
             throw new InvalidArgumentException(sprintf('The service file "%s" is not valid. It should contain an array. Check your YAML syntax.', $file));
         }
 
-        foreach (array_keys($content) as $namespace) {
+        foreach ($content as $namespace => $data) {
             if (in_array($namespace, array('imports', 'parameters', 'services'))) {
                 continue;
             }

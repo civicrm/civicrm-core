@@ -309,7 +309,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
           $this->_formValues['group'][$groupID] = 1;
         }
       }
-
     }
 
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
@@ -386,6 +385,16 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     if ($status) {
       $this->_formValues['contribution_status_id'] = array($status => 1);
       $this->_defaults['contribution_status_id'] = array($status => 1);
+    }
+
+    $pcpid = (array) CRM_Utils_Request::retrieve('pcpid', 'String', $this);
+    if ($pcpid) {
+      // Add new pcpid to the tail of the array...
+      foreach ($pcpid as $pcpIdList) {
+        $this->_formValues['contribution_pcp_made_through_id'][] = $pcpIdList;
+      }
+      // and avoid any duplicate
+      $this->_formValues['contribution_pcp_made_through_id'] = array_unique($this->_formValues['contribution_pcp_made_through_id']);
     }
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);

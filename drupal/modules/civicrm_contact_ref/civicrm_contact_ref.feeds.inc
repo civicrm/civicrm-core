@@ -7,7 +7,7 @@
 /**
  * Implements hook_feeds_processor_targets_alter().
  *
- * @see FeedsNodeProcessor::getMappingTargets().
+ * @see FeedsNodeProcessor::getMappingTargets()
  */
 function civicrm_contact_ref_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
   foreach (field_info_instances($entity_type, $bundle_name) as $name => $instance) {

@@ -304,20 +304,24 @@ class CRM_Admin_Page_AJAX {
     $parent = CRM_Utils_Type::escape(CRM_Utils_Array::value('parent_id', $_GET, 0), 'Integer');
     $result = array();
 
-    $parentClause = $parent ? "AND tag.parent_id = $parent" : 'AND tag.parent_id IS NULL';
-    $sql = "SELECT tag.*, child.id AS child, COUNT(et.id) as usages
-      FROM civicrm_tag tag
-      LEFT JOIN civicrm_entity_tag et ON et.tag_id = tag.id
-      LEFT JOIN civicrm_tag child ON child.parent_id = tag.id
-      WHERE tag.is_tagset <> 1 $parentClause
-      GROUP BY tag.id
-      ORDER BY tag.name";
+    $parentClause = $parent ? "AND parent_id = $parent" : 'AND parent_id IS NULL';
+    $sql = "SELECT *
+      FROM civicrm_tag
+      WHERE is_tagset <> 1 $parentClause
+      GROUP BY id
+      ORDER BY name";
+
+    // fetch all child tags in Array('parent_tag' => array('child_tag_1', 'child_tag_2', ...)) format
+    $childTagIDs = CRM_Core_BAO_Tag::getChildTags();
+
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       $style = '';
       if ($dao->color) {
         $style = "background-color: {$dao->color}; color: " . CRM_Utils_Color::getContrast($dao->color);
       }
+      $hasChildTags = empty($childTagIDs[$dao->id]) ? FALSE : TRUE;
+      $usedFor = (array) explode(',', $dao->used_for);
       $result[] = array(
         'id' => $dao->id,
         'text' => $dao->name,
@@ -330,16 +334,23 @@ class CRM_Admin_Page_AJAX {
           'style' => $style,
           'class' => 'crm-tag-item',
         ),
-        'children' => (bool) $dao->child,
+        'children' => $hasChildTags,
         'data' => array(
           'description' => (string) $dao->description,
           'is_selectable' => (bool) $dao->is_selectable,
           'is_reserved' => (bool) $dao->is_reserved,
-          'used_for' => $dao->used_for ? explode(',', $dao->used_for) : array(),
+          'used_for' => $usedFor,
           'color' => $dao->color ? $dao->color : '#ffffff',
-          'usages' => (int) $dao->usages,
+          'usages' => civicrm_api3('EntityTag', 'getcount', array(
+            'entity_table' => array('IN' => $usedFor),
+            'tag_id' => $dao->id,
+          )),
         ),
       );
+    }
+
+    if (!empty($_REQUEST['is_unit_test'])) {
+      return $result;
     }
 
     CRM_Utils_JSON::output($result);

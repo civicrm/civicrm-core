@@ -99,12 +99,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
    * method.
    */
   public function run() {
-    // get the requested action, default to 'browse'
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-
-    // assign vars to templates
-    $this->assign('action', $action);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
+    $id = $this->getIdAndAction();
 
     $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE);
     if ($context == 'nonDupe') {
@@ -116,18 +111,18 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
     $this->assign('hasperm_merge_duplicate_contacts', CRM_Core_Permission::check('merge duplicate contacts'));
 
     // which action to take?
-    if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
-      $this->edit($action, $id);
+    if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
+      $this->edit($this->_action, $id);
     }
-    if ($action & CRM_Core_Action::DELETE) {
+    if ($this->_action & CRM_Core_Action::DELETE) {
       $this->delete($id);
     }
 
     // browse the rules
     $this->browse();
 
-    // parent run
-    return parent::run();
+    // This replaces parent run, but do parent's parent run
+    return CRM_Core_Page::run();
   }
 
   /**

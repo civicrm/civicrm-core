@@ -237,6 +237,11 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
   }
 
   public function from() {
+    $relType = civicrm_api3('RelationshipType', 'getvalue', array(
+      'return' => "id",
+      'name_a_b' => "Employee of",
+      'name_b_a' => "Employer of",
+    ));
     $this->_from = "
 FROM civicrm_contact {$this->_aliases['civicrm_contact']}
 
@@ -247,7 +252,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
      LEFT JOIN civicrm_relationship {$this->_aliases['civicrm_relationship']}
           ON ( {$this->_aliases['civicrm_relationship']}.contact_id_a={$this->_aliases['civicrm_contact']}.id
               AND {$this->_aliases['civicrm_relationship']}.contact_id_b={$this->_aliases['civicrm_contact']}.employer_id
-              AND {$this->_aliases['civicrm_relationship']}.relationship_type_id=4)
+              AND {$this->_aliases['civicrm_relationship']}.relationship_type_id={$relType})
      LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
           ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id
              AND {$this->_aliases['civicrm_address']}.is_primary = 1 )

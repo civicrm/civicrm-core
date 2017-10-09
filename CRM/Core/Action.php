@@ -236,7 +236,7 @@ class CRM_Core_Action {
 
         if (isset($link['qs']) && !CRM_Utils_System::isNull($link['qs'])) {
           $urlPath = CRM_Utils_System::url(self::replace($link['url'], $values),
-            self::replace($link['qs'], $values), TRUE, NULL, TRUE, $frontend
+            self::replace($link['qs'], $values), FALSE, NULL, TRUE, $frontend
           );
         }
         else {

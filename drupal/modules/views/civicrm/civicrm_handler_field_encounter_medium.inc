@@ -21,9 +21,9 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
-/*
+/**
  * Heavily based on anonymous code contribution. No claim.
  *
  * civicrm_handler_field_event_type.inc
@@ -32,7 +32,7 @@
  */
 class civicrm_handler_field_encounter_medium extends views_handler_field {
   static $_encounter_medium;
-  function construct() {
+  public function construct() {
     parent::construct();
     if (!self::$_encounter_medium) {
       if (!civicrm_initialize()) {
@@ -43,7 +43,7 @@ class civicrm_handler_field_encounter_medium extends views_handler_field {
     }
   }
 
-  function render($values) {
+  public function render($values) {
     $sid = $values->{$this->field_alias};
     if (empty($sid) ||
       (int ) $sid <= 0
@@ -52,5 +52,5 @@ class civicrm_handler_field_encounter_medium extends views_handler_field {
     }
     return self::$_encounter_medium[$values->{$this->field_alias}];
   }
-}
 
+}

@@ -140,7 +140,7 @@ class CRM_Contact_Form_Task_SMSCommon {
           continue;
         }
 
-        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+        $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
         $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
         //target contacts limit check
         $ids = array_keys(CRM_Activity_BAO_ActivityContact::getNames($id, $targetID));

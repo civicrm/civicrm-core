@@ -45,7 +45,9 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     $this->_key = CRM_Utils_Request::retrieve('key', 'String',
       $this, FALSE, 0
     );
-
+    if (!CRM_Utils_Type::validate($this->_key, 'ExtensionKey')) {
+      throw new CRM_Core_Exception('Extension Key does not match expected standard');
+    }
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1&action=browse');
     $session->pushUserContext($url);

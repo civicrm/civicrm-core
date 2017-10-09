@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 use Symfony\Component\DependencyInjection\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 /**
  * PhpDumper dumps a service container as a PHP class.
@@ -58,6 +59,11 @@ class PhpDumper extends Dumper
     private $expressionLanguage;
     private $targetDirRegex;
     private $targetDirMaxMatches;
+
+    /**
+     * @var ExpressionFunctionProviderInterface[]
+     */
+    private $expressionLanguageProviders = array();
 
     /**
      * @var \Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface
@@ -139,6 +145,7 @@ class PhpDumper extends Dumper
 
         if ($this->container->isFrozen()) {
             $code .= $this->addFrozenConstructor();
+            $code .= $this->addFrozenCompile();
         } else {
             $code .= $this->addConstructor();
         }
@@ -191,6 +198,7 @@ class PhpDumper extends Dumper
             $this->getServiceCallsFromArguments($iDefinition->getMethodCalls(), $calls, $behavior);
             $this->getServiceCallsFromArguments($iDefinition->getProperties(), $calls, $behavior);
             $this->getServiceCallsFromArguments(array($iDefinition->getConfigurator()), $calls, $behavior);
+            $this->getServiceCallsFromArguments(array($iDefinition->getFactory()), $calls, $behavior);
         }
 
         $code = '';
@@ -552,7 +560,18 @@ class PhpDumper extends Dumper
         if ($definition->isSynthetic()) {
             $return[] = '@throws RuntimeException always since this service is expected to be injected dynamically';
         } elseif ($class = $definition->getClass()) {
-            $return[] = sprintf("@return %s A %s instance.", 0 === strpos($class, '%') ? 'object' : "\\".$class, $class);
+            $return[] = sprintf('@return %s A %s instance.', 0 === strpos($class, '%') ? 'object' : '\\'.$class, $class);
+        } elseif ($definition->getFactory()) {
+            $factory = $definition->getFactory();
+            if (is_string($factory)) {
+                $return[] = sprintf('@return object An instance returned by %s().', $factory);
+            } elseif (is_array($factory) && (is_string($factory[0]) || $factory[0] instanceof Definition || $factory[0] instanceof Reference)) {
+                if (is_string($factory[0]) || $factory[0] instanceof Reference) {
+                    $return[] = sprintf('@return object An instance returned by %s::%s().', (string) $factory[0], $factory[1]);
+                } elseif ($factory[0] instanceof Definition) {
+                    $return[] = sprintf('@return object An instance returned by %s::%s().', $factory[0]->getClass(), $factory[1]);
+                }
+            }
         } elseif ($definition->getFactoryClass()) {
             $return[] = sprintf('@return object An instance returned by %s::%s().', $definition->getFactoryClass(), $definition->getFactoryMethod());
         } elseif ($definition->getFactoryService()) {
@@ -731,7 +750,25 @@ EOF;
             $arguments[] = $this->dumpValue($value);
         }
 
-        if (null !== $definition->getFactoryMethod()) {
+        if (null !== $definition->getFactory()) {
+            $callable = $definition->getFactory();
+            if (is_array($callable)) {
+                if ($callable[0] instanceof Reference
+                    || ($callable[0] instanceof Definition && $this->definitionVariables->contains($callable[0]))) {
+                    return sprintf("        $return{$instantiation}%s->%s(%s);\n", $this->dumpValue($callable[0]), $callable[1], $arguments ? implode(', ', $arguments) : '');
+                }
+
+                $class = $this->dumpValue($callable[0]);
+                // If the class is a string we can optimize call_user_func away
+                if (strpos($class, "'") === 0) {
+                    return sprintf("        $return{$instantiation}%s::%s(%s);\n", $this->dumpLiteralClass($class), $callable[1], $arguments ? implode(', ', $arguments) : '');
+                }
+
+                return sprintf("        $return{$instantiation}call_user_func(array(%s, '%s')%s);\n", $this->dumpValue($callable[0]), $callable[1], $arguments ? ', '.implode(', ', $arguments) : '');
+            }
+
+            return sprintf("        $return{$instantiation}\\%s(%s);\n", $callable, $arguments ? implode(', ', $arguments) : '');
+        } elseif (null !== $definition->getFactoryMethod()) {
             if (null !== $definition->getFactoryClass()) {
                 $class = $this->dumpValue($definition->getFactoryClass());
 
@@ -783,7 +820,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 $bagClass
 
 /**
- * $class
+ * $class.
  *
  * This class has been auto-generated
  * by the Symfony Dependency Injection Component.
@@ -819,8 +856,8 @@ EOF;
 
         if (count($scopes = $this->container->getScopes()) > 0) {
             $code .= "\n";
-            $code .= "        \$this->scopes = ".$this->dumpValue($scopes).";\n";
-            $code .= "        \$this->scopeChildren = ".$this->dumpValue($this->container->getScopeChildren()).";\n";
+            $code .= '        $this->scopes = '.$this->dumpValue($scopes).";\n";
+            $code .= '        $this->scopeChildren = '.$this->dumpValue($this->container->getScopeChildren()).";\n";
         }
 
         $code .= $this->addMethodMap();
@@ -861,15 +898,12 @@ EOF;
         \$this->services =
         \$this->scopedServices =
         \$this->scopeStacks = array();
-
-        \$this->set('service_container', \$this);
-
 EOF;
 
         $code .= "\n";
         if (count($scopes = $this->container->getScopes()) > 0) {
-            $code .= "        \$this->scopes = ".$this->dumpValue($scopes).";\n";
-            $code .= "        \$this->scopeChildren = ".$this->dumpValue($this->container->getScopeChildren()).";\n";
+            $code .= '        $this->scopes = '.$this->dumpValue($scopes).";\n";
+            $code .= '        $this->scopeChildren = '.$this->dumpValue($this->container->getScopeChildren()).";\n";
         } else {
             $code .= "        \$this->scopes = array();\n";
             $code .= "        \$this->scopeChildren = array();\n";
@@ -884,6 +918,26 @@ EOF;
 EOF;
 
         return $code;
+    }
+
+    /**
+     * Adds the constructor for a frozen container.
+     *
+     * @return string
+     */
+    private function addFrozenCompile()
+    {
+        return <<<EOF
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compile()
+    {
+        throw new LogicException('You cannot compile a dumped frozen container.');
+    }
+
+EOF;
     }
 
     /**
@@ -994,6 +1048,7 @@ EOF;
 
         return \$this->parameterBag;
     }
+
 EOF;
         }
 
@@ -1111,7 +1166,7 @@ EOF;
                     $behavior[$id] = $argument->getInvalidBehavior();
                 }
 
-                $calls[$id] += 1;
+                ++$calls[$id];
             }
         }
     }
@@ -1130,7 +1185,8 @@ EOF;
                 $this->getDefinitionsFromArguments($definition->getArguments()),
                 $this->getDefinitionsFromArguments($definition->getMethodCalls()),
                 $this->getDefinitionsFromArguments($definition->getProperties()),
-                $this->getDefinitionsFromArguments(array($definition->getConfigurator()))
+                $this->getDefinitionsFromArguments(array($definition->getConfigurator())),
+                $this->getDefinitionsFromArguments(array($definition->getFactory()))
             );
 
             $this->inlinedDefinitions->offsetSet($definition, $definitions);
@@ -1176,7 +1232,7 @@ EOF;
      *
      * @return bool
      */
-    private function hasReference($id, array $arguments, $deep = false, array $visited = array())
+    private function hasReference($id, array $arguments, $deep = false, array &$visited = array())
     {
         foreach ($arguments as $argument) {
             if (is_array($argument)) {
@@ -1208,7 +1264,7 @@ EOF;
     /**
      * Dumps values.
      *
-     * @param array $value
+     * @param mixed $value
      * @param bool  $interpolate
      *
      * @return string
@@ -1239,23 +1295,53 @@ EOF;
             foreach ($value->getArguments() as $argument) {
                 $arguments[] = $this->dumpValue($argument);
             }
-            $class = $this->dumpValue($value->getClass());
 
-            if (false !== strpos($class, '$')) {
-                throw new RuntimeException('Cannot dump definitions which have a variable class name.');
+            if (null !== $value->getFactory()) {
+                $factory = $value->getFactory();
+
+                if (is_string($factory)) {
+                    return sprintf('\\%s(%s)', $factory, implode(', ', $arguments));
+                }
+
+                if (is_array($factory)) {
+                    if (is_string($factory[0])) {
+                        return sprintf('\\%s::%s(%s)', $factory[0], $factory[1], implode(', ', $arguments));
+                    }
+
+                    if ($factory[0] instanceof Definition) {
+                        return sprintf("call_user_func(array(%s, '%s')%s)", $this->dumpValue($factory[0]), $factory[1], count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
+                    }
+
+                    if ($factory[0] instanceof Reference) {
+                        return sprintf('%s->%s(%s)', $this->dumpValue($factory[0]), $factory[1], implode(', ', $arguments));
+                    }
+                }
+
+                throw new RuntimeException('Cannot dump definition because of invalid factory');
             }
 
             if (null !== $value->getFactoryMethod()) {
                 if (null !== $value->getFactoryClass()) {
                     return sprintf("call_user_func(array(%s, '%s')%s)", $this->dumpValue($value->getFactoryClass()), $value->getFactoryMethod(), count($arguments) > 0 ? ', '.implode(', ', $arguments) : '');
                 } elseif (null !== $value->getFactoryService()) {
-                    return sprintf("%s->%s(%s)", $this->getServiceCall($value->getFactoryService()), $value->getFactoryMethod(), implode(', ', $arguments));
+                    $service = $this->dumpValue($value->getFactoryService());
+
+                    return sprintf('%s->%s(%s)', 0 === strpos($service, '$') ? sprintf('$this->get(%s)', $service) : $this->getServiceCall($value->getFactoryService()), $value->getFactoryMethod(), implode(', ', $arguments));
                 } else {
                     throw new RuntimeException('Cannot dump definitions which have factory method without factory service or factory class.');
                 }
             }
 
-            return sprintf("new \\%s(%s)", substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
+            $class = $value->getClass();
+            if (null === $class) {
+                throw new RuntimeException('Cannot dump definitions which have no class nor factory.');
+            }
+            $class = $this->dumpValue($class);
+            if (false !== strpos($class, '$')) {
+                throw new RuntimeException('Cannot dump definitions which have a variable class name.');
+            }
+
+            return sprintf('new \\%s(%s)', substr(str_replace('\\\\', '\\', $class), 1, -1), implode(', ', $arguments));
         } elseif ($value instanceof Variable) {
             return '$'.$value;
         } elseif ($value instanceof Reference) {
@@ -1316,6 +1402,16 @@ EOF;
         }
 
         return sprintf("\$this->getParameter('%s')", strtolower($name));
+    }
+
+    /**
+     * @deprecated Deprecated since 2.6.2, to be removed in 3.0. Use Symfony\Component\DependencyInjection\ContainerBuilder::addExpressionLanguageProvider instead.
+     *
+     * @param ExpressionFunctionProviderInterface $provider
+     */
+    public function addExpressionLanguageProvider(ExpressionFunctionProviderInterface $provider)
+    {
+        $this->expressionLanguageProviders[] = $provider;
     }
 
     /**
@@ -1380,17 +1476,17 @@ EOF;
             $i = $this->variableCount;
 
             if ('' === $name) {
-                $name .= $firstChars[$i%$firstCharsLength];
-                $i = intval($i/$firstCharsLength);
+                $name .= $firstChars[$i % $firstCharsLength];
+                $i = (int) ($i / $firstCharsLength);
             }
 
             while ($i > 0) {
-                $i -= 1;
-                $name .= $nonFirstChars[$i%$nonFirstCharsLength];
-                $i = intval($i/$nonFirstCharsLength);
+                --$i;
+                $name .= $nonFirstChars[$i % $nonFirstCharsLength];
+                $i = (int) ($i / $nonFirstCharsLength);
             }
 
-            $this->variableCount += 1;
+            ++$this->variableCount;
 
             // check that the name is not reserved
             if (in_array($name, $this->reservedVariables, true)) {
@@ -1407,7 +1503,14 @@ EOF;
             if (!class_exists('Symfony\Component\ExpressionLanguage\ExpressionLanguage')) {
                 throw new RuntimeException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
-            $this->expressionLanguage = new ExpressionLanguage();
+            $providers = array_merge($this->container->getExpressionLanguageProviders(), $this->expressionLanguageProviders);
+            $this->expressionLanguage = new ExpressionLanguage(null, $providers);
+
+            if ($this->container->isTrackingResources()) {
+                foreach ($providers as $provider) {
+                    $this->container->addObjectResource($provider);
+                }
+            }
         }
 
         return $this->expressionLanguage;

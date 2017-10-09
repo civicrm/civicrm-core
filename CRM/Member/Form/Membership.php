@@ -280,19 +280,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $defaults['receive_date_time'] = $currentTime;
     }
 
-    if (is_numeric($this->_memType)) {
-      $defaults['membership_type_id'] = array();
-      $defaults['membership_type_id'][0] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-        $this->_memType,
-        'member_of_contact_id',
-        'id'
-      );
-      $defaults['membership_type_id'][1] = $this->_memType;
-    }
-    else {
-      $defaults['membership_type_id'] = $this->_memType;
-    }
-
     $defaults['num_terms'] = 1;
 
     if (!empty($defaults['id'])) {
@@ -638,26 +625,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         )
       );
 
-      $allowStatuses = array();
-      $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
-      if ($this->_onlinePendingContributionId) {
-        $statusNames = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-        foreach ($statusNames as $val => $name) {
-          if (in_array($name, array(
-            'In Progress',
-            'Overdue',
-          ))
-          ) {
-            continue;
-          }
-          $allowStatuses[$val] = $statuses[$val];
-        }
-      }
-      else {
-        $allowStatuses = $statuses;
-      }
       $this->add('select', 'contribution_status_id',
-        ts('Payment Status'), $allowStatuses
+        ts('Payment Status'), CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('membership')
       );
       $this->add('text', 'check_number', ts('Check Number'),
         CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'check_number')
@@ -1117,7 +1086,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $params = $softParams = $ids = array();
 
     $allMemberStatus = CRM_Member_PseudoConstant::membershipStatus();
-    $allContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $allContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $this->processBillingAddress();
 
     if ($this->_id) {
@@ -1645,6 +1614,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
           $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
           unset($params['lineItems']);
+          // skip line item creation for next interation since line item(s) are already created.
+          $params['skipLineItem'] = TRUE;
 
           $this->_membershipIDs[] = $membership->id;
           $createdMemberships[$memType] = $membership;
@@ -1723,10 +1694,91 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     $isRecur = CRM_Utils_Array::value('is_recur', $params);
+    $this->updateContributionOnMembershipTypeChange($params, $membership);
     $this->setStatusMessage($membership, $endDate, $receiptSent, $membershipTypes, $createdMemberships, $isRecur, $calcDates, $mailSend);
     return $createdMemberships;
   }
 
+  /**
+   * Update related contribution of a membership if update_contribution_on_membership_type_change
+   *   contribution setting is enabled and type is changed on edit
+   *
+   * @param array $inputParams
+   *      submitted form values
+   * @param CRM_Member_DAO_Membership $membership
+   *     Updated membership object
+   *
+   */
+  protected function updateContributionOnMembershipTypeChange($inputParams, $membership) {
+    if (Civi::settings()->get('update_contribution_on_membership_type_change') &&
+      ($this->_action & CRM_Core_Action::UPDATE) && // on update
+      $this->_id && // if ID is present
+      !in_array($this->_memType, $this->_memTypeSelected) // if selected membership doesn't match with earlier membership
+    ) {
+      if (CRM_Utils_Array::value('is_recur', $inputParams)) {
+        CRM_Core_Session::setStatus(ts('Associated recurring contribution cannot be updated on membership type change.', ts('Error'), 'error'));
+        return;
+      }
+
+      // fetch lineitems by updated membership ID
+      $lineItems = CRM_Price_BAO_LineItem::getLineItems($membership->id, 'membership');
+      // retrieve the related contribution ID
+      $contributionID = CRM_Core_DAO::getFieldValue(
+        'CRM_Member_DAO_MembershipPayment',
+        $membership->id,
+        'contribution_id',
+        'membership_id'
+      );
+      // get price fields of chosen price-set
+      $priceSetDetails = CRM_Utils_Array::value(
+        $this->_priceSetId,
+        CRM_Price_BAO_PriceSet::getSetDetail(
+          $this->_priceSetId,
+          TRUE,
+          TRUE
+        )
+      );
+
+      // add price field information in $inputParams
+      self::addPriceFieldByMembershipType($inputParams, $priceSetDetails['fields'], $membership->membership_type_id);
+      // paid amount
+      $paidAmount = CRM_Utils_Array::value('paid', CRM_Contribute_BAO_Contribution::getPaymentInfo($membership->id, 'membership'));
+      // update related contribution and financial records
+      CRM_Price_BAO_LineItem::changeFeeSelections(
+        $inputParams,
+        $membership->id,
+        'membership',
+        $contributionID,
+        $priceSetDetails['fields'],
+        $lineItems, $paidAmount
+      );
+      CRM_Core_Session::setStatus(ts('Associated contribution is updated on membership type change.'), ts('Success'), 'success');
+    }
+  }
+
+  /**
+   * Add selected price field information in $formValues
+   *
+   * @param array $formValues
+   *      submitted form values
+   * @param array $priceFields
+   *     Price fields of selected Priceset ID
+   * @param int $membershipTypeID
+   *     Selected membership type ID
+   *
+   */
+  public static function addPriceFieldByMembershipType(&$formValues, $priceFields, $membershipTypeID) {
+    foreach ($priceFields as $priceFieldID => $priceField) {
+      if (isset($priceField['options']) && count($priceField['options'])) {
+        foreach ($priceField['options'] as $option) {
+          if ($option['membership_type_id'] == $membershipTypeID) {
+            $formValues["price_{$priceFieldID}"] = $option['id'];
+            break;
+          }
+        }
+      }
+    }
+  }
   /**
    * Set context in session.
    */

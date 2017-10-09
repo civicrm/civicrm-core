@@ -353,8 +353,8 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
     //LCD also allow restrictions to membership owner via GET
     $owner = CRM_Utils_Request::retrieve('owner', 'String');
-    if ($owner) {
-      $this->_formValues['member_is_primary'] = $this->_defaults['member_is_primary'] = 2;
+    if (in_array($owner, array('0', '1'))) {
+      $this->_formValues['member_is_primary'] = $this->_defaults['member_is_primary'] = $owner;
     }
   }
 

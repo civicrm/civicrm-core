@@ -99,6 +99,7 @@ class civicrm_cli {
   public function callApi() {
     require_once 'api/api.php';
 
+    CRM_Core_Config::setPermitCacheFlushMode(FALSE);
     //  CRM-9822 -'execute' action always goes thru Job api and always writes to log
     if ($this->_action != 'execute' && $this->_joblog) {
       require_once 'CRM/Core/JobManager.php';
@@ -111,6 +112,8 @@ class civicrm_cli {
       $this->_params['auth'] = FALSE;
       $result = civicrm_api($this->_entity, $this->_action, $this->_params);
     }
+    CRM_Core_Config::setPermitCacheFlushMode(TRUE);
+    CRM_Contact_BAO_Contact_Utils::clearContactCaches();
 
     if (!empty($result['is_error'])) {
       $this->_log($result['error_message']);
@@ -418,9 +421,6 @@ class civicrm_cli_csv_file extends civicrm_cli {
       $this->separator = ";";
       rewind($handle);
       $header = fgetcsv($handle, 0, $this->separator);
-      if (count($header) == 1) {
-        die("Invalid file format for " . $this->_file . ". It must be a valid csv with separator ',' or ';'\n");
-      }
     }
 
     $this->header = $header;
@@ -430,6 +430,10 @@ class civicrm_cli_csv_file extends civicrm_cli {
         continue;
       }
       $this->row++;
+      if ($this->row % 1000 == 0) {
+        // Reset PEAR_DB_DATAOBJECT cache to prevent memory leak
+        CRM_Core_DAO::freeResult();
+      }
       $params = $this->convertLine($data);
       $this->processLine($params);
     }

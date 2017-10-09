@@ -27,10 +27,10 @@
  * @author Monte Ohrt <monte at ohrt dot com>
  * @author Andrei Zmievski <andrei@php.net>
  * @package Smarty
- * @version 2.6.27
+ * @version 2.6.30
  */
 
-/* $Id: Smarty.class.php 4660 2012-09-24 20:05:15Z uwe.tews@googlemail.com $ */
+/* $Id$ */
 
 /**
  * DIR_SEP isn't used anymore, but third party apps might
@@ -465,7 +465,7 @@ class Smarty
      *
      * @var string
      */
-    var $_version              = '2.6.27';
+    var $_version              = '2.6.30';
 
     /**
      * current template inclusion depth
@@ -562,11 +562,17 @@ class Smarty
      */
     var $_cache_including = false;
 
+    /**
+     * plugin filepath cache
+     *
+     * @var array
+     */
+    var $_filepaths_cache = array();
     /**#@-*/
     /**
      * The class constructor.
      */
-    function __construct()
+    public function __construct()
     {
       $this->assign('SCRIPT_NAME', isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME']
                     : @$GLOBALS['HTTP_SERVER_VARS']['SCRIPT_NAME']);
@@ -1511,10 +1517,8 @@ class Smarty
      */
     function _get_compile_path($resource_name)
     {
-        $compilePath = $this->_get_auto_filename( $this->compile_dir,
-                                                  $resource_name,
-                                                  $this->_compile_id );
-        $compilePath .= '.php';
+        $compilePath =  $this->_get_auto_filename($this->compile_dir, $resource_name,
+                                         $this->_compile_id) . '.php';
 
         //for 'string:' resource smarty might going to fail to create
         //compile file, so make sure we should have valid path, CRM-5890
@@ -1542,9 +1546,9 @@ class Smarty
             smarty_core_create_dir_structure( array('dir' => $dirname ), $this );
         }
 
-        $isValid = false;
+        $isValid = FALSE;
         if ( $fd = @fopen( $compilePath, 'wb') ) {
-            $isValid = true;
+            $isValid = TRUE;
             @fclose( $fd );
             @unlink($compilePath);
         }

@@ -7,7 +7,7 @@
 function civicrm_contact_ref_menu() {
   $items = array();
   $items['civicrm_contact_ref/autocomplete'] = array(
-    'title' => t('Contacts'),
+    'title' => 'Contacts',
     'page callback' => 'civicrm_contact_ref_autocomplete_value',
     'type' => MENU_CALLBACK,
     'access arguments' => array('access content'),
@@ -17,7 +17,7 @@ function civicrm_contact_ref_menu() {
 }
 
 /**
- * Implemetation of hook_field_info
+ * Implemets hook_field_info
  */
 function civicrm_contact_ref_field_info() {
   return array(
@@ -33,7 +33,7 @@ function civicrm_contact_ref_field_info() {
 }
 
 /**
- * Implemetation of hook_field_widget_info
+ * Implemets hook_field_widget_info().
  */
 function civicrm_contact_ref_field_widget_info() {
   return array(
@@ -50,7 +50,7 @@ function civicrm_contact_ref_field_widget_info() {
 }
 
 /**
- * Implemetation of hook_field_widget_info_alter
+ * ImplemetS hook_field_widget_info_alter().
  */
 function civicrm_contact_ref_field_widget_info_alter(&$info) {
   $info['options_select']['field types'][] = 'civicrm_contact_ref_contact';
@@ -93,7 +93,7 @@ function civicrm_contact_ref_field_formatter_info() {
 }
 
 /**
- * Implements hook_field_formatter_view()
+ * Implements hook_field_formatter_view().
  */
 function civicrm_contact_ref_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
@@ -149,7 +149,7 @@ function civicrm_contact_ref_field_formatter_view($entity_type, $entity, $field,
  * @param $field
  *   The field definition.
  *
- * @return
+ * @return array
  *   The array of valid contacts.
  */
 function civicrm_contact_ref_allowed_values($field) {
@@ -260,7 +260,7 @@ function civicrm_contact_ref_autocomplete_validate($element, &$form_state) {
   form_set_value($element, $cid, $form_state);
 }
 
-/*
+/**
  * Function to provide values for autocomplete civicrm contact
  * element, depend upon entered string.
  */
@@ -296,7 +296,7 @@ function civicrm_contact_ref_autocomplete_value($field_name, $string = '') {
  * @param $exact_string
  *   Optional: should the title filter be an exact match.
  *
- * @return
+ * @return array
  *   An array of valid nodes in the form:
  *   array(
  *     nid => array(
@@ -427,7 +427,9 @@ WHERE  id = %1";
 }
 
 /**
- * Implements hook_field_views_data() to allow for views relationships
+ * Implements hook_field_views_data().
+ *
+ * To allow for views relationships
  */
 function civicrm_contact_ref_field_views_data($field) {
   $data = field_views_field_default_views_data($field);
@@ -455,6 +457,7 @@ function civicrm_contact_ref_field_views_data($field) {
 
 /**
  * Implements hook_civicrm_merge().
+ *
  * Update field data to reflect new cids when contacts are merged.
  */
 function civicrm_contact_ref_civicrm_merge($type, $data, $new_id = NULL, $old_id = NULL, $tables = NULL) {

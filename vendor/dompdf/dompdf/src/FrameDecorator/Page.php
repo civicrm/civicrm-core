@@ -191,7 +191,6 @@ class Page extends AbstractFrameDecorator
             $prev = $prev->get_prev_sibling();
         }
 
-
         if (in_array($style->page_break_before, $page_breaks)) {
 
             // Prevent cascading splits
@@ -223,7 +222,6 @@ class Page extends AbstractFrameDecorator
                 return true;
             }
         }
-
 
         return false;
     }
@@ -437,7 +435,6 @@ class Page extends AbstractFrameDecorator
                     Helpers::dompdf_debug("page-break", "table-row/row-groups: break allowed");
 
                     return true;
-
                 } else {
                     if (in_array($display, Table::$ROW_GROUPS)) {
 
@@ -445,7 +442,6 @@ class Page extends AbstractFrameDecorator
                         return false;
 
                     } else {
-
                         Helpers::dompdf_debug("page-break", "? " . $frame->get_style()->display . "");
 
                         return false;
@@ -463,7 +459,7 @@ class Page extends AbstractFrameDecorator
      *
      * @param Frame $frame the frame to check
      *
-     * @return Frame the frame following the page break
+     * @return bool
      */
     function check_page_break(Frame $frame)
     {
@@ -491,20 +487,13 @@ class Page extends AbstractFrameDecorator
             return false;
 
         // Determine the frame's maximum y value
-        $max_y = $frame->get_position("y") + $margin_height;
+        $max_y = (float)$frame->get_position("y") + $margin_height;
 
         // If a split is to occur here, then the bottom margins & paddings of all
         // parents of $frame must fit on the page as well:
         $p = $frame->get_parent();
         while ($p) {
-            $style = $p->get_style();
-            $max_y += $style->length_in_pt(
-                array(
-                    $style->margin_bottom,
-                    $style->padding_bottom,
-                    $style->border_bottom_width
-                )
-            );
+            $max_y += $p->get_style()->computed_bottom_spacing();
             $p = $p->get_parent();
         }
 
@@ -604,6 +593,10 @@ class Page extends AbstractFrameDecorator
 
     //........................................................................
 
+    /**
+     * @param Frame|null $frame
+     * @param bool $force_pagebreak
+     */
     function split(Frame $frame = null, $force_pagebreak = false)
     {
         // Do nothing
@@ -629,11 +622,18 @@ class Page extends AbstractFrameDecorator
         return $this->_floating_frames;
     }
 
+    /**
+     * @param $key
+     */
     public function remove_floating_frame($key)
     {
         unset($this->_floating_frames[$key]);
     }
 
+    /**
+     * @param Frame $child
+     * @return int|mixed
+     */
     public function get_lowest_float_offset(Frame $child)
     {
         $style = $child->get_style();
@@ -642,17 +642,19 @@ class Page extends AbstractFrameDecorator
 
         $y = 0;
 
-        foreach ($this->_floating_frames as $key => $frame) {
-            if ($side === "both" || $frame->get_style()->float === $side) {
-                $y = max($y, $frame->get_position("y") + $frame->get_margin_height());
-
-                if ($float !== "none") {
-                    $this->remove_floating_frame($key);
+        if ($float === "none") {
+            foreach ($this->_floating_frames as $key => $frame) {
+                if ($side === "both" || $frame->get_style()->float === $side) {
+                    $y = max($y, $frame->get_position("y") + $frame->get_margin_height());
                 }
+                $this->remove_floating_frame($key);
             }
+        }
+
+        if ($y > 0) {
+            $y++; // add 1px buffer from float
         }
 
         return $y;
     }
-
 }

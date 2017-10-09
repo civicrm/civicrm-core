@@ -271,7 +271,8 @@ input.crm-form-entityref {
 }
 .crm-container input.crm-form-text,
 .crm-container .crm-icon-picker-button,
-.crm-container input.dateplugin {
+.crm-container input.dateplugin,
+.crm-container input.crm-form-password {
   border: 1px solid #999;
   vertical-align: middle;
   padding: 1px 2px;
@@ -285,7 +286,9 @@ input.crm-form-entityref {
 .crm-container input.crm-form-text[disabled],
 .crm-container input.dateplugin[disabled],
 .crm-container select.crm-form-select[disabled],
-.crm-container input.crm-form-text[readonly] {
+.crm-container input.crm-form-text[readonly],
+.crm-container input.crm-form-password[disabled],
+.crm-container input.crm-form-password[readonly] {
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #ddd), color-stop(15%, #f2f2f2));
   background-image: -webkit-linear-gradient(top, #ddd 1%, #f2f2f2 15%);
   background-image: -moz-linear-gradient(top, #ddd 1%, #f2f2f2 15%);
@@ -294,7 +297,8 @@ input.crm-form-entityref {
 
 .crm-container input.crm-form-text[disabled],
 .crm-container input.dateplugin[disabled],
-.crm-container select.crm-form-select[disabled] {
+.crm-container select.crm-form-select[disabled],
+.crm-container input.crm-form-password[disabled] {
   color: #a9a9a9;
 }
 

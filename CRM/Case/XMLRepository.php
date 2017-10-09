@@ -63,6 +63,13 @@ class CRM_Case_XMLRepository {
     return self::$singleton;
   }
 
+  public function flush() {
+    $this->xml = array();
+    $this->hookCache = NULL;
+    $this->allCaseTypes = NULL;
+    CRM_Core_DAO::$_dbColumnValueCache = array();
+  }
+
   /**
    * Class constructor.
    *

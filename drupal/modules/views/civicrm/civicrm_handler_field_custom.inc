@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Field handler to render a custom field with options
@@ -29,20 +29,20 @@
  * @ingroup civicrm_field_handlers
  */
 class civicrm_handler_field_custom extends views_handler_field {
-  function construct() {
+  public function construct() {
     parent::construct();
     civicrm_initialize();
   }
 
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['civicrm_custom_formatter'] = array(
-      'default' => 'label'
+      'default' => 'label',
     );
     return $options;
   }
 
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     // Replicate Drupal UI for formatter options, but with CiviCRM
     // terminology.
@@ -57,7 +57,7 @@ class civicrm_handler_field_custom extends views_handler_field {
     );
   }
 
-  function render($values) {
+  public function render($values) {
     $value = $values->{$this->field_alias};
     switch ($this->options['civicrm_custom_formatter']) {
       case 'value':
@@ -79,4 +79,5 @@ class civicrm_handler_field_custom extends views_handler_field {
         return NULL;
     }
   }
+
 }

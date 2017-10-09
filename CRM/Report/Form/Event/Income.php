@@ -78,7 +78,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
     $eventID = implode(',', $eventIDs);
 
-    $participantStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1");
+    $participantStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1", "label");
     $participantRole = CRM_Event_PseudoConstant::participantRole();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
@@ -127,13 +127,13 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     $eventDAO = $this->executeReportQuery($sql);
     $currency = array();
     while ($eventDAO->fetch()) {
-      $eventSummary[$eventDAO->event_id]['Title'] = $eventDAO->event_title;
-      $eventSummary[$eventDAO->event_id]['Max Participants'] = $eventDAO->max_participants;
-      $eventSummary[$eventDAO->event_id]['Start Date'] = CRM_Utils_Date::customFormat($eventDAO->start_date);
-      $eventSummary[$eventDAO->event_id]['End Date'] = CRM_Utils_Date::customFormat($eventDAO->end_date);
-      $eventSummary[$eventDAO->event_id]['Event Type'] = $eventDAO->event_type;
-      $eventSummary[$eventDAO->event_id]['Event Income'] = CRM_Utils_Money::format($eventDAO->total, $eventDAO->currency);
-      $eventSummary[$eventDAO->event_id]['Registered Participant'] = "{$eventDAO->participant} ({$activeparticipnatStutusLabel})";
+      $eventSummary[$eventDAO->event_id][ts('Title')] = $eventDAO->event_title;
+      $eventSummary[$eventDAO->event_id][ts('Max Participants')] = $eventDAO->max_participants;
+      $eventSummary[$eventDAO->event_id][ts('Start Date')] = CRM_Utils_Date::customFormat($eventDAO->start_date);
+      $eventSummary[$eventDAO->event_id][ts('End Date')] = CRM_Utils_Date::customFormat($eventDAO->end_date);
+      $eventSummary[$eventDAO->event_id][ts('Event Type')] = $eventDAO->event_type;
+      $eventSummary[$eventDAO->event_id][ts('Event Income')] = CRM_Utils_Money::format($eventDAO->total, $eventDAO->currency);
+      $eventSummary[$eventDAO->event_id][ts('Registered Participant')] = "{$eventDAO->participant} ({$activeparticipnatStutusLabel})";
       $currency[$eventDAO->event_id] = $eventDAO->currency;
     }
     $this->assign_by_ref('summary', $eventSummary);
@@ -197,7 +197,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
       }
     }
 
-    $rows['Role'] = $roleRows;
+    $rows[ts('Role')] = $roleRows;
 
     // Count the Participant by status ID for Event.
     $status = "
@@ -222,7 +222,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
       $statusRows[$statusDAO->event_id][$participantStatus[$statusDAO->STATUSID]]['amount'] = CRM_Utils_Money::format($statusDAO->amount, $currency[$statusDAO->event_id]);
     }
 
-    $rows['Status'] = $statusRows;
+    $rows[ts('Status')] = $statusRows;
 
     //Count the Participant by payment instrument ID for Event
     //e.g. Credit Card, Check,Cash etc
@@ -254,7 +254,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
         $instrumentRows[$instrumentDAO->event_id][$paymentInstruments[$instrumentDAO->INSTRUMENT]]['amount'] = CRM_Utils_Money::format($instrumentDAO->amount, $currency[$instrumentDAO->event_id]);
       }
     }
-    $rows['Payment Method'] = $instrumentRows;
+    $rows[ts('Payment Method')] = $instrumentRows;
 
     $this->assign_by_ref('rows', $rows);
     if (!$this->_setVariable) {

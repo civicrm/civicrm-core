@@ -202,7 +202,8 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
                   $this->_participantWhere
 
         GROUP BY civicrm_participant.event_id,
-                 civicrm_participant.status_id";
+                 civicrm_participant.status_id,
+                 civicrm_participant.fee_currency";
 
     $info = CRM_Core_DAO::executeQuery($sql);
     $participant_data = $participant_info = $currency = array();

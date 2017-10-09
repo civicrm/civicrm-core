@@ -57,7 +57,7 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         'details' => ts('Activity Details'),
         'activity_date_time' => ts('Activity Date-Time'),
       ),
-      $this->getCustomTokens('Activity')
+      CRM_Utils_Token::getCustomFieldTokens('Activity')
     ));
   }
 

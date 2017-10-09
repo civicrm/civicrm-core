@@ -246,7 +246,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
 
             try {
                 $value[$name] = $child->finalize($value[$name]);
-            } catch (UnsetKeyException $unset) {
+            } catch (UnsetKeyException $e) {
                 unset($value[$name]);
             }
         }
@@ -269,6 +269,9 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                 $this->getPath(),
                 gettype($value)
             ));
+            if ($hint = $this->getInfo()) {
+                $ex->addHint($hint);
+            }
             $ex->setPath($this->getPath());
 
             throw $ex;

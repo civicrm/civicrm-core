@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Field handler for website field
@@ -31,7 +31,7 @@
 class civicrm_handler_field_website extends civicrm_handler_field_location {
   static $_websiteType;
 
-  function construct() {
+  public function construct() {
     parent::construct();
     if (!self::$_websiteType) {
       if (!civicrm_initialize()) {
@@ -41,13 +41,13 @@ class civicrm_handler_field_website extends civicrm_handler_field_location {
     }
   }
 
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['website_type'] = array('default' => 0);
     return $options;
   }
 
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $websiteOptions = array(0 => 'Any');
     foreach (self::$_websiteType as $id => $type) {
@@ -63,7 +63,7 @@ class civicrm_handler_field_website extends civicrm_handler_field_location {
     );
   }
 
-  function join_website($join = array()) {
+  public function join_website($join = array()) {
     $extra = array();
     if (isset($join->extra)) {
       $extra = $join->extra;
@@ -82,26 +82,28 @@ class civicrm_handler_field_website extends civicrm_handler_field_location {
     return $join;
   }
 
-  function get_join() {
+  public function get_join() {
     $join = parent::get_join();
     $join = $this->join_website($join);
     return $join;
   }
 
-  function ensure_my_table() {
+  public function ensure_my_table() {
     if (!isset($this->table_alias)) {
       if (!method_exists($this->query, 'ensure_table')) {
         vpr_trace();
         exit;
       }
       $join = $this->get_join();
-      if (empty($this->relationship)) { //https://www.drupal.org/node/2617032
+      if (empty($this->relationship)) {
+        //https://www.drupal.org/node/2617032
         $this->table_alias = $this->query->add_table($this->table, $this->relationship, $join);
-      } else {
+      }
+      else {
         $this->table_alias = $this->query->ensure_table($this->table, $this->relationship, $join);
       }
     }
     return $this->table_alias;
   }
-}
 
+}

@@ -542,7 +542,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       }
       \Civi::$statics[__CLASS__]['columnsOf'][$table] = array();
       while ($dao->fetch()) {
-        \Civi::$statics[__CLASS__]['columnsOf'][$table][] = $dao->Field;
+        \Civi::$statics[__CLASS__]['columnsOf'][$table][] = CRM_Utils_type::escape($dao->Field, 'MysqlColumnNameOrAlias');
       }
     }
     return \Civi::$statics[__CLASS__]['columnsOf'][$table];
@@ -932,6 +932,18 @@ COLS;
   public function getLogTablesForContact() {
     $tables = array_keys(CRM_Dedupe_Merger::cidRefs());
     return array_intersect($tables, $this->tables);
+  }
+
+  /**
+   * Retrieve missing log tables.
+   *
+   * @return array
+   */
+  public function getMissingLogTables() {
+    if ($this->tablesExist()) {
+      return array_diff($this->tables, array_keys($this->logs));
+    }
+    return array();
   }
 
 }

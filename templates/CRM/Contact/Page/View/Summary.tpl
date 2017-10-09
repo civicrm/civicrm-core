@@ -125,7 +125,7 @@
       <ul class="crm-contact-tabs-list">
         {foreach from=$allTabs key=tabName item=tabValue}
           <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all crm-count-{$tabValue.count}{if isset($tabValue.class)} {$tabValue.class}{/if}">
-            <a href="{$tabValue.url}" title="{$tabValue.title}">
+            <a href="{$tabValue.url}" title="{$tabValue.title|escape}">
               {$tabValue.title}
               {if empty($tabValue.hideCount)}<em>{$tabValue.count}</em>{/if}
             </a>
@@ -166,7 +166,7 @@
                       </div>
                       <div class="crm-content" id="tags">
                         {foreach from=$contactTag item=tagName key=tagId}
-                          <span class="crm-tag-item" {if !empty($allTags.$tagId.color)}style="background-color: {$allTags.$tagId.color}; color: {$allTags.$tagId.color|colorContrast};"{/if} title="{$allTags.$tagId.description}">
+                          <span class="crm-tag-item" {if !empty($allTags.$tagId.color)}style="background-color: {$allTags.$tagId.color}; color: {$allTags.$tagId.color|colorContrast};"{/if} title="{$allTags.$tagId.description|escape}">
                             {$tagName}
                           </span>
                         {/foreach}

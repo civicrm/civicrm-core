@@ -559,6 +559,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     jimport('joomla.application.cli');
 
+    if (!defined('JDEBUG')) {
+      define('JDEBUG', FALSE);
+    }
+
     // CRM-14281 Joomla wasn't available during bootstrap, so hook_civicrm_config never executes.
     $config = CRM_Core_Config::singleton();
     CRM_Utils_Hook::config($config);
@@ -694,6 +698,11 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    *   local file system path to CMS root, or NULL if it cannot be determined
    */
   public function cmsRootPath() {
+    global $civicrm_paths;
+    if (!empty($civicrm_paths['cms.root']['path'])) {
+      return $civicrm_paths['cms.root']['path'];
+    }
+
     list($url, $siteName, $siteRoot) = $this->getDefaultSiteSettings();
     $includePath = "$siteRoot/libraries/cms/version";
     if (file_exists("$includePath/version.php")) {

@@ -26,7 +26,7 @@
  * @package Smarty
  */
 
-/* $Id: Smarty_Compiler.class.php 3163 2009-06-17 14:39:24Z monte.ohrt $ */
+/* $Id$ */
 
 /**
  * Template compiling class
@@ -78,7 +78,7 @@ class Smarty_Compiler extends Smarty {
     /**
      * The class constructor.
      */
-    function __construct()
+    public function __construct()
     {
         // matches double quoted strings:
         // "foobar"

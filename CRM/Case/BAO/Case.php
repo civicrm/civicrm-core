@@ -75,7 +75,9 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   public static function add(&$params) {
     $caseDAO = new CRM_Case_DAO_Case();
     $caseDAO->copyValues($params);
-    return $caseDAO->save();
+    $result = $caseDAO->save();
+    $caseDAO->find(TRUE); // Get other case values (required by XML processor), this adds to $result array
+    return $result;
   }
 
   /**
@@ -87,6 +89,10 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @return CRM_Case_BAO_Case
    */
   public static function &create(&$params) {
+    // CRM-20958 - These fields are managed by MySQL triggers. Watch out for clients resaving stale timestamps.
+    unset($params['created_date']);
+    unset($params['modified_date']);
+
     $transaction = new CRM_Core_Transaction();
 
     if (!empty($params['id'])) {
@@ -271,6 +277,7 @@ WHERE civicrm_case.id = %1";
     $caseContact->case_id = $caseId;
     $caseContact->find();
     $contactArray = array();
+    // FIXME: Why does this return a 1-based array?
     $count = 1;
     while ($caseContact->fetch()) {
       if ($contactID != $caseContact->contact_id) {
@@ -862,7 +869,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
   public static function getCaseActivity($caseID, &$params, $contactID, $context = NULL, $userID = NULL, $type = NULL) {
     $values = array();
 
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -2086,7 +2093,7 @@ SELECT civicrm_contact.id as casemanager_id,
 
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name');
     $activityStatuses = CRM_Core_PseudoConstant::activityStatus('name');
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -2624,7 +2631,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
               //edit - contact must be source or assignee
               //view - contact must be source/assignee/target
               $isTarget = $isAssignee = $isSource = FALSE;
-              $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+              $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
               $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
               $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
               $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -3135,6 +3142,17 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       // This field is not part of this object but the api supports it
       case 'medium_id':
         $className = 'CRM_Activity_BAO_Activity';
+        break;
+
+      // Filter status id by case type id
+      case 'status_id':
+        if (!empty($props['case_type_id'])) {
+          $idField = is_numeric($props['case_type_id']) ? 'id' : 'name';
+          $caseType = civicrm_api3('CaseType', 'getsingle', array($idField => $props['case_type_id'], 'return' => 'definition'));
+          if (!empty($caseType['definition']['statuses'])) {
+            $params['condition'] = 'v.name IN ("' . implode('","', $caseType['definition']['statuses']) . '")';
+          }
+        }
         break;
     }
     return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
