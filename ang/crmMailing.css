@@ -111,3 +111,13 @@ input[name=preview_test_email]:-ms-input-placeholder {
   margin: 0.5em;
   color: red;
 }
+
+.crmMailing-outdated-count {
+  color: red;
+  font-weight: bold;
+}
+
+.crmMailing-latest-count {
+  color: green;
+  font-weight: bold;
+}

@@ -1,9 +1,4 @@
 <div ng-controller="EditRecipCtrl" class="crm-mailing-recipients-row">
-  <div style="float: right;">
-    <div class="crmMailing-recip-est">
-      <a href="" ng-click="previewRecipients()" title="{{ts('Preview a List of Recipients')}}">{{getRecipientsEstimate()}}</a>
-    </div>
-  </div>
   <input
     type="hidden"
     crm-mailing-recipients
@@ -11,6 +6,14 @@
     crm-mandatory-groups="crmMailingConst.groupNames | filter:{is_hidden:1}"
     crm-ui-id="{{crmMailingBlockRecipients.id}}"
     name="{{crmMailingBlockRecipients.name}}"
-    ng-required="true"/>
-  <a crm-icon="fa-wrench" ng-click="editOptions(mailing)" class="crm-hover-button" title="{{ts('Edit Recipient Options')}}"></a>
+    ng-required="true" />
+    <a crm-icon="fa-wrench" ng-click="editOptions(mailing)" class="crm-hover-button" title="{{ts('Edit Recipient Options')}}"></a>
+    <div>
+      <button ng-click="rebuildRecipients()" class="ng-binding crm-button" title="{{ts('Preview a List of Recipients')}}">{{getRecipientsEstimate()}}</button>
+      <a ng-click="previewRecipients()" class="crm-hover-button" title="{{ts('Click to refresh recipient count')}}">
+        <span class="{{((outdated || recipient == 0) ? 'crmMailing-outdated-count' : 'crmMailing-latest-count')}}">
+          {{getRecipientCount()}}
+        </span>
+      </a>
+    </div>
 </div>
