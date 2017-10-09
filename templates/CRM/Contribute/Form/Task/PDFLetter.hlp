@@ -39,12 +39,3 @@
 {htxt id="id-contribution-email-print"}
   <p>{ts}You can choose to send thank-you letters as emails to contacts who are able to receive email. If you choose to do this, you can also decide whether to only print PDF's for the remaining contacts OR generate PDF's for all.{/ts}</p>
 {/htxt}
-{htxt id ="id-from_email"}
-  <p>{ts}Select the "FROM" Email Address for this mailing from the dropdown list. Available email addresses are configurable by users with Administer CiviCRM permission. EXAMPLE: "Client Services" &lt;clientservices@example.org&gt;{/ts}</p>
-{if $params.isAdmin}
-  {capture assign="fromConfig"}{crmURL p="civicrm/admin/options/from_email_address" q="reset=1"}{/capture}
-  <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a> to add or edit email addresses. Make sure these email addresses are valid email accounts with your email service provider.{/ts}</p>
-{else}
-  {ts}Contact your site administrator if you need to use a "FROM" Email Address which is not in the dropdown list.{/ts}
-{/if}
-{/htxt}
