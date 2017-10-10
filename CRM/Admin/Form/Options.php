@@ -80,6 +80,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'name'
     );
     $this->_gLabel = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $this->_gid, 'title');
+    $this->_domainSpecific = in_array($this->_gName, CRM_Core_OptionGroup::$_domainIDGroups);
     $url = "civicrm/admin/options/{$this->_gName}";
     $params = "reset=1";
 
@@ -171,7 +172,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       TRUE
     );
 
-    $this->_domainSpecific = in_array($this->_gName, CRM_Core_OptionGroup::$_domainIDGroups) ? TRUE : FALSE;
     if ($this->_gName != 'activity_type') {
       $this->add('text',
         'value',
