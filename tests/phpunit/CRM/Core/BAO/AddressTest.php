@@ -330,4 +330,165 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertNotContains('street_number_suffix', $parsedStreetAddress);
   }
 
+  /**
+   * CRM-21214 - Ensure all child addresses are updated correctly - 1.
+   * 1. First, create three contacts: A, B, and C
+   * 2. Create an address for contact A
+   * 3. Use contact A's address for contact B
+   * 4. Use contact B's address for contact C
+   * 5. Change contact A's address
+   * Address of Contact C should reflect contact A's address change
+   * Also, Contact C's address' master_id should be Contact A's address id.
+   */
+  public function testSharedAddressChaining1() {
+    $contactIdA = $this->individualCreate(array(), 0);
+    $contactIdB = $this->individualCreate(array(), 1);
+    $contactIdC = $this->individualCreate(array(), 2);
+
+    $addressParamsA = array(
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'contact_id' => $contactIdA,
+    );
+    $addAddressA = CRM_Core_BAO_Address::add($addressParamsA, FALSE);
+
+    $addressParamsB = array(
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'master_id' => $addAddressA->id,
+      'contact_id' => $contactIdB,
+    );
+    $addAddressB = CRM_Core_BAO_Address::add($addressParamsB, FALSE);
+
+    $addressParamsC = array(
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'master_id' => $addAddressB->id,
+      'contact_id' => $contactIdC,
+    );
+    $addAddressC = CRM_Core_BAO_Address::add($addressParamsC, FALSE);
+
+    $updatedAddressParamsA = array(
+      'id' => $addAddressA->id,
+      'street_address' => '1313 New Address Lane',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'contact_id' => $contactIdA,
+    );
+    $updatedAddressA = CRM_Core_BAO_Address::add($updatedAddressParamsA, FALSE);
+
+    // CRM-21214 - Has Address C been updated with Address A's new values?
+    $newAddressC = new CRM_Core_DAO_Address();
+    $newAddressC->id = $addAddressC->id;
+    $newAddressC->find(TRUE);
+    $newAddressC->fetch(TRUE);
+
+    $this->assertEquals($updatedAddressA->street_address, $newAddressC->street_address);
+    $this->assertEquals($updatedAddressA->id, $newAddressC->master_id);
+  }
+
+  /**
+   * CRM-21214 - Ensure all child addresses are updated correctly - 2.
+   * 1. First, create three contacts: A, B, and C
+   * 2. Create an address for contact A and B
+   * 3. Use contact A's address for contact C
+   * 4. Use contact B's address for contact A
+   * 5. Change contact B's address
+   * Address of Contact C should reflect contact B's address change
+   * Also, Contact C's address' master_id should be Contact B's address id.
+   */
+  public function testSharedAddressChaining2() {
+    $contactIdA = $this->individualCreate(array(), 0);
+    $contactIdB = $this->individualCreate(array(), 1);
+    $contactIdC = $this->individualCreate(array(), 2);
+
+    $addressParamsA = array(
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'contact_id' => $contactIdA,
+    );
+    $addAddressA = CRM_Core_BAO_Address::add($addressParamsA, FALSE);
+
+    $addressParamsB = array(
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'contact_id' => $contactIdB,
+    );
+    $addAddressB = CRM_Core_BAO_Address::add($addressParamsB, FALSE);
+
+    $addressParamsC = array(
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'master_id' => $addAddressA->id,
+      'contact_id' => $contactIdC,
+    );
+    $addAddressC = CRM_Core_BAO_Address::add($addressParamsC, FALSE);
+
+    $updatedAddressParamsA = array(
+      'id' => $addAddressA->id,
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'master_id' => $addAddressB->id,
+      'contact_id' => $contactIdA,
+    );
+    $updatedAddressA = CRM_Core_BAO_Address::add($updatedAddressParamsA, FALSE);
+
+    $updatedAddressParamsB = array(
+      'id' => $addAddressB->id,
+      'street_address' => '1313 New Address Lane',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'contact_id' => $contactIdB,
+    );
+    $updatedAddressB = CRM_Core_BAO_Address::add($updatedAddressParamsB, FALSE);
+
+    // CRM-21214 - Has Address C been updated with Address B's new values?
+    $newAddressC = new CRM_Core_DAO_Address();
+    $newAddressC->id = $addAddressC->id;
+    $newAddressC->find(TRUE);
+    $newAddressC->fetch(TRUE);
+
+    $this->assertEquals($updatedAddressB->street_address, $newAddressC->street_address);
+    $this->assertEquals($updatedAddressB->id, $newAddressC->master_id);
+  }
+
+  /**
+   * CRM-21214 - Ensure all child addresses are updated correctly - 3.
+   * 1. First, create a contact: A
+   * 2. Create an address for contact A
+   * 3. Use contact A's address for contact A's address
+   * An error should be given, and master_id should remain the same.
+   */
+  public function testSharedAddressChaining3() {
+    $contactIdA = $this->individualCreate(array(), 0);
+
+    $addressParamsA = array(
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'contact_id' => $contactIdA,
+    );
+    $addAddressA = CRM_Core_BAO_Address::add($addressParamsA, FALSE);
+
+    $updatedAddressParamsA = array(
+      'id' => $addAddressA->id,
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'master_id' => $addAddressA->id,
+      'contact_id' => $contactIdA,
+    );
+    $updatedAddressA = CRM_Core_BAO_Address::add($updatedAddressParamsA, FALSE);
+
+    // CRM-21214 - AdressA shouldn't be master of itself.
+    $this->assertEmpty($updatedAddressA->master_id);
+  }
+
 }
