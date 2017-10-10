@@ -3003,6 +3003,12 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
     $optionGroupID = $this->callAPISuccessGetValue('option_group', array('return' => 'id', 'name' => 'acl_role'));
+    $ov = new CRM_Core_DAO_OptionValue();
+    $ov->option_group_id = $optionGroupID;
+    $ov->value = 55;
+    if ($ov->find(TRUE)) {
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_option_value WHERE id = {$ov->id}");
+    }
     $optionValue = $this->callAPISuccess('option_value', 'create', array(
       'option_group_id' => $optionGroupID,
       'label' => 'pick me',
