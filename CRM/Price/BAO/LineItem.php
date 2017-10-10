@@ -70,8 +70,8 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     // unset entity table and entity id in $params
     // we never update the entity table and entity id during update mode
     if ($id) {
-      $entity_id = $params['entity_id'];
-      $entity_table = $params['entity_table'];
+      $entity_id = CRM_Utils_Array::value('entity_id', $params);
+      $entity_table = CRM_Utils_Array::value('entity_table', $params);
       unset($params['entity_id'], $params['entity_table']);
     }
     else {
