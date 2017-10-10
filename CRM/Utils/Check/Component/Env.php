@@ -889,6 +889,10 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    */
   public function checkResourceUrl() {
     $messages = array();
+    // Skip when run during unit tests, you can't check without a CMS.
+    if (CRM_Core_Config::singleton()->userFramework == 'UnitTests') {
+      return $messages;
+    }
     // Does arrow.png exist where we expect it?
     $arrowUrl = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'packages/jquery/css/images/arrow.png';
     $headers = get_headers($arrowUrl);
