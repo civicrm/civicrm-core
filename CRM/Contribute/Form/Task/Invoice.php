@@ -311,6 +311,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         }
         else {
           $creditNoteId = $contribution->creditnote_id;
+          CRM_Utils_Hook::generateIdentifier($creditNoteId, 'creditnote_id', $contribution);
         }
       }
       $invoiceNumber = CRM_Utils_Array::value('invoice_prefix', $prefixValue) . "" . $contribution->id;
