@@ -2390,7 +2390,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function generateIdentifier(&$identifier, $context, $object) {
-    return self::singleton()->invoke($identifier, $context, $object, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_generateIdentifier');
+    return self::singleton()->invoke(array('identifier', 'context', 'object'), $identifier, $context, $object, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_generateIdentifier');
   }
 
 }
