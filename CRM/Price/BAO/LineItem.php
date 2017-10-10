@@ -70,6 +70,8 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     // unset entity table and entity id in $params
     // we never update the entity table and entity id during update mode
     if ($id) {
+      $entity_id = $params['entity_id'];
+      $entity_table = $params['entity_table'];
       unset($params['entity_id'], $params['entity_table']);
     }
     else {
@@ -102,6 +104,9 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     }
 
     if ($id) {
+      // CRM-21281: Restore entity reference in case the post hook needs it
+      $lineItemBAO->entity_id = $entity_id;
+      $lineItemBAO->entity_table = $entity_table;
       CRM_Utils_Hook::post('edit', 'LineItem', $id, $lineItemBAO);
     }
     else {
