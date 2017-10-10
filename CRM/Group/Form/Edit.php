@@ -175,7 +175,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       if (CRM_Core_Permission::check('administer Multiple Organizations') && CRM_Core_Permission::isMultisiteEnabled()) {
         CRM_Contact_BAO_GroupOrganization::retrieve($this->_id, $defaults);
       }
-    } else {
+    }
+    else {
       $defaults['is_active'] = 1;
     }
 
