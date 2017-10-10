@@ -2231,7 +2231,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
                     ON  {$t['queue']}.job_id = {$t['job']}.id
             WHERE       {$t['url']}.mailing_id = $mailing_id
                     AND {$t['job']}.is_test = 0
-            GROUP BY    {$t['url']}.id");
+            GROUP BY    {$t['url']}.id
+            ORDER BY    unique_clicks DESC");
 
     $report['click_through'] = array();
 
