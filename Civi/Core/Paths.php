@@ -67,7 +67,7 @@ class Paths {
         );
       })
       ->register('wp.backend.base', function () {
-        return array('url' => CIVICRM_UF_BASEURL . 'wp-admin/');
+        return array('url' => CIVICRM_UF_BASEURL . '/wp-admin/');
       })
       ->register('wp.backend', function () use ($paths) {
         return array(
