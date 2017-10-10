@@ -52,7 +52,8 @@
     "civicrm/civicrm-cxn-rpc": "~0.17.07.01",
     "pear/Auth_SASL": "1.1.0",
     "pear/Net_SMTP": "1.6.*",
-    "pear/Net_socket": "1.0.*"
+    "pear/Net_socket": "1.0.*",
+    "pear/Mail": "1.4.*"
   },
   "repositories": [
     {
@@ -66,14 +67,16 @@
       "bash tools/scripts/composer/tcpdf-cleanup.sh",
       "bash tools/scripts/composer/pear-exception-fix.sh",
       "bash tools/scripts/composer/net-smtp-fix.sh",
-      "bash tools/scripts/composer/phpword-jquery.sh"
+      "bash tools/scripts/composer/phpword-jquery.sh",
+      "bash tools/scripts/composer/mail-fix.sh"
     ],
     "post-update-cmd": [
       "bash tools/scripts/composer/dompdf-cleanup.sh",
       "bash tools/scripts/composer/tcpdf-cleanup.sh",
       "bash tools/scripts/composer/pear-exception-fix.sh",
       "bash tools/scripts/composer/net-smtp-fix.sh",
-      "bash tools/scripts/composer/phpword-jquery.sh"
+      "bash tools/scripts/composer/phpword-jquery.sh",
+      "bash tools/scripts/composer/mail-fix.sh"
     ]
   }
 }
