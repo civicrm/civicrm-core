@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "1d0ba40a540772d8ca8b73f72fff02d8",
+    "content-hash": "6abd711477a577550967549258a7aec0",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -144,6 +144,46 @@
             "description": "phpQuery is a server-side, chainable, CSS3 selector driven Document Object Model (DOM) API based on jQuery JavaScript Library",
             "homepage": "http://code.google.com/p/phpquery/",
             "time": "2013-03-21T12:39:33+00:00"
+        },
+        {
+            "name": "marcj/topsort",
+            "version": "dev-1.0-php53",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/totten/topsort.php.git",
+                "reference": "2765723d36f0e536d987e42cbc60de52209212bd"
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "codeclimate/php-test-reporter": "dev-master",
+                "phpunit/phpunit": "~4.0",
+                "symfony/console": "~2.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MJS\\TopSort\\": "src/",
+                    "MJS\\TopSort\\Tests\\": "tests/Tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marc J. Schmidt",
+                    "email": "marc@marcjschmidt.de"
+                }
+            ],
+            "description": "High-Performance TopSort/Dependency resolving algorithm",
+            "keywords": [
+                "dependency resolving",
+                "topological sort",
+                "topsort"
+            ],
+            "time": "2016-03-25 21:38:05"
         },
         {
             "name": "pclzip/pclzip",
@@ -1567,6 +1607,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "zetacomponents/mail": 20,
+        "marcj/topsort": 20,
         "pear/validate_finance_creditcard": 20
     },
     "prefer-stable": false,
