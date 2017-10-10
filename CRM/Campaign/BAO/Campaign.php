@@ -72,6 +72,9 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
 
     $campaign = new CRM_Campaign_DAO_Campaign();
     $campaign->copyValues($params);
+
+    CRM_Utils_Hook::generateIdentifier($campaign->external_identifier, 'campaign_external_identifier', $campaign);
+
     $campaign->save();
 
     if (!empty($params['id'])) {

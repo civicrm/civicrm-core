@@ -211,6 +211,9 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     $employerId = empty($contact->id) ? NULL : CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contact->id, 'employer_id');
 
     if (!$allNull) {
+      // see if somebody wants to generate/manipulate the external_identifier
+      CRM_Utils_Hook::generateIdentifier($contact->external_identifier, 'contact_external_identifier', $contact);
+
       $contact->save();
 
       CRM_Core_BAO_Log::register($contact->id,

@@ -2382,4 +2382,15 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(array('message'), $message, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_inboundSMS');
   }
 
+  /**
+   * TODO
+   * @param String $identifier  blabla
+   * @param String $context     currently one of 'invoice_id', 'creditnote_id', 'contact_external_identifier', 'campaign_external_identifier'
+   * @param Object $object      depends on $context, e.g. Contact BAO, Contribution BAO, Campaign BAO
+   * @return mixed
+   */
+  public static function generateIdentifier(&$identifier, $context, $object) {
+    return self::singleton()->invoke($identifier, $context, $object, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_generateIdentifier');
+  }
+
 }
