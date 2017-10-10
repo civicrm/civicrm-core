@@ -3,10 +3,9 @@
 -- CRM-21268 Missing French overseas departments.
  INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
    (NULL, 1076, "WF", "Wallis-et-Futuna"),
-   (NULL, 1076, "NC", "Nouvelle-Calédonie");
+   (NULL, 1076, "NC", "Nouvelle-Calédonie"),
 
 -- CRM-21283 Add in missing parishes and regions of Barbados and Antigua and Barbuda
-INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
   (NULL, 1009, "03", "Saint George"),
   (NULL, 1009, "04", "Saint John"),
   (NULL, 1009, "05", "Saint Mary"),
