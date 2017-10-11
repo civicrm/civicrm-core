@@ -60,7 +60,6 @@ CRM.$(function($) {
     <th class="right">{ts}Total Paid{/ts}</th>
     <th class="right">{ts}Balance{/ts}</th>
   </tr>
-{foreach from = $paymentInfo item=paymentInfo } {*CRM-14538 - fix*}
   <tr>
     <td>{$paymentInfo.total|crmMoney}</td>
     <td class='right'>
@@ -77,17 +76,13 @@ CRM.$(function($) {
     </td>
     <td class="right" id="payment-info-balance" data-balance="{$paymentInfo.balance}">{$paymentInfo.balance|crmMoney}</td>
   </tr>
-<tr><td>{*CRM-14538 - fix*}
+</table>
 {if $paymentInfo.balance and !$paymentInfo.payLater && !$hideButtonLinks}
   {if $paymentInfo.balance > 0}
      {assign var=paymentButtonName value='Record Payment'}
   {elseif $paymentInfo.balance < 0}
      {assign var=paymentButtonName value='Record Refund'}
   {/if}
-  <a class="action-item crm-hover-button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$paymentInfo.component`&id=`$paymentInfo.id`&cid=`$cid`"}'><i class="crm-i fa-plus-circle"></i> {ts}{$paymentButtonName}{/ts}</a>
-
+  <a class="action-item crm-hover-button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$component`&id=`$id`&cid=`$cid`"}'><i class="crm-i fa-plus-circle"></i> {ts}{$paymentButtonName}{/ts}</a>
 {/if}
-</td></tr>	  {*CRM-14538 - fix*}
-{/foreach}{*CRM-14538 - fix*}
-</table>
 {/if}

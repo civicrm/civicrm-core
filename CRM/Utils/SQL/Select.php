@@ -594,6 +594,38 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
   }
 
   /**
+   * Execute the query.
+   *
+   * To examine the results, use a function like `fetch()`, `fetchAll()`,
+   * `fetchValue()`, or `fetchMap()`.
+   *
+   * @param string|NULL $daoName
+   *   The return object should be an instance of this class.
+   *   Ex: 'CRM_Contact_BAO_Contact'.
+   * @param bool $i18nRewrite
+   *   If the system has multilingual features, should the field/table
+   *   names be rewritten?
+   * @return CRM_Core_DAO
+   * @see CRM_Core_DAO::executeQuery
+   * @see CRM_Core_I18n_Schema::rewriteQuery
+   */
+  public function execute($daoName = NULL, $i18nRewrite = TRUE) {
+    // Don't pass through $params. toSQL() handles interpolation.
+    $params = array();
+
+    // Don't pass through $abort, $trapException. Just use straight-up exceptions.
+    $abort = TRUE;
+    $trapException = FALSE;
+    $errorScope = CRM_Core_TemporaryErrorScope::useException();
+
+    // Don't pass through freeDAO. You can do it yourself.
+    $freeDAO = FALSE;
+
+    return CRM_Core_DAO::executeQuery($this->toSQL(), $params, $abort, $daoName,
+      $freeDAO, $i18nRewrite, $trapException);
+  }
+
+  /**
    * Has an offset been set.
    *
    * @param string $offset

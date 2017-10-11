@@ -37,6 +37,27 @@
  */
 
 return array(
+  'assetCache' => array(
+    'group_name' => 'Developer Preferences',
+    'group' => 'developer',
+    'name' => 'assetCache',
+    'type' => 'String',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => array(
+      //'class' => 'crm-select2',
+    ),
+    'default' => 'auto',
+    'add' => '4.7',
+    'title' => 'Asset Caching',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Store computed JS/CSS content in cache files? (Note: In "Auto" mode, the "Debug" setting will determine whether to activate the cache.)',
+    'help_text' => NULL,
+    'pseudoconstant' => array(
+      'callback' => '\Civi\Core\AssetBuilder::getCacheModes',
+    ),
+  ),
   'userFrameworkLogging' => array(
     'group_name' => 'Developer Preferences',
     'group' => 'developer',
@@ -78,6 +99,26 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => "Set this value to Yes if you want to display a backtrace listing when a fatal error is encountered. This feature should NOT be enabled for production sites",
+  ),
+  'environment' => array(
+    'group_name' => 'Developer Preferences',
+    'group' => 'developer',
+    'name' => 'environment',
+    'type' => 'String',
+    'html_type' => 'Select',
+    'quick_form_type' => 'Select',
+    'default' => 'Production',
+    'pseudoconstant' => array(
+      'optionGroupName' => 'environment',
+    ),
+    'add' => '4.7',
+    'title' => 'Environment',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => "Setting to define the environment in which this CiviCRM instance is running.",
+    'on_change' => array(
+      'CRM_Core_BAO_Setting::onChangeEnvironmentSetting',
+    ),
   ),
   'fatalErrorHandler' => array(
     'group_name' => 'Developer Preferences',

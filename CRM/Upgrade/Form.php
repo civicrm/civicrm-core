@@ -567,6 +567,13 @@ SET    version = '$version'
       'reset' => TRUE,
     ));
 
+    $task = new CRM_Queue_Task(
+      array('CRM_Upgrade_Form', 'doFileCleanup'),
+      array($postUpgradeMessageFile),
+      "Cleanup old files"
+    );
+    $queue->createItem($task);
+
     $revisions = $upgrade->getRevisionSequence();
     foreach ($revisions as $rev) {
       // proceed only if $currentVer < $rev
@@ -601,6 +608,47 @@ SET    version = '$version'
     }
 
     return $queue;
+  }
+
+  /**
+   * Find any old, orphaned files that should have been deleted.
+   *
+   * These files can get left behind, eg, if you use the Joomla
+   * upgrade procedure.
+   *
+   * The earlier we can do this, the better - don't want upgrade logic
+   * to inadvertently rely on old/relocated files.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string $postUpgradeMessageFile
+   * @return bool
+   */
+  public static function doFileCleanup(CRM_Queue_TaskContext $ctx, $postUpgradeMessageFile) {
+    $source = new CRM_Utils_Check_Component_Source();
+    $files = $source->findOrphanedFiles();
+    $errors = array();
+    foreach ($files as $file) {
+      if (is_dir($file['path'])) {
+        @rmdir($file['path']);
+      }
+      else {
+        @unlink($file['path']);
+      }
+
+      if (file_exists($file['path'])) {
+        $errors[] = sprintf("<li>%s</li>", htmlentities($file['path']));
+      }
+    }
+
+    if (!empty($errors)) {
+      file_put_contents($postUpgradeMessageFile,
+        '<br/><br/>' . ts('Some old files could not be removed. Please remove them.')
+        . '<ul>' . implode("\n", $errors) . '</ul>',
+        FILE_APPEND
+      );
+    }
+
+    return TRUE;
   }
 
   /**
@@ -720,9 +768,6 @@ SET    version = '$version'
     // Rebuild all triggers and re-enable logging if needed
     $logging = new CRM_Logging_Schema();
     $logging->fixSchemaDifferences();
-
-    //CRM-16257 update Config.IDS.ini might be an old copy
-    CRM_Core_IDS::createConfigFile(TRUE);
   }
 
   /**

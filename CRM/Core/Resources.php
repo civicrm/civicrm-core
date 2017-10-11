@@ -311,6 +311,7 @@ class CRM_Core_Resources {
     foreach ($this->settingsFactories as $callable) {
       $result = $this->mergeSettings($result, $callable());
     }
+    CRM_Utils_Hook::alterResourceSettings($result);
     return $result;
   }
 
@@ -527,6 +528,9 @@ class CRM_Core_Resources {
     $patterns = (array) $patterns;
     $files = array();
     foreach ($patterns as $pattern) {
+      if (preg_match(';^(assetBuilder|ext)://;', $pattern)) {
+        $files[] = $pattern;
+      }
       if (CRM_Utils_File::isAbsolute($pattern)) {
         // Absolute path.
         $files = array_merge($files, (array) glob($pattern, $flags));
@@ -839,6 +843,8 @@ class CRM_Core_Resources {
       array('key' => 'country', 'value' => ts('Country'), 'entity' => 'address'),
       array('key' => 'gender_id', 'value' => ts('Gender')),
       array('key' => 'is_deceased', 'value' => ts('Deceased')),
+      array('key' => 'contact_id', 'value' => ts('Contact ID'), 'type' => 'text'),
+      array('key' => 'external_identifier', 'value' => ts('External ID'), 'type' => 'text'),
       array('key' => 'source', 'value' => ts('Contact Source'), 'type' => 'text'),
     );
 

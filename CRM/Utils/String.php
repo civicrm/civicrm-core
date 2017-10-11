@@ -47,7 +47,7 @@ class CRM_Utils_String {
   /**
    * Convert a display name into a potential variable name.
    *
-   * @param $title title of the string
+   * @param string $title title of the string
    * @param int $maxLength
    *
    * @return string
@@ -787,6 +787,80 @@ class CRM_Utils_String {
    */
   public static function unstupifyUrl($htmlUrl) {
     return str_replace('&amp;', '&', $htmlUrl);
+  }
+
+  /**
+   * When a user supplies a URL (e.g. to an image), we'd like to:
+   *  - Remove the protocol and domain name if the URL points to the current
+   *    site.
+   *  - Keep the domain name for remote URLs.
+   *  - Optionally, force remote URLs to use https instead of http (which is
+   *    useful for images)
+   *
+   * @param string $url
+   *   The URL to simplify. Examples:
+   *     "https://example.org/sites/default/files/coffee-mug.jpg"
+   *     "sites/default/files/coffee-mug.jpg"
+   *     "http://i.stack.imgur.com/9jb2ial01b.png"
+   * @param bool $forceHttps = FALSE
+   *   If TRUE, ensure that remote URLs use https. If a URL with
+   *   http is supplied, then we'll change it to https.
+   *   This is useful for situations like showing a premium product on a
+   *   contribution, because (as reported in CRM-14283) if the user gets a
+   *   browser warning like "page contains insecure elements" on a contribution
+   *   page, that's a very bad thing. Thus, even if changing http to https
+   *   breaks the image, that's better than leaving http content in a
+   *   contribution page.
+   *
+   * @return string
+   *   The simplified URL. Examples:
+   *     "/sites/default/files/coffee-mug.jpg"
+   *     "https://i.stack.imgur.com/9jb2ial01b.png"
+   */
+  public static function simplifyURL($url, $forceHttps = FALSE) {
+    $config = CRM_Core_Config::singleton();
+    $siteURLParts = self::simpleParseUrl($config->userFrameworkBaseURL);
+    $urlParts = self::simpleParseUrl($url);
+
+    // If the image is locally hosted, then only give the path to the image
+    $urlIsLocal
+      = ($urlParts['host+port'] == '')
+      | ($urlParts['host+port'] == $siteURLParts['host+port']);
+    if ($urlIsLocal) {
+      // and make sure it begins with one forward slash
+      return preg_replace('_^/*(?=.)_', '/', $urlParts['path+query']);
+    }
+
+    // If the URL is external, then keep the full URL as supplied
+    else {
+      return $forceHttps ? preg_replace('_^http://_', 'https://', $url) : $url;
+    }
+  }
+
+  /**
+   * A simplified version of PHP's parse_url() function.
+   *
+   * @param string $url
+   *   e.g. "https://example.com:8000/foo/bar/?id=1#fragment"
+   *
+   * @return array
+   *   Will always contain keys 'host+port' and 'path+query', even if they're
+   *   empty strings. Example:
+   *   [
+   *     'host+port' => "example.com:8000",
+   *     'path+query' => "/foo/bar/?id=1",
+   *   ]
+   */
+  public static function simpleParseUrl($url) {
+    $parts = parse_url($url);
+    $host = isset($parts['host']) ? $parts['host'] : '';
+    $port = isset($parts['port']) ? ':' . $parts['port'] : '';
+    $path = isset($parts['path']) ? $parts['path'] : '';
+    $query = isset($parts['query']) ? '?' . $parts['query'] : '';
+    return array(
+      'host+port' => "$host$port",
+      'path+query' => "$path$query",
+    );
   }
 
   /**

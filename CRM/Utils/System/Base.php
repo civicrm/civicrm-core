@@ -396,6 +396,15 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Check if user registration is permitted.
+   *
+   * @return bool
+   */
+  public function isUserRegistrationPermitted() {
+    return FALSE;
+  }
+
+  /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
    * @param string $destination
@@ -638,6 +647,23 @@ abstract class CRM_Utils_System_Base {
     }
     elseif ($config->userFramework == 'WordPress') {
       $userFrameworkResourceURL = CIVICRM_PLUGIN_URL . "civicrm/";
+    }
+    elseif ($this->is_drupal) {
+      // Drupal setting
+      // check and see if we are installed in sites/all (for D5 and above)
+      // we dont use checkURL since drupal generates an error page and throws
+      // the system for a loop on lobo's macosx box
+      // or in modules
+      $cmsPath = $config->userSystem->cmsRootPath();
+      $userFrameworkResourceURL = $baseURL . str_replace("$cmsPath/", '',
+          str_replace('\\', '/', $civicrm_root)
+        );
+
+      $siteName = $config->userSystem->parseDrupalSiteNameFromRoot($civicrm_root);
+      if ($siteName) {
+        $civicrmDirName = trim(basename($civicrm_root));
+        $userFrameworkResourceURL = $baseURL . "sites/$siteName/modules/$civicrmDirName/";
+      }
     }
     else {
       $userFrameworkResourceURL = NULL;

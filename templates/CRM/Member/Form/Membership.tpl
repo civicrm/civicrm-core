@@ -65,6 +65,16 @@
   </div>
   {/if}
   <div class="crm-block crm-form-block crm-membership-form-block">
+    {if $newCredit AND $action EQ 1 AND $membershipMode EQ null}
+    <div class="action-link css_right crm-link-credit-card-mode">
+      {if $contactId}
+        {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/membership' q="reset=1&action=add&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
+      {else}
+        {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/membership' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
+      {/if}
+     <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card membership{/ts}</a>
+    </div>
+    {/if}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     {if $action eq 8}
     <div class="messages status no-popup">
@@ -82,12 +92,6 @@
         {else}
           <td class="label">{$form.contact_id.label}</td>
           <td>{$form.contact_id.html}</td>
-        {/if}
-        {if $membershipMode}
-          <tr>
-            <td class="label">{$form.payment_processor_id.label}</td>
-            <td>{$form.payment_processor_id.html}</td>
-          </tr>
         {/if}
         <tr class="crm-membership-form-block-membership_type_id">
           <td class="label">{$form.membership_type_id.label}</td>
@@ -173,7 +177,6 @@
             <fieldset id="recordContribution"><legend>{ts}Membership Payment and Receipt{/ts}</legend>
         {/if}
         {include file="CRM/Member/Form/MembershipCommon.tpl"}
-
         {if $emailExists and $isEmailEnabledForSite}
           <tr id="send-receipt" class="crm-membership-form-block-send_receipt">
             <td class="label">{$form.send_receipt.label}</td><td>{$form.send_receipt.html}<br />
@@ -565,9 +568,8 @@
     {/literal}{if $buildPriceSet}{literal}
     cj( "#totalAmountORPriceSet" ).hide( );
     cj( "#mem_type_id" ).hide( );
-	//CRM-14538 - fix
-    cj('#total_amount').attr("readonly", false);
-	cj( "#num_terms_row" ).hide( );
+    cj('#total_amount').attr("readonly", true);
+    cj( "#num_terms_row" ).hide( );
     cj(".crm-membership-form-block-financial_type_id-mode").hide();
     {/literal}{/if}{literal}
 
@@ -602,10 +604,8 @@
       }
 
       cj( "#total_amount" ).val( '' );
-      
-	  //CRM-14538 - fix
-	  cj('#total_amount').attr("readonly", false);
-	
+      cj('#total_amount').attr("readonly", true);
+
       var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&priceSetId=' + priceSetId;
 
       var response = cj.ajax({

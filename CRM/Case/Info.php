@@ -59,19 +59,10 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @inheritDoc
    */
   public function getAngularModules() {
-    $result = array();
-    $result['crmCaseType'] = array(
-      'ext' => 'civicrm',
-      'js' => array('ang/crmCaseType.js'),
-      'css' => array('ang/crmCaseType.css'),
-      'partials' => array('ang/crmCaseType'),
-    );
+    global $civicrm_root;
 
-    CRM_Core_Resources::singleton()->addSetting(array(
-      'crmCaseType' => array(
-        'REL_TYPE_CNAME' => CRM_Case_XMLProcessor::REL_TYPE_CNAME,
-      ),
-    ));
+    $result = array();
+    $result['crmCaseType'] = include "$civicrm_root/ang/crmCaseType.ang.php";
     return $result;
   }
 
@@ -252,6 +243,42 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
         CRM_Core_Error::fatal($msg);
       }
     }
+  }
+
+  /**
+   * @return array
+   *   Array(string $value => string $label).
+   */
+  public static function getRedactOptions() {
+    return array(
+      'default' => ts('Default'),
+      '0' => ts('Do not redact emails'),
+      '1' => ts('Redact emails'),
+    );
+  }
+
+  /**
+   * @return array
+   *   Array(string $value => string $label).
+   */
+  public static function getMultiClientOptions() {
+    return array(
+      'default' => ts('Default'),
+      '0' => ts('Single client per case'),
+      '1' => ts('Multiple client per case'),
+    );
+  }
+
+  /**
+   * @return array
+   *   Array(string $value => string $label).
+   */
+  public static function getSortOptions() {
+    return array(
+      'default' => ts('Default'),
+      '0' => ts('Definition order'),
+      '1' => ts('Alphabetical order'),
+    );
   }
 
 }

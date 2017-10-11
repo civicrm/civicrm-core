@@ -207,10 +207,11 @@ abstract class CRM_Utils_Hook {
       $this->commonIncluded = TRUE;
 
       $config = CRM_Core_Config::singleton();
-      if (!empty($config->customPHPPathDir) &&
-        file_exists("{$config->customPHPPathDir}/civicrmHooks.php")
-      ) {
-        @include_once "civicrmHooks.php";
+      if (!empty($config->customPHPPathDir)) {
+        $civicrmHooksFile = CRM_Utils_File::addTrailingSlash($config->customPHPPathDir) . 'civicrmHooks.php';
+        if (file_exists($civicrmHooksFile)) {
+          @include_once $civicrmHooksFile;
+        }
       }
 
       if (!empty($fnPrefix)) {
@@ -2072,10 +2073,32 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Modify the CRM_Core_Resources settings data.
+   *
+   * @param array $data
+   * @see CRM_Core_Resources::addSetting
+   */
+  public static function alterResourceSettings(&$data) {
+    $event = \Civi\Core\Event\GenericHookEvent::create(array(
+      'data' => &$data,
+    ));
+    Civi::dispatcher()->dispatch('hook_civicrm_alterResourceSettings', $event);
+  }
+
+  /**
    * EXPERIMENTAL: This hook allows one to register additional Angular modules
    *
    * @param array $angularModules
-   *   List of modules.
+   *   List of modules. Each module defines:
+   *    - ext: string, the CiviCRM extension which hosts the files.
+   *    - js: array, list of JS files or globs.
+   *    - css: array, list of CSS files or globs.
+   *    - partials: array, list of base-dirs containing HTML.
+   *    - requires: array, list of required Angular modules.
+   *    - basePages: array, uncondtionally load this module onto the given Angular pages. [v4.7.21+]
+   *      If omitted, default to "array('civicrm/a')" for backward compat.
+   *      For a utility that should only be loaded on-demand, use "array()".
+   *      For a utility that should be loaded in all pages use, "array('*')".
    * @return null
    *   the return value is ignored
    *
@@ -2087,9 +2110,11 @@ abstract class CRM_Utils_Hook {
    *   );
    *   $angularModules['myBigAngularModule'] = array(
    *     'ext' => 'org.example.mymod',
-   *     'js' => array('js/part1.js', 'js/part2.js'),
-   *     'css' => array('css/myAngularModule.css'),
+   *     'js' => array('js/part1.js', 'js/part2.js', 'ext://other.ext.name/file.js', 'assetBuilder://dynamicAsset.js'),
+   *     'css' => array('css/myAngularModule.css', 'ext://other.ext.name/file.css', 'assetBuilder://dynamicAsset.css'),
    *     'partials' => array('partials/myBigAngularModule'),
+   *     'requires' => array('otherModuleA', 'otherModuleB'),
+   *     'basePages' => array('civicrm/a'),
    *   );
    * }
    * @endcode
@@ -2098,6 +2123,53 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(array('angularModules'), $angularModules,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_angularModules'
+    );
+  }
+
+  /**
+   * Alter the definition of some Angular HTML partials.
+   *
+   * @param \Civi\Angular\Manager $angular
+   *
+   * @code
+   * function example_civicrm_alterAngular($angular) {
+   *   $changeSet = \Civi\Angular\ChangeSet::create('mychanges')
+   *     ->alterHtml('~/crmMailing/EditMailingCtrl/2step.html', function(phpQueryObject $doc) {
+   *       $doc->find('[ng-form="crmMailingSubform"]')->attr('cat-stevens', 'ts(\'wild world\')');
+   *     })
+   *   );
+   *   $angular->add($changeSet);
+   * }
+   * @endCode
+   */
+  public static function alterAngular($angular) {
+    $event = \Civi\Core\Event\GenericHookEvent::create(array(
+      'angular' => $angular,
+    ));
+    Civi::dispatcher()->dispatch('hook_civicrm_alterAngular', $event);
+  }
+
+  /**
+   * This hook is called whenever the system builds a new copy of
+   * semi-static asset.
+   *
+   * @param string $asset
+   *   The name of the asset.
+   *   Ex: 'angular.json'
+   * @param array $params
+   *   List of optional arguments which influence the content.
+   *   Note: Params are immutable because they are part of the cache-key.
+   * @param string $mimeType
+   *   Initially, NULL. Modify to specify the mime-type.
+   * @param string $content
+   *   Initially, NULL. Modify to specify the rendered content.
+   * @return null
+   *   the return value is ignored
+   */
+  public static function buildAsset($asset, $params, &$mimeType, &$content) {
+    return self::singleton()->invoke(array('asset', 'params', 'mimeType', 'content'),
+      $asset, $params, $mimeType, $content, self::$_nullObject, self::$_nullObject,
+      'civicrm_buildAsset'
     );
   }
 

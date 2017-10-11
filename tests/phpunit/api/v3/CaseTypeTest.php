@@ -230,4 +230,29 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     $this->assertEquals(0, $getCaseType['count']);
   }
 
+  /**
+   * Test the api returns case statuses filtered by case type.
+   *
+   * Api getoptions should respect the case statuses declared in the case type definition.
+   *
+   * @throws \Exception
+   */
+  public function testCaseStatusByCaseType() {
+    $this->markTestIncomplete('Cannot figure out why this passes locally but fails on Jenkins.');
+    $statusName = md5(mt_rand());
+    $template = $this->callAPISuccess('CaseType', 'getsingle', array('id' => $this->caseTypeId));
+    unset($template['id']);
+    $template['name'] = $template['title'] = 'test_case_type';
+    $template['definition']['statuses'] = array('Closed', $statusName);
+    $this->callAPISuccess('CaseType', 'create', $template);
+    $this->callAPISuccess('OptionValue', 'create', array(
+      'option_group_id' => 'case_status',
+      'name' => $statusName,
+      'label' => $statusName,
+      'weight' => 99,
+    ));
+    $result = $this->callAPISuccess('Case', 'getoptions', array('field' => 'status_id', 'case_type_id' => 'test_case_type', 'context' => 'validate'));
+    $this->assertEquals($template['definition']['statuses'], array_values($result['values']));
+  }
+
 }

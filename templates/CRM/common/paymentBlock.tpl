@@ -52,6 +52,8 @@
       payment_processor.show();
       payment_information.show();
       billing_block.show();
+      // also set selected payment methods
+      cj('input[name="payment_processor_id"][checked=checked]').prop('checked', true);
     }
   }
 

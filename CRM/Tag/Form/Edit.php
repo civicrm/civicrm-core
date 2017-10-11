@@ -54,24 +54,24 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
+    $bounceUrl = CRM_Utils_System::url('civicrm/tag');
     if ($this->_action == CRM_Core_Action::DELETE) {
-      $url = CRM_Utils_System::url('civicrm/tag');
       if (!$this->_id) {
         $this->_id = explode(',', CRM_Utils_Request::retrieve('id', 'String'));
       }
       $this->_id = (array) $this->_id;
       if (!$this->_id) {
-        CRM_Core_Error::statusBounce(ts("Unknown tag."), $url);
+        CRM_Core_Error::statusBounce(ts("Unknown tag."), $bounceUrl);
       }
       foreach ($this->_id as $id) {
         if (!CRM_Utils_Rule::positiveInteger($id)) {
-          CRM_Core_Error::statusBounce(ts("Unknown tag."), $url);
+          CRM_Core_Error::statusBounce(ts("Unknown tag."), $bounceUrl);
         }
         if ($tag = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $id, 'name', 'parent_id')) {
-          CRM_Core_Error::statusBounce(ts("This tag cannot be deleted. You must delete all its child tags ('%1', etc) prior to deleting this tag.", array(1 => $tag)), $url);
+          CRM_Core_Error::statusBounce(ts("This tag cannot be deleted. You must delete all its child tags ('%1', etc) prior to deleting this tag.", array(1 => $tag)), $bounceUrl);
         }
         if (!CRM_Core_Permission::check('administer reserved tags') && CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $id, 'is_reserved')) {
-          CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to delete this reserved tag."), $url);
+          CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to delete this reserved tag."), $bounceUrl);
         }
       }
       if (count($this->_id) > 1) {
@@ -79,12 +79,21 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
       }
     }
     else {
+      $adminTagset = CRM_Core_Permission::check('administer Tagsets');
+      $adminReservedTags = CRM_Core_Permission::check('administer reserved tags');
+
       $this->_isTagSet = CRM_Utils_Request::retrieve('tagset', 'Positive', $this);
 
       if (!$this->_isTagSet && $this->_id &&
         CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'is_tagset')
       ) {
         $this->_isTagSet = TRUE;
+      }
+      if ($this->_isTagSet && !$adminTagset) {
+        CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to edit this tagset."), $bounceUrl);
+      }
+      if ($this->_id && !$adminReservedTags && CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'is_reserved')) {
+        CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to edit this reserved tag."), $bounceUrl);
       }
 
       if ($this->_id) {
@@ -133,16 +142,10 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
         $this->addSelect('used_for', array('multiple' => TRUE, 'option_url' => NULL));
       }
 
-      $adminTagset = TRUE;
-      if (!CRM_Core_Permission::check('administer Tagsets')) {
-        $adminTagset = FALSE;
-      }
       $this->assign('adminTagset', $adminTagset);
 
-      $adminReservedTags = TRUE;
-      if (!CRM_Core_Permission::check('administer reserved tags')) {
+      if (!$adminReservedTags) {
         $isReserved->freeze();
-        $adminReservedTags = FALSE;
       }
       $this->assign('adminReservedTags', $adminReservedTags);
     }
@@ -162,6 +165,9 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
       $params = array('id' => $cloneFrom);
       CRM_Core_BAO_Tag::retrieve($params, $this->_values);
       $this->_values['name'] .= ' (' . ts('copy') . ')';
+      if (!empty($this->_values['is_reserved']) && !CRM_Core_Permission::check('administer reserved tags')) {
+        $this->_values['is_reserved'] = 0;
+      }
       $defaults = $this->_values;
     }
     if (empty($defaults['color'])) {

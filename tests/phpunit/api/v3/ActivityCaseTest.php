@@ -77,4 +77,15 @@ class api_v3_ActivityCaseTest extends CiviCaseTestCase {
     $this->assertEquals(array(), array_intersect($getByCaseId_ids, $getByCaseNull_ids));
   }
 
+  public function testActivityGetWithCaseInfo() {
+    $activities = $this->callAPISuccess('Activity', 'get', array(
+      'sequential' => 1,
+      'case_id' => $this->_case['id'],
+      'return' => array('case_id', 'case_id.subject'),
+    ));
+    $this->assertEquals(__CLASS__, $activities['values'][0]['case_id.subject']);
+    // Note - case_id is always an array
+    $this->assertEquals($this->_case['id'], $activities['values'][0]['case_id'][0]);
+  }
+
 }

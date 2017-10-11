@@ -100,6 +100,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
     elseif ($this->_mappingID) {
       $mappingID = $this->_mappingID;
+      if ($this->_context == 'event') {
+        $this->add('hidden', 'mappingID', $mappingID);
+      }
     }
 
     $this->add(

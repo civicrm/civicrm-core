@@ -32,8 +32,6 @@
  * @subpackage API_Job
  *
  * @copyright CiviCRM LLC (c) 2004-2017
- * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
- *
  */
 
 /**
@@ -57,7 +55,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
   public function setUp() {
     $this->useTransaction();
     parent::setUp();
-    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
 
     $this->_groupID = $this->groupCreate();
     $this->createContactsInGroup(2, $this->_groupID);
@@ -118,7 +116,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       'open_tracking' => 1,
       // Note: open_tracking does nothing with text, but we'll just verify that it does nothing
     ));
-    foreach ($allMessages as $k => $message) {
+    foreach ($allMessages as $message) {
       /** @var ezcMail $message */
       /** @var ezcMailText $textPart */
 
@@ -146,7 +144,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       'open_tracking' => 1,
       'url_tracking' => 0,
     ));
-    foreach ($allMessages as $k => $message) {
+    foreach ($allMessages as $message) {
       /** @var ezcMail $message */
       /** @var ezcMailText $htmlPart */
       /** @var ezcMailText $textPart */
@@ -196,7 +194,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       'open_tracking' => 1,
       'url_tracking' => 1,
     ));
-    foreach ($allMessages as $k => $message) {
+    foreach ($allMessages as $message) {
       /** @var ezcMail $message */
       /** @var ezcMailText $htmlPart */
       /** @var ezcMailText $textPart */
@@ -239,17 +237,19 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Each case comes in four parts:
+   * 1. Mailing HTML (body_html)
+   * 2. Regex to run against final HTML
+   * 3. Regex to run against final text
+   * 4. Additional mailing options
+   *
+   * @return array
+   */
   public function urlTrackingExamples() {
     $cases = array();
 
-    // Each case comes in four parts:
-    // 1. Mailing HTML (body_html)
-    // 2. Regex to run against final HTML
-    // 3. Regex to run against final text
-    // 4. Additional mailing options
-
     // Tracking disabled
-
     $cases[] = array(
       '<p><a href="http://example.net/">Foo</a></p>',
       ';<p><a href="http://example\.net/">Foo</a></p>;',
@@ -285,7 +285,6 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     );
 
     // Tracking enabled
-
     $cases[] = array(
       '<p><a href="http://example.net/">Foo</a></p>',
       ';<p><a href=[\'"].*extern/url\.php\?u=\d+.*[\'"]>Foo</a></p>;',
@@ -338,7 +337,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       'subject' => 'Example Subject',
       'body_html' => $inputHtml,
     ));
-    foreach ($allMessages as $k => $message) {
+    foreach ($allMessages as $message) {
       /** @var ezcMail $message */
       /** @var ezcMailText $htmlPart */
       /** @var ezcMailText $textPart */
@@ -395,7 +394,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
     $mailingParams = array_merge($this->defaultParams, $params);
     $this->callAPISuccess('mailing', 'create', $mailingParams);
     $this->_mut->assertRecipients(array());
-    $this->callAPISuccess('job', 'process_mailing', array());
+    $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
 
     $allMessages = $this->_mut->getAllMessages('ezc');
     // There are exactly two contacts produced by setUp().

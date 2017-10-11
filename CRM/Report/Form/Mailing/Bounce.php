@@ -441,7 +441,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
    */
   public function bounce_type() {
 
-    $data = array('' => ts('--Please Select--'));
+    $data = array();
 
     $bounce_type = new CRM_Mailing_DAO_BounceType();
     $query = "SELECT name FROM civicrm_mailing_bounce_type";

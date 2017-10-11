@@ -31,7 +31,7 @@
 
   <div class="crm-footer" id="civicrm-footer">
     {crmVersion assign=version}
-    {ts 1=$version}Powered by CiviCRM %1.{/ts}
+    {ts}Powered by CiviCRM{/ts} <a href="https://github.com/civicrm/civicrm-core/blob/{$version}/release-notes/{$version}.md">{$version}</a>.
     {if !empty($footer_status_severity)}
       <span class="status{if $footer_status_severity gt 3} crm-error{elseif $footer_status_severity gt 2} crm-warning{else} crm-ok{/if}">
       <a href="{crmURL p='civicrm/a/#/status'}">{$footer_status_message}</a>

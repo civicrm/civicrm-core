@@ -81,7 +81,7 @@
     <div class="label">{$form.is_honor_roll.label}</div>
     <div class="content">
       {$form.is_honor_roll.html}
-      <div class="description">{ts}If this option is checked, an "honor roll" will be displayed with the names (or nicknames) of the people who supported you. (Donors will have the option to remain anonymous. Their names will NOT be listed.){/ts}</div>{* [ML] string changed #9704 *}
+      <div class="description">{ts}If this option is checked, an "honor roll" will be displayed with the names (or nicknames) of the people who supported you. (Donors will have the option to remain anonymous. Their names will NOT be listed.){/ts}</div>
     </div>
     <div class="clear"></div>
   </div>

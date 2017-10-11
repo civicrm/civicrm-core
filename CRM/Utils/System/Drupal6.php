@@ -543,6 +543,12 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       // drush anyway takes care of multisite install etc
       return drush_get_context('DRUSH_DRUPAL_ROOT');
     }
+
+    global $civicrm_paths;
+    if (!empty($civicrm_paths['cms.root']['path'])) {
+      return $civicrm_paths['cms.root']['path'];
+    }
+
     // CRM-7582
     $pathVars = explode('/',
       str_replace('//', '/',

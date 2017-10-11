@@ -270,7 +270,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       else {
         $this->assign('mode', 'Add');
       }
-      $pcpStatus = CRM_Core_OptionGroup::getLabel('pcp_status', $statusId);
+      $pcpStatus = CRM_Core_PseudoConstant::getLabel('CRM_PCP_DAO_PCP', 'status_id', $statusId);
       $this->assign('pcpStatus', $pcpStatus);
 
       $this->assign('pcpId', $pcp->id);

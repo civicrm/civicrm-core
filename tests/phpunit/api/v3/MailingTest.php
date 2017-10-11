@@ -879,4 +879,18 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
     $this->assertContains($unicodeURL, $url);
   }
 
+  /**
+   * CRM-20892 : Test if Mail.create API throws error on update,
+   *  if modified_date less then the date when the mail was last updated/created
+   */
+  public function testModifiedDateMismatchOnMailingUpdate() {
+    $mail = $this->callAPISuccess('mailing', 'create', $this->_params + array('modified_date' => 'now'));
+    try {
+      $this->callAPISuccess('mailing', 'create', $this->_params + array('id' => $mail['id'], 'modified_date' => '2 seconds ago'));
+    }
+    catch (Exception $e) {
+      $this->assertRegExp("/Failure in api call for mailing create:  Mailing has not been saved, Content maybe out of date, please refresh the page and try again/", $e->getMessage());
+    }
+  }
+
 }

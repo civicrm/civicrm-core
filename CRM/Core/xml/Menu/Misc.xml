@@ -89,7 +89,7 @@
      <path>civicrm/api</path>
      <page_callback>CRM_Admin_Page_APIExplorer</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
-     <title>CiviCRM API</title>
+     <title>CiviCRM API v3</title>
   </item>
   <item>
      <path>civicrm/ajax/apiexample</path>
@@ -120,6 +120,11 @@
      <path>civicrm/ajax/chart</path>
      <page_callback>CRM_Contribute_Form_ContributionCharts</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/asset/builder</path>
+    <page_callback>\Civi\Core\AssetBuilder::pageRun</page_callback>
+    <access_arguments>*always allow*</access_arguments>
   </item>
   <item>
      <path>civicrm/contribute/ajax/tableview</path>

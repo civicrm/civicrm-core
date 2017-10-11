@@ -34,6 +34,7 @@
   <base href="{$config->resourceBase}" />
   <style type="text/css" media="screen">
     @import url({$config->resourceBase}css/civicrm.css);
+    @import url({$config->resourceBase}css/crm-i.css);
     @import url({$config->resourceBase}bower_components/font-awesome/css/font-awesome.min.css);
   </style>
 </head>
@@ -43,11 +44,12 @@
 <div id="crm-container" class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
   <style type="text/css" media="screen">
     @import url({$config->resourceBase}css/civicrm.css);
+    @import url({$config->resourceBase}css/crm-i.css);
     @import url({$config->resourceBase}bower_components/font-awesome/css/font-awesome.min.css);
   </style>
 {/if}
 <div class="messages status no-popup">  <i class="crm-i fa-exclamation-triangle crm-i-red"></i>
- <span class="status-fatal">{ts}Sorry but we are not able to provide this at the moment.{/ts}</span>
+ <span class="status-fatal">{ts}Sorry, due to an error, we are unable to fulfill your request at the moment. You may want to contact your administrator or service provider with more details about what action you were performing when this occurred.{/ts}</span>
     <div class="crm-section crm-error-message">{$message}</div>
     {if $error.message && $message != $error.message}
         <hr style="solid 1px" />

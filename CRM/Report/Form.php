@@ -361,6 +361,12 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $_orderBy = NULL;
   public $_orderByFields = array();
   public $_orderByArray = array();
+  /**
+   * Array of clauses to group by.
+   *
+   * @var array
+   */
+  protected $_groupByArray = array();
   public $_groupBy = NULL;
   public $_whereClauses = array();
   public $_havingClauses = array();
@@ -2637,7 +2643,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * Build group by clause.
    */
   public function groupBy() {
-    $groupBys = array();
     if (!empty($this->_params['group_bys']) &&
       is_array($this->_params['group_bys'])
     ) {
@@ -2645,15 +2650,15 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
             if (!empty($this->_params['group_bys'][$fieldName])) {
-              $groupBys[] = $field['dbAlias'];
+              $this->_groupByArray[] = $field['dbAlias'];
             }
           }
         }
       }
     }
 
-    if (!empty($groupBys)) {
-      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBys);
+    if (!empty($this->_groupByArray)) {
+      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $this->_groupByArray);
     }
   }
 
@@ -3442,7 +3447,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $smartGroups = array_keys($groups['values']);
 
     $query = "
-       SELECT group_contact.contact_id as id
+       SELECT DISTINCT group_contact.contact_id as id
        FROM civicrm_group_contact group_contact
        WHERE group_contact.group_id IN (" . implode(', ', $filteredGroups) . ")
        AND group_contact.status = 'Added' ";

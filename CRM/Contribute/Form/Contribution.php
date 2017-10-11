@@ -154,8 +154,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   protected $_formType;
 
-  public $_honoreeProfileType;
-
   /**
    * Array of the payment fields to be displayed in the payment fieldset (pane) in billingBlock.tpl
    * this contains all the information to describe these fields from quickform. See CRM_Core_Form_Payment getPaymentFormFieldsMetadata
@@ -250,8 +248,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       return;
     }
 
-    $this->assign('showCheckNumber', TRUE);
-
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
 
     if (in_array('CiviPledge', CRM_Core_Config::singleton()->enableComponents) && !$this->_formType) {
@@ -301,10 +297,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     else {
       $this->setPageTitle($this->_ppID ? ts('Pledge Payment') : ts('Contribution'));
     }
-
-    if ($this->_id) {
-      CRM_Contribute_Form_SoftCredit::preprocess($this);
-    }
   }
 
   /**
@@ -313,7 +305,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @return array
    */
   public function setDefaultValues() {
-
     $defaults = $this->_values;
 
     // Set defaults for pledge payment.
@@ -370,12 +361,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    if (isset($defaults['non_deductible_amount'])) {
-      $defaults['non_deductible_amount'] = CRM_Utils_Money::format($defaults['non_deductible_amount'], NULL, '%a');
-    }
-
-    if (isset($defaults['fee_amount'])) {
-      $defaults['fee_amount'] = CRM_Utils_Money::format($defaults['fee_amount'], NULL, '%a');
+    $amountFields = array('non_deductible_amount', 'fee_amount', 'net_amount');
+    foreach ($amountFields as $amt) {
+      if (isset($defaults[$amt])) {
+        $defaults[$amt] = CRM_Utils_Money::format($defaults[$amt], NULL, '%a');
+      }
     }
 
     if ($this->_contributionType) {
@@ -560,7 +550,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paneNames[ts('Premium Information')] = 'Premium';
     }
 
-    if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->getDefaultPaymentInstrumentId()) == TRUE) {
+    $this->payment_instrument_id = CRM_Utils_Array::value('payment_instrument_id', $defaults, $this->getDefaultPaymentInstrumentId());
+    if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->payment_instrument_id) == TRUE) {
       if (!empty($this->_recurPaymentProcessors)) {
         $buildRecurBlock = TRUE;
         if ($this->_ppID) {
@@ -659,91 +650,31 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
 
-    $status = CRM_Contribute_PseudoConstant::contributionStatus();
-
-    // suppressing contribution statuses that are NOT relevant to pledges (CRM-5169)
-    $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $isUpdate = FALSE;
+    $component = 'contribution';
+    if ($this->_id) {
+      $isUpdate = TRUE;
+      $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
+      if (CRM_Utils_Array::value('membership', $componentDetails)) {
+        $component = 'membership';
+      }
+      elseif (CRM_Utils_Array::value('participant', $componentDetails)) {
+        $component = 'participant';
+      }
+    }
     if ($this->_ppID) {
-      foreach (array(
-                 'Cancelled',
-                 'Failed',
-                 'In Progress',
-               ) as $suppress) {
-        unset($status[CRM_Utils_Array::key($suppress, $statusName)]);
-      }
+      $component = 'pledge';
     }
-    elseif ((!$this->_ppID && $this->_id) || !$this->_id) {
-      $suppressFlag = FALSE;
-      if ($this->_id) {
-        $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-        if (CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails)) {
-          $suppressFlag = TRUE;
-        }
-      }
-      if (!$suppressFlag) {
-        foreach (array(
-                   'Overdue',
-                   'In Progress',
-                 ) as $suppress) {
-          unset($status[CRM_Utils_Array::key($suppress, $statusName)]);
-        }
-      }
-      else {
-        unset($status[CRM_Utils_Array::key('Overdue', $statusName)]);
-      }
-    }
+    $status = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses($component, $this->_id);
 
     // define the status IDs that show the cancellation info, see CRM-17589
     $cancelInfo_show_ids = array();
-    foreach (array_keys($statusName) as $status_id) {
+    foreach (array_keys($status) as $status_id) {
       if (CRM_Contribute_BAO_Contribution::isContributionStatusNegative($status_id)) {
         $cancelInfo_show_ids[] = "'$status_id'";
       }
     }
     $this->assign('cancelInfo_show_ids', implode(',', $cancelInfo_show_ids));
-
-    if ($this->_id) {
-      $contributionStatus = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_id, 'contribution_status_id');
-      $name = CRM_Utils_Array::value($contributionStatus, $statusName);
-      switch ($name) {
-        case 'Completed':
-          // [CRM-17498] Removing unsupported status change options.
-          unset($status[CRM_Utils_Array::key('Pending', $statusName)]);
-          unset($status[CRM_Utils_Array::key('Failed', $statusName)]);
-          unset($status[CRM_Utils_Array::key('Partially paid', $statusName)]);
-          unset($status[CRM_Utils_Array::key('Pending refund', $statusName)]);
-        case 'Cancelled':
-        case 'Chargeback':
-        case 'Refunded':
-          unset($status[CRM_Utils_Array::key('In Progress', $statusName)]);
-          unset($status[CRM_Utils_Array::key('Pending', $statusName)]);
-          unset($status[CRM_Utils_Array::key('Failed', $statusName)]);
-          break;
-
-        case 'Pending':
-        case 'In Progress':
-          unset($status[CRM_Utils_Array::key('Refunded', $statusName)]);
-          unset($status[CRM_Utils_Array::key('Chargeback', $statusName)]);
-          break;
-
-        case 'Failed':
-          foreach (array(
-                     'Pending',
-                     'Refunded',
-                     'Chargeback',
-                     'Completed',
-                     'In Progress',
-                     'Cancelled',
-                   ) as $suppress) {
-            unset($status[CRM_Utils_Array::key($suppress, $statusName)]);
-          }
-          break;
-      }
-    }
-    else {
-      unset($status[CRM_Utils_Array::key('Refunded', $statusName)]);
-      unset($status[CRM_Utils_Array::key('Chargeback', $statusName)]);
-    }
 
     $statusElement = $this->add('select', 'contribution_status_id',
       ts('Contribution Status'),
@@ -772,7 +703,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_online) {
       $this->assign('hideCalender', TRUE);
     }
-    $checkNumber = $this->add('text', 'check_number', ts('Check Number'), $attributes['contribution_check_number']);
 
     $this->addDateTime('receipt_date', ts('Receipt Date'), FALSE, array('formatType' => 'activityDateTime'));
     $this->addDateTime('cancel_date', ts('Cancelled / Refunded Date'), FALSE, array('formatType' => 'activityDateTime'));
@@ -903,11 +833,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // if status is Cancelled freeze Amount, Payment Instrument, Check #, Financial Type,
     // Net and Fee Amounts are frozen in AdditionalInfo::buildAdditionalDetail
-    if ($this->_id && $this->_values['contribution_status_id'] == array_search('Cancelled', $statusName)) {
+    if ($this->_id && ($this->_values['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'))) {
       if ($totalAmount) {
         $totalAmount->freeze();
       }
-      $checkNumber->freeze();
       $paymentInstrument->freeze();
       $trxnId->freeze();
       $financialType->freeze();
@@ -1081,6 +1010,18 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (empty($this->_id) && !empty($contribution->id)) {
       $this->_id = $contribution->id;
     }
+    if (!empty($this->_id) && CRM_Core_Permission::access('CiviMember')) {
+      $membershipPaymentCount = civicrm_api3('MembershipPayment', 'getCount', array('contribution_id' => $this->_id));
+      if ($membershipPaymentCount) {
+        $this->ajaxResponse['updateTabs']['#tab_member'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactID);
+      }
+    }
+    if (!empty($this->_id) && CRM_Core_Permission::access('CiviEvent')) {
+      $participantPaymentCount = civicrm_api3('ParticipantPayment', 'getCount', array('contribution_id' => $this->_id));
+      if ($participantPaymentCount) {
+        $this->ajaxResponse['updateTabs']['#tab_participant'] = CRM_Contact_BAO_Contact::getCountComponent('participant', $this->_contactID);
+      }
+    }
   }
 
   /**
@@ -1156,6 +1097,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!empty($this->_params['receive_date'])) {
       $this->_params['receive_date'] = CRM_Utils_Date::processDate($this->_params['receive_date'], $this->_params['receive_date_time']);
     }
+    else {
+      $this->_params['receive_date'] = $now;
+    }
 
     $this->_params['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $params);
     $this->_params['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $params);
@@ -1198,8 +1142,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!empty($this->_params['receive_date'])) {
       $paymentParams['receive_date'] = $this->_params['receive_date'];
     }
-
-    $this->_params['receive_date'] = $now;
 
     if (!empty($this->_params['is_email_receipt'])) {
       $this->_params['receipt_date'] = $now;
@@ -1418,7 +1360,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     CRM_Contribute_Form_AdditionalInfo::buildPremium($this);
 
     $this->_fields = array();
-    $this->submit(array_merge($defaults, $params), $action, CRM_Utils_Array::value('pledge_payment_id', $params));
+    return $this->submit(array_merge($defaults, $params), $action, CRM_Utils_Array::value('pledge_payment_id', $params));
 
   }
 

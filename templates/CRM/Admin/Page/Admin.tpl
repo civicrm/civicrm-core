@@ -72,7 +72,7 @@
         {foreach from=$group.fields item=panelItem  key=panelName name=groupLoop}
             <tr class="{cycle values="odd-row,even-row" name=$groupName}">
                 <td style="vertical-align: top; width:24px;">
-                    <a href="{$panelItem.url}"{if $panelItem.extra} {$panelItem.extra}{/if} ><img src="{$config->resourceBase}i/{if $panelItem.icon}{$panelItem.icon}{else}admin/small/option.png{/if}" alt="{$panelItem.title}"/></a>
+                    <a href="{$panelItem.url}"{if $panelItem.extra} {$panelItem.extra}{/if} ><img src="{$config->resourceBase}i/{if $panelItem.icon}{$panelItem.icon}{else}admin/small/option.png{/if}" alt="{$panelItem.title|escape}"/></a>
                 </td>
                 <td class="report font-size11pt" style="vertical-align: text-top;" width="20%">
                     <a href="{$panelItem.url}"{if $panelItem.extra} {$panelItem.extra}{/if} id="id_{$panelItem.id}">{$panelItem.title}</a>

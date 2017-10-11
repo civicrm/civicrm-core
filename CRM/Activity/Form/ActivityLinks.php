@@ -63,8 +63,8 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
         if (!CRM_Utils_Mail::validOutBoundMail() || !$contactId) {
           continue;
         }
-        list($name, $email, $doNotEmail, $onHold, $isDeseased) = CRM_Contact_BAO_Contact::getContactDetails($contactId);
-        if (!$doNotEmail && $email && !$isDeseased) {
+        list($name, $email, $doNotEmail, $onHold, $isDeceased) = CRM_Contact_BAO_Contact::getContactDetails($contactId);
+        if (!$doNotEmail && $email && !$isDeceased) {
           $url = 'civicrm/activity/email/add';
           $act['label'] = ts('Send an Email');
         }
@@ -77,7 +77,7 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
           continue;
         }
         // Check for existence of a mobile phone and ! do not SMS privacy setting
-        $mobileTypeID = CRM_Core_OptionGroup::getValue('phone_type', 'Mobile', 'name');
+        $mobileTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile');
         list($name, $phone, $doNotSMS) = CRM_Contact_BAO_Contact_Location::getPhoneDetails($contactId, $mobileTypeID);
         if (!$doNotSMS && $phone) {
           $url = 'civicrm/activity/sms/add';

@@ -207,6 +207,30 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test permission for participant get.
+   */
+  public function testGetParticipantWithPermission() {
+    $config = CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array();
+    $params = array(
+      'event_id' => $this->_eventID,
+      'check_permissions' => TRUE,
+      'return' => array(
+        'participant_id',
+        'event_id',
+        'participant_register_date',
+        'participant_source',
+      ),
+    );
+    $this->callAPIFailure('participant', 'get', $params);
+
+    $params['check_permissions'] = FALSE;
+    $result = $this->callAPISuccess('participant', 'get', $params);
+    $this->assertEquals($result['is_error'], 0);
+  }
+
+
+  /**
    * Check with params id.
    */
   public function testGetParamsAsIdOnly() {

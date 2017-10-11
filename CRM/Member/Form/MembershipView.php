@@ -1,28 +1,28 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | CiviCRM version 4.7                                                |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -103,7 +103,8 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
         $relatedContactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
         $relatedDisplayName = CRM_Contact_BAO_Contact::displayName($relatedContactId);
         CRM_Member_BAO_Membership::del($id);
-        CRM_Core_Session::setStatus(ts('Related membership for %1 has been deleted.', array(1 => $relatedDisplayName)), ts('Membership Deleted'), 'success');
+        CRM_Core_Session::setStatus(ts('Related membership for %1 has been deleted.', array(1 => $relatedDisplayName)),
+          ts('Membership Deleted'), 'success');
         break;
 
       case 'create':
@@ -124,7 +125,8 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
         );
         CRM_Member_BAO_Membership::create($params, $ids);
         $relatedDisplayName = CRM_Contact_BAO_Contact::displayName($params['contact_id']);
-        CRM_Core_Session::setStatus(ts('Related membership for %1 has been created.', array(1 => $relatedDisplayName)), ts('Membership Added'), 'success');
+        CRM_Core_Session::setStatus(ts('Related membership for %1 has been created.', array(1 => $relatedDisplayName)),
+          ts('Membership Added'), 'success');
         break;
 
       default:
@@ -133,9 +135,10 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
 
     // Redirect back to membership view page for the owner, without the relAction parameters
     CRM_Utils_System::redirect(
-        CRM_Utils_System::url(
-            'civicrm/contact/view/membership', "action=view&reset=1&id={$owner['membership_id']}&cid={$owner['contact_id']}" . $this->addContext()
-        )
+      CRM_Utils_System::url(
+        'civicrm/contact/view/membership',
+        "action=view&reset=1&id={$owner['membership_id']}&cid={$owner['contact_id']}" . $this->addContext()
+      )
     );
   }
 
@@ -182,24 +185,22 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
       }
 
       //Provide information about membership source when it is the result of a relationship (CRM-1901)
-      $values['owner_membership_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $id, 'owner_membership_id'
+      $values['owner_membership_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+        $id,
+        'owner_membership_id'
       );
-      //CRM-14538 - fix
-      // Get Line Items
-      if (isset($id)) {
-        $lineItem = CRM_Price_BAO_LineItem::getLineItems($id, 'membership');
-        if (!CRM_Utils_System::isNull($lineItem)) {
-          $values[$id]['lineItem'][] = $lineItem;
-        }
-        $this->assign('componentId', $id);
-        $this->assign('component', 'membership');
-      }
 
       if (isset($values['owner_membership_id'])) {
-        $values['owner_contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $values['owner_membership_id'], 'contact_id', 'id'
+        $values['owner_contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+          $values['owner_membership_id'],
+          'contact_id',
+          'id'
         );
 
-        $values['owner_display_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $values['owner_contact_id'], 'display_name', 'id'
+        $values['owner_display_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+          $values['owner_contact_id'],
+          'display_name',
+          'id'
         );
 
         $direction = strrev($membershipType['relationship_direction']);
@@ -222,7 +223,10 @@ END AS 'relType'
             if ($values['relationship']) {
               $values['relationship'] .= ',';
             }
-            $values['relationship'] .= CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $typeId, "name_$direction", 'id'
+            $values['relationship'] .= CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType',
+              $typeId,
+              "name_$direction",
+              'id'
             );
           }
         }
@@ -259,8 +263,8 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
         foreach (array('a', 'b') as $dir) {
           if (isset($relTypeDir[$dir])) {
             $query .= ($query ? ' UNION ' : '')
-                . str_replace('_y', '_' . $dir, str_replace('_x', '_' . ($dir == 'a' ? 'b' : 'a'), $select))
-                . ' AND r.relationship_type_id IN (' . implode(',', $relTypeDir[$dir]) . ')';
+              . str_replace('_y', '_' . $dir, str_replace('_x', '_' . ($dir == 'a' ? 'b' : 'a'), $select))
+              . ' AND r.relationship_type_id IN (' . implode(',', $relTypeDir[$dir]) . ')';
           }
         }
         $query .= " ORDER BY is_current_member DESC";
@@ -287,20 +291,32 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
           }
           if ($row['mid'] && ($row['is_current_member'] == 1)) {
             $relatedRemaining--;
-            $row['action'] = CRM_Core_Action::formLink(self::links(), CRM_Core_Action::DELETE, array(
-                  'id' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
-                  'cid' => $row['cid'],
-                  'mid' => $row['mid'],
-                    ), ts('more'), FALSE, 'membership.relationship.action', 'Relationship', CRM_Utils_Request::retrieve('id', 'Positive', $this)
+            $row['action'] = CRM_Core_Action::formLink(self::links(), CRM_Core_Action::DELETE,
+              array(
+                'id' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
+                'cid' => $row['cid'],
+                'mid' => $row['mid'],
+              ),
+              ts('more'),
+              FALSE,
+              'membership.relationship.action',
+              'Relationship',
+              CRM_Utils_Request::retrieve('id', 'Positive', $this)
             );
           }
           else {
             if ($relatedRemaining > 0) {
-              $row['action'] = CRM_Core_Action::formLink(self::links(), CRM_Core_Action::ADD, array(
-                    'id' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
-                    'cid' => $row['cid'],
-                    'rid' => $row['cid'],
-                      ), ts('more'), FALSE, 'membership.relationship.action', 'Relationship', CRM_Utils_Request::retrieve('id', 'Positive', $this)
+              $row['action'] = CRM_Core_Action::formLink(self::links(), CRM_Core_Action::ADD,
+                array(
+                  'id' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
+                  'cid' => $row['cid'],
+                  'rid' => $row['cid'],
+                ),
+                ts('more'),
+                FALSE,
+                'membership.relationship.action',
+                'Relationship',
+                CRM_Utils_Request::retrieve('id', 'Positive', $this)
               );
             }
           }
@@ -333,26 +349,35 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
 
       // add viewed membership to recent items list
       $recentTitle = $displayName . ' - ' . ts('Membership Type:') . ' ' . $values['membership_type'];
-      $url = CRM_Utils_System::url('civicrm/contact/view/membership', "action=view&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
+      $url = CRM_Utils_System::url('civicrm/contact/view/membership',
+        "action=view&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
       );
 
       $recentOther = array();
       if (CRM_Core_Permission::checkActionPermission('CiviMember', CRM_Core_Action::UPDATE)) {
-        $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership', "action=update&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
+        $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership',
+          "action=update&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
         );
       }
       if (CRM_Core_Permission::checkActionPermission('CiviMember', CRM_Core_Action::DELETE)) {
-        $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership', "action=delete&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
+        $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership',
+          "action=delete&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
         );
       }
-      CRM_Utils_Recent::add($recentTitle, $url, $values['id'], 'Membership', $values['contact_id'], NULL, $recentOther
+      CRM_Utils_Recent::add($recentTitle,
+        $url,
+        $values['id'],
+        'Membership',
+        $values['contact_id'],
+        NULL,
+        $recentOther
       );
 
       CRM_Member_Page_Tab::setContext($this, $values['contact_id']);
 
       $memType = CRM_Core_DAO::getFieldValue("CRM_Member_DAO_Membership", $id, "membership_type_id");
 
-      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', $this, $id, 0, $memType);
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', NULL, $id, 0, $memType);
       CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $id);
 
       $isRecur = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $id, 'contribution_recur_id');

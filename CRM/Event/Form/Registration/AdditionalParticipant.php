@@ -186,7 +186,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
                'post',
              ) as $keys) {
       if (isset($this->_values['additional_custom_' . $keys . '_id'])) {
-        $this->buildCustom($this->_values['additional_custom_' . $keys . '_id'], 'additionalCustom' . ucfirst($keys), TRUE);
+        $this->buildCustom($this->_values['additional_custom_' . $keys . '_id'], 'additionalCustom' . ucfirst($keys));
         $$keys = CRM_Core_BAO_UFGroup::getFields($this->_values['additional_custom_' . $keys . '_id']);
       }
       foreach (array(
@@ -356,7 +356,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     if ($allowToProceed) {
       $buttons = array_merge($buttons, array(
           array(
-            'type' => 'next',
+            'type' => 'upload',
             'name' => ts('Continue'),
             'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
             'isDefault' => TRUE,
@@ -613,6 +613,9 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       $params['contact_id'] = CRM_Event_Form_Registration_Register::getRegistrationContactID($params, $this, TRUE);
     }
 
+    if (!empty($params['image_URL'])) {
+      CRM_Contact_BAO_Contact::processImageParams($params);
+    }
     //carry campaign to partcipants.
     if (array_key_exists('participant_campaign_id', $params)) {
       $params['campaign_id'] = $params['participant_campaign_id'];

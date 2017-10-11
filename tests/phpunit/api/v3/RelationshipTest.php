@@ -779,6 +779,61 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Chain Relationship.get and to Contact.get.
+   */
+  public function testRelationshipGetWithChainedCall() {
+    // Create a relationship.
+    $createResult = $this->callAPISuccess('relationship', 'create', $this->_params);
+    $id = $createResult['id'];
+
+    // Try to retrieve it using chaining.
+    $params = array(
+      'relationship_type_id' => $this->_relTypeID,
+      'id' => $id,
+      'api.Contact.get' => array(
+        'id' => '$value.contact_id_b',
+      ),
+    );
+
+    $result = $this->callAPISuccess('relationship', 'get', $params);
+
+    $this->assertEquals(1, $result['count']);
+    $relationship = CRM_Utils_Array::first($result['values']);
+    $this->assertEquals(1, $relationship['api.Contact.get']['count']);
+    $contact = CRM_Utils_Array::first($relationship['api.Contact.get']['values']);
+    $this->assertEquals($this->_cId_b, $contact['id']);
+  }
+
+  /**
+   * Chain Contact.get to Relationship.get and again to Contact.get.
+   */
+  public function testRelationshipGetInChainedCall() {
+    // Create a relationship.
+    $this->callAPISuccess('relationship', 'create', $this->_params);
+
+    // Try to retrieve it using chaining.
+    $params = array(
+      'id' => $this->_cId_a,
+      'api.Relationship.get' => array(
+        'relationship_type_id' => $this->_relTypeID,
+        'contact_id_a' => '$value.id',
+        'api.Contact.get' => array(
+          'id' => '$value.contact_id_b',
+        ),
+      ),
+    );
+
+    $result = $this->callAPISuccess('contact', 'get', $params);
+    $this->assertEquals(1, $result['count']);
+    $contact = CRM_Utils_Array::first($result['values']);
+    $this->assertEquals(1, $contact['api.Relationship.get']['count']);
+    $relationship = CRM_Utils_Array::first($contact['api.Relationship.get']['values']);
+    $this->assertEquals(1, $relationship['api.Contact.get']['count']);
+    $contact = CRM_Utils_Array::first($relationship['api.Contact.get']['values']);
+    $this->assertEquals($this->_cId_b, $contact['id']);
+  }
+
+  /**
    * Check with valid params array.
    * (The get function will behave differently without 'contact_id' passed
    */

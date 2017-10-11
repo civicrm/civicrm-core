@@ -187,10 +187,9 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
     $membershipRecords = FALSE;
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $membershipType = new CRM_Member_BAO_Membership();
-      $membershipType->membership_type_id = $this->_id;
-      if ($membershipType->find(TRUE)) {
-        $membershipRecords = TRUE;
+      $result = civicrm_api3("Membership", "get", array("membership_type_id" => $this->_id, "options" => array("limit" => 1)));
+      $membershipRecords = ($result["count"] > 0);
+      if ($membershipRecords) {
         $memberRel->freeze();
       }
     }

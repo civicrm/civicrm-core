@@ -83,6 +83,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'civicrm_acl_contact_cache',
       'civicrm_activity_contact',
       'civicrm_activity',
+      'civicrm_group',
+      'civicrm_group_contact',
+      'civicrm_saved_search',
+      'civicrm_group_contact_cache',
     );
 
     $this->quickCleanup($tablesToTruncate, TRUE);
@@ -113,6 +117,29 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       $contact['id'],
       $params
     );
+  }
+
+  /**
+   * Test that it is possible to prevent cache clearing via option.
+   *
+   * Cache clearing is bypassed if 'options' => array('do_not_reset_cache' => 1 is used.
+   */
+  public function testCreateIndividualNoCacheClear() {
+
+    $contact = $this->callAPISuccess('contact', 'create', $this->_params);
+    $groupID = $this->groupCreate();
+
+    $this->putGroupContactCacheInClearableState($groupID, $contact);
+
+    $this->callAPISuccess('contact', 'create', array('id' => $contact['id']));
+    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_group_contact_cache"));
+
+    // Rinse & repeat, but with the option.
+    $this->putGroupContactCacheInClearableState($groupID, $contact);
+    CRM_Core_Config::setPermitCacheFlushMode(FALSE);
+    $this->callAPISuccess('contact', 'create', array('id' => $contact['id']));
+    $this->assertEquals(1, CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_group_contact_cache"));
+    CRM_Core_Config::setPermitCacheFlushMode(TRUE);
   }
 
   /**
@@ -236,7 +263,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(2, $result['count']);
 
   }
-
 
   /**
    * Verify that attempt to create contact with empty params fails.
@@ -1718,6 +1744,29 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Ensure consistent return format for option group fields.
    */
+  public function testSetPreferredCommunicationNull() {
+    $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
+      'preferred_communication_method' => array('Phone', 'SMS'),
+    )));
+    $preferredCommunicationMethod = $this->callAPISuccessGetValue('Contact', array(
+      'id' => $contact['id'],
+      'return' => 'preferred_communication_method',
+    ));
+    $this->assertNotEmpty($preferredCommunicationMethod);
+    $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
+      'preferred_communication_method' => 'null',
+      'id' => $contact['id'],
+    )));
+    $preferredCommunicationMethod = $this->callAPISuccessGetValue('Contact', array(
+      'id' => $contact['id'],
+      'return' => 'preferred_communication_method',
+    ));
+    $this->assertEmpty($preferredCommunicationMethod);
+  }
+
+  /**
+   * Ensure consistent return format for option group fields.
+   */
   public function testPseudoFields() {
     $params = array(
       'preferred_communication_method' => array('Phone', 'SMS'),
@@ -2309,6 +2358,21 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params = array('id' => 500, 'format.is_success' => 1);
     $result = $this->callAPIAndDocument('Contact', 'Create', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals(0, $result);
+  }
+
+  /**
+   * Test long display names.
+   *
+   * CRM-21258
+   */
+  public function testContactCreateLongDisplayName() {
+    $result = $this->callAPISuccess('Contact', 'Create', array(
+      'first_name' => str_pad('a', 64, 'a'),
+      'last_name' => str_pad('a', 64, 'a'),
+      'contact_type' => 'Individual',
+    ));
+    $this->assertEquals('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $result['values'][$result['id']]['display_name']);
+    $this->assertEquals('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $result['values'][$result['id']]['sort_name']);
   }
 
   /**
@@ -3466,6 +3530,22 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $cid = $this->createLoggedInUser();
     $contact = $this->callAPIAndDocument('contact', 'get', array('id' => 'user_contact_id'), __FUNCTION__, __FILE__, $description, $subFile);
     $this->assertEquals($cid, $contact['id']);
+  }
+
+  /**
+   * @param $groupID
+   * @param $contact
+   */
+  protected function putGroupContactCacheInClearableState($groupID, $contact) {
+    // We need to force the situation where there is invalid data in the cache and it
+    // is due to be cleared.
+    CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_group_contact_cache (group_id, contact_id)
+      VALUES ({$groupID}, {$contact['id']})
+    ");
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = '2017-01-01'");
+    // Reset so it does not skip.
+    Civi::$statics['CRM_Contact_BAO_GroupContactCache']['is_refresh_init'] = FALSE;
   }
 
 }

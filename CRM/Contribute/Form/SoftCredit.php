@@ -37,31 +37,6 @@
 class CRM_Contribute_Form_SoftCredit {
 
   /**
-   * Set variables up before form is built.
-   *
-   * @param CRM_Core_Form $form
-   */
-  public static function preProcess(&$form) {
-    $contriDAO = new CRM_Contribute_DAO_Contribution();
-    $contriDAO->id = $form->_id;
-    $contriDAO->find(TRUE);
-    if ($contriDAO->contribution_page_id) {
-      $ufJoinParams = array(
-        'module' => 'soft_credit',
-        'entity_table' => 'civicrm_contribution_page',
-        'entity_id' => $contriDAO->contribution_page_id,
-      );
-      $profileId = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-
-      //check if any honree profile is enabled if yes then assign its profile type to $_honoreeProfileType
-      // which will be used to constraint soft-credit contact type in formRule, CRM-13981
-      if (!empty($profileId[0]) && !empty($profileId[2])) {
-        $form->_honoreeProfileType = CRM_Core_BAO_UFGroup::getContactType($profileId[0]);
-      }
-    }
-  }
-
-  /**
    * Function used to build form element for soft credit block.
    *
    * @param CRM_Core_Form $form
@@ -241,10 +216,6 @@ class CRM_Contribute_Form_SoftCredit {
           }
           if (empty($fields['soft_credit_amount'][$key])) {
             $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount.');
-          }
-          $contactType = CRM_Contact_BAO_Contact::getContactType($fields['soft_credit_contact_id'][$key]);
-          if ($self->_honoreeProfileType && $self->_honoreeProfileType != $contactType) {
-            $errors["soft_credit_contact_id[$key]"] = ts('Please choose a contact of type %1', array(1 => $self->_honoreeProfileType));
           }
         }
       }

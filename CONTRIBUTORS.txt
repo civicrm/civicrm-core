@@ -10,7 +10,7 @@ CiviCRM Team - Atif Shaikh, Coleman Watts, David Greenberg, Eileen McNaughton,
                Yashodha Chaku
 
 AGH Strategies - Andrew Hunt, Tyrell Cook, Nikki Murray
-Agileware - Francis Whittle
+Agileware - Justin Freeman, Francis Whittle, Iris Abarquez, Vaibhav Sagar
 Andrew West
 Aputsiaĸ Niels Janussen
 Aron Novak
@@ -21,6 +21,7 @@ Brian Dombrowski
 Caroline Badley
 Christian Wach
 Charlie DeTar
+Chirojeugd Vlaanderen - Johan Vervloet
 Circle Interactive - Dave Jenkins
 CiviCoop - Jaap Jansma
 CiviDesk - Nicolas Ganivet, Sunil Pawar, Virginie Ganivet
@@ -42,7 +43,6 @@ Ginkgo Street Labs - Frank Gomez, Galata Tona, Michael Daryabeygi, Roshani Kotha
 Jake Martin White
 Joanne Chester
 Joe McLaughlin
-Johan Vervloet
 John P Kirk
 Joris
 JMA Consulting - Joe Murray, Pradeep Nayak, Edsel Lopez
@@ -60,6 +60,7 @@ Lighthouse Consulting and Design - Brian Shaughnessy
 Marty Wright
 Matthew Wire
 Mattias Michaux
+Megaphone Technology Consulting - Jon Goldberg
 Mohit Aggarwal
 National Urban League - Lisa Taliano
 Nicholai Burton
@@ -68,7 +69,7 @@ New York City Council
 New York State Senate - Ken Zalewski
 Northbridge Digital - Oliver Gibson
 Olaf Buddenhagen
-Palante Technology Cooperative - Jon Goldberg, Joseph Lacey
+Palante Technology Cooperative - Joseph Lacey
 Paul Campbell
 Progressive Tech Project - Alice Aguilar, Jamie McClelland
 Richard Van Oosterhout
@@ -107,6 +108,7 @@ CiviCRM Team - Atif Shaikh, Coleman Watts, David Greenberg, Donald Lobo,
                Yashodha Chaku
 ADG Communications - Steve Binkowski  
 AGH Strategies - Andrew Hunt, Jane Hanley, Tommy Bobo, Tyrell Cook
+Agileware - Justin Freeman, Francis Whittle, Iris Abarquez, Vaibhav Sagar
 Alex C
 Allan Chappell
 Amnesty International Spain - Carlos Capote
@@ -116,6 +118,7 @@ Arete Imagine - Marisa Porter, Nate Porter
 Asylum Hill Congregational Church
 Blackfly Solutions - Alan Dixon
 Botanical Society of America - Toby Lounsbury
+Chirojeugd Vlaanderen - Johan Vervloet
 Christian Wach
 Chris Ward
 Circle Interactive - Dave Moreton, Andrew Walker, Dave Jenkins, Maya Gibbs
@@ -139,7 +142,6 @@ Gnu.org - David Thompson
 Jaka Kranjc
 JMA Consulting - Joe Murray, Pradeep Nayak, Edsel Lopez
 Joanne Chester
-Johan Vervloet
 John Kingsnorth
 jsnyder83
 Kathryn Benedicto

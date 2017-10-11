@@ -211,6 +211,89 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-20621 : Test to check usage count of Tag tree
+   */
+  public function testGetTagTree() {
+    $contacts = array();
+    // create three contacts
+    for ($i = 0; $i < 3; $i++) {
+      $contacts[] = $this->individualCreate();
+    }
+
+    // Create Tag called as 'Parent Tag'
+    $parentTag = $this->tagCreate(array(
+      'name' => 'Parent Tag',
+      'used_for' => 'civicrm_contact',
+    ));
+    //assign first contact to parent tag
+    $params = array(
+      'entity_id' => $contacts[0],
+      'entity_table' => 'civicrm_contact',
+      'tag_id' => $parentTag['id'],
+    );
+    // TODO: EntityTag.create API is not working
+    CRM_Core_BAO_EntityTag::add($params);
+
+    // Create child Tag of $parentTag
+    $childTag1 = $this->tagCreate(array(
+      'name' => 'Child Tag Level 1',
+      'parent_id' => $parentTag['id'],
+      'used_for' => 'civicrm_contact',
+    ));
+    //assign contact to this level 1 child tag
+    $params = array(
+      'entity_id' => $contacts[1],
+      'entity_table' => 'civicrm_contact',
+      'tag_id' => $childTag1['id'],
+    );
+    CRM_Core_BAO_EntityTag::add($params);
+
+    // Create child Tag of $childTag1
+    $childTag2 = $this->tagCreate(array(
+      'name' => 'Child Tag Level 2',
+      'parent_id' => $childTag1['id'],
+      'used_for' => 'civicrm_contact',
+    ));
+    //assign contact to this level 2 child tag
+    $params = array(
+      'entity_id' => $contacts[2],
+      'entity_table' => 'civicrm_contact',
+      'tag_id' => $childTag2['id'],
+    );
+    CRM_Core_BAO_EntityTag::add($params);
+
+    // CASE I : check the usage count of parent tag which need to be 1
+    //  as the one contact added
+    $_REQUEST['is_unit_test'] = TRUE;
+    $parentTagTreeResult = CRM_Admin_Page_AJAX::getTagTree();
+    foreach ($parentTagTreeResult as $result) {
+      if ($result['id'] == $parentTag['id']) {
+        $this->assertEquals(1, $result['data']['usages']);
+      }
+    }
+
+    // CASE 2 : check the usage count of level 1 child tag, which needs to be 1
+    //  as it should include the count of added one contact
+    $_GET['parent_id'] = $parentTag['id'];
+    $childTagTree = CRM_Admin_Page_AJAX::getTagTree();
+    $this->assertEquals(1, $childTagTree[0]['data']['usages']);
+
+    // CASE 2 : check the usage count of child tag at level 2
+    //which needs to be 1 as it has no child tag
+    $_GET['parent_id'] = $childTag1['id'];
+    $childTagTree = CRM_Admin_Page_AJAX::getTagTree();
+    $this->assertEquals(1, $childTagTree[0]['data']['usages']);
+
+    //cleanup
+    foreach ($contacts as $id) {
+      $this->callAPISuccess('Contact', 'delete', array('id' => $id));
+    }
+    $this->callAPISuccess('Tag', 'delete', array('id' => $childTag2['id']));
+    $this->callAPISuccess('Tag', 'delete', array('id' => $childTag1['id']));
+    $this->callAPISuccess('Tag', 'delete', array('id' => $parentTag['id']));
+  }
+
+  /**
    * Test to check contact reference field
    */
   public function testContactReference() {

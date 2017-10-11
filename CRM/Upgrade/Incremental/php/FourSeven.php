@@ -62,6 +62,26 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     if ($rev == '4.7.13') {
       $preUpgradeMessage .= '<p>' . ts('A new permission has been added called %1 This Permission is now used to control access to the Manage Tags screen', array(1 => 'manage tags')) . '</p>';
     }
+    if ($rev == '4.7.22') {
+      // Based on support inquiries for 4.7.21, show message during 4.7.22.
+      // For affected users, this issue prevents loading the regular status screen.
+      if (!$this->checkImageUploadDir()) {
+        $preUpgradeMessage .= '<p>' . ts('There appears to be an inconsistency in the configuration of "Image Upload URL" and "Image Upload Directory".') . '</p>'
+          . '<p>'
+          . ts('Further advice will be displayed at the end of the upgrade.')
+          . '</p>';
+      }
+    }
+    if ($rev == '4.7.26') {
+      $params = array(
+        1 => 'Close accounting batches created by user',
+        2 => 'Close all accounting batches',
+        3 => 'Reopen accounting batches created by user',
+        4 => 'Reopen all accounting batches',
+        5 => 'https://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles',
+      );
+      $preUpgradeMessage .= '<p>' . ts('A new set of batch permissions has been added called "%1", "%2", "%3" and "%4". These permissions are now used to control access to the Accounting Batches tasks. If your users need to be able to Reopen or Close batches you may need to give them additional permissions. <a href=%5>Read more</a>', $params) . '</p>';
+    }
   }
 
   /**
@@ -111,7 +131,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     if ($rev == '4.7.14') {
       $ck_href = 'href="' . CRM_Utils_System::url('civicrm/admin/ckeditor') . '"';
       $postUpgradeMessage .= '<p>' . ts('CiviMail no longer forces CKEditor to add html/head/body tags to email content because some sites place these in the message header/footer. This was added in 4.7.5 and is now disabled by default.')
-        . '<br />' . ts('You can re-enable it by visitng the <a %1>CKEditor Config</a> screen and setting "fullPage = true" under the Advanced Options of the CiviMail preset.', array(1 => $ck_href))
+        . '<br />' . ts('You can re-enable it by visiting the <a %1>CKEditor Config</a> screen and setting "fullPage = true" under the Advanced Options of the CiviMail preset.', array(1 => $ck_href))
         . '</p>';
     }
     if ($rev == '4.7.19') {
@@ -121,6 +141,29 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       if ($check > 1 && (bool) $smsCheck) {
         $postUpgradeMessage .= '<p>civicrm_sms_provider ' . ts('has now had a domain id column added. As there is more than 1 domains in this install you need to manually set the domain id for the providers in this install') . '</p>';
       }
+    }
+    if ($rev == '4.7.22') {
+      // Based on support inquiries for 4.7.21, show message during 4.7.22.
+      // For affected users, this issue prevents loading the regular status screen.
+      if (!$this->checkImageUploadDir()) {
+        $config = CRM_Core_Config::singleton();
+        $postUpgradeMessage .=
+          '<h3>' . ts('Warning') . '</h3>'
+          . '<p>' . ts('There appears to be an inconsistency in the configuration of "Image Upload URL" and "Image Upload Directory".') . '</p>'
+          . sprintf("<ul><li><b>imageUploadDir</b>: <code>%s</code></li><li><b>imageUploadURL</b>: <code>%s</code></li></ul>", htmlentities($config->imageUploadDir), htmlentities($config->imageUploadURL))
+          . '<p>'
+          . ts('You may need to check that: <ul><li>(a) the path and URL match,</li><li> (b) the httpd/htaccess policy allows requests for files inside this folder,</li><li>and (c) the web domain matches the normal web domain.</ul>')
+          . '</p>'
+          . '<p><em>'
+          . ts('(Note: Although files should be readable, it is best if they are not listable or browseable.)')
+          . '</em></p>'
+          . '<p>'
+          . ts('If this remains unresolved, then some important screens may fail to load.')
+          . '</p>';
+      }
+    }
+    if ($rev == '4.7.23') {
+      $postUpgradeMessage .= '<br /><br />' . ts('Default version of the following System Workflow Message Templates have been modified: <ul><li>Contribution Invoice</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
     }
   }
 
@@ -340,7 +383,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       }
     }
     $this->addTask('CRM-19961 - Add domain_id column to civicrm_sms_provider', 'addColumn',
-      'civicrm_sms_provider', 'domain_id', 'int(10) unsigned', "Which Domain is this sms provier for");
+      'civicrm_sms_provider', 'domain_id', "int(10) unsigned COMMENT 'Which Domain is this sms provier for'");
     $this->addTask('CRM-19961 - Populate domain id table and perhaps add foreign key', 'populateSMSProviderDomainId');
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('CRM-16633 - Add "Change Case Subject" activity', 'addChangeCaseSubjectActivityType');
@@ -358,6 +401,69 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Add activity_status column to civicrm_mail_settings', 'addColumn',
       'civicrm_mail_settings', 'activity_status', "varchar (255) DEFAULT NULL COMMENT 'Name of status to use when creating email to activity.'");
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_23($rev) {
+    $this->addTask('CRM-20387 - Add invoice_number column to civicrm_contribution', 'addColumn',
+      'civicrm_contribution', 'invoice_number', "varchar(255) COMMENT 'Human readable invoice number' DEFAULT NULL");
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_25($rev) {
+    $this->addTask("CRM-20927 - Add column to 'civicrm_menu' for additional metadata", 'addColumn',
+      'civicrm_menu', 'module_data', "text COMMENT 'All other menu metadata not stored in other fields'");
+    $this->addTask('CRM-21052 - Determine activity revision policy', 'pickActivityRevisionPolicy');
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Add cancel button text column to civicrm_uf_group', 'addColumn',
+      'civicrm_uf_group', 'cancel_button_text', "varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Custom Text to display on the cancel button when used in create or edit mode'", TRUE);
+    $this->addTask('Add Submit button text column to civicrm_uf_group', 'addColumn',
+      'civicrm_uf_group', 'submit_button_text', "varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Custom Text to display on the submit button on profile edit/create screens'", TRUE);
+
+    $this->addTask('CRM-20958 - Add created_date to civicrm_activity', 'addColumn',
+      'civicrm_activity', 'created_date', "timestamp NULL  DEFAULT NULL COMMENT 'When was the activity was created.'");
+    $this->addTask('CRM-20958 - Add modified_date to civicrm_activity', 'addColumn',
+      'civicrm_activity', 'modified_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When was the activity (or closely related entity) was created or modified or deleted.'");
+    $this->addTask('CRM-20958 - Add created_date to civicrm_case', 'addColumn',
+      'civicrm_case', 'created_date', "timestamp NULL  DEFAULT NULL COMMENT 'When was the case was created.'");
+    $this->addTask('CRM-20958 - Add modified_date to civicrm_case', 'addColumn',
+      'civicrm_case', 'modified_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When was the case (or closely related entity) was created or modified or deleted.'");
+    $this->addTask('Rebuild Multilingual Schema', 'rebuildMultilingalSchema');
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_26($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('CRM-20892 - Add modified_date to civicrm_mailing', 'addColumn',
+      'civicrm_mailing', 'modified_date', "timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When the mailing (or closely related entity) was created or modified or deleted.'");
+    $this->addTask('CRM-21195 - Add icon field to civicrm_navigation', 'addColumn',
+      'civicrm_navigation', 'icon', "varchar(255) NULL DEFAULT NULL COMMENT 'CSS class name for an icon'");
+    $this->addTask('CRM-12167 - Add visibility column to civicrm_price_field_value', 'addColumn',
+      'civicrm_price_field_value', 'visibility_id', 'int(10) unsigned DEFAULT 1 COMMENT "Implicit FK to civicrm_option_group with name = \'visibility\'"');
+    $this->addTask('Remove broken Contribution_logging reports', 'removeContributionLoggingReports');
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_27($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('CRM-20572: Fix date fields in save search criteria of Contrib Sybunt custom search ', 'fixDateFieldsInSmartGroups');
   }
 
   /*
@@ -822,7 +928,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
             ADD COLUMN `help_post_{$locale}` text COLLATE utf8_unicode_ci COMMENT 'Price field option post help text.'", array(), TRUE, NULL, FALSE, FALSE);
         }
       }
-      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, TRUE);
     }
     else {
       if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_price_field_value', 'help_pre')) {
@@ -924,14 +1030,14 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     }
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
-    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'content');
-    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'is_minimized');
-    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'is_fullscreen');
-    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'created_date');
-    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'is_fullscreen');
-    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'is_minimized');
-    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'column_no');
-    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'weight');
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'content', FALSE, TRUE);
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'is_minimized', FALSE, TRUE);
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'is_fullscreen', FALSE, TRUE);
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard_contact', 'created_date', FALSE, TRUE);
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'is_fullscreen', FALSE, TRUE);
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'is_minimized', FALSE, TRUE);
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'column_no', FALSE, TRUE);
+    CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_dashboard', 'weight', FALSE, TRUE);
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET url = REPLACE(url, "&snippet=5", ""), fullscreen_url = REPLACE(fullscreen_url, "&snippet=5", "")');
 
@@ -941,7 +1047,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     }
     if ($domain->locales) {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
-      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, TRUE);
     }
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_dashboard SET cache_minutes = 1440 WHERE name = "blog"');
@@ -993,7 +1099,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     $domain->find(TRUE);
     if ($domain->locales) {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
-      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, TRUE);
     }
 
     CRM_Core_DAO::executeQuery("UPDATE `civicrm_option_group` SET `data_type` = 'Integer'
@@ -1141,6 +1247,71 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_action_schedule`
       CHANGE `mapping_id` `mapping_id` varchar(64) COLLATE
       utf8_unicode_ci DEFAULT NULL COMMENT 'Name/ID of the mapping to use on this table'");
+    return TRUE;
+  }
+
+  public static function pickActivityRevisionPolicy(CRM_Queue_TaskContext $ctx) {
+    // CRM-21052 - If site is using activity revisions, continue doing so. Otherwise, switch out.
+    $count = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_activity WHERE is_current_revision = 0 OR original_id IS NOT NULL');
+    Civi::settings()->set('civicaseActivityRevisions', $count > 0);
+    return TRUE;
+  }
+
+  /**
+   * Remove the contribution logging reports which have been broken for a very long time.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function removeContributionLoggingReports(CRM_Queue_TaskContext $ctx) {
+    if (class_exists('CRM_Report_Form_Contribute_LoggingDetail') || class_exists('CRM_Report_Form_Contribute_LoggingSummary')) {
+      // Perhaps the site has overridden these classes. The core ones are broken but they
+      // may have functional ones.
+      return TRUE;
+    }
+    $options = civicrm_api3('OptionValue', 'get', array('option_group_id' => 'report_template', 'options' => array('limit' => 0)));
+    foreach ($options['values'] as $option) {
+      if ($option['name'] === 'CRM_Report_Form_Contribute_LoggingDetail' || $option['name'] === 'CRM_Report_Form_Contribute_LoggingSummary') {
+        $instances = civicrm_api3('ReportInstance', 'get', array('report_id' => $option['value']));
+        if ($instances['count']) {
+          foreach ($instances['values'] as $instance) {
+            if ($instance['navigation_id']) {
+              civicrm_api3('Navigation', 'delete', array('id' => $instance['navigation_id']));
+            }
+            civicrm_api3('ReportInstance', 'delete', array('id' => $instance['id']));
+          }
+        }
+        civicrm_api3('OptionValue', 'delete', array('id' => $option['id']));
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * @return bool
+   */
+  protected function checkImageUploadDir() {
+    $config = CRM_Core_Config::singleton();
+    $check = new CRM_Utils_Check_Component_Security();
+    return $config->imageUploadDir && $config->imageUploadURL && $check->isDirAccessible($config->imageUploadDir, $config->imageUploadURL);
+  }
+
+  /**
+   * CRM-20572 - Format date fields in Contrib Sybunt custom search's saved criteria.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function fixDateFieldsInSmartGroups(CRM_Queue_TaskContext $ctx) {
+    $dao = CRM_Core_DAO::executeQuery("SELECT id, form_values FROM civicrm_saved_search WHERE form_values LIKE '%CRM_Contact_Form_Search_Custom_ContribSYBNT%'");
+    while ($dao->fetch()) {
+      $formValues = unserialize($dao->form_values);
+      CRM_Contact_Form_Search_Custom_ContribSYBNT::formatSavedSearchFields($formValues);
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_saved_search SET form_values = %1 WHERE id = {$dao->id}", array(1 => array(serialize($formValues), 'String')));
+    }
+
     return TRUE;
   }
 

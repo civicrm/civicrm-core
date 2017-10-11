@@ -186,7 +186,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function testSubmitCreditCardPayPal() {
     $mut = new CiviMailUtils($this, TRUE);
-    $mut->clearMessages(0);
+    $mut->clearMessages();
     $form = new CRM_Contribute_Form_Contribution();
     $paymentProcessorID = $this->paymentProcessorCreate(array('is_test' => 0));
     $form->_mode = 'Live';
@@ -246,6 +246,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       $msgs = $mut->getAllMessages();
       $this->assertEquals(1, count($msgs));
     }
+    $mut->clearMessages();
     $mut->stop();
   }
 
@@ -254,7 +255,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function testSubmitCreditCardWithEmailReceipt() {
     $mut = new CiviMailUtils($this, TRUE);
-    $mut->clearMessages(0);
+    $mut->clearMessages();
     $form = new CRM_Contribute_Form_Contribution();
     $form->_mode = 'Live';
     $error = FALSE;
@@ -559,7 +560,35 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('Address', array(
       'id' => $contribution['address_id'],
     ));
+  }
 
+  /**
+   * CRM-20745: Test the submit function correctly sets the
+   * receive date for recurring contribution.
+   */
+  public function testSubmitCreditCardWithRecur() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $receiveDate = date('m/d/Y', strtotime('+1 month'));
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'is_recur' => 1,
+      'frequency_interval' => 2,
+      'frequency_unit' => 'month',
+      'installments' => 2,
+      'receive_date' => $receiveDate,
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'payment_processor_id' => $this->paymentProcessorID,
+      'credit_card_exp_date' => array('M' => 5, 'Y' => 2025),
+      'credit_card_number' => '411111111111111',
+      'billing_city-5' => 'Vancouver',
+    ), CRM_Core_Action::ADD,
+      'live'
+    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('return' => 'receive_date'));
+    $this->assertEquals(date("m/d/Y", strtotime($contribution['receive_date'])), $receiveDate);
   }
 
   /**
@@ -902,6 +931,62 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   }
 
   /**
+   * Test the submit function if only payment instrument is changed from 'Check' to 'Credit Card'
+   */
+  public function testSubmitUpdateChangePaymentInstrument() {
+    $form = new CRM_Contribute_Form_Contribution();
+
+    $form->testSubmit(array(
+        'total_amount' => 50,
+        'financial_type_id' => 1,
+        'receive_date' => '04/21/2015',
+        'receive_date_time' => '11:27PM',
+        'contact_id' => $this->_individualId,
+        'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+        'check_number' => '123AX',
+        'contribution_status_id' => 1,
+        'price_set_id' => 0,
+      ),
+      CRM_Core_Action::ADD);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'net_amount' => 50,
+      'financial_type_id' => 1,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialTrxn', 'card_type_id', 'Visa'),
+      'pan_truncation' => '1011',
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+      'id' => $contribution['id'],
+    ),
+      CRM_Core_Action::UPDATE);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
+    $this->assertEquals(50, (int) $contribution['total_amount']);
+
+    $financialTransactions = $this->callAPISuccess('FinancialTrxn', 'get', array('sequential' => TRUE));
+    $this->assertEquals(3, $financialTransactions['count']);
+
+    list($oldTrxn, $reversedTrxn, $latestTrxn) = $financialTransactions['values'];
+
+    $this->assertEquals(50, $oldTrxn['total_amount']);
+    $this->assertEquals('123AX', $oldTrxn['check_number']);
+    $this->assertEquals(array_search('Check', $this->paymentInstruments), $oldTrxn['payment_instrument_id']);
+
+    $this->assertEquals(-50, $reversedTrxn['total_amount']);
+    $this->assertEquals('123AX', $reversedTrxn['check_number']);
+    $this->assertEquals(array_search('Check', $this->paymentInstruments), $reversedTrxn['payment_instrument_id']);
+
+    $this->assertEquals(50, $latestTrxn['total_amount']);
+    $this->assertEquals('1011', $latestTrxn['pan_truncation']);
+    $this->assertEquals(array_search('Credit Card', $this->paymentInstruments), $latestTrxn['payment_instrument_id']);
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', array());
+  }
+
+  /**
    * Get parameters for credit card submit calls.
    *
    * @return array
@@ -1156,9 +1241,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     $this->assertEquals(100, $items['values'][0]['amount']);
     $this->assertEquals(10, $items['values'][1]['amount']);
-    // @todo currently its $110 which is incorrect, the proper value should be $200
-    // $this->assertEquals(200, $items['values'][2]['amount']);
-    $this->assertEquals(20, $items['values'][3]['amount']);
+    $this->assertEquals(100, $items['values'][2]['amount']);
+    $this->assertEquals(10, $items['values'][3]['amount']);
   }
 
   /**

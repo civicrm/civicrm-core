@@ -344,4 +344,185 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $this->assertEquals('20140510000000', $date);
   }
 
+  /**
+   * Test pledge payments that cover multiple pledge installments (CRM-17281).
+   * Check for rounding bugs. NB: this cannot be done in the API, because the
+   * API does not call CRM_Contribute_BAO_Contribution::updateRelatedPledge().
+   */
+  public function testCreatePledgePaymentForMultipleInstallments() {
+    $scheduled_date = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));
+    $contact_id = 2;
+
+    $pledge = $this->callAPISuccess('Pledge', 'create', array(
+      'contact_id' => $contact_id,
+      'pledge_create_date' => date('Ymd'),
+      'start_date' => date('Ymd'),
+      'scheduled_date' => $scheduled_date,
+      'amount' => 1618.80,
+      'pledge_status_id' => 2,
+      'pledge_financial_type_id' => 1,
+      'pledge_original_installment_amount' => 134.90,
+      'original_installment_amount' => 134.90,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'frequency_day' => 1,
+      'installments' => 12,
+      'sequential' => 1,
+    ));
+
+    $contributionID = $this->contributionCreate(array(
+      'contact_id' => $contact_id,
+      'financial_type_id' => 1,
+      'invoice_id' => 46,
+      'trxn_id' => 46,
+      'total_amount' => 404.70,
+      'fee_amount' => 0.00,
+      'net_amount' => 404.70,
+      'payment_instrument_id' => 1,
+      'non_deductible_amount' => 0.00,
+    ));
+
+    // Fetch the first planned pledge payment/installment
+    $pledgePayments = civicrm_api3('PledgePayment', 'get', array(
+      'pledge_id' => $pledge['id'],
+      'sequential' => 1,
+    ));
+
+    // Does all sorts of shenanigans if the amount was not the expected amount,
+    // and this is what we really want to test in this function.
+    CRM_Contribute_BAO_Contribution::updateRelatedPledge(
+      CRM_Core_Action::ADD,
+      $pledgePayments['values'][0]['id'],
+      $contributionID,
+      NULL, // adjustTotalAmount
+      404.70,
+      134.90,
+      1, // contribution_status_id
+      NULL // original_contribution_status_id
+    );
+
+    // Fetch the pledge payments again to see if the amounts and statuses
+    // have been updated correctly.
+    $pledgePayments = $this->callAPISuccess('pledge_payment', 'get', array(
+      'pledge_id' => $pledge['id'],
+      'sequential' => 1,
+    ));
+
+    // The status of the first 3 pledges should be set to complete
+    $this->assertEquals($pledgePayments['values'][0]['status_id'], 1);
+    $this->assertEquals($pledgePayments['values'][0]['actual_amount'], 404.70);
+
+    $this->assertEquals($pledgePayments['values'][1]['status_id'], 1);
+    $this->assertEquals($pledgePayments['values'][1]['actual_amount'], 0);
+
+    $this->assertEquals($pledgePayments['values'][2]['status_id'], 1);
+    $this->assertEquals($pledgePayments['values'][2]['actual_amount'], 0);
+
+    // Fourth pledge should still be pending
+    $this->assertEquals($pledgePayments['values'][3]['status_id'], 2);
+
+    // Cleanup
+    civicrm_api3('Pledge', 'delete', array(
+      'id' => $pledge['id'],
+    ));
+  }
+
+  /**
+   * Test pledge payments that cover multiple pledge installments (CRM-17281).
+   * Check for rounding bugs and correct status of the last pledge payment.
+   *
+   * More specifically, in the UI this would be equivalent to creating a $100
+   * pledge to be paid in 11 installments of $8.33 and one installment of $8.37
+   * (to compensate the missing $0.04 from round(100/12)*12.
+   * The API does not allow to do this kind of pledge, because the BAO recalculates
+   * the 'amount' using original_installment_amount * installment.
+   */
+  public function testCreatePledgePaymentForMultipleInstallments2() {
+    $scheduled_date = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));
+    $contact_id = 2;
+
+    $params = array(
+      'contact_id' => $contact_id,
+      'pledge_create_date' => date('Ymd'),
+      'start_date' => date('Ymd'),
+      'scheduled_date' => $scheduled_date,
+      'amount' => 100.00,
+      'pledge_status_id' => 2,
+      'pledge_financial_type_id' => 1,
+      'original_installment_amount' => (100 / 12), // the API does not allow this
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'frequency_day' => 1,
+      'installments' => 12,
+      'sequential' => 1,
+    );
+
+    $pledge = CRM_Pledge_BAO_Pledge::create($params);
+
+    $contributionID = $this->contributionCreate(array(
+      'contact_id' => $contact_id,
+      'financial_type_id' => 1,
+      'invoice_id' => 47,
+      'trxn_id' => 47,
+      'total_amount' => 100.00,
+      'fee_amount' => 0.00,
+      'net_amount' => 100.00,
+      'payment_instrument_id' => 1,
+      'non_deductible_amount' => 0.00,
+    ));
+
+    // Fetch the first planned pledge payment/installment
+    $pledgePayments = civicrm_api3('PledgePayment', 'get', array(
+      'pledge_id' => $pledge->id,
+      'sequential' => 1,
+    ));
+
+    // The last pledge payment is 8.37 because 12*8.33 = 99.96
+    // So CiviCRM automatically creates a larger final pledge to catch the missing cents.
+    $last_pp_idx = count($pledgePayments['values']) - 1;
+    $this->assertEquals(8.37, $pledgePayments['values'][$last_pp_idx]['scheduled_amount'], '', 0.01);
+
+    // Does all sorts of shenanigans if the amount was not the expected amount,
+    // and this is what we really want to test in this function.
+    // This tests an old bug where, given a pledge of 100 in 12 installments,
+    // the last pledge payment would have 4¢ left and still be pending.
+    CRM_Contribute_BAO_Contribution::updateRelatedPledge(
+      CRM_Core_Action::ADD,
+      $pledgePayments['values'][0]['id'],
+      $contributionID,
+      NULL, // adjustTotalAmount
+      100.00,
+      100.00,
+      1, // contribution_status_id
+      NULL // original_contribution_status_id
+    );
+
+    // Fetch the pledge payments again to see if the amounts and statuses
+    // have been updated correctly.
+    $pledgePayments = $this->callAPISuccess('pledge_payment', 'get', array(
+      'pledge_id' => $pledge->id,
+      'sequential' => 1,
+    ));
+
+    foreach ($pledgePayments['values'] as $key => $pp) {
+      if ($key == 0) {
+        // First pledge payment has the full amount.
+        $this->assertEquals(8.33, $pp['scheduled_amount']);
+        $this->assertEquals(100.00, $pp['actual_amount']);
+      }
+      else {
+        $this->assertEquals(0, $pp['scheduled_amount']);
+        $this->assertEquals(0, $pp['actual_amount']);
+      }
+
+      // All pledge payments must be set as 'completed'.
+      $this->assertEquals(1, $pp['status_id']);
+    }
+
+    // Cleanup
+    civicrm_api3('Pledge', 'delete', array(
+      'id' => $pledge->id,
+    ));
+  }
+
 }

@@ -16,6 +16,10 @@
   organization: Agileware
   jira        : agileware
 
+- github      : agileware-dev
+  name        : Agileware Team
+  organization: Agileware
+
 - github      : ajdavis
   name        : A. Jesse Jiryu Davis
   organization: MongoDB
@@ -25,18 +29,41 @@
   name        : Alessandro Verdura
   organization: CompuCorp
 
+- github      : AlainBenbassat
+  name        : Alain Benbassat
+  organization: Business & Code
+  jira        : alainb
+
+- github      : alexmarketaccess
+  name        : Alex Block
+
 - github      : alifrumin
   name        : Alice Frumin
   organization: AGH Strategies
   jira        : alifrumin
 
+- github      : amsharma9
+  name        : Amal Sharma
+  organization: Abhikalak Consultants
+
 - github      : andrew-cormick-dockery
   name        : Andrew Cormick-Dockery
   jira        : andrew_dockery
 
+- name        : Andrew Perry
+  organization: Community Builders
+  jira        : andrew
+
 - github      : andrewpthompson
   name        : Andrew Thompson
   jira        : andrewpthompson
+
+- name        : F. M. Andrimont
+  jira        : andrimont
+
+- name        : Andrew Walker
+  organization: Circle Interactive
+  jira        : andyw
 
 - github      : anthonylindsay
   name        : Anthony Lindsay
@@ -47,12 +74,33 @@
   name        : Anthony Borrow
   jira        : arborrow
 
+- github      : AronNovakInovae
+  name        : Aron Novak
+  organization: Gizra
+
 - github      : artem3
   name        : Artem Goncharenko
 
 - github      : arthuralmeidap
   name        : Arthur Almeida
   organization: Neuwald Tecnologia da Informação
+
+- name        : Sean Prónay
+  organization: Apple Street Market
+  jira        : ASMC
+
+- name        : Rich Lott
+  organization: Artful Robot
+  jira        : artfulrobot.com
+
+- github      : autarch
+  name        : Dave Rolsky
+  jira        : autarch
+
+- github      : axon-obriend
+  name        : Dan O'Brien
+  organization: Ginkgo Street Labs
+  jira        : axon-obriend
 
 - github      : aydun
   name        : Aidan Saunders
@@ -67,6 +115,9 @@
 - github      : BorislavZlatanov
   name        : Borislav Zlatanov
   jira        : BorislavZlatanov
+
+- name        : Brian McFee
+  jira        : brian
 
 - github      : brucew2013
   name        : Bruce Wolfe
@@ -85,8 +136,16 @@
   organization: Monadnock Developmental Services
   jira        : chagrawil
 
+- name        : Charles Register
+  organization: Hemophilia of North Carolina
+  jira        : charlie
+
 - github      : chanunc
   name        : Chanun Chirattikanon
+
+- name        : Cheryl Chase
+  organization: Mathias Consulting
+  jira        : cherylchase
 
 - github      : christianwach
   name        : Christian Wach
@@ -101,12 +160,21 @@
   organization: CiviCRM
   jira        : colemanw
 
-- name        : Chris Wells
+- github      : chrisfromredfin
+  name        : Chris Wells
   organization: Redfin Solutions
   jira        : cwells
 
+- name        : Andy Clarke
+  jira        : clarkac
+
 - name        : Daniel Martinez
   jira        : danielmart
+
+- github      : darrick
+  name        : Darrick Servis
+  organization: Davis Media Access
+  jira        : darrick
 
 - github      : davecivicrm
   name        : Dave Greenberg
@@ -119,6 +187,7 @@
 
 - github      : davialexandre
   name        : Davi Alexandre
+  organization: CompuCorp
   jira        : davialexandre
 
 - github      : davidjosephhayes
@@ -131,15 +200,27 @@
   organization: Glick Software
   jira        : davisagli
 
+- github      : deepak-srivastava
+  name        : Deepak Srivastava
+  jira        : deepak
+
 - github      : dejan9393
   name        : Dejan Lukic
   organization: Community Builders
   jira        : dejan9393
 
+- github      : demeritcowboy
+  name        : Dave D
+  jira        : demeritcowboy
+
 - github      : detsieber
   name        : Detlev Sieber
   organization: Digitalcourage
   jira        : detsieber
+
+- github      : devarun
+  name        : Arun Singh
+  jira        : aruns6578
 
 - name        : Adam Kwiatkowski
   organization: DevMate
@@ -164,6 +245,27 @@
   organization: Nubay Services
   jira        : dtarrant
 
+- name        : Dean Valentine
+  organization: National Democratic Institute
+  jira        : dvalentine@ndi.org
+
+- name        : Diego Viegas
+  organization: dotPro
+  jira        : diegov
+
+- name        : Dina London
+  organization: Jvillage Network
+  jira        : dinalondon
+
+- github      : dsnopek
+  name        : David Snopek
+  organization: myDropWizard
+  jira        : dsnopek
+
+- github      : dvhirst
+  name        : Donald Hirst
+  jira        : dvhirst
+
 - github      : edzelopez
   name        : Edsel Lopez
   organization: JMA Consulting
@@ -171,8 +273,20 @@
 
 - github      : eileenmcnaughton
   name        : Eileen McNaughton
-  organization: Fuzion
+  organization: Wikimedia Foundation
   jira        : eileen
+
+- github      : Eaiman
+  name        : Eaiman Shoshi
+
+- github      : ejegg
+  name        : Elliott Eggleston
+  organization: Wikimedia Foundation
+  jira        : ejegg
+
+- github      : elisseck
+  name        : Eli Lisseck
+  jira        : elilisseck
 
 - name        : Ellen Hendricks
   organization: Spry Digital
@@ -182,6 +296,10 @@
   name        : Christopher Gervais
   organization: Ergon Logic Enterprises
   jira        : ergonlogic
+
+- name        : Eric Goldhagen
+  organization: Openflows
+  jira        : ericg
 
 - github      : ErichBSchulz
   name        : Erich Schulz
@@ -194,6 +312,18 @@
 - github      : esantanche
   name        : Emanuele Santanchè
   jira        : esantanche
+
+- name        : Evan Summers
+  organization: National Democratic Institute
+  jira        : esummers
+
+- name        : Fabian Schuttenberg
+  organization: Systopia
+  jira        : fabian (systopia)
+
+- name        : Fabian Schuttenberg
+  organization: Systopia
+  jira        : fabian_SYSTOPIA
 
 - name        : Fedor Khodkov
   jira        : fkhodkov
@@ -213,6 +343,11 @@
 - github      : francescbassas
   name        : Francesc Bassas i Bullich
   jira        : francescbassas
+
+- github      : freephile
+  name        : Greg Rundlett
+  organization: eQuality Technology
+  jira        : freephile
 
 - github      : galgeek
   name        : Barbara Miller
@@ -268,9 +403,16 @@
   name        : Naomi Rosenberg
   jira        : naomi
 
+- name        : Anthony Colombo
+  organization: DreamSpace
+  jira        : Hunabku
+
 - github      : ineffyble
   name        : Effy Elden
   jira        : effy
+
+- name        : Brian Hay
+  jira        : inteja
 
 - github      : jaapjansma
   name        : Jaap Jansma
@@ -300,6 +442,10 @@
 - github      : jernic
   name        : jernic
 
+- name        : Jeremy Nicholls
+  organization: SEN Magazine
+  jira        : jern
+
 - github      : jeromelebleu
   name        : Jérôme Lebleu
   jira        : jlebleu
@@ -318,9 +464,15 @@
   name        : Joanne Chester
   jira        : jchester
 
+- github      : joels341
+  name        : Joel Stevens
+
 - github      : JKingsnorth
   name        : John Kingsnorth
   jira        : john
+
+- github      : JO0st
+  name        : Joost Fock
 
 - github      : JoeMurray
   name        : Joe Murray
@@ -340,6 +492,9 @@
   organization: GMCVO Databases
   jira        : jon-man
 
+- github      : jonesinator
+  name        : Aaron Jones
+
 - github      : joshgowans
   name        : Josh Gowans
   organization: CiviCRM
@@ -347,11 +502,15 @@
 
 - github      : josephlacey
   name        : Joseph Lacey
-  organization: Palante Technology Cooperative
   jira        : jlacey
+
+- github      : jusfreeman
+  name        : Justin Freeman
+  organization: Agileware
 
 - github      : kainuk
   name        : Klaas Eikelboom
+  organization: CiviCoop
   jira        : keikelboom
 
 - github      : Kajakaran
@@ -375,6 +534,7 @@
 
 - github      : kenwest
   name        : Ken West
+  jira        : ken
 
 - github      : konadave
   name        : David Reedy Jr
@@ -394,6 +554,11 @@
   name        : Kurund Jalmi
   organization: Web Access
   jira        : kurund
+
+- github      : laryn
+  name        : Laryn Kragt Bakker
+  organization: CEDC
+  jira        : lpkb
 
 - github      : lcdservices
   name        : Brian Shaughnessy
@@ -421,6 +586,10 @@
   organization: Freeform Solutions
   jira        : lola_slade
 
+- github      : lsmithgo
+  name        : Lionel Smith-Gordon
+  jira        : lsmithgo
+
 - name        : Madura Krishnamoorthy
   organization: CompuCorp
   jira        : madura
@@ -428,6 +597,9 @@
 - github      : magnolia61
   name        : Richard van Oosterhout
   jira        : magnolia61
+
+- name        : Manish Zope
+  jira        : manish
 
 - name        : Martin Castle
   organization: Circle Interactive
@@ -449,6 +621,11 @@
 - name        : Maureen Parks
   organization: Minnesota Association of Veterinary Technicians
   jira        : membership
+
+- github      : mepps
+  name        : Maggie Epps
+  organization: Wikimedia Foundation
+  jira        : mepps
 
 - github      : mfb
   name        : Mark Burdett
@@ -488,6 +665,11 @@
 - github      : MiyaNoctem
   name        : Camilo Rodriguez
   organization: CompuCorp
+  jira        : Miya27
+
+- name        : Michael Lueck
+  organization: Lueck Data Systems
+  jira        : mdlueck
 
 - github      : mlutfy
   name        : Mathieu Lutfy
@@ -530,6 +712,13 @@
   name        : Pawel Nowak
   jira        : pnowak
 
+- name        : Peter Bull
+  jira        : peter39
+
+- github      : philmck
+  name        : Phil McKerracher
+  jira        : philmck
+
 - name        : René Nieuwburg
   organization: Comunica2
   jira        : ñull
@@ -555,8 +744,9 @@
 - name        : Dennis Gray
   jira        : ozyank
 
-- github      : PalanteJon
+- github      : MegaphoneJon
   name        : Jon Goldberg
+  organization: Megaphone Technology Consulting
   jira        : palantejon
 
 - name        : Patrick Corbett
@@ -567,6 +757,10 @@
   name        : Peter Davis
   organization: Fuzion
   jira        : petednz
+
+- github      : pillarsdotnet
+  name        : Bob Vincent
+  jira        : pillarsdotnet
 
 - name        : Peter Davis
   organization: Fuzion
@@ -589,6 +783,10 @@
 - name        : Rareș Pamfil
   jira        : rares
 
+- github      : RexAK
+  name        : Rex Keal
+  jira        : RexAK
+
 - name        : Lutz Frommberger
   jira        : re-quest
 
@@ -600,6 +798,10 @@
 - name        : Robert Lang
   jira        : rjlang
 
+- name        : Rohan Chavan
+  organization: Web Access
+  jira        : rohan
+
 - github      : rohankatkar
   name        : Rohan Katkar
   organization: CiviCRM
@@ -609,9 +811,17 @@
   name        : Romain Thouvenin
   jira        : romain
 
+- github      : rtobias81
+  name        : Randy Tobias
+  organization: Technology & Beyond
+  jira        : rtobias
+
 - github      : rubofvil
   name        : Rubén Pineda
   organization: iXiam
+
+- name        : Steve Binkowski
+  jira        : s.bink
 
 - name        : Sheila Burkett
   organization: Spry Digital
@@ -645,15 +855,26 @@
 
 - github      : seanmadsen
   name        : Sean Madsen
+  organization: Left Join Labs
   jira        : seanmadsen
+
+- name        : Shailesh Lende
+  jira        : shailesh
 
 - github      : sharique
   name        : Sharique Ahmed Farooqui
   jira        : sharique
 
+- name        : James van der Hoven
+  jira        : sixfootjames
+
 - github      : spalmstr
   name        : Stephen Palmstrom
   jira        : spalmstr
+
+- github      : spencerbrooks
+  name        : Spencer Brooks
+  organization: Brooks Digital
 
 - github      : sqweets
   name        : Ellen Hendricks
@@ -688,15 +909,22 @@
   organization: Third Sun
   jira        : thirdsun
 
-- name        : Thomas Nilefalk
+- github      : thoni56
+  name        : Thomas Nilefalk
+  organization: Responsive Development Technologies
   jira        : thoni56
 
 - github      : tobiaslounsbury
   name        : Tobias Lounsbury
+  jira        : tobiaslounsbury
 
 - name        : Thomas Mannell
   organization: Registered Nurses' Association of Ontario
   jira        : tom.m
+
+
+- name        : Torrance Hodgson
+  jira        : torrance123
 
 - github      : totten
   name        : Tim Otten
@@ -717,6 +945,11 @@
   name        : Thomas Schüttler
   organization: Oxfam Germany
   jira        : tschuettler
+
+- github      : tttp
+  name        : Xavier Dutoit
+  organization: Tech To The People
+  jira        : xavier
 
 - github      : tunbola
   name        : Tunbola Ogunwande
@@ -769,6 +1002,10 @@
   organization: Debre-Genet Holy Trinity Ethiopian Orthodox Tewahedo Church
   jira        : 'website@dght.uk'
 
+- github      : wdecraene
+  organization: Wim De Craene
+  jira        : wdecraene
+
 - name        : William Gordon
   organization: British Humanist Association
   jira        : wdgordon
@@ -780,7 +1017,6 @@
 
 - github      : xurizaemon
   name        : Chris Burgess
-  organization: Fuzion
   jira        : xurizaemon
 
 - github      : yashodha

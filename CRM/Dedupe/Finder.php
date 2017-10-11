@@ -145,6 +145,10 @@ class CRM_Dedupe_Finder {
     }
     $params['check_permission'] = CRM_Utils_Array::value('check_permission', $params, TRUE);
 
+    if (isset($params['civicrm_phone']['phone_numeric'])) {
+      $orig = $params['civicrm_phone']['phone_numeric'];
+      $params['civicrm_phone']['phone_numeric'] = preg_replace('/[^\d]/', '', $orig);
+    }
     $rgBao->params = $params;
     $rgBao->fillTable();
     $dao = new CRM_Core_DAO();
@@ -287,6 +291,16 @@ class CRM_Dedupe_Finder {
             'country' => 'country_id',
             'state_province' => 'state_province_id',
             'county' => 'county_id',
+          );
+          foreach ($fixes as $orig => $target) {
+            if (!empty($flat[$orig])) {
+              $params[$table][$target] = $flat[$orig];
+            }
+          }
+        }
+        if ($table == 'civicrm_phone') {
+          $fixes = array(
+            'phone' => 'phone_numeric',
           );
           foreach ($fixes as $orig => $target) {
             if (!empty($flat[$orig])) {
