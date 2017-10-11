@@ -79,9 +79,33 @@ class CRM_Utils_Hook_Generate_Identifier_Test extends CiviUnitTestCase {
    * Verify the generateIdentifier hook for contribution's creditnote_id
    */
   public function testCreditnoteHook() {
-    // TODO: test create + cancel
+    $this->hookClass->setHook('civicrm_generateIdentifier', array($this, 'hooktest_civicrm_generateIdentifier'));
 
-    // TODO: test create refunded
+    // create a contribution
+    $this->callAPISuccess('Contribution', 'create', array(
+      'total_amount'           => '11.11',
+      'financial_type_id'      => 1,
+      'contact_id'             => 1,
+      'payment_instrument_id'  => 1,
+      'contribution_status_id' => 1,
+      'trxn_id'                => 'HOOKAH2'
+    ));
+    // reload
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', array('trxn_id' => 'HOOKAH2', 'return' => 'creditnote_id'));
+
+    // this should have no creditnote
+    $this->assertEquals('', CRM_Utils_Array::value('creditnote_id', $contribution), "A new contribution should not have a creditnote ID");
+
+    // now cancel the contribution
+    $contribution = $this->callAPISuccess('Contribution', 'create', array(
+      'id' => $contribution['id'],
+      'contribution_status_id' => 3, // Cancelled
+      'cancel_reason'          => 'test'));
+    // reload
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', array('trxn_id' => 'HOOKAH2', 'return' => 'creditnote_id'));
+
+    // this should have no creditnote
+    $this->assertEquals('HOOKAH', CRM_Utils_Array::value('creditnote_id', $contribution), "The contribution should have our creditnote ID");
   }
 
   /**
@@ -99,7 +123,7 @@ class CRM_Utils_Hook_Generate_Identifier_Test extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'trxn_id'                => 'HOOKAH'
     ));
-    $contribution = $this->callAPISuccess('Contribution', 'getsingle', array('trxn_id' => 'HOOKAH'));
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', array('trxn_id' => 'HOOKAH', 'return' => 'invoice_number'));
 
     // verify: no invoice number
     $this->assertEquals('', CRM_Utils_Array::value('invoice_number', $contribution), "A new contribution should not have an invoice ID");
@@ -113,6 +137,9 @@ class CRM_Utils_Hook_Generate_Identifier_Test extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', array('trxn_id' => 'HOOKAH', 'return' => 'invoice_number'));
     $this->assertEquals('HOOKAH', CRM_Utils_Array::value('invoice_number', $contribution), "The invoice number should be ours");
   }
+
+
+
 
   /**
    * Helper hook implementation
