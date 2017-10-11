@@ -315,60 +315,60 @@ elseif ($installType == 'wordpress') {
 
 // Load civicrm database config
 if (isset($_POST['mysql'])) {
-    $databaseConfig = $_POST['mysql'];
+  $databaseConfig = $_POST['mysql'];
 }
 else {
-    $databaseConfig = array(
-        "server"   => "localhost",
-        "username" => "civicrm",
-        "password" => "",
-        "database" => "civicrm",
-    );
+  $databaseConfig = [
+    "server" => "localhost",
+    "username" => "civicrm",
+    "password" => "",
+    "database" => "civicrm",
+  ];
 }
 
 if ($installType == 'wordpress') {
-    // Load WP database config
-    if (isset($_POST['mysql'])) {
-        $databaseConfig = $_POST['mysql'];
-    }
-    else {
-        $databaseConfig = array(
-            "server"   => DB_HOST,
-            "username" => DB_USER,
-            "password" => DB_PASSWORD,
-            "database" => DB_NAME,
-        );
-    }
+  // Load WP database config
+  if (isset($_POST['mysql'])) {
+    $databaseConfig = $_POST['mysql'];
+  }
+  else {
+    $databaseConfig = [
+      "server" => DB_HOST,
+      "username" => DB_USER,
+      "password" => DB_PASSWORD,
+      "database" => DB_NAME,
+    ];
+  }
 }
 
 if ($installType == 'drupal') {
-    // Load drupal database config
-    if (isset($_POST['drupal'])) {
-        $drupalConfig = $_POST['drupal'];
-    }
-    else {
-        $drupalConfig = array(
-            "server" => $databases['default']['default']['host'],
-            "username" => $databases['default']['default']['username'],
-            "password" => $databases['default']['default']['password'],
-            "database" => $databases['default']['default']['database'],
-        );
-    }
+  // Load drupal database config
+  if (isset($_POST['drupal'])) {
+    $drupalConfig = $_POST['drupal'];
+  }
+  else {
+    $drupalConfig = [
+      "server" => $databases['default']['default']['host'],
+      "username" => $databases['default']['default']['username'],
+      "password" => $databases['default']['default']['password'],
+      "database" => $databases['default']['default']['database'],
+    ];
+  }
 }
 
 if ($installType == 'backdrop') {
-    // Load backdrop database config
-    if (isset($_POST['backdrop'])) {
-        $backdropConfig = $_POST['backdrop'];
-    }
-    else {
-        $backdropConfig = array(
-            "server" => "localhost",
-            "username" => "backdrop",
-            "password" => "",
-            "database" => "backdrop",
-        );
-    }
+  // Load backdrop database config
+  if (isset($_POST['backdrop'])) {
+    $backdropConfig = $_POST['backdrop'];
+  }
+  else {
+    $backdropConfig = [
+      "server" => "localhost",
+      "username" => "backdrop",
+      "password" => "",
+      "database" => "backdrop",
+    ];
+  }
 }
 
 // Check requirements
