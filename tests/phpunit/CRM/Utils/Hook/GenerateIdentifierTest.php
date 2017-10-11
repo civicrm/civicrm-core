@@ -1,7 +1,9 @@
 <?php
-
 /**
  * Class CRM_Utils_Hook_Generate_Identifier_Test
+ *
+ * Tests the civicrm_generateIdentifier hook (see CRM-21289)
+ *
  * @group headless
  */
 class CRM_Utils_Hook_Generate_Identifier_Test extends CiviUnitTestCase {
