@@ -318,12 +318,12 @@ if (isset($_POST['mysql'])) {
   $databaseConfig = $_POST['mysql'];
 }
 else {
-  $databaseConfig = [
+  $databaseConfig = array(
     "server" => "localhost",
     "username" => "civicrm",
     "password" => "",
     "database" => "civicrm",
-  ];
+  );
 }
 
 if ($installType == 'wordpress') {
@@ -332,12 +332,12 @@ if ($installType == 'wordpress') {
     $databaseConfig = $_POST['mysql'];
   }
   else {
-    $databaseConfig = [
+    $databaseConfig = array(
       "server" => DB_HOST,
       "username" => DB_USER,
       "password" => DB_PASSWORD,
       "database" => DB_NAME,
-    ];
+    );
   }
 }
 
@@ -347,12 +347,12 @@ if ($installType == 'drupal') {
     $drupalConfig = $_POST['drupal'];
   }
   else {
-    $drupalConfig = [
+    $drupalConfig = array(
       "server" => $databases['default']['default']['host'],
       "username" => $databases['default']['default']['username'],
       "password" => $databases['default']['default']['password'],
       "database" => $databases['default']['default']['database'],
-    ];
+    );
   }
 }
 
@@ -362,12 +362,12 @@ if ($installType == 'backdrop') {
     $backdropConfig = $_POST['backdrop'];
   }
   else {
-    $backdropConfig = [
+    $backdropConfig = array(
       "server" => "localhost",
       "username" => "backdrop",
       "password" => "",
       "database" => "backdrop",
-    ];
+    );
   }
 }
 
