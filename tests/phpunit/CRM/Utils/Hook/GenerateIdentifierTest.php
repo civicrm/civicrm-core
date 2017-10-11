@@ -27,7 +27,7 @@ class CRM_Utils_Hook_Generate_Identifier_Test extends CiviUnitTestCase {
     $contactA = civicrm_api3('Contact', 'create', array(
       'first_name'   => 'Captain',
       'last_name'    => 'Hook',
-      'contact_type' => 'Individual'
+      'contact_type' => 'Individual',
     ));
     $this->assertAPISuccess($contactA);
     $contactA = civicrm_api3('Contact', 'getsingle', array('id' => $contactA['id']));
@@ -40,7 +40,7 @@ class CRM_Utils_Hook_Generate_Identifier_Test extends CiviUnitTestCase {
     $contactB = civicrm_api3('Contact', 'create', array(
       'first_name'   => 'Jake',
       'last_name'    => 'Hook',
-      'contact_type' => 'Individual'
+      'contact_type' => 'Individual',
     ));
     $this->assertAPISuccess($contactB);
     $contactB = civicrm_api3('Contact', 'getsingle', array('id' => $contactB['id']));
@@ -90,7 +90,7 @@ class CRM_Utils_Hook_Generate_Identifier_Test extends CiviUnitTestCase {
       'contact_id'             => 1,
       'payment_instrument_id'  => 1,
       'contribution_status_id' => 1,
-      'trxn_id'                => 'HOOKAH2'
+      'trxn_id'                => 'HOOKAH2',
     ));
     // reload
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', array('trxn_id' => 'HOOKAH2', 'return' => 'creditnote_id'));
@@ -123,7 +123,7 @@ class CRM_Utils_Hook_Generate_Identifier_Test extends CiviUnitTestCase {
       'contact_id'             => 1,
       'payment_instrument_id'  => 1,
       'contribution_status_id' => 1,
-      'trxn_id'                => 'HOOKAH'
+      'trxn_id'                => 'HOOKAH',
     ));
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', array('trxn_id' => 'HOOKAH', 'return' => 'invoice_number'));
 
@@ -139,8 +139,6 @@ class CRM_Utils_Hook_Generate_Identifier_Test extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', array('trxn_id' => 'HOOKAH', 'return' => 'invoice_number'));
     $this->assertEquals('HOOKAH', CRM_Utils_Array::value('invoice_number', $contribution), "The invoice number should be ours");
   }
-
-
 
 
   /**
@@ -160,4 +158,5 @@ class CRM_Utils_Hook_Generate_Identifier_Test extends CiviUnitTestCase {
       }
     }
   }
+
 }

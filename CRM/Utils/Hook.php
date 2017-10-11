@@ -2387,8 +2387,8 @@ abstract class CRM_Utils_Hook {
    * It has to be ensured, though, that existing ids are preserved.
    * This is a generic
    *
-   * @param String $identifier  the identifier about to be used
-   * @param String $context     currently one of 'invoice_id', 'creditnote_id', 'contact_external_identifier', 'campaign_external_identifier'
+   * @param string $identifier  the identifier about to be used
+   * @param string $context     currently one of 'invoice_id', 'creditnote_id', 'contact_external_identifier', 'campaign_external_identifier'
    * @param Object $object      depends on $context, e.g. Contact BAO, Contribution BAO, Campaign BAO
    * @return mixed
    */
