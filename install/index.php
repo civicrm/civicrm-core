@@ -348,7 +348,7 @@ if ($installType == 'drupal') {
   }
   else {
     $drupalConfig = array(
-      "server" => $databases['default']['default']['host'],
+      "server" => $databases['default']['default']['host'] . ':' . $databases['default']['default']['port'],
       "username" => $databases['default']['default']['username'],
       "password" => $databases['default']['default']['password'],
       "database" => $databases['default']['default']['database'],
