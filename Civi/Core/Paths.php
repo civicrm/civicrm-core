@@ -57,7 +57,7 @@ class Paths {
         return \CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
       })
       ->register('wp.frontend.base', function () {
-        return array('url' => CIVICRM_UF_BASEURL . '/');
+        return array('url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/');
       })
       ->register('wp.frontend', function () use ($paths) {
         $config = \CRM_Core_Config::singleton();
@@ -67,7 +67,7 @@ class Paths {
         );
       })
       ->register('wp.backend.base', function () {
-        return array('url' => CIVICRM_UF_BASEURL . '/wp-admin/');
+        return array('url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/wp-admin/');
       })
       ->register('wp.backend', function () use ($paths) {
         return array(
