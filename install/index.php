@@ -267,6 +267,9 @@ if ($installType == 'drupal') {
     }
   }
 
+  // Bootstrap Drupal to get settings
+  drupal_bootstrap(DRUPAL_BOOTSTRAP_CONFIGURATION);
+
   if (!defined('VERSION') or version_compare(VERSION, '6.0') < 0) {
     $errorTitle = ts("Oops! Incorrect Drupal version");
     $errorMsg = ts("This version of CiviCRM can only be used with Drupal 6.x or 7.x. Please ensure that '%1' exists if you are running Drupal 7.0 and over.", array(1 => implode("' or '", $drupalVersionFiles)));
@@ -345,10 +348,10 @@ if ($installType == 'drupal') {
     }
     else {
         $drupalConfig = array(
-            "server" => "localhost",
-            "username" => "drupal",
-            "password" => "",
-            "database" => "drupal",
+            "server" => $databases['default']['default']['host'],
+            "username" => $databases['default']['default']['username'],
+            "password" => $databases['default']['default']['password'],
+            "database" => $databases['default']['default']['database'],
         );
     }
 }
