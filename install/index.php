@@ -313,17 +313,9 @@ elseif ($installType == 'wordpress') {
   }
 }
 
-// Load civicrm database config
+// Load CiviCRM database config
 if (isset($_POST['mysql'])) {
   $databaseConfig = $_POST['mysql'];
-}
-else {
-  $databaseConfig = array(
-    "server" => "localhost",
-    "username" => "civicrm",
-    "password" => "",
-    "database" => "civicrm",
-  );
 }
 
 if ($installType == 'wordpress') {
@@ -368,6 +360,16 @@ if ($installType == 'backdrop') {
       "password" => "",
       "database" => "backdrop",
     );
+  }
+}
+
+// By default set CiviCRM database to be same as CMS database
+if (!isset($databaseConfig)) {
+  if (($installType == 'drupal') && (isset($drupalConfig))) {
+    $databaseConfig = $drupalConfig;
+  }
+  if (($installType == 'backdrop') && (isset($backdropConfig))) {
+    $databaseConfig = $backdropConfig;
   }
 }
 
