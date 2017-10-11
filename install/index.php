@@ -104,64 +104,6 @@ $pkgPath = $crmPath . DIRECTORY_SEPARATOR . 'packages';
 require_once $crmPath . '/CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
 
-// Load civicrm database config
-if (isset($_POST['mysql'])) {
-  $databaseConfig = $_POST['mysql'];
-}
-else {
-  $databaseConfig = array(
-    "server"   => "localhost",
-    "username" => "civicrm",
-    "password" => "",
-    "database" => "civicrm",
-  );
-}
-
-if ($installType == 'wordpress') {
-  // Load WP database config
-  if (isset($_POST['mysql'])) {
-    $databaseConfig = $_POST['mysql'];
-  }
-  else {
-    $databaseConfig = array(
-      "server"   => DB_HOST,
-      "username" => DB_USER,
-      "password" => DB_PASSWORD,
-      "database" => DB_NAME,
-    );
-  }
-}
-
-if ($installType == 'drupal') {
-  // Load drupal database config
-  if (isset($_POST['drupal'])) {
-    $drupalConfig = $_POST['drupal'];
-  }
-  else {
-    $drupalConfig = array(
-      "server" => "localhost",
-      "username" => "drupal",
-      "password" => "",
-      "database" => "drupal",
-    );
-  }
-}
-
-if ($installType == 'backdrop') {
-  // Load backdrop database config
-  if (isset($_POST['backdrop'])) {
-    $backdropConfig = $_POST['backdrop'];
-  }
-  else {
-    $backdropConfig = array(
-      "server" => "localhost",
-      "username" => "backdrop",
-      "password" => "",
-      "database" => "backdrop",
-    );
-  }
-}
-
 $loadGenerated = 0;
 if (isset($_POST['loadGenerated'])) {
   $loadGenerated = 1;
@@ -366,6 +308,64 @@ elseif ($installType == 'wordpress') {
     $errorMsg = ts("This installer can only be used for the WordPress version of CiviCRM.");
     errorDisplayPage($errorTitle, $errorMsg);
   }
+}
+
+// Load civicrm database config
+if (isset($_POST['mysql'])) {
+    $databaseConfig = $_POST['mysql'];
+}
+else {
+    $databaseConfig = array(
+        "server"   => "localhost",
+        "username" => "civicrm",
+        "password" => "",
+        "database" => "civicrm",
+    );
+}
+
+if ($installType == 'wordpress') {
+    // Load WP database config
+    if (isset($_POST['mysql'])) {
+        $databaseConfig = $_POST['mysql'];
+    }
+    else {
+        $databaseConfig = array(
+            "server"   => DB_HOST,
+            "username" => DB_USER,
+            "password" => DB_PASSWORD,
+            "database" => DB_NAME,
+        );
+    }
+}
+
+if ($installType == 'drupal') {
+    // Load drupal database config
+    if (isset($_POST['drupal'])) {
+        $drupalConfig = $_POST['drupal'];
+    }
+    else {
+        $drupalConfig = array(
+            "server" => "localhost",
+            "username" => "drupal",
+            "password" => "",
+            "database" => "drupal",
+        );
+    }
+}
+
+if ($installType == 'backdrop') {
+    // Load backdrop database config
+    if (isset($_POST['backdrop'])) {
+        $backdropConfig = $_POST['backdrop'];
+    }
+    else {
+        $backdropConfig = array(
+            "server" => "localhost",
+            "username" => "backdrop",
+            "password" => "",
+            "database" => "backdrop",
+        );
+    }
 }
 
 // Check requirements
