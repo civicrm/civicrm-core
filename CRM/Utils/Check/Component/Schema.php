@@ -37,6 +37,11 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
    */
   public function checkIndices() {
     $messages = array();
+
+    // CRM-21298: The "Update Indices" tool that this check suggests is
+    // unreliable. Bypass this check until CRM-20817 and CRM-20533 are resolved.
+    return $messages;
+
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
     if ($missingIndices) {
       $html = '';
