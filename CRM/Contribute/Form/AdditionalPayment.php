@@ -355,6 +355,34 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     );
     $contributionStatusID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'contribution_status_id');
     if ($contributionStatuses[$contributionStatusID] == 'Pending') {
+      // CRM-20432, Updating the Pending status of Membership Record along with contribution.
+      // Updating the membership status to Current from Pending.
+      //
+      // Updating the status directly here is good idea instead of doing it at Schedule job level,
+      // In which we may have to go through all the memberships which are pending and then their contributions of each.
+      // Which could make the process slower and time consuming for large records.
+      $membershipStatuses = CRM_Member_PseudoConstant::membershipStatus();
+      $pendingStatusId = array_search('Pending', $membershipStatuses);
+
+      $membership_payments = civicrm_api3('membership_payment', 'get',
+        array(
+          'contribution_id' => $this->_contributionId,
+          'membership_id.status_id' => $pendingStatusId,
+        )
+      );
+
+      if ($membership_payments["count"] > 0) {
+        $membership_payments = $membership_payments["values"];
+        foreach ($membership_payments as $membership_payment) {
+          $membership_id = $membership_payment["membership_id"];
+          $membership = civicrm_api3('Membership', 'getsingle', array(
+            'id' => $membership_id,
+          ));
+          $currentStatusId = array_search('Current', $membershipStatuses);
+          $membership["status_id"] = $currentStatusId;
+          civicrm_api3('Membership', 'create', $membership);
+        }
+      }
       civicrm_api3('Contribution', 'create',
         array(
           'id' => $this->_contributionId,
