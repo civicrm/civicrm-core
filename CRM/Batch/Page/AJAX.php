@@ -54,21 +54,32 @@ class CRM_Batch_Page_AJAX {
    * @deprecated
    */
   public static function getBatchList() {
-    $sortMapper = array(
-      0 => 'title',
-      1 => 'type_id',
-      2 => '',
-      3 => 'total',
-      4 => 'status_id',
-      5 => '',
-    );
-
+    $context = isset($_REQUEST['context']) ? CRM_Utils_Type::escape($_REQUEST['context'], 'String') : NULL;
+    if ($context != 'financialBatch') {
+      $sortMapper = array(
+        0 => 'title',
+        1 => 'type_id.label',
+        2 => 'item_count',
+        3 => 'total',
+        4 => 'status_id.label',
+        5 => 'created_id.sort_name',
+      );
+    }
+    else {
+      $sortMapper = array(
+        1 => 'title',
+        2 => 'payment_instrument_id.label',
+        3 => 'item_count',
+        4 => 'total',
+        5 => 'status_id.label',
+        6 => 'created_id.sort_name',
+      );
+    }
     $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
     $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
     $rowCount = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
     $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
-    $context = isset($_REQUEST['context']) ? CRM_Utils_Type::escape($_REQUEST['context'], 'String') : NULL;
 
     $params = $_REQUEST;
     if ($sort && $sortOrder) {
