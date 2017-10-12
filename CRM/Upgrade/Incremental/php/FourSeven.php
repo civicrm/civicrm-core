@@ -462,7 +462,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    *
    * @param string $rev
    */
-  public function upgrade_4_7_27($rev) {
+  public function upgrade_4_7_28($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('CRM-20572: Fix date fields in save search criteria of Contrib Sybunt custom search ', 'fixDateFieldsInSmartGroups');
   }
