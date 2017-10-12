@@ -8,12 +8,8 @@
     name="{{crmMailingBlockRecipients.name}}"
     ng-required="true" />
     <a crm-icon="fa-wrench" ng-click="editOptions(mailing)" class="crm-hover-button" title="{{ts('Edit Recipient Options')}}"></a>
-    <div>
-      <button ng-click="rebuildRecipients()" class="ng-binding crm-button" title="{{ts('Preview a List of Recipients')}}">{{getRecipientsEstimate()}}</button>
-      <a ng-click="previewRecipients()" class="crm-hover-button" title="{{ts('Click to refresh recipient count')}}">
-        <span class="{{((outdated || recipient == 0) ? 'crmMailing-outdated-count' : 'crmMailing-latest-count')}}">
-          {{getRecipientCount()}}
-        </span>
-      </a>
+    <div ng-style="{display: permitRecipientRebuild ? '' : 'inline-block'}">
+      <button ng-click="rebuildRecipients()" ng-show="permitRecipientRebuild" class="crm-button" title="{{ts('Click to refresh recipient count')}}">{{getRecipientsEstimate()}}</button>
+      <a ng-click="previewRecipients()" class="crm-hover-button" title="{{ts('Preview a List of Recipients')}}" style="font-weight: bold;">{{getRecipientCount()}}</a>
     </div>
 </div>
