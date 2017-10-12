@@ -171,6 +171,17 @@ class CRM_Event_BAO_CRM19273 extends CiviUnitTestCase {
   }
 
   /**
+   * @param $expectedContributionState
+   */
+  private function contributionStateCheck($expectedContributionState) {
+    $contributionStatusId = CRM_Core_DAO::singleValueQuery('SELECT contribution_status_id FROM civicrm_contribution WHERE id=%1', array(
+      '1' => array($this->contributionID, 'Integer'),
+    ));
+    $currentContributionState = CRM_Contribute_PseudoConstant::contributionStatus($contributionStatusId);
+    $this->assertEquals($expectedContributionState, $currentContributionState, "Expected contribution state $expectedContributionState but found $currentContributionState ");
+  }
+
+  /**
    * Prepare records for editing.
    */
   public function registerParticipantAndPay() {
@@ -287,6 +298,57 @@ class CRM_Event_BAO_CRM19273 extends CiviUnitTestCase {
       $this->assertEquals($contributionCompletedStatusID, $financialItem['status_id']);
       $expectedAmount = -$expectedAmount;
     }
+  }
+
+  public function testCRM17151ChangeToCheap() {
+
+    // start state - participant selected the expensive fee
+    // and paid - so the transaction must be marked completed
+
+    $this->contributionStateCheck('Completed');
+
+    // then he changes (for example by requesting a change in email)
+    // he opts for the cheap option
+    // so the money must be refunded
+
+    $PSparams['price_1'] = 2;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($PSparams, $this->participantID, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee);
+    $this->contributionStateCheck('Pending refund');
+
+    // but he changes his mind again and reverts to the first choice.
+    // so the transaction must be complete again
+
+    $PSparams['price_1'] = 1;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($PSparams, $this->participantID, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee);
+    $this->contributionStateCheck('Completed');
+  }
+
+  public function testCRM17151ChangeToExpensive() {
+
+    // start state - participant selected the expensive fee
+    // and paid - so the transaction must be marked completed
+
+    $this->contributionStateCheck('Completed');
+
+    // then he changes (for example by requesting a change in email)
+    // he opts for the very expensive option but he does not pay
+    // so the the contribution must be marked partially paid
+
+    $PSparams['price_1'] = 3;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($PSparams, $this->participantID, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee);
+    $this->contributionStateCheck('Partially paid');
+
+    // but he changes his mind again and reverts to the first choice.
+    // so the transaction must be complete again
+
+    $PSparams['price_1'] = 1;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($PSparams, $this->participantID, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee);
+    $this->contributionStateCheck('Completed');
+
   }
 
 }
