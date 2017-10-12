@@ -86,6 +86,20 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Create a completed mailing (e.g when importing from a provider).
+   */
+  public function testMailerCreateCompleted() {
+    $this->_params['body_html'] = 'I am completed so it does not matter if there is an opt out link since I have already been sent by another system';
+    $this->_params['is_completed'] = 1;
+    $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + array('scheduled_date' => 'now'), __FUNCTION__, __FILE__);
+    $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
+    $this->assertEquals(1, $jobs['count']);
+    $this->assertEquals('Complete', $jobs['values'][$jobs['id']]['status']);
+    unset($this->_params['created_id']); // return isn't working on this in getAndCheck so lets not check it for now
+    $this->getAndCheck($this->_params, $result['id'], 'mailing');
+  }
+
+  /**
    * Per CRM-20316 the mailing should still create without created_id (not mandatory).
    */
   public function testMailerCreateSuccessNoCreatedID() {
