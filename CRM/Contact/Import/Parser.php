@@ -844,7 +844,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       ) {
         //we should not update Date to null, CRM-4062
         if ($val && ($customFields[$customFieldID]['data_type'] == 'Date')) {
-	  //CRM-21267
+          //CRM-21267
           CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
         }
         elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
