@@ -339,8 +339,12 @@ if ($installType == 'drupal') {
     $drupalConfig = $_POST['drupal'];
   }
   else {
+    $dbServer = $databases['default']['default']['host'];
+    if (!empty($databases['default']['default']['port'])) {
+      $dbServer .= ':' . $databases['default']['default']['port'];
+    }
     $drupalConfig = array(
-      "server" => $databases['default']['default']['host'] . ':' . $databases['default']['default']['port'],
+      "server" => $dbServer,
       "username" => $databases['default']['default']['username'],
       "password" => $databases['default']['default']['password'],
       "database" => $databases['default']['default']['database'],
