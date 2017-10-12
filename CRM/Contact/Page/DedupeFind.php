@@ -156,36 +156,18 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
         CRM_Dedupe_Merger::resetMergeStats($cacheKeyString);
       }
 
-      $this->_mainContacts = CRM_Dedupe_Merger::getDuplicatePairs($rgid, $gid, !$isConflictMode, 0, $isConflictMode, '', $isConflictMode, $criteria, TRUE);
-
-      if (empty($this->_mainContacts)) {
-        if ($isConflictMode) {
-          // if the current screen was intended to list only selected contacts, move back to full dupe list
-          $urlQry['action'] = 'update';
-          unset($urlQry['snippet']);
-          CRM_Utils_System::redirect(CRM_Utils_System::url(CRM_Utils_System::currentPath(), $urlQry));
-        }
-        $ruleGroupName = civicrm_api3('RuleGroup', 'getvalue', array('id' => $rgid, 'return' => 'name'));
-        CRM_Core_Session::singleton()->setStatus(ts('No possible duplicates were found using %1 rule.', array(1 => $ruleGroupName)), ts('None Found'), 'info');
-        $url = CRM_Utils_System::url('civicrm/contact/deduperules', 'reset=1');
-        if ($context == 'search') {
-          $url = CRM_Core_Session::singleton()->readUserContext();
-        }
-        CRM_Utils_System::redirect($url);
+      $urlQry['action'] = 'update';
+      if ($this->_cid) {
+        // @todo passing cid to this form doesn't really seem to be valid - legacy cruft?
+        $urlQry['cid'] = $this->_cid;
+        CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/contact/deduperules',
+          $urlQry
+        ));
       }
       else {
-        $urlQry['action'] = 'update';
-        if ($this->_cid) {
-          $urlQry['cid'] = $this->_cid;
-          CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/contact/deduperules',
-            $urlQry
-          ));
-        }
-        else {
-          CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/contact/dedupefind',
-            $urlQry
-          ));
-        }
+        CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/contact/dedupefind',
+          $urlQry
+        ));
       }
 
       $this->assign('action', $this->action);
