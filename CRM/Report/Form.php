@@ -2397,7 +2397,50 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     }
 
     $this->_selectClauses = $select;
-    $this->_select = "SELECT " . implode(', ', $select) . " ";
+    // CRM-21061: Modifying length of the Alias to maximum of 60 characters.
+    $this->modifySelectClauses();
+    $this->_select = "SELECT " . implode(', ', $this->_selectClauses) . " ";
+  }
+
+  /**
+   * Modify select clauses
+   */
+  public function modifySelectClauses() {
+    // use this method to modify $this->_selectClauses
+    foreach ($this->_selectClauses as $key => $selectClause) {
+      $matches = array();
+      preg_match('/([A-Za-z_.0-9]*)\s(as)\s([A-Za-z_.0-9]*)/', $selectClause, $matches);
+
+      if (count($matches) >= 4) {
+        $alias = $matches[3];
+        if (strlen($alias) >= 64) {
+          $updatedAlias = substr($alias, 0, 60) . "_" . $key; //Appending Key to make alias unique.
+          $this->_selectAliases[$key] = $updatedAlias;
+          $matches[3] = $updatedAlias;
+          unset($matches[0]);
+          $this->_selectClauses[$key] = implode(" ", $matches);
+        }
+      }
+    }
+  }
+
+  /**
+   * Modify column headers.
+   */
+  public function modifyColumnHeaders() {
+    // use this method to modify $this->_columnHeaders
+    // CRM-21061: Modifying length of Column headers to match with updated alias.
+    $modifiedColumnHeaders = array();
+    $columnIndex = 0;
+    foreach ($this->_columnHeaders as $key => $columnHeader) {
+      $updatedKey = $key;
+      if (strlen($key) >= 64) {
+        $updatedKey = substr($key, 0, 60) . "_" . $columnIndex;
+      }
+      $modifiedColumnHeaders[$updatedKey] = $columnHeader;
+      $columnIndex;
+    }
+    $this->_columnHeaders = $modifiedColumnHeaders;
   }
 
   /**
@@ -2850,13 +2893,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       }
       $this->assign('sectionTotals', $totals);
     }
-  }
-
-  /**
-   * Modify column headers.
-   */
-  public function modifyColumnHeaders() {
-    // use this method to modify $this->_columnHeaders
   }
 
   /**
