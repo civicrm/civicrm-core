@@ -309,7 +309,7 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
     $errorMessage = array();
     $customGroup = $this->customGroupCreate(array(
       'extends' => 'Contact',
-      'title' => 'ABC'
+      'title' => 'ABC',
     ));
     $customField = $this->customFieldOptionValueCreate($customGroup, 'fieldABC', array('html_type' => 'Multi-Select'));
     $params = array(
