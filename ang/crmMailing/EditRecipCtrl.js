@@ -8,6 +8,7 @@
   angular.module('crmMailing').controller('EditRecipCtrl', function EditRecipCtrl($scope, dialogService, crmApi, crmMailingMgr, $q, crmMetadata, crmStatus, crmMailingCache) {
     // Time to wait before triggering AJAX update to recipients list
     var RECIPIENTS_DEBOUNCE_MS = 100;
+    var SETTING_DEBOUNCE_MS = 5000;
     var RECIPIENTS_PREVIEW_LIMIT = 50;
 
     var ts = $scope.ts = CRM.ts(null);
@@ -19,11 +20,12 @@
 
     $scope.recipients = null;
     $scope.outdated = null;
+    $scope.permitRecipientRebuild = null;
 
     $scope.getRecipientsEstimate = function() {
       var ts = $scope.ts;
       if ($scope.recipients === null) {
-        return ts('(Estimating)');
+        return ts('Estimating...');
       }
       if ($scope.recipients === 0) {
         return ts('Estimate recipient count');
@@ -33,8 +35,8 @@
 
     $scope.getRecipientCount = function() {
       var ts = $scope.ts;
-      if ($scope.recipients === 0) {
-        return ts('(unknown)');
+      if ($scope.recipients === 0 || $scope.outdated) {
+        return $scope.permitRecipientRebuild ? ts('(unknown)') : ts('No Recipients');
       }
       return ($scope.recipients === 1) ? ts('~1 recipient') : ts('~%1 recipients', {1 : $scope.recipients});
     };
@@ -46,8 +48,8 @@
         if (!$scope.mailing) {
           return;
         }
-        crmMailingMgr.previewRecipientCount($scope.mailing, crmMailingCache, false).then(function(recipients) {
-          $scope.outdated = (_.difference($scope.mailing.recipients, crmMailingCache.get('mailing-' + $scope.mailing.id + '-recipient-params')) !== 0);
+        crmMailingMgr.previewRecipientCount($scope.mailing, crmMailingCache, !$scope.permitRecipientRebuild).then(function(recipients) {
+          $scope.outdated = ($scope.permitRecipientRebuild && _.difference($scope.mailing.recipients, crmMailingCache.get('mailing-' + $scope.mailing.id + '-recipient-params')) !== 0);
           $scope.recipients = recipients;
         });
       });
@@ -59,6 +61,16 @@
     $scope.$watchCollection("mailing.recipients.groups.exclude", refreshRecipients);
     $scope.$watchCollection("mailing.recipients.mailings.include", refreshRecipients);
     $scope.$watchCollection("mailing.recipients.mailings.exclude", refreshRecipients);
+
+    // refresh setting at a duration on 5sec
+    var refreshSetting = _.debounce(function() {
+      $scope.$apply(function() {
+        crmApi('Setting', 'getvalue', {"name": 'auto_recipient_rebuild', "return": "value"}).then(function(response) {
+          $scope.permitRecipientRebuild = (response.result === 0);
+        });
+      });
+    }, SETTING_DEBOUNCE_MS);
+    $scope.$watchCollection("permitRecipientRebuild", refreshSetting);
 
     $scope.previewRecipients = function previewRecipients() {
       var model = {
@@ -73,7 +85,7 @@
       });
 
       // don't open preview dialog if there is no recipient to show.
-      if ($scope.recipients !== 0) {
+      if ($scope.recipients !== 0 && !$scope.outdated) {
         if (!_.isEmpty(model.sample)) {
           dialogService.open('recipDialog', '~/crmMailing/PreviewRecipCtrl.html', model, options);
         }
@@ -87,6 +99,8 @@
     };
 
     $scope.rebuildRecipients = function rebuildRecipients() {
+      // setting null will put 'Estimating..' text on refresh button
+      $scope.recipients = null;
       return crmMailingMgr.previewRecipientCount($scope.mailing, crmMailingCache, true).then(function(recipients) {
         $scope.outdated = (recipients === 0) ? true : false;
         $scope.recipients = recipients;
