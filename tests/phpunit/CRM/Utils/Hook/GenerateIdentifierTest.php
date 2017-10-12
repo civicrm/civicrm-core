@@ -111,7 +111,7 @@ class CRM_Utils_Hook_Generate_Identifier_Test extends CiviUnitTestCase {
   }
 
   /**
-   * Verify the generateIdentifier hook for contribution's invoice ID
+   * Verify the generateIdentifier hook for contribution's invoice number
    */
   public function testInvoiceIDHook() {
     $this->hookClass->setHook('civicrm_generateIdentifier', array($this, 'hooktest_civicrm_generateIdentifier'));
@@ -128,7 +128,7 @@ class CRM_Utils_Hook_Generate_Identifier_Test extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', array('trxn_id' => 'HOOKAH', 'return' => 'invoice_number'));
 
     // verify: no invoice number
-    $this->assertEquals('', CRM_Utils_Array::value('invoice_number', $contribution), "A new contribution should not have an invoice ID");
+    $this->assertEquals('', CRM_Utils_Array::value('invoice_number', $contribution), "A new contribution should not have an invoice number");
 
     // create invoice
     $params = array('forPage' => 1, 'output' => 'pdf_invoice');
