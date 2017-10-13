@@ -63,6 +63,28 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test test import parser will update exisiting fields with empty values.
+   *
+   * @throws \Exception
+   */
+  public function testImportParserWithOverridingExistingValuesByEmptyValues() {
+    list($originalValues, $result) = $this->setUpBaseContact(array(
+      'workemail'     => 'workemail@gmail.com',
+    ));
+    $originalValues["workemail"] = "";
+    $emailParams = array(
+      "contact_id"       => $result["id"],
+      "location_type_id" => 2,
+    );
+    $emailcount = $this->callAPISuccess('Email', 'getcount', $emailParams);
+    $this->assertEquals($emailcount, 1, "Work email count is not one after creating contact.");
+    $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
+    $result = $this->callAPISuccessGetSingle('Contact', $originalValues);
+    $emailcount = $this->callAPISuccess('Email', 'getcount', $emailParams);
+    $this->assertEquals($emailcount, 0, "Work email count is not zero after updating.");
+  }
+
+  /**
    * Test import parser will update contacts with an external identifier.
    *
    * This is the basic test where the identifier matches the import parameters.
@@ -302,9 +324,9 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('Contact', $contactValues);
   }
 
- /**
-  * Test the determination of whether a custom field is valid.
-  */
+  /**
+   * Test the determination of whether a custom field is valid.
+   */
   public function testCustomFieldValidation() {
     $errorMessage = array();
     $customGroup = $this->customGroupCreate(array(
@@ -448,6 +470,21 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   protected function runImport($originalValues, $onDuplicateAction, $expectedResult, $mapperLocType = NULL, $fields = NULL) {
     if (!$fields) {
       $fields = array_keys($originalValues);
+
+      // CRM-20792: Combining work email along with other import fields.
+      // If work email found, create locationMapper array to identify email type.
+
+      $totalfields = count($fields);
+      $emailindex = array_search("email", $fields);
+      $email2index = array_search("workemail", $fields);
+      if ($email2index) {
+        $fields[$email2index] = "email";
+        $mapperLocType = array_fill(0, $totalfields, NULL);
+        $mapperLocType[$email2index] = 2;
+        if ($emailindex) {
+          $mapperLocType[$emailindex] = 1;
+        }
+      }
     }
     $values = array_values($originalValues);
     $parser = new CRM_Contact_Import_Parser_Contact($fields, $mapperLocType);

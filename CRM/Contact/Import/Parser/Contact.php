@@ -1043,6 +1043,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           $cid = CRM_Contact_BAO_Contact::createProfileContact($formatted, $contactFields, $contactId, NULL, NULL, $formatted['contact_type']);
         }
         elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
+          $this->cleanBlankValuesOfContact($params, $contactId);
           $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactId);
         }
         elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
@@ -1674,6 +1675,95 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     }
     else {
       $errorMessage = $errorName;
+    }
+  }
+
+  /**
+   * CRM-20792: Removing blank blocks while updating the existing contact.
+   *
+   * @param array $params
+   * @param int $contactid
+   *
+   * return int
+   */
+  public function cleanBlankValuesOfContact($params, $contactid) {
+    $totalDeletedBlocks = 0;
+    if (isset($params["email"])) {
+      foreach ($params["email"] as $email) {
+        if ($email["email"] == "") {
+          $blockid = $this->getBlockByLocationType("Email", $email["location_type_id"], $contactid);
+          $this->deleteBlockIfExists("Email", $blockid);
+          $totalDeletedBlocks++;
+        }
+      }
+    }
+
+    if (isset($params["phone"])) {
+      foreach ($params["phone"] as $phone) {
+        if ($phone["phone"] == "") {
+          $blockid = $this->getBlockByLocationType("Phone", $phone["location_type_id"], $contactid);
+          $this->deleteBlockIfExists("Phone", $blockid);
+          $totalDeletedBlocks++;
+        }
+      }
+    }
+
+    if (isset($params["im"])) {
+      foreach ($params["im"] as $im) {
+        if ($im["im"] == "") {
+          $blockid = $this->getBlockByLocationType("Im", $im["location_type_id"], $contactid);
+          $this->deleteBlockIfExists("Im", $blockid);
+          $totalDeletedBlocks++;
+        }
+      }
+    }
+
+    if (isset($params["openid"])) {
+      foreach ($params["openid"] as $openid) {
+        if ($openid["openid"] == "") {
+          $blockid = $this->getBlockByLocationType("OpenID", $openid["location_type_id"], $contactid);
+          $this->deleteBlockIfExists("OpenID", $blockid);
+          $totalDeletedBlocks++;
+        }
+      }
+    }
+    return $totalDeletedBlocks;
+  }
+
+  /**
+   * CRM-20792: Function to fetch the block ID
+   *
+   * @param string $blockEntity
+   * @param int $locationTypeId
+   * @param int $contactid
+   *
+   * return int
+   */
+  private function getBlockByLocationType($blockEntity, $locationTypeId, $contactid) {
+    $result = civicrm_api3($blockEntity, 'get', array(
+      'sequential' => 1,
+      'location_type_id' => $locationTypeId,
+      'contact_id' => $contactid,
+    ));
+    if ($result["count"] > 0) {
+      return $result["values"][0]["id"];
+    }
+    return -1;
+  }
+
+  /**
+   * CRM-20792: Function to delete a block by ID
+   *
+   * @param string $blockEntity
+   * @param int $blockid
+   *
+   * return NULL;
+   */
+  private function deleteBlockIfExists($blockEntity, $blockid) {
+    if ($blockid > 0) {
+      civicrm_api3($blockEntity, "delete", array(
+        "id"       => $blockid,
+      ));
     }
   }
 
