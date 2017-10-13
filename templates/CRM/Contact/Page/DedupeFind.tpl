@@ -116,22 +116,6 @@
     <tbody>
     </tbody>
   </table>
-  {if $cid}
-    <table style="width: 45%; float: left; margin: 10px;">
-      <tr class="columnheader"><th colspan="2">{ts 1=$main_contacts[$cid]}Merge %1 with{/ts}</th></tr>
-      {foreach from=$dupe_contacts[$cid] item=dupe_name key=dupe_id}
-        {if $dupe_name}
-          {capture assign=link}<a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$dupe_id"}">{$dupe_name}</a>{/capture}
-          {capture assign=merge}<a href="{crmURL p='civicrm/contact/merge' q="reset=1&cid=$cid&oid=$dupe_id"}">{ts}merge{/ts}</a>{/capture}
-          <tr class="{cycle values="odd-row,even-row"}">
-      <td>{$link}</td>
-      <td style="text-align: right">{$merge}</td>
-      <td style="text-align: right"><a class='crm-notDuplicate' href="#" title={ts}not a duplicate{/ts} onClick="processDupes( {$main.srcID}, {$main.dstID}, 'dupe-nondupe' );return false;">{ts}not a duplicate{/ts}</a></td>
-      </tr>
-        {/if}
-      {/foreach}
-    </table>
-  {/if}
 </div>
 
 {if $context eq 'search'}
@@ -189,7 +173,7 @@
         }
         // for action column at the last, set nowrap
         $('td:last', row).attr('nowrap','nowrap');
-        // for conflcts column
+        // for conflicts column
         var col = CRM.$('table#dupePairs thead th.crm-contact-conflicts').index();
         $('td:eq(' + col + ')', row).attr('nowrap','nowrap');
       }
