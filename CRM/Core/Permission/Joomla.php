@@ -181,8 +181,9 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
 
     $db->setQuery($query);
 
-    // Load the result as a stdClass object, decoding JSON on the way
-    return json_decode($db->loadObject()->rules);
+    // Joomla gotcha: loadObject returns NULL in the case of no matches.
+    $result = $db->loadObject();
+    return $result ? json_decode($result->rules) : (object) array();
   }
 
   /**
