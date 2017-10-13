@@ -414,6 +414,7 @@ if (!CRM.vars) CRM.vars = {};
         $el = $(this),
         iconClass,
         settings = {
+          placeholder: $el.data('placeholder') || $el.attr('placeholder') || $('option[value=""]', $el).text(),
           allowClear: !$el.hasClass('required'),
           formatResult: formatCrmSelect2,
           formatSelection: formatCrmSelect2
@@ -440,12 +441,11 @@ if (!CRM.vars) CRM.vars = {};
           return out;
         };
       }
-
       // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
         settings.minimumResultsForSearch = 10;
         if ($('option:first', this).val() === '') {
-          settings.placeholderOption = 'first';
+          settings.placeholder = $('option:first', this).text();
         }
       }
       $.extend(settings, $el.data('select-params') || {}, options || {});
@@ -505,7 +505,7 @@ if (!CRM.vars) CRM.vars = {};
         formatResult: CRM.utils.formatSelect2Result,
         formatSelection: formatEntityRefSelection,
         escapeMarkup: _.identity,
-        initSelection: function($el, callback) {
+        current: function(callback) {
           var
             multiple = !!$el.data('select-params').multiple,
             val = $el.val(),
@@ -542,7 +542,7 @@ if (!CRM.vars) CRM.vars = {};
             CRM.api3(entity, 'create', $.extend({name: e.object.term}, $el.data('api-params').params || {}))
               .done(function(created) {
                 var
-                  val = $el.select2('val'),
+                  val = $el.val(),
                   data = $el.select2('data'),
                   item = {id: created.id, label: e.object.term};
                 if (val === "0") {
