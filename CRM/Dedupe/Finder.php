@@ -51,9 +51,10 @@ class CRM_Dedupe_Finder {
    * @param bool $checkPermissions
    *   Respect logged in user permissions.
    *
-   * @param int $limit
-   *   Optional limit. This limits the number of contacts for which the code will
-   *   attempt to find matches.
+   * @param int $searchLimit
+   *  Limit for the number of contacts to be used for comparison.
+   *  The search methodology finds all matches for the searchedContacts so this limits
+   *  the number of searched contacts, not the matches found.
    *
    * @return array
    *   Array of (cid1, cid2, weight) dupe triples
@@ -61,18 +62,18 @@ class CRM_Dedupe_Finder {
    * @throws CiviCRM_API3_Exception
    * @throws Exception
    */
-  public static function dupes($rgid, $cids = array(), $checkPermissions = TRUE, $limit = NULL) {
+  public static function dupes($rgid, $cids = array(), $checkPermissions = TRUE, $searchLimit = 0) {
     $rgBao = new CRM_Dedupe_BAO_RuleGroup();
     $rgBao->id = $rgid;
     $rgBao->contactIds = $cids;
     if (!$rgBao->find(TRUE)) {
       CRM_Core_Error::fatal("Dedupe rule not found for selected contacts");
     }
-    if (empty($rgBao->contactIds) && !empty($limit)) {
+    if (empty($rgBao->contactIds) && !empty($searchLimit)) {
       $limitedContacts = civicrm_api3('Contact', 'get', array(
         'return' => 'id',
         'contact_type' => $rgBao->contact_type,
-        'options' => array('limit' => $limit),
+        'options' => array('limit' => $searchLimit),
       ));
       $rgBao->contactIds = array_keys($limitedContacts['values']);
     }
@@ -171,12 +172,16 @@ class CRM_Dedupe_Finder {
    * @param int $gid
    *   Contact group id (currently, works only with non-smart groups).
    *
-   * @param int $limit
+   * @param int $searchLimit
+   *  Limit for the number of contacts to be used for comparison.
+   *  The search methodology finds all matches for the searchedContacts so this limits
+   *  the number of searched contacts, not the matches found.
+   *
    * @return array
    *   array of (cid1, cid2, weight) dupe triples
    */
-  public static function dupesInGroup($rgid, $gid, $limit = NULL) {
-    $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid, $limit));
+  public static function dupesInGroup($rgid, $gid, $searchLimit = 0) {
+    $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid, $searchLimit));
     if (!empty($cids)) {
       return self::dupes($rgid, $cids);
     }
