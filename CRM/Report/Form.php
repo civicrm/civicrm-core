@@ -3051,7 +3051,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                 $value = CRM_Utils_Array::value($op, $pair) . " " . $val;
               }
             }
-            if ($value) {
+            if ($value && empty($field['no_display'])) {
               $statistics['filters'][] = array(
                 'title' => CRM_Utils_Array::value('title', $field),
                 'value' => $value,
@@ -4550,6 +4550,11 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ),
       'preferred_language' => array(
         'title' => ts('Preferred Language'),
+      ),
+      'is_deleted' => array(
+        'no_display' => TRUE,
+        'default' => 0,
+        'type' => CRM_Utils_Type::T_BOOLEAN,
       ),
     );
   }

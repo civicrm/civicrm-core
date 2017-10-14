@@ -115,27 +115,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'title' => ts('Contact Subtype'),
           ),
         ),
-        'filters' => array(
-          'sort_name' => array(
-            'title' => ts('Participant Name'),
-            'operator' => 'like',
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-        ),
+        'filters' => CRM_Report_Form::getBasicContactFilters(),
       ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
