@@ -3,7 +3,7 @@
  * Class CRM_Event_BAO_AdditionalPaymentTest
  * @group headless
  */
-class CRM_Event_BAO_CRM19273 extends CiviUnitTestCase {
+class CRM_Event_BAO_CRM19273Test extends CiviUnitTestCase {
 
   protected $_priceSetID;
   protected $_cheapFee = 80;
