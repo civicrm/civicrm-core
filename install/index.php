@@ -223,7 +223,7 @@ if ($alreadyInstalled) {
   }
 
   $docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, ts('Installation Guide'), NULL, NULL, "wiki");
-  $errorMsg = ts("CiviCRM has already been installed. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>%1</strong>.</li><li>To <strong>upgrade an existing installation</strong>, <a href='%2'>refer to the online documentation</a>.</li></ul>", array(1 => $settings_directory, 2 => $docLink));
+  $errorMsg = ts("CiviCRM has already been installed. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>%1</strong>.</li><li>To <strong>upgrade an existing installation</strong>, refer to the online documentation: %2.</li></ul>", array(1 => $settings_directory, 2 => $docLink));
   errorDisplayPage($errorTitle, $errorMsg, FALSE);
 }
 
@@ -1842,13 +1842,7 @@ function getSiteDir($cmsPath, $str) {
 function errorDisplayPage($errorTitle, $errorMsg, $showRefer = TRUE) {
   if ($showRefer) {
     $docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, 'Installation Guide', NULL, NULL, "wiki");
-
-    if (function_exists('ts')) {
-      $errorMsg .= '<p>' . ts("<a %1>Refer to the online documentation for more information</a>", array(1 => "href='$docLink'")) . '</p>';
-    }
-    else {
-      $errorMsg .= '<p>' . sprintf("<a %s>Refer to the online documentation for more information</a>", "href='$docLink'") . '</p>';
-    }
+    $errorMsg .= '<p>' . ts("Refer to the online documentation for more information: ") . $docLink . '</p>';
   }
 
   include 'error.html';
