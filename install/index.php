@@ -257,8 +257,20 @@ if ($installType == 'drupal') {
     }
   }
 
-  // Bootstrap Drupal to get settings
-  drupal_bootstrap(DRUPAL_BOOTSTRAP_CONFIGURATION);
+  // Bootstrap Drupal to get settings and user
+  $base_root = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
+  $base_root .= '://' . $_SERVER['HTTP_HOST'];
+  $base_url = $base_root;
+  drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+
+  // Check that user is logged in and has administrative permissions
+  // This is necessary because the script exposes the database settings in the form and these could be viewed by unauthorised users
+  if ((!function_exists('user_access')) || (!user_access('administer site configuration'))) {
+    $errorTitle = ts("You don't have permission to access this page");
+    $errorMsg = ts("The installer can only be run by a user with the permission to administer site configuration.");
+    errorDisplayPage($errorTitle, $errorMsg);
+    exit();
+  }
 
   if (!defined('VERSION') or version_compare(VERSION, '6.0') < 0) {
     $errorTitle = ts("Oops! Incorrect Drupal version");
