@@ -176,13 +176,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   public function buildQuickForm() {
 
-    if ($this->_mode) {
-      $this->add('select', 'payment_processor_id',
-        ts('Payment Processor'),
-        $this->_processors, TRUE,
-        array('onChange' => "buildAutoRenew( null, this.value, '{$this->_mode}');")
-      );
-    }
+    $this->addPaymentProcessorSelect(TRUE, FALSE, TRUE);
     CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->getDefaultPaymentInstrumentId());
     // Build the form for auto renew. This is displayed when in credit card mode or update mode.
     // The reason for showing it in update mode is not that clear.
