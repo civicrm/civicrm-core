@@ -207,6 +207,52 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the Membership status after completing the pending pay later Contribution.
+   */
+  public function testMembershipStatusAfterCompletingPayLaterContribution() {
+    $this->createContribution('Pending');
+    $membership = $this->createPendingMembershipAndRecordContribution($this->_contributionId);
+    // pay additional amount
+    $this->submitPayment(100);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('id' => $this->_contributionId));
+    $contributionMembership = $this->callAPISuccessGetSingle('Membership', array('id' => $membership["id"]));
+    $membershipStatus = $this->callAPISuccessGetSingle('MembershipStatus', array('id' => $contributionMembership["status_id"]));
+    $this->assertEquals('New', $membershipStatus['name']);
+  }
+
+  private function createPendingMembershipAndRecordContribution($contributionId) {
+    $this->_individualId = $this->individualCreate();
+    $membershipTypeAnnualFixed = $this->callAPISuccess('membership_type', 'create', array(
+      'domain_id' => 1,
+      'name' => "AnnualFixed",
+      'member_of_contact_id' => 1,
+      'duration_unit' => "year",
+      'duration_interval' => 1,
+      'period_type' => "fixed",
+      'fixed_period_start_day' => "101",
+      'fixed_period_rollover_day' => "1231",
+      'relationship_type_id' => 20,
+      'financial_type_id' => 2,
+    ));
+    $membershipStatuses = CRM_Member_PseudoConstant::membershipStatus();
+    $pendingStatusId = array_search('Pending', $membershipStatuses);
+    $membership = $this->callAPISuccess('Membership', 'create', array(
+      'contact_id' => $this->_individualId,
+      'membership_type_id' => $membershipTypeAnnualFixed['id'],
+    ));
+    // Updating Membership status to Pending
+    $membership = $this->callAPISuccess('Membership', 'create', array(
+      'id' => $membership["id"],
+      'status_id' => $pendingStatusId,
+    ));
+    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'create', array(
+      'membership_id' => $membership["id"],
+      'contribution_id' => $contributionId,
+    ));
+    return $membership;
+  }
+
+  /**
    * Test the submit function that completes the pending pay later Contribution with multiple payments.
    */
   public function testMultiplePaymentForPendingPayLaterContribution() {
