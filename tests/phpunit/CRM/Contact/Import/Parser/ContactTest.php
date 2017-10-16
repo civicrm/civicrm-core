@@ -47,6 +47,26 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that import parser will not fail when same external_identifier found of deleted contact.
+   *
+   * @throws \Exception
+   */
+  public function testImportParserWtihDeletedContactExternalIdentifier() {
+    $contactId = $this->individualCreate(array(
+      "external_identifier" => "ext-1",
+    ));
+    CRM_Contact_BAO_Contact::deleteContact($contactId);
+    list($originalValues, $result) = $this->setUpBaseContact(array(
+      'external_identifier' => 'ext-1',
+    ));
+    $originalValues['nick_name'] = 'Old Bill';
+    $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
+    $originalValues['id'] = $result['id'];
+    $this->assertEquals('ext-1', $this->callAPISuccessGetValue('Contact', array('id' => $result['id'], 'return' => 'external_identifier')));
+    $this->callAPISuccessGetSingle('Contact', $originalValues);
+  }
+
+  /**
    * Test import parser will update based on a rule match.
    *
    * In this case the contact has no external identifier.
@@ -302,9 +322,9 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('Contact', $contactValues);
   }
 
- /**
-  * Test the determination of whether a custom field is valid.
-  */
+  /**
+   * Test the determination of whether a custom field is valid.
+   */
   public function testCustomFieldValidation() {
     $errorMessage = array();
     $customGroup = $this->customGroupCreate(array(
