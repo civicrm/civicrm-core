@@ -405,6 +405,15 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Check if user can create passwords or is initially assigned a system-generated one.
+   *
+   * @return bool
+   */
+  function isPasswordUserGenerated() {
+    return FALSE;
+  }
+
+  /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
    * @param string $destination

@@ -427,6 +427,16 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
+  function isPasswordUserGenerated() {
+    if (variable_get('user_email_verification', TRUE)) {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function updateCategories() {
     // copied this from profile.module. Seems a bit inefficient, but i don't know a better way
     cache_clear_all();
@@ -653,5 +663,4 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       }
     }
   }
-
 }

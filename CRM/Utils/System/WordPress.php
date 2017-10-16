@@ -620,6 +620,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritDoc
+   */
+  function isPasswordUserGenerated() {
+    return TRUE;
+  }
+
+  /**
    * @return mixed
    */
   public function getLoggedInUserObject() {
