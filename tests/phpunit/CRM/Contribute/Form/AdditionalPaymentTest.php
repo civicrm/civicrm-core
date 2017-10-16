@@ -217,7 +217,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('id' => $this->_contributionId));
     $contributionMembership = $this->callAPISuccessGetSingle('Membership', array('id' => $membership["id"]));
     $membershipStatus = $this->callAPISuccessGetSingle('MembershipStatus', array('id' => $contributionMembership["status_id"]));
-    $this->assertEquals('Current', $membershipStatus['name']);
+    $this->assertEquals('New', $membershipStatus['name']);
   }
 
   private function createPendingMembershipAndRecordContribution($contributionId) {
