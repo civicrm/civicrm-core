@@ -539,7 +539,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
-  function isPasswordUserGenerated() {
+  public function isPasswordUserGenerated() {
     if (\Drupal::config('user.settings')->get('verify_mail') == TRUE) {
       return FALSE;
     }

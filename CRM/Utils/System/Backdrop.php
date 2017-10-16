@@ -425,7 +425,7 @@ AND    u.status = 1
   /**
    * @inheritDoc
    */
-  function isPasswordUserGenerated() {
+  public function isPasswordUserGenerated() {
     if (config_get('system.core', 'user_email_verification') == TRUE) {
       return FALSE;
     }

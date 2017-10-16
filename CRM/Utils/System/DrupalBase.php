@@ -427,7 +427,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  function isPasswordUserGenerated() {
+  public function isPasswordUserGenerated() {
     if (variable_get('user_email_verification', TRUE)) {
       return FALSE;
     }
@@ -663,4 +663,5 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       }
     }
   }
+
 }

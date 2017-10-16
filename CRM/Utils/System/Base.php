@@ -409,7 +409,7 @@ abstract class CRM_Utils_System_Base {
    *
    * @return bool
    */
-  function isPasswordUserGenerated() {
+  public function isPasswordUserGenerated() {
     return FALSE;
   }
 
