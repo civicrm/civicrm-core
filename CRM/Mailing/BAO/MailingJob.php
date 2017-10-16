@@ -69,10 +69,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     $job->scheduled_date = $params['scheduled_date'];
     $job->is_test = $params['is_test'];
     $job->save();
-    $mailing = new CRM_Mailing_BAO_Mailing();
-    $mailing->id = $params['mailing_id'];
-    if ($mailing->id && $mailing->find(TRUE)) {
-      $mailing->getRecipients($job->id, $params['mailing_id'], TRUE, $mailing->dedupe_email);
+    if ($params['mailing_id']) {
+      CRM_Mailing_BAO_Mailing::getRecipients($params['mailing_id']);
       return $job;
     }
     else {

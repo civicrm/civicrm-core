@@ -114,6 +114,7 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
 
   private $mode = NULL;
   private $insertInto = NULL;
+  private $insertVerb = 'INSERT INTO ';
   private $insertIntoFields = array();
   private $selects = array();
   private $from;
@@ -404,6 +405,34 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
   }
 
   /**
+   * Wrapper function of insertInto fn but sets insertVerb = "INSERT IGNORE INTO "
+   *
+   * @param string $table
+   *   The name of the other table (which receives new data).
+   * @param array $fields
+   *   The fields to fill in the other table (in order).
+   * @return CRM_Utils_SQL_Select
+   */
+  public function insertIgnoreInto($table, $fields = array()) {
+    $this->insertVerb = "INSERT IGNORE INTO ";
+    return $this->insertInto($table, $fields);
+  }
+
+  /**
+   * Wrapper function of insertInto fn but sets insertVerb = "REPLACE INTO "
+   *
+   * @param string $table
+   *   The name of the other table (which receives new data).
+   * @param array $fields
+   *   The fields to fill in the other table (in order).
+   */
+  public function replaceInto($table, $fields = array()) {
+    $this->insertVerb = "REPLACE INTO ";
+    return $this->insertInto($table, $fields);
+  }
+
+
+  /**
    * @param array $fields
    *   The fields to fill in the other table (in order).
    * @return CRM_Utils_SQL_Select
@@ -550,10 +579,11 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
   public function toSQL() {
     $sql = '';
     if ($this->insertInto) {
-      $sql .= 'INSERT INTO ' . $this->insertInto . ' (';
+      $sql .= $this->insertVerb . $this->insertInto . ' (';
       $sql .= implode(', ', $this->insertIntoFields);
       $sql .= ")\n";
     }
+
     if ($this->selects) {
       $sql .= 'SELECT ' . $this->distinct . implode(', ', $this->selects) . "\n";
     }

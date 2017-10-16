@@ -145,6 +145,9 @@
                 mids.push(dv.entity_id);
               }
             }
+            if (gids.length === 0) {
+              return;
+            }
 
             CRM.api3('Group', 'getlist', { params: { id: { IN: gids }, options: { limit: 0 } }, extra: ["is_hidden"] } ).then(
               function(glist) {
