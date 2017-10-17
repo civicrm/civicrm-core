@@ -140,10 +140,7 @@
         </div>
       </fieldset>
     {/if}
-
-    {if $priceSet}
-      {include file='CRM/Core/BillingBlockWrapper.tpl'}
-    {/if}
+    {include file='CRM/Core/BillingBlockWrapper.tpl'}
 
     <div class="crm-public-form-item crm-section custom_pre-section">
       {include file="CRM/UF/Form/Block.tpl" fields=$customPost}

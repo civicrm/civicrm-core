@@ -287,7 +287,7 @@
             <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
           </tr>
           {if $participantMode}
-            <tr class="crm-participant-form-block-payment_processor_id">
+            <tr class="crm-participant-form-block-payment_processor_id payment_processor-section" style="display:none;">
               <td class="label nowrap">{$form.payment_processor_id.label}</td>
               <td>{$form.payment_processor_id.html}</td>
             </tr>
@@ -418,6 +418,7 @@
             url: dataUrl,
             success: function ( html ) {
               $(".crm-event-form-fee-block", $form).html( html ).trigger('crmLoad');
+              $('.payment_processor-section').show();
               //show event real full as well as waiting list message.
               if ( $("#hidden_eventFullMsg", $form).val( ) ) {
                 $( "#eventFullMsg", $form).show( ).html( $("#hidden_eventFullMsg", $form).val( ) );
