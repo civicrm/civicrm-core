@@ -171,18 +171,22 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         );
         return;
 
+      case 'membership_start_date':
       case 'member_start_date_low':
       case 'member_start_date_high':
+        $fldName = str_replace(array('_low', '_high'), '', $name);
         $query->dateQueryBuilder($values,
-          'civicrm_membership', 'member_start_date', 'start_date',
+          'civicrm_membership', $fldName, 'start_date',
           'Start Date'
         );
         return;
 
+      case 'membership_end_date':
       case 'member_end_date_low':
       case 'member_end_date_high':
+        $fldName = str_replace(array('_low', '_high'), '', $name);
         $query->dateQueryBuilder($values,
-          'civicrm_membership', 'member_end_date', 'end_date',
+          'civicrm_membership', $fldName, 'end_date',
           'End Date'
         );
         return;
