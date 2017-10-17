@@ -49,20 +49,20 @@ class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
       'accepted_credit_cards' => json_encode(array(
         'Visa' => 'Visa',
         'Mastercard' => 'Mastercard',
-        'Amex' => 'Amex',
+        'Amex' => 'American Express',
       )),
     );
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($params);
     $expectedCards = array(
       'Visa' => 'Visa',
       'Mastercard' => 'Mastercard',
-      'Amex' => 'Amex',
+      'Amex' => 'American Express',
     );
     $cards = CRM_Financial_BAO_PaymentProcessor::getCreditCards($paymentProcessor->id);
     $this->assertEquals($cards, $expectedCards, 'Verify correct credit card types are returned');
   }
 
-  public function testCreditCardCSSName() {
+  public function testCreditCardType() {
     $params = array(
       'name' => 'API_Test_PP_Type',
       'title' => 'API Test Payment Processor Type',
@@ -74,26 +74,30 @@ class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
       'accepted_credit_cards' => json_encode(array(
         'Visa' => 'Visa',
         'Mastercard' => 'Mastercard',
-        'Amex' => 'Amex',
+        'Amex' => 'American Express',
       )),
     );
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($params);
+
+    // Check what credit card types are available for the Test Payment Processor
     $cards = CRM_Financial_BAO_PaymentProcessor::getCreditCards($paymentProcessor->id);
-    $CSSCards = CRM_Core_Payment_Form::getCreditCardCSSNames($cards);
-    $expectedCSSCards = array(
-      'visa' => 'Visa',
-      'mastercard' => 'Mastercard',
-      'amex' => 'Amex',
+    $Cards = CRM_Contribute_PseudoConstant::creditCard($cards);
+    $expectedCards = array(
+      'Visa' => 'Visa',
+      'Mastercard' => 'Mastercard',
+      'Amex' => 'American Express',
     );
-    $this->assertEquals($CSSCards, $expectedCSSCards, 'Verify correct credit card types are returned');
-    $CSSCards2 = CRM_Core_Payment_Form::getCreditCardCSSNames(array());
+    $this->assertEquals($Cards, $expectedCards, 'Verify correct credit card types are returned');
+
+    // Check what credit card types are available with no payment processor specified - the default ones
+    $Cards2 = CRM_Contribute_PseudoConstant::creditCard(array());
     $allCards = array(
-      'visa' => 'Visa',
-      'mastercard' => 'MasterCard',
-      'amex' => 'Amex',
-      'discover' => 'Discover',
+      'Visa' => 'Visa',
+      'Mastercard' => 'Mastercard',
+      'Amex' => 'American Express',
+      'Discover' => 'Discover', // Note: Discover is a default credit card type available, not assigned to a processor
     );
-    $this->assertEquals($CSSCards2, $allCards, 'Verify correct credit card types are returned');
+    $this->assertEquals($Cards2, $allCards, 'Verify correct credit card types are returned');
   }
 
 }

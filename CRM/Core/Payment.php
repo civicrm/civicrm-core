@@ -660,7 +660,7 @@ abstract class CRM_Core_Payment {
    *   field metadata
    */
   public function getPaymentFormFieldsMetadata() {
-    $creditCardType = array('' => ts('- select -')) + CRM_Core_Payment_Form::getCreditCardCSSNames();
+    $creditCardType = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::creditCard();
     return array(
       'credit_card_number' => array(
         'htmlType' => 'text',

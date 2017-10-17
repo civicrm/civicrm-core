@@ -117,7 +117,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    */
   public static function addCreditCardJs($paymentProcessorID = NULL, $region = 'billing-block') {
     $creditCards = CRM_Financial_BAO_PaymentProcessor::getCreditCards($paymentProcessorID);
-    $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames($creditCards);
+    $creditCardTypes = CRM_Contribute_PseudoConstant::creditCard($creditCards);
     CRM_Core_Resources::singleton()
       // CRM-20516: add BillingBlock script on billing-block region
       //  to support this feature in payment form snippet too.
