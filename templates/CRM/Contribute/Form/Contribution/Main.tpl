@@ -355,7 +355,7 @@
     }
     else {
       cj('#recurHelp').hide();
-      cj('#amount_sum_label').text('{/literal}{ts escape='js'}Total amount{/ts}{literal}');
+      cj('#amount_sum_label').text('{/literal}{ts escape='js'}Total Amount{/ts}{literal}');
     }
   }
 
