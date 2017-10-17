@@ -72,7 +72,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
           . '</p>';
       }
     }
-    if ($rev == '4.7.26') {
+    if ($rev == '4.7.27') {
       $params = array(
         1 => 'Close accounting batches created by user',
         2 => 'Close all accounting batches',
@@ -445,8 +445,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    *
    * @param string $rev
    */
-  public function upgrade_4_7_26($rev) {
+  public function upgrade_4_7_27($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('CRM-21234 Missing subdivisions of Tajikistan', 'tajikistanMissingSubdivisions');
     $this->addTask('CRM-20892 - Add modified_date to civicrm_mailing', 'addColumn',
       'civicrm_mailing', 'modified_date', "timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When the mailing (or closely related entity) was created or modified or deleted.'");
     $this->addTask('CRM-21195 - Add icon field to civicrm_navigation', 'addColumn',
@@ -1244,6 +1245,28 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     // CRM-21052 - If site is using activity revisions, continue doing so. Otherwise, switch out.
     $count = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_activity WHERE is_current_revision = 0 OR original_id IS NOT NULL');
     Civi::settings()->set('civicaseActivityRevisions', $count > 0);
+    return TRUE;
+  }
+
+  /**
+   * Add in missing Tajikistan Subdivisions
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function tajikistanMissingSubdivisions(CRM_Queue_TaskContext $ctx) {
+    $sql = 'INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES';
+    $updates = array();
+    if (!CRM_Core_DAO::singleValueQuery("Select id FROM civicrm_state_province WHERE country_id = 1209 AND name = 'Dushanbe'")) {
+      $updates[] = '(NULL, 1209, "DU", "Dushanbe")';
+    }
+    if (!CRM_Core_DAO::singleValueQuery("Select id FROM civicrm_state_province WHERE country_id = 1209 AND name = 'Nohiyahoi Tobei Jumhurí'")) {
+      $updates[] = '(NULL, 1209, "RA", "Nohiyahoi Tobei Jumhurí")';
+    }
+    if (!empty($updates)) {
+      CRM_Core_DAO::executeQuery($sql . implode(', ', $updates));
+    }
     return TRUE;
   }
 
