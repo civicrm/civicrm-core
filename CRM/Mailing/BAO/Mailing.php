@@ -342,7 +342,8 @@ WHERE  c.group_id = {$groupDAO->id}
                         AND             $phone.phone IS NOT NULL
                         AND             $phone.phone != ''
                         AND             $mg.mailing_id = {$mailing_id}
-                        AND             X_$job_id.contact_id IS null";
+                        AND             X_$job_id.contact_id IS null
+                    ORDER BY $phone.is_primary ASC";
     }
     $mailingGroup->query($query);
 
@@ -396,7 +397,8 @@ WHERE  c.group_id = {$groupDAO->id}
                         AND             $contact.is_deceased <> 1
                         AND             $phone.phone_type_id = {$phoneTypes['Mobile']}
                         AND             $mg.mailing_id = {$mailing_id}
-                        AND             X_$job_id.contact_id IS null";
+                        AND             X_$job_id.contact_id IS null
+                    ORDER BY $phone.is_primary ASC";
     }
     $mailingGroup->query($query);
 
@@ -448,7 +450,8 @@ WHERE      gc.group_id = {$groupDAO->id}
   AND      c.is_opt_out = 0
   AND      c.is_deceased <> 1
   AND      p.phone_type_id = {$phoneTypes['Mobile']}
-  AND      X_$job_id.contact_id IS null";
+  AND      X_$job_id.contact_id IS null
+ORDER BY   p.is_primary ASC";
       }
       $mailingGroup->query($smartGroupInclude);
     }
@@ -520,7 +523,8 @@ AND    $mg.mailing_id = {$mailing_id}
                         AND             $contact.is_deceased <> 1
                         AND             $phone.phone_type_id = {$phoneTypes['Mobile']}
                         AND             $mg.mailing_id = {$mailing_id}
-                        AND             X_$job_id.contact_id IS null";
+                        AND             X_$job_id.contact_id IS null
+                    ORDER BY $phone.is_primary ASC";
     }
     $mailingGroup->query($query);
 
