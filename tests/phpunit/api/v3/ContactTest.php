@@ -1493,6 +1493,76 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test merging 2 organizations.
+   *
+   * CRM-20421: This test make sure that inherited memberships are deleted upon merging organization.
+   */
+  public function testMergeOrganizations() {
+    $organizationID1 = $this->organizationCreate(array(), 0);
+    $organizationID2 = $this->organizationCreate(array(), 1);
+    $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
+        'employer_id' => $organizationID1,
+      )
+    ));
+    $contact = $contact["values"][$contact["id"]];
+
+    $membershipType = $this->createEmployerOfMembership();
+    $membershipParams = array(
+      'membership_type_id' => $membershipType["id"],
+      'contact_id' => $organizationID1,
+      'start_date' => "01/01/2015",
+      'join_date' => "01/01/2010",
+      'end_date' => "12/31/2015",
+    );
+    $ownermembershipid = $this->contactMembershipCreate($membershipParams);
+
+    $contactmembership = $this->callAPISuccess("membership", "getsingle", array(
+      "contact_id" => $contact["id"],
+    ));
+
+    $this->assertEquals($ownermembershipid, $contactmembership["owner_membership_id"], "Contact membership must be inherited from Organization");
+
+    CRM_Dedupe_Merger::moveAllBelongings($organizationID2, $organizationID1, array(
+      "move_rel_table_memberships"   => "0",
+      "move_rel_table_relationships" => "1",
+      "main_details" => array(
+        "contact_id"   => $organizationID2,
+        "contact_type" => "Organization",
+      ),
+      "other_details" => array(
+        "contact_id"   => $organizationID1,
+        "contact_type" => "Organization",
+      ),
+    ));
+
+    $contactmembership = $this->callAPISuccess("membership", "get", array(
+      "contact_id" => $contact["id"],
+    ));
+
+    $this->assertEquals(0, $contactmembership["count"], "Contact membership must be deleted after merging organization without memberships.");
+  }
+
+  private function createEmployerOfMembership() {
+    $params = array(
+      'domain_id' => CRM_Core_Config::domainID(),
+      'name' => 'Organization Membership',
+      'description' => NULL,
+      'member_of_contact_id' => 1,
+      'financial_type_id' => 1,
+      'minimum_fee' => 10,
+      'duration_unit' => 'year',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'relationship_type_id' => 5,
+      'relationship_direction' => 'b_a',
+      'visibility' => 'Public',
+      'is_active' => 1,
+    );
+    $membershipType = $this->callAPISuccess('membership_type', 'create', $params);
+    return $membershipType["values"][$membershipType["id"]];
+  }
+
+  /**
    * Verify successful update of household contact.
    */
   public function testUpdateHouseholdWithAll() {

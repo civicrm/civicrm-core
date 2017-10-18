@@ -430,6 +430,34 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
+   * Based on the provided two contact_ids and a set of tables, remove the
+   * belongings of the other contact and of their relations.
+   *
+   * @param int $otherID
+   * @param bool $tables
+   */
+  public static function removeContactBelongings($otherID, $tables) {
+    // CRM-20421: Removing Inherited memberships when memberships of parent are not migrated to new contact.
+    if (in_array("civicrm_membership", $tables)) {
+      $membershipIDs = CRM_Utils_Array::collect('id',
+        CRM_Utils_Array::value('values',
+          civicrm_api3("Membership", "get", array(
+            "contact_id" => $otherID,
+            "return"     => "id",
+          )
+          )
+        ));
+
+      if (!empty($membershipIDs)) {
+        civicrm_api3("Membership", "get", array(
+          'owner_membership_id' => array('IN' => $membershipIDs),
+          'api.Membership.delete' => array('id' => '$value.id'),
+        ));
+      }
+    }
+  }
+
+  /**
    * Based on the provided two contact_ids and a set of tables, move the
    * belongings of the other contact to the main one.
    *
@@ -1482,7 +1510,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
     $relTables = CRM_Dedupe_Merger::relTables();
-    $submittedCustomFields = $moveTables = $locationMigrationInfo = $tableOperations = array();
+    $submittedCustomFields = $moveTables = $locationMigrationInfo = $tableOperations = $removeTables = array();
 
     foreach ($migrationInfo as $key => $value) {
       if ($value == $qfZeroBug) {
@@ -1510,6 +1538,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           }
         }
       }
+      elseif (substr($key, 0, 15) == 'move_rel_table_' and $value == '0') {
+        $removeTables = array_merge($moveTables, $relTables[substr($key, 5)]['tables']);
+      }
     }
     self::mergeLocations($mainId, $otherId, $locationMigrationInfo, $migrationInfo);
 
@@ -1517,6 +1548,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $customTablesToCopyValues = self::getAffectedCustomTables($submittedCustomFields);
     CRM_Dedupe_Merger::moveContactBelongings($mainId, $otherId, $moveTables, $tableOperations, $customTablesToCopyValues);
     unset($moveTables, $tableOperations);
+
+    // **** Do table related removals
+    if (!empty($removeTables)) {
+      // **** CRM-20421
+      CRM_Dedupe_Merger::removeContactBelongings($otherId, $removeTables);
+      $removeTables = array();
+    }
 
     // FIXME: fix gender, prefix and postfix, so they're edible by createProfileContact()
     $names['gender'] = array('newName' => 'gender_id', 'groupName' => 'gender');
