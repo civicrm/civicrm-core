@@ -592,6 +592,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
+  public function isPasswordUserGenerated() {
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getLoggedInUfID() {
     $user = JFactory::getUser();
     return ($user->guest) ? NULL : $user->id;
