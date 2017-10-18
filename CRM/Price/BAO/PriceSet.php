@@ -274,25 +274,6 @@ WHERE     cpf.price_set_id = %1";
   }
 
   /**
-    * Get price set for the given entity and id.
-    *
-    * @param string $entityTable
-    * @param int $entityId
-    *
-    * @return mixed
-    */
-  public static function getPriceSetOfEntity($entityTable, $entityId) {
-      $dao = new CRM_Price_DAO_PriceSetEntity();
-      $dao->entity_id = $entityId;
-      $dao->entity_table = $entityTable;
-      if ($dao->find(TRUE)) {
-          $entities['table'] = $dao->entity_table;
-          $entities['id'] = $dao->entity_id;
-          $entities['price_set_id'] = $dao->price_set_id;
-      }
-      return $entities;
-  }
-  /**
    * Delete price set for the given entity and id.
    *
    * @param string $entityTable
