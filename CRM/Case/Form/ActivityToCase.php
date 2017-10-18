@@ -67,6 +67,12 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
 
     // If this contact has an open case, supply it as a default
     $cid = CRM_Utils_Request::retrieve('cid', 'Integer');
+    if (!$cid) {
+      $act = civicrm_api3('Activity', 'getsingle', array('id' => $this->_activityId, 'return' => 'target_contact_id'));
+      if (!empty($act['target_contact_id'])) {
+        $cid = $act['target_contact_id'][0];
+      }
+    }
     if ($cid) {
       $cases = civicrm_api3('CaseContact', 'get', array(
         'contact_id' => $cid,

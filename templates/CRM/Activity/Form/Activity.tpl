@@ -265,13 +265,13 @@
       <a href="{crmURL p='civicrm/contact/view/activity' q=$urlParams}" class="delete button" title="{ts}Delete{/ts}"><span><i class="crm-i fa-trash"></i> {ts}Delete{/ts}</span></a>
     {/if}
   {/if}
-  {if $action eq 4 and call_user_func(array('CRM_Case_BAO_Case','checkPermission'), $activityId, 'File On Case', $atype)}
+  {if $action eq 4 and $context != 'case' and call_user_func(array('CRM_Case_BAO_Case','checkPermission'), $activityId, 'File On Case', $atype)}
     <a href="#" onclick="fileOnCase('file', {$activityId}, null, this); return false;" class="cancel button" title="{ts}File On Case{/ts}"><span><i class="crm-i fa-clipboard"></i> {ts}File on Case{/ts}</span></a>
+    {include file="CRM/Case/Form/ActivityToCase.tpl"}
   {/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>
 
-  {include file="CRM/Case/Form/ActivityToCase.tpl"}
 
   {if $action eq 1 or $action eq 2 or $context eq 'search' or $context eq 'smog'}
   {*include custom data js file*}
