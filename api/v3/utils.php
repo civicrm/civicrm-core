@@ -1685,6 +1685,12 @@ function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
   if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
     return;
   }
+
+  if ($fieldValue === 'null' && empty($fieldInfo['api.required'])) {
+    // This is the wierd & wonderful way PEAR sets null.
+    return;
+  }
+
   //should we check first to prevent it from being copied if they have passed in sql friendly format?
   if (!empty($params[$fieldInfo['name']])) {
     $fieldValue = _civicrm_api3_getValidDate($fieldValue, $fieldInfo['name'], $fieldInfo['type']);
