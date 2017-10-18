@@ -1088,7 +1088,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
     // to cover all variants.
     $this->_params['amount_level'] = 0;
-    $this->_params['description'] = ts("Contribution submitted by a staff person using contributor's credit card");
+    $this->_params['description'] = $this->_params['source'] ? $this->_params['source'] : ts("Contribution submitted by a staff person using contributor's credit card");
     $this->_params['currencyID'] = CRM_Utils_Array::value('currency',
       $this->_params,
       CRM_Core_Config::singleton()->defaultCurrency
