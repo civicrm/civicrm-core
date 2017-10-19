@@ -1708,12 +1708,13 @@ class Installer extends InstallRequirements {
         $output .= "<li>" . ts("Use the <a %1>Configuration Checklist</a> to review and configure settings for your new site", array(1 => "target='_blank' href='$cmsURL'")) . "</li>";
         $output .= $commonOutputMessage;
 
-        echo '</ul>';
-        echo '</div>';
+        $output .= '</ul>';
+        $output .= '</div>';
+        echo $output;
 
         $c = CRM_Core_Config::singleton(FALSE);
         $c->free();
-        $wpInstallRedirect = admin_url("?page=CiviCRM&q=civicrm&reset=1");
+        $wpInstallRedirect = admin_url('admin.php?page=CiviCRM&q=civicrm&reset=1');
         echo "<script>
          window.location = '$wpInstallRedirect';
         </script>";
