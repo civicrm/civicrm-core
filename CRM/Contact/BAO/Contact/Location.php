@@ -45,13 +45,15 @@ class CRM_Contact_BAO_Contact_Location {
    *   Array of display_name, email, location type and location id if found, or (null,null,null, null)
    */
   public static function getEmailDetails($id, $isPrimary = TRUE, $locationTypeID = NULL) {
-    $emails = civicrm_api3('Email', 'get', array(
-      'is_primary' => $isPrimary,
+    $params = array(
       'location_type_id' => $locationTypeID,
       'contact_id' => $id,
-      'options' => array('limit' => 1),
       'return' => array('contact_id.display_name', 'email', 'location_type_id', 'id'),
-    ));
+    );
+    if ($isPrimary) {
+      $params['is_primary'] = 1;
+    }
+    $emails = civicrm_api3('Email', 'get', $params);
 
     if ($emails['count'] > 0) {
       $email = reset($emails['values']);
