@@ -143,7 +143,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
       $paymentParams['item_name'] = $form->_params['description'];
 
-      $paymentParams['qfKey'] = $form->controller->_key;
+      $paymentParams['qfKey'] = empty($paymentParams['qfKey']) ? $form->controller->_key : $paymentParams['qfKey'];
       if ($paymentParams['skipLineItem']) {
         // We are not processing the line item here because we are processing a membership.
         // Do not continue with contribution processing in this function.
