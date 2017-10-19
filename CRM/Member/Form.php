@@ -33,7 +33,6 @@
 
 /**
  * Base class for offline membership / membership type / membership renewal and membership status forms
- *
  */
 class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
@@ -78,6 +77,23 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   public $_priceSetId;
 
   /**
+   * Used when price set specified.  Used to indicate that form is only to retrieve
+   * price set.  How we use price set is unconventional.  We re-use the same
+   * Membership/MembershipRenewal Form used to enter memberships.  When user selects
+   * a PriceSet, we use JavaScript to inject HTML returned by a recursive call to this form.
+   *
+   * This flag controls this recursive call, short-circuiting it to only retrieve the price
+   * set.
+   *
+   * Field introduced as part of CRM-15861.  Prior to CRM-15861, this was controlled by the
+   * name of the parameter used to request the price set (price_set_id, meant only price set,
+   * in contact->membership->add context, whilst priceSetId meant NOT only price set). Too
+   * confusing & too brittle.  An explicit member variable is now set for this.
+   *
+   */
+  public $_priceSetOnly;
+
+  /**
    * Price set details as an array.
    *
    * @var array
@@ -106,6 +122,24 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $params['context'] = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'membership');
     $params['id'] = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $params['mode'] = CRM_Utils_Request::retrieve('mode', 'String', $this);
+
+    // XXX We have too many ways that we set price set.  TODO: Clean this!
+    // When posting after saving, will come via POST price_set_id (from contact -> add membership)
+    // When posting after saving, from membership renewal will come via POST priceSetId
+    // When requesting via javascript (after user picks price set), will come via REQUEST
+    // When renewing, pre-process will automatically determine one before reverting to parent (us)
+    if (!$this->_priceSetId) {
+      $this->_priceSetId = CRM_Utils_Request::retrieve('priceSetId', 'Int', $this, FALSE);
+    }
+    if (!$this->_priceSetId) {
+      $this->_priceSetId = CRM_Utils_Request::retrieve('priceSetId', 'Int', $this, FALSE, NULL, "POST");
+    }
+    if (!$this->_priceSetId) {
+      $this->_priceSetId = CRM_Utils_Request::retrieve('price_set_id', 'Int', $this, FALSE, NULL, "POST");
+    }
+    $this->_priceSetOnly = CRM_Utils_Request::retrieve('priceSetOnly', 'Boolean');
+    $this->assign('priceSetOnly', $this->_priceSetOnly);
+    $this->assign('priceSetId', $this->_priceSetId);
 
     $this->setContextVariables($params);
 
@@ -167,6 +201,16 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     }
     else {
       $defaults['membership_type_id'] = $this->_memType;
+    }
+    $defaults['num_terms'] = 1;
+    $defaults['send_receipt'] = 0;
+
+    //set Soft Credit Type to Gift by default
+    $scTypes = CRM_Core_OptionGroup::values("soft_credit_type");
+    $defaults['soft_credit_type_id'] = CRM_Utils_Array::value(ts('Gift'), array_flip($scTypes));
+    $this->assign('member_is_test', CRM_Utils_Array::value('member_is_test', $defaults));
+    if ($this->_mode) {
+      $defaults = $this->getBillingDefaults($defaults);
     }
     return $defaults;
   }
@@ -291,6 +335,37 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
+   * Assign price set to page.
+   *
+   * @return array
+   */
+  protected function assignPriceSet() {
+    if ($this->_action & CRM_Core_Action::ADD || $this->_action == CRM_Core_Action::RENEW) {
+      $priceSets = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviMember');
+      if (empty($priceSets)) {
+        $this->assign('hasPriceSets', FALSE);
+      }
+      else {
+        $options = array();
+        if ($this->shouldIncludeChoosePriceSetOption()) {
+          $options = $options + array('' => ts('Choose price set'));
+        }
+        $options = $options + $priceSets;
+
+        $this->add('select', 'price_set_id', ts('Choose price set'), $options,
+            NULL, array('onchange' => "buildAmount( this.value );")
+        );
+        $this->assign('hasPriceSets', TRUE);
+      }
+    }
+    return empty($priceSets);
+  }
+
+  protected function shouldIncludeChoosePriceSetOption() {
+    return TRUE;
+  }
+
+  /**
    * Set variables in a way that can be accessed from different places.
    *
    * This is part of refactoring for unit testability on the submit function.
@@ -377,13 +452,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
         return;
       }
     }
-    $priceFields = CRM_Member_BAO_Membership::setQuickConfigMembershipParameters(
+if ($this->_priceSet && $this->_priceSet['is_quick_config']) {    $priceFields = CRM_Member_BAO_Membership::setQuickConfigMembershipParameters(
       $formValues['membership_type_id'][0],
       $formValues['membership_type_id'][1],
       CRM_Utils_Array::value('total_amount', $formValues),
       $this->_priceSetId
     );
-    $formValues = array_merge($formValues, $priceFields['price_fields']);
+    $formValues = array_merge($formValues, $priceFields['price_fields']);}
   }
 
   /**
