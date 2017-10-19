@@ -100,15 +100,15 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     $form->_contactIds = array();
     $form->_contactTypes = array();
 
-    $isStandAlone = (in_array('task', $form->urlPath));
+    $isStandAlone = in_array('task', $form->urlPath);
     if ($isStandAlone) {
       list($form->_task, $title) = CRM_Contact_Task::getTaskAndTitleByClass(get_class($form));
       if (!array_key_exists($form->_task, CRM_Contact_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission()))) {
-        CRM_Core_Error::fatal(ts('You do not have enough permission to do this task.'));
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
       $form->_contactIds = explode(',', CRM_Utils_Request::retrieve('cids', 'String', $form, TRUE));
       if (empty($form->_contactIds)) {
-        CRM_Core_Error::statusBounce(ts("You did't selected any contact to perform this task."));
+        CRM_Core_Error::statusBounce(ts('No Contacts Selected'));
       }
       $form->setTitle($title);
     }
