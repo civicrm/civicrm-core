@@ -52,6 +52,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     $this->addRadio('outBound_option', ts('Select Mailer'), $outBoundOption);
 
     CRM_Utils_System::setTitle(ts('Settings - Outbound Mail'));
+    $this->add('checkbox', 'allow_mail_from_logged_in_contact', ts('Allow Mail to be sent from logged in contact\'s email address'));
     $this->add('text', 'sendmail_path', ts('Sendmail Path'));
     $this->add('text', 'sendmail_args', ts('Sendmail Argument'));
     $this->add('text', 'smtpServer', ts('SMTP Server'));
@@ -78,6 +79,14 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     CRM_Utils_System::flushCache();
 
     $formValues = $this->controller->exportValues($this->_name);
+
+    if (!empty($formValues['allow_mail_from_logged_in_contact'])) {
+      Civi::settings()->set('allow_mail_from_logged_in_contact', TRUE);
+    }
+    else {
+      Civi::settings()->set('allow_mail_from_logged_in_contact', FALSE);
+    }
+    unset($formValues['allow_mail_from_logged_in_contact']);
 
     $buttonName = $this->controller->getButtonName();
     // check if test button
@@ -237,6 +246,8 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   public function setDefaultValues() {
     if (!$this->_defaults) {
       $this->_defaults = array();
+
+      $this->_defaults['allow_mail_from_logged_in_contact'] = Civi::settings()->get('allow_mail_from_logged_in_contact');
 
       $mailingBackend = Civi::settings()->get('mailing_backend');
       if (!empty($mailingBackend)) {

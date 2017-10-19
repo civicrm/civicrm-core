@@ -119,7 +119,7 @@ AND    {$this->_componentClause}";
     $this->add('checkbox', 'receipt_update', ts('Update receipt dates for these contributions'), FALSE);
     $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do not email / Do not mail)'), FALSE);
 
-    $this->add('select', 'fromEmailAddress', ts('From Email'), $this->_fromEmails, FALSE, array('class' => 'crm-select2 huge'));
+    $this->add('select', 'from_email_address', ts('From Email'), $this->_fromEmails, FALSE);
 
     $this->addButtons(array(
         array(
@@ -197,11 +197,9 @@ AND    {$this->_componentClause}";
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
 
       $values = array();
-      if (isset($params['fromEmailAddress']) && !$elements['createPdf']) {
+      if (isset($params['from_email_address']) && !$elements['createPdf']) {
         // CRM-19129 Allow useres the choice of From Email to send the receipt from.
-        $fromEmail = $params['fromEmailAddress'];
-        $from = CRM_Utils_Array::value($fromEmail, $this->_emails);
-        $fromDetails = explode(' <', $from);
+        $fromDetails = explode(' <', $params['from_email_address']);
         $input['receipt_from_email'] = substr(trim($fromDetails[1]), 0, -1);
         $input['receipt_from_name'] = str_replace('"', '', $fromDetails[0]);
       }

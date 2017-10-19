@@ -329,16 +329,6 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   }
 
   /**
-   * Get default from address.
-   *
-   * @return mixed
-   */
-  public function getDefaultFrom() {
-    $values = CRM_Core_OptionGroup::values('from_email_address');
-    return $values[1];
-  }
-
-  /**
    * Send email receipt.
    *
    * @param array $events_in_cart
@@ -362,7 +352,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $send_template_params = array(
       'table' => 'civicrm_msg_template',
       'contactId' => $this->payer_contact_id,
-      'from' => $this->getDefaultFrom(),
+      'from' => CRM_Core_BAO_Domain::getNameAndEmail(TRUE, TRUE),
       'groupName' => 'msg_tpl_workflow_event',
       'isTest' => FALSE,
       'toEmail' => $contact_details[1],

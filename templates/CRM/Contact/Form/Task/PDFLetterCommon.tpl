@@ -35,6 +35,10 @@
         {$form.template.html} {ts}OR{/ts} {$form.document_file.html}
       </td>
     </tr>
+    <tr id="fromEmail" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
+      <td class="label">{$form.from_email_address.label}</td>
+      <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
+    </tr>
     <tr>
       <td class="label-left">{$form.subject.label}</td>
       <td>{$form.subject.html}</td>

@@ -372,6 +372,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         $emails = array_keys($emails);
         $defaults['from'] = array_pop($emails);
       }
+      else {
+        $defaults['from'] = $params['from'];
+      }
       if (!empty($params['subject'])) {
         $defaults['subject'] = $params['subject'];
       }

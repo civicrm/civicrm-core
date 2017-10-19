@@ -333,4 +333,17 @@ return array(
     'description' => 'The number of emails sendable via simple mail. Make sure you understand the implications for your spam reputation and legal requirements for bulk emails before editing. As there is some risk both to your spam reputation and the products if this is misused it is a hidden setting',
     'help_text' => 'CiviCRM forces users sending more than this number of mails to use CiviMails. CiviMails have additional precautions: not sending to contacts who do not want bulk mail, adding domain name and opt out links. You should familiarise yourself with the law relevant to you on bulk mailings if changing this setting. For the US https://en.wikipedia.org/wiki/CAN-SPAM_Act_of_2003 is a good place to start.',
   ),
+  'allow_mail_from_logged_in_contact' => array(
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'allow_mail_from_logged_in_contact',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 1,
+    'title' => 'Allow mail from logged in contact',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Allow sending email from the logged in contact\'s email address',
+    'help_text' => 'CiviCRM allows you to send email from the domain from email addresses and the logged in contact id addresses by default. Disable this if you only want to allow the domain from addresses to be used.',
+  ),
 );

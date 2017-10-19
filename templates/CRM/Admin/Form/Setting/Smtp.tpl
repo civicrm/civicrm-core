@@ -31,6 +31,10 @@
 
 </div>
      <table class="form-layout-compressed">
+       <tr class="crm-smtp-form-block-allow_mail_from_logged_in_contact">
+         <td class="label">{$form.allow_mail_from_logged_in_contact.html}</td>
+         <td>{$form.allow_mail_from_logged_in_contact.label}</td>
+       </tr>
            <tr class="crm-smtp-form-block-outBound_option">
               <td class="label">{$form.outBound_option.label}</td>
               <td>{$form.outBound_option.html}</td>
