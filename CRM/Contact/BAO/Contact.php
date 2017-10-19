@@ -946,11 +946,12 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     if (!$id) {
       return FALSE;
     }
-    $query = "
-UPDATE civicrm_contact
-SET image_URL=NULL
-WHERE id={$id}; ";
-    CRM_Core_DAO::executeQuery($query);
+
+    $contact = new self();
+    $contact->id = $id;
+    $contact->image_URL = 'null';
+    $contact->save();
+
     return TRUE;
   }
 
