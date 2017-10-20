@@ -162,6 +162,28 @@ class CRM_Member_Form_Task extends CRM_Core_Form {
   }
 
   /**
+   * Given an array of membership IDs, set 'membership_id' for each contact in extraParams.
+   *   This allows for membership tokens to be looked up later as the membership_id is available.
+   * @param array $memberIds
+   *
+   * @return array
+   */
+  public static function setExtraTokenDetails($memberIds) {
+    if (empty($memberIds)) {
+      return array();
+    }
+    $extraParams = array();
+    $memberships = CRM_Utils_Token::getMembershipTokenDetails($memberIds);
+    foreach ($memberIds as $membershipId) {
+      $membership = $memberships[$membershipId];
+      // get contact information
+      $contactId = $membership['contact_id'];
+      $extraParams['contact_details'][$contactId] = array('membership_id' => $membershipId);
+    }
+    return $extraParams;
+  }
+
+  /**
    * Simple shell that derived classes can call to add buttons to.
    * the form with a customized title for the main Submit
    *

@@ -1528,12 +1528,20 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     }
 
     // get token details for contacts, call only if tokens are used
-    $details = array();
+    $details = $extraParams = array();
+    foreach ($contactDetails as $key => $detail) {
+      if (!empty($detail['membership_id'])) {
+        $extraParams = array_replace_recursive($extraParams, CRM_Member_Form_Task::setExtraTokenDetails(array($detail['membership_id'])));
+      }
+    }
+
     if (!empty($returnProperties) || !empty($tokens) || !empty($allTokens)) {
       list($details) = CRM_Utils_Token::getTokenDetails(
         $contactIds,
         $returnProperties,
-        NULL, NULL, FALSE,
+        NULL,
+        NULL,
+        $extraParams,
         $allTokens,
         'CRM_Activity_BAO_Activity'
       );

@@ -212,24 +212,13 @@ class CRM_Contact_Form_Task_EmailCommon {
 
     // check if we need to setdefaults and check for valid contact emails / communication preferences
     if (is_array($form->_allContactIds) && $setDefaults) {
-      $returnProperties = array(
-        'sort_name' => 1,
-        'email' => 1,
-        'do_not_email' => 1,
-        'is_deceased' => 1,
-        'on_hold' => 1,
-        'display_name' => 1,
-        'preferred_mail_format' => 1,
+      $contactParams = array(
+        'id' => array('IN' => $form->_allContactIds),
+        'return' => array('sort_name', 'email', 'do_not_email', 'is_deceased', 'on_hold', 'display_name', 'preferred_mail_format'),
+        'options' => array('limit' => 0),
       );
-
-      // get the details for all selected contacts ( to, cc and bcc contacts )
-      list($form->_contactDetails) = CRM_Utils_Token::getTokenDetails($form->_allContactIds,
-        $returnProperties,
-        FALSE,
-        FALSE
-      );
-
-      // make a copy of all contact details
+      $contactDetails = civicrm_api3('Contact', 'get', $contactParams);
+      $form->_contactDetails = $contactDetails['values'];
       $form->_allContactDetails = $form->_contactDetails;
 
       // perform all validations on unique contact Ids
@@ -480,6 +469,8 @@ class CRM_Contact_Form_Task_EmailCommon {
     // format contact details array to handle multiple emails from same contact
     $formattedContactDetails = array();
     $tempEmails = array();
+    $extraParams = CRM_Member_Form_Task::setExtraTokenDetails($form->getVar('_memberIds'));
+
     foreach ($form->_contactIds as $key => $contactId) {
       // if we dont have details on this contactID, we should ignore
       // potentially this is due to the contact not wanting to receive email
@@ -495,6 +486,9 @@ class CRM_Contact_Form_Task_EmailCommon {
         $details = $form->_contactDetails[$contactId];
         $details['email'] = $email;
         unset($details['email_id']);
+        if (!empty($extraParams['contact_details'][$contactId])) {
+          $details += $extraParams['contact_details'][$contactId];
+        }
         $formattedContactDetails[] = $details;
       }
     }

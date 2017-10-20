@@ -61,6 +61,8 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
     $memberships = CRM_Utils_Token::getMembershipTokenDetails($membershipIDs);
     $html = array();
 
+    $extraParams = CRM_Member_Form_Task::setExtraTokenDetails($membershipIDs);
+
     foreach ($membershipIDs as $membershipID) {
       $membership = $memberships[$membershipID];
       // get contact information
@@ -73,7 +75,7 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
         $returnProperties,
         $skipOnHold,
         $skipDeceased,
-        NULL,
+        $extraParams,
         $messageToken,
         'CRM_Contribution_Form_Task_PDFLetterCommon'
       );
