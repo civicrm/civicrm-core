@@ -54,35 +54,25 @@ else {
   define('CIVICRM_WINDOWS', 0);
 }
 
-// set installation type - drupal
-if (!session_id()) {
-  if (defined('PANTHEON_ENVIRONMENT')) {
-    ini_set('session.save_handler', 'files');
-  }
-  session_start();
-}
-
-// unset civicrm session if any
-if (array_key_exists('CiviCRM', $_SESSION)) {
-  unset($_SESSION['CiviCRM']);
-}
-
-if (isset($_GET['civicrm_install_type'])) {
-  $_SESSION['civicrm_install_type'] = $_GET['civicrm_install_type'];
-}
-else {
-  if (!isset($_SESSION['civicrm_install_type'])) {
-    $_SESSION['civicrm_install_type'] = "drupal";
-  }
-}
-
 global $installType;
 global $crmPath;
 global $pkgPath;
 global $installDirPath;
 global $installURLPath;
 
-$installType = strtolower($_SESSION['civicrm_install_type']);
+// Set the install type
+// this is sent as a query string when the page is first loaded
+// and subsequently posted to the page as a hidden field
+if (isset($_POST['civicrm_install_type'])) {
+  $installType = $_POST['civicrm_install_type'];
+}
+elseif (isset($_GET['civicrm_install_type'])) {
+  $installType = strtolower($_GET['civicrm_install_type']);
+}
+else {
+  // default value if not set
+  $installType = "drupal";
+}
 
 if ($installType == 'drupal' || $installType == 'backdrop') {
   $crmPath = dirname(dirname($_SERVER['SCRIPT_FILENAME']));
@@ -103,64 +93,6 @@ $pkgPath = $crmPath . DIRECTORY_SEPARATOR . 'packages';
 
 require_once $crmPath . '/CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
-
-// Load civicrm database config
-if (isset($_POST['mysql'])) {
-  $databaseConfig = $_POST['mysql'];
-}
-else {
-  $databaseConfig = array(
-    "server"   => "localhost",
-    "username" => "civicrm",
-    "password" => "",
-    "database" => "civicrm",
-  );
-}
-
-if ($installType == 'wordpress') {
-  // Load WP database config
-  if (isset($_POST['mysql'])) {
-    $databaseConfig = $_POST['mysql'];
-  }
-  else {
-    $databaseConfig = array(
-      "server"   => DB_HOST,
-      "username" => DB_USER,
-      "password" => DB_PASSWORD,
-      "database" => DB_NAME,
-    );
-  }
-}
-
-if ($installType == 'drupal') {
-  // Load drupal database config
-  if (isset($_POST['drupal'])) {
-    $drupalConfig = $_POST['drupal'];
-  }
-  else {
-    $drupalConfig = array(
-      "server" => "localhost",
-      "username" => "drupal",
-      "password" => "",
-      "database" => "drupal",
-    );
-  }
-}
-
-if ($installType == 'backdrop') {
-  // Load backdrop database config
-  if (isset($_POST['backdrop'])) {
-    $backdropConfig = $_POST['backdrop'];
-  }
-  else {
-    $backdropConfig = array(
-      "server" => "localhost",
-      "username" => "backdrop",
-      "password" => "",
-      "database" => "backdrop",
-    );
-  }
-}
 
 $loadGenerated = 0;
 if (isset($_POST['loadGenerated'])) {
@@ -325,6 +257,21 @@ if ($installType == 'drupal') {
     }
   }
 
+  // Bootstrap Drupal to get settings and user
+  $base_root = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
+  $base_root .= '://' . $_SERVER['HTTP_HOST'];
+  $base_url = $base_root;
+  drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+
+  // Check that user is logged in and has administrative permissions
+  // This is necessary because the script exposes the database settings in the form and these could be viewed by unauthorised users
+  if ((!function_exists('user_access')) || (!user_access('administer site configuration'))) {
+    $errorTitle = ts("You don't have permission to access this page");
+    $errorMsg = ts("The installer can only be run by a user with the permission to administer site configuration.");
+    errorDisplayPage($errorTitle, $errorMsg);
+    exit();
+  }
+
   if (!defined('VERSION') or version_compare(VERSION, '6.0') < 0) {
     $errorTitle = ts("Oops! Incorrect Drupal version");
     $errorMsg = ts("This version of CiviCRM can only be used with Drupal 6.x or 7.x. Please ensure that '%1' exists if you are running Drupal 7.0 and over.", array(1 => implode("' or '", $drupalVersionFiles)));
@@ -365,6 +312,70 @@ elseif ($installType == 'wordpress') {
     $errorTitle = ts("Oops! Incorrect CiviCRM version");
     $errorMsg = ts("This installer can only be used for the WordPress version of CiviCRM.");
     errorDisplayPage($errorTitle, $errorMsg);
+  }
+}
+
+// Load CiviCRM database config
+if (isset($_POST['mysql'])) {
+  $databaseConfig = $_POST['mysql'];
+}
+
+if ($installType == 'wordpress') {
+  // Load WP database config
+  if (isset($_POST['mysql'])) {
+    $databaseConfig = $_POST['mysql'];
+  }
+  else {
+    $databaseConfig = array(
+      "server" => DB_HOST,
+      "username" => DB_USER,
+      "password" => DB_PASSWORD,
+      "database" => DB_NAME,
+    );
+  }
+}
+
+if ($installType == 'drupal') {
+  // Load drupal database config
+  if (isset($_POST['drupal'])) {
+    $drupalConfig = $_POST['drupal'];
+  }
+  else {
+    $dbServer = $databases['default']['default']['host'];
+    if (!empty($databases['default']['default']['port'])) {
+      $dbServer .= ':' . $databases['default']['default']['port'];
+    }
+    $drupalConfig = array(
+      "server" => $dbServer,
+      "username" => $databases['default']['default']['username'],
+      "password" => $databases['default']['default']['password'],
+      "database" => $databases['default']['default']['database'],
+    );
+  }
+}
+
+if ($installType == 'backdrop') {
+  // Load backdrop database config
+  if (isset($_POST['backdrop'])) {
+    $backdropConfig = $_POST['backdrop'];
+  }
+  else {
+    $backdropConfig = array(
+      "server" => "localhost",
+      "username" => "backdrop",
+      "password" => "",
+      "database" => "backdrop",
+    );
+  }
+}
+
+// By default set CiviCRM database to be same as CMS database
+if (!isset($databaseConfig)) {
+  if (($installType == 'drupal') && (isset($drupalConfig))) {
+    $databaseConfig = $drupalConfig;
+  }
+  if (($installType == 'backdrop') && (isset($backdropConfig))) {
+    $databaseConfig = $backdropConfig;
   }
 }
 
@@ -1697,12 +1708,13 @@ class Installer extends InstallRequirements {
         $output .= "<li>" . ts("Use the <a %1>Configuration Checklist</a> to review and configure settings for your new site", array(1 => "target='_blank' href='$cmsURL'")) . "</li>";
         $output .= $commonOutputMessage;
 
-        echo '</ul>';
-        echo '</div>';
+        $output .= '</ul>';
+        $output .= '</div>';
+        echo $output;
 
         $c = CRM_Core_Config::singleton(FALSE);
         $c->free();
-        $wpInstallRedirect = admin_url("?page=CiviCRM&q=civicrm&reset=1");
+        $wpInstallRedirect = admin_url('admin.php?page=CiviCRM&q=civicrm&reset=1');
         echo "<script>
          window.location = '$wpInstallRedirect';
         </script>";
