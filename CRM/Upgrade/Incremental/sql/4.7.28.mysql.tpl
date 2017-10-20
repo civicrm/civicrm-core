@@ -25,3 +25,27 @@
   (NULL, 1018, "09", "Saint Peter"),
   (NULL, 1018, "10", "Saint Philip"),
   (NULL, 1018, "11", "Saint Thomas");
+
+-- CRM-21337 ISO compliance for Romanian and Bulgarian counties
+UPDATE `civicrm_state_province` SET `name` = 'Argeș' WHERE `name` = 'Arges' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Bacău' WHERE `name` = 'Bacau' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Bistrița-Năsăud' WHERE `name` = 'Bistrita-Nasaud' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Botoșani' WHERE `name` = 'Boto\'ani' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Brașov' WHERE `name` = 'Bra\'ov' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Brăila' WHERE `name` = 'Braila' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Buzău' WHERE `name` = 'Buzau' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Caraș-Severin' WHERE `name` = 'Caras-Severin' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Călărași' WHERE `name` = 'Ca la ras\'i' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Constanța' WHERE `name` = 'Constant\'a' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Dâmbovița' WHERE `name` = 'Dambovit\'a' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Galați' WHERE `name` = 'Galat\'i' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Ialomița' WHERE `name` = 'Ialomit\'a' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Iași' WHERE `name` = 'Ias\'i' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Maramureș' WHERE `name` = 'Maramures' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Mehedinți' WHERE `name` = 'Mehedint\'i' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Mureș' WHERE `name` = 'Mures' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Neamț' WHERE `name` = 'Neamt' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Sălaj' WHERE `name` = 'Sa laj' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Timiș' WHERE `name` = 'Timis' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Vâlcea' WHERE `name` = 'Valcea' AND `country_id` = 1176;
+UPDATE `civicrm_state_province` SET `name` = 'Pazardzhik' WHERE `name` = 'Pazardzik' AND `country_id` = 1033;
