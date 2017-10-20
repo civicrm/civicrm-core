@@ -364,9 +364,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       $params['line_item'] = $params['lineItems'];
     }
 
-    //we failed to retrieve an existing membership payment contribution_id, just above.
-    //This means we're dealing with a first contribution.
-    //do cleanup line  items if membership edit the Membership type.
     if (empty($ids['contribution']) && !empty($ids['membership'])) {
       CRM_Price_BAO_LineItem::deleteLineItems($ids['membership'], 'civicrm_membership');
     }
@@ -2148,7 +2145,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *       since adding memberships using priceSets calls this first to properly
    *       update line-items that are in fluxing state.
    *
-   * @param int $membershipId
+   * @param int $membershipID
    *   Membership id.
    * @all bool
    *   if more than one payment associated with membership id need to be returned.
@@ -2156,26 +2153,24 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @return int
    *   contribution id
    */
-  public static function getMembershipContributionId($membershipId, $all = FALSE) {
-
+  public static function getMembershipContributionId($membershipID, $all = FALSE) {
     $membershipPayment = new CRM_Member_DAO_MembershipPayment();
-    $membershipPayment->membership_id = $membershipId;
-    if ($all && $membershipPayment->find()) {
-      $contributionIds = array();
-      while ($membershipPayment->fetch()) {
-        $contributionIds[] = $membershipPayment->contribution_id;
-      }
-      return $contributionIds;
-    }
+    $membershipPayment->membership_id = $membershipID;
 
-    // Pre CRM-15861, only returning first was fine, since when this was called
-    // we only ever had one item.  Post CRM-15861, need to get last.
-    $last = NULL;
-    $membershipPayment->find();
-    while ($membershipPayment->fetch()) {
-      $last = $membershipPayment->contribution_id;
+    if (!$all) {
+      $membershipPayment->limit(1);
+      $membershipPayment->orderBy('id DESC');
+      $membershipPayment->find(TRUE);
+      return $membershipPayment->contribution_id;
     }
-    return $last;
+    else {
+      $membershipPayment->find();
+      $contributionIDs = array();
+      while ($membershipPayment->fetch()) {
+        $contributionIDs[] = $membershipPayment->contribution_id;
+      }
+      return $contributionIDs;
+    }
   }
 
   /**

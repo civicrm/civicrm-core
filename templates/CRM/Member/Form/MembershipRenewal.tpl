@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $priceSetOnly}
+{if $priceSetId}
   {include file="CRM/Member/Form/MembershipPriceSetCommon.tpl"}
 {else}
 
@@ -71,13 +71,17 @@
         <td class="html-adjust">
           <table>
             <tr>
-            <td>
+              <td>
                 {$orgName}&nbsp;&nbsp;-&nbsp;&nbsp;{$memType}
-                      {if $member_is_test} {ts}(test){/ts}{/if}
-            </td>
-            <td>
-                  <a id="changeMembershipOrgType" href='#' onclick='adjustMembershipOrgType(); return false;'>{ts}change membership type{/ts}</a>
-            </td>
+                {if $member_is_test}
+                  ({ts}test{/ts})
+                {/if}
+              </td>
+              <td>
+                <a id="changeMembershipOrgType" href='#' onclick='adjustMembershipOrgType(); return false;'>
+                  {ts}change membership type{/ts}
+                </a>
+              </td>
             </tr>
           </table>
         </td>
@@ -387,7 +391,7 @@
         cj('#total_amount').val( '' );
         cj('#total_amount').attr("readonly", true);
 
-        var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&priceSetOnly=TRUE&priceSetId=' + priceSetId;
+        var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&price_set_id=' + priceSetId;
 
         var response = cj.ajax({
           url: dataUrl,

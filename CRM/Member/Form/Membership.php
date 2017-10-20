@@ -262,8 +262,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-
-    if ($this->_priceSetId && $this->_priceSetOnly) {
+    if ($this->_priceSetId) {
       return CRM_Price_BAO_PriceSet::setDefaultPriceSet($this, $defaults);
     }
 
@@ -366,7 +365,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-
     $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
 
     $this->assign('currency', CRM_Core_Config::singleton()->defaultCurrencySymbol);
@@ -396,7 +394,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->assign('contributionType', CRM_Utils_Array::value('financial_type_id', $this->_priceSet));
 
       // get only price set form elements.
-      if ($this->_priceSetOnly) {
+      if (CRM_Utils_Array::value('snippet', $_GET)) {
         return;
       }
 

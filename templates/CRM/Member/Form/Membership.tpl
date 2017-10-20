@@ -31,7 +31,7 @@
   </div>
 {/if}
 <div class="spacer"></div>
-{if $priceSetOnly}
+{if $priceSetId}
   {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Membership"}
   {literal}
   <script type="text/javascript">
@@ -48,7 +48,7 @@
   </script>
   {/literal}
 {else}
-  {if $membershipMode == 'test' }
+  {if $membershipMode == 'test'}
     {assign var=registerMode value="TEST"}
     {elseif $membershipMode == 'live'}
     {assign var=registerMode value="LIVE"}
@@ -606,7 +606,7 @@
       cj( "#total_amount" ).val( '' );
       cj('#total_amount').attr("readonly", true);
 
-      var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&priceSetOnly=TRUE&priceSetId=' + priceSetId;
+      var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&price_set_id=' + priceSetId;
 
       var response = cj.ajax({
         url: dataUrl,

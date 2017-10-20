@@ -212,6 +212,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $defaults['receive_date'] = $now;
     $defaults['receive_date_time'] = $currentTime;
 
+    CRM_Core_Error::debug_var('as', $this->_priceSetId);
     if ($this->_priceSetId) {
       if (isset($this->_priceSet) && !empty($this->_priceSet['fields'])) {
         CRM_Price_BAO_PriceSet::setPriceSetDefaultsToLastUsedValues($defaults, $this->_priceSet, $this->_contactID);

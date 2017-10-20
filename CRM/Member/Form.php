@@ -77,23 +77,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   public $_priceSetId;
 
   /**
-   * Used when price set specified.  Used to indicate that form is only to retrieve
-   * price set.  How we use price set is unconventional.  We re-use the same
-   * Membership/MembershipRenewal Form used to enter memberships.  When user selects
-   * a PriceSet, we use JavaScript to inject HTML returned by a recursive call to this form.
-   *
-   * This flag controls this recursive call, short-circuiting it to only retrieve the price
-   * set.
-   *
-   * Field introduced as part of CRM-15861.  Prior to CRM-15861, this was controlled by the
-   * name of the parameter used to request the price set (price_set_id, meant only price set,
-   * in contact->membership->add context, whilst priceSetId meant NOT only price set). Too
-   * confusing & too brittle.  An explicit member variable is now set for this.
-   *
-   */
-  public $_priceSetOnly;
-
-  /**
    * Price set details as an array.
    *
    * @var array
@@ -123,23 +106,9 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $params['id'] = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $params['mode'] = CRM_Utils_Request::retrieve('mode', 'String', $this);
 
-    // XXX We have too many ways that we set price set.  TODO: Clean this!
-    // When posting after saving, will come via POST price_set_id (from contact -> add membership)
-    // When posting after saving, from membership renewal will come via POST priceSetId
-    // When requesting via javascript (after user picks price set), will come via REQUEST
-    // When renewing, pre-process will automatically determine one before reverting to parent (us)
-    if (!$this->_priceSetId) {
-      $this->_priceSetId = CRM_Utils_Request::retrieve('priceSetId', 'Int', $this, FALSE);
+    if ($this->_priceSetId = CRM_Utils_Request::retrieve('price_set_id', 'Int')) {
+      $this->assign('priceSetId', $this->_priceSetId);
     }
-    if (!$this->_priceSetId) {
-      $this->_priceSetId = CRM_Utils_Request::retrieve('priceSetId', 'Int', $this, FALSE, NULL, "POST");
-    }
-    if (!$this->_priceSetId) {
-      $this->_priceSetId = CRM_Utils_Request::retrieve('price_set_id', 'Int', $this, FALSE, NULL, "POST");
-    }
-    $this->_priceSetOnly = CRM_Utils_Request::retrieve('priceSetOnly', 'Boolean');
-    $this->assign('priceSetOnly', $this->_priceSetOnly);
-    $this->assign('priceSetId', $this->_priceSetId);
 
     $this->setContextVariables($params);
 
