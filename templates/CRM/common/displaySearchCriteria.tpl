@@ -31,7 +31,7 @@
         <ul>
         <li>
         {foreach from=$orClauses name=criteria item=item}
-            {$item}
+            {$item|escape}
             {if !$smarty.foreach.criteria.last}
                 <span class="font-italic">...{ts}AND{/ts}...</span>
             {/if}
@@ -52,10 +52,10 @@
     {else}
         {foreach from=$orClauses name=criteria item=item}
             <div class="qill">
-            {$item}
+            {$item|escape}
             {if !$smarty.foreach.criteria.last}
                 {if $operator}
-                  <span class="font-italic">...{$operator}...</span>
+                  <span class="font-italic">...{$operator|escape}...</span>
                 {else}
                   <span class="font-italic">...{ts}AND{/ts}...</span>
                 {/if}
