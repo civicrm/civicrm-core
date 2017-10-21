@@ -71,6 +71,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     if ($form->getVar('_id') <= 0) {
       return NULL;
     }
+    $eventID = $form->getVar('_id');
 
     $default = array(
       'link' => NULL,
@@ -85,7 +86,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $tabs['location'] = array('title' => ts('Event Location')) + $default;
     $tabs['fee'] = array('title' => ts('Fees')) + $default;
     $tabs['registration'] = array('title' => ts('Online Registration')) + $default;
-    if (CRM_Core_Permission::check('administer CiviCRM') || CRM_Event_BAO_Event::checkPermission(NULL, CRM_Core_Permission::EDIT)) {
+    if (CRM_Core_Permission::check('administer CiviCRM') || CRM_Event_BAO_Event::checkPermission($eventID, CRM_Core_Permission::EDIT)) {
       $tabs['reminder'] = array('title' => ts('Schedule Reminders'), 'class' => 'livePage') + $default;
     }
     $tabs['conference'] = array('title' => ts('Conference Slots')) + $default;
@@ -104,7 +105,6 @@ class CRM_Event_Form_ManageEvent_TabHeader {
       unset($tabs['conference']);
     }
 
-    $eventID = $form->getVar('_id');
     if ($eventID) {
       // disable tabs based on their configuration status
       $eventNameMapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(

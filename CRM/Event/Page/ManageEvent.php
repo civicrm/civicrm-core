@@ -137,7 +137,13 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'field' => 'is_online_registration',
         );
 
-      if (CRM_Core_Permission::check('administer CiviCRM') || CRM_Event_BAO_Event::checkPermission(NULL, CRM_Core_Permission::EDIT)) {
+      // Don't retrieve all events you can change to decide whether to show
+      // this link. (CRM-20665)
+      if (CRM_Core_Permission::check('administer CiviCRM') || CRM_Core_Permission::check('access CiviEvent')) {
+        // If you can access CiviEvent, you can create events. If you can
+        // create events, you can schedule reminders for your events.
+        // We don't know which event is shown, so we put the link there just
+        // in case.
         self::$_tabLinks[$cacheKey]['reminder']
           = array(
             'title' => ts('Schedule Reminders'),
@@ -295,7 +301,6 @@ ORDER BY start_date desc
    LIMIT $offset, $rowCount";
 
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Event_DAO_Event');
-    $permissions = CRM_Event_BAO_Event::checkPermission();
 
     //get all campaigns.
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
@@ -318,7 +323,8 @@ ORDER BY start_date desc
     )));
     $eventType = CRM_Core_OptionGroup::values('event_type');
     while ($dao->fetch()) {
-      if (in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])) {
+      // Check permissions one by one, to avoid memory problems (CRM-20665).
+      if (CRM_Event_BAO_Event::checkPermission($dao->id, CRM_Core_Permission::VIEW)) {
         $manageEvent[$dao->id] = array();
         $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($dao->id, 'civicrm_event');
         $manageEvent[$dao->id]['repeat'] = '';
@@ -337,10 +343,12 @@ ORDER BY start_date desc
           $action -= CRM_Core_Action::DISABLE;
         }
 
-        if (!in_array($dao->id, $permissions[CRM_Core_Permission::DELETE])) {
+        // Check permissions one by one, to avoid memory problems (CRM-20665).
+        if (CRM_Event_BAO_Event::checkPermission($dao->id, CRM_Core_Permission::DELETE)) {
           $action -= CRM_Core_Action::DELETE;
         }
-        if (!in_array($dao->id, $permissions[CRM_Core_Permission::EDIT])) {
+        // Check permissions one by one, to avoid memory problems (CRM-20665).
+        if (CRM_Event_BAO_Event::checkPermission($dao->id, CRM_Core_Permission::EDIT)) {
           $action -= CRM_Core_Action::UPDATE;
         }
 
