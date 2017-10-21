@@ -29,7 +29,7 @@
     <div class="crm-accordion-header">{$article.title}</div>
     <div class="crm-accordion-body help">
       <div>{$article.description}</div>
-      <div><a href="{$article.link}" title="{$article.title}">{ts}read more{/ts}.</a></div>
+      <div><a href="{$article.link}" title="{$article.title|escape}">{ts}read more{/ts}.</a></div>
     </div>
   </div>
 </div>
