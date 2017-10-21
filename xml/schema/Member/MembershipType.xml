@@ -116,6 +116,7 @@
     <name>minimum_fee</name>
     <title>membership Type Minimum Fee</title>
     <type>decimal</type>
+    <length>18,9</length>
     <comment>Minimum fee for this membership (0 for free/complimentary memberships).</comment>
     <default>0</default>
     <add>1.5</add>
