@@ -80,7 +80,6 @@ function civicrm_api3_message_template_delete($params) {
 function _civicrm_api3_message_template_get_spec(&$params) {
   // fetch active records by default
   $params['is_active']['api.default'] = 1;
-  $params['is_reserved']['api.default'] = 0;
 
   $params['option_group_name']['description'] = 'option group name of the template (required if no id supplied)';
   $params['option_group_name']['title'] = 'Option Group Name';
