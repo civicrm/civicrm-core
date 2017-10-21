@@ -80,4 +80,24 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * @return array
+   */
+  public function extensionKeyTests() {
+    $keys = array();
+    $keys[] = array('org.civicrm.multisite', TRUE);
+    $keys[] = array('au.org.contribute2016', TRUE);
+    $keys[] = array('%3Csvg%20onload=alert(0)%3E', FALSE);
+    return $keys;
+  }
+
+  /**
+   * @param $key
+   * @param $expectedResult
+   * @dataProvider extensionKeyTests
+   */
+  public function testExtensionKeyValid($key, $expectedResult) {
+    $this->assertEquals($expectedResult, CRM_Utils_Rule::checkExtensionKeyIsValid($key));
+  }
+
 }
