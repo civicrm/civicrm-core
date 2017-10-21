@@ -95,9 +95,9 @@
   </field>
   <field>
     <name>amount</name>
-    <type>varchar</type>
+    <type>decimal</type>
     <title>Amount</title>
-    <length>512</length>
+    <length>18,9</length>
     <html>
       <type>Text</type>
       <size>8</size>
