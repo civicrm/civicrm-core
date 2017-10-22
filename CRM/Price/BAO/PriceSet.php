@@ -1690,122 +1690,24 @@ WHERE       ps.id = %1
   }
 
   /**
-   * Get the last (still active) price set that was used to create that membership.
+   * Get priceset ID of selected entity ID
    *
-   * If that price set does not exist, is not found or isn't active,
-   * then return the price set that will  cover that membership's record organisation.
-   * As multiple price sets may meet that criteria, the price set that cover's the most
-   * of that contact's membership of organizations will be returned.  As multiple price sets may
-   * still meet that criteria, the first defined price set is returned. Getting
-   * heuristics for determining the best price set here seems impossible.
+   * @param int $entityID
+   * @param string $entityTable
    *
-   * @param int $membership_id The membership that is being renewed.
-   *
-   * @return int
-   *     e.g., 9. To indicate that price set #9 is the last price set that as
-   *           used on contact #3.
+   * @return int Price set ID
    */
-  public static function getLastPriceSetUsed($membership_id) {
-    $sql = "
-SELECT p.contribution_id, c.receive_Date, pf.price_set_id
-  FROM civicrm_membership m
-    LEFT JOIN civicrm_membership_payment p
-           ON p.membership_id = m.id
-     LEFT JOIN civicrm_contribution c
-            ON c.id = p.contribution_id
-    LEFT JOIN civicrm_line_item li
-           ON li.contribution_id = p.contribution_id
-          AND li.entity_table = 'civicrm_membership'
-          AND li.entity_id = m.id
-    LEFT JOIN civicrm_price_field_value pfv
-           ON pfv.id = li.price_field_value_id
-          AND pfv.is_active = 1
-    LEFT JOIN civicrm_price_field pf
-           ON pf.id = pfv.price_field_id
-          AND pf.is_active = 1
-    LEFT JOIN civicrm_price_set ps
-           ON ps.id = pf.price_set_id
-          AND ps.is_active = 1
- WHERE m.id = %1
-       ORDER BY c.receive_date DESC, p.contribution_id DESC
+  public static function getPriceSetFromEntityID($entityID, $entityTable = 'civicrm_contribution') {
+    $sql = "SELECT ps.id
+      FROM civicrm_price_set ps
+       INNER JOIN civicrm_price_field pf ON ps.id = pf.price_set_id
+       INNER JOIN civicrm_line_item li ON pf.id = li.price_field_id
+      WHERE li.entity_table = %1 AND li.id = %2
     ";
-
-    $params = array(1 => array($membership_id, 'Integer'));
-    $dao = self::executeQuery($sql, $params);
-    $activateByDefault = TRUE;
-    while ($dao->fetch()) {
-      // last price set used on this membership (could be multiple over the course of time)
-      // only select "price set view", if last contribution was for the price set.
-      if ($dao->price_set_id) {
-        return array(
-          'price_set_id' => $dao->price_set_id,
-          'price_set_is_through_contribution' => $activateByDefault,
-        );
-      }
-      $activateByDefault = FALSE;
-    }
-
-    // nothing found.  we want to pick, by default the price set that will cover
-    // the most of this contact's members of organizations (firstly), and the most
-    // of this contact's membership types (secondly)
-    $sql = "
-SELECT ps.id, ps.name,
-			(
-				SELECT COUNT(*)
-				  FROM civicrm_membership m
-				 WHERE m.contact_id = mem_renewed.contact_id
-				   AND EXISTS(SELECT 1 FROM civicrm_price_field_value pfv, civicrm_price_field pf
-				 				  WHERE pfv.membership_type_id = m.membership_type_id
-				 				    AND pfv.is_active
-				 				    AND pfv.price_field_id = pf.id
-				 				    AND pf.is_active = 1
-				 				    AND pf.price_set_id = ps.id
-				 		   )
-		     ) AS match_ps_cnt,
-		     (
-				SELECT COUNT(*)
-				  FROM -- count memberships
-				      civicrm_membership m
-				  	  INNER JOIN civicrm_membership_type mt ON mt.id = m.membership_type_id
-				 WHERE m.contact_id = mem_renewed.contact_id
-				   AND -- for which there exists a price set field value for the same org
-				       EXISTS(SELECT 1 FROM civicrm_price_field_value pfv, civicrm_price_field pf
-				 				  WHERE pfv.membership_type_id IN (SELECT mt2.id
-				 				  						       FROM civicrm_membership_type mt2
-				 				  						      WHERE mt2.member_of_contact_id = mt.member_of_contact_id)
-				 				    AND pfv.is_active
-				 				    AND pfv.price_field_id = pf.id
-				 				    AND pf.is_active = 1
-				 				    AND pf.price_set_id = ps.id
-				 		   )
-		     ) AS match_org_cnt
-  FROM civicrm_price_set ps, civicrm_membership mem_renewed, civicrm_membership_type mt_renewed
- WHERE mem_renewed.id = %1
-   AND mt_renewed.id = mem_renewed.membership_type_id
-   AND ps.is_active = 1
-   AND ps.is_quick_config = 0
-       -- also make sure price set returned covers org of memebership being renewed
-   AND EXISTS(SELECT 1 
-                FROM civicrm_price_field pf, civicrm_price_field_value pfv 
-               WHERE pf.price_set_id = ps.id
-                 AND pfv.price_field_id = pf.id
-                 AND pfv.membership_type_id IN (SELECT mt.id FROM civicrm_membership_type mt WHERE mt.member_of_contact_id = mt_renewed.member_of_contact_id)
-             )
- ORDER BY match_org_cnt DESC, match_ps_cnt DESC, ps.id
- LIMIT 1
- ";
-
-    $params = array(1 => array($membership_id, 'Integer'));
-    $dao = self::executeQuery($sql, $params);
-    if ($dao->fetch()) {
-      return array(
-        'price_set_id' => $dao->id,
-        'price_set_is_through_contribution' => FALSE,
-      );
-    }
-    else {
-      return array();
-    }
+    return CRM_Core_DAO::singleValueQuery($sql, array(
+      1 => array($entityTable, 'String'),
+      2 => array($entityID, 'Int'),
+    ));
   }
 
   /**

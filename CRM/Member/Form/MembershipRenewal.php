@@ -143,36 +143,14 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       )
     );
 
-    // there is a bunch of processing on price set id.  Make sure to retrieve it from
-    // submitteValues first when doing "submit".
-    if (!empty($this->_submitValues['price_set_id'])) {
-      $this->_priceSetId = $this->_submitValues['price_set_id'];
+    if (empty($this->_priceSetId)) {
+      $this->_priceSetId = CRM_Price_BAO_PriceSet::getPriceSetFromEntityID($this->_id, 'civicrm_membership');
     }
 
-    $skipMinimumAmountCheck = FALSE;
-    if (empty($this->_priceSetId)) {
-      $pair = CRM_Price_BAO_PriceSet::getLastPriceSetUsed($this->_id);
-      if ($pair != NULL) {
-        $this->_priceSetId = $pair['price_set_id'];
-        // this logic here (and the more complicated SQL from getLastPriceSet used to
-        // set this param) arguably not required.  For simple uses of price sets, (e.g.,
-        // one price set / org & few contribs, works well.  For complicated use cases
-        // (e.g., multiple price sets, multiple orgs per price set) also works well,
-        // if not better, making it easier for an admin to pick a price set that has the
-        // "most" coverage.
-        $this->assign('show_price_set', $pair['price_set_is_through_contribution']);
-        $skipMinimumAmountCheck = TRUE;
-      }
-    }
-    else {
-      // a price set is specified, we're reloading this page to load price set, skip the edit check.
-      // wouldn't make sense to prevent, even if min amount was == 0, there are many price options
-      // that *could* result in a chargeable amount.
-      $skipMinimumAmountCheck = TRUE;
+    if (!empty($this->_priceSetId)) {
       $this->assign('show_price_set', TRUE);
     }
-
-    if ($this->_mode && $skipMinimumAmountCheck == FALSE) {
+    elseif ($this->_mode) {
       $membershipFee = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee');
       if (!$membershipFee) {
         $statusMsg = ts('Membership Renewal using a credit card requires a Membership fee. Since there is no fee associated with the selected membership type, you can use the normal renewal mode.');

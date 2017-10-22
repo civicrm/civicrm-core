@@ -394,7 +394,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->assign('contributionType', CRM_Utils_Array::value('financial_type_id', $this->_priceSet));
 
       // get only price set form elements.
-      if (CRM_Utils_Array::value('snippet', $_GET)) {
+      if ($this->_priceSetId && !CRM_Utils_Array::value('price_set_id', $_POST)) {
         return;
       }
 

@@ -23,10 +23,9 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $priceSetId}
+{if $priceSetOnly}
   {include file="CRM/Member/Form/MembershipPriceSetCommon.tpl"}
 {else}
-
 {* this template is used for renewing memberships for a contact  *}
   {if $membershipMode == 'test' }
     {assign var=registerMode value="TEST"}
@@ -391,7 +390,7 @@
         cj('#total_amount').val( '' );
         cj('#total_amount').attr("readonly", true);
 
-        var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&price_set_id=' + priceSetId;
+        var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&priceSetOnly=1&price_set_id=' + priceSetId;
 
         var response = cj.ajax({
           url: dataUrl,
