@@ -19,18 +19,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testSubmit() {
-    $event = $this->eventCreate();
-    $contactID = $this->individualCreate();
-    $form = $this->getFormObject('CRM_Event_Form_Participant');
-    $form->_single = TRUE;
-    $form->_contactId = $contactID;
-    $form->setCustomDataTypes();
+    $form = $this->commonPrepare();
     $form->submit(array(
       'register_date' => 'now',
       'register_date_time' => '00:00:00',
       'status_id' => 1,
       'role_id' => 1,
-      'event_id' => $event['id'],
+      'event_id' => $form->_eventId,
     ));
     $participants = $this->callAPISuccess('Participant', 'get', array());
     $this->assertEquals(1, $participants['count']);
@@ -42,14 +37,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testSubmitWithPayment() {
-    $event = $this->eventCreate(array('is_monetary' => 1, 'financial_type_id' => 1));
-    $contactID = $this->individualCreate();
-    $form = $this->getFormObject('CRM_Event_Form_Participant');
-    $form->_single = TRUE;
-    $form->_contactId = $contactID;
-    $form->setCustomDataTypes();
-    $form->_bltID = 5;
-    $form->_eventId = $event['id'];
+    $form = $this->commonPrepare(array('is_monetary' => 1, 'financial_type_id' => 1));
     $paymentProcessorID = $this->processorCreate(array('is_test' => 0));
     $form->_mode = 'Live';
     $form->_values['fee'] = array();
@@ -63,7 +51,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'register_date_time' => '00:00:00',
       'status_id' => 1,
       'role_id' => 1,
-      'event_id' => $event['id'],
+      'event_id' => $form->_eventId,
       'credit_card_number' => 4444333322221111,
       'cvv2' => 123,
       'credit_card_exp_date' => array(
@@ -132,6 +120,30 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
         '<p>Test event type - 1</p>',
       )
     );
+  }
+
+  /**
+   * Shared preparation.
+   *
+   * @param array $eventParams
+   *
+   * @return CRM_Event_Form_Participant
+   */
+  protected function commonPrepare($eventParams = array()) {
+    $event = $this->eventCreate($eventParams);
+    $contactID = $this->individualCreate();
+    $form = $this->getFormObject('CRM_Event_Form_Participant');
+    $form->_single = TRUE;
+    $form->_contactId = $contactID;
+    $form->setCustomDataTypes();
+    $form->_eventId = $event['id'];
+    if (!empty($eventParams['is_monetary'])) {
+      $form->_mode = 'Live';
+      $form->_bltID = 5;
+      $form->_values['fee'] = array();
+      $form->_isPaidEvent = TRUE;
+    }
+    return $form;
   }
 
 }
