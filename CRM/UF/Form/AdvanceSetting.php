@@ -51,6 +51,8 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     // we do not have any url checks to allow relative urls
     $form->addElement('text', 'post_URL', ts('Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'post_URL'));
     $form->addElement('text', 'cancel_URL', ts('Cancel Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_URL'));
+    $form->addElement('text', 'cancel_button_text', ts('Cancel Button Text'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_button_text'));
+    $form->addElement('text', 'submit_button_text', ts('Submit Button Text'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'submit_button_text'));
 
     // add select for groups
     $group = array('' => ts('- select -')) + $form->_group;

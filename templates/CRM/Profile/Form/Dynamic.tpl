@@ -36,7 +36,7 @@
 
   <div class="crm-submit-buttons">
     <span class="crm-button">{$form._qf_Edit_upload_delete.html}</span>
-    <a class="button cancel" href="{$cancelURL}">{ts}Cancel{/ts}</a>
+    <a class="button cancel" href="{$cancelURL}">{$cancelButtonText}</a>
   </div>
 {else}
 {if ! empty( $fields )}
@@ -221,7 +221,7 @@
         <a class="button cancel" href="{$cancelURL}">
           <span>
             <i class="crm-i fa-times"></i>
-            {ts}Cancel{/ts}
+            {$cancelButtonText}
           </span>
         </a>
       </div>
