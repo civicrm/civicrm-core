@@ -417,6 +417,12 @@ class CRM_Utils_Type {
         }
         break;
 
+      case 'ExtensionKey':
+        if (CRM_Utils_Rule::checkExtensionKeyIsValid($data)) {
+          return $data;
+        }
+        break;
+
       default:
         CRM_Core_Error::fatal("Cannot recognize $type for $data");
         break;
