@@ -2074,10 +2074,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     $params = array_merge($defaults, $params);
 
-    if (strlen($params['title']) > 13) {
-      $params['title'] = substr($params['title'], 0, 13);
-    }
-
     //have a crack @ deleting it first in the hope this will prevent derailing our tests
     $this->callAPISuccess('custom_group', 'get', array(
       'title' => $params['title'],
