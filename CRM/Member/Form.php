@@ -101,11 +101,16 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       CRM_Core_Error::statusBounce(ts('There are no configured membership statuses. You cannot add this membership until your membership statuses are correctly configured'));
     }
 
+    $this->assign('priceSetOnly', CRM_Utils_Request::retrieve('priceSetOnly', 'Boolean'));
+
     parent::preProcess();
     $params = array();
     $params['context'] = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'membership');
     $params['id'] = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $params['mode'] = CRM_Utils_Request::retrieve('mode', 'String', $this);
+    if (!$this->_priceSetId) {
+      $params['priceSetId'] = CRM_Utils_Request::retrieve('price_set_id', 'Int', $this);
+    }
 
     $this->setContextVariables($params);
 
@@ -304,10 +309,15 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       'id' => '_id',
       'cid' => '_contactID',
       'mode' => '_mode',
+      'priceSetId' => '_priceSetId',
     );
     foreach ($variables as $paramKey => $classVar) {
       if (isset($params[$paramKey]) && !isset($this->$classVar)) {
         $this->$classVar = $params[$paramKey];
+        if ($paramKey == 'priceSetId') {
+          $this->set($paramKey, $this->$classVar);
+          $this->assign($paramKey, $this->$classVar);
+        }
       }
     }
 

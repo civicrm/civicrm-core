@@ -173,10 +173,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
     $this->assign('formClass', 'membership');
     parent::preProcess();
-    // get price set id.
-    $this->_priceSetId = CRM_Utils_Array::value('priceSetId', $_GET);
-    $this->set('priceSetId', $this->_priceSetId);
-    $this->assign('priceSetId', $this->_priceSetId);
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $contributionID = CRM_Member_BAO_Membership::getMembershipContributionId($this->_id);
@@ -400,17 +396,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
     // build price set form.
     $buildPriceSet = FALSE;
-    if ($this->_priceSetId || !empty($_POST['price_set_id'])) {
-      if (!empty($_POST['price_set_id'])) {
-        $buildPriceSet = TRUE;
-      }
-      $getOnlyPriceSetElements = TRUE;
-      if (!$this->_priceSetId) {
-        $this->_priceSetId = $_POST['price_set_id'];
-        $getOnlyPriceSetElements = FALSE;
-      }
-
-      $this->set('priceSetId', $this->_priceSetId);
+    if ($this->_priceSetId) {
       CRM_Price_BAO_PriceSet::buildPriceSet($this);
 
       $optionsMembershipTypes = array();
@@ -429,7 +415,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->assign('contributionType', CRM_Utils_Array::value('financial_type_id', $this->_priceSet));
 
       // get only price set form elements.
-      if ($getOnlyPriceSetElements) {
+      if ($this->_priceSetId && !CRM_Utils_Array::value('price_set_id', $_POST)) {
         return;
       }
     }
