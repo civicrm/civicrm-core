@@ -53,6 +53,7 @@
     duration_interval="1"
     period_type="rolling"
     relationship_type_id="20"
+    relationship_direction="b_a"
     financial_type_id="2"
   />
   <civicrm_membership_type
@@ -62,6 +63,7 @@
     member_of_contact_id="23"
     duration_unit="lifetime"
     relationship_type_id="20"
+    relationship_direction="b_a"
     financial_type_id="2"
    />
    <civicrm_membership_type
@@ -73,6 +75,7 @@
      duration_interval="1"
      period_type="rolling"
      relationship_type_id="20"
+    relationship_direction="b_a"
      financial_type_id="2"
    />
 </dataset>
