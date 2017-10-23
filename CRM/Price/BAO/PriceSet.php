@@ -1800,7 +1800,7 @@ WHERE     ct.id = cp.financial_type_id AND
   }
 
   /**
-   * Get priceset ID of selected entity ID
+   * Get non-quick config priceset ID of selected entity ID
    *
    * @param int $entityID
    * @param string $entityTable
@@ -1812,7 +1812,7 @@ WHERE     ct.id = cp.financial_type_id AND
       FROM civicrm_price_set ps
        INNER JOIN civicrm_price_field pf ON ps.id = pf.price_set_id
        INNER JOIN civicrm_line_item li ON pf.id = li.price_field_id
-      WHERE li.entity_table = %1 AND li.entity_id = %2
+      WHERE ps.is_quick_config = 0 AND li.entity_table = %1 AND li.entity_id = %2
     ";
     return CRM_Core_DAO::singleValueQuery($sql, array(
       1 => array($entityTable, 'String'),

@@ -467,7 +467,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $errors['payment_instrument_id'] = ts('Payment Method is a required field.');
       }
     }
-    return empty($errors) ? TRUE : $errors;
+
+    return empty($errors) ? parent::formRule($params, $files, $self) : $errors;
   }
 
   /**
