@@ -1603,8 +1603,7 @@ class CRM_Core_Permission {
    *   invoices permission and the invoice author is the current user.
    */
   public static function checkDownloadInvoice() {
-    global $user;
-    $cid = CRM_Core_BAO_UFMatch::getContactId($user->uid);
+    $cid = CRM_Core_Session::getLoggedInContactID();
     if (CRM_Core_Permission::check('access CiviContribute') ||
       (CRM_Core_Permission::check('view my invoices') && $_GET['cid'] == $cid)
     ) {
