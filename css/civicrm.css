@@ -1128,6 +1128,7 @@ input.crm-form-entityref {
 
 .crm-recentview-item {
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #crm-recently-viewed .crm-recentview-wrapper a:hover {
