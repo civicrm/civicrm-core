@@ -79,7 +79,9 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       $result = civicrm_api3('ReportInstance', 'get', array(
         'sequential' => 1,
         'report_id' => 'mailing/' . $report));
-      $reportIds[$report] = $result['values'][0]['id'];
+      if (!empty($result['values'])) {
+        $reportIds[$report] = $result['values'][0]['id'];
+      }
     }
     $result = array();
     $result['crmMailing'] = include "$civicrm_root/ang/crmMailing.ang.php";
