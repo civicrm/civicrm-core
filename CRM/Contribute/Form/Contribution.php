@@ -1701,7 +1701,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
     }
 
-    if ($contribution->id) {
+    if ($contribution->id && array_key_exists('note', $submittedValues)) {
       CRM_Contribute_Form_AdditionalInfo::processNote($submittedValues, $this->_contactID, $contribution->id, $this->_noteID);
     }
 
