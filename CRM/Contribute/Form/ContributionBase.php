@@ -938,6 +938,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
 
         $fieldTypes = array('Contact', 'Organization');
+        if (!empty($form->_membershipBlock)) {
+          $fieldTypes = array_merge($fieldTypes, array('Membership'));
+        }
         $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
         $fieldTypes = array_merge($fieldTypes, $contactSubType);
 
