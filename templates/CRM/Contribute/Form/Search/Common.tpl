@@ -164,6 +164,21 @@
   {/if}
 </tr>
 
+<tr>
+  <td colspan="2">
+    {$form.contribution_cancel_reason.label}<br />
+    {$form.contribution_cancel_reason.html}
+  </td>
+</tr>
+<tr>
+  <td colspan="2">
+    <label>{ts}Cancelled / Refunded Date{/ts}</label>
+  </td>
+</tr>
+<tr>
+  {include file="CRM/Core/DateRange.tpl" fieldName="contribution_cancel_date" from='_low' to='_high'}
+</tr>
+
 {* campaign in contribution search *}
 {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
 campaignTrClass='' campaignTdClass=''}

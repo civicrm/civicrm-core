@@ -227,6 +227,17 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
+      case 'contribution_cancel_date':
+      case 'contribution_cancel_date_low':
+      case 'contribution_cancel_date_low_time':
+      case 'contribution_cancel_date_high':
+      case 'contribution_cancel_date_high_time':
+        // process to / from date
+        $query->dateQueryBuilder($values,
+          'civicrm_contribution', 'contribution_cancel_date', 'cancel_date', 'Contribution Cancel Date'
+        );
+        return;
+
       case 'financial_type_id':
         // @todo we need to make this resemble a hook approach.
         CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
@@ -894,6 +905,11 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     $form->add('text', 'contribution_amount_high', ts('To'), array('size' => 8, 'maxlength' => 8));
     $form->addRule('contribution_amount_high', ts('Please enter a valid money value (e.g. %1).', array(1 => CRM_Utils_Money::format('99.99', ' '))), 'money');
 
+    // Adding Cancelled Contribution fields -- CRM-21343
+    $form->add('text', 'contribution_cancel_reason', ts('Cancellation / Refund Reason'), array('size' => 40));
+    CRM_Core_Form_Date::buildDateRange($form, 'contribution_cancel_date', 1, '_low', '_high', ts('From:'), FALSE);
+    $form->addElement('hidden', 'contribution_cancel_date_range_error');
+
     // Adding select option for curreny type -- CRM-4711
     $form->add('select', 'contribution_currency_type',
       ts('Currency Type'),
@@ -1068,11 +1084,12 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
   public static function formRule($fields, $files, $form) {
     $errors = array();
 
-    if (empty($fields['contribution_date_high']) || empty($fields['contribution_date_low'])) {
-      return TRUE;
+    if (!empty($fields['contribution_date_high']) && !empty($fields['contribution_date_low'])) {
+      CRM_Utils_Rule::validDateRange($fields, 'contribution_date', $errors, ts('Date Received'));
     }
-
-    CRM_Utils_Rule::validDateRange($fields, 'contribution_date', $errors, ts('Date Received'));
+    if (!empty($fields['contribution_cancel_date_high']) && !empty($fields['contribution_cancel_date_low'])) {
+      CRM_Utils_Rule::validDateRange($fields, 'contribution_cancel_date', $errors, ts('Cancel Date'));
+    }
 
     return empty($errors) ? TRUE : $errors;
   }
