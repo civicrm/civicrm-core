@@ -534,7 +534,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if ($this->_noteID &&
-      isset($this->_values['note'])
+      !CRM_Utils_System::isNull($this->_values['note'])
     ) {
       $defaults['hidden_AdditionalDetail'] = 1;
     }
@@ -1701,7 +1701,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
     }
 
-    if ($contribution->id && !empty($submittedValues['note'])) {
+    if ($contribution->id) {
       CRM_Contribute_Form_AdditionalInfo::processNote($submittedValues, $this->_contactID, $contribution->id, $this->_noteID);
     }
 

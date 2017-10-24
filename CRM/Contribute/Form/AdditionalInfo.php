@@ -254,6 +254,10 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param int $contributionNoteID
    */
   public static function processNote($params, $contactID, $contributionID, $contributionNoteID = NULL) {
+    if (CRM_Utils_System::isNull($params['note']) && $contributionNoteID) {
+      CRM_Core_BAO_Note::del($contributionNoteID);
+      return;
+    }
     //process note
     $noteParams = array(
       'entity_table' => 'civicrm_contribution',
