@@ -124,7 +124,7 @@
     // example: <div crm-ui-field="{title: ts('My Field')}"> {{mydata}} </div>
     // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" /> </div>
     // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" required /> </div>
-    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field'), help: hs('help_field_name')}"> {{mydata}} </div>
+    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field'), help: hs('help_field_name'), required: true}"> {{mydata}} </div>
     .directive('crmUiField', function() {
       // Note: When writing new templates, the "label" position is particular. See/patch "var label" below.
       var templateUrls = {
@@ -255,12 +255,17 @@
           // immediately for initialization. Use retries/retryDelay to initialize such elements.
           var init = function (retries, retryDelay) {
             var input = $('#' + id);
-            if (input.length === 0) {
+            if (input.length === 0 && !attrs.crmUiForceRequired) {
               if (retries) {
                 $timeout(function(){
                   init(retries-1, retryDelay);
                 }, retryDelay);
               }
+              return;
+            }
+
+            if (attrs.crmUiForceRequired) {
+              scope.crmIsRequired = true;
               return;
             }
 
