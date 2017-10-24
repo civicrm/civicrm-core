@@ -256,6 +256,11 @@
           var init = function (retries, retryDelay) {
             var input = $('#' + id);
             if (input.length === 0) {
+              // CRM-21335 : there is no other way to fetch the 'ng-required' property of a subform (here recipients),
+              // so better to provide requiredness on basis of name which is a hackish fix for now.
+              if (attrs.crmUiFor === 'subform.recipients') {
+                scope.crmIsRequired = true;
+              }
               if (retries) {
                 $timeout(function(){
                   init(retries-1, retryDelay);
