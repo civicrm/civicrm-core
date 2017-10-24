@@ -65,17 +65,17 @@
     relationship_type_id="20"
     relationship_direction="b_a"
     financial_type_id="2"
-   />
-   <civicrm_membership_type
-     id="35"
-     domain_id="1"
-     name="AnnualRolling1"
-     member_of_contact_id="32"
-     duration_unit="year"
-     duration_interval="1"
-     period_type="rolling"
-     relationship_type_id="20"
+  />
+  <civicrm_membership_type
+    id="35"
+    domain_id="1"
+    name="AnnualRolling1"
+    member_of_contact_id="32"
+    duration_unit="year"
+    duration_interval="1"
+    period_type="rolling"
+    relationship_type_id="20"
     relationship_direction="b_a"
-     financial_type_id="2"
-   />
+    financial_type_id="2"
+  />
 </dataset>

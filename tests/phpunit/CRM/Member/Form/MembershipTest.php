@@ -1005,20 +1005,20 @@ Expires: ',
    */
   public function testTwoInheritedMembershipsViaPriceSetInBackend() {
     // Create an organization and give it a "Member of" relationship to $this->_individualId.
-    $orgId = $this->organizationCreate();
+    $orgID = $this->organizationCreate();
     $relationship = $this->callAPISuccess('relationship', 'create', array(
       'contact_id_a' => $this->_individualId,
-      'contact_id_b' => $orgId,
+      'contact_id_b' => $orgID,
       'relationship_type_id' => 20,
       'is_active' => 1,
     ));
 
     // Create two memberships for the organization, via a price set in the back end.
-    $this->createTwoMembershipsViaPriceSetInBackEnd($orgId);
+    $this->createTwoMembershipsViaPriceSetInBackEnd($orgID);
 
     // Check the primary memberships on the organization.
     $orgMembershipResult = $this->callAPISuccess('membership', 'get', array(
-      'contact_id' => $orgId,
+      'contact_id' => $orgID,
     ));
     $this->assertEquals(2, $orgMembershipResult['count'], "2 primary memberships should have been created on the organization.");
     $primaryMembershipIds = array();
@@ -1042,23 +1042,23 @@ Expires: ',
     // CRM-20966: check that the correct membership contribution, line items
     // & membership_payment records were created for the organization.
     $contributionResult = $this->callAPISuccess('contribution', 'get', array(
-      'contact_id' => $orgId,
+      'contact_id' => $orgID,
       'sequential' => 1,
       'api.line_item.get' => array(),
       'api.membership_payment.get' => array(),
     ));
     $this->assertEquals(1, $contributionResult['count'], "One contribution should have been created for the organization's memberships.");
 
-    $this->assertEquals(2, $contributionResult['values'][0]['api.line_item.get']['count'], "2 line_items should have been created for the organization's memberships.");
+    $this->assertEquals(2, $contributionResult['values'][0]['api.line_item.get']['count'], "2 line items should have been created for the organization's memberships.");
     foreach ($contributionResult['values'][0]['api.line_item.get']['values'] as $lineItem) {
-      $this->assertEquals('civicrm_membership', $lineItem['entity_table'], "Membership line_item entity_table should be 'civicrm_membership'.");
-      $this->assertContains($lineItem['entity_id'], $primaryMembershipIds, "Membership line_item entity_id should be the id of a primary membership.");
+      $this->assertEquals('civicrm_membership', $lineItem['entity_table'], "Membership line item's entity_table should be 'civicrm_membership'.");
+      $this->assertContains($lineItem['entity_id'], $primaryMembershipIds, "Membership line item's entity_id should be the id of a primary membership.");
     }
 
-    $this->assertEquals(2, $contributionResult['values'][0]['api.membership_payment.get']['count'], "2 membership_payment records should have been created for the organization's memberships.");
+    $this->assertEquals(2, $contributionResult['values'][0]['api.membership_payment.get']['count'], "2 membership payment records should have been created for the organization's memberships.");
     foreach ($contributionResult['values'][0]['api.membership_payment.get']['values'] as $membershipPayment) {
-      $this->assertEquals($contributionResult['values'][0]['id'], $membershipPayment['contribution_id'], "membership_payment contribution_id should be the id of the organization's membership contribution.");
-      $this->assertContains($membershipPayment['membership_id'], $primaryMembershipIds, "membership_payment membership_id should be the id of a primary membership.");
+      $this->assertEquals($contributionResult['values'][0]['id'], $membershipPayment['contribution_id'], "membership payment's contribution ID should be the ID of the organization's membership contribution.");
+      $this->assertContains($membershipPayment['membership_id'], $primaryMembershipIds, "membership payment's membership ID should be the ID of a primary membership.");
     }
 
     // CRM-20966: check that deleting relationship used for inheritance does not delete contribution.
@@ -1068,7 +1068,7 @@ Expires: ',
 
     $contributionResultAfterRelationshipDelete = $this->callAPISuccess('contribution', 'get', array(
       'id' => $contributionResult['values'][0]['id'],
-      'contact_id' => $orgId,
+      'contact_id' => $orgID,
     ));
     $this->assertEquals(1, $contributionResultAfterRelationshipDelete['count'], "Contribution has been wrongly deleted.");
   }
