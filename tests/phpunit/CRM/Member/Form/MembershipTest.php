@@ -762,84 +762,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  after related Contribution is cancelled
    */
   public function testFinancialEntiriesOnCancelledContribution() {
-    $form = $this->getForm(NULL);
-    $form->preProcess();
-    $this->createLoggedInUser();
-
-    // create a price-set of price-field of type checkbox and each price-option corrosponds to a membership type
-    $priceSet = $this->callAPISuccess('price_set', 'create', array(
-      'is_quick_config' => 0,
-      'extends' => 'CiviMember',
-      'financial_type_id' => 1,
-      'title' => 'my Page',
-    ));
-    $priceSetID = $priceSet['id'];
-    // create respective checkbox price-field
-    $priceField = $this->callAPISuccess('price_field', 'create', array(
-      'price_set_id' => $priceSetID,
-      'label' => 'Memberships',
-      'html_type' => 'Checkbox',
-    ));
-    $priceFieldID = $priceField['id'];
-    // create two price options, each represent a membership type of amount 20 and 10 respectively
-    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
-        'price_set_id' => $priceSetID,
-        'price_field_id' => $priceField['id'],
-        'label' => 'Long Haired Goat',
-        'amount' => 20,
-        'financial_type_id' => 'Donation',
-        'membership_type_id' => 15,
-        'membership_num_terms' => 1,
-      )
-    );
-    $pfvIDs = array($priceFieldValue['id'] => 1);
-    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
-        'price_set_id' => $priceSetID,
-        'price_field_id' => $priceField['id'],
-        'label' => 'Shoe-eating Goat',
-        'amount' => 10,
-        'financial_type_id' => 'Donation',
-        'membership_type_id' => 35,
-        'membership_num_terms' => 2,
-      )
-    );
-    $pfvIDs[$priceFieldValue['id']] = 1;
-
-    // register for both of this memberships via backoffice membership form submission
-    $params = array(
-      'cid' => $this->_individualId,
-      'join_date' => date('m/d/Y', time()),
-      'start_date' => '',
-      'end_date' => '',
-      // This format reflects the 23 being the organisation & the 25 being the type.
-      "price_$priceFieldID" => $pfvIDs,
-      "price_set_id" => $priceSetID,
-      'membership_type_id' => array(1 => 0),
-      'auto_renew' => '0',
-      'max_related' => '',
-      'num_terms' => '2',
-      'source' => '',
-      'total_amount' => '30.00',
-      //Member dues, see data.xml
-      'financial_type_id' => '2',
-      'soft_credit_type_id' => '',
-      'soft_credit_contact_id' => '',
-      'payment_instrument_id' => 4,
-      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
-      'receipt_text_signup' => 'Thank you text',
-      'payment_processor_id' => $this->_paymentProcessorID,
-      'record_contribution' => TRUE,
-      'trxn_id' => 777,
-      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Pending'),
-      'billing_first_name' => 'Test',
-      'billing_middlename' => 'Last',
-      'billing_street_address-5' => '10 Test St',
-      'billing_city-5' => 'Test',
-      'billing_state_province_id-5' => '1003',
-      'billing_postal_code-5' => '90210',
-      'billing_country_id-5' => '1228',
-    );
-    $form->testSubmit($params);
+    // Create two memberships for individual $this->_individualId, via a price set in the back end.
+    $this->createTwoMembershipsViaPriceSetInBackEnd($this->_individualId);
 
     // cancel the related contribution via API
     $contribution = $this->callAPISuccessGetSingle('Contribution', array(
@@ -1073,6 +997,83 @@ Expires: ',
   }
 
   /**
+   * CRM-20955, CRM-20966:
+   * Test creating two memberships with inheritance via price set in the back end,
+   * checking that the correct primary & secondary memberships, contributions, line items
+   * & membership_payment records are created.
+   * Uses some data from tests/phpunit/CRM/Member/Form/dataset/data.xml .
+   */
+  public function testTwoInheritedMembershipsViaPriceSetInBackend() {
+    // Create an organization and give it a "Member of" relationship to $this->_individualId.
+    $orgID = $this->organizationCreate();
+    $relationship = $this->callAPISuccess('relationship', 'create', array(
+      'contact_id_a' => $this->_individualId,
+      'contact_id_b' => $orgID,
+      'relationship_type_id' => 20,
+      'is_active' => 1,
+    ));
+
+    // Create two memberships for the organization, via a price set in the back end.
+    $this->createTwoMembershipsViaPriceSetInBackEnd($orgID);
+
+    // Check the primary memberships on the organization.
+    $orgMembershipResult = $this->callAPISuccess('membership', 'get', array(
+      'contact_id' => $orgID,
+    ));
+    $this->assertEquals(2, $orgMembershipResult['count'], "2 primary memberships should have been created on the organization.");
+    $primaryMembershipIds = array();
+    foreach ($orgMembershipResult['values'] as $membership) {
+      $primaryMembershipIds[] = $membership['id'];
+      $this->assertTrue(empty($membership['owner_membership_id']), "Membership on the organization has owner_membership_id so is inherited.");
+    }
+
+    // CRM-20955: check that correct inherited memberships were created for the individual,
+    // for both of the primary memberships.
+    $individualMembershipResult = $this->callAPISuccess('membership', 'get', array(
+      'contact_id' => $this->_individualId,
+    ));
+    $this->assertEquals(2, $individualMembershipResult['count'], "2 inherited memberships should have been created on the individual.");
+    foreach ($individualMembershipResult['values'] as $membership) {
+      $this->assertNotEmpty($membership['owner_membership_id'], "Membership on the individual lacks owner_membership_id so is not inherited.");
+      $this->assertNotContains($membership['id'], $primaryMembershipIds, "Inherited membership id should not be the id of a primary membership.");
+      $this->assertContains($membership['owner_membership_id'], $primaryMembershipIds, "Inherited membership owner_membership_id should be the id of a primary membership.");
+    }
+
+    // CRM-20966: check that the correct membership contribution, line items
+    // & membership_payment records were created for the organization.
+    $contributionResult = $this->callAPISuccess('contribution', 'get', array(
+      'contact_id' => $orgID,
+      'sequential' => 1,
+      'api.line_item.get' => array(),
+      'api.membership_payment.get' => array(),
+    ));
+    $this->assertEquals(1, $contributionResult['count'], "One contribution should have been created for the organization's memberships.");
+
+    $this->assertEquals(2, $contributionResult['values'][0]['api.line_item.get']['count'], "2 line items should have been created for the organization's memberships.");
+    foreach ($contributionResult['values'][0]['api.line_item.get']['values'] as $lineItem) {
+      $this->assertEquals('civicrm_membership', $lineItem['entity_table'], "Membership line item's entity_table should be 'civicrm_membership'.");
+      $this->assertContains($lineItem['entity_id'], $primaryMembershipIds, "Membership line item's entity_id should be the id of a primary membership.");
+    }
+
+    $this->assertEquals(2, $contributionResult['values'][0]['api.membership_payment.get']['count'], "2 membership payment records should have been created for the organization's memberships.");
+    foreach ($contributionResult['values'][0]['api.membership_payment.get']['values'] as $membershipPayment) {
+      $this->assertEquals($contributionResult['values'][0]['id'], $membershipPayment['contribution_id'], "membership payment's contribution ID should be the ID of the organization's membership contribution.");
+      $this->assertContains($membershipPayment['membership_id'], $primaryMembershipIds, "membership payment's membership ID should be the ID of a primary membership.");
+    }
+
+    // CRM-20966: check that deleting relationship used for inheritance does not delete contribution.
+    $this->callAPISuccess('relationship', 'delete', array(
+      'id' => $relationship['id'],
+    ));
+
+    $contributionResultAfterRelationshipDelete = $this->callAPISuccess('contribution', 'get', array(
+      'id' => $contributionResult['values'][0]['id'],
+      'contact_id' => $orgID,
+    ));
+    $this->assertEquals(1, $contributionResultAfterRelationshipDelete['count'], "Contribution has been wrongly deleted.");
+  }
+
+  /**
    * Get a membership form object.
    *
    * We need to instantiate the form to run preprocess, which means we have to trick it about the request method.
@@ -1128,6 +1129,93 @@ Expires: ',
       'send_receipt' => 1,
     );
     return $params;
+  }
+
+  /**
+   * Scenario builder:
+   * create two memberships for the same individual, via a price set in the back end.
+   *
+   * @param int $contactId Id of contact on which the memberships will be created.
+   */
+  protected function createTwoMembershipsViaPriceSetInBackEnd($contactId) {
+    $form = $this->getForm(NULL);
+    $form->preProcess();
+    $this->createLoggedInUser();
+
+    // create a price-set of price-field of type checkbox and each price-option corresponds to a membership type
+    $priceSet = $this->callAPISuccess('price_set', 'create', array(
+      'is_quick_config' => 0,
+      'extends' => 'CiviMember',
+      'financial_type_id' => 1,
+      'title' => 'my Page',
+    ));
+    $priceSetID = $priceSet['id'];
+    // create respective checkbox price-field
+    $priceField = $this->callAPISuccess('price_field', 'create', array(
+      'price_set_id' => $priceSetID,
+      'label' => 'Memberships',
+      'html_type' => 'Checkbox',
+    ));
+    $priceFieldID = $priceField['id'];
+    // create two price options, each represent a membership type of amount 20 and 10 respectively
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Long Haired Goat',
+        'amount' => 20,
+        'financial_type_id' => 'Donation',
+        'membership_type_id' => 15,
+        'membership_num_terms' => 1,
+      )
+    );
+    $pfvIDs = array($priceFieldValue['id'] => 1);
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Shoe-eating Goat',
+        'amount' => 10,
+        'financial_type_id' => 'Donation',
+        'membership_type_id' => 35,
+        'membership_num_terms' => 2,
+      )
+    );
+    $pfvIDs[$priceFieldValue['id']] = 1;
+
+    // register for both of these memberships via backoffice membership form submission
+    $params = array(
+      'cid' => $contactId,
+      'join_date' => date('m/d/Y', time()),
+      'start_date' => '',
+      'end_date' => '',
+      // This format reflects the 23 being the organisation & the 25 being the type.
+      "price_$priceFieldID" => $pfvIDs,
+      "price_set_id" => $priceSetID,
+      'membership_type_id' => array(1 => 0),
+      'auto_renew' => '0',
+      'max_related' => '',
+      'num_terms' => '2',
+      'source' => '',
+      'total_amount' => '30.00',
+      //Member dues, see data.xml
+      'financial_type_id' => '2',
+      'soft_credit_type_id' => '',
+      'soft_credit_contact_id' => '',
+      'payment_instrument_id' => 4,
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'receipt_text_signup' => 'Thank you text',
+      'payment_processor_id' => $this->_paymentProcessorID,
+      'record_contribution' => TRUE,
+      'trxn_id' => 777,
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Pending'),
+      'billing_first_name' => 'Test',
+      'billing_middlename' => 'Last',
+      'billing_street_address-5' => '10 Test St',
+      'billing_city-5' => 'Test',
+      'billing_state_province_id-5' => '1003',
+      'billing_postal_code-5' => '90210',
+      'billing_country_id-5' => '1228',
+    );
+    $form->testSubmit($params);
   }
 
 }
