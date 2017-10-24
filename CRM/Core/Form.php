@@ -1873,6 +1873,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param $props
    */
   private function formatReferenceFieldAttributes(&$props) {
+    CRM_Utils_Hook::alterEntityRefParams($props);
     $props['data-select-params'] = json_encode($props['select']);
     $props['data-api-params'] = $props['api'] ? json_encode($props['api']) : NULL;
     $props['data-api-entity'] = $props['entity'];
