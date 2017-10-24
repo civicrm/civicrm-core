@@ -68,7 +68,7 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
       $query->_element['pledge_original_installment_amount'] = 1;
       $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
     }
-    
+
     if (!empty($query->_returnProperties['installments'])) {
       $query->_select['installments'] = 'civicrm_pledge.installments as installments';
       $query->_element['installments'] = 1;
