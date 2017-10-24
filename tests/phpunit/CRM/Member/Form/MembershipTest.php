@@ -715,49 +715,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test membership form with Failed Contribution.
-   */
-  public function testFormStatusUpdate() {
-    $form = $this->getForm();
-    $form->preProcess();
-    $this->_individualId = $this->createLoggedInUser();
-    $memParams = array(
-      'contact_id' => $this->_individualId,
-      'membership_type_id' => $this->membershipTypeAnnualFixedID,
-      'is_override' => TRUE,
-      'status_id' => array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus()),
-    );
-    $params = $this->getBaseSubmitParams();
-    $params['id'] = $this->contactMembershipCreate($memParams);
-    unset($params['price_set_id']);
-    unset($params['credit_card_number']);
-    unset($params['cvv2']);
-    unset($params['credit_card_exp_date']);
-    unset($params['credit_card_type']);
-    unset($params['send_receipt']);
-    unset($params['is_recur']);
-
-    // process date params to mysql date format.
-    $dateTypes = array(
-      'join_date' => 'joinDate',
-      'start_date' => 'startDate',
-      'end_date' => 'endDate',
-    );
-    $previousStatus = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $params['id'], 'status_id');
-    foreach ($dateTypes as $dateField => $dateVariable) {
-      $params[$dateField] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $params['id'], $dateField);
-    }
-    $form->_id = $params['id'];
-    $form->_mode = NULL;
-    $form->_contactID = $this->_individualId;
-
-    $form->testSubmit($params);
-    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
-    //Assert the status remains when the form dates are not modified.
-    $this->assertEquals($membership['status_id'], $previousStatus);
-  }
-
-  /**
    * CRM-20946: Test the financial entires especially the reversed amount,
    *  after related Contribution is cancelled
    */

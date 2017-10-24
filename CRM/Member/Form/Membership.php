@@ -1201,19 +1201,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       'start_date' => 'startDate',
       'end_date' => 'endDate',
     );
-    $dateModified = FALSE;
     foreach ($dateTypes as $dateField => $dateVariable) {
-      if (!empty($params['id'])) {
-        $membershipDate = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $params['id'], $dateField, 'id');
-        if ($membershipDate != date('Y-m-d', strtotime($formValues[$dateField]))) {
-          $dateModified = TRUE;
-        }
-      }
       $$dateVariable = CRM_Utils_Date::processDate($formValues[$dateField]);
-    }
-    //skip status calculation on update if none of the dates are modified.
-    if (!empty($params['id']) && empty($params['is_override']) && !$dateModified) {
-      $params['skipStatusCal'] = TRUE;
     }
 
     $memTypeNumTerms = empty($termsByType) ? CRM_Utils_Array::value('num_terms', $formValues) : NULL;
