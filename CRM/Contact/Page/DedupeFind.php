@@ -149,7 +149,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
 
       $stats = CRM_Dedupe_Merger::getMergeStatsMsg($cacheKeyString);
       if ($stats) {
-        CRM_Core_Session::setStatus($stats);
+        CRM_Core_Session::setStatus($stats, '', 'alert', array('expires' => 0));
         // reset so we not displaying same message again
         CRM_Dedupe_Merger::resetMergeStats($cacheKeyString);
       }
