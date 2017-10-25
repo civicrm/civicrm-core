@@ -1756,6 +1756,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             );
 
             $membership->status_id = $newStatus;
+            $membership->is_override = TRUE;
             $membership->save();
             civicrm_api3('activity', 'create', $activityParam);
 
@@ -1803,6 +1804,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
           }
           if ($membership && $update) {
             $membership->status_id = array_search('Expired', $membershipStatuses);
+            $membership->is_override = TRUE;
             $membership->save();
 
             $updateResult['updatedComponents']['CiviMember'] = $membership->status_id;
