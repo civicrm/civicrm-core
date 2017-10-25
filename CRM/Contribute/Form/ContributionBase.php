@@ -770,12 +770,19 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
 
         if ($addCaptcha && !$viewOnly) {
-          $captcha = CRM_Utils_ReCAPTCHA::singleton();
-          $captcha->add($this);
-          $this->assign('isCaptcha', TRUE);
+          $this->enableCaptchaOnForm();
         }
       }
     }
+  }
+
+  /**
+   * Enable ReCAPTCHA on Contribution form
+   */
+  protected function enableCaptchaOnForm() {
+    $captcha = CRM_Utils_ReCAPTCHA::singleton();
+    $captcha->add($this);
+    $this->assign('isCaptcha', TRUE);
   }
 
   /**
