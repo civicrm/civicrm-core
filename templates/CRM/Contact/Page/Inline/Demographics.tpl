@@ -48,7 +48,8 @@
           <div class="crm-summary-row">
             <div class="crm-label">{ts}Date Deceased{/ts}</div>
             <div class="crm-content crm-contact-deceased_date_display">
-              {$deceased_date}
+              {assign var="date_format" value = $fields.birth_date.smarty_view_format}
+              {$deceased_date|crmDate:$date_format}
             </div>
           </div>
         {else}
