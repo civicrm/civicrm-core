@@ -302,7 +302,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->buildComponentForm($this->_id, $this);
     }
 
-    if (count($this->_paymentProcessors) == 1 && get_class($this->_paymentProcessors[0]["object"]) == "CRM_Core_Payment_Manual" && !$this->get_template_vars("isCaptcha")) {
+    if (count($this->_paymentProcessors) >= 1 && !isset($this->_paymentProcessors[0]) && !$this->get_template_vars("isCaptcha") && !$this->_userID) {
       $this->enableCaptchaOnForm();
     }
 

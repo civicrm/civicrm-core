@@ -781,8 +781,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   protected function enableCaptchaOnForm() {
     $captcha = CRM_Utils_ReCAPTCHA::singleton();
-    $captcha->add($this);
-    $this->assign('isCaptcha', TRUE);
+    if ($captcha->hasSettingsAvailable()) {
+      $captcha->add($this);
+      $this->assign('isCaptcha', TRUE);
+    }
+    else {
+      $this->assign('displayCaptchaWarning', TRUE);
+    }
   }
 
   /**

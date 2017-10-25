@@ -62,6 +62,18 @@ class CRM_Utils_ReCAPTCHA {
     return self::$_singleton;
   }
 
+
+  /**
+   * Check if reCaptcha settings is avilable to add on form.
+   */
+  public static function hasSettingsAvailable() {
+    $config = CRM_Core_Config::singleton();
+    if ($config->recaptchaPublicKey == NULL || $config->recaptchaPublicKey == "") {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
   /**
    * Add element to form.
    *
