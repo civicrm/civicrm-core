@@ -3136,4 +3136,36 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     return FALSE;
   }
 
+  /**
+   * Build the mailToContacts array for use in CRM_Activity_BAO_Activity::sendToAssignee()
+   * @param  [array] $recipientIds       recipient cids
+   * @param  [array] $assigneeContacts   data about assignees
+   * @param  [int] $activityId           activity id
+   * @return [array]                     array keyed by email
+   */
+  public static function buildMailToContacts($recipientIds, $assigneeContacts, $activityId) {
+    $mailToContacts = array();
+    // Build an associative array with unique email addresses.
+    foreach ($recipientIds as $id) {
+      if (isset($id) && array_key_exists($id, $assigneeContacts)) {
+        $mailToContacts[$assigneeContacts[$id]['email']] = $assigneeContacts[$id];
+      }
+      else {
+        // Contacts may not be in $assigneeContacts have been added by hook
+        $res = civicrm_api3('Contact', 'get', array(
+          'sequential' => 1,
+          'return' => array('email', 'display_name', 'sort_name', 'contact_id'),
+          'id' => $id,
+        ));
+        if ($res['count'] == 1) {
+          if ($email = $res['values'][0]['email']) {
+            $mailToContacts[$email] = $res['values'][0];
+            $mailToContacts[$email]['activity_id'] = $activityId;
+          }
+        }
+      }
+    }
+    return $mailToContacts;
+  }
+
 }
