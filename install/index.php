@@ -1846,6 +1846,9 @@ function errorDisplayPage($errorTitle, $errorMsg, $showRefer = TRUE) {
     if (is_callable(array('CRM_Utils_System', 'docURL2'))) {
       $docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, 'Installation Guide', NULL, NULL, "wiki");
     }
+    else {
+      $docLink = '';
+    }
 
     if (function_exists('ts')) {
       $errorMsg .= '<p>' . ts("Refer to the online documentation for more information: ") . $docLink . '</p>';
