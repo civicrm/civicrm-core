@@ -35,7 +35,7 @@
   {* include wysiwyg related files*}
   {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
   {if !$component}
-    {capture assign=schedRemindersDocLink}{docURL page="user/current/email/scheduled-reminders/"}{/capture}
+    {capture assign=schedRemindersDocLink}{docURL page="user/email/scheduled-reminders/"}{/capture}
     <div class="help">
       {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
     </div>
