@@ -16,7 +16,7 @@ Other resources for identifying changes are:
 
 ## CiviCRM 4.7.27
 
-Released November 8, 2017
+Released November 1, 2017
 
 - **[Synopsis](release-notes/4.7.27.md#synopsis)**
 - **[Features](release-notes/4.7.27.md#features)**
