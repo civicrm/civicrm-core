@@ -785,9 +785,26 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $captcha->add($this);
       $this->assign('isCaptcha', TRUE);
     }
-    else {
-      $this->assign('displayCaptchaWarning', TRUE);
+  }
+
+  /**
+   * Display ReCAPTCHA warning on Contribution form
+   */
+  protected function displayCaptchaWarning() {
+    if (CRM_Core_Permission::check("administer CiviCRM")) {
+      $captcha = CRM_Utils_ReCAPTCHA::singleton();
+      if (!$captcha->hasSettingsAvailable()) {
+        $this->assign('displayCaptchaWarning', TRUE);
+      }
     }
+  }
+
+  /**
+   * Check if ReCAPTCHA has to be added on Contribution form forcefully.
+   */
+  protected function hasToAddForcefully() {
+    $captcha = CRM_Utils_ReCAPTCHA::singleton();
+    return $captcha->hasToAddForcefully();
   }
 
   /**

@@ -75,6 +75,17 @@ class CRM_Utils_ReCAPTCHA {
   }
 
   /**
+   * Check if reCaptcha has to be added on form forcefully.
+   */
+  public static function hasToAddForcefully() {
+    $config = CRM_Core_Config::singleton();
+    if (!$config->forceRecaptcha) {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
    * Add element to form.
    *
    * @param CRM_Core_Form $form
