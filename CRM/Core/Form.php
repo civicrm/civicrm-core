@@ -1865,15 +1865,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     $props['select'] = CRM_Utils_Array::value('select', $props, array()) + $defaults;
 
-    $this->formatReferenceFieldAttributes($props);
+    $this->formatReferenceFieldAttributes($props, get_class($this));
     return $this->add('text', $name, $label, $props, $required);
   }
 
   /**
-   * @param $props
+   * @param array $props
+   * @param string $formName
    */
-  private function formatReferenceFieldAttributes(&$props) {
-    CRM_Utils_Hook::alterEntityRefParams($props);
+  private function formatReferenceFieldAttributes(&$props, $formName) {
+    CRM_Utils_Hook::alterEntityRefParams($props, $formName);
     $props['data-select-params'] = json_encode($props['select']);
     $props['data-api-params'] = $props['api'] ? json_encode($props['api']) : NULL;
     $props['data-api-entity'] = $props['entity'];
