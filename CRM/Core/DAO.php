@@ -118,10 +118,9 @@ class CRM_Core_DAO extends DB_DataObject {
     }
     $factory = new CRM_Contact_DAO_Factory();
     CRM_Core_DAO::setFactory($factory);
-    $currentSqlMode = CRM_Core_DAO::singleValueQuery("SELECT @@GLOBAL.sql_mode");
-    $currentModes = explode(',', $currentSqlMode);
+    $currentModes = CRM_Utils_SQL::getSqlModes();
     if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
-      if (self::supportsFullGroupBy() && !in_array('ONLY_FULL_GROUP_BY', $currentModes)) {
+      if (CRM_Utils_SQL::supportsFullGroupBy() && !in_array('ONLY_FULL_GROUP_BY', $currentModes)) {
         $currentModes[] = 'ONLY_FULL_GROUP_BY';
       }
       if (!in_array('STRICT_TRANS_TABLES', $currentModes)) {
@@ -408,14 +407,6 @@ class CRM_Core_DAO extends DB_DataObject {
       echo "Inconsistent system initialization sequence. Premature access of (" . get_class($this) . ")";
       CRM_Utils_System::civiExit();
     }
-  }
-
-  /**
-   * Does this System support the MYSQL mode ONLY_FULL_GROUP_BY
-   * @return mixed
-   */
-  public static function supportsFullGroupBy() {
-    return version_compare(CRM_Core_DAO::singleValueQuery('SELECT VERSION()'), '5.7', '>=');
   }
 
   /**

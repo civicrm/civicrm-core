@@ -384,11 +384,10 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * Test that known sql modes are present in session.
    */
   public function testSqlModePresent() {
-    $currentSqlModes = CRM_Core_DAO::singleValueQuery("SELECT @@sql_mode");
-    $sqlModes = explode(',', $currentSqlModes);
+    $sqlModes = CRM_Utils_SQL::getSqlModes();
     // assert we have strict trans
     $this->assertContains('STRICT_TRANS_TABLES', $sqlModes);
-    if (CRM_Core_DAO::supportsFullGroupBy()) {
+    if ($this->_supportFullGroupBy) {
       $this->assertContains('ONLY_FULL_GROUP_BY', $sqlModes);
     }
   }
