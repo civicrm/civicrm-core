@@ -126,6 +126,11 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       ),
     );
 
+  //Define global CLASS CONSTANTS for recurring entity mode types
+  const MODE_THIS_ENTITY_ONLY = 1;
+  const MODE_NEXT_ALL_ENTITY = 2;
+  const MODE_ALL_ENTITY_IN_SERIES = 3;
+
   /**
    * Getter for status.
    *
