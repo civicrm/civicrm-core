@@ -149,11 +149,13 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
       'order_bys' => array(
         'start_date' => array(
           'title' => ts('Start Date'),
+          'dbAlias' => 'MIN(mailing_job_civireport.start_date)',
         ),
         'end_date' => array(
           'title' => ts('End Date'),
           'default_weight' => '1',
           'default_order' => 'DESC',
+          'dbAlias' => 'MAX(mailing_job_civireport.end_date)',
         ),
       ),
       'grouping' => 'mailing-fields',

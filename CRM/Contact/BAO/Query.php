@@ -4703,11 +4703,11 @@ civicrm_relationship.is_permission_a_b = 0
    *
    */
   public static function getGroupByFromOrderBy(&$groupBy, $orderBys) {
-    if (!CRM_Utils_SQL::disableFullGroupByMode()) {
+    if (CRM_Utils_SQL::disableFullGroupByMode()) {
       foreach ($orderBys as $orderBy) {
         $orderBy = str_replace(array(' DESC', ' ASC'), '', $orderBy); // remove sort syntax from ORDER BY clauses if present
         // if ORDER BY column is not present in GROUP BY then append it to end
-        if (!strstr($groupBy, $orderBy)) {
+        if (preg_match('/(MAX|MIN)\(/i', trim($orderBy)) !== 1 && !strstr($groupBy, $orderBy)) {
           $groupBy .= ", {$orderBy}";
         }
       }
