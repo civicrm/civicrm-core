@@ -380,4 +380,16 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->checkArrayEquals($contactsFetchedFromBufferedQuery, $contactsFetchedFromUnbufferedQuery);
   }
 
+  /**
+   * Test that known sql modes are present in session.
+   */
+  public function testSqlModePresent() {
+    $sqlModes = CRM_Utils_SQL::getSqlModes();
+    // assert we have strict trans
+    $this->assertContains('STRICT_TRANS_TABLES', $sqlModes);
+    if ($this->_supportFullGroupBy) {
+      $this->assertContains('ONLY_FULL_GROUP_BY', $sqlModes);
+    }
+  }
+
 }

@@ -4716,7 +4716,7 @@ civicrm_relationship.is_permission_a_b = 0
     $sqlMode = CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode');
 
     //return if ONLY_FULL_GROUP_BY is not enabled.
-    if (!version_compare($mysqlVersion, '5.7', '<') && !empty($sqlMode) && in_array('ONLY_FULL_GROUP_BY', explode(',', $sqlMode))) {
+    if (CRM_Utils_SQL::supportsFullGroupBy() && !empty($sqlMode) && in_array('ONLY_FULL_GROUP_BY', explode(',', $sqlMode))) {
       $regexToExclude = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
       foreach ($selectClauses as $key => $val) {
         $aliasArray = preg_split('/ as /i', $val);

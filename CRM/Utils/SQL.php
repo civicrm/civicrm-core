@@ -59,4 +59,21 @@ class CRM_Utils_SQL {
     return $clauses;
   }
 
+  /**
+   * Get current sqlModes of the session
+   * @return array
+   */
+  public static function getSqlModes() {
+    $sqlModes = explode(',', CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode'));
+    return $sqlModes;
+  }
+
+  /**
+   * Does this System support the MYSQL mode ONLY_FULL_GROUP_BY
+   * @return mixed
+   */
+  public static function supportsFullGroupBy() {
+    return version_compare(CRM_Core_DAO::singleValueQuery('SELECT VERSION()'), '5.7', '>=');
+  }
+
 }
