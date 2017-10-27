@@ -363,8 +363,12 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
     $html = $activityIds = array();
 
+    // CRM-21255 - Hrm, CiviCase 4+5 seem to report buttons differently...
+    $c = $form->controller->container();
+    $isLiveMode = ($buttonName == '_qf_PDF_upload') || isset($c['values']['PDF']['buttons']['_qf_PDF_upload']);
+
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
-    if ($buttonName == '_qf_PDF_upload') {
+    if ($isLiveMode) {
 
       // This seems silly, but the old behavior was to first check `_cid`
       // and then use the provided `$contactIds`. Probably not even necessary,
@@ -418,7 +422,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     }
 
     $tee = NULL;
-    if (Civi::settings()->get('recordGeneratedLetters') === 'combined-attached') {
+    if ($isLiveMode && Civi::settings()->get('recordGeneratedLetters') === 'combined-attached') {
       if (count($activityIds) !== 1) {
         throw new CRM_Core_Exception("When recordGeneratedLetters=combined-attached, there should only be one activity.");
       }
