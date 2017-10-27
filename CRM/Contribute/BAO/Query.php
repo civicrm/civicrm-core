@@ -386,6 +386,13 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         $query->_tables['civicrm_contribution_recur'] = $query->_whereTables['civicrm_contribution_recur'] = 1;
         return;
 
+      case 'contribution_recur_contribution_status_id':
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_recur.contribution_status_id", $op, $value, 'String');
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_ContributionRecur', 'contribution_status_id', $value, $op, $pseudoExtraParam);
+        $query->_qill[$grouping][] = ts("Recurring Contribution Status %1 '%2'", array(1 => $op, 2 => $value));
+        $query->_tables['civicrm_contribution_recur'] = $query->_whereTables['civicrm_contribution_recur'] = 1;
+        return;
+
       case 'contribution_note':
         $value = $strtolower(CRM_Core_DAO::escapeString($value));
         if ($wildcard) {
