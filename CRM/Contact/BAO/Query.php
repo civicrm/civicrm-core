@@ -4678,16 +4678,7 @@ civicrm_relationship.is_permission_a_b = 0
    * @return string
    */
   public static function appendAnyValueToSelect($selectClauses, $groupBy) {
-    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
-    $sqlMode = explode(',', CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode'));
-
-    // Disable only_full_group_by mode for lower sql versions.
-    if (version_compare($mysqlVersion, '5.7', '<') || (!empty($sqlMode) && !in_array('ONLY_FULL_GROUP_BY', $sqlMode))) {
-      $key = array_search('ONLY_FULL_GROUP_BY', $sqlMode);
-      unset($sqlMode[$key]);
-      CRM_Core_DAO::executeQuery("SET SESSION sql_mode = '" . implode(',', $sqlMode) . "'");
-    }
-    else {
+    if (!CRM_Utils_SQL::disableFullGroupByMode()) {
       $groupBy = array_map('trim', (array) $groupBy);
       $aggregateFunctions = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
       foreach ($selectClauses as $key => &$val) {
@@ -4700,6 +4691,27 @@ civicrm_relationship.is_permission_a_b = 0
     }
 
     return "SELECT " . implode(', ', $selectClauses) . " ";
+  }
+
+  /**
+   * For some special cases, where if non-aggregate ORDER BY columns are not present in GROUP BY
+   *  on full_group_by mode, then append the those missing columns to GROUP BY clause
+   * keyword to select fields not present in groupBy
+   *
+   * @param string $groupBy - GROUP BY clause where missing ORDER BY columns will be appended
+   * @param array $orderBys - ORDER BY sub-clauses
+   *
+   */
+  public static function getGroupByFromOrderBy(&$groupBy, $orderBys) {
+    if (!CRM_Utils_SQL::disableFullGroupByMode()) {
+      foreach ($orderBys as $orderBy) {
+        $orderBy = str_replace(array(' DESC', ' ASC'), '', $orderBy); // remove sort syntax from ORDER BY clauses if present
+        // if ORDER BY column is not present in GROUP BY then append it to end
+        if (!strstr($groupBy, $orderBy)) {
+          $groupBy .= ", {$orderBy}";
+        }
+      }
+    }
   }
 
   /**
