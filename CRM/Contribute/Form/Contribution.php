@@ -472,7 +472,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
     $allPanes = array();
-    $recurJs = NULL;
+
     //tax rate from financialType
     $this->assign('taxRates', json_encode(CRM_Core_PseudoConstant::getTaxRates()));
     $this->assign('currencies', json_encode(CRM_Core_OptionGroup::values('currencies_enabled')));
@@ -482,6 +482,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $this->assign('invoicing', $invoicing);
+
+    $buildRecurBlock = FALSE;
 
     // display tax amount on edit contribution page
     if ($invoicing && $this->_action & CRM_Core_Action::UPDATE && isset($this->_values['tax_amount'])) {
@@ -568,10 +570,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           CRM_Contribute_Form_Contribution_Main::buildRecur($this);
           $this->setDefaults(array('is_recur' => 0));
           $this->assign('buildRecurBlock', TRUE);
-          $recurJs = array('onChange' => "buildRecurBlock( this.value ); return false;");
         }
       }
     }
+    $this->addPaymentProcessorSelect(FALSE, $buildRecurBlock);
 
     foreach ($paneNames as $name => $type) {
       $allPanes[$name] = $this->generatePane($type, $defaults);
@@ -650,10 +652,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
 
-    $isUpdate = FALSE;
     $component = 'contribution';
     if ($this->_id) {
-      $isUpdate = TRUE;
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
       if (CRM_Utils_Array::value('membership', $componentDetails)) {
         $component = 'membership';
@@ -708,18 +708,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->addDateTime('cancel_date', ts('Cancelled / Refunded Date'), FALSE, array('formatType' => 'activityDateTime'));
 
     $this->add('textarea', 'cancel_reason', ts('Cancellation / Refund Reason'), $attributes['cancel_reason']);
-    $this->add('text', 'refund_trxn_id', ts('Transaction ID for the refund payment'));
-    $element = $this->add('select',
-      'payment_processor_id',
-      ts('Payment Processor'),
-      $this->_processors,
-      NULL,
-      $recurJs
-    );
-
-    if ($this->_online) {
-      $element->freeze();
-    }
 
     $totalAmount = NULL;
     if (empty($this->_lineItems)) {

@@ -645,8 +645,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if ($this->_mode) {
       // exclude events which are not monetary when credit card registration is used
       $eventFieldParams['api']['params']['is_monetary'] = 1;
-      $this->add('select', 'payment_processor_id', ts('Payment Processor'), $this->_processors, TRUE);
     }
+    $this->addPaymentProcessorSelect(TRUE, FALSE, FALSE);
 
     $element = $this->addEntityRef('event_id', ts('Event'), $eventFieldParams, TRUE);
 
