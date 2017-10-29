@@ -957,6 +957,7 @@ WHERE  id = %1";
     if (in_array($className, array(
       'CRM_Contribute_Form_Contribution',
       'CRM_Member_Form_Membership',
+      'CRM_Member_Form_MembershipRenewal',
     ))) {
       $validFieldsOnly = FALSE;
     }
@@ -999,7 +1000,7 @@ WHERE  id = %1";
     $form->assign('priceSet', $form->_priceSet);
 
     $component = 'contribution';
-    if ($className == 'CRM_Member_Form_Membership') {
+    if (in_array($className, array('CRM_Member_Form_Membership', 'CRM_Member_Form_MembershipRenewal'))) {
       $component = 'membership';
     }
 
@@ -1052,7 +1053,7 @@ WHERE  id = %1";
           }
         }
 
-        $formClasses = array('CRM_Contribute_Form_Contribution', 'CRM_Member_Form_Membership');
+        $formClasses = array('CRM_Contribute_Form_Contribution', 'CRM_Member_Form_Membership', 'CRM_Member_Form_MembershipRenewal');
 
         if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
           continue;
@@ -1796,6 +1797,43 @@ WHERE     ct.id = cp.financial_type_id AND
       }
     }
     return $usedBy;
+  }
+
+  /**
+   * Get non-quick config priceset ID of selected entity ID
+   *
+   * @param int $entityID
+   * @param string $entityTable
+   *
+   * @return int Price set ID
+   */
+  public static function getPriceSetFromEntityID($entityID, $entityTable = 'civicrm_contribution') {
+    $sql = "SELECT ps.id
+      FROM civicrm_price_set ps
+       INNER JOIN civicrm_price_field pf ON ps.id = pf.price_set_id
+       INNER JOIN civicrm_line_item li ON pf.id = li.price_field_id
+      WHERE ps.is_quick_config = 0 AND li.entity_table = %1 AND li.entity_id = %2
+    ";
+    return CRM_Core_DAO::singleValueQuery($sql, array(
+      1 => array($entityTable, 'String'),
+      2 => array($entityID, 'Int'),
+    ));
+  }
+
+  /**
+   * Set default price field value on basis of entity ID and entity
+   *
+   * @param array $defaults
+   * @param int $entityID
+   * @param string $entity
+   *
+   */
+  public static function setPriceSetDefaultsToLastUsedValues(&$defaults, $entityID, $entity = 'contribution') {
+    $lineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, $entity);
+    foreach ($lineItems as $lineItem) {
+      $priceFieldName = "price_" . $lineItem['price_field_id'];
+      self::setDefaultPriceSetField($priceFieldName, $lineItem['price_field_value_id'], $lineItem['html_type'], $defaults);
+    }
   }
 
 }
