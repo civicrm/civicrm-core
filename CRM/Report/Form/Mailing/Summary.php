@@ -149,11 +149,13 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
       'order_bys' => array(
         'start_date' => array(
           'title' => ts('Start Date'),
+          'dbAlias' => 'MIN(mailing_job_civireport.start_date)',
         ),
         'end_date' => array(
           'title' => ts('End Date'),
           'default_weight' => '1',
           'default_order' => 'DESC',
+          'dbAlias' => 'MAX(mailing_job_civireport.end_date)',
         ),
       ),
       'grouping' => 'mailing-fields',
@@ -500,10 +502,6 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     else {
       $this->_where = "WHERE " . implode(' AND ', $clauses);
     }
-
-    // if ( $this->_aclWhere ) {
-    // $this->_where .= " AND {$this->_aclWhere} ";
-    // }
   }
 
   public function groupBy() {
@@ -511,6 +509,11 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
       "{$this->_aliases['civicrm_mailing']}.id",
     );
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+  }
+
+  public function orderBy() {
+    parent::orderBy();
+    CRM_Contact_BAO_Query::getGroupByFromOrderBy($this->_groupBy, $this->_orderByArray);
   }
 
   public function postProcess() {
