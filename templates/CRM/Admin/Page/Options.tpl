@@ -50,7 +50,7 @@
     {ts}The following credit card options will be offered to contributors using Online Contribution pages. You will need to verify which cards are accepted by your chosen Payment Processor and update these entries accordingly.{/ts}<br /><br />
     {ts}IMPORTANT: This page does NOT control credit card/payment method choices for sites and/or contributors using the PayPal Express service (e.g. where billing information is collected on the Payment Processor's website).{/ts}
   {elseif $gName eq "acl_role"}
-    {capture assign=docLink}{docURL page="user/current/initial-set-up/permissions-and-access-control/" text="Access Control Documentation"}{/capture}
+    {capture assign=docLink}{docURL page="user/initial-set-up/permissions-and-access-control/" text="Access Control Documentation"}{/capture}
     {capture assign=aclURL}{crmURL p='civicrm/acl' q='reset=1'}{/capture}
     {capture assign=erURL}{crmURL p='civicrm/acl/entityrole' q='reset=1'}{/capture}
     {ts 1=$docLink}ACLs allow you control access to CiviCRM data. An ACL consists of an <strong>Operation</strong> (e.g. 'View' or 'Edit'), a <strong>set of data</strong> that the operation can be performed on (e.g. a group of contacts), and a <strong>Role</strong> that has permission to do this operation. Refer to the %1 for more info.{/ts}<br /><br />
