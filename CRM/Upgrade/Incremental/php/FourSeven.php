@@ -447,6 +447,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_4_7_27($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('CRM-20892 Change created_date to default to NULL', 'civiMailingCreatedDateNull');
     $this->addTask('CRM-21234 Missing subdivisions of Tajikistan', 'tajikistanMissingSubdivisions');
     $this->addTask('CRM-20892 - Add modified_date to civicrm_mailing', 'addColumn',
       'civicrm_mailing', 'modified_date', "timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When the mailing (or closely related entity) was created or modified or deleted.'");
@@ -1308,6 +1309,19 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     $config = CRM_Core_Config::singleton();
     $check = new CRM_Utils_Check_Component_Security();
     return $config->imageUploadDir && $config->imageUploadURL && $check->isDirAccessible($config->imageUploadDir, $config->imageUploadURL);
+  }
+
+  /**
+   * CRM-20892 Convert default of created_date in civicrm_mailing table to NULL
+   * @return bool
+   */
+  public static function civiMailingCreatedDateNull(CRM_Queue_TaskContext $ctx) {
+    $dataType = 'timestamp';
+    if (CRM_Utils_Check_Component_Timestamps::isFieldType('civicrm_mailing', 'created_date', 'datetime')) {
+      $dataType = 'datetime';
+    }
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_mailing CHANGE created_date created_date {$dataType} NULL DEFAULT NULL COMMENT 'Date and time this mailing was created.'");
+    return TRUE;
   }
 
 }
