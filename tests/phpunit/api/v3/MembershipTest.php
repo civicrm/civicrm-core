@@ -227,9 +227,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccess('membership', 'get', $params);
 
     $result = $membership['values'][$this->_membershipID];
-    $this->callAPISuccess('Membership', 'Delete', array(
-      'id' => $this->_membershipID,
-    ));
+
     $this->assertEquals($result['contact_id'], $this->_contactID, "In line " . __LINE__);
     $this->assertEquals($result['membership_type_id'], $this->_membershipTypeID, "In line " . __LINE__);
     $this->assertEquals($result['status_id'], $this->_membershipStatusID, "In line " . __LINE__);
@@ -238,6 +236,69 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($result['end_date'], '2009-12-21', "In line " . __LINE__);
     $this->assertEquals($result['source'], 'Payment', "In line " . __LINE__);
     $this->assertEquals($result['is_override'], 1, "In line " . __LINE__);
+
+    $this->callAPISuccess('Membership', 'Delete', array(
+      'id' => $this->_membershipID,
+    ));
+  }
+
+  /**
+   * Test Membership.Get API with group ID filter
+   */
+  public function testGetByGroupID() {
+    $this->_membershipID = $this->contactMembershipCreate($this->_params);
+
+    // Create group and add contact ID used in membership create
+    $groupName = uniqid();
+    $groupID = $this->groupCreate(array(
+      'name' => $groupName,
+      'title' => 'whatever',
+    ));
+    $this->callAPISuccess('GroupContact', 'create', array(
+      'group_id' => $groupID,
+      'contact_id' => $this->_contactID,
+      'status' => 'Added',
+    ));
+    // Search by Group name
+    $membership = $this->callAPISuccess('membership', 'get', array(
+      'contact_id.group' => $groupName,
+    ));
+    $this->assertEquals(1, $membership['count']);
+    $this->assertEquals($this->_contactID, $membership['values'][$this->_membershipID]['contact_id']);
+
+    // cleanup
+    $this->callAPISuccess('Membership', 'Delete', array(
+      'id' => $this->_membershipID,
+    ));
+  }
+
+  /**
+   * Test Membership.Get API with group ID filter
+   */
+  public function testGetByTag() {
+    $this->_membershipID = $this->contactMembershipCreate($this->_params);
+
+    // Create group and add contact ID used in membership create
+    $tagName = uniqid();
+    $tag = $this->tagCreate(array(
+      'name' => $tagName,
+      'used_for' => 'civicrm_contact',
+    ));
+    $this->callAPISuccess('EntityTag', 'create', array(
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $this->_contactID,
+      'tag_id' => $tag['id'],
+    ));
+    $membership = $this->callAPISuccess('membership', 'get', array(
+      'contact_id.tag' => $tagName,
+    ));
+    $this->assertEquals(1, $membership['count']);
+    $this->assertEquals($this->_contactID, $membership['values'][$this->_membershipID]['contact_id']);
+
+    // cleanup
+    $this->callAPISuccess('Membership', 'Delete', array(
+      'id' => $this->_membershipID,
+    ));
   }
 
   /**
