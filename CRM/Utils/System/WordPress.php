@@ -503,6 +503,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         $valid = TRUE;
       }
     }
+    elseif (!empty($_SERVER['DOCUMENT_ROOT'])) {
+      $cmsRoot = $_SERVER['DOCUMENT_ROOT'];
+      $valid = TRUE;
+    }
     else {
       $pathVars = explode('/', str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']));
 
