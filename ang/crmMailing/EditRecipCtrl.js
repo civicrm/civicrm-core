@@ -35,10 +35,18 @@
 
     $scope.getRecipientCount = function() {
       var ts = $scope.ts;
-      if ($scope.recipients === 0 || $scope.outdated) {
-        return $scope.permitRecipientRebuild ? ts('(unknown)') : ts('No Recipients');
+      if ($scope.recipients === 0) {
+        return ts('No Recipients');
       }
-      return ($scope.recipients === 1) ? ts('~1 recipient') : ts('~%1 recipients', {1 : $scope.recipients});
+      else if ($scope.recipients > 0) {
+        return ts('~%1 recipients', {1 : $scope.recipients});
+      }
+      else if ($scope.outdated) {
+        return ts('(unknown)');
+      }
+      else {
+        return $scope.permitRecipientRebuild ? ts('(unknown)') : ts('Estimating...');
+      }
     };
 
     // We monitor four fields -- use debounce so that changes across the
