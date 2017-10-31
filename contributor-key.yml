@@ -89,13 +89,18 @@
   organization: Apple Street Market
   jira        : ASMC
 
-- name        : Rich Lott
+- github      : artfulrobot
+  name        : Rich Lott
   organization: Artful Robot
   jira        : artfulrobot.com
 
 - github      : autarch
   name        : Dave Rolsky
   jira        : autarch
+
+- github      : awzilkie
+  name        : Adam Zilkie
+  jira        : adzil
 
 - github      : axon-obriend
   name        : Dan O'Brien
@@ -153,6 +158,7 @@
 
 - github      : coldrunKacper
   name        : Kacper Warda
+  organization: CompuCorp
   jira        : coldrunKacper
 
 - github      : colemanw
@@ -297,7 +303,8 @@
   organization: Ergon Logic Enterprises
   jira        : ergonlogic
 
-- name        : Eric Goldhagen
+- github      : ericfg
+  name        : Eric Goldhagen
   organization: Openflows
   jira        : ericg
 
@@ -356,6 +363,11 @@
 - github      : garethdylan361
   name        : Gareth Small
   jira        : garethsmall361@gmail.com
+
+- github      : gboudrias
+  name        : Guillaume Boudrias
+  organization: Coop SymbioTIC
+  jira        : gboudrias
 
 - github      : gemmapotaka
   name        : Gemma Potaka
@@ -503,6 +515,10 @@
 - github      : josephlacey
   name        : Joseph Lacey
   jira        : jlacey
+
+- name        : Julie Hall
+  organization: Custom Websites to Go
+  jira        : jules54
 
 - github      : jusfreeman
   name        : Justin Freeman
@@ -679,6 +695,15 @@
 - name        : Michal Mach
   jira        : mover
 
+- github      : mmauroy
+  name        : Matthias de Mauroy
+  organization: CYIM
+  jira        : mmauroy
+
+- github      : mohamedziada
+  name        : Mohamed Ziada
+  jira        : mohamedziada
+
 - github      : mollux
   name        : Mattias Michaux
 
@@ -707,6 +732,10 @@
 
 - name        : Thomas Bacon
   jira        : nocabt
+
+- github      : otetard
+  name        : Olivier Tétard
+  jira        : otetard
 
 - github      : nowszy
   name        : Pawel Nowak
@@ -1014,6 +1043,10 @@
   name        : William Mortada
   organization: Community IT Academy
   jira        : wmortada
+
+- name        : Philipp Michael
+  organization: XIMA
+  jira        : ximapmi
 
 - github      : xurizaemon
   name        : Chris Burgess
