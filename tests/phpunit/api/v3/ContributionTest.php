@@ -128,6 +128,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test Get.
    */
   public function testGetContribution() {
+    $contributionSettings = $this->enableTaxAndInvoicing();
+    $invoice_prefix = CRM_Contribute_BAO_Contribution::checkContributeSettings('invoice_prefix', TRUE);
     $p = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
@@ -165,6 +167,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['net_amount'], 95.00);
     $this->assertEquals($contribution['trxn_id'], 23456);
     $this->assertEquals($contribution['invoice_id'], 78910);
+    $this->assertEquals($contribution['invoice_number'], $invoice_prefix . $contributions['id']);
     $this->assertEquals($contribution['contribution_source'], 'SSF');
     $this->assertEquals($contribution['contribution_status'], 'Completed');
     // Create a second contribution - we are testing that 'id' gets the right contribution id (not the contact id).
