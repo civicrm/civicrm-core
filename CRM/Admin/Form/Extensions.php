@@ -50,9 +50,9 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     $this->assign('remoteExtensionRows', $remoteExtensionRows);
 
     $this->_key = CRM_Utils_Request::retrieve('key', 'String',
-      $this, FALSE, 0
+      $this, FALSE, NULL
     );
-    if (!CRM_Utils_Type::validate($this->_key, 'ExtensionKey')) {
+    if (!empty($this->_key) && !CRM_Utils_Type::validate($this->_key, 'ExtensionKey')) {
       throw new CRM_Core_Exception('Extension Key does not match expected standard');
     }
     $session = CRM_Core_Session::singleton();
