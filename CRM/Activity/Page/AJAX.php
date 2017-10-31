@@ -208,7 +208,7 @@ class CRM_Activity_Page_AJAX {
     foreach ($caseRelationships as $key => &$row) {
       $typeLabel = $row['relation'];
       // Add "<br />(Case Manager)" to label
-      if ($row['relation_type'] == $managerRoleId) {
+      if (!empty($row['relation_type']) && $row['relation_type'] == $managerRoleId) {
         $row['relation'] .= '<br />' . '(' . ts('Case Manager') . ')';
       }
       // view user links
