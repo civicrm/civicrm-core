@@ -120,6 +120,9 @@ img.menu-item-arrow{
   right: 4px;
   top: 8px;
 }
+#civicrm-menu i {
+  margin-right: 5px;
+}
 li.menu-separator{
   border-bottom: 1px solid #000;
   font-size: 0; /* for ie */
