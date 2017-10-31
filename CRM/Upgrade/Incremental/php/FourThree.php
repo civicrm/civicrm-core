@@ -762,7 +762,7 @@ INSERT INTO civicrm_financial_trxn
             (contribution_id, payment_instrument_id, currency, total_amount, net_amount, fee_amount, trxn_id, status_id, check_number,
              to_financial_account_id, from_financial_account_id, trxn_date, payment_processor_id, is_fee)
 
-SELECT con.id, ft.payment_instrument_id, ft.currency, ft.fee_amount, NULL, NULL, ft.trxn_id, %1 as status_id,
+SELECT DISTINCT con.id, ft.payment_instrument_id, ft.currency, ft.fee_amount, NULL, NULL, ft.trxn_id, %1 as status_id,
        ft.check_number, efaFT.financial_account_id as to_financial_account_id, CASE
          WHEN efaPP.financial_account_id IS NOT NULL THEN
               efaPP.financial_account_id
@@ -782,8 +782,7 @@ FROM   civicrm_contribution con
                    AND efaPP.account_relationship = {$assetAccountIs})
        LEFT  JOIN {$tempTableName1} tpi
                ON ft.payment_instrument_id = tpi.instrument_id
-WHERE  ft.fee_amount IS NOT NULL AND ft.fee_amount != 0 AND (con.contribution_status_id IN (%1, %3) OR (con.contribution_status_id =%2 AND con.is_pay_later = 1))
-GROUP  BY con.id";
+WHERE  ft.fee_amount IS NOT NULL AND ft.fee_amount != 0 AND (con.contribution_status_id IN (%1, %3) OR (con.contribution_status_id =%2 AND con.is_pay_later = 1))";
     CRM_Core_DAO::executeQuery($sql, $queryParams);
 
     //link financial_trxn to contribution
