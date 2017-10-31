@@ -150,6 +150,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       ) {
         if (empty($params['creditnote_id']) || $params['creditnote_id'] == "null") {
           $params['creditnote_id'] = self::createCreditNoteId();
+          CRM_Utils_Hook::generateIdentifier($params['creditnote_id'], 'creditnote_id', $params);
         }
       }
     }
@@ -499,6 +500,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       ) {
         if (empty($params['creditnote_id']) || $params['creditnote_id'] == "null") {
           $params['creditnote_id'] = self::createCreditNoteId();
+          CRM_Utils_Hook::generateIdentifier($params['creditnote_id'], 'creditnote_id', $params);
         }
       }
     }
@@ -3509,6 +3511,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
         if (empty($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
           $creditNoteId = self::createCreditNoteId();
+          CRM_Utils_Hook::generateIdentifier($creditNoteId, 'creditnote_id', $params['contribution']);
           CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
         }
       }
@@ -3524,6 +3527,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['trxnParams']['total_amount'] = -$params['total_amount'];
           if (is_null($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
             $creditNoteId = self::createCreditNoteId();
+            CRM_Utils_Hook::generateIdentifier($creditNoteId, 'creditnote_id', $params['contribution']);
             CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
           }
         }

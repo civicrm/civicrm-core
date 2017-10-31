@@ -306,13 +306,16 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       if ($contribution->contribution_status_id == $refundedStatusId || $contribution->contribution_status_id == $cancelledStatusId) {
         if (is_null($contribution->creditnote_id)) {
           $creditNoteId = CRM_Contribute_BAO_Contribution::createCreditNoteId();
+          CRM_Utils_Hook::generateIdentifier($creditNoteId, 'creditnote_id', $contribution);
           CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'creditnote_id', $creditNoteId);
         }
         else {
           $creditNoteId = $contribution->creditnote_id;
+          CRM_Utils_Hook::generateIdentifier($creditNoteId, 'creditnote_id', $contribution);
         }
       }
       $invoiceNumber = CRM_Utils_Array::value('invoice_prefix', $prefixValue) . "" . $contribution->id;
+      CRM_Utils_Hook::generateIdentifier($invoiceNumber, 'invoice_number', $contribution);
 
       //to obtain due date for PDF invoice
       $contributionReceiveDate = date('F j,Y', strtotime(date($input['receive_date'])));
