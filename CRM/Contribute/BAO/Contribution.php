@@ -139,6 +139,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     //set defaults in create mode
     if (!$contributionID) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
+
+      if (empty($params['invoice_number'])) {
+        $nextContributionID = CRM_Core_DAO::singleValueQuery("SELECT COALESCE(MAX(id) + 1, 1) FROM civicrm_contribution");
+        $params['invoice_number'] = self::getInvoiceNumber($nextContributionID);
+      }
     }
 
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -5105,11 +5110,16 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    *
    *
    * @param string $name
+   * @param bool $checkInvoicing
    * @return string
    *
    */
-  public static function checkContributeSettings($name = NULL) {
+  public static function checkContributeSettings($name = NULL, $checkInvoicing = FALSE) {
     $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
+
+    if ($checkInvoicing && !CRM_Utils_Array::value('invoicing', $contributeSettings)) {
+      return NULL;
+    }
 
     if ($name) {
       return CRM_Utils_Array::value($name, $contributeSettings);
@@ -5754,6 +5764,21 @@ LIMIT 1;";
       $contributionDetails[$result['values'][$result['id']]['contact_id']]['html'] = CRM_Utils_Token::replaceContributionTokens($html, $result, FALSE, $messageToken, FALSE, $escapeSmarty);
     }
     return $contributionDetails;
+  }
+
+  /**
+   * Get invoice_number for contribution.
+   *
+   * @param int $contributionID
+   *
+   * @return string
+   */
+  public static function getInvoiceNumber($contributionID) {
+    if ($invoicePrefix = self::checkContributeSettings('invoice_prefix', TRUE)) {
+      return $invoicePrefix . $contributionID;
+    }
+
+    return NULL;
   }
 
 }
