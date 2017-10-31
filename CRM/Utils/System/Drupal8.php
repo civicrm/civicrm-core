@@ -215,7 +215,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     switch ($region) {
       case 'html-header':
-      case 'page-footer':
         break;
 
       default:
@@ -240,7 +239,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   public function addScript($code, $region) {
     switch ($region) {
       case 'html-header':
-      case 'page-footer':
         break;
 
       default:
