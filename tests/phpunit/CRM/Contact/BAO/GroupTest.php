@@ -73,6 +73,58 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test case to ensure child group is present in the hierarchy
+   *  if it has multiple parent groups and not all are disabled.
+   */
+  public function testGroupHirearchy() {
+    // Use-case :
+    // 1. Create two parent group A and B and disable B
+    // 2. Create a child group C
+    // 3. Ensure that Group C is present in the group hierarchy
+    $params = array(
+      'name' => uniqid(),
+      'title' => 'Parent Group A',
+      'description' => 'Parent Group One',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+    );
+    $group1 = CRM_Contact_BAO_Group::create($params);
+
+    $params = array_merge($params, array(
+      'name' => uniqid(),
+      'title' => 'Parent Group B',
+      'description' => 'Parent Group Two',
+      'is_active' => 0, // disable
+    ));
+    $group2 = CRM_Contact_BAO_Group::create($params);
+
+    $params = array_merge($params, array(
+      'name' => uniqid(),
+      'title' => 'Child Group C',
+      'description' => 'Child Group C',
+      'parents' => array(
+        $group1->id => 1,
+        $group2->id => 1,
+      ),
+    ));
+    $group3 = CRM_Contact_BAO_Group::create($params);
+
+    $params = array(
+      $group1->id => 1,
+      $group3->id => 1,
+    );
+    $groupsHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($params, NULL, '&nbsp;&nbsp;', TRUE);
+    // check if child group is present in the tree with formatted group title prepended with spacer '&nbsp;&nbsp;'
+    $this->assertEquals('&nbsp;&nbsp;Child Group C', $groupsHierarchy[$group3->id]);
+
+    // Disable parent group A and ensure that child group C is not present as both of its parent groups are disabled
+    $group1->is_active = 0;
+    $group1->save();
+    $groupsHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($params, NULL, '&nbsp;&nbsp;', TRUE);
+    $this->assertFalse(array_key_exists($group3->id, $groupsHierarchy));
+  }
+
+  /**
    * Test adding a smart group.
    */
   public function testAddSmart() {
