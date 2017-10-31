@@ -2382,4 +2382,18 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(array('message'), $message, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_inboundSMS');
   }
 
+  /**
+   * This hook is called to modify api params of EntityRef form field
+   *
+   * @param array $params
+   *
+   * @return mixed
+   */
+  public static function alterEntityRefParams(&$params, $formName) {
+    return self::singleton()->invoke(array('params', 'formName'), $params, $formName,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_alterEntityRefParams'
+    );
+  }
+
 }
