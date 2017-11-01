@@ -722,6 +722,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $activityParams['activity_type_id'] = array('IN' => array_keys($activityTypes));
     }
 
+    if (!empty($params['activity_status_id'])) {
+      $activityParams['activity_status_id'] = array('IN' => explode(',', $params['activity_status_id']));
+    }
+
     $excludeActivityIDs = array();
     if (!empty($params['activity_type_exclude_id'])) {
       if (is_array($params['activity_type_exclude_id'])) {
