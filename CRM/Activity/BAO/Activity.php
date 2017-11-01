@@ -706,10 +706,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       ),
     );
 
-    if ($params['context'] != 'activity') {
-      $activityParams['status_id'] = CRM_Core_PseudoConstant::getKey(__CLASS__, 'status_id', 'Scheduled');
-    }
-
     // activity type ID clause
     if (!empty($params['activity_type_id'])) {
       if (is_array($params['activity_type_id'])) {
@@ -1258,9 +1254,6 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
 
     if (!empty($input['activity_status_id'])) {
       $commonClauses[] = sprintf("civicrm_activity.status_id IN (%s)", $input['activity_status_id']);
-    }
-    elseif ($input['context'] != 'activity') {
-      $commonClauses[] = "civicrm_activity.status_id = 1";
     }
 
     // Filter on component IDs.
