@@ -482,6 +482,20 @@ class CRM_Utils_Rule {
    *
    * @return bool
    */
+  public static function commaSeparatedIntegers($value) {
+    foreach (explode(',', $value) as $val) {
+      if (!self::positiveInteger($val)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * @param $value
+   *
+   * @return bool
+   */
   public static function numeric($value) {
     // lets use a php gatekeeper to ensure this is numeric
     if (!is_numeric($value)) {
