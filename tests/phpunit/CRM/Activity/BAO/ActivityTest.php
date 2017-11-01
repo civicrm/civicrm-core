@@ -310,6 +310,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'caseId' => NULL,
       'context' => 'home',
       'activity_type_id' => NULL,
+      'activity_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled'), // for dashlet the Scheduled status is set by default
       'offset' => 0,
       'rowCount' => 0,
       'sort' => NULL,
@@ -496,6 +497,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'caseId' => NULL,
       'context' => 'home',
       'activity_type_id' => NULL,
+      'activity_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled'), // for dashlet the Scheduled status is set by default
       'offset' => 0,
       'rowCount' => 0,
       'sort' => NULL,
@@ -974,6 +976,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'caseId' => NULL,
       'context' => 'home',
       'activity_type_id' => NULL,
+      'activity_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled'), // for dashlet the Scheduled status is set by default
       'offset' => 0,
       'rowCount' => 0,
       'sort' => NULL,
