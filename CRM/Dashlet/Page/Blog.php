@@ -141,6 +141,12 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
         );
         foreach ($channel->item as $item) {
           $item = (array) $item;
+          if (!is_string($item['title'])) {
+            // Some items seem to mess up the dashlet (CRM-21355).
+            // I have no clue what exactly is going on, but if the title is
+            // no string, just ignore the item.
+            continue;
+          }
           $item['title'] = strip_tags($item['title']);
           // Clean up description - remove tags & styles that would break dashboard layout
           $description = preg_replace('#<h[1-3][^>]*>(.+?)</h[1-3][^>]*>#s', '<h4>$1</h4>', $item['description']);
