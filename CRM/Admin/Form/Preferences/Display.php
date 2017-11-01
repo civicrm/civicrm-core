@@ -37,6 +37,7 @@
 class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('Settings - Display Preferences'));
+    $optionValues = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, NULL, 'name');
 
     $this->_varNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
@@ -103,6 +104,13 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'html_type' => 'checkbox',
           'title' => ts('Enable Popup Forms'),
           'weight' => 13,
+        ),
+        'filter_activity_type_notification' => array(
+          'html_type' => 'select',
+          'option_values' => $optionValues,
+          'attributes' => array('multiple' => 1, "class" => "crm-select2"),
+          'title' => ts('Blocked Activity Types.'),
+          'weight' => 14,
         ),
       ),
     );

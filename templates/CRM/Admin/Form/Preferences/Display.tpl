@@ -133,6 +133,17 @@
       </td>
     </tr>
 
+    <tr id="filter_activity_type_notification" class="crm-preferences-display-form-block-filter_activity_type_notification">
+      <td class="label">{$form.filter_activity_type_notification.label}</td>
+      <td>{$form.filter_activity_type_notification.html}</td>
+    </tr>
+    <tr id="filter_activity_type_notification-desc" class="crm-preferences-display-form-block-description">
+      <td>&nbsp;</td>
+      <td class="description">
+        {ts}Selected activity types will not be included in notifying the assignees.{/ts}
+      </td>
+    </tr>
+
     <tr class="crm-preferences-display-form-block-activity_assignee_notification_ics">
       <td class="label"></td>
       <td>{$form.activity_assignee_notification_ics.html} {$form.activity_assignee_notification_ics.label}</td>
@@ -227,6 +238,18 @@
           }
           $('#contact_edit_preferences').val(params.toString());
         }
+
+        //show/hide activity types based on checkbox value
+        $('#filter_activity_type_notification').hide();
+        $('#filter_activity_type_notification-desc').hide();
+        if ($('#activity_assignee_notification').is(":checked")) {
+          $('#filter_activity_type_notification').show();
+          $('#filter_activity_type_notification-desc').show();
+        }
+        $('#activity_assignee_notification').change(function() {
+          $('#filter_activity_type_notification').toggle();
+          $('#filter_activity_type_notification-desc').toggle();
+        });
 
         var invoicesKey = '{/literal}{$invoicesKey}{literal}';
         var invoicing = '{/literal}{$invoicing}{literal}';

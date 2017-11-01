@@ -967,4 +967,25 @@ return array(
     'description' => 'When enabled, any filter settings a user selects on the contact\'s Activity tab will be remembered as they visit other contacts',
     'help_text' => NULL,
   ),
+  'filter_activity_type_notification' => array(
+    'group_name' => 'Filter Activity Type Notification',
+    'group' => 'core',
+    'name' => 'filter_activity_type_notification',
+    'type' => 'Array',
+    'add' => '4.7',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Select Activity types to disable assignee notifications.',
+    'title' => 'Filter Activity Type Notification',
+    'help_text' => '',
+    'html_type' => 'Select',
+    'html_attributes' => array(
+      'multiple' => 1,
+      'class' => 'crm-select2',
+    ),
+    'pseudoconstant' => array(
+      'optionGroupName' => 'activity_type',
+    ),
+    'quick_form_type' => 'Select',
+  ),
 );
