@@ -16,6 +16,11 @@
   organization: Agileware
   jira        : agileware
 
+- github      : agilewarealok
+  name        : Alok Patel
+  organization: Agileware
+  jira        : agilewarealok
+
 - github      : agileware-dev
   name        : Agileware Team
   organization: Agileware
