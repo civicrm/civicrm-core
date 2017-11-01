@@ -336,7 +336,7 @@ WHERE civicrm_case.id = %1";
  LEFT JOIN  civicrm_case_contact ON civicrm_case_contact.contact_id = contact_a.id
  LEFT JOIN  civicrm_email ce ON ( ce.contact_id = contact_a.id AND ce.is_primary = 1)
  LEFT JOIN  civicrm_phone cp ON ( cp.contact_id = contact_a.id AND cp.is_primary = 1)
-     WHERE  civicrm_case_contact.case_id = %1
+     WHERE  contact_a.is_deleted = 0 AND civicrm_case_contact.case_id = %1
      ORDER BY civicrm_case_contact.id";
 
     $dao = CRM_Core_DAO::executeQuery($query,
