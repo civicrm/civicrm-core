@@ -374,9 +374,19 @@ abstract class CRM_Core_Payment {
    * @return array
    *   field metadata
    */
-  public function getPaymentFormFieldsMetadata() {
+  public function getPaymentFormFieldsMetadata($isBackOffice = FALSE) {
     //@todo convert credit card type into an option value
     $creditCardType = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::creditCard();
+    $isCVVRequired = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
+      'cvv_backoffice_required',
+      NULL,
+      1
+    );
+
+    if (!$isBackOffice) {
+      $isCVVRequired = TRUE;
+    }
+
     return array(
       'credit_card_number' => array(
         'htmlType' => 'text',
@@ -401,11 +411,7 @@ abstract class CRM_Core_Payment {
           'maxlength' => 10,
           'autocomplete' => 'off',
         ),
-        'is_required' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-          'cvv_backoffice_required',
-          NULL,
-          1
-        ),
+        'is_required' => $isCVVRequired,
         'rules' => array(
           array(
             'rule_message' => ts('Please enter a valid value for your card security code. This is usually the last 3-4 digits on the card\'s signature panel.'),
