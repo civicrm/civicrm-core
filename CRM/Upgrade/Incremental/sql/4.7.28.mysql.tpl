@@ -53,3 +53,4 @@ UPDATE `civicrm_state_province` SET `name` = 'Pazardzhik' WHERE `name` = 'Pazard
 -- CRM-20772 Price set calculation precision when sales tax enabled
 ALTER TABLE `civicrm_membership_type` CHANGE `minimum_fee` `minimum_fee` DECIMAL(18,9) NULL DEFAULT '0.00' COMMENT 'Minimum fee for this membership (0 for free/complimentary memberships).';
 ALTER TABLE `civicrm_price_field_value` CHANGE `amount` `amount` DECIMAL(18,9) NOT NULL COMMENT 'Price field option amount';
+
