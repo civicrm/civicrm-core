@@ -19,6 +19,7 @@ Other resources for identifying changes are:
 Released November 1, 2017
 
 - **[Security](release-notes/4.7.26.md#security)**
+- **[Credits](release-notes/4.7.26.md#credits)**
 
 ## CiviCRM 4.7.25
 
