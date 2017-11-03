@@ -1446,11 +1446,10 @@ abstract class CRM_Core_Payment {
 
         case 'recur':
           $sql = "
-    SELECT con.contact_id
+    SELECT DISTINCT con.contact_id
       FROM civicrm_contribution_recur rec
 INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
-     WHERE rec.id = %1
-  GROUP BY rec.id";
+     WHERE rec.id = %1";
           $contactID = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($entityID, 'Integer')));
           $entityArg = 'crid';
           break;
