@@ -23,6 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-event-userdashboard-pre"}
+{/crmRegion}
 <div class="view-content">
     {if $event_rows}
         {strip}
@@ -70,3 +72,5 @@
         </div>
     {/if}
 </div>
+{crmRegion name="crm-event-userdashboard-post"}
+{/crmRegion}

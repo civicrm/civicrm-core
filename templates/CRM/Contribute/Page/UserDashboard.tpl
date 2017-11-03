@@ -23,6 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-contribute-userdashboard-pre"}
+{/crmRegion}
 <div class="view-content">
     {if $contribute_rows}
         {strip}
@@ -158,3 +160,5 @@
         {/if}
     {/if}
 </div>
+{crmRegion name="crm-contribute-userdashboard-post"}
+{/crmRegion}
