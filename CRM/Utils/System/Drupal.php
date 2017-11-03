@@ -848,4 +848,15 @@ AND    u.status = 1
     );
   }
 
+  /**
+   * Commit the session before exiting.
+   * Similar to drupal_exit().
+   */
+  public function onCiviExit() {
+    if (!defined('MAINTENANCE_MODE') || MAINTENANCE_MODE != 'update') {
+      module_invoke_all('exit');
+    }
+    drupal_session_commit();
+  }
+
 }
