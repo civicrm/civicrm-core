@@ -169,6 +169,24 @@ class RecipientBuilder {
   }
 
   /**
+   * Returns a query that can be used to create a filter to prevent duplicate
+   * sends, e.g. $myQuery->where("e.contact_id NOT IN ({$this->previousRunsToday('e')})").
+   * See CRM-18236.
+   *
+   * @param string $entityTableAlias
+   * @return string
+   */
+  protected function previousRunsToday($entityTableAlias) {
+    return "SELECT log.contact_id
+      FROM civicrm_action_log log
+      WHERE log.contact_id = $entityTableAlias.contact_id
+      AND log.entity_id = $entityTableAlias.id
+      AND log.entity_table = '!casMappingEntity'
+      AND log.action_schedule_id = #casActionScheduleId
+      AND log.action_date_time > DATE_SUB(!casNow, INTERVAL 1 DAY)";
+  }
+
+  /**
    * Generate action_log's for new, first-time alerts to related contacts.
    *
    * @throws \Exception
@@ -207,8 +225,7 @@ class RecipientBuilder {
     if (empty($referenceReminderIDs)) {
       $firstQuery = $query->copy()
         ->merge($this->selectIntoActionLog(self::PHASE_RELATION_FIRST, $query))
-        ->merge($this->joinReminder('LEFT JOIN', 'rel', $query))
-        ->where("reminder.id IS NULL")
+        ->where("e.contact_id NOT IN ({$this->previousRunsToday('e')})")
         ->where($startDateClauses)
         ->strict()
         ->toSQL();
@@ -243,8 +260,7 @@ class RecipientBuilder {
     $insertAdditionalSql = \CRM_Utils_SQL_Select::from("civicrm_contact c")
       ->merge($query, array('params'))
       ->merge($this->selectIntoActionLog(self::PHASE_ADDITION_FIRST, $query))
-      ->merge($this->joinReminder('LEFT JOIN', 'addl', $query))
-      ->where('reminder.id IS NULL')
+      ->where("e.contact_id NOT IN ({$this->previousRunsToday('e')})")
       ->where("c.is_deleted = 0 AND c.is_deceased = 0")
       ->merge($this->prepareAddlFilter('c.id'))
       ->where("c.id NOT IN (
