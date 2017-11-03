@@ -1951,7 +1951,7 @@ AND    a.details = 'Membership Payment'
     $sql = "INSERT INTO civicrm_contribution (contact_id, financial_type_id, payment_instrument_id, receive_date, total_amount, currency, receipt_date, source, contribution_status_id)
 SELECT  `contact_id`, $financialTypeID, $paymentInstrumentID, now(), `fee_amount`, 'USD', now(), CONCAT(ce.title, ' : Offline registration'), 1  FROM `civicrm_participant` cp
 LEFT JOIN civicrm_event ce ON ce.id = cp.event_id
-group by `contact_id`;";
+group by `contact_id`, `fee_amount`, `title`;";
 
     $this->_query($sql);
 
