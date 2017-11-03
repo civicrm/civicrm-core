@@ -102,6 +102,16 @@ class CRM_Member_Task extends CRM_Core_Task {
           'class' => 'CRM_Member_Form_Task_PDFLetter',
           'result' => FALSE,
         ),
+        self::SAVE_SEARCH => array(
+          'title' => ts('Group - create smart group'),
+          'class' => 'CRM_Contact_Form_Task_SaveSearch',
+          'result' => TRUE,
+        ),
+        self::SAVE_SEARCH_UPDATE => array(
+          'title' => ts('Group - update smart group'),
+          'class' => 'CRM_Contact_Form_Task_SaveSearch_Update',
+          'result' => TRUE,
+        ),
       );
 
       //CRM-4418, check for delete

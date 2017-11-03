@@ -882,7 +882,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     // CRM-9936
     $reservedPermission = CRM_Core_Permission::check('administer reserved groups');
 
-    $links = self::actionLinks();
+    $links = self::actionLinks($params);
 
     $allTypes = CRM_Core_OptionGroup::values('group_type');
     $values = array();
@@ -1254,12 +1254,17 @@ WHERE {$whereClause}";
    * @return array
    *   array of action links
    */
-  public static function actionLinks() {
+  public static function actionLinks($params) {
+    // If component_mode is set we change the "View" link to match the requested component type
+    if (!isset($params['component_mode'])) {
+      $params['component_mode'] = CRM_Contact_BAO_Query::MODE_CONTACTS;
+    }
+    $modeValue = CRM_Contact_Form_Search::getModeValue($params['component_mode']);
     $links = array(
       CRM_Core_Action::VIEW => array(
-        'name' => ts('Contacts'),
+        'name' => $modeValue['selectorLabel'],
         'url' => 'civicrm/group/search',
-        'qs' => 'reset=1&force=1&context=smog&gid=%%id%%',
+        'qs' => 'reset=1&force=1&context=smog&gid=%%id%%&component_mode=' . $params['component_mode'],
         'title' => ts('Group Contacts'),
       ),
       CRM_Core_Action::UPDATE => array(

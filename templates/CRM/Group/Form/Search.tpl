@@ -24,45 +24,57 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-group-search-form-block">
-
-<h3>{ts}Find Groups{/ts}</h3>
-<table class="form-layout">
-  <tr>
-    <td>
-      {$form.title.label}<br />
-      {$form.title.html}<br />
-      <span class="description font-italic">
+  <div class="crm-accordion-wrapper crm-search_builder-accordion {if $rows and !$showSearchForm}collapsed{/if}">
+    <div class="crm-accordion-header crm-master-accordion-header">
+      {ts}Find Groups{/ts}
+    </div>
+    <div class="crm-accordion-body">
+      <div id="searchForm">
+        <table class="form-layout">
+          <tr>
+            <td>
+              {$form.title.label}<br />
+              {$form.title.html}<br />
+              <span class="description font-italic">
           {ts}Complete OR partial group name.{/ts}
       </span>
-    </td>
-    <td>
-      {$form.created_by.label}<br />
-      {$form.created_by.html}<br />
-      <span class="description font-italic">
+            </td>
+            <td>
+              {$form.created_by.label}<br />
+              {$form.created_by.html}<br />
+              <span class="description font-italic">
           {ts}Complete OR partial creator name.{/ts}
       </span>
-    </td>
-    <td id="group_type-block">
-      {$form.group_type_search.label}<br />
-      {$form.group_type_search.html}<br />
-      <span class="description font-italic">
-          {ts}Filter search by group type(s).{/ts}
-      </span>
-    </td>
-    <td>
-      {$form.visibility.label}<br />
-      {$form.visibility.html}<br />
-      <span class="description font-italic">
+            </td>
+            <td>
+              {$form.visibility.label}<br />
+              {$form.visibility.html}<br />
+              <span class="description font-italic">
           {ts}Filter search by visibility.{/ts}
       </span>
-    </td>
-    <td>
-      {$form.group_status.label}<br />
-      {$form.group_status.html}
-    </td>
-  </tr>
-</table>
-</div>
+            </td>
+          </tr>
+          <tr>
+            <td id="group_type-block">
+              {$form.group_type_search.label}<br />
+              {$form.group_type_search.html}<br />
+              <span class="description font-italic">
+          {ts}Filter search by group type(s).{/ts}
+      </span>
+            </td>
+            <td>
+              {$form.group_status.label}<br />
+              {$form.group_status.html}
+            </td>
+            <td>
+              {$form.component_mode.label}<br />
+              {$form.component_mode.html}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
 <div class="css_right">
   <a class="crm-hover-button action-item" href="{crmURL q="reset=1&update_smart_groups=1"}">{ts}Update Smart Group Counts{/ts}</a> {help id="update_smart_groups"}
 </div>
@@ -119,6 +131,7 @@
           d.group_type = groupTypes,
           d.visibility = $(".crm-group-search-form-block select#visibility").val(),
           d.status = groupStatus,
+          d.component_mode = $(".crm-group-search-form-block select#component_mode").val(),
           d.showOrgInfo = {/literal}"{$showOrgInfo}"{literal},
           d.parentsOnly = parentsOnly
         }
