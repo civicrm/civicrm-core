@@ -39,6 +39,18 @@
 </tr>
 <tr>
   <td>
+    <label>{ts}Currency{/ts}</label> <br />
+    {$form.contribution_currency_type.html|crmAddClass:twenty}
+  </td>
+  {if $form.contribution_batch_id.html }
+    <td>
+      {$form.contribution_batch_id.label}<br />
+      {$form.contribution_batch_id.html}
+    </td>
+  {/if}
+</tr>
+<tr>
+  <td>
     <div class="float-left">
       <label>{$form.payment_instrument_id.label}</label> <br />
       {$form.payment_instrument_id.html|crmAddClass:twenty}
@@ -146,37 +158,27 @@
     {include file="CRM/Contribute/Form/PCP.js.tpl"}
   </td>
   <td>
-    {$form.contribution_pcp_display_in_roll.label}
-    {$form.contribution_pcp_display_in_roll.html}
-  </td>
-</tr>
-
-<tr>
-  <td>
-    <label>{ts}Currency{/ts}</label> <br />
-    {$form.contribution_currency_type.html|crmAddClass:twenty}
-  </td>
-  {if $form.contribution_batch_id.html }
-    <td>
-      {$form.contribution_batch_id.label}<br />
-      {$form.contribution_batch_id.html}
-    </td>
-  {/if}
-</tr>
-
-<tr>
-  <td colspan="2">
     {$form.contribution_cancel_reason.label}<br />
     {$form.contribution_cancel_reason.html}
   </td>
 </tr>
 <tr>
-  <td colspan="2">
-    <label>{ts}Cancelled / Refunded Date{/ts}</label>
+  <td>
+    {$form.contribution_pcp_display_in_roll.label}
+    {$form.contribution_pcp_display_in_roll.html}
   </td>
-</tr>
-<tr>
-  {include file="CRM/Core/DateRange.tpl" fieldName="contribution_cancel_date" from='_low' to='_high'}
+  <td>
+    <table style="width:auto">
+      <tr>
+        <td>
+          <label>{ts}Cancelled / Refunded Date{/ts}</label>
+        </td>
+      </tr>
+      <tr>
+        {include file="CRM/Core/DateRange.tpl" fieldName="contribution_cancel_date" from='_low' to='_high'}
+      </tr>
+    </table>
+  </td>
 </tr>
 
 {* campaign in contribution search *}
