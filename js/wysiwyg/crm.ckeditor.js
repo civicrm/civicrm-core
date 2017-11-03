@@ -48,6 +48,7 @@
       editor.on('maximize', function (e) {
         $('#civicrm-menu').toggle(e.data === 2);
       });
+      $(editor.element.$).trigger('crmWysiwygCreate', ['ckeditor', editor]);
       deferred.resolve();
     }
     
