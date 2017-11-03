@@ -24,6 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 {* relationship selector *}
+{crmRegion name="crm-contact-relationshipselector-pre"}
+{/crmRegion}
 <div class="crm-contact-relationship-{$context}">
   <table
     class="crm-contact-relationship-selector-{$context} crm-ajax-table"
@@ -43,3 +45,5 @@
     </thead>
   </table>
 </div>
+{crmRegion name="crm-contact-relationshipselector-post"}
+{/crmRegion}

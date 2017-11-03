@@ -23,6 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-contact-userdashboard-groupcontact-pre"}
+{/crmRegion}
 <div id="groupContact">
     <div class="view-content">
         {if $groupCount eq 0 }
@@ -131,3 +133,5 @@
         {/if}
     </div>
 </div>
+{crmRegion name="crm-contact-userdashboard-groupcontact-post"}
+{/crmRegion}
