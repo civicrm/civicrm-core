@@ -271,10 +271,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
       if ($returnCode & self::ERROR) {
         $this->_invalidRowCount++;
-        if ($this->_invalidRowCount < $this->_maxErrorCount) {
-          array_unshift($values, $this->_rowCount);
-          $this->_errors[] = $values;
-        }
+        array_unshift($values, $this->_rowCount);
+        $this->_errors[] = $values;
       }
 
       if ($returnCode & self::CONFLICT) {

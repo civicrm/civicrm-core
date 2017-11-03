@@ -256,38 +256,32 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
 
       if ($returnCode == self::ERROR) {
         $this->_invalidRowCount++;
-        if ($this->_invalidRowCount < $this->_maxErrorCount) {
-          $recordNumber = $this->_lineCount;
-          if ($this->_haveColumnHeader) {
-            $recordNumber--;
-          }
-          array_unshift($values, $recordNumber);
-          $this->_errors[] = $values;
+        $recordNumber = $this->_lineCount;
+        if ($this->_haveColumnHeader) {
+          $recordNumber--;
         }
+        array_unshift($values, $recordNumber);
+        $this->_errors[] = $values;
       }
 
       if ($returnCode == self::PLEDGE_PAYMENT_ERROR) {
         $this->_invalidPledgePaymentRowCount++;
-        if ($this->_invalidPledgePaymentRowCount < $this->_maxErrorCount) {
-          $recordNumber = $this->_lineCount;
-          if ($this->_haveColumnHeader) {
-            $recordNumber--;
-          }
-          array_unshift($values, $recordNumber);
-          $this->_pledgePaymentErrors[] = $values;
+        $recordNumber = $this->_lineCount;
+        if ($this->_haveColumnHeader) {
+          $recordNumber--;
         }
+        array_unshift($values, $recordNumber);
+        $this->_pledgePaymentErrors[] = $values;
       }
 
       if ($returnCode == self::SOFT_CREDIT_ERROR) {
         $this->_invalidSoftCreditRowCount++;
-        if ($this->_invalidSoftCreditRowCount < $this->_maxErrorCount) {
-          $recordNumber = $this->_lineCount;
-          if ($this->_haveColumnHeader) {
-            $recordNumber--;
-          }
-          array_unshift($values, $recordNumber);
-          $this->_softCreditErrors[] = $values;
+        $recordNumber = $this->_lineCount;
+        if ($this->_haveColumnHeader) {
+          $recordNumber--;
         }
+        array_unshift($values, $recordNumber);
+        $this->_softCreditErrors[] = $values;
       }
 
       if ($returnCode == self::CONFLICT) {
