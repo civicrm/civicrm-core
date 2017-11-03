@@ -520,7 +520,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
       ON cc.id = cmp.contribution_id
       WHERE cc.is_test = 0
       $dateWhere
-      GROUP BY cmp.membership_id";
+      GROUP BY cmp.membership_id, cc.contact_id";
     CRM_Core_DAO::executeQuery($sql);
     return $tempTable;
   }

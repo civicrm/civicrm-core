@@ -588,7 +588,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     $select = str_ireplace('contribution_civireport.total_amount', 'contribution_soft_civireport.amount', $this->_select);
     $select = str_ireplace("'Contribution' as", "'Soft Credit' as", $select);
     // We really don't want to join soft credit in if not required.
-    if (!empty($this->_groupBy) && !$this->noDisplayContributionOrSoftColumn) {
+    if (!empty($this->_groupBy) && $this->isTableSelected('contribution_soft_civireport')) {
       $this->_groupBy .= ', contribution_soft_civireport.amount';
     }
     // we inner join with temp1 to restrict soft contributions to those in temp1 table
