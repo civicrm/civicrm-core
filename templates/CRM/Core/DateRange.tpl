@@ -41,15 +41,30 @@
   </span>
   {literal}
     <script type="text/javascript">
-      cj("#{/literal}{$relativeName}{literal}").change(function() {
-        var n = cj(this).parent().parent();
-        if (cj(this).val() == "0") {
-          cj(".crm-absolute-date-range", n).show();
-        } else {
-          cj(".crm-absolute-date-range", n).hide();
-          cj(':text', n).val('');
-        }
-      }).change();
+
+      CRM.$(function($) {
+
+        $('#{/literal}{$relativeName}{literal}').change(function() {
+          var n = $(this).parent().parent();
+          var val = $(this).val();
+          if (val == "0") {
+            $(".crm-absolute-date-range", n).show();
+            $(':text', n).show();
+            $('[formattype="searchDate"]', n).hide();
+            $('.crm-absolute-date-from', n).css('display', 'inline');
+          }
+          else if (val == '1') {
+            $('.crm-absolute-date-range', n).show();
+            $(':text', n).hide();
+            $('[formattype="searchDate"]', n).show();
+            $('.crm-absolute-date-from', n).css('display', 'block');
+          } else {
+            $(".crm-absolute-date-range", n).hide();
+            $(':text', n).val('');
+          }
+        }).change();
+      }
+    );
     </script>
   {/literal}
 </td>
