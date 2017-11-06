@@ -25,7 +25,7 @@
 *}
 {include file="CRM/common/pager.tpl" location="top"}
 {strip}
-<table class="caseSelector">
+<table class="caseSelector row-highlight">
   <tr class="columnheader">
 
   {if ! $single and $context eq 'Search' }
