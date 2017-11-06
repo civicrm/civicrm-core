@@ -77,7 +77,14 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
-          'household_name' => array('title' => ts('Household Name')),
+          'household_name' => array(
+            'title' => ts('Household Name'),
+          ),
+          'is_deleted' => array(
+            'no_display' => TRUE,
+            'default' => 0,
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+          ),
         ),
         'grouping' => 'household-fields',
       ),

@@ -89,7 +89,14 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
-          'organization_name' => array('title' => ts('Organization Name')),
+          'organization_name' => array(
+            'title' => ts('Organization Name'),
+          ),
+          'is_deleted' => array(
+            'no_display' => TRUE,
+            'default' => 0,
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+          ),
         ),
         'grouping' => 'organization-fields',
       ),
