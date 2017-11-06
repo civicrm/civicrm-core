@@ -18,7 +18,7 @@ index 40329063..bfb1c2b1 100644
              $doc->loadHTML($str);
              $doc->encoding = $encoding;
  
-+            // Remove #text children nodes in nodes that shouldn't have
++            // Remove #text children nodes in nodes that shouldn't have #CRM-21395
 +            $tag_names = array("html", "table", "tbody", "thead", "tfoot", "tr");
 +            foreach ($tag_names as $tag_name) {
 +                $nodes = $doc->getElementsByTagName($tag_name);
