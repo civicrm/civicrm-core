@@ -120,7 +120,7 @@ class CRM_Core_DAO extends DB_DataObject {
     CRM_Core_DAO::setFactory($factory);
     $currentModes = CRM_Utils_SQL::getSqlModes();
     if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
-      if (CRM_Utils_SQL::supportsFullGroupBy() && !in_array('ONLY_FULL_GROUP_BY', $currentModes)) {
+      if (CRM_Utils_SQL::supportsFullGroupBy() && !in_array('ONLY_FULL_GROUP_BY', $currentModes) && CRM_Utils_SQL::isGroupByModeInDefault()) {
         $currentModes[] = 'ONLY_FULL_GROUP_BY';
       }
       if (!in_array('STRICT_TRANS_TABLES', $currentModes)) {
