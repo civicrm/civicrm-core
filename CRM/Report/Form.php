@@ -2617,9 +2617,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->customDataFrom();
     $this->buildPermissionClause();
     $this->where();
-    if (array_key_exists('civicrm_contribution', $this->getVar('_columns'))) {
-      $this->getPermissionedFTQuery($this);
-    }
     $this->groupBy();
     $this->orderBy();
 
@@ -4662,59 +4659,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     $row["{$tablePrefix}_{$fieldName}_hover"] = ts("%1 for this %2.",
       array(1 => $linkText, 2 => $fieldLabel)
     );
-  }
-
-  /**
-   * Generate temporary table to hold all contributions with permissioned FTs.
-   *
-   * @param object $query
-   * @param string $alias
-   * @param bool $return
-   *
-   * @return string
-   */
-  public function getPermissionedFTQuery(&$query, $alias = NULL, $return = FALSE) {
-    if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-      return FALSE;
-    }
-    $financialTypes = NULL;
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-    if (empty($financialTypes)) {
-      $contFTs = "0";
-      $liFTs = implode(',', array_keys(CRM_Contribute_PseudoConstant::financialType()));
-    }
-    else {
-      $contFTs = $liFTs = implode(',', array_keys($financialTypes));
-    }
-    $temp = CRM_Utils_Array::value('civicrm_line_item', $query->_aliases);
-    if ($alias) {
-      $query->_aliases['civicrm_line_item'] = $alias;
-    }
-    elseif (!$temp) {
-      $query->_aliases['civicrm_line_item'] = 'civicrm_line_item_civireport';
-    }
-    if (empty($query->_where)) {
-      $query->_where = "WHERE {$query->_aliases['civicrm_contribution']}.id IS NOT NULL ";
-    }
-    CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS civicrm_contribution_temp");
-    $sql = "CREATE TEMPORARY TABLE civicrm_contribution_temp {$this->_databaseAttributes} AS SELECT {$query->_aliases['civicrm_contribution']}.id {$query->_from}
-              LEFT JOIN civicrm_line_item   {$query->_aliases['civicrm_line_item']}
-                      ON {$query->_aliases['civicrm_contribution']}.id = {$query->_aliases['civicrm_line_item']}.contribution_id AND
-                         {$query->_aliases['civicrm_line_item']}.entity_table = 'civicrm_contribution'
-                      AND {$query->_aliases['civicrm_line_item']}.financial_type_id NOT IN (" . $liFTs . ")
-              {$query->_where}
-                      AND {$query->_aliases['civicrm_contribution']}.financial_type_id IN (" . $contFTs . ")
-                      AND {$query->_aliases['civicrm_line_item']}.id IS NULL
-              GROUP BY {$query->_aliases['civicrm_contribution']}.id";
-    CRM_Core_DAO::executeQuery($sql);
-    if (isset($temp)) {
-      $query->_aliases['civicrm_line_item'] = $temp;
-    }
-    $from = " INNER JOIN civicrm_contribution_temp temp ON {$query->_aliases['civicrm_contribution']}.id = temp.id ";
-    if ($return) {
-      return $from;
-    }
-    $query->_from .= $from;
   }
 
   /**

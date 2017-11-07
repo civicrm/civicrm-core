@@ -612,7 +612,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
     $this->groupBy();
     $this->orderBy();
-    $this->getPermissionedFTQuery($this);
     $limitFilter = '';
 
     // order_by columns not selected for display need to be included in SELECT
