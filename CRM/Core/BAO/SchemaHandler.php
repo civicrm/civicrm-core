@@ -725,6 +725,7 @@ MODIFY      {$columnName} varchar( $length )
       $extSigs[] = CRM_Utils_Array::collect('sig', $indices);
     }
     CRM_Utils_Array::flatten($extSigs, $existingSigs);
+    // Civi::log()->alert(print_r(['$requiredSigs' => $requiredSigs, '$existingSigs' => $existingSigs], 1));
 
     // Compare
     $missingSigs = array_diff($requiredSigs, $existingSigs);
@@ -750,10 +751,12 @@ MODIFY      {$columnName} varchar( $length )
       foreach ($requiredIndices[$sigParts[0]] as $index) {
         if ($index['sig'] == $sig) {
           $missingIndices[$sigParts[0]][] = $index;
+          // Civi::log()->alert(print_r(['$index' => $index], 1));
           continue;
         }
       }
     }
+    // Civi::log()->alert('$missingIndices: ' . print_r($missingIndices, 1));
     return $missingIndices;
   }
 
@@ -766,15 +769,21 @@ MODIFY      {$columnName} varchar( $length )
     $queries = array();
     foreach ($missingIndices as $table => $indexList) {
       foreach ($indexList as $index) {
+        if (CRM_Core_BAO_SchemaHandler::checkIfIndexExists($table, $index['name'])) {
+          $queries[] = 'SET foreign_key_checks = 0';
+          $queries[] = 'DROP INDEX ' . $index['name'] . ' ON ' . $table;
+        }
         $queries[] = "CREATE " .
-        (array_key_exists('unique', $index) && $index['unique'] ? 'UNIQUE ' : '') .
-        "INDEX {$index['name']} ON {$table} (" .
-          implode(", ", $index['field']) .
-        ")";
+          (array_key_exists('unique', $index) && $index['unique'] ? 'UNIQUE ' : '') .
+          "INDEX {$index['name']} ON {$table} (" .
+            implode(", ", $index['field']) .
+          ")";
+        $queries[] = 'SET foreign_key_checks = 1';
       }
     }
 
-    /* FIXME potential problem if index name already exists, so check before creating */
+    // Civi::log()->alert('$queries: ' . print_r($queries, 1));
+
     $dao = new CRM_Core_DAO();
     foreach ($queries as $query) {
       $dao->query($query, FALSE);
