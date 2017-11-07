@@ -5,4 +5,5 @@ b2c114b | Redmine-9013 Fix issue where mail_report cron returns a copy of the ht
 9903e81 | Atrium 4516/Redmine 11737 Stop ACL Cache from being cleared | No upstream fix and unlikely to be soon  
 26bb201 | Add in AUG Change log |  
 45c2935 | CRM-19835 port of PR 9801 | No sign its being merged in core soon 
-b87620c | CRM-21206 Ensure that the recipients field of AB Test results is filled in | Core PR opne no sign yet of being merged in   
+b87620c | CRM-21206 Ensure that the recipients field of AB Test results is filled in | Core PR open no sign yet of being merged in   
+b6978b8 | CRM-21400 Add a static var to hold the trxn_id so it can be accessed through hook_civicrm_buildForm | Core PR open waiting to be merged  
