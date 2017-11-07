@@ -183,6 +183,13 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
       }
     }
 
+    if ($customSearchClass = CRM_Utils_Array::value('customSearchClass', $result)) {
+      // check if there is a special function - formatSavedSearchFields defined in the custom search form
+      if (method_exists($customSearchClass, 'formatSavedSearchFields')) {
+        $customSearchClass::formatSavedSearchFields($result);
+      }
+    }
+
     return $result;
   }
 

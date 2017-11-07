@@ -227,6 +227,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       // lets just bump this to a regular session error and redirect user to main page
       $this->controller->invalidKeyRedirect();
     }
+    $this->_emailExists = $this->get('emailExists');
 
     // this was used prior to the cleverer this_>getContactID - unsure now
     $this->_userID = CRM_Core_Session::singleton()->getLoggedInContactID();
@@ -579,23 +580,36 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // The concept of contributeMode is deprecated.
     // The payment processor object can provide info about the fields it shows.
-    if ($this->_contributeMode == 'direct' && $assignCCInfo) {
-      if ($this->_paymentProcessor &&
-        $this->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
-      ) {
-        $this->assign('account_holder', $this->_params['account_holder']);
-        $this->assign('bank_identification_number', $this->_params['bank_identification_number']);
-        $this->assign('bank_name', $this->_params['bank_name']);
-        $this->assign('bank_account_number', $this->_params['bank_account_number']);
+    if ($assignCCInfo) {
+      /** @var  $paymentProcessorObject \CRM_Core_Payment */
+      $paymentProcessorObject = $this->_paymentProcessor['object'];
+      $paymentFields = $paymentProcessorObject->getPaymentFormFields();
+      foreach ($paymentFields as $index => $paymentField) {
+        if (!isset($this->_params[$paymentField])) {
+          unset($paymentFields[$index]);
+          continue;
+        }
+        if ($paymentField === 'credit_card_exp_date') {
+          $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $this->_params));
+          $date = CRM_Utils_Date::mysqlToIso($date);
+          $this->assign('credit_card_exp_date', $date);
+        }
+        elseif ($paymentField === 'credit_card_number') {
+          $this->assign('credit_card_number',
+            CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $this->_params))
+          );
+        }
+        else {
+          $this->assign($paymentField, $this->_params[$paymentField]);
+        }
       }
-      else {
-        $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $this->_params));
-        $date = CRM_Utils_Date::mysqlToIso($date);
-        $this->assign('credit_card_exp_date', $date);
-        $this->assign('credit_card_number',
-          CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $this->_params))
-        );
+      $paymentFieldsetLabel = ts('%1 Information', array($paymentProcessorObject->getPaymentTypeLabel()));
+      if (empty($paymentFields)) {
+        $paymentFieldsetLabel = '';
       }
+      $this->assign('paymentFieldsetLabel', $paymentFieldsetLabel);
+      $this->assign('paymentFields', $paymentFields);
+
     }
 
     $this->assign('email',
@@ -652,6 +666,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               !in_array($profileContactType, array('honor', 'onbehalf'))
           ) {
             $this->_emailExists = TRUE;
+            $this->set('emailExists', TRUE);
           }
         }
 
@@ -893,7 +908,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           }
         }
 
-        $form->assign('fieldSetTitle', ts('Organization Details'));
+        $form->assign('fieldSetTitle', ts(CRM_Core_BAO_UFGroup::getTitle($form->_values['onbehalf_profile_id'])));
 
         if (CRM_Utils_Array::value('is_for_organization', $form->_values)) {
           if ($form->_values['is_for_organization'] == 2) {
@@ -923,6 +938,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
 
         $fieldTypes = array('Contact', 'Organization');
+        if (!empty($form->_membershipBlock)) {
+          $fieldTypes = array_merge($fieldTypes, array('Membership'));
+        }
         $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
         $fieldTypes = array_merge($fieldTypes, $contactSubType);
 

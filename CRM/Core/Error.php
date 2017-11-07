@@ -343,7 +343,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
 
     if (!$message) {
-      $message = ts('We experienced an unexpected error. Please post a detailed description and the backtrace on the CiviCRM forums: %1', array(1 => 'http://forum.civicrm.org/'));
+      $message = ts('We experienced an unexpected error. You may have found a bug. For more information on how to provide a bug report, please read: %1', array(1 => 'https://civicrm.org/bug-reporting'));
     }
 
     if (php_sapi_name() == "cli") {
@@ -423,7 +423,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       'exception' => $exception,
     );
     if (!$vars['message']) {
-      $vars['message'] = ts('We experienced an unexpected error. Please post a detailed description and the backtrace on the CiviCRM forums: %1', array(1 => 'http://forum.civicrm.org/'));
+      $vars['message'] = ts('We experienced an unexpected error. You may have found a bug. For more information on how to provide a bug report, please read: %1', array(1 => 'https://civicrm.org/bug-reporting'));
     }
 
     // Case A: CLI
@@ -680,7 +680,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Generate the name of the logfile to use and store it as a static.
    *
-   * This function includes poor man's log file management and a check as to whether the file exists.
+   * This function includes simplistic log rotation and a check as to whether
+   * the file exists.
    *
    * @param string $prefix
    */
@@ -693,9 +694,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       $hash = self::generateLogFileHash($config);
       $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . $hash . '.log';
 
-      // Roll log file monthly or if greater than 256M
-      // note that PHP file functions have a limit of 2G and hence
-      // the alternative was introduce
+      // Roll log file monthly or if greater than 256M.
+      // Size-based rotation introduced in response to filesize limits on
+      // certain OS/PHP combos.
       if (file_exists($fileName)) {
         $fileTime = date("Ym", filemtime($fileName));
         $fileSize = filesize($fileName);

@@ -63,7 +63,7 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
     }
 
     // handle custom data.
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Pledge', $this, $params['id']);
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Pledge', NULL, $params['id']);
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $params['id']);
 
     if (!empty($values['contribution_page_id'])) {

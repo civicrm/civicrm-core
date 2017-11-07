@@ -389,6 +389,9 @@
   div.tag-info input[type=color] {
     cursor: pointer;
   }
+  div.tag-info input[disabled] {
+    cursor: default;
+  }
   div.tag-info .tdl {
     font-weight: bold;
     color: #999;
@@ -432,15 +435,15 @@
 <script type="text/template" id="oneSelectedTpl">
   <div class="crm-entity" data-entity="Tag" data-id="<%= id %>">
     <h4>
-      <input type="color" value="<%= data.color %>" title="{ts}Select color{/ts}"/>
-      <span class="crm-editable" data-field="name"><%- text %></span>
+      <input type="color" value="<%= data.color %>" <% if (!data.is_reserved || adminReserved) {ldelim} %>title="{ts}Select color{/ts}" <% {rdelim} else {ldelim} %>disabled<% {rdelim} %> />
+      <span class="<% if (!data.is_reserved || adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="name"><%- text %></span>
     </h4>
     <hr />
     <div><span class="tdl">{ts}Description:{/ts}</span>
-      <span class="crm-editable" data-field="description"><%- data.description %></span>
+      <span class="<% if (!data.is_reserved || adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="description"><%- data.description %></span>
     </div>
     <div><span class="tdl">{ts}Selectable:{/ts}</span>
-      <span class="crm-editable" data-field="is_selectable" data-type="select"><% if (data.is_selectable) {ldelim} %> {ts}Yes{/ts} <% {rdelim} else {ldelim} %> {ts}No{/ts} <% {rdelim} %></span>
+      <span class="<% if (!data.is_reserved || adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="is_selectable" data-type="select"><% if (data.is_selectable) {ldelim} %> {ts}Yes{/ts} <% {rdelim} else {ldelim} %> {ts}No{/ts} <% {rdelim} %></span>
     </div>
     <div><span class="tdl">{ts}Reserved:{/ts}</span>
       <span class="<% if (adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="is_reserved" data-type="select"><% if (data.is_reserved) {ldelim} %> {ts}Yes{/ts} <% {rdelim} else {ldelim} %> {ts}No{/ts} <% {rdelim} %></span>
@@ -449,7 +452,7 @@
       <div>
         <span class="tdl">{ts}Used For:{/ts}</span>
         {literal}
-          <span class="crm-editable-enabled used-for-toggle">
+          <span class="<% if (!data.is_reserved || adminReserved) { %>crm-editable-enabled used-for-toggle<% } %>">
             <% if (!data.used_for.length) { %><i class="crm-i fa-pencil crm-editable-placeholder"></i><% } %>
             <% _.forEach(data.used_for, function(key, i) { %><%- (i ? ', ' : '') + usedFor[key] %><% }) %>
           </span>

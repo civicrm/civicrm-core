@@ -396,6 +396,24 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Check if user registration is permitted.
+   *
+   * @return bool
+   */
+  public function isUserRegistrationPermitted() {
+    return FALSE;
+  }
+
+  /**
+   * Check if user can create passwords or is initially assigned a system-generated one.
+   *
+   * @return bool
+   */
+  public function isPasswordUserGenerated() {
+    return FALSE;
+  }
+
+  /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
    * @param string $destination
@@ -593,15 +611,6 @@ abstract class CRM_Utils_System_Base {
       $tempURL = str_replace("/administrator/", "/", $baseURL);
       $filesURL = $tempURL . "media/civicrm/";
     }
-    elseif ($this->is_drupal) {
-      $siteName = $config->userSystem->parseDrupalSiteName($civicrm_root);
-      if ($siteName) {
-        $filesURL = $baseURL . "sites/$siteName/files/civicrm/";
-      }
-      else {
-        $filesURL = $baseURL . "sites/default/files/civicrm/";
-      }
-    }
     elseif ($config->userFramework == 'UnitTests') {
       $filesURL = $baseURL . "sites/default/files/civicrm/";
     }
@@ -659,7 +668,7 @@ abstract class CRM_Utils_System_Base {
           str_replace('\\', '/', $civicrm_root)
         );
 
-      $siteName = $config->userSystem->parseDrupalSiteName($civicrm_root);
+      $siteName = $config->userSystem->parseDrupalSiteNameFromRoot($civicrm_root);
       if ($siteName) {
         $civicrmDirName = trim(basename($civicrm_root));
         $userFrameworkResourceURL = $baseURL . "sites/$siteName/modules/$civicrmDirName/";

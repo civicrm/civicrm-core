@@ -141,19 +141,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     $sort = ($n > 2) ? func_get_arg(2) : NULL;
     // what action do we want to perform ? (store it for smarty too.. :)
 
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-    $this->assign('action', $this->_action);
-
-    // get 'id' if present
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
-
-    require_once str_replace('_', DIRECTORY_SEPARATOR, $this->getBAOName()) . ".php";
-
-    if ($id) {
-      if (!$this->checkPermission($id, NULL)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to make changes to the record'));
-      }
-    }
+    $id = $this->getIdAndAction();
 
     if ($this->_action & (CRM_Core_Action::VIEW |
         CRM_Core_Action::ADD |
@@ -173,6 +161,33 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     }
 
     return parent::run();
+  }
+
+  /**
+   * Retrieve the action and ID from the request.
+   *
+   * Action is assigned to the template while we're at it.  This is pulled from
+   * the `run()` method above.
+   *
+   * @return int
+   *   The ID if present, or 0.
+   */
+  public function getIdAndAction() {
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
+    $this->assign('action', $this->_action);
+
+    // get 'id' if present
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
+
+    require_once str_replace('_', DIRECTORY_SEPARATOR, $this->getBAOName()) . ".php";
+
+    if ($id) {
+      if (!$this->checkPermission($id, NULL)) {
+        CRM_Core_Error::fatal(ts('You do not have permission to make changes to the record'));
+      }
+    }
+
+    return $id;
   }
 
   /**
@@ -288,11 +303,10 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     $hasDelete = $hasDisable = TRUE;
 
     if (!empty($values['name']) && in_array($values['name'], array(
-        'encounter_medium',
-        'case_type',
-        'case_status',
-      ))
-    ) {
+      'encounter_medium',
+      'case_type',
+      'case_status',
+    ))) {
       static $caseCount = NULL;
       if (!isset($caseCount)) {
         $caseCount = CRM_Case_BAO_Case::caseCount(NULL, FALSE);

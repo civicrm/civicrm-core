@@ -853,6 +853,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     //get the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
+    if (!isset($params['preferred_communication_method'])) {
+      // If this field is empty QF will trim it so we have to add it in.
+      $params['preferred_communication_method'] = 'null';
+    }
 
     $group = CRM_Utils_Array::value('group', $params);
     if (!empty($group) && is_array($group)) {
@@ -992,7 +996,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     if (array_key_exists('TagsAndGroups', $this->_editOptions)) {
       //add contact to tags
-      CRM_Core_BAO_EntityTag::create($params['tag'], 'civicrm_contact', $params['contact_id']);
+      if (isset($params['tag']) && !empty($params['tag'])) {
+        $params['tag'] = array_flip(explode(',', $params['tag']));
+        CRM_Core_BAO_EntityTag::create($params['tag'], 'civicrm_contact', $params['contact_id']);
+      }
 
       //save free tags
       if (isset($params['contact_taglist']) && !empty($params['contact_taglist'])) {

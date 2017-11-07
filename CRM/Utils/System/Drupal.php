@@ -590,6 +590,12 @@ AND    u.status = 1
       // drush anyway takes care of multisite install etc
       return drush_get_context('DRUSH_DRUPAL_ROOT');
     }
+
+    global $civicrm_paths;
+    if (!empty($civicrm_paths['cms.root']['path'])) {
+      return $civicrm_paths['cms.root']['path'];
+    }
+
     // CRM-7582
     $pathVars = explode('/',
       str_replace('//', '/',
@@ -840,6 +846,17 @@ AND    u.status = 1
       'contactMatching' => $contactMatching,
       'contactCreated' => $contactCreated,
     );
+  }
+
+  /**
+   * Commit the session before exiting.
+   * Similar to drupal_exit().
+   */
+  public function onCiviExit() {
+    if (!defined('MAINTENANCE_MODE') || MAINTENANCE_MODE != 'update') {
+      module_invoke_all('exit');
+    }
+    drupal_session_commit();
   }
 
 }

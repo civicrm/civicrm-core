@@ -463,4 +463,24 @@
     <headerPattern>/(activity.)?(star|favorite)/i</headerPattern>
     <add>4.7</add>
   </field>
+  <field>
+    <name>created_date</name>
+    <uniqueName>activity_created_date</uniqueName>
+    <type>timestamp</type>
+    <comment>When was the activity was created.</comment>
+    <required>false</required>
+    <export>true</export>
+    <default>NULL</default>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <uniqueName>activity_modified_date</uniqueName>
+    <type>timestamp</type>
+    <comment>When was the activity (or closely related entity) was created or modified or deleted.</comment>
+    <required>false</required>
+    <export>true</export>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <add>4.7</add>
+  </field>
 </table>

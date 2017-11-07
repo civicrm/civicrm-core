@@ -108,23 +108,60 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   /**
    * Get the list of mappings.
    *
-   * @param string $mappingTypeId
-   *   Mapping type id.
+   * @param string $mappingType
+   *   Mapping type name.
    *
    * @return array
-   *   array of mapping name
+   *   Array of mapping names, keyed by id.
    */
-  public static function getMappings($mappingTypeId) {
+  public static function getMappings($mappingType) {
+    $result = civicrm_api3('Mapping', 'get', array(
+      'mapping_type_id' => $mappingType,
+      'options' => array(
+        'sort' => 'name',
+        'limit' => 0,
+      ),
+    ));
     $mapping = array();
-    $mappingDAO = new CRM_Core_DAO_Mapping();
-    $mappingDAO->mapping_type_id = $mappingTypeId;
-    $mappingDAO->find();
 
-    while ($mappingDAO->fetch()) {
-      $mapping[$mappingDAO->id] = $mappingDAO->name;
+    foreach ($result['values'] as $key => $value) {
+      $mapping[$key] = $value['name'];
     }
-
     return $mapping;
+  }
+
+  /**
+   * Get the mappings array, creating if it does not exist.
+   *
+   * @param string $mappingType
+   *   Mapping type name.
+   *
+   * @return array
+   *   Array of mapping names, keyed by id.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getCreateMappingValues($mappingType) {
+    try {
+      return CRM_Core_BAO_Mapping::getMappings($mappingType);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      // Having a valid mapping_type_id is now enforced. However, rather than error let's
+      // add it. This is required for Multi value which could be done by upgrade script, but
+      // it feels like there could be other instances so this is safer.
+      $errorParams = $e->getExtraParams();
+      if ($errorParams['error_field'] === 'mapping_type_id') {
+        $mappingValues = civicrm_api3('Mapping', 'getoptions', array('field' => 'mapping_type_id'));
+        civicrm_api3('OptionValue', 'create', array(
+          'option_group_id' => 'mapping_type',
+          'label' => $mappingType,
+          'value' => max(array_keys($mappingValues['values'])) + 1,
+          'is_reserved' => 1,
+        ));
+        return CRM_Core_BAO_Mapping::getMappings($mappingType);
+      }
+      throw $e;
+    }
   }
 
   /**
@@ -133,10 +170,14 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $mappingId
    *   Mapping id.
    *
+   * @param bool $addPrimary
+   *   Add the key 'Primary' when the field is a location field AND there is
+   *   no location type (meaning Primary)?
+   *
    * @return array
    *   array of mapping fields
    */
-  public static function getMappingFields($mappingId) {
+  public static function getMappingFields($mappingId, $addPrimary = FALSE) {
     //mapping is to be loaded from database
     $mapping = new CRM_Core_DAO_MappingField();
     $mapping->mapping_id = $mappingId;
@@ -151,6 +192,14 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
       if (!empty($mapping->location_type_id)) {
         $mappingLocation[$mapping->grouping][$mapping->column_number] = $mapping->location_type_id;
+      }
+      elseif ($addPrimary) {
+        if (CRM_Contact_BAO_Contact::isFieldHasLocationType($mapping->name)) {
+          $mappingLocation[$mapping->grouping][$mapping->column_number] = ts('Primary');
+        }
+        else {
+          $mappingLocation[$mapping->grouping][$mapping->column_number] = NULL;
+        }
       }
 
       if (!empty($mapping->phone_type_id)) {
@@ -601,6 +650,14 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
                 }
                 elseif (isset($relationshipType->$target_type)) {
                   $relatedFields = array_merge((array) $relatedMapperFields[$relationshipType->$target_type], (array) $relationshipCustomFields);
+                }
+                //CRM-20672 If contact target type not set e.g. "All Contacts" relationship - present user with all field options and let them determine what they expect to work
+                else {
+                  $types = CRM_Contact_BAO_ContactType::basicTypes(FALSE);
+                  foreach ($types as $contactType => $label) {
+                    $relatedFields = array_merge($relatedFields, (array) $relatedMapperFields[$label]);
+                  }
+                  $relatedFields = array_merge($relatedFields, (array) $relationshipCustomFields);
                 }
               }
               $relationshipType->free();

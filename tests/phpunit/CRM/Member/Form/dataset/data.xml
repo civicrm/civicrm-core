@@ -11,11 +11,27 @@
     last_name="Blow"
   />
   <civicrm_contact
+    id="18"
+    contact_type="Individual"
+    is_opt_out="0"
+    display_name="Alex Blow"
+    sort_name="Blow, Alex"
+    first_name="Alex"
+    last_name="Blow"
+  />
+  <civicrm_contact
     id="23"
     contact_type="Organization"
     is_opt_out="0"
     display_name="Save The Dollars"
     organization_name="Save The Dollars"
+  />
+  <civicrm_contact
+    id="32"
+    contact_type="Organization"
+    is_opt_out="0"
+    display_name="Save The Rupees"
+    organization_name="Save The Rupees"
   />
 
   <civicrm_relationship_type
@@ -37,6 +53,7 @@
     duration_interval="1"
     period_type="rolling"
     relationship_type_id="20"
+    relationship_direction="b_a"
     financial_type_id="2"
   />
   <civicrm_membership_type
@@ -46,7 +63,19 @@
     member_of_contact_id="23"
     duration_unit="lifetime"
     relationship_type_id="20"
+    relationship_direction="b_a"
     financial_type_id="2"
-   />
-
+  />
+  <civicrm_membership_type
+    id="35"
+    domain_id="1"
+    name="AnnualRolling1"
+    member_of_contact_id="32"
+    duration_unit="year"
+    duration_interval="1"
+    period_type="rolling"
+    relationship_type_id="20"
+    relationship_direction="b_a"
+    financial_type_id="2"
+  />
 </dataset>

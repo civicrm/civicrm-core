@@ -117,7 +117,7 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
         $defaults['contact_types_a'] .= '__' . $defaults['contact_sub_type_a'];
       }
 
-      $defaults['contact_types_b'] = $defaults['contact_type_b'];
+      $defaults['contact_types_b'] = CRM_Utils_Array::value('contact_type_b', $defaults);
       if (!empty($defaults['contact_sub_type_b'])) {
         $defaults['contact_types_b'] .= '__' . $defaults['contact_sub_type_b'];
       }

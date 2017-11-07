@@ -29,7 +29,7 @@
         scope.previewTestGroup = function(e) {
           var $dialog = $(this);
           $dialog.html('<div class="crm-loading-element"></div>').parent().find('button[data-op=yes]').prop('disabled', true);
-          $dialog.dialog('option', 'title', ts('Send to %1', {1: _.pluck(_.where(scope.crmMailingConst.groupNames, {id: scope.testGroup.gid}), 'title')[0]}));
+          $dialog.dialog('option', 'title', ts('Send to %1', {1: _.pluck(_.where(scope.crmMailingConst.testGroupNames, {id: scope.testGroup.gid}), 'title')[0]}));
           CRM.api3('contact', 'get', {
             group: scope.testGroup.gid,
             options: {limit: 0},

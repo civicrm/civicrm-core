@@ -91,18 +91,8 @@ class CRM_Core_BAO_CMSUser {
     $isJoomla = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
     $isWordPress = $config->userFramework == 'WordPress' ? TRUE : FALSE;
 
-    //if CMS is configured for not to allow creating new CMS user,
-    //don't build the form,Fixed for CRM-4036
-    if ($isJoomla) {
-      $userParams = JComponentHelper::getParams('com_users');
-      if (!$userParams->get('allowUserRegistration')) {
-        return FALSE;
-      }
-    }
-    elseif ($isDrupal && !variable_get('user_register', TRUE)) {
-      return FALSE;
-    }
-    elseif ($isWordPress && !get_option('users_can_register')) {
+    if (!$config->userSystem->isUserRegistrationPermitted()) {
+      // Do not build form if CMS is not configured to allow creating users.
       return FALSE;
     }
 
@@ -111,8 +101,7 @@ class CRM_Core_BAO_CMSUser {
     }
 
     // $cms is true when there is email(primary location) is set in the profile field.
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
+    $userID = CRM_Core_Session::singleton()->get('userID');
     $showUserRegistration = FALSE;
     if ($action) {
       $showUserRegistration = TRUE;
@@ -138,7 +127,7 @@ class CRM_Core_BAO_CMSUser {
         $form->assign('isCMS', $required);
         if (!$userID || $action & CRM_Core_Action::PREVIEW || $action & CRM_Core_Action::PROFILE) {
           $form->add('text', 'cms_name', ts('Username'), NULL, $required);
-          if (($isDrupal && !variable_get('user_email_verification', TRUE)) OR ($isJoomla) OR ($isWordPress)) {
+          if ($config->userSystem->isPasswordUserGenerated()) {
             $form->add('password', 'cms_pass', ts('Password'));
             $form->add('password', 'cms_confirm_pass', ts('Confirm Password'));
           }
@@ -208,7 +197,7 @@ class CRM_Core_BAO_CMSUser {
         $errors[$emailName] = ts('Please specify a valid email address.');
       }
 
-      if (($isDrupal && !variable_get('user_email_verification', TRUE)) OR ($isJoomla) OR ($isWordPress)) {
+      if ($config->userSystem->isPasswordUserGenerated()) {
         if (empty($fields['cms_pass']) ||
           empty($fields['cms_confirm_pass'])
         ) {

@@ -57,7 +57,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       );
     }
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType,
-      $this,
+      NULL,
       $this->_contactId,
       NULL,
       $entitySubType
@@ -182,10 +182,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
                 $idValue = $blockVal['master_id'];
               }
             }
-            $groupTree = CRM_Core_BAO_CustomGroup::getTree(ucfirst($key),
-              $this,
-              $idValue
-            );
+            $groupTree = CRM_Core_BAO_CustomGroup::getTree(ucfirst($key), NULL, $idValue);
             // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.
             $defaults[$key][$blockId]['custom'] = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, "dnc_");
           }

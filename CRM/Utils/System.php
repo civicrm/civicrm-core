@@ -41,7 +41,7 @@
  * @method static mixed permissionDenied() Show access denied screen.
  * @method static mixed logout() Log out the current user.
  * @method static mixed updateCategories() Clear CMS caches related to the user registration/profile forms.
- * @method static appendBreadCrumb(string $breadCrumbs) Append an additional breadcrumb tag to the existing breadcrumbs.
+ * @method static appendBreadCrumb(array $breadCrumbs) Append an additional breadcrumb tag to the existing breadcrumbs.
  * @method static resetBreadCrumb() Reset an additional breadcrumb tag to the existing breadcrumb.
  * @method static addHTMLHead(string $bc) Append a string to the head of the HTML file.
  * @method static string postURL(int $action) Determine the post URL for a form.
@@ -1404,6 +1404,14 @@ class CRM_Utils_System {
     // move things to CiviCRM cache as needed
     CRM_Core_Session::storeSessionObjects();
 
+    if (Civi\Core\Container::isContainerBooted()) {
+      Civi::dispatcher()->dispatch('civi.core.exit');
+    }
+
+    $userSystem = CRM_Core_Config::singleton()->userSystem;
+    if (is_callable(array($userSystem, 'onCiviExit'))) {
+      $userSystem->onCiviExit();
+    }
     exit($status);
   }
 

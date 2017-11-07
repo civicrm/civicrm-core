@@ -51,7 +51,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         'fa-server'
       );
     }
-    elseif (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_DEFECT_PHP_VER) >= 0) {
+    elseif (version_compare(phpversion(), CRM_Upgrade_Incremental_General::PREVIOUS_MIN_RECOMMENDED_PHP_VER) >= 0) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('This system uses PHP version %1. While this meets the minimum requirements for CiviCRM to function, upgrading to PHP version %2 or newer is recommended for maximum compatibility.',
@@ -66,13 +66,22 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       );
     }
     else {
+      $date = '';
+      $dateFormat = Civi::Settings()->get('dateformatshortdate');
+      if (version_compare(phpversion(), 5.4) < 0) {
+        $date = CRM_Utils_Date::customFormat('2017-12-31', $dateFormat);
+      }
+      elseif (version_compare(phpversion(), 5.5) < 0) {
+        $date = CRM_Utils_Date::customFormat('2018-02-28', $dateFormat);
+      }
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('This system uses PHP version %1. CiviCRM can be installed on this version, but some specific features are known to fail or degrade. Version %3 is the bare minimum to avoid known issues, and version %2 is recommended.',
+        ts('This system uses PHP version %1. CiviCRM can be installed on this version. However PHP version %1 will not work in releases published after %2, and version %3 is recommended. For more explanation see <a href="%4"> the announcement</a>',
           array(
             1 => phpversion(),
-            2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
-            3 => CRM_Upgrade_Incremental_General::MIN_DEFECT_PHP_VER,
+            2 => $date,
+            3 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+            4 => 'https://civicrm.org/blog/totten/end-of-zombies-php-53-and-54',
           )),
         ts('PHP Out-of-Date'),
         \Psr\Log\LogLevel::WARNING,
@@ -848,6 +857,53 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ts('The PHP Multibyte String extension is needed for CiviCRM to correctly handle user input among other functionality. Ask your system administrator to install it.'),
         ts('Missing mbstring Extension'),
         \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+    }
+    return $messages;
+  }
+
+  /**
+   * Check if environment is Production.
+   * @return array
+   */
+  public function checkEnvironment() {
+    $messages = array();
+
+    $environment = CRM_Core_Config::environment();
+    if ($environment != 'Production') {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The environment of this CiviCRM instance is set to \'%1\'. Certain functionality like scheduled jobs has been disabled.', array(1 => $environment)),
+        ts('Non-Production Environment'),
+        \Psr\Log\LogLevel::ALERT,
+        'fa-bug'
+      );
+    }
+    return $messages;
+  }
+
+  /**
+   * Check that the resource URL points to the correct location.
+   * @return array
+   */
+  public function checkResourceUrl() {
+    $messages = array();
+    // Skip when run during unit tests, you can't check without a CMS.
+    if (CRM_Core_Config::singleton()->userFramework == 'UnitTests') {
+      return $messages;
+    }
+    // Does arrow.png exist where we expect it?
+    $arrowUrl = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'packages/jquery/css/images/arrow.png';
+    $headers = get_headers($arrowUrl);
+    $fileExists = stripos($headers[0], "200 OK") ? 1 : 0;
+    if (!$fileExists) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The Resource URL is not set correctly. Please set the <a href="%1">CiviCRM Resource URL</a>.',
+          array(1 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1'))),
+        ts('Incorrect Resource URL'),
+        \Psr\Log\LogLevel::ERROR,
         'fa-server'
       );
     }

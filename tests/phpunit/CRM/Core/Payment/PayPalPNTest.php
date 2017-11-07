@@ -76,8 +76,8 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   public function testInvoiceSentOnIPNPaymentSuccess() {
     $this->enableTaxAndInvoicing();
 
-    $pendingStatusID = CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name');
-    $completedStatusID = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+    $pendingStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $completedStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     $params = array(
       'payment_processor_id' => $this->_paymentProcessorID,
       'contact_id' => $this->_contactID,

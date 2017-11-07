@@ -481,11 +481,11 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
       case 'case_tags':
         $tags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
 
-        if (is_array($value)) {
-          foreach ($value as $k => $v) {
+        if (!empty($value)) {
+          $val = explode(',', $value);
+          foreach ($val as $v) {
             if ($v) {
-              $val[$k] = $k;
-              $names[] = $tags[$k];
+              $names[] = $tags[$v];
             }
           }
         }
@@ -517,7 +517,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
         break;
 
       case 'civicrm_case_reporter':
-        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+        $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
         $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $from .= " $side JOIN civicrm_activity_contact as case_activity_contact ON (case_activity.id = case_activity_contact.activity_id AND  case_activity_contact.record_type_id = {$sourceID} ) ";
         $from .= " $side JOIN civicrm_contact as civicrm_case_reporter ON case_activity_contact.contact_id = civicrm_case_reporter.id ";
@@ -701,12 +701,10 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     }
     $form->assign('accessAllCases', $accessAllCases);
 
-    $caseTags = CRM_Core_BAO_Tag::getTags('civicrm_case');
+    $caseTags = CRM_Core_BAO_Tag::getColorTags('civicrm_case');
 
     if ($caseTags) {
-      foreach ($caseTags as $tagID => $tagName) {
-        $form->_tagElement = &$form->addElement('checkbox', "case_tags[$tagID]", NULL, $tagName);
-      }
+      $form->add('select2', 'case_tags', ts('Case Tag(s)'), $caseTags, FALSE, array('class' => 'big', 'placeholder' => ts('- select -'), 'multiple' => TRUE));
     }
 
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_case');
@@ -715,6 +713,16 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     if (CRM_Core_Permission::check('administer CiviCase')) {
       $form->addElement('checkbox', 'case_deleted', ts('Deleted Cases'));
     }
+
+    $form->addElement('text',
+      'case_subject',
+      ts('Case Subject'),
+      array('class' => 'huge')
+    );
+    $form->addElement('text',
+      'case_id',
+      ts('Case ID')
+    );
 
     self::addCustomFormFields($form, array('Case'));
 

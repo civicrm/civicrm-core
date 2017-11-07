@@ -314,6 +314,13 @@ function civicrm_api3_job_process_pledge($params) {
 function civicrm_api3_job_process_mailing($params) {
   $mailsProcessedOrig = CRM_Mailing_BAO_MailingJob::$mailsProcessed;
 
+  try {
+    CRM_Core_BAO_Setting::isAPIJobAllowedToRun($params);
+  }
+  catch (Exception $e) {
+    return civicrm_api3_create_error($e->getMessage());
+  }
+
   if (!CRM_Mailing_BAO_Mailing::processQueue()) {
     return civicrm_api3_create_error('Process Queue failed');
   }
@@ -494,6 +501,7 @@ function civicrm_api3_job_process_batch_merge($params) {
       'options' => array('limit' => 1),
     ));
   }
+  $rgid = CRM_Utils_Array::value('rgid', $params);
   $gid = CRM_Utils_Array::value('gid', $params);
   $mode = CRM_Utils_Array::value('mode', $params, 'safe');
 

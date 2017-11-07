@@ -54,7 +54,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     // This reuses some styles from search forms
     CRM_Core_Resources::singleton()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
 
-    self::$_entityID = CRM_Utils_Request::retrieve('bid', 'Positive') ? CRM_Utils_Request::retrieve('bid', 'Positive') : $_POST['batch_id'];
+    self::$_entityID = CRM_Utils_Request::retrieve('bid', 'Positive') ? CRM_Utils_Request::retrieve('bid', 'Positive') : CRM_Utils_Array::value('batch_id', $_POST);
     $this->assign('entityID', self::$_entityID);
     if (isset(self::$_entityID)) {
       $this->_batchStatusId = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'status_id');
@@ -67,7 +67,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
         $validStatus = TRUE;
       }
       $this->assign('validStatus', $validStatus);
-
+      $this->_values = civicrm_api3('Batch', 'getSingle', array('id' => self::$_entityID));
       $batchTitle = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'title');
       CRM_Utils_System::setTitle(ts('Accounting Batch - %1', array(1 => $batchTitle)));
 
@@ -76,10 +76,10 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
         'status' => ts('Status'),
         'description' => ts('Description'),
         'payment_instrument' => ts('Payment Method'),
-        'item_count' => ts('Entered Transactions'),
-        'assigned_item_count' => ts('Assigned Transactions'),
-        'total' => ts('Entered Total'),
-        'assigned_total' => ts('Assigned Total'),
+        'item_count' => ts('Expected Number of Items'),
+        'assigned_item_count' => ts('Actual Number of Items'),
+        'total' => ts('Expected Total Amount'),
+        'assigned_total' => ts('Actual Total Amount'),
         'opened_date' => ts('Opened'),
       );
       $this->assign('columnHeaders', $columnHeaders);
@@ -100,8 +100,12 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     }
 
     parent::buildQuickForm();
-    $this->add('submit', 'close_batch', ts('Close Batch'));
-    $this->add('submit', 'export_batch', ts('Close & Export Batch'));
+    if (CRM_Batch_BAO_Batch::checkBatchPermission('close', $this->_values['created_id'])) {
+      $this->add('submit', 'close_batch', ts('Close Batch'));
+      if (CRM_Batch_BAO_Batch::checkBatchPermission('export', $this->_values['created_id'])) {
+        $this->add('submit', 'export_batch', ts('Close & Export Batch'));
+      }
+    }
 
     // text for sort_name
     $this->addElement('text',

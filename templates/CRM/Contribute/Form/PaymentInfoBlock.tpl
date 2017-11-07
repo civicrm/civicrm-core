@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
@@ -23,34 +22,37 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
- */
-class CRM_Report_Form_Contribute_LoggingDetail extends CRM_Logging_ReportDetail {
-  /**
-   */
-  public function __construct() {
-    $logging = new CRM_Logging_Schema();
-    $this->tables[] = 'civicrm_contribution';
-    $this->tables = array_merge($this->tables, array_keys($logging->customDataLogTables()));
-
-    $this->detail = 'logging/contribute/detail';
-    $this->summary = 'logging/contribute/summary';
-
-    parent::__construct();
-  }
-
-  public function buildQuickForm() {
-    parent::buildQuickForm();
-
-    // link back to summary report
-    $this->assign('backURL', CRM_Report_Utils_Report::getNextUrl('logging/contribute/summary', 'reset=1', FALSE, TRUE));
-  }
-
-}
+*}
+{crmRegion name="payment-info-block"}
+{if !empty($payments)}
+  <table class="selector row-highlight">
+    <tr>
+      <th>{ts}Amount{/ts}</th>
+      <th>{ts}Type{/ts}</th>
+      <th>{ts}Payment Method{/ts}</th>
+      <th>{ts}Received{/ts}</th>
+      <th>{ts}Transaction ID{/ts}</th>
+      <th>{ts}Status{/ts}</th>
+      <th></th>
+    </tr>
+    {foreach from=$payments item=payment}
+      <tr class="{cycle values="odd-row,even-row"}">
+        <td>{$payment.total_amount|crmMoney:$payment.currency}</td>
+        <td>{$payment.financial_type}</td>
+        <td>{$payment.payment_instrument}{if $payment.check_number} (#{$payment.check_number}){/if}</td>
+        <td>{$payment.receive_date|crmDate}</td>
+        <td>{$payment.trxn_id}</td>
+        <td>{$payment.status}</td>
+        <td>{$payment.action}</td>
+      </tr>
+    {/foreach}
+  </table>
+{else}
+   {if $component eq 'event'}
+     {assign var='entity' value='participant'}
+   {else}
+     {assign var='entity' value=$component}
+   {/if}
+   {ts 1=$entity}No payments found for this %1 record{/ts}
+{/if}
+{/crmRegion}

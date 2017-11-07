@@ -59,4 +59,41 @@ class CRM_Utils_SQL {
     return $clauses;
   }
 
+  /**
+   * Get current sqlModes of the session
+   * @return array
+   */
+  public static function getSqlModes() {
+    $sqlModes = explode(',', CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode'));
+    return $sqlModes;
+  }
+
+  /**
+   * Does this System support the MYSQL mode ONLY_FULL_GROUP_BY
+   * @return mixed
+   */
+  public static function supportsFullGroupBy() {
+    return version_compare(CRM_Core_DAO::singleValueQuery('SELECT VERSION()'), '5.7', '>=');
+  }
+
+  /**
+   * Disable ONLY_FULL_GROUP_BY for MySQL versions lower then 5.7
+   *
+   * @return bool
+   */
+  public static function disableFullGroupByMode() {
+    $sqlModes = self::getSqlModes();
+
+    // Disable only_full_group_by mode for lower sql versions.
+    if (!self::supportsFullGroupBy() || (!empty($sqlModes) && !in_array('ONLY_FULL_GROUP_BY', $sqlModes))) {
+      if ($key = array_search('ONLY_FULL_GROUP_BY', $sqlModes)) {
+        unset($sqlModes[$key]);
+        CRM_Core_DAO::executeQuery("SET SESSION sql_mode = '" . implode(',', $sqlModes) . "'");
+      }
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
 }

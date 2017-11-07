@@ -147,6 +147,41 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-21026 Test ContributionCount after contribution created with disabled FT
+   */
+  public function testContributionCountDisabledFinancialType() {
+    $contactId = $this->individualCreate();
+    $financialType = array(
+      'name' => 'grassvariety1' . substr(sha1(rand()), 0, 7),
+      'is_reserved' => 0,
+      'is_active' => 0,
+    );
+    $finType = $this->callAPISuccess('financial_type', 'create', $financialType);
+    $params = array(
+      'contact_id' => $contactId,
+      'currency' => 'USD',
+      'financial_type_id' => $finType['id'],
+      'contribution_status_id' => 1,
+      'payment_instrument_id' => 1,
+      'source' => 'STUDENT',
+      'receive_date' => '20080522000000',
+      'receipt_date' => '20080522000000',
+      'id' => NULL,
+      'non_deductible_amount' => 0.00,
+      'total_amount' => 200.00,
+      'fee_amount' => 5,
+      'net_amount' => 195,
+      'trxn_id' => '22ereerwww322323',
+      'invoice_id' => '22ed39c9e9ee6ef6031621ce0eafe6da70',
+      'thankyou_date' => '20080522',
+    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $testResult = $this->callAPISuccess('financial_type', 'create', array('is_active' => 0, 'id' => $finType['id']));
+    $contributionCount = CRM_Contribute_BAO_Contribution::contributionCount($contactId);
+    $this->assertEquals(1, $contributionCount);
+  }
+
+  /**
    * DeleteContribution() method
    */
   public function testDeleteContribution() {
@@ -690,7 +725,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'financial_type_id' => 4,
       'contribution_status_id' => 1,
       'partial_payment_total' => 300.00,
-      'partial_amount_pay' => 150,
+      'partial_amount_to_pay' => 150,
       'contribution_mode' => 'participant',
       'participant_id' => $participant->id,
     );
@@ -1017,7 +1052,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'receipt_date' => '20080522000000',
       'total_amount' => '20000.00',
       'partial_payment_total' => '20,000.00',
-      'partial_amount_pay' => '8,000.00',
+      'partial_amount_to_pay' => '8,000.00',
     );
 
     $contribution = CRM_Contribute_BAO_Contribution::create($params);
@@ -1058,15 +1093,9 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'payment_instrument_id' => 1,
       'trxn_date' => date('Ymd'),
       'status_id' => 1,
+      'entity_id' => $contribution['id'],
     );
     $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'create', $params);
-    $params = array(
-      'amount' => 50,
-      'entity_table' => 'civicrm_contribution',
-      'entity_id' => $contribution['id'],
-      'financial_trxn_id' => $financialTrxn['id'],
-    );
-    $this->callAPISuccess('EntityFinancialTrxn', 'create', $params);
     $entityParams = array(
       'contribution_total_amount' => $contribution['total_amount'],
       'trxn_total_amount' => 55,
@@ -1076,11 +1105,11 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $eftParams = array(
       'entity_table' => 'civicrm_financial_item',
       'entity_id' => $previousLineItem['id'],
-      'financial_trxn_id' => $financialTrxn['id'],
+      'financial_trxn_id' => (string) $financialTrxn['id'],
     );
     CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
     $trxnTestArray = array_merge($eftParams, array(
-      'amount' => 50,
+      'amount' => '50.00',
     ));
     $this->callAPISuccessGetSingle('EntityFinancialTrxn', $eftParams, $trxnTestArray);
   }
@@ -1104,20 +1133,14 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   public function testcreateProportionalFinancialEntries() {
     list($contribution, $financialAccount) = $this->createContributionWithTax();
     $params = array(
-      'total_amount' => 55,
+      'total_amount' => 50,
       'to_financial_account_id' => $financialAccount->financial_account_id,
       'payment_instrument_id' => 1,
       'trxn_date' => date('Ymd'),
       'status_id' => 1,
+      'entity_id' => $contribution['id'],
     );
     $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'create', $params);
-    $params = array(
-      'amount' => 50,
-      'entity_table' => 'civicrm_contribution',
-      'entity_id' => $contribution['id'],
-      'financial_trxn_id' => $financialTrxn['id'],
-    );
-    $this->callAPISuccess('EntityFinancialTrxn', 'create', $params);
     $entityParams = array(
       'contribution_total_amount' => $contribution['total_amount'],
       'trxn_total_amount' => 55,
@@ -1189,6 +1212,84 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       )
     );
     return array($contribution, $financialAccount);
+  }
+
+  /**
+   * Test processOnBehalfOrganization() function.
+   */
+  public function testProcessOnBehalfOrganization() {
+    $orgInfo = array(
+      'phone' => '11111111',
+      'email' => 'testorg@gmail.com',
+      'street_address' => 'test Street',
+      'city' => 'test City',
+      'state_province' => 'AA',
+      'postal_code' => '222222',
+      'country' => 'United States',
+    );
+    $contactID = $this->individualCreate();
+    $orgId = $this->organizationCreate(array('organization_name' => 'testorg1'));
+    $orgCount = $this->callAPISuccessGetCount('Contact', array(
+      'contact_type' => "Organization",
+      'organization_name' => "testorg1",
+    ));
+    $this->assertEquals($orgCount, 1);
+
+    $values = $params = array();
+    $behalfOrganization = array(
+      'organization_name' => 'testorg1',
+      'phone' => array(
+        1 => array(
+          'phone' => $orgInfo['phone'],
+          'is_primary' => 1,
+        ),
+      ),
+      'email' => array(
+        1 => array(
+          'email' => $orgInfo['email'],
+          'is_primary' => 1,
+        ),
+      ),
+      'address' => array(
+        3 => array(
+          'street_address' => $orgInfo['street_address'],
+          'city' => $orgInfo['city'],
+          'location_type_id' => 3,
+          'postal_code' => $orgInfo['postal_code'],
+          'country' => 'US',
+          'state_province' => 'AA',
+          'is_primary' => 1,
+        ),
+      ),
+    );
+    $fields = array(
+      'organization_name' => 1,
+      'phone-3-1' => 1,
+      'email-3' => 1,
+      'street_address-3' => 1,
+      'city-3' => 1,
+      'postal_code-3' => 1,
+      'country-3' => 1,
+      'state_province-3' => 1,
+    );
+    CRM_Contribute_Form_Contribution_Confirm::processOnBehalfOrganization($behalfOrganization, $contactID, $values, $params, $fields);
+
+    //Check whether new organisation is not created.
+    $result = $this->callAPISuccess('Contact', 'get', array(
+      'contact_type' => "Organization",
+      'organization_name' => "testorg1",
+    ));
+    $this->assertEquals($result['count'], 1);
+
+    //Assert all org values are updated.
+    foreach ($orgInfo as $key => $val) {
+      $this->assertEquals($result['values'][$orgId][$key], $val);
+    }
+
+    //Check if alert is assigned to params if more than 1 dupe exists.
+    $orgId = $this->organizationCreate(array('organization_name' => 'testorg1', 'email' => 'testorg@gmail.com'));
+    CRM_Contribute_Form_Contribution_Confirm::processOnBehalfOrganization($behalfOrganization, $contactID, $values, $params, $fields);
+    $this->assertEquals($params['onbehalf_dupe_alert'], 1);
   }
 
   /**

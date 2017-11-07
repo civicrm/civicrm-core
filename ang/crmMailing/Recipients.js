@@ -6,12 +6,8 @@
       restrict: 'AE',
       require: 'ngModel',
       scope: {
-        crmAvailGroups: '@', // available groups
-        crmAvailMailings: '@', // available mailings
-        crmMandatoryGroups: '@', // hard-coded/mandatory groups
         ngRequired: '@'
       },
-      templateUrl: '~/crmMailing/Recipients.html',
       link: function(scope, element, attrs, ngModel) {
         scope.recips = ngModel.$viewValue;
         scope.groups = scope.$parent.$eval(attrs.crmAvailGroups);
@@ -116,14 +112,157 @@
           }
         }
 
+        var rcpAjaxState = {
+         input: '',
+         entity: 'civicrm_group',
+         type: 'include',
+         page_n: 0,
+         page_i: 0,
+        };
+
         $(element).select2({
+          width: '36em',
           dropdownAutoWidth: true,
           placeholder: "Groups or Past Recipients",
           formatResult: formatItem,
           formatSelection: formatItem,
           escapeMarkup: function(m) {
             return m;
-          }
+          },
+          multiple: true,
+          initSelection: function(el, cb) {
+            var values = el.val().split(',');
+
+            var gids = [];
+            var mids = [];
+
+            for (var i in values) {
+              var dv = convertValueToObj(values[i]);
+              if (dv.entity_type == 'civicrm_group') {
+                gids.push(dv.entity_id);
+              }
+              else if (dv.entity_type == 'civicrm_mailing') {
+                mids.push(dv.entity_id);
+              }
+            }
+
+            CRM.api3('Group', 'getlist', { params: { id: { IN: gids } }, extra: ["is_hidden"] }).then(
+              function(glist) {
+                CRM.api3('Mailing', 'getlist', { params: { id: { IN: mids } } }).then(
+                  function(mlist) {
+                    var datamap = [];
+
+                    var groupNames = [];
+                    var civiMails = [];
+
+                    $(glist.values).each(function (idx, group) {
+                      var key = group.id + ' civicrm_group include';
+                      groupNames.push({id: parseInt(group.id), title: group.label, is_hidden: group.extra.is_hidden});
+
+                      if (values.indexOf(key) >= 0) {
+                        datamap.push({id: key, text: group.label});
+                      }
+
+                      key = group.id + ' civicrm_group exclude';
+                      if (values.indexOf(key) >= 0) {
+                        datamap.push({id: key, text: group.label});
+                      }
+                    });
+
+                    $(mlist.values).each(function (idx, group) {
+                      var key = group.id + ' civicrm_mailing include';
+                      civiMails.push({id: parseInt(group.id), name: group.label});
+
+                      if (values.indexOf(key) >= 0) {
+                        datamap.push({id: key, text: group.label});
+                      }
+
+                      key = group.id + ' civicrm_mailing exclude';
+                      if (values.indexOf(key) >= 0) {
+                        datamap.push({id: key, text: group.label});
+                      }
+                    });
+
+                    scope.$parent.crmMailingConst.groupNames = groupNames;
+                    scope.$parent.crmMailingConst.civiMails = civiMails;
+
+                    refreshMandatory();
+
+                    cb(datamap);
+                  });
+              });
+          },
+          ajax: {
+            url: CRM.url('civicrm/ajax/rest'),
+            quietMillis: 300,
+            data: function(input, page_num) {
+              if (page_num <= 1) {
+                rcpAjaxState = {
+                  input: input,
+                  entity: 'civicrm_group',
+                  type: 'include',
+                  page_n: 0,
+                };
+              }
+
+              rcpAjaxState.page_i = page_num - rcpAjaxState.page_n;
+              var filterParams = {};
+              switch(rcpAjaxState.entity) {
+              case 'civicrm_group':
+                filterParams = { is_hidden: 0, is_active: 1, group_type: {"LIKE": "%2%"} };
+                break;
+
+              case 'civicrm_mailing':
+                filterParams = { is_hidden: 0, is_active: 1 };
+                break;
+              }
+              var params = {
+                input: input,
+                page_num: rcpAjaxState.page_i,
+                params: filterParams,
+              };
+              return params;
+            },
+            transport: function(params) {
+              switch(rcpAjaxState.entity) {
+              case 'civicrm_group':
+                CRM.api3('Group', 'getlist', params.data).then(params.success, params.error);
+                break;
+
+              case 'civicrm_mailing':
+                params.data.params.options = { sort: "is_archived asc, scheduled_date desc" };
+                CRM.api3('Mailing', 'getlist', params.data).then(params.success, params.error);
+                break;
+              }
+            },
+            results: function(data) {
+              results = {
+                children: $.map(data.values, function(obj) {
+                  return {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type,
+                             text: obj.label };
+                })
+              };
+
+              if (rcpAjaxState.page_i == 1 && data.count) {
+                results.text = ts((rcpAjaxState.type == 'include'? 'Include ' : 'Exclude ') +
+                  (rcpAjaxState.entity == 'civicrm_group'? 'Group' : 'Mailing'));
+              }
+
+              more = data.more_results || !(rcpAjaxState.entity == 'civicrm_mailing' && rcpAjaxState.type == 'exclude');
+
+              if (more && !data.more_results) {
+                if (rcpAjaxState.type == 'include') {
+                  rcpAjaxState.type = 'exclude';
+                } else {
+                 rcpAjaxState.type = 'include';
+                 rcpAjaxState.entity = 'civicrm_mailing';
+                }
+                rcpAjaxState.page_n += rcpAjaxState.page_i;
+              }
+
+              return { more: more, results: [ results ] };
+            },
+          },
         });
 
         $(element).on('select2-selecting', function(e) {

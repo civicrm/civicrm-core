@@ -86,6 +86,20 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Create a completed mailing (e.g when importing from a provider).
+   */
+  public function testMailerCreateCompleted() {
+    $this->_params['body_html'] = 'I am completed so it does not matter if there is an opt out link since I have already been sent by another system';
+    $this->_params['is_completed'] = 1;
+    $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + array('scheduled_date' => 'now'), __FUNCTION__, __FILE__);
+    $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
+    $this->assertEquals(1, $jobs['count']);
+    $this->assertEquals('Complete', $jobs['values'][$jobs['id']]['status']);
+    unset($this->_params['created_id']); // return isn't working on this in getAndCheck so lets not check it for now
+    $this->getAndCheck($this->_params, $result['id'], 'mailing');
+  }
+
+  /**
    * Per CRM-20316 the mailing should still create without created_id (not mandatory).
    */
   public function testMailerCreateSuccessNoCreatedID() {
@@ -877,6 +891,20 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
 
     $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($dao->queue_id, $dao->url_id);
     $this->assertContains($unicodeURL, $url);
+  }
+
+  /**
+   * CRM-20892 : Test if Mail.create API throws error on update,
+   *  if modified_date less then the date when the mail was last updated/created
+   */
+  public function testModifiedDateMismatchOnMailingUpdate() {
+    $mail = $this->callAPISuccess('mailing', 'create', $this->_params + array('modified_date' => 'now'));
+    try {
+      $this->callAPISuccess('mailing', 'create', $this->_params + array('id' => $mail['id'], 'modified_date' => '2 seconds ago'));
+    }
+    catch (Exception $e) {
+      $this->assertRegExp("/Failure in api call for mailing create:  Mailing has not been saved, Content maybe out of date, please refresh the page and try again/", $e->getMessage());
+    }
   }
 
 }

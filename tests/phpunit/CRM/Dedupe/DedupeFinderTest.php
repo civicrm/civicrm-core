@@ -58,6 +58,31 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $this->assertEquals(count($foundDupes), 3, 'Check Individual-Fuzzy dupe rule for dupesInGroup().');
   }
 
+  public function testCustomRule() {
+    $this->setupForGroupDedupe();
+
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', array(
+      'contact_type' => 'Individual',
+      'threshold' => 8,
+      'used' => 'General',
+      'name' => 'TestRule',
+      'title' => 'TestRule',
+      'is_reserved' => 0,
+    ));
+    foreach (array('first_name', 'last_name') as $field) {
+      $ruleDao = new CRM_Dedupe_DAO_Rule();
+      $ruleDao->dedupe_rule_group_id = $ruleGroup['id'];
+      $ruleDao->rule_table = 'civicrm_contact';
+      $ruleDao->rule_field = $field;
+      $ruleDao->rule_length = NULL;
+      $ruleDao->rule_weight = 4;
+      $ruleDao->save();
+      $ruleDao->free();
+    }
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $this->assertEquals(count($foundDupes), 4);
+  }
+
   /**
    * Test the supervised dedupe rule against a group.
    *

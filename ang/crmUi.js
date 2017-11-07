@@ -5,7 +5,7 @@
     pageTitle = 'CiviCRM',
     documentTitle = 'CiviCRM';
 
-  angular.module('crmUi', [])
+  angular.module('crmUi', CRM.angRequires('crmUi'))
 
     // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
     // WISHLIST: crmCollapsed should support two-way/continuous binding
@@ -124,7 +124,7 @@
     // example: <div crm-ui-field="{title: ts('My Field')}"> {{mydata}} </div>
     // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" /> </div>
     // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" required /> </div>
-    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field'), help: hs('help_field_name')}"> {{mydata}} </div>
+    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field'), help: hs('help_field_name'), required: true}"> {{mydata}} </div>
     .directive('crmUiField', function() {
       // Note: When writing new templates, the "label" position is particular. See/patch "var label" below.
       var templateUrls = {
@@ -255,12 +255,17 @@
           // immediately for initialization. Use retries/retryDelay to initialize such elements.
           var init = function (retries, retryDelay) {
             var input = $('#' + id);
-            if (input.length === 0) {
+            if (input.length === 0 && !attrs.crmUiForceRequired) {
               if (retries) {
                 $timeout(function(){
                   init(retries-1, retryDelay);
                 }, retryDelay);
               }
+              return;
+            }
+
+            if (attrs.crmUiForceRequired) {
+              scope.crmIsRequired = true;
               return;
             }
 
@@ -326,6 +331,7 @@
         link: function (scope, elm, attrs) {
           var iframe = $(elm)[0];
           iframe.setAttribute('width', '100%');
+          iframe.setAttribute('height', '250px');
           iframe.setAttribute('frameborder', '0');
 
           var refresh = function () {
@@ -353,6 +359,10 @@
           $(elm).parent().on('dialogresize dialogopen', function(e, ui) {
             $(this).css({padding: '0', margin: '0', overflow: 'hidden'});
             iframe.setAttribute('height', '' + $(this).innerHeight() + 'px');
+          });
+
+          $(elm).parent().on('dialogresize', function(e, ui) {
+            iframe.setAttribute('class', 'resized');
           });
 
           scope.$parent.$watch(attrs.crmUiIframe, refresh);
@@ -576,6 +586,7 @@
     .directive('crmUiSelect', function ($parse, $timeout) {
       return {
         require: '?ngModel',
+        priority: 1,
         scope: {
           crmUiSelect: '='
         },
@@ -611,7 +622,6 @@
             element.crmSelect2(scope.crmUiSelect || {});
             if (ngModel) {
               element.on('change', refreshModel);
-              $timeout(ngModel.$render);
             }
           }
 
@@ -690,7 +700,8 @@
       return {
         restrict: 'EA',
         scope: {
-          crmUiTabSet: '@'
+          crmUiTabSet: '@',
+          tabSetOptions: '@'
         },
         templateUrl: '~/crmUi/tabset.html',
         transclude: true,
@@ -787,11 +798,7 @@
           };
           this.isSelectable = function(step) {
             if (step.selected) return false;
-            var result = false;
-            angular.forEach(steps, function(otherStep, otherKey) {
-              if (step === otherStep && otherKey <= maxVisited) result = true;
-            });
-            return result;
+            return this.$validStep();
           };
 
           /*** @param Object step the $scope of the step */
@@ -1010,7 +1017,7 @@
               // If the CMS has already added title markup to the page, use it
               $('h1').not('.crm-container h1').each(function() {
                 if (_.trim($(this).html()) === pageTitle) {
-                  $(this).html(newPageTitle);
+                  $(this).addClass('crm-page-title').html(newPageTitle);
                   $el.hide();
                 }
               });

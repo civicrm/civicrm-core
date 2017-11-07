@@ -127,7 +127,7 @@
     <length>255</length>
     <add>1.8</add>
     <html>
-      <type>Text</type>
+      <type>Password</type>
     </html>
   </field>
   <field>

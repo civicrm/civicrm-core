@@ -165,6 +165,17 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertTrue(strpos($actual, $expected) !== FALSE);
   }
 
+  public function testAddSettingHook() {
+    $test = $this;
+    Civi::dispatcher()->addListener('hook_civicrm_alterResourceSettings', function($event) use ($test) {
+      $test->assertEquals('apple', $event->data['fruit']['mine']);
+      $event->data['fruit']['mine'] = 'banana';
+    });
+    $this->res->addSetting(array('fruit' => array('mine' => 'apple')));
+    $settings = $this->res->getSettings();
+    $this->assertTreeEquals(array('fruit' => array('mine' => 'banana')), $settings);
+  }
+
   public function testAddSettingFactory() {
     $this->res->addSettingsFactory(function () {
       return array('fruit' => array('yours' => 'orange'));

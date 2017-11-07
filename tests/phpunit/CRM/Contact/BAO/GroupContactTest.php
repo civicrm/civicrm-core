@@ -94,23 +94,45 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
    */
   public function testContactSearchByParentGroup() {
     // create a parent group
-    $groupParams1 = array(
+    $parentGroup = $this->callAPISuccess('Group', 'create', array(
       'title' => 'Parent Group',
       'description' => 'Parent Group',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-    );
-    $parentGroup = $this->callAPISuccess('Group', 'create', $groupParams1);
+    ));
 
     // create a child group
-    $groupParams2 = array(
+    $childGroup = $this->callAPISuccess('Group', 'create', array(
       'title' => 'Child Group',
       'description' => 'Child Group',
       'visibility' => 'User and User Admin Only',
       'parents' => $parentGroup['id'],
       'is_active' => 1,
-    );
-    $childGroup = $this->callAPISuccess('Group', 'create', $groupParams2);
+    ));
+
+    // create smart group based on saved criteria Gender = Male
+    $batch = $this->callAPISuccess('SavedSearch', 'create', array(
+      'form_values' => 'a:1:{i:0;a:5:{i:0;s:9:"gender_id";i:1;s:1:"=";i:2;i:2;i:3;i:0;i:4;i:0;}}',
+    ));
+    // Create contact with Gender - Male
+    $childSmartGroupContact = $this->individualCreate(array(
+      'gender_id' => "Male",
+      'first_name' => 'C',
+    ), 1);
+    // then create smart group
+    $childSmartGroup = $this->callAPISuccess('Group', 'create', array(
+      'title' => 'Child Smart Group',
+      'description' => 'Child Smart Group',
+      'visibility' => 'User and User Admin Only',
+      'saved_search_id' => $batch['id'],
+      'is_active' => 1,
+      'parents' => $parentGroup['id'],
+    ));
+
+    $this->callAPISuccess('Group', 'create', array(
+      'id' => $parentGroup['id'],
+      'children' => implode(',', array($childGroup['id'], $childSmartGroup['id'])),
+    ));
 
     // Create a contact within parent group
     $parentContactParams = array(
@@ -129,23 +151,21 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $childContact = $this->individualCreate($childContactParams);
 
     // Check if searching by parent group  returns both parent and child group contacts
-    $searchParams = array(
+    $result = $this->callAPISuccess('contact', 'get', array(
       'group' => $parentGroup['id'],
-    );
-    $result = $this->callAPISuccess('contact', 'get', $searchParams);
+    ));
     $validContactIds = array($parentContact, $childContact);
     $resultContactIds = array();
     foreach ($result['values'] as $k => $v) {
       $resultContactIds[] = $v['contact_id'];
     }
-    $this->assertEquals(2, count($resultContactIds), 'Check the count of returned values');
+    $this->assertEquals(3, count($resultContactIds), 'Check the count of returned values');
     $this->assertEquals(array(), array_diff($validContactIds, $resultContactIds), 'Check that the difference between two arrays should be blank array');
 
     // Check if searching by child group returns just child group contacts
-    $searchParams = array(
+    $result = $this->callAPISuccess('contact', 'get', array(
       'group' => $childGroup['id'],
-    );
-    $result = $this->callAPISuccess('contact', 'get', $searchParams);
+    ));
     $validChildContactIds = array($childContact);
     $resultChildContactIds = array();
     foreach ($result['values'] as $k => $v) {
@@ -153,6 +173,23 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     }
     $this->assertEquals(1, count($resultChildContactIds), 'Check the count of returned values');
     $this->assertEquals(array(), array_diff($validChildContactIds, $resultChildContactIds), 'Check that the difference between two arrays should be blank array');
+
+    // Check if searching by smart child group returns just smart child group contacts
+    $result = $this->callAPISuccess('contact', 'get', array(
+      'group' => $childSmartGroup['id'],
+    ));
+    $validChildContactIds = array($childSmartGroupContact);
+    $resultChildContactIds = array();
+    foreach ($result['values'] as $k => $v) {
+      $resultChildContactIds[] = $v['contact_id'];
+    }
+    $this->assertEquals(1, count($resultChildContactIds), 'Check the count of returned values');
+    $this->assertEquals(array(), array_diff($validChildContactIds, $resultChildContactIds), 'Check that the difference between two arrays should be blank array');
+
+    //cleanup
+    $this->callAPISuccess('Contact', 'delete', array('id' => $parentContact));
+    $this->callAPISuccess('Contact', 'delete', array('id' => $childContact));
+    $this->callAPISuccess('Contact', 'delete', array('id' => $childSmartGroupContact));
   }
 
 
@@ -292,7 +329,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     foreach ($useCases as $case) {
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
       list($select, $from, $where, $having) = $query->query();
-      $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where ORDER BY contact_a.first_name")->fetchAll();
+      $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id, contact_a.first_name $from $where ORDER BY contact_a.first_name")->fetchAll();
       foreach ($groupContacts as $key => $value) {
         $groupContacts[$key] = $value['id'];
       }

@@ -40,6 +40,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   protected $_customGroupExtends = array(
     'Contribution',
     'Membership',
+    'Contact',
   );
 
   /**
@@ -81,6 +82,10 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           ),
           'last_name' => array(
             'title' => ts('Last Name'),
+            'no_repeat' => TRUE,
+          ),
+          'nick_name' => array(
+            'title' => ts('Nickname'),
             'no_repeat' => TRUE,
           ),
           'contact_type' => array(

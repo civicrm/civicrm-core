@@ -80,9 +80,6 @@
       <td class="label">{$form.contact_id.label}</td>
       <td>{$form.contact_id.html}</td>
     {/if}
-    {if $contributionMode}
-      <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
-    {/if}
     <tr class="crm-contribution-form-block-contribution_type_id crm-contribution-form-block-financial_type_id">
       <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
       {if $is_test}
@@ -107,7 +104,7 @@
             <div id="priceset" class="hiddenElement"></div>
           {/if}
 
-          {if $ppID}{ts}<a href='#' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
+          {if $ppID}{ts}<a class='action-item crm-hover-button' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
           <div id="totalAmountBlock">
             {if $hasPriceSets}<span class="description">{ts}Alternatively, you can use a price set.{/ts}</span>{/if}
             <div id="totalTaxAmount" class="label"></div>
@@ -157,27 +154,6 @@
   {* CRM-7362 --add campaign to contributions *}
   {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-contribution-form-block-campaign_id"}
 
-    {if $contributionMode}
-    {if $email and $outBound_option != 2}
-     <tr class="crm-contribution-form-block-is_email_receipt">
-       <td class="label">{$form.is_email_receipt.label}</td>
-       <td>{$form.is_email_receipt.html}&nbsp; <span class="description">{ts 1=$email}Automatically email a receipt for this contribution to %1?{/ts}</span>
-       </td>
-     </tr>
-     {elseif $context eq 'standalone' and $outBound_option != 2 }
-       <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt"><td class="label">{$form.is_email_receipt.label}</td><td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this contribution to {/ts}<span id="email-address"></span>?</span></td></tr>
-    {/if}
-    <tr id="fromEmail" style="display:none;" >
-      <td class="label">{$form.from_email_address.label}</td>
-      <td>{$form.from_email_address.html}</td>
-    </tr>
-    <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
-      <td class="label">{$form.receipt_date.label}</td>
-      <td>{include file="CRM/common/jcalendar.tpl" elementName=receipt_date}<br />
-        <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
-      </td>
-    </tr>
-    {/if}
     {if !$contributionMode || $payNow}
       <tr class="crm-contribution-form-block-contribution_status_id">
         <td class="label">{$form.contribution_status_id.label}</td>
@@ -225,12 +201,46 @@
         </fieldset>
         </td>
       </tr>
+      <tr class="crm-contribution-form-block-receive_date">
+        <td class="label">{$form.receive_date.label}</td>
+        <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}<br />
+          <span class="description">{ts}The date this contribution was received.{/ts}</span>
+        </td>
+      </tr>
     {/if}
     {if $form.revenue_recognition_date && !$payNow}
       <tr class="crm-contribution-form-block-revenue_recognition_date">
         <td class="label">{$form.revenue_recognition_date.label}</td>
         <td>{$form.revenue_recognition_date.html}</td>
       </tr>
+    {/if}
+
+    {if $email and $outBound_option != 2}
+      <tr class="crm-contribution-form-block-is_email_receipt">
+        <td class="label">{$form.is_email_receipt.label}</td>
+        <td>{$form.is_email_receipt.html}&nbsp;
+          <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
+        </td>
+      </tr>
+    {elseif $context eq 'standalone' and $outBound_option != 2 }
+      <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt">
+        <td class="label">{$form.is_email_receipt.label}</td>
+        <td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
+        </td>
+      </tr>
+    {/if}
+    <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
+      <td class="label">{$form.from_email_address.label}</td>
+      <td>{$form.from_email_address.html}</td>
+    </tr>
+    <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
+      <td class="label">{$form.receipt_date.label}</td>
+      <td>{include file="CRM/common/jcalendar.tpl" elementName=receipt_date}<br />
+        <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
+      </td>
+    </tr>
+    {if $form.payment_processor_id}
+      <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
     {/if}
   </table>
 
@@ -240,50 +250,14 @@
         {ts}Payment Details{/ts}
       </legend>
         <table class="form-layout-compressed" >
-          <tr class="crm-contribution-form-block-receive_date">
-            <td class="label">{$form.receive_date.label}</td>
-            <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}<br />
-              <span class="description">{ts}The date this contribution was received.{/ts}</span>
-            </td>
-          </tr>
           <tr class="crm-contribution-form-block-payment_instrument_id">
             <td class="label">{$form.payment_instrument_id.label}</td>
             <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
             </td>
           </tr>
-          {if $showCheckNumber || !$isOnline}
-            <tr id="checkNumber" class="crm-contribution-form-block-check_number">
-              <td class="label">{$form.check_number.label}</td>
-              <td>{$form.check_number.html}</td>
-            </tr>
-          {/if}
           <tr class="crm-contribution-form-block-trxn_id">
             <td class="label">{$form.trxn_id.label}</td>
             <td {$valueStyle}>{$form.trxn_id.html} {help id="id-trans_id"}</td>
-          </tr>
-          {if $email and $outBound_option != 2}
-            <tr class="crm-contribution-form-block-is_email_receipt">
-              <td class="label">
-                {$form.is_email_receipt.label}</td><td>{$form.is_email_receipt.html}&nbsp;
-                <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
-              </td>
-            </tr>
-          {elseif $context eq 'standalone' and $outBound_option != 2 }
-            <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt">
-              <td class="label">{$form.is_email_receipt.label}</td>
-              <td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
-              </td>
-            </tr>
-          {/if}
-          <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
-            <td class="label">{$form.receipt_date.label}</td>
-            <td>{include file="CRM/common/jcalendar.tpl" elementName=receipt_date}<br />
-              <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
-            </td>
-          </tr>
-          <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
-            <td class="label">{$form.from_email_address.label}</td>
-            <td>{$form.from_email_address.html}</td>
           </tr>
         </table>
       </fieldset>
@@ -517,17 +491,6 @@
         {/literal}{/if}
       });
     </script>
-      {if !$contributionMode}
-        {crmAPI var="checkVal" entity="OptionValue" action="getvalue" version="3" option_group_id="payment_instrument" name="Check" return="value"}
-        {include file="CRM/common/showHideByFieldValue.tpl"
-        trigger_field_id    ="payment_instrument_id"
-        trigger_value       = $checkVal
-        target_element_id   ="checkNumber"
-        target_element_type ="table-row"
-        field_type          ="select"
-        invert              = 0
-        }
-    {/if}
   {/if} {* not delete mode if*}
 
 {/if} {* closing of main custom data if *}
@@ -592,7 +555,9 @@ function buildAmount( priceSetId, financialtypeIds ) {
   cj("#price_set_id option[value='']").html( manual );
 
   cj('label[for="total_amount"]').text('{/literal}{ts}Price Sets{/ts}{literal}');
-  cj("#financial_type_id option[value="+financialtypeIds[priceSetId]+"]").prop('selected', true);
+  if (financialtypeIds) {
+    cj("#financial_type_id option[value="+financialtypeIds[priceSetId]+"]").prop('selected', true);
+  }
   cj(".crm-contribution-form-block-financial_type_id").css("display", "none");
 }
 
@@ -647,6 +612,7 @@ CRM.$(function($) {
       if (!freezeFinancialType) {
         var financialType = $('#financial_type_id').val();
         var taxRates = '{/literal}{$taxRates}{literal}';
+        var taxTerm = '{/literal}{$taxTerm}{literal}';
         taxRates = JSON.parse(taxRates);
         var currencies = '{/literal}{$currencies}{literal}';
         currencies = JSON.parse(currencies);
@@ -672,8 +638,7 @@ CRM.$(function($) {
         taxAmount = isNaN (taxAmount) ? 0:taxAmount;
         var totalTaxAmount = taxAmount + Number(totalAmount);
         totalTaxAmount = formatMoney( totalTaxAmount, 2, separator, thousandMarker );
-
-        $("#totalTaxAmount" ).html('Amount with tax : <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
+        $("#totalTaxAmount" ).html('{/literal}{ts 1=$taxTerm}Amount with %1 :{/ts}{literal} <span id="currencySymbolShow">' + currencySymbol + '</span> '+ totalTaxAmount);
       }
       event.handled = true;
     }

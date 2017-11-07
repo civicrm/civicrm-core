@@ -68,8 +68,20 @@ class CRM_Utils_Mail {
         $params['auth'] = FALSE;
       }
 
-      // set the localhost value, CRM-3153
-      $params['localhost'] = CRM_Utils_Array::value('SERVER_NAME', $_SERVER, 'localhost');
+      /*
+       * Set the localhost value, CRM-3153
+       * Use the host name of the web server, falling back to the base URL
+       * (eg when using the PHP CLI), and then falling back to localhost.
+       */
+      $params['localhost'] = CRM_Utils_Array::value(
+        'SERVER_NAME',
+        $_SERVER,
+        CRM_Utils_Array::value(
+          'host',
+          parse_url(CIVICRM_UF_BASEURL),
+          'localhost'
+        )
+      );
 
       // also set the timeout value, lets set it to 30 seconds
       // CRM-7510
@@ -100,12 +112,12 @@ class CRM_Utils_Mail {
     }
     elseif ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
       CRM_Core_Error::debug_log_message(ts('Outbound mail has been disabled. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))));
-      CRM_Core_Session::setStatus(ts('Outbound mail has been disabled. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))));
+      CRM_Core_Error::statusBounce(ts('Outbound mail has been disabled. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))));
     }
     else {
       CRM_Core_Error::debug_log_message(ts('There is no valid SMTP server Setting Or SendMail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))));
-      CRM_Core_Session::setStatus(ts('There is no valid SMTP server Setting Or sendMail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))));
       CRM_Core_Error::debug_var('mailing_info', $mailingInfo);
+      CRM_Core_Error::statusBounce(ts('There is no valid SMTP server Setting Or sendMail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1'))));
     }
     return $mailer;
   }

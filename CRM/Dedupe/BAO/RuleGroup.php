@@ -115,7 +115,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
           }
         }
         // add custom data fields
-        foreach (CRM_Core_BAO_CustomGroup::getTree($ctype, CRM_Core_DAO::$_nullObject, NULL, -1) as $key => $cg) {
+        foreach (CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1) as $key => $cg) {
           if (!is_int($key)) {
             continue;
           }
@@ -238,6 +238,18 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
 
             preg_match($patternColumn, $query, $matches);
             $query = str_replace(' WHERE ', str_replace('column', $matches[1], $dupeCopyJoin), $query);
+
+            // CRM-19612: If there's a union, there will be two WHEREs, and you
+            // can't use the temp table twice.
+            if (preg_match('/dedupe_copy[\S\s]*(union)[\S\s]*dedupe_copy/i', $query, $matches, PREG_OFFSET_CAPTURE)) {
+              // Make a second temp table:
+              $dao->query("DROP TEMPORARY TABLE IF EXISTS dedupe_copy_2");
+              $dao->query("CREATE TEMPORARY TABLE dedupe_copy_2 SELECT * FROM dedupe WHERE weight >= {$weightSum}");
+              $dao->free();
+              // After the union, use that new temp table:
+              $part1 = substr($query, 0, $matches[1][1]);
+              $query = $part1 . str_replace('dedupe_copy', 'dedupe_copy_2', substr($query, $matches[1][1]));
+            }
           }
           $searchWithinDupes = 1;
 

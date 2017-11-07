@@ -65,6 +65,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   private static $dbInit = FALSE;
 
   /**
+   * Does the current setup support ONLY_FULL_GROUP_BY mode
+   */
+  protected $_supportFullGroupBy;
+
+  /**
    *  Database connection.
    *
    * @var PHPUnit_Extensions_Database_DB_IDatabaseConnection
@@ -290,6 +295,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     //  Get and save a connection to the database
     $this->_dbconn = $this->getConnection();
+
+    $this->_supportFullGroupBy = CRM_Utils_SQL::supportsFullGroupBy();
 
     // reload database before each test
     //        $this->_populateDB();
@@ -897,7 +904,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public function callAPISuccessGetSingle($entity, $params, $checkAgainst = NULL) {
     $params += array(
       'version' => $this->_apiversion,
-      'debug' => 1,
     );
     $result = $this->civicrm_api($entity, 'getsingle', $params);
     if (!is_array($result) || !empty($result['is_error']) || isset($result['values'])) {
@@ -1952,12 +1958,15 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * @param array $params
    *   Optional parameters.
+   * @param bool $reloadConfig
+   *   While enabling CiviCampaign component, we shouldn't always forcibly
+   *    reload config as this hinder hook call in test environment
    *
    * @return int
    *   Campaign ID.
    */
-  public function campaignCreate($params = array()) {
-    $this->enableCiviCampaign();
+  public function campaignCreate($params = array(), $reloadConfig = TRUE) {
+    $this->enableCiviCampaign($reloadConfig);
     $campaign = $this->callAPISuccess('campaign', 'create', array_merge(array(
       'name' => 'big_campaign',
       'title' => 'Campaign',
@@ -2248,11 +2257,16 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
   /**
    * Enable CiviCampaign Component.
+   *
+   * @param bool $reloadConfig
+   *    Force relaod config or not
    */
-  public function enableCiviCampaign() {
+  public function enableCiviCampaign($reloadConfig = TRUE) {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
-    // force reload of config object
-    $config = CRM_Core_Config::singleton(TRUE, TRUE);
+    if ($reloadConfig) {
+      // force reload of config object
+      $config = CRM_Core_Config::singleton(TRUE, TRUE);
+    }
     //flush cache by calling with reset
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
   }
@@ -2424,10 +2438,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $customGroup
    * @param string $name
    *   Name of custom field.
+   * @param array $extraParams
+   *   Additional parameters to pass through.
    *
    * @return array|int
    */
-  public function customFieldOptionValueCreate($customGroup, $name) {
+  public function customFieldOptionValueCreate($customGroup, $name, $extraParams = array()) {
     $fieldParams = array(
       'custom_group_id' => $customGroup['id'],
       'name' => 'test_custom_group',
@@ -2454,7 +2470,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'option_status' => 1,
     );
 
-    $params = array_merge($fieldParams, $optionGroup, $optionValue);
+    $params = array_merge($fieldParams, $optionGroup, $optionValue, $extraParams);
 
     return $this->callAPISuccess('custom_field', 'create', $params);
   }
@@ -2994,6 +3010,12 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
     $optionGroupID = $this->callAPISuccessGetValue('option_group', array('return' => 'id', 'name' => 'acl_role'));
+    $ov = new CRM_Core_DAO_OptionValue();
+    $ov->option_group_id = $optionGroupID;
+    $ov->value = 55;
+    if ($ov->find(TRUE)) {
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_option_value WHERE id = {$ov->id}");
+    }
     $optionValue = $this->callAPISuccess('option_value', 'create', array(
       'option_group_id' => $optionGroupID,
       'label' => 'pick me',
@@ -3394,7 +3416,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'financial_type_id' => 4,
       'contribution_status_id' => 1,
       'partial_payment_total' => 300.00,
-      'partial_amount_pay' => 150,
+      'partial_amount_to_pay' => 150,
       'contribution_mode' => 'participant',
       'participant_id' => $participant['id'],
     );
@@ -3887,6 +3909,24 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       $query = "UPDATE civicrm_participant SET source = 'Post Hook Update' WHERE id = %1";
       CRM_Core_DAO::executeQuery($query, $params);
     }
+  }
+
+
+  /**
+   * Instantiate form object.
+   *
+   * We need to instantiate the form to run preprocess, which means we have to trick it about the request method.
+   *
+   * @param string $class
+   *   Name of form class.
+   *
+   * @return \CRM_Core_Form
+   */
+  public function getFormObject($class) {
+    $form = new $class();
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $form->controller = new CRM_Core_Controller();
+    return $form;
   }
 
 }

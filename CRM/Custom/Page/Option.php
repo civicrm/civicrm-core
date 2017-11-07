@@ -109,6 +109,47 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
   }
 
   /**
+   * Alphabetize multiple option values
+   *
+   * @return void
+   */
+  public function alphabetize() {
+    $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
+      $this->_fid,
+      'option_group_id'
+    );
+    $query = "
+SELECT id, label
+FROM   civicrm_option_value
+WHERE  option_group_id = %1";
+    $params = array(
+      1 => array($optionGroupID, 'Integer'),
+    );
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $optionValue = array();
+    while ($dao->fetch()) {
+      $optionValue[$dao->id] = $dao->label;
+    }
+    asort($optionValue, SORT_STRING | SORT_FLAG_CASE | SORT_NATURAL);
+
+    $i = 1;
+    foreach ($optionValue as $key => $_) {
+      $clause[] = "WHEN $key THEN $i";
+      $i++;
+    }
+
+    $when = implode(' ', $clause);
+    $sql = "
+UPDATE civicrm_option_value
+SET weight = CASE id
+$when
+END
+WHERE option_group_id = %1";
+
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+  }
+
+  /**
    * Browse all custom group fields.
    *
    * @return void
@@ -167,7 +208,6 @@ WHERE  option_group_id = %1";
     $controller->setEmbedded(TRUE);
     $controller->process();
     $controller->run();
-    $this->browse();
   }
 
   /**
@@ -222,7 +262,7 @@ WHERE  option_group_id = %1";
       $this, FALSE, 0
     );
 
-    // what action to take ?
+    // take action in addition to default browse ?
     if (($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD |
           CRM_Core_Action::VIEW | CRM_Core_Action::DELETE
         )
@@ -232,9 +272,11 @@ WHERE  option_group_id = %1";
       // no browse for edit/update/view
       $this->edit($action);
     }
-    else {
-      $this->browse();
+    elseif ($action & CRM_Core_Action::MAP) {
+      $this->alphabetize();
     }
+    $this->browse();
+
     // Call the parents run method
     return parent::run();
   }

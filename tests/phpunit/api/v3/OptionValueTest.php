@@ -159,7 +159,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('option_group', 'get', array(
       'name' => 'from_email_address',
       'sequential' => 1,
-      'api.option_value.create' => array('domain_id' => 2, 'name' => 'my@y.com'),
+      'api.option_value.create' => array('domain_id' => 2, 'name' => 'my@y.com', 'value' => '10'),
     ));
 
     $optionValueId = $result['values'][0]['api.option_value.create']['id'];
@@ -168,6 +168,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'return' => 'domain_id',
     ));
     $this->assertEquals(2, $domain_id);
+    $this->callAPISuccess('option_value', 'delete', array('id' => $optionValueId));
   }
 
   /**
@@ -186,6 +187,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'return' => 'component_id',
     ));
     $this->assertEquals(2, $component_id);
+    $this->callAPISuccess('option_value', 'delete', array('id' => $optionValueId));
   }
 
   /**
@@ -207,6 +209,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'return' => 'component_id',
     ));
     $this->assertEquals(2, $component_id);
+    $this->callAPISuccess('option_value', 'delete', array('id' => $optionValueId));
   }
 
   /**
@@ -372,6 +375,43 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'return' => 'is_active',
     ));
     $this->assertEquals($val, 0, "update with group id is not proper " . __LINE__);
+  }
+
+  /**
+   * CRM-19346 Ensur that Option Values cannot share same value in the same option value group
+   */
+  public function testCreateOptionValueWithSameValue() {
+    $og = $this->callAPISuccess('option_group', 'create', array(
+      'name' => 'our test Option Group for with group id',
+      'is_active' => 1,
+    ));
+    // create a option value
+    $ov = $this->callAPISuccess('option_value', 'create',
+      array('option_group_id' => $og['id'], 'label' => 'test option value')
+    );
+    // update option value without 'option_group_id'
+    $ov2 = $this->callAPIFailure('option_value', 'create',
+      array('option_group_id' => $og['id'], 'label' => 'Test 2nd option value', 'value' => $ov['values'][$ov['id']]['value'])
+    );
+  }
+
+  public function testCreateOptionValueWithSameValueDiffOptionGroup() {
+    $og = $this->callAPISuccess('option_group', 'create', array(
+      'name' => 'our test Option Group for with group id',
+      'is_active' => 1,
+    ));
+    // create a option value
+    $ov = $this->callAPISuccess('option_value', 'create',
+      array('option_group_id' => $og['id'], 'label' => 'test option value')
+    );
+    $og2 = $this->callAPISuccess('option_group', 'create', array(
+      'name' => 'our test Option Group for with group id 2',
+      'is_active' => 1,
+    ));
+    // update option value without 'option_group_id'
+    $ov2 = $this->callAPISuccess('option_value', 'create',
+      array('option_group_id' => $og2['id'], 'label' => 'Test 2nd option value', 'value' => $ov['values'][$ov['id']]['value'])
+    );
   }
 
 }

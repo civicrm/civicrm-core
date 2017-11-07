@@ -120,6 +120,9 @@ img.menu-item-arrow{
   right: 4px;
   top: 8px;
 }
+#civicrm-menu i {
+  margin-right: 5px;
+}
 li.menu-separator{
   border-bottom: 1px solid #000;
   font-size: 0; /* for ie */
@@ -129,11 +132,11 @@ li.menu-separator{
 }
 #civicrm-menu .crm-logo-sm,
 .crm-container .crm-logo-sm {
-  background: url('../i/item_sprites.png') no-repeat scroll -80px -16px;
+  background: url('../i/logo_sm.png') no-repeat;
   display: inline-block;
   width: 16px;
   height: 16px;
-  vertical-align:middle;
+  vertical-align: middle;
 }
 
 #civicrm-menu .ui-autocomplete-input,

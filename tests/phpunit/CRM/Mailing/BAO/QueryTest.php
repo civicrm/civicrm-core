@@ -69,4 +69,24 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
     $this->assertEquals($ids, $contacts);
   }
 
+  /**
+   * CRM-20412: Test accurate count for unique open details
+   */
+  public function testOpenedMailingQuery() {
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
+    $op->execute($this->_dbconn,
+      $this->createFlatXMLDataSet(
+        dirname(__FILE__) . '/queryDataset.xml'
+      )
+    );
+
+    // ensure that total unique opened mail count is same while
+    //   fetching rows and row count for mailing_id = 14
+    $totalOpenedMailCount = CRM_Mailing_Event_BAO_Opened::getTotalCount(14, NULL, TRUE);
+    $totalOpenedMail = CRM_Mailing_Event_BAO_Opened::getRows(14, NULL, TRUE);
+
+    $this->assertEquals(4, $totalOpenedMailCount);
+    $this->assertEquals(4, count($totalOpenedMail));
+  }
+
 }

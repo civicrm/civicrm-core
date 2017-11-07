@@ -533,8 +533,17 @@ abstract class CRM_Core_Payment {
 
   /**
    * Get array of fields that should be displayed on the payment form.
-   * @todo make payment type an option value & use it in the function name - currently on debit & credit card work
+   *
+   * Common results are
+   *   array('credit_card_type', 'credit_card_number', 'cvv2', 'credit_card_exp_date')
+   *   or
+   *   array('account_holder', 'bank_account_number', 'bank_identification_number', 'bank_name')
+   *   or
+   *   array()
+   *
    * @return array
+   *   Array of payment fields appropriate to the payment processor.
+   *
    * @throws CiviCRM_API3_Exception
    */
   public function getPaymentFormFields() {
@@ -1437,11 +1446,10 @@ abstract class CRM_Core_Payment {
 
         case 'recur':
           $sql = "
-    SELECT con.contact_id
+    SELECT DISTINCT con.contact_id
       FROM civicrm_contribution_recur rec
 INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
-     WHERE rec.id = %1
-  GROUP BY rec.id";
+     WHERE rec.id = %1";
           $contactID = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($entityID, 'Integer')));
           $entityArg = 'crid';
           break;

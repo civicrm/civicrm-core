@@ -88,8 +88,7 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
 
     if ($this->get('edit')) {
       // make sure we have right permission to edit this user
-      $session = CRM_Core_Session::singleton();
-      $userID = $session->get('userID');
+      $userID = CRM_Core_Session::getLoggedInContactID();
 
       // Set the ID from the query string, otherwise default to the current user
       $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, $userID);
@@ -221,9 +220,11 @@ SELECT module,is_reserved
 
     $this->assign('cancelURL', $this->_cancelURL);
 
+    $cancelButtonValue = !empty($this->_ufGroup['cancel_button_text']) ? $this->_ufGroup['cancel_button_text'] : ts('Cancel');
+    $this->assign('cancelButtonText', $cancelButtonValue);
+
     if (($this->_multiRecord & CRM_Core_Action::DELETE) && $this->_recordExists) {
       $this->_deleteButtonName = $this->getButtonName('upload', 'delete');
-
       $this->addElement('submit', $this->_deleteButtonName, ts('Delete'));
 
       return;
@@ -242,7 +243,7 @@ SELECT module,is_reserved
 
     $buttons[] = array(
       'type' => $buttonName,
-      'name' => ts('Save'),
+      'name' => !empty($this->_ufGroup['submit_button_text']) ? $this->_ufGroup['submit_button_text'] : ts('Save'),
       'isDefault' => TRUE,
     );
 

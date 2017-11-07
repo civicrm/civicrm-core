@@ -484,6 +484,220 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-19653 : Test that custom field data should/shouldn't be overriden on
+   *   selecting/not selecting option to migrate data respectively
+   */
+  public function testCustomDataOverwrite() {
+    // Create Custom Field
+    $createGroup  = $this->setupCustomGroupForIndividual();
+    $createField = $this->setupCustomField('Graduation', $createGroup);
+    $customFieldName = "custom_" . $createField['id'];
+
+    // Contacts setup
+    $this->setupMatchData();
+
+    $originalContactID = $this->contacts[0]['id'];
+    $duplicateContactID1 = $this->contacts[1]['id']; // used as duplicate contact in 1st use-case
+    $duplicateContactID2 = $this->contacts[2]['id']; // used as duplicate contact in 2nd use-case
+
+    // update the text custom field for original contact with value 'abc'
+    $this->callAPISuccess('Contact', 'create', array(
+      'id' => $originalContactID,
+      "{$customFieldName}" => 'abc',
+    ));
+    $this->assertCustomFieldValue($originalContactID, 'abc', $customFieldName);
+
+    // update the text custom field for duplicate contact 1 with value 'def'
+    $this->callAPISuccess('Contact', 'create', array(
+      'id' => $duplicateContactID1,
+      "{$customFieldName}" => 'def',
+    ));
+    $this->assertCustomFieldValue($duplicateContactID1, 'def', $customFieldName);
+
+    // update the text custom field for duplicate contact 2 with value 'ghi'
+    $this->callAPISuccess('Contact', 'create', array(
+      'id' => $duplicateContactID2,
+      "{$customFieldName}" => 'ghi',
+    ));
+    $this->assertCustomFieldValue($duplicateContactID2, 'ghi', $customFieldName);
+
+    /*** USE-CASE 1: DO NOT OVERWRITE CUSTOM FIELD VALUE **/
+    $this->mergeContacts($originalContactID, $duplicateContactID1, array(
+        "move_{$customFieldName}" => NULL,
+    ));
+    $this->assertCustomFieldValue($originalContactID, 'abc', $customFieldName);
+
+    /*** USE-CASE 2: OVERWRITE CUSTOM FIELD VALUE **/
+    $this->mergeContacts($originalContactID, $duplicateContactID2, array(
+      "move_{$customFieldName}" => 'ghi',
+    ));
+    $this->assertCustomFieldValue($originalContactID, 'ghi', $customFieldName);
+
+    // cleanup created custom set
+    $this->callAPISuccess('CustomField', 'delete', array('id' => $createField['id']));
+    $this->callAPISuccess('CustomGroup', 'delete', array('id' => $createGroup['id']));
+  }
+
+  /**
+   * Verifies that when a contact with a custom field value is merged into a
+   * contact without a record int its corresponding custom group table, and none
+   * of the custom fields of that custom table are selected, the value is not
+   * merged in.
+   */
+  public function testMigrationOfUnselectedCustomDataOnEmptyCustomRecord() {
+    // Create Custom Fields
+    $createGroup  = $this->setupCustomGroupForIndividual();
+    $customField1 = $this->setupCustomField('TestField', $createGroup);
+
+    // Contacts setup
+    $this->setupMatchData();
+    $originalContactID = $this->contacts[0]['id'];
+    $duplicateContactID = $this->contacts[1]['id'];
+
+    // Update the text custom fields for duplicate contact
+    $this->callAPISuccess('Contact', 'create', array(
+      'id' => $duplicateContactID,
+      "custom_{$customField1['id']}" => 'abc',
+    ));
+    $this->assertCustomFieldValue($duplicateContactID, 'abc', "custom_{$customField1['id']}");
+
+    $this->mergeContacts($originalContactID, $duplicateContactID, array(
+      "move_custom_{$customField1['id']}" => NULL,
+    ));
+    $this->assertCustomFieldValue($originalContactID, '', "custom_{$customField1['id']}");
+
+    // cleanup created custom set
+    $this->callAPISuccess('CustomField', 'delete', array('id' => $customField1['id']));
+    $this->callAPISuccess('CustomGroup', 'delete', array('id' => $createGroup['id']));
+  }
+
+  /**
+   * Tests that if only part of the custom fields of a custom group are selected
+   * for a merge, only those values are merged, while all other fields of the
+   * custom group retain their original value, specifically for a contact with
+   * no records on the custom group table.
+   */
+  public function testMigrationOfSomeCustomDataOnEmptyCustomRecord() {
+    // Create Custom Fields
+    $createGroup  = $this->setupCustomGroupForIndividual();
+    $customField1 = $this->setupCustomField('Test1', $createGroup);
+    $customField2 = $this->setupCustomField('Test2', $createGroup);
+
+    // Contacts setup
+    $this->setupMatchData();
+    $originalContactID = $this->contacts[0]['id'];
+    $duplicateContactID = $this->contacts[1]['id'];
+
+    // Update the text custom fields for duplicate contact
+    $this->callAPISuccess('Contact', 'create', array(
+      'id' => $duplicateContactID,
+      "custom_{$customField1['id']}" => 'abc',
+      "custom_{$customField2['id']}" => 'def',
+    ));
+    $this->assertCustomFieldValue($duplicateContactID, 'abc', "custom_{$customField1['id']}");
+    $this->assertCustomFieldValue($duplicateContactID, 'def', "custom_{$customField2['id']}");
+
+    // Perform merge
+    $this->mergeContacts($originalContactID, $duplicateContactID, array(
+      "move_custom_{$customField1['id']}" => NULL,
+      "move_custom_{$customField2['id']}" => 'def',
+    ));
+    $this->assertCustomFieldValue($originalContactID, '', "custom_{$customField1['id']}");
+    $this->assertCustomFieldValue($originalContactID, 'def', "custom_{$customField2['id']}");
+
+    // cleanup created custom set
+    $this->callAPISuccess('CustomField', 'delete', array('id' => $customField1['id']));
+    $this->callAPISuccess('CustomField', 'delete', array('id' => $customField2['id']));
+    $this->callAPISuccess('CustomGroup', 'delete', array('id' => $createGroup['id']));
+  }
+
+  /**
+   * Calls merge method on given contacts, with values given in $params array.
+   *
+   * @param $originalContactID
+   *   ID of target contact
+   * @param $duplicateContactID
+   *   ID of contact to be merged
+   * @param $params
+   *   Array of fields to be merged from source into target contact, of the form
+   *   ['move_<fieldName>' => <fieldValue>]
+   */
+  private function mergeContacts($originalContactID, $duplicateContactID, $params) {
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($originalContactID, $duplicateContactID);
+
+    $migrationData = array(
+      'main_details' => $rowsElementsAndInfo['main_details'],
+      'other_details' => $rowsElementsAndInfo['other_details'],
+    );
+
+    // Migrate data of duplicate contact
+    CRM_Dedupe_Merger::moveAllBelongings($originalContactID, $duplicateContactID, array_merge($migrationData, $params));
+  }
+
+  /**
+   * Checks if the expected value for the given field corresponds to what is
+   * stored in the database for the given contact ID.
+   *
+   * @param $contactID
+   * @param $expectedValue
+   * @param $customFieldName
+   */
+  private function assertCustomFieldValue($contactID, $expectedValue, $customFieldName) {
+    $data = $this->callAPISuccess('Contact', 'getsingle', array(
+      'id' => $contactID,
+      'return' => array($customFieldName),
+    ));
+
+    $this->assertEquals($expectedValue, $data[$customFieldName], "Custom field value was supposed to be '{$expectedValue}', '{$data[$customFieldName]}' found.");
+  }
+
+  /**
+   * Creates a custom group to run tests on contacts that are individuals.
+   *
+   * @return array
+   *   Data for the created custom group record
+   */
+  private function setupCustomGroupForIndividual() {
+    $customGroup = $this->callAPISuccess('custom_group', 'get', array(
+      'name' => 'test_group',
+    ));
+
+    if ($customGroup['count'] > 0) {
+      $this->callAPISuccess('CustomGroup', 'delete', array('id' => $customGroup['id']));
+    }
+
+    $customGroup = $this->callAPISuccess('custom_group', 'create', array(
+      'title' => 'Test_Group',
+      'name' => 'test_group',
+      'extends' => array('Individual'),
+      'style' => 'Inline',
+      'is_multiple' => FALSE,
+      'is_active' => 1,
+    ));
+
+    return $customGroup;
+  }
+
+  /**
+   * Creates a custom field on the provided custom group with the given field
+   * label.
+   *
+   * @param $fieldLabel
+   * @param $createGroup
+   *
+   * @return array
+   *   Data for the created custom field record
+   */
+  private function setupCustomField($fieldLabel, $createGroup) {
+    return $this->callAPISuccess('custom_field', 'create', array(
+      'label' => $fieldLabel,
+      'data_type' => 'Alphanumeric',
+      'html_type' => 'Text',
+      'custom_group_id' => $createGroup['id'],
+    ));
+  }
+
+  /**
    * Set up some contacts for our matching.
    */
   public function setupMatchData() {

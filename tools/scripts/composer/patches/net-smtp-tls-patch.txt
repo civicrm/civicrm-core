@@ -1,0 +1,23 @@
+diff --git a/Net/SMTP.php b/Net/SMTP.php
+index 28eae8c..8f4e92b 100644
+--- a/Net/SMTP.php
++++ b/Net/SMTP.php
+@@ -602,7 +602,17 @@
+             if (PEAR::isError($result = $this->_parseResponse(220))) {
+                 return $result;
+             }
+-            if (PEAR::isError($result = $this->_socket->enableCrypto(true, STREAM_CRYPTO_METHOD_TLS_CLIENT))) {
++            if (isset($this->_socket_options['ssl']['crypto_method'])) {
++                $crypto_method = $this->_socket_options['ssl']['crypto_method'];
++            } else {
++                /* STREAM_CRYPTO_METHOD_TLS_ANY_CLIENT constant does not exist
++                 * and STREAM_CRYPTO_METHOD_SSLv23_CLIENT constant is
++                 * inconsistent across PHP versions. */
++                $crypto_method = STREAM_CRYPTO_METHOD_TLS_CLIENT
++                                 | @STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT
++                                 | @STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
++            }
++            if (PEAR::isError($result = $this->_socket->enableCrypto(true, $crypto_method))) {
+                 return $result;
+             } elseif ($result !== true) {
+                 return PEAR::raiseError('STARTTLS failed');

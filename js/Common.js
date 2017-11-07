@@ -1592,6 +1592,10 @@ if (!CRM.vars) CRM.vars = {};
     return format.replace(/1.*234.*56/, result);
   };
 
+  CRM.angRequires = function(name) {
+    return CRM.angular.requires[name] || [];
+  };
+
   CRM.console = function(method, title, msg) {
     if (window.console) {
       method = $.isFunction(console[method]) ? method : 'log';

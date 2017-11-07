@@ -76,6 +76,8 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    */
   public function testIPNPaymentRecurSuccess() {
     $this->setupRecurringPaymentProcessorTransaction();
+    global $_GET;
+    $_GET = $this->getPaypalProRecurTransaction();
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction());
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
@@ -93,6 +95,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       ));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
+    $this->assertEquals('Debit Card', $contribution['values'][1]['payment_instrument']);
   }
 
   /**
@@ -338,7 +341,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'amount_per_cycle' => '15.00',
       'mc_gross' => '15.00',
       'payment_date' => '03:59:05 Jul 14, 2013 PDT',
-      'rp_invoice_id' => 'i=' . $this->_invoiceID . '&m=contribute&c=' . $this->_contactID . '&r=' . $this->_contributionRecurID . '&b=' . $this->_contributionID . '&p=' . $this->_contributionPageID,
+      'rp_invoice_id' => 'i=' . $this->_invoiceID . '&m=contribute&c=' . $this->_contactID . '&r=' . $this->_contributionRecurID . '&b=' . $this->_contributionID . '&p=null',
       'payment_status' => 'Completed',
       'business' => 'nowhere@civicrm.org',
       'last_name' => 'Roberty',

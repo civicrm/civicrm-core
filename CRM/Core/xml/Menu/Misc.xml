@@ -89,7 +89,7 @@
      <path>civicrm/api</path>
      <page_callback>CRM_Admin_Page_APIExplorer</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
-     <title>CiviCRM API</title>
+     <title>CiviCRM API v3</title>
   </item>
   <item>
      <path>civicrm/ajax/apiexample</path>
@@ -120,6 +120,11 @@
      <path>civicrm/ajax/chart</path>
      <page_callback>CRM_Contribute_Form_ContributionCharts</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/asset/builder</path>
+    <page_callback>\Civi\Core\AssetBuilder::pageRun</page_callback>
+    <access_arguments>*always allow*</access_arguments>
   </item>
   <item>
      <path>civicrm/contribute/ajax/tableview</path>
@@ -206,5 +211,60 @@
     <page_callback>CRM_Core_Form_ShortCode</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
     <title>Insert CiviCRM Content</title>
+  </item>
+  <item>
+    <path>civicrm/task/add-to-group</path>
+    <page_callback>CRM_Contact_Form_Task_AddToGroup</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/remove-from-group</path>
+    <page_callback>CRM_Contact_Form_Task_RemoveFromGroup</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/add-to-tag</path>
+    <page_callback>CRM_Contact_Form_Task_AddToTag</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/remove-from-tag</path>
+    <page_callback>CRM_Contact_Form_Task_RemoveFromTag</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/send-email</path>
+    <page_callback>CRM_Contact_Form_Task_Email</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/make-mailing-label</path>
+    <page_callback>CRM_Contact_Form_Task_Label</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/pick-profile</path>
+    <page_callback>CRM_Contact_Form_Task_PickProfile</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/print-document</path>
+    <page_callback>CRM_Contact_Form_Task_PDF</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/unhold-email</path>
+    <page_callback>CRM_Contact_Form_Task_Unhold</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/alter-contact-preference</path>
+    <page_callback>CRM_Contact_Form_Task_AlterPreferences</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/delete-contact</path>
+    <page_callback>CRM_Contact_Form_Task_Delete</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
   </item>
 </menu>

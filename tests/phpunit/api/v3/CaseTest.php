@@ -52,6 +52,11 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   protected $_caseActivityId;
 
   /**
+   * @var \Civi\Core\SettingsStack
+   */
+  protected $settingsStack;
+
+  /**
    * Test setup for every test.
    *
    * Connect to the database, truncate the tables that will be used
@@ -75,6 +80,13 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'subject' => 'Test case',
       'contact_id' => 17,
     );
+
+    $this->settingsStack = new \Civi\Core\SettingsStack();
+  }
+
+  public function tearDown() {
+    $this->settingsStack->popAll();
+    parent::tearDown();
   }
 
   /**
@@ -147,6 +159,24 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
+   * Test case create with valid parameters and custom data.
+   */
+  public function testCaseCreateCustom() {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $params = $this->_params;
+    $params['custom_' . $ids['custom_field_id']] = "custom string";
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'get', array(
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'id' => $result['id'],
+    ));
+    $this->assertEquals("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
+  }
+
+  /**
    * Test update (create with id) function with valid parameters.
    */
   public function testCaseUpdate() {
@@ -163,9 +193,51 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $params['subject'] = $case['subject'] = 'Something Else';
     $this->callAPISuccess('case', 'create', $params);
 
-    // Verify that updated case is exactly equal to the original with new subject.
+    // Verify that updated case is equal to the original with new subject.
     $result = $this->callAPISuccessGetSingle('Case', array('case_id' => $id));
+    // Modification dates are likely to differ by 0-2 sec. Check manually.
+    $this->assertGreaterThanOrEqual($result['modified_date'], $case['modified_date']);
+    unset($result['modified_date']);
+    unset($case['modified_date']);
+    // Everything else should be identical.
     $this->assertAPIArrayComparison($result, $case);
+  }
+
+  /**
+   * Test case update with custom data
+   */
+  public function testCaseUpdateCustom() {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $params = $this->_params;
+
+    // Create a case with custom data
+    $params['custom_' . $ids['custom_field_id']] = 'custom string';
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+
+    $caseId = $result['id'];
+    $result = $this->callAPISuccess($this->_entity, 'get', array(
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'version' => 3,
+      'id' => $result['id'],
+    ));
+    $this->assertEquals("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
+    $fields = $this->callAPISuccess($this->_entity, 'getfields', array('version' => $this->_apiversion));
+    $this->assertTrue(is_array($fields['values']['custom_' . $ids['custom_field_id']]));
+
+    // Update the activity with custom data.
+    $params = array(
+      'id' => $caseId,
+      'custom_' . $ids['custom_field_id'] => 'Updated my test data',
+      'version' => $this->_apiversion,
+    );
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+
+    $result = $this->callAPISuccess($this->_entity, 'get', array(
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'version' => 3,
+      'id' => $result['id'],
+    ));
+    $this->assertEquals("Updated my test data", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
   }
 
   /**
@@ -333,7 +405,9 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   /**
    * Test activity api update for case activities.
    */
-  public function testCaseActivityUpdate() {
+  public function testCaseActivityUpdate_Tracked() {
+    $this->settingsStack->push('civicaseActivityRevisions', TRUE);
+
     // Need to create the case and activity before we can update it
     $this->testCaseActivityCreate();
 
@@ -372,7 +446,45 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     //TODO: check some more things
   }
 
+  /**
+   * If you disable `civicaseActivityRevisions`, then editing an activity
+   * will *not* create or change IDs.
+   */
+  public function testCaseActivityUpdate_Untracked() {
+    $this->settingsStack->push('civicaseActivityRevisions', FALSE);
+
+    //  Need to create the case and activity before we can update it
+    $this->testCaseActivityCreate();
+
+    $oldIDs = CRM_Utils_SQL_Select::from('civicrm_activity')
+      ->select('id, original_id, is_current_revision')
+      ->orderBy('id')
+      ->execute()->fetchAll();
+
+    $params = array(
+      'activity_id' => $this->_caseActivityId,
+      'case_id' => 1,
+      'activity_type_id' => 14,
+      'source_contact_id' => $this->_loggedInUser,
+      'subject' => 'New subject',
+    );
+    $result = $this->callAPISuccess('activity', 'create', $params);
+    $this->assertEquals($result['values'][$result['id']]['subject'], $params['subject']);
+
+    // id should not change because we've opted out.
+    $this->assertEquals($this->_caseActivityId, $result['values'][$result['id']]['id']);
+    $this->assertEmpty($result['values'][$result['id']]['original_id']);
+
+    $newIDs = CRM_Utils_SQL_Select::from('civicrm_activity')
+      ->select('id, original_id, is_current_revision')
+      ->orderBy('id')
+      ->execute()->fetchAll();
+    $this->assertEquals($oldIDs, $newIDs);
+  }
+
   public function testCaseActivityUpdateCustom() {
+    $this->settingsStack->push('civicaseActivityRevisions', TRUE);
+
     // Create a case first
     $result = $this->callAPISuccess('case', 'create', $this->_params);
 
@@ -643,9 +755,12 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    *
    * See the case.addtimeline api.
    *
+   * @dataProvider caseActivityRevisionExamples
    * @throws \Exception
    */
-  public function testCaseAddtimeline() {
+  public function testCaseAddtimeline($enableRevisions) {
+    $this->settingsStack->push('civicaseActivityRevisions', $enableRevisions);
+
     $caseSpec = array(
       'title' => 'Application with Definition',
       'name' => 'Application_with_Definition',
@@ -704,7 +819,6 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertEquals('Follow up', $result['values'][1]['activity_type_id.name']);
   }
 
-
   /**
    * Test the case merge function.
    *
@@ -731,6 +845,61 @@ class api_v3_CaseTest extends CiviCaseTestCase {
 
     $result = $this->callAPISuccess('Case', 'getsingle', array('id' => $case2['id']));
     $this->assertEquals(1, $result['is_deleted']);
+  }
+
+  public function caseActivityRevisionExamples() {
+    $examples = array();
+    $examples[] = array(FALSE);
+    $examples[] = array(TRUE);
+    return $examples;
+  }
+
+  public function testTimestamps() {
+    $params = $this->_params;
+    $case_created = $this->callAPISuccess('case', 'create', $params);
+
+    $case_1 = $this->callAPISuccess('Case', 'getsingle', array(
+      'id' => $case_created['id'],
+    ));
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_1['created_date']);
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_1['modified_date']);
+    $this->assertApproxEquals(strtotime($case_1['created_date']), strtotime($case_1['modified_date']), 2);
+
+    $activity_1 = $this->callAPISuccess('activity', 'getsingle', array(
+      'case_id' => $case_created['id'],
+      'options' => array(
+        'limit' => 1,
+      ),
+    ));
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_1['created_date']);
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_1['modified_date']);
+    $this->assertApproxEquals(strtotime($activity_1['created_date']), strtotime($activity_1['modified_date']), 2);
+
+    usleep(1.5 * 1000000);
+    $this->callAPISuccess('activity', 'create', array(
+      'id' => $activity_1['id'],
+      'subject' => 'Make cheese',
+    ));
+
+    $activity_2 = $this->callAPISuccess('activity', 'getsingle', array(
+      'id' => $activity_1['id'],
+    ));
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_2['created_date']);
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $activity_2['modified_date']);
+    $this->assertNotEquals($activity_2['created_date'], $activity_2['modified_date']);
+
+    $this->assertEquals($activity_1['created_date'], $activity_2['created_date']);
+    $this->assertNotEquals($activity_1['modified_date'], $activity_2['modified_date']);
+    $this->assertLessThan($activity_2['modified_date'], $activity_1['modified_date'],
+      sprintf("Original modification time (%s) should predate later modification time (%s)", $activity_1['modified_date'], $activity_2['modified_date']));
+
+    $case_2 = $this->callAPISuccess('Case', 'getsingle', array(
+      'id' => $case_created['id'],
+    ));
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_2['created_date']);
+    $this->assertRegExp(';^\d\d\d\d-\d\d-\d\d \d\d:\d\d;', $case_2['modified_date']);
+    $this->assertEquals($case_1['created_date'], $case_2['created_date']);
+    $this->assertNotEquals($case_2['created_date'], $case_2['modified_date']);
   }
 
 }

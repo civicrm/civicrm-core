@@ -1,6 +1,6 @@
 /// crmUi: Sundry UI helpers
 (function (angular, $, _) {
-  angular.module('crmUtil', []);
+  angular.module('crmUtil', CRM.angRequires('crmUtil'));
 
   // Angular implementation of CRM.api3
   // @link http://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface#AJAXInterface-CRM.api3

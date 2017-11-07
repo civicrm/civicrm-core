@@ -40,10 +40,6 @@
           <td class="label">{$form.payment_instrument_id.label}<span class='marker'>*</span></td>
           <td>{$form.payment_instrument_id.html} {help id="payment_instrument_id" file="CRM/Contribute/Page/Tab.hlp"}</td>
         </tr>
-        <tr id="checkNumber" class="crm-{$formClass}-form-block-check_number">
-          <td class="label">{$form.check_number.label}</td>
-          <td>{$form.check_number.html|crmAddClass:six}</td>
-        </tr>
 
         {if $action neq 2 }
           <tr class="crm-{$formClass}-form-block-trxn_id">
@@ -54,6 +50,12 @@
         <tr class="crm-{$formClass}-form-block-contribution_status_id">
           <td class="label">{$form.contribution_status_id.label}</td>
           <td>{$form.contribution_status_id.html}</td>
+        </tr>
+
+        <tr class="crm-membership-form-block-billing">
+          <td colspan="2">
+            {include file='CRM/Core/BillingBlockWrapper.tpl'}
+          </td>
         </tr>
       </table>
     </fieldset></td></tr>
@@ -100,9 +102,14 @@
 
   <div class="spacer"></div>
 {/if}
-
-<tr class="crm-membership-form-block-billing">
-  <td colspan="2">
-    {include file='CRM/Core/BillingBlockWrapper.tpl'}
-  </td>
-</tr>
+{if $membershipMode}
+  <tr>
+    <td class="label">{$form.payment_processor_id.label}</td>
+    <td>{$form.payment_processor_id.html}</td>
+  </tr>
+  <tr class="crm-membership-form-block-billing">
+    <td colspan="2">
+      {include file='CRM/Core/BillingBlockWrapper.tpl'}
+    </td>
+  </tr>
+{/if}

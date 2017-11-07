@@ -110,6 +110,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'name' => "AnnualFixed",
       'member_of_contact_id' => 23,
       'duration_unit' => "year",
+      'minimum_fee' => 50,
       'duration_interval' => 1,
       'period_type' => "fixed",
       'fixed_period_start_day' => "101",
@@ -136,8 +137,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
         'civicrm_uf_match',
       )
     );
-    $this->callAPISuccess('contact', 'delete', array('id' => 17, 'skip_undelete' => TRUE));
-    $this->callAPISuccess('contact', 'delete', array('id' => 23, 'skip_undelete' => TRUE));
+    foreach (array(17, 18, 23, 32) as $contactID) {
+      $this->callAPISuccess('contact', 'delete', array('id' => $contactID, 'skip_undelete' => TRUE));
+    }
     $this->callAPISuccess('relationship_type', 'delete', array('id' => 20));
   }
 
@@ -513,6 +515,172 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the submit function of the membership form on membership type change.
+   *  Check if the related contribuion is also updated if the minimum_fee didn't match
+   */
+  public function testContributionUpdateOnMembershipTypeChange() {
+    // Step 1: Create a Membership via backoffice whose with 50.00 payment
+    $form = $this->getForm();
+    $form->preProcess();
+    $this->mut = new CiviMailUtils($this, TRUE);
+    $this->createLoggedInUser();
+    $priceSet = $this->callAPISuccess('PriceSet', 'Get', array("extends" => "CiviMember"));
+    $form->set('priceSetId', $priceSet['id']);
+    CRM_Price_BAO_PriceSet::buildPriceSet($form);
+    $params = array(
+      'cid' => $this->_individualId,
+      'join_date' => date('m/d/Y', time()),
+      'start_date' => '',
+      'end_date' => '',
+      // This format reflects the 23 being the organisation & the 25 being the type.
+      'membership_type_id' => array(23, $this->membershipTypeAnnualFixedID),
+      'record_contribution' => 1,
+      'total_amount' => 50,
+      'receive_date' => date('m/d/Y', time()),
+      'receive_date_time' => '08:36PM',
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'financial_type_id' => '2', //Member dues, see data.xml
+      'payment_processor_id' => $this->_paymentProcessorID,
+    );
+    $form->_contactID = $this->_individualId;
+    $form->testSubmit($params);
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    // check the membership status after partial payment, if its Pending
+    $this->assertEquals(array_search('New', CRM_Member_PseudoConstant::membershipStatus()), $membership['status_id']);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array(
+      'contact_id' => $this->_individualId,
+    ));
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertEquals(50.00, $contribution['total_amount']);
+    $this->assertEquals(50.00, $contribution['net_amount']);
+
+    // Step 2: Change the membership type whose minimum free is less than earlier membership
+    $secondMembershipType = $this->callAPISuccess('membership_type', 'create', array(
+      'domain_id' => 1,
+      'name' => "Second Test Membership",
+      'member_of_contact_id' => 23,
+      'duration_unit' => "month",
+      'minimum_fee' => 25,
+      'duration_interval' => 1,
+      'period_type' => "fixed",
+      'fixed_period_start_day' => "101",
+      'fixed_period_rollover_day' => "1231",
+      'relationship_type_id' => 20,
+      'financial_type_id' => 2,
+    ));
+    Civi::settings()->set('update_contribution_on_membership_type_change', TRUE);
+    $form = $this->getForm();
+    $form->preProcess();
+    $form->_id = $membership['id'];
+    $form->set('priceSetId', $priceSet['id']);
+    CRM_Price_BAO_PriceSet::buildPriceSet($form);
+    $form->_action = CRM_Core_Action::UPDATE;
+    $params = array(
+      'cid' => $this->_individualId,
+      'join_date' => date('m/d/Y', time()),
+      'start_date' => '',
+      'end_date' => '',
+      // This format reflects the 23 being the organisation & the 25 being the type.
+      'membership_type_id' => array(23, $secondMembershipType['id']),
+      'record_contribution' => 1,
+      'status_id' => 1,
+      'total_amount' => 25,
+      'receive_date' => date('m/d/Y', time()),
+      'receive_date_time' => '08:36PM',
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'financial_type_id' => '2', //Member dues, see data.xml
+      'payment_processor_id' => $this->_paymentProcessorID,
+    );
+    $form->_contactID = $this->_individualId;
+    $form->testSubmit($params);
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    // check the membership status after partial payment, if its Pending
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array(
+      'contact_id' => $this->_individualId,
+    ));
+    $payment = CRM_Contribute_BAO_Contribution::getPaymentInfo($membership['id'], 'membership', FALSE, TRUE);
+    // Check the contribution status on membership type change whose minimum fee was less than earlier memebership
+    $this->assertEquals('Pending refund', $contribution['contribution_status']);
+    // Earlier paid amount
+    $this->assertEquals(50, $payment['paid']);
+    // balance remaning
+    $this->assertEquals(-25, $payment['balance']);
+  }
+
+  /**
+   * Test the submit function of the membership form for partial payment.
+   */
+  public function testSubmitPartialPayment() {
+    // Step 1: submit a partial payment for a membership via backoffice
+    $form = $this->getForm();
+    $form->preProcess();
+    $this->mut = new CiviMailUtils($this, TRUE);
+    $this->createLoggedInUser();
+    $priceSet = $this->callAPISuccess('PriceSet', 'Get', array("extends" => "CiviMember"));
+    $form->set('priceSetId', $priceSet['id']);
+    $partiallyPaidAmount = 25;
+    CRM_Price_BAO_PriceSet::buildPriceSet($form);
+    $params = array(
+      'cid' => $this->_individualId,
+      'join_date' => date('m/d/Y', time()),
+      'start_date' => '',
+      'end_date' => '',
+      // This format reflects the 23 being the organisation & the 25 being the type.
+      'membership_type_id' => array(23, $this->membershipTypeAnnualFixedID),
+      'record_contribution' => 1,
+      'total_amount' => $partiallyPaidAmount,
+      'receive_date' => date('m/d/Y', time()),
+      'receive_date_time' => '08:36PM',
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid'),
+      'financial_type_id' => '2', //Member dues, see data.xml
+      'payment_processor_id' => $this->_paymentProcessorID,
+    );
+    $form->_contactID = $this->_individualId;
+    $form->testSubmit($params);
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    // check the membership status after partial payment, if its Pending
+    $this->assertEquals(array_search('Pending', CRM_Member_PseudoConstant::membershipStatus()), $membership['status_id']);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array(
+      'contact_id' => $this->_individualId,
+    ));
+    $this->assertEquals('Partially paid', $contribution['contribution_status']);
+    // $this->assertEquals(50.00, $contribution['total_amount']);
+    // $this->assertEquals(25.00, $contribution['net_amount']);
+
+    // Step 2: submit the other half of the partial payment
+    //  via AdditionalPayment form to complete the related contribution
+    $form = new CRM_Contribute_Form_AdditionalPayment();
+    $submitParams = array(
+      'contribution_id' => $contribution['contribution_id'],
+      'contact_id' => $this->_individualId,
+      'total_amount' => $partiallyPaidAmount,
+      'currency' => 'USD',
+      'financial_type_id' => 2,
+      'receive_date' => '04/21/2015',
+      'receive_date_time' => '11:27PM',
+      'trxn_date' => '2017-04-11 13:05:11',
+      'payment_processor_id' => 0,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'check_number' => 'check-12345',
+    );
+    $form->cid = $this->_individualId;
+    $form->testSubmit($submitParams);
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    // check the membership status after additional payment, if its changed to 'New'
+    $this->assertEquals(array_search('New', CRM_Member_PseudoConstant::membershipStatus()), $membership['status_id']);
+
+    // check the contribution status and net amount after additional payment
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array(
+      'contact_id' => $this->_individualId,
+    ));
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+    // $this->assertEquals(50.00, $contribution['total_amount']);
+    // $this->assertEquals(50.00, $contribution['net_amount']);
+  }
+
+  /**
    * Test the submit function of the membership form.
    */
   public function testSubmitRecur() {
@@ -547,46 +715,47 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test membership form with Failed Contribution.
+   * CRM-20946: Test the financial entires especially the reversed amount,
+   *  after related Contribution is cancelled
    */
-  public function testFormStatusUpdate() {
-    $form = $this->getForm();
-    $form->preProcess();
-    $this->_individualId = $this->createLoggedInUser();
-    $memParams = array(
+  public function testFinancialEntiriesOnCancelledContribution() {
+    // Create two memberships for individual $this->_individualId, via a price set in the back end.
+    $this->createTwoMembershipsViaPriceSetInBackEnd($this->_individualId);
+
+    // cancel the related contribution via API
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array(
       'contact_id' => $this->_individualId,
-      'membership_type_id' => $this->membershipTypeAnnualFixedID,
-      'is_override' => TRUE,
-      'status_id' => array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus()),
-    );
-    $params = $this->getBaseSubmitParams();
-    $params['id'] = $this->contactMembershipCreate($memParams);
-    unset($params['price_set_id']);
-    unset($params['credit_card_number']);
-    unset($params['cvv2']);
-    unset($params['credit_card_exp_date']);
-    unset($params['credit_card_type']);
-    unset($params['send_receipt']);
-    unset($params['is_recur']);
+      'contribution_status_id' => 2,
+    ));
+    $this->callAPISuccess('Contribution', 'create', array(
+      'id' => $contribution['id'],
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Cancelled'),
+    ));
 
-    // process date params to mysql date format.
-    $dateTypes = array(
-      'join_date' => 'joinDate',
-      'start_date' => 'startDate',
-      'end_date' => 'endDate',
+    // fetch financial_trxn ID of the related contribution
+    $sql = "SELECT financial_trxn_id
+     FROM civicrm_entity_financial_trxn
+     WHERE entity_id = %1 AND entity_table = 'civicrm_contribution'
+     ORDER BY id DESC
+     LIMIT 1
+    ";
+    $financialTrxnID = CRM_Core_DAO::singleValueQuery($sql, array(1 => array($contribution['id'], 'Int')));
+
+    // fetch entity_financial_trxn records and compare their cancelled records
+    $result = $this->callAPISuccess('EntityFinancialTrxn', 'Get', array(
+      'financial_trxn_id' => $financialTrxnID,
+      'entity_table' => 'civicrm_financial_item',
+    ));
+    // compare the reversed amounts of respective memberships after cancelling contribution
+    $cancelledMembershipAmounts = array(
+      -20.00,
+      -10.00,
     );
-    $previousStatus = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $params['id'], 'status_id');
-    foreach ($dateTypes as $dateField => $dateVariable) {
-      $params[$dateField] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $params['id'], $dateField);
+    $count = 0;
+    foreach ($result['values'] as $record) {
+      $this->assertEquals($cancelledMembershipAmounts[$count], $record['amount']);
+      $count++;
     }
-    $form->_id = $params['id'];
-    $form->_mode = NULL;
-    $form->_contactID = $this->_individualId;
-
-    $form->testSubmit($params);
-    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
-    //Assert the status remains when the form dates are not modified.
-    $this->assertEquals($membership['status_id'], $previousStatus);
   }
 
   /**
@@ -647,6 +816,46 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'street_address' => '10 Test St',
       'postal_code' => 90210,
     ));
+  }
+
+  /**
+   * Test if membership is updated to New after contribution
+   * is updated from Partially paid to Completed.
+   */
+  public function testSubmitUpdateMembershipFromPartiallyPaid() {
+    $memStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'validate');
+
+    //Perform a pay later membership contribution.
+    $this->testSubmitPayLaterWithBilling();
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    $this->assertEquals($membership['status_id'], array_search('Pending', $memStatus));
+    $contribution = $this->callAPISuccessGetSingle('MembershipPayment', array(
+      'membership_id' => $membership['id'],
+    ));
+
+    //Update contribution to Partially paid.
+    $prevContribution = $this->callAPISuccess('Contribution', 'create', array(
+      'id' => $contribution['contribution_id'],
+      'contribution_status_id' => 'Partially paid',
+    ));
+    $prevContribution = $prevContribution['values'][1];
+
+    //Complete the contribution from offline form.
+    $form = new CRM_Contribute_Form_Contribution();
+    $submitParams = array(
+      'id' => $contribution['contribution_id'],
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'price_set_id' => 0,
+    );
+    $fields = array('total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'contact_id', 'payment_instrument_id');
+    foreach ($fields as $val) {
+      $submitParams[$val] = $prevContribution[$val];
+    }
+    $form->testSubmit($submitParams, CRM_Core_Action::UPDATE);
+
+    //Check if Membership is updated to New.
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    $this->assertEquals($membership['status_id'], array_search('New', $memStatus));
   }
 
   /**
@@ -745,6 +954,83 @@ Expires: ',
   }
 
   /**
+   * CRM-20955, CRM-20966:
+   * Test creating two memberships with inheritance via price set in the back end,
+   * checking that the correct primary & secondary memberships, contributions, line items
+   * & membership_payment records are created.
+   * Uses some data from tests/phpunit/CRM/Member/Form/dataset/data.xml .
+   */
+  public function testTwoInheritedMembershipsViaPriceSetInBackend() {
+    // Create an organization and give it a "Member of" relationship to $this->_individualId.
+    $orgID = $this->organizationCreate();
+    $relationship = $this->callAPISuccess('relationship', 'create', array(
+      'contact_id_a' => $this->_individualId,
+      'contact_id_b' => $orgID,
+      'relationship_type_id' => 20,
+      'is_active' => 1,
+    ));
+
+    // Create two memberships for the organization, via a price set in the back end.
+    $this->createTwoMembershipsViaPriceSetInBackEnd($orgID);
+
+    // Check the primary memberships on the organization.
+    $orgMembershipResult = $this->callAPISuccess('membership', 'get', array(
+      'contact_id' => $orgID,
+    ));
+    $this->assertEquals(2, $orgMembershipResult['count'], "2 primary memberships should have been created on the organization.");
+    $primaryMembershipIds = array();
+    foreach ($orgMembershipResult['values'] as $membership) {
+      $primaryMembershipIds[] = $membership['id'];
+      $this->assertTrue(empty($membership['owner_membership_id']), "Membership on the organization has owner_membership_id so is inherited.");
+    }
+
+    // CRM-20955: check that correct inherited memberships were created for the individual,
+    // for both of the primary memberships.
+    $individualMembershipResult = $this->callAPISuccess('membership', 'get', array(
+      'contact_id' => $this->_individualId,
+    ));
+    $this->assertEquals(2, $individualMembershipResult['count'], "2 inherited memberships should have been created on the individual.");
+    foreach ($individualMembershipResult['values'] as $membership) {
+      $this->assertNotEmpty($membership['owner_membership_id'], "Membership on the individual lacks owner_membership_id so is not inherited.");
+      $this->assertNotContains($membership['id'], $primaryMembershipIds, "Inherited membership id should not be the id of a primary membership.");
+      $this->assertContains($membership['owner_membership_id'], $primaryMembershipIds, "Inherited membership owner_membership_id should be the id of a primary membership.");
+    }
+
+    // CRM-20966: check that the correct membership contribution, line items
+    // & membership_payment records were created for the organization.
+    $contributionResult = $this->callAPISuccess('contribution', 'get', array(
+      'contact_id' => $orgID,
+      'sequential' => 1,
+      'api.line_item.get' => array(),
+      'api.membership_payment.get' => array(),
+    ));
+    $this->assertEquals(1, $contributionResult['count'], "One contribution should have been created for the organization's memberships.");
+
+    $this->assertEquals(2, $contributionResult['values'][0]['api.line_item.get']['count'], "2 line items should have been created for the organization's memberships.");
+    foreach ($contributionResult['values'][0]['api.line_item.get']['values'] as $lineItem) {
+      $this->assertEquals('civicrm_membership', $lineItem['entity_table'], "Membership line item's entity_table should be 'civicrm_membership'.");
+      $this->assertContains($lineItem['entity_id'], $primaryMembershipIds, "Membership line item's entity_id should be the id of a primary membership.");
+    }
+
+    $this->assertEquals(2, $contributionResult['values'][0]['api.membership_payment.get']['count'], "2 membership payment records should have been created for the organization's memberships.");
+    foreach ($contributionResult['values'][0]['api.membership_payment.get']['values'] as $membershipPayment) {
+      $this->assertEquals($contributionResult['values'][0]['id'], $membershipPayment['contribution_id'], "membership payment's contribution ID should be the ID of the organization's membership contribution.");
+      $this->assertContains($membershipPayment['membership_id'], $primaryMembershipIds, "membership payment's membership ID should be the ID of a primary membership.");
+    }
+
+    // CRM-20966: check that deleting relationship used for inheritance does not delete contribution.
+    $this->callAPISuccess('relationship', 'delete', array(
+      'id' => $relationship['id'],
+    ));
+
+    $contributionResultAfterRelationshipDelete = $this->callAPISuccess('contribution', 'get', array(
+      'id' => $contributionResult['values'][0]['id'],
+      'contact_id' => $orgID,
+    ));
+    $this->assertEquals(1, $contributionResultAfterRelationshipDelete['count'], "Contribution has been wrongly deleted.");
+  }
+
+  /**
    * Get a membership form object.
    *
    * We need to instantiate the form to run preprocess, which means we have to trick it about the request method.
@@ -800,6 +1086,93 @@ Expires: ',
       'send_receipt' => 1,
     );
     return $params;
+  }
+
+  /**
+   * Scenario builder:
+   * create two memberships for the same individual, via a price set in the back end.
+   *
+   * @param int $contactId Id of contact on which the memberships will be created.
+   */
+  protected function createTwoMembershipsViaPriceSetInBackEnd($contactId) {
+    $form = $this->getForm(NULL);
+    $form->preProcess();
+    $this->createLoggedInUser();
+
+    // create a price-set of price-field of type checkbox and each price-option corresponds to a membership type
+    $priceSet = $this->callAPISuccess('price_set', 'create', array(
+      'is_quick_config' => 0,
+      'extends' => 'CiviMember',
+      'financial_type_id' => 1,
+      'title' => 'my Page',
+    ));
+    $priceSetID = $priceSet['id'];
+    // create respective checkbox price-field
+    $priceField = $this->callAPISuccess('price_field', 'create', array(
+      'price_set_id' => $priceSetID,
+      'label' => 'Memberships',
+      'html_type' => 'Checkbox',
+    ));
+    $priceFieldID = $priceField['id'];
+    // create two price options, each represent a membership type of amount 20 and 10 respectively
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Long Haired Goat',
+        'amount' => 20,
+        'financial_type_id' => 'Donation',
+        'membership_type_id' => 15,
+        'membership_num_terms' => 1,
+      )
+    );
+    $pfvIDs = array($priceFieldValue['id'] => 1);
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Shoe-eating Goat',
+        'amount' => 10,
+        'financial_type_id' => 'Donation',
+        'membership_type_id' => 35,
+        'membership_num_terms' => 2,
+      )
+    );
+    $pfvIDs[$priceFieldValue['id']] = 1;
+
+    // register for both of these memberships via backoffice membership form submission
+    $params = array(
+      'cid' => $contactId,
+      'join_date' => date('m/d/Y', time()),
+      'start_date' => '',
+      'end_date' => '',
+      // This format reflects the 23 being the organisation & the 25 being the type.
+      "price_$priceFieldID" => $pfvIDs,
+      "price_set_id" => $priceSetID,
+      'membership_type_id' => array(1 => 0),
+      'auto_renew' => '0',
+      'max_related' => '',
+      'num_terms' => '2',
+      'source' => '',
+      'total_amount' => '30.00',
+      //Member dues, see data.xml
+      'financial_type_id' => '2',
+      'soft_credit_type_id' => '',
+      'soft_credit_contact_id' => '',
+      'payment_instrument_id' => 4,
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'receipt_text_signup' => 'Thank you text',
+      'payment_processor_id' => $this->_paymentProcessorID,
+      'record_contribution' => TRUE,
+      'trxn_id' => 777,
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Pending'),
+      'billing_first_name' => 'Test',
+      'billing_middlename' => 'Last',
+      'billing_street_address-5' => '10 Test St',
+      'billing_city-5' => 'Test',
+      'billing_state_province_id-5' => '1003',
+      'billing_postal_code-5' => '90210',
+      'billing_country_id-5' => '1228',
+    );
+    $form->testSubmit($params);
   }
 
 }

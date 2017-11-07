@@ -910,7 +910,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $links = self::actionLinks();
 
     $allTypes = CRM_Core_OptionGroup::values('group_type');
-    $values = $groupsToCount = array();
+    $values = array();
 
     $visibility = CRM_Core_SelectValues::ufVisibility();
 
@@ -964,8 +964,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
       $values[$object->id]['visibility'] = $visibility[$values[$object->id]['visibility']];
 
-      $groupsToCount[$object->saved_search_id ? 'civicrm_group_contact_cache' : 'civicrm_group_contact'][] = $object->id;
-
       if (isset($values[$object->id]['group_type'])) {
         $groupTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR,
           substr($values[$object->id]['group_type'], 1, -1)
@@ -1017,19 +1015,16 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $contactUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$object->created_id}");
         $values[$object->id]['created_by'] = "<a href='{$contactUrl}'>{$object->created_by}</a>";
       }
-    }
 
-    // Get group counts - executes one query for regular groups and another for smart groups
-    foreach ($groupsToCount as $table => $groups) {
-      $where = "g.group_id IN (" . implode(',', $groups) . ")";
-      if ($table == 'civicrm_group_contact') {
-        $where .= " AND g.status = 'Added'";
+      // By default, we try to get a count of the contacts in each group
+      // to display to the user on the Manage Group page. However, if
+      // that will result in the cache being regenerated, then dipslay
+      // "unknown" instead to avoid a long wait for the user.
+      if (CRM_Contact_BAO_GroupContactCache::shouldGroupBeRefreshed($object->id)) {
+        $values[$object->id]['count'] = ts('unknown');
       }
-      // Exclude deleted contacts
-      $where .= " and c.id = g.contact_id AND c.is_deleted = 0";
-      $dao = CRM_Core_DAO::executeQuery("SELECT g.group_id, COUNT(*) as `count` FROM $table g, civicrm_contact c WHERE $where GROUP BY g.group_id");
-      while ($dao->fetch()) {
-        $values[$dao->group_id]['count'] = $dao->count;
+      else {
+        $values[$object->id]['count'] = civicrm_api3('Contact', 'getcount', array('group' => $object->id));
       }
     }
 
@@ -1086,9 +1081,9 @@ FROM   civicrm_group
 WHERE  id IN $groupIdString
 ";
     if ($parents) {
-      // group can have > 1 parent so parents may be comma separated list (eg. '1,2,5'). We just grab and match on 1st parent.
+      // group can have > 1 parent so parents may be comma separated list (eg. '1,2,5').
       $parentArray = explode(',', $parents);
-      $parent = $parentArray[0];
+      $parent = self::filterActiveGroups($parentArray);
       $args[2] = array($parent, 'Integer');
       $query .= " AND SUBSTRING_INDEX(parents, ',', 1) = %2";
     }
@@ -1104,7 +1099,7 @@ WHERE  id IN $groupIdString
     while ($dao->fetch()) {
       if ($dao->parents) {
         $parentArray = explode(',', $dao->parents);
-        $parent = $parentArray[0];
+        $parent = self::filterActiveGroups($parentArray);
         $tree[$parent][] = array(
           'id' => $dao->id,
           'title' => $dao->title,
@@ -1356,23 +1351,65 @@ WHERE {$whereClause}";
   /**
    * Get child group ids
    *
-   * @param array $ids
+   * @param array $regularGroupIDs
    *    Parent Group IDs
    *
    * @return array
    */
-  public static function getChildGroupIds($ids) {
-    $notFound = FALSE;
-    $childGroupIds = array();
-    foreach ($ids as $id) {
-      $childId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'children');
-      while (!empty($childId)) {
-        $childGroupIds[] = $childId;
-        $childId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $childId, 'children');
+  public static function getChildGroupIds($regularGroupIDs) {
+    $childGroupIDs = array();
+
+    foreach ($regularGroupIDs as $regularGroupID) {
+      // temporary store the child group ID(s) of regular group identified by $id,
+      //   later merge with main child group array
+      $tempChildGroupIDs = array();
+      // check that the regular group has any child group, if not then continue
+      if ($childrenFound = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $regularGroupID, 'children')) {
+        $tempChildGroupIDs[] = $childrenFound;
+      }
+      else {
+        continue;
+      }
+      // as civicrm_group.children stores multiple group IDs in comma imploded string format,
+      //   so we need to convert it into array of child group IDs first
+      $tempChildGroupIDs = explode(',', implode(',', $tempChildGroupIDs));
+      $childGroupIDs = array_merge($childGroupIDs, $tempChildGroupIDs);
+      // recursively fetch the child group IDs
+      while (count($tempChildGroupIDs)) {
+        $tempChildGroupIDs = self::getChildGroupIds($tempChildGroupIDs);
+        if (count($tempChildGroupIDs)) {
+          $childGroupIDs = array_merge($childGroupIDs, $tempChildGroupIDs);
+        }
       }
     }
 
-    return $childGroupIds;
+    return $childGroupIDs;
+  }
+
+  /**
+   * Check parent groups and filter out the disabled ones.
+   *
+   * @param array $parentArray
+   *   Array of group Ids.
+   *
+   * @return int
+   */
+  public static function filterActiveGroups($parentArray) {
+    if (count($parentArray) > 1) {
+      $result = civicrm_api3('Group', 'get', array(
+        'id' => array('IN' => $parentArray),
+        'is_active' => TRUE,
+        'return' => 'id',
+      ));
+      $activeParentGroupIDs = CRM_Utils_Array::collect('id', $result['values']);
+      foreach ($parentArray as $key => $groupID) {
+        if (!array_key_exists($groupID, $activeParentGroupIDs)) {
+          unset($parentArray[$key]);
+        }
+      }
+    }
+
+    return reset($parentArray);
   }
 
 }

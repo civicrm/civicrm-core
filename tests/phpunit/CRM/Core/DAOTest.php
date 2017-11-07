@@ -6,6 +6,8 @@
  */
 class CRM_Core_DAOTest extends CiviUnitTestCase {
 
+  const ABORTED_SQL = "_aborted_sql_";
+
   public function testGetReferenceColumns() {
     // choose CRM_Core_DAO_Email as an arbitrary example
     $emailRefs = CRM_Core_DAO_Email::getReferenceColumns();
@@ -72,15 +74,40 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $cases = array();
     // $cases[] = array('Input-SQL', 'Input-Params', 'Expected-SQL');
 
+    $cases[0] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('', 'String')), 'UPDATE civicrm_foo SET bar = \'\'');
+    $cases[1] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('the text', 'String')), 'UPDATE civicrm_foo SET bar = \'the text\'');
+    $cases[2] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array(NULL, 'String')), self::ABORTED_SQL);
+    $cases[3] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('null', 'String')), 'UPDATE civicrm_foo SET bar = NULL');
+
+    $cases[3] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('', 'Float')), self::ABORTED_SQL);
+    $cases[4] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('1.23', 'Float')), 'UPDATE civicrm_foo SET bar = 1.23');
+    $cases[5] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array(NULL, 'Float')), self::ABORTED_SQL);
+    $cases[6] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('null', 'Float')), self::ABORTED_SQL);
+
+    $cases[11] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('', 'Money')), self::ABORTED_SQL);
+    $cases[12] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('1.23', 'Money')), 'UPDATE civicrm_foo SET bar = 1.23');
+    $cases[13] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array(NULL, 'Money')), self::ABORTED_SQL);
+    $cases[14] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('null', 'Money')), self::ABORTED_SQL);
+
+    $cases[15] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('', 'Int')), self::ABORTED_SQL);
+    $cases[16] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('123', 'Int')), 'UPDATE civicrm_foo SET bar = 123');
+    $cases[17] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array(NULL, 'Int')), self::ABORTED_SQL);
+    $cases[18] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('null', 'Int')), self::ABORTED_SQL);
+
+    $cases[19] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('', 'Timestamp')), 'UPDATE civicrm_foo SET bar = null');
+    $cases[20] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('20150102030405', 'Timestamp')), 'UPDATE civicrm_foo SET bar = 20150102030405');
+    $cases[21] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array(NULL, 'Timestamp')), 'UPDATE civicrm_foo SET bar = null');
+    $cases[22] = array('UPDATE civicrm_foo SET bar = %1', array(1 => array('null', 'Timestamp')), self::ABORTED_SQL);
+
     // CASE: No params
-    $cases[] = array(
+    $cases[1000] = array(
       'SELECT * FROM whatever',
       array(),
       'SELECT * FROM whatever',
     );
 
     // CASE: Integer param
-    $cases[] = array(
+    $cases[1001] = array(
       'SELECT * FROM whatever WHERE id = %1',
       array(
         1 => array(10, 'Integer'),
@@ -89,7 +116,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     );
 
     // CASE: String param
-    $cases[] = array(
+    $cases[1002] = array(
       'SELECT * FROM whatever WHERE name = %1',
       array(
         1 => array('Alice', 'String'),
@@ -98,7 +125,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     );
 
     // CASE: Two params
-    $cases[] = array(
+    $cases[1003] = array(
       'SELECT * FROM whatever WHERE name = %1 AND title = %2',
       array(
         1 => array('Alice', 'String'),
@@ -108,7 +135,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     );
 
     // CASE: Two params with special character (%1)
-    $cases[] = array(
+    $cases[1004] = array(
       'SELECT * FROM whatever WHERE name = %1 AND title = %2',
       array(
         1 => array('Alice %2', 'String'),
@@ -118,7 +145,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     );
 
     // CASE: Two params with special character ($1)
-    $cases[] = array(
+    $cases[1005] = array(
       'SELECT * FROM whatever WHERE name = %1 AND title = %2',
       array(
         1 => array('Alice $1', 'String'),
@@ -137,7 +164,13 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * @param $expectSql
    */
   public function testComposeQuery($inputSql, $inputParams, $expectSql) {
-    $actualSql = CRM_Core_DAO::composeQuery($inputSql, $inputParams);
+    $scope = CRM_Core_TemporaryErrorScope::useException();
+    try {
+      $actualSql = CRM_Core_DAO::composeQuery($inputSql, $inputParams);
+    }
+    catch (Exception $e) {
+      $actualSql = self::ABORTED_SQL;
+    }
     $this->assertEquals($expectSql, $actualSql);
   }
 
@@ -162,6 +195,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     list($inputSql, $inputParams, $expectSql) = $cases[0];
     $actualSql = CRM_Core_DAO::composeQuery($inputSql, $inputParams);
     $this->assertFalse(($expectSql == $actualSql));
+    unset($scope);
   }
 
   /**
@@ -305,6 +339,56 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       $this->checkArrayEquals($toArray, $daoToArray);
       $daoToArray = $dao->toArray($format);
       $this->checkArrayEquals($modifiedKeyArray, $daoToArray);
+    }
+  }
+
+  /**
+   * CRM-17748: Test internal DAO options
+   */
+  public function testDBOptions() {
+    $contactIDs = array();
+    for ($i = 0; $i < 10; $i++) {
+      $contactIDs[] = $this->individualCreate(array(
+        'first_name' => 'Alan' . substr(sha1(rand()), 0, 7),
+        'last_name' => 'Smith' . substr(sha1(rand()), 0, 4),
+      ));
+    }
+
+    // Test option 'result_buffering'
+    $this->_testMemoryUsageForUnbufferedQuery();
+
+    // cleanup
+    foreach ($contactIDs as $contactID) {
+      $this->callAPISuccess('Contact', 'delete', array('id' => $contactID));
+    }
+  }
+
+  /**
+   * Helper function to test result of buffered and unbuffered query
+   */
+  public function _testMemoryUsageForUnbufferedQuery() {
+    $sql = "SELECT * FROM civicrm_contact WHERE first_name LIKE 'Alan%' AND last_name LIKE 'Smith%' ";
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $contactsFetchedFromBufferedQuery = $dao->fetchAll();
+    $dao->free();
+
+    $dao = CRM_Core_DAO::executeUnbufferedQuery($sql);
+    $contactsFetchedFromUnbufferedQuery = $dao->fetchAll();
+    $dao->free();
+
+    $this->checkArrayEquals($contactsFetchedFromBufferedQuery, $contactsFetchedFromUnbufferedQuery);
+  }
+
+  /**
+   * Test that known sql modes are present in session.
+   */
+  public function testSqlModePresent() {
+    $sqlModes = CRM_Utils_SQL::getSqlModes();
+    // assert we have strict trans
+    $this->assertContains('STRICT_TRANS_TABLES', $sqlModes);
+    if ($this->_supportFullGroupBy) {
+      $this->assertContains('ONLY_FULL_GROUP_BY', $sqlModes);
     }
   }
 

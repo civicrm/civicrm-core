@@ -543,7 +543,7 @@ AND image_URL IS NOT NULL
   public static function activityContacts(CRM_Queue_TaskContext $ctx) {
     $upgrade = new CRM_Upgrade_Form();
 
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $ovValue[] = $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $ovValue[] = $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $ovValue[] = $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);

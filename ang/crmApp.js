@@ -5,6 +5,16 @@
   var crmApp = angular.module('crmApp', CRM.angular.modules);
   crmApp.config(['$routeProvider',
     function($routeProvider) {
+
+      if (CRM.crmApp.defaultRoute) {
+        $routeProvider.when('/', {
+          template: '<div></div>',
+          controller: function($location) {
+            $location.path(CRM.crmApp.defaultRoute);
+          }
+        });
+      }
+
       $routeProvider.otherwise({
         template: ts('Unknown path')
       });

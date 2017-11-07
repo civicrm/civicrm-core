@@ -63,6 +63,18 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
     }
 
+    if (!empty($query->_returnProperties['pledge_original_installment_amount'])) {
+      $query->_select['pledge_original_installment_amount'] = 'civicrm_pledge.original_installment_amount as pledge_original_installment_amount';
+      $query->_element['pledge_original_installment_amount'] = 1;
+      $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
+    }
+
+    if (!empty($query->_returnProperties['installments'])) {
+      $query->_select['installments'] = 'civicrm_pledge.installments as installments';
+      $query->_element['installments'] = 1;
+      $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
+    }
+
     if (!empty($query->_returnProperties['pledge_create_date'])) {
       $query->_select['pledge_create_date'] = 'civicrm_pledge.create_date as pledge_create_date';
       $query->_element['pledge_create_date'] = 1;
@@ -298,11 +310,15 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
           $tableName = 'civicrm_pledge';
           $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
           $label = "Pledge Status";
+          $qillDAO = 'CRM_Pledge_DAO_Pledge';
+          $qillField = 'status_id';
         }
         else {
           $tableName = 'civicrm_pledge_payment';
           $query->_tables['civicrm_pledge_payment'] = $query->_whereTables['civicrm_pledge_payment'] = 1;
           $label = "Pledge Payment Status";
+          $qillDAO = 'CRM_Contribute_DAO_Contribution';
+          $qillField = 'contribution_status_id';
         }
         $name = 'status_id';
         if (!empty($value) && is_array($value) && !in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
@@ -314,7 +330,7 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
           $value,
           'Integer'
         );
-        list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_Contribution', 'contribution_status_id', $value, $op);
+        list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue($qillDAO, $qillField, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $label, 2 => $qillop, 3 => $qillVal));
         return;
 
@@ -405,7 +421,7 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
         break;
 
       case 'pledge_status':
-        $from .= " $side JOIN civicrm_option_group option_group_pledge_status ON (option_group_pledge_status.name = 'contribution_status')";
+        $from .= " $side JOIN civicrm_option_group option_group_pledge_status ON (option_group_pledge_status.name = 'pledge_status')";
         $from .= " $side JOIN civicrm_option_value pledge_status ON (civicrm_pledge.status_id = pledge_status.value AND option_group_pledge_status.id = pledge_status.option_group_id ) ";
         break;
 

@@ -791,12 +791,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
 
       // we should use primary email for
-      // 1. free event registration.
-      // 2. pay later participant.
-      // 3. waiting list participant.
-      // 4. require approval participant.
+      // 1. pay later participant.
+      // 2. waiting list participant.
+      // 3. require approval participant.
       if (!empty($this->_params['is_pay_later']) ||
-        $this->_allowWaitlist || $this->_requireApproval || empty($this->_values['event']['is_monetary'])
+        $this->_allowWaitlist || $this->_requireApproval
       ) {
         $mail = 'email-Primary';
       }

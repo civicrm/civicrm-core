@@ -358,10 +358,22 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     );
     $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
 
-    $result = CRM_Member_BAO_MembershipType::getMembershipTypesByOrg($this->_orgContactID);
+    $membershipTypesResult = civicrm_api3('MembershipType', 'get', array(
+      'member_of_contact_id' => $this->_orgContactID,
+      'options' => array(
+        'limit' => 0,
+      ),
+    ));
+    $result = CRM_Utils_Array::value('values', $membershipTypesResult, NULL);
     $this->assertEquals(empty($result), FALSE, 'Verify membership types for organization.');
 
-    $result = CRM_Member_BAO_MembershipType::getMembershipTypesByOrg(501);
+    $membershipTypesResult = civicrm_api3('MembershipType', 'get', array(
+      'member_of_contact_id' => 501,
+      'options' => array(
+        'limit' => 0,
+      ),
+    ));
+    $result = CRM_Utils_Array::value('values', $membershipTypesResult, NULL);
     $this->assertEquals(empty($result), TRUE, 'Verify membership types for organization.');
 
     $this->membershipTypeDelete(array('id' => $membershipType->id));

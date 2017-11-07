@@ -100,7 +100,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       'receive_date' => date('Y-m-d') . " 00:00:00",
       'skipLineItem' => 1,
       'partial_payment_total' => $feeTotal,
-      'partial_amount_pay' => $actualPaidAmt,
+      'partial_amount_to_pay' => $actualPaidAmt,
     );
 
     $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
@@ -176,7 +176,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
     //Change selection to a lower amount.
     $params['price_2'] = 50;
-    CRM_Event_BAO_Participant::changeFeeSelections($params, $participant['id'], $contribution->id, $feeBlock, $lineItem, $feeAmt, $priceSetId);
+    CRM_Price_BAO_LineItem::changeFeeSelections($params, $participant['id'], 'participant', $contribution->id, $feeBlock, $lineItem, $feeAmt);
 
     //Record a refund of the remaining amount.
     $submittedValues['total_amount'] = 50;

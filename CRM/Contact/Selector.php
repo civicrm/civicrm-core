@@ -1248,6 +1248,7 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
         foreach ($value as $n => $v) {
           foreach ($v as $n1 => $v1) {
             if (!strpos('_id', $n1) && $n1 != 'location_type') {
+              $n = str_replace(' ', '_', $n);
               $properties[] = "{$n}-{$n1}";
             }
           }

@@ -39,7 +39,7 @@
             {foreach from=$actionsMenuList.otherActions item='row'}
               {if !empty($row.href) or !empty($row.tab)}
               <li class="crm-contact-{$row.ref}">
-                <a href="{if !empty($row.href)}{$row.href}&cid={$contactId}{else}#{/if}" title="{$row.title}" data-tab="{$row.tab}" {if !empty($row.class)}class="{$row.class}"{/if}>
+                <a href="{if !empty($row.href)}{$row.href}{if strstr($row.href, '?')}&cid={$contactId}{/if}{else}#{/if}" title="{$row.title|escape}" data-tab="{$row.tab}" {if !empty($row.class)}class="{$row.class}"{/if}>
                   <span><i {if !empty($row.icon)}class="{$row.icon}"{/if}></i> {$row.title}</span>
                 </a>
               </li>
@@ -52,7 +52,7 @@
           {foreach from=$actionsMenuList.moreActions item='row'}
           {if !empty($row.href) or !empty($row.tab)}
           <li class="crm-action-{$row.ref}">
-            <a href="{if !empty($row.href)}{$row.href}&cid={$contactId}{else}#{/if}" title="{$row.title}" data-tab="{$row.tab}" {if !empty($row.class)}class="{$row.class}"{/if}>{$row.title}</a>
+            <a href="{if !empty($row.href)}{$row.href}{if strstr($row.href, '?')}&cid={$contactId}{/if}{else}#{/if}" title="{$row.title|escape}" data-tab="{$row.tab}" {if !empty($row.class)}class="{$row.class}"{/if}>{$row.title}</a>
           </li>
           {/if}
         {/foreach}

@@ -140,7 +140,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
         if ($this->_multiRecordDisplay == 'single') {
           $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupId);
           CRM_Utils_System::setTitle(ts('View %1 Record', array(1 => $groupTitle)));
-          $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, $this, $this->_contactId,
+          $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, NULL, $this->_contactId,
             $this->_groupId, $entitySubType, NULL, TRUE, NULL, FALSE, TRUE, $this->_cgcount
           );
 
@@ -149,7 +149,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
           $this->assign('skipTitle', 1);
         }
         else {
-          $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, $this, $this->_contactId,
+          $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, NULL, $this->_contactId,
             $this->_groupId, $entitySubType
           );
         }

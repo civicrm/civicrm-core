@@ -120,9 +120,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       'help_pre',
       'help_post',
       'is_active',
-      'is_public',
       'is_multiple',
     );
+    $current_db_version = CRM_Core_DAO::singleValueQuery("SELECT version FROM civicrm_domain WHERE id = " . CRM_Core_Config::domainID());
+    $is_public_version = $current_db_version >= '4.7.19' ? 1 : 0;
+    if ($is_public_version) {
+      $fields[] = 'is_public';
+    }
     foreach ($fields as $field) {
       if (isset($params[$field]) || $field == 'is_multiple') {
         $group->$field = CRM_Utils_Array::value($field, $params, FALSE);
@@ -317,8 +321,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * @param string $entityType
    *   Of the contact whose contact type is needed.
-   * @param CRM_Core_Form $deprecated
-   *   Not used.
+   * @param array $toReturn
+   *   What data should be returned. ['custom_group' => ['id', 'name', etc.], 'custom_field' => ['id', 'label', etc.]]
    * @param int $entityID
    * @param int $groupID
    * @param array $subTypes
@@ -331,7 +335,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *   api - through which it is properly tested - so can be refactored with some comfort.)
    *
    * @param bool $checkPermission
-   * @param varchar $singleRecord
+   * @param string|int $singleRecord
    *   holds 'new' or id if view/edit/copy form for a single record is being loaded.
    * @param bool $showPublicOnly
    *
@@ -349,7 +353,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    */
   public static function getTree(
     $entityType,
-    $deprecated = NULL,
+    $toReturn = array(),
     $entityID = NULL,
     $groupID = NULL,
     $subTypes = array(),
@@ -381,10 +385,11 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     // create a new tree
     $strWhere = $orderBy = '';
 
-    // using tableData to build the queryString
+    // legacy hardcoded list of data to return
     $tableData = array(
-      'civicrm_custom_field' => array(
+      'custom_field' => array(
         'id',
+        'name',
         'label',
         'column_name',
         'data_type',
@@ -403,7 +408,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'option_group_id',
         'in_selector',
       ),
-      'civicrm_custom_group' => array(
+      'custom_group' => array(
         'id',
         'name',
         'table_name',
@@ -417,16 +422,32 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'extends_entity_column_id',
         'extends_entity_column_value',
         'max_multiple',
-        'is_public',
       ),
     );
+    $current_db_version = CRM_Core_DAO::singleValueQuery("SELECT version FROM civicrm_domain WHERE id = " . CRM_Core_Config::domainID());
+    $is_public_version = $current_db_version >= '4.7.19' ? 1 : 0;
+    if ($is_public_version) {
+      $tableData['custom_group'][] = 'is_public';
+    }
+    if (!$toReturn || !is_array($toReturn)) {
+      $toReturn = $tableData;
+    }
+    else {
+      // Supply defaults and remove unknown array keys
+      $toReturn = array_intersect_key(array_filter($toReturn) + $tableData, $tableData);
+      // Merge in required fields that we must have
+      $toReturn['custom_field'] = array_unique(array_merge($toReturn['custom_field'], array('id', 'column_name', 'data_type')));
+      $toReturn['custom_group'] = array_unique(array_merge($toReturn['custom_group'], array('id', 'is_multiple', 'table_name', 'name')));
+      // Validate return fields
+      $toReturn['custom_field'] = array_intersect($toReturn['custom_field'], array_keys(CRM_Core_DAO_CustomField::fieldKeys()));
+      $toReturn['custom_group'] = array_intersect($toReturn['custom_group'], array_keys(CRM_Core_DAO_CustomGroup::fieldKeys()));
+    }
 
     // create select
     $select = array();
-    foreach ($tableData as $tableName => $tableColumn) {
+    foreach ($toReturn as $tableName => $tableColumn) {
       foreach ($tableColumn as $columnName) {
-        $alias = $tableName . "_" . $columnName;
-        $select[] = "{$tableName}.{$columnName} as {$tableName}_{$columnName}";
+        $select[] = "civicrm_{$tableName}.{$columnName} as civicrm_{$tableName}_{$columnName}";
       }
     }
     $strSelect = "SELECT " . implode(', ', $select);
@@ -500,7 +521,7 @@ WHERE civicrm_custom_group.is_active = 1
         );
     }
 
-    if ($showPublicOnly) {
+    if ($showPublicOnly && $is_public_version) {
       $strWhere .= "AND civicrm_custom_group.is_public = 1";
     }
 
@@ -551,7 +572,7 @@ ORDER BY civicrm_custom_group.weight,
           $groupTree[$groupID]['id'] = $groupID;
 
           // populate the group information
-          foreach ($tableData['civicrm_custom_group'] as $fieldName) {
+          foreach ($toReturn['custom_group'] as $fieldName) {
             $fullFieldName = "civicrm_custom_group_$fieldName";
             if ($fieldName == 'id' ||
               is_null($crmDAO->$fullFieldName)
@@ -580,7 +601,7 @@ ORDER BY civicrm_custom_group.weight,
         $customValueTables[$crmDAO->civicrm_custom_group_table_name][$crmDAO->civicrm_custom_field_column_name] = 1;
         $groupTree[$groupID]['fields'][$fieldId]['id'] = $fieldId;
         // populate information for a custom field
-        foreach ($tableData['civicrm_custom_field'] as $fieldName) {
+        foreach ($toReturn['custom_field'] as $fieldName) {
           $fullFieldName = "civicrm_custom_field_$fieldName";
           if ($fieldName == 'id' ||
             is_null($crmDAO->$fullFieldName)
@@ -1010,7 +1031,6 @@ ORDER BY civicrm_custom_group.weight,
     );
 
     // create select
-    $select = "SELECT";
     $s = array();
     foreach ($tableData as $tableName => $tableColumn) {
       foreach ($tableColumn as $columnName) {

@@ -40,12 +40,6 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   }
 
   /**
-   * Financial account.
-   * @var array
-   */
-  private static $financialAccount;
-
-  /**
    * Fetch object based on array of properties.
    *
    * @param array $params
@@ -157,30 +151,20 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    * @param int $paymentInstrumentValue
    *   Payment instrument value.
    *
-   * @return array|null|string
+   * @return null|int
    */
-  public static function getInstrumentFinancialAccount($paymentInstrumentValue = NULL) {
-    if (!self::$financialAccount) {
-      $query = "SELECT ceft.financial_account_id, cov.value
-FROM civicrm_entity_financial_account ceft
-INNER JOIN civicrm_option_value cov ON cov.id = ceft.entity_id AND ceft.entity_table = 'civicrm_option_value'
-INNER JOIN civicrm_option_group cog ON cog.id = cov.option_group_id
-WHERE cog.name = 'payment_instrument' ";
-
-      if ($paymentInstrumentValue) {
-        $query .= " AND cov.value = '{$paymentInstrumentValue}' ";
-        return CRM_Core_DAO::singleValueQuery($query);
-      }
-      else {
-        $result = CRM_Core_DAO::executeQuery($query);
-        while ($result->fetch()) {
-          self::$financialAccount[$result->value] = $result->financial_account_id;
-        }
-        return self::$financialAccount;
-      }
-    }
-
-    return $paymentInstrumentValue ? self::$financialAccount[$paymentInstrumentValue] : self::$financialAccount;
+  public static function getInstrumentFinancialAccount($paymentInstrumentValue) {
+    $paymentInstrument = civicrm_api3('OptionValue', 'getsingle', array(
+      'return' => array("id"),
+      'value' => $paymentInstrumentValue,
+      'option_group_id' => "payment_instrument",
+    ));
+    $financialAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount(
+      $paymentInstrument['id'],
+      NULL,
+      'civicrm_option_value'
+    );
+    return $financialAccountId;
   }
 
   /**
@@ -273,6 +257,7 @@ WHERE cog.name = 'payment_instrument' ";
    *
    * @param obj $financialTypeAccount of CRM_Financial_DAO_EntityFinancialAccount
    *
+   * @throws CRM_Core_Exception
    */
   public static function validateRelationship($financialTypeAccount) {
     $financialAccountLinks = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
@@ -282,7 +267,7 @@ WHERE cog.name = 'payment_instrument' ";
       $params = array(
         1 => $accountRelationships[$financialTypeAccount->account_relationship],
       );
-      throw new Exception(ts("This financial account cannot have '%1' relationship.", $params));
+      throw new CRM_Core_Exception(ts("This financial account cannot have '%1' relationship.", $params));
     }
   }
 

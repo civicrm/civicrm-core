@@ -83,8 +83,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   public function buildQuickForm() {
     parent::buildQuickForm();
     $this->setPageTitle(ts('Financial Batch'));
-
-    if (isset($this->_id)) {
+    if (!empty($this->_id)) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $this->_id, 'title');
       CRM_Utils_System::setTitle($this->_title . ' - ' . ts('Accounting Batch'));
       $this->assign('batchTitle', $this->_title);

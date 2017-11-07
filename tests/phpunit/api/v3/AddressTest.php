@@ -348,6 +348,32 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'delete', array('id' => $address1['id']));
   }
 
+  /**
+   * Test Creating address of same type alreay ind the database
+   * This is legacy API v3 behaviour and not correct behaviour
+   * however we are too far down the path wiwth v3 to fix this
+   * @link https://chat.civicrm.org/civicrm/pl/zcq3jkg69jdt5g4aqze6bbe9pc
+   * @todo vis this in v4 api
+   */
+  public function testCreateDuplicateLocationTypes() {
+    $address1 = $this->callAPISuccess('address', 'create', $this->_params);
+    $address2 = $this->callAPISuccess('address', 'create', array(
+      'location_type_id' => $this->_locationType->id,
+      'street_address' => '1600 Pensilvania Avenue',
+      'city' => 'Washington DC',
+      'is_primary' => 0,
+      'is_billing' => 0,
+      'contact_id' => $this->_contactID,
+    ));
+    $check = $this->callAPISuccess('address', 'getcount', array(
+      'contact_id' => $this->_contactID,
+      'location_type_id' => $this->_locationType->id,
+    ));
+    $this->assertEquals(2, $check);
+    $this->callAPISuccess('address', 'delete', array('id' => $address1['id']));
+    $this->callAPISuccess('address', 'delete', array('id' => $address2['id']));
+  }
+
   public function testGetWithJoin() {
     $cid = $this->individualCreate(array(
       'api.Address.create' => array(

@@ -126,6 +126,10 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
          // Explicitly do not check permissions so we are not
          // restricted by financial type, so we can change them.
         'check_permissions' => FALSE,
+        'options' => array(
+          'limit' => 0,
+          'sort' => array('weight', 'label'),
+        ),
     ));
     $customOption = $priceOptions['values'];
 
@@ -149,15 +153,16 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       $action = array_sum(array_keys(self::actionLinks()));
       // Adding the required fields in the array
       if (isset($taxRate[$values['financial_type_id']])) {
-        $customOption[$id]['tax_rate'] = $taxRate[$values['financial_type_id']];
+        // Cast to float so trailing zero decimals are removed
+        $customOption[$id]['tax_rate'] = (float) $taxRate[$values['financial_type_id']];
         if ($invoicing && isset($customOption[$id]['tax_rate'])) {
           $getTaxDetails = TRUE;
         }
         $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($customOption[$id]['amount'], $customOption[$id]['tax_rate']);
         $customOption[$id]['tax_amount'] = $taxAmount['tax_amount'];
       }
-      if (!empty($values['financial_type_id']) && !empty($financialType[$values['financial_type_id']])) {
-        $customOption[$id]['financial_type_id'] = $financialType[$values['financial_type_id']];
+      if (!empty($values['financial_type_id'])) {
+        $customOption[$id]['financial_type_id'] = CRM_Contribute_PseudoConstant::financialType($values['financial_type_id']);
       }
       // update enable/disable links depending on price_field properties.
       if ($this->_isSetReserved) {

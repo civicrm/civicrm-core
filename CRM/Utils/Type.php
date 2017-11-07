@@ -144,6 +144,28 @@ class CRM_Utils_Type {
   }
 
   /**
+   * @return array
+   *   An array of type in the form 'type name' => 'int representing type'
+   */
+  public static function getValidTypes() {
+    return array(
+      'Int' => self::T_INT,
+      'String' => self::T_STRING,
+      'Enum' => self::T_ENUM,
+      'Date' => self::T_DATE,
+      'Time' => self::T_TIME,
+      'Boolean' => self::T_BOOLEAN,
+      'Text' => self::T_TEXT,
+      'Blob' => self::T_BLOB,
+      'Timestamp' => self::T_TIMESTAMP,
+      'Float' => self::T_FLOAT,
+      'Money' => self::T_MONEY,
+      'Email' => self::T_EMAIL,
+      'Mediumblob' => self::T_MEDIUMBLOB,
+    );
+  }
+
+  /**
    * Get the data_type for the field.
    *
    * @param array $fieldMetadata
@@ -466,6 +488,12 @@ class CRM_Utils_Type {
         }
         break;
 
+      case 'ExtensionKey':
+        if (CRM_Utils_Rule::checkExtesnionKeyIsValid($data)) {
+          return $data;
+        }
+        break;
+
       default:
         CRM_Core_Error::fatal("Cannot recognize $type for $data");
         break;
@@ -518,7 +546,7 @@ class CRM_Utils_Type {
   }
 
   /**
-   * Get list of avaliable Data Tupes for Option Groups
+   * Get list of avaliable Data Types for Option Groups
    *
    * @return array
    */

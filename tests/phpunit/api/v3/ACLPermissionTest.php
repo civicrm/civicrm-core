@@ -115,6 +115,23 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Ensure contact permissions do not block contact-less location entities.
+   */
+  public function testAddressWithoutContactIDAccess() {
+    $ownID = $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'view all contacts');
+    $this->callAPISuccess('Address', 'create', array(
+      'city' => 'Mouseville',
+      'location_type_id' => 'Main',
+      'api.LocBlock.create' => 1,
+      'contact_id' => $ownID,
+    ));
+    $this->callAPISuccessGetSingle('Address', array('city' => 'Mouseville', 'check_permissions' => 1));
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_address SET contact_id = NULL WHERE contact_id = %1', array(1 => array($ownID, 'Integer')));
+    $this->callAPISuccessGetSingle('Address', array('city' => 'Mouseville', 'check_permissions' => 1));
+  }
+
+  /**
    * Ensure contact permissions extend to related entities like email
    */
   public function testRelatedEntityPermissions() {

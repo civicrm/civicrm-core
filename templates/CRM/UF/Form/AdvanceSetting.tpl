@@ -55,6 +55,16 @@
             <td>{$form.cancel_URL.html} {help id='id-cancel_URL' file="CRM/UF/Form/Group.hlp"}</td>
         </tr>
 
+        <tr class="crm-uf-advancesetting-form-block-cancel_button_text">
+            <td class="label">{$form.cancel_button_text.label}</td>
+            <td>{$form.cancel_button_text.html} {help id='id-cancel_button_text' file="CRM/UF/Form/Group.hlp"}</td>
+        </tr>
+
+        <tr class="crm-uf-advancesetting-form-block-submit_button_text">
+            <td class="label">{$form.submit_button_text.label}</td>
+            <td>{$form.submit_button_text.html} {help id='id-submit_button_text' file="CRM/UF/Form/Group.hlp"}</td>
+        </tr>
+
         <tr class="crm-uf-advancesetting-form-block-add_captcha">
             <td class="label"></td>
             <td>{$form.add_captcha.html} {$form.add_captcha.label} {help id='id-add_captcha' file="CRM/UF/Form/Group.hlp"}</td>

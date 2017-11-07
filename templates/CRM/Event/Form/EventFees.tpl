@@ -88,7 +88,6 @@
                     <td>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}</td>
                 </tr>
                 <tr class="crm-event-eventfees-form-block-payment_instrument_id"><td class="label">{$form.payment_instrument_id.label}<span class="crm-marker"> *</span></td><td>{$form.payment_instrument_id.html} {help id="payment_instrument_id" file="CRM/Contribute/Page/Tab.hlp"}</td></tr>
-                <tr id="checkNumber" class="crm-event-eventfees-form-block-check_number"><td class="label">{$form.check_number.label}</td><td>{$form.check_number.html|crmAddClass:six}</td></tr>
                 {if $showTransactionId }
                     <tr class="crm-event-eventfees-form-block-trxn_id"><td class="label">{$form.trxn_id.label}</td><td>{$form.trxn_id.html}</td></tr>
                 {/if}
@@ -102,7 +101,9 @@
 
 {/if}
 
-{include file='CRM/Core/BillingBlockWrapper.tpl'}
+{if $action neq 2}
+  {include file='CRM/Core/BillingBlockWrapper.tpl'}
+{/if}
 
 {if ($email OR $batchEmail) and $outBound_option != 2}
     <fieldset id="send_confirmation_receipt"><legend>{if $paid}{ts}Registration Confirmation and Receipt{/ts}{else}{ts}Registration Confirmation{/ts}{/if}</legend>
@@ -173,17 +174,6 @@
     target_element_id   ="from-email"
     target_element_type ="table-row"
     field_type          ="radio"
-    invert              = 0
-}
-{/if}
-
-{if $paid and ($action eq 1 or ( $action eq 2 and !$hasPayment) ) and !$participantMode}
-{include file="CRM/common/showHideByFieldValue.tpl"
-    trigger_field_id    ="payment_instrument_id"
-    trigger_value       = '4'
-    target_element_id   ="checkNumber"
-    target_element_type ="table-row"
-    field_type          ="select"
     invert              = 0
 }
 {/if}

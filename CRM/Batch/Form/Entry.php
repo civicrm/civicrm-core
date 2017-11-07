@@ -425,7 +425,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $paramValues = array(
       'id' => $this->_batchId,
       // close status
-      'status_id' => CRM_Core_OptionGroup::getValue('batch_status', 'Closed', 'name'),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Closed'),
       'total' => $params['actualBatchTotal'],
     );
 
@@ -698,7 +698,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             $value['soft_credit'][$key]['soft_credit_type_id'] = $params['soft_credit_type'][$key];
           }
           else {
-            $value['soft_credit'][$key]['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'Gift', 'name');
+            $value['soft_credit'][$key]['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'Gift');
           }
         }
 

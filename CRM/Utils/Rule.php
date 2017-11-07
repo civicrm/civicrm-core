@@ -574,7 +574,10 @@ class CRM_Utils_Rule {
       return TRUE;
     }
 
-    return preg_match('/(^-?\d+\.\d?\d?$)|(^-?\.\d\d?$)/', $value) ? TRUE : FALSE;
+    // Allow values such as -0, 1.024555, -.1
+    // We need to support multiple decimal places here, not just the number allowed by locale
+    //  otherwise tax calculations break when you want the inclusive amount to be a round number (eg. £10 inc. VAT requires 8.333333333 here).
+    return preg_match('/(^-?\d+\.?\d*$)|(^-?\.\d+$)/', $value) ? TRUE : FALSE;
   }
 
   /**
@@ -906,6 +909,17 @@ class CRM_Utils_Rule {
     if ($lowDate > $highDate) {
       $errors[$fieldName . '_range_error'] = ts('%1: Please check that your date range is in correct chronological order.', array(1 => $title));
     }
+  }
+
+  /**
+   * @param string $key Extension Key to check
+   * @return bool
+   */
+  public static function checkExtesnionKeyIsValid($key = NULL) {
+    if (!empty($key) && !preg_match('/^[0-9a-zA-Z._-]+$/', $key)) {
+      return FALSE;
+    }
+    return TRUE;
   }
 
 }
