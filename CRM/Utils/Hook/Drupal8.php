@@ -32,4 +32,13 @@
  */
 class CRM_Utils_Hook_Drupal8 extends CRM_Utils_Hook_DrupalBase {
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function getDrupalModules() {
+    if (class_exists('\Drupal') && \Drupal::hasContainer()) {
+      return array_keys(\Drupal::moduleHandler()->getModuleList());
+    }
+  }
+
 }
