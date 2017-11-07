@@ -5,5 +5,6 @@ b2c114b | Redmine-9013 Fix issue where mail_report cron returns a copy of the ht
 bca954e | Atrium 4516/Redmine 11737 Stop ACL Cache from being cleared | No upstream fix and unlikely to be soon  
 aa21b59 | Agileware Redmine 24407 Atrium 4462 Fix loading of CiviRCRM new mailing page by coverting recipients box into AJAX get list call | Unlikely to be fixed soon in Core  
 26bb201 | Add in AUG Change log |  
-45c2935 | CRM-19835 port of PR 9801 | No sign its being merged in core soon  
-e899ec4 | Fix issue where disabled groups were appearing in CiviMail Receipients box | Pr waiting merger as per Redmine 24407 Atrium 4462  
+45c2935 | CRM-19835 port of PR 9801 | No sign its being merged in core soon 
+b87620c | CRM-21206 Ensure that the recipients field of AB Test results is filled in | Core PR open no sign yet of being merged in   
+b6978b8 | CRM-21400 Add a static var to hold the trxn_id so it can be accessed through hook_civicrm_buildForm | Core PR open waiting to be merged  
