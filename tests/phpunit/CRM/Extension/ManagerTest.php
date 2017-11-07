@@ -145,6 +145,40 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
   }
 
+  /**
+   * This is the same as testInstallAuto_Twice
+   *
+   * @throws \CRM_Extension_Exception
+   */
+  public function testInstallAuto_Twice() {
+    $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
+    $manager = $this->_createManager(array(
+      self::TESTING_TYPE => $testingTypeManager,
+    ));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+
+    $testingTypeManager->expects($this->exactly(2))->method('onPreInstall');
+    $testingTypeManager->expects($this->exactly(2))->method('onPostInstall');
+    $this->assertEquals(array('test.foo.bar', 'test.foo.downstream'),
+      $manager->findInstallRequirements(array('test.foo.downstream')));
+    $manager->install(
+      $manager->findInstallRequirements(array('test.foo.downstream')));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+
+    // And install a second time...
+    $testingTypeManager->expects($this->exactly(0))->method('onPreInstall');
+    $testingTypeManager->expects($this->exactly(0))->method('onPostInstall');
+    $manager->install(
+      $manager->findInstallRequirements(array('test.foo.downstream')));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+  }
+
   public function test_InstallAuto_DisableUpstream() {
     $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
