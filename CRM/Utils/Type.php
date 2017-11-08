@@ -412,6 +412,12 @@ class CRM_Utils_Type {
         }
         break;
 
+      case 'CommaSeparatedIntegers':
+        if (CRM_Utils_Rule::commaSeparatedIntegers($data)) {
+          return $data;
+        }
+        break;
+
       case 'Boolean':
         if (CRM_Utils_Rule::boolean($data)) {
           return $data;

@@ -105,10 +105,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       }
     }
 
-    // This seems silly, but the old behavior was to first check `_cid`
-    // and then use the provided `$contactIds`. Probably not even necessary,
-    // but difficult to audit.
-    $contactIds = $form->_cid ? array($form->_cid) : array_keys($contacts);
+    $contactIds = array_keys($contacts);
     self::createActivities($form, $html_message, $contactIds, CRM_Utils_Array::value('subject', $formValues, ts('Thank you letter')), CRM_Utils_Array::value('campaign_id', $formValues), $contactHtml);
     $html = array_diff_key($html, $emailedHtml);
 
