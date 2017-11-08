@@ -77,6 +77,11 @@ class CRM_Contact_Task {
    */
   static $_optionalTasks = NULL;
 
+  public static function tasks() {
+    self::initTasks();
+    return self::$_tasks;
+  }
+
   public static function initTasks() {
     if (!self::$_tasks) {
       self::$_tasks = array(
@@ -398,7 +403,7 @@ class CRM_Contact_Task {
     self::initTasks();
 
     foreach (self::$_tasks as $task => $value) {
-      if (!empty($value['url']) && (
+      if ((!empty($value['url']) || $task == self::EXPORT_CONTACTS) && (
         (is_array($value['class']) && in_array($className, $value['class'])) ||
          ($value['class'] == $className)
         )
