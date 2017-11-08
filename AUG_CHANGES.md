@@ -7,4 +7,4 @@ aa21b59 | Agileware Redmine 24407 Atrium 4462 Fix loading of CiviRCRM new mailin
 26bb201 | Add in AUG Change log |  
 45c2935 | CRM-19835 port of PR 9801 | No sign its being merged in core soon 
 b87620c | CRM-21206 Ensure that the recipients field of AB Test results is filled in | Core PR open no sign yet of being merged in   
-b6978b8 | CRM-21400 Add a static var to hold the trxn_id so it can be accessed through hook_civicrm_buildForm | Core PR open waiting to be merged  
+b6978b8 | CRM-21400 Add a static var to hold the trxn_id so it can be accessed through hook_civicrm_buildForm | Core PR merged into 4.7.29  
