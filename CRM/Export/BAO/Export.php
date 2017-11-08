@@ -1322,19 +1322,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     }
     else {
       if (substr($fieldName, -3, 3) == '_id') {
-        // for trxn_id and its variants use a longer buffer
-        // to accommodate different systems - CRM-13739
-        static $notRealIDFields = NULL;
-        if ($notRealIDFields == NULL) {
-          $notRealIDFields = array('trxn_id', 'componentpaymentfield_transaction_id', 'phone_type_id');
-        }
-
-        if (in_array($fieldName, $notRealIDFields)) {
-          $sqlColumns[$fieldName] = "$fieldName varchar(255)";
-        }
-        else {
-          $sqlColumns[$fieldName] = "$fieldName varchar(16)";
-        }
+        $sqlColumns[$fieldName] = "$fieldName varchar(255)";
       }
       elseif (substr($fieldName, -5, 5) == '_note') {
         $sqlColumns[$fieldName] = "$fieldName text";
