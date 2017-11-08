@@ -2396,6 +2396,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       }
     }
 
+    if (empty($select)) {
+      // CRM-21412 Do not give fatal error on report when no fields selected
+      $select = array(1);
+    }
+
     $this->_selectClauses = $select;
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
