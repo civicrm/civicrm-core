@@ -2630,6 +2630,114 @@ AND       civicrm_openid.is_primary = 1";
   }
 
   /**
+   * Check whether greetings for this contact contain tokens for the given
+   * custom field.
+   *
+   * @param object $contact Contact object.
+   * @param int $customFieldId System ID of the custom field.
+   * @return bool
+   */
+  public static function checkGreetingsUseCustomFieldToken($contact, $customFieldId) {
+    $greetingStrings = self::getGreetingStrings($contact, FALSE);
+    foreach ($greetingStrings as $greetingString) {
+      if (strpos($greetingString, ".custom_{$customFieldId}}") !== FALSE) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Get an array of template strings for greeting fields.
+   *
+   * @param object $contact Contact object.
+   * @param bool $useDefaults If TRUE, use system default greeting values;
+   *    otherwise, use values for this specific contact.
+   * @return Array of greeting strings, with keys: 'email', 'postal', 'addressee'.
+   */
+  public static function getGreetingStrings($contact, $useDefaults = FALSE) {
+    static $greetingStrings = array();
+    if (!array_key_exists($contact->id, $greetingStrings)) {
+      if ($useDefaults) {
+        //retrieve default greetings
+        $defaultGreetings = CRM_Core_PseudoConstant::greetingDefaults();
+        $contactDefaults = $defaultGreetings[$contact->contact_type];
+      }
+
+      $greetingStrings[$contact->id] = array(
+        'email' => NULL,
+        'postal' => NULL,
+        'addressee' => NULL,
+      );
+
+      //cache email and postal greeting to greeting display
+      if ($contact->email_greeting_custom != 'null' && $contact->email_greeting_custom) {
+        $greetingStrings[$contact->id]['email'] = $contact->email_greeting_custom;
+      }
+      elseif ($contact->email_greeting_id != 'null' && $contact->email_greeting_id) {
+        // the filter value for Individual contact type is set to 1
+        $filter = array(
+          'contact_type' => $contact->contact_type,
+          'greeting_type' => 'email_greeting',
+        );
+
+        $emailGreeting = CRM_Core_PseudoConstant::greeting($filter);
+        $greetingStrings[$contact->id]['email'] = $emailGreeting[$contact->email_greeting_id];
+      }
+      else {
+        if ($useDefaults) {
+          reset($contactDefaults['email_greeting']);
+          $emailGreetingID = key($contactDefaults['email_greeting']);
+          $greetingStrings[$contact->id]['email'] = $contactDefaults['email_greeting'][$emailGreetingID];
+        }
+      }
+
+      //postal greetings
+      if ($contact->postal_greeting_custom != 'null' && $contact->postal_greeting_custom) {
+        $greetingStrings[$contact->id]['postal'] = $contact->postal_greeting_custom;
+      }
+      elseif ($contact->postal_greeting_id != 'null' && $contact->postal_greeting_id) {
+        $filter = array(
+          'contact_type' => $contact->contact_type,
+          'greeting_type' => 'postal_greeting',
+        );
+        $postalGreeting = CRM_Core_PseudoConstant::greeting($filter);
+        $greetingStrings[$contact->id]['postal'] = $postalGreeting[$contact->postal_greeting_id];
+      }
+      else {
+        if ($useDefaults) {
+          reset($contactDefaults['postal_greeting']);
+          $postalGreetingID = key($contactDefaults['postal_greeting']);
+          $greetingStrings[$contact->id]['postal'] = $contactDefaults['postal_greeting'][$postalGreetingID];
+        }
+      }
+
+      // addressee
+      if ($contact->addressee_custom != 'null' && $contact->addressee_custom) {
+        $greetingStrings[$contact->id]['addressee'] = $contact->addressee_custom;
+      }
+      elseif ($contact->addressee_id != 'null' && $contact->addressee_id) {
+        $filter = array(
+          'contact_type' => $contact->contact_type,
+          'greeting_type' => 'addressee',
+        );
+
+        $addressee = CRM_Core_PseudoConstant::greeting($filter);
+        $greetingStrings[$contact->id]['addressee'] = $addressee[$contact->addressee_id];
+      }
+      else {
+        if ($useDefaults) {
+          reset($contactDefaults['addressee']);
+          $addresseeID = key($contactDefaults['addressee']);
+          $greetingStrings[$contact->id]['addressee'] = $contactDefaults['addressee'][$addresseeID];
+        }
+      }
+    }
+
+    return $greetingStrings[$contact->id];
+  }
+
+  /**
    * Process greetings and cache.
    *
    * @param object $contact

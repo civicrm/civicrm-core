@@ -475,4 +475,50 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->assertEquals('custom_value.id', $fields['custom_value.id']['name']);
   }
 
+  public function testUpdateCustomGreetings() {
+    // Create a custom group with one field.
+    $customGroupResult = $this->callAPISuccess('CustomGroup', 'create', array(
+      'sequential' => 1,
+      'title' => "test custom group",
+      'extends' => "Individual",
+    ));
+    $customFieldResult = $this->callAPISuccess('CustomField', 'create', array(
+      'custom_group_id' => $customGroupResult['id'],
+      'label' => "greeting test",
+      'data_type' => "String",
+      'html_type' => "Text",
+    ));
+    $customFieldId = $customFieldResult['id'];
+
+    // Create a contact with an email greeting format that includes the new custom field.
+    $contactResult = $this->callAPISuccess('Contact', 'create', array(
+      'contact_type' => 'Individual',
+      'email' => substr(sha1(rand()), 0, 7) . '@yahoo.com',
+      'email_greeting_id' => "Customized",
+      'email_greeting_custom' => "Dear {contact.custom_{$customFieldId}}",
+    ));
+    $cid = $contactResult['id'];
+
+    // Define testing values.
+    $uniq = uniqid();
+    $testGreetingValue = "Dear $uniq";
+
+    // Update contact's custom field with CustomValue.create
+    $customValueResult = $this->callAPISuccess('CustomValue', 'create', array(
+      'entity_id' => $cid,
+      "custom_{$customFieldId}" => $uniq,
+      'entity_table' => "civicrm_contact",
+    ));
+
+    // Contact.get API doesn't return greetings currently. That's a separate
+    // issue. For now, use Contact BAO to fetch greetings.
+    $bao = new CRM_Contact_BAO_Contact();
+    $bao->id = $cid;
+    $bao->find();
+    $bao->fetch();
+
+    $this->assertEquals($bao->email_greeting_display, $testGreetingValue);
+
+  }
+
 }
