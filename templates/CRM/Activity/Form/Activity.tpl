@@ -78,13 +78,15 @@
   <td class="label">{$form.target_contact_id.label}</td>
     <td class="view-value">
       {$form.target_contact_id.html}
-      {if $action eq 1 or $single eq false}
-      <div class="crm-is-multi-activity-wrapper">
-        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
-      </div>
-      {/if}
     </td>
   </tr>
+
+  {if $action eq 1 or $single eq false}
+    <tr class="crm-activity-form-block-separation crm-is-multi-activity-wrapper">
+      <td class="label">{$form.separation.label}</td>
+      <td>{$form.separation.html} {help id="separation"}</td>
+    </tr>
+  {/if}
 
   <tr class="crm-activity-form-block-assignee_contact_id">
       <td class="label">
