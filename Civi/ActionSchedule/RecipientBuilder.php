@@ -173,7 +173,6 @@ class RecipientBuilder {
    * sends, e.g. $myQuery->where("e.contact_id NOT IN ({$this->previousRunsToday('e')})").
    * See CRM-18236.
    *
-   * @param string $entityTableAlias
    * @return string
    */
   protected function previousRunsToday() {
