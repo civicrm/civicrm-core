@@ -176,13 +176,10 @@ class RecipientBuilder {
    * @param string $entityTableAlias
    * @return string
    */
-  protected function previousRunsToday($entityTableAlias) {
-    return "SELECT log.contact_id
+  protected function previousRunsToday() {
+    return "SELECT DISTINCT log.contact_id
       FROM civicrm_action_log log
-      WHERE log.contact_id = $entityTableAlias.contact_id
-      AND log.entity_id = $entityTableAlias.id
-      AND log.entity_table = '!casMappingEntity'
-      AND log.action_schedule_id = #casActionScheduleId
+      WHERE  log.action_schedule_id = #casActionScheduleId
       AND log.action_date_time > DATE_SUB(!casNow, INTERVAL 1 DAY)";
   }
 
@@ -225,7 +222,7 @@ class RecipientBuilder {
     if (empty($referenceReminderIDs)) {
       $firstQuery = $query->copy()
         ->merge($this->selectIntoActionLog(self::PHASE_RELATION_FIRST, $query))
-        ->where("e.contact_id NOT IN ({$this->previousRunsToday('e')})")
+        ->where("!casContactIdField NOT IN ({$this->previousRunsToday()})")
         ->where($startDateClauses)
         ->strict()
         ->toSQL();
@@ -260,7 +257,7 @@ class RecipientBuilder {
     $insertAdditionalSql = \CRM_Utils_SQL_Select::from("civicrm_contact c")
       ->merge($query, array('params'))
       ->merge($this->selectIntoActionLog(self::PHASE_ADDITION_FIRST, $query))
-      ->where("e.contact_id NOT IN ({$this->previousRunsToday('e')})")
+      ->where("grp.contact_id NOT IN ({$this->previousRunsToday()})")
       ->where("c.is_deleted = 0 AND c.is_deceased = 0")
       ->merge($this->prepareAddlFilter('c.id'))
       ->where("c.id NOT IN (
