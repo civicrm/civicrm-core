@@ -176,7 +176,6 @@
 {literal}
 <script type="text/javascript">
   (function($) {
-    $('[data-warn-changes=true]').attr('data-warn-changes', 'false');
     CRM.$('table#dupePairs').data({
       "ajax": {
         "url": {/literal}'{$sourceUrl}'{literal}
