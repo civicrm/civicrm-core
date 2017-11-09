@@ -183,6 +183,21 @@ class RecipientBuilder {
   }
 
   /**
+   * Analogous in use to previousRunsToday()
+   * but selects contact ID's for reminders that repeat.
+   * CRM-18236
+   *
+   * @return string SQL
+   */
+  protected function previousRunsThatRepeat() {
+    return "SELECT DISTINCT log.contact_id
+      FROM civicrm_action_log log
+      INNER JOIN civicrm_action_schedule sch on log.action_schedule_id = sch.id
+      AND sch.is_repeat <> 0
+    ";
+  }
+
+  /**
    * Generate action_log's for new, first-time alerts to related contacts.
    *
    * @throws \Exception
@@ -222,6 +237,7 @@ class RecipientBuilder {
       $firstQuery = $query->copy()
         ->merge($this->selectIntoActionLog(self::PHASE_RELATION_FIRST, $query))
         ->where("!casContactIdField NOT IN ({$this->previousRunsToday()})")
+        ->where("!casContactIdField NOT IN ({$this->previousRunsThatRepeat()})")
         ->where($startDateClauses)
         ->strict()
         ->toSQL();
@@ -257,6 +273,7 @@ class RecipientBuilder {
       ->merge($query, array('params'))
       ->merge($this->selectIntoActionLog(self::PHASE_ADDITION_FIRST, $query))
       ->where("grp.contact_id NOT IN ({$this->previousRunsToday()})")
+      ->where("grp.contact_id NOT IN ({$this->previousRunsThatRepeat()})")
       ->where("c.is_deleted = 0 AND c.is_deceased = 0")
       ->merge($this->prepareAddlFilter('c.id'))
       ->where("c.id NOT IN (
