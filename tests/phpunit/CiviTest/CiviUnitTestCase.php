@@ -1606,6 +1606,23 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Create a paid event.
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  protected function eventCreatePaid($params) {
+    $event = $this->eventCreate($params);
+    $this->priceSetID = $this->eventPriceSetCreate(55, 0, 'Radio');
+    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $event['id'], $this->priceSetID);
+    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->priceSetID, TRUE, FALSE);
+    $priceSet = CRM_Utils_Array::value($this->priceSetID, $priceSet);
+    $this->eventFeeBlock = CRM_Utils_Array::value('fields', $priceSet);
+    return $event;
+  }
+
+  /**
    * Delete event.
    *
    * @param int $id
@@ -3325,11 +3342,12 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *
    * @param int $feeTotal
    * @param int $minAmt
+   * @param string $type
    *
    * @return int
    *   Price Set ID.
    */
-  protected function eventPriceSetCreate($feeTotal, $minAmt = 0) {
+  protected function eventPriceSetCreate($feeTotal, $minAmt = 0, $type = 'Text') {
     // creating price set, price field
     $paramsSet['title'] = 'Price Set';
     $paramsSet['name'] = CRM_Utils_String::titleToVar('Price Set');
@@ -3337,17 +3355,13 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $paramsSet['extends'] = 1;
     $paramsSet['min_amount'] = $minAmt;
 
-    $priceset = CRM_Price_BAO_PriceSet::create($paramsSet);
-    $priceSetId = $priceset->id;
+    $priceSet = CRM_Price_BAO_PriceSet::create($paramsSet);
+    $this->_ids['price_set'] = $priceSet->id;
 
-    //Checking for priceset added in the table.
-    $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
-      'id', $paramsSet['title'], 'Check DB for created priceset'
-    );
     $paramsField = array(
       'label' => 'Price Field',
       'name' => CRM_Utils_String::titleToVar('Price Field'),
-      'html_type' => 'Text',
+      'html_type' => $type,
       'price' => $feeTotal,
       'option_label' => array('1' => 'Price Field'),
       'option_value' => array('1' => $feeTotal),
@@ -3358,13 +3372,22 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'weight' => 1,
       'options_per_line' => 1,
       'is_active' => array('1' => 1),
-      'price_set_id' => $priceset->id,
+      'price_set_id' => $this->_ids['price_set'],
       'is_enter_qty' => 1,
       'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
     );
+    if ($type === 'Radio') {
+      $paramsField['is_enter_qty'] = 0;
+      $paramsField['option_value'][2] = $paramsField['option_weight'][2] = $paramsField['option_amount'][2] = 100;
+      $paramsField['option_label'][2] = $paramsField['option_name'][2] = 'hundy';
+    }
     CRM_Price_BAO_PriceField::create($paramsField);
+    $fields = $this->callAPISuccess('PriceField', 'get', array('price_set_id' => $this->_ids['price_set']));
+    $this->_ids['price_field'] = array_keys($fields['values']);
+    $fieldValues = $this->callAPISuccess('PriceFieldValue', 'get', array('price_field_id' => $this->_ids['price_field'][0]));
+    $this->_ids['price_field_value'] = array_keys($fieldValues['values']);
 
-    return $priceSetId;
+    return $this->_ids['price_set'];
   }
 
   /**

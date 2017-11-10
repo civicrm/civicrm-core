@@ -1029,6 +1029,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
         //lets carry currency, CRM-4453
         $params['fee_currency'] = $config->defaultCurrency;
+        if (!isset($lineItem[0])) {
+          $lineItem[0] = array();
+        }
         CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'],
           $params, $lineItem[0]
         );
@@ -1666,7 +1669,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           //add dataArray in the receipts in ADD and UPDATE condition
           $dataArray = array();
           if ($this->_action & CRM_Core_Action::ADD) {
-            $line = $lineItem[0];
+            $line = isset($lineItem[0]) ? $lineItem[0] : array();
           }
           elseif ($this->_action & CRM_Core_Action::UPDATE) {
             $line = $this->_values['line_items'];
