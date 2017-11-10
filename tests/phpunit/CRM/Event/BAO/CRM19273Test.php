@@ -76,12 +76,13 @@ class CRM_Event_BAO_CRM19273 extends CiviUnitTestCase {
    *
    * @todo resolve this with parent function.
    *
-   * @param int $amount
-   * @param int $min_fee
+   * @param int $feeTotal
+   * @param int $minAmt
+   * @param string $type
+   *
    * @return int
    */
-  protected function eventPriceSetCreate($amount = 0, $min_fee = 0) {
-
+  protected function eventPriceSetCreate($feeTotal = 55, $minAmt = 0, $type = 'Text') {
     $paramsSet['title'] = 'Two Options';
     $paramsSet['name'] = CRM_Utils_String::titleToVar('Two Options');
     $paramsSet['is_active'] = FALSE;
