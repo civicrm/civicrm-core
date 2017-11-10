@@ -288,11 +288,7 @@
     };
 
     $scope.isActivityRemovable = function(activitySet, activity) {
-      if (activitySet.name == 'standard_timeline' && activity.name == 'Open Case') {
-        return false;
-      } else {
-        return true;
-      }
+      return true;
     };
 
     $scope.isValidName = function(name) {
