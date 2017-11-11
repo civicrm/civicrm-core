@@ -739,18 +739,17 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Get merge statistics message.
    *
-   * @param string $cacheKeyString
+   * @param array $stats
    *
    * @return string
    */
-  public static function getMergeStatsMsg($cacheKeyString) {
-    $msg   = '';
-    $stats = CRM_Dedupe_Merger::getMergeStats($cacheKeyString);
+  public static function getMergeStatsMsg($stats) {
+    $msg = '';
     if (!empty($stats['merged'])) {
-      $msg = "{$stats['merged']} " . ts('Contact(s) were merged.');
+      $msg = '<p>' . ts('One contact merged.', array('count' => $stats['merged'], 'plural' => '%count contacts merged.')) . '</p>';
     }
     if (!empty($stats['skipped'])) {
-      $msg .= $stats['skipped'] . ts(' Contact(s) were skipped.');
+      $msg .= '<p>' . ts('One contact was skipped.', array('count' => $stats['skipped'], 'plural' => '%count contacts were skipped.')) . '</p>';
     }
     return $msg;
   }
