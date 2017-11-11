@@ -975,17 +975,19 @@ return array(
     'add' => '4.7',
     'is_domain' => 1,
     'is_contact' => 0,
+    'default' => array(),
     'description' => 'Select Activity types to disable assignee notifications.',
     'title' => 'Filter Activity Type Notification',
     'help_text' => '',
-    'html_type' => 'Select',
+    'html_type' => 'advmultiselect',
     'html_attributes' => array(
-      'multiple' => 1,
-      'class' => 'crm-select2',
+      'size' => 5,
+      'style' => 'width:150px',
+      'class' => 'advmultiselect',
     ),
     'pseudoconstant' => array(
       'optionGroupName' => 'activity_type',
     ),
-    'quick_form_type' => 'Select',
+    'quick_form_type' => 'Element',
   ),
 );
