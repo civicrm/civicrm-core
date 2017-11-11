@@ -746,10 +746,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   public static function getMergeStatsMsg($stats) {
     $msg = '';
     if (!empty($stats['merged'])) {
-      $msg = '<p>' . ts('One contact merged.', array(1 => $stats['merged'], 'plural' => '%1 contacts merged.')) . '</p>';
+      $msg = '<p>' . ts('One contact merged.', array('count' => $stats['merged'], 'plural' => '%count contacts merged.')) . '</p>';
     }
     if (!empty($stats['skipped'])) {
-      $msg .= '<p>' . ts('One contact was skipped.', array(1 => $stats['skipped'], 'plural' => '%1 contacts were skipped.')) . '</p>';
+      $msg .= '<p>' . ts('One contact was skipped.', array('count' => $stats['skipped'], 'plural' => '%count contacts were skipped.')) . '</p>';
     }
     return $msg;
   }
