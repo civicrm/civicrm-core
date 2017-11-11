@@ -147,9 +147,11 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       //reload from cache table
       $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria);
 
-      $stats = CRM_Dedupe_Merger::getMergeStatsMsg($cacheKeyString);
+      $stats = CRM_Dedupe_Merger::getMergeStats($cacheKeyString);
       if ($stats) {
-        CRM_Core_Session::setStatus($stats);
+        $message = CRM_Dedupe_Merger::getMergeStatsMsg($stats);
+        $status = empty($stats['skipped']) ? 'success' : 'alert';
+        CRM_Core_Session::setStatus($message, ts('Batch Complete'), $status, array('expires' => 0));
         // reset so we not displaying same message again
         CRM_Dedupe_Merger::resetMergeStats($cacheKeyString);
       }
