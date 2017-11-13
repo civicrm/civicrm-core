@@ -829,12 +829,11 @@ WHERE li.contribution_id = %1";
   GROUP BY li.entity_table, li.entity_id, price_field_value_id, fi.id
     ";
     $updateFinancialItemInfoDAO = CRM_Core_DAO::executeQuery($updateFinancialItem);
+    $financialItemResult = $updateFinancialItemInfoDAO->fetchAll();
 
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-    $updateFinancialItemInfoValues = array();
-    while ($updateFinancialItemInfoDAO->fetch()) {
-      $updateFinancialItemInfoValues = (array) $updateFinancialItemInfoDAO;
+    foreach ($financialItemResult as $updateFinancialItemInfoValues) {
       $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
       // the below params are not needed
       $previousFinancialItemID = $updateFinancialItemInfoValues['id'];
