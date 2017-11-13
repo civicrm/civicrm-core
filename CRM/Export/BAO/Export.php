@@ -555,7 +555,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $query = new CRM_Contact_BAO_Query($params, $returnProperties, NULL,
       FALSE, FALSE, $queryMode,
-      FALSE, TRUE, TRUE, NULL, $queryOperator
+      FALSE, TRUE, TRUE, NULL, $queryOperator, NULL, TRUE
     );
 
     //sort by state
