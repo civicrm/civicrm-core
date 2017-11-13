@@ -306,6 +306,12 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
           }
         }
       }
+
+      // CRM-21041: set default 'Communication Style' if unset when creating a contact.
+      if (empty($params['communication_style_id'])) {
+        $defaultCommunicationStyleId = CRM_Core_OptionGroup::values('communication_style', TRUE, NULL, NULL, 'AND is_default = 1');
+        $params['communication_style_id'] = array_pop($defaultCommunicationStyleId);
+      }
     }
 
     $transaction = new CRM_Core_Transaction();
