@@ -30,7 +30,6 @@
             var rcpAjaxState = {
               input: '',
               entity: 'civicrm_msg_templates',
-              type: 'include',
               page_n: 0,
               page_i: 0,
             };
@@ -55,7 +54,7 @@
                         $(tlist.values).each(function(id, val) {
                           template.id = val.id;
                           template.text = val.label;
-                        })
+                        });
                       }
 
                       cb(template);
@@ -69,7 +68,6 @@
                       rcpAjaxState = {
                         input: input,
                         entity: 'civicrm_msg_templates',
-                        type: 'include',
                         page_n: 0,
                       };
                     }
