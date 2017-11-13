@@ -3560,7 +3560,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $result = $this->callAPISuccessGetSingle('Contact', array('last_name' => 'Doe'));
     $this->assertEquals(1, $result['communication_style_id']);
   }
-  
+
   /**
    * CRM-21041 Test if 'communication style' is set if value is passed.
    */
