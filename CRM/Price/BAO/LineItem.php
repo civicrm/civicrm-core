@@ -639,20 +639,19 @@ WHERE li.contribution_id = %1";
     $lineItemObj = new CRM_Price_BAO_LineItem();
 
     // fetch submitted LineItems from input params and feeBlock information
-    $submittedLineItems = $lineItemObj->_getSubmittedLineItems($params, $feeBlock);
+    $submittedLineItems = $lineItemObj->getSubmittedLineItems($params, $feeBlock);
 
     // retrieve the submitted price field value IDs from $submittedLineItems array keys
     $submittedPriceFieldValueIDs = empty($submittedLineItems) ? array() : array_keys($submittedLineItems);
 
-    // get lineItems need to be updated and added to record changed fee
-    list($lineItemsToAdd, $lineItemsToUpdate) = $lineItemObj->_getLineItemsToAddAndUpdate($submittedLineItems, $entityID, $entity);
+    $requiredChanges = $lineItemObj->getLineItemsToAlter($submittedLineItems, $entityID, $entity);
 
     // cancel previous line item
     $additionalWhereClause = empty($submittedPriceFieldValueIDs) ? NULL : sprintf("price_field_value_id NOT IN (%s)", implode(', ', $submittedPriceFieldValueIDs));
-    $lineItemObj->_cancelLineItems($entityID, $entityTable, $additionalWhereClause);
+    $lineItemObj->cancelLineItems($entityID, $entityTable, $additionalWhereClause);
 
     // get financial information that need to be recorded on basis on submitted price field value IDs
-    $financialItemsArray = $lineItemObj->_getFinancialItemsToRecord(
+    $financialItemsArray = $lineItemObj->getReverseFinancialItemsToRecord(
       $entityID,
       $entityTable,
       $contributionId,
@@ -662,8 +661,8 @@ WHERE li.contribution_id = %1";
     // update line item with changed line total and other information
     $totalParticipant = $participantCount = 0;
     $amountLevel = array();
-    if (!empty($lineItemsToUpdate)) {
-      foreach ($lineItemsToUpdate as $priceFieldValueID => $value) {
+    if (!empty($requiredChanges['line_items_to_update'])) {
+      foreach ($requiredChanges['line_items_to_update'] as $priceFieldValueID => $value) {
         $taxAmount = "NULL";
         if (isset($value['tax_amount'])) {
           $taxAmount = $value['tax_amount'];
@@ -691,7 +690,7 @@ WHERE li.contribution_id = %1";
     // insert new 'adjusted amount' transaction entry and update contribution entry.
     // ensure entity_financial_trxn table has a linking of it.
     // insert new line items
-    $lineItemObj->_addLineItemOnChangeFeeSelection($lineItemsToAdd, $entityID, $entityTable, $contributionId);
+    $lineItemObj->addLineItemOnChangeFeeSelection($requiredChanges['line_items_to_add'], $entityID, $entityTable, $contributionId);
 
     // the recordAdjustedAmt code would execute over here
     $count = 0;
@@ -721,7 +720,7 @@ WHERE li.contribution_id = %1";
     if (!empty($amountLevel)) {
       $updateAmountLevel = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
     }
-    $trxn = $lineItemObj->_recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount, $updateAmountLevel);
+    $trxn = $lineItemObj->recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount, $updateAmountLevel);
 
     $contributionCompletedStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Completed');
     if (!empty($financialItemsArray)) {
@@ -761,10 +760,10 @@ WHERE li.contribution_id = %1";
     if (!empty($trxn->id)) {
       $trxnId['id'] = $trxn->id;
     }
-    $lineItemObj->_addLineItemOnChangeFeeSelection($lineItemsToAdd, $entityID, $entityTable, $contributionId, $trxnId, TRUE);
+    $lineItemObj->addLineItemOnChangeFeeSelection($requiredChanges['line_items_to_add'], $entityID, $entityTable, $contributionId, $trxnId, TRUE);
 
     // update participant fee_amount column
-    $lineItemObj->_updateEntityRecordOnChangeFeeSelection($params, $entityID, $entity);
+    $lineItemObj->updateEntityRecordOnChangeFeeSelection($params, $entityID, $entity);
   }
 
   /**
@@ -776,7 +775,7 @@ WHERE li.contribution_id = %1";
    * @param string $additionalWhereClause
    *
    */
-  protected function _cancelLineItems($entityID, $entityTable, $additionalWhereClause = NULL) {
+  protected function cancelLineItems($entityID, $entityTable, $additionalWhereClause = NULL) {
     $whereClauses = array(
       "li.entity_id = %1",
       "li.entity_table = %2",
@@ -813,7 +812,7 @@ WHERE li.contribution_id = %1";
    * @return array
    *      List of formatted Financial Items to be recorded
    */
-  protected function _getFinancialItemsToRecord($entityID, $entityTable, $contributionID, $submittedPriceFieldValueIDs) {
+  protected function getReverseFinancialItemsToRecord($entityID, $entityTable, $contributionID, $submittedPriceFieldValueIDs) {
     $previousLineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, str_replace('civicrm_', '', $entityTable));
 
     $financialItemsArray = array();
@@ -846,7 +845,7 @@ WHERE li.contribution_id = %1";
         // INSERT negative financial_items
         $updateFinancialItemInfoValues['amount'] = -$updateFinancialItemInfoValues['amount'];
         // reverse the related financial trxn too
-        $updateFinancialItemInfoValues['financialTrxn'] = $this->_getRelatedCancelFinancialTrxn($previousFinancialItemID);
+        $updateFinancialItemInfoValues['financialTrxn'] = $this->getRelatedCancelFinancialTrxn($previousFinancialItemID);
         if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
           $updateFinancialItemInfoValues['tax']['amount'] = -($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']);
           $updateFinancialItemInfoValues['tax']['description'] = $taxTerm;
@@ -886,7 +885,7 @@ WHERE li.contribution_id = %1";
    * @return array
    *     List of submitted line items
    */
-  protected function _getSubmittedLineItems($inputParams, $feeBlock) {
+  protected function getSubmittedLineItems($inputParams, $feeBlock) {
     $submittedLineItems = array();
     foreach ($feeBlock as $id => $values) {
       CRM_Price_BAO_LineItem::format($id, $inputParams, $values, $submittedLineItems);
@@ -896,16 +895,16 @@ WHERE li.contribution_id = %1";
   }
 
   /**
-   * Helper function to retrieve formatted lineitems need to be added and/or updated
+   *  Helper function to retrieve formatted line items that need to be altered.
    *
    * @param array $submittedLineItems
    * @param int $entityID
    * @param string $entity
    *
    * @return array
-   *    Array of formatted lineitems
+   *    Array of formatted line items
    */
-  protected function _getLineItemsToAddAndUpdate($submittedLineItems, $entityID, $entity) {
+  protected function getLineItemsToAlter($submittedLineItems, $entityID, $entity) {
     $previousLineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, $entity);
 
     $lineItemsToAdd = $submittedLineItems;
@@ -934,7 +933,10 @@ WHERE li.contribution_id = %1";
       }
     }
 
-    return array($lineItemsToAdd, $lineItemsToUpdate);
+    return array(
+      'line_items_to_add' => $lineItemsToAdd,
+      'line_items_to_update' => $lineItemsToUpdate,
+    );
   }
 
   /**
@@ -949,7 +951,7 @@ WHERE li.contribution_id = %1";
    *
    * @return void
    */
-  protected function _addLineItemOnChangeFeeSelection(
+  protected function addLineItemOnChangeFeeSelection(
     $lineItemsToAdd,
     $entityID,
     $entityTable,
@@ -1030,7 +1032,7 @@ WHERE li.contribution_id = %1";
    * @param string $entity
    *
    */
-  protected function _updateEntityRecordOnChangeFeeSelection($inputParams, $entityID, $entity) {
+  protected function updateEntityRecordOnChangeFeeSelection($inputParams, $entityID, $entity) {
     $entityTable = "civicrm_{$entity}";
 
     if ($entity == 'participant') {
@@ -1062,7 +1064,7 @@ WHERE li.contribution_id = %1";
    * @return array $financialTrxn
    *
    */
-  protected function _getRelatedCancelFinancialTrxn($financialItemID) {
+  protected function getRelatedCancelFinancialTrxn($financialItemID) {
     $financialTrxn = civicrm_api3('EntityFinancialTrxn', 'getsingle', array(
       'entity_table' => 'civicrm_financial_item',
       'entity_id' => $financialItemID,
@@ -1099,7 +1101,7 @@ WHERE li.contribution_id = %1";
    *
    * @return bool|\CRM_Core_BAO_FinancialTrxn
    */
-  protected function _recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
+  protected function recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
     $pendingAmount = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
     $pendingAmount = CRM_Utils_Array::value('total_amount', $pendingAmount, 0);
     $balanceAmt = $updatedAmount - $paidAmount;
