@@ -3548,4 +3548,38 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     Civi::$statics['CRM_Contact_BAO_GroupContactCache']['is_refresh_init'] = FALSE;
   }
 
+  /**
+   * CRM-21041 Test if 'communication style' is set to site default if not passed.
+   */
+  public function testCreateCommunicationStyleUnset() {
+    $this->callAPISuccess('Contact', 'create', array(
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'contact_type' => 'Individual')
+    );
+    $result = $this->callAPISuccessGetSingle('Contact', array('last_name' => 'Doe'));
+    $this->assertEquals(1, $result['communication_style_id']);
+  }
+  
+  /**
+   * CRM-21041 Test if 'communication style' is set if value is passed.
+   */
+  public function testCreateCommunicationStylePassed() {
+    $this->callAPISuccess('Contact', 'create', array(
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'contact_type' => 'Individual',
+      'communication_style_id' => 'Familiar',
+    ));
+    $result = $this->callAPISuccessGetSingle('Contact', array('last_name' => 'Doe'));
+    $params = array(
+      'option_group_id' => 'communication_style',
+      'label' => 'Familiar',
+      'return' => 'value',
+    );
+    $optionResult = civicrm_api3('OptionValue', 'get', $params);
+    $communicationStyle = reset($optionResult['values']);
+    $this->assertEquals($communicationStyle['value'], $result['communication_style_id']);
+  }
+
 }
