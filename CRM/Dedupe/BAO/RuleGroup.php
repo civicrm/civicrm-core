@@ -196,13 +196,13 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     if ($this->params && !$this->noRules) {
       $tempTableQuery = "CREATE TEMPORARY TABLE dedupe (id1 int, weight int, UNIQUE UI_id1 (id1)) ENGINE=InnoDB";
       $insertClause = "INSERT INTO dedupe (id1, weight)";
-      $groupByClause = "GROUP BY id1";
+      $groupByClause = "GROUP BY id1, weight";
       $dupeCopyJoin = " JOIN dedupe_copy ON dedupe_copy.id1 = t1.column WHERE ";
     }
     else {
       $tempTableQuery = "CREATE TEMPORARY TABLE dedupe (id1 int, id2 int, weight int, UNIQUE UI_id1_id2 (id1, id2)) ENGINE=InnoDB";
       $insertClause = "INSERT INTO dedupe (id1, id2, weight)";
-      $groupByClause = "GROUP BY id1, id2";
+      $groupByClause = "GROUP BY id1, id2, weight";
       $dupeCopyJoin = " JOIN dedupe_copy ON dedupe_copy.id1 = t1.column AND dedupe_copy.id2 = t2.column WHERE ";
     }
     $patternColumn = '/t1.(\w+)/';
