@@ -704,7 +704,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // this option should be available only during add mode
     if ($this->_action != CRM_Core_Action::UPDATE) {
-      $this->add('advcheckbox', 'is_multi_activity', ts('Create a separate activity for each contact.'));
+      $this->addRadio(
+        'separation',
+        ts('Activity Separation'),
+        array(
+          'separate' => ts('Create separate activities for each contact'),
+          'combined' => ts('Create one activity with all contacts together'),
+        )
+      );
     }
 
     $this->addRule('duration',
@@ -832,6 +839,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if ((!empty($fields['followup_activity_subject']) || !empty($fields['followup_date'])) && empty($fields['followup_activity_type_id'])) {
       $errors['followup_activity_subject'] = ts('Follow-up Activity type is a required field.');
     }
+    $actionIsAdd = $self->_action == CRM_Core_Action::ADD;
+    $hasMultipleTargetContacts = !empty($fields['target_contact_id']) && strpos($fields['target_contact_id'], ',') !== FALSE;
+    $separationFieldIsEmpty = empty($fields['separation']);
+    if ($actionIsAdd && $hasMultipleTargetContacts && $separationFieldIsEmpty) {
+      $errors['separation'] = ts('Activity Separation is a required field.');
+    }
     return $errors;
   }
 
@@ -915,6 +928,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       'civicrm_activity',
       $this->_activityId
     );
+
+    $params['is_multi_activity'] = CRM_Utils_Array::value('separation', $params) == 'separate';
 
     $activity = array();
     if (!empty($params['is_multi_activity']) &&
