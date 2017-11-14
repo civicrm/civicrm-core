@@ -152,15 +152,9 @@
   </tr>
   <tr class="crm-activity-form-block-details">
     <td class="label">{$form.details.label}</td>
-    {if $activityTypeName eq "Print PDF Letter"}
-      <td class="view-value">
-      {$form.details.html}
-      </td>
-      {else}
-      <td class="view-value">
-       {$form.details.html|crmStripAlternatives}
-      </td>
-    {/if}
+    <td class="view-value">
+     {$form.details.html}
+    </td>
   </tr>
   <tr class="crm-activity-form-block-priority_id">
     <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
@@ -247,7 +241,7 @@
   {/if} {* End Delete vs. Add / Edit action *}
   </table>
   <div class="crm-submit-buttons">
-  {if $action eq 4 && $activityTName neq 'Inbound Email'}
+  {if $action eq 4 && ($activityTName neq 'Inbound Email' || $allow_edit_inbound_emails == 1)}
     {if !$context }
       {assign var="context" value='activity'}
     {/if}
