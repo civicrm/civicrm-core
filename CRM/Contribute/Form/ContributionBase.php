@@ -329,7 +329,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
 
       if ($isMonetary &&
-        (!$isPayLater || !empty($this->_values['payment_processor']))
+        ($isPayLater || !empty($this->_values['payment_processor']))
       ) {
         $this->_paymentProcessorIDs = explode(
           CRM_Core_DAO::VALUE_SEPARATOR,
@@ -580,7 +580,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // The concept of contributeMode is deprecated.
     // The payment processor object can provide info about the fields it shows.
-    if ($assignCCInfo) {
+    if ($assignCCInfo && $this->_paymentProcessor) {
       /** @var  $paymentProcessorObject \CRM_Core_Payment */
       $paymentProcessorObject = $this->_paymentProcessor['object'];
       $paymentFields = $paymentProcessorObject->getPaymentFormFields();
