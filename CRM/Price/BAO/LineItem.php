@@ -914,19 +914,26 @@ WHERE li.contribution_id = %1";
       // check through the submitted items if the previousItem exists,
       // if found in submitted items, do not use it for new item creations
       if (in_array($previousLineItem['price_field_value_id'], $submittedPriceFieldValueIDs)) {
+        $submittedLineItem = $submittedLineItems[$previousLineItem['price_field_value_id']];
         // if submitted line items are existing don't fire INSERT query
         if ($previousLineItem['line_total'] != 0) {
           unset($lineItemsToAdd[$previousLineItem['price_field_value_id']]);
         }
         else {
-          $lineItemsToAdd[$previousLineItem['price_field_value_id']]['skip'] = TRUE;
+          $submittedLineItem['skip'] = TRUE;
         }
         // for updating the line items i.e. use-case - once deselect-option selecting again
-        if (($previousLineItem['line_total'] != $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total']) ||
-          ($submittedLineItems[$previousLineItem['price_field_value_id']]['line_total'] == 0 && $submittedLineItems[$previousLineItem['price_field_value_id']]['qty'] == 1) ||
-          ($previousLineItem['qty'] != $submittedLineItems[$previousLineItem['price_field_value_id']]['qty'])
+        if (($previousLineItem['line_total'] != $submittedLineItem['line_total'])
+          || (
+            // This would be a $0 line item - but why it should be catered to
+            // other than when the above condition is unclear.
+            $submittedLineItem['line_total'] == 0 && $submittedLineItem['qty'] == 1
+          )
+          || (
+            $previousLineItem['qty'] != $submittedLineItem['qty']
+          )
         ) {
-          $lineItemsToUpdate[$previousLineItem['price_field_value_id']] = $submittedLineItems[$previousLineItem['price_field_value_id']];
+          $lineItemsToUpdate[$previousLineItem['price_field_value_id']] = $submittedLineItem;
           $lineItemsToUpdate[$previousLineItem['price_field_value_id']]['id'] = $id;
         }
       }
@@ -975,42 +982,7 @@ WHERE li.contribution_id = %1";
         'contribution_id' => $contributionID,
       ));
       if ($addFinancialItemOnly) {
-        // don't add financial item for cancelled line item
-        if ($lineParams['qty'] == 0) {
-          continue;
-        }
-        elseif (empty($adjustedFinancialTrxnID)) {
-          // add financial item if ONLY financial type is changed
-          if ($lineParams['financial_type_id'] != $updatedContribution->financial_type_id) {
-            $changedFinancialTypeID = $lineParams['financial_type_id'];
-            $adjustedTrxnValues = array(
-              'from_financial_account_id' => NULL,
-              'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($updatedContribution->payment_instrument_id),
-              'total_amount' => $lineParams['line_total'],
-              'net_amount' => $lineParams['line_total'],
-              'status_id' => $updatedContribution->contribution_status_id,
-              'payment_instrument_id' => $updatedContribution->payment_instrument_id,
-              'contribution_id' => $updatedContribution->id,
-              'is_payment' => TRUE, // since balance is 0, which means contribution is completed
-              'trxn_date' => date('YmdHis'),
-              'currency' => $updatedContribution->currency,
-            );
-            $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
-            $tempFinancialTrxnID = array('id' => $adjustedTrxn->id);
-          }
-          // don't add financial item if line_total and financial type aren't changed,
-          //  which is identified by empty $adjustedFinancialTrxnID
-          else {
-            continue;
-          }
-        }
-        $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams, CRM_Core_DAO::$_nullArray);
-        // insert financial items
-        // ensure entity_financial_trxn table has a linking of it.
-        CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, NULL, $tempFinancialTrxnID);
-        if (isset($lineObj->tax_amount)) {
-          CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE, $tempFinancialTrxnID);
-        }
+        $changedFinancialTypeID = $this->addFinancialItemsOnLineItemChange(empty($adjustedFinancialTrxnID), $lineParams, $updatedContribution, $tempFinancialTrxnID, $changedFinancialTypeID);
       }
       elseif (!array_key_exists('skip', $lineParams)) {
         self::create($lineParams);
@@ -1162,6 +1134,64 @@ WHERE li.contribution_id = %1";
       $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
     }
     return $adjustedTrxn;
+  }
+
+  /**
+   * Add financial items to reflect line item change.
+   *
+   * @param bool $isCreateAdditionalFinancialTrxn
+   * @param array $lineParams
+   * @param \CRM_Contribute_BAO_Contribution $updatedContribution
+   * @param int $tempFinancialTrxnID
+   * @param int|NULL $changedFinancialTypeID
+   *
+   * @return int|NULL
+   */
+  protected function addFinancialItemsOnLineItemChange($isCreateAdditionalFinancialTrxn, $lineParams, $updatedContribution, $tempFinancialTrxnID, $changedFinancialTypeID) {
+    // don't add financial item for cancelled line item
+    if ($lineParams['qty'] == 0) {
+      return $changedFinancialTypeID;
+    }
+    elseif ($isCreateAdditionalFinancialTrxn) {
+      // This routine & the return below is super uncomfortable.
+      // I have refactored to here but don't understand how this would be hit
+      // and it is how it would be a good thing, given the odd return below which
+      // does not seem consistent with what is going on.
+      // I'm tempted to add an e-deprecated into it to confirm my suspicion it only exists to
+      // cause mental anguish.
+      // original comment : add financial item if ONLY financial type is changed
+      if ($lineParams['financial_type_id'] != $updatedContribution->financial_type_id) {
+        $changedFinancialTypeID = (int) $lineParams['financial_type_id'];
+        $adjustedTrxnValues = array(
+          'from_financial_account_id' => NULL,
+          'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($updatedContribution->payment_instrument_id),
+          'total_amount' => $lineParams['line_total'],
+          'net_amount' => $lineParams['line_total'],
+          'status_id' => $updatedContribution->contribution_status_id,
+          'payment_instrument_id' => $updatedContribution->payment_instrument_id,
+          'contribution_id' => $updatedContribution->id,
+          'is_payment' => TRUE,
+          // since balance is 0, which means contribution is completed
+          'trxn_date' => date('YmdHis'),
+          'currency' => $updatedContribution->currency,
+        );
+        $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
+        $tempFinancialTrxnID = array('id' => $adjustedTrxn->id);
+      }
+      // don't add financial item if line_total and financial type aren't changed,
+      //  which is identified by empty $adjustedFinancialTrxnID
+      else {
+        return $changedFinancialTypeID;
+      }
+    }
+    $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams, CRM_Core_DAO::$_nullArray);
+    // insert financial items
+    // ensure entity_financial_trxn table has a linking of it.
+    CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, NULL, $tempFinancialTrxnID);
+    if (isset($lineObj->tax_amount)) {
+      CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE, $tempFinancialTrxnID);
+    }
+    return $changedFinancialTypeID;
   }
 
 }
