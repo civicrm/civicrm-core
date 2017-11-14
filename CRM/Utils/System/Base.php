@@ -725,6 +725,11 @@ abstract class CRM_Utils_System_Base {
       $dateTime = new DateTime("now", $tzObj);
       $tz = $tzObj->getOffset($dateTime);
 
+      if ($tz === 0) {
+        // CRM-21422
+        return '+00:00';
+      }
+
       if (empty($tz)) {
         return FALSE;
       }
