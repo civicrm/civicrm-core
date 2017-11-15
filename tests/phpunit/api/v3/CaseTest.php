@@ -204,6 +204,33 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
+   * Test update (create with id) function with valid parameters.
+   */
+  public function testCaseUpdateWithExistingCaseContact() {
+    $params = $this->_params;
+    // Test using name instead of value
+    unset($params['case_type_id']);
+    $params['case_type'] = $this->caseType;
+    $result = $this->callAPISuccess('case', 'create', $params);
+    $id = $result['id'];
+    $case = $this->callAPISuccess('case', 'getsingle', array('id' => $id));
+
+    // Update Case, we specify existing case ID and existing contact ID to verify that CaseContact.create is not called
+    $params = $this->_params;
+    $params['id'] = $id;
+    $this->callAPISuccess('case', 'create', $params);
+
+    // Verify that updated case is equal to the original with new subject.
+    $result = $this->callAPISuccessGetSingle('Case', array('case_id' => $id));
+    // Modification dates are likely to differ by 0-2 sec. Check manually.
+    $this->assertGreaterThanOrEqual($result['modified_date'], $case['modified_date']);
+    unset($result['modified_date']);
+    unset($case['modified_date']);
+    // Everything else should be identical.
+    $this->assertAPIArrayComparison($result, $case);
+  }
+
+  /**
    * Test case update with custom data
    */
   public function testCaseUpdateCustom() {
