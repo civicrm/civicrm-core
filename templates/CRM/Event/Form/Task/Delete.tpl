@@ -25,9 +25,6 @@
 *}
 {* Confirmation of participation deletes  *}
 <div class="crm-block crm-form-block crm-event-delete-form-block">
-<div class="crm-submit-buttons">
- {include file="CRM/common/formButtons.tpl" location="top"}
-</div>
 <div class="messages status no-popup">
   <div class="icon inform-icon"></div>
   <div>
