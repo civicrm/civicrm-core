@@ -621,6 +621,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $batchLimit = 1, $isSelected = 2, $criteria = array(), $checkPermissions = TRUE) {
     $redirectForPerformance = ($batchLimit > 1) ? TRUE : FALSE;
+    $isProcessUntilAllProcessed = !$redirectForPerformance;
     $reloadCacheIfEmpty = (!$redirectForPerformance && $isSelected == 2);
     $dupePairs = self::getDuplicatePairs($rgid, $gid, $reloadCacheIfEmpty, $batchLimit, $isSelected, '', ($mode == 'aggressive'), $criteria, $checkPermissions);
 
@@ -629,9 +630,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       // @todo stop passing these parameters in & instead calculate them in the merge function based
       // on the 'real' params like $isRespectExclusions $batchLimit and $isSelected.
       'join' => self::getJoinOnDedupeTable(),
-      'where' => self::getWhereString($batchLimit, $isSelected),
+      'where' => self::getWhereString($isSelected),
     );
-    return CRM_Dedupe_Merger::merge($dupePairs, $cacheParams, $mode, $redirectForPerformance, $checkPermissions);
+    return CRM_Dedupe_Merger::merge($dupePairs, $cacheParams, $mode, $isProcessUntilAllProcessed, $checkPermissions, $batchLimit);
   }
 
   /**
@@ -652,20 +653,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Get where string for dedupe join.
    *
-   * @param int $batchLimit
    * @param bool $isSelected
    *
    * @return string
    */
-  protected static function getWhereString($batchLimit, $isSelected) {
+  protected static function getWhereString($isSelected) {
     $where = "de.id IS NULL";
     if ($isSelected === 0 || $isSelected === 1) {
       $where .= " AND pn.is_selected = {$isSelected}";
-    }
-    // else consider all dupe pairs
-    // @todo Adding limit to Where??!!
-    if ($batchLimit) {
-      $where .= " LIMIT {$batchLimit}";
     }
     return $where;
   }
@@ -767,16 +762,19 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *                             A 'safe' value skips the merge if there are any un-resolved conflicts.
    *                             Does a force merge otherwise (aggressive mode).
    *
-   * @param bool $redirectForPerformance
-   *   Redirect to a url for batch processing.
+   * @param bool $isProcessUntilAllProcessed
+   *   Iterate through the cache until all matches for the cache string are processed?
    *
    * @param bool $checkPermissions
    *   Respect logged in user permissions.
    *
+   * @param int $batchLimit
+   *   Number of rows to merge in each batch. One or more will be processed depending on
+   *   $isProcessUntilAllProcessed
+   *
    * @return array|bool
    */
-  public static function merge($dupePairs = array(), $cacheParams = array(), $mode = 'safe',
-     $redirectForPerformance = FALSE, $checkPermissions = TRUE
+  public static function merge($dupePairs = array(), $cacheParams = array(), $mode = 'safe', $isProcessUntilAllProcessed = TRUE, $checkPermissions = TRUE, $batchLimit = 0
   ) {
     $cacheKeyString = CRM_Utils_Array::value('cache_key_string', $cacheParams);
     $resultStats = array('merged' => array(), 'skipped' => array());
@@ -810,14 +808,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         self::dedupePair($rowsElementsAndInfo['migration_info'], $resultStats, $deletedContacts, $mode, $checkPermissions, $mainId, $otherId, $cacheKeyString);
       }
 
-      if ($cacheKeyString && !$redirectForPerformance) {
+      if ($cacheKeyString && $isProcessUntilAllProcessed) {
         // retrieve next pair of dupes
         // @todo call getDuplicatePairs.
         $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString,
           $cacheParams['join'],
           $cacheParams['where'],
           0,
-          0,
+          $batchLimit,
           array(),
           '',
           FALSE
@@ -1932,16 +1930,16 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *    Array of matches meeting the criteria.
    */
   public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $orderByClause = '', $includeConflicts = TRUE, $criteria = array(), $checkPermissions = TRUE, $searchLimit = 0) {
-    $where = self::getWhereString($batchLimit, $isSelected);
+    $where = self::getWhereString($isSelected);
     $cacheKeyString = self::getMergeCacheKeyString($rule_group_id, $group_id, $criteria, $checkPermissions);
     $join = self::getJoinOnDedupeTable();
-    $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, 0, array(), $orderByClause, $includeConflicts);
+    $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, $batchLimit, array(), $orderByClause, $includeConflicts);
     if (empty($dupePairs) && $reloadCacheIfEmpty) {
       // If we haven't found any dupes, probably cache is empty.
       // Try filling cache and give another try. We don't need to specify include conflicts here are there will not be any
       // until we have done some processing.
       CRM_Core_BAO_PrevNextCache::refillCache($rule_group_id, $group_id, $cacheKeyString, $criteria, $checkPermissions, $searchLimit);
-      $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, 0, array(), $orderByClause, $includeConflicts);
+      $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, $batchLimit, array(), $orderByClause, $includeConflicts);
       return $dupePairs;
     }
     return $dupePairs;

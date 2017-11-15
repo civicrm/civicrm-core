@@ -590,7 +590,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @return bool
    *   email/openId
    */
-  public static function formRule($fields, &$errors, $contactId = NULL) {
+  public static function formRule($fields, &$errors, $contactId, $contactType) {
     $config = CRM_Core_Config::singleton();
 
     // validations.
@@ -713,6 +713,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       }
     }
 
+    // Check for duplicate contact if it wasn't already handled by ajax or disabled
+    if (!Civi::settings()->get('contact_ajax_check_similar')) {
+      self::checkDuplicateContacts($fields, $errors, $contactId, $contactType);
+    }
+
     return $primaryID;
   }
 
@@ -753,6 +758,14 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     //build contact type specific fields
     $className = 'CRM_Contact_Form_Edit_' . $this->_contactType;
     $className::buildQuickForm($this);
+
+    // Ajax duplicate checking
+    $checkSimilar = $this->_action == CRM_Core_Action::ADD && Civi::settings()->get('contact_ajax_check_similar');
+    $this->assign('checkSimilar', $checkSimilar);
+    if ($checkSimilar == 1) {
+      $ruleParams = array('used' => 'Supervised', 'contact_type' => $this->_contactType);
+      $this->assign('ruleFields', CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams));
+    }
 
     // build Custom data if Custom data present in edit option
     $buildCustomData = 'noCustomDataPresent';
