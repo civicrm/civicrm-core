@@ -63,7 +63,13 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
 
     $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
 
-    $urlQry = "reset=1&action=update&rgid={$rgid}&gid={$gid}&limit={$limit}";
+    $urlQry = array(
+      'reset' => 1,
+      'action' => 'update',
+      'rgid' => $rgid,
+      'gid' => $gid,
+      'limit' => $limit
+    );
 
     if ($mode == 'aggressive' && !CRM_Core_Permission::check('force merge duplicate contacts')) {
       CRM_Core_Session::setStatus(ts('You do not have permission to force merge duplicate contact records'), ts('Permission Denied'), 'error');
@@ -107,7 +113,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     }
 
     // Setup the Runner
-    $urlQry .= "&context=conflicts";
+    $urlQry['context'] = "conflicts";
     $runner = new CRM_Queue_Runner(array(
       'title'     => ts('Merging Duplicates..'),
       'queue'     => $queue,
