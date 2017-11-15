@@ -197,7 +197,7 @@ LIMIT 1;";
    * Get the transaction id for the (latest) refund associated with a contribution.
    *
    * @param int $contributionID
-   * @return string
+   * @return array
    */
   public static function getRefundTransactionIDs($contributionID) {
     $refundStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');

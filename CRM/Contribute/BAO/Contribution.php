@@ -97,7 +97,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param array $ids
    *   The array that holds all the db ids.
    *
-   * @return CRM_Contribute_BAO_Contribution|void
+   * @return CRM_Contribute_BAO_Contribution|\CRM_Core_Error
    */
   public static function add(&$params, $ids = array()) {
     if (empty($params)) {
@@ -1429,7 +1429,7 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
    *
    * @param int $exportMode
    *   Export mode.
-   * @param string $componentIds
+   * @param array $componentIds
    *   Component ids.
    *
    * @return array
@@ -2184,7 +2184,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * @param array $contributionParams
    * @param int $paymentProcessorID
    *
-   * @return array
+   * @return bool
    * @throws CiviCRM_API3_Exception
    */
   protected static function repeatTransaction(&$contribution, &$input, $contributionParams, $paymentProcessorID) {
@@ -4304,13 +4304,13 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    * @param array $errors
    *   List of errors.
    *
-   * @return bool
+   * @return void
    */
   public static function checkFinancialTypeChange($financialTypeId, $contributionId, &$errors) {
     if (!empty($financialTypeId)) {
       $oldFinancialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'financial_type_id');
       if ($oldFinancialTypeId == $financialTypeId) {
-        return FALSE;
+        return;
       }
     }
     $sql = 'SELECT financial_type_id FROM civicrm_line_item WHERE contribution_id = %1 GROUP BY financial_type_id;';
@@ -4730,6 +4730,9 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
 
   /**
    * Generate From email and from name in an array values
+   * @param array $input
+   * @param \CRM_Contribute_BAO_Contribution $contribution
+   * @return array
    */
   public static function generateFromEmailAndName($input, $contribution) {
     // Use input valuse if supplied.
@@ -4880,7 +4883,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    * @param CRM_Contribute_BAO_Contribution $contribution
    * @param CRM_Event_DAO_Event|null $event
    *
-   * @return array
+   * @return string
    * @throws \CiviCRM_API3_Exception
    */
   protected static function getRecurringContributionDescription($contribution, $event) {
@@ -4908,7 +4911,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    * for Partially Paid status
    *
    * @param array $contributions
-   * @param array $contributionStatusId
+   * @param string $contributionStatusId
    *
    */
   public static function addPayments($contributions, $contributionStatusId = NULL) {
@@ -5231,7 +5234,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    *
    * @param int $contributionID
    *
-   * @return array
+   * @return \CRM_Contribute_BAO_Contribution|null
    */
   private static function getOriginalContribution($contributionID) {
     return self::getValues(array('id' => $contributionID), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
@@ -5362,6 +5365,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * Note that the way in which $memberships are loaded as objects is pretty messy & I think we could just
    * load them in this function. Code clean up would compensate for any minor performance implication.
    *
+   * @param \CRM_Contribute_BAO_Contribution $contribution
    * @param array $memberships
    * @param int $primaryContributionID
    * @param string $changeDate
@@ -5520,10 +5524,10 @@ LIMIT 1;";
    *
    * @param array $trxnParams
    *   Financial trxn params
-   * @param string $contributionParams
+   * @param array $contributionParams
    *   Contribution Params
    *
-   * @return string
+   * @return null
    */
   public static function recordAlwaysAccountsReceivable(&$trxnParams, $contributionParams) {
     if (!self::checkContributeSettings('always_post_to_accounts_receivable')) {
