@@ -464,6 +464,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         // update contact information
         $this->updateContactInfo($value);
+        if (!empty($value['contribution_check_number'])) {
+          $value['check_number'] = $value['contribution_check_number'];
+        }
 
         //build soft credit params
         if (!empty($params['soft_credit_contact_id'][$key]) && !empty($params['soft_credit_amount'][$key])) {
