@@ -64,6 +64,7 @@ require_once 'api/api.php';
  * @property string $defaultContactStateProvince
  * @property string $monetaryDecimalPoint
  * @property string $monetaryThousandSeparator
+ * @property array fiscalYearStart
  */
 class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 

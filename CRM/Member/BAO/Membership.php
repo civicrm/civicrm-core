@@ -1145,9 +1145,8 @@ AND civicrm_membership.is_test = %2";
    *   Reference to the array.
    *   containing all values of
    *   the current membership
-   * @param array $changeToday
-   *   Array of month, day, year.
-   *   values in case today needs
+   * @param string $changeToday
+   *   In case today needs
    *   to be customised, null otherwise
    */
   public static function fixMembershipStatusBeforeRenew(&$currentMembership, $changeToday) {
@@ -1826,7 +1825,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @param int $contactID
    * @param int $membershipTypeID
    * @param bool $is_test
-   * @param $changeToday
+   * @param string $changeToday
    * @param int $modifiedID
    * @param $customFieldsFormatted
    * @param $numRenewTerms
@@ -2149,7 +2148,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @all bool
    *   if more than one payment associated with membership id need to be returned.
    *
-   * @return int
+   * @return int|int[]
    *   contribution id
    */
   public static function getMembershipContributionId($membershipId, $all = FALSE) {

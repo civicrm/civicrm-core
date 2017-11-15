@@ -1110,6 +1110,7 @@ WHERE civicrm_event.is_active = 1
    * @param int $participantId
    * @param bool $isTest
    * @param bool $returnMessageText
+   * @return array|null
    */
   public static function sendMail($contactID, &$values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
 
