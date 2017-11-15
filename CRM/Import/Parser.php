@@ -34,7 +34,7 @@ abstract class CRM_Import_Parser {
   /**
    * Settings
    */
-  const MAX_ERRORS = 250, MAX_WARNINGS = 25, DEFAULT_TIMEOUT = 30;
+  const MAX_WARNINGS = 25, DEFAULT_TIMEOUT = 30;
 
   /**
    * Return codes
@@ -78,11 +78,6 @@ abstract class CRM_Import_Parser {
    * @var int
    */
   protected $_maxLinesToProcess;
-
-  /**
-   * Maximum number of invalid rows to store
-   */
-  protected $_maxErrorCount;
 
   /**
    * Array of error lines, bounded by MAX_ERROR
@@ -192,7 +187,6 @@ abstract class CRM_Import_Parser {
    */
   public function __construct() {
     $this->_maxLinesToProcess = 0;
-    $this->_maxErrorCount = self::MAX_ERRORS;
   }
 
   /**
