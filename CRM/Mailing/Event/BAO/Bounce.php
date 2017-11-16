@@ -61,6 +61,8 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
     $bounce = new CRM_Mailing_Event_BAO_Bounce();
     $bounce->time_stamp = date('YmdHis');
 
+    CRM_Utils_Hook::pre('create', 'MailingEventBounce', NULL, $params);
+
     // if we dont have a valid bounce type, we should set it
     // to bounce_type_id 11 which is Syntax error. this allows such email
     // addresses to be bounce a few more time before being put on hold
