@@ -376,9 +376,6 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
 
     $this->beginPostProcess();
 
-    // get the acl clauses built before we assemble the query
-    $this->buildACLClause($this->_aliases['civicrm_contact']);
-
     $this->buildQuery();
 
     //set the variable value rank, rows = 0
