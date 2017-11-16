@@ -153,16 +153,6 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
       ),
       "/Malformed name/",
     );
-    $cases[] = array(
-      'CRM_Core_DAO_Domain',
-      array(
-        'name' => self::getFilePrefix() . 'exampleFromContent.txt',
-        'mime_type' => 'text/plain',
-        'description' => 'My test description',
-        'content' => 'My test content',
-      ),
-      "/Unrecognized target entity/",
-    );
 
     return $cases;
   }
