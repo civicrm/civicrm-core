@@ -70,7 +70,7 @@
 <table class="crm-info-panel">
   <tr>
     <td class="label">{ts}From{/ts}</td>
-    <td class="bold">{$displayName}</td>
+    <td class="bold"><a href="{crmURL p='civicrm/contact/view' q="cid=$contact_id"}">{$displayName}</a></td>
   </tr>
   <tr>
     <td class="label">{ts}Financial Type{/ts}</td>
