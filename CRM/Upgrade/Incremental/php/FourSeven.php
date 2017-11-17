@@ -478,6 +478,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
           3 => $endId,
         ));
         $this->addTask($title, 'updateContributionInvoiceNumber', $startId, $endId, $invoicePrefix);
+        if (civicrm_api3('Setting', 'getvalue', array('name' => 'contact_undelete', 'group' => 'CiviCRM Preferences'))) {
+          $this->addTask('CRM-21439 Add assignee to deleted contact activity records if undelete is true', 'addAssigneetoDeletedContactActivity');
+        }
       }
     }
   }
@@ -1384,6 +1387,27 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     }
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_mailing CHANGE created_date created_date {$dataType} NULL DEFAULT NULL COMMENT 'Date and time this mailing was created.'");
     return TRUE;
+  }
+
+  public static function addAssigneetoDeletedContactActivity() {
+    $batch = 100;
+    $maxId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_activity");
+    $activity_type_id = civicrm_api3('OptionValue', 'getSingle', array('label' => 'Contact Deleted by Merge', 'return' => 'value'));
+    $query = "SELECT ca.id as activity_id, cap.contact_id as new_contact_id
+      FROM civicrm_activity ca
+      JOIN civicrm_activity_contact cap ON ca.parent_id=cap.activity_id AND cap.record_type_id=3
+      WHERE (SELECT count(*) FROM civicrm_activity_contact WHERE record_type_id=1 AND activity_id=ca.id)=0
+      AND ca.activity_type_id=%1 AND ca.id BETWEEN %2 AND %3";
+    $params = array(1 => array($activity_type_id['value'], 'Integer'));
+    for ($startId = 0; $startId < $maxId; $startId += $batch) {
+      $endId = $startId + $batch;
+      $params[2] = array($startId, 'Integer');
+      $params[3] = array($endId, 'Integer');
+      $activities = CRM_Core_DAO::executeQuery($query, $params);
+      while ($activities->fetch()) {
+        civicrm_api3('ActivityContact', 'create', array('activity_id' => $activities->activity_id, 'contact_id' => $activities->new_contact_id, 'record_type_id' => 1));
+      }
+    }
   }
 
 }
