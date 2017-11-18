@@ -322,6 +322,7 @@ class CRM_Dedupe_Merger {
         // Empty array == do nothing - this table is handled by mergeGroupContact
         'civicrm_subscription_history' => array(),
         'civicrm_relationship' => array('CRM_Contact_BAO_Relationship' => 'mergeRelationships'),
+        'civicrm_membership' => array('CRM_Member_BAO_Membership' => 'mergeMemberships'),
       );
     }
     return $tables;
