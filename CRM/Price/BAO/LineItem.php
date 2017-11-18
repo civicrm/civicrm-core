@@ -760,7 +760,7 @@ WHERE li.contribution_id = %1";
     if (!empty($trxn->id)) {
       $trxnId['id'] = $trxn->id;
     }
-    $lineItemObj->addLineItemOnChangeFeeSelection($requiredChanges['line_items_to_add'], $entityID, $entityTable, $contributionId, $trxnId, TRUE);
+    $lineItemObj->addFinancialItemsOnLineItemsChange($requiredChanges['line_items_to_add'], $entityID, $entityTable, $contributionId, $trxnId);
 
     // update participant fee_amount column
     $lineItemObj->updateEntityRecordOnChangeFeeSelection($params, $entityID, $entity);
@@ -952,18 +952,47 @@ WHERE li.contribution_id = %1";
    * @param int $entityID
    * @param string $entityTable
    * @param int $contributionID
-   * @param array $adjustedFinancialTrxnID
-   * @param bool $addFinancialItemOnly
-   *
-   * @return void
    */
   protected function addLineItemOnChangeFeeSelection(
     $lineItemsToAdd,
     $entityID,
     $entityTable,
+    $contributionID
+  ) {
+    // if there is no line item to add, do not proceed
+    if (empty($lineItemsToAdd)) {
+      return;
+    }
+
+    foreach ($lineItemsToAdd as $priceFieldValueID => $lineParams) {
+      $lineParams = array_merge($lineParams, array(
+        'entity_table' => $entityTable,
+        'entity_id' => $entityID,
+        'contribution_id' => $contributionID,
+      ));
+      if (!array_key_exists('skip', $lineParams)) {
+        self::create($lineParams);
+      }
+    }
+  }
+
+  /**
+   * Helper function to add lineitems or financial item related to it, to as result of fee change
+   *
+   * @param array $lineItemsToAdd
+   * @param int $entityID
+   * @param string $entityTable
+   * @param int $contributionID
+   * @param array $adjustedFinancialTrxnID
+   *
+   * @return void
+   */
+  protected function addFinancialItemsOnLineItemsChange(
+    $lineItemsToAdd,
+    $entityID,
+    $entityTable,
     $contributionID,
-    $adjustedFinancialTrxnID = NULL,
-    $addFinancialItemOnly = FALSE
+    $adjustedFinancialTrxnID = NULL
   ) {
     // if there is no line item to add, do not proceed
     if (empty($lineItemsToAdd)) {
@@ -981,12 +1010,7 @@ WHERE li.contribution_id = %1";
         'entity_id' => $entityID,
         'contribution_id' => $contributionID,
       ));
-      if ($addFinancialItemOnly) {
-        $changedFinancialTypeID = $this->addFinancialItemsOnLineItemChange(empty($adjustedFinancialTrxnID), $lineParams, $updatedContribution, $tempFinancialTrxnID, $changedFinancialTypeID);
-      }
-      elseif (!array_key_exists('skip', $lineParams)) {
-        self::create($lineParams);
-      }
+      $changedFinancialTypeID = $this->addFinancialItemsOnLineItemChange(empty($adjustedFinancialTrxnID), $lineParams, $updatedContribution, $tempFinancialTrxnID, $changedFinancialTypeID);
     }
 
     if ($changedFinancialTypeID) {
