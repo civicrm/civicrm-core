@@ -101,6 +101,8 @@ class CRM_Contribute_BAO_Widget extends CRM_Contribute_DAO_Widget {
       $data['num_donors'] = $data['money_raised'] = $data->money_raised = 0;
     }
 
+    $data['money_raised_amount'] = CRM_Utils_Money::format($data['money_raised']);
+
     $query = "
             SELECT goal_amount, start_date, end_date, is_active
             FROM   civicrm_contribution_page
