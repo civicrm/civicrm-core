@@ -37,7 +37,6 @@
  *
  * @package CRM
  * @author Marshal Newrock <marshal@idealso.com>
- * $Id$
  */
 
 /**
@@ -823,8 +822,6 @@ WHERE li.contribution_id = %1";
 
     $financialItemResult = $this->getNonCancelledFinancialItems($entityID, $entityTable);
 
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
     foreach ($financialItemResult as $updateFinancialItemInfoValues) {
       $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
       // the below params are not needed
@@ -839,7 +836,7 @@ WHERE li.contribution_id = %1";
         $updateFinancialItemInfoValues['financialTrxn'] = $this->getRelatedCancelFinancialTrxn($previousFinancialItemID);
         if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
           $updateFinancialItemInfoValues['tax']['amount'] = -($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']);
-          $updateFinancialItemInfoValues['tax']['description'] = $taxTerm;
+          $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
           if ($updateFinancialItemInfoValues['financial_type_id']) {
             $updateFinancialItemInfoValues['tax']['financial_account_id'] = CRM_Contribute_BAO_Contribution::getFinancialAccountId($updateFinancialItemInfoValues['financial_type_id']);
           }
@@ -855,7 +852,7 @@ WHERE li.contribution_id = %1";
           isset($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['tax_amount'])
         ) {
           $updateFinancialItemInfoValues['tax']['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['tax_amount'];
-          $updateFinancialItemInfoValues['tax']['description'] = $taxTerm;
+          $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
           if ($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['financial_type_id']) {
             $updateFinancialItemInfoValues['tax']['financial_account_id'] = CRM_Contribute_BAO_Contribution::getFinancialAccountId($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['financial_type_id']);
           }
@@ -1248,6 +1245,15 @@ WHERE li.contribution_id = %1";
 
     }
     return $financialItemResult;
+  }
+
+  /**
+   * Get the string used to describe the sales tax (eg. VAT, GST).
+   *
+   * @return string
+   */
+  protected function getSalesTaxTerm() {
+    return CRM_Contribute_BAO_Contribution::checkContributeSettings('tax_term');
   }
 
 }
