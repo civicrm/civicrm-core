@@ -37,7 +37,7 @@
 class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('Settings - Display Preferences'));
-    $optionValues = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, NULL, 'name');
+    $optionValues = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
 
     $this->_varNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
