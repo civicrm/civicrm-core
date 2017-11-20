@@ -755,10 +755,7 @@ WHERE li.contribution_id = %1";
       }
     }
 
-    $trxnId = array();
-    if (!empty($trxn->id)) {
-      $trxnId['id'] = $trxn->id;
-    }
+    $trxnId = !empty($trxn->id) ? array('id' => $trxn->id) : array();
     $lineItemObj->addFinancialItemsOnLineItemsChange($requiredChanges['line_items_to_add'], $entityID, $entityTable, $contributionId, $trxnId);
 
     // update participant fee_amount column
