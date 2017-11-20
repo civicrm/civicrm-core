@@ -530,7 +530,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
     $menuMarkup = sprintf('<span class="menu-label">%s</span>', $name);
 
     if (!empty($value['attributes']['icon'])) {
-      $menuIconMarkup = sprintf('<span class="menu-icon %s"></span>', $value['attributes']['icon']);
+      $menuIconMarkup = sprintf('<span class="menu-icon %s" aria-hidden="true"></span>', $value['attributes']['icon']);
       $menuMarkup = $menuIconMarkup . $menuMarkup;
     }
 
