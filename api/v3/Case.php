@@ -170,6 +170,7 @@ function _civicrm_api3_case_create_xmlProcessor($params, $caseBAO) {
     'medium_id' => CRM_Utils_Array::value('medium_id', $params),
     'details' => CRM_Utils_Array::value('details', $params),
     'custom' => array(),
+    'relationship_end_date' => CRM_Utils_Array::value('end_date', $params),
   );
 
   // Do it! :-D
