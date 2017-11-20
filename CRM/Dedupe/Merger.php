@@ -518,7 +518,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       // Call custom processing function for objects that require it
       if (isset($cpTables[$table])) {
         foreach ($cpTables[$table] as $className => $fnName) {
-          $className::$fnName($mainId, $otherId, $sqls);
+          $className::$fnName($mainId, $otherId, $sqls, $tables, $tableOperations);
         }
         // Skip normal processing
         continue;
