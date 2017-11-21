@@ -1542,13 +1542,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     );
     CRM_Core_DAO::executeQuery($query, $p);
 
-    // do a menu rebuild if we are on drupal, so it gets all the new menu entries
-    // for user account
-    $config = CRM_Core_Config::singleton();
-    if ($menuRebuild &&
-      $config->userSystem->is_drupal
-    ) {
-      menu_rebuild();
+    // Do a menu rebuild, so it gets all the new menu entries for user account
+    if ($menuRebuild) {
+      $config = CRM_Core_Config::singleton();
+      $config->userSystem->updateCategories();
     }
   }
 

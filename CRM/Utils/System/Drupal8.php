@@ -547,6 +547,13 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
+  public function updateCategories() {
+    // @todo Is anything necessary?
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getLoggedInUfID() {
     if ($id = \Drupal::currentUser()->id()) {
       return $id;
