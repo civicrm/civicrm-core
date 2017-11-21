@@ -186,7 +186,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       case 'contribution_date_high_time':
         // process to / from date
         $query->dateQueryBuilder($values,
-          'civicrm_contribution', 'contribution_date', 'receive_date', 'Contribution Date'
+          'civicrm_contribution', 'contribution_date', 'receive_date', ts('Contribution Date')
         );
         return;
 
@@ -234,7 +234,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       case 'contribution_cancel_date_high_time':
         // process to / from date
         $query->dateQueryBuilder($values,
-          'civicrm_contribution', 'contribution_cancel_date', 'cancel_date', 'Contribution Cancel Date'
+          'civicrm_contribution', 'contribution_cancel_date', 'cancel_date', ts('Cancelled / Refunded Date')
         );
         return;
 
