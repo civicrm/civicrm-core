@@ -8,3 +8,4 @@ b2c114b | Redmine-9013 Fix issue where mail_report cron returns a copy of the ht
 b87620c | CRM-21206 Ensure that the recipients field of AB Test results is filled in | Core PR open no sign yet of being merged in   
 b6978b8 | CRM-21400 Add a static var to hold the trxn_id so it can be accessed through hook_civicrm_buildForm | Core PR merged into 4.7.29
 eaf140c | CRM-21435 Duplicate reporting of aggregates in Top Donor reports | PR available - needs testing
+74856bd | CRM-21458 Add/Edit Scheduled reminder page broken if there's a backslash in an event name | PR available - needs testing
