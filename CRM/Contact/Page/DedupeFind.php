@@ -63,6 +63,8 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
     $limit = CRM_Utils_Request::retrieve('limit', 'Integer', $this);
     $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this);
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, 0);
+    $isSelected = CRM_Utils_Request::retrieve('selected', 'Int', $this, FALSE, 0);
+
     // Using a placeholder for criteria as it is intended to be able to pass this later.
     $criteria = array();
     $isConflictMode = ($context == 'conflicts');
@@ -138,10 +140,9 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       $this->action = CRM_Core_Action::UPDATE;
 
       $urlQry['snippet'] = 4;
-      if ($isConflictMode) {
-        $urlQry['selected'] = 1;
+      if ($isSelected) {
+        $urlQry['selected'] = $isSelected;
       }
-
       $this->assign('sourceUrl', CRM_Utils_System::url('civicrm/ajax/dedupefind', $urlQry, FALSE, NULL, FALSE));
 
       //reload from cache table
@@ -182,6 +183,9 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
           ));
         }
         else {
+          if ($isSelected == 1) {
+            $urlQry['selected'] = 1;
+          }
           CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/contact/dedupefind',
             $urlQry
           ));
