@@ -145,6 +145,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test the submit function on the contribution page.
    */
   public function testSubmit() {
+    $this->swapMessageTemplateForTestTemplate('contribution_offline_receipt');
+    $mut = new CiviMailUtils($this, TRUE);
+    $mut->clearMessages();
     $form = new CRM_Contribute_Form_Contribution();
     $form->testSubmit(array(
       'total_amount' => 50,
@@ -154,10 +157,24 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => 1,
+      'is_email_receipt' => TRUE,
+      'from_email_address' => 'test@test.com',
     ),
       CRM_Core_Action::ADD);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
     $this->assertEmpty($contribution['amount_level']);
+    $mut->checkMailLog(array(
+      'amount:::50.00',
+      'receive_date:::20150421000000',
+      // Only check as far as day since time will change marginally since written.
+      "receipt_date:::" . date('Ymd'),
+      "contactID:::{$this->_individualId}",
+      "contributionID:::{$contribution['id']}",
+      "financialTypes:::Donation",
+      "financialTypeArray:::\n    financialTypeValue:::Donation\n    financialTypeKey:::1",
+    ));
+    $mut->stop();
+    $this->revertTemplateToReservedTemplate('contribution_offline_receipt');
   }
 
   /**
