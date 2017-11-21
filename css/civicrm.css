@@ -1634,11 +1634,6 @@ input.crm-form-entityref {
   clear: both;
 }
 
-#crm-container table.caseSelector td.status-urgent {
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
 .crm-container .crm-clearfix:after {
   clear: both;
   content: ".";

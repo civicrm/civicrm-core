@@ -186,4 +186,30 @@ class CRM_Case_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
+  public static function getCases() {
+    $requiredParameters = array(
+      'type' => 'String',
+    );
+    $optionalParameters = array(
+      'case_type_id' => 'String',
+      'status_id' => 'String',
+      'all' => 'Positive',
+    );
+    $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
+    $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);
+
+    $allCases = (bool) $params['all'];
+
+    $cases = CRM_Case_BAO_Case::getCases($allCases, $params);
+
+    $casesDT = array(
+      'recordsFiltered' => $cases['total'],
+      'recordsTotal' => $cases['total'],
+    );
+    unset($cases['total']);
+    $casesDT['data'] = $cases;
+
+    CRM_Utils_JSON::output($casesDT);
+  }
+
 }
