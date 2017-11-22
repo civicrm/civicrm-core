@@ -3582,4 +3582,23 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($communicationStyle['value'], $result['communication_style_id']);
   }
 
+  /**
+   * Test that creating a contact with various contact greetings works.
+   */
+  public function testContactGreetingsCreate() {
+    $contact = $this->callAPISuccess('Contact', 'create', array('first_name' => 'Alan', 'last_name' => 'MouseMouse', 'contact_type' => 'Individual'));
+    $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $contact['id'], 'return' => 'postal_greeting'));
+    $this->assertEquals('Dear Alan', $contact['postal_greeting_display']);
+
+    $contact = $this->callAPISuccess('Contact', 'create', array('id' => $contact['id'], 'postal_greeting_id' => 2));
+    $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $contact['id'], 'return' => 'postal_greeting'));
+    $this->assertEquals('Dear Alan MouseMouse', $contact['postal_greeting_display']);
+
+    $contact = $this->callAPISuccess('Contact', 'create', array('organization_name' => 'Alan\'s Show', 'contact_type' => 'Organization'));
+    $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $contact['id'], 'return' => 'postal_greeting, addressee, email_greeting'));
+    $this->assertEquals('', $contact['postal_greeting_display']);
+    $this->assertEquals('', $contact['email_greeting_display']);
+    $this->assertEquals('Alan\'s Show', $contact['addressee_display']);
+  }
+
 }
