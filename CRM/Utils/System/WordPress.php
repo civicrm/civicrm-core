@@ -380,8 +380,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getUFLocale() {
+    // Polylang plugin
+    if (function_exists('pll_current_language')) {
+      $language = pll_current_language();
+    }
     // WPML plugin
-    if (defined('ICL_LANGUAGE_CODE')) {
+    elseif (defined('ICL_LANGUAGE_CODE')) {
       $language = ICL_LANGUAGE_CODE;
     }
 
