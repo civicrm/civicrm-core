@@ -546,6 +546,14 @@ class CRM_Utils_REST {
       );
       CRM_Utils_JSON::output($error);
     }
+    // FIXME: Shouldn't the X-Forwarded-Proto check be part of CRM_Utils_System::isSSL()?
+    if (Civi::settings()->get('enableSSL') &&
+      !CRM_Utils_System::isSSL() &&
+      strtolower(CRM_Utils_Array::value('X_FORWARDED_PROTO', CRM_Utils_System::getRequestHeaders())) != 'https'
+    ) {
+      CRM_Utils_System::loadBootStrap(array(), FALSE, FALSE);
+      CRM_Utils_System::redirectToSSL();
+    }
     if (empty($requestParams['entity'])) {
       CRM_Utils_JSON::output(civicrm_api3_create_error('missing entity param'));
     }
@@ -608,6 +616,15 @@ class CRM_Utils_REST {
         )
       );
       CRM_Utils_JSON::output($error);
+    }
+
+    // FIXME: Shouldn't the X-Forwarded-Proto check be part of CRM_Utils_System::isSSL()?
+    if (Civi::settings()->get('enableSSL') &&
+      !CRM_Utils_System::isSSL() &&
+      strtolower(CRM_Utils_Array::value('X_FORWARDED_PROTO', CRM_Utils_System::getRequestHeaders())) != 'https'
+    ) {
+      CRM_Utils_System::loadBootStrap(array(), FALSE, FALSE);
+      CRM_Utils_System::redirectToSSL();
     }
 
     $q = CRM_Utils_Array::value('fnName', $requestParams);
@@ -686,6 +703,15 @@ class CRM_Utils_REST {
         return self::error('ERROR: Malformed REST path');
       }
       // Therefore we have reasonably well-formed "?q=civicrm/X/Y"
+    }
+
+    // FIXME: Shouldn't the X-Forwarded-Proto check be part of CRM_Utils_System::isSSL()?
+    if (Civi::settings()->get('enableSSL') &&
+      !CRM_Utils_System::isSSL() &&
+      strtolower(CRM_Utils_Array::value('X_FORWARDED_PROTO', CRM_Utils_System::getRequestHeaders())) != 'https'
+    ) {
+      CRM_Utils_System::loadBootStrap(array(), FALSE, FALSE);
+      CRM_Utils_System::redirectToSSL();
     }
 
     if (!CRM_Utils_System::authenticateKey(FALSE)) {
