@@ -305,8 +305,13 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     $membershipType = CRM_Utils_Request::retrieve('type', 'String');
 
     if ($membershipType) {
-      $this->_formValues['membership_type_id'] = array($membershipType);
-      $this->_defaults['membership_type_id'] = array($membershipType);
+			$typearray=explode(",",$membershipType);
+			$typeresult = array();
+			foreach ($typearray as $type){
+				$typeresult+=array($type => 1);
+			}
+			$this->_formValues['member_membership_type_id'] = $typeresult;
+			$this->_defaults['member_membership_type_id'] = $typeresult;
     }
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
