@@ -1394,7 +1394,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     return TRUE;
   }
 
-  public static function addAssigneetoDeletedContactActivity($startId, $endId) {
+  public static function addAssigneetoDeletedContactActivity(CRM_Queue_TaskContext $ctx, $startId, $endId) {
     $activity_type_id = civicrm_api3('OptionValue', 'getSingle', array('label' => 'Contact Deleted by Merge', 'return' => 'value'));
     $query = "SELECT ca.id as activity_id, cap.contact_id as new_contact_id
       FROM civicrm_activity ca
