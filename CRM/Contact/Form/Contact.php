@@ -943,11 +943,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // process shared contact address.
     CRM_Contact_BAO_Contact_Utils::processSharedAddress($params['address']);
 
-    if (!array_key_exists('TagsAndGroups', $this->_editOptions) && !empty($params['group'])) {
+    if (!array_key_exists('TagsAndGroups', $this->_editOptions)) {
       unset($params['group']);
     }
-
-    if (!empty($params['contact_id']) && ($this->_action & CRM_Core_Action::UPDATE) && !empty($params['group'])) {
+    elseif (!empty($params['contact_id']) && ($this->_action & CRM_Core_Action::UPDATE)) {
       // figure out which all groups are intended to be removed
       $contactGroupList = CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], 'Added');
       if (is_array($contactGroupList)) {
