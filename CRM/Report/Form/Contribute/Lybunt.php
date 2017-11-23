@@ -32,6 +32,8 @@
  */
 class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
+  protected $groupConcatTested = TRUE;
+
   protected $_charts = array(
     '' => 'Tabular',
     'barChart' => 'Bar Chart',
@@ -312,10 +314,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       return "SUM({$this->_aliases[$tableName]}.total_amount) as {$tableName}_{$fieldName}";
     }
     if ($fieldName == 'receive_date') {
-      return self::fiscalYearOffset($field['dbAlias']) .
-        " as {$tableName}_{$fieldName} ";
+      return "GROUP_CONCAT(" . (self::fiscalYearOffset($field['dbAlias'])) . ") as {$tableName}_{$fieldName} ";
     }
-    return FALSE;
+    return parent::selectClause($tableName, $tableKey, $fieldName, $field);
   }
 
   /**
@@ -511,9 +512,8 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
 
   public function groupBy() {
-    $this->_groupBy = "GROUP BY  {$this->_aliases['civicrm_contribution']}.contact_id ";
-    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, "{$this->_aliases['civicrm_contribution']}.contact_id");
-    $this->assign('chartSupported', TRUE);
+    $this->_groupByArray["{$this->_aliases['civicrm_contribution']}.contact_id"] = "{$this->_aliases['civicrm_contribution']}.contact_id";
+    parent::groupBy();
   }
 
   /**
@@ -593,15 +593,12 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   /**
    * Build the report query.
    *
-   * The issue we are hitting is that if we want to do group by & then ORDER BY we have to
-   * wrap the query in an outer query with the order by - otherwise the group by takes precedent.
-   * This is an issue when we want to group by contact but order by the maximum aggregate donation.
-   *
    * @param bool $applyLimit
    *
    * @return string
    */
   public function buildQuery($applyLimit = TRUE) {
+    // @todo remove this function - it is now almost the same as the parent.
     $this->buildGroupTempTable();
     $this->buildPermissionClause();
     // Calling where & select before FROM allows us to build temp tables to use in from.
@@ -614,14 +611,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->orderBy();
     $limitFilter = '';
 
-    // order_by columns not selected for display need to be included in SELECT
-    // This differs from parent in that we are getting those not in order by rather than not in
-    // sections, as we need to adapt to our contact group by.
-    $unselectedSectionColumns = array_diff_key($this->_orderByFields, $this->getSelectColumns());
-    foreach ($unselectedSectionColumns as $alias => $section) {
-      $this->_select .= ", {$section['dbAlias']} as {$alias}";
-    }
-
     if ($applyLimit && empty($this->_params['charts'])) {
       $this->limit();
     }
@@ -629,11 +618,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $sql = "{$this->_select} {$this->_from} {$this->_where} {$limitFilter} {$this->_groupBy} {$this->_having} {$this->_rollup}";
 
     if (!empty($this->_orderByArray)) {
-      $this->_orderBy = str_replace('contact_civireport.', 'civicrm_contact_', "ORDER BY ISNULL(civicrm_contribution_contact_id), " . implode(', ', $this->_orderByArray));
-      $this->_orderBy = str_replace('contribution_civireport.', 'civicrm_contribution_', $this->_orderBy);
-      foreach ($this->_orderByFields as $field) {
-        $this->_orderBy = str_replace($field['dbAlias'], $field['tplField'], $this->_orderBy);
-      }
       $sql = str_replace('SQL_CALC_FOUND_ROWS', '', $sql);
       $sql = "SELECT SQL_CALC_FOUND_ROWS  * FROM ( $sql ) as inner_query {$this->_orderBy} $this->_limit";
     }
@@ -642,6 +626,30 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->addToDeveloperTab($sql);
 
     return $sql;
+  }
+
+  public function select() {
+    parent::select();
+    $this->storeOrderByArray();
+    if (!empty($this->_orderByFields)) {
+      $this->_select = str_replace('SQL_CALC_FOUND_ROWS', '', $this->_select);
+      foreach ($this->_orderByFields as $field) {
+        if (!stristr($this->_select, $field['tplField'])) {
+          $this->_select .= ", GROUP_CONCAT(DISTINCT {$field['dbAlias']}) as {$field['tplField']}";
+        }
+      }
+    }
+  }
+
+  public function orderBy() {
+    parent::orderBy();
+    if (!empty($this->_orderByArray)) {
+      $this->_orderBy = str_replace('contact_civireport.', 'civicrm_contact_', "ORDER BY ISNULL(civicrm_contribution_contact_id), " . implode(', ', $this->_orderByArray));
+      $this->_orderBy = str_replace('contribution_civireport.', 'civicrm_contribution_', $this->_orderBy);
+      foreach ($this->_orderByFields as $field) {
+        $this->_orderBy = str_replace($field['dbAlias'], $field['tplField'], $this->_orderBy);
+      }
+    }
   }
 
   /**
