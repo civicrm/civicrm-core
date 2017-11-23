@@ -96,7 +96,7 @@ class CRM_Event_DAO_Participant extends CRM_Core_DAO {
    * Populate with the label (text) associated with a fee level for paid events with multiple levels. Note that
    we store the label value and not the key
    *
-   * @var string
+   * @var text
    */
   public $fee_level;
   /**
