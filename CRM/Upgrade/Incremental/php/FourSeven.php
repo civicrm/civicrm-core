@@ -627,7 +627,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       UPDATE `civicrm_contribution` SET `invoice_number` = CONCAT(%1, `id`)
        WHERE `id` BETWEEN (%2 AND %3) AND `invoice_number` IS NOT NULL ",
       array(
-        1 => array($invoicePrefix, 'string'),
+        1 => array($invoicePrefix, 'String'),
         2 => array($startID, 'Integer'),
         3 => array($endID, 'Integer'),
       )
