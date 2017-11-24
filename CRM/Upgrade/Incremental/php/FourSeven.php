@@ -480,6 +480,8 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
         $this->addTask($title, 'updateContributionInvoiceNumber', $startId, $endId, $invoicePrefix);
       }
     }
+
+    $this->addTask('Rebuild Multilingual Schema', 'rebuildMultilingalSchema');
   }
 
   /*
