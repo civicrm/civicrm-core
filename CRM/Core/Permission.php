@@ -806,6 +806,10 @@ class CRM_Core_Permission {
         $prefix . ts('view all notes'),
         ts("View notes (for visible contacts) even if they're marked admin only"),
       ),
+      'add contact notes' => array(
+        $prefix . ts('add contact notes'),
+        ts("Create notes for contacts"),
+      ),
       'access AJAX API' => array(
         $prefix . ts('access AJAX API'),
         ts('Allow API access even if Access CiviCRM is not granted'),
