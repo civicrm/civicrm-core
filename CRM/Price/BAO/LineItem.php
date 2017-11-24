@@ -37,7 +37,6 @@
  *
  * @package CRM
  * @author Marshal Newrock <marshal@idealso.com>
- * $Id$
  */
 
 /**
@@ -756,10 +755,7 @@ WHERE li.contribution_id = %1";
       }
     }
 
-    $trxnId = array();
-    if (!empty($trxn->id)) {
-      $trxnId['id'] = $trxn->id;
-    }
+    $trxnId = !empty($trxn->id) ? array('id' => $trxn->id) : array();
     $lineItemObj->addFinancialItemsOnLineItemsChange($requiredChanges['line_items_to_add'], $entityID, $entityTable, $contributionId, $trxnId);
 
     // update participant fee_amount column
@@ -821,18 +817,8 @@ WHERE li.contribution_id = %1";
       return $financialItemsArray;
     }
 
-    // gathering necessary info to record negative (deselected) financial_item
-    $updateFinancialItem = "
-  SELECT fi.*, SUM(fi.amount) as differenceAmt, price_field_value_id, financial_type_id, tax_amount
-    FROM civicrm_financial_item fi LEFT JOIN civicrm_line_item li ON (li.id = fi.entity_id AND fi.entity_table = 'civicrm_line_item')
-  WHERE (li.entity_table = '{$entityTable}' AND li.entity_id = {$entityID})
-  GROUP BY li.entity_table, li.entity_id, price_field_value_id, fi.id
-    ";
-    $updateFinancialItemInfoDAO = CRM_Core_DAO::executeQuery($updateFinancialItem);
-    $financialItemResult = $updateFinancialItemInfoDAO->fetchAll();
+    $financialItemResult = $this->getNonCancelledFinancialItems($entityID, $entityTable);
 
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
     foreach ($financialItemResult as $updateFinancialItemInfoValues) {
       $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
       // the below params are not needed
@@ -847,7 +833,7 @@ WHERE li.contribution_id = %1";
         $updateFinancialItemInfoValues['financialTrxn'] = $this->getRelatedCancelFinancialTrxn($previousFinancialItemID);
         if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
           $updateFinancialItemInfoValues['tax']['amount'] = -($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']);
-          $updateFinancialItemInfoValues['tax']['description'] = $taxTerm;
+          $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
           if ($updateFinancialItemInfoValues['financial_type_id']) {
             $updateFinancialItemInfoValues['tax']['financial_account_id'] = CRM_Contribute_BAO_Contribution::getFinancialAccountId($updateFinancialItemInfoValues['financial_type_id']);
           }
@@ -863,7 +849,7 @@ WHERE li.contribution_id = %1";
           isset($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['tax_amount'])
         ) {
           $updateFinancialItemInfoValues['tax']['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['tax_amount'];
-          $updateFinancialItemInfoValues['tax']['description'] = $taxTerm;
+          $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
           if ($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['financial_type_id']) {
             $updateFinancialItemInfoValues['tax']['financial_account_id'] = CRM_Contribute_BAO_Contribution::getFinancialAccountId($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['financial_type_id']);
           }
@@ -1216,6 +1202,55 @@ WHERE li.contribution_id = %1";
       CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE, $tempFinancialTrxnID);
     }
     return $changedFinancialTypeID;
+  }
+
+  /**
+   * Get Financial items, culling out any that have already been reversed.
+   *
+   * @param int $entityID
+   * @param string $entityTable
+   *
+   * @return array
+   *   Array of financial items that have not be reversed.
+   */
+  protected function getNonCancelledFinancialItems($entityID, $entityTable) {
+    $updateFinancialItem = "
+  SELECT fi.*, SUM(fi.amount) as differenceAmt, price_field_value_id, financial_type_id, tax_amount
+    FROM civicrm_financial_item fi LEFT JOIN civicrm_line_item li ON (li.id = fi.entity_id AND fi.entity_table = 'civicrm_line_item')
+  WHERE (li.entity_table = '{$entityTable}' AND li.entity_id = {$entityID})
+  GROUP BY li.entity_table, li.entity_id, price_field_value_id, fi.id
+    ";
+    $updateFinancialItemInfoDAO = CRM_Core_DAO::executeQuery($updateFinancialItem);
+
+    $financialItemResult = $updateFinancialItemInfoDAO->fetchAll();
+    $items = array();
+    foreach ($financialItemResult as $index => $financialItem) {
+      $items[$financialItem['price_field_value_id']][$index] = $financialItem['amount'];
+
+      if (!empty($items[$financialItem['price_field_value_id']])) {
+        foreach ($items[$financialItem['price_field_value_id']] as $existingItemID => $existingAmount) {
+          if ($financialItem['amount'] + $existingAmount == 0) {
+            // Filter both rows as they cancel each other out.
+            unset($financialItemResult[$index]);
+            unset($financialItemResult[$existingItemID]);
+            unset($items['price_field_value_id'][$existingItemID]);
+            unset($items[$financialItem['price_field_value_id']][$index]);
+          }
+        }
+
+      }
+
+    }
+    return $financialItemResult;
+  }
+
+  /**
+   * Get the string used to describe the sales tax (eg. VAT, GST).
+   *
+   * @return string
+   */
+  protected function getSalesTaxTerm() {
+    return CRM_Contribute_BAO_Contribution::checkContributeSettings('tax_term');
   }
 
 }
