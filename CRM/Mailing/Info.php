@@ -129,6 +129,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ));
     $enabledLanguages = CRM_Core_I18n::languages(TRUE);
     $isMultiLingual = (count($enabledLanguages) > 1);
+    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
     $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS, array()) : CRM_Utils_Token::getRequiredTokens();
     CRM_Core_Resources::singleton()
       ->addSetting(array(

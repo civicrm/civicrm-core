@@ -118,6 +118,7 @@ class CRM_Utils_Token {
    *    else an array of the missing tokens
    */
   public static function requiredTokens(&$str) {
+    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
     $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS, array()) : CRM_Utils_Token::getRequiredTokens();
 
     $missing = array();
