@@ -477,7 +477,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $args['paymentAction'] = 'Sale';
     $args['amt'] = $params['amount'];
-    $args['currencyCode'] = $params['currencyID'];
+    $args['currencyCode'] = $this->getCurrency($params);
     $args['invnum'] = $params['invoiceID'];
     $args['ipaddress'] = $params['ip_address'];
     $args['creditCardType'] = $params['credit_card_type'];
