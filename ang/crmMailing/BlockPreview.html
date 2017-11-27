@@ -30,11 +30,12 @@ Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
     <div>
       <input
         name="preview_test_email"
-        type="email"
+        type="text"
         class="crm-form-text"
         ng-model="testContact.email"
         placeholder="example@example.org"
-        />
+        crm-multiple-email
+      />
     </div>
     <button crm-icon="fa-paper-plane" title="{{crmMailing.$invalid || !testContact.email ? ts('Complete all required fields first') : ts('Send test message to %1', {1: testContact.email})}}" ng-disabled="crmMailing.$invalid || !testContact.email" ng-click="doSend({email: testContact.email})">{{ts('Send test')}}</button>
   </div>
