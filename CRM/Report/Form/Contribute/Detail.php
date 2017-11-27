@@ -71,32 +71,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
         'fields' => $this->getBasicContactFields(),
-        'filters' => array(
-          'sort_name' => array(
-            'title' => ts('Donor Name'),
-            'operator' => 'like',
-          ),
-          'id' => array(
-            'title' => ts('Contact ID'),
-            'no_display' => TRUE,
-            'type' => CRM_Utils_Type::T_INT,
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-        ),
+        'filters' => $this->getBasicContactFilters(),
         'grouping' => 'contact-fields',
         'order_bys' => array(
           'sort_name' => array(

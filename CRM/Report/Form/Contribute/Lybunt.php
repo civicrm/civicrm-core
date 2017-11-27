@@ -127,37 +127,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
             'title' => ts('Contact Subtype'),
           ),
         ),
-        'filters' => array(
-          'sort_name' => array(
-            'title' => ts('Donor Name'),
-            'operator' => 'like',
-          ),
-          'id' => array(
-            'title' => ts('Contact ID'),
-            'no_display' => TRUE,
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-          'is_deceased' => array(),
-          'do_not_phone' => array(),
-          'do_not_email' => array(),
-          'do_not_sms' => array(),
-          'do_not_mail' => array(),
-          'is_opt_out' => array(),
-        ),
+        'filters' => $this->getBasicContactFilters(),
       ),
       'civicrm_line_item' => array(
         'dao' => 'CRM_Price_DAO_LineItem',

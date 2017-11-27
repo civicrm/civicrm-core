@@ -70,57 +70,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
-            'title' => ts('Donor Name'),
-            'required' => TRUE,
-            'no_repeat' => TRUE,
-          ),
-          'first_name' => array(
-            'title' => ts('First Name'),
-            'no_repeat' => TRUE,
-          ),
-          'last_name' => array(
-            'title' => ts('Last Name'),
-            'no_repeat' => TRUE,
-          ),
-          'nick_name' => array(
-            'title' => ts('Nickname'),
-            'no_repeat' => TRUE,
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-            'no_repeat' => TRUE,
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-            'no_repeat' => TRUE,
-          ),
-          'do_not_email' => array(
-            'title' => ts('Do Not Email'),
-            'no_repeat' => TRUE,
-          ),
-          'is_opt_out' => array(
-            'title' => ts('No Bulk Email(Is Opt Out)'),
-            'no_repeat' => TRUE,
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-            'csv_display' => TRUE,
-            'title' => ts('Contact ID'),
-          ),
-        ),
-        'filters' => array(
-          'sort_name' => array(
-            'title' => ts('Donor Name'),
-            'operator' => 'like',
-          ),
-          'id' => array(
-            'title' => ts('Contact ID'),
-            'no_display' => TRUE,
-          ),
-        ),
+        'fields' => $this->getBasicContactFields(),
+        'filters' => $this->getBasicContactFilters(),
         'grouping' => 'contact-fields',
       ),
       'civicrm_email' => array(
