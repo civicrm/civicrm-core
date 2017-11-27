@@ -138,7 +138,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(array('civicrm_note', 'civicrm_uf_match', 'civicrm_address'));
+    $this->quickCleanup(array('civicrm_note', 'civicrm_uf_match', 'civicrm_address', 'civicrm_contribution_page'));
   }
 
   /**
@@ -1365,7 +1365,9 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     }
     catch (CRM_Core_Exception $e) {
       $this->assertContains("A payment processor configured for this page might be disabled (contact the site administrator for assistance).", $e->getMessage());
+      return;
     }
+    $this->fail('Exception was expected');
   }
 
   /**
