@@ -224,15 +224,15 @@ class CRM_Event_BAO_CRM19273Test extends CiviUnitTestCase {
     $priceSetParams['price_1'] = 1;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
 
-    // return here as the following lines will not work until the reset of PR 10962 has been merged.
-    return;
-
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee);
+
     $this->balanceCheck($this->_expensiveFee);
 
     $priceSetParams['price_1'] = 3;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee);
+    // return here as the following lines will not work until the reset of PR 10962 has been merged.
+    return;
     $this->balanceCheck($this->_veryExpensive);
   }
 
