@@ -92,6 +92,11 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
     // CRM-20958 - These fields are managed by MySQL triggers. Watch out for clients resaving stale timestamps.
     unset($params['created_date']);
     unset($params['modified_date']);
+    $caseStatus = CRM_Case_PseudoConstant::caseStatus('name');
+    // for resolved case the end date should set to now
+    if (!empty($params['status_id']) && $params['status_id'] == array_search('Closed', $caseStatus)) {
+      $params['end_date'] = date("Ymd");
+    }
 
     $transaction = new CRM_Core_Transaction();
 

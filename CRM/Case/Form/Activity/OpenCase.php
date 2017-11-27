@@ -230,11 +230,6 @@ class CRM_Case_Form_Activity_OpenCase {
 
     // for open case start date should be set to current date
     $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
-    $caseStatus = CRM_Case_PseudoConstant::caseStatus('name');
-    // for resolved case the end date should set to now
-    if ($params['status_id'] == array_search('Closed', $caseStatus)) {
-      $params['end_date'] = $params['now'];
-    }
 
     // rename activity_location param to the correct column name for activity DAO
     $params['location'] = CRM_Utils_Array::value('activity_location', $params);
@@ -329,6 +324,7 @@ class CRM_Case_Form_Activity_OpenCase {
       'duration' => CRM_Utils_Array::value('duration', $params),
       'medium_id' => $params['medium_id'],
       'details' => $params['activity_details'],
+      'relationship_end_date' => CRM_Utils_Array::value('end_date', $params),
     );
 
     if (array_key_exists('custom', $params) && is_array($params['custom'])) {
