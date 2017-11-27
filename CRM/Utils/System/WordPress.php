@@ -391,7 +391,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     // TODO: set language variable for others WordPress plugin
 
-    if (isset($language) && !empty($language)) {
+    if (!empty($language)) {
       return CRM_Core_I18n_PseudoConstant::longForShort(substr($language, 0, 2));
     }
     else {
