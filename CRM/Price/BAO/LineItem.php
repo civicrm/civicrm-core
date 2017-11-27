@@ -29,14 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
- */
-
-/**
- *
- * @package CRM
- * @author Marshal Newrock <marshal@idealso.com>
  */
 
 /**
@@ -317,6 +309,7 @@ WHERE li.contribution_id = %1";
       }
     }
     if ($invoicing) {
+      // @todo - this is an inappropriate place to be doing form level assignments.
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       $smarty = CRM_Core_Smarty::singleton();
       $smarty->assign('taxTerm', $taxTerm);
