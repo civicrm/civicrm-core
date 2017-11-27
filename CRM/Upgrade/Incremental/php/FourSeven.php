@@ -478,23 +478,32 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
           3 => $endId,
         ));
         $this->addTask($title, 'updateContributionInvoiceNumber', $startId, $endId, $invoicePrefix);
-        if (civicrm_api3('Setting', 'getvalue', array('name' => 'contact_undelete', 'group' => 'CiviCRM Preferences'))) {
-          list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
-            FROM civicrm_activity_contact ")->getDatabaseResult()->fetchRow();
-          for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
-            $endId = $startId + self::BATCH_SIZE - 1;
-            $this->addTask('CRM-21439 Add assignee to deleted contact activity records if undelete is true', 'addAssigneetoDeletedContactActivity', $startId, $endId);
-          }
-        }
       }
     }
   }
 
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
    */
+   public function upgrade_4_7_29($rev) {
+     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+     if (civicrm_api3('Setting', 'getvalue', array('name' => 'contact_undelete', 'group' => 'CiviCRM Preferences'))) {
+       list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
+         FROM civicrm_activity_contact ")->getDatabaseResult()->fetchRow();
+       for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
+           $endId = $startId + self::BATCH_SIZE - 1;
+           $this->addTask('CRM-21439 Add assignee to deleted contact activity records if undelete is true', 'addAssigneetoDeletedContactActivity', $startId, $endId);
+       }
+     }
+   }
+
+    /*
+     * Important! All upgrade functions MUST add a 'runSql' task.
+     * Uncomment and use the following template for a new upgrade version
+     * (change the x in the function name):
+     */
 
   //  /**
   //   * Upgrade function.
