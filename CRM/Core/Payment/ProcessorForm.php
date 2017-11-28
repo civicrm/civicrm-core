@@ -72,11 +72,7 @@ class CRM_Core_Payment_ProcessorForm {
 
     $form->assign('suppressSubmitButton', $form->_paymentObject->isSuppressSubmitButtons());
 
-    $currency = CRM_Utils_Array::value('currency', $form->_values);
-    // For event forms, currency is in a different spot
-    if (empty($currency)) {
-      $currency = CRM_Utils_Array::value('currency', $form->_values['event']);
-    }
+    $currency = $form->getCurrency();
     $form->assign('currency', $currency);
 
     // also set cancel subscription url
