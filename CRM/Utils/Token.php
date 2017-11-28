@@ -90,6 +90,8 @@ class CRM_Utils_Token {
 
 
   /**
+   * @deprecated
+   *   This is used by CiviMail but will be made redundant by FlexMailer.
    * @return array
    */
   public static function getRequiredTokens() {
