@@ -129,7 +129,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @var int
    */
-  protected $isPayLaterEnabled;
+  protected $_is_pay_later_enabled;
 
   /**
    * The renderer used for this form
