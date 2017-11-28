@@ -986,6 +986,19 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Get the currency for the transaction.
+   *
+   * Handle any inconsistency about how it is passed in here.
+   *
+   * @param $params
+   *
+   * @return string
+   */
+  protected function getCurrency($params) {
+    return CRM_Utils_Array::value('currencyID', $params, CRM_Utils_Array::value('currency', $params));
+  }
+
+  /**
    * Get url to return to after cancelled or failed transaction.
    *
    * @param string $qfKey
