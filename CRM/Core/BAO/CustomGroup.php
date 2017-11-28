@@ -1660,7 +1660,7 @@ ORDER BY civicrm_custom_group.weight,
       return array();
     }
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type);
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type, NULL, NULL, NULL, NULL, NULL, NULL, NULL, TRUE);
     $customValue = array();
     $htmlType = array(
       'CheckBox',
@@ -1737,6 +1737,10 @@ ORDER BY civicrm_custom_group.weight,
               if (!empty($field['time_format'])) {
                 $customValue[$fieldName . '_time'] = $time;
               }
+            }
+            if ($field['html_type'] == 'Select Date') {
+              // CRM-20922: date value must be ISO formatted before being set as a default value for crmDatepicker custom field.
+              $value = CRM_Utils_Date::processDate($value, NULL, FALSE, 'Y-m-d G:i:s');
             }
             $valid = TRUE;
           }
