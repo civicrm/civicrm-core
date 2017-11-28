@@ -392,9 +392,7 @@ class CRM_Utils_Array {
   /**
    * Convert associative array names to values and vice-versa.
    *
-   * This function is used by both the web form layer and the api. Note that
-   * the api needs the name => value conversion, also the view layer typically
-   * requires value => name conversion
+   * This function is used by by import functions and some webforms.
    *
    * @param array $defaults
    * @param string $property
