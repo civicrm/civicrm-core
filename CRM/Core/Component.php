@@ -139,7 +139,7 @@ class CRM_Core_Component {
   }
 
   static public function flushEnabledComponents() {
-    self::getEnabledComponents(TRUE);
+    unset(Civi::$statics[__CLASS__]);
   }
 
   /**
