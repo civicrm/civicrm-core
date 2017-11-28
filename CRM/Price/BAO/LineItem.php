@@ -664,7 +664,6 @@ WHERE li.contribution_id = %1";
       CRM_Price_BAO_LineItem::create($lineItemToAlter);
     }
 
-    // the recordAdjustedAmt code would execute over here
     $count = 0;
     if ($entity == 'participant') {
       $count = count(CRM_Event_BAO_Participant::getParticipantIds($contributionId));
@@ -694,14 +693,15 @@ WHERE li.contribution_id = %1";
     }
     $trxn = $lineItemObj->recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId, $taxAmount, $updateAmountLevel);
 
-    $contributionCompletedStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Completed');
+    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_DAO_Contribution', 'contribution_status_id', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'contribution_status_id'));
+
     if (!empty($financialItemsArray)) {
       foreach ($financialItemsArray as $updateFinancialItemInfoValues) {
         $newFinancialItem = CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues);
         // record reverse transaction only if Contribution is Completed because for pending refund or
         //   partially paid we are already recording the surplus owed or refund amount
-        if (!empty($updateFinancialItemInfoValues['financialTrxn']) && ($contributionCompletedStatusID ==
-          CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'contribution_status_id'))
+        if (!empty($updateFinancialItemInfoValues['financialTrxn']) && ($contributionStatus == 'Completed'
+          )
         ) {
           $updateFinancialItemInfoValues = array_merge($updateFinancialItemInfoValues['financialTrxn'], array(
             'entity_id' => $newFinancialItem->id,
