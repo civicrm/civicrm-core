@@ -724,20 +724,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * It would be good to sync it with the back-end function on abstractEditPayment & use one everywhere.
    *
-   * @param bool $is_pay_later_enabled
+   * @param bool $isPayLaterEnabled
    *
    * @throws \CRM_Core_Exception
    */
-  protected function assignPaymentProcessor($is_pay_later_enabled) {
+  protected function assignPaymentProcessor($isPayLaterEnabled) {
     $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(
       array(ucfirst($this->_mode) . 'Mode'),
       $this->_paymentProcessorIDs
     );
+    if ($isPayLaterEnabled) {
+      $this->_paymentProcessors[0] = CRM_Financial_BAO_PaymentProcessor::getPayment(0);
+    }
 
     if (!empty($this->_paymentProcessors)) {
-      if ($is_pay_later_enabled) {
-        $this->_paymentProcessors[0] = CRM_Financial_BAO_PaymentProcessor::getPayment(0);
-      }
       foreach ($this->_paymentProcessors as $paymentProcessorID => $paymentProcessorDetail) {
         if (empty($this->_paymentProcessor) && $paymentProcessorDetail['is_default'] == 1 || (count($this->_paymentProcessors) == 1)
         ) {
