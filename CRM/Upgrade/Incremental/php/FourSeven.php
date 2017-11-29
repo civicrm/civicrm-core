@@ -627,7 +627,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   public static function updateContributionInvoiceNumber(CRM_Queue_TaskContext $ctx, $startID, $endID, $invoicePrefix) {
     CRM_Core_DAO::executeQuery("
       UPDATE `civicrm_contribution` SET `invoice_number` = CONCAT(%1, `id`)
-       WHERE `id` BETWEEN (%2 AND %3) AND `invoice_number` IS NOT NULL ",
+       WHERE `id` >= %2 AND `id` <= %3 AND `invoice_number` IS NOT NULL",
       array(
         1 => array($invoicePrefix, 'String'),
         2 => array($startID, 'Integer'),
