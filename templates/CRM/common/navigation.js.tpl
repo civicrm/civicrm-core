@@ -182,7 +182,8 @@ $('#civicrm-menu').ready(function() {
   }
   $('.crm-quickSearchField').click(function() {
     setQuickSearchValue();
-    $('#sort_name_navigation').focus();
+    $.Menu.closeAll();
+    $('#sort_name_navigation').focus().autocomplete("search");
   });
   // Set & retrieve default value
   if (window.localStorage) {
