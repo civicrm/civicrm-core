@@ -231,7 +231,7 @@
     {/if}
     <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
       <td class="label">{$form.from_email_address.label}</td>
-      <td>{$form.from_email_address.html}</td>
+      <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
     </tr>
     <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
       <td class="label">{$form.receipt_date.label}</td>

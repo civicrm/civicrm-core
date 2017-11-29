@@ -77,7 +77,7 @@
         </tr>
         <tr id="fromEmail" class="crm-payment-form-block-from_email_address" style="display:none;">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html}</td>
+          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
         </tr>
       {/if}
       {if $contributionMode}
