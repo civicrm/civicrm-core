@@ -65,7 +65,7 @@
                                 <a class="button no-popup nowrap"
                                    href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
                                     <i class="crm-i fa-print"></i>
-                                    {if $row.contribution_status_id != 7 && $row.contribution_status_id != 3 }
+                                    {if $row.contribution_status_name != 'Refunded' && $row.contribution_status_name != 'Cancelled' }
                                         <span>{ts}Print Invoice{/ts}</span>
                                     {else}
                                         <span>{ts}Print Invoice and Credit Note{/ts}</span>
@@ -74,7 +74,7 @@
                             {/if}
                           </td>
                         {/if}
-                        {if $defaultInvoicePage && $row.contribution_status_id == 2}
+                        {if $defaultInvoicePage && $row.contribution_status_name == 'Pending' }
                           <td>
                             {assign var='id' value=$row.contribution_id}
                             {capture assign=payNowLink}{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$defaultInvoicePage`&ccid=`$id`"}{/capture}
