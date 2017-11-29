@@ -51,7 +51,6 @@ abstract class CRM_Import_Form_Preview extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-
     $this->addButtons(array(
         array(
           'type' => 'back',
@@ -69,6 +68,19 @@ abstract class CRM_Import_Form_Preview extends CRM_Core_Form {
         ),
       )
     );
+  }
+
+  /**
+   * Set status url for ajax.
+   */
+  public function setStatusUrl() {
+    $statusID = $this->get('statusID');
+    if (!$statusID) {
+      $statusID = md5(uniqid(rand(), TRUE));
+      $this->set('statusID', $statusID);
+    }
+    $statusUrl = CRM_Utils_System::url('civicrm/ajax/status', "id={$statusID}", FALSE, NULL, FALSE);
+    $this->assign('statusUrl', $statusUrl);
   }
 
 }
