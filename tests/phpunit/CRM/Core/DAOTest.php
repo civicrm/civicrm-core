@@ -387,7 +387,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $sqlModes = CRM_Utils_SQL::getSqlModes();
     // assert we have strict trans
     $this->assertContains('STRICT_TRANS_TABLES', $sqlModes);
-    if ($this->_supportFullGroupBy) {
+    if (CRM_Utils_SQL::supportsFullGroupBy()) {
       $this->assertContains('ONLY_FULL_GROUP_BY', $sqlModes);
     }
   }
