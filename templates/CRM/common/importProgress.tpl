@@ -28,7 +28,12 @@
 CRM.$(function($) {
   var loop;
   $("form#Preview").on('submit', function (e) {
-    verify();
+    if (!confirm("{/literal}{ts escape='js'}Backing up your database before importing is recommended, as there is no Undo for this. Are you sure you want to import now?{/ts}{literal}")) {
+      e.preventDefault();
+    }
+    else {
+      showProgressBar();
+    }
   });
   function setIntermediate() {
     var dataUrl = "{/literal}{$statusUrl}{literal}";
@@ -41,13 +46,13 @@ CRM.$(function($) {
         $("#importProgressBar .ui-progressbar-value").animate({width: result[0] + "%"}, 500);
         $("#status").text(result[0] + "% Completed");
       }
+      else {
+        window.clearInterval(loop);
+      }
     });
   }
 
-  function verify() {
-    if (!confirm('Backing up your database before importing is recommended, as there is no Undo for this. {/literal}{ts escape='js'}Are you sure you want to Import now{/ts}{literal}?')) {
-      return false;
-    }
+  function showProgressBar() {
     $("#id-processing").show( ).dialog({
       modal         : true,
       width         : 450,
