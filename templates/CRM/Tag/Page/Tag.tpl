@@ -53,6 +53,7 @@
       <div class="help">
         {ts}Organize the tag hierarchy by clicking and dragging. Shift-click to select multiple tags to merge/move/delete.{/ts}
       </div>
+      <input class="crm-form-text big" name="filter_tag_tree" placeholder="{ts}Filter List{/ts}" allowclear="1"/>
     </div>
     {foreach from=$tagsets item=set}
       <div id="tagset-{$set.id}">
@@ -250,7 +251,7 @@
             }
           });
 
-        plugins = ['wholerow', 'changed'];
+        plugins = ['wholerow', 'changed', 'search'];
         if (!tagset) {
           // Allow drag-n-drop nesting of the tag tree
           plugins.push('dnd');
@@ -268,6 +269,10 @@
                 }
               },
               check_callback: true
+            },
+            'search': {
+              'case_insensitive' : true,
+              'show_only_matches': true
             },
             plugins: plugins,
             dnd: {
@@ -305,6 +310,9 @@
         });
 
       renderTree($('#tree'));
+      $('input[name=filter_tag_tree]').on('keyup change', function() {
+        $(".tag-tree").jstree("search", $(this).val());
+      });
 
       // Prevent the info box from scrolling offscreen
       $window.on('scroll resize', function () {
