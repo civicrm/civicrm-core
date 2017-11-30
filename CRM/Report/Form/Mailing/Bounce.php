@@ -171,7 +171,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
         'time_stamp' => array(
           'title' => ts('Bounce Date'),
           'operatorType' => CRM_Report_Form::OP_DATE,
-          'type' => CRM_Utils_Type::T_DATE,
+          'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
         ),
       ),
       'order_bys' => array(
