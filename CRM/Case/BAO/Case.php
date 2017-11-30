@@ -2000,7 +2000,8 @@ SELECT civicrm_contact.id as casemanager_id,
     SELECT  relCase.id as id,
             civicrm_case_type.title as case_type,
             client.display_name as client_name,
-            client.id as client_id
+            client.id as client_id,
+            relCase.status_id
       FROM  civicrm_case relCase
  INNER JOIN  civicrm_case_contact relCaseContact ON ( relCase.id = relCaseContact.case_id )
  INNER JOIN  civicrm_contact      client         ON ( client.id = relCaseContact.contact_id )
@@ -2010,6 +2011,7 @@ SELECT civicrm_contact.id as casemanager_id,
     $dao = CRM_Core_DAO::executeQuery($query);
     $contactViewUrl = CRM_Utils_System::url("civicrm/contact/view", "reset=1&cid=");
     $hasViewContact = CRM_Core_Permission::giveMeAllACLs();
+    $statuses = CRM_Case_BAO_Case::buildOptions('status_id');
 
     while ($dao->fetch()) {
       $caseView = NULL;
@@ -2027,6 +2029,7 @@ SELECT civicrm_contact.id as casemanager_id,
         'case_id' => $dao->id,
         'case_type' => $dao->case_type,
         'client_name' => $clientView,
+        'case_status' => $statuses[$dao->status_id],
         'links' => $caseView,
       );
     }
