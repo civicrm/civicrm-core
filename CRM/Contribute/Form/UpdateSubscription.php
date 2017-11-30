@@ -82,18 +82,18 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     $this->contributionRecurID = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
     if ($this->contributionRecurID) {
       try {
-        $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($this->contributionRecurID);
+        $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($this->contributionRecurID);
       }
       catch (CRM_Core_Exception $e) {
         CRM_Core_Error::statusBounce(ts('There is no valid processor for this subscription so it cannot be edited.'));
       }
-      $this->_paymentProcessorObj = $this->_paymentProcessor['object'];
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->contributionRecurID);
     }
 
     $this->_coid = CRM_Utils_Request::retrieve('coid', 'Integer', $this, FALSE);
     if ($this->_coid) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'info');
+      // @todo test & replace with $this->_paymentProcessorObj =  Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
       $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
       $this->contributionRecurID = $this->_subscriptionDetails->recur_id;
@@ -137,9 +137,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     }
 
     $this->assign('editableScheduleFields', array_diff($this->editableScheduleFields, $alreadyHardCodedFields));
-    $this->assign('paymentProcessor', $this->_paymentProcessor);
-    $this->assign('frequency_unit', $this->_subscriptionDetails->frequency_unit);
-    $this->assign('frequency_interval', $this->_subscriptionDetails->frequency_interval);
 
     if ($this->_subscriptionDetails->contact_id) {
       list($this->_donorDisplayName, $this->_donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
