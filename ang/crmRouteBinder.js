@@ -51,6 +51,9 @@
 
         options.format = options.format || 'json';
         var fmt = formats[options.format];
+        if (options.deep) {
+          fmt.watcher = '$watch';
+        }
         if (options.default === undefined) {
           options.default = fmt.default;
         }
@@ -85,7 +88,7 @@
             activeTimer = null;
             ignorable = {};
           }, 50);
-        });
+        }, options.deep);
       };
 
       return $delegate;
