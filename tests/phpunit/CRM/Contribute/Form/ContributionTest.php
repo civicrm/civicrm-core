@@ -232,14 +232,18 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       $error = TRUE;
     }
 
-    $this->callAPISuccessGetCount('Contribution', array(
+    $contribution = $this->callAPISuccess('Contribution', 'get', array(
       'contact_id' => $this->_individualId,
       'contribution_status_id' => $error ? 'Failed' : 'Completed',
       'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', array(
         'return' => 'payment_instrument_id',
         'id' => $paymentProcessorID,
        )),
-    ), 1);
+    ));
+
+    $this->assertEquals(1, $contribution["count"], "Contribution count should be one.");
+    $this->assertTrue(!empty($contribution["values"][$contribution["id"]]["receipt_date"]), "Receipt date should not be blank.");
+
     $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $this->_individualId));
     $this->assertTrue(empty($contact['source']));
     if (!$error) {
