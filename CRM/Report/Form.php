@@ -4379,7 +4379,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'dao' => 'CRM_Core_DAO_Phone',
         'fields' => array(
           $options['prefix'] . 'phone' => array(
-            'title' => ts($options['prefix_label'] . 'Phone'),
+            'title' => $options['prefix_label'] . ts('Phone'),
             'name' => 'phone',
           ),
         ),
@@ -5000,19 +5000,19 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     $spec = array(
       $options['prefix'] . 'display_name' => array(
         'name' => 'display_name',
-        'title' => ts($options['prefix_label'] . 'Contact Name'),
+        'title' => $options['prefix_label'] . ts('Contact Name'),
         'is_fields' => TRUE,
       ),
       $options['prefix'] . 'sort_name' => array(
         'name' => 'sort_name',
-        'title' => ts($options['prefix_label'] . 'Contact Name (in sort format)'),
+        'title' => $options['prefix_label'] . ts('Contact Name (in sort format)'),
         'is_fields' => TRUE,
         'is_filters' => TRUE,
         'is_order_bys' => TRUE,
       ),
       $options['prefix'] . 'id' => array(
         'name' => 'id',
-        'title' => ts($options['prefix_label'] . 'Contact ID'),
+        'title' => $options['prefix_label'] . ts('Contact ID'),
         'alter_display' => 'alterContactID',
         'type' => CRM_Utils_Type::T_INT,
         'is_order_bys' => TRUE,
@@ -5021,12 +5021,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ),
       $options['prefix'] . 'external_identifier' => array(
         'name' => 'external_identifier',
-        'title' => ts($options['prefix_label'] . 'External ID'),
+        'title' => $options['prefix_label'] . ts('External ID'),
         'type' => CRM_Utils_Type::T_INT,
         'is_fields' => TRUE,
       ),
       $options['prefix'] . 'contact_type' => array(
-        'title' => ts($options['prefix_label'] . 'Contact Type'),
+        'title' => $options['prefix_label'] . ts('Contact Type'),
         'name' => 'contact_type',
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => CRM_Contact_BAO_Contact::buildOptions('contact_type'),
@@ -5035,7 +5035,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_group_bys' => TRUE,
       ),
       $options['prefix'] . 'contact_sub_type' => array(
-        'title' => ts($options['prefix_label'] . 'Contact Sub Type'),
+        'title' => $options['prefix_label'] . ts('Contact Sub Type'),
         'name' => 'contact_sub_type',
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'options' => CRM_Contact_BAO_Contact::buildOptions('contact_sub_type'),
@@ -5044,7 +5044,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_group_bys' => TRUE,
       ),
       $options['prefix'] . 'is_deleted' => array(
-        'title' => ts($options['prefix_label'] . 'Is deleted'),
+        'title' => $options['prefix_label'] . ts('Is deleted'),
         'name' => 'is_deleted',
         'type' => CRM_Utils_Type::T_BOOLEAN,
         'is_fields' => FALSE,
@@ -5055,30 +5055,30 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     $individualFields = array(
       $options['prefix'] . 'first_name' => array(
         'name' => 'first_name',
-        'title' => ts($options['prefix_label'] . 'First Name'),
+        'title' => $options['prefix_label'] . ts('First Name'),
         'is_fields' => TRUE,
         'is_filters' => TRUE,
         'is_order_bys' => TRUE,
       ),
       $options['prefix'] . 'middle_name' => array(
         'name' => 'middle_name',
-        'title' => ts($options['prefix_label'] . 'Middle Name'),
+        'title' => $options['prefix_label'] . ts('Middle Name'),
         'is_fields' => TRUE,
       ),
       $options['prefix'] . 'last_name' => array(
         'name' => 'last_name',
-        'title' => ts($options['prefix_label'] . 'Last Name'),
+        'title' => $options['prefix_label'] . ts('Last Name'),
         'default_order' => 'ASC',
         'is_fields' => TRUE,
       ),
       $options['prefix'] . 'nick_name' => array(
         'name' => 'nick_name',
-        'title' => ts($options['prefix_label'] . 'Nick Name'),
+        'title' => $options['prefix_label'] . ts('Nick Name'),
         'is_fields' => TRUE,
       ),
       $options['prefix'] . 'gender_id' => array(
         'name' => 'gender_id',
-        'title' => ts($options['prefix_label'] . 'Gender'),
+        'title' => $options['prefix_label'] . ts('Gender'),
         'options' => CRM_Contact_BAO_Contact::buildOptions('gender_id'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
         'alter_display' => 'alterGenderID',
@@ -5086,20 +5086,20 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_filters' => TRUE,
       ),
       'birth_date' => array(
-        'title' => ts($options['prefix_label'] . 'Birth Date'),
+        'title' => $options['prefix_label'] . ts('Birth Date'),
         'operatorType' => CRM_Report_Form::OP_DATE,
         'type' => CRM_Utils_Type::T_DATE,
         'is_fields' => TRUE,
         'is_filters' => TRUE,
       ),
       'age' => array(
-        'title' => ts($options['prefix_label'] . 'Age'),
+        'title' => $options['prefix_label'] . ts('Age'),
         'dbAlias' => 'TIMESTAMPDIFF(YEAR, ' . $tableAlias . '.birth_date, CURDATE())',
         'type' => CRM_Utils_Type::T_INT,
         'is_fields' => TRUE,
       ),
       $options['prefix'] . 'is_deceased' => array(
-        'title' => ts($options['prefix_label'] . 'Is deceased'),
+        'title' => $options['prefix_label'] . ts('Is deceased'),
         'name' => 'is_deceased',
         'type' => CRM_Utils_Type::T_BOOLEAN,
         'is_fields' => FALSE,
