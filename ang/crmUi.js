@@ -79,18 +79,24 @@
             element.val(ngModel.$viewValue).change();
           };
 
-          element
-            .crmDatepicker(scope.crmUiDatepicker)
-            .on('change', function() {
-              var requiredLength = 19;
-              if (scope.crmUiDatepicker && scope.crmUiDatepicker.time === false) {
-                requiredLength = 10;
-              }
-              if (scope.crmUiDatepicker && scope.crmUiDatepicker.date === false) {
-                requiredLength = 8;
-              }
-              ngModel.$setValidity('incompleteDateTime', !($(this).val().length && $(this).val().length !== requiredLength));
-            });
+          ngModel.$validators.incompleteDateTime = function(modelValue, viewValue) {
+            var requiredLength = 19;
+            if (scope.crmUiDatepicker && scope.crmUiDatepicker.time === false) {
+              requiredLength = 10;
+            }
+            if (scope.crmUiDatepicker && scope.crmUiDatepicker.date === false) {
+              requiredLength = 8;
+            }
+
+            // Treat empty datetimes as valid. If you don't like that, make the field required.
+            if (!modelValue || modelValue.length < 1) {
+              return true;
+            }
+
+            return (modelValue.length === requiredLength);
+          };
+
+          element.crmDatepicker(scope.crmUiDatepicker);
         }
       };
     })
