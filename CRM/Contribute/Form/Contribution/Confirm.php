@@ -191,6 +191,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if ($paymentProcessorOutcome) {
       $contributionParams['payment_processor'] = CRM_Utils_Array::value('payment_processor', $paymentProcessorOutcome);
     }
+    if (!empty($params["is_email_receipt"])) {
+      $contributionParams += array(
+        'receipt_date' => $receiptDate,
+      );
+    }
     if (!$pending && $paymentProcessorOutcome) {
       $contributionParams += array(
         'fee_amount' => CRM_Utils_Array::value('fee_amount', $paymentProcessorOutcome),
