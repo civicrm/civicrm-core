@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
  */
 class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
 
@@ -55,8 +53,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
   protected $otherContact;
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     self::validRelationships();
@@ -89,7 +86,13 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
-          'organization_name' => array('title' => ts('Organization Name')),
+          'organization_name' => array(
+            'title' => ts('Organization Name'),
+          ),
+          'is_deleted' => array(
+            'default' => 0,
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+          ),
         ),
         'grouping' => 'organization-fields',
       ),
