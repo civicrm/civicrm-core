@@ -116,10 +116,20 @@
         maxDate: new Date(endRangeYr, 12 - 1, 31)
       });
 
-      // format display date
-      var displayDateValue = $.datepicker.formatDate(date_format, $.datepicker.parseDate(altDateFormat, $originalElement.val()));
-      //support unsaved-changes warning: CRM-14353
-      $dateElement.val(displayDateValue).data('crm-initial-value', displayDateValue);
+      // clear hidden date field when the visible control is cleared
+      $dateElement.change($.proxy(function() {
+        if (!this.val()) {
+          this.datepicker('setDate', null);
+        }
+      }, $dateElement));
+
+      try {
+        // format display date
+        var displayDateValue = $.datepicker.formatDate(date_format, $.datepicker.parseDate(altDateFormat, $originalElement.val()));
+        //support unsaved-changes warning: CRM-14353
+        $dateElement.val(displayDateValue).data('crm-initial-value', displayDateValue);
+      }
+      catch(err) {} // this try/catch block is here to support Relative Date Range searches
 
       // Add clear button
       $($timeElement).add($originalElement).add($dateElement).on('blur change', function() {
