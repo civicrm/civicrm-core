@@ -82,6 +82,11 @@
     </td>
   </tr>
 
+  <tr class="crm-group-form-block-isActive">
+    <td class="label">{$form.is_active.label}</td>
+    <td>{$form.is_active.html}</td>
+  </tr>
+
   <tr>
       <td colspan=2>{include file="CRM/Custom/Form/CustomData.tpl"}</td>
   </tr>
