@@ -635,7 +635,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
     $punc = '.:?\-';
     $any = "{$letters}{$gunk}{$punc}";
     if ($onlyHrefs) {
-      $pattern = "\\bhref[ ]*=[ ]*([\"'])?(($protos:[$any]+?(?=[$punc]*[^$any]|$)))([\"'])?";
+      $pattern = "\\bhref[ ]*=[ ]*([\"'])?(($protos:[$any]+[$punc]*?(?=[$punc]*[^$any]|$)))([\"'])?";
     }
     else {
       $pattern = "\\b($protos:[$any]+?(?=[$punc]*[^$any]|$))";
