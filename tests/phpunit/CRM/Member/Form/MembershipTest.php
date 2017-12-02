@@ -1175,4 +1175,54 @@ Expires: ',
     $form->testSubmit($params);
   }
 
+  /**
+   * Test membership status overrides when contribution is cancelled.
+   */
+  public function testContributionFormStatusUpdate() {
+    $form = new CRM_Contribute_Form_Contribution();
+
+    //Create a membership with status = 'New'.
+    $this->_individualId = $this->createLoggedInUser();
+    $memParams = array(
+      'contact_id' => $this->_individualId,
+      'membership_type_id' => $this->membershipTypeAnnualFixedID,
+      'status_id' => array_search('New', CRM_Member_PseudoConstant::membershipStatus()),
+    );
+    $cancelledStatusId = $this->callAPISuccessGetValue('OptionValue', array(
+      'return' => "value",
+      'option_group_id' => "contribution_status",
+      'name' => "Cancelled",
+    ));
+    $params = array(
+      'total_amount' => 50,
+      'financial_type_id' => 2,
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => $cancelledStatusId,
+    );
+    $membershipId = $this->contactMembershipCreate($memParams);
+
+    $contriParams = array(
+      'membership_id' => $membershipId,
+      'total_amount' => 50,
+      'financial_type_id' => 2,
+      'contact_id' => $this->_individualId,
+    );
+    $contribution = CRM_Member_BAO_Membership::recordMembershipContribution($contriParams);
+
+    //Update Contribution to Cancelled.
+    $form->_id = $params['id'] = $contribution->id;
+    $form->_mode = NULL;
+    $form->_contactID = $this->_individualId;
+    $form->testSubmit($params, CRM_Core_Action::UPDATE);
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+
+    //Assert membership status overrides when the contribution cancelled.
+    $this->assertEquals($membership['is_override'], TRUE);
+    $this->assertEquals($membership['status_id'], $this->callAPISuccessGetValue('MembershipStatus', array(
+      'return' => "id",
+      'name' => "Cancelled",
+    )));
+  }
+
 }
