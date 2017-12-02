@@ -67,6 +67,16 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
         }
       }
 
+      // Add linked membership
+      $membership = civicrm_api3('Membership', 'get', array(
+        'contribution_recur_id' => $recur->id,
+      ));
+      if (!empty($membership['count'])) {
+        $membershipDetails = reset($membership['values']);
+        $values['membership_id'] = $membershipDetails['id'];
+        $values['membership_name'] = $membershipDetails['membership_name'];
+      }
+
       $this->assign('recur', $values);
     }
   }
