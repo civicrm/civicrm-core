@@ -60,6 +60,7 @@ class SqlTriggers {
 
     \CRM_Core_I18n_Schema::triggerInfo($info, $tableName);
     \CRM_Contact_BAO_Contact::triggerInfo($info, $tableName);
+    \CRM_Activity_BAO_Activity::triggerInfo($info, $tableName);
 
     \CRM_Utils_Hook::triggerInfo($info, $tableName);
 
