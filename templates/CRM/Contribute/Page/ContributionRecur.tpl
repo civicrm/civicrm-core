@@ -51,6 +51,11 @@
             {if $recur.payment_processor}<tr><td class="label">{ts}Payment Processor{/ts}</td><td>{$recur.payment_processor}</td></tr>{/if}
             {if $recur.financial_type}<tr><td class="label">{ts}Financial Type{/ts}</td><td>{$recur.financial_type}</td></tr>{/if}
             {if $recur.campaign}<tr><td class="label">{ts}Campaign{/ts}</td><td>{$recur.campaign}</td></tr>{/if}
+            {if $recur.membership_id}<tr>
+              <td class="label">{ts}Membership{/ts}</td>
+              <td><a class="crm-hover-button" href='{crmURL p="civicrm/contact/view/membership" q="action=view&reset=1&cid=`$contactId`&id=`$recur.membership_id`&context=membership&selectedChild=member"}'>{$recur.membership_name}</a></td>
+              </tr>
+            {/if}
           </table>
           <div class="crm-submit-buttons"><a class="button cancel crm-form-submit" href="{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=contribute'}">{ts}Done{/ts}</a></div>
         </div>
