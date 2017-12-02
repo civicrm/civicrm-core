@@ -3043,9 +3043,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $sql = "UPDATE civicrm_contact SET created_date = '2012-03-01' WHERE id = " . $contact3;
     CRM_Core_DAO::executeQuery($sql);
     $contacts = $this->callAPISuccess('contact', 'get', array('created_date' => array('<' => '2014-01-01')));
-    $this->assertEquals($contacts['count'], 3);
+    $this->assertEquals(3, $contacts['count']);
     $contacts = $this->callAPISuccess('contact', 'get', array('created_date' => array('>' => '2014-01-01')));
-    $this->assertEquals($contacts['count'], $preExistingContactCount);
+    $this->assertEquals($preExistingContactCount, $contacts['count']);
   }
 
   /**

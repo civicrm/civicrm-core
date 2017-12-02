@@ -148,7 +148,7 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
    * Create an activity record for Alice with type "Meeting".
    */
   public function addAliceMeeting() {
-    $this->callAPISuccess('Activity', 'create', array(
+    $a = $this->callAPISuccess('Activity', 'create', array(
       'source_contact_id' => $this->contacts['alice']['id'],
       'activity_type_id' => 'Meeting',
       'subject' => 'Subject for Alice',
@@ -178,7 +178,7 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
   public function scheduleForMeeting() {
     $actTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
     $this->schedule->mapping_id = CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID;
-    $this->schedule->start_action_date = 'receive_date';
+    $this->schedule->start_action_date = 'activity_date_time';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded(array(array_search('Meeting', $actTypes)));
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(array(2));
   }
@@ -189,18 +189,18 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
   public function scheduleForPhoneCall() {
     $actTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
     $this->schedule->mapping_id = CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID;
-    $this->schedule->start_action_date = 'receive_date';
+    $this->schedule->start_action_date = 'activity_date_time';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded(array(array_search('Phone Call', $actTypes)));
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
   }
 
   /**
-   * Schedule message delivery for any contribution, regardless of type.
+   * Schedule message delivery for any activity, regardless of type.
    */
   public function scheduleForAny() {
     $actTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
     $this->schedule->mapping_id = CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID;
-    $this->schedule->start_action_date = 'receive_date';
+    $this->schedule->start_action_date = 'activity_date_time';
     $this->schedule->entity_value = CRM_Utils_Array::implodePadded(array_keys($actTypes));
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
   }

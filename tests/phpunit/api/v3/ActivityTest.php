@@ -446,6 +446,10 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   public function testActivityCreateExample() {
     require_once 'api/v3/examples/Activity/Create.php';
     $result = activity_create_example();
+
+    // FIXME: activity_created_date is hard to test, so skipping it. Suggestiongs welcome.
+    unset($result['values'][$result['id']]['activity_created_date']);
+
     $expectedResult = activity_create_expectedresult();
     // Compare everything *except* timestamps.
     unset($result['values'][1]['created_date']);

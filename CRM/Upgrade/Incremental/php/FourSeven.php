@@ -484,6 +484,16 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask('Rebuild Multilingual Schema', 'rebuildMultilingalSchema');
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_17($rev) {
+    $this->addTask('CRM-19923 - Scheduled reminders for activities based on "created date"', 'addColumn',
+      'civicrm_activity', 'activity_created_date', "timestamp NULL DEFAULT NULL COMMENT 'When was the activity created.'");
+  }
+
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
