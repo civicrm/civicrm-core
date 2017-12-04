@@ -618,7 +618,6 @@ function _civicrm_api3_greeting_format_params($params) {
 
     $nullValue = FALSE;
     $filter = array(
-      'contact_type' => $params['contact_type'],
       'greeting_type' => "{$key}{$greeting}",
     );
 

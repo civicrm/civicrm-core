@@ -588,6 +588,9 @@ class CRM_Core_PseudoConstant {
     }
     if ($name == 'cache') {
       CRM_Core_OptionGroup::flushAll();
+      if (isset(\Civi::$statics[__CLASS__])) {
+        unset(\Civi::$statics[__CLASS__]);
+      }
     }
   }
 
