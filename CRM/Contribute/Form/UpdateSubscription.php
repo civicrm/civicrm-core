@@ -282,18 +282,13 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
 
       $activityParams = array(
         'source_contact_id' => $contactID,
-        'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
-          'Update Recurring Contribution',
-          'name'
-        ),
+        'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Update Recurring Contribution'),
         'subject' => $msg,
         'details' => $message,
         'activity_date_time' => date('YmdHis'),
-        'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
-          'Completed',
-          'name'
-        ),
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
       );
+
       $session = CRM_Core_Session::singleton();
       $cid = $session->get('userID');
 
