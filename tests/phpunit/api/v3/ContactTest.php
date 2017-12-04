@@ -3621,6 +3621,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $contact['id'], 'return' => 'postal_greeting'));
     $this->assertEquals('Dear Alan Mice', $contact['postal_greeting_display']);
 
+    // Set contact to have no postal greeting & check it is correct.
+    $this->callAPISuccess('Contact', 'create', array('id' => $contact['id'], 'postal_greeting_id' => 'null'));
+    $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $contact['id'], 'return' => 'postal_greeting'));
+    $this->assertEquals('', $contact['postal_greeting_display']);
+
     //Cleanup
     $this->callAPISuccess('OptionValue', 'create', array('id' => $postalOption['id'], 'name' => 'Dear {contact.first_name}'));
     $this->customFieldDelete($ids['custom_field_id']);

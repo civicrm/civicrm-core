@@ -1097,6 +1097,34 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
   }
 
   /**
+   * Get the tokens that will need to be resolved to populate the contact's greetings.
+   *
+   * @param array $contactParams
+   *
+   * @return array
+   *   Array of tokens. The ALL ke
+   */
+  public static function getTokensRequiredForContactGreetings($contactParams) {
+    $tokens = array();
+    foreach (array('addressee', 'email_greeting', 'postal_greeting') as $greeting) {
+      $string = '';
+      if (!empty($contactParams[$greeting . '_id'])) {
+        $string = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $greeting . '_id', $contactParams[$greeting . '_id']);
+      }
+      $string = isset($contactParams[$greeting . '_custom']) ? $contactParams[$greeting . '_custom'] : $string;
+      if (empty($string)) {
+        $tokens[$greeting] = array();
+      }
+      else {
+        $tokens[$greeting] = CRM_Utils_Token::getTokens($string);
+      }
+    }
+    $allTokens = array_merge_recursive($tokens['addressee'], $tokens['email_greeting'], $tokens['postal_greeting']);
+    $tokens['all'] = $allTokens;
+    return $tokens;
+  }
+
+  /**
    * Process a greeting template string to produce the individualised greeting text.
    *
    * This works just like message templates for mailings:
