@@ -81,7 +81,7 @@
     </td>
   </tr>
 
-  {if $action eq 1 or $single eq false}
+  {if $form.separation }
     <tr class="crm-activity-form-block-separation crm-is-multi-activity-wrapper">
       <td class="label">{$form.separation.label}</td>
       <td>{$form.separation.html} {help id="separation"}</td>

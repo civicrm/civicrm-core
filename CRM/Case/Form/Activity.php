@@ -197,6 +197,11 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
     }
 
+    // Turn off the prompt which asks the user if they want to create separate
+    // activities when specifying multiple contacts "with" a new activity.
+    // Instead, always create one activity with all contacts together.
+    $this->supportsActivitySeparation = FALSE;
+
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext($url);
   }
