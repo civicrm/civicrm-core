@@ -647,11 +647,6 @@ function _civicrm_api3_greeting_format_params($params) {
     }
 
     if ($greetingId) {
-
-      if (!array_key_exists($greetingId, $greetings)) {
-        throw new API_Exception(ts('Invalid %1 greeting Id', array(1 => $key)));
-      }
-
       if (!$customGreeting && ($greetingId == array_search('Customized', $greetings))) {
         throw new API_Exception(ts('Please provide a custom value for %1 greeting',
             array(1 => $key)
