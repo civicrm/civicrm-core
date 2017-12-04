@@ -196,6 +196,7 @@
 
         if (tagset) {
           addHelp();
+          $panel.append('<input class="crm-form-text big" name="filter_tag_tree" placeholder="' + ts('Filter List') + '" allowclear="1"/>');
         }
 
         function moveTagDialog(e) {
@@ -279,6 +280,10 @@
               copy: false
             }
           });
+
+        $('input[name=filter_tag_tree]', $panel).on('keyup change', function() {
+          $(".tag-tree", $panel).jstree("search", $(this).val());
+        });
       }
 
       function newTagset() {
@@ -310,9 +315,6 @@
         });
 
       renderTree($('#tree'));
-      $('input[name=filter_tag_tree]').on('keyup change', function() {
-        $(".tag-tree").jstree("search", $(this).val());
-      });
 
       // Prevent the info box from scrolling offscreen
       $window.on('scroll resize', function () {
