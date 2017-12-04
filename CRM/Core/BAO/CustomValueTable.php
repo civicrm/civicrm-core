@@ -46,6 +46,8 @@ class CRM_Core_BAO_CustomValueTable {
       return;
     }
 
+    $paramFieldsExtendContactForEntities = array();
+
     foreach ($customParams as $tableName => $tables) {
       foreach ($tables as $index => $fields) {
         $sqlOP = NULL;
@@ -227,6 +229,17 @@ class CRM_Core_BAO_CustomValueTable {
             $params[$count] = array($value, $type);
             $count++;
           }
+
+          $fieldExtends = CRM_Utils_Array::value('extends', $field);
+          if (
+            CRM_Utils_Array::value('entity_table', $field) == 'civicrm_contact'
+            || $fieldExtends == 'Contact'
+            || $fieldExtends == 'Individual'
+            || $fieldExtends == 'Organization'
+            || $fieldExtends == 'Household'
+          ) {
+            $paramFieldsExtendContactForEntities[$entityID]['custom_' . CRM_Utils_Array::value('custom_field_id', $field)] = CRM_Utils_Array::value('custom_field_id', $field);
+          }
         }
 
         if (!empty($set)) {
@@ -261,6 +274,10 @@ class CRM_Core_BAO_CustomValueTable {
           );
         }
       }
+    }
+
+    if (!empty($paramFieldsExtendContactForEntities)) {
+      CRM_Contact_BAO_Contact::updateGreetingsOnTokenFieldChange($paramFieldsExtendContactForEntities, array('contact_id' => $entityID));
     }
   }
 
@@ -560,6 +577,7 @@ AND    $cond
 SELECT cg.table_name  as table_name ,
        cg.id          as cg_id      ,
        cg.is_multiple as is_multiple,
+       cg.extends     as extends,
        cf.column_name as column_name,
        cf.id          as cf_id      ,
        cf.data_type   as data_type
@@ -616,6 +634,7 @@ AND    cf.id IN ( $fieldIDList )
           'table_name' => $dao->table_name,
           'column_name' => $dao->column_name,
           'is_multiple' => $dao->is_multiple,
+          'extends' => $dao->extends,
         );
 
         if ($cvParam['type'] == 'File') {

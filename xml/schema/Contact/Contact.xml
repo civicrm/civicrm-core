@@ -603,6 +603,9 @@
     <title>Addressee ID</title>
     <comment>FK to civicrm_option_value.id, that has to be valid registered Addressee.</comment>
     <add>3.0</add>
+    <pseudoconstant>
+      <optionGroupName>addressee</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>addressee_custom</name>
@@ -615,9 +618,6 @@
     <html>
       <type>Text</type>
     </html>
-    <pseudoconstant>
-      <optionGroupName>addressee</optionGroupName>
-    </pseudoconstant>
   </field>
   <field>
     <name>addressee_display</name>
