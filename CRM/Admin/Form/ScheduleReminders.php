@@ -349,6 +349,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $errors[$recipientKind[$fields['recipient']]['target_id']] = ts('If "Also include" or "Limit to" are selected, you must specify at least one %1', array(1 => $recipientKind[$fields['recipient']]['name']));
     }
 
+    //CRM-21523
+    if (!empty($fields['is_repeat']) &&
+      (empty($fields['repetition_frequency_interval']) || ($fields['end_frequency_interval'] == NULL))
+    ) {
+      $errors['is_repeat'] = ts('If you are enabling repetition you must indicate the frequency and ending term.');
+    }
+
     $actionSchedule = $self->parseActionSchedule($fields);
     if ($actionSchedule->mapping_id) {
       $mapping = CRM_Core_BAO_ActionSchedule::getMapping($actionSchedule->mapping_id);
