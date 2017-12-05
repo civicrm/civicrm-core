@@ -491,6 +491,13 @@
         editorAttrs: {maxlength: 64},
         validators: ['required']
       },
+      'display_title': {
+        title: ts('Profile Title'),
+        help: ts(''),
+        type: 'Text',
+        editorAttrs: {maxlength: 64},
+        validators: []
+      },
       'group_type': {
         // For a description of group_type, see CRM_Core_BAO_UFGroup::updateGroupTypes
         // title: ts(''),
