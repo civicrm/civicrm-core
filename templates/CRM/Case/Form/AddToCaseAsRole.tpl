@@ -10,7 +10,7 @@
 <script type="text/javascript">
     (function($, CRM) {
         $(function() {
-            $('[name=assign_to], [name=role]', this)
+            $('[name=assign_to]', this)
                     .val('')
                     .crmEntityRef({create: false});
         });
