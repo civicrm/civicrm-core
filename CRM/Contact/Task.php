@@ -61,7 +61,8 @@ class CRM_Contact_Task {
     RESTORE = 23,
     DELETE_PERMANENTLY = 24,
     COMMUNICATION_PREFS = 25,
-    INDIVIDUAL_CONTACTS = 26;
+    INDIVIDUAL_CONTACTS = 26,
+    ADD_TO_CASE = 27;
 
   /**
    * The task array
@@ -275,16 +276,17 @@ class CRM_Contact_Task {
         );
       }
 
-      self::$_tasks[] = array(
-        'title' => 'Add to case as role',
-        'class' => 'CRM_Case_Form_AddToCaseAsRole',
-        'result' => FALSE
-      );
+      if (CRM_Core_Permission::access('CiviCase')) {
+        self::$_tasks[self::ADD_TO_CASE] = [
+          'title' => 'Add to case as role',
+          'class' => 'CRM_Case_Form_AddToCaseAsRole',
+          'result' => FALSE,
+        ];
+      }
 
       self::$_tasks += CRM_Core_Component::taskList();
 
       CRM_Utils_Hook::searchTasks('contact', self::$_tasks);
-
     }
   }
 
