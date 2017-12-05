@@ -70,6 +70,21 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
   }
 
   /**
+   * Tests that a nested multipart email does not cause pain & misery & fatal errors.
+   *
+   * Sample anonymized from an email that broke bounce processing at Wikimedia
+   */
+  public function testProcessingNestedMultipartEmail() {
+    $this->setUpMailing();
+    $mail = 'test_nested_message.eml';
+
+    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
+    $this->callAPISuccess('job', 'fetch_bounces', array());
+    $this->assertFalse(file_exists(__DIR__ . '/data/mail/' . $mail));
+    $this->checkMailingBounces(1);
+  }
+
+  /**
    * Test that a deleted email does not cause a hard fail.
    *
    * The civicrm_mailing_event_queue table tracks email ids to represent an
