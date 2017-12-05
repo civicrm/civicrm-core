@@ -24,8 +24,8 @@ class CRM_Case_FormBuilder {
       array(
         'type' => 'submit',
         'name' => ts('Submit'),
-        'isDefault' => true
-      )
+        'isDefault' => TRUE,
+      ),
     ));
   }
 
@@ -40,4 +40,5 @@ class CRM_Case_FormBuilder {
     }
     return $roleTypes;
   }
+
 }

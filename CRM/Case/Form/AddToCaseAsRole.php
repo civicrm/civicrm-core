@@ -9,8 +9,8 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
   public function postProcess() {
     $values = $this->controller->exportValues();
 
-    $caseId = (int)$values['assign_to'];
-    $roleTypeId = (int)$values['role_type'];
+    $caseId = (int) $values['assign_to'];
+    $roleTypeId = (int) $values['role_type'];
     $contacts = $this->_contactIds;
 
     $clients = CRM_Case_BAO_Case::getCaseClients($caseId);
@@ -19,7 +19,7 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
       'contact_id_a' => $clients[0],
       'contact_id_b' => $contacts,
       'case_id' => $caseId,
-      'relationship_type_id' => $roleTypeId
+      'relationship_type_id' => $roleTypeId,
     );
 
     CRM_Contact_BAO_Relationship::createMultiple($params, 'a');
@@ -30,4 +30,5 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
     );
     CRM_Utils_System::redirect($url);
   }
+
 }

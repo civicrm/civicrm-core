@@ -3110,7 +3110,7 @@ AND       civicrm_openid.is_primary = 1";
       'href' => CRM_Utils_System::url('civicrm/case/add-contact', 'reset=1'),
       'weight' => 100,
       'ref' => 'add-to-case-as-role',
-      'key' => 'add-to-case-as-role'
+      'key' => 'add-to-case-as-role',
     );
 
     CRM_Utils_Hook::summaryActions($menu, $contactId);
