@@ -456,6 +456,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask('CRM-12167 - Add visibility column to civicrm_price_field_value', 'addColumn',
       'civicrm_price_field_value', 'visibility_id', 'int(10) unsigned DEFAULT 1 COMMENT "Implicit FK to civicrm_option_group with name = \'visibility\'"');
     $this->addTask('Remove broken Contribution_logging reports', 'removeContributionLoggingReports');
+    $this->addTask('CRM-21311 - Update option value name to lowercase', 'optionValueNameToLowercase');
   }
 
   /**
@@ -1385,6 +1386,15 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       $dataType = 'datetime';
     }
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_mailing CHANGE created_date created_date {$dataType} NULL DEFAULT NULL COMMENT 'Date and time this mailing was created.'");
+    return TRUE;
+  }
+
+  /**
+   * CRM-21311 Updating civicrm_option_value name to lowercase.
+   * @return bool
+   */
+  public static function optionValueNameToLowercase(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value v INNER JOIN civicrm_option_group g ON v.option_group_id = g.id AND g.name= 'accept_creditcard' SET v.name = lower(v.name), v.is_reserved = 1;");
     return TRUE;
   }
 
