@@ -275,6 +275,12 @@ class CRM_Contact_Task {
         );
       }
 
+      self::$_tasks[] = array(
+        'title' => 'Add to case as role',
+        'class' => 'CRM_Case_Form_AddToCaseAsRole',
+        'result' => FALSE
+      );
+
       self::$_tasks += CRM_Core_Component::taskList();
 
       CRM_Utils_Hook::searchTasks('contact', self::$_tasks);
