@@ -182,6 +182,9 @@
 - name        : Daniel Martinez
   jira        : danielmart
 
+- github      : DanielvV
+  name        : Daniël van Vuuren
+
 - github      : darrick
   name        : Darrick Servis
   organization: Davis Media Access
@@ -716,6 +719,10 @@
   name        : Monish Deb
   organization: JMA Consulting
   jira        : monish.deb
+
+- github      : mukeshcompucorp
+  name        : Mukesh Ram
+  organization: CompuCorp
 
 - name        : Nathan Brettell
   jira        : nathan_b
