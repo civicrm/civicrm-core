@@ -277,11 +277,11 @@ class CRM_Contact_Task {
       }
 
       if (CRM_Core_Permission::access('CiviCase')) {
-        self::$_tasks[self::ADD_TO_CASE] = [
+        self::$_tasks[self::ADD_TO_CASE] = array(
           'title' => 'Add to case as role',
           'class' => 'CRM_Case_Form_AddToCaseAsRole',
           'result' => FALSE,
-        ];
+        );
       }
 
       self::$_tasks += CRM_Core_Component::taskList();
