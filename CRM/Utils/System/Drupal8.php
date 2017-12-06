@@ -459,7 +459,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     \Drupal\Core\DrupalKernel::createFromRequest($request, $autoloader, 'prod')->prepareLegacyRequest($request);
 
     // Initialize Civicrm
-    \Drupal::service('civicrm');
+    \Drupal::service('civicrm')->initialize();
 
     // We need to call the config hook again, since we now know
     // all the modules that are listening on it (CRM-8655).
