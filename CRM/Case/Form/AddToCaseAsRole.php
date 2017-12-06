@@ -18,8 +18,15 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
       'role_type',
       ts('Relationship Type'),
       array('' => ts('- select type -')) + $roleTypes,
-      FALSE,
+      TRUE,
       array('class' => 'crm-select2 twenty')
+    );
+
+    $this->addEntityRef(
+      'assign_to',
+      ts('Assign to'),
+      array('entity' => 'case'),
+      TRUE
     );
 
     $this->addButtons(array(
@@ -27,6 +34,10 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
         'type' => 'submit',
         'name' => ts('Submit'),
         'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
       ),
     ));
   }
