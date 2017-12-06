@@ -62,7 +62,7 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
     $bounce->time_stamp = date('YmdHis');
 
     $action = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($action, 'MailingEventBounce', NULL, $params);
+    CRM_Utils_Hook::pre($action, 'MailingEventBounce', CRM_Utils_Array::value('id', $params), $params);
 
     // if we dont have a valid bounce type, we should set it
     // to bounce_type_id 11 which is Syntax error. this allows such email
