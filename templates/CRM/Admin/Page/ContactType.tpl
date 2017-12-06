@@ -32,7 +32,7 @@
   </div>
 
 <div class="crm-content-block crm-block">
-{if $rows}
+  {if $rows}
   <div>
     {strip}
     {* handle enable/disable actions*}
