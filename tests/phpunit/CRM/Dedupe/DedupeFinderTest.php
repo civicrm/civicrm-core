@@ -90,7 +90,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
    */
   public function testSupervisedDupes() {
     $this->setupForGroupDedupe();
-    $ruleGroup = $this->callAPISuccessGetSingle('RuleGroup', array('s_reserved' => 1, 'contact_type' => 'Individual', 'used' => 'Supervised'));
+    $ruleGroup = $this->callAPISuccessGetSingle('RuleGroup', array('is_reserved' => 1, 'contact_type' => 'Individual', 'used' => 'Supervised'));
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
     // -------------------------------------------------------------------------
     // default dedupe rule: threshold = 20 => (First + Last + Email) Matches ( 1 pair )

@@ -703,9 +703,7 @@ WHERE li.contribution_id = %1";
         $newFinancialItem = CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues);
         // record reverse transaction only if Contribution is Completed because for pending refund or
         //   partially paid we are already recording the surplus owed or refund amount
-        if (!empty($updateFinancialItemInfoValues['financialTrxn']) && ($contributionStatus == 'Completed'
-          )
-        ) {
+        if (!empty($updateFinancialItemInfoValues['financialTrxn']) && ($contributionStatus == 'Completed')) {
           $updateFinancialItemInfoValues = array_merge($updateFinancialItemInfoValues['financialTrxn'], array(
             'entity_id' => $newFinancialItem->id,
             'entity_table' => 'civicrm_financial_item',
@@ -719,6 +717,15 @@ WHERE li.contribution_id = %1";
             'amount' => $reverseTrxn->total_amount,
           ));
           unset($updateFinancialItemInfoValues['financialTrxn']);
+        }
+        elseif (!empty($updateFinancialItemInfoValues['link-financial-trxn'])) {
+          civicrm_api3('EntityFinancialTrxn', 'create', array(
+            'entity_id' => $newFinancialItem->id,
+            'entity_table' => 'civicrm_financial_item',
+            'financial_trxn_id' => $trxn->id,
+            'amount' => $newFinancialItem->amount,
+          ));
+          unset($updateFinancialItemInfoValues['link-financial-trxn']);
         }
       }
     }
@@ -771,6 +778,13 @@ WHERE li.contribution_id = %1";
           $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
         }
         // INSERT negative financial_items for tax amount
+        $financialItemsArray[$updateFinancialItemInfoValues['entity_id']] = $updateFinancialItemInfoValues;
+      }
+      elseif (!empty($lineItemsToUpdate) &&
+      $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['html_type'] == 'Text' &&
+      $updateFinancialItemInfoValues['amount'] > 0
+      ) {
+        $updateFinancialItemInfoValues['link-financial-trxn'] = TRUE;
         $financialItemsArray[$updateFinancialItemInfoValues['entity_id']] = $updateFinancialItemInfoValues;
       }
     }
