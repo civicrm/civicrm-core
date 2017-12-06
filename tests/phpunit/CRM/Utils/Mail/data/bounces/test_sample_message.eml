@@ -1,13 +1,13 @@
-Return-Path: <mlemos@acm.org>
+Return-Path: <xxxxxx@acm.org>
 To: b.2.1.aaaaaaaaaaaaaaaa@example.com
 Subject: Testing Manuel Lemos' MIME E-mail composing and sending PHP class: HTML message
-From: mlemos <mlemos@acm.org>
-Reply-To: mlemos <mlemos@acm.org>
-Sender: mlemos@acm.org
+From: xxxxxx <xxxxxx@acm.org>
+Reply-To: xxxxxx <xxxxxx@acm.org>
+Sender: xxxxxx@acm.org
 X-Mailer: http://www.phpclasses.org/mimemessage $Revision: 1.63 $ (mail)
 MIME-Version: 1.0
 Content-Type: multipart/mixed; boundary="652b8c4dcb00cdcdda1e16af36781caf"
-Message-ID: <20050430192829.0489.mlemos@acm.org>
+Message-ID: <20050430192829.0489.xxxxxx@acm.org>
 Date: Sat, 30 Apr 2005 19:28:29 -0300
 
 
@@ -56,7 +56,7 @@ ses.org/mimemessage">MIME E-mail message composing and sending PHP class</a=
 </center>
 <center><img src=3D"cid:ae0357e57f04b8347f7621662cb63855.gif"></center>Than=
 k you,<br>
-mlemos</p>
+xxxxxx</p>
 </td>
 </tr>
 </table>
