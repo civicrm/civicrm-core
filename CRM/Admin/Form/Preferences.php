@@ -196,12 +196,9 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
               $this->addElement('select',
                 $fieldName,
                 $fieldValue['title'],
-                $fieldValue['option_values']
+                $fieldValue['option_values'],
+                CRM_Utils_Array::value('attributes', $fieldValue)
               );
-              break;
-
-            case 'advmultiselect':
-              $this->addElement('advmultiselect', $fieldName, $fieldValue['title'], $fieldValue['options'], $fieldValue['attributes']);
               break;
 
             case 'wysiwyg':
@@ -276,7 +273,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
           case 'text':
           case 'select':
-          case 'advmultiselect':
           case 'radio':
           case 'YesNo':
           case 'entity_reference':

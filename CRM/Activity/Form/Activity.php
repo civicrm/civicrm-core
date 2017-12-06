@@ -1048,7 +1048,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $mailStatus = '';
 
     if (Civi::settings()->get('activity_assignee_notification')
-      && !in_array($activity->activity_type_id, Civi::settings()->get('filter_activity_type_notification'))) {
+      && !in_array($activity->activity_type_id, Civi::settings()->get('do_not_notify_assignees_for'))) {
       $activityIDs = array($activity->id);
       if ($followupActivity) {
         $activityIDs = array_merge($activityIDs, array($followupActivity->id));
