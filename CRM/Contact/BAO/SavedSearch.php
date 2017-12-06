@@ -412,7 +412,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   public static function saveRelativeDates(&$queryParams, $formValues) {
     $relativeDates = array('relative_dates' => array());
     foreach ($formValues as $id => $value) {
-      if (preg_match('/_date_relative$/', $id) && !empty($value)) {
+      if (preg_match('/(_date|custom_[0-9]+)_relative$/', $id) && !empty($value)) {
         $entityName = strstr($id, '_date', TRUE);
         $relativeDates['relative_dates'][$entityName] = $value;
       }
