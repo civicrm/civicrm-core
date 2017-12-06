@@ -134,7 +134,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *
    * @return CRM_Core_BAO_Address|null
    */
-  public static function add(&$params, $fixAddress) {
+  public static function add(&$params, $fixAddress = FALSE) {
 
     $address = new CRM_Core_DAO_Address();
     $checkPermissions = isset($params['check_permissions']) ? $params['check_permissions'] : TRUE;
