@@ -70,6 +70,10 @@
   organization: Circle Interactive
   jira        : andyw
 
+- name        : Anna Kovalova
+  organization: CompuCorp
+  jira        : anna
+
 - github      : anthonylindsay
   name        : Anthony Lindsay
   organization: Annertech
@@ -181,6 +185,10 @@
 
 - name        : Daniel Martinez
   jira        : danielmart
+
+- github      : DanielvV
+  name        : Daniël van Vuuren
+  jira        : hollandopensource.nl
 
 - github      : darrick
   name        : Darrick Servis
@@ -456,6 +464,11 @@
   organization: Avietech
   jira        : jboeke
 
+- github      : jcorlew
+  name        : Josh Corlew
+  organization: AGH Strategies
+  jira        : jcorlew
+
 - github      : jernic
   name        : jernic
 
@@ -483,6 +496,9 @@
 
 - github      : joels341
   name        : Joel Stevens
+
+- github      : jorich-2000
+  name        : Jonathan Richardson
 
 - github      : JKingsnorth
   name        : John Kingsnorth
@@ -557,6 +573,11 @@
   name        : Ken West
   jira        : ken
 
+- github      : klevie
+  name        : Kevin Levie
+  organization: Levity
+  jira        : klevie
+
 - github      : konadave
   name        : David Reedy Jr
   organization: Klangsoft
@@ -607,6 +628,9 @@
   organization: Freeform Solutions
   jira        : lola_slade
 
+- name        : Lorenzo Ardizzone
+  jira        : 'lorenzo.ardizzone@y-tech.it'
+
 - github      : lsmithgo
   name        : Lionel Smith-Gordon
   jira        : lsmithgo
@@ -652,6 +676,10 @@
   name        : Mark Burdett
   organization: Electronic Frontier Foundation
   jira        : mfb
+
+- github      : mgribaudo
+  name        : Marcello Gribaudo
+  jira        : mgribaudo
 
 - github      : mhurwicz
   name        : Michael Hurwicz
@@ -717,8 +745,16 @@
   organization: JMA Consulting
   jira        : monish.deb
 
+- github      : mukeshcompucorp
+  name        : Mukesh Ram
+  organization: CompuCorp
+  jira        : mukesh
+
 - name        : Nathan Brettell
   jira        : nathan_b
+
+- name        : Neil Zampella
+  jira        : neilz
 
 - github      : nganivet
   name        : Nicolas Ganivet
@@ -738,6 +774,9 @@
 - name        : Thomas Bacon
   jira        : nocabt
 
+- github      : olivierh65
+  name        : Olivier Hertrich
+
 - github      : otetard
   name        : Olivier Tétard
   jira        : otetard
@@ -752,6 +791,9 @@
 - github      : philmck
   name        : Phil McKerracher
   jira        : philmck
+
+- name        : Richard Edgar
+  jira        : redgar
 
 - name        : René Nieuwburg
   organization: Comunica2
@@ -799,6 +841,10 @@
 - name        : Peter Davis
   organization: Fuzion
   jira        : peted
+
+- github      : powdevel
+  name        : Beto Aveiga
+  organization: PowDevel
 
 - github      : pradpnayak
   name        : Pradeep Nayak
@@ -866,6 +912,9 @@
   organization: Coop SymbioTIC
   jira        : samuelsov
 
+- name        : small biz
+  jira        : smallbiz
+
 - github      : sdragnev
   name        : Stan Dragnev
   jira        : stan_d
@@ -918,6 +967,9 @@
   name        : Steve Kessler
   organization: CiviDesk
   jira        : Skessler
+
+- name`       : Stevel
+  jira        : stevel
 
 - github      : stoob
   name        : Stuart Gaston
@@ -1031,6 +1083,14 @@
 
 - github      : vikaskumar14786
   name        : Vikas Kumar
+
+- github      : vingle
+  name        : Nicol Wistreich
+  jira        : nicw
+
+- github      : waddyvic
+  name        : Victor Huang
+  jira        : waddyvic
 
 - name        : Milli Aje
   organization: Debre-Genet Holy Trinity Ethiopian Orthodox Tewahedo Church
