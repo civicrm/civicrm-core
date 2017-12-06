@@ -365,9 +365,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $system->loadBootStrap(array(), FALSE);
 
     $uid = \Drupal::service('user.auth')->authenticate($name, $password);
-    $contact_id = CRM_Core_BAO_UFMatch::getContactId($uid);
+    if ($uid) {
+      if ($this->loadUser($name)) {
+        $contact_id = CRM_Core_BAO_UFMatch::getContactId($uid);
+        return array($contact_id, $uid, mt_rand());
+      }
+    }
 
-    return array($contact_id, $uid, mt_rand());
+    return FALSE;
   }
 
   /**
@@ -469,7 +474,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       if (!empty($params['uid']) && $username = \Drupal\user\Entity\User::load($uid)->getUsername()) {
         $this->loadUser($username);
       }
-      elseif (!empty($params['name']) && !empty($params['pass']) && $this->authenticate($params['name'], $params['pass'])) {
+      elseif (!empty($params['name']) && !empty($params['pass']) && \Drupal::service('user.auth')->authenticate($params['name'], $params['pass'])) {
         $this->loadUser($params['name']);
       }
     }
