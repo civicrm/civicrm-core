@@ -105,15 +105,11 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'title' => ts('Enable Popup Forms'),
           'weight' => 13,
         ),
-        'filter_activity_type_notification' => array(
-          'html_type' => 'advmultiselect',
-          'options' => $optionValues,
-          'attributes' => array(
-            'size' => 5,
-            'style' => 'width:150px',
-            'class' => 'advmultiselect',
-          ),
-          'title' => ts('Blocked Activity Types.'),
+        'do_not_notify_assignees_for' => array(
+          'html_type' => 'select',
+          'option_values' => $optionValues,
+          'attributes' => array('multiple' => 1, "class" => "huge crm-select2"),
+          'title' => ts('Do not notify assignees for'),
           'weight' => 14,
         ),
       ),

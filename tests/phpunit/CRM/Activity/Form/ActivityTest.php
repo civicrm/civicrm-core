@@ -25,7 +25,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
   public function testActivityCreate() {
     Civi::settings()->set('activity_assignee_notification', TRUE);
     //Reset filter to none.
-    Civi::settings()->set('filter_activity_type_notification', array());
+    Civi::settings()->set('do_not_notify_assignees_for', array());
     $mut = new CiviMailUtils($this, TRUE);
     $mut->clearMessages();
 
@@ -49,7 +49,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
     $mut->clearMessages();
 
     //Block Meeting notification.
-    Civi::settings()->set('filter_activity_type_notification', array($activityTypeId));
+    Civi::settings()->set('do_not_notify_assignees_for', array($activityTypeId));
     $params['assignee_contact_id'] = array($this->assignee2);
     $method->invokeArgs($form, array(&$params));
     $msg = $mut->getMostRecentEmail();
