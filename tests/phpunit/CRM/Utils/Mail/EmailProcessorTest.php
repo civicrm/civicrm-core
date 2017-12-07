@@ -23,6 +23,8 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
+    CRM_Utils_File::cleanDir(__DIR__ . '/data/mail');
+    mkdir(__DIR__ . '/data/mail');
     $this->callAPISuccess('MailSettings', 'get', array(
       'api.MailSettings.create' => array(
         'name' => 'local',
@@ -31,6 +33,12 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
         'domain' => 'example.com',
       ),
     ));
+  }
+
+  public function tearDown() {
+    CRM_Utils_File::cleanDir(__DIR__ . '/data/mail');
+    parent::tearDown();
+    $this->quickCleanup(array('civicrm_group', 'civicrm_group_contact', 'civicrm_mailing', 'civicrm_mailing_job', 'civicrm_mailing_event_bounce', 'civicrm_mailing_event_queue', 'civicrm_mailing_group', 'civicrm_mailing_recipients', 'civicrm_contact', 'civicrm_email'));
   }
 
   /**
@@ -43,6 +51,21 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
     $this->assertTrue(file_exists(__DIR__ . '/data/mail/bounce_no_verp.txt'));
     $this->callAPISuccess('job', 'fetch_bounces', array());
     $this->assertFalse(file_exists(__DIR__ . '/data/mail/bounce_no_verp.txt'));
+    $this->checkMailingBounces(1);
+  }
+
+  /**
+   * Tests that a multipart related email does not cause pain & misery & fatal errors.
+   *
+   * Sample taken from https://www.phpclasses.org/browse/file/14672.html
+   */
+  public function testProcessingMultipartRelatedEmail() {
+    $this->setUpMailing();
+    $mail = 'test_sample_message.eml';
+
+    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' .   $mail);
+    $this->callAPISuccess('job', 'fetch_bounces', array());
+    $this->assertFalse(file_exists(__DIR__ . '/data/mail/' . $mail));
     $this->checkMailingBounces(1);
   }
 
@@ -76,6 +99,7 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
   }
 
   /**
+   *
    * Wrapper to check for mailing bounces.
    *
    * Normally we would call $this->callAPISuccessGetCount but there is not one & there is resistance to
@@ -85,7 +109,7 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
    */
   public function checkMailingBounces($expectedCount) {
     $this->assertEquals($expectedCount, CRM_Core_DAO::singleValueQuery(
-      "SELECT count(*) FROM civicrm_mailing_event_bounce WHERE event_queue_id = " . $this->eventQueue['id']
+      "SELECT count(*) FROM civicrm_mailing_event_bounce"
     ));
   }
 
