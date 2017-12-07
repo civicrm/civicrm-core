@@ -109,7 +109,9 @@ AND    {$this->_componentClause}";
         document.getElementById('selectEmailFrom').style.display = 'block';")
     );
     $this->addElement('radio', 'output', NULL, ts('PDF Receipts'), 'pdf_receipt',
-      array('onClick' => "document.getElementById('selectPdfFormat').style.display = 'block';")
+      array(
+        'onClick' => "document.getElementById('selectPdfFormat').style.display = 'block';
+        document.getElementById('selectEmailFrom').style.display = 'none';")
     );
     $this->addRule('output', ts('Selection required'), 'required');
 

@@ -108,8 +108,8 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     //enable form element
     $this->assign('suppressForm', FALSE);
 
-    // use contact form as a base
-    CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($this);
+    // Build common form elements
+    CRM_Contribute_Form_Task_PDFLetterCommon::buildQuickForm($this);
 
     // specific need for contributions
     $this->add('static', 'more_options_header', NULL, ts('Thank-you Letter Options'));

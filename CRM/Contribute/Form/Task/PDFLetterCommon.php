@@ -12,6 +12,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * @var CRM_Core_Form $form
    */
   public static function buildQuickForm(&$form) {
+    // use contact form as a base
+    CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($form);
+
     // Contribute PDF tasks allow you to email as well, so we need to add email address to those forms
     $form->add('select', 'from_email_address', ts('From Email Address'), $form->_fromEmails, TRUE);
     parent::buildQuickForm($form);
