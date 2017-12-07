@@ -182,7 +182,6 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
       $financialItems = array();
       $this->_batchIds = $batchId;
 
-      $batchItems = array();
       $queryResults = array();
 
       while ($dao->fetch()) {
@@ -225,14 +224,13 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
         );
 
         end($financialItems);
-        $batchItems[] = &$financialItems[key($financialItems)];
         $queryResults[] = get_object_vars($dao);
       }
 
-      CRM_Utils_Hook::batchItems($queryResults, $batchItems);
+      CRM_Utils_Hook::batchItems($queryResults, $financialItems);
 
-      $batchItems['headers'] = self::formatHeaders($batchItems);
-      self::export($batchItems);
+      $financialItems['headers'] = self::formatHeaders($financialItems);
+      self::export($financialItems);
     }
     parent::initiateDownload();
   }
