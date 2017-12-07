@@ -237,15 +237,10 @@
           $('#contact_edit_preferences').val(params.toString());
         }
 
-        //show/hide activity types based on checkbox value
-        if ($('#activity_assignee_notification').is(":checked")) {
-          $('.crm-preferences-display-form-activity_types').show();
-        }
-        else {
-          $('.crm-preferences-display-form-activity_types').hide();
-        }
+        // show/hide activity types based on checkbox value
+        $('.crm-preferences-display-form-activity_types').toggle($('#activity_assignee_notification').is(":checked"));
         $('#activity_assignee_notification').click(function() {
-          $('.crm-preferences-display-form-activity_types').toggle($('#activity_assignee_notification').is(":checked"));
+          $('.crm-preferences-display-form-activity_types').toggle($(this).is(":checked"));
         });
 
         var invoicesKey = '{/literal}{$invoicesKey}{literal}';
