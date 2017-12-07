@@ -596,6 +596,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
   }
 
+  public function orderBy() {
+    $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact_b']}.sort_name ";
+  }
+
   public function postProcess() {
     $this->beginPostProcess();
 
