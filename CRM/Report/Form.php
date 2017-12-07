@@ -2311,7 +2311,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             }
 
             // include statistics columns only if set
-            if (!empty($field['statistics'])) {
+            if (!empty($field['statistics']) && !empty($this->_groupByArray)) {
               $select = $this->addStatisticsToSelect($field, $tableName, $fieldName, $select);
             }
             else {
@@ -2645,19 +2645,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * Build group by clause.
    */
   public function groupBy() {
-    if (!empty($this->_params['group_bys']) &&
-      is_array($this->_params['group_bys'])
-    ) {
-      foreach ($this->_columns as $tableName => $table) {
-        if (array_key_exists('group_bys', $table)) {
-          foreach ($table['group_bys'] as $fieldName => $field) {
-            if (!empty($this->_params['group_bys'][$fieldName])) {
-              $this->_groupByArray[] = $field['dbAlias'];
-            }
-          }
-        }
-      }
-    }
+    $this->storeGroupByArray();
 
     if (!empty($this->_groupByArray)) {
       $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $this->_groupByArray);
