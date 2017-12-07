@@ -513,14 +513,14 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     }
     $tempTable = CRM_Core_DAO::createTempTableName('civicrm_report_memcontr', TRUE);
     $sql = "
-      CREATE TEMPORARY TABLE $tempTable (INDEX (entity_id, contact_id, receive_date))
+      CREATE TEMPORARY TABLE $tempTable (index (contact_id, receive_date, entity_id))
       SELECT cc.contact_id, max(cc.receive_date) as receive_date, cmp.membership_id as entity_id
       FROM civicrm_membership_payment cmp
       INNER JOIN civicrm_contribution cc
       ON cc.id = cmp.contribution_id
       WHERE cc.is_test = 0
       $dateWhere
-      GROUP BY cmp.membership_id";
+      GROUP BY cc.contact_id";
     CRM_Core_DAO::executeQuery($sql);
     return $tempTable;
   }
