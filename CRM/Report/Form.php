@@ -3370,7 +3370,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $group->find();
     $smartGroups = array();
     while ($group->fetch()) {
-      if (in_array($group->id, $this->_params['gid_value']) &&
+      if (in_array($group->id, (array) $this->_params['gid_value']) &&
         $group->saved_search_id
       ) {
         $smartGroups[] = $group->id;
