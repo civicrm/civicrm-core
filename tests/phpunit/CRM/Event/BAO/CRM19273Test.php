@@ -178,7 +178,6 @@ class CRM_Event_BAO_CRM19273Test extends CiviUnitTestCase {
   private function balanceCheck($amount) {
     $this->assertEquals($amount, $this->contributionInvoice($this->_contributionId), "Invoice must a total of $amount");
     $this->assertEquals($amount, $this->totalIncome($this->_participantId), "The recorded income must be $amount ");
-    $this->assertEquals($amount, $this->totalIncome($this->_contributionId), "The accumulated assets must be $amount ");
   }
 
   /**
@@ -351,18 +350,59 @@ class CRM_Event_BAO_CRM19273Test extends CiviUnitTestCase {
       'contribution_id' => $this->_contributionId,
     ));
 
+    // CASE 1: Choose text price qty 1 (x$10 = $10 amount)
     $priceSetParams['price_1'] = 1;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
     CRM_Price_BAO_PriceSet::processAmount($this->_feeBlock, $priceSetParams, $lineItem);
     $lineItemVal[$this->_priceSetID] = $lineItem;
     CRM_Price_BAO_LineItem::processPriceSet($this->_participantId, $lineItemVal, $contribution, 'civicrm_participant');
 
+    // CASE 2: Choose text price qty 3 (x$10 = $30 amount)
+    $priceSetParams['price_1'] = 3;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, 0);
+
+    // CASE 3: Choose text price qty 2 (x$10 = $20 amount)
     $priceSetParams['price_1'] = 2;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
-    $lineitem = civicrm_api3('LineItem', 'Getsingle', array(
-      'entity_table' => 'civicrm_participant',
-    ));
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, 0);
+
+    $financialItems = $this->callAPISuccess('FinancialItem', 'Get', array(
+      'entity_table' => 'civicrm_line_item',
+      'entity_id' => array('IN' => array_keys($lineItem)),
+      'sequential' => 1,
+    ));
+
+    $unpaidStatus = CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialItem', 'status_id', 'Unpaid');
+    $expectedResults = array(
+      array(
+        'amount' => 10.00, // when qty 1 is used
+        'status_id' => $unpaidStatus,
+        'entity_table' => 'civicrm_line_item',
+        'entity_id' => 1,
+      ),
+      array(
+        'amount' => 20.00, // when qty 3 is used, add the surplus amount i.e. $30 - $10 = $20
+        'status_id' => $unpaidStatus,
+        'entity_table' => 'civicrm_line_item',
+        'entity_id' => 1,
+      ),
+      array(
+        'amount' => -10.00, // when qty 2 is used, add the surplus amount i.e. $20 - $30 = -$10
+        'status_id' => $unpaidStatus,
+        'entity_table' => 'civicrm_line_item',
+        'entity_id' => 1,
+      ),
+    );
+    // Check if 3 financial items were recorded
+    $this->assertEquals(count($expectedResults), $financialItems['count']);
+    foreach ($expectedResults as $key => $expectedResult) {
+      foreach ($expectedResult as $column => $value) {
+        $this->assertEquals($expectedResult[$column], $financialItems['values'][$key][$column]);
+      }
+    }
+
+    $this->balanceCheck(20);
   }
 
 }
