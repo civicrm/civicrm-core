@@ -414,7 +414,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   public function add2group($groupID) {
     if (is_numeric($groupID)) {
 
-      $sql = "
+      $sql = "SELECT * FROM (
 {$this->_select} {$this->_from}  {$this->_where} {$this->_groupBy}
 ORDER BY civicrm_contribution_total_amount_sum DESC
 ) as abc {$this->_groupLimit}";
@@ -443,8 +443,6 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
       $rowCount = $this->_dashBoardRowCount;
     }
     if ($this->_outputMode == 'html' || $this->_outputMode == 'group') {
-      // Replace only first occurrence of SELECT.
-      $this->_select = preg_replace('/SELECT/', 'SELECT SQL_CALC_FOUND_ROWS ', $this->_select, 1);
       $pageId = CRM_Utils_Request::retrieve('crmPID', 'Integer');
 
       if (!$pageId && !empty($_POST) && isset($_POST['crmPID_B'])) {
