@@ -10,9 +10,7 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
    */
   public function buildQuickForm() {
 
-    $this->add('text', 'assign_to', ts('Assign to'));
     $roleTypes = $this->getRoleTypes();
-
     $this->add(
       'select',
       'role_type',
