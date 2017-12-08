@@ -1335,10 +1335,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
     $activityParams['source_record_id'] = $activityId;
     $activityParams['source_contact_id'] = $userID;
-    $activityParams['activity_type_id'] = CRM_Core_OptionGroup::getValue('activity_type', 'Email', 'name');
+    $activityParams['activity_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_type_id', 'Email');
     $activityParams['activity_date_time'] = date('YmdHis');
-    $activityParams['status_id'] = CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name');
-    $activityParams['medium_id'] = CRM_Core_OptionGroup::getValue('encounter_medium', 'email', 'name');
+    $activityParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_status_id', 'Completed');
+    $activityParams['medium_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'encounter_medium', 'email');
     $activityParams['case_id'] = $caseId;
     $activityParams['is_auto'] = 0;
     $activityParams['target_id'] = $clientId;
