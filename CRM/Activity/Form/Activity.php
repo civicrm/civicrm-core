@@ -810,12 +810,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     $this->addFormRule(array('CRM_Activity_Form_Activity', 'formRule'), $this);
 
-    if (Civi::settings()->get('activity_assignee_notification')) {
-      $this->assign('activityAssigneeNotification', TRUE);
-    }
-    else {
+    $doNotNotifyAssigneeFor = Civi::settings()->get('do_not_notify_assignees_for');
+    if (($this->_activityTypeId && in_array($this->_activityTypeId, $doNotNotifyAssigneeFor)) || !Civi::settings()->get('activity_assignee_notification')) {
       $this->assign('activityAssigneeNotification', FALSE);
     }
+    else {
+      $this->assign('activityAssigneeNotification', TRUE);
+    }
+    $this->assign('doNotNotifyAssigneeFor', $doNotNotifyAssigneeFor);
   }
 
   /**
@@ -1085,7 +1087,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     // send copy to assignee contacts.CRM-4509
     $mailStatus = '';
 
-    if (Civi::settings()->get('activity_assignee_notification')) {
+    if (Civi::settings()->get('activity_assignee_notification')
+      && !in_array($activity->activity_type_id, Civi::settings()->get('do_not_notify_assignees_for'))) {
       $activityIDs = array($activity->id);
       if ($followupActivity) {
         $activityIDs = array_merge($activityIDs, array($followupActivity->id));
