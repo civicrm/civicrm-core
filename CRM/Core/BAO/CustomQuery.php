@@ -361,7 +361,7 @@ SELECT f.id, f.label, f.data_type,
               if ($isSerialized && !CRM_Utils_System::isNull($value) && !strstr($op, 'NULL') && !strstr($op, 'LIKE')) {
                 $sp = CRM_Core_DAO::VALUE_SEPARATOR;
                 $value = str_replace(",", "$sp|$sp", $value);
-                $value = str_replace(array('[:comma:]', '(', ')'), array(',', '[[.left-parenthesis.]]', '[[.right-parenthesis.]]'), $value);
+                $value = str_replace(array('[:comma:]', '(', ')'), array(',', '[(]', '[)]'), $value);
 
                 $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
                 $value = $sp . $value . $sp;
