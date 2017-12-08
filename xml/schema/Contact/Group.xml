@@ -104,6 +104,7 @@
     <type>text</type>
     <title>Tables For Select Clause</title>
     <comment>the tables to be included in a select data</comment>
+    <serialize>PHP</serialize>
     <add>1.6</add>
   </field>
   <field>
@@ -111,6 +112,7 @@
     <type>text</type>
     <title>Tables For Where Clause</title>
     <comment>the tables to be included in the count statement</comment>
+    <serialize>PHP</serialize>
     <add>1.6</add>
   </field>
   <field>
@@ -122,6 +124,7 @@
     <pseudoconstant>
       <optionGroupName>group_type</optionGroupName>
     </pseudoconstant>
+    <serialize>SEPARATOR_BOOKEND</serialize>
     <add>1.9</add>
   </field>
   <field>
