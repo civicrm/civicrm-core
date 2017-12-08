@@ -767,7 +767,7 @@ ORDER BY   {$orderBy}
     if (!$this->templates) {
       $this->getHeaderFooter();
       $this->templates = array();
-      if ($this->body_text || !empty($this->header)) {
+      if ($this->body_text) {
         $template = array();
         if (!empty($this->header->body_text)) {
           $template[] = $this->header->body_text;
@@ -776,12 +776,7 @@ ORDER BY   {$orderBy}
           $template[] = CRM_Utils_String::htmlToText($this->header->body_html);
         }
 
-        if ($this->body_text) {
-          $template[] = $this->body_text;
-        }
-        else {
-          $template[] = CRM_Utils_String::htmlToText($this->body_html);
-        }
+        $template[] = $this->body_text;
 
         if (!empty($this->footer->body_text)) {
           $template[] = $this->footer->body_text;
