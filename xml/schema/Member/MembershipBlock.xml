@@ -47,6 +47,7 @@
     <type>varchar</type>
     <length>1024</length>
     <comment>Membership types to be exposed by this block</comment>
+    <serialize>PHP</serialize>
     <add>1.5</add>
      <!-- changed from varchar 255 to 1024 in 4.6 beta 2 -->
     <change>4.6</change>

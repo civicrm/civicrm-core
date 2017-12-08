@@ -121,6 +121,7 @@
     <type>text</type>
     <import>true</import>
     <comment>Submitted form values for this report</comment>
+    <serialize>PHP</serialize>
     <add>2.2</add>
   </field>
   <field>
