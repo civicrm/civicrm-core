@@ -215,7 +215,28 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * These templates require minimal data config.
    */
   public static function getContributionReportTemplates() {
-    return array(array('contribute/summary'), array('contribute/detail'), array('contribute/repeat'), array('contribute/topDonor'));
+    return array(array('contribute/summary'), array('contribute/detail'), array('contribute/repeat'), array('topDonor' => 'contribute/topDonor'));
+  }
+
+  /**
+   * Get contribution templates that work with basic filter tests.
+   *
+   * These templates require minimal data config.
+   */
+  public static function getMembershipReportTemplates() {
+    return array(array('member/detail'));
+  }
+
+  public static function getMembershipAndContributionReportTemplatesForGroupTests() {
+    $templates = array_merge(self::getContributionReportTemplates(), self::getMembershipReportTemplates());
+    foreach ($templates as $key => $value) {
+      if (array_key_exists('topDonor', $value)) {
+        // Report is not standard enough to test here.
+        unset($templates[$key]);
+      }
+
+    }
+    return $templates;
   }
 
   /**
@@ -312,23 +333,32 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   /**
    * Test the group filter works on the contribution summary (with a smart group).
+   *
+   * @dataProvider getMembershipAndContributionReportTemplatesForGroupTests
+   *
+   * @param string $template
+   *   Name of the template to test.
    */
-  public function testContributionSummaryWithSmartGroupFilter() {
+  public function testContributionSummaryWithSmartGroupFilter($template) {
     $groupID = $this->setUpPopulatedSmartGroup();
     $rows = $this->callAPISuccess('report_template', 'getrows', array(
-      'report_id' => 'contribute/summary',
+      'report_id' => $template,
       'gid_value' => $groupID,
       'gid_op' => 'in',
       'options' => array('metadata' => array('sql')),
     ));
-    $this->assertEquals(3, $rows['values'][0]['civicrm_contribution_total_amount_count']);
-
+    $this->assertNumberOfContactsInResult(3, $rows, $template);
+    if ($template === 'contribute/summary') {
+      $this->assertEquals(3, $rows['values'][0]['civicrm_contribution_total_amount_count']);
+    }
   }
 
   /**
-   * Test the group filter works on the contribution summary (with a smart group).
+   * Test the group filter works on the contribution summary.
+   *
+   * @dataProvider getMembershipAndContributionReportTemplatesForGroupTests
    */
-  public function testContributionSummaryWithNotINSmartGroupFilter() {
+  public function testContributionSummaryWithNotINSmartGroupFilter($template) {
     $groupID = $this->setUpPopulatedSmartGroup();
     $rows = $this->callAPISuccess('report_template', 'getrows', array(
       'report_id' => 'contribute/summary',
@@ -341,14 +371,14 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the group filter works on the contribution summary (with a smart group).
+   * Test the group filter works on the various reports.
    *
-   * @dataProvider getContributionReportTemplates
+   * @dataProvider getMembershipAndContributionReportTemplatesForGroupTests
    *
    * @param string $template
    *   Report template unique identifier.
    */
-  public function testContributionSummaryWithNonSmartGroupFilter($template) {
+  public function testReportsWithNonSmartGroupFilter($template) {
     $groupID = $this->setUpPopulatedGroup();
     $rows = $this->callAPISuccess('report_template', 'getrows', array(
       'report_id' => $template,
@@ -467,6 +497,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ));
     foreach (array($household1ID, $individual1ID, $householdID, $individualID, $individualIDRemoved) as $contactID) {
       $this->contributionCreate(array('contact_id' => $contactID, 'invoice_id' => '', 'trxn_id' => ''));
+      $this->contactMembershipCreate(array('contact_id' => $contactID));
     }
 
     // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
@@ -475,12 +506,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Set up a smart group for testing.
+   * Set up a static group for testing.
    *
-   * The smart group includes all Households by filter. In addition an individual
-   * is created and hard-added and an individual is created that is not added.
-   *
-   * One household is hard-added as well as being in the filter.
+   * An individual is created and hard-added and an individual is created that is not added.
    *
    * This gives us a range of scenarios for testing contacts are included only once
    * whenever they are hard-added or in the criteria.
@@ -507,6 +535,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     foreach (array($individual1ID, $individualID, $individualIDRemoved) as $contactID) {
       $this->contributionCreate(array('contact_id' => $contactID, 'invoice_id' => '', 'trxn_id' => ''));
+      $this->contactMembershipCreate(array('contact_id' => $contactID));
     }
 
     // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
