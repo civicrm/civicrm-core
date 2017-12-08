@@ -8,3 +8,8 @@ UPDATE `civicrm_state_province` SET `name` = 'Thüringen' WHERE `name` = 'Thueri
 -- CRM-21378 Ensure that email abuse reports are treated as spam
 SELECT @bounceTypeID := max(id) FROM civicrm_mailing_bounce_type WHERE name = 'Spam';
 INSERT INTO civicrm_mailing_bounce_pattern (bounce_type_id, pattern) VALUES (@bounceTypeID, 'abuse report');
+
+
+-- CRM-21532 Add French state/departments
+INSERT INTO `civicrm_state_province` (`id`, `country_id`, `abbreviation`, `name`) VALUES
+(NULL, 1076, "52", "Haute-Marne");
