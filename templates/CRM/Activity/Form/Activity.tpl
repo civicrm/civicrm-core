@@ -279,7 +279,7 @@
     {literal}
     <script type="text/javascript">
     CRM.$(function($) {
-      var doNotNotifyAssigneeFor = ["{/literal}{'","'|implode:$doNotNotifyAssigneeFor}{literal}"];
+      var doNotNotifyAssigneeFor = {/literal}{$doNotNotifyAssigneeFor|@json_encode}{literal};
       $('#activity_type_id').change(function() {
         if ($.inArray($(this).val(), doNotNotifyAssigneeFor) != -1) {
           $('#notify_assignee_msg').hide();
