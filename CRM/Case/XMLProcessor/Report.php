@@ -558,7 +558,7 @@ WHERE      a.id = %1
             $value = $dao->$columnName;
           }
           else {
-            $value = CRM_Core_BAO_CustomField::displayValue($dao->$columnName, $typeValue['fieldID']);
+            $value = CRM_Core_BAO_CustomField::displayValue($dao->$columnName, $typeValue['fieldID'], $activityDAO->id);
           }
 
           if ($value) {
@@ -571,10 +571,6 @@ WHERE      a.id = %1
               CRM_Utils_Array::value('type', $typeValue) == 'Memo'
             ) {
               $value = $this->redact($value);
-            }
-            elseif (CRM_Utils_Array::value('type', $typeValue) == 'File') {
-              $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $typeValue, 'entity_table');
-              $value = CRM_Core_BAO_File::attachmentInfo($tableName, $activityDAO->id);
             }
             elseif (CRM_Utils_Array::value('type', $typeValue) == 'Link') {
               $value = CRM_Utils_System::formatWikiURL($value);
