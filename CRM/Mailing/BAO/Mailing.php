@@ -1311,6 +1311,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       elseif ($html) {
         // Else if it doesn't exist and the html version exists, use it
         $textBody = implode('', $html);
+        $textBody = htmlspecialchars_decode(htmlspecialchars_decode($textBody)); // Some &s have become 'really encoded'
         $textBody = CRM_Utils_String::htmlToText($textBody);
       }
 
