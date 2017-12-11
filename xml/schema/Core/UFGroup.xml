@@ -53,6 +53,14 @@
     <add>1.1</add>
   </field>
   <field>
+    <name>display_title</name>
+    <type>varchar</type>
+    <length>64</length>
+    <localizable>true</localizable>
+    <comment>Profile Form display title</comment>
+    <add>4.7</add>
+  </field>
+  <field>
     <name>description</name>
     <type>text</type>
     <title>Profile Description</title>

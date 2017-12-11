@@ -866,7 +866,7 @@
     initialize: function() {
       this.form = new Backbone.Form({
         model: this.model,
-        fields: ['title', 'help_pre', 'help_post', 'is_active']
+        fields: ['title', 'display_title', 'help_pre', 'help_post', 'is_active']
       });
       this.form.on('change', this.form.commit, this.form);
     },

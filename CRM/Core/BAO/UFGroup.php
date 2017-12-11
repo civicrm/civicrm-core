@@ -483,6 +483,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $formattedField = array(
       'name' => $name,
       'groupTitle' => $group->title,
+      'groupDisplayTitle' => ($group->display_title != "") ? $group->display_title : $group->title,
       'groupName' => $group->name,
       'groupHelpPre' => empty($group->help_pre) ? '' : $group->help_pre,
       'groupHelpPost' => empty($group->help_post) ? '' : $group->help_post,
@@ -1677,7 +1678,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       // CRM-13555, since description field was added later (4.4), and to avoid any problems with upgrade
       $selectFields[] = 'description';
     }
-
+    if (CRM_Core_DAO::checkFieldExists('civicrm_uf_group', 'display_title')) {
+      $selectFields[] = 'display_title';
+    }
     if (!empty($returnFields)) {
       $selectFields = array_merge($returnFields, array_diff($selectFields, $returnFields));
     }

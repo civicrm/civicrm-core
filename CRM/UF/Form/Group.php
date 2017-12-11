@@ -136,6 +136,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
 
     // title
     $this->add('text', 'title', ts('Profile Name'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'title'), TRUE);
+    $this->add('text', 'display_title', ts('Profile Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'display_title'));
     $this->add('textarea', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'description'));
 
     //add checkboxes
