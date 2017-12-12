@@ -119,13 +119,7 @@ function dm_install_drupal() {
   # Set full version in .info files. See CRM-15768.
   local MODULE_DIRS=`find "$to" -type f -name "*.info"`
   for INFO in $MODULE_DIRS; do
-    if [ $(uname) = "Darwin" ]; then
-      ## BSD sed
-      sed -i '' "s/version = \([0-9]*\.x-\)[1-9.]*/version = \1$DM_VERSION/g" $INFO
-    else
-      ## GNU sed
-      sed -i'' "s/version = \([0-9]*\.x-\)[1-9.]*/version = \1$DM_VERSION/g" $INFO
-    fi
+    dm_preg_edit '/version = ([0-9]*\.x)-[1-9.]*/m' "version = \$1-$DM_VERSION" "$INFO"
   done
 
   for f in "$to/.gitignore" "$to/.toxic.json" ; do
@@ -193,6 +187,8 @@ function dm_install_wordpress() {
     --exclude=civicrm \
     "$repo/./"  "$to/./"
   ## Need --exclude=civicrm for self-building on WP site
+
+  dm_preg_edit '/^Version: [0-9\.]+/m' "Version: $DM_VERSION" "$to/civicrm.php"
 }
 
 
@@ -238,4 +234,13 @@ function dm_git_checkout() {
     git checkout .
     git checkout "$2"
   popd
+}
+
+## Edit a file by applying a regular expression.
+## Note: We'd rather just call "sed", but it differs on GNU+BSD.
+## usage: dm_preg_edit <search-pattern> <replacement-pattern> <file>
+## example: '/version = \([0-9]*\.x-\)[1-9.]*/' 'version = \1$DM_VERSION'
+function dm_preg_edit() {
+  env RPAT="$1" RREPL="$2" RFILE="$3" \
+    php -r '$c = file_get_contents(getenv("RFILE")); $c = preg_replace(getenv("RPAT"), getenv("RREPL"), $c); file_put_contents(getenv("RFILE"), $c);'
 }
