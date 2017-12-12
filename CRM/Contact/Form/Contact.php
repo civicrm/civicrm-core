@@ -866,8 +866,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       }
     }
 
-    CRM_Contact_BAO_Contact_Optimizer::edit($params, $this->_preEditValues);
-
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
@@ -915,8 +913,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     else {
       CRM_Utils_Hook::pre('create', $params['contact_type'], NULL, $params);
     }
-
-    $customFields = CRM_Core_BAO_CustomField::getFields($params['contact_type'], FALSE, TRUE);
 
     //CRM-5143
     //if subtype is set, send subtype as extend to validate subtype customfield
