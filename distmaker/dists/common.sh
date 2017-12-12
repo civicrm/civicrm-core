@@ -119,13 +119,7 @@ function dm_install_drupal() {
   # Set full version in .info files. See CRM-15768.
   local MODULE_DIRS=`find "$to" -type f -name "*.info"`
   for INFO in $MODULE_DIRS; do
-    if [ $(uname) = "Darwin" ]; then
-      ## BSD sed
-      sed -i '' "s/version = \([0-9]*\.x-\)[1-9.]*/version = \1$DM_VERSION/g" $INFO
-    else
-      ## GNU sed
-      sed -i'' "s/version = \([0-9]*\.x-\)[1-9.]*/version = \1$DM_VERSION/g" $INFO
-    fi
+    dm_preg_edit '/version = ([0-9]*\.x)-[1-9.]*/m' "version = \$1-$DM_VERSION" "$INFO"
   done
 
   for f in "$to/.gitignore" "$to/.toxic.json" ; do
