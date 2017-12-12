@@ -796,7 +796,7 @@ ORDER BY   {$orderBy}
       }
 
       // To check for an html part strip tags
-      if (trim(strip_tags($this->body_html))) {
+      if (trim(strip_tags($this->body_html, '<img>'))) {
 
         $template = array();
         if ($this->header) {
