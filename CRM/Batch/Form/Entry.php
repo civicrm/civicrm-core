@@ -146,7 +146,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     // remove file type field and then limit fields
     $suppressFields = FALSE;
-    $removehtmlTypes = array('File', 'Autocomplete-Select');
+    $removehtmlTypes = array('File');
     foreach ($this->_fields as $name => $field) {
       if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) &&
         in_array($this->_fields[$name]['html_type'], $removehtmlTypes)
@@ -270,7 +270,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields && $buttonName != '_qf_Entry_next') {
-      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Update multiple records."), ts('Some Fields Excluded'), 'info');
+      CRM_Core_Session::setStatus(ts("File type field(s) in the selected profile are not supported for Update multiple records."), ts('Some Fields Excluded'), 'info');
     }
   }
 
