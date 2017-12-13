@@ -1083,7 +1083,7 @@ SELECT is_primary,
         'individual_prefix' => $rows[$rowID]['individual_prefix'],
       );
       $format = Civi::settings()->get('display_name_format');
-      $firstNameWithPrefix = CRM_Utils_Address::format($formatted, $format, FALSE, FALSE, TRUE);
+      $firstNameWithPrefix = CRM_Utils_Address::format($formatted, $format, FALSE, FALSE);
       $firstNameWithPrefix = trim($firstNameWithPrefix);
 
       // fill uniqueAddress array with last/first name tree
