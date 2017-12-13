@@ -4087,6 +4087,9 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1076, "WF", "Wallis-et-Futuna"),
 (NULL, 1076, "NC", "Nouvelle-Calédonie"),
 
+-- CRM-21532 Add French state/departments
+(NULL, 1076, "52", "Haute-Marne"),
+
 -- Add states for: Barbados and Antigua and Barbuda
 (NULL, 1009, "03", "Saint George"),
 (NULL, 1009, "04", "Saint John"),
