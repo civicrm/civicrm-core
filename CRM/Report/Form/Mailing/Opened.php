@@ -179,6 +179,7 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
         'id' => array(
           'required' => TRUE,
           'no_display' => TRUE,
+          'dbAlias' => CRM_Utils_SQL::supportsFullGroupBy() ? 'ANY_VALUE(mailing_event_opened_civireport.id)' : NULL,
         ),
         'time_stamp' => array(
           'title' => ts('Open Date'),
@@ -190,6 +191,11 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
           'title' => ts('Open Date'),
           'operatorType' => CRM_Report_Form::OP_DATE,
           'type' => CRM_Utils_Type::T_DATE,
+        ),
+        'unique_opens' => array(
+          'title' => ts('Unique Opens'),
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+          'pseudofield' => TRUE,
         ),
       ),
       'order_bys' => array(
@@ -296,6 +302,11 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
       $groupBy = "civicrm_mailing_event_queue.email_id";
     }
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+
+    if (!empty($this->_params['unique_opens_value'])) {
+      $this->_groupBy .= ", civicrm_mailing_event_queue.id";
+      $this->_groupBy = str_replace('mailing_event_opened_civireport.id,', '', $this->_groupBy);
+    }
   }
 
   public function postProcess() {
