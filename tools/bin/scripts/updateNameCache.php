@@ -109,10 +109,10 @@ class CRM_UpdateNameCache {
       $params['individual_prefix'] = $prefixes[$dao->prefix_id];
       $params['individual_suffix'] = $suffixes[$dao->suffix_id];
 
-      $sortName = CRM_Utils_Address::format($params, $sortFormat, FALSE, FALSE, TRUE, $tokenFields);
+      $sortName = CRM_Utils_Address::format($params, $sortFormat, FALSE, FALSE, $tokenFields);
       $sortName = trim(CRM_Core_DAO::escapeString($sortName));
 
-      $displayName = CRM_Utils_Address::format($params, $displayFormat, FALSE, FALSE, TRUE, $tokenFields);
+      $displayName = CRM_Utils_Address::format($params, $displayFormat, FALSE, FALSE, $tokenFields);
       $displayName = trim(CRM_Core_DAO::escapeString($displayName));
 
       //check for email
