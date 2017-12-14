@@ -81,7 +81,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       }
 
       $addressExists = self::dataExists($value);
-      if (empty($value['id'])) {
+      if (empty($value['id']) && ($key==1)) {
         if (!empty($addresses) && array_key_exists(CRM_Utils_Array::value('location_type_id', $value), $addresses)) {
           $value['id'] = $addresses[CRM_Utils_Array::value('location_type_id', $value)];
         }
