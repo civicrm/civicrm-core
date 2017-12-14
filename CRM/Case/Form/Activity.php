@@ -72,7 +72,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
     $result = parent::preProcess();
 
-    $scheduleStatusId = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
+    $scheduleStatusId = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Scheduled');
     $this->assign('scheduleStatusId', $scheduleStatusId);
 
     if (!$this->_caseId && $this->_activityId) {
@@ -258,7 +258,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
 
       // remove Open Case activity type since we're inside an existing case
-      $openCaseID = CRM_Core_OptionGroup::getValue('activity_type', 'Open Case', 'name');
+      $openCaseID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
       unset($aTypes[$openCaseID]);
       asort($aTypes);
       $this->_fields['followup_activity_type_id']['attributes'] = array('' => '- select activity type -') + $aTypes;

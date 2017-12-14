@@ -53,10 +53,7 @@ class CRM_Case_Form_Activity_OpenCase {
 
     if ($form->_context == 'caseActivity') {
       $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $form);
-      $atype = CRM_Core_OptionGroup::getValue('activity_type',
-        'Change Case Start Date',
-        'name'
-      );
+      $atype = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Case Start Date');
       $caseId = CRM_Utils_Array::first($form->_caseId);
       $form->assign('changeStartURL', CRM_Utils_System::url('civicrm/case/activity',
           "action=add&reset=1&cid=$contactID&caseid={$caseId}&atype=$atype"
