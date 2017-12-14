@@ -994,10 +994,7 @@ SELECT  id
         CRM_Utils_Array::remove($caseFields,
           'case_id',
           'case_type',
-          'case_start_date',
-          'case_end_date',
           'case_role',
-          'case_status',
           'case_deleted'
         );
       }
