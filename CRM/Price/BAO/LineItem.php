@@ -639,7 +639,7 @@ WHERE li.contribution_id = %1";
     if (!empty($requiredChanges['line_items_to_cancel']) || !empty($requiredChanges['line_items_to_update'])) {
       // @todo - this IF is to get this through PR merge but I suspect that it should not
       // be necessary & is masking something else.
-      $financialItemsArray = $lineItemObj->getReverseFinancialItemsToRecord(
+      $financialItemsArray = $lineItemObj->getAdjustedFinancialItemsToRecord(
         $entityID,
         $entityTable,
         $contributionId,
@@ -703,9 +703,7 @@ WHERE li.contribution_id = %1";
         $newFinancialItem = CRM_Financial_BAO_FinancialItem::create($updateFinancialItemInfoValues);
         // record reverse transaction only if Contribution is Completed because for pending refund or
         //   partially paid we are already recording the surplus owed or refund amount
-        if (!empty($updateFinancialItemInfoValues['financialTrxn']) && ($contributionStatus == 'Completed'
-          )
-        ) {
+        if (!empty($updateFinancialItemInfoValues['financialTrxn']) && ($contributionStatus == 'Completed')) {
           $updateFinancialItemInfoValues = array_merge($updateFinancialItemInfoValues['financialTrxn'], array(
             'entity_id' => $newFinancialItem->id,
             'entity_table' => 'civicrm_financial_item',
@@ -719,6 +717,15 @@ WHERE li.contribution_id = %1";
             'amount' => $reverseTrxn->total_amount,
           ));
           unset($updateFinancialItemInfoValues['financialTrxn']);
+        }
+        elseif (!empty($updateFinancialItemInfoValues['link-financial-trxn'])) {
+          civicrm_api3('EntityFinancialTrxn', 'create', array(
+            'entity_id' => $newFinancialItem->id,
+            'entity_table' => 'civicrm_financial_item',
+            'financial_trxn_id' => $trxn->id,
+            'amount' => $newFinancialItem->amount,
+          ));
+          unset($updateFinancialItemInfoValues['link-financial-trxn']);
         }
       }
     }
@@ -743,7 +750,7 @@ WHERE li.contribution_id = %1";
    * @return array
    *      List of formatted reverse Financial Items to be recorded
    */
-  protected function getReverseFinancialItemsToRecord($entityID, $entityTable, $contributionID, $priceFieldValueIDsToCancel, $lineItemsToUpdate) {
+  protected function getAdjustedFinancialItemsToRecord($entityID, $entityTable, $contributionID, $priceFieldValueIDsToCancel, $lineItemsToUpdate) {
     $previousLineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, str_replace('civicrm_', '', $entityTable));
 
     $financialItemsArray = array();
@@ -771,6 +778,21 @@ WHERE li.contribution_id = %1";
           $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
         }
         // INSERT negative financial_items for tax amount
+        $financialItemsArray[$updateFinancialItemInfoValues['entity_id']] = $updateFinancialItemInfoValues;
+      }
+      // INSERT a financial item to record surplus/lesser amount when a text price fee is changed
+      elseif (!empty($lineItemsToUpdate) &&
+      $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['html_type'] == 'Text' &&
+      $updateFinancialItemInfoValues['amount'] > 0
+      ) {
+        // calculate the amount difference, considered as financial item amount
+        $updateFinancialItemInfoValues['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['line_total'] - $totalFinancialAmount;
+        // add a flag, later used to link financial trxn and this new financial item
+        $updateFinancialItemInfoValues['link-financial-trxn'] = TRUE;
+        if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
+          $updateFinancialItemInfoValues['tax']['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['entity_id']]['tax_amount'] - $previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount'];
+          $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
+        }
         $financialItemsArray[$updateFinancialItemInfoValues['entity_id']] = $updateFinancialItemInfoValues;
       }
     }
