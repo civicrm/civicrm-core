@@ -65,11 +65,23 @@ class CRM_Core_DAO extends DB_DataObject {
     BULK_INSERT_HIGH_COUNT = 200,
     QUERY_FORMAT_WILDCARD = 1,
     QUERY_FORMAT_NO_QUOTES = 2,
+
+    /**
+     * Serialized string separated by and bookended with VALUE_SEPARATOR
+     */
     SERIALIZE_SEPARATOR_BOOKEND = 1,
+    /**
+     * @deprecated format separated by VALUE_SEPARATOR
+     */
     SERIALIZE_SEPARATOR_TRIMMED = 2,
-    SERIALIZE_COMMA = 3,
-    SERIALIZE_JSON = 4,
-    SERIALIZE_PHP = 5;
+    /**
+     * Recommended serialization format
+     */
+    SERIALIZE_JSON = 3,
+    /**
+     * @deprecated format using php serialize()
+     */
+    SERIALIZE_PHP = 4;
 
   /**
    * Define entities that shouldn't be created or deleted when creating/ deleting
@@ -2616,9 +2628,6 @@ SELECT contact_id
       case self::SERIALIZE_SEPARATOR_TRIMMED:
         return is_array($value) ? implode(self::VALUE_SEPARATOR, $value) : $value;
 
-      case self::SERIALIZE_COMMA:
-        return is_array($value) ? implode(',', $value) : $value;
-
       case self::SERIALIZE_JSON:
         return is_array($value) ? json_encode($value) : $value;
 
@@ -2647,9 +2656,6 @@ SELECT contact_id
 
       case self::SERIALIZE_SEPARATOR_TRIMMED:
         return explode(self::VALUE_SEPARATOR, trim($value));
-
-      case self::SERIALIZE_COMMA:
-        return explode(',', trim(str_replace(', ', '', $value)));
 
       case self::SERIALIZE_JSON:
         return strlen($value) ? json_decode($value, TRUE) : array();
