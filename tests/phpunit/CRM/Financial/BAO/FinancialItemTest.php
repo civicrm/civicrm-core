@@ -311,8 +311,14 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
 
   /**
    * Check method getPreviousFinancialItem() with tax entry.
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testGetPreviousFinancialItemHavingTax() {
+  public function testGetPreviousFinancialItemHavingTax($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $contactId = $this->individualCreate();
     $this->enableTaxAndInvoicing();
     $this->relationForFinancialTypeWithFinancialAccount(1);
