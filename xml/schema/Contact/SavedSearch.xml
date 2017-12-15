@@ -33,6 +33,7 @@
     <type>text</type>
     <import>true</import>
     <comment>Submitted form values for this search</comment>
+    <serialize>PHP</serialize>
     <add>1.1</add>
   </field>
   <field>
@@ -75,6 +76,7 @@
     <type>text</type>
     <title>Select Tables</title>
     <comment>the tables to be included in a select data</comment>
+    <serialize>PHP</serialize>
     <add>1.6</add>
   </field>
   <field>
@@ -82,6 +84,7 @@
     <type>text</type>
     <title>Where Tables</title>
     <comment>the tables to be included in the count statement</comment>
+    <serialize>PHP</serialize>
     <add>1.6</add>
   </field>
 </table>

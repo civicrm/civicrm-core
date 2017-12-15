@@ -392,4 +392,45 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * @return array
+   */
+  public function serializationMethods() {
+    $constants = array();
+    $simpleData = array(
+      NULL,
+      array('Foo', 'Bar', '3', '4', '5'),
+      array(),
+      array('0'),
+    );
+    $complexData = array(
+      array(
+        'foo' => 'bar',
+        'baz' => array('1', '2', '3', array('one', 'two')),
+        '3' => '0',
+      ),
+    );
+    $daoInfo = new ReflectionClass('CRM_Core_DAO');
+    foreach ($daoInfo->getConstants() as $constant => $val) {
+      if ($constant == 'SERIALIZE_JSON' || $constant == 'SERIALIZE_PHP') {
+        $constants[] = array($val, array_merge($simpleData, $complexData));
+      }
+      elseif (strpos($constant, 'SERIALIZE_') === 0) {
+        $constants[] = array($val, $simpleData);
+      }
+    }
+    return $constants;
+  }
+
+  /**
+   * @dataProvider serializationMethods
+   */
+  public function testFieldSerialization($method, $sampleData) {
+    foreach ($sampleData as $value) {
+      $serialized = CRM_Core_DAO::serializeField($value, $method);
+      $newValue = CRM_Core_DAO::unSerializeField($serialized, $method);
+      $this->assertEquals($value, $newValue);
+    }
+  }
+
 }

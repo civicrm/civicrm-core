@@ -64,6 +64,7 @@
       <type>Select</type>
       <multiple>1</multiple>
     </html>
+    <serialize>SEPARATOR_BOOKEND</serialize>
     <add>1.5</add>
   </field>
   <index>
@@ -288,7 +289,9 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <multiple>1</multiple>
     </html>
+    <serialize>SEPARATOR_BOOKEND</serialize>
   </field>
   <index>
     <name>index_preferred_communication_method</name>

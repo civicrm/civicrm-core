@@ -91,11 +91,7 @@
     <type>text</type>
     <title>Domain Configuration</title>
     <comment>Backend configuration.</comment>
-    <html>
-      <type>TextArea</type>
-      <rows>20</rows>
-      <cols>80</cols>
-    </html>
+    <serialize>PHP</serialize>
     <add>1.6</add>
   </field>
   <field>
@@ -138,11 +134,7 @@
     <type>text</type>
     <title>Language Customizations</title>
     <comment>Locale specific string overrides</comment>
-    <html>
-      <type>TextArea</type>
-      <rows>20</rows>
-      <cols>80</cols>
-    </html>
+    <serialize>PHP</serialize>
     <add>3.2</add>
   </field>
 </table>

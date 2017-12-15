@@ -69,6 +69,7 @@
     <title>Custom Group Subtype</title>
     <length>255</length>
     <comment>linking custom group for dynamic object</comment>
+    <serialize>SEPARATOR_BOOKEND</serialize>
     <add>1.6</add>
   </field>
   <field>
