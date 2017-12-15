@@ -170,7 +170,10 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 
 {if $field.FKClassName}
                       'FKClassName' => '{$field.FKClassName}',
-{/if} {* field.FKClassName *}
+{/if}
+{if $field.serialize}
+  'serialize' => self::SERIALIZE_{$field.serialize|strtoupper},
+{/if}
 {if $field.html}
   {assign var=htmlOptions value=$field.html}
   'html' => array(
