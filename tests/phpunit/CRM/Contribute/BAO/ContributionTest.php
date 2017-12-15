@@ -1084,8 +1084,14 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
   /**
    * Test for function createProportionalEntry().
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testcreateProportionalEntry() {
+  public function testCreateProportionalEntry($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     list($contribution, $financialAccount) = $this->createContributionWithTax();
     $params = array(
       'total_amount' => 55,
