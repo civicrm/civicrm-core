@@ -80,7 +80,7 @@ class CRM_Utils_SQL {
     // CRM-21455 MariaDB 10.2 does not support ANY_VALUE
     $version = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
 
-    if (stripos('mariadb', $version) !== FALSE) {
+    if (stripos($version, 'mariadb') !== FALSE) {
       return FALSE;
     }
 
