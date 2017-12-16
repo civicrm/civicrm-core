@@ -83,7 +83,7 @@ class CRM_Member_Form_MembershipConfig extends CRM_Core_Form {
     }
 
     if (isset($defaults['minimum_fee'])) {
-      $defaults['minimum_fee'] = CRM_Utils_Money::format($defaults['minimum_fee'], NULL, '%a');
+      $defaults['minimum_fee'] = CRM_Utils_Money::formatLongDecimal($defaults['minimum_fee']);
     }
 
     if (isset($defaults['status'])) {
