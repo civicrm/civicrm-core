@@ -2142,6 +2142,7 @@ class CRM_Contact_BAO_Query {
       }
 
       $this->_where[$grouping][] = self::buildClause($where, $op, $value);
+      $this->_tables[$aName] = $this->_whereTables[$aName] = 1;
       list($qillop, $qillVal) = self::buildQillForFieldValue('CRM_Core_DAO_Address', "state_province_id", $value, $op);
       $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['title'], 2 => $qillop, 3 => $qillVal));
     }
@@ -2170,8 +2171,9 @@ class CRM_Contact_BAO_Query {
       }
 
       $this->_where[$grouping][] = self::buildClause($where, $op, $value, 'Positive');
+      $this->_tables[$aName] = $this->_whereTables[$aName] = 1;
 
-      list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $name, $value, $op);
+        list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $name, $value, $op);
       $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['title'], 2 => $qillop, 3 => $qillVal));
     }
     elseif ($name === 'world_region') {
