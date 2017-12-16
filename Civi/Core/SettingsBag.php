@@ -352,9 +352,10 @@ class SettingsBag {
     }
     $dao->find(TRUE);
 
-    // string comparison with 0 always return true, so to be ensure the type use ===
-    // ref - https://stackoverflow.com/questions/8671942/php-string-comparasion-to-0-integer-returns-true
-    if (isset($metadata['on_change']) && !($value === 0 && ($dao->value === NULL || unserialize($dao->value) == 0))) {
+    // string comparison with 0 always return true, but we must also evaluate a string of '0' to false
+    // ref - http://php.net/manual/en/types.comparisons.php
+    // The boolean logic here is: "If an on_change callback exists, and the old and new values are not both zero"
+    if (isset($metadata['on_change']) && ($value || !($dao->value === NULL || unserialize($dao->value) == 0))) {
       foreach ($metadata['on_change'] as $callback) {
         call_user_func(
           \Civi\Core\Resolver::singleton()->get($callback),
