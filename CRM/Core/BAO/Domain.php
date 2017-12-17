@@ -303,9 +303,14 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     if (!empty($domain['domain_email'])) {
       return array($domain['name'], $domain['domain_email']);
     }
-    $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
     $userName = '';
     $userEmail = '';
+
+    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      return array($userName, $userEmail);
+    }
+
+    $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
     if (!empty($userID)) {
       list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
     }

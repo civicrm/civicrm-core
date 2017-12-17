@@ -3196,7 +3196,9 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   public static function getReceiptFrom($activityID) {
     $name = $address = NULL;
 
-    if (!empty($activityID)) {
+    if (!empty($activityID) && (Civi::settings()->get('allow_mail_from_logged_in_contact'))) {
+      // This breaks SPF/DMARC if email is sent from an email address that the server is not authorised to send from.
+      //    so we can disable this behaviour with the "allow_mail_from_logged_in_contact" setting.
       // There is always a 'Added by' contact for a activity,
       //  so we can safely use ActivityContact.Getvalue API
       $sourceContactId = civicrm_api3('ActivityContact', 'getvalue', array(
