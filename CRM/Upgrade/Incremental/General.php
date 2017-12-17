@@ -67,10 +67,10 @@ class CRM_Upgrade_Incremental_General {
     $dateFormat = Civi::Settings()->get('dateformatshortdate');
     if (version_compare(phpversion(), self::MIN_RECOMMENDED_PHP_VER) < 0) {
       $preUpgradeMessage .= '<p>';
-      $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but future releases will require PHP %2 or above. We recommend php version %3.', array(
+      $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but future releases will require PHP %2 or above. We recommend PHP version %3.', array(
          1 => $latestVer,
          2 => self::MIN_RECOMMENDED_PHP_VER,
-         2 => self::RECOMMENDED_PHP_VER,
+         3 => self::RECOMMENDED_PHP_VER,
       ));
       $preUpgradeMessage .= '</p>';
     }
