@@ -549,6 +549,9 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
 
     if ($this->_caseTypeNameOrderBy) {
       $this->_orderBy = str_replace('case_civireport.case_type_name', 'civireport_case_types.title', $this->_orderBy);
+      if (isset($this->_sections['civicrm_case_case_type_name'])) {
+        $this->_sections['civicrm_case_case_type_name']['dbAlias'] = 'civireport_case_types.title';
+      }
     }
   }
 
