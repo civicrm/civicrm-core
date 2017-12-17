@@ -351,6 +351,18 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'bao' => 'CRM_Core_BAO_UFGroup',
           'localizable' => 0,
         ) ,
+         'for_duplicate_URL' => array(
+             'name' => 'for_duplicate_URL',
+             'type' => CRM_Utils_Type::T_STRING,
+             'title' => ts('Duplicate Url'),
+             'description' => 'For duplicate URL.',
+             'maxlength' => 255,
+             'size' => CRM_Utils_Type::HUGE,
+             'table_name' => 'civicrm_uf_group',
+             'entity' => 'UFGroup',
+             'bao' => 'CRM_Core_BAO_UFGroup',
+             'localizable' => 0,
+         ) ,
         'add_to_group_id' => array(
           'name' => 'add_to_group_id',
           'type' => CRM_Utils_Type::T_INT,

@@ -35,6 +35,10 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
   /**
    * Build the form object for Advanced Settings.
    *
+   * ALTER TABLE `civicrm_uf_group`
+  ADD COLUMN `for_duplicate_URL` VARCHAR(255) DEFAULT NULL AFTER `post_URL`;
+   *
+   *
    * @param CRM_Core_Form $form
    */
   public static function buildAdvanceSetting(&$form) {
@@ -50,6 +54,7 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     $form->addGroup($options, 'is_update_dupe', ts('What to do upon duplicate match'));
     // we do not have any url checks to allow relative urls
     $form->addElement('text', 'post_URL', ts('Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'post_URL'));
+    $form->addElement('text', 'for_duplicate_URL', ts('Duplicate Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'for_duplicate_URL'));
     $form->addElement('text', 'cancel_URL', ts('Cancel Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_URL'));
     $form->addElement('text', 'cancel_button_text', ts('Cancel Button Text'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_button_text'));
     $form->addElement('text', 'submit_button_text', ts('Submit Button Text'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'submit_button_text'));

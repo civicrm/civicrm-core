@@ -946,7 +946,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $form->_ruleGroupID
       );
       if ($ids) {
-        if ($form->_isUpdateDupe == 2) {
+          if($form->_isUpdateDupe == 1 && $form->_ufGroup['add_to_group_id'] != NULL) {
+              $form->changePostURL();
+              if (!$form->_id) {
+                  $form->_id = $ids[0];
+              }
+          } else if ($form->_isUpdateDupe == 2) {
           CRM_Core_Session::setStatus(ts('Note: this contact may be a duplicate of an existing record.'), ts('Possible Duplicate Detected'), 'alert');
         }
         elseif ($form->_isUpdateDupe == 1) {
