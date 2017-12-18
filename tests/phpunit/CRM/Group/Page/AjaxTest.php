@@ -26,10 +26,6 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    // CRM_Contact_BAO_Group::getPermissionClause sets a static variable.
-    // Ensure it is reset before each run.
-    $force = TRUE;
-    CRM_Contact_BAO_Group::getPermissionClause($force);
     $this->_params = array(
       'page' => 1,
       'rp' => 50,
@@ -79,7 +75,6 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   public function setHookAndRequest($permission, $hook) {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = (array) $permission;
     $this->hookClass->setHook('civicrm_aclGroup', array($this, $hook));
-    CRM_Contact_BAO_Group::getPermissionClause(TRUE);
     global $_REQUEST;
     $_REQUEST = $this->_params;
   }
@@ -253,7 +248,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
    */
   public function testGroupListAccessCiviCRM() {
     $this->setPermissionAndRequest('access CiviCRM');
-    $permissionClause = CRM_Contact_BAO_Group::getPermissionClause(TRUE);
+    $permissionClause = CRM_Contact_BAO_Group::getPermissionClause();
     $this->assertEquals('1 = 0', $permissionClause);
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
