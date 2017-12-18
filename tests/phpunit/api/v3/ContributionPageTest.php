@@ -698,8 +698,14 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    *
    * Ensure a separate payment for the membership vs the contribution, with
    * correct amounts.
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNowChargesCorrectAmounts() {
+  public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNowChargesCorrectAmounts($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $this->setUpMembershipContributionPage(TRUE);
     $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
     $processor->setDoDirectPaymentResult(array('fee_amount' => .72));
@@ -763,7 +769,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertCount(2, $distinct_contribution_ids, "Expected exactly 2 log contributions with distinct contributionIDs.");
     $this->assertTrue($found_contribution_amount, "Expected one log contribution with amount '$contributionPageAmount' (the contribution page amount)");
     $this->assertTrue($found_membership_amount, "Expected one log contribution with amount '$this->_membershipBlockAmount' (the membership amount)");
-
   }
 
   /**
@@ -1588,8 +1593,14 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test form submission with multiple option price set.
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testSubmitContributionPageWithPriceSet() {
+  public function testSubmitContributionPageWithPriceSet($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $this->_priceSetParams['is_quick_config'] = 0;
     $this->setUpContributionPage();
     $submitParams = array(
@@ -1608,13 +1619,16 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 2,
     ));
-    $this->callAPISuccessGetCount(
-      'LineItem',
-      array(
-        'contribution_id' => $contribution['id'],
-      ),
-      3
-    );
+    $this->assertEquals(80, $contribution['total_amount']);
+    $lineItems = $this->callAPISuccess('LineItem', 'get', array(
+      'contribution_id' => $contribution['id'],
+    ));
+    $this->assertEquals(3, $lineItems['count']);
+    $totalLineAmount = 0;
+    foreach ($lineItems['values'] as $lineItem) {
+      $totalLineAmount = $totalLineAmount + $lineItem['line_total'];
+    }
+    $this->assertEquals(80, $totalLineAmount);
   }
 
   /**
@@ -1650,14 +1664,20 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test Tax Amount is calculated properly when using PriceSet with Field Type = Text/Numeric Quantity
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testSubmitContributionPageWithPriceSetQuantity() {
+  public function testSubmitContributionPageWithPriceSetQuantity($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $this->_priceSetParams['is_quick_config'] = 0;
     $this->enableTaxAndInvoicing();
     $financialType = $this->createFinancialType();
     $financialTypeId = $financialType['id'];
     // This function sets the Tax Rate at 10% - it currently has no way to pass Tax Rate into it - so let's work with 10%
-    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id'], 5);
+    $this->relationForFinancialTypeWithFinancialAccount($financialType['id'], 5);
 
     $this->setUpContributionPage();
     $submitParams = array(
@@ -1689,9 +1709,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams['price_' . $priceFieldId] = 180;
 
     // contribution_page submit requires amount and tax_amount - and that's ok we're not testing that - we're testing at the LineItem level
-    $submitParams['amount'] = 180 * 16.95;
+    $submitParams['amount'] = $this->formatMoneyInput(180 * 16.95);
     // This is the correct Tax Amount - use it later to compare to what the CiviCRM Core came up with at the LineItem level
-    $submitParams['tax_amount'] = 180 * 16.95 * 0.10;
+    $submitParams['tax_amount'] = $this->formatMoneyInput(180 * 16.95 * 0.10);
 
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $contribution = $this->callAPISuccessGetSingle('contribution', array(
@@ -1699,15 +1719,15 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     ));
 
     // Retrieve the lineItem that belongs to the Printing Rights and check the tax_amount CiviCRM Core calculated for it
-    $lineItem = $this->callAPISuccess('LineItem', 'get', array(
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', array(
       'contribution_id' => $contribution['id'],
       'label' => 'Printing Rights',
     ));
-    $lineItemId = $lineItem['id'];
-    $lineItem_TaxAmount = round($lineItem['values'][$lineItemId]['tax_amount'], 2);
 
-    // Compare this to what it should be!
-    $this->assertEquals($lineItem_TaxAmount, round($submitParams['tax_amount'], 2), 'Wrong Sales Tax Amount is calculated and stored.');
+    $lineItem_TaxAmount = round($lineItem['tax_amount'], 2);
+
+    $this->assertEquals($lineItem['line_total'], $contribution['total_amount'], 'Contribution total should match line total');
+    $this->assertEquals($lineItem_TaxAmount, round(180 * 16.95 * 0.10, 2), 'Wrong Sales Tax Amount is calculated and stored.');
   }
 
   public function hook_civicrm_alterPaymentProcessorParams($paymentObj, &$rawParams, &$cookedParams) {
