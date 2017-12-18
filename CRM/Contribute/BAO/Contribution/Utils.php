@@ -114,6 +114,9 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $contributionParams['payment_instrument_id'] = $paymentParams['payment_instrument_id'] = $form->_paymentProcessor['payment_instrument_id'];
       }
 
+      // @todo this is the wrong place for this - it should be done as close to form submission
+      // as possible
+      $paymentParams['amount'] = CRM_Utils_Rule::cleanMoney($paymentParams['amount']);
       $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution(
         $form,
         $paymentParams,
@@ -468,15 +471,24 @@ LIMIT 1
    *   Amount of field.
    * @param float $taxRate
    *   Tax rate of selected financial account for field.
+   * @param bool $ugWeDoNotKnowIfItNeedsCleaning_Help
+   *   This should ALWAYS BE FALSE and then be removed. A 'clean' money string uses a standardised format
+   *   such as '1000.99' for one thousand $/Euro/CUR and ninety nine cents/units.
+   *   However, we are in the habit of not necessarily doing that so need to grandfather in
+   *   the new expectation.
    *
    * @return array
    *   array of tax amount
    *
    */
-  public static function calculateTaxAmount($amount, $taxRate) {
+  public static function calculateTaxAmount($amount, $taxRate, $ugWeDoNotKnowIfItNeedsCleaning_Help = FALSE) {
     $taxAmount = array();
+    if ($ugWeDoNotKnowIfItNeedsCleaning_Help) {
+      Civi::log()->warning('Deprecated function, make sure money is in usable format before calling this.', array('civi.tag' => 'deprecated'));
+      $amount = CRM_Utils_Rule::cleanMoney($amount);
+    }
     // There can not be any rounding at this stage - as this is prior to quantity multiplication
-    $taxAmount['tax_amount'] = ($taxRate / 100) * CRM_Utils_Rule::cleanMoney($amount);
+    $taxAmount['tax_amount'] = ($taxRate / 100) * $amount;
 
     return $taxAmount;
   }
