@@ -646,6 +646,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         // update contact information
         $this->updateContactInfo($value);
 
+        if (!empty($value['contribution_check_number'])) {
+          $value['check_number'] = $value['contribution_check_number'];
+        }
         $membershipTypeId = $value['membership_type_id'] = $value['membership_type'][1];
 
         if (!empty($value['send_receipt'])) {
