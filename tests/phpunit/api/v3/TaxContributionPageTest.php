@@ -167,23 +167,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   public function tearDown() {
-    $this->quickCleanup(array(
-      'civicrm_contribution',
-      'civicrm_contribution_soft',
-      'civicrm_event',
-      'civicrm_contribution_page',
-      'civicrm_participant',
-      'civicrm_participant_payment',
-      'civicrm_line_item',
-      'civicrm_financial_trxn',
-      'civicrm_financial_item',
-      'civicrm_entity_financial_trxn',
-      'civicrm_contact',
-      'civicrm_membership',
-      'civicrm_membership_payment',
-      'civicrm_payment_processor',
-    ));
-    CRM_Core_PseudoConstant::flush('taxRates');
+    $this->quickCleanUpFinancialEntities();
   }
 
   public function setUpContributionPage() {
@@ -224,14 +208,20 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Online and offline contrbution from above created contrbution page.
+   * Online and offline contrbution from above created contribution page.
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testCreateContributionOnline() {
+  public function testCreateContributionOnline($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $this->setUpContributionPage();
     $params = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
-      'total_amount' => 100.00,
+      'total_amount' => $this->formatMoneyInput(100.00),
       'financial_type_id' => $this->financialtypeID,
       'contribution_page_id' => $this->_ids['contribution_page'],
       'payment_processor' => $this->_ids['paymentProcessID'],
@@ -254,7 +244,16 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->_checkFinancialRecords($contribution, 'online');
   }
 
-  public function testCreateContributionChainedLineItems() {
+  /**
+   * Create contribution with chained line items.
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
+   */
+  public function testCreateContributionChainedLineItems($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $this->setUpContributionPage();
     $params = array(
       'contact_id' => $this->_individualId,
@@ -321,12 +320,21 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->_checkFinancialRecords($contribution, 'payLater');
   }
 
-  public function testCreateContributionPendingOnline() {
+  /**
+   * Test online pending contributions.
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
+   */
+  public function testCreateContributionPendingOnline($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $this->setUpContributionPage();
     $params = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
-      'total_amount' => 100.00,
+      'total_amount' => $this->formatMoneyInput(100.00),
       'financial_type_id' => $this->financialtypeID,
       'contribution_page_id' => $this->_ids['contribution_page'],
       'trxn_id' => 12345,
@@ -345,6 +353,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['tax_amount'], 20);
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 2);
     $this->_checkFinancialRecords($contribution, 'pending');
+    $this->setCurrencySeparators($thousandSeparator);
   }
 
   /**
