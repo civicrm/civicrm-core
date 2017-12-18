@@ -232,14 +232,18 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       $error = TRUE;
     }
 
-    $this->callAPISuccessGetCount('Contribution', array(
+    $contribution = $this->callAPISuccess('Contribution', 'get', array(
       'contact_id' => $this->_individualId,
       'contribution_status_id' => $error ? 'Failed' : 'Completed',
       'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', array(
         'return' => 'payment_instrument_id',
         'id' => $paymentProcessorID,
        )),
-    ), 1);
+    ));
+
+    $this->assertEquals(1, $contribution["count"], "Contribution count should be one.");
+    $this->assertTrue(!empty($contribution["values"][$contribution["id"]]["receipt_date"]), "Receipt date should not be blank.");
+
     $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $this->_individualId));
     $this->assertTrue(empty($contact['source']));
     if (!$error) {
@@ -1322,6 +1326,55 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     );
     $this->assertEquals(CRM_Utils_Array::value('card_type_id.label', $financialTrxn), 'Visa');
     $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), 4567);
+  }
+
+  /**
+   * Check payment processor is correctly assigned for a contribution page.
+   */
+  public function testContributionBasePreProcess() {
+    //Create contribution page with only pay later enabled.
+    $params = array(
+      'title' => "Test Contribution Page",
+      'financial_type_id' => 1,
+      'currency' => 'NZD',
+      'goal_amount' => 100,
+      'is_pay_later' => 1,
+      'is_monetary' => TRUE,
+      'is_active' => TRUE,
+      'is_email_receipt' => TRUE,
+      'receipt_from_email' => 'yourconscience@donate.com',
+      'receipt_from_name' => 'Ego Freud',
+    );
+
+    $page1 = $this->callAPISuccess("contribution_page", 'create', $params);
+
+    //Execute CRM_Contribute_Form_ContributionBase preProcess
+    //and check the assignment of payment processors
+    $form = new CRM_Contribute_Form_ContributionBase();
+    $form->controller = new CRM_Core_Controller();
+    $form->set('id', $page1['id']);
+    $_REQUEST['id'] = $page1['id'];
+
+    $form->preProcess();
+    $this->assertEquals($form->_paymentProcessor['name'], 'pay_later');
+
+    //Disable all the payment processor for the contribution page.
+    $params['is_pay_later'] = 0;
+    $page2 = $this->callAPISuccess("contribution_page", 'create', $params);
+
+    //Assert an exception is thrown on loading the contribution page.
+    $form = new CRM_Contribute_Form_ContributionBase();
+    $form->controller = new CRM_Core_Controller();
+    $_REQUEST['id'] = $page2['id'];
+    $form->set('id', $page2['id']);
+    try {
+      $form->preProcess();
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertContains("A payment processor configured for this page might be disabled (contact the site administrator for assistance).", $e->getMessage());
+      return;
+    }
+    $this->fail('Exception was expected');
   }
 
   /**

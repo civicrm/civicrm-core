@@ -454,6 +454,9 @@ if (!defined('CIVICRM_CLEANURL')) {
   if ( function_exists('variable_get') && variable_get('clean_url', '0') != '0') {
     define('CIVICRM_CLEANURL', 1 );
   }
+  elseif ( function_exists('config_get') && config_get('system.core', 'clean_url') != 0) {
+    define('CIVICRM_CLEANURL', 1 );
+  }
   else {
     define('CIVICRM_CLEANURL', 0);
   }

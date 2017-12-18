@@ -122,7 +122,7 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
       array('table' => 'civicrm_mailing_event_subscribe', 'column' => 'time_stamp', 'changed' => '4.7.20', 'default' => 'CURRENT_TIMESTAMP', 'jira' => 'CRM-9683', 'comment' => 'When this subscription event occurred.'),
       array('table' => 'civicrm_mailing_event_trackable_url_open', 'column' => 'time_stamp', 'changed' => '4.7.20', 'default' => 'CURRENT_TIMESTAMP', 'jira' => 'CRM-9683', 'comment' => 'When this trackable URL open occurred.'),
       array('table' => 'civicrm_mailing_event_unsubscribe', 'column' => 'time_stamp', 'changed' => '4.7.20', 'default' => 'CURRENT_TIMESTAMP', 'jira' => 'CRM-9683', 'comment' => 'When this delivery event occurred.'),
-      array('table' => 'civicrm_mailing', 'column' => 'created_date', 'changed' => '4.7.20', 'default' => 'CURRENT_TIMESTAMP', 'jira' => 'CRM-9683', 'comment' => 'Date and time this mailing was created.'),
+      array('table' => 'civicrm_mailing', 'column' => 'created_date', 'changed' => '4.7.20', 'jira' => 'CRM-9683', 'comment' => 'Date and time this mailing was created.'),
       array('table' => 'civicrm_mailing', 'column' => 'scheduled_date', 'changed' => '4.7.20', 'jira' => 'CRM-9683', 'comment' => 'Date and time this mailing was scheduled.'),
       array('table' => 'civicrm_mailing', 'column' => 'approval_date', 'changed' => '4.7.20', 'jira' => 'CRM-9683', 'comment' => 'Date and time this mailing was approved.'),
       array('table' => 'civicrm_mailing_abtest', 'column' => 'created_date', 'changed' => '4.7.20', 'default' => 'CURRENT_TIMESTAMP', 'jira' => 'CRM-9683', 'comment' => 'When was this item created'),

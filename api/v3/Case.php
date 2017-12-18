@@ -123,7 +123,7 @@ function civicrm_api3_case_create($params) {
     throw new API_Exception('Case not created. Please check input params.');
   }
 
-  if (isset($params['contact_id'])) {
+  if (isset($params['contact_id']) && !isset($params['id'])) {
     foreach ((array) $params['contact_id'] as $cid) {
       $contactParams = array('case_id' => $caseBAO->id, 'contact_id' => $cid);
       CRM_Case_BAO_CaseContact::create($contactParams);
@@ -170,6 +170,7 @@ function _civicrm_api3_case_create_xmlProcessor($params, $caseBAO) {
     'medium_id' => CRM_Utils_Array::value('medium_id', $params),
     'details' => CRM_Utils_Array::value('details', $params),
     'custom' => array(),
+    'relationship_end_date' => CRM_Utils_Array::value('end_date', $params),
   );
 
   // Do it! :-D
@@ -217,6 +218,7 @@ function _civicrm_api3_case_create_spec(&$params) {
     'description' => 'Contact id of case client(s)',
     'api.required' => 1,
     'type' => CRM_Utils_Type::T_INT,
+    'FKApiName' => 'Contact',
   );
   $params['status_id']['api.default'] = 1;
   $params['status_id']['api.aliases'] = array('case_status');

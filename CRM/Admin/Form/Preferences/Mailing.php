@@ -106,7 +106,13 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
           'html_type' => 'checkbox',
           'title' => ts('Hashed Mailing URL\'s'),
           'weight' => 11,
-          'description' => 'If enabled, a randomized hash key will be used to reference the mailing URL in the mailing.viewUrl token, instead of the mailing ID',
+          'description' => ts('If enabled, a randomized hash key will be used to reference the mailing URL in the mailing.viewUrl token, instead of the mailing ID'),
+        ),
+        'auto_recipient_rebuild' => array(
+          'html_type' => 'checkbox',
+          'title' => ts('Enable automatic CiviMail recipient count display'),
+          'weight' => 12,
+          'description' => ts('Enable this setting to rebuild recipient list automatically during composing mail. Disable will allow you to rebuild recipient manually.'),
         ),
       ),
     );

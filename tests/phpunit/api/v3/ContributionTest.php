@@ -684,6 +684,23 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Create test with unique field name on source.
    */
+  public function testCreateContributionNullOutThankyouDate() {
+
+    $params = $this->_params;
+    $params['thankyou_date'] = 'yesterday';
+
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $contribution = $this->callAPISuccessGetSingle('contribution', array('id' => $contribution['id']));
+    $this->assertEquals(date('Y-m-d', strtotime('yesterday')), date('Y-m-d', strtotime($contribution['thankyou_date'])));
+
+    $params['thankyou_date'] = 'null';
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $contribution = $this->assertTrue(empty($contribution['thankyou_date']));
+  }
+
+  /**
+   * Create test with unique field name on source.
+   */
   public function testCreateContributionSourceInvalidContact() {
 
     $params = array(

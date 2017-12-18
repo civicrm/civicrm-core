@@ -65,11 +65,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   private static $dbInit = FALSE;
 
   /**
-   * Does the current setup support ONLY_FULL_GROUP_BY mode
-   */
-  protected $_supportFullGroupBy;
-
-  /**
    *  Database connection.
    *
    * @var PHPUnit_Extensions_Database_DB_IDatabaseConnection
@@ -295,8 +290,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     //  Get and save a connection to the database
     $this->_dbconn = $this->getConnection();
-
-    $this->_supportFullGroupBy = CRM_Utils_SQL::supportsFullGroupBy();
 
     // reload database before each test
     //        $this->_populateDB();

@@ -156,12 +156,6 @@ class CRM_Core_PseudoConstant {
   private static $greeting;
 
   /**
-   * Default Greetings
-   * @var array
-   */
-  private static $greetingDefaults;
-
-  /**
    * Extensions of type module
    * @var array
    */
@@ -594,6 +588,9 @@ class CRM_Core_PseudoConstant {
     }
     if ($name == 'cache') {
       CRM_Core_OptionGroup::flushAll();
+      if (isset(\Civi::$statics[__CLASS__])) {
+        unset(\Civi::$statics[__CLASS__]);
+      }
     }
   }
 
@@ -778,6 +775,32 @@ WHERE  id = %1";
     }
 
     return self::$stateProvinceAbbreviation;
+  }
+
+  /**
+   * Get all the State/Province abbreviations from the database for the specified country.
+   *
+   * @param int $countryID
+   *
+   * @return array
+   *   array of all State/Province abbreviations for the given country.
+   */
+  public static function stateProvinceAbbreviationForCountry($countryID) {
+    if (!isset(\Civi::$statics[__CLASS__]['stateProvinceAbbreviationForCountry'][$countryID])) {
+      \Civi::$statics[__CLASS__]['stateProvinceAbbreviationForCountry'][$countryID] = array();
+    }
+    self::populate(\Civi::$statics[__CLASS__]['stateProvinceAbbreviationForCountry'][$countryID], 'CRM_Core_DAO_StateProvince', TRUE, 'abbreviation', 'is_active', "country_id = " . (int) $countryID, 'abbreviation');
+    return \Civi::$statics[__CLASS__]['stateProvinceAbbreviationForCountry'][$countryID];
+  }
+
+  /**
+   * Get all the State/Province abbreviations from the database for the default country.
+   *
+   * @return array
+   *   array of all State/Province abbreviations for the given country.
+   */
+  public static function stateProvinceAbbreviationForDefaultCountry() {
+    return CRM_Core_PseudoConstant::stateProvinceAbbreviationForCountry(Civi::settings()->get('defaultContactCountry'));
   }
 
   /**
@@ -1650,6 +1673,10 @@ WHERE  id = %1
    *   array reference of all greetings.
    */
   public static function greeting($filter, $columnName = 'label') {
+    if (!isset(Civi::$statics[__CLASS__]['greeting'])) {
+      Civi::$statics[__CLASS__]['greeting'] = array();
+    }
+
     $index = $filter['greeting_type'] . '_' . $columnName;
 
     // also add contactType to the array
@@ -1658,11 +1685,7 @@ WHERE  id = %1
       $index .= '_' . $contactType;
     }
 
-    if (NULL === self::$greeting) {
-      self::$greeting = array();
-    }
-
-    if (!CRM_Utils_Array::value($index, self::$greeting)) {
+    if (!CRM_Utils_Array::value($index, Civi::$statics[__CLASS__]['greeting'])) {
       $filterCondition = NULL;
       if ($contactType) {
         $filterVal = 'v.filter =';
@@ -1682,40 +1705,10 @@ WHERE  id = %1
         $filterCondition .= "AND (v.filter = 0 OR {$filterVal}) ";
       }
 
-      self::$greeting[$index] = CRM_Core_OptionGroup::values($filter['greeting_type'], NULL, NULL, NULL, $filterCondition, $columnName);
+      Civi::$statics[__CLASS__]['greeting'][$index] = CRM_Core_OptionGroup::values($filter['greeting_type'], NULL, NULL, NULL, $filterCondition, $columnName);
     }
 
-    return self::$greeting[$index];
-  }
-
-  /**
-   * Construct array of default greeting values for contact type.
-   *
-   *
-   * @return array
-   *   array reference of default greetings.
-   */
-  public static function &greetingDefaults() {
-    if (!self::$greetingDefaults) {
-      $defaultGreetings = array();
-      $contactTypes = self::get('CRM_Contact_DAO_Contact', 'contact_type', array(
-          'keyColumn' => 'id',
-          'labelColumn' => 'name',
-        ));
-
-      foreach ($contactTypes as $filter => $contactType) {
-        $filterCondition = " AND (v.filter = 0 OR v.filter = $filter) AND v.is_default = 1 ";
-
-        foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
-          $tokenVal = CRM_Core_OptionGroup::values($greeting, NULL, NULL, NULL, $filterCondition, 'label');
-          $defaultGreetings[$contactType][$greeting] = $tokenVal;
-        }
-      }
-
-      self::$greetingDefaults = $defaultGreetings;
-    }
-
-    return self::$greetingDefaults;
+    return Civi::$statics[__CLASS__]['greeting'][$index];
   }
 
   /**

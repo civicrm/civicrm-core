@@ -67,65 +67,15 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       $this->activeCampaigns = $getCampaigns['campaigns'];
       asort($this->activeCampaigns);
     }
-    $this->_columns = array(
-      'civicrm_contact' => array(
-        'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => $this->getBasicContactFields(),
-        'filters' => array(
-          'sort_name' => array(
-            'title' => ts('Donor Name'),
-            'operator' => 'like',
-          ),
-          'id' => array(
-            'title' => ts('Contact ID'),
-            'no_display' => TRUE,
-            'type' => CRM_Utils_Type::T_INT,
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-        ),
-        'grouping' => 'contact-fields',
-        'order_bys' => array(
-          'sort_name' => array(
-            'title' => ts('Last Name, First Name'),
-            'default' => '1',
-            'default_weight' => '0',
-            'default_order' => 'ASC',
-          ),
-          'first_name' => array(
-            'name' => 'first_name',
-            'title' => ts('First Name'),
-          ),
-          'gender_id' => array(
-            'name' => 'gender_id',
-            'title' => ts('Gender'),
-          ),
-          'birth_date' => array(
-            'name' => 'birth_date',
-            'title' => ts('Birth Date'),
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-        ),
 
-      ),
+    $this->_columns = array_merge($this->getColumns('Contact', array(
+      'order_bys_defaults' => array('sort_name' => 'ASC '),
+      'fields_defaults' => array('sort_name'),
+      'fields_excluded' => array('id'),
+      'fields_required' => array('id'),
+      'filters_defaults' => array('is_deleted' => FALSE),
+      'no_field_disambiguation' => TRUE,
+    )), array(
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
         'fields' => array(
@@ -358,7 +308,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           ),
         ),
       ),
-    ) + $this->addAddressFields(FALSE);
+    )) + $this->addAddressFields(FALSE);
     // The tests test for this variation of the sort_name field. Don't argue with the tests :-).
     $this->_columns['civicrm_contact']['fields']['sort_name']['title'] = ts('Donor Name');
     $this->_groupFilter = TRUE;

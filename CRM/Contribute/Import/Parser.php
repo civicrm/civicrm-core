@@ -125,7 +125,9 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
     $skipColumnHeader = FALSE,
     $mode = self::MODE_PREVIEW,
     $contactType = self::CONTACT_INDIVIDUAL,
-    $onDuplicate = self::DUPLICATE_SKIP
+    $onDuplicate = self::DUPLICATE_SKIP,
+    $statusID = NULL,
+    $totalRowCount = NULL
   ) {
     if (!is_array($fileName)) {
       CRM_Core_Error::fatal();
@@ -165,6 +167,10 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
     $this->_conflicts = array();
     $this->_pledgePaymentErrors = array();
     $this->_softCreditErrors = array();
+    if ($statusID) {
+      $this->progressImport($statusID);
+      $startTimestamp = $currTimestamp = $prevTimestamp = time();
+    }
 
     $this->_fileSize = number_format(filesize($fileName) / 1024.0, 2);
 
@@ -215,6 +221,9 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
       }
       elseif ($mode == self::MODE_IMPORT) {
         $returnCode = $this->import($onDuplicate, $values);
+        if ($statusID && (($this->_lineCount % 50) == 0)) {
+          $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
+        }
       }
       else {
         $returnCode = self::ERROR;

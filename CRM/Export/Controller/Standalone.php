@@ -68,7 +68,8 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
   }
 
   /**
-   *
+   * Export forms are historically tightly coupled to search forms,so this simulates
+   * the output of a search form, with an array of checkboxes for each selected entity.
    *
    * @param string $pageName
    * @return array
@@ -81,6 +82,7 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
         $values[CRM_Core_Form::CB_PREFIX . $id] = 1;
       }
     }
+    // Set the "task" selector value to Export
     $className = 'CRM_' . $this->get('entity') . '_Task';
     foreach ($className::tasks() as $taskId => $task) {
       $taskForm = (array) $task['class'];

@@ -23,6 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-contribute-pcp-userdashboard-pre"}
+{/crmRegion}
 <div class="view-content">
 
 {if $pcpInfo}
@@ -88,3 +90,5 @@
 {/if}
 
 </div>
+{crmRegion name="crm-contribute-pcp-userdashboard-post"}
+{/crmRegion}

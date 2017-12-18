@@ -32,7 +32,7 @@
 {else}
 
   {if $rows}
-    <div id="badge-layout">
+    <div id="badge-layout" class="crm-content-block crm-block">
       {strip}
       {* handle enable/disable actions*}
         {include file="CRM/common/enableDisableApi.tpl"}

@@ -456,7 +456,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           if (!empty($qf->_quickConfig) && $field->name == 'contribution_amount') {
             $extra += array('onclick' => 'clearAmountOther();');
           }
-          elseif (!empty($qf->_quickConfig) && $field->name == 'membership_amount') {
+          if ($field->name == 'membership_amount') {
             $extra += array(
               'onclick' => "return showHideAutoRenew({$opt['membership_type_id']});",
               'membership-type' => $opt['membership_type_id'],
@@ -836,8 +836,16 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
       list($componentName) = explode(':', $fields['_qf_default']);
       // now we have all selected amount in hand.
       $totalAmount = array_sum($selectedAmounts);
+      // The form offers a field to enter the amount paid. This may differ from the amount that is due to complete the purchase
+      $totalPaymentAmountEnteredOnForm = CRM_Utils_Array::value('partial_payment_total', $fields, CRM_Utils_Array::value('total_amount', $fields));
       if ($totalAmount < 0) {
         $error['_qf_default'] = ts('%1 amount can not be less than zero. Please select the options accordingly.', array(1 => $componentName));
+      }
+      elseif ($totalAmount > 0 &&
+        $totalPaymentAmountEnteredOnForm >= $totalAmount && // if total amount is equal to all selected amount in hand
+        (CRM_Utils_Array::value('contribution_status_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Partially paid'))
+      ) {
+        $error['total_amount'] = ts('You have specified the status Partially Paid but have entered an amount that equals or exceeds the amount due. Please adjust the status of the payment or the amount');
       }
     }
     else {

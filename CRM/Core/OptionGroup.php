@@ -676,6 +676,12 @@ WHERE  v.option_group_id = g.id
     );
   }
 
+  /**
+   * Flush all the places where option values are cached.
+   *
+   * Note that this is called from CRM_Core_PseudoConstant::flush() so we should resist
+   * the intuitive urge to flush that class.
+   */
   public static function flushAll() {
     self::$_values = array();
     self::$_cache = array();

@@ -31,7 +31,7 @@
 </div>
 
 {if $rows}
-<div id="membership_type">
+<div id="membership_type" class="crm-content-block crm-block">
   {strip}
   {* handle enable/disable actions*}
   {include file="CRM/common/enableDisableApi.tpl"}

@@ -34,7 +34,7 @@
     {ts 1=$pathsURL 2=$urlsURL}The old paths and URLs may be retained in some database records. Use this form to clear caches or to reset paths to their defaults. If you need further customizations, then update the <a href="%1">Directories</a> and <a href="%2">Resource URLs</a>.{/ts}
     </p>
 </div>
-        <div>
+        <div class="crm-submit-buttons">
           <span class="crm-button crm-i-button">
             <i class="crm-i fa-undo"></i>
             {$form._qf_UpdateConfigBackend_next_cleanup.html}

@@ -967,4 +967,24 @@ return array(
     'description' => 'When enabled, any filter settings a user selects on the contact\'s Activity tab will be remembered as they visit other contacts',
     'help_text' => NULL,
   ),
+  'do_not_notify_assignees_for' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'do_not_notify_assignees_for',
+    'type' => 'Array',
+    'add' => '4.7',
+    'is_domain' => 1,
+    'default' => array(),
+    'title' => 'Do not notify assignees for',
+    'help_text' => 'These activity types will be excluded from automated email notifications to assignees.',
+    'html_type' => 'Select',
+    'html_attributes' => array(
+      'multiple' => 1,
+      'class' => 'huge crm-select2',
+    ),
+    'pseudoconstant' => array(
+      'optionGroupName' => 'activity_type',
+    ),
+    'quick_form_type' => 'Select',
+  ),
 );

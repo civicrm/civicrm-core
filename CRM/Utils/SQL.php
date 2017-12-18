@@ -69,11 +69,22 @@ class CRM_Utils_SQL {
   }
 
   /**
-   * Does this System support the MYSQL mode ONLY_FULL_GROUP_BY
+   * Checks if this system enforce the MYSQL mode ONLY_FULL_GROUP_BY.
+   * This function should be named supportsAnyValueAndEnforcesFullGroupBY(),
+   * but should be deprecated instead.
+   *
    * @return mixed
+   * @deprecated
    */
   public static function supportsFullGroupBy() {
-    return version_compare(CRM_Core_DAO::singleValueQuery('SELECT VERSION()'), '5.7', '>=');
+    // CRM-21455 MariaDB 10.2 does not support ANY_VALUE
+    $version = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+
+    if (stripos($version, 'mariadb') !== FALSE) {
+      return FALSE;
+    }
+
+    return version_compare($version, '5.7', '>=');
   }
 
   /**

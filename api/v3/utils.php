@@ -1685,6 +1685,12 @@ function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
   if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
     return;
   }
+
+  if ($fieldValue === 'null' && empty($fieldInfo['api.required'])) {
+    // This is the wierd & wonderful way PEAR sets null.
+    return;
+  }
+
   //should we check first to prevent it from being copied if they have passed in sql friendly format?
   if (!empty($params[$fieldInfo['name']])) {
     $fieldValue = _civicrm_api3_getValidDate($fieldValue, $fieldInfo['name'], $fieldInfo['type']);
@@ -2274,7 +2280,7 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
   if (is_array($fieldValue)) {
     foreach ($fieldValue as &$value) {
       if (!is_array($value)) {
-        _civicrm_api3_api_match_pseudoconstant_value($value, $options, $fieldName);
+        _civicrm_api3_api_match_pseudoconstant_value($value, $options, $fieldName, CRM_Utils_Array::value('api.required', $fieldInfo));
       }
     }
     // TODO: unwrap the call to implodePadded from the conditional and do it always
@@ -2285,7 +2291,7 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
     }
   }
   else {
-    _civicrm_api3_api_match_pseudoconstant_value($fieldValue, $options, $fieldName);
+    _civicrm_api3_api_match_pseudoconstant_value($fieldValue, $options, $fieldName, CRM_Utils_Array::value('api.required', $fieldInfo));
   }
 }
 
@@ -2295,10 +2301,14 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
  * @param string $value field value
  * @param array $options array of options for this field
  * @param string $fieldName field name used in api call (not necessarily the canonical name)
+ * @param bool $isRequired
+ *   Is this a required field or is 'null' an acceptable option. We allow 'null' last
+ *   in case we have the weird situation of it being a valid option in which case our
+ *   brains will probably explode.
  *
  * @throws API_Exception
  */
-function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldName) {
+function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldName, $isRequired) {
   // If option is a key, no need to translate
   // or if no options are avaiable for pseudoconstant 'table' property
   if (array_key_exists($value, $options) || !$options) {
@@ -2317,6 +2327,10 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
   $options = array_map("strtolower", $options);
   $newValue = array_search($newValue, $options);
   if ($newValue === FALSE) {
+    if ($value === 'null' && !$isRequired) {
+      // CiviMagic syntax for Nulling out the field - let it through.
+      return;
+    }
     throw new API_Exception("'$value' is not a valid option for field $fieldName", 2001, array('error_field' => $fieldName));
   }
   $value = $newValue;

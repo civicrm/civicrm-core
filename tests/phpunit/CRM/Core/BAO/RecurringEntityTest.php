@@ -106,6 +106,69 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
   }
 
   /**
+   * Creating action schedule
+   */
+  private function createActionSchedule($entity_id, $entity_table) {
+    $params = array(
+      "used_for" => $entity_table,
+      "entity_value" => $entity_id,
+      "start_action_date" => date("YmdHis"),
+      "repetition_frequency_unit" => "week",
+      "repetition_frequency_interval" => "3",
+      "start_action_condition" => "monday,tuesday,wednesday,thursday,friday,saturday",
+      "start_action_offset" => "2",
+    );
+    $actionScheduleObj = CRM_Core_BAO_ActionSchedule::add($params);
+    return $actionScheduleObj;
+  }
+
+  /**
+   * Creating recurring entities
+   */
+  private function createRecurringEntities($actionScheduleObj, $entity_id, $entity_table) {
+    $recursion = new CRM_Core_BAO_RecurringEntity();
+    $recursion->dateColumns = array(
+      "start_date",
+    );
+    $recursion->scheduleId = $actionScheduleObj->id;
+    $recursion->entity_id = $entity_id;
+    $recursion->entity_table = $entity_table;
+    $recursion->linkedEntities = array(
+      array(
+        "table"          => "civicrm_price_set_entity",
+        "findCriteria"   => array(
+          "entity_id"    => $entity_id,
+          "entity_table" => $entity_table,
+        ),
+        "linkedColumns"  => array(
+          "entity_id",
+        ),
+        "isRecurringEntityRecord" => FALSE,
+      ),
+    );
+    return $recursion->generate();
+  }
+
+  /**
+   * Testing Event Generation through Entity Recursion.
+   */
+  public function testRepeatEventCreation() {
+    $event = $this->eventCreate();
+    $entity_table = "civicrm_event";
+    $entity_id = $event["id"];
+    CRM_Price_BAO_PriceSet::addTo($entity_table, $entity_id, 1);
+    $actionScheduleObj = $this->createActionSchedule($entity_id, $entity_table);
+    $recurringEntities = $this->createRecurringEntities($actionScheduleObj, $entity_id, $entity_table);
+    $finalResult = CRM_Core_BAO_RecurringEntity::updateModeAndPriceSet($entity_id, $entity_table, CRM_Core_BAO_RecurringEntity::MODE_ALL_ENTITY_IN_SERIES, array(), 2);
+    $this->assertEquals(2, count($recurringEntities["civicrm_event"]), "Recurring events not created.");
+    $this->assertEquals(2, count($recurringEntities["civicrm_price_set_entity"]), "Recurring price sets not created.");
+    $priceSetOne = CRM_Price_BAO_PriceSet::getFor($entity_table, $recurringEntities["civicrm_price_set_entity"][0]);
+    $priceSetTwo = CRM_Price_BAO_PriceSet::getFor($entity_table, $recurringEntities["civicrm_price_set_entity"][1]);
+    $this->assertEquals(2, $priceSetOne, "Price set id of the recurring event is not updated.");
+    $this->assertEquals(2, $priceSetTwo, "Price set id of the recurring event is not updated.");
+  }
+
+  /**
    * Testing Event Generation through Entity Recursion.
    */
   public function testEventGeneration() {

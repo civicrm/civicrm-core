@@ -31,7 +31,6 @@
             <div class="description font-italic">
                 {ts}Complete OR partial Contribution Page title.{/ts}
             </div>
-            <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
         </td>
 
         <td>
@@ -51,4 +50,5 @@
     campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
 
  </table>
+ <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 </div>

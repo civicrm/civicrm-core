@@ -646,9 +646,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
-  public function postProcess() {
-    $this->beginPostProcess();
-
+  public function beginPostProcessCommon() {
     $originalRelationshipTypeIdValue = CRM_Utils_Array::value('relationship_type_id_value', $this->_params);
     if ($originalRelationshipTypeIdValue) {
       $relationshipTypes = array();
@@ -663,11 +661,16 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       $this->relationType = $direction[0];
       $this->_params['relationship_type_id_value'] = $relationshipTypes;
     }
+  }
+
+  public function postProcess() {
+    $this->beginPostProcess();
 
     $this->buildACLClause(array(
       $this->_aliases['civicrm_contact'],
       $this->_aliases['civicrm_contact_b'],
     ));
+
     $sql = $this->buildQuery();
     $this->buildRows($sql, $rows);
 

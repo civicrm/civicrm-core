@@ -712,10 +712,12 @@ ORDER BY   {$orderBy}
   }
 
   /**
-   *
    * Prepares the text and html templates
    * for generating the emails and returns a copy of the
    * prepared templates
+   *
+   * @deprecated
+   *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
    */
   private function getPreparedTemplates() {
     if (!$this->preparedTemplates) {
@@ -794,7 +796,7 @@ ORDER BY   {$orderBy}
       }
 
       // To check for an html part strip tags
-      if (trim(strip_tags($this->body_html))) {
+      if (trim(strip_tags($this->body_html, '<img>'))) {
 
         $template = array();
         if ($this->header) {
@@ -1166,6 +1168,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * Compose a message.
    *
+   * @deprecated
+   *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
    * @param int $job_id
    *   ID of the Job associated with this message.
    * @param int $event_queue_id
@@ -1434,6 +1438,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * Get mailing object and replaces subscribeInvite, domain and mailing tokens.
    *
+   * @deprecated
+   *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
    * @param CRM_Mailing_BAO_Mailing $mailing
    */
   public static function tokenReplace(&$mailing) {
@@ -1456,6 +1462,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
   /**
    * Get data to resolve tokens.
+   *
+   * @deprecated
+   *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
    *
    * @param array $token_a
    * @param bool $html
@@ -1808,6 +1817,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
+   * @deprecated
+   *   This is used by CiviMail but will be made redundant by FlexMailer.
    * @param CRM_Mailing_DAO_Mailing $mailing
    *   The mailing which may or may not be sendable.
    * @return array
@@ -2672,6 +2683,8 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
+   * @deprecated
+   *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
    * @return array
    */
   public function getReturnProperties() {

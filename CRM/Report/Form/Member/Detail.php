@@ -29,18 +29,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
  */
 class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
-
-  protected $_addressField = FALSE;
-
-  protected $_emailField = FALSE;
-
-  protected $_phoneField = FALSE;
-
-  protected $_contribField = FALSE;
 
   protected $_summary = NULL;
 
@@ -66,7 +56,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
    *
    * @var bool
    */
-  protected $groupFilterNotOptimised = TRUE;
+  protected $groupFilterNotOptimised = FALSE;
 
   /**
    * Class constructor.
@@ -283,39 +273,10 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     parent::preProcess();
   }
 
-  public function select() {
-    $select = $this->_columnHeaders = array();
-
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('fields', $table)) {
-        foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
-            if ($tableName == 'civicrm_email') {
-              $this->_emailField = TRUE;
-            }
-            elseif ($tableName == 'civicrm_phone') {
-              $this->_phoneField = TRUE;
-            }
-            elseif ($tableName == 'civicrm_contribution') {
-              $this->_contribField = TRUE;
-            }
-            $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-            if (array_key_exists('title', $field)) {
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
-            }
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-          }
-        }
-      }
-    }
-
-    $this->_selectClauses = $select;
-    $this->_select = "SELECT " . implode(', ', $select) . " ";
-  }
-
   public function from() {
-    $this->_from = "
-         FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
+    $this->setFromBase('civicrm_contact');
+    $this->_from .= "
+         {$this->_aclFrom}
                INNER JOIN civicrm_membership {$this->_aliases['civicrm_membership']}
                           ON {$this->_aliases['civicrm_contact']}.id =
                              {$this->_aliases['civicrm_membership']}.contact_id AND {$this->_aliases['civicrm_membership']}.is_test = 0
@@ -331,8 +292,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
                           {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }
 
-    //used when email field is selected
-    if ($this->_emailField) {
+    if ($this->isTableSelected('civicrm_email')) {
       $this->_from .= "
               LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
                         ON {$this->_aliases['civicrm_contact']}.id =
@@ -340,7 +300,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
                            {$this->_aliases['civicrm_email']}.is_primary = 1\n";
     }
     //used when phone field is selected
-    if ($this->_phoneField) {
+    if ($this->isTableSelected('civicrm_phone')) {
       $this->_from .= "
               LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
                         ON {$this->_aliases['civicrm_contact']}.id =
@@ -348,14 +308,12 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
                            {$this->_aliases['civicrm_phone']}.is_primary = 1\n";
     }
     //used when contribution field is selected.
-    if ($this->_contribField) {
-      $contribution_table_join = $this->contributionTableJoin();
+    if ($this->isTableSelected('civicrm_contribution')) {
       $this->_from .= "
-             LEFT JOIN $contribution_table_join as max_payment
-                 ON max_payment.entity_id = {$this->_aliases['civicrm_membership']}.id
+             LEFT JOIN civicrm_membership_payment cmp
+                 ON {$this->_aliases['civicrm_membership']}.id = cmp.membership_id
              LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                 ON max_payment.contact_id = {$this->_aliases['civicrm_contribution']}.contact_id
-                 AND max_payment.receive_date = {$this->_aliases['civicrm_contribution']}.receive_date\n";
+                 ON cmp.contribution_id={$this->_aliases['civicrm_contribution']}.id\n";
     }
   }
 
@@ -486,43 +444,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         break;
       }
     }
-  }
-
-  /**
-   * Create temporary table to get most recent
-   * contribution for each contact and membership type.
-   *
-   * @return string $tempTable.
-   */
-  public function contributionTableJoin() {
-    static $tempTable = NULL;
-    if (!empty($tempTable)) {
-      return $tempTable;
-    }
-    $params = $this->_params;
-    $receive_date_relative = empty($params['receive_date_relative']) ? '' : $params['receive_date_relative'];
-    $receive_date_from = empty($params['receive_date_from']) ? '' : $params['receive_date_from'];
-    $receive_date_to = empty($params['receive_date_to']) ? '' : $params['receive_date_to'];
-    $dateFilter = parent::dateClause('receive_date', $receive_date_relative,
-      $receive_date_from, $receive_date_to);
-    if ($dateFilter) {
-      $dateWhere = 'AND ' . str_replace('receive_date', 'cc.receive_date', $dateFilter);
-    }
-    else {
-      $dateWhere = '';
-    }
-    $tempTable = CRM_Core_DAO::createTempTableName('civicrm_report_memcontr', TRUE);
-    $sql = "
-      CREATE TEMPORARY TABLE $tempTable (INDEX (entity_id, contact_id, receive_date))
-      SELECT cc.contact_id, max(cc.receive_date) as receive_date, cmp.membership_id as entity_id
-      FROM civicrm_membership_payment cmp
-      INNER JOIN civicrm_contribution cc
-      ON cc.id = cmp.contribution_id
-      WHERE cc.is_test = 0
-      $dateWhere
-      GROUP BY cmp.membership_id";
-    CRM_Core_DAO::executeQuery($sql);
-    return $tempTable;
   }
 
 }
