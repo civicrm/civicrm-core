@@ -602,16 +602,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
    * Get permission relevant clauses.
-   * CRM-12209
-   *
-   * @param bool $force
    *
    * @return array
    */
-  public static function getPermissionClause($force = FALSE) {
-    static $clause = 1;
-    static $retrieved = FALSE;
-    if (!$retrieved || $force) {
+  public static function getPermissionClause() {
+    if (!isset(Civi::$statics[__CLASS__]['permission_clause'])) {
       if (CRM_Core_Permission::check('view all contacts') || CRM_Core_Permission::check('edit all contacts')) {
         $clause = 1;
       }
@@ -626,9 +621,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           $clause = '1 = 0';
         }
       }
+      Civi::$statics[__CLASS__]['permission_clause'] = $clause;
     }
-    $retrieved = TRUE;
-    return $clause;
+    return Civi::$statics[__CLASS__]['permission_clause'];
   }
 
   /**
@@ -642,6 +637,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       'CRM_Core_PseudoConstant' => 'groups',
       'CRM_ACL_API' => 'group_permission',
       'CRM_ACL_BAO_ACL' => 'permissioned_groups',
+      'CRM_Contact_BAO_Group' => 'permission_clause',
     );
     foreach ($staticCaches as $class => $key) {
       if (isset(Civi::$statics[$class][$key])) {
