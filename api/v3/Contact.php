@@ -153,6 +153,12 @@ function _civicrm_api3_contact_create_spec(&$params) {
     'description' => 'Throw error if contact create matches dedupe rule',
     'type' => CRM_Utils_Type::T_BOOLEAN,
   );
+  $params['skip_greeting_processing'] = array(
+    'title' => 'Skip Greeting processing',
+    'description' => 'Do not process greetings, (these can be done by scheduled job and there may be a preference to do so for performance reasons)',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => 0,
+  );
   $params['prefix_id']['api.aliases'] = array('individual_prefix', 'individual_prefix_id');
   $params['suffix_id']['api.aliases'] = array('individual_suffix', 'individual_suffix_id');
   $params['gender_id']['api.aliases'] = array('gender');
