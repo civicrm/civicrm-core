@@ -595,12 +595,9 @@ class InstallRequirements {
 
     $this->errors = NULL;
 
-    // See also: CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER
-    $this->requirePHPVersion('5.3.4', array(
+    $this->requirePHPVersion(array(
       ts("PHP Configuration"),
       ts("PHP5 installed"),
-      NULL,
-      ts("PHP version %1", array(1 => phpversion())),
     ));
 
     // Check that we can identify the root folder successfully
@@ -860,36 +857,30 @@ class InstallRequirements {
   }
 
   /**
-   * @param $minVersion
-   * @param $testDetails
-   * @param null $maxVersion
+   * @param array $testDetails
+   * @return bool
    */
-  public function requirePHPVersion($minVersion, $testDetails, $maxVersion = NULL) {
+  public function requirePHPVersion($testDetails) {
 
     $this->testing($testDetails);
 
     $phpVersion = phpversion();
-    $aboveMinVersion = version_compare($phpVersion, $minVersion) >= 0;
-    $belowMaxVersion = $maxVersion ? version_compare($phpVersion, $maxVersion) < 0 : TRUE;
+    $aboveMinVersion = version_compare($phpVersion, CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER) >= 0;
 
-    if ($aboveMinVersion && $belowMaxVersion) {
-      if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) < 0) {
-        $testDetails[2] = ts('This webserver is running an outdated version of PHP (%1). It is strongly recommended to upgrade to PHP %2 or later, as older versions can present a security risk.', array(
-          1 => phpversion(),
+    if ($aboveMinVersion) {
+      if (version_compare($phpVersion, CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) < 0) {
+        $testDetails[2] = ts('This webserver is running an outdated version of PHP (%1). It is strongly recommended to upgrade to PHP %2 or later, as older versions can present a security risk. The preferred version is %3.', array(
+          1 => $phpVersion,
           2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+          3 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
         ));
         $this->warning($testDetails);
       }
       return TRUE;
     }
 
-    if (!$testDetails[2]) {
-      if (!$aboveMinVersion) {
-        $testDetails[2] = ts("You need PHP version %1 or later, only %2 is installed. Please upgrade your server, or ask your web-host to do so.", array(1 => $minVersion, 2 => $phpVersion));
-      }
-      else {
-        $testDetails[2] = ts("PHP version %1 is not supported. PHP version earlier than %2 is required. You might want to downgrade your server, or ask your web-host to do so.", array(1 => $maxVersion, 2 => $phpVersion));
-      }
+    if (empty($testDetails[2])) {
+      $testDetails[2] = ts("You need PHP version %1 or later, only %2 is installed. Please upgrade your server, or ask your web-host to do so.", array(1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER, 2 => $phpVersion));
     }
 
     $this->error($testDetails);
