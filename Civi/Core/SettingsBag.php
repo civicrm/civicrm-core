@@ -352,9 +352,11 @@ class SettingsBag {
     }
     $dao->find(TRUE);
 
-    // string comparison with 0 always return true, so to be ensure the type use ===
-    // ref - https://stackoverflow.com/questions/8671942/php-string-comparasion-to-0-integer-returns-true
-    if (isset($metadata['on_change']) && !($value === 0 && ($dao->value === NULL || unserialize($dao->value) == 0))) {
+    // Call 'on_change' listeners. It would be nice to only fire when there's
+    // a genuine change in the data. However, PHP developers have mixed
+    // expectations about whether 0, '0', '', NULL, and FALSE represent the same
+    // value, so there's no universal way to determine if a change is genuine.
+    if (isset($metadata['on_change'])) {
       foreach ($metadata['on_change'] as $callback) {
         call_user_func(
           \Civi\Core\Resolver::singleton()->get($callback),
