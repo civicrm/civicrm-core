@@ -1018,12 +1018,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *   parameters for civicrm_contact_add api function call
    * @param int $seq
    *   sequence number if creating multiple individuals
+   * @param bool $random
    *
    * @return int
    *   id of Individual created
    */
-  public function individualCreate($params = array(), $seq = 0) {
-    $params = array_merge($this->sampleContact('Individual', $seq), $params);
+  public function individualCreate($params = array(), $seq = 0, $random = FALSE) {
+    $params = array_merge($this->sampleContact('Individual', $seq, $random), $params);
     return $this->_contactCreate($params);
   }
 
@@ -1054,7 +1055,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return array
    *   properties of sample contact (ie. $params for API call)
    */
-  public function sampleContact($contact_type, $seq = 0) {
+  public function sampleContact($contact_type, $seq = 0, $random = FALSE) {
     $samples = array(
       'Individual' => array(
         // The number of values in each list need to be coprime numbers to not have duplicates
@@ -1078,6 +1079,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $params = array('contact_type' => $contact_type);
     foreach ($samples[$contact_type] as $key => $values) {
       $params[$key] = $values[$seq % count($values)];
+      if ($random) {
+        $params[$key] .= substr(sha1(rand()), 0, 5);
+      }
     }
     if ($contact_type == 'Individual') {
       $params['email'] = strtolower(
@@ -1870,13 +1874,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param int $groupID
    * @param int $totalCount
+   * @param bool $random
    * @return int
    *    groupId of created group
    */
-  public function groupContactCreate($groupID, $totalCount = 10) {
+  public function groupContactCreate($groupID, $totalCount = 10, $random = FALSE) {
     $params = array('group_id' => $groupID);
     for ($i = 1; $i <= $totalCount; $i++) {
-      $contactID = $this->individualCreate();
+      $contactID = $this->individualCreate(array(), 0, $random);
       if ($i == 1) {
         $params += array('contact_id' => $contactID);
       }

@@ -121,8 +121,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
    * @dataProvider groupPctProvider
    */
   public function testDistribution($totalGroupContacts, $groupPct, $expectedCountA, $expectedCountB, $expectedCountC) {
-
-    $result = $this->groupContactCreate($this->_groupID, $totalGroupContacts);
+    $result = $this->groupContactCreate($this->_groupID, $totalGroupContacts, TRUE);
     $this->assertEquals($totalGroupContacts, $result['added'], "in line " . __LINE__);
 
     $params = $this->_params;

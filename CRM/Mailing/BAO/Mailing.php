@@ -306,7 +306,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
       $orderBy = array("MIN(i.contact_id)", "MIN(i.$tempColumn)");
       $query = $query->join('e', " INNER JOIN civicrm_email e ON e.id = i.email_id ")->groupBy("e.email");
       if (CRM_Utils_SQL::supportsFullGroupBy()) {
-        $selectClause[] = "e.email";
+        $selectClause = array('#mailingID', 'ANY_VALUE(i.contact_id) contact_id', "ANY_VALUE(i.$tempColumn) $tempColumn", "e.email");
       }
     }
 
