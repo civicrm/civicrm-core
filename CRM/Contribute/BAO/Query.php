@@ -817,6 +817,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         'fee_amount' => 1,
         // another
         'net_amount' => 1,
+        'tax_amount' => 1,
         // expensive
         'trxn_id' => 1,
         // join
