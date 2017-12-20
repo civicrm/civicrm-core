@@ -1173,9 +1173,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @return string
    */
   private static function formatDisplayValue($value, $field, $entityId = NULL) {
-
+    // Unserialize string to array
     if (self::isSerialized($field) && !is_array($value)) {
-      $value = CRM_Utils_Array::explodePadded($value);
+      $value = CRM_Core_DAO::unSerializeField($value, self::isSerialized($field));
     }
     // CRM-12989 fix
     if ($field['html_type'] == 'CheckBox') {
@@ -2415,17 +2415,17 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
   }
 
   /**
-   * Does this field store a serialized string?
+   * If this field stores a serialized string, returns the serialization method.
    *
-   * @param array $field
+   * @param array|object $field
    *
-   * @return bool
+   * @return int|null
    */
   public static function isSerialized($field) {
     // Fields retrieved via api are an array, or from the dao are an object. We'll accept either.
-    $field = (array) $field;
+    $htmlType = is_object($field) ? $field->html_type : $field['html_type'];
     // FIXME: Currently the only way to know if data is serialized is by looking at the html_type. It would be cleaner to decouple this.
-    return ($field['html_type'] == 'CheckBox' || strpos($field['html_type'], 'Multi') !== FALSE);
+    return ($htmlType == 'CheckBox' || strpos($htmlType, 'Multi') !== FALSE) ? CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND : NULL;
   }
 
   /**
