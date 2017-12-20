@@ -294,6 +294,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->_fields = $this->get('fields');
     $this->_bltID = $this->get('bltID');
     $this->_paymentProcessor = $this->get('paymentProcessor');
+    if (!$this->_paymentProcessor) {
+      $this->_paymentProcessor = array('object' => Civi\Payment\System::singleton()->getById(0));
+    }
     $this->_priceSetId = $this->get('priceSetId');
     $this->_priceSet = $this->get('priceSet');
 

@@ -297,7 +297,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // lineItem isn't set until Register postProcess
     $this->_lineItem = $this->get('lineItem');
     $this->_ccid = $this->get('ccid');
-    $this->_paymentProcessor = $this->get('paymentProcessor');
+
     $this->_params = $this->controller->exportValues('Main');
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->get('amount');
