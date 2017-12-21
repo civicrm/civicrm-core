@@ -769,7 +769,7 @@ ORDER BY   {$orderBy}
     if (!$this->templates) {
       $this->getHeaderFooter();
       $this->templates = array();
-      if ($this->body_text) {
+      if ($this->body_text || !empty($this->header)) {
         $template = array();
         if (!empty($this->header->body_text)) {
           $template[] = $this->header->body_text;
@@ -778,7 +778,12 @@ ORDER BY   {$orderBy}
           $template[] = CRM_Utils_String::htmlToText($this->header->body_html);
         }
 
-        $template[] = $this->body_text;
+        if ($this->body_text) {
+          $template[] = $this->body_text;
+        }
+        else {
+          $template[] = CRM_Utils_String::htmlToText($this->body_html);
+        }
 
         if (!empty($this->footer->body_text)) {
           $template[] = $this->footer->body_text;
@@ -806,6 +811,12 @@ ORDER BY   {$orderBy}
 
         $this->templates['html'] = implode("\n", $template);
 
+        // this is where we create a text template from the html template if the text template did not exist
+        // this way we ensure that every recipient will receive an email even if the pref is set to text and the
+        // user uploads an html email only
+        if (empty($this->templates['text'])) {
+          $this->templates['text'] = CRM_Utils_String::htmlToText($this->templates['html']);
+        }
       }
 
       if ($this->subject) {
@@ -1269,6 +1280,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         array_push($pEmail, $template[($idx + 1)]);
       }
     }
+
     $html = NULL;
     if (isset($pEmails['html']) && is_array($pEmails['html']) && count($pEmails['html'])) {
       $html = &$pEmails['html'];
@@ -1296,33 +1308,15 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     $mailParams = $headers;
-
-    // If we should be sending a text version of the email
-    if (($test || $contact['preferred_mail_format'] == 'Text' ||
+    if ($text && ($test || $contact['preferred_mail_format'] == 'Text' ||
         $contact['preferred_mail_format'] == 'Both' ||
         ($contact['preferred_mail_format'] == 'HTML' && !array_key_exists('html', $pEmails))
       )
     ) {
-
-      // The following if elseif allows us to ensure that people who have a
-      // preference for text emails will get one even when the person composing
-      // the email has not uploaded a text version.
-
-      if ($text) {
-        // If the text version exists, use it
-        $textBody = implode('', $text);
-      }
-      elseif ($html) {
-        // Else if it doesn't exist and the html version exists, use it
-        $textBody = implode('', $html);
-        $textBody = htmlspecialchars_decode(htmlspecialchars_decode($textBody)); // Some &s have become 'really encoded'
-        $textBody = CRM_Utils_String::htmlToText($textBody);
-      }
-
+      $textBody = implode('', $text);
       if ($useSmarty) {
         $textBody = $smarty->fetch("string:$textBody");
       }
-
       $mailParams['text'] = $textBody;
     }
 
@@ -1346,6 +1340,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $res = NULL;
       return $res;
     }
+
     $mailParams['attachments'] = $attachments;
 
     $mailParams['Subject'] = CRM_Utils_Array::value('subject', $pEmails);
