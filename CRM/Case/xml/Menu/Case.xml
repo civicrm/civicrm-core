@@ -136,11 +136,4 @@
     <path>civicrm/ajax/delcaserole</path>
     <page_callback>CRM_Case_Page_AJAX::deleteCaseRoles</page_callback>
   </item>
-  <item>
-    <path>civicrm/case/add-contact</path>
-    <page_callback>CRM_Case_Form_AddContact</page_callback>
-    <title>AddContact</title>
-    <access_arguments>access CiviCRM</access_arguments>
-    <page_type>0</page_type>
-  </item>
 </menu>
