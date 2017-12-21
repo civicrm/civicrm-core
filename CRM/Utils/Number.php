@@ -89,7 +89,6 @@ class CRM_Utils_Number {
     if ($size) {
       $last = strtolower($size{strlen($size) - 1});
       $size = (int)$size;
-      
       switch ($last) {
         // The 'G' modifier is available since PHP 5.1.0
 
