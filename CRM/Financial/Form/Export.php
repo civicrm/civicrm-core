@@ -61,6 +61,11 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
   protected $_exportFormat;
 
   /**
+   * Download export File.
+   */
+  protected $_downloadFile = TRUE;
+
+  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
@@ -175,7 +180,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
       CRM_Batch_BAO_Batch::create($batchParams);
     }
 
-    CRM_Batch_BAO_Batch::exportFinancialBatch($batchIds, $this->_exportFormat);
+    CRM_Batch_BAO_Batch::exportFinancialBatch($batchIds, $this->_exportFormat, $this->_downloadFile);
   }
 
 }
