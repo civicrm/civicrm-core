@@ -127,7 +127,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         ";" .
         "Sample Header for TEXT formatted content.\n" . // Default header
         "BEWARE children need regular infusions of toys. Santa knows your .*\\. There is no http.*civicrm/mailing/optout.*\\.\n" .
-        "Unsubscribe: http.*civicrm/mailing/optout" . // Default footer
+        "to unsubscribe: http.*civicrm/mailing/optout" . // Default footer
         ";",
         $message->body->text
       );
@@ -156,26 +156,29 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertEquals('html', $htmlPart->subType);
       $this->assertRegExp(
         ";" .
-        "<p>Sample Header for HTML formatted content\.</p>.*" . // Default header
+        "Sample Header for HTML formatted content.\n" . // Default header
         // FIXME: CiviMail puts double " after hyperlink!
-        "<p>You can go to <a href=\"http://example.net/first\\?cs=[0-9a-f_]+\"\"?>Google</a> or <a href=\"http.*civicrm/mailing/optout.*\">opt out</a>.</p>.*" . // body_html
-        "<p>Sample Footer for HTML formatted content\.</p>.*" . // Default footer
+        "<p>You can go to <a href=\"http://example.net/first\\?cs=[0-9a-f_]+\"\"?>Google</a> or <a href=\"http.*civicrm/mailing/optout.*\">opt out</a>.</p>\n" . // body_html
+        "Sample Footer for HTML formatted content" . // Default footer
+        ".*\n" .
         "<img src=\".*extern/open.php.*\"" .
-        ";s",
+        ";",
         $htmlPart->text
       );
+
       $this->assertEquals('plain', $textPart->subType);
       $this->assertRegExp(
         ";" .
-        "Sample Header for HTML formatted content\\..*" . // Default header (converted from HTML as it was not supplied)
-        "You can go to Google \\[1\\] or opt out \\[2\\]\\..*" . //  Text body (converted from HTML as it was not supplied)
-        "Sample Footer for HTML formatted content\..*" . // Footer footer (converted from HTML as it was not supplied)
-        "Unsubscribe \\[2\\]\\..*" . //  Text body (converted from HTML as it was not supplied)
-        "Links:.*" .
-        "------.*" .
-        "\\[1\\] http://example.net/first\\?cs=[0-9a-f_]+.*" .
-        "\\[2\\] http.*civicrm/mailing/optout.*" .
-        ";s",
+        "Sample Header for TEXT formatted content.\n" . // Default header
+        "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" . //  body_html, filtered
+        "\n" .
+        "Links:\n" .
+        "------\n" .
+        "\\[1\\] http://example.net/first\\?cs=[0-9a-f_]+\n" .
+        "\\[2\\] http.*civicrm/mailing/optout.*\n" .
+        "\n" .
+        "to unsubscribe: http.*civicrm/mailing/optout" . // Default footer
+        ";",
         $textPart->text
       );
     }
@@ -207,23 +210,28 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
         "<p>You can go to <a href=['\"].*extern/url\.php\?u=\d+&amp\\;qid=\d+['\"]>Google</a>" .
         " or <a href=\"http.*civicrm/mailing/optout.*\">opt out</a>.</p>\n" .
         // Default footer
-        "<p>Sample Footer for HTML formatted content\.</p>" .
+        "Sample Footer for HTML formatted content" .
         ".*\n" .
         // Open-tracking code
         "<img src=\".*extern/open.php.*\"" .
         ";",
         $htmlPart->text
       );
+
       $this->assertEquals('plain', $textPart->subType);
       $this->assertRegExp(
         ";" .
-        "You can go to Google \\[1\\] or opt out \\[2\\]\\..*" .
-        "Unsubscribe \\[2\\].*" .
+        //  body_html, filtered
+        "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
+        "\n" .
         "Links:\n" .
         "------\n" .
-        "\\[1\\] .*extern/url\.php\?u=\d+&qid=\d+.*" .
-        "\\[2\\] http.*civicrm/mailing/optout.*" .
-        ";s",
+        "\\[1\\] .*extern/url\.php\?u=\d+&qid=\d+\n" .
+        "\\[2\\] http.*civicrm/mailing/optout.*\n" .
+        "\n" .
+        // Default footer
+        "to unsubscribe: http.*civicrm/mailing/optout" .
+        ";",
         $textPart->text
       );
     }
@@ -306,10 +314,11 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       array('url_tracking' => 1),
     );
     $cases[] = array(
-      // Plain-text URLs are not tracked.
+      // Plain-text URL's are tracked in plain-text emails...
+      // but not in HTML emails.
       "<p>Please go to: http://example.net/</p>",
       ";<p>Please go to: http://example\.net/</p>;",
-      ';Please go to: http://example\.net/;',
+      ';Please go to: .*extern/url.php\?u=\d+&qid=\d+;',
       array('url_tracking' => 1),
     );
 
