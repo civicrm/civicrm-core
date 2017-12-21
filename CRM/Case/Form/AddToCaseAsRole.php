@@ -80,7 +80,12 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
 
     $url = CRM_Utils_System::url(
       'civicrm/contact/view/case',
-      sprintf('cid=%d&id=%d', $clients[0], $caseId)
+      array(
+        'cid' => $clients[0],
+        'id' => $caseId,
+        'reset' => 1,
+        'action' => 'view',
+      )
     );
     CRM_Utils_System::redirect($url);
   }
