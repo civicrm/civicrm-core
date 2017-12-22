@@ -179,6 +179,7 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
         'id' => array(
           'required' => TRUE,
           'no_display' => TRUE,
+          'dbAlias' => CRM_Utils_SQL::supportsFullGroupBy() ? 'ANY_VALUE(mailing_event_opened_civireport.id)' : NULL,
         ),
         'time_stamp' => array(
           'title' => ts('Open Date'),
@@ -190,6 +191,11 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
           'title' => ts('Open Date'),
           'operatorType' => CRM_Report_Form::OP_DATE,
           'type' => CRM_Utils_Type::T_DATE,
+        ),
+        'unique_opens' => array(
+          'title' => ts('Unique Opens'),
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+          'pseudofield' => TRUE,
         ),
       ),
       'order_bys' => array(
@@ -289,13 +295,13 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    if (!empty($this->_params['charts'])) {
-      $groupBy = "{$this->_aliases['civicrm_mailing']}.id";
+    $groupBys = empty($this->_params['charts']) ? array("civicrm_mailing_event_queue.email_id") : array("{$this->_aliases['civicrm_mailing']}.id");
+
+    if (!empty($this->_params['unique_opens_value'])) {
+      $groupBys[] = "civicrm_mailing_event_queue.id";
     }
-    else {
-      $groupBy = "civicrm_mailing_event_queue.email_id";
-    }
-    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, $groupBys);
+    $this->_groupBy = "GROUP BY " . implode(', ', $groupBys);
   }
 
   public function postProcess() {
