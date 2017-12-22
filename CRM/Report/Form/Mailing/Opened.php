@@ -295,18 +295,13 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    if (!empty($this->_params['charts'])) {
-      $groupBy = "{$this->_aliases['civicrm_mailing']}.id";
-    }
-    else {
-      $groupBy = "civicrm_mailing_event_queue.email_id";
-    }
-    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
+    $groupBys = empty($this->_params['charts']) ? array("civicrm_mailing_event_queue.email_id") : array("{$this->_aliases['civicrm_mailing']}.id");
 
     if (!empty($this->_params['unique_opens_value'])) {
-      $this->_groupBy .= ", civicrm_mailing_event_queue.id";
-      $this->_groupBy = str_replace('mailing_event_opened_civireport.id,', '', $this->_groupBy);
+      $groupBys[] = "civicrm_mailing_event_queue.id";
     }
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, $groupBys);
+    $this->_groupBy = "GROUP BY " . implode(', ', $groupBys);
   }
 
   public function postProcess() {
