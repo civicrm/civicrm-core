@@ -61,7 +61,8 @@ class CRM_Contact_Task {
     RESTORE = 23,
     DELETE_PERMANENTLY = 24,
     COMMUNICATION_PREFS = 25,
-    INDIVIDUAL_CONTACTS = 26;
+    INDIVIDUAL_CONTACTS = 26,
+    CREATE_MAILING_TRADITIONAL = 27;
 
   /**
    * The task array
@@ -273,6 +274,14 @@ class CRM_Contact_Task {
           'class' => 'CRM_Mailing_Form_Task_AdhocMailing',
           'result' => FALSE,
         );
+        $templateTypes = CRM_Mailing_BAO_Mailing::getTemplateTypes();
+        if (count($templateTypes) > 1) {
+          self::$_tasks[self::CREATE_MAILING_TRADITIONAL] = array(
+            'title' => ts('Email - schedule/send via traditional CiviMail'),
+            'class' => 'CRM_Mailing_Form_Task_AdhocMailing',
+            'result' => FALSE,
+          );
+        }
       }
 
       self::$_tasks += CRM_Core_Component::taskList();

@@ -39,12 +39,18 @@ class CRM_Mailing_Form_Task_AdhocMailing extends CRM_Contact_Form_Task {
   public function preProcess() {
     parent::preProcess();
     $templateTypes = CRM_Mailing_BAO_Mailing::getTemplateTypes();
+    if ($this->_task == CRM_Contact_Task::CREATE_MAILING) {
+      $templateType = $templateTypes[0]['name'];
+    }
+    elseif ($this->_task == CRM_Contact_Task::CREATE_MAILING_TRADITIONAL) {
+      $templateType = $templateTypes[1]['name'];
+    }
     list ($groupId, $ssId) = $this->createHiddenGroup();
     $mailing = civicrm_api3('Mailing', 'create', array(
       'name' => "",
       'campaign_id' => NULL,
       'replyto_email' => "",
-      'template_type' => $templateTypes[0]['name'],
+      'template_type' => $templateType,
       'template_options' => array('nonce' => 1),
       'subject' => "",
       'body_html' => "",
