@@ -35,10 +35,6 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
   /**
    * Build the form object for Advanced Settings.
    *
-   * ALTER TABLE `civicrm_uf_group`
-  ADD COLUMN `for_duplicate_URL` VARCHAR(255) DEFAULT NULL AFTER `post_URL`;
-   *
-   *
    * @param CRM_Core_Form $form
    */
   public static function buildAdvanceSetting(&$form) {

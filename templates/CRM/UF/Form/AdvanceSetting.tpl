@@ -110,22 +110,20 @@
 
 <script type="text/javascript">
     {literal}
-    var updateDupeInputs = document.getElementsByName("is_update_dupe");
-    var duplicateURLInput = document.getElementById("for_duplicate_URL_block");
-
-    updateDupeInputs.forEach(function (checkbox, index) {
-        checkbox.addEventListener('change', confirmCheck);
-        if(index == 1)
-            checkbox.dispatchEvent(new Event('change'));
+    CRM.$(function () {
+        CRM.$("[name=is_update_dupe]").each(function () {
+            this.addEventListener('change', confirmCheck);
+            if (CRM.$(this).attr('checked'))
+                this.dispatchEvent(new Event('change'));
+        });
     });
 
     function confirmCheck() {
-        if (this.checked && this.value == 1) {
-            console.log("show input");
-            duplicateURLInput.style.display = '';
-        } else if(window.getComputedStyle(duplicateURLInput).display !== 'none') {
-            console.log("hide input");
-            duplicateURLInput.style.display = 'none';
+        var duplicateURLInput = CRM.$("#for_duplicate_URL_block");
+        if (CRM.$(this).attr('checked') && CRM.$(this).val() == 1) {
+            duplicateURLInput.css('display', '');
+        } else if (duplicateURLInput.css('display') !== 'none') {
+            duplicateURLInput.css('display', 'none');
         }
     }
     {/literal}
