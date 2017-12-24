@@ -43,6 +43,7 @@
 class CRM_Profile_Form_Edit extends CRM_Profile_Form {
   protected $_postURL = NULL;
   protected $_cancelURL = NULL;
+  protected $_for_duplicateURL = NULL;
   protected $_errorURL = NULL;
   protected $_context;
   protected $_blockNo;
@@ -170,6 +171,7 @@ SELECT module,is_reserved
     if ($this->_context != 'dialog') {
       $this->_postURL = $this->_ufGroup['post_URL'];
       $this->_cancelURL = $this->_ufGroup['cancel_URL'];
+      $this->_for_duplicateURL = $this->_ufGroup['for_duplicate_URL'];
 
       $gidString = $this->_gid;
       if (!empty($this->_profileIds)) {
@@ -202,6 +204,7 @@ SELECT module,is_reserved
       // we do this gross hack since qf also does entity replacement
       $this->_postURL = str_replace('&amp;', '&', $this->_postURL);
       $this->_cancelURL = str_replace('&amp;', '&', $this->_cancelURL);
+      $this->_for_duplicateURL = str_replace('&amp;', '&', $this->_for_duplicateURL);
 
       // also retain error URL if set
       $this->_errorURL = CRM_Utils_Array::value('errorURL', $_POST);
@@ -359,4 +362,10 @@ SELECT module,is_reserved
     return $errors;
   }
 
+   public function changePostURL()
+   {
+       if(!empty($this->_for_duplicateURL)){
+           $this->_postURL = $this->_for_duplicateURL;
+       }
+   }
 }

@@ -96,6 +96,13 @@
 {ts}If you are using this profile as a contact signup or edit form, and want to redirect the user to a static URL after they've submitted the form, you can also use contact tokens in URL - enter the complete URL here. If this field is left blank, the built-in Profile form will be redisplayed with a generic status message - 'Your contact information has been saved.'{/ts}
 {/htxt}
 
+{htxt id='id-for_duplicate_URL-title'}
+  {ts}Duplicate Redirect URL{/ts}
+{/htxt}
+{htxt id='id-for_duplicate_URL'}
+{ts}In this field you can specify a URL to which the user will be redirected if the email address they entered already exists in CiviCRM. This is useful if you want to provide different instructions to these users. For example, if you have a newsletter signup form and a user who is already subscribed to your newsletter submits it, you can redirect that user to a page that instructs them what to do (e.g. contact you to work out why they might not be receiving your newsletters){/ts}
+{/htxt}
+
 {htxt id='id-cancel_URL-title'}
   {ts}Cancel Redirect{/ts}
 {/htxt}
@@ -109,7 +116,6 @@
 {htxt id='id-cancel_button_text'}
   {ts}Override the default button text for the cancel button for this profile{/ts}
 {/htxt}
-
 {htxt id='id-submit_button_text-title'}
   {ts}Submit Button Text{/ts}
 {/htxt}

@@ -2388,4 +2388,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return $currency;
   }
 
+    public function changePostURL() {
+        throw new Exception("This is just a stub! Find an implementation for this method");
+    }
 }

@@ -273,4 +273,11 @@
     <localizable>true</localizable>
     <add>4.7</add>
   </field>
+  <field>
+    <name>for_duplicate_URL</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Duplicate Redirect URL</comment>
+    <add>4.7</add>
+  </field>
 </table>
