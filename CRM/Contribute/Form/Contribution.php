@@ -1522,7 +1522,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if (!isset($submittedValues['total_amount'])) {
-      $submittedValues['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_values) - CRM_Utils_Array::value('tax_amount', $this->_values);
+      $submittedValues['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_values);
+      // Avoid tax amount deduction on edit form and keep it original, because this will lead to error described in CRM-20676
+      if (!$this->_id) {
+        $submittedValues['total_amount'] -= CRM_Utils_Array::value('tax_amount', $this->_values, 0);
+      }
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
