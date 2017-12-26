@@ -1041,7 +1041,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
     // define statuses which are handled like Completed status (others are assumed to be handled like Scheduled status)
     $compStatusValues = array();
-    $compStatusNames = array('Completed', 'Left Message', 'Cancelled', 'Unreachable', 'Not Required');
+    $compStatusNames = array_merge(
+      array('Completed', 'Left Message', 'Cancelled', 'Unreachable', 'Not Required'),
+      CRM_Activity_BAO_Activity::getStatusesByType(CRM_Activity_BAO_Activity::COMPLETED)
+    );
     foreach ($compStatusNames as $name) {
       $compStatusValues[] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $name);
     }
