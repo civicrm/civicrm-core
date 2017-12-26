@@ -64,7 +64,7 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
-    $this->add('text', 'title', ts('Find'),
+    $this->add('text', 'title', ts('Event Name'),
       array(CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'title'))
     );
 
