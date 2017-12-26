@@ -28,7 +28,7 @@
   <table class="form-layout">
     <tr class="crm-event-searchevent-form-block-title">
         <td>
-          <label>{ts}Event Nanme{/ts}</label>
+          <label>{$form.title.label}</label>
           {$form.title.html|crmAddClass:twenty}
           <div class="description font-italic">
                  {ts}Complete OR partial Event name.{/ts}
