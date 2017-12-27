@@ -730,8 +730,11 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    *
    * The default return properties array returns far too many fields for 'everyday use. Every field you add to this array
    * kills a small kitten so add carefully.
+   *
+   * @param array $queryParams
+   * @return array
    */
-  public static function selectorReturnProperties() {
+  public static function selectorReturnProperties($queryParams) {
     $properties = array(
       'contact_type' => 1,
       'contact_sub_type' => 1,
@@ -758,7 +761,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       'cancel_date' => 1,
       'contribution_recur_id' => 1,
     );
-    if (self::isSoftCreditOptionEnabled()) {
+    if (self::isSoftCreditOptionEnabled($queryParams)) {
       $properties = array_merge($properties, self::softCreditReturnProperties());
     }
 
