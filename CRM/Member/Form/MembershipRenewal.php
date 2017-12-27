@@ -230,7 +230,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     parent::buildQuickForm();
 
-    $defaults = parent::setDefaultValues();
+    //CRM-21485
+    $defaults = self::setDefaultValues();
     $this->assign('customDataType', 'Membership');
     $this->assign('customDataSubType', $this->_memType);
     $this->assign('entityID', $this->_id);
@@ -240,7 +241,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     //CRM-16950
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-    $taxRate = CRM_Utils_Array::value($this->allMembershipTypeDetails[$defaults['membership_type_id']]['financial_type_id'], $taxRates);
+    $taxRate = CRM_Utils_Array::value($defaults['financial_type_id'], $taxRates);//CRM-21485
 
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
 
@@ -271,7 +272,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         //CRM-16950
         $taxAmount = NULL;
         $totalAmount = CRM_Utils_Array::value('minimum_fee', $values);
-        if (CRM_Utils_Array::value($values['financial_type_id'], $taxRates)) {
+        if (CRM_Utils_Array::value($defaults['financial_type_id'], $taxRates)) { //CRM-21485
           $taxAmount = ($taxRate / 100) * CRM_Utils_Array::value('minimum_fee', $values);
           $totalAmount = $totalAmount + $taxAmount;
         }
