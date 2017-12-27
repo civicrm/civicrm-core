@@ -1647,8 +1647,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $params['line_item'] = $lineItem;
       $params['payment_processor_id'] = $params['payment_processor'] = CRM_Utils_Array::value('id', $this->_paymentProcessor);
-      if (isset($submittedValues['tax_amount'])) {
-        $params['tax_amount'] = $submittedValues['tax_amount'];
+      if (isset($this->_values['tax_amount'])) {
+        $params['tax_amount'] = $this->_values['tax_amount'];
       }
       //create contribution.
       if ($isQuickConfig) {
