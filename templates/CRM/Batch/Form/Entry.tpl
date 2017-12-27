@@ -373,7 +373,6 @@ function updateContactInfo(blockNo, prefix) {
             var membershipTypeId = data.values[0].membership_type_id;
             var membershipJoinDate = data.values[0].join_date;
             var membershipStartDate = data.values[0].start_date;
-
             CRM.api('MembershipType', 'get', {
                 'sequential': '1',
                 'id': membershipTypeId
@@ -385,7 +384,6 @@ function updateContactInfo(blockNo, prefix) {
                 cj('select[id="field_' + blockNo + '_membership_type_1"]').val(membershipTypeId).change();
                 cj('#field_' + blockNo + '_' + 'join_date').val(membershipJoinDate).trigger('change');
                 cj('#field_' + blockNo + '_' + 'membership_start_date').val(membershipStartDate).trigger('change');
-
               }
               });
           }
