@@ -1655,6 +1655,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params['is_quick_config'] = 1;
       }
       $params['non_deductible_amount'] = $this->calculateNonDeductibleAmount($params, $formValues);
+      $this->assign('non_deductible_amount', $params['non_deductible_amount']);
 
       // we are already handling note below, so to avoid duplicate notes against $contribution
       if (!empty($params['note']) && !empty($submittedValues['note'])) {
