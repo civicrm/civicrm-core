@@ -243,6 +243,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
     $taxRate = CRM_Utils_Array::value($defaults['financial_type_id'], $taxRates);//CRM-21485
 
+    if (is_array($defaults['membership_type_id'])) { //CRM-21485
+      $defaults['membership_type_id'] = $defaults['membership_type_id'][1];
+    }
+
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
 
     // auto renew options if enabled for the membership
