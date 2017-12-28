@@ -93,13 +93,13 @@ class CRM_Utils_SQL {
    * @return bool
    */
   public static function disableFullGroupByMode() {
-    $sqlModes = self::getSqlModes();
+    $sqlModes = array_flip(self::getSqlModes());
 
     // Disable only_full_group_by mode for lower sql versions.
-    if (!self::supportsFullGroupBy() || (!empty($sqlModes) && !in_array('ONLY_FULL_GROUP_BY', $sqlModes))) {
-      if ($key = array_search('ONLY_FULL_GROUP_BY', $sqlModes)) {
-        unset($sqlModes[$key]);
-        CRM_Core_DAO::executeQuery("SET SESSION sql_mode = '" . implode(',', $sqlModes) . "'");
+    if (!self::supportsFullGroupBy() || (!empty($sqlModes) && !array_key_exists('ONLY_FULL_GROUP_BY', $sqlModes))) {
+      if (array_key_exists('ONLY_FULL_GROUP_BY', $sqlModes)) {
+        unset($sqlModes['ONLY_FULL_GROUP_BY']);
+        CRM_Core_DAO::executeQuery("SET SESSION sql_mode = '" . implode(',', array_keys($sqlModes)) . "'");
       }
       return TRUE;
     }

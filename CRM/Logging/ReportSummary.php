@@ -193,7 +193,27 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $this->_groupBy = 'GROUP BY entity_log_civireport.log_conn_id, entity_log_civireport.log_user_id, EXTRACT(DAY_MICROSECOND FROM entity_log_civireport.log_date), entity_log_civireport.id';
+    $this->_groupByArray = array(
+      'entity_log_civireport.log_conn_id',
+      'entity_log_civireport.log_user_id',
+      'EXTRACT(DAY_MICROSECOND FROM entity_log_civireport.log_date)',
+      'entity_log_civireport.id',
+    );
+    $this->_groupBy = 'GROUP BY ' .  implode(', ', $this->_groupByArray);
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect(
+      $this->_selectClauses,
+      $this->_groupByArray,
+      'GROUP_CONCAT'
+    );
+  }
+
+  public function orderBy() {
+    parent::orderBy();
+    $orderBys = array_merge(CRM_Utils_Array::collect('dbAlias', $this->_orderByFields), $this->_groupByArray);
+    if (!empty($orderBys)) {
+      CRM_Contact_BAO_Query::getGroupByFromOrderBy($this->_groupBy, $orderBys);
+      $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, $orderBys, 'GROUP_CONCAT');
+    }
   }
 
   /**
@@ -220,7 +240,12 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
         return 1;
       }
       $mergeActivityID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Contact Merged');
-      return " IF (entity_log_civireport.log_action = 'Insert' AND extra_table.activity_type_id = $mergeActivityID , GROUP_CONCAT(entity_log_civireport.contact_id), 1) ";
+      if (CRM_Utils_SQL::supportsFullGroupBy()) {
+        return " IF (LOCATE('Insert', GROUP_CONCAT(DISTINCT entity_log_civireport.log_action)) = 0 AND MAX(extra_table.activity_type_id) = $mergeActivityID , GROUP_CONCAT(entity_log_civireport.contact_id), 1) ";
+      }
+      else {
+        return " IF (entity_log_civireport.log_action = 'Insert' AND extra_table.activity_type_id = $mergeActivityID , GROUP_CONCAT(entity_log_civireport.contact_id), 1) ";
+      }
     }
   }
 
