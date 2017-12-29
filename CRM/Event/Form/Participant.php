@@ -1588,6 +1588,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
 
         $this->assign('totalAmount', $contributionParams['total_amount']);
+        if (isset($contributionParams['non_deductible_amount'])) {
+          $this->assign('non_deductible_amount', $contributionParams['non_deductible_amount']);
+        }
         if (isset($contributionParams['partial_payment_total'])) {
           // balance amount
           $balanceAmount = $contributionParams['partial_payment_total'] - $contributionParams['partial_amount_to_pay'];

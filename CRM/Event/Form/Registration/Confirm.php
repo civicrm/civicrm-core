@@ -615,6 +615,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $value['trxn_id'] = $contribution->trxn_id;
           $value['contributionID'] = $contribution->id;
           $value['contributionTypeID'] = $contribution->financial_type_id;
+          $value['non_deductible_amount'] = $contribution->non_deductible_amount;
         }
         $value['contactID'] = $contactID;
         $value['eventID'] = $this->_eventId;
@@ -638,7 +639,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if (!$pending && !empty($value['is_primary']) &&
           !$this->_allowWaitlist && !$this->_requireApproval
         ) {
-          // transactionID & receive date required while building email template
+          // transactionID and receive date required while building email template
           $this->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $value));
           $this->assign('receive_date', CRM_Utils_Date::mysqlToIso(CRM_Utils_Array::value('receive_date', $value)));
           $this->set('receiveDate', CRM_Utils_Date::mysqlToIso(CRM_Utils_Array::value('receive_date', $value)));
@@ -647,6 +648,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
 
       $value['fee_amount'] = CRM_Utils_Array::value('amount', $value);
+
+      // assign amount for Non-deductible token if used in email template
+      $this->assign('non_deductible_amount', CRM_Utils_Array::value('non_deductible_amount', $value));
+
       $this->set('value', $value);
 
       // handle register date CRM-4320
