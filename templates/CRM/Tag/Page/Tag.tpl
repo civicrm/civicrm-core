@@ -167,7 +167,12 @@
 
         function moveTag(e, data) {
           if (data.parent != data.old_parent) {
-            CRM.api3('Tag', 'create', {id: data.node.id, parent_id: data.parent.replace('#', '')}, true);
+            CRM.api3('Tag', 'create', {id: data.node.id, parent_id: data.parent.replace('#', '')}, true)
+            .done(function (result) {
+              if (result.is_error === 1) {
+                $('.tag-tree', $panel).jstree(true).refresh();
+              }
+            });
           }
         }
 
