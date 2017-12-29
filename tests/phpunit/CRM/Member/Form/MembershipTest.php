@@ -689,6 +689,17 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    */
   public function testSubmitRecur() {
+    $pendingVal = $this->callAPISuccessGetValue('OptionValue', array(
+      'return' => "id",
+      'option_group_id' => "contribution_status",
+      'label' => "Pending",
+    ));
+    //Update label for Pending contribution status.
+    $this->callAPISuccess('OptionValue', 'create', array(
+      'id' => $pendingVal,
+      'label' => "PendingEdited",
+    ));
+
     $form = $this->getForm();
 
     $this->callAPISuccess('MembershipType', 'create', array(
@@ -710,6 +721,12 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'is_test' => TRUE,
     ));
+
+    //Check if Membership Payment is recorded.
+    $this->callAPISuccessGetCount('MembershipPayment', array(
+      'membership_id' => $membership['id'],
+      'contribution_id' => $contribution['id'],
+    ), 1);
 
     // CRM-16992.
     $this->callAPISuccessGetCount('LineItem', array(
