@@ -83,7 +83,11 @@ class CRM_Core_DAO extends DB_DataObject {
     /**
      * @deprecated format using php serialize()
      */
-    SERIALIZE_PHP = 4;
+    SERIALIZE_PHP = 4,
+    /**
+     * Comma separated string, no quotes, no spaces
+     */
+    SERIALIZE_COMMA = 5;
 
   /**
    * Define entities that shouldn't be created or deleted when creating/ deleting
@@ -2615,6 +2619,7 @@ SELECT contact_id
    * @param array|NULL $value
    * @param $serializationType
    * @return string|NULL
+   * @throws \Exception
    */
   public static function serializeField($value, $serializationType) {
     if ($value === NULL) {
@@ -2632,6 +2637,12 @@ SELECT contact_id
 
       case self::SERIALIZE_PHP:
         return is_array($value) ? serialize($value) : $value;
+
+      case self::SERIALIZE_COMMA:
+        return is_array($value) ? implode(',', $value) : $value;
+
+      default:
+        throw new Exception('Unknown serialization method for field.');
     }
   }
 
@@ -2641,6 +2652,7 @@ SELECT contact_id
    * @param string|null $value
    * @param $serializationType
    * @return array|null
+   * @throws \Exception
    */
   public static function unSerializeField($value, $serializationType) {
     if ($value === NULL) {
@@ -2661,6 +2673,12 @@ SELECT contact_id
 
       case self::SERIALIZE_PHP:
         return strlen($value) ? unserialize($value) : array();
+
+      case self::SERIALIZE_COMMA:
+        return explode(',', trim(str_replace(', ', '', $value)));
+
+      default:
+        throw new Exception('Unknown serialization method for field.');
     }
   }
 
