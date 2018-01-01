@@ -1288,10 +1288,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public function testSubmit($params, $action, $creditCardMode = NULL) {
     $defaults = array(
       'soft_credit_contact_id' => array(),
+      'receive_date' => date('Y-m-d H:i:s'),
       'receipt_date' => '',
-      'receipt_date_time' => '',
       'cancel_date' => '',
-      'cancel_date_time' => '',
       'hidden_Premium' => 1,
     );
     $this->_bltID = 5;
