@@ -1088,6 +1088,23 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $lineItem = $this->callAPISuccessGetSingle('LineItem', array('contribution_id' => $contribution['id']));
     $this->assertEquals(100, $lineItem['line_total']);
     $this->assertEquals(10, $lineItem['tax_amount']);
+
+    // CRM-20423: Upon simple submit of 'Edit Contribution' form ensure that total amount is same
+    $form->testSubmit(array(
+        'id' => $contribution['id'],
+        'financial_type_id' => 3,
+        'receive_date' => '04/21/2015',
+        'receive_date_time' => '11:27PM',
+        'contact_id' => $this->_individualId,
+        'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+        'contribution_status_id' => 1,
+      ),
+      CRM_Core_Action::UPDATE
+    );
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
+    // Check if total amount is unchanged
+    $this->assertEquals(110, $contribution['total_amount']);
   }
 
   /**
