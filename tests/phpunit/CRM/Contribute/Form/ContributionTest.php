@@ -149,8 +149,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => 1,
@@ -168,8 +166,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
       'contribution_status_id' => 1,
@@ -195,8 +191,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       $form->testSubmit(array(
         'total_amount' => 50,
         'financial_type_id' => 1,
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
         'contact_id' => $this->_individualId,
         'contribution_status_id' => 1,
         'credit_card_number' => 4444333322221111,
@@ -267,8 +261,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       $form->testSubmit(array(
         'total_amount' => 50,
         'financial_type_id' => 1,
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
         'contact_id' => $this->_individualId,
         'contribution_status_id' => 1,
         'credit_card_number' => 4444333322221111,
@@ -332,8 +324,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       $form->testSubmit(array(
         'total_amount' => 60,
         'financial_type_id' => 1,
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
         'contact_id' => $this->_individualId,
         'contribution_status_id' => 1,
         'credit_card_number' => 4444333322221111,
@@ -393,8 +383,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
       'contribution_status_id' => 1,
@@ -446,8 +434,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
       'contribution_status_id' => 1,
@@ -506,8 +492,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       $form->testSubmit(array(
         'total_amount' => 50,
         'financial_type_id' => 1,
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
         'contact_id' => $this->_individualId,
         'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
         'payment_processor_id' => $this->paymentProcessorID,
@@ -546,8 +530,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
       'payment_processor_id' => $this->paymentProcessorID,
@@ -572,7 +554,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function testSubmitCreditCardWithRecur() {
     $form = new CRM_Contribute_Form_Contribution();
-    $receiveDate = date('m/d/Y', strtotime('+1 month'));
+    $receiveDate = date('Y-m-d H:i:s', strtotime('+1 month'));
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => 1,
@@ -581,7 +563,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'frequency_unit' => 'month',
       'installments' => 2,
       'receive_date' => $receiveDate,
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
       'payment_processor_id' => $this->paymentProcessorID,
@@ -592,7 +573,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'live'
     );
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('return' => 'receive_date'));
-    $this->assertEquals(date("m/d/Y", strtotime($contribution['receive_date'])), $receiveDate);
+    $this->assertEquals($contribution['receive_date'], $receiveDate);
   }
 
   /**
@@ -603,8 +584,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
       'payment_processor_id' => $this->paymentProcessorID,
@@ -630,8 +609,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
@@ -688,8 +665,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $params = array(
       'total_amount' => 100,
       'financial_type_id' => $donationFT,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
@@ -746,8 +721,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'pledge_payment_id' => $pledgePaymentID,
@@ -768,8 +741,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => 1,
@@ -797,8 +768,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => 1,
@@ -829,8 +798,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => 1,
@@ -851,8 +818,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => 1,
@@ -876,8 +841,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form->testSubmit(array(
       'total_amount' => -5,
       'financial_type_id' => 1,
-      'receive_date' => '04/24/2016',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => 1,
@@ -900,8 +863,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form->testSubmit(array(
         'total_amount' => 50,
         'financial_type_id' => 1,
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
         'contact_id' => $this->_individualId,
         'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
         'contribution_status_id' => 1,
@@ -913,8 +874,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'total_amount' => 45,
       'net_amount' => 45,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => 1,
@@ -943,8 +902,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form->testSubmit(array(
         'total_amount' => 50,
         'financial_type_id' => 1,
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
         'contact_id' => $this->_individualId,
         'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
         'check_number' => '123AX',
@@ -957,8 +914,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'total_amount' => 50,
       'net_amount' => 50,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
       'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialTrxn', 'card_type_id', 'Visa'),
@@ -1014,8 +969,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       array(
         'total_amount' => 50,
         'financial_type_id' => 1,
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
         'contact_id' => $this->_individualId,
         'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
         'check_number' => substr(sha1(rand()), 0, 7),
@@ -1035,8 +988,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'total_amount' => 50,
       'currency' => 'USD',
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit card', $this->paymentInstruments),
       'payment_processor_id' => $this->paymentProcessorID,
@@ -1066,8 +1017,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form->testSubmit(array(
        'total_amount' => 100,
         'financial_type_id' => $this->_financialTypeId,
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
         'contact_id' => $this->_individualId,
         'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
         'contribution_status_id' => 1,
@@ -1093,8 +1042,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form->testSubmit(array(
         'id' => $contribution['id'],
         'financial_type_id' => 3,
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
         'contact_id' => $this->_individualId,
         'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
         'contribution_status_id' => 1,
@@ -1118,8 +1065,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form->testSubmit(array(
        'total_amount' => 100,
         'financial_type_id' => 3,
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
         'contact_id' => $this->_individualId,
         'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
         'contribution_status_id' => 1,
@@ -1279,8 +1224,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form->testSubmit(array(
       'total_amount' => 100,
       'financial_type_id' => $this->_financialTypeId,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
+      'receive_date' => '2015-04-21 00:00:00',
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => 1,
@@ -1316,8 +1260,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       array(
         'total_amount' => 100,
         'financial_type_id' => 3,
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
         'contact_id' => $this->_individualId,
         'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
         'contribution_status_id' => 1,
@@ -1405,8 +1347,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       array(
         'total_amount' => 50,
         'financial_type_id' => 1,
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
         'contact_id' => $this->_individualId,
         'credit_card_number' => 4444333322221111,
         'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),

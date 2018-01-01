@@ -1203,8 +1203,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $form->testSubmit(array(
        'total_amount' => 100,
         'financial_type_id' => $financialType['id'],
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
         'contact_id' => $contactId,
         'contribution_status_id' => 1,
         'price_set_id' => 0,
