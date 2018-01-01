@@ -3876,8 +3876,7 @@ LEFT JOIN civicrm_entity_financial_trxn eft
   ON (ft.id = eft.financial_trxn_id)
 WHERE eft.entity_table = 'civicrm_contribution'
   AND eft.entity_id = {$contributionId}
-  AND ft.to_financial_account_id != {$toFinancialAccount}
-  AND ft.status_id = {$statusId}
+  AND ft.is_payment = 1
 ";
       $query = CRM_Core_DAO::executeQuery($sql);
       $query->fetch();
