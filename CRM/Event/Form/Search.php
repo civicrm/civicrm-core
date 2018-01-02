@@ -223,14 +223,10 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->assign('participantCount', $participantCount);
       $this->assign('lineItems', $lineItems);
 
-      $permission = CRM_Core_Permission::getPermission();
+      $taskParams['ssID'] = isset($this->_ssID) ? $this->_ssID : NULL;
+      $tasks = CRM_Event_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission(), $taskParams);
 
-      $tasks = CRM_Event_Task::permissionedTaskTitles($permission);
       if (isset($this->_ssID)) {
-        if ($permission == CRM_Core_Permission::EDIT) {
-          $tasks = $tasks + CRM_Event_Task::optionalTaskTitle();
-        }
-
         $savedSearchValues = array(
           'id' => $this->_ssID,
           'name' => CRM_Contact_BAO_SavedSearch::getName($this->_ssID, 'title'),
