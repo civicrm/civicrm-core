@@ -391,13 +391,44 @@ class CRM_Utils_Type {
    *   The type to validate against.
    * @param bool $abort
    *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
-   * @name string $name
+   * @param string $name
    *   The name of the attribute
+   * @param bool $isThrowException
+   *   Should an exception be thrown rather than a using a deprecated fatal error.
    *
    * @return mixed
    *   The data, escaped if necessary
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ') {
+  public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ', $isThrowException = FALSE) {
+
+    $possibleTypes = array(
+      'Integer',
+      'Int',
+      'Positive',
+      'CommaSeparatedIntegers',
+      'Boolean',
+      'Float',
+      'Money',
+      'Text',
+      'String',
+      'Link',
+      'Memo',
+      'Date',
+      'Timestamp',
+      'ContactReference',
+      'MysqlColumnNameOrAlias',
+      'MysqlOrderByDirection',
+      'MysqlOrderBy',
+      'ExtensionKey',
+    );
+    if (!in_array($type, $possibleTypes)) {
+      if ($isThrowException) {
+        throw new CRM_Core_Exception(ts('Invalid type, must be one of : ' . implode($possibleTypes)));
+      }
+      CRM_Core_Error::fatal(ts('Invalid type, must be one of : ' . implode($possibleTypes)));
+    }
     switch ($type) {
       case 'Integer':
       case 'Int':
@@ -409,6 +440,12 @@ class CRM_Utils_Type {
       case 'Positive':
         if (CRM_Utils_Rule::positiveInteger($data)) {
           return (int) $data;
+        }
+        break;
+
+      case 'CommaSeparatedIntegers':
+        if (CRM_Utils_Rule::commaSeparatedIntegers($data)) {
+          return $data;
         }
         break;
 
@@ -493,14 +530,13 @@ class CRM_Utils_Type {
           return $data;
         }
         break;
-
-      default:
-        CRM_Core_Error::fatal("Cannot recognize $type for $data");
-        break;
     }
 
     if ($abort) {
       $data = htmlentities($data);
+      if ($isThrowException) {
+        throw new CRM_Core_Exception("$name (value: $data) is not of the type $type");
+      }
       CRM_Core_Error::fatal("$name (value: $data) is not of the type $type");
     }
 

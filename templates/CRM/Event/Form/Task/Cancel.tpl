@@ -25,9 +25,6 @@
 *}
 {* Confirmation of Cancel Registration *}
 <div class="crm-block crm-form-block crm-event-cancel-form-block">
-<div class="crm-submit-buttons">
-  {include file="CRM/common/formButtons.tpl" location="top"}
-</div>
 <div class="messages status no-popup">
   <div class="icon inform-icon"></div>
   <div>

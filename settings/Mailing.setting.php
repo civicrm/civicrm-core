@@ -333,4 +333,17 @@ return array(
     'description' => 'The number of emails sendable via simple mail. Make sure you understand the implications for your spam reputation and legal requirements for bulk emails before editing. As there is some risk both to your spam reputation and the products if this is misused it is a hidden setting',
     'help_text' => 'CiviCRM forces users sending more than this number of mails to use CiviMails. CiviMails have additional precautions: not sending to contacts who do not want bulk mail, adding domain name and opt out links. You should familiarise yourself with the law relevant to you on bulk mailings if changing this setting. For the US https://en.wikipedia.org/wiki/CAN-SPAM_Act_of_2003 is a good place to start.',
   ),
+  'auto_recipient_rebuild' => array(
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'auto_recipient_rebuild',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => '1',
+    'title' => 'Enable automatic CiviMail recipient count display',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Enable this setting to rebuild recipient list automatically during composing mail. Disable will allow you to rebuild recipient manually.',
+    'help_text' => 'CiviMail automatically fetches recipient list and count whenever mailing groups are included or excluded while composing bulk mail. This phenomena may degrade performance for large sites, so disable this setting to build and fetch recipients for selected groups, manually.',
+  ),
 );

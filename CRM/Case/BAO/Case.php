@@ -92,6 +92,11 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
     // CRM-20958 - These fields are managed by MySQL triggers. Watch out for clients resaving stale timestamps.
     unset($params['created_date']);
     unset($params['modified_date']);
+    $caseStatus = CRM_Case_PseudoConstant::caseStatus('name');
+    // for resolved case the end date should set to now
+    if (!empty($params['status_id']) && $params['status_id'] == array_search('Closed', $caseStatus)) {
+      $params['end_date'] = date("Ymd");
+    }
 
     $transaction = new CRM_Core_Transaction();
 
@@ -336,7 +341,7 @@ WHERE civicrm_case.id = %1";
  LEFT JOIN  civicrm_case_contact ON civicrm_case_contact.contact_id = contact_a.id
  LEFT JOIN  civicrm_email ce ON ( ce.contact_id = contact_a.id AND ce.is_primary = 1)
  LEFT JOIN  civicrm_phone cp ON ( cp.contact_id = contact_a.id AND cp.is_primary = 1)
-     WHERE  civicrm_case_contact.case_id = %1
+     WHERE  contact_a.is_deleted = 0 AND civicrm_case_contact.case_id = %1
      ORDER BY civicrm_case_contact.id";
 
     $dao = CRM_Core_DAO::executeQuery($query,
@@ -817,7 +822,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
  LEFT JOIN  civicrm_phone ON (civicrm_phone.contact_id = con.id AND civicrm_phone.is_primary = 1)
  LEFT JOIN  civicrm_email ON (civicrm_email.contact_id = con.id AND civicrm_email.is_primary = 1)
      WHERE  (rel.contact_id_a = %1 OR rel.contact_id_b = %1) AND rel.case_id = %2
-       AND  rel.is_active = 1 AND (rel.end_date IS NULL OR rel.end_date > NOW())';
+       AND  rel.is_active = 1 AND con.is_deleted = 0 AND (rel.end_date IS NULL OR rel.end_date > NOW())';
 
     $params = array(
       1 => array($contactID, 'Positive'),
@@ -1028,14 +1033,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $viewTitle = ts('View activity');
 
     $emailActivityTypeIDs = array(
-      'Email' => CRM_Core_OptionGroup::getValue('activity_type',
-        'Email',
-        'name'
-      ),
-      'Inbound Email' => CRM_Core_OptionGroup::getValue('activity_type',
-        'Inbound Email',
-        'name'
-      ),
+      'Email' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email'),
+      'Inbound Email' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email'),
     );
 
     $caseDeleted = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $caseID, 'is_deleted');
@@ -1044,7 +1043,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $compStatusValues = array();
     $compStatusNames = array('Completed', 'Left Message', 'Cancelled', 'Unreachable', 'Not Required');
     foreach ($compStatusNames as $name) {
-      $compStatusValues[] = CRM_Core_OptionGroup::getValue('activity_status', $name, 'name');
+      $compStatusValues[] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $name);
     }
 
     $contactViewUrl = CRM_Utils_System::url("civicrm/contact/view", "reset=1&cid=", FALSE, NULL, FALSE);
@@ -1330,10 +1329,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
     $activityParams['source_record_id'] = $activityId;
     $activityParams['source_contact_id'] = $userID;
-    $activityParams['activity_type_id'] = CRM_Core_OptionGroup::getValue('activity_type', 'Email', 'name');
+    $activityParams['activity_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_type_id', 'Email');
     $activityParams['activity_date_time'] = date('YmdHis');
-    $activityParams['status_id'] = CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name');
-    $activityParams['medium_id'] = CRM_Core_OptionGroup::getValue('encounter_medium', 'email', 'name');
+    $activityParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_status_id', 'Completed');
+    $activityParams['medium_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'encounter_medium', 'email');
     $activityParams['case_id'] = $caseId;
     $activityParams['is_auto'] = 0;
     $activityParams['target_id'] = $clientId;
@@ -1491,10 +1490,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         $params['activity_date_time'] = $result['date'];
         $params['details'] = $result['body'];
         $params['source_contact_id'] = $result['from']['id'];
-        $params['status_id'] = CRM_Core_OptionGroup::getValue('activity_status',
-          'Completed',
-          'name'
-        );
+        $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
 
         $details = CRM_Case_PseudoConstant::caseActivityType();
         $matches = array();
@@ -1509,7 +1505,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
           }
         }
         if (!isset($params['activity_type_id'])) {
-          $params['activity_type_id'] = CRM_Core_OptionGroup::getValue('activity_type', 'Inbound Email', 'name');
+          $params['activity_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email');
         }
 
         // create activity
@@ -1812,23 +1808,16 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       'source_contact_id' => $session->get('userID'),
       'subject' => $caseRelationship . ' : ' . $assigneContactName,
       'activity_date_time' => date('YmdHis'),
-      'status_id' => CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name'),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
     );
 
     //if $relContactId is passed, role is added or modified.
     if (!empty($relContactId)) {
       $activityParams['assignee_contact_id'] = $assigneContactIds;
-
-      $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
-        'Assign Case Role',
-        'name'
-      );
+      $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Assign Case Role');
     }
     else {
-      $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
-        'Remove Case Role',
-        'name'
-      );
+      $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Remove Case Role');
     }
 
     $activityParams['activity_type_id'] = $activityTypeID;

@@ -237,6 +237,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
         'is_active' => 1,
         'case_id' => $params['caseID'],
         'start_date' => date("Ymd"),
+        'end_date' => CRM_Utils_Array::value('relationship_end_date', $params),
       );
 
       if (!$this->createRelationship($relationshipParams)) {

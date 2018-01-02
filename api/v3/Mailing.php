@@ -74,7 +74,9 @@ function civicrm_api3_mailing_create($params) {
   if (!$timestampCheck) {
     throw new API_Exception("Mailing has not been saved, Content maybe out of date, please refresh the page and try again");
   }
-  $safeParams['_evil_bao_validator_'] = 'CRM_Mailing_BAO_Mailing::checkSendable';
+
+  // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
+  $safeParams['_evil_bao_validator_'] = \CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_SENDABLE', 'CRM_Mailing_BAO_Mailing::checkSendable');
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $safeParams);
   return _civicrm_api3_mailing_get_formatResult($result);
 }

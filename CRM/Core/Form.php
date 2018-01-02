@@ -2360,4 +2360,32 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return $name;
   }
 
+  /**
+   * Get the currency for the form.
+   *
+   * @todo this should be overriden on the forms rather than having this
+   * historic, possible handling in here. As we clean that up we should
+   * add deprecation notices into here.
+   *
+   * @param array $submittedValues
+   *   Array allowed so forms inheriting this class do not break.
+   *   Ideally we would make a clear standard around how submitted values
+   *   are stored (is $this->_values consistently doing that?).
+   *
+   * @return string
+   */
+  public function getCurrency($submittedValues = array()) {
+    $currency = CRM_Utils_Array::value('currency', $this->_values);
+    // For event forms, currency is in a different spot
+    if (empty($currency)) {
+      $currency = CRM_Utils_Array::value('currency', CRM_Utils_Array::value('event', $this->_values));
+    }
+    if (empty($currency)) {
+      $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
+    }
+    // @todo If empty there is a problem - we should probably put in a deprecation notice
+    // to warn if that seems to be happening.
+    return $currency;
+  }
+
 }

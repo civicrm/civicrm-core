@@ -129,3 +129,7 @@ make_font_readme > vendor/dompdf/dompdf/lib/fonts/README.DejaVuFonts.txt
 
 # Remove debug_print_backtrace(), which can leak system details. Put backtrace in log.
 simple_replace vendor/dompdf/dompdf/lib/html5lib/TreeBuilder.php 'debug_print_backtrace();' 'CRM_Core_Error::backtrace("backTrace", TRUE);'
+
+if ! grep -q 'CRM-21395' vendor/dompdf/dompdf/src/Dompdf.php; then
+  patch vendor/dompdf/dompdf/src/Dompdf.php < tools/scripts/composer/patches/dompdf_no_block_level_parent_fix.patch
+fi

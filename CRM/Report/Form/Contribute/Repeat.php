@@ -413,7 +413,6 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
     $temp = $this->_aliases['civicrm_contribution'];
     $this->_aliases['civicrm_contribution'] = $replaceAliasWith;
     $from = $this->_from;
-    $from .= (string) $this->getPermissionedFTQuery($this, 'civicrm_line_item_report', TRUE);
     $this->_aliases['civicrm_contribution'] = $temp;
     $this->_where = '';
     return $from;
@@ -830,10 +829,11 @@ GROUP BY    currency
     $this->from();
     $this->where();
     $this->groupBy();
+    $this->orderBy();
     $this->limit();
 
     $count = 0;
-    $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_limit}";
+    $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_orderBy} {$this->_limit}";
     $dao = $this->executeReportQuery($sql);
     $rows = array();
     while ($dao->fetch()) {

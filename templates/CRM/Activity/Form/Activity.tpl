@@ -78,13 +78,15 @@
   <td class="label">{$form.target_contact_id.label}</td>
     <td class="view-value">
       {$form.target_contact_id.html}
-      {if $action eq 1 or $single eq false}
-      <div class="crm-is-multi-activity-wrapper">
-        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
-      </div>
-      {/if}
     </td>
   </tr>
+
+  {if $form.separation }
+    <tr class="crm-activity-form-block-separation crm-is-multi-activity-wrapper">
+      <td class="label">{$form.separation.label}</td>
+      <td>{$form.separation.html} {help id="separation"}</td>
+    </tr>
+  {/if}
 
   <tr class="crm-activity-form-block-assignee_contact_id">
       <td class="label">
@@ -101,7 +103,7 @@
           {/if}
           {if $activityAssigneeNotification}
             <br />
-            <span class="description"><i class="crm-i fa-paper-plane"></i> {ts}A copy of this activity will be emailed to each Assignee.{/ts} {help id="sent_copy_email"}</span>
+            <span id="notify_assignee_msg" class="description"><i class="crm-i fa-paper-plane"></i> {ts}A copy of this activity will be emailed to each Assignee.{/ts} {help id="sent_copy_email"}</span>
           {/if}
         {/if}
       </td>
@@ -274,18 +276,28 @@
 
 
   {if $action eq 1 or $action eq 2 or $context eq 'search' or $context eq 'smog'}
-  {*include custom data js file*}
-  {include file="CRM/common/customData.tpl"}
+    {*include custom data js file*}
+    {include file="CRM/common/customData.tpl"}
     {literal}
     <script type="text/javascript">
     CRM.$(function($) {
-    {/literal}
-    {if $customDataSubType}
-      CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-      {else}
-      CRM.buildCustomData( '{$customDataType}' );
-    {/if}
-    {literal}
+      var doNotNotifyAssigneeFor = {/literal}{$doNotNotifyAssigneeFor|@json_encode}{literal};
+      $('#activity_type_id').change(function() {
+        if ($.inArray($(this).val(), doNotNotifyAssigneeFor) != -1) {
+          $('#notify_assignee_msg').hide();
+        }
+        else {
+          $('#notify_assignee_msg').show();
+        }
+      });
+
+      {/literal}
+      {if $customDataSubType}
+        CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
+        {else}
+        CRM.buildCustomData( '{$customDataType}' );
+      {/if}
+      {literal}
     });
     </script>
     {/literal}

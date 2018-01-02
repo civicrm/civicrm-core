@@ -90,6 +90,8 @@ class CRM_Utils_Token {
 
 
   /**
+   * @deprecated
+   *   This is used by CiviMail but will be made redundant by FlexMailer.
    * @return array
    */
   public static function getRequiredTokens() {
@@ -118,7 +120,8 @@ class CRM_Utils_Token {
    *    else an array of the missing tokens
    */
   public static function requiredTokens(&$str) {
-    $requiredTokens = self::getRequiredTokens();
+    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
+    $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS, array()) : CRM_Utils_Token::getRequiredTokens();
 
     $missing = array();
     foreach ($requiredTokens as $token => $value) {
@@ -657,17 +660,14 @@ class CRM_Utils_Token {
     $returnBlankToken = FALSE,
     $escapeSmarty = FALSE
   ) {
+    // Refresh contact tokens in case they have changed. There is heavy caching
+    // in exportable fields so there is no benefit in doing this conditionally.
+    self::$_tokens['contact'] = array_merge(
+      array_keys(CRM_Contact_BAO_Contact::exportableFields('All')),
+      array('checksum', 'contact_id')
+    );
+
     $key = 'contact';
-    if (self::$_tokens[$key] == NULL) {
-      // This should come from UF
-
-      self::$_tokens[$key]
-        = array_merge(
-          array_keys(CRM_Contact_BAO_Contact::exportableFields('All')),
-          array('checksum', 'contact_id')
-        );
-    }
-
     // here we intersect with the list of pre-configured valid tokens
     // so that we remove anything we do not recognize
     // I hope to move this step out of here soon and

@@ -1110,6 +1110,7 @@ WHERE civicrm_event.is_active = 1
    * @param int $participantId
    * @param bool $isTest
    * @param bool $returnMessageText
+   * @return array|null
    */
   public static function sendMail($contactID, &$values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
 
@@ -2066,23 +2067,24 @@ WHERE  ce.loc_block_id = $locBlockId";
     static $permissions = NULL;
 
     if (empty($permissions)) {
-      $result = civicrm_api3('Event', 'get', array(
+      $params = array(
         'check_permissions' => 1,
         'return' => 'title',
         'options' => array(
           'limit' => 0,
         ),
-      ));
+      );
+
+      if ($eventId) {
+        $params['id'] = $eventId;
+      }
+
+      $result = civicrm_api3('Event', 'get', $params);
       $allEvents = CRM_Utils_Array::collect('title', $result['values']);
 
-      $result = civicrm_api3('Event', 'get', array(
-        'check_permissions' => 1,
-        'return' => 'title',
-        'created_id' => 'user_contact_id',
-        'options' => array(
-          'limit' => 0,
-        ),
-      ));
+      // Search again, but only events created by the user.
+      $params['created_id'] = 'user_contact_id';
+      $result = civicrm_api3('Event', 'get', $params);
       $createdEvents = CRM_Utils_Array::collect('title', $result['values']);
 
       // Note: for a multisite setup, a user with edit all events, can edit all events

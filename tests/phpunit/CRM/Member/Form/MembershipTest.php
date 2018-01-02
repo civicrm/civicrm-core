@@ -610,8 +610,14 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form for partial payment.
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testSubmitPartialPayment() {
+  public function testSubmitPartialPayment($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     // Step 1: submit a partial payment for a membership via backoffice
     $form = $this->getForm();
     $form->preProcess();
@@ -629,7 +635,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       // This format reflects the 23 being the organisation & the 25 being the type.
       'membership_type_id' => array(23, $this->membershipTypeAnnualFixedID),
       'record_contribution' => 1,
-      'total_amount' => $partiallyPaidAmount,
+      'total_amount' => $this->formatMoneyInput($partiallyPaidAmount),
       'receive_date' => date('m/d/Y', time()),
       'receive_date_time' => '08:36PM',
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
@@ -655,7 +661,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $submitParams = array(
       'contribution_id' => $contribution['contribution_id'],
       'contact_id' => $this->_individualId,
-      'total_amount' => $partiallyPaidAmount,
+      'total_amount' => $this->formatMoneyInput($partiallyPaidAmount),
       'currency' => 'USD',
       'financial_type_id' => 2,
       'receive_date' => '04/21/2015',
@@ -676,7 +682,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
     ));
     $this->assertEquals('Completed', $contribution['contribution_status']);
-    // $this->assertEquals(50.00, $contribution['total_amount']);
     // $this->assertEquals(50.00, $contribution['net_amount']);
   }
 
@@ -684,6 +689,17 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    */
   public function testSubmitRecur() {
+    $pendingVal = $this->callAPISuccessGetValue('OptionValue', array(
+      'return' => "id",
+      'option_group_id' => "contribution_status",
+      'label' => "Pending",
+    ));
+    //Update label for Pending contribution status.
+    $this->callAPISuccess('OptionValue', 'create', array(
+      'id' => $pendingVal,
+      'label' => "PendingEdited",
+    ));
+
     $form = $this->getForm();
 
     $this->callAPISuccess('MembershipType', 'create', array(
@@ -705,6 +721,12 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'is_test' => TRUE,
     ));
+
+    //Check if Membership Payment is recorded.
+    $this->callAPISuccessGetCount('MembershipPayment', array(
+      'membership_id' => $membership['id'],
+      'contribution_id' => $contribution['id'],
+    ), 1);
 
     // CRM-16992.
     $this->callAPISuccessGetCount('LineItem', array(
@@ -1173,6 +1195,56 @@ Expires: ',
       'billing_country_id-5' => '1228',
     );
     $form->testSubmit($params);
+  }
+
+  /**
+   * Test membership status overrides when contribution is cancelled.
+   */
+  public function testContributionFormStatusUpdate() {
+    $form = new CRM_Contribute_Form_Contribution();
+
+    //Create a membership with status = 'New'.
+    $this->_individualId = $this->createLoggedInUser();
+    $memParams = array(
+      'contact_id' => $this->_individualId,
+      'membership_type_id' => $this->membershipTypeAnnualFixedID,
+      'status_id' => array_search('New', CRM_Member_PseudoConstant::membershipStatus()),
+    );
+    $cancelledStatusId = $this->callAPISuccessGetValue('OptionValue', array(
+      'return' => "value",
+      'option_group_id' => "contribution_status",
+      'name' => "Cancelled",
+    ));
+    $params = array(
+      'total_amount' => 50,
+      'financial_type_id' => 2,
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => $cancelledStatusId,
+    );
+    $membershipId = $this->contactMembershipCreate($memParams);
+
+    $contriParams = array(
+      'membership_id' => $membershipId,
+      'total_amount' => 50,
+      'financial_type_id' => 2,
+      'contact_id' => $this->_individualId,
+    );
+    $contribution = CRM_Member_BAO_Membership::recordMembershipContribution($contriParams);
+
+    //Update Contribution to Cancelled.
+    $form->_id = $params['id'] = $contribution->id;
+    $form->_mode = NULL;
+    $form->_contactID = $this->_individualId;
+    $form->testSubmit($params, CRM_Core_Action::UPDATE);
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+
+    //Assert membership status overrides when the contribution cancelled.
+    $this->assertEquals($membership['is_override'], TRUE);
+    $this->assertEquals($membership['status_id'], $this->callAPISuccessGetValue('MembershipStatus', array(
+      'return' => "id",
+      'name' => "Cancelled",
+    )));
   }
 
 }

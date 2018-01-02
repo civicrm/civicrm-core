@@ -119,6 +119,23 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
   protected $unsavedWarn = TRUE;
 
+  /*
+   * Is it possible to create separate activities with this form?
+   *
+   * When TRUE, the form will ask whether the user wants to create separate
+   * activities (if the user has specified multiple contacts in the "with"
+   * field).
+   *
+   * When FALSE, the form will create one activity with all contacts together
+   * and won't ask the user anything.
+   *
+   * Note: This is a class property so that child classes can turn off this
+   * behavior (e.g. in CRM_Case_Form_Activity)
+   *
+   * @var boolean
+   */
+  protected $supportsActivitySeparation = TRUE;
+
   /**
    * Explicitly declare the entity api name.
    *
@@ -702,9 +719,18 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
     $this->assign('surveyActivity', $this->_isSurveyActivity);
 
-    // this option should be available only during add mode
-    if ($this->_action != CRM_Core_Action::UPDATE) {
-      $this->add('advcheckbox', 'is_multi_activity', ts('Create a separate activity for each contact.'));
+    // Add the "Activity Separation" field
+    $actionIsAdd = $this->_action != CRM_Core_Action::UPDATE;
+    $separationIsPossible = $this->supportsActivitySeparation;
+    if ($actionIsAdd && $separationIsPossible) {
+      $this->addRadio(
+        'separation',
+        ts('Activity Separation'),
+        array(
+          'separate' => ts('Create separate activities for each contact'),
+          'combined' => ts('Create one activity with all contacts together'),
+        )
+      );
     }
 
     $this->addRule('duration',
@@ -784,12 +810,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     $this->addFormRule(array('CRM_Activity_Form_Activity', 'formRule'), $this);
 
-    if (Civi::settings()->get('activity_assignee_notification')) {
-      $this->assign('activityAssigneeNotification', TRUE);
-    }
-    else {
+    $doNotNotifyAssigneeFor = Civi::settings()->get('do_not_notify_assignees_for');
+    if (($this->_activityTypeId && in_array($this->_activityTypeId, $doNotNotifyAssigneeFor)) || !Civi::settings()->get('activity_assignee_notification')) {
       $this->assign('activityAssigneeNotification', FALSE);
     }
+    else {
+      $this->assign('activityAssigneeNotification', TRUE);
+    }
+    $this->assign('doNotNotifyAssigneeFor', $doNotNotifyAssigneeFor);
   }
 
   /**
@@ -832,6 +860,16 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if ((!empty($fields['followup_activity_subject']) || !empty($fields['followup_date'])) && empty($fields['followup_activity_type_id'])) {
       $errors['followup_activity_subject'] = ts('Follow-up Activity type is a required field.');
     }
+
+    // Check that a value has been set for the "activity separation" field if needed
+    $separationIsPossible = $self->supportsActivitySeparation;
+    $actionIsAdd = $self->_action == CRM_Core_Action::ADD;
+    $hasMultipleTargetContacts = !empty($fields['target_contact_id']) && strpos($fields['target_contact_id'], ',') !== FALSE;
+    $separationFieldIsEmpty = empty($fields['separation']);
+    if ($separationIsPossible && $actionIsAdd && $hasMultipleTargetContacts && $separationFieldIsEmpty) {
+      $errors['separation'] = ts('Activity Separation is a required field.');
+    }
+
     return $errors;
   }
 
@@ -915,6 +953,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       'civicrm_activity',
       $this->_activityId
     );
+
+    $params['is_multi_activity'] = CRM_Utils_Array::value('separation', $params) == 'separate';
 
     $activity = array();
     if (!empty($params['is_multi_activity']) &&
@@ -1047,7 +1087,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     // send copy to assignee contacts.CRM-4509
     $mailStatus = '';
 
-    if (Civi::settings()->get('activity_assignee_notification')) {
+    if (Civi::settings()->get('activity_assignee_notification')
+      && !in_array($activity->activity_type_id, Civi::settings()->get('do_not_notify_assignees_for'))) {
       $activityIDs = array($activity->id);
       if ($followupActivity) {
         $activityIDs = array_merge($activityIDs, array($followupActivity->id));

@@ -61,7 +61,8 @@ class CRM_Contact_Task {
     RESTORE = 23,
     DELETE_PERMANENTLY = 24,
     COMMUNICATION_PREFS = 25,
-    INDIVIDUAL_CONTACTS = 26;
+    INDIVIDUAL_CONTACTS = 26,
+    ADD_TO_CASE = 27;
 
   /**
    * The task array
@@ -76,6 +77,11 @@ class CRM_Contact_Task {
    * @var array
    */
   static $_optionalTasks = NULL;
+
+  public static function tasks() {
+    self::initTasks();
+    return self::$_tasks;
+  }
 
   public static function initTasks() {
     if (!self::$_tasks) {
@@ -270,10 +276,17 @@ class CRM_Contact_Task {
         );
       }
 
+      if (CRM_Core_Permission::access('CiviCase')) {
+        self::$_tasks[self::ADD_TO_CASE] = array(
+          'title' => 'Add to case as role',
+          'class' => 'CRM_Case_Form_AddToCaseAsRole',
+          'result' => FALSE,
+        );
+      }
+
       self::$_tasks += CRM_Core_Component::taskList();
 
       CRM_Utils_Hook::searchTasks('contact', self::$_tasks);
-
     }
   }
 
@@ -398,7 +411,7 @@ class CRM_Contact_Task {
     self::initTasks();
 
     foreach (self::$_tasks as $task => $value) {
-      if (!empty($value['url']) && (
+      if ((!empty($value['url']) || $task == self::EXPORT_CONTACTS) && (
         (is_array($value['class']) && in_array($className, $value['class'])) ||
          ($value['class'] == $className)
         )

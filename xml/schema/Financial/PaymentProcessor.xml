@@ -238,6 +238,7 @@
     <type>text</type>
     <default>NULL</default>
     <comment>array of accepted credit card types</comment>
+    <serialize>JSON</serialize>
     <add>4.7</add>
   </field>
 </table>

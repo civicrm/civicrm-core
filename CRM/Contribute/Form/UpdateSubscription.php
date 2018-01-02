@@ -81,17 +81,19 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
 
     $this->contributionRecurID = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
     if ($this->contributionRecurID) {
-      $this->_paymentProcessor = CRM_Contribute_BAO_ContributionRecur::getPaymentProcessor($this->contributionRecurID);
-      if (!$this->_paymentProcessor) {
+      try {
+        $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($this->contributionRecurID);
+      }
+      catch (CRM_Core_Exception $e) {
         CRM_Core_Error::statusBounce(ts('There is no valid processor for this subscription so it cannot be edited.'));
       }
-      $this->_paymentProcessorObj = $this->_paymentProcessor['object'];
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->contributionRecurID);
     }
 
     $this->_coid = CRM_Utils_Request::retrieve('coid', 'Integer', $this, FALSE);
     if ($this->_coid) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'info');
+      // @todo test & replace with $this->_paymentProcessorObj =  Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
       $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
       $this->contributionRecurID = $this->_subscriptionDetails->recur_id;
@@ -135,9 +137,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     }
 
     $this->assign('editableScheduleFields', array_diff($this->editableScheduleFields, $alreadyHardCodedFields));
-    $this->assign('paymentProcessor', $this->_paymentProcessor);
-    $this->assign('frequency_unit', $this->_subscriptionDetails->frequency_unit);
-    $this->assign('frequency_interval', $this->_subscriptionDetails->frequency_interval);
 
     if ($this->_subscriptionDetails->contact_id) {
       list($this->_donorDisplayName, $this->_donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
@@ -283,18 +282,13 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
 
       $activityParams = array(
         'source_contact_id' => $contactID,
-        'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
-          'Update Recurring Contribution',
-          'name'
-        ),
+        'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Update Recurring Contribution'),
         'subject' => $msg,
         'details' => $message,
         'activity_date_time' => date('YmdHis'),
-        'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
-          'Completed',
-          'name'
-        ),
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
       );
+
       $session = CRM_Core_Session::singleton();
       $cid = $session->get('userID');
 

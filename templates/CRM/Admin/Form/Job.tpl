@@ -50,7 +50,7 @@
         <td class="label">{$form.run_frequency.label}</td><td>{$form.run_frequency.html}</td>
     </tr>
     <tr class="crm-job-form-block-api_action">
-        <td class="label">{ts}API call:{/ts}</td>
+        <td class="label"><label>{ts}API call:{/ts}</label></td>
         <td>
 
         <div id="fname"><br/>

@@ -534,7 +534,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if ($this->_noteID &&
-      isset($this->_values['note'])
+      !CRM_Utils_System::isNull($this->_values['note'])
     ) {
       $defaults['hidden_AdditionalDetail'] = 1;
     }
@@ -1324,6 +1324,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       ));
       $this->_id = $params['id'];
       $this->_values = $existingContribution;
+      if (CRM_Contribute_BAO_Contribution::checkContributeSettings('invoicing')) {
+        $this->_values['tax_amount'] = civicrm_api3('contribution', 'getvalue', array(
+          'id' => $params['id'],
+          'return' => 'tax_amount',
+        ));
+      }
     }
     else {
       $existingContribution = array();
@@ -1522,7 +1528,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     if (!isset($submittedValues['total_amount'])) {
-      $submittedValues['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_values) - CRM_Utils_Array::value('tax_amount', $this->_values);
+      $submittedValues['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_values);
+      // Avoid tax amount deduction on edit form and keep it original, because this will lead to error described in CRM-20676
+      if (!$this->_id) {
+        $submittedValues['total_amount'] -= CRM_Utils_Array::value('tax_amount', $this->_values, 0);
+      }
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
@@ -1701,7 +1711,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
     }
 
-    if ($contribution->id && !empty($submittedValues['note'])) {
+    if ($contribution->id && array_key_exists('note', $submittedValues)) {
       CRM_Contribute_Form_AdditionalInfo::processNote($submittedValues, $this->_contactID, $contribution->id, $this->_noteID);
     }
 

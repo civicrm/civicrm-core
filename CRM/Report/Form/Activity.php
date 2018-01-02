@@ -253,6 +253,10 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'title' => ts('Duration'),
             'type' => CRM_Utils_Type::T_INT,
           ),
+          'location' => array(
+            'title' => ts('Location'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
           'details' => array(
             'title' => ts('Activity Details'),
           ),
@@ -278,6 +282,10 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::activityStatus(),
+          ),
+          'location' => array(
+            'title' => ts('Location'),
+            'type' => CRM_Utils_Type::T_TEXT,
           ),
           'details' => array(
             'title' => ts('Activity Details'),

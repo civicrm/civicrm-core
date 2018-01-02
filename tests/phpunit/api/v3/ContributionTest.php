@@ -122,6 +122,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(array('civicrm_uf_match'));
+    $financialAccounts = $this->callAPISuccess('FinancialAccount', 'get', array());
+    foreach ($financialAccounts['values'] as $financialAccount) {
+      if ($financialAccount['name'] == 'Test Tax financial account ' || $financialAccount['name'] == 'Test taxable financial Type') {
+        $entityFinancialTypes = $this->callAPISuccess('EntityFinancialAccount', 'get', array(
+          'financial_account_id' => $financialAccount['id'],
+        ));
+        foreach ($entityFinancialTypes['values'] as $entityFinancialType) {
+          $this->callAPISuccess('EntityFinancialAccount', 'delete', array('id' => $entityFinancialType['id']));
+        }
+        $this->callAPISuccess('FinancialAccount', 'delete', array('id' => $financialAccount['id']));
+      }
+    }
   }
 
   /**
@@ -679,6 +691,23 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $contribution = $this->callAPISuccessGetSingle('contribution', array('id' => $contribution['id']));
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['receive_date'])));
+  }
+
+  /**
+   * Create test with unique field name on source.
+   */
+  public function testCreateContributionNullOutThankyouDate() {
+
+    $params = $this->_params;
+    $params['thankyou_date'] = 'yesterday';
+
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $contribution = $this->callAPISuccessGetSingle('contribution', array('id' => $contribution['id']));
+    $this->assertEquals(date('Y-m-d', strtotime('yesterday')), date('Y-m-d', strtotime($contribution['thankyou_date'])));
+
+    $params['thankyou_date'] = 'null';
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $contribution = $this->assertTrue(empty($contribution['thankyou_date']));
   }
 
   /**
@@ -1929,9 +1958,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-19126 Add test to verify when complete transaction is called tax amount is not changed
+   * CRM-19126 Add test to verify when complete transaction is called tax amount is not changed.
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testCheckTaxAmount() {
+  public function testCheckTaxAmount($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $contact = $this->createLoggedInUser();
     $financialType = $this->callAPISuccess('financial_type', 'create', array(
       'name' => 'Test taxable financial Type',

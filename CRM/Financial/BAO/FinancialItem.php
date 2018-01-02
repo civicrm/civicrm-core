@@ -47,7 +47,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_BAO_FinancialItem
+   * @return CRM_Financial_BAO_FinancialItem
    */
   public static function retrieve(&$params, &$defaults) {
     $financialItem = new CRM_Financial_DAO_FinancialItem();
@@ -286,7 +286,7 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
    *
    * @param int $entityId
    *
-   * @return object CRM_Core_DAO
+   * @return array
    */
   public static function getPreviousFinancialItem($entityId) {
     $params = array(

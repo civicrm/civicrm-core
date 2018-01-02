@@ -167,20 +167,9 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     }
 
     if ($statusID) {
-      $skip = 50;
-      // $skip = 1;
-      $config = CRM_Core_Config::singleton();
-      $statusFile = "{$config->uploadDir}status_{$statusID}.txt";
-      $status = "<div class='description'>&nbsp; " . ts('No processing status reported yet.') . "</div>";
-
-      //do not force the browser to display the save dialog, CRM-7640
-      $contents = json_encode(array(0, $status));
-
-      file_put_contents($statusFile, $contents);
-
+      $this->progressImport($statusID);
       $startTimestamp = $currTimestamp = $prevTimestamp = time();
     }
-
     // get the contents of the temp. import table
     $query = "SELECT * FROM $tableName";
     if ($mode == self::MODE_IMPORT) {
@@ -215,39 +204,9 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       elseif ($mode == self::MODE_IMPORT) {
         //print "Running parser in import mode<br/>\n";
         $returnCode = $this->import($onDuplicate, $values, $doGeocodeAddress);
-        if ($statusID && (($this->_rowCount % $skip) == 0)) {
-          $currTimestamp = time();
-          $totalTime = ($currTimestamp - $startTimestamp);
-          $time = ($currTimestamp - $prevTimestamp);
-          $recordsLeft = $totalRowCount - $this->_rowCount;
-          if ($recordsLeft < 0) {
-            $recordsLeft = 0;
-          }
-          $estimatedTime = ($recordsLeft / $skip) * $time;
-          $estMinutes = floor($estimatedTime / 60);
-          $timeFormatted = '';
-          if ($estMinutes > 1) {
-            $timeFormatted = $estMinutes . ' ' . ts('minutes') . ' ';
-            $estimatedTime = $estimatedTime - ($estMinutes * 60);
-          }
-          $timeFormatted .= round($estimatedTime) . ' ' . ts('seconds');
-          $processedPercent = (int ) (($this->_rowCount * 100) / $totalRowCount);
-          $statusMsg = ts('%1 of %2 records - %3 remaining',
-            array(1 => $this->_rowCount, 2 => $totalRowCount, 3 => $timeFormatted)
-          );
-          $status = "
-<div class=\"description\">
-&nbsp; <strong>{$statusMsg}</strong>
-</div>
-";
-
-          $contents = json_encode(array($processedPercent, $status));
-
-          file_put_contents($statusFile, $contents);
-
-          $prevTimestamp = $currTimestamp;
+        if ($statusID && (($this->_rowCount % 50) == 0)) {
+          $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
         }
-        // sleep(1);
       }
       else {
         $returnCode = self::ERROR;
@@ -271,10 +230,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
       if ($returnCode & self::ERROR) {
         $this->_invalidRowCount++;
-        if ($this->_invalidRowCount < $this->_maxErrorCount) {
-          array_unshift($values, $this->_rowCount);
-          $this->_errors[] = $values;
-        }
+        array_unshift($values, $this->_rowCount);
+        $this->_errors[] = $values;
       }
 
       if ($returnCode & self::CONFLICT) {

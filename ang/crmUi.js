@@ -675,6 +675,38 @@
       };
     })
 
+    // validate multiple email text
+    // usage: <input crm-multiple-email type="text" ng-model="myobj.field" />
+    .directive('crmMultipleEmail', function ($parse, $timeout) {
+      return {
+        require: 'ngModel',
+        link: function(scope, element, attrs, ctrl) {
+          ctrl.$parsers.unshift(function(viewValue) {
+            // if empty value provided simply bypass validation
+            if (_.isEmpty(viewValue)) {
+              ctrl.$setValidity('crmMultipleEmail', true);
+              return viewValue;
+            }
+
+            // split email string on basis of comma
+            var emails = viewValue.split(',');
+            // regex pattern for single email
+            var emailRegex = /\S+@\S+\.\S+/;
+
+            var validityArr = emails.map(function(str){
+              return emailRegex.test(str.trim());
+            });
+
+            if ($.inArray(false, validityArr) > -1) {
+              ctrl.$setValidity('crmMultipleEmail', false);
+            } else {
+              ctrl.$setValidity('crmMultipleEmail', true);
+            }
+            return viewValue;
+          });
+        }
+      };
+    })
     // example <div crm-ui-tab id="tab-1" crm-title="ts('My Title')" count="3">...content...</div>
     // WISHLIST: use a full Angular component instead of an incomplete jQuery wrapper
     .directive('crmUiTab', function($parse) {

@@ -49,6 +49,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    */
   public $_id = NULL;
 
+  protected $entity = 'Contribution';
+
   protected $_owed = NULL;
 
   protected $_refund = NULL;
@@ -80,26 +82,18 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   public function preProcess() {
 
-    parent::preProcess();
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
-    // @todo don't set this - rely on parent $this->contactID
-    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this, TRUE);
+    parent::preProcess();
+    $this->_contactId = $this->_contactID;
+    $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this, FALSE, 'contribution');
     $this->_view = CRM_Utils_Request::retrieve('view', 'String', $this, FALSE);
     $this->assign('component', $this->_component);
     $this->assign('id', $this->_id);
     $this->assign('suppressPaymentFormButtons', $this->isBeingCalledFromSelectorContext());
 
     if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
-      $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, TRUE);
-      $title = ts('View Payment');
-      if ($this->_component == 'event') {
-        $info = CRM_Event_BAO_Participant::participantDetails($this->_id);
-        $title .= " - {$info['title']}";
-      }
+      $title = $this->assignPaymentInfoBlock();
       CRM_Utils_System::setTitle($title);
-      $this->assign('transaction', TRUE);
-      $this->assign('payments', $paymentInfo['transaction']);
       return;
     }
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
@@ -138,10 +132,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       CRM_Core_Error::fatal(ts('Credit card payment is not for Refund payments use'));
     }
 
-    list($this->_contributorDisplayName, $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
+    list($this->_contributorDisplayName, $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
 
     $this->assign('contributionMode', $this->_mode);
-    $this->assign('contactId', $this->_contactId);
+    $this->assign('contactId', $this->_contactID);
     $this->assign('paymentType', $this->_paymentType);
     $this->assign('paymentAmt', abs($paymentAmt));
 
@@ -184,7 +178,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     if ($this->_refund) {
-      $defaults['total_amount'] = abs($this->_refund);
+      $defaults['total_amount'] = CRM_Utils_Money::format(abs($this->_refund), NULL, NULL, TRUE);
     }
     elseif ($this->_owed) {
       $defaults['total_amount'] = number_format($this->_owed, 2);

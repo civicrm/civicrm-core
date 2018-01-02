@@ -1404,6 +1404,14 @@ class CRM_Utils_System {
     // move things to CiviCRM cache as needed
     CRM_Core_Session::storeSessionObjects();
 
+    if (Civi\Core\Container::isContainerBooted()) {
+      Civi::dispatcher()->dispatch('civi.core.exit');
+    }
+
+    $userSystem = CRM_Core_Config::singleton()->userSystem;
+    if (is_callable(array($userSystem, 'onCiviExit'))) {
+      $userSystem->onCiviExit();
+    }
     exit($status);
   }
 

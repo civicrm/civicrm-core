@@ -662,6 +662,10 @@ abstract class CRM_Core_Payment {
   public function getPaymentFormFieldsMetadata() {
     //@todo convert credit card type into an option value
     $creditCardType = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::creditCard();
+    $isCVVRequired = Civi::settings()->get('cvv_backoffice_required');
+    if (!$this->isBackOffice()) {
+      $isCVVRequired = TRUE;
+    }
     return array(
       'credit_card_number' => array(
         'htmlType' => 'text',
@@ -686,7 +690,7 @@ abstract class CRM_Core_Payment {
           'maxlength' => 10,
           'autocomplete' => 'off',
         ),
-        'is_required' => Civi::settings()->get('cvv_backoffice_required'),
+        'is_required' => $isCVVRequired,
         'rules' => array(
           array(
             'rule_message' => ts('Please enter a valid value for your card security code. This is usually the last 3-4 digits on the card\'s signature panel.'),
@@ -982,6 +986,19 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Get the currency for the transaction.
+   *
+   * Handle any inconsistency about how it is passed in here.
+   *
+   * @param $params
+   *
+   * @return string
+   */
+  protected function getCurrency($params) {
+    return CRM_Utils_Array::value('currencyID', $params, CRM_Utils_Array::value('currency', $params));
+  }
+
+  /**
    * Get url to return to after cancelled or failed transaction.
    *
    * @param string $qfKey
@@ -1141,7 +1158,7 @@ abstract class CRM_Core_Payment {
    */
   public function doPayment(&$params, $component = 'contribute') {
     $this->_component = $component;
-    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
 
     // If we have a $0 amount, skip call to processor and set payment_status to Completed.
     // Conceivably a processor might override this - perhaps for setting up a token - but we don't

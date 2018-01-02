@@ -1730,8 +1730,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       // add price field information in $inputParams
       self::addPriceFieldByMembershipType($inputParams, $priceSetDetails['fields'], $membership->membership_type_id);
-      // paid amount
-      $paidAmount = CRM_Utils_Array::value('paid', CRM_Contribute_BAO_Contribution::getPaymentInfo($membership->id, 'membership'));
+
       // update related contribution and financial records
       CRM_Price_BAO_LineItem::changeFeeSelections(
         $inputParams,
@@ -1739,7 +1738,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         'membership',
         $contributionID,
         $priceSetDetails['fields'],
-        $lineItems, $paidAmount
+        $lineItems
       );
       CRM_Core_Session::setStatus(ts('Associated contribution is updated on membership type change.'), ts('Success'), 'success');
     }

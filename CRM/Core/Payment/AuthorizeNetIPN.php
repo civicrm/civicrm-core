@@ -118,14 +118,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       return FALSE;
     }
 
-    // At this point $object has first contribution loaded.
-    // Lets do a check to make sure this payment has the amount same as that of first contribution.
-    if ($objects['contribution']->total_amount != $input['amount']) {
-      CRM_Core_Error::debug_log_message("Subscription amount mismatch.");
-      echo "Failure: Subscription amount mismatch<p>";
-      return FALSE;
-    }
-
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
     $transaction = new CRM_Core_Transaction();

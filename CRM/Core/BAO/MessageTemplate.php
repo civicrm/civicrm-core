@@ -406,6 +406,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       'text' => $dao->text,
       'html' => $dao->html,
       'format' => $dao->format,
+      'groupName' => $params['groupName'],
+      'valueName' => $params['valueName'],
+      'messageTemplateID' => $params['messageTemplateID'],
     );
     $dao->free();
 

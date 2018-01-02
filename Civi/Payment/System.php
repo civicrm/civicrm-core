@@ -38,7 +38,7 @@ class System {
    *   Override the config check. This is required in uninstall as no valid instances exist
    *   but will deliberately not work with any valid processors.
    *
-   * @return CRM_Core_Payment|NULL
+   * @return \CRM_Core_Payment|NULL
    *
    * @throws \CRM_Core_Exception
    */

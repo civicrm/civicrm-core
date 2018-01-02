@@ -881,6 +881,7 @@ SELECT g.*
       $cache = CRM_Utils_Cache::singleton();
       $ids = $cache->get($cacheKey);
       if (!$ids) {
+        $ids = array();
         $query = "
 SELECT   a.operation, a.object_id
   FROM   civicrm_acl_cache c, civicrm_acl a

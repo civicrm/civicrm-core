@@ -33,7 +33,8 @@
     <type>varchar</type>
     <length>255</length>
     <import>true</import>
-    <comment>This column will store a comma separated list of the type(s) of profile fields.</comment>
+    <comment>Comma separated list of the type(s) of profile fields.</comment>
+    <serialize>COMMA</serialize>
     <add>2.1</add>
   </field>
   <field>

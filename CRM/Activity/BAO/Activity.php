@@ -605,10 +605,16 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     // if the subject contains a ‘[case #…]’ string, file that activity on the related case (CRM-5916)
     $matches = array();
-    if (preg_match('/\[case #([0-9a-h]{7})\]/', CRM_Utils_Array::value('subject', $params), $matches)) {
+    $subjectToMatch = CRM_Utils_Array::value('subject', $params);
+    if (preg_match('/\[case #([0-9a-h]{7})\]/', $subjectToMatch, $matches)) {
       $key = CRM_Core_DAO::escapeString(CIVICRM_SITE_KEY);
       $hash = $matches[1];
-      $query = "SELECT id FROM civicrm_case WHERE SUBSTR(SHA1(CONCAT('$key', id)), 1, 7) = '$hash'";
+      $query = "SELECT id FROM civicrm_case WHERE SUBSTR(SHA1(CONCAT('$key', id)), 1, 7) = '" . CRM_Core_DAO::escapeString($hash) . "'";
+    }
+    elseif (preg_match('/\[case #(\d+)\]/', $subjectToMatch, $matches)) {
+      $query = "SELECT id FROM civicrm_case WHERE id = '" . CRM_Core_DAO::escapeString($matches[1]) . "'";
+    }
+    if (!empty($matches)) {
       $caseParams = array(
         'activity_id' => $activity->id,
         'case_id' => CRM_Core_DAO::singleValueQuery($query),
@@ -617,7 +623,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         CRM_Case_BAO_Case::processCaseActivity($caseParams);
       }
       else {
-        self::logActivityAction($activity, "unknown case hash encountered: $hash");
+        self::logActivityAction($activity, "Case details for {$matches[1]} not found while recording an activity on case.");
       }
     }
 

@@ -100,13 +100,13 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     $form->_contactIds = array();
     $form->_contactTypes = array();
 
-    $isStandAlone = in_array('task', $form->urlPath);
+    $isStandAlone = in_array('task', $form->urlPath) || in_array('standalone', $form->urlPath);
     if ($isStandAlone) {
       list($form->_task, $title) = CRM_Contact_Task::getTaskAndTitleByClass(get_class($form));
       if (!array_key_exists($form->_task, CRM_Contact_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission()))) {
         CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
-      $form->_contactIds = explode(',', CRM_Utils_Request::retrieve('cids', 'String', $form, TRUE));
+      $form->_contactIds = explode(',', CRM_Utils_Request::retrieve('cids', 'CommaSeparatedIntegers', $form, TRUE));
       if (empty($form->_contactIds)) {
         CRM_Core_Error::statusBounce(ts('No Contacts Selected'));
       }

@@ -482,6 +482,20 @@ class CRM_Utils_Rule {
    *
    * @return bool
    */
+  public static function commaSeparatedIntegers($value) {
+    foreach (explode(',', $value) as $val) {
+      if (!self::positiveInteger($val)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * @param $value
+   *
+   * @return bool
+   */
   public static function numeric($value) {
     // lets use a php gatekeeper to ensure this is numeric
     if (!is_numeric($value)) {
@@ -502,9 +516,15 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
+   * Strip thousand separator from a money string.
    *
-   * @return mixed
+   * Note that this should be done at the form layer. Once we are processing
+   * money at the BAO or processor layer we should be working with something that
+   * is already in a normalised format.
+   *
+   * @param string $value
+   *
+   * @return string
    */
   public static function cleanMoney($value) {
     // first remove all white space

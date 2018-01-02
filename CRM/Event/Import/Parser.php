@@ -192,14 +192,12 @@ abstract class CRM_Event_Import_Parser extends CRM_Import_Parser {
 
       if ($returnCode & self::ERROR) {
         $this->_invalidRowCount++;
-        if ($this->_invalidRowCount < $this->_maxErrorCount) {
-          $recordNumber = $this->_lineCount;
-          if ($this->_haveColumnHeader) {
-            $recordNumber--;
-          }
-          array_unshift($values, $recordNumber);
-          $this->_errors[] = $values;
+        $recordNumber = $this->_lineCount;
+        if ($this->_haveColumnHeader) {
+          $recordNumber--;
         }
+        array_unshift($values, $recordNumber);
+        $this->_errors[] = $values;
       }
 
       if ($returnCode & self::CONFLICT) {

@@ -310,24 +310,46 @@
         });
       },
 
-      previewRecipientCount: function previewRecipientCount(mailing) {
-        // To get list of recipients, we tentatively save the mailing and
-        // get the resulting recipients -- then rollback any changes.
-        var params = angular.extend({}, mailing, mailing.recipients, {
-          name: 'placeholder', // for previewing recipients on new, incomplete mailing
-          subject: 'placeholder', // for previewing recipients on new, incomplete mailing
-          options: {force_rollback: 1},
-          'api.mailing_job.create': 1, // note: exact match to API default
-          'api.MailingRecipients.getcount': {
-            mailing_id: '$value.id'
+      previewRecipientCount: function previewRecipientCount(mailing, crmMailingCache, rebuild) {
+        var cachekey = 'mailing-' + mailing.id + '-recipient-count';
+        var recipientCount = crmMailingCache.get(cachekey);
+        if (rebuild || _.isEmpty(recipientCount)) {
+          // To get list of recipients, we tentatively save the mailing and
+          // get the resulting recipients -- then rollback any changes.
+          var params = angular.extend({}, mailing, mailing.recipients, {
+            name: 'placeholder', // for previewing recipients on new, incomplete mailing
+            subject: 'placeholder', // for previewing recipients on new, incomplete mailing
+            options: {force_rollback: 1},
+            'api.mailing_job.create': 1, // note: exact match to API default
+            'api.MailingRecipients.getcount': {
+              mailing_id: '$value.id'
+            }
+          });
+          // if this service is executed on rebuild then also fetch the recipients list
+          if (rebuild) {
+            params = angular.extend(params, {
+              'api.MailingRecipients.get': {
+                mailing_id: '$value.id',
+                options: {limit: 50},
+                'api.contact.getvalue': {'return': 'display_name'},
+                'api.email.getvalue': {'return': 'email'}
+              }
+            });
+            crmMailingCache.put('mailing-' + mailing.id + '-recipient-params', params.recipients);
           }
-        });
-        delete params.recipients; // the content was merged in
-        return qApi('Mailing', 'create', params).then(function (recipResult) {
-          // changes rolled back, so we don't care about updating mailing
-          mailing.modified_date = recipResult.values[recipResult.id].modified_date;
-          return recipResult.values[recipResult.id]['api.MailingRecipients.getcount'];
-        });
+          delete params.recipients; // the content was merged in
+          recipientCount = qApi('Mailing', 'create', params).then(function (recipResult) {
+            // changes rolled back, so we don't care about updating mailing
+            mailing.modified_date = recipResult.values[recipResult.id].modified_date;
+            if (rebuild) {
+              crmMailingCache.put('mailing-' + mailing.id + '-recipient-list', recipResult.values[recipResult.id]['api.MailingRecipients.get'].values);
+            }
+            return recipResult.values[recipResult.id]['api.MailingRecipients.getcount'];
+          });
+          crmMailingCache.put(cachekey, recipientCount);
+        }
+
+        return recipientCount;
       },
 
       // Save a (draft) mailing
@@ -517,7 +539,7 @@
             return crmLegacy.url('civicrm/contact/search/advanced',
               'force=1&mailing_id=' + mailing.id + statType.searchFilter);
           case 'report':
-            var reportIds = CRM.crmMailing.reportIds; 
+            var reportIds = CRM.crmMailing.reportIds;
             return crmLegacy.url('civicrm/report/instance/' + reportIds[statType.reportType],
                 'reset=1&mailing_id_value=' + mailing.id + statType.reportFilter);
           default:
@@ -554,5 +576,9 @@
       };
     };
   });
+
+  angular.module('crmMailing').factory('crmMailingCache', ['$cacheFactory', function($cacheFactory) {
+    return $cacheFactory('crmMailingCache');
+  }]);
 
 })(angular, CRM.$, CRM._);

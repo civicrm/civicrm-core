@@ -89,26 +89,22 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         }
         $contact['is_sent'][$groupBy][$groupByID] = TRUE;
       }
-      // update dates (do it for each contribution including grouped recurring contribution)
-      //@todo - the 2 calls below bypass all hooks. Using the api would possibly be slower than one call but not than 2
+      // Update receipt/thankyou dates
+      $contributionParams = array('id' => $contributionId);
       if ($receipt_update) {
-        $result = CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'receipt_date', $nowDate);
-        if ($result) {
-          $receipts++;
-        }
+        $contributionParams['receipt_date'] = $nowDate;
       }
       if ($thankyou_update) {
-        $result = CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'thankyou_date', $nowDate);
-        if ($result) {
-          $thanks++;
-        }
+        $contributionParams['thankyou_date'] = $nowDate;
+      }
+      if ($receipt_update || $thankyou_update) {
+        civicrm_api3('Contribution', 'create', $contributionParams);
+        $receipts = ($receipt_update ? $receipts + 1 : $receipts);
+        $thanks = ($thankyou_update ? $thanks + 1 : $thanks);
       }
     }
 
-    // This seems silly, but the old behavior was to first check `_cid`
-    // and then use the provided `$contactIds`. Probably not even necessary,
-    // but difficult to audit.
-    $contactIds = $form->_cid ? array($form->_cid) : array_keys($contacts);
+    $contactIds = array_keys($contacts);
     self::createActivities($form, $html_message, $contactIds, CRM_Utils_Array::value('subject', $formValues, ts('Thank you letter')), CRM_Utils_Array::value('campaign_id', $formValues), $contactHtml);
     $html = array_diff_key($html, $emailedHtml);
 

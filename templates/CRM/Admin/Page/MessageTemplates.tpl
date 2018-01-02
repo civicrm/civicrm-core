@@ -86,7 +86,7 @@
 {/if}
 
 {if $rows and $action ne 2 and $action ne 4}
-
+<div class="crm-content-block crm-block">
   <div id='mainTabContainer'>
     <ul>
       <li id='tab_user'>    <a href='#user'     title='{ts}User-driven Messages{/ts}'>    {ts}User-driven Messages{/ts}    </a></li>
@@ -162,7 +162,7 @@
       </div>
     {/foreach}
   </div>
-
+</div>
   <script type='text/javascript'>
     var selectedTab = 'user';
     {if $selectedChild}selectedTab = '{$selectedChild}';{/if}

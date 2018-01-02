@@ -64,6 +64,7 @@
       <type>Select</type>
       <multiple>1</multiple>
     </html>
+    <serialize>SEPARATOR_BOOKEND</serialize>
     <add>1.5</add>
   </field>
   <index>
@@ -288,7 +289,9 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <multiple>1</multiple>
     </html>
+    <serialize>SEPARATOR_BOOKEND</serialize>
   </field>
   <index>
     <name>index_preferred_communication_method</name>
@@ -603,6 +606,9 @@
     <title>Addressee ID</title>
     <comment>FK to civicrm_option_value.id, that has to be valid registered Addressee.</comment>
     <add>3.0</add>
+    <pseudoconstant>
+      <optionGroupName>addressee</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>addressee_custom</name>
@@ -615,9 +621,6 @@
     <html>
       <type>Text</type>
     </html>
-    <pseudoconstant>
-      <optionGroupName>addressee</optionGroupName>
-    </pseudoconstant>
   </field>
   <field>
     <name>addressee_display</name>
