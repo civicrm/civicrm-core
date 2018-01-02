@@ -42,7 +42,7 @@
 
     <div id='responseErrors' class = "hiddenElement messages crm-error"></div>
 
-    <div id='help' class='help'>
+    <div class='help'>
       {if $votingTab}
         {ts}Click <strong>record response</strong> button to update values for each respondent as needed.{/ts}
       {else}
