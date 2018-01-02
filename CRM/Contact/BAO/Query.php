@@ -56,7 +56,8 @@ class CRM_Contact_BAO_Query {
     // There is no 4,
     MODE_MEMBER = 8,
     MODE_EVENT = 16,
-    // No 32, no 64.
+    MODE_CONTACTSRELATED = 32,
+    // no 64.
     MODE_GRANT = 128,
     MODE_PLEDGEBANK = 256,
     MODE_PLEDGE = 512,
@@ -66,6 +67,13 @@ class CRM_Contact_BAO_Query {
     MODE_CAMPAIGN = 8192,
     MODE_MAILING = 16384,
     MODE_ALL = 17407;
+
+  /**
+   * Constants for search operators
+   */
+  const
+    SEARCH_OPERATOR_AND = 'AND',
+    SEARCH_OPERATOR_OR = 'OR';
 
   /**
    * The default set of return properties.

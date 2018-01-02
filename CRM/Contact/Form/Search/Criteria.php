@@ -158,32 +158,6 @@ class CRM_Contact_Form_Search_Criteria {
     );
 
     $componentModes = CRM_Contact_Form_Search::getModeSelect();
-    $enabledComponents = CRM_Core_Component::getEnabledComponents();
-
-    // unset disabled components that must should have been enabled
-    // to the option be viable
-    if (!array_key_exists('CiviMail', $enabledComponents)) {
-      unset($componentModes['8']);
-    }
-
-    // unset contributions or participants if user does not have
-    // permission on them
-    if (!CRM_Core_Permission::access('CiviContribute')) {
-      unset($componentModes['2']);
-    }
-
-    if (!CRM_Core_Permission::access('CiviEvent')) {
-      unset($componentModes['3']);
-    }
-
-    if (!CRM_Core_Permission::access('CiviMember')) {
-      unset($componentModes['5']);
-    }
-
-    if (!CRM_Core_Permission::check('view all activities')) {
-      unset($componentModes['4']);
-    }
-
     if (count($componentModes) > 1) {
       $form->add('select',
         'component_mode',
@@ -198,8 +172,8 @@ class CRM_Contact_Form_Search_Criteria {
       'operator',
       ts('Search Operator'),
       array(
-        'AND' => ts('AND'),
-        'OR' => ts('OR'),
+        CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND => ts('AND'),
+        CRM_Contact_BAO_Query::SEARCH_OPERATOR_OR => ts('OR'),
       ),
       array('allowClear' => FALSE)
     );

@@ -206,7 +206,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     $this->normalizeDefaultValues($defaults);
 
     if ($this->_context === 'amtg') {
-      $defaults['task'] = CRM_Contact_Task::GROUP_CONTACTS;
+      $defaults['task'] = CRM_Contact_Task::GROUP_ADD;
     }
 
     return $defaults;
