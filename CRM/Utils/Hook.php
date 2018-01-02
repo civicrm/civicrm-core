@@ -2275,23 +2275,6 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called when retrieving a list of transactions to be displayed for batch assignment.
-   *
-   * @param string $query
-   * @param int $batchId
-   * @param array $params
-   * @param bool $batchTransactions
-   *
-   * @return mixed
-   */
-  public static function alterBatchTransactionListQuery(&$query, $batchId, $params, $batchTransactions) {
-    return self::singleton()->invoke(array('query', 'batchId', 'params', 'batchTransactions'),
-      $query, $batchId, $params, $batchTransactions, self::$_nullObject, self::$_nullObject,
-      'civicrm_alterBatchTransactionListQuery'
-    );
-  }
-
-  /**
    * This hook is called to alter Deferred revenue item values just before they are
    * inserted in civicrm_financial_trxn table
    *

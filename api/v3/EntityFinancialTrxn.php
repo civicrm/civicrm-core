@@ -51,7 +51,38 @@ function civicrm_api3_entity_financial_trxn_create($params) {
  *   Array of retrieved Entity Financial Trxn property values.
  */
 function civicrm_api3_entity_financial_trxn_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $sql = CRM_Utils_SQL_Select::fragment();
+  _civicrm_api3_entity_financial_trxn_get_extraFilters($params, $sql);
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'EntityFinancialTrxn', $sql);
+}
+
+function _civicrm_api3_entity_financial_trxn_get_extraFilters(&$params, &$sql) {
+  $rels = array(
+    'batch_id' => array(
+      'join' => '!joinType civicrm_entity_batch ON (civicrm_entity_batch.entity_table = "civicrm_financial_trxn" AND civicrm_entity_batch.entity_id = a.financial_trxn_id)',
+      'column' => 'batch_id',
+    ),
+    'tag_id' => array(
+      'join' => '
+        LEFT JOIN civicrm_contribution cc ON (a.entity_table = "civicrm_contribution" AND a.entity_id = cc.id)
+        LEFT JOIN civicrm_entity_tag ON (civicrm_entity_tag.contact_id = cc.contact_id)',
+      'column' => 'tag_id',
+    ),
+  );
+  foreach ($rels as $filter => $relSpec) {
+    if (!empty($params[$filter])) {
+      if (!is_array($params[$filter])) {
+        $params[$filter] = array('=' => $params[$filter]);
+      }
+      // $mode is one of ('LEFT JOIN', 'INNER JOIN', 'SUBQUERY')
+      $mode = isset($params[$filter]['IS NULL']) ? 'LEFT JOIN' : 'INNER JOIN';
+      $clause = \CRM_Core_DAO::createSQLFilter($relSpec['column'], $params[$filter]);
+      if ($clause) {
+        $sql->join('', $relSpec['join'], array('joinType' => $mode));
+        $sql->where($clause);
+      }
+    }
+  }
 }
 
 /**

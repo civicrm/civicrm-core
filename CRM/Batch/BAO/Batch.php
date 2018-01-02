@@ -656,143 +656,181 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * Retrieve financial items assigned for a batch.
    *
    * @param int $entityID
-   * @param array $returnValues
    * @param bool $notPresent
    * @param array $params
    * @param bool $getCount
+   * @param string $batchStatus
    *
-   * @return CRM_Core_DAO
+   * @return array
    */
-  public static function getBatchFinancialItems($entityID, $returnValues, $notPresent = NULL, $params = NULL, $getCount = FALSE) {
+  public static function getBatchFinancialItems($entityID, $notPresent = NULL, $params = NULL, $getCount = FALSE, $batchStatus = NULL) {
+    $mappingFields = array(
+      'financial_trxn_id.id' => 'id',
+      'financial_trxn_id.payment_instrument_id.label' => 'payment_method',
+      'entity_id.contact_id' => 'contact_id',
+      'entity_id.id' => 'contributionID',
+      'entity_id.contact_id.sort_name' => 'sort_name',
+      'financial_trxn_id.total_amount' => 'amount',
+      'financial_trxn_id.trxn_id' => 'trxn_id',
+      'entity_id.contact_id.contact_type' => 'contact_type',
+      'entity_id.contact_id.contact_sub_type' => 'contact_sub_type',
+      'financial_trxn_id.trxn_date' => 'transaction_date',
+      'entity_id.receive_date' => 'receive_date',
+      'entity_id.financial_type_id.name' => 'financial_type',
+      'entity_id.currency' => 'currency',
+      'financial_trxn_id.status_id.label' => 'status',
+      'financial_trxn_id.check_number' => 'check_number',
+    );
+    $apiParams = array(
+      'entity_table' => 'civicrm_contribution',
+      'batch_id' => $notPresent ? array('IS NULL' => 1) : $entityID,
+      'return' => array_keys($mappingFields),
+      'options' => array('sort' => 'financial_trxn_id'),
+    );
     $limit = NULL;
     if (!$getCount) {
-      if (!empty($params['rowCount']) &&
-        $params['rowCount'] > 0
-      ) {
-        $limit = " LIMIT {$params['offset']}, {$params['rowCount']} ";
+      if (!empty($params['rowCount']) && $params['rowCount'] > 0) {
+        $apiParams['options']['limit'] = $params['rowCount'];
+        $apiParams['options']['offset'] = $params['offset'];
       }
     }
-    // action is taken depending upon the mode
-    $select = 'civicrm_financial_trxn.id ';
-    if (!empty($returnValues)) {
-      $select .= " , " . implode(' , ', $returnValues);
-    }
-
-    $orderBy = " ORDER BY civicrm_financial_trxn.id";
     if (!empty($params['sort'])) {
-      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'String');
+      $matches = explode(' ', $params['sort']);
+      $apiParams['options']['sort'] = CRM_Utils_Type::escape($matches[0], 'String');
+      if ($sort = array_search($apiParams['options']['sort'], $mappingFields)) {
+        $apiParams['options']['sort'] = $sort . ' ' . $matches[1];
+      }
     }
-
-    $from = "civicrm_financial_trxn
-INNER JOIN civicrm_entity_financial_trxn ON civicrm_entity_financial_trxn.financial_trxn_id = civicrm_financial_trxn.id
-INNER JOIN civicrm_contribution ON (civicrm_contribution.id = civicrm_entity_financial_trxn.entity_id
-  AND civicrm_entity_financial_trxn.entity_table='civicrm_contribution')
-LEFT JOIN civicrm_entity_batch ON civicrm_entity_batch.entity_table = 'civicrm_financial_trxn'
-AND civicrm_entity_batch.entity_id = civicrm_financial_trxn.id
-LEFT JOIN civicrm_financial_type ON civicrm_financial_type.id = civicrm_contribution.financial_type_id
-LEFT JOIN civicrm_contact contact_a ON contact_a.id = civicrm_contribution.contact_id
-LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id = civicrm_contribution.id
-";
 
     $searchFields = array(
-      'sort_name',
-      'financial_type_id',
-      'contribution_page_id',
-      'payment_instrument_id',
-      'contribution_trxn_id',
-      'contribution_source',
-      'contribution_currency_type',
-      'contribution_pay_later',
-      'contribution_recurring',
-      'contribution_test',
-      'contribution_thankyou_date_is_not_null',
-      'contribution_receipt_date_is_not_null',
-      'contribution_pcp_made_through_id',
-      'contribution_pcp_display_in_roll',
-      'contribution_date_relative',
-      'contribution_amount_low',
-      'contribution_amount_high',
-      'contribution_in_honor_of',
-      'contact_tags',
-      'group',
-      'contribution_date_relative',
-      'contribution_date_high',
-      'contribution_date_low',
-      'contribution_check_number',
-      'contribution_status_id',
+      'sort_name' => 'entity_id.contact_id.sort_name',
+      'financial_type_id' => 'entity_id.financial_type_id',
+      'contribution_page_id' => 'entity_id.contribution_page_id',
+      'payment_instrument_id' => 'financial_trxn_id.payment_instrument_id',
+      'contribution_trxn_id' => 'entity_id.trxn_id',
+      'contribution_source' => 'entity_id.source',
+      'contribution_currency_type' => 'entity_id.currency',
+      'contribution_pay_later' => 'entity_id.is_pay_later',
+      'contribution_recurring' => 'entity_id.contribution_recur_id',
+      'contribution_test' => 'entity_id.is_test',
+      'contribution_thankyou_date_is_not_null' => 'entity_id.thankyou_date',
+      'contribution_receipt_date_is_not_null' => 'entity_id.receipt_date',
+      'contribution_pcp_made_through_id' => 'pcp_id',
+      'contribution_pcp_display_in_roll' => 'pcp_display_in_roll',
+      'contribution_amount_low' => 'entity_id.total_amount',
+      'contribution_amount_high' => 'entity_id.total_amount',
+      'contact_tags' => 'tag_id',
+      'group' => 'group_id',
+      'contribution_date_relative' => NULL,
+      'contribution_date_high' => NULL,
+      'contribution_date_low' => NULL,
+      'contribution_check_number' => 'entity_id.check_number',
+      'contribution_status_id' => 'entity_id.contribution_status_id',
     );
-    $values = array();
-    foreach ($searchFields as $field) {
+
+    foreach ($searchFields as $field => $column) {
       if (isset($params[$field])) {
-        $values[$field] = $params[$field];
         if ($field == 'sort_name') {
-          $from .= " LEFT JOIN civicrm_contact contact_b ON contact_b.id = civicrm_contribution.contact_id
-          LEFT JOIN civicrm_email ON contact_b.id = civicrm_email.contact_id";
+          $apiParams[$column] = array('LIKE' => "%$params[$field]%");
         }
-        if ($field == 'contribution_in_honor_of') {
-          $from .= " LEFT JOIN civicrm_contact contact_b ON contact_b.id = civicrm_contribution.contact_id";
+        elseif (in_array($field, array('financial_type_id', 'payment_instrument_id', 'contribution_pcp_made_through_id', 'contribution_status_id', 'group'))) {
+          $params[$field] = (array) $params[$field];
+          $apiParams[$column] = array('IN' => $params[$field]);
         }
-        if ($field == 'contact_tags') {
-          $from .= " LEFT JOIN civicrm_entity_tag `civicrm_entity_tag-{$params[$field]}` ON `civicrm_entity_tag-{$params[$field]}`.entity_id = contact_a.id";
+        elseif (in_array($field, array('contribution_pay_later', 'contribution_recurring', 'contribution_test', 'contribution_thankyou_date_is_not_null', 'contribution_receipt_date_is_not_null'))) {
+          $apiParams[$column] = ($params[$field] == 0) ? array('IS NULL' => 1) : array('IS NOT NULL' => 1);
         }
-        if ($field == 'group') {
-          $from .= " LEFT JOIN civicrm_group_contact `civicrm_group_contact-{$params[$field]}` ON contact_a.id = `civicrm_group_contact-{$params[$field]}`.contact_id ";
-        }
-        if ($field == 'contribution_date_relative') {
+        elseif ($field == 'contribution_date_relative') {
           $relativeDate = explode('.', $params[$field]);
           $date = CRM_Utils_Date::relativeToAbsolute($relativeDate[0], $relativeDate[1]);
-          $values['contribution_date_low'] = $date['from'];
-          $values['contribution_date_high'] = $date['to'];
+          $apiParams[$column] = array('BETWEEN' => array($date['from'], $date['to']));
         }
-        $searchParams = CRM_Contact_BAO_Query::convertFormValues($values);
-        // @todo the use of defaultReturnProperties means the search will be inefficient
-        // as slow-unneeded properties are included.
-        $query = new CRM_Contact_BAO_Query($searchParams,
-          CRM_Contribute_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_CONTRIBUTE,
-            FALSE
-          ), NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTRIBUTE
-        );
+        elseif ($field == 'contribution_amount_high' || $field == 'contribution_amount_low') {
+          $op = ($field == 'contribution_amount_high') ? '<=' : '>=';
+          $apiParams[$column] = array($op => $params[$field]);
+        }
         if ($field == 'contribution_date_high' || $field == 'contribution_date_low') {
-          $query->dateQueryBuilder($params[$field], 'civicrm_contribution', 'contribution_date', 'receive_date', 'Contribution Date');
+          // todo
+        }
+        else {
+          $apiParams[$column] = $params[$field];
         }
       }
     }
-    if (!empty($query->_where[0])) {
-      $where = implode(' AND ', $query->_where[0]) .
-        " AND civicrm_entity_batch.batch_id IS NULL ";
-      $where = str_replace('civicrm_contribution.payment_instrument_id', 'civicrm_financial_trxn.payment_instrument_id', $where);
+
+    if ($getCount) {
+      return civicrm_api3('EntityFinancialTrxn', 'getcount', $apiParams);
     }
-    else {
-      if (!$notPresent) {
-        $where = " civicrm_entity_batch.batch_id = {$entityID} ";
+
+    $result = civicrm_api3('EntityFinancialTrxn', 'get', $apiParams);
+
+    $rows = array();
+    foreach ($result['values'] as $key => $record) {
+      $rows[$key] = array();
+      foreach ($record as $column => $value) {
+        if ($column == 'id') {
+          continue;
+        }
+        if ($mappingFields[$column] == 'amount') {
+          $value = CRM_Utils_Money::format($value, $record['entity_id.currency']);
+        }
+        elseif (in_array($mappingFields[$column], array('transaction_date', 'receive_date'))) {
+          $value = CRM_Utils_Date::customFormat($value);
+        }
+        elseif ($mappingFields[$column] == 'sort_name') {
+          $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=" . $record['entity_id.contact_id']);
+          $value = '<a href=' . $url . '>' . $value . '</a>';
+        }
+        $rows[$key][$mappingFields[$column]] = $value;
+        if ($mappingFields[$column] == 'payment_method' && $value == 'Check') {
+          $rows[$key][$mappingFields[$column]] .= $record['financial_trxn_id.check_number'] ? " (#" . $record['financial_trxn_id.check_number'] . ")" : '';
+        }
+      }
+      if (isset($batchStatus) && in_array($batchStatus, array('Open', 'Reopened'))) {
+        if (isset($notPresent)) {
+          $rows[$key]['check'] = "<input type='checkbox' id='mark_x_" . $rows[$key]['id'] . "' name='mark_x_" . $rows[$key]['id'] . "' value='1' onclick=enableActions('x')></input>";
+        }
+        else {
+          $rows[$key]['check'] = "<input type='checkbox' id='mark_y_" . $rows[$key]['id'] . "' name='mark_y_" . $rows[$key]['id'] . "' value='1' onclick=enableActions('y')></input>";
+        }
+        $rows[$key]['action'] = CRM_Core_Action::formLink(
+          CRM_Financial_Page_BatchTransaction::links(),
+          NULL,
+          array(
+            'id' => $rows[$key]['id'],
+            'contid' => $rows[$key]['contributionID'],
+            'cid' => $rows[$key]['contact_id'],
+          ),
+          ts('more'),
+          FALSE,
+          'financialItem.batch.row',
+          'FinancialItem',
+          $rows[$key]['id']
+        );
       }
       else {
-        $where = " civicrm_entity_batch.batch_id IS NULL ";
+        $rows[$key]['check'] = NULL;
+        $tempBAO = new CRM_Financial_Page_BatchTransaction();
+        $links = $tempBAO->links();
+        unset($links['remove']);
+        $row[$key]['action'] = CRM_Core_Action::formLink(
+          $links,
+          NULL,
+          array(
+            'id' => $rows[$key]['id'],
+            'contid' => $rows[$key]['contributionID'],
+            'cid' => $rows[$key]['contact_id'],
+          ),
+          ts('more'),
+          FALSE,
+          'financialItem.batch.row',
+          'FinancialItem',
+          $rows[$key]['id']
+        );
       }
     }
 
-    $query = array(
-      'select' => $select,
-      'from' => $from,
-      'where' => $where,
-      'orderBy' => $orderBy,
-      'groupBy' => '',
-      'limit' => $limit,
-    );
-
-    CRM_Utils_Hook::alterBatchTransactionListQuery($query, $entityID, $params, $notPresent);
-
-    $sql = "
-      SELECT {$query['select']}
-      FROM   {$query['from']}
-      WHERE  {$query['where']}
-             {$query['groupBy']}
-             {$query['orderBy']}
-             {$query['limit']}
-    ";
-
-    $result = CRM_Core_DAO::executeQuery($sql);
-    return $result;
+    return $rows;
   }
 
   /**
