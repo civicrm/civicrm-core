@@ -757,13 +757,15 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $lastWeekActivities = array(1, 2, 3);
     $todayActivities = array(4, 5, 6, 7);
     $lastTwoMonthsActivities = array(8, 9, 10, 11);
-    $lastYearActivties = array(12, 13, 14, 15, 16);
+    $lastOrNextYearActivities = array(12, 13, 14, 15, 16);
 
     // date values later used to set activity date value
     $lastWeekDate = date('YmdHis', strtotime('1 week ago'));
     $today = date('YmdHis');
     $lastTwoMonthAgoDate = date('YmdHis', strtotime('2 months ago'));
-    $lastYearDate = date('YmdHis', strtotime('1 year ago'));
+    // if current month is Jan then choose next year date otherwise the search result will include
+    //  the previous week and last two months activities which are still in previous year and hence leads to improper result
+    $lastOrNextYearDate = (date('M') == 'Jan') ? date('YmdHis', strtotime('+1 year')) : date('YmdHis', strtotime('1 year ago'));
     for ($i = 1; $i <= 16; $i++) {
       if (in_array($i, $lastWeekActivities)) {
         $date = $lastWeekDate;
@@ -771,8 +773,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       elseif (in_array($i, $lastTwoMonthsActivities)) {
         $date = $lastTwoMonthAgoDate;
       }
-      elseif (in_array($i, $lastYearActivties)) {
-        $date = $lastYearDate;
+      elseif (in_array($i, $lastOrNextYearActivities)) {
+        $date = $lastOrNextYearDate;
       }
       elseif (in_array($i, $todayActivities)) {
         $date = $today;
@@ -838,13 +840,13 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
           'sort' => NULL,
         ),
       ),
-      'last-year-activity' => array(
+      'last-or-next-year-activity' => array(
         'params' => array(
           'contact_id' => 1,
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
-          'activity_date_relative' => 'previous.year',
+          'activity_date_relative' => (date('M') == 'Jan') ? 'next.year' : 'previous.year',
           'activity_type_id' => NULL,
           'offset' => 0,
           'rowCount' => 0,
@@ -887,10 +889,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
         $this->assertEquals(count($lastTwoMonthsActivities), count($activitiesDep));
         $this->checkArrayEquals($lastTwoMonthsActivities, $activityIDs);
       }
-      elseif ($caseName == 'last-year-activity') {
-        $this->assertEquals(count($lastYearActivties), $activityCount);
-        $this->assertEquals(count($lastYearActivties), count($activitiesDep));
-        $this->checkArrayEquals($lastYearActivties, $activityIDs);
+      elseif ($caseName == 'last-or-next-year-activity') {
+        $this->assertEquals(count($lastOrNextYearActivities), $activityCount);
+        $this->assertEquals(count($lastOrNextYearActivities), count($activitiesDep));
+        $this->checkArrayEquals($lastOrNextYearActivities, $activityIDs);
       }
       elseif ($caseName == 'activity-of-all-statuses') {
         $this->assertEquals(16, $activityCount);
