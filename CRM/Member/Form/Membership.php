@@ -1426,7 +1426,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
           }
 
-          CRM_Core_Error::displaySessionError($e);
+          CRM_Core_Session::singleton()->setStatus($e->getMessage());
           CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/membership',
             "reset=1&action=add&cid={$this->_contactID}&context=membership&mode={$this->_mode}"
           ));
