@@ -190,8 +190,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $form->testSubmit(array(
       'total_amount' => 100,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $contactId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => 3,
