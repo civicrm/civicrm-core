@@ -469,7 +469,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       return $statusMsg;
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-      CRM_Core_Error::displaySessionError($e->getMessage());
+      CRM_Core_Session::singleton()->setStatus($e->getMessage());
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/membership',
         "reset=1&action=renew&cid={$this->_contactID}&id={$this->_id}&context=membership&mode={$this->_mode}"
       ));
