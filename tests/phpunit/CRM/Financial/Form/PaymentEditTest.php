@@ -58,9 +58,8 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
     $form = new CRM_Contribute_Form_Contribution();
     $form->testSubmit(array(
       'total_amount' => 50,
+      'receive_date' => '2015-04-21 23:27:00',
       'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualID,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'check_number' => '123XA',
@@ -131,8 +130,6 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualID,
       'payment_instrument_id' => $checkPaymentInstrumentID,
       'check_number' => $checkNumber1,

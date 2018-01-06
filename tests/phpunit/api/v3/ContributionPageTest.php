@@ -1687,6 +1687,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'last_name' => 'T',
       'email' => 'JT@ohcanada.ca',
       'is_pay_later' => TRUE,
+      'receive_date' => date('Y-m-d H:i:s'),
     );
 
     // Create PriceSet/PriceField
