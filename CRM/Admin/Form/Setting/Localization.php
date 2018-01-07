@@ -205,6 +205,10 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     // unset currencyLimit so we dont store there
     unset($values['currencyLimit']);
 
+    // CRM-21627: set default language setting before making multilingual changes,
+    //  otherwise it will lead to error due to blank locale fetched from this setting
+    Civi::settings()->set('lcMessages', CRM_Utils_Array::value('lcMessages', $values));
+
     // make the site multi-lang if requested
     if (!empty($values['makeMultilingual'])) {
       CRM_Core_I18n_Schema::makeMultilingual($values['lcMessages']);
@@ -230,10 +234,15 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     $return = (bool) (CRM_Utils_Array::value('makeMultilingual', $values) or CRM_Utils_Array::value('addLanguage', $values));
 
     $filteredValues = $values;
-    unset($filteredValues['makeMultilingual']);
-    unset($filteredValues['makeSinglelingual']);
-    unset($filteredValues['addLanguage']);
-    unset($filteredValues['languageLimit']);
+    foreach (array(
+      'makeMultilingual',
+      'makeSinglelingual',
+      'addLanguage',
+      'languageLimit',
+      'lcMessages',
+    ) as $ignoreSetting) {
+      unset($filteredValues[$ignoreSetting]);
+    }
 
     Civi::settings()->set('languageLimit', CRM_Utils_Array::value('languageLimit', $values));
 
