@@ -107,6 +107,9 @@ class CRM_Core_I18n_Schema {
     // update civicrm_domain.locales
     $domain->locales = $locale;
     $domain->save();
+
+    // CRM-21627 Updates the $dbLocale
+    CRM_Core_BAO_ConfigSetting::applyLocale(Civi::settings($domain->id), $domain->locales);
   }
 
   /**
