@@ -80,6 +80,10 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       return CRM_Utils_System::permissionDenied();
     }
 
+    if (!$values['event']['is_public']) {
+      CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+    }
+
     if (!empty($values['event']['is_template'])) {
       // form is an Event Template
       CRM_Core_Error::fatal(ts('The page you requested is currently unavailable.'));

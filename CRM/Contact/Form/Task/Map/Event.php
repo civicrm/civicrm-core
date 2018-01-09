@@ -50,6 +50,10 @@ class CRM_Contact_Form_Task_Map_Event extends CRM_Contact_Form_Task_Map {
     self::createMapXML($ids, $lid, $this, TRUE, $type);
     $this->assign('single', FALSE);
     $this->assign('skipLocationType', TRUE);
+
+    if ($is_public == 0) {
+      CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+    }
   }
 
   /**
