@@ -35,12 +35,6 @@
 class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
 
   /**
-   * Static field for all the grant information that we can potentially export.
-   * @var array
-   */
-  static $_exportableFields = NULL;
-
-  /**
    * Class constructor.
    */
   public function __construct() {
