@@ -30,6 +30,7 @@
 <head>
   <title>{if $pageTitle}{$pageTitle|strip_tags}{else}{ts}Printer-Friendly View{/ts} | {ts}CiviCRM{/ts}{/if}</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="ROBOTS" content="NOINDEX, NOFOLLOW">
   {crmRegion name='html-header' allowCmsOverride=0}{/crmRegion}
   <style type="text/css" media="print">@import url({$config->resourceBase}css/print.css);</style>
 </head>
