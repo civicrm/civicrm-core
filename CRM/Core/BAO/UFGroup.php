@@ -2339,7 +2339,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             $defaults[$name . '_custom'] = $details[$name . '_custom'];
           }
           elseif ($name == 'preferred_communication_method') {
-            $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $details[$name]);
+            $v = $details[$name];
+            if (!is_array($details[$name])) {
+              $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $v);
+            }
             foreach ($v as $item) {
               if ($item) {
                 $defaults[$fldName . "[$item]"] = 1;
