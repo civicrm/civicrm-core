@@ -1372,6 +1372,8 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       CRM_Contact_Form_Search_Custom_ContribSYBNT::formatSavedSearchFields($formValues);
       CRM_Core_DAO::executeQuery("UPDATE civicrm_saved_search SET form_values = %1 WHERE id = {$dao->id}", array(1 => array(serialize($formValues), 'String')));
     }
+    return TRUE;
+  }
 
   /**
    * CRM-20892 Convert default of created_date in civicrm_mailing table to NULL
@@ -1383,7 +1385,6 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       $dataType = 'datetime';
     }
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_mailing CHANGE created_date created_date {$dataType} NULL DEFAULT NULL COMMENT 'Date and time this mailing was created.'");
-
     return TRUE;
   }
 
