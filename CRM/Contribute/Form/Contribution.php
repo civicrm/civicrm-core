@@ -450,6 +450,23 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Build the form object.
    */
   public function buildQuickForm() {
+    if ($this->_action & CRM_Core_Action::DELETE) {
+      $this->addButtons(array(
+          array(
+            'type' => 'next',
+            'name' => ts('Delete'),
+            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+            'isDefault' => TRUE,
+          ),
+          array(
+            'type' => 'cancel',
+            'name' => ts('Cancel'),
+          ),
+        )
+      );
+      return;
+    }
+
     // FIXME: This probably needs to be done in preprocess
     if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
       && $this->_action & CRM_Core_Action::UPDATE
@@ -581,23 +598,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $this->applyFilter('__ALL__', 'trim');
-
-    if ($this->_action & CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
-      return;
-    }
 
     //need to assign custom data type and subtype to the template
     $this->assign('customDataType', 'Contribution');
