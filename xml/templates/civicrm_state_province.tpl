@@ -4109,4 +4109,16 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1018, "08", "Saint Michael"),
 (NULL, 1018, "09", "Saint Peter"),
 (NULL, 1018, "10", "Saint Philip"),
-(NULL, 1018, "11", "Saint Thomas");
+(NULL, 1018, "11", "Saint Thomas"),
+
+-- CRM-21649 Missing states for South Sudan
+(NULL, 1247, "EC", "Central Equatoria"),
+(NULL, 1247, "EE", "Eastern Equatoria"),
+(NULL, 1247, "JG", "Jonglei"),
+(NULL, 1247, "LK", "Lakes"),
+(NULL, 1247, "BN", "Northern Bahr el Ghazal"),
+(NULL, 1247, "UY", "Unity"),
+(NULL, 1247, "NU", "Upper Nile"),
+(NULL, 1247, "WR", "Warrap"),
+(NULL, 1247, "BW", "Western Bahr el Ghazal"),
+(NULL, 1247, "EW", "Western Equatoria");
