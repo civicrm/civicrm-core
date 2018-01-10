@@ -294,7 +294,7 @@ class CRM_Financial_Page_AJAX {
       'civicrm_financial_trxn.status_id as status',
       'civicrm_financial_trxn.check_number as check_number',
       'civicrm_financial_trxn.card_type_id',
-      'civicrm_financial_trxn.pan_truncation'
+      'civicrm_financial_trxn.pan_truncation',
     );
 
     $columnHeader = array(
