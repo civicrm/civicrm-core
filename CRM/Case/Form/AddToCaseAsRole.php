@@ -47,14 +47,14 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
    *   List of role types
    */
   private function getRoleTypes() {
-    $relType = CRM_Contact_BAO_Relationship::getRelationType('Individual');
-    $roleTypes = array();
+    $relationshipType = array();
+    $allRelationshipType = CRM_Core_PseudoConstant::relationshipType();
 
-    foreach ($relType as $k => $v) {
-      $roleTypes[substr($k, 0, strpos($k, '_'))] = $v;
+    foreach ($allRelationshipType as $key => $type) {
+      $relationshipType[$key] = $type['label_a_b'];
     }
 
-    return $roleTypes;
+    return $relationshipType;
   }
 
   /**
