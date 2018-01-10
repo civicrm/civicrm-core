@@ -487,7 +487,6 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $this->assertEquals($case['expected_qill'], $qill);
     }
   }
-
     /**
    *  CRM-21343: Test CRM_Contribute_Form_Search Cancelled filters
    */
@@ -574,5 +573,4 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $this->assertEquals($case['expected_qill'], $qill);
     }
   }
-
 }
