@@ -388,6 +388,7 @@ class CRM_Contact_Page_AJAX {
       }
 
       if ($queryString) {
+        $result = array();
         $offset = CRM_Utils_Array::value('offset', $_GET, 0);
         $rowCount = Civi::settings()->get('search_autocomplete_count');
 
@@ -450,9 +451,7 @@ LIMIT {$offset}, {$rowCount}
             );
           }
         }
-        if ($result) {
-          CRM_Utils_JSON::output($result);
-        }
+        CRM_Utils_JSON::output($result);
       }
     }
     CRM_Utils_System::civiExit();
@@ -483,6 +482,7 @@ LIMIT {$offset}, {$rowCount}
     }
 
     if ($queryString) {
+      $result = array();
       $offset = CRM_Utils_Array::value('offset', $_GET, 0);
       $rowCount = CRM_Utils_Array::value('rowcount', $_GET, 20);
 
@@ -519,9 +519,6 @@ LIMIT {$offset}, {$rowCount}
           'id' => (CRM_Utils_Array::value('id', $_GET)) ? "{$dao->id}::{$dao->phone}" : '"' . $dao->name . '" <' . $dao->phone . '>',
         );
       }
-    }
-
-    if ($result) {
       CRM_Utils_JSON::output($result);
     }
     CRM_Utils_System::civiExit();
