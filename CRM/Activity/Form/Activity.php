@@ -308,6 +308,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       CRM_Activity_BAO_Activity::checkPermission($this->_activityId, CRM_Core_Action::UPDATE)
     ) {
       $this->assign('permission', 'edit');
+      $this->assign('allow_edit_inbound_emails', CRM_Activity_BAO_Activity::checkEditInboundEmailsPermissions());
     }
 
     if (!$this->_activityTypeId && $this->_activityId) {
