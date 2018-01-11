@@ -48,7 +48,7 @@
   </script>
   {/literal}
 {else}
-  {if $membershipMode == 'test' }
+  {if $membershipMode == 'test'}
     {assign var=registerMode value="TEST"}
     {elseif $membershipMode == 'live'}
     {assign var=registerMode value="LIVE"}
@@ -606,7 +606,7 @@
       cj( "#total_amount" ).val( '' );
       cj('#total_amount').attr("readonly", true);
 
-      var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&priceSetId=' + priceSetId;
+      var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&priceSetOnly=1&price_set_id=' + priceSetId;
 
       var response = cj.ajax({
         url: dataUrl,

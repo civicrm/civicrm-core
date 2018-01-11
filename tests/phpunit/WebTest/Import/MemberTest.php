@@ -78,7 +78,7 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   * Helper function to provide data for Membeship import for Individuals.
+   * Helper function to provide data for Membership import for Individuals.
    *
    * @return array
    */
@@ -124,7 +124,7 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   * Helper function to provide data for Membeship import for Households.
+   * Helper function to provide data for Membership import for Households.
    *
    * @return array
    */
@@ -168,7 +168,7 @@ class WebTest_Import_MemberTest extends ImportCiviSeleniumTestCase {
   }
 
   /**
-   * Helper function to provide data for Membeship import for Organizations.
+   * Helper function to provide data for Membership import for Organizations.
    *
    * @return array
    */

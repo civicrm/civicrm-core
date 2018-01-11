@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  $Id: data.xml 43570 2012-11-09 12:03:45Z deepak $ -->
+<dataset>
+
+    <!-- new membership, gets current year -->
+    <memberships_etc    membership_type_id="161"                join_date="special-now-3m"      start_date="special-memyear-01-01"         end_date="special-memyear-12-31"
+                        mem_status_id="1"
+
+                        con_financial_type_id="2"               payment_instrument_id="2"   total_amount="206.85"           fee_amount="1.50"
+                        net_amount="205.35"                     con_currency="USD"          contribution_status_id="1"      trxn_id_ln="20"
+                        invoice_id_ln="32"
+
+                        qty="1.00"                              unit_price="20.00"          line_total="20.00"
+                        lit_financial_type_id="240"
+
+                        created_date="special-now"              transaction_date="special-now-3m"
+                        description="Canadian Society for Chemical Engineering (CSChE) (taxable)"
+                        amount="20.00"
+                        fit_currency="USD"                      financial_account_id="249"  fit_status_id="1"/>
+
+
+    <!-- new membership, gets current year -->
+    <memberships_etc    membership_type_id="162"                join_date="special-now-3m"      start_date="special-memyear-01-01"         end_date="special-memyear-12-31"
+                        mem_status_id="1"
+
+                        con_financial_type_id="2"               payment_instrument_id="2"   total_amount="206.85"           fee_amount="1.50"
+                        net_amount="205.35"                     con_currency="USD"          contribution_status_id="1"      trxn_id_ln="20"
+                        invoice_id_ln="32"
+
+                        qty="1.00"                              unit_price="20.00"          line_total="20.00"
+                        lit_financial_type_id="242"
+
+                        created_date="special-now"              transaction_date="special-now-3m"
+                        description="Canadian Society for Chemical Technology (CSCT) (taxable)"
+                        amount="20.00"
+
+                        fit_currency="USD"                      financial_account_id="251"  fit_status_id="1"/>
+
+
+    <!-- existing membership, simply gets extended by 1.  So because manually created to expire based on cyrrent year, will now go after current year. -->
+    <memberships_etc    membership_type_id="163"                join_date="special-now-3m"      start_date="special-now-3m"         end_date="special-now+9m"
+                        mem_status_id="1"
+
+                        con_financial_type_id="2"               payment_instrument_id="2"   total_amount="206.85"           fee_amount="1.50"
+                        net_amount="205.35"                     con_currency="USD"          contribution_status_id="1"      trxn_id_ln="20"
+                        invoice_id_ln="32"
+
+                        qty="1.00"                              unit_price="0.00"           line_total="0.00"
+                        lit_financial_type_id="237"
+
+                        created_date="special-now"              transaction_date="special-now-3m"
+                        description="Print and Online"
+                        amount="0.00"
+
+                        fit_currency="USD"                      financial_account_id="246"  fit_status_id="1"/>
+
+
+    <memberships_etc    membership_type_id="199"                join_date="special-now-3m"      start_date="special-now-3m"         end_date="special-now+9m"
+                        mem_status_id="1"
+
+                        con_financial_type_id="2"               payment_instrument_id="2"   total_amount="206.85"           fee_amount="1.50"
+                        net_amount="205.35"                     con_currency="USD"          contribution_status_id="1"      trxn_id_ln="20"
+                        invoice_id_ln="32"
+
+                        qty="1.00"                              unit_price="157.00"         line_total="157.00"
+                        lit_financial_type_id="191"
+
+                        created_date="special-now"              transaction_date="special-now-3m"
+                        description="CSC Full Fee (taxable)"
+                        amount="157.00"
+
+                        fit_currency="USD"                     fit_status_id="1"/>
+
+
+
+</dataset>

@@ -249,7 +249,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'cvv2' => '123',
       'credit_card_exp_date' => array(
         'M' => '9',
-        'Y' => '2019', // TODO: Future proof
+        'Y' => date("Y") + 2,
       ),
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
@@ -581,7 +581,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'cvv2' => '123',
       'credit_card_exp_date' => array(
         'M' => '9',
-        'Y' => '2019', // TODO: Future proof
+        'Y' => date("Y") + 2,
       ),
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',

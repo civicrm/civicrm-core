@@ -33,7 +33,6 @@
 
 /**
  * Base class for offline membership / membership type / membership renewal and membership status forms
- *
  */
 class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
@@ -101,11 +100,16 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       CRM_Core_Error::statusBounce(ts('There are no configured membership statuses. You cannot add this membership until your membership statuses are correctly configured'));
     }
 
+    $this->assign('priceSetOnly', CRM_Utils_Request::retrieve('priceSetOnly', 'Boolean'));
+
     parent::preProcess();
     $params = array();
     $params['context'] = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'membership');
     $params['id'] = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $params['mode'] = CRM_Utils_Request::retrieve('mode', 'String', $this);
+    if (!$this->_priceSetId) {
+      $params['priceSetId'] = CRM_Utils_Request::retrieve('price_set_id', 'Int', $this);
+    }
 
     $this->setContextVariables($params);
 
@@ -167,6 +171,16 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     }
     else {
       $defaults['membership_type_id'] = $this->_memType;
+    }
+    $defaults['num_terms'] = 1;
+    $defaults['send_receipt'] = 0;
+
+    //set Soft Credit Type to Gift by default
+    $scTypes = CRM_Core_OptionGroup::values("soft_credit_type");
+    $defaults['soft_credit_type_id'] = CRM_Utils_Array::value(ts('Gift'), array_flip($scTypes));
+    $this->assign('member_is_test', CRM_Utils_Array::value('member_is_test', $defaults));
+    if ($this->_mode) {
+      $defaults = $this->getBillingDefaults($defaults);
     }
     return $defaults;
   }
@@ -291,6 +305,37 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
+   * Assign price set to page.
+   *
+   * @return array
+   */
+  protected function assignPriceSet() {
+    if ($this->_action & CRM_Core_Action::ADD || $this->_action == CRM_Core_Action::RENEW) {
+      $priceSets = CRM_Price_BAO_PriceSet::getAssoc(FALSE, 'CiviMember');
+      if (empty($priceSets)) {
+        $this->assign('hasPriceSets', FALSE);
+      }
+      else {
+        $options = array();
+        if ($this->shouldIncludeChoosePriceSetOption()) {
+          $options = $options + array('' => ts('Choose price set'));
+        }
+        $options = $options + $priceSets;
+
+        $this->add('select', 'price_set_id', ts('Choose price set'), $options,
+            NULL, array('onchange' => "buildAmount( this.value );")
+        );
+        $this->assign('hasPriceSets', TRUE);
+      }
+    }
+    return empty($priceSets);
+  }
+
+  protected function shouldIncludeChoosePriceSetOption() {
+    return TRUE;
+  }
+
+  /**
    * Set variables in a way that can be accessed from different places.
    *
    * This is part of refactoring for unit testability on the submit function.
@@ -304,10 +349,15 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       'id' => '_id',
       'cid' => '_contactID',
       'mode' => '_mode',
+      'priceSetId' => '_priceSetId',
     );
     foreach ($variables as $paramKey => $classVar) {
       if (isset($params[$paramKey]) && !isset($this->$classVar)) {
         $this->$classVar = $params[$paramKey];
+        if ($paramKey == 'priceSetId') {
+          $this->set($paramKey, $this->$classVar);
+          $this->assign($paramKey, $this->$classVar);
+        }
       }
     }
 
@@ -377,13 +427,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
         return;
       }
     }
-    $priceFields = CRM_Member_BAO_Membership::setQuickConfigMembershipParameters(
+if ($this->_priceSet && $this->_priceSet['is_quick_config']) {    $priceFields = CRM_Member_BAO_Membership::setQuickConfigMembershipParameters(
       $formValues['membership_type_id'][0],
       $formValues['membership_type_id'][1],
       CRM_Utils_Array::value('total_amount', $formValues),
       $this->_priceSetId
     );
-    $formValues = array_merge($formValues, $priceFields['price_fields']);
+    $formValues = array_merge($formValues, $priceFields['price_fields']);}
   }
 
   /**
