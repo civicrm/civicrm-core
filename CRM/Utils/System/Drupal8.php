@@ -81,12 +81,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     try {
       $account->save();
+      $config->inCiviCRM = FALSE;
     }
     catch (\Drupal\Core\Entity\EntityStorageException $e) {
+      $config->inCiviCRM = FALSE;
       return FALSE;
-    }
-    finally {
-      $config->inCiviCRM = TRUE;
     }
 
     // Send off any emails as required.
