@@ -245,7 +245,7 @@
         }
 
         $panel
-          .append('<div class="tag-tree-wrapper"><div class="tag-tree"></div><div class="tag-info"></div></div>')
+          .append('<div class="search-box" style="display: none;"><img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}searching{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Searching{/ts}{literal}...</div><div class="tag-tree-wrapper"><div class="tag-tree"></div><div class="tag-info"></div></div>')
           .on('change', 'input[type=color]', changeColor)
           .on('change', 'input[name=used_for]', changeUsedFor)
           .on('click', '.clear-tag-selection', clearSelection)
@@ -275,6 +275,9 @@
         $('.tag-tree', $panel)
           .on('changed.jstree loaded.jstree', changeSelection)
           .on('move_node.jstree', moveTag)
+          .on('search.jstree', function() {
+            $("div.search-box").hide();
+          })
           .jstree({
             core: {
               data: {
@@ -298,13 +301,30 @@
             }
           });
 
-        $('input[name=filter_tag_tree]', $panel).on('keyup change', function() {
-          if ($(this).val() === '') {
-            $('.tag-tree', $panel).jstree("clear_search");
-            $('.tag-tree', $panel).jstree("refresh", true, true);
+        $('input[name=filter_tag_tree]', $panel).on('keyup change', function(e) {
+          var element = $(this);
+          var searchString = element.val();
+          if (e.type == 'change') {
+            if (window.searchedString === searchString) {
+              if (searchString === '') {
+                $('.tag-tree', $panel).jstree("clear_search");
+                $('.tag-tree', $panel).jstree("refresh", true, true);
+              }
+              else {
+                $("div.search-box").show();
+                $(".tag-tree", $panel).jstree("search", searchString);
+                delete window.searchedString;
+              }
+            }
           }
           else {
-            $(".tag-tree", $panel).jstree("search", $(this).val());
+            if (this.timer) clearTimeout(this.timer);
+            this.timer = setTimeout(function() {
+              if (_.isEmpty(window.searchedString) || window.searchedString !== searchString) {
+                window.searchedString = searchString;
+                element.trigger('change');
+              }
+            }, 1000);
           }
         });
       }
@@ -363,6 +383,19 @@
   div.tag-tree-wrapper {
     position: relative;
     min-height: 250px;
+  }
+  div.search-box {
+    margin: auto;
+    position: absolute;
+    top: 0px; left: 0px;
+    bottom: 0px; right: 0px;
+    background-color: grey;
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 350px;
+    font-weight: bold;
+    opacity: .6;
   }
   div.tag-tree {
     width: 59%;
