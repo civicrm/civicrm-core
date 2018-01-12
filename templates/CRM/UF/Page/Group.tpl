@@ -73,6 +73,7 @@
              <thead>
               <tr>
                 <th id="sortable">{ts}Profile Title{/ts}</th>
+                <th>{ts}Public Title{/ts}</th>
                 <th>{ts}Created By{/ts}</th>
                 <th>{ts}Description{/ts}</th>
                 <th>{ts}Type{/ts}</th>
@@ -86,6 +87,7 @@
             {if !$row.is_reserved }
               <tr id="UFGroup-{$row.id}" data-action="setvalue" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
                 <td class="crmf-title crm-editable">{$row.title}</td>
+                <td class="crmf-frontend_title crm-editable">{$row.frontend_title}</td>
                 <td>
                   {if $row.created_id && $row.created_by}
                     <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
@@ -116,6 +118,7 @@
              <thead>
               <tr>
                 <th id="sortable">{ts}Profile Title{/ts}</th>
+                <th>{ts}Public Title{/ts}</th>
                 <th>{ts}Created By{/ts}</th>
                 <th>{ts}Description{/ts}</th>
                 <th>{ts}Type{/ts}</th>
@@ -129,6 +132,7 @@
             {if $row.is_reserved}
               <tr id="UFGroup-{$row.id}" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
                 <td>{$row.title}</td>
+                <td>{$row.frontend_title}</td>
                 <td>
                   {if $row.created_id && $row.created_by}
                     <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
