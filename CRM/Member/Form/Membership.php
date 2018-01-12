@@ -936,7 +936,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   public static function emailReceipt(&$form, &$formValues, &$membership) {
     // retrieve 'from email id' for acknowledgement
-    $receiptFrom = $formValues['from_email_address'];
+    $receiptFrom = CRM_Utils_Array::value('from_email_address', $formValues);
 
     if (!empty($formValues['payment_instrument_id'])) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();

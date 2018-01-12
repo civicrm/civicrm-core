@@ -7,6 +7,20 @@
 class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLetterCommon {
 
   /**
+   * Build the form object.
+   *
+   * @var CRM_Core_Form $form
+   */
+  public static function buildQuickForm(&$form) {
+    // use contact form as a base
+    CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($form);
+
+    // Contribute PDF tasks allow you to email as well, so we need to add email address to those forms
+    $form->add('select', 'from_email_address', ts('From Email Address'), $form->_fromEmails, TRUE);
+    parent::buildQuickForm($form);
+  }
+
+  /**
    * Process the form after the input has been submitted and validated.
    *
    * @param CRM_Contribute_Form_Task $form
@@ -22,7 +36,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     if (!empty($formValues['email_options'])) {
       $returnProperties['email'] = $returnProperties['on_hold'] = $returnProperties['is_deceased'] = $returnProperties['do_not_email'] = 1;
       $emailParams = array(
-        'subject' => $formValues['subject'],
+        'subject' => CRM_Utils_Array::value('subject', $formValues),
+        'from' => CRM_Utils_Array::value('from_email_address', $formValues),
       );
       // We need display_name for emailLetter() so add to returnProperties here
       $returnProperties['display_name'] = 1;
@@ -367,6 +382,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         $emails = CRM_Core_BAO_Email::getFromEmail();
         $emails = array_keys($emails);
         $defaults['from'] = array_pop($emails);
+      }
+      else {
+        $defaults['from'] = $params['from'];
       }
       if (!empty($params['subject'])) {
         $defaults['subject'] = $params['subject'];
