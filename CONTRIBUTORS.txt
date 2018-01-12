@@ -45,7 +45,7 @@ Joanne Chester
 Joe McLaughlin
 John P Kirk
 Joris
-JMA Consulting - Joe Murray, Pradeep Nayak, Edsel Lopez
+JMA Consulting - Joe Murray, Edsel Lopez
 gah242s
 Greenleaf Advancement - Guy Iaccarino
 K Sneed Consulting - Kate Sneed
@@ -71,6 +71,7 @@ Northbridge Digital - Oliver Gibson
 Olaf Buddenhagen
 Palante Technology Cooperative - Joseph Lacey
 Paul Campbell
+Pradeep Nayak
 Progressive Tech Project - Alice Aguilar, Jamie McClelland
 Richard Van Oosterhout
 RocXa
@@ -103,10 +104,10 @@ Key Contributors and Sponsors for 4.6
 ************************************************
 
 CiviCRM Team - Atif Shaikh, Coleman Watts, David Greenberg, Donald Lobo,
-               Eileen McNaughton, Jitendra Purohit, Josh Gowan, Kurund Jalmi, 
+               Eileen McNaughton, Jitendra Purohit, Josh Gowan, Kurund Jalmi,
                Michael McAndrew, Monish Deb, Rohan Ramesh Katkar, Tim Otten,
                Yashodha Chaku
-ADG Communications - Steve Binkowski  
+ADG Communications - Steve Binkowski
 AGH Strategies - Andrew Hunt, Jane Hanley, Tommy Bobo, Tyrell Cook
 Agileware - Justin Freeman, Francis Whittle, Iris Abarquez, Vaibhav Sagar
 Alex C
