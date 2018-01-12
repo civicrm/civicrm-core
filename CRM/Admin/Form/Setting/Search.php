@@ -86,12 +86,12 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
    * @return array
    */
   public static function getAvailableProfiles() {
-    return array('' => ts('- none -')) + CRM_Core_BAO_UFGroup::getProfiles(array(
+    return array('' => ts('- none -')) + CRM_Core_BAO_UFGroup::getProfiles(array_merge(array(
       'Contact',
       'Individual',
       'Organization',
       'Household',
-    ));
+    ), CRM_Contact_BAO_ContactType::subTypes()));
   }
 
   /**
