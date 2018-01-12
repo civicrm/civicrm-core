@@ -1041,13 +1041,11 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
     // define statuses which are handled like Completed status (others are assumed to be handled like Scheduled status)
     $compStatusValues = array();
-    $compStatusNames = array_merge(
-      array('Completed', 'Left Message', 'Cancelled', 'Unreachable', 'Not Required'),
-      CRM_Activity_BAO_Activity::getStatusesByType(CRM_Activity_BAO_Activity::COMPLETED)
-    );
+    $compStatusNames = array('Left Message', 'Cancelled', 'Unreachable', 'Not Required');
     foreach ($compStatusNames as $name) {
       $compStatusValues[] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $name);
     }
+    $compStatusValues = array_merge($compStatusValues, array_keys(CRM_Activity_BAO_Activity::getStatusesByType(CRM_Activity_BAO_Activity::COMPLETED)));
 
     $contactViewUrl = CRM_Utils_System::url("civicrm/contact/view", "reset=1&cid=", FALSE, NULL, FALSE);
     $hasViewContact = CRM_Core_Permission::giveMeAllACLs();
