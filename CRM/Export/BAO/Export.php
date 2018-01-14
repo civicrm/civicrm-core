@@ -1210,6 +1210,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     else {
       require_once $ext->classToPath($customSearchClass);
     }
+    /** @var \CRM_Contact_Form_Search_Interface $search */
     $search = new $customSearchClass($formValues);
 
     $includeContactIDs = FALSE;
@@ -1221,15 +1222,48 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $columns = $search->columns();
 
-    $header = array_keys($columns);
+    // Create arrays for export hook
+    $sqlColumns = [];
+    $headerRows = [];
+    foreach ($columns as $description => $columnName) {
+      // FIXME: This is why you cannot have two columns with the same field name
+      // in your custom search, even if they're qualified with an alias.
+      $unqualified_field = CRM_Utils_Array::First(array_slice(explode('.', $columnName), -1));
+      // I just put 'varchar(255)' in there; this is not ideal, but it might
+      // work if you're just exporting to csv. The values of $sqlColumns are
+      // never used in plain CiviCRM, but they might be used in a hook
+      // implementation, so it is tricky.
+      $sqlColumns[$unqualified_field] = "$unqualified_field varchar(255)";
+      // Who invented the name headerRows for column headers? ;-)
+      $headerRows[] = $description;
+    }
+    $exportMode = CRM_Export_Form_Select::CONTACT_EXPORT;
+
+    if (!method_exists($search, 'alterRow')) {
+      // If there is no alterRow, this might work:
+      $exportTempTable = CRM_Core_DAO::createTempTableName('civicrm_export', TRUE);
+      $createAndInsertQuery = "CREATE TABLE $exportTempTable AS ($sql)";
+
+      CRM_Core_DAO::executeQuery($createAndInsertQuery);
+      CRM_Utils_Hook::export($exportTempTable, $headerRows, $sqlColumns, $exportMode);
+      self::writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $exportMode);
+      CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS $exportTempTable");
+      CRM_Utils_System::civiExit();
+    }
+
+    // Create temporary table with results.
+    $exportTempTable = self::createTempTable($sqlColumns);
+    $dropExportTable = "DROP TABLE IF EXISTS $exportTempTable";
+
     $fields = array_values($columns);
 
     $rows = array();
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $alterRow = FALSE;
-    if (method_exists($search, 'alterRow')) {
-      $alterRow = TRUE;
-    }
+
+    // I just copied this from the 'ordinary' 'exportComponents'.
+    $tempRowCount = 100;
+    $count = 0;
+
     while ($dao->fetch()) {
       $row = array();
 
@@ -1237,13 +1271,20 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $unqualified_field = CRM_Utils_Array::First(array_slice(explode('.', $field), -1));
         $row[$field] = $dao->$unqualified_field;
       }
-      if ($alterRow) {
-        $search->alterRow($row);
-      }
+      $search->alterRow($row);
       $rows[] = $row;
+      if ((++$count) == $tempRowCount) {
+        self::writeDetailsToTable($exportTempTable, $rows, $sqlColumns);
+        $count = 0;
+        $rows = [];
+      }
     }
+    $dao->free();
 
-    CRM_Core_Report_Excel::writeCSVFile(self::getExportFileName(), $header, $rows);
+    self::writeDetailsToTable($exportTempTable, $rows, $sqlColumns);
+    CRM_Utils_Hook::export($exportTempTable, $headerRows, $sqlColumns, $exportMode);
+    self::writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $exportMode);
+    CRM_Core_DAO::executeQuery($dropExportTable);
     CRM_Utils_System::civiExit();
   }
 
