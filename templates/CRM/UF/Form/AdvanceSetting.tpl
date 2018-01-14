@@ -110,21 +110,17 @@
 
 <script type="text/javascript">
     {literal}
-    CRM.$(function () {
-        CRM.$("[name=is_update_dupe]").each(function () {
-            this.addEventListener('change', confirmCheck);
-            if (CRM.$(this).attr('checked'))
-                this.dispatchEvent(new Event('change'));
-        });
-    });
+    CRM.$(function ($) {
+        $("[name=is_update_dupe]").change(confirmCheck).filter(':checked').each(confirmCheck);
 
-    function confirmCheck() {
-        var duplicateURLInput = CRM.$("#for_duplicate_URL_block");
-        if (CRM.$(this).attr('checked') && CRM.$(this).val() == 1) {
-            duplicateURLInput.css('display', '');
-        } else if (duplicateURLInput.css('display') !== 'none') {
-            duplicateURLInput.css('display', 'none');
+        function confirmCheck() {
+            var duplicateURLInput = $("#for_duplicate_URL_block");
+            if ($(this).attr('checked') && $(this).val() == 1) {
+                duplicateURLInput.css('display', '');
+            } else if (duplicateURLInput.css('display') !== 'none') {
+                duplicateURLInput.css('display', 'none');
+            }
         }
-    }
+    });
     {/literal}
 </script>
