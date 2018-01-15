@@ -238,6 +238,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $allMembershipInfo = array();
 
+    if (is_array($defaults['membership_type_id'])) { //CRM-21485
+      $defaults['membership_type_id'] = $defaults['membership_type_id'][1];
+    }
+
     //CRM-16950
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
     $taxRate = CRM_Utils_Array::value($this->allMembershipTypeDetails[$defaults['membership_type_id']]['financial_type_id'], $taxRates);
