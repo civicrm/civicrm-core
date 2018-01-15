@@ -1,4 +1,4 @@
-(function($, _) {
+(function($, _, Backbone) {
   if (!CRM.Designer) CRM.Designer = {};
 
   /**
@@ -875,4 +875,4 @@
     }
   });
 
-})(CRM.$, CRM._);
+})(CRM.$, CRM._, CRM.BB);

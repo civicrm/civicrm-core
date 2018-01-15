@@ -226,52 +226,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
-  public function addScriptUrl($url, $region) {
-    static $weight = 0;
-
-    switch ($region) {
-      case 'html-header':
-        break;
-
-      default:
-        return FALSE;
-    }
-
-    $script = array(
-      '#tag' => 'script',
-      '#attributes' => array(
-        'src' => $url,
-      ),
-      '#weight' => $weight,
-    );
-    $weight++;
-    \Drupal::service('civicrm.page_state')->addJS($script);
-    return TRUE;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function addScript($code, $region) {
-    switch ($region) {
-      case 'html-header':
-        break;
-
-      default:
-        return FALSE;
-    }
-
-    $script = array(
-      '#tag' => 'script',
-      '#value' => $code,
-    );
-    \Drupal::service('civicrm.page_state')->addJS($script);
-    return TRUE;
-  }
-
-  /**
-   * @inheritDoc
-   */
   public function addStyleUrl($url, $region) {
     if ($region != 'html-header') {
       return FALSE;
