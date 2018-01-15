@@ -153,11 +153,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     // remove file type field and then limit fields
     $suppressFields = FALSE;
-    $removehtmlTypes = array('File');
     foreach ($this->_fields as $name => $field) {
-      if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) &&
-        in_array($this->_fields[$name]['html_type'], $removehtmlTypes)
-      ) {
+      if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) && $this->_fields[$name]['html_type'] == 'Autocomplete-Select') {
         $suppressFields = TRUE;
         unset($this->_fields[$name]);
       }
