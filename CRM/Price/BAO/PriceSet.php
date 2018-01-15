@@ -696,12 +696,13 @@ WHERE  id = %1";
     // This seems to only affect radio link items as that is the use case for the 'quick config'
     // set up (which allows a free form field).
     $amount_override = NULL;
+    $isQuick = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetID, 'is_quick_config');
 
     if ($component) {
       $autoRenew = array();
       $autoRenew[0] = $autoRenew[1] = $autoRenew[2] = 0;
     }
-    if ($priceSetID) {
+    if ($priceSetID && $isQuick) {
       $priceFields = self::filterPriceFieldsFromParams($priceSetID, $params);
       if (count($priceFields) == 1) {
         $amount_override = CRM_Utils_Array::value('partial_payment_total', $params, CRM_Utils_Array::value('total_amount', $params));
