@@ -1247,4 +1247,53 @@ Expires: ',
     )));
   }
 
+  /**
+   * CRM-21656: Test the submit function of the membership form if Sale Tax is enabled.
+   *  Check that the tax rate isn't reapplied to line item's unit price and total amount
+   */
+  public function testLineItemAmountOnSaleTax() {
+    $this->enableTaxAndInvoicing();
+    $this->relationForFinancialTypeWithFinancialAccount(2);
+    $form = $this->getForm();
+    $form->preProcess();
+    $this->mut = new CiviMailUtils($this, TRUE);
+    $this->createLoggedInUser();
+    $priceSet = $this->callAPISuccess('PriceSet', 'Get', array("extends" => "CiviMember"));
+    $form->set('priceSetId', $priceSet['id']);
+    // clean the price options static variable to repopulate the options, in order to fetch tax information
+    \Civi::$statics['CRM_Price_BAO_PriceField']['priceOptions'] = NULL;
+    CRM_Price_BAO_PriceSet::buildPriceSet($form);
+    // rebuild the price set form variable to include the tax information against each price options
+    $form->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSet['id']));
+    $params = array(
+      'cid' => $this->_individualId,
+      'join_date' => date('m/d/Y', time()),
+      'start_date' => '',
+      'end_date' => '',
+      // This format reflects the 23 being the organisation & the 25 being the type.
+      'membership_type_id' => array(23, $this->membershipTypeAnnualFixedID),
+      'record_contribution' => 1,
+      'total_amount' => 55,
+      'receive_date' => date('m/d/Y', time()),
+      'receive_date_time' => '08:36PM',
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'financial_type_id' => 2, //Member dues, see data.xml
+      'payment_processor_id' => $this->_paymentProcessorID,
+    );
+    $form->_contactID = $this->_individualId;
+    $form->testSubmit($params);
+
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', array('entity_id' => $membership['id'], 'entity_table' => 'civicrm_membership'));
+    $this->assertEquals(1, $lineItem['qty']);
+    $this->assertEquals(50.00, $lineItem['unit_price']);
+    $this->assertEquals(50.00, $lineItem['line_total']);
+    $this->assertEquals(5.00, $lineItem['tax_amount']);
+
+    // reset the price options static variable so not leave any dummy data, that might hamper other unit tests
+    \Civi::$statics['CRM_Price_BAO_PriceField']['priceOptions'] = NULL;
+    $this->disableTaxAndInvoicing();
+  }
+
 }

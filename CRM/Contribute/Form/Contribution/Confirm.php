@@ -1991,7 +1991,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $priceFields = $priceFields[$priceSetID]['fields'];
     $lineItems = array();
-    CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
+    CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution', $priceSetID);
     $form->_lineItem = array($priceSetID => $lineItems);
     $membershipPriceFieldIDs = array();
     foreach ((array) $lineItems as $lineItem) {
