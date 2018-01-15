@@ -10,20 +10,21 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
    */
   public function buildQuickForm() {
 
-    $this->add(
-      'select',
-      'role_type',
-      ts('Relationship Type'),
-      array('' => ts('- select type -')),
-      TRUE,
-      array('class' => 'crm-select2 twenty')
-    );
-
     $this->addEntityRef(
       'assign_to',
       ts('Assign to'),
       array('entity' => 'case'),
       TRUE
+    );
+
+    $roleTypes = $this->getRoleTypes();
+    $this->add(
+      'select',
+      'role_type',
+      ts('Relationship Type'),
+      array('' => ts('- select type -')) + $roleTypes,
+      TRUE,
+      array('class' => 'crm-select2 twenty')
     );
 
     $this->addButtons(array(
@@ -37,6 +38,23 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
         'name' => ts('Cancel'),
       ),
     ));
+  }
+
+  /**
+   * Returns list of configured role types for individuals.
+   *
+   * @return array
+   *   List of role types
+   */
+  private function getRoleTypes() {
+    $relationshipType = array();
+    $allRelationshipType = CRM_Core_PseudoConstant::relationshipType();
+
+    foreach ($allRelationshipType as $key => $type) {
+      $relationshipType[$key] = $type['label_a_b'];
+    }
+
+    return $relationshipType;
   }
 
   /**

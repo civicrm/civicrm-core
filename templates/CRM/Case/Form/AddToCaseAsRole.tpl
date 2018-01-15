@@ -1,9 +1,9 @@
 <script type="text/javascript">
   {literal}
   CRM.$(function($) {
-    $('#assign_to').change(function () {
-      console.log($('#assign_to').val());
+    $('#role_type').prop('disabled', 'disabled');
 
+    $('#assign_to').change(function () {
       var apiCalls = {
         getCaseData: ['Case', 'getsingle', {
           'sequential': 1,
@@ -16,6 +16,9 @@
       };
 
       CRM.api3(apiCalls).done(function(results) {
+        $('#role_type').children('option:not(:first)').remove();
+        $('#role_type').prop('disabled', false);
+
         var caseRoles = results.getCaseData['api.CaseType.getsingle'].definition.caseRoles;
         var relationshipTypes = results.getRelationshipTypes.values;
 
