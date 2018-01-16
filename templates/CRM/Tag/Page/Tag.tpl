@@ -245,7 +245,7 @@
         }
 
         $panel
-          .append('<div class="search-box" style="display: none;"><img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}searching{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Searching{/ts}{literal}...</div><div class="tag-tree-wrapper"><div class="tag-tree"></div><div class="tag-info"></div></div>')
+          .append('<div class="tag-tree-wrapper"><div class="tag-tree"></div><div class="tag-info"></div></div>')
           .on('change', 'input[type=color]', changeColor)
           .on('change', 'input[name=used_for]', changeUsedFor)
           .on('click', '.clear-tag-selection', clearSelection)
@@ -276,7 +276,7 @@
           .on('changed.jstree loaded.jstree', changeSelection)
           .on('move_node.jstree', moveTag)
           .on('search.jstree', function() {
-            $("div.search-box").hide();
+            $(this).unblock();
           })
           .jstree({
             core: {
@@ -311,7 +311,7 @@
                 $('.tag-tree', $panel).jstree("refresh", true, true);
               }
               else {
-                $("div.search-box").show();
+                $('.tag-tree', $panel).block();
                 $(".tag-tree", $panel).jstree("search", searchString);
                 delete window.searchedString;
               }
@@ -383,19 +383,6 @@
   div.tag-tree-wrapper {
     position: relative;
     min-height: 250px;
-  }
-  div.search-box {
-    margin: auto;
-    position: absolute;
-    top: 0px; left: 0px;
-    bottom: 0px; right: 0px;
-    background-color: grey;
-    color: white;
-    text-align: center;
-    vertical-align: middle;
-    line-height: 350px;
-    font-weight: bold;
-    opacity: .6;
   }
   div.tag-tree {
     width: 59%;
