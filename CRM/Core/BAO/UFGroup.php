@@ -995,6 +995,13 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     if (!$details->fetch()) {
       return;
     }
+    else {
+      // CRM-21643 : when a profile have custom field that contain multi value,
+      //  then traverse and fetch the last DAO object that contain the latest value
+      while ($details->fetch()) {
+        continue;
+      }
+    }
     $query->convertToPseudoNames($details);
     $config = CRM_Core_Config::singleton();
 
