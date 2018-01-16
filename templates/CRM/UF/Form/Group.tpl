@@ -50,6 +50,10 @@
             <td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_group' field='title' id=$gid}{/if}</td>
             <td class="html-adjust">{$form.title.html}</td>
         </tr>
+        <tr class="crm-uf_group-form-block-frontend_title">
+            <td class="label">{$form.frontend_title.label}</td>
+            <td class="html-adjust">{$form.frontend_title.html}</td>
+        </tr>
         <tr class="crm-uf_group-form-block-description">
             <td class="label">{$form.description.label} {help id='id-description' file="CRM/UF/Form/Group.hlp"}</td>
             <td class="html-adjust">{$form.description.html}</td>
