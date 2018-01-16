@@ -11,14 +11,21 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @var array
    */
-  protected $contactIDs = array();
+  protected $contactIDs = [];
 
   /**
    * Contribution IDs created for testing.
    *
    * @var array
    */
-  protected $contributionIDs = array();
+  protected $contributionIDs = [];
+
+  /**
+   * Contribution IDs created for testing.
+   *
+   * @var array
+   */
+  protected $activityIDs = [];
 
   /**
    * Basic test to ensure the exportComponents function completes without error.
@@ -86,6 +93,40 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $sql = "DROP TABLE IF EXISTS {$tableName}";
     CRM_Core_DAO::executeQuery($sql);
   }
+
+  /**
+   * Basic test to ensure the exportComponents function can export selected fields for contribution.
+   */
+  public function testExportComponentsActivity() {
+    $this->setUpActivityExportData();
+    $selectedFields = array(
+      array('Individual', 'display_name'),
+      array('Individual', '5_a_b', 'display_name'),
+    );
+
+    list($tableName) = CRM_Export_BAO_Export::exportComponents(
+      FALSE,
+      $this->activityIDs,
+      array(),
+      '`activity_date_time` desc',
+      $selectedFields,
+      NULL,
+      CRM_Export_Form_Select::ACTIVITY_EXPORT,
+      'civicrm_activity.id IN ( ' . implode(',', $this->activityIDs) . ')',
+      NULL,
+      FALSE,
+      FALSE,
+      array(
+        'exportOption' => CRM_Export_Form_Select::ACTIVITY_EXPORT,
+        'suppress_csv_for_testing' => TRUE,
+      )
+    );
+
+    // delete the export temp table and component table
+    $sql = "DROP TABLE IF EXISTS {$tableName}";
+    CRM_Core_DAO::executeQuery($sql);
+  }
+
   /**
    * Test the function that extracts the arrays used to structure the output.
    *
@@ -158,6 +199,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   public function setUpContributionExportData() {
     $this->setUpContactExportData();
     $this->contributionIDs[] = $this->contributionCreate(array('contact_id' => $this->contactIDs[0]));
+  }
+
+  /**
+   * Set up some data for us to do testing on.
+   */
+  public function setUpActivityExportData() {
+    $this->setUpContactExportData();
+    $this->activityIDs[] = $this->activityCreate(array('contact_id' => $this->contactIDs[0]))['id'];
   }
 
   /**

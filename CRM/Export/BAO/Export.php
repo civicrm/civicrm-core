@@ -286,6 +286,10 @@ class CRM_Export_BAO_Export {
    * @param array $exportParams
    * @param string $queryOperator
    *
+   * @return array|null
+   *   An array can be requested from within a unit test.
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function exportComponents(
     $selectAll,
@@ -385,7 +389,6 @@ class CRM_Export_BAO_Export {
           }
         }
 
-        $contactType = CRM_Utils_Array::value(0, $value);
         $locTypeId = CRM_Utils_Array::value(2, $value);
 
         if ($relationField) {
@@ -609,10 +612,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         }
         elseif ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
           $sourceID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Source');
-          $query = "SELECT contact_id FROM civicrm_activity_contact
-                              WHERE activity_id IN ( " . implode(',', $ids) . ") AND
-                              record_type_id = {$sourceID}";
-          $dao = CRM_Core_DAO::executeQuery($query);
+          $dao = CRM_Core_DAO::executeQuery("
+            SELECT contact_id FROM civicrm_activity_contact
+            WHERE activity_id IN ( " . implode(',', $ids) . ") AND
+            record_type_id = {$sourceID}
+          ");
+
           while ($dao->fetch()) {
             $relIDs[] = $dao->contact_id;
           }
@@ -1114,7 +1119,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       CRM_Utils_System::civiExit();
     }
     else {
-      CRM_Core_Error::fatal(ts('No records to export'));
+      throw new CRM_Core_Exception(ts('No records to export'));
     }
   }
 
