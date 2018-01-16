@@ -305,6 +305,7 @@
 
 - github      : elisseck
   name        : Eli Lisseck
+  organization: AGH Strategies
   jira        : elilisseck
 
 - name        : Ellen Hendricks
@@ -848,7 +849,6 @@
 
 - github      : pradpnayak
   name        : Pradeep Nayak
-  organization: JMA Consulting
   jira        : pradeep.nayak
 
 - name        : Angela Cacciola
