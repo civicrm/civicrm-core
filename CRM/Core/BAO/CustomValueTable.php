@@ -217,6 +217,9 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             default:
+              if ($value == NULL) {
+                $type = 'Timestamp';
+              }
               break;
           }
           if (strtolower($value) === "null") {
