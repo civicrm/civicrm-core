@@ -936,7 +936,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   public static function emailReceipt(&$form, &$formValues, &$membership) {
     // retrieve 'from email id' for acknowledgement
-    $receiptFrom = $formValues['from_email_address'];
+    $receiptFrom = CRM_Utils_Array::value('from_email_address', $formValues);
 
     if (!empty($formValues['payment_instrument_id'])) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
@@ -1417,7 +1417,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           // Assign amount to template if payment was successful.
           $this->assign('amount', $params['total_amount']);
         }
-        catch (PaymentProcessorException $e) {
+        catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
           if (!empty($paymentParams['contributionID'])) {
             CRM_Contribute_BAO_Contribution::failPayment($paymentParams['contributionID'], $this->_contactID,
               $e->getMessage());
@@ -1426,9 +1426,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
           }
 
-          CRM_Core_Error::displaySessionError($result);
+          CRM_Core_Session::singleton()->setStatus($e->getMessage());
           CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/membership',
-            "reset=1&action=add&cid={$this->_contactID}&context=&mode={$this->_mode}"
+            "reset=1&action=add&cid={$this->_contactID}&context=membership&mode={$this->_mode}"
           ));
 
         }

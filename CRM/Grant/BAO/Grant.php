@@ -35,12 +35,6 @@
 class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
 
   /**
-   * Static field for all the grant information that we can potentially export.
-   * @var array
-   */
-  static $_exportableFields = NULL;
-
-  /**
    * Class constructor.
    */
   public function __construct() {
@@ -346,54 +340,19 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *   array of exportable Fields
    */
   public static function &exportableFields() {
-    if (!self::$_exportableFields) {
-      if (!self::$_exportableFields) {
-        self::$_exportableFields = array();
-      }
+    $fields = CRM_Grant_DAO_Grant::export();
+    $grantNote = array(
+      'grant_note' => array(
+        'title' => ts('Grant Note'),
+        'name' => 'grant_note',
+        'data_type' => CRM_Utils_Type::T_TEXT,
+      ),
+    );
+    $fields = array_merge($fields, $grantNote,
+      CRM_Core_BAO_CustomField::getFieldsForImport('Grant')
+    );
 
-      $grantFields = array(
-        'grant_status' => array(
-          'title' => ts('Grant Status'),
-          'name' => 'grant_status',
-          'data_type' => CRM_Utils_Type::T_STRING,
-        ),
-        'grant_type' => array(
-          'title' => ts('Grant Type'),
-          'name' => 'grant_type',
-          'data_type' => CRM_Utils_Type::T_STRING,
-        ),
-        'grant_money_transfer_date' => array(
-          'title' => ts('Grant Money Transfer Date'),
-          'name' => 'grant_money_transfer_date',
-          'data_type' => CRM_Utils_Type::T_DATE,
-        ),
-        'grant_amount_requested' => array(
-          'title' => ts('Grant Amount Requested'),
-          'name' => 'grant_amount_requested',
-          'data_type' => CRM_Utils_Type::T_FLOAT,
-        ),
-        'grant_application_received_date' => array(
-          'title' => ts('Grant Application Received Date'),
-          'name' => 'grant_application_received_date',
-          'data_type' => CRM_Utils_Type::T_DATE,
-        ),
-      );
-
-      $fields = CRM_Grant_DAO_Grant::export();
-      $grantNote = array(
-        'grant_note' => array(
-          'title' => ts('Grant Note'),
-          'name' => 'grant_note',
-          'data_type' => CRM_Utils_Type::T_TEXT,
-        ),
-      );
-      $fields = array_merge($fields, $grantFields, $grantNote,
-        CRM_Core_BAO_CustomField::getFieldsForImport('Grant')
-      );
-      self::$_exportableFields = $fields;
-    }
-
-    return self::$_exportableFields;
+    return $fields;
   }
 
   /**

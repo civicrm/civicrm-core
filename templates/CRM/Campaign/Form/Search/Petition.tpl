@@ -198,7 +198,7 @@ function loadPetitionList( )
              "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
                  "sZeroRecords" : noRecordFoundMsg },
              "fnDrawCallback": function() {
-               $(this).trigger('crmLoad');
+               CRM.$(this).trigger('crmLoad');
              },
              "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
 

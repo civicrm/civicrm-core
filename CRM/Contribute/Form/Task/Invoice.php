@@ -129,6 +129,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $this->_selectedOutput = CRM_Utils_Request::retrieve('select', 'String', $this);
     $this->assign('selectedOutput', $this->_selectedOutput);
 
+    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
     if ($this->_selectedOutput == 'email') {
       CRM_Utils_System::setTitle(ts('Email Invoice'));
     }
@@ -141,36 +142,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $session = CRM_Core_Session::singleton();
     $this->preventAjaxSubmit();
     if (CRM_Core_Permission::check('administer CiviCRM')) {
       $this->assign('isAdmin', 1);
     }
-    $contactID = $session->get('userID');
-    $contactEmails = CRM_Core_BAO_Email::allEmails($contactID);
-    $emails = array();
-    $fromDisplayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-      $contactID, 'display_name'
-    );
-    foreach ($contactEmails as $emailId => $item) {
-      $email = $item['email'];
-      if ($email) {
-        $emails[$emailId] = '"' . $fromDisplayName . '" <' . $email . '> ';
-      }
-      if (isset($emails[$emailId])) {
-        $emails[$emailId] .= $item['locationType'];
-        if ($item['is_primary']) {
-          $emails[$emailId] .= ' ' . ts('(preferred)');
-        }
-        $emails[$emailId] = htmlspecialchars($emails[$emailId]);
-      }
-    }
-    $fromEmailAddress = CRM_Core_OptionGroup::values('from_email_address');
-    foreach ($fromEmailAddress as $key => $email) {
-      $fromEmailAddress[$key] = htmlspecialchars($fromEmailAddress[$key]);
-    }
-    $fromEmail = CRM_Utils_Array::crmArrayMerge($emails, $fromEmailAddress);
-    $this->add('select', 'from_email_address', ts('From Email Address'), array('' => '- select -') + $fromEmail);
+
+    $this->add('select', 'from_email_address', ts('From'), $this->_fromEmails, TRUE);
     if ($this->_selectedOutput != 'email') {
       $this->addElement('radio', 'output', NULL, ts('Email Invoice'), 'email_invoice');
       $this->addElement('radio', 'output', NULL, ts('PDF Invoice'), 'pdf_invoice');
@@ -479,30 +456,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'tplParams' => $tplParams,
         'PDFFilename' => $pdfFileName,
       );
-      $session = CRM_Core_Session::singleton();
-      $contactID = $session->get('userID');
-      //CRM-16319 - we dont store in userID in case the user is doing multiple
-      //transactions etc
-      if (empty($contactID)) {
-        $contactID = $session->get('transaction.userID');
-      }
-      // Fix Invoice email doesnot send out when completed payment using Paypal
-      if (empty($contactID)) {
-        $contactID = current($contactIds);
-      }
-      $contactEmails = CRM_Core_BAO_Email::allEmails($contactID);
-      $emails = array();
-      $fromDisplayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        $contactID, 'display_name'
-      );
 
-      foreach ($contactEmails as $emailId => $item) {
-        $email = $item['email'];
-        if ($email) {
-          $emails[$emailId] = '"' . $fromDisplayName . '" <' . $email . '> ';
-        }
-      }
-      $fromEmail = CRM_Utils_Array::crmArrayMerge($emails, CRM_Core_OptionGroup::values('from_email_address'));
+      $fromEmail = CRM_Core_BAO_Email::getFromEmail();
 
       // from email address
       if (isset($params['from_email_address'])) {

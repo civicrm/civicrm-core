@@ -2902,8 +2902,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'net_amount' => 20,
       'fee_amount' => 0,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 1,
       'billing_middle_name' => '',

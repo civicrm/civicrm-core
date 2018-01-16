@@ -169,9 +169,13 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    *   name & email for domain
    * @throws Exception
    */
-  public static function getNameAndEmail($skipFatal = FALSE) {
+  public static function getNameAndEmail($skipFatal = FALSE, $returnString = FALSE) {
     $fromEmailAddress = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
     if (!empty($fromEmailAddress)) {
+      if ($returnString) {
+        // Return a string like: "Demonstrators Anonymous" <info@example.org>
+        return $fromEmailAddress;
+      }
       foreach ($fromEmailAddress as $key => $value) {
         $email = CRM_Utils_Mail::pluckEmailFromHeader($value);
         $fromArray = explode('"', $value);
@@ -180,12 +184,13 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
       }
       return array($fromName, $email);
     }
-    elseif ($skipFatal) {
-      return array('', '');
+
+    if ($skipFatal) {
+      return array(NULL, NULL);
     }
 
-    $url = CRM_Utils_System::url('civicrm/admin/domain',
-      'action=update&reset=1'
+    $url = CRM_Utils_System::url('civicrm/admin/options/from_email_address',
+      'reset=1'
     );
     $status = ts("There is no valid default from email address configured for the domain. You can configure here <a href='%1'>Configure From Email Address.</a>", array(1 => $url));
 
@@ -287,8 +292,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
   /**
    * CRM-20308 & CRM-19657
-   * Return domain information / user information for the useage in receipts
-   * Try default from adress then fall back to using logged in user details
+   * Return domain information / user information for the usage in receipts
+   * Try default from address then fall back to using logged in user details
    */
   public static function getDefaultReceiptFrom() {
     $domain = civicrm_api3('domain', 'getsingle', array('id' => CRM_Core_Config::domainID()));

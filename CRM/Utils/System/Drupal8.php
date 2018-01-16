@@ -49,6 +49,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       return FALSE;
     }
 
+    /** @var \Drupal\user\Entity\User $account */
     $account = entity_create('user');
     $account->setUsername($params['cms_name'])->setEmail($params[$mail]);
 
@@ -64,6 +65,9 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if ($user_register_conf != 'visitors' && !$user->hasPermission('administer users')) {
       $account->block();
     }
+    elseif (!$verify_mail_conf) {
+      $account->activate();
+    }
 
     // Validate the user object
     $violations = $account->validate();
@@ -71,10 +75,16 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       return FALSE;
     }
 
+    // Let the Drupal module know we're already in CiviCRM.
+    $config = CRM_Core_Config::singleton();
+    $config->inCiviCRM = TRUE;
+
     try {
       $account->save();
+      $config->inCiviCRM = FALSE;
     }
     catch (\Drupal\Core\Entity\EntityStorageException $e) {
+      $config->inCiviCRM = FALSE;
       return FALSE;
     }
 
@@ -98,6 +108,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       case 'visitors_admin_approval':
         _user_mail_notify('register_pending_approval', $account);
         break;
+    }
+
+    // If this is a user creating their own account, login them in!
+    if ($account->isActive() && $user->isAnonymous()) {
+      \user_login_finalize($account);
     }
 
     return $account->id();
@@ -139,10 +154,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       $violations = iterator_to_array($user->validate());
       // We only care about violations on the username field; discard the rest.
       $violations = array_filter($violations, function ($v) {
-        return $v->getPropertyPath() == 'name.0.value';
+        return $v->getPropertyPath() == 'name';
       });
       if (count($violations) > 0) {
-        $errors['cms_name'] = $violations[0]->getMessage();
+        $errors['cms_name'] = (string) $violations[0]->getMessage();
       }
     }
 
@@ -157,10 +172,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       $violations = iterator_to_array($user->validate());
       // We only care about violations on the email field; discard the rest.
       $violations = array_filter($violations, function ($v) {
-        return $v->getPropertyPath() == 'mail.0.value';
+        return $v->getPropertyPath() == 'mail';
       });
       if (count($violations) > 0) {
-        $errors[$emailName] = $violations[0]->getMessage();
+        $errors[$emailName] = (string) $violations[0]->getMessage();
       }
     }
   }
@@ -205,52 +220,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function addHTMLHead($header) {
     \Drupal::service('civicrm.page_state')->addHtmlHeader($header);
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function addScriptUrl($url, $region) {
-    static $weight = 0;
-
-    switch ($region) {
-      case 'html-header':
-        break;
-
-      default:
-        return FALSE;
-    }
-
-    $script = array(
-      '#tag' => 'script',
-      '#attributes' => array(
-        'src' => $url,
-      ),
-      '#weight' => $weight,
-    );
-    $weight++;
-    \Drupal::service('civicrm.page_state')->addJS($script);
-    return TRUE;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function addScript($code, $region) {
-    switch ($region) {
-      case 'html-header':
-        break;
-
-      default:
-        return FALSE;
-    }
-
-    $script = array(
-      '#tag' => 'script',
-      '#value' => $code,
-    );
-    \Drupal::service('civicrm.page_state')->addJS($script);
-    return TRUE;
   }
 
   /**

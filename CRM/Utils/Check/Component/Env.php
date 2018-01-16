@@ -898,6 +898,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     if (CRM_Core_Config::singleton()->userFramework == 'UnitTests') {
       return $messages;
     }
+    // CRM-21629 Set User Agent to avoid being blocked by filters
+    stream_context_set_default(array(
+      'http' => array('user_agent' => 'CiviCRM'),
+    ));
+
     // Does arrow.png exist where we expect it?
     $arrowUrl = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'packages/jquery/css/images/arrow.png';
     $headers = get_headers($arrowUrl);

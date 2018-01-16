@@ -139,7 +139,19 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   protected function addPaypalExpressCode(&$form) {
     // @todo use $this->isBackOffice() instead, test.
     if (empty($form->isBackOffice)) {
-      $form->_expressButtonName = $form->getButtonName('upload', 'express');
+
+      /**
+       * if payment method selected using ajax call then form object is of 'CRM_Financial_Form_Payment',
+       * instead of 'CRM_Contribute_Form_Contribution_Main' so it generate wrong button name
+       * and then clicking on express button it redirect to confirm screen rather than PayPal Express form
+       */
+
+      if ('CRM_Financial_Form_Payment' == get_class($form) && $form->_formName) {
+        $form->_expressButtonName = '_qf_' . $form->_formName . '_upload_express';
+      }
+      else {
+        $form->_expressButtonName = $form->getButtonName('upload', 'express');
+      }
       $form->assign('expressButtonName', $form->_expressButtonName);
       $form->add(
         'image',

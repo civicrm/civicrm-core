@@ -40,7 +40,7 @@
             <span class="description">{ts}Unique internal reference ID for this contribution.{/ts}</span></td></tr>
         <tr class="crm-contribution-form-block-creditnote_id"><td class="label">{$form.creditnote_id.label}</td><td{$valueStyle}>{$form.creditnote_id.html}<br />
             <span class="description">{ts}Unique internal Credit Note ID for this contribution.{/ts}</span></td></tr>
-        <tr class="crm-contribution-form-block-thankyou_date"><td class="label">{$form.thankyou_date.label}</td><td>{include file="CRM/common/jcalendar.tpl" elementName=thankyou_date}<br />
+        <tr class="crm-contribution-form-block-thankyou_date"><td class="label">{$form.thankyou_date.label}</td><td>{$form.thankyou_date.html}<br />
             <span class="description">{ts}Date that a thank-you message was sent to the contributor.{/ts}</span></td></tr>
     </table>
 </div>
