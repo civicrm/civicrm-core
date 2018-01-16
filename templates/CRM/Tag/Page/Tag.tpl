@@ -275,6 +275,9 @@
         $('.tag-tree', $panel)
           .on('changed.jstree loaded.jstree', changeSelection)
           .on('move_node.jstree', moveTag)
+          .on('search.jstree', function() {
+            $(this).unblock();
+          })
           .jstree({
             core: {
               data: {
@@ -298,13 +301,30 @@
             }
           });
 
-        $('input[name=filter_tag_tree]', $panel).on('keyup change', function() {
-          if ($(this).val() === '') {
-            $('.tag-tree', $panel).jstree("clear_search");
-            $('.tag-tree', $panel).jstree("refresh", true, true);
+        $('input[name=filter_tag_tree]', $panel).on('keyup change', function(e) {
+          var element = $(this);
+          var searchString = element.val();
+          if (e.type == 'change') {
+            if (window.searchedString === searchString) {
+              if (searchString === '') {
+                $('.tag-tree', $panel).jstree("clear_search");
+                $('.tag-tree', $panel).jstree("refresh", true, true);
+              }
+              else {
+                $('.tag-tree', $panel).block();
+                $(".tag-tree", $panel).jstree("search", searchString);
+                delete window.searchedString;
+              }
+            }
           }
           else {
-            $(".tag-tree", $panel).jstree("search", $(this).val());
+            if (this.timer) clearTimeout(this.timer);
+            this.timer = setTimeout(function() {
+              if (_.isEmpty(window.searchedString) || window.searchedString !== searchString) {
+                window.searchedString = searchString;
+                element.trigger('change');
+              }
+            }, 1000);
           }
         });
       }
