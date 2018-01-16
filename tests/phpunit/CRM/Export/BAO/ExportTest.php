@@ -27,6 +27,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected $activityIDs = [];
 
+  public function tearDown() {
+    $this->quickCleanup(['civicrm_contact', 'civicrm_email', 'civicrm_address']);
+    parent::tearDown();
+  }
+
   /**
    * Basic test to ensure the exportComponents function completes without error.
    */
@@ -213,14 +218,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up some data for us to do testing on.
    */
   public function setUpContactExportData() {
-    $this->contactIDs[] = $this->individualCreate();
-  }
-
-  public function testExportMasterAddress() {
-    $contactA = $this->individualCreate(array(), 0);
-    $contactB = $this->individualCreate(array(), 1);
-
-    //create address for contact A
+    $this->contactIDs[] = $contactA = $this->individualCreate();
+    // Create address for contact A.
     $params = array(
       'contact_id' => $contactA,
       'location_type_id' => 'Home',
@@ -233,12 +232,79 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('address', 'create', $params);
     $addressId = $result['id'];
 
-    //share address with contact B
-    $result = $this->callAPISuccess('address', 'create', array(
+    $this->callAPISuccess('email', 'create', array(
+      'id' => $this->callAPISuccessGetValue('Email', ['contact_id' => $params['contact_id'], 'return' => 'id']),
+      'location_type_id' => 'Home',
+      'email' => 'home@example.com',
+      'is_primary' => 1,
+    ));
+    $this->callAPISuccess('email', 'create', array('contact_id' => $params['contact_id'], 'location_type_id' => 'Work', 'email' => 'work@example.com', 'is_primary' => 0));
+
+    $params['is_primary'] = 0;
+    $params['location_type_id'] = 'Work';
+    $this->callAPISuccess('address', 'create', $params);
+    $this->contactIDs[] = $contactB = $this->individualCreate();
+
+    $this->callAPISuccess('address', 'create', array(
       'contact_id' => $contactB,
       'location_type_id' => "Home",
       'master_id' => $addressId,
     ));
+
+  }
+
+  /**
+   * Test variants of primary address exporting.
+   *
+   * @param int $isPrimaryOnly
+   *
+   * @dataProvider getPrimarySearchOptions
+   */
+  public function testExportPrimaryAddress($isPrimaryOnly) {
+    \Civi::settings()->set('searchPrimaryDetailsOnly', $isPrimaryOnly);
+    $this->setUpContactExportData();
+
+    $selectedFields = [['Individual', 'email', ' '], ['Individual', 'email', '1'], ['Individual', 'email', '2']];
+    list($tableName) = CRM_Export_BAO_Export::exportComponents(
+      TRUE,
+      [],
+      [['email', 'LIKE', 'c', 0, 1]],
+      NULL,
+      $selectedFields,
+      NULL,
+      CRM_Export_Form_Select::CONTACT_EXPORT,
+      "contact_a.id IN ({$this->contactIDs[0]}, {$this->contactIDs[1]})",
+      NULL,
+      FALSE,
+      FALSE,
+      array(
+        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
+        'suppress_csv_for_testing' => TRUE,
+      )
+    );
+
+    $dao = CRM_Core_DAO::executeQuery('SELECT * from ' . $tableName);
+    $dao->fetch();
+    $this->assertEquals('home@example.com', $dao->email);
+    $this->assertEquals('work@example.com', $dao->work_email);
+    $this->assertEquals('home@example.com', $dao->home_email);
+    $this->assertEquals(2, $dao->N);
+    \Civi::settings()->set('searchPrimaryDetailsOnly', FALSE);
+  }
+
+  /**
+   * Get the options for the primary search setting field.
+   * @return array
+   */
+  public function getPrimarySearchOptions() {
+    return [[TRUE], [FALSE]];
+  }
+
+  /**
+   * Test master_address_id field.
+   */
+  public function testExportMasterAddress() {
+    $this->setUpContactExportData();
 
     //export the master address for contact B
     $selectedFields = array(
@@ -246,13 +312,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     );
     list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
       TRUE,
-      array($contactB),
+      array($this->contactIDs[1]),
       array(),
       NULL,
       $selectedFields,
       NULL,
       CRM_Export_Form_Select::CONTACT_EXPORT,
-      "contact_a.id IN ({$contactB})",
+      "contact_a.id IN ({$this->contactIDs[1]})",
       NULL,
       FALSE,
       FALSE,
@@ -265,7 +331,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     //assert the exported result
     $masterName = CRM_Core_DAO::singleValueQuery("SELECT {$field} FROM {$tableName}");
-    $displayName = CRM_Contact_BAO_Contact::getMasterDisplayName(NULL, $contactB);
+    $displayName = CRM_Contact_BAO_Contact::getMasterDisplayName(NULL, $this->contactIDs[1]);
     $this->assertEquals($displayName, $masterName);
 
     // delete the export temp table and component table
