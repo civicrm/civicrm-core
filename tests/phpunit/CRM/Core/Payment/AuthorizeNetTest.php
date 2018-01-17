@@ -88,7 +88,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'is_test' => 1,
       'contribution_status_id' => 2,
     );
-    $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
 
     $params = array(
       'qfKey' => '08ed21c7ca00a1f7d32fff2488596ef7_4454',
