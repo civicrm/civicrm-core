@@ -143,11 +143,16 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function on the contribution page.
+   *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testSubmit() {
+  public function testSubmit($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $form = new CRM_Contribute_Form_Contribution();
     $form->testSubmit(array(
-      'total_amount' => 50,
+      'total_amount' => $this->formatMoneyInput(1234),
       'financial_type_id' => 1,
       'receive_date' => '04/21/2015',
       'receive_date_time' => '11:27PM',
@@ -158,6 +163,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       CRM_Core_Action::ADD);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
     $this->assertEmpty($contribution['amount_level']);
+    $this->assertEquals(1234, $contribution['total_amount']);
+    $this->assertEquals(1234, $contribution['net_amount']);
   }
 
   /**
