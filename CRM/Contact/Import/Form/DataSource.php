@@ -203,7 +203,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
     $config = CRM_Core_Config::singleton();
     $geoCode = FALSE;
-    if (!empty($config->geocodeMethod)) {
+    if (CRM_Core_BAO_Address::getGeoCodingClassIfEnabled()) {
       $geoCode = TRUE;
       $this->addElement('checkbox', 'doGeocodeAddress', ts('Geocode addresses during import?'));
     }

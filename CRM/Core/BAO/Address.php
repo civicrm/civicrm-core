@@ -342,8 +342,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       $params['country'] = CRM_Core_PseudoConstant::country($params['country_id']);
     }
 
-    $config = CRM_Core_Config::singleton();
-
     $asp = Civi::settings()->get('address_standardization_provider');
     // clean up the address via USPS web services if enabled
     if ($asp === 'USPS' &&
@@ -379,14 +377,12 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       }
     }
 
-    // check if geocode should be skipped (can be forced with an optional parameter through the api)
-    $skip_geocode = (isset($params['skip_geocode']) && $params['skip_geocode']) ? TRUE : FALSE;
-
-    // add latitude and longitude and format address if needed
-    if (!$skip_geocode && !empty($config->geocodeMethod) && ($config->geocodeMethod != 'CRM_Utils_Geocode_OpenStreetMaps') && empty($params['manual_geo_code'])) {
-      $class = $config->geocodeMethod;
-      $class::format($params);
+    // skip_geocode is an optional parameter through the api.
+    // manual_geo_code is on the contact edit form. They do the same thing....
+    if (empty($params['skip_geocode']) && empty($params['manual_geo_code'])) {
+      self::addGeocoderData($params);
     }
+
   }
 
   /**
@@ -1339,6 +1335,39 @@ SELECT is_primary,
         return CRM_Core_PseudoConstant::worldRegion();
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+  }
+
+  /**
+   * Add data from the configured geocoding provider.
+   *
+   * Generally this means lattitude & longitude data.
+   *
+   * @param array $params
+   */
+  public static function addGeocoderData(&$params) {
+    if (($geoCodeClass = self::getGeoCodingClassIfEnabled()) === FALSE) {
+      return;
+    }
+    $geoCodeClass::format($params);
+  }
+
+  /**
+   * Get the geocoding class if enabled.
+   *
+   * This retrieves the geocoding class, checking it can be accessed.
+   * Checks are done to mitigate the possibility it has been configured
+   * and then the file has been removed.
+   *
+   * @return string|bool
+   *   Class name if usable, else false.
+   */
+  public static function getGeoCodingClassIfEnabled() {
+    $geoCodeClass = CRM_Core_Config::singleton()->geocodeMethod;
+    if (!class_exists($geoCodeClass) || !method_exists($geoCodeClass, 'format')) {
+      // This is a protection for sites that have a geocoding class configured that has been removed.
+      return FALSE;
+    }
+    return $geoCodeClass;
   }
 
 }
