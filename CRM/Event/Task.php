@@ -101,7 +101,10 @@ class CRM_Event_Task {
           'result' => FALSE,
         ),
         6 => array(
-          'title' => ts('Email - send now'),
+          'title' => ts('Email - send now (to %1 or less)', array(
+            1 => Civi::settings()
+              ->get('simple_mail_limit'),
+          )),
           'class' => 'CRM_Event_Form_Task_Email',
           'result' => TRUE,
         ),
