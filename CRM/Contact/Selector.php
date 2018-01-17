@@ -1182,14 +1182,13 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
 
   /**
    * @param array $params
-   * @param $action
    * @param int $sortID
    * @param null $displayRelationshipType
    * @param string $queryOperator
    *
    * @return CRM_Contact_DAO_Contact
    */
-  public function contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
+  public function contactIDQuery($params, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
     $sortOrder = &$this->getSortOrder($this->_action);
     $sort = new CRM_Utils_Sort($sortOrder, $sortID);
 

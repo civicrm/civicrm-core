@@ -158,6 +158,22 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the contact ID query does not fail on country search.
+   */
+  public function testContactIDQuery() {
+    $params = [[
+      0 => 'country-1',
+      1 => '=',
+      2 => '1228',
+      3 => 1,
+      4 => 0,
+    ]];
+
+    $searchOBJ = new CRM_Contact_Selector(NULL);
+    $searchOBJ->contactIDQuery($params, '1_u');
+  }
+
+  /**
    * Get the default select string since this is generally consistent.
    */
   public function getDefaultSelectString() {
