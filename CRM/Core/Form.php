@@ -2388,4 +2388,24 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return $currency;
   }
 
+  /**
+   * Is the form in view or edit mode.
+   *
+   * The 'addField' function relies on the form action being one of a set list
+   * of actions. Checking for these allows for an early return.
+   *
+   * @return bool
+   */
+  protected function isFormInViewOrEditMode() {
+    return in_array($this->_action, [
+      CRM_Core_Action::UPDATE,
+      CRM_Core_Action::ADD,
+      CRM_Core_Action::VIEW,
+      CRM_Core_Action::BROWSE,
+      CRM_Core_Action::BASIC,
+      CRM_Core_Action::ADVANCED,
+      CRM_Core_Action::PREVIEW,
+    ]);
+  }
+
 }
