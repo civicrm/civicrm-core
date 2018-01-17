@@ -80,6 +80,10 @@
     }
     showHidePayment(isHide);
   }
+  // If we get a validation error and the form reloads we can end up with this still showing the selected pp
+  //  but the billing section is for the first payproc.
+  CRM.$('#payment_processor_id > option:selected').each(function () {CRM.$(this).removeAttr('selected')});
+
   skipPaymentMethod();
 
   CRM.$(function($) {
@@ -107,7 +111,7 @@
         {capture assign='profilePathVar'}{/capture}
       {/if}
 
-      {capture assign='isBackOfficePathVar'}&is_back_office={$isBackOffice}&{/capture}
+      {capture assign='isBackOfficePathVar'}is_back_office={$isBackOffice}&{/capture}
 
       var payment_instrument_id = $('#payment_instrument_id').val();
 
