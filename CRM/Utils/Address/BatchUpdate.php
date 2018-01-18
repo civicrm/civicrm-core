@@ -71,7 +71,7 @@ class CRM_Utils_Address_BatchUpdate {
 
     // do check for geocoding.
     $processGeocode = FALSE;
-    if (!CRM_Core_BAO_Address::getGeoCodingClassIfEnabled()) {
+    if (!CRM_Utils_GeocodeProviderFactory::getUsableClassName()) {
       if (CRM_Utils_String::strtobool($this->geocoding) === TRUE) {
         $this->returnMessages[] = ts('Error: You need to set a mapping provider under Administer > System Settings > Mapping and Geocoding');
         $this->returnError = 1;

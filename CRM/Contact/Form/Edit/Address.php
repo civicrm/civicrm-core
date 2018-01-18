@@ -153,7 +153,7 @@ class CRM_Contact_Form_Edit_Address {
 
     // CRM-11665 geocode override option
     $geoCode = FALSE;
-    if (CRM_Core_BAO_Address::getGeoCodingClassIfEnabled()) {
+    if (CRM_Utils_GeocodeProviderFactory::getUsableClassName()) {
       $geoCode = TRUE;
       $form->addElement('checkbox',
         "address[$blockId][manual_geo_code]",

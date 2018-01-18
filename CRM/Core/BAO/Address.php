@@ -1347,31 +1347,14 @@ SELECT is_primary,
    *   TRUE if params could be passed to a provider, else FALSE.
    */
   public static function addGeocoderData(&$params) {
-    $geoCodeClassName = self::getGeoCodingClassIfEnabled();
-    if ($geoCodeClassName === FALSE) {
+    try {
+      $provider = CRM_Utils_GeocodeProviderFactory::create();
+    }
+    catch (CRM_Core_Exception $e) {
       return FALSE;
     }
-    $geoCodeClassName::format($params);
+    $provider::format($params);
     return TRUE;
-  }
-
-  /**
-   * Get the geocoding class if enabled.
-   *
-   * This retrieves the geocoding class, checking it can be accessed.
-   * Checks are done to mitigate the possibility it has been configured
-   * and then the file has been removed.
-   *
-   * @return string|bool
-   *   Class name if usable, else false.
-   */
-  public static function getGeoCodingClassIfEnabled() {
-    $geoCodeClass = CRM_Core_Config::singleton()->geocodeMethod;
-    if (!class_exists($geoCodeClass) || !method_exists($geoCodeClass, 'format')) {
-      // This is a protection for sites that have a geocoding class configured that has been removed.
-      return FALSE;
-    }
-    return $geoCodeClass;
   }
 
 }
