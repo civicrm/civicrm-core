@@ -352,22 +352,13 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
              {$this->_aclFrom}";
 
-    if ($this->isTableSelected('civicrm_email')) {
-      $this->_from .= "
-              LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
-                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
-                     AND {$this->_aliases['civicrm_email']}.is_primary = 1";
-    }
-    if ($this->isTableSelected('civicrm_phone')) {
-      $this->_from .= "
-              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
-                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                         {$this->_aliases['civicrm_phone']}.is_primary = 1";
-    }
+    $this->joinPhoneFromContact();
+    $this->joinEmailFromContact();
+
     // for credit card type
     $this->addFinancialTrxnFromClause();
 
-    $this->addAddressFromClause();
+    $this->joinAddressFromContact();
   }
 
   public function where() {
