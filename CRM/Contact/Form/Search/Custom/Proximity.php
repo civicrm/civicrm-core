@@ -135,6 +135,9 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     $country = array('' => ts('- select -')) + CRM_Core_PseudoConstant::country();
     $form->add('select', 'country_id', ts('Country'), $country, TRUE, array('class' => 'crm-select2'));
 
+    $form->add('text', 'geo_code_1', ts('Latitude'));
+    $form->add('text', 'geo_code_2', ts('Longitude'));
+
     $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::nestedGroup();
     $form->addElement('select', 'group', ts('Group'), $group, array('class' => 'crm-select2 huge'));
 

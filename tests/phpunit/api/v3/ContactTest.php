@@ -3524,6 +3524,34 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'delete', array('id' => $created_contact_id, 'skip_undelete' => TRUE));
   }
 
+  /**
+   * Test the prox_distance functionality works.
+   *
+   * This is primarily testing functionality in the BAO_Query object that 'happens to be'
+   * accessible via the api.
+   */
+  public function testContactGetProximity() {
+    CRM_Core_Config::singleton()->geocodeMethod = 'CRM_Utils_MockGeocoder';
+    $this->individualCreate();
+    $contactID = $this->individualCreate();
+    $this->callAPISuccess('Address', 'create', [
+      'contact_id' => $contactID,
+      'is_primary' => 1,
+      'city' => 'Whangarei',
+      'street_address' => 'Dent St',
+      'geo_code_1' => '-35.8743325',
+      'geo_code_2' => '174.4567136',
+      'location_type_id' => 'Home',
+    ]);
+    $contact = $this->callAPISuccess('Contact', 'get', [
+      'prox_distance' => 100,
+      'prox_geo_code_1' => '-35.72192',
+      'prox_geo_code_2' => '174.32034',
+    ]);
+    $this->assertEquals(1, $contact['count']);
+    $this->assertEquals($contactID, $contact['id']);
+  }
+
   public function testLoggedInUserAPISupportToken() {
     $description = "Get contact id of the current logged in user";
     $subFile = "ContactIDOfLoggedInUserContactAPI";

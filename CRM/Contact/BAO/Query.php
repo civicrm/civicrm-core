@@ -2002,6 +2002,8 @@ class CRM_Contact_BAO_Query {
       case 'prox_postal_code':
       case 'prox_state_province_id':
       case 'prox_country_id':
+      case 'prox_geo_code_1':
+      case 'prox_geo_code_2':
         // handled by the proximity_distance clause
         return;
 
