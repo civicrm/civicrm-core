@@ -295,15 +295,15 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'invoice_id' => '86ed39c9e9ee6ef6031621ce0eafe7eb81',
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
 
     $params = array(
-      'id' => $contribution->id,
+      'id' => $contribution['id'],
       'total_amount' => 300.00,
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
-    $financialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution->id);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
+    $financialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
     $params = array('id' => $financialItem['id']);
     $financialItem = $this->callAPISuccess('FinancialItem', 'get', $params);
     $this->assertEquals(200.00, $financialItem['values'][$financialItem['id']]['amount'], "The amounts do not match.");
