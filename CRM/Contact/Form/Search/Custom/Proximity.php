@@ -64,13 +64,13 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
       }
 
       // use the address to get the latitude and longitude
-      CRM_Utils_Geocode_Google::format($this->_formValues);
+      CRM_Core_BAO_Address::addGeocoderData($this->_formValues);
 
       if (!is_numeric(CRM_Utils_Array::value('geo_code_1', $this->_formValues)) ||
         !is_numeric(CRM_Utils_Array::value('geo_code_2', $this->_formValues)) ||
         !isset($this->_formValues['distance'])
       ) {
-        CRM_Core_Error::fatal(ts('Could not geocode input'));
+        throw new CRM_Core_Exception(ts('Could not geocode input'));
       }
 
       $this->_latitude = $this->_formValues['geo_code_1'];

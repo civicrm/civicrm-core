@@ -34,7 +34,7 @@
 /**
  * Class that uses google geocoder
  */
-class CRM_Utils_Geocode_Google {
+class CRM_Utils_Geocode_Google extends CRM_Utils_Geocode {
 
   /**
    * Server to retrieve the lat/long
@@ -51,15 +51,7 @@ class CRM_Utils_Geocode_Google {
   static protected $_uri = '/maps/api/geocode/xml?sensor=false&address=';
 
   /**
-   * Function that takes an address object and gets the latitude / longitude for this
-   * address. Note that at a later stage, we could make this function also clean up
-   * the address into a more valid format
-   *
-   * @param array $values
-   * @param bool $stateName
-   *
-   * @return bool
-   *   true if we modified the address, false otherwise
+   * @inheritDoc
    */
   public static function format(&$values, $stateName = FALSE) {
     // we need a valid country, else we ignore
