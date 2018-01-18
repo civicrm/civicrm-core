@@ -253,17 +253,14 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
         FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
             INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                 ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0
-             LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
-                         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
-                         AND {$this->_aliases['civicrm_email']}.is_primary = 1
-             LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
-                         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                            {$this->_aliases['civicrm_phone']}.is_primary = 1";
+       ";
 
     // for credit card type
     $this->addFinancialTrxnFromClause();
 
-    $this->addAddressFromClause();
+    $this->joinAddressFromContact();
+    $this->joinPhoneFromContact();
+    $this->joinEmailFromContact();
   }
 
   public function where() {
