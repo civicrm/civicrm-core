@@ -67,7 +67,7 @@ function _civicrm_api3_option_value_get_spec(&$params) {
  *   API result array
  */
 function civicrm_api3_option_value_create($params) {
-  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'OptionValue');
   if (!empty($params['id']) && !array_key_exists('option_group_id', $params)) {
     $groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
       $params['id'], 'option_group_id', 'id'
