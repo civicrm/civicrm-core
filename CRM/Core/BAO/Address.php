@@ -1343,12 +1343,16 @@ SELECT is_primary,
    * Generally this means lattitude & longitude data.
    *
    * @param array $params
+   * @return boolean
+   *   TRUE if params could be passed to a provider, else FALSE.
    */
   public static function addGeocoderData(&$params) {
-    if (($geoCodeClass = self::getGeoCodingClassIfEnabled()) === FALSE) {
-      return;
+    $geoCodeClassName = self::getGeoCodingClassIfEnabled();
+    if ($geoCodeClassName === FALSE) {
+      return FALSE;
     }
-    $geoCodeClass::format($params);
+    $geoCodeClassName::format($params);
+    return TRUE;
   }
 
   /**

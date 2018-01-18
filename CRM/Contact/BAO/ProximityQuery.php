@@ -335,10 +335,9 @@ ACOS(
 
     $query->_tables['civicrm_address'] = $query->_whereTables['civicrm_address'] = 1;
 
-    if (!CRM_Core_BAO_Address::getGeoCodingClassIfEnabled()) {
+    if (!CRM_Core_BAO_Address::addGeocoderData($proximityAddress)) {
       throw new CRM_Core_Exception(ts('Proximity searching requires you to set a valid geocoding provider'));
     }
-    CRM_Core_BAO_Address::addGeocoderData($proximityAddress);
 
     if (
       !is_numeric(CRM_Utils_Array::value('geo_code_1', $proximityAddress)) ||
