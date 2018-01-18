@@ -193,7 +193,6 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
                    ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
                       {$this->_aliases['civicrm_address']}.is_primary = 1 ) ";
 
-
     $this->addPhoneFromClause();
     $this->addEmailFromClause()
 

@@ -284,7 +284,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
                           ON {$this->_aliases['civicrm_membership_status']}.id =
                              {$this->_aliases['civicrm_membership']}.status_id ";
 
-
     $this->addAddressFromClause();
     $this->addPhoneFromClause();
     $this->addEmailFromClause();
