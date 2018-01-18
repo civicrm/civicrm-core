@@ -523,7 +523,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       // We filter out alternatives, in case this is a stored e-mail, before sending to front-end
-      $this->_values['details'] = CRM_Utils_String::stripAlternatives($this->_values['details']);
+      $this->_values['details'] = CRM_Utils_String::stripAlternatives($this->_values['details']) ?: '';
 
       if ($this->_activityTypeName === 'Inbound Email' &&
         !CRM_Core_Permission::check('edit inbound email basic information and content')
