@@ -3738,6 +3738,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Enable Tax and Invoicing
    */
   protected function disableTaxAndInvoicing($params = array()) {
+    if (!empty(\Civi::$statics['CRM_Core_PseudoConstant']) && isset(\Civi::$statics['CRM_Core_PseudoConstant']['taxRates'])) {
+      unset(\Civi::$statics['CRM_Core_PseudoConstant']['taxRates']);
+    }
     // Enable component contribute setting
     $contributeSetting = array_merge($params,
       array(
@@ -3769,6 +3772,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'entity_id' => $financialTypeId,
       'account_relationship' => key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' ")),
     );
+
+    // set tax rate (as 10) for provided financial type ID to static variable, later used to fetch tax rates of all financial types
+    \Civi::$statics['CRM_Core_PseudoConstant']['taxRates'][$financialTypeId] = 10;
 
     //CRM-20313: As per unique index added in civicrm_entity_financial_account table,
     //  first check if there's any record on basis of unique key (entity_table, account_relationship, entity_id)

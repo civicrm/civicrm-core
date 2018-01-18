@@ -645,17 +645,16 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *   array of options
    */
   public static function getOptions($fieldId, $inactiveNeeded = FALSE, $reset = FALSE, $isDefaultContributionPriceSet = FALSE) {
-    static $options = array();
-    if ($reset) {
-      $options = array();
+    if ($reset || !isset(Civi::$statics[__CLASS__]['priceOptions'])) {
+      Civi::$statics[__CLASS__]['priceOptions'] = array();
       // This would happen if the function was only called to clear the cache.
       if (empty($fieldId)) {
         return array();
       }
     }
 
-    if (empty($options[$fieldId])) {
-      $values = array();
+    if (empty(Civi::$statics[__CLASS__]['priceOptions'][$fieldId])) {
+      $values = $options = array();
       CRM_Price_BAO_PriceFieldValue::getValues($fieldId, $values, 'weight', !$inactiveNeeded);
       $options[$fieldId] = $values;
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();
@@ -669,9 +668,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $options[$fieldId][$priceFieldId]['tax_amount'] = $taxAmount['tax_amount'];
         }
       }
+      Civi::$statics[__CLASS__]['priceOptions'][$fieldId] = $options[$fieldId];
     }
 
-    return $options[$fieldId];
+    return Civi::$statics[__CLASS__]['priceOptions'][$fieldId];
   }
 
   /**

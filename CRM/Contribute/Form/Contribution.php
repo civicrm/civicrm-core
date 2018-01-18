@@ -1382,7 +1382,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // as a point of fragility rather than a logical 'if' clause.
     if ($priceSetId) {
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-        $submittedValues, $lineItem[$priceSetId]);
+        $submittedValues, $lineItem[$priceSetId], NULL, $priceSetId);
       // Unset tax amount for offline 'is_quick_config' contribution.
       // @todo WHY  - quick config was conceived as a quick way to configure contribution forms.
       // this is an example of 'other' functionality being hung off it.
