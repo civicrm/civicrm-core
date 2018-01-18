@@ -288,7 +288,6 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $params['mailings']['include'] = array();
     $params['mailings']['exclude'] = array();
     $params['options']['force_rollback'] = 1;
-    $params['api.mailing_job.create'] = 1;
     $params['api.MailingRecipients.get'] = array(
       'mailing_id' => '$value.id',
       'api.contact.getvalue' => array(
@@ -302,12 +301,10 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
     $maxIDs = array(
       'mailing' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing'),
-      'job' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_job'),
       'group' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_group'),
     );
     $create = $this->callAPIAndDocument('Mailing', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertDBQuery($maxIDs['mailing'], 'SELECT MAX(id) FROM civicrm_mailing'); // 'Preview should not create any mailing records'
-    $this->assertDBQuery($maxIDs['job'], 'SELECT MAX(id) FROM civicrm_mailing_job'); // 'Preview should not create any mailing_job record'
     $this->assertDBQuery($maxIDs['group'], 'SELECT MAX(id) FROM civicrm_mailing_group'); // 'Preview should not create any mailing_group records'
 
     $preview = $create['values'][$create['id']]['api.MailingRecipients.get'];
@@ -346,7 +343,6 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $params['mailings']['include'] = array();
     $params['options']['force_rollback'] = 1;
     $params['dedupe_email'] = 1;
-    $params['api.mailing_job.create'] = 1;
     $params['api.MailingRecipients.get'] = array(
       'mailing_id' => '$value.id',
       'api.contact.getvalue' => array(
