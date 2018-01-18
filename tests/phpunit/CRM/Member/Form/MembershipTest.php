@@ -430,8 +430,13 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form.
+   *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testSubmit() {
+  public function testSubmit($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $form = $this->getForm();
     $form->preProcess();
     $this->mut = new CiviMailUtils($this, TRUE);
@@ -448,7 +453,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'max_related' => '',
       'num_terms' => '1',
       'source' => '',
-      'total_amount' => '50.00',
+      'total_amount' => $this->formatMoneyInput(1234.56),
       'financial_type_id' => '2', //Member dues, see data.xml
       'soft_credit_type_id' => '',
       'soft_credit_contact_id' => '',
@@ -500,7 +505,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     $this->_checkFinancialRecords(array(
       'id' => $contribution['id'],
-      'total_amount' => 50,
+      'total_amount' => 1234.56,
       'financial_account_id' => 2,
       'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', array(
         'id' => $this->_paymentProcessorID,
@@ -508,7 +513,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       )),
     ), 'online');
     $this->mut->checkMailLog(array(
-      '50',
+      CRM_Utils_Money::format('1234.56'),
       'Receipt text',
     ));
     $this->mut->stop();

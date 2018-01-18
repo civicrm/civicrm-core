@@ -176,8 +176,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
   /**
    * Test offline participant mail.
+   *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testParticipantOfflineReceipt() {
+  public function testParticipantOfflineReceipt($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $mut = new CiviMailUtils($this, TRUE);
 
     //Get workflow id of event_offline receipt.
@@ -202,11 +207,12 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'msg_html' => $newMsg,
     ));
 
-    $this->testSubmitWithPayment();
+    $this->testSubmitWithPayment($thousandSeparator);
     //Check if type is correctly populated in mails.
-    $mail = $mut->checkMailLog(array(
+    $mail = $mut->checkMailLog([
         '<p>Test event type - 1</p>',
-      )
+        $this->formatMoneyInput(1550.55),
+      ]
     );
   }
 
