@@ -34,23 +34,18 @@
 /**
  * Class CRM_Utils_Geocode
  */
-class CRM_Utils_Geocode {
+abstract class CRM_Utils_Geocode {
 
   /**
-   * @return string|''
-   *   Class name, or empty.
+   * Updates the passed address with additional information (e.g.,
+   * latitude/longitude, probably by querying an external service).
+   *
+   * @param array $values
+   * @param bool $stateName
+   *
+   * @return bool
+   *   TRUE if we modified the address, FALSE otherwise
    */
-  public static function getProviderClass() {
-    $settings = Civi::settings();
-    if ($settings->get('geoProvider')) {
-      return 'CRM_Utils_Geocode_' . $settings->get('geoProvider');
-    }
-    elseif ($settings->get('mapProvider')) {
-      return 'CRM_Utils_Geocode_' . $settings->get('mapProvider');
-    }
-    else {
-      return '';
-    }
-  }
+  abstract public static function format(array &$values, bool $stateName = FALSE);
 
 }
