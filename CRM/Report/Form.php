@@ -4324,13 +4324,26 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * Add Phone into From Table if required.
    */
   public function addPhoneFromClause() {
-    // include address field if address column is to be included
+    // include phone field if phone column is to be included
     if ($this->isTableSelected('civicrm_phone')) {
       $this->_from .= "
       LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
       ON ({$this->_aliases['civicrm_contact']}.id =
       {$this->_aliases['civicrm_phone']}.contact_id) AND
       {$this->_aliases['civicrm_phone']}.is_primary = 1\n";
+    }
+  }
+
+  /**
+   * Add Email into From Table if required.
+   */
+  public function addEmailFromClause() {
+    // include email field if email column is to be included
+    if ($this->isTableSelected('civicrm_email')) {
+      $this->_from .= "
+            LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']}
+                   ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
+                      {$this->_aliases['civicrm_email']}.is_primary = 1) ";
     }
   }
 

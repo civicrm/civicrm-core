@@ -45,7 +45,7 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
     'Organization',
   );
 
-  public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
+  public $_drilldownReport = array('contact/summary' => 'Link to Summary Report');
 
   /**
    * This report has not been optimised for group filtering.
@@ -193,19 +193,9 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
                    ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
                       {$this->_aliases['civicrm_address']}.is_primary = 1 ) ";
 
-    if ($this->isTableSelected('civicrm_email')) {
-      $this->_from .= "
-            LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']}
-                   ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                      {$this->_aliases['civicrm_email']}.is_primary = 1) ";
-    }
 
-    if ($this->_phoneField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                      {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
-    }
+    $this->addPhoneFromClause();
+    $this->addEmailFromClause()
 
     if ($this->isTableSelected('civicrm_country')) {
       $this->_from .= "

@@ -183,17 +183,10 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
     $this->_from = "
 FROM       civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
 ";
-    if ($this->_addressField) {
-      $this->_from .= "LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
 
-    if ($this->_emailField) {
-      $this->_from .= "LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND {$this->_aliases['civicrm_email']}.is_primary = 1\n";
-    }
-
-    if ($this->_phoneField) {
-      $this->_from .= "LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']} ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND {$this->_aliases['civicrm_phone']}.is_primary = 1\n";
-    }
+    $this->addAddressFromClause();
+    $this->addPhoneFromClause();
+    $this->addEmailFromClause();
   }
 
   public function where() {
