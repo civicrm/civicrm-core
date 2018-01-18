@@ -203,6 +203,9 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * Add generic fields that specify the contact.
    */
   protected function addContactSearchFields() {
+    if (!$this->isFormInViewOrEditMode()) {
+      return;
+    }
     $this->addSortNameField();
 
     $this->_group = CRM_Core_PseudoConstant::nestedGroup();
