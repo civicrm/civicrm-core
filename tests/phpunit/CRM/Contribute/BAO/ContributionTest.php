@@ -204,16 +204,14 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => '33ereerwww322323',
       'invoice_id' => '33ed39c9e9ee6ef6031621ce0eafe6da70',
       'thankyou_date' => '20080522',
+      'sequential' => TRUE,
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
 
-    $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id creation.');
-    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+    CRM_Contribute_BAO_Contribution::deleteContribution($contribution['id']);
 
-    CRM_Contribute_BAO_Contribution::deleteContribution($contribution->id);
-
-    $this->assertDBNull('CRM_Contribute_DAO_Contribution', $contribution->trxn_id,
+    $this->assertDBNull('CRM_Contribute_DAO_Contribution', $contribution['trxn_id'],
       'id', 'trxn_id', 'Database check for deleted Contribution.'
     );
   }
