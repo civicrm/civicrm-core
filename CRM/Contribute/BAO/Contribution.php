@@ -3930,6 +3930,7 @@ WHERE eft.entity_table = 'civicrm_contribution'
           }
         }
 
+        // update membership details
         self::updateMembershipBasedOnCompletionOfContribution(
           $contributionDAO,
           $contributionId,
@@ -5406,60 +5407,63 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * @param int $primaryContributionID
    * @param string $changeDate
    *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   protected static function updateMembershipBasedOnCompletionOfContribution($contribution, $primaryContributionID, $changeDate) {
-    $contribution->loadRelatedMembershipObjects();
-    if (empty($contribution->_relatedObjects['membership'])) {
-      return;
+    // Load memberships from contribution info. There may be multiple memberships (or none)
+    $membershipFields = array('id', 'contact_id', 'is_test', 'membership_type_id', 'contribution_recur_id', 'status_id.is_current_member',
+      'start_date', 'join_date', 'end_date', 'status_id');
+    $memberships = array();
+    if (!empty($contribution->contribution_recur_id)) {
+      // Load memberships associated with recurring contribution
+      $membershipResult = civicrm_api3('Membership', 'get', array(
+        'contribution_recur_id' => $contribution->contribution_recur_id,
+        'return' => $membershipFields,
+        'options' => ['limit' => 0],
+      ));
     }
-    $memberships = $contribution->_relatedObjects['membership'];
-    foreach ($memberships as $membershipTypeIdKey => $membership) {
+    elseif (!empty($primaryContributionID)) {
+      // Load membership associated with original contribution
+      $membershipPaymentResult = civicrm_api3('MembershipPayment', 'get', array(
+        'contribution_id' => $primaryContributionID,
+        'options' => ['limit' => 0],
+      ));
+      if (!empty($membershipPaymentResult['count'])) {
+        foreach ($membershipPaymentResult['values'] as $payment) {
+          $membershipIDs[] = $payment['membership_id'];
+        }
+        $membershipResult = civicrm_api3('Membership', 'get', array(
+          'id' => array('IN' => $membershipIDs),
+          'return' => $membershipFields,
+          'options' => ['limit' => 0],
+        ));
+      }
+    }
+    if (isset($membershipResult) && !empty($membershipResult['count'])) {
+      $memberships = $membershipResult['values'];
+    }
+
+    // Loop through all found memberships and update status/renew
+    foreach ($memberships as $membershipId => $membership) {
       if ($membership) {
         $membershipParams = array(
-          'id' => $membership->id,
-          'contact_id' => $membership->contact_id,
-          'is_test' => $membership->is_test,
-          'membership_type_id' => $membership->membership_type_id,
+          'id' => $membership['id'],
+          'contact_id' => $membership['contact_id'],
+          'is_test' => $membership['is_test'],
+          'membership_type_id' => $membership['membership_type_id'],
           'membership_activity_status' => 'Completed',
         );
-
-        $currentMembership = CRM_Member_BAO_Membership::getContactMembership($membershipParams['contact_id'],
-          $membershipParams['membership_type_id'],
-          $membershipParams['is_test'],
-          $membershipParams['id']
-        );
-
-        // CRM-8141 update the membership type with the value recorded in log when membership created/renewed
-        // this picks up membership type changes during renewals
-        // @todo this is almost certainly an obsolete sql call, the pre-change
-        // membership is accessible via $this->_relatedObjects
-        $sql = "
-SELECT    membership_type_id
-FROM      civicrm_membership_log
-WHERE     membership_id={$membershipParams['id']}
-ORDER BY  id DESC
-LIMIT 1;";
-        $dao = CRM_Core_DAO::executeQuery($sql);
-        if ($dao->fetch()) {
-          if (!empty($dao->membership_type_id)) {
-            $membershipParams['membership_type_id'] = $dao->membership_type_id;
-          }
-        }
-        $dao->free();
 
         $membershipParams['num_terms'] = $contribution->getNumTermsByContributionAndMembershipType(
           $membershipParams['membership_type_id'],
           $primaryContributionID
         );
-        // @todo remove all this stuff in favour of letting the api call further down handle in
-        // (it is a duplication of what the api does).
-        $dates = array_fill_keys(array(
-          'join_date',
-          'start_date',
-          'end_date',
-        ), NULL);
+
+        // Does the contact have a "current" membership (ie. not expired/pending etc).
+        $currentMembership = CRM_Member_BAO_Membership::getContactMembership($membershipParams['contact_id'],
+          $membershipParams['membership_type_id'],
+          $membershipParams['is_test'],
+          $membershipParams['id']
+        );
         if ($currentMembership) {
           /*
            * Fixed FOR CRM-4433
@@ -5467,38 +5471,20 @@ LIMIT 1;";
            * when Contribution mode is notify and membership is for renewal )
            */
           CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, $changeDate);
-
-          // @todo - we should pass membership_type_id instead of null here but not
-          // adding as not sure of testing
-          $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membershipParams['id'],
-            $changeDate, NULL, $membershipParams['num_terms']
-          );
-          $dates['join_date'] = $currentMembership['join_date'];
         }
 
-        //get the status for membership.
-        $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'],
-          $dates['end_date'],
-          $dates['join_date'],
-          'today',
-          TRUE,
-          $membershipParams['membership_type_id'],
-          $membershipParams
-        );
-
-        unset($dates['end_date']);
-        $membershipParams['status_id'] = CRM_Utils_Array::value('id', $calcStatus, 'New');
-        //we might be renewing membership,
-        //so make status override false.
+        // Tell the Membership BAO to calculate membership status.
+        $membershipParams['skipStatusCal'] = 0;
+        $membershipParams['exclude_is_admin'] = TRUE;
         $membershipParams['is_override'] = FALSE;
         $membershipParams['status_override_end_date'] = 'null';
-
-        //CRM-17723 - reset static $relatedContactIds array()
-        // @todo move it to Civi Statics.
-        $var = TRUE;
-        CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
-        civicrm_api3('Membership', 'create', $membershipParams);
       }
+
+      //CRM-17723 - reset static $relatedContactIds array()
+      // @todo move it to Civi Statics.
+      $var = TRUE;
+      CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
+      civicrm_api3('Membership', 'create', $membershipParams);
     }
   }
 
