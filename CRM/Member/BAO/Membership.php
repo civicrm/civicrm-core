@@ -1477,6 +1477,10 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
           $params['createActivity'] = TRUE;
         }
 
+        //CRM-20707 - include start/end date
+        $params['start_date'] = $membership->start_date;
+        $params['end_date'] = $membership->end_date;
+
         // we should not created contribution record for related contacts, CRM-3371
         unset($params['contribution_status_id']);
 
