@@ -2052,6 +2052,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         if (in_array($htmlType, array(
           'Text',
           'TextArea',
+          'CheckBox',
         ))) {
           $retValue = $value;
           break;
