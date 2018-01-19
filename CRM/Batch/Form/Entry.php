@@ -135,11 +135,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
     elseif ($this->_batchInfo['type_id'] == $batchTypes['Membership']) {
       CRM_Utils_System::setTitle(ts('Batch Data Entry for Memberships'));
-      $customFields = CRM_Core_BAO_CustomField::getFields('Membership');
     }
     elseif ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
       CRM_Utils_System::setTitle(ts('Batch Data Entry for Pledge Payments'));
-      $customFields = CRM_Core_BAO_CustomField::getFields('Contribution');
     }
     $this->_fields = array();
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($this->_profileId, FALSE, CRM_Core_Action::VIEW);
@@ -187,7 +185,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $this->assign('rowCount', $this->_batchInfo['item_count'] + 1);
 
-    $fileFieldExists = FALSE;
     $preserveDefaultsArray = array(
       'first_name',
       'last_name',
@@ -198,7 +195,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
     $contactReturnProperties = array();
-    $config = CRM_Core_Config::singleton();
 
     for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
       $this->addEntityRef("primary_contact_id[{$rowNumber}]", '', array(
@@ -633,6 +629,11 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       // @todo - most of the wrangling in this function is because the api is not being used, especially date stuff.
       $customFields = array();
       foreach ($params['field'] as $key => $value) {
+        foreach ($value as $fieldKey => $fieldValue) {
+          if (isset($this->_fields[$fieldKey]) && $this->_fields[$fieldKey]['data_type'] === 'Money') {
+            $value[$fieldKey] = CRM_Utils_Rule::cleanMoney($fieldValue);
+          }
+        }
         // if contact is not selected we should skip the row
         if (empty($params['primary_contact_id'][$key])) {
           continue;
@@ -790,6 +791,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
           // make contribution entry
           $contrbutionParams = array_merge($value, array('membership_id' => $membership->id));
+          $contrbutionParams['skipCleanMoney'] = TRUE;
           // @todo - calling this from here is pretty hacky since it is called from membership.create anyway
           // This form should set the correct params & not call this fn directly.
           CRM_Member_BAO_Membership::recordMembershipContribution($contrbutionParams);
