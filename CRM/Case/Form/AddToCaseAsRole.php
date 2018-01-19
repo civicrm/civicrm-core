@@ -82,9 +82,10 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
       $contactTypes[$contact['contact_type']] = $contact['contact_type'];
     }
 
-    if (sizeof($contactTypes) === 1) {
+    if (count($contactTypes) === 1) {
       $filter = array_shift($contactTypes);
-    } else {
+    }
+    else {
       $filter = '';
     }
 
