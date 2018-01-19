@@ -1,4 +1,6 @@
 <script type="text/javascript">
+  var typeFilter = '{$typeFilter}';
+
   {literal}
   CRM.$(function($) {
     $('#role_type').prop('disabled', 'disabled');
@@ -21,13 +23,25 @@
 
         var caseRoles = results.getCaseData['api.CaseType.getsingle'].definition.caseRoles;
         var relationshipTypes = results.getRelationshipTypes.values;
+        var found = false;
 
         for (var i = 0; i < relationshipTypes.length; i++) {
           for (var j = 0; j < caseRoles.length; j++) {
-            if (relationshipTypes[i].label_b_a === caseRoles[j].name) {
-              $('#role_type').append($('<option>', {value: relationshipTypes[i].id, text: relationshipTypes[i].label_b_a}));
+            if (relationshipTypes[i].label_b_a === caseRoles[j].name &&
+              (relationshipTypes[i].contact_type_b === typeFilter || relationshipTypes[i].contact_type_b === '')
+            ) {
+              $('#role_type').append(
+                $('<option>', {value: relationshipTypes[i].id, text: relationshipTypes[i].label_b_a})
+              );
+              found = true;
             }
           }
+        }
+
+        if (!found) {
+          $('#not_found_alert').html('&nbsp;&nbsp;No available case roles were found for the selected case and contacts!');
+        } else {
+          $('#not_found_alert').html('');
         }
       });
     });
@@ -36,9 +50,9 @@
 </script>
 
 <div><label for="assign_to">{$form.assign_to.label}:</label></div>
-<div>{$form.assign_to.html}</div>
+<div>{$form.assign_to.html}</span></div>
 
 <div>{$form.role_type.label}</div>
-<div>{$form.role_type.html}</div><br />
+<div>{$form.role_type.html}<span id="not_found_alert"></div><br />
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

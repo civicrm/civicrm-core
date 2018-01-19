@@ -38,6 +38,8 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
         'name' => ts('Cancel'),
       ),
     ));
+
+    $this->assign('typeFilter', $this->getSelectedContactTypesFilter());
   }
 
   /**
@@ -55,6 +57,38 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
     }
 
     return $relationshipType;
+  }
+
+  /**
+   * Calculates the filter to be used to filter available case roles according
+   * to selected contacts' types.
+   *
+   * - If all contacts have the same type, case roles should only allow that
+   *   contact type or all contact types.
+   * - If more than one contact type was selected, only case roles that allow
+   *   all contact types should be shown.
+   *
+   * @return array
+   */
+  private function getSelectedContactTypesFilter() {
+    $result = civicrm_api3('Contact', 'get', array(
+      'sequential' => 1,
+      'return' => array('contact_type'),
+      'id' => array('IN' => $this->_contactIds),
+    ));
+
+    $contactTypes = array();
+    foreach ($result['values'] as $contact) {
+      $contactTypes[$contact['contact_type']] = $contact['contact_type'];
+    }
+
+    if (sizeof($contactTypes) === 1) {
+      $filter = array_shift($contactTypes);
+    } else {
+      $filter = '';
+    }
+
+    return $filter;
   }
 
   /**
