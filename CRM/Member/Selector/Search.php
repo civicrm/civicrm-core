@@ -316,7 +316,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * @param string $output
    *   What should the result set include (web/email/csv).
    *
-   * @return int
+   * @return array
    *   the total number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
@@ -441,14 +441,18 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         );
       }
 
-      //does membership have auto renew CRM-7137.
-      $autoRenew = FALSE;
-      if (isset($result->membership_recur_id) && $result->membership_recur_id &&
-        !CRM_Member_BAO_Membership::isSubscriptionCancelled($row['membership_id'])
-      ) {
-        $autoRenew = TRUE;
+      // Display Auto-renew status on page (0=disabled, 1=enabled, 2=enabled, but error
+      if (!empty($result->membership_recur_id)) {
+        if (CRM_Member_BAO_Membership::isSubscriptionCancelled($row['membership_id'])) {
+          $row['auto_renew'] = 2;
+        }
+        else {
+          $row['auto_renew'] = 1;
+        }
       }
-      $row['auto_renew'] = $autoRenew;
+      else {
+        $row['auto_renew'] = 0;
+      }
 
       $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
