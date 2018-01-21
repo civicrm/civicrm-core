@@ -437,7 +437,12 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       }
     }
 
-    self::processGreetings($contact);
+    // In order to prevent a series of expensive queries in intensive batch processing
+    // api calls may pass in skip_greeting_processing, probably doing it later via the
+    // scheduled job. CRM-21551
+    if (empty($params['skip_greeting_processing'])) {
+      self::processGreetings($contact);
+    }
 
     return $contact;
   }

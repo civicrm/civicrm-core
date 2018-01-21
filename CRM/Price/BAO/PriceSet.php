@@ -747,7 +747,7 @@ WHERE  id = %1";
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, $amount_override);
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
-            if (CRM_Utils_Array::value('field_title', $lineItem[$optionValueId]) == 'Membership Amount') {
+            if ($amount_override) {
               $lineItem[$optionValueId]['line_total'] = $lineItem[$optionValueId]['unit_price'] = CRM_Utils_Rule::cleanMoney($lineItem[$optionValueId]['line_total'] - $lineItem[$optionValueId]['tax_amount']);
             }
           }

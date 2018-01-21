@@ -230,6 +230,9 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
         ),
       ),
       'filters' => array(
+        'email' => array(
+          'title' => ts('Email'),
+        ),
         'on_hold' => array(
           'title' => ts('On hold'),
         ),

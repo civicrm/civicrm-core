@@ -52,7 +52,7 @@ function civicrm_api3_uf_match_get($params) {
  *   Api result array
  */
 function civicrm_api3_uf_match_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'UFMatch');
 }
 
 /**

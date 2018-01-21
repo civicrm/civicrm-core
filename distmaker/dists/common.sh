@@ -236,6 +236,13 @@ function dm_git_checkout() {
   popd
 }
 
+## Download a Civi extension
+## usage: dm_install_cvext <full-ext-key> <target-path>
+function dm_install_cvext() {
+  # cv dl -b '@https://civicrm.org/extdir/ver=4.7.25|cms=Drupal/com.iatspayments.civicrm.xml' --destination=$PWD/iatspayments
+  cv dl -b "@https://civicrm.org/extdir/ver=$DM_VERSION|cms=Drupal/$1.xml" --to="$2"
+}
+
 ## Edit a file by applying a regular expression.
 ## Note: We'd rather just call "sed", but it differs on GNU+BSD.
 ## usage: dm_preg_edit <search-pattern> <replacement-pattern> <file>

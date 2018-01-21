@@ -3,7 +3,7 @@
  * Class CRM_Event_BAO_AdditionalPaymentTest
  * @group headless
  */
-class CRM_Event_BAO_CRM19273Test extends CiviUnitTestCase {
+class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
 
   protected $_priceSetID;
   protected $_cheapFee = 80;
@@ -253,17 +253,31 @@ class CRM_Event_BAO_CRM19273Test extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-21245: Test that Contribution status doesn't changed to 'Pending Refund' from 'Partially Paid' if the partially paid amount is lower then newly selected fee amount
+   */
+  public function testCRM21245() {
+    $this->registerParticipantAndPay(50);
+    $partiallyPaidContribuitonStatus = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid');
+    $this->assertEquals($this->callAPISuccessGetValue('Contribution', array('id' => $this->_contributionId, 'return' => 'contribution_status_id')), $partiallyPaidContribuitonStatus);
+
+    $priceSetParams['price_1'] = 3;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
+    $this->assertEquals($this->callAPISuccessGetValue('Contribution', array('id' => $this->_contributionId, 'return' => 'contribution_status_id')), $partiallyPaidContribuitonStatus);
+  }
+
+  /**
    * Test that proper financial items are recorded for cancelled line items
    */
   public function testCRM20611() {
     $priceSetParams['price_1'] = 1;
-    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee);
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $this->balanceCheck($this->_expensiveFee);
 
     $priceSetParams['price_1'] = 2;
-    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee);
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $this->balanceCheck($this->_cheapFee);
 
     //Complete the refund payment.
@@ -403,6 +417,29 @@ class CRM_Event_BAO_CRM19273Test extends CiviUnitTestCase {
     }
 
     $this->balanceCheck(20);
+  }
+
+  /**
+   * CRM-17151: Test that Contribution status change to 'Completed' if balance is zero.
+   */
+  public function testCRM17151() {
+    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
+    $pendingRefundStatusId = array_search('Pending refund', $contributionStatuses);
+    $completedStatusId = array_search('Completed', $contributionStatuses);
+    $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $completedStatusId, 'Payment t be completed');
+    $priceSetParams['price_1'] = 2;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
+    $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $pendingRefundStatusId, 'Contribution must be refunding');
+    $priceSetParams['price_1'] = 1;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
+    $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $completedStatusId, 'Contribution must, after complete payment be in state completed');
+    $priceSetParams['price_1'] = 3;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
+    $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $partiallyPaidStatusId, 'Partial Paid');
   }
 
 }

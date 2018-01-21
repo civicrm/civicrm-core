@@ -552,7 +552,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $expectedValue, $message
   ) {
     $value = CRM_Core_DAO::getFieldValue($daoName, $searchValue, $returnColumn, $searchColumn, TRUE);
-    $this->assertEquals($value, $expectedValue, $message);
+    $this->assertEquals($expectedValue, $value, $message);
   }
 
   /**
@@ -1018,12 +1018,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *   parameters for civicrm_contact_add api function call
    * @param int $seq
    *   sequence number if creating multiple individuals
+   * @param bool $random
    *
    * @return int
    *   id of Individual created
    */
-  public function individualCreate($params = array(), $seq = 0) {
-    $params = array_merge($this->sampleContact('Individual', $seq), $params);
+  public function individualCreate($params = array(), $seq = 0, $random = FALSE) {
+    $params = array_merge($this->sampleContact('Individual', $seq, $random), $params);
     return $this->_contactCreate($params);
   }
 
@@ -1054,7 +1055,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return array
    *   properties of sample contact (ie. $params for API call)
    */
-  public function sampleContact($contact_type, $seq = 0) {
+  public function sampleContact($contact_type, $seq = 0, $random = FALSE) {
     $samples = array(
       'Individual' => array(
         // The number of values in each list need to be coprime numbers to not have duplicates
@@ -1078,6 +1079,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $params = array('contact_type' => $contact_type);
     foreach ($samples[$contact_type] as $key => $values) {
       $params[$key] = $values[$seq % count($values)];
+      if ($random) {
+        $params[$key] .= substr(sha1(rand()), 0, 5);
+      }
     }
     if ($contact_type == 'Individual') {
       $params['email'] = strtolower(
@@ -1870,13 +1874,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param int $groupID
    * @param int $totalCount
+   * @param bool $random
    * @return int
    *    groupId of created group
    */
-  public function groupContactCreate($groupID, $totalCount = 10) {
+  public function groupContactCreate($groupID, $totalCount = 10, $random = FALSE) {
     $params = array('group_id' => $groupID);
     for ($i = 1; $i <= $totalCount; $i++) {
-      $contactID = $this->individualCreate();
+      $contactID = $this->individualCreate(array(), 0, $random);
       if ($i == 1) {
         $params += array('contact_id' => $contactID);
       }
@@ -2090,10 +2095,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     );
 
     $params = array_merge($defaults, $params);
-
-    if (strlen($params['title']) > 13) {
-      $params['title'] = substr($params['title'], 0, 13);
-    }
 
     //have a crack @ deleting it first in the hope this will prevent derailing our tests
     $this->callAPISuccess('custom_group', 'get', array(
@@ -2587,6 +2588,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $var = TRUE;
     CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
     $this->disableTaxAndInvoicing();
+    $this->setCurrencySeparators(',');
+    CRM_Core_PseudoConstant::flush('taxRates');
     System::singleton()->flushProcessors();
   }
 
@@ -3085,7 +3088,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     if (!$isProfile) {
       //flush cache
       CRM_ACL_BAO_Cache::resetCache();
-      CRM_Contact_BAO_Group::getPermissionClause(TRUE);
       CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL, TRUE);
     }
   }
@@ -3565,7 +3567,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   protected function setPermissions($permissions) {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
     $this->flushFinancialTypeStatics();
-    CRM_Contact_BAO_Group::getPermissionClause(TRUE);
   }
 
   /**
@@ -3742,6 +3743,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Enable Tax and Invoicing
    */
   protected function disableTaxAndInvoicing($params = array()) {
+    if (!empty(\Civi::$statics['CRM_Core_PseudoConstant']) && isset(\Civi::$statics['CRM_Core_PseudoConstant']['taxRates'])) {
+      unset(\Civi::$statics['CRM_Core_PseudoConstant']['taxRates']);
+    }
     // Enable component contribute setting
     $contributeSetting = array_merge($params,
       array(
@@ -3773,6 +3777,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'entity_id' => $financialTypeId,
       'account_relationship' => key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' ")),
     );
+
+    // set tax rate (as 10) for provided financial type ID to static variable, later used to fetch tax rates of all financial types
+    \Civi::$statics['CRM_Core_PseudoConstant']['taxRates'][$financialTypeId] = 10;
 
     //CRM-20313: As per unique index added in civicrm_entity_financial_account table,
     //  first check if there's any record on basis of unique key (entity_table, account_relationship, entity_id)
@@ -3943,6 +3950,37 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Core_Controller();
     return $form;
+  }
+
+  /**
+   * Get possible thousand separators.
+   *
+   * @return array
+   */
+  public function getThousandSeparators() {
+    return array(array('.'), array(','));
+  }
+
+  /**
+   * Set the separators for thousands and decimal points.
+   *
+   * @param string $thousandSeparator
+   */
+  protected function setCurrencySeparators($thousandSeparator) {
+    Civi::settings()->set('monetaryThousandSeparator', $thousandSeparator);
+    Civi::settings()
+      ->set('monetaryDecimalPoint', ($thousandSeparator === ',' ? '.' : ','));
+  }
+
+  /**
+   * Format money as it would be input.
+   *
+   * @param string $amount
+   *
+   * @return string
+   */
+  protected function formatMoneyInput($amount) {
+    return CRM_Utils_Money::format($amount, NULL, '%a');
   }
 
 }

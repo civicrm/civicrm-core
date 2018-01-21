@@ -129,6 +129,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (!empty($params['skipCleanMoney'])) {
       unset($moneyFields[0]);
     }
+    else {
+      // @todo put a deprecated here - this should be done in the form layer.
+      $params['skipCleanMoney'] = FALSE;
+    }
 
     foreach ($moneyFields as $field) {
       if (isset($params[$field])) {
@@ -4100,12 +4104,18 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     }
 
     $paymentBalance = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($id, $entity, FALSE, $total);
-    $contributionIsPayLater = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'is_pay_later');
+    $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $id, 'return' => array('is_pay_later', 'contribution_status_id', 'financial_type_id')));
 
-    $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'financial_type_id');
+    $info['payLater'] = $contribution['is_pay_later'];
+    $info['contribution_status'] = $contribution['contribution_status'];
+
+    $financialTypeId = $contribution['financial_type_id'];
     $feeFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeId, 'Expense Account is');
 
-    if ($paymentBalance == 0 && $contributionIsPayLater) {
+    if ($paymentBalance == 0 && $info['payLater']) {
+      // @todo - review - this looks very unlikely to be correct.
+      // the balance should be correct based on payment transactions not
+      // assumptions.
       $paymentBalance = $total;
     }
 
@@ -4114,7 +4124,6 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     $info['balance'] = $paymentBalance;
     $info['id'] = $id;
     $info['component'] = $component;
-    $info['payLater'] = $contributionIsPayLater;
     $rows = array();
     if ($getTrxnInfo && $baseTrxnId) {
       // Need to exclude fee trxn rows so filter out rows where TO FINANCIAL ACCOUNT is expense account
@@ -4193,6 +4202,8 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       }
       $info['transaction'] = $rows;
     }
+
+    $info['payment_links'] = self::getContributionPaymentLinks($id, $paymentBalance, $info['contribution_status']);
     return $info;
   }
 
@@ -4207,6 +4218,11 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
   public static function checkTaxAmount($params, $isLineItem = FALSE) {
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
 
+    // This function should be only called after standardisation (removal of
+    // thousand separator & using a decimal point for cents separator.
+    // However, we don't know if that is always true :-(
+    // There is a deprecation notice tho :-)
+    $unknownIfMoneyIsClean = empty($params['skipCleanMoney']) && !$isLineItem;
     // Update contribution.
     if (!empty($params['id'])) {
       // CRM-19126 and CRM-19152 If neither total or financial_type_id are set on an update
@@ -4253,7 +4269,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       empty($params['skipLineItem']) && !$isLineItem
     ) {
       $taxRateParams = $taxRates[$params['financial_type_id']];
-      $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount(CRM_Utils_Array::value('total_amount', $params), $taxRateParams);
+      $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount(CRM_Utils_Array::value('total_amount', $params), $taxRateParams, $unknownIfMoneyIsClean);
       $params['tax_amount'] = round($taxAmount['tax_amount'], 2);
 
       // Get Line Item on update of contribution
@@ -4285,9 +4301,9 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     }
     else {
       // update line item of contrbution
-      if (isset($params['financial_type_id']) && array_key_exists($params['financial_type_id'], $taxRates) && $isLineItem) {
+      if (isset($params['financial_type_id']) && array_key_exists($params['financial_type_id'], $taxRates)  && $isLineItem) {
         $taxRate = $taxRates[$params['financial_type_id']];
-        $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($params['line_total'], $taxRate);
+        $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($params['line_total'], $taxRate, $unknownIfMoneyIsClean);
         $params['tax_amount'] = round($taxAmount['tax_amount'], 2);
       }
     }
@@ -4736,7 +4752,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    * @return array
    */
   public static function generateFromEmailAndName($input, $contribution) {
-    // Use input valuse if supplied.
+    // Use input value if supplied.
     if (!empty($input['receipt_from_email'])) {
       return array(CRM_Utils_array::value('receipt_from_name', $input, ''), $input['receipt_from_email']);
     }
@@ -4924,7 +4940,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     $contributionStatus = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
       'labelColumn' => 'name',
     ));
-    foreach ($contributions as $k => $contribution) {
+    foreach ($contributions as $contribution) {
       if (!($contributionStatus[$contribution->contribution_status_id] == 'Partially paid'
         || CRM_Utils_Array::value($contributionStatusId, $contributionStatus) == 'Partially paid')
       ) {
@@ -5465,6 +5481,63 @@ LIMIT 1;";
         civicrm_api3('Membership', 'create', $membershipParams);
       }
     }
+  }
+
+  /**
+   * Get payment links as they relate to a contribution.
+   *
+   * If a payment can be made then include a payment link & if a refund is appropriate
+   * then a refund link.
+   *
+   * @param int $id
+   * @param float $balance
+   * @param string $contributionStatus
+   *
+   * @return array $actionLinks Links array containing:
+   *   -url
+   *   -title
+   */
+  protected static function getContributionPaymentLinks($id, $balance, $contributionStatus) {
+    if ($contributionStatus === 'Failed' || !CRM_Core_Permission::check('edit contributions')) {
+      // In general the balance is the best way to determine if a payment can be added or not,
+      // but not for Failed contributions, where we don't accept additional payments at the moment.
+      // (in some cases the contribution is 'Pending' and only the payment is failed. In those we
+      // do accept more payments agains them.
+      return array();
+    }
+    $actionLinks = array();
+    if ((int) $balance > 0) {
+      if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
+        $actionLinks[] = array(
+          'url' => CRM_Utils_System::url('civicrm/payment', array(
+            'action' => 'add',
+            'reset' => 1,
+            'id' => $id,
+            'mode' => 'live',
+          )),
+          'title' => ts('Submit Credit Card payment'),
+        );
+      }
+      $actionLinks[] = array(
+        'url' => CRM_Utils_System::url('civicrm/payment', array(
+          'action' => 'add',
+          'reset' => 1,
+          'id' => $id,
+        )),
+        'title' => ts('Record Payment'),
+      );
+    }
+    elseif ((int) $balance < 0) {
+      $actionLinks[] = array(
+        'url' => CRM_Utils_System::url('civicrm/payment', array(
+          'action' => 'add',
+          'reset' => 1,
+          'id' => $id,
+        )),
+        'title' => ts('Record Refund'),
+      );
+    }
+    return $actionLinks;
   }
 
   /**

@@ -260,6 +260,12 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
       }
       $includedGroups = implode(',', $allGroups);
 
+      //CRM-15049 - Include child group ids.
+      $childGroupIds = CRM_Contact_BAO_Group::getChildGroupIds($this->_includeGroups);
+      if (count($childGroupIds) > 0) {
+        $this->_includeGroups = array_merge($this->_includeGroups, $childGroupIds);
+      }
+
       if (!empty($this->_includeGroups)) {
         $iGroups = implode(',', $this->_includeGroups);
       }

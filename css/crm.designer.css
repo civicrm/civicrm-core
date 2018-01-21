@@ -209,6 +209,11 @@ button#crm-designer-add-custom-set {
   margin: 0 2em 0 0;
 }
 
+/* Hack for Drupal 8 for some reason was moving it around strange */
+.crm-designer-dialog .ui-resizable {
+  position: absolute;
+}
+
 .crm-designer-dialog .disabled .description {
   display: none;
 }

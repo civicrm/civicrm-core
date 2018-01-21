@@ -34,11 +34,7 @@
 <div id="searchForm">
     {strip}
         <table class="form-layout">
-        <tr>
-           <td class="font-size12pt" colspan="2">
-               {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}&nbsp;&nbsp;&nbsp;{$form.buttons.html}
-           </td>
-        </tr>
+        {include file="CRM/Contact/Form/Search/ContactSearchFields.tpl"}
         {include file="CRM/Pledge/Form/Search/Common.tpl"}
 
         <tr>

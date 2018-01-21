@@ -45,6 +45,9 @@ function civicrm_api3_contribution_create(&$params) {
   $values = array();
   _civicrm_api3_custom_format_params($params, $values, 'Contribution');
   $params = array_merge($params, $values);
+  // The BAO should not clean money - it should be done in the form layer & api wrapper
+  // (although arguably the api should expect pre-cleaned it seems to do some cleaning.)
+  $params['skipCleanMoney'] = TRUE;
 
   if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
     if (empty($params['id'])) {

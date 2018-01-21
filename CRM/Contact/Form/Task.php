@@ -298,11 +298,9 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     }
 
     $selectorName = $this->controller->selectorName();
-    require_once str_replace('_', DIRECTORY_SEPARATOR, $selectorName) . '.php';
 
     $fv = $this->get('formValues');
     $customClass = $this->get('customSearchClass');
-    require_once 'CRM/Core/BAO/Mapping.php';
     $returnProperties = CRM_Core_BAO_Mapping::returnProperties(self::$_searchFormValues);
 
     $selector = new $selectorName($customClass, $fv, NULL, $returnProperties);
@@ -318,7 +316,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     if (!$queryOperator) {
       $queryOperator = 'AND';
     }
-    $dao = $selector->contactIDQuery($params, $this->_action, $sortID,
+    $dao = $selector->contactIDQuery($params, $sortID,
       CRM_Utils_Array::value('display_relationship_type', $fv),
       $queryOperator
     );

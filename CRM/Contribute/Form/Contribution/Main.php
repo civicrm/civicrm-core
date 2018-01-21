@@ -1165,7 +1165,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $component = 'membership';
       }
 
-      CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem[$priceSetId], $component);
+      CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem[$priceSetId], $component, $priceSetId);
       if ($params['tax_amount']) {
         $this->set('tax_amount', $params['tax_amount']);
       }

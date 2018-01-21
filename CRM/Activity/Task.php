@@ -93,7 +93,10 @@ class CRM_Activity_Task {
           'result' => FALSE,
         ),
         5 => array(
-          'title' => ts('Email - send now'),
+          'title' => ts('Email - send now (to %1 or less)', array(
+            1 => Civi::settings()
+              ->get('simple_mail_limit'),
+          )),
           'class' => array(
             'CRM_Activity_Form_Task_PickOption',
             'CRM_Activity_Form_Task_Email',

@@ -484,6 +484,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       'name' => $name,
       'groupTitle' => $group->title,
       'groupName' => $group->name,
+      'groupDisplayTitle' => (!empty($group->frontend_title)) ? $group->frontend_title : $group->title,
       'groupHelpPre' => empty($group->help_pre) ? '' : $group->help_pre,
       'groupHelpPost' => empty($group->help_post) ? '' : $group->help_post,
       'title' => $title,
@@ -1673,9 +1674,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   public static function getModuleUFGroup($moduleName = NULL, $count = 0, $skipPermission = TRUE, $op = CRM_Core_Permission::VIEW, $returnFields = NULL) {
     $selectFields = array('id', 'title', 'created_id', 'is_active', 'is_reserved', 'group_type');
 
-    if (!CRM_Core_Config::isUpgradeMode()) {
+    if (CRM_Core_DAO::checkFieldExists('civicrm_uf_group', 'description')) {
       // CRM-13555, since description field was added later (4.4), and to avoid any problems with upgrade
       $selectFields[] = 'description';
+    }
+
+    if (CRM_Core_DAO::checkFieldExists('civicrm_uf_group', 'frontend_title')) {
+      $selectFields[] = 'frontend_title';
     }
 
     if (!empty($returnFields)) {
@@ -1753,6 +1758,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
       if (CRM_Contact_BAO_ContactType::isaSubType($profileType)) {
         $profileType = CRM_Contact_BAO_ContactType::getBasicType($profileType);
+
+        //in some cases getBasicType() returns a cached array instead of string. Example: array ('sponsor' => 'organization')
+        if (is_array($profileType)) {
+          $profileType = array_shift($profileType);
+        }
       }
 
       //allow special mix profiles for Contribution and Participant
@@ -2339,7 +2349,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             $defaults[$name . '_custom'] = $details[$name . '_custom'];
           }
           elseif ($name == 'preferred_communication_method') {
-            $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $details[$name]);
+            $v = $details[$name];
+            if (!is_array($details[$name])) {
+              $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $v);
+            }
             foreach ($v as $item) {
               if ($item) {
                 $defaults[$fldName . "[$item]"] = 1;

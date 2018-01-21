@@ -491,6 +491,13 @@
         editorAttrs: {maxlength: 64},
         validators: ['required']
       },
+      'frontend_title': {
+        title: ts('Public Title'),
+        help: ts(''),
+        type: 'Text',
+        editorAttrs: {maxlength: 64},
+        validators: []
+      },
       'group_type': {
         // For a description of group_type, see CRM_Core_BAO_UFGroup::updateGroupTypes
         // title: ts(''),

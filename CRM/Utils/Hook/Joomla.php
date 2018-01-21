@@ -123,6 +123,12 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
       }
       return $result;
     }
+    else {
+      // CRM-20904: We should still call Civi extension hooks even if Joomla isn't online yet.
+      return $this->commonInvoke($numParams,
+        $arg1, $arg2, $arg3, $arg4, $arg5, $arg6,
+        $fnSuffix, 'joomla');
+    }
   }
 
 }

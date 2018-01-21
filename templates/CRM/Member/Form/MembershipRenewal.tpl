@@ -129,7 +129,7 @@
         </tr>
         <tr id="fromEmail">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html}</td>
+          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
         </tr>
         <tr id="notice" class="crm-member-membershiprenew-form-block-receipt_text_renewal">
           <td class="label">{$form.receipt_text_renewal.label}</td>

@@ -610,8 +610,14 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form for partial payment.
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testSubmitPartialPayment() {
+  public function testSubmitPartialPayment($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     // Step 1: submit a partial payment for a membership via backoffice
     $form = $this->getForm();
     $form->preProcess();
@@ -629,7 +635,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       // This format reflects the 23 being the organisation & the 25 being the type.
       'membership_type_id' => array(23, $this->membershipTypeAnnualFixedID),
       'record_contribution' => 1,
-      'total_amount' => $partiallyPaidAmount,
+      'total_amount' => $this->formatMoneyInput($partiallyPaidAmount),
       'receive_date' => date('m/d/Y', time()),
       'receive_date_time' => '08:36PM',
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
@@ -655,7 +661,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $submitParams = array(
       'contribution_id' => $contribution['contribution_id'],
       'contact_id' => $this->_individualId,
-      'total_amount' => $partiallyPaidAmount,
+      'total_amount' => $this->formatMoneyInput($partiallyPaidAmount),
       'currency' => 'USD',
       'financial_type_id' => 2,
       'receive_date' => '04/21/2015',
@@ -676,7 +682,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
     ));
     $this->assertEquals('Completed', $contribution['contribution_status']);
-    // $this->assertEquals(50.00, $contribution['total_amount']);
     // $this->assertEquals(50.00, $contribution['net_amount']);
   }
 
@@ -684,6 +689,17 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    */
   public function testSubmitRecur() {
+    $pendingVal = $this->callAPISuccessGetValue('OptionValue', array(
+      'return' => "id",
+      'option_group_id' => "contribution_status",
+      'label' => "Pending",
+    ));
+    //Update label for Pending contribution status.
+    $this->callAPISuccess('OptionValue', 'create', array(
+      'id' => $pendingVal,
+      'label' => "PendingEdited",
+    ));
+
     $form = $this->getForm();
 
     $this->callAPISuccess('MembershipType', 'create', array(
@@ -705,6 +721,12 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'is_test' => TRUE,
     ));
+
+    //Check if Membership Payment is recorded.
+    $this->callAPISuccessGetCount('MembershipPayment', array(
+      'membership_id' => $membership['id'],
+      'contribution_id' => $contribution['id'],
+    ), 1);
 
     // CRM-16992.
     $this->callAPISuccessGetCount('LineItem', array(
@@ -1223,6 +1245,55 @@ Expires: ',
       'return' => "id",
       'name' => "Cancelled",
     )));
+  }
+
+  /**
+   * CRM-21656: Test the submit function of the membership form if Sale Tax is enabled.
+   *  Check that the tax rate isn't reapplied to line item's unit price and total amount
+   */
+  public function testLineItemAmountOnSaleTax() {
+    $this->enableTaxAndInvoicing();
+    $this->relationForFinancialTypeWithFinancialAccount(2);
+    $form = $this->getForm();
+    $form->preProcess();
+    $this->mut = new CiviMailUtils($this, TRUE);
+    $this->createLoggedInUser();
+    $priceSet = $this->callAPISuccess('PriceSet', 'Get', array("extends" => "CiviMember"));
+    $form->set('priceSetId', $priceSet['id']);
+    // clean the price options static variable to repopulate the options, in order to fetch tax information
+    \Civi::$statics['CRM_Price_BAO_PriceField']['priceOptions'] = NULL;
+    CRM_Price_BAO_PriceSet::buildPriceSet($form);
+    // rebuild the price set form variable to include the tax information against each price options
+    $form->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSet['id']));
+    $params = array(
+      'cid' => $this->_individualId,
+      'join_date' => date('m/d/Y', time()),
+      'start_date' => '',
+      'end_date' => '',
+      // This format reflects the 23 being the organisation & the 25 being the type.
+      'membership_type_id' => array(23, $this->membershipTypeAnnualFixedID),
+      'record_contribution' => 1,
+      'total_amount' => 55,
+      'receive_date' => date('m/d/Y', time()),
+      'receive_date_time' => '08:36PM',
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'financial_type_id' => 2, //Member dues, see data.xml
+      'payment_processor_id' => $this->_paymentProcessorID,
+    );
+    $form->_contactID = $this->_individualId;
+    $form->testSubmit($params);
+
+    $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', array('entity_id' => $membership['id'], 'entity_table' => 'civicrm_membership'));
+    $this->assertEquals(1, $lineItem['qty']);
+    $this->assertEquals(50.00, $lineItem['unit_price']);
+    $this->assertEquals(50.00, $lineItem['line_total']);
+    $this->assertEquals(5.00, $lineItem['tax_amount']);
+
+    // reset the price options static variable so not leave any dummy data, that might hamper other unit tests
+    \Civi::$statics['CRM_Price_BAO_PriceField']['priceOptions'] = NULL;
+    $this->disableTaxAndInvoicing();
   }
 
 }
