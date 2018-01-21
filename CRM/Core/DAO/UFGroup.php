@@ -373,8 +373,8 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
           'localizable' => 0,
-        ) ,
-          'for_duplicate_URL' => array(
+        ],
+          'for_duplicate_URL' => [
               'name' => 'for_duplicate_URL',
               'type' => CRM_Utils_Type::T_STRING,
               'title' => ts('Duplicate Url'),
@@ -385,8 +385,8 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
               'entity' => 'UFGroup',
               'bao' => 'CRM_Core_BAO_UFGroup',
               'localizable' => 0,
-          ) ,
-        'add_to_group_id' => array(
+        ],
+        'add_to_group_id' => [
           'name' => 'add_to_group_id',
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Add Contact To Group'),
