@@ -222,6 +222,15 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $billingFieldSets = array();
 
   /**
+   * Monetary fields that may be submitted.
+   *
+   * These should get a standardised format in the beginPostProcess function.
+   *
+   * These fields are common to many forms. Some may override this.
+   */
+  protected $submittableMoneyFields = ['total_amount', 'net_amount', 'non_deductible_amount', 'fee_amount'];
+
+  /**
    * Pre process function with common actions.
    */
   public function preProcess() {
@@ -567,6 +576,11 @@ WHERE  contribution_id = {$id}
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
 
     self::formatCreditCardDetails($this->_params);
+    foreach ($this->submittableMoneyFields as $moneyField) {
+      if (isset($this->_params[$moneyField])) {
+        $this->_params[$moneyField] = CRM_Utils_Rule::cleanMoney($this->_params[$moneyField]);
+      }
+    }
   }
 
   /**

@@ -119,9 +119,14 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   /**
    * Initial test of submit function.
    *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
+   *
    * @throws \Exception
    */
-  public function testSubmitWithPayment() {
+  public function testSubmitWithPayment($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $form = $this->getForm(array('is_monetary' => 1, 'financial_type_id' => 1));
     $form->_mode = 'Live';
     $form->_quickConfig = TRUE;
@@ -156,8 +161,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
         13 => 1,
       ),
       'amount_level' => 'Too much',
-      'fee_amount' => 55,
-      'total_amount' => 55,
+      'fee_amount' => $this->formatMoneyInput(1550.55),
+      'total_amount' => $this->formatMoneyInput(1550.55),
       'from_email_address' => 'abc@gmail.com',
       'send_receipt' => 1,
       'receipt_text' => '',
@@ -165,14 +170,19 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $participants = $this->callAPISuccess('Participant', 'get', array());
     $this->assertEquals(1, $participants['count']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array());
-    $this->assertEquals(55, $contribution['total_amount']);
+    $this->assertEquals(1550.55, $contribution['total_amount']);
     $this->assertEquals('Debit Card', $contribution['payment_instrument']);
   }
 
   /**
    * Test offline participant mail.
+   *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testParticipantOfflineReceipt() {
+  public function testParticipantOfflineReceipt($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $mut = new CiviMailUtils($this, TRUE);
 
     //Get workflow id of event_offline receipt.
@@ -197,11 +207,12 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'msg_html' => $newMsg,
     ));
 
-    $this->testSubmitWithPayment();
+    $this->testSubmitWithPayment($thousandSeparator);
     //Check if type is correctly populated in mails.
-    $mail = $mut->checkMailLog(array(
+    $mail = $mut->checkMailLog([
         '<p>Test event type - 1</p>',
-      )
+        $this->formatMoneyInput(1550.55),
+      ]
     );
   }
 
