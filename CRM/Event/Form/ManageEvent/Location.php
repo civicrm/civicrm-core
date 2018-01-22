@@ -252,6 +252,9 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
           $values['is_primary'] = 1;
         }
         $values['location_type_id'] = ($defaultLocationType->id) ? $defaultLocationType->id : 1;
+        if (isset($this->_values[$block][$count])) {
+          $values['id'] = $this->_values[$block][$count]['id'];
+        }
       }
     }
 
