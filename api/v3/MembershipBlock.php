@@ -41,7 +41,7 @@
  *   API result array
  */
 function civicrm_api3_membership_block_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'MembershipBlock');
 }
 
 /**

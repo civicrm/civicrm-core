@@ -61,7 +61,7 @@ function civicrm_api3_contact_type_create($params) {
     $params['name'] = CRM_Utils_String::munge($params['name']);
   }
 
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'ContactType');
 }
 
 /**

@@ -43,7 +43,7 @@ function civicrm_api3_financial_trxn_create($params) {
     throw new API_Exception("Mandatory key(s) missing from params array: both contribution_id and entity_id are missing");
   }
 
-  return _civicrm_api3_basic_create('CRM_Core_BAO_FinancialTrxn', $params);
+  return _civicrm_api3_basic_create('CRM_Core_BAO_FinancialTrxn', $params, 'FinancialTrxn');
 }
 
 /**
