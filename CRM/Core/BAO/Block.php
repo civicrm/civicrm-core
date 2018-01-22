@@ -302,7 +302,8 @@ class CRM_Core_BAO_Block {
               $valueId = TRUE;
             }
           }
-          else {
+          // CRM-21071
+          elseif ($blockName != 'email') {
             $valueId = TRUE;
           }
           if ($valueId) {
