@@ -204,6 +204,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   protected $statusMessageTitle;
 
   /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
@@ -1420,6 +1427,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // would cause breakage for negative values in some cases.
       $submittedValues['total_amount'] = CRM_Utils_Array::value('amount', $submittedValues);
     }
+
     if ($this->_id) {
       if ($this->_compId) {
         if ($this->_context == 'participant') {
