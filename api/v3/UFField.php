@@ -43,7 +43,7 @@
  *   Newly created $ufFieldArray
  */
 function civicrm_api3_uf_field_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'UFField');
 }
 
 /**

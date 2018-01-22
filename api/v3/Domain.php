@@ -139,7 +139,7 @@ function civicrm_api3_domain_create($params) {
   else {
     unset($params['version']);
   }
-  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Domain');
 
   $result_value = CRM_Utils_Array::first($result['values']);
   if (isset($result_value['version'])) {

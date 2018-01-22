@@ -48,7 +48,7 @@ function civicrm_api3_line_item_create($params) {
   // do the work, and it should be in a tighter function. The below function is  not really
   // readable because it is handling contribution and line item together.
   $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params, TRUE);
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'LineItem');
 }
 
 /**
