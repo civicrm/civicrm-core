@@ -1725,7 +1725,7 @@ class CRM_Utils_Token {
       $formattedDates = array();
       $dates = explode($separator, $contribution['receive_date']);
       foreach ($dates as $date) {
-        if (strlen($string) == 0) {
+        if (strlen($date) == 0) {
           $formattedDates[] = $date;
         }
         else {
