@@ -1725,7 +1725,12 @@ class CRM_Utils_Token {
       $formattedDates = array();
       $dates = explode($separator, $contribution['receive_date']);
       foreach ($dates as $date) {
-        $formattedDates[] = CRM_Utils_Date::customFormat($date, NULL, array('j', 'm', 'Y'));
+        if (strlen($string) == 0) {
+          $formattedDates[] = $date;
+        }
+        else {
+          $formattedDates[] = CRM_Utils_Date::customFormat($date, NULL, array('j', 'm', 'Y'));
+        }
       }
       $str = str_replace("{contribution.receive_date}", implode($separator, $formattedDates), $str);
       unset($knownTokens['contribution']['receive_date']);
