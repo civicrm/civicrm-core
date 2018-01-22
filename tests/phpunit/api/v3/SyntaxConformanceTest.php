@@ -262,6 +262,19 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Add a smattering of entities that don't normally have custom data.
+   *
+   * @return array
+   */
+  public static function custom_data_incl_non_std_entities_get() {
+    $customDataEntities = self::custom_data_entities();
+    $customDataEntities[] = ['UFGroup'];
+    $customDataEntities[] = ['PriceSet'];
+    $customDataEntities[] = ['PaymentToken'];
+    return $customDataEntities;
+  }
+
+  /**
    * Get entities to be skipped on get tests.
    *
    * @param bool $sequential
@@ -768,11 +781,20 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
-   * @dataProvider custom_data_entities_get
+   * @dataProvider custom_data_incl_non_std_entities_get
    * @param $entityName
    */
   public function testCustomDataGet($entityName) {
     $this->createLoggedInUser();// so subsidiary activities are created
+
+    if (!isset(CRM_Core_BAO_CustomQuery::$extendsMap[$entityName])) {
+      $createdValue = $this->callAPISuccess('OptionValue', 'create', [
+        'option_group_id' => 'cg_extend_objects',
+        'label' => $entityName,
+        'value' => $entityName,
+        'name' => CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($entityName)),
+      ]);
+    }
     // We are not passing 'check_permissions' so the the more limited permissions *should* be
     // ignored but per CRM-17700 there is a history of custom data applying permissions when it shouldn't.
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'view my contact');
@@ -784,12 +806,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
     $getParams = array('id' => $result['id'], 'return' => array($customFieldName));
     $check = $this->callAPISuccess($entityName, 'get', $getParams);
-    $this->assertEquals("custom string", $check['values'][$check['id']][$customFieldName]);
+    $this->assertEquals("custom string", $check['values'][$check['id']][$customFieldName], 'Custom data not present for ' . $entityName);
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
     $this->callAPISuccess($entityName, 'delete', array('id' => $result['id']));
     $this->quickCleanup(array('civicrm_uf_match'));
+    if (!empty($createdValue)) {
+      $this->callAPISuccess('OptionValue', 'delete', ['id' => $createdValue['id']]);
+    }
   }
 
   /**
