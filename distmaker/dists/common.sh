@@ -109,6 +109,16 @@ function dm_install_packages() {
   ${DM_RSYNC:-rsync} -avC $excludes_rsync --include=core "$repo/./" "$to/./"
 }
 
+## Copy civicrm-setup
+## usage: dm_install_setup <setup_repo_path> <to_path>
+function dm_install_setup() {
+  local repo="$1"
+  local to="$2"
+
+  [ ! -d "$to" ] && mkdir "$to"
+  ${DM_RSYNC:-rsync} -avC --exclude=.git --exclude=.svn "$repo/./" "$to/./"
+}
+
 ## Copy Drupal-integration module
 ## usage: dm_install_drupal <drupal_repo_path> <to_path>
 function dm_install_drupal() {

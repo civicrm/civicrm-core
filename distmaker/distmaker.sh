@@ -41,6 +41,7 @@ D56PACK=0
 D7DIR=0
 J5PACK=0
 WP5PACK=0
+WPORGPACK=0
 SK5PACK=0
 L10NPACK=0
 REPOREPORT=0
@@ -60,7 +61,8 @@ display_usage()
   echo "  Drupal6|d5.6   - generate Drupal6 PHP5 module"
   echo "  d7_dir         - generate Drupal7 PHP5 module, but output to a directory, no tarball"
   echo "  Joomla|j5      - generate Joomla PHP5 module"
-  echo "  WordPress|wp5  - generate Wordpress PHP5 module"
+  echo "  WordPress|wp5  - generate WordPress PHP5 module"
+  echo "  wporg          - Generate WordPress+setup PHP5 module"
   echo "  sk             - generate Drupal StarterKit module"
   echo
   echo "You also need to have distmaker.conf file in place."
@@ -106,6 +108,10 @@ check_conf()
     DM_PACKAGESDIR="$DM_SOURCEDIR/packages"
   fi
 
+  if [ -z $DM_SETUPDIR ] ; then
+    DM_SETUPDIR="$DM_SOURCEDIR/setup"
+  fi
+
   if [ -z $DM_OUTPUTDIR ] ; then
     DM_OUTPUTDIR="$DM_TARGETDIR/civicrm_files"
   fi
@@ -120,10 +126,11 @@ check_conf()
     echo "DM_TMPDIR : $DM_TMPDIR";
     echo "DM_GENFILESDIR : $DM_GENFILESDIR";
     echo "DM_PACKAGESDIR : $DM_PACKAGESDIR";
+    echo "DM_SETUPDIR : $DM_SETUPDIR";
     echo "Current directory is : $THIS_DIR";
     exit 1
   else
-    export DM_SOURCEDIR DM_GENFILESDIR DM_TMPDIR DM_TARGETDIR DM_PHP DM_RSYNC DM_ZIP DM_VERSION DM_REF_CORE DM_REF_DRUPAL DM_REF_DRUPAL6 DM_REF_JOOMLA DM_REF_WORDPRESS DM_REF_PACKAGES
+    export DM_SOURCEDIR DM_GENFILESDIR DM_TMPDIR DM_TARGETDIR DM_PHP DM_RSYNC DM_ZIP DM_VERSION DM_REF_CORE DM_REF_DRUPAL DM_REF_DRUPAL6 DM_REF_JOOMLA DM_REF_WORDPRESS DM_REF_PACKAGES DM_REF_SETUP
     if [ ! -d "$DM_SOURCEDIR" ]; then
       echo; echo "ERROR! " DM_SOURCEDIR "directory not found!"; echo "(if you get empty directory name, it might mean that one of necessary variables is not set)"; echo;
     fi
@@ -193,6 +200,12 @@ case $1 in
   WP5PACK=1
   ;;
 
+  # WORDPRESS+SETUP PHP5
+  wporg)
+  echo; echo "Generating wporg module"; echo;
+  WPORGPACK=1
+  ;;
+
   # REPO REPORT PHP5
   report)
   echo; echo "Generating repo report module"; echo;
@@ -207,6 +220,7 @@ case $1 in
   D56PACK=1
   J5PACK=1
   WP5PACK=1
+  WPORGPACK=1
   SKPACK=1
   L10NPACK=1
   REPOREPORT=1
@@ -223,6 +237,7 @@ esac
 ## Make sure we have the right branch or tag
 dm_git_checkout "$DM_SOURCEDIR" "$DM_REF_CORE"
 dm_git_checkout "$DM_PACKAGESDIR" "$DM_REF_PACKAGES"
+dm_git_checkout "$DM_SETUPDIR" "$DM_REF_SETUP"
 
 ## in theory, this shouldn't matter, but GenCode is CMS-dependent, and we've been doing our past builds based on D7
 GENCODE_CMS=
@@ -297,6 +312,12 @@ if [ "$WP5PACK" = 1 ]; then
   bash $P/dists/wordpress_php5.sh
 fi
 
+if [ "$WPORGPACK" = 1 ]; then
+  echo; echo "Packaging for wporg version"; echo;
+  dm_git_checkout "$DM_SOURCEDIR/WordPress" "$DM_REF_WORDPRESS"
+  bash $P/dists/wporg_php5.sh
+fi
+
 if [ "$REPOREPORT" = 1 ]; then
   echo; echo "Preparing repository report"; echo;
   env \
@@ -308,6 +329,7 @@ if [ "$REPOREPORT" = 1 ]; then
     SKPACK="$SKPACK" \
     J5PACK="$J5PACK" \
     WP5PACK="$WP5PACK" \
+    WPORGPACK="$WPORGPACK" \
     bash $P/dists/repo-report.sh
 fi
 

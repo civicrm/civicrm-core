@@ -40,6 +40,7 @@ $data = array(
     //'civicrm-drupal@8.x' => repo("$DM_SOURCEDIR/drupal", getenv('DM_REF_DRUPAL8')),
     'civicrm-joomla' => repo("$DM_SOURCEDIR/joomla", getenv('DM_REF_JOOMLA')),
     'civicrm-packages' => repo("$DM_SOURCEDIR/packages", getenv('DM_REF_PACKAGES')),
+    'civicrm-setup' => repo("$DM_SOURCEDIR/setup", getenv('DM_REF_SETUP')),
     'civicrm-wordpress' => repo("$DM_SOURCEDIR/WordPress", getenv('DM_REF_WORDPRESS')),
   ),
 );
