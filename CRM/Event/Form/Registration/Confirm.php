@@ -1040,7 +1040,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     $contribParams['skipLineItem'] = 1;
     // create contribution record
-    $contribution = CRM_Contribute_BAO_Contribution::add($contribParams, $ids);
+    $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
     // CRM-11124
     CRM_Event_BAO_Participant::createDiscountTrxn($form->_eventId, $contribParams, NULL, CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
 
