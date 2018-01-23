@@ -487,7 +487,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
   public function fixTimeStampAndNotNullSQL($query) {
     $query = str_ireplace("TIMESTAMP NOT NULL", "TIMESTAMP NULL", $query);
     $query = str_ireplace("DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", '', $query);
-    $query = str_ireplace("DEFAULT CURRENT_TIMESTAMP", '', $query);
+    $query = preg_replace("/DEFAULT CURRENT_TIMESTAMP(\(\))/", '', $query);
     $query = str_ireplace("NOT NULL", '', $query);
     return $query;
   }
