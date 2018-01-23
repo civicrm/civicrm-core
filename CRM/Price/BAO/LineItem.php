@@ -475,6 +475,7 @@ WHERE li.contribution_id = %1";
         }
       }
     }
+    // create deferred revenue transaction
     if (!$update && $contributionDetails) {
       CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItem, $contributionDetails);
     }

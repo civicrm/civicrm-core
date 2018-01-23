@@ -135,6 +135,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
   public function testCreateDeferredTrxn() {
     Civi::settings()->set('contribution_invoice_settings', array('deferred_revenue_enabled' => '1'));
     $cid = $this->individualCreate();
+    $financialTypeId = 4;
     $params = array(
       'contact_id' => $cid,
       'receive_date' => '2016-01-20',
@@ -151,7 +152,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
               'qty' => 1,
               'unit_price' => 100,
               'line_total' => 100,
-              'financial_type_id' => 4,
+              'financial_type_id' => $financialTypeId,
             ),
           ),
           'params' => array(),
@@ -162,12 +163,20 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $lineItems[1] = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution->id);
     $lineItemId = key($lineItems[1]);
     $lineItems[1][$lineItemId]['financial_item_id'] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_item WHERE entity_table = 'civicrm_line_item' AND entity_id = {$lineItemId}");
-    // Get financial trxns for contribution
-    $trxn = $this->callAPISuccess("FinancialTrxn", "get", array('total_amount' => 622));
+    // Get the Deferred financial trxns for contribution
+    $toDeferredFinancialAccountID = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeId, 'Deferred Revenue Account is');
+    $trxn = $this->callAPISuccess("FinancialTrxn", "get", array(
+      'total_amount' => 622,
+      'to_financial_account_id' => $toDeferredFinancialAccountID,
+    ));
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime('2016-01-20')));
     $contribution->revenue_recognition_date = date('Ymd', strtotime("+1 month"));
     CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contribution);
-    $trxn = $this->callAPISuccess("FinancialTrxn", "get", array('total_amount' => 622, 'id' => array("NOT IN" => array($trxn['id']))));
+    $trxn = $this->callAPISuccess("FinancialTrxn", "get", array(
+      'total_amount' => 622,
+      'id' => array("NOT IN" => array($trxn['id'])),
+      'to_financial_account_id' => $toDeferredFinancialAccountID,
+    ));
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime("+1 month")));
   }
 
