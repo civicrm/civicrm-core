@@ -53,7 +53,8 @@
     "civicrm/civicrm-cxn-rpc": "~0.17.07.01",
     "pear/Auth_SASL": "1.1.0",
     "pear/Net_SMTP": "1.6.*",
-    "pear/Net_socket": "1.0.*"
+    "pear/Net_socket": "1.0.*",
+    "civicrm/civicrm-setup": "~0.2.0"
   },
   "repositories": [
     {
