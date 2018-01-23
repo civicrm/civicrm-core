@@ -352,18 +352,4 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('FinancialItem', $params, $checkAgainst);
   }
 
-  /**
-   * Get the contribution object.
-   *
-   * @param int $contributionID
-   *
-   * @return \CRM_Contribute_BAO_Contribution
-   */
-  protected function getContributionObject($contributionID) {
-    $contributionObj = new CRM_Contribute_BAO_Contribution();
-    $contributionObj->id = $contributionID;
-    $contributionObj->find(TRUE);
-    return $contributionObj;
-  }
-
 }

@@ -3983,4 +3983,19 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     return CRM_Utils_Money::format($amount, NULL, '%a');
   }
 
+
+  /**
+   * Get the contribution object.
+   *
+   * @param int $contributionID
+   *
+   * @return \CRM_Contribute_BAO_Contribution
+   */
+  protected function getContributionObject($contributionID) {
+    $contributionObj = new CRM_Contribute_BAO_Contribution();
+    $contributionObj->id = $contributionID;
+    $contributionObj->find(TRUE);
+    return $contributionObj;
+  }
+
 }
