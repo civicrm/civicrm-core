@@ -33,5 +33,6 @@ env \
   SKPACK="$SKPACK" \
   J5PACK="$J5PACK" \
   WP5PACK="$WP5PACK" \
+  WPORGPACK="$WPORGPACK" \
   php "$DM_SOURCEDIR/distmaker/utils/repo-report.php" \
   > "$REPORT"
