@@ -2520,6 +2520,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     $template = $this->_assignMessageVariablesToTemplate($values, $input, $returnMessageText);
+    $paymentObject = NULL;
     //what does recur 'mean here - to do with payment processor return functionality but
     // what is the importance
     if (!empty($this->contribution_recur_id) && !empty($this->_relatedObjects['paymentProcessor'])) {
