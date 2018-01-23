@@ -350,33 +350,32 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       $params['country_id'] == 1228
     ) {
       CRM_Utils_Address_USPS::checkAddress($params);
+    }
+    // do street parsing again if enabled, since street address might have changed
+    $parseStreetAddress = CRM_Utils_Array::value(
+      'street_address_parsing',
+      CRM_Core_BAO_Setting::valueOptions(
+        CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'address_options'
+      ),
+      FALSE
+    );
 
-      // do street parsing again if enabled, since street address might have changed
-      $parseStreetAddress = CRM_Utils_Array::value(
-        'street_address_parsing',
-        CRM_Core_BAO_Setting::valueOptions(
-          CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-          'address_options'
-        ),
-        FALSE
-      );
-
-      if ($parseStreetAddress && !empty($params['street_address'])) {
-        foreach (array(
-                   'street_number',
-                   'street_name',
-                   'street_unit',
-                   'street_number_suffix',
-                 ) as $fld) {
-          unset($params[$fld]);
-        }
-        // main parse string.
-        $parseString = CRM_Utils_Array::value('street_address', $params);
-        $parsedFields = CRM_Core_BAO_Address::parseStreetAddress($parseString);
-
-        // merge parse address in to main address block.
-        $params = array_merge($params, $parsedFields);
+    if ($parseStreetAddress && !empty($params['street_address'])) {
+      foreach (array(
+                 'street_number',
+                 'street_name',
+                 'street_unit',
+                 'street_number_suffix',
+               ) as $fld) {
+        unset($params[$fld]);
       }
+      // main parse string.
+      $parseString = CRM_Utils_Array::value('street_address', $params);
+      $parsedFields = CRM_Core_BAO_Address::parseStreetAddress($parseString);
+
+      // merge parse address in to main address block.
+      $params = array_merge($params, $parsedFields);
     }
 
     // check if geocode should be skipped (can be forced with an optional parameter through the api)

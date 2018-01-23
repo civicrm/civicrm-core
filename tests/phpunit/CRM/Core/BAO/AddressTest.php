@@ -280,6 +280,58 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
+  public function setStreetAddressParsing($status) {
+    $address_options = CRM_Core_BAO_Setting::valueOptions(
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+      'address_options',
+      TRUE, NULL, TRUE
+    );
+    if ($status) {
+      $value = 1;
+    }
+    else {
+      $value = 0;
+    }
+    $address_options['street_address_parsing'] = $value;
+    CRM_Core_BAO_Setting::setValueOption(
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+      'address_options',
+      $address_options
+    );
+  }
+
+  /**
+   * ParseStreetAddress if enabled, otherwise, don't.
+   */
+  public function testParseStreetAddressIfEnabled() {
+    // Turn off address standardization. Parsing should work without it.
+    Civi::settings()->set('address_standardization_provider', NULL);
+
+    // Ensure street parsing happens if enabled.
+    $this->setStreetAddressParsing(TRUE);
+
+    $contactId = $this->individualCreate();
+    $street_address = "54 Excelsior Ave.";
+    $params = array(
+      'contact_id' => $contactId,
+      'street_address' => $street_address,
+      'location_type_id' => 1,
+    );
+
+    $result = civicrm_api3('Address', 'create', $params);
+    $value = array_pop($result['values']);
+    $street_number = CRM_Utils_Array::value('street_number', $value);
+    $this->assertEquals($street_number, '54');
+
+    // Ensure street parsing does not happen if disabled.
+    $this->setStreetAddressParsing(FALSE);
+    $result = civicrm_api3('Address', 'create', $params);
+    $value = array_pop($result['values']);
+    $street_number = CRM_Utils_Array::value('street_number', $value);
+    $this->assertEmpty($street_number);
+
+  }
+
   /**
    * ParseStreetAddress() method (get street address parsed)
    */
