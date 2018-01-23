@@ -1,5 +1,6 @@
 *~
 *.bak
+.use-civicrm-setup
 backdrop/
 bower_components
 CRM/Case/xml/configuration
