@@ -158,7 +158,7 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
     $query['casContactTableAlias'] = NULL;
     $query['casDateField'] = str_replace('event_', 'r.', $schedule->start_action_date);
     if (empty($query['casDateField']) && $schedule->absolute_date) {
-      $query['casDateField'] = $schedule->absolute_date;
+      $query['casDateField'] = "'" . CRM_Utils_Type::escape($schedule->absolute_date, 'String') . "'";
     }
 
     $query->join('r', 'INNER JOIN civicrm_event r ON e.event_id = r.id');
