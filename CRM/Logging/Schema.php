@@ -444,7 +444,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     $line = preg_grep("/^  `$col` /", $createQuery);
     $line = rtrim(array_pop($line), ',');
     // CRM-11179
-    $line = $this->fixTimeStampAndNotNullSQL($line);
+    $line = self::fixTimeStampAndNotNullSQL($line);
     return $line;
   }
 
@@ -484,9 +484,12 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    *
    * @return mixed
    */
-  public function fixTimeStampAndNotNullSQL($query) {
+  public static function fixTimeStampAndNotNullSQL($query) {
+    $query = str_ireplace("TIMESTAMP() NOT NULL", "TIMESTAMP NULL", $query);
     $query = str_ireplace("TIMESTAMP NOT NULL", "TIMESTAMP NULL", $query);
+    $query = str_ireplace("DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()", '', $query);
     $query = str_ireplace("DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", '', $query);
+    $query = str_ireplace("DEFAULT CURRENT_TIMESTAMP()", '', $query);
     $query = str_ireplace("DEFAULT CURRENT_TIMESTAMP", '', $query);
     $query = str_ireplace("NOT NULL", '', $query);
     return $query;
