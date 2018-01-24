@@ -5023,6 +5023,28 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
   }
 
   /**
+   * Checks if Contribution of specified ID has its Recurring Contribution with
+   * multiple installments and offline payment (no payment processor).
+   *
+   * @param int $contributionID
+   *
+   * @return boolean
+   */
+  public static function isOfflineRecurring($contributionID) {
+    $contribution = self::findById($contributionID);
+    if (empty($contribution->contribution_recur_id)) {
+      return FALSE;
+    }
+
+    $recurringContribution = CRM_Contribute_BAO_ContributionRecur::findById($contribution->contribution_recur_id);
+    if ($recurringContribution->installments > 1 && empty($recurringContribution->payment_processor_id)) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
    * ContributionPage values were being imposed onto values.
    *
    * I have made this explicit and removed the couple (is_recur, is_pay_later) we
