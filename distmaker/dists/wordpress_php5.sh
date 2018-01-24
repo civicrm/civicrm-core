@@ -29,5 +29,11 @@ dm_install_cvext com.iatspayments.civicrm "$TRG/civicrm/civicrm/ext/iatspayments
 cd $TRG
 ${DM_ZIP:-zip} -r -9 $DM_TARGETDIR/civicrm-$DM_VERSION-wordpress.zip *
 
+# gen wporg tarball
+touch "$TRG/civicrm/civicrm/.use-civicrm-setup"
+cp "$TRG/civicrm/civicrm/vendor/civicrm/civicrm-setup/plugins/blocks/opt-in.disabled.php" "$TRG/civicrm/civicrm/vendor/civicrm/civicrm-setup/plugins/blocks/opt-in.civi-setup.php"
+cd "$TRG"
+${DM_ZIP:-zip} -r -9 $DM_TARGETDIR/civicrm-$DM_VERSION-wporg.zip *
+
 # clean up
 rm -rf $TRG
