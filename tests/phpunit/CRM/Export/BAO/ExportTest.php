@@ -339,4 +339,76 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery($sql);
   }
 
+  /**
+   * Test that deceased and do not mail contacts are removed from contacts before
+   */
+  public function testExportDeceasedDoNotMail() {
+    $contactA = $this->callAPISuccess('contact', 'create', array(
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'contact_type' => 'Individual',
+    ));
+
+    $contactB = $this->callAPISuccess('contact', 'create', array(
+      'first_name' => 'Jane',
+      'last_name' => 'Doe',
+      'contact_type' => 'Individual',
+      'is_deceased' => 1,
+    ));
+
+    //create address for contact A
+    $result = $this->callAPISuccess('address', 'create', array(
+      'contact_id' => $contactA['id'],
+      'location_type_id' => 'Home',
+      'street_address' => 'ABC 12',
+      'postal_code' => '123 AB',
+      'country_id' => '1152',
+      'city' => 'ABC',
+      'is_primary' => 1,
+    ));
+
+    //create address for contact B
+    $result = $this->callAPISuccess('address', 'create', array(
+      'contact_id' => $contactB['id'],
+      'location_type_id' => 'Home',
+      'street_address' => 'ABC 12',
+      'postal_code' => '123 AB',
+      'country_id' => '1152',
+      'city' => 'ABC',
+      'is_primary' => 1,
+    ));
+
+    //export and merge contacts with same address
+    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
+      TRUE,
+      array($contactA['id'], $contactB['id']),
+      array(),
+      NULL,
+      NULL,
+      NULL,
+      CRM_Export_Form_Select::CONTACT_EXPORT,
+      "contact_a.id IN ({$contactA['id']}, {$contactB['id']})",
+      NULL,
+      TRUE,
+      FALSE,
+      array(
+        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
+        'mergeOption' => TRUE,
+        'suppress_csv_for_testing' => TRUE,
+        'postal_mailing_export' => array(
+          'postal_mailing_export' => TRUE,
+        ),
+      )
+    );
+
+    $greeting = CRM_Core_DAO::singleValueQuery("SELECT email_greeting FROM {$tableName}");
+
+    //Assert email_greeting is not merged
+    $this->assertNotContains(',', (string) $greeting);
+
+    // delete the export temp table and component table
+    $sql = "DROP TABLE IF EXISTS {$tableName}";
+    CRM_Core_DAO::executeQuery($sql);
+  }
+
 }
