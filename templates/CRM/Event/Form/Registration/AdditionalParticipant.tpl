@@ -70,7 +70,7 @@
   {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPost}
 </div>
 
-<div id="crm-submit-buttons">
+<div id="crm-submit-buttons" class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl"}
 </div>
 </div>

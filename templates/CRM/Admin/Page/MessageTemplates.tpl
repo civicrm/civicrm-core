@@ -81,7 +81,7 @@
     </div>
   </div>
 
-  <div id="crm-submit-buttons">{$form.buttons.html}</div>
+  <div id="crm-submit-buttons" class="crm-submit-buttons">{$form.buttons.html}</div>
   </fieldset>
 {/if}
 
