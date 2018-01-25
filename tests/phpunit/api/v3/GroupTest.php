@@ -261,8 +261,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $params['parents']["(SELECT api_key FROM civicrm_contact where id = 1)"] = "Test";
     $this->callAPIFailure('group', 'create', $params);
     unset($params['parents']["(SELECT api_key FROM civicrm_contact where id = 1)"]);
-    $group2 = $this->callAPISuccess('group', 'create', $params);
-    $this->assertEquals(count($group2['values'][$group2['id']]['parents']), 1);
+    $this->callAPIFailure('group', 'create', $params, '\'test Group\' is not a valid option for field parents');
   }
 
   /**

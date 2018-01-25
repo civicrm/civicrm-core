@@ -150,6 +150,9 @@
     <comment>IDs of the parent(s)</comment>
     <add>2.1</add>
     <serialize>COMMA</serialize>
+    <pseudoconstant>
+      <callback>CRM_Core_PseudoConstant::group</callback>
+    </pseudoconstant>
   </field>
   <field>
     <name>children</name>
