@@ -2196,15 +2196,13 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
   if (!is_array($fieldValue)) {
     $fieldValue = (string) $fieldValue;
   }
-  else {
-    //@todo what do we do about passed in arrays. For many of these fields
-    // the missing piece of functionality is separating them to a separated string
-    // & many save incorrectly. But can we change them wholesale?
-  }
+
   if ($fieldValue) {
-    foreach ((array) $fieldValue as $value) {
-      if (!CRM_Utils_Rule::xssString($fieldValue)) {
-        throw new Exception('Input contains illegal SCRIPT tag.');
+    foreach ((array) $fieldValue as $key => $value) {
+      foreach ([$fieldValue, $key, $value] as $input) {
+        if (!CRM_Utils_Rule::xssString($input)) {
+          throw new Exception('Input contains illegal SCRIPT tag.');
+        }
       }
       if ($fieldName == 'currency') {
         //When using IN operator $fieldValue is a array of currency codes
