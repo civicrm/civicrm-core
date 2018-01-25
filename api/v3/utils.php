@@ -1346,7 +1346,7 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
 
   CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
   $instance = new $dao_name();
-  $instance->copyValues($params);
+  $instance->copyValues($params, TRUE);
   $instance->save();
   CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
 

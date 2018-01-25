@@ -149,6 +149,7 @@
     <title>Group Parents</title>
     <comment>IDs of the parent(s)</comment>
     <add>2.1</add>
+    <serialize>COMMA</serialize>
   </field>
   <field>
     <name>children</name>

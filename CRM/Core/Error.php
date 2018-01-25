@@ -106,7 +106,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param bool $throwPEAR_Error
    * @param string $stackClass
    *
-   * @return object
+   * @return CRM_Core_Error
    */
   public static function &singleton($package = NULL, $msgCallback = FALSE, $contextCallback = FALSE, $throwPEAR_Error = FALSE, $stackClass = 'PEAR_ErrorStack') {
     if (self::$_singleton === NULL) {
