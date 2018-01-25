@@ -456,17 +456,22 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
   /**
    * Get the number of terms for this contribution for a given membership type
-   * based on querying the line item table and relevant price field values
+   * based on querying the line item table and relevant price field values.
    * Note that any one contribution should only be able to have one line item relating to a particular membership
-   * type
+   * type.
+   *
+   * For offline recurring Contribution we return '0' to not extend Membership.
    *
    * @param int $membershipTypeID
-   *
    * @param int $contributionID
    *
    * @return int
    */
   public function getNumTermsByContributionAndMembershipType($membershipTypeID, $contributionID) {
+    if (self::isOfflineRecurring($contributionID)) {
+      return 0;
+    }
+
     $numTerms = CRM_Core_DAO::singleValueQuery("
       SELECT membership_num_terms FROM civicrm_line_item li
       LEFT JOIN civicrm_price_field_value v ON li.price_field_value_id = v.id
@@ -5022,6 +5027,28 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       );
     }
     return $default;
+  }
+
+  /**
+   * Checks if Contribution of specified ID has its Recurring Contribution with
+   * multiple installments and offline payment (no payment processor).
+   *
+   * @param int $contributionID
+   *
+   * @return boolean
+   */
+  public static function isOfflineRecurring($contributionID) {
+    $contribution = self::findById($contributionID);
+    if (empty($contribution->contribution_recur_id)) {
+      return FALSE;
+    }
+
+    $recurringContribution = CRM_Contribute_BAO_ContributionRecur::findById($contribution->contribution_recur_id);
+    if ($recurringContribution->installments > 1 && empty($recurringContribution->payment_processor_id)) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**
