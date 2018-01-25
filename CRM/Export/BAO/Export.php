@@ -1080,6 +1080,14 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     if ($exportTempTable) {
       self::writeDetailsToTable($exportTempTable, $componentDetails, $sqlColumns);
 
+      // if postalMailing option is checked, exclude contacts who are deceased, have
+      // "Do not mail" privacy setting, or have no street address
+      if (isset($exportParams['postal_mailing_export']['postal_mailing_export']) &&
+        $exportParams['postal_mailing_export']['postal_mailing_export'] == 1
+      ) {
+        self::postalMailingFormat($exportTempTable, $headerRows, $sqlColumns, $exportMode);
+      }
+
       // do merge same address and merge same household processing
       if ($mergeSameAddress) {
         self::mergeSameAddress($exportTempTable, $headerRows, $sqlColumns, $exportParams);
@@ -1089,14 +1097,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       if ($mergeSameHousehold) {
         self::mergeSameHousehold($exportTempTable, $headerRows, $sqlColumns, $relationKeyMOH);
         self::mergeSameHousehold($exportTempTable, $headerRows, $sqlColumns, $relationKeyHOH);
-      }
-
-      // if postalMailing option is checked, exclude contacts who are deceased, have
-      // "Do not mail" privacy setting, or have no street address
-      if (isset($exportParams['postal_mailing_export']['postal_mailing_export']) &&
-        $exportParams['postal_mailing_export']['postal_mailing_export'] == 1
-      ) {
-        self::postalMailingFormat($exportTempTable, $headerRows, $sqlColumns, $exportMode);
       }
 
       // call export hook
