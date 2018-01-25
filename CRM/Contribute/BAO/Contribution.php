@@ -2397,7 +2397,20 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $ids
     ));
 
-    if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $this->contribution_page_id) {
+    $ids['contributionType'] = $this->financial_type_id;
+    $ids['financialType'] = $this->financial_type_id;
+    if ($this->contribution_page_id) {
+      $ids['contributionPage'] = $this->contribution_page_id;
+    }
+    $this->loadRelatedEntitiesByID($ids);
+
+    $recurPaymentProcessor = FALSE;
+    if (!empty($this->_relatedObjects['contributionRecur']) && !$paymentProcessorID) {
+      $recurPaymentProcessor = TRUE;
+      $paymentProcessorID = $this->_relatedObjects['contributionRecur']->payment_processor_id;
+    }
+
+    if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $this->contribution_page_id && !$recurPaymentProcessor) {
       $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
         $this->contribution_page_id,
         'payment_processor'
@@ -2405,18 +2418,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if ($paymentProcessorID) {
         $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage;
       }
-    }
-
-    $ids['contributionType'] = $this->financial_type_id;
-    $ids['financialType'] = $this->financial_type_id;
-    if ($this->contribution_page_id) {
-      $ids['contributionPage'] = $this->contribution_page_id;
-    }
-
-    $this->loadRelatedEntitiesByID($ids);
-
-    if (!empty($ids['contributionRecur']) && !$paymentProcessorID) {
-      $paymentProcessorID = $this->_relatedObjects['contributionRecur']->payment_processor_id;
     }
 
     if (!empty($ids['pledge_payment'])) {
@@ -2519,6 +2520,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     $template = $this->_assignMessageVariablesToTemplate($values, $input, $returnMessageText);
+    $paymentObject = NULL;
     //what does recur 'mean here - to do with payment processor return functionality but
     // what is the importance
     if (!empty($this->contribution_recur_id) && !empty($this->_relatedObjects['paymentProcessor'])) {
