@@ -3172,6 +3172,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     if (CRM_Utils_Array::value('contribution_mode', $params) == 'membership') {
       $isRelatedId = TRUE;
+      // CRM-21645: isRelatedId means we will check the id against the civicrm_contribution table
+      // so ensure we have a proper entityID
+      $entityId = $params['contribution']->id;
     }
 
     $entityID[] = $entityId;
