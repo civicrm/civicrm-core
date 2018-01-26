@@ -238,7 +238,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         'temp.contact_id IS null',
       );
       CRM_Utils_SQL_Select::from($phone)
-        ->select(" DISTINCT $phone.id as phone_id ")
+        ->select(" DISTINCT $phone.contact_id, $phone.id as phone_id ")
         ->join($contact, " INNER JOIN $contact ON $phone.contact_id = $contact.id ")
         ->join('gc', " INNER JOIN civicrm_group_contact gc ON $contact.id = gc.contact_id ")
         ->join('mg', " INNER JOIN civicrm_mailing_group mg ON gc.group_id = mg.entity_id AND mg.entity_table = 'civicrm_group' ")
