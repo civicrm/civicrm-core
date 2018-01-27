@@ -4050,16 +4050,20 @@ WHERE  $smartGroupClause
       }
     }
 
-    $rTypeValues = $relTypes = array();
+    $rTypeValues = $relTypes = $relTypesIds = array();
     if (!empty($relationType)) {
       $relationType[2] = (array) $relationType[2];
       foreach ($relationType[2] as $relType) {
         $rel = explode('_', $relType);
         self::$_relType .= $rel[1];
         $params = array('id' => $rel[0]);
-        $relTypes[] = $rel[0];
         $typeValues = array();
-        $rTypeValues[] = CRM_Contact_BAO_RelationshipType::retrieve($params, $typeValues);
+        $rTypeValue = CRM_Contact_BAO_RelationshipType::retrieve($params, $typeValues);
+        if (!empty($rTypeValue)) {
+          $rTypeValues[] = $rTypeValue;
+          $relTypesIds[] = $rel[0];
+          $relTypes[] = $relType;
+        }
       }
     }
     if (!empty($rTypeValues)) {
@@ -4091,7 +4095,7 @@ WHERE  $smartGroupClause
     if ($nameClause || !$targetGroup) {
       if (!empty($relationType)) {
         $relQill = '';
-        foreach ($relationType[2] as $rel) {
+        foreach ($relTypes as $rel) {
           if (!empty($relQill)) {
             $relQill .= ' OR ';
           }
@@ -4131,7 +4135,7 @@ WHERE  $smartGroupClause
       }
       if (!empty($relationType)) {
         $relQill = '';
-        foreach ($relationType[2] as $rel) {
+        foreach ($relTypes as $rel) {
           if (!empty($relQill)) {
             $relQill .= ' OR ';
           }
@@ -4188,7 +4192,7 @@ civicrm_relationship.is_permission_a_b = 0
     $this->addRelationshipDateClauses($grouping, $where);
     $this->addRelationshipActivePeriodClauses($grouping, $where);
     if (!empty($relTypes)) {
-      $where[$grouping][] = 'civicrm_relationship.relationship_type_id IN (' . implode(',', $relTypes) . ')';
+      $where[$grouping][] = 'civicrm_relationship.relationship_type_id IN (' . implode(',', $relTypesIds) . ')';
     }
     $this->_tables['civicrm_relationship'] = $this->_whereTables['civicrm_relationship'] = 1;
     $this->_useDistinct = TRUE;
