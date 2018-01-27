@@ -393,6 +393,11 @@ class CRM_Contact_Task {
     if (!CRM_Utils_Array::value($value, self::$_tasks)) {
       // make it the print task by default
       $value = self::PRINT_CONTACTS;
+      // CRM-21718: If there is no print task, just choose the first one. If any.
+      if (!self::$_tasks[$value]) {
+        $value = CRM_Utils_Array::first(array_keys(self::$_tasks));
+        // FIXME: I have no clue about what will happen if there are no tasks.
+      }
     }
     return array(
       CRM_Utils_Array::value('class', self::$_tasks[$value]),
