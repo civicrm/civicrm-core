@@ -4050,17 +4050,31 @@ WHERE  $smartGroupClause
       }
     }
 
-    $rTypeValues = array();
+    $rTypeValues = $relTypes = $relTypesIds = array();
     if (!empty($relationType)) {
-      $rel = explode('_', $relationType[2]);
-      self::$_relType = $rel[1];
-      $params = array('id' => $rel[0]);
-      $rType = CRM_Contact_BAO_RelationshipType::retrieve($params, $rTypeValues);
+      $relationType[2] = (array) $relationType[2];
+      foreach ($relationType[2] as $relType) {
+        $rel = explode('_', $relType);
+        self::$_relType .= $rel[1];
+        $params = array('id' => $rel[0]);
+        $typeValues = array();
+        $rTypeValue = CRM_Contact_BAO_RelationshipType::retrieve($params, $typeValues);
+        if (!empty($rTypeValue)) {
+          $rTypeValues[] = $rTypeValue;
+          $relTypesIds[] = $rel[0];
+          $relTypes[] = $relType;
+        }
+      }
     }
-    if (!empty($rTypeValues) && $rTypeValues['name_a_b'] == $rTypeValues['name_b_a']) {
-      // if we don't know which end of the relationship we are dealing with we'll create a temp table
-      //@todo unless we are dealing with a target group
-      self::$_relType = 'reciprocal';
+    if (!empty($rTypeValues)) {
+      foreach ($rTypeValues as $rTypeValue) {
+        $rTypeValue = (array) $rTypeValue;
+        if ($rTypeValue['name_a_b'] == $rTypeValue['name_b_a']) {
+          // if we don't know which end of the relationship we are dealing with we'll create a temp table
+          //@todo unless we are dealing with a target group
+          self::$_relType = 'reciprocal';
+        }
+      }
     }
     // if we are creating a temp table we build our own where for the relationship table
     $relationshipTempTable = NULL;
@@ -4077,12 +4091,17 @@ WHERE  $smartGroupClause
         $where[$grouping][] = "( contact_b.sort_name $nameClause AND contact_b.id != contact_a.id )";
       }
     }
-
     $allRelationshipType = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE);
-
     if ($nameClause || !$targetGroup) {
       if (!empty($relationType)) {
-        $this->_qill[$grouping][] = $allRelationshipType[$relationType[2]] . " $name";
+        $relQill = '';
+        foreach ($relTypes as $rel) {
+          if (!empty($relQill)) {
+            $relQill .= ' OR ';
+          }
+          $relQill .= $allRelationshipType[$rel];
+        }
+        $this->_qill[$grouping][] = 'Relationship Type(s) ' . $relQill . " $name";
       }
       else {
         $this->_qill[$grouping][] = $name;
@@ -4115,7 +4134,14 @@ WHERE  $smartGroupClause
         }
       }
       if (!empty($relationType)) {
-        $this->_qill[$grouping][] = $allRelationshipType[$relationType[2]] . " ( " . implode(", ", $qillNames) . " )";
+        $relQill = '';
+        foreach ($relTypes as $rel) {
+          if (!empty($relQill)) {
+            $relQill .= ' OR ';
+          }
+          $relQill .= $allRelationshipType[$rel];
+        }
+        $this->_qill[$grouping][] = 'Relationship Type(s) ' . $relQill . " ( " . implode(", ", $qillNames) . " )";
       }
       else {
         $this->_qill[$grouping][] = implode(", ", $qillNames);
@@ -4165,8 +4191,8 @@ civicrm_relationship.is_permission_a_b = 0
 
     $this->addRelationshipDateClauses($grouping, $where);
     $this->addRelationshipActivePeriodClauses($grouping, $where);
-    if (!empty($relationType) && !empty($rType) && isset($rType->id)) {
-      $where[$grouping][] = 'civicrm_relationship.relationship_type_id = ' . $rType->id;
+    if (!empty($relTypes)) {
+      $where[$grouping][] = 'civicrm_relationship.relationship_type_id IN (' . implode(',', $relTypesIds) . ')';
     }
     $this->_tables['civicrm_relationship'] = $this->_whereTables['civicrm_relationship'] = 1;
     $this->_useDistinct = TRUE;
@@ -4196,7 +4222,6 @@ civicrm_relationship.is_permission_a_b = 0
       ";
       CRM_Core_DAO::executeQuery($sql);
     }
-
   }
 
   /**
