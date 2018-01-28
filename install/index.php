@@ -727,6 +727,13 @@ class InstallRequirements {
       ts("JSON support not included in PHP."),
     ));
 
+    // check for Multibyte support such as mb_substr. Required for proper handling of Multilingual setups.
+    $this->requireFunction('mb_substr', array(
+      ts("PHP Configuration"),
+      ts("Multibyte support"),
+      ts("Multibyte support not enabled in PHP."),
+    ));
+
     // Check for xcache_isset and emit warning if exists
     $this->checkXCache(array(
       ts("PHP Configuration"),
