@@ -519,6 +519,16 @@
         help: ts('If you are using this profile as a contact signup or edit form, and want to redirect the user to a static URL if they click the Cancel button - enter the complete URL here. If this field is left blank, the built-in Profile form will be redisplayed.'),
         type: 'Text'
       },
+      'cancel_button_text': {
+        title: ts('Cancel Button Text'),
+        help: ts('Text to display on the cancel button when used in create or edit mode'),
+        type: 'Text'
+      },
+      'submit_button_text': {
+        title: ts('Submit Button Text'),
+        help: ts('Text to display on the submit button when used in create or edit mode'),
+        type: 'Text'
+      },
       'created_date': {
         //title: ts(''),
         type: 'Text'// FIXME
