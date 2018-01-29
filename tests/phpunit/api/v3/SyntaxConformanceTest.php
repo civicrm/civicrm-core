@@ -271,6 +271,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $customDataEntities[] = ['UFGroup'];
     $customDataEntities[] = ['PriceSet'];
     $customDataEntities[] = ['PaymentToken'];
+    $customDataEntities[] = ['Mailing'];
     return $customDataEntities;
   }
 
