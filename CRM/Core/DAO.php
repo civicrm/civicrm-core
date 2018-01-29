@@ -610,11 +610,17 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param array $params
    *   (reference ) associative array of name/value pairs.
+   * @param bool $serializeArrays
+   *   Should arrays that are passed in be serialised according to the metadata.
+   *   Eventually this should be always true / gone, but in the interests of caution
+   *   it is being grandfathered in. In general an array is not valid on the DAO
+   *   but there may be instances where this function is called & then some handling
+   *   takes place on the would-be array.
    *
    * @return bool
    *   Did we copy all null values into the object
    */
-  public function copyValues(&$params) {
+  public function copyValues(&$params, $serializeArrays = FALSE) {
     $fields = $this->fields();
     $allNull = TRUE;
     foreach ($fields as $name => $value) {
@@ -635,6 +641,10 @@ class CRM_Core_DAO extends DB_DataObject {
       if ($exists) {
         if ($pValue === '') {
           $this->$dbName = 'null';
+        }
+        elseif ($serializeArrays && is_array($pValue) && !empty($value['serialize'])) {
+          $this->$dbName = CRM_Core_DAO::serializeField($pValue, $value['serialize']);
+          $allNull = FALSE;
         }
         else {
           $this->$dbName = $pValue;

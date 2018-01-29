@@ -1351,7 +1351,7 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
 
   CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
   $instance = new $dao_name();
-  $instance->copyValues($params);
+  $instance->copyValues($params, TRUE);
   $instance->save();
   CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
 
@@ -1535,9 +1535,6 @@ function _civicrm_api3_validate_switch_cases($fieldName, $fieldInfo, $entity, $p
       break;
 
     case CRM_Utils_Type::T_TEXT:
-      _civicrm_api3_validate_html($params, $fieldName, $fieldInfo);
-      break;
-
     case CRM_Utils_Type::T_STRING:
       _civicrm_api3_validate_string($params, $fieldName, $fieldInfo, $entity);
       break;
@@ -1607,10 +1604,6 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields) {
         break;
 
       case CRM_Utils_Type::T_TEXT:
-        //blob
-        _civicrm_api3_validate_html($params, $fieldName, $fieldInfo);
-        break;
-
       case CRM_Utils_Type::T_STRING:
         _civicrm_api3_validate_string($params, $fieldName, $fieldInfo, $entity);
         break;
@@ -2208,15 +2201,13 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
   if (!is_array($fieldValue)) {
     $fieldValue = (string) $fieldValue;
   }
-  else {
-    //@todo what do we do about passed in arrays. For many of these fields
-    // the missing piece of functionality is separating them to a separated string
-    // & many save incorrectly. But can we change them wholesale?
-  }
+
   if ($fieldValue) {
-    foreach ((array) $fieldValue as $value) {
-      if (!CRM_Utils_Rule::xssString($fieldValue)) {
-        throw new Exception('Input contains illegal SCRIPT tag.');
+    foreach ((array) $fieldValue as $key => $value) {
+      foreach ([$fieldValue, $key, $value] as $input) {
+        if (!CRM_Utils_Rule::xssString($input)) {
+          throw new Exception('Input contains illegal SCRIPT tag.');
+        }
       }
       if ($fieldName == 'currency') {
         //When using IN operator $fieldValue is a array of currency codes
