@@ -101,6 +101,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $refreshURL .= "&civicrmDestination=$destination";
     }
 
+    $this->refreshURL = $refreshURL;
     $this->assign('refreshURL', $refreshURL);
 
     $this->assign('is_recur', $this->_ppDAO->is_recur);
@@ -385,7 +386,17 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
     $this->updatePaymentProcessor($values, $domainID, FALSE);
     $this->updatePaymentProcessor($values, $domainID, TRUE);
-    CRM_Core_Session::setStatus(ts('Payment processor %1 has been saved.', array(1 => "<em>{$values['name']}</em>")), ts('Saved'), 'success');
+
+    $processor = civicrm_api3('payment_processor', 'getsingle', array('name' => $values['name'], 'is_test' => 0));
+    $errors = Civi\Payment\System::singleton()->checkProcessorConfig($processor);
+    if ($errors) {
+      CRM_Core_Session::setStatus($errors, 'Payment processor configuration invalid', 'error');
+      Civi::log()->error('Payment processor configuration invalid: ' . $errors);
+      CRM_Core_Session::singleton()->pushUserContext($this->refreshURL);
+    }
+    else {
+      CRM_Core_Session::setStatus(ts('Payment processor %1 has been saved.', array(1 => "<em>{$values['name']}</em>")), ts('Saved'), 'success');
+    }
   }
 
   /**
