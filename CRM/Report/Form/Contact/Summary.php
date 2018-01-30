@@ -45,7 +45,7 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
     'Organization',
   );
 
-  public $_drilldownReport = array('contact/summary' => 'Link to Summary Report');
+  public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
 
   /**
    * This report has not been optimised for group filtering.
@@ -194,7 +194,7 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
                       {$this->_aliases['civicrm_address']}.is_primary = 1 ) ";
 
     $this->addPhoneFromClause();
-    $this->addEmailFromClause()
+    $this->addEmailFromClause();
 
     if ($this->isTableSelected('civicrm_country')) {
       $this->_from .= "
