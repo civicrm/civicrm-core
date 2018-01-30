@@ -442,6 +442,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['campaign_id'] = $this->_pledgeValues['campaign_id'];
     }
 
+    $defaults['from_email_address'] = key(CRM_Core_OptionGroup::values('from_email_address', TRUE, FALSE, FALSE, ' AND is_default = 1'));
     $this->_defaults = $defaults;
     return $defaults;
   }
