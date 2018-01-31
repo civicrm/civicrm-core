@@ -242,7 +242,6 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
                         LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                     ON ({$this->_aliases['civicrm_grant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  ) ";
 
-
     $this->addAddressFromClause();
     $this->addCountryFromClause();
     if ($this->_addressField) {
