@@ -4321,6 +4321,19 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
+   * Add Country into From Table if required.
+   */
+  public function addCountryFromClause() {
+    // include country field if country column is to be included
+    if ($this->isTableSelected('civicrm_country')) {
+      $this->_from .= "
+            LEFT JOIN civicrm_country {$this->_aliases['civicrm_country']}
+                   ON {$this->_aliases['civicrm_address']}.country_id = {$this->_aliases['civicrm_country']}.id AND
+                      {$this->_aliases['civicrm_address']}.is_primary = 1 ";
+    }
+  }
+
+  /**
    * Add Phone into From Table if required.
    */
   public function addPhoneFromClause() {

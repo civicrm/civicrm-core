@@ -195,13 +195,7 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
 
     $this->addPhoneFromClause();
     $this->addEmailFromClause();
-
-    if ($this->isTableSelected('civicrm_country')) {
-      $this->_from .= "
-            LEFT JOIN civicrm_country {$this->_aliases['civicrm_country']}
-                   ON {$this->_aliases['civicrm_address']}.country_id = {$this->_aliases['civicrm_country']}.id AND
-                      {$this->_aliases['civicrm_address']}.is_primary = 1 ";
-    }
+    $this->addCountryFromClause();
   }
 
   public function postProcess() {
