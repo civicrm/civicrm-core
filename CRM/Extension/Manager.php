@@ -444,6 +444,7 @@ class CRM_Extension_Manager {
           $this->statuses[$dao->full_name] = $codeExists ? self::STATUS_DISABLED : self::STATUS_DISABLED_MISSING;
         }
       }
+      $dao->free();
     }
     return $this->statuses;
   }
