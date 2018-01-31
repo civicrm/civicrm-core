@@ -660,7 +660,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         }
 
         $updateDAO = CRM_Core_DAO::cascadeUpdate($daoName, $obj->id, $entityID, $skipData);
-        CRM_Core_DAO::freeResult();
       }
       else {
         CRM_Core_Error::fatal("DAO Mapper missing for $entityTable.");
