@@ -575,9 +575,7 @@ class CRM_Core_I18n {
    *   True if CiviCRM is in multilingual mode.
    */
   public static function isMultilingual() {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    return (bool) $domain->locales;
+    return (bool) CRM_Core_DAO::singleValueQuery("SELECT locales FROM civicrm_domain");
   }
 
   /**
