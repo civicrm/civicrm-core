@@ -1022,10 +1022,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       CRM_Utils_Hook::post('delete', $contactType, $contact->id, $contact);
     }
 
-    // also reset the DB_DO global array so we can reuse the memory
-    // http://issues.civicrm.org/jira/browse/CRM-4387
-    CRM_Core_DAO::freeResult();
-
     return TRUE;
   }
 
