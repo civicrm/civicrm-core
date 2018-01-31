@@ -4375,7 +4375,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   public function addEmailFromClause($prefix = '', $extra = array()) {
     // include email field if email column is to be included
-    if ($this->isTableSelected($prefix .'civicrm_email')) {
+    if ($this->isTableSelected($prefix . 'civicrm_email')) {
       $this->_from .= "
             LEFT JOIN  civicrm_email {$this->_aliases[$prefix . 'civicrm_email']}
                    ON ({$this->_aliases[$prefix . 'civicrm_contact']}.id = {$this->_aliases[$prefix . 'civicrm_email']}.contact_id AND
