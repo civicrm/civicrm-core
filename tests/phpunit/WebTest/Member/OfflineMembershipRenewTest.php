@@ -152,7 +152,7 @@ class WebTest_Member_OfflineMembershipRenewTest extends CiviSeleniumTestCase {
     // Let End Date be auto computed
 
     // fill in Status Override?
-    $this->click('is_override', 'value=1');
+    $this->select('status_override_type', "value=" . CRM_Member_StatusOverrideTypes::PERMANENT);
     $this->waitForElementPresent('status_id');
     $this->select('status_id', 'value=3');
 

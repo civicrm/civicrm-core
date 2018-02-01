@@ -171,6 +171,20 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       CRM_Contact_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
     }
 
+    if (!empty($params['status_override_type'])) {
+      if (CRM_Member_StatusOverrideTypes::isOverridden($params['status_override_type']) && empty($params['status_id'])) {
+        $errorMessage = 'Membership Status is required when Status override is set.';
+        CRM_Contact_Import_Parser_Contact::addToErrorMsg('Status Override Type', $errorMessage);
+      }
+
+      if (CRM_Member_StatusOverrideTypes::isUntilDate($params['status_override_type'])) {
+        if (empty($params['status_override_end_date'])) {
+          $errorMessage = 'Membership override end date is not set.';
+          CRM_Contact_Import_Parser_Contact::addToErrorMsg('Status Override End Date', $errorMessage);
+        }
+      }
+    }
+
     //for date-Formats
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get('dateTypes');
@@ -211,6 +225,17 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             }
             break;
 
+          case 'status_override_end_date':
+            if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
+              if (!CRM_Utils_Rule::date($params[$key])) {
+                CRM_Contact_Import_Parser_Contact::addToErrorMsg('Status Override End Date', $errorMessage);
+              }
+            }
+            else {
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Status Override End Date', $errorMessage);
+            }
+            break;
+
           case 'membership_type_id':
             $membershipTypes = CRM_Member_PseudoConstant::membershipType();
             if (!CRM_Utils_Array::crmInArray($val, $membershipTypes) &&
@@ -223,6 +248,12 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           case 'status_id':
             if (!CRM_Utils_Array::crmInArray($val, CRM_Member_PseudoConstant::membershipStatus())) {
               CRM_Contact_Import_Parser_Contact::addToErrorMsg('Membership Status', $errorMessage);
+            }
+            break;
+
+          case 'status_override_type':
+            if (!in_array($val, CRM_Member_StatusOverrideTypes::getList())) {
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Status Override Type', $errorMessage);
             }
             break;
 
@@ -318,10 +349,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
                 $params['membership_status'] = $val;
               }
               break;
-
-            case 'is_override':
-              $params[$key] = CRM_Utils_String::strtobool($val);
-              break;
           }
           if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
             if ($customFields[$customFieldID]['data_type'] == 'Date') {
@@ -364,10 +391,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       else {
         //fix for CRM-2219 Update Membership
         // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
-        if (!empty($formatted['is_override']) && empty($formatted['status_id'])) {
-          array_unshift($values, 'Required parameter missing: Status');
-          return CRM_Import_Parser::ERROR;
-        }
 
         if (!empty($formatValues['membership_id'])) {
           $dao = new CRM_Member_BAO_Membership();
@@ -415,6 +438,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       $endDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('end_date', $formatted), '%Y-%m-%d');
       $joinDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('join_date', $formatted), '%Y-%m-%d');
 
+      $noStatusOverride = empty($formatted['status_override_type']) || CRM_Member_StatusOverrideTypes::isNo($formatted['status_override_type']);
       if ($this->_contactIdIndex < 0) {
         $error = $this->checkContactDuplicate($formatValues);
 
@@ -439,7 +463,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             //fix for CRM-3570, exclude the statuses those having is_admin = 1
             //now user can import is_admin if is override is true.
             $excludeIsAdmin = FALSE;
-            if (empty($formatted['is_override'])) {
+            if ($noStatusOverride) {
               $formatted['exclude_is_admin'] = $excludeIsAdmin = TRUE;
             }
             $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
@@ -454,7 +478,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             if (empty($formatted['status_id'])) {
               $formatted['status_id'] = $calcStatus['id'];
             }
-            elseif (empty($formatted['is_override'])) {
+            elseif ($noStatusOverride) {
               if (empty($calcStatus)) {
                 array_unshift($values, 'Status in import row (' . $formatValues['status_id'] . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.');
                 return CRM_Import_Parser::ERROR;
@@ -529,7 +553,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         //fix for CRM-3570, exclude the statuses those having is_admin = 1
         //now user can import is_admin if is override is true.
         $excludeIsAdmin = FALSE;
-        if (empty($formatted['is_override'])) {
+        if ($noStatusOverride) {
           $formatted['exclude_is_admin'] = $excludeIsAdmin = TRUE;
         }
         $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
@@ -543,7 +567,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         if (empty($formatted['status_id'])) {
           $formatted['status_id'] = CRM_Utils_Array::value('id', $calcStatus);
         }
-        elseif (empty($formatted['is_override'])) {
+        elseif ($noStatusOverride) {
           if (empty($calcStatus)) {
             array_unshift($values, 'Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.');
             return CRM_Import_Parser::ERROR;

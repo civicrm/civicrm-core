@@ -79,7 +79,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array();
@@ -91,7 +91,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     // Now call create() to modify an existing Membership
 
-    $params = array();
     $params = array(
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
@@ -99,7 +98,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array(
@@ -134,7 +133,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => date('Ymd'),
       'end_date' => date('Ymd', $year_from_now),
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
 
@@ -152,7 +151,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', $last_month),
       'end_date' => date('Ymd', $year_from_last_month),
       'source' => 'Source123',
-      'is_override' => 0,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::NO,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array();
@@ -185,7 +184,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array();
@@ -213,7 +212,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array();
@@ -235,7 +234,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'PaySource',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array();
@@ -273,7 +272,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array();
@@ -300,7 +299,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array();
@@ -333,7 +332,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array();
@@ -363,7 +362,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array();
@@ -394,7 +393,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array();
@@ -425,7 +424,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => '2006-01-21',
       'end_date' => '2006-12-21',
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
 
@@ -450,7 +449,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array();
@@ -481,7 +480,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'start_date' => $startDate,
       'end_date' => $endDate,
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array();

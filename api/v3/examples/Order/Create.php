@@ -35,7 +35,7 @@ function order_create_example() {
           'start_date' => '2006-01-21',
           'end_date' => '2006-12-21',
           'source' => 'Payment',
-          'is_override' => 1,
+          'status_override_type' => 1,
           'status_id' => 1,
         ),
       ),

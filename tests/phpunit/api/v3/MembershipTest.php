@@ -78,7 +78,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '2009-01-21',
       'end_date' => '2009-12-21',
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
   }
@@ -235,7 +235,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($result['start_date'], '2009-01-21', "In line " . __LINE__);
     $this->assertEquals($result['end_date'], '2009-12-21', "In line " . __LINE__);
     $this->assertEquals($result['source'], 'Payment', "In line " . __LINE__);
-    $this->assertEquals($result['is_override'], 1, "In line " . __LINE__);
+    $this->assertEquals($result['status_override_type'], CRM_Member_StatusOverrideTypes::PERMANENT, "In line " . __LINE__);
   }
 
   /**
@@ -307,7 +307,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($result['start_date'], '2009-01-21');
     $this->assertEquals($result['end_date'], '2009-12-21');
     $this->assertEquals($result['source'], 'Payment');
-    $this->assertEquals($result['is_override'], 1);
+    $this->assertEquals($result['status_override_type'], CRM_Member_StatusOverrideTypes::PERMANENT);
     $this->assertEquals($result['id'], $membership['id']);
   }
 
@@ -385,7 +385,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($result['start_date'], '2009-01-21');
     $this->assertEquals($result['end_date'], '2009-12-21');
     $this->assertEquals($result['source'], 'Payment');
-    $this->assertEquals($result['is_override'], 1);
+    $this->assertEquals($result['status_override_type'], CRM_Member_StatusOverrideTypes::PERMANENT);
   }
 
 
@@ -493,7 +493,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '2009-01-21',
       'end_date' => '2009-12-21',
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
     $membershipID = $this->contactMembershipCreate($params);
@@ -724,7 +724,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '2006-01-21',
       'end_date' => '2006-12-21',
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
 
@@ -746,7 +746,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '2006-01-21',
       'end_date' => '2006-12-21',
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
 
@@ -841,7 +841,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '2006-01-21',
       'end_date' => '2006-12-21',
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
 
@@ -880,7 +880,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '2006-01-21',
       'end_date' => '2006-12-21',
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
 
@@ -904,7 +904,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
       'membership_type_id' => $this->_membershipTypeID,
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
 
@@ -926,7 +926,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => $membershipID,
       'source' => 'not much here',
       'contact_id' => $this->_contactID,
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
 
@@ -1032,7 +1032,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '2010-01-21',
       'end_date' => '2008-12-21',
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
 
@@ -1061,7 +1061,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '2010-01-21',
       'end_date' => '2008-12-21',
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
 
@@ -1085,7 +1085,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '2010-01-21',
       'end_date' => '2008-12-21',
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
 
@@ -1109,7 +1109,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '2010-01-21',
       'end_date' => '2008-12-21',
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
 
@@ -1120,7 +1120,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * Test that if membership join date is not set it defaults to today.
    */
   public function testEmptyJoinDate() {
-    unset($this->_params['join_date'], $this->_params['is_override']);
+    unset($this->_params['join_date'], $this->_params['status_override_type']);
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $result = $this->callAPISuccess($this->_entity, 'getsingle', array('id' => $result['id']));
     $this->assertEquals(date('Y-m-d', strtotime('now')), $result['join_date']);
@@ -1133,7 +1133,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    *  - fixed
    */
   public function testEmptyStartDateFixed() {
-    unset($this->_params['start_date'], $this->_params['is_override']);
+    unset($this->_params['start_date'], $this->_params['status_override_type']);
     $this->_params['membership_type_id'] = $this->_membershipTypeID2;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $result = $this->callAPISuccess($this->_entity, 'getsingle', array('id' => $result['id']));
@@ -1147,7 +1147,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    *  - fixed
    */
   public function testEmptyStartEndDateFixedOneYear() {
-    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+    unset($this->_params['start_date'], $this->_params['status_override_type'], $this->_params['end_date']);
     $this->callAPISuccess('membership_type', 'create', array('id' => $this->_membershipTypeID2, 'duration_interval' => 1));
     $this->_params['membership_type_id'] = $this->_membershipTypeID2;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
@@ -1161,7 +1161,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * Test that if membership start date is not set it defaults to correct end date for fixed multi year memberships.
    */
   public function testEmptyStartEndDateFixedMultiYear() {
-    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+    unset($this->_params['start_date'], $this->_params['status_override_type'], $this->_params['end_date']);
     $this->callAPISuccess('membership_type', 'create', array('id' => $this->_membershipTypeID2, 'duration_interval' => 5));
     $this->_params['membership_type_id'] = $this->_membershipTypeID2;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
@@ -1241,7 +1241,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * and we add on 4 years rather than 5 because we are not after the rollover day - so we calculate 31 Dec 2019
    */
   public function testFixedMultiYearDateSetTwoEmptyStartEndDate() {
-    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+    unset($this->_params['start_date'], $this->_params['status_override_type'], $this->_params['end_date']);
 
     $this->callAPISuccess('membership_type', 'create', array(
       'id' => $this->_membershipTypeID2,
@@ -1270,7 +1270,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * and we add on 4 years rather than 5 because we are not after the rollover day - so we calculate 31 Dec 2019
    */
   public function testFixedMultiYearDateSetTwoEmptyEndDate() {
-    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+    unset($this->_params['start_date'], $this->_params['status_override_type'], $this->_params['end_date']);
 
     $this->callAPISuccess('membership_type', 'create', array(
       'id' => $this->_membershipTypeID2,
@@ -1302,7 +1302,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * and we add on <1 years rather than > 1 because we are not after the rollover day - so we calculate 31 Dec 2015
    */
   public function testFixedSingleYearDateSetTwoEmptyStartEndDate() {
-    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+    unset($this->_params['start_date'], $this->_params['status_override_type'], $this->_params['end_date']);
 
     $this->callAPISuccess('membership_type', 'create', array(
       'id' => $this->_membershipTypeID2,
@@ -1331,7 +1331,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * and we add on <1 years rather than > 1 because we are not after the rollover day - so we calculate 31 Dec 2015
    */
   public function testFixedSingleYearDateSetTwoEmptyEndDate() {
-    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+    unset($this->_params['start_date'], $this->_params['status_override_type'], $this->_params['end_date']);
 
     $this->callAPISuccess('membership_type', 'create', array(
       'id' => $this->_membershipTypeID2,
@@ -1361,7 +1361,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * and we add on 1 year we are after the rollover day - so we calculate 31 Oct 2016
    */
   public function testFixedSingleYearDateSetThreeEmptyEndDate() {
-    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+    unset($this->_params['start_date'], $this->_params['status_override_type'], $this->_params['end_date']);
 
     $this->callAPISuccess('membership_type', 'create', array(
       'id' => $this->_membershipTypeID2,
@@ -1393,7 +1393,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * and we add on 1 year we are after the rollover day - so we calculate 31 Oct 2016
    */
   public function testFixedSingleYearDateSetThreeEmptyStartEndDate() {
-    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+    unset($this->_params['start_date'], $this->_params['status_override_type'], $this->_params['end_date']);
 
     $this->callAPISuccess('membership_type', 'create', array(
       'id' => $this->_membershipTypeID2,
@@ -1422,7 +1422,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * and we add on 5 years we are after the rollover day - so we calculate 31 Oct 2020
    */
   public function testFixedMultiYearDateSetThreeEmptyEndDate() {
-    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+    unset($this->_params['start_date'], $this->_params['status_override_type'], $this->_params['end_date']);
 
     $this->callAPISuccess('membership_type', 'create', array(
       'id' => $this->_membershipTypeID2,
@@ -1455,7 +1455,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * and we add on 5 years we are after the rollover day - so we calculate 31 Oct 2020
    */
   public function testFixedMultiYearDateSetThreeEmptyStartEndDate() {
-    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+    unset($this->_params['start_date'], $this->_params['status_override_type'], $this->_params['end_date']);
 
     $this->callAPISuccess('membership_type', 'create', array(
       'id' => $this->_membershipTypeID2,
@@ -1480,7 +1480,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * Test that if membership start date is not set it defaults to correct end date for fixed single year memberships.
    */
   public function testEmptyStartDateRolling() {
-    unset($this->_params['start_date'], $this->_params['is_override']);
+    unset($this->_params['start_date'], $this->_params['status_override_type']);
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $result = $this->callAPISuccess($this->_entity, 'getsingle', array('id' => $result['id']));
     $this->assertEquals('2009-01-21', $result['join_date']);
@@ -1493,7 +1493,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    *  - rolling
    */
   public function testEmptyEndDateFixed() {
-    unset($this->_params['start_date'], $this->_params['is_override'], $this->_params['end_date']);
+    unset($this->_params['start_date'], $this->_params['status_override_type'], $this->_params['end_date']);
     $this->_params['membership_type_id'] = $this->_membershipTypeID2;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $result = $this->callAPISuccess($this->_entity, 'getsingle', array('id' => $result['id']));
@@ -1507,7 +1507,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    *  - rolling
    */
   public function testEmptyEndDateRolling() {
-    unset($this->_params['is_override'], $this->_params['end_date']);
+    unset($this->_params['status_override_type'], $this->_params['end_date']);
     $this->_params['membership_type_id'] = $this->_membershipTypeID;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $result = $this->callAPISuccess($this->_entity, 'getsingle', array('id' => $result['id']));

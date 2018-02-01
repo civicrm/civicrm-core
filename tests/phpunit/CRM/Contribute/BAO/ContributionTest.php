@@ -962,7 +962,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
         'start_date' => '2006-01-21',
         'end_date' => '2006-12-21',
         'source' => 'Payment',
-        'is_override' => 1,
+        'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
         'status_id' => 1,
       ),
     );

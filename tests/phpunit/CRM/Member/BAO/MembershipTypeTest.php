@@ -321,7 +321,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'start_date' => '20060121000000',
       'end_date' => '20070120000000',
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
     $ids = array();

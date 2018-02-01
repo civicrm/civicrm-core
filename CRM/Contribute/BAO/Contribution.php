@@ -1765,7 +1765,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             );
 
             $membership->status_id = $newStatus;
-            $membership->is_override = TRUE;
+            $membership->status_override_type = CRM_Member_StatusOverrideTypes::PERMANENT;
             $membership->save();
             civicrm_api3('activity', 'create', $activityParam);
 
@@ -1813,7 +1813,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
           }
           if ($membership && $update) {
             $membership->status_id = array_search('Expired', $membershipStatuses);
-            $membership->is_override = TRUE;
+            $membership->status_override_type = CRM_Member_StatusOverrideTypes::PERMANENT;
             $membership->save();
 
             $updateResult['updatedComponents']['CiviMember'] = $membership->status_id;
@@ -5472,8 +5472,8 @@ LIMIT 1;";
           unset($dates['end_date']);
           $membershipParams['status_id'] = CRM_Utils_Array::value('id', $calcStatus, 'New');
           //we might be renewing membership,
-          //so make status override false.
-          $membershipParams['is_override'] = FALSE;
+          //so disable status override.
+          $membershipParams['status_override_type'] = CRM_Member_StatusOverrideTypes::NO;
         }
         //CRM-17723 - reset static $relatedContactIds array()
         // @todo move it to Civi Statics.

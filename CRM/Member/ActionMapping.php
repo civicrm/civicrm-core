@@ -104,7 +104,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
       $query->where("e.membership_type_id IS NULL");
     }
 
-    $query->where("( e.is_override IS NULL OR e.is_override = 0 )");
+    $query->where("e.status_override_type = " . CRM_Member_StatusOverrideTypes::NO);
     $query->merge($this->prepareMembershipPermissionsFilter());
     $query->where("e.status_id IN (#memberStatus)")
       ->param('memberStatus', \CRM_Member_PseudoConstant::membershipStatus(NULL, "(is_current_member = 1 OR name = 'Expired')", 'id'));

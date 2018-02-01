@@ -484,7 +484,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('start_date');
 
     // fill in Status Override?
-    $this->click("is_override");
+    $this->select('status_override_type', "value=" . CRM_Member_StatusOverrideTypes::PERMANENT);
     $this->waitForElementPresent("status_id");
     $this->select("status_id", "label=Grace");
 

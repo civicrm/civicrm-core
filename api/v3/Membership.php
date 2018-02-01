@@ -92,8 +92,15 @@ function civicrm_api3_membership_create($params) {
   }
   else {
     // also check for status id if override is set (during add/update)
-    if (!empty($params['is_override']) && empty($params['status_id'])) {
+    $isOverriden = !empty($params['status_override_type']) && CRM_Member_StatusOverrideTypes::isOverridden($params['status_override_type']);
+    if ($isOverriden && empty($params['status_id'])) {
       return civicrm_api3_create_error('Status ID required');
+    }
+
+    // If override type is 'Until Date' then ensure the 'Until Date' is provided
+    $isUntilDate= !empty($params['status_override_type']) && CRM_Member_StatusOverrideTypes::isUntilDate($params['status_override_type']);
+    if ($isUntilDate && empty($params['status_override_end_date'])) {
+      return civicrm_api3_create_error('Status Override End Date is required');
     }
   }
 

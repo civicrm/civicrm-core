@@ -155,16 +155,29 @@
     <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>
-    <name>is_override</name>
+    <name>status_override_type</name>
     <title>Status Override</title>
     <import>true</import>
     <headerPattern>/override$/i</headerPattern>
-    <type>boolean</type>
-    <comment>Admin users may set a manual status which overrides the calculated status. When this flag is true, automated status update scripts should NOT modify status for the record.</comment>
+    <type>int</type>
+    <default>0</default>
+    <comment>Admin users may set a manual status which overrides the calculated status. When not set to 'No', automated status update scripts should NOT modify status for the record.</comment>
     <html>
-      <type>CheckBox</type>
+      <type>Select</type>
     </html>
-    <add>1.5</add>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>status_override_end_date</name>
+    <title>Status Override End Date</title>
+    <type>date</type>
+    <default>NULL</default>
+    <import>true</import>
+    <comment>Then end date of membership status override if 'Override until selected date' overide type is selected.</comment>
+    <add>4.7</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>owner_membership_id</name>
