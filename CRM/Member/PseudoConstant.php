@@ -81,6 +81,28 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
+   *  Bug Fix: CRM-21356 Membership Status is not updated after disabling a membership type
+   */
+  public static function allMembershipType($id = NULL, $force = TRUE) {
+    if (!self::$membershipType || $force) {
+      CRM_Core_PseudoConstant::populate(self::$membershipType,
+        'CRM_Member_DAO_MembershipType',
+        TRUE, 'name', 'is_active', NULL, 'weight', 'id', TRUE
+      );
+    }
+    if ($id) {
+      if (array_key_exists($id, self::$membershipType)) {
+        return self::$membershipType[$id];
+      }
+      else {
+        $result = NULL;
+        return $result;
+      }
+    }
+    return self::$membershipType;
+  }
+
+  /**
    * Get all the membership statuss.
    *
    *
@@ -107,6 +129,36 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
       CRM_Core_PseudoConstant::populate(self::$membershipStatus[$cacheKey],
         'CRM_Member_DAO_MembershipStatus',
         $allStatus, $column, 'is_active', $cond, 'weight'
+      );
+    }
+
+    $value = NULL;
+    if ($id) {
+      $value = CRM_Utils_Array::value($id, self::$membershipStatus[$cacheKey]);
+    }
+    else {
+      $value = self::$membershipStatus[$cacheKey];
+    }
+
+    return $value;
+  }
+
+  /**
+   *  Bug Fix: CRM-21356 Membership Status is not updated after disabling a membership type
+   */
+  public static function &allMembershipStatus($id = NULL, $cond = NULL, $column = 'name', $force = FALSE, $allStatus = FALSE) {
+    if (self::$membershipStatus === NULL) {
+      self::$membershipStatus = array();
+    }
+
+    $cacheKey = $column;
+    if ($cond) {
+      $cacheKey .= "_{$cond}";
+    }
+    if (!isset(self::$membershipStatus[$cacheKey]) || $force) {
+      CRM_Core_PseudoConstant::populate(self::$membershipStatus[$cacheKey],
+        'CRM_Member_DAO_MembershipStatus',
+        TRUE, $column, 'is_active', $cond, 'weight'
       );
     }
 
