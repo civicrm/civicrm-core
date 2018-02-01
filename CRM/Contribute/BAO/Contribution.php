@@ -5688,15 +5688,17 @@ LIMIT 1;";
    * Create tax entry in civicrm_entity_financial_trxn table.
    *
    * @param array $entityParams
-   *
    * @param array $eftParams
    *
    */
   public static function createProportionalEntry($entityParams, $eftParams) {
-    $paid = $entityParams['line_item_amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
-    // Record Entity Financial Trxn; CRM-20145
-    $eftParams['amount'] = CRM_Contribute_BAO_Contribution_Utils::formatAmount($paid);
-    civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
+    $contributionTotalAmount = (float) $entityParams['contribution_total_amount'];
+    if (!empty($contributionTotalAmount)) {
+      $paid = $entityParams['line_item_amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
+      // Record Entity Financial Trxn; CRM-20145
+      $eftParams['amount'] = CRM_Contribute_BAO_Contribution_Utils::formatAmount($paid);
+      civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
+    }
   }
 
   /**
