@@ -102,7 +102,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    * Test IPN response updates contribution_recur & contribution for first & second contribution.
    */
   public function testIPNPaymentMembershipRecurSuccess() {
-    $this->setupMembershipRecurringPaymentProcessorTransaction();
+    $this->setupMembershipRecurringPaymentProcessorTransaction(array('duration_unit' => 'year', 'frequency_unit' => 'year'));
     $this->callAPISuccessGetSingle('membership_payment', array());
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurTransaction());
     $paypalIPN->main();

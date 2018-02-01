@@ -3202,9 +3202,19 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * We don't have a good way to set up a recurring contribution with a membership so let's just do one then alter it
+   *
+   * @param array $params Optionally modify params for membership/recur (duration_unit/frequency_unit)
    */
-  public function setupMembershipRecurringPaymentProcessorTransaction() {
-    $this->ids['membership_type'] = $this->membershipTypeCreate();
+  public function setupMembershipRecurringPaymentProcessorTransaction($params = array()) {
+    $membershipParams = $recurParams = array();
+    if (!empty($params['duration_unit'])) {
+      $membershipParams['duration_unit'] = $params['duration_unit'];
+    }
+    if (!empty($params['frequency_unit'])) {
+      $recurParams['frequency_unit'] = $params['frequency_unit'];
+    }
+
+    $this->ids['membership_type'] = $this->membershipTypeCreate($membershipParams);
     //create a contribution so our membership & contribution don't both have id = 1
     if ($this->callAPISuccess('Contribution', 'getcount', array()) == 0) {
       $this->contributionCreate(array(
@@ -3215,7 +3225,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'trxn_id' => 345,
       ));
     }
-    $this->setupRecurringPaymentProcessorTransaction();
+    $this->setupRecurringPaymentProcessorTransaction($recurParams);
 
     $this->ids['membership'] = $this->callAPISuccess('membership', 'create', array(
       'contact_id' => $this->_contactID,
