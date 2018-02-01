@@ -596,13 +596,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->add('select', 'status_id', ts('Membership Status'),
         array('' => ts('- select -')) + CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label')
       );
-      $statusOverride = $this->addElement('checkbox', 'is_override',
-        ts('Status Override?'), NULL,
-        array('onClick' => 'showHideMemberStatus()')
+
+      $this->add('select', 'status_override_type', ts('Status Override?'),
+        CRM_Member_StatusOverrideTypes::getSelectOptions()
       );
-      if ($statusOverride) {
-        $elements[] = $statusOverride;
-      }
+
+      $this->add('datepicker', 'status_override_end_date', ts('Status Override End Date'), '', FALSE, array('minDate' => time(), 'time' => FALSE));
 
       $this->addElement('checkbox', 'record_contribution', ts('Record Membership Payment?'));
 
@@ -821,9 +820,13 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             foreach ($tmp_statuses as $cur_stat) {
               $status_ids[] = $cur_stat['id'];
             }
+
             if (empty($params['status_id']) || in_array($params['status_id'], $status_ids) == FALSE) {
               $errors['status_id'] = ts('Please enter a status that does NOT represent a current membership status.');
-              $errors['is_override'] = ts('This must be checked because you set an End Date for a lifetime membership');
+            }
+
+            if (!CRM_Member_StatusOverrideTypes::isPermanent($params['status_override_type'])) {
+              $errors['status_override_type'] = ts('Because you set an End Date for a lifetime membership, This must be set to "Override Permanently"');
             }
           }
           else {
@@ -855,7 +858,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
 
         //CRM-3724, check for availability of valid membership status.
-        if (empty($params['is_override']) && !isset($errors['_qf_default'])) {
+        if (CRM_Member_StatusOverrideTypes::isNo($params['status_override_type']) && !isset($errors['_qf_default'])) {
           $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
             $endDate,
             $joinDate,
@@ -869,7 +872,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             $errors['_qf_default'] = ts('There is no valid Membership Status available for selected membership dates.');
             $status = ts('Oops, it looks like there is no valid membership status available for the given membership dates. You can <a href="%1">Configure Membership Status Rules</a>.', array(1 => $url));
             if (!$self->_mode) {
-              $status .= ' ' . ts('OR You can sign up by setting Status Override? to true.');
+              $status .= ' ' . ts('OR You can sign up by setting Status Override? to something other than "NO".');
             }
             CRM_Core_Session::setStatus($status, ts('Membership Status Error'), 'error');
           }
@@ -880,10 +883,20 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $errors['join_date'] = ts('Please enter the Member Since.');
     }
 
-    if (isset($params['is_override']) &&
-      $params['is_override'] && empty($params['status_id'])
-    ) {
-      $errors['status_id'] = ts('Please enter the status.');
+    if (CRM_Member_StatusOverrideTypes::isOverridden($params['status_override_type']) && empty($params['status_id'])) {
+      $errors['status_id'] = ts('Please enter the Membership status.');
+    }
+
+    if (CRM_Member_StatusOverrideTypes::isUntilDate($params['status_override_type'])) {
+      if (!empty($params['status_override_end_date'])) {
+        $overrideEndDate = CRM_Utils_Date::processDate($params['status_override_type']);
+        if (!$overrideEndDate) {
+          $errors['status_override_end_date'] = ts('Please enter a valid Membership override end date.');
+        }
+      }
+      else {
+        $errors['status_override_end_date'] = ts('Please enter the Membership override end date.');
+      }
     }
 
     //total amount condition arise when membership type having no
@@ -1180,7 +1193,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $fields = array(
       'status_id',
       'source',
-      'is_override',
+      'status_override_type',
+      'status_override_end_date',
       'campaign_id',
     );
 
@@ -1189,9 +1203,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     // fix for CRM-3724
-    // when is_override false ignore is_admin statuses during membership
+    // when status_override_type is 'No' ignore is_admin statuses during membership
     // status calculation. similarly we did fix for import in CRM-3570.
-    if (empty($params['is_override'])) {
+    if (CRM_Member_StatusOverrideTypes::isNo($params['status_override_type'])) {
       $params['exclude_is_admin'] = TRUE;
     }
 
@@ -1286,7 +1300,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
 
-      if (empty($params['is_override']) &&
+      if (CRM_Member_StatusOverrideTypes::isNo($params['status_override_type']) &&
         CRM_Utils_Array::value('contribution_status_id', $params) != array_search('Completed', $allContributionStatus)
       ) {
         $params['status_id'] = array_search('Pending', $allMemberStatus);

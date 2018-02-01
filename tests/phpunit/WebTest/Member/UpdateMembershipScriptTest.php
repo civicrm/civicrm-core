@@ -59,7 +59,8 @@ class WebTest_Member_UpdateMembershipScriptTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('join_date', "1 March 2008");
 
     // Override status
-    $this->check('is_override');
+    $this->select('status_override_type', "value=" . CRM_Member_StatusOverrideTypes::PERMANENT);
+    $this->waitForElementPresent("status_id");
     $this->select('status_id', "label=Current");
 
     // Clicking save.

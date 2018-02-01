@@ -274,7 +274,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $params = array(
       'join_date' => date('m/d/Y', $unixNow),
       'membership_type_id' => array('23', '25'),
-      'is_override' => TRUE,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
     );
     $files = array();
     $obj = new CRM_Member_Form_Membership();
@@ -1240,7 +1240,7 @@ Expires: ',
     $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
 
     //Assert membership status overrides when the contribution cancelled.
-    $this->assertEquals($membership['is_override'], TRUE);
+    $this->assertEquals($membership['status_override_type'], CRM_Member_StatusOverrideTypes::PERMANENT);
     $this->assertEquals($membership['status_id'], $this->callAPISuccessGetValue('MembershipStatus', array(
       'return' => "id",
       'name' => "Cancelled",

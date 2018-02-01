@@ -89,7 +89,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
       'start_date' => '2006-01-21',
       'end_date' => '2006-12-21',
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
 
@@ -125,7 +125,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
     );
 

@@ -974,7 +974,8 @@ SELECT  id
         'membership_id',
         'membership_type_id',
         'member_is_test',
-        'is_override',
+        'status_override_type',
+        'status_override_end_date',
         'status_id',
         'member_is_pay_later'
       );

@@ -56,7 +56,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'join_date' => '20120315',
       'start_date' => '20120315',
       'end_date' => '20120615',
-      'is_override' => 0,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::NO,
     );
 
     $this->fixtures['rolling_membership_past'] = array(
@@ -69,7 +69,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'join_date' => '20100310',
       'start_date' => '20100310',
       'end_date' => '20100610',
-      'is_override' => 'NULL',
     );
     $this->fixtures['participant'] = array(
       'event_id' => array(
@@ -1799,7 +1798,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'join_date' => '20120315',
         'start_date' => '20120315',
         'end_date' => '20130315',
-        'is_override' => 0,
+        'status_override_type' => CRM_Member_StatusOverrideTypes::NO,
         'status_id' => 2,
       );
       $membershipParams['status-id'] = 1;

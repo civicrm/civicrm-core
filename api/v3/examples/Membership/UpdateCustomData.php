@@ -13,7 +13,7 @@ function membership_create_example() {
     'start_date' => '2009-01-21',
     'end_date' => '2009-12-21',
     'source' => 'Payment',
-    'is_override' => 1,
+    'status_override_type' => 1,
     'status_id' => 41,
     'custom_1' => 'custom string',
   );
@@ -60,7 +60,7 @@ function membership_create_expectedresult() {
         'end_date' => '2013-08-04 00:00:00',
         'source' => 'Payment',
         'status_id' => '41',
-        'is_override' => '1',
+        'status_override_type' => '1',
         'owner_membership_id' => '',
         'max_related' => '',
         'is_test' => 0,

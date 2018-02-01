@@ -551,7 +551,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'start_date' => '2009-01-21',
       'end_date' => '2009-12-21',
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_membershipStatusID,
       'version' => 3,
     );

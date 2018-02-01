@@ -154,17 +154,23 @@
           </td>
         </tr>
         {if !$membershipMode}
-          <tr><td class="label">{$form.is_override.label} {help id="id-status-override"}</td><td>{$form.is_override.html}</td></tr>
-          {* Show read-only Status block - when action is UPDATE and is_override is FALSE *}
+          <tr>
+            <td class="label">{$form.status_override_type.label} {help id="id-status-override"}</td>
+            <td>
+            <span id="status-override-type">{$form.status_override_type.html}</span>
+            <span id="status-override-end-date">{$form.status_override_end_date.html}</span>
+            </td>
+          </tr>
+          {* Show read-only Status block - when action is UPDATE and status_override_type is 'No' *}
           <tr id="memberStatus_show">
             {if $action eq 2}
               <td class="label">{$form.status_id.label}</td><td class="view-value">{$membershipStatus}</td>
             {/if}
           </tr>
 
-          {* Show editable status field when is_override is TRUE *}
+          {* Show editable status field when override_end_date is Not 'No' *}
           <tr id="memberStatus"><td class="label">{$form.status_id.label}</td><td>{$form.status_id.html}<br />
-            <span class="description">{ts}If <strong>Status Override</strong> is checked, the selected status will remain in force (it will NOT be modified by the automated status update script).{/ts}</span></td></tr>
+            <span class="description">{ts}When <strong>Status Override</strong> is active, the selected status will remain in force (it will NOT be subject to membership status rules) until it is cancelled or become inactive.{/ts}</span></td></tr>
         {/if}
 
         {if $accessContribution and !$membershipMode AND ($action neq 2 or (!$rows.0.contribution_id AND !$softCredit) or $onlinePendingContributionId)}
@@ -401,15 +407,34 @@
     <script type="text/javascript">
 
     {/literal}{if !$membershipMode}{literal}
+    cj( "#status_override_type" ).change(function() {
+      showHideMemberStatus();
+    });
+
     showHideMemberStatus();
     function showHideMemberStatus() {
-      if ( cj( "#is_override" ).prop('checked') ) {
-        cj('#memberStatus').show( );
-        cj('#memberStatus_show').hide( );
-      }
-      else {
-        cj('#memberStatus').hide( );
-        cj('#memberStatus_show').show( );
+      var override_type = cj( "#status_override_type" ).val();
+      switch (override_type) {
+        case '0':
+          cj('#memberStatus').hide();
+          cj('#memberStatus_show').show();
+          cj('#status-override-end-date').hide();
+          break;
+        case '1':
+          cj('#memberStatus').show();
+          cj('#memberStatus_show').hide();
+          cj('#status-override-end-date').hide();
+          break;
+        case '2':
+          cj('#memberStatus').show();
+          cj('#memberStatus_show').hide();
+          cj('#status-override-end-date').show();
+          break;
+        default :
+          cj('#memberStatus').hide( );
+          cj('#memberStatus_show').show( );
+          cj('#status-override-end-date').hide();
+          break;
       }
     }
     {/literal}{/if}

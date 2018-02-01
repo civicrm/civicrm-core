@@ -88,7 +88,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_mebershipStatusID,
     );
 
@@ -116,7 +116,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_mebershipStatusID,
     );
     $ids = array(
@@ -145,7 +145,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
       'start_date' => date('Ymd', strtotime('2006-01-21')),
       'end_date' => date('Ymd', strtotime('2006-12-21')),
       'source' => 'Payment',
-      'is_override' => 1,
+      'status_override_type' => CRM_Member_StatusOverrideTypes::PERMANENT,
       'status_id' => $this->_mebershipStatusID,
     );
     $ids = array(

@@ -57,7 +57,7 @@ function membership_get_expectedresult() {
         'end_date' => '2013-08-04 00:00:00',
         'source' => 'Payment',
         'status_id' => '22',
-        'is_override' => '1',
+        'status_override_type' => '1',
         'is_test' => 0,
         'is_pay_later' => 0,
         'membership_name' => 'General',

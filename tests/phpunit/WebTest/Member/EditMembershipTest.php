@@ -132,7 +132,7 @@ class WebTest_Member_EditMembershipTest extends CiviSeleniumTestCase {
     // now edit and update type and status
     $this->click("crm-membership-edit-button-top");
     $this->waitForElementPresent("_qf_Membership_upload-bottom");
-    $this->click('is_override');
+    $this->select('status_override_type', "value=" . CRM_Member_StatusOverrideTypes::PERMANENT);
     $this->waitForElementPresent('status_id');
     $this->select('status_id', 'label=Current');
     $this->select('membership_type_id[0]', 'value=1');

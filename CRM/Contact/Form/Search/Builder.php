@@ -451,7 +451,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       'member_campaign_id' => 'membership',
       'member_is_test' => 'yesno',
       'member_is_pay_later' => 'yesno',
-      'is_override' => 'yesno',
     );
     $entities = array(
       'contact',

@@ -85,10 +85,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       }
     }
 
-    if (array_key_exists('is_override', $params) && !$params['is_override']) {
-      $params['is_override'] = 'null';
-    }
-
     $membership = new CRM_Member_BAO_Membership();
     $membership->copyValues($params);
     $membership->id = $id;
@@ -263,13 +259,14 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @return CRM_Member_BAO_Membership|CRM_Core_Error
    */
   public static function create(&$params, &$ids, $skipRedirect = FALSE) {
-    // always calculate status if is_override/skipStatusCal is not true.
-    // giving respect to is_override during import.  CRM-4012
+    // always calculate status if status_override_type set to 'No' and skipStatusCal is false.
+    // giving respect to status_override_type during import.  CRM-4012
 
     // To skip status calculation we should use 'skipStatusCal'.
     // eg pay later membership, membership update cron CRM-3984
 
-    if (empty($params['is_override']) && empty($params['skipStatusCal'])) {
+    $statusOverridden = CRM_Member_StatusOverrideTypes::isOverridden($params['status_override_type']);
+    if (!$statusOverridden && empty($params['skipStatusCal'])) {
       $dates = array('start_date', 'end_date', 'join_date');
       // Declare these out of courtesy as IDEs don't pick up the setting of them below.
       $start_date = $end_date = $join_date = NULL;
@@ -280,8 +277,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       //fix for CRM-3570, during import exclude the statuses those having is_admin = 1
       $excludeIsAdmin = CRM_Utils_Array::value('exclude_is_admin', $params, FALSE);
 
-      //CRM-3724 always skip is_admin if is_override != true.
-      if (!$excludeIsAdmin && empty($params['is_override'])) {
+      //CRM-3724 always skip is_admin if status_override_type is set to 'No'.
+      if (!$excludeIsAdmin && !$statusOverridden) {
         $excludeIsAdmin = TRUE;
       }
 
@@ -2034,8 +2031,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     }
 
     //since we are renewing,
-    //make status override false.
-    $memParams['is_override'] = FALSE;
+    //disable status override if there is any.
+    $memParams['status_override_type'] = CRM_Member_StatusOverrideTypes::NO;
 
     //CRM-4027, create log w/ individual contact.
     if ($modifiedID) {
@@ -2188,7 +2185,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     // get only memberships with active membership types
     $query = "
 SELECT     civicrm_membership.id                    as membership_id,
-           civicrm_membership.is_override           as is_override,
+           civicrm_membership.status_override_type  as status_override_type,
+           civicrm_membership.status_override_end_date  as status_override_end_date,
            civicrm_membership.membership_type_id    as membership_type_id,
            civicrm_membership.status_id             as status_id,
            civicrm_membership.join_date             as join_date,
@@ -2275,10 +2273,12 @@ WHERE      civicrm_membership.is_test = 0";
         continue;
       }
 
+      self::processOverridenUntilDateMembership($dao);
+
       //update membership records where status is NOT - Pending OR Cancelled.
-      //as well as membership is not override.
+      //as well as if membership is not overridden.
       //skipping Expired membership records -> reduced extra processing( kiran )
-      if (!$dao->is_override &&
+      if (CRM_Member_StatusOverrideTypes::isNo($dao->status_override_type) &&
         !in_array($dao->status_id, array(
           array_search('Pending', $allStatus),
           // CRM-15475
@@ -2339,6 +2339,39 @@ WHERE      civicrm_membership.is_test = 0";
       2 => $updateCount,
     ));
     return $result;
+  }
+
+  /**
+   * Sets the 'overridden until date' membership to 'No'
+   * and clears the 'until date' field in case the 'until date'
+   * is equal or after today date.
+   *
+   * @param CRM_Member_DAO_Membership $membership
+   *   The membership to be processed
+   */
+  private static function processOverridenUntilDateMembership($membership) {
+    $isOverriddenUntilDate = CRM_Member_StatusOverrideTypes::isUntilDate($membership->status_override_type) && !empty($membership->status_override_end_date);
+    if (!$isOverriddenUntilDate) {
+      return;
+    }
+
+    $todayDate = new DateTime();
+    $todayDate->setTime(0, 0);
+
+    $overrideEndDate = new DateTime($membership->status_override_end_date);
+    $overrideEndDate->setTime(0, 0);
+
+    $datesDifference = $todayDate->diff($overrideEndDate);
+    $daysDifference =  (int) $datesDifference->format('%R%a');
+
+    if ($daysDifference >= 0) {
+      $params = array(
+        'id' => $membership->id,
+        'status_override_type' => CRM_Member_StatusOverrideTypes::NO,
+        'status_override_end_date' => 'null',
+      );
+      civicrm_api('membership', 'create', $params);
+    }
   }
 
   /**

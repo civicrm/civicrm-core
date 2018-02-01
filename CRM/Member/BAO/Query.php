@@ -371,7 +371,13 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'member_is_override':
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_membership.is_override", $op, $value, "Boolean");
+        $op = 'IN';
+        $searchValues = array(CRM_Member_StatusOverrideTypes::NO);
+        if ($value) {
+          $searchValues = array(CRM_Member_StatusOverrideTypes::PERMANENT, CRM_Member_StatusOverrideTypes::UNTIL_DATE);
+        }
+
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_membership.status_override_type", $op, $searchValues, "Boolean");
         $query->_qill[$grouping][] = $value ? ts("Membership Status Is Overriden") : ts("Membership Status Is NOT Overriden");
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
