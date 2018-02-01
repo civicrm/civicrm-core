@@ -536,6 +536,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         $date = $membershipDetails->end_date;
       }
       $date = explode('-', $date);
+      // We have to add 1 day first in case it's the end of the month, then subtract afterwards
+      // eg. 2018-02-28 should renew to 2018-03-31, if we just added 1 month we'd get 2018-03-28
       $logStartDate = date('Y-m-d', mktime(0, 0, 0,
         (double) $date[1],
         (double) ($date[2] + 1),
