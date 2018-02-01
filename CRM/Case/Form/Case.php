@@ -354,7 +354,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       $params['subject'] = $params['activity_subject'];
     }
     $caseObj = CRM_Case_BAO_Case::create($params);
-    $params['case_id'] = $caseObj->id;
+    $this->_caseId = $params['case_id'] = $caseObj->id;
     // unset any ids, custom data
     unset($params['id'], $params['custom']);
 
