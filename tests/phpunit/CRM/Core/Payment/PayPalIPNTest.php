@@ -145,7 +145,8 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    * Test IPN response updates contribution_recur & contribution for first & second contribution.
    */
   public function testIPNPaymentMembershipRecurSuccess() {
-    $this->setupMembershipRecurringPaymentProcessorTransaction();
+    $durationUnit = 'year';
+    $this->setupMembershipRecurringPaymentProcessorTransaction(array('duration_unit' => $durationUnit, 'frequency_unit' => $durationUnit));
     $this->callAPISuccessGetSingle('membership_payment', array());
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurTransaction());
     $paypalIPN->main();
@@ -159,7 +160,8 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
     $paypalIPN = new CRM_Core_Payment_PaypalIPN($this->getPaypalRecurSubsequentTransaction());
     $paypalIPN->main();
-    $this->assertEquals(strtotime('+ 1 year', strtotime($membershipEndDate)), strtotime($this->callAPISuccessGetValue('membership', array('return' => 'end_date'))));
+    $renewedMembershipEndDate = $this->membershipRenewalDate($durationUnit, $membershipEndDate);
+    $this->assertEquals($renewedMembershipEndDate, $this->callAPISuccessGetValue('membership', array('return' => 'end_date')));
     $contribution = $this->callAPISuccess('contribution', 'get', array(
         'contribution_recur_id' => $this->_contributionRecurID,
         'sequential' => 1,
