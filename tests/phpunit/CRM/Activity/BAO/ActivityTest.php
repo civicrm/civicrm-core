@@ -745,7 +745,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * CRM-20793 : Test getActivities by using activity date and status filter
    */
-  public function testbyActivityDateAndStatus() {
+  public function testByActivityDateAndStatus() {
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -840,19 +840,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
           'sort' => NULL,
         ),
       ),
-      'last-or-next-year-activity' => array(
-        'params' => array(
-          'contact_id' => 1,
-          'admin' => TRUE,
-          'caseId' => NULL,
-          'context' => 'activity',
-          'activity_date_relative' => (date('M') == 'Jan') ? 'next.year' : 'previous.year',
-          'activity_type_id' => NULL,
-          'offset' => 0,
-          'rowCount' => 0,
-          'sort' => NULL,
-        ),
-      ),
       'activity-of-all-statuses' => array(
         'params' => array(
           'contact_id' => 1,
@@ -899,6 +886,64 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
         $this->assertEquals(16, count($activitiesDep));
       }
     }
+  }
+
+  /**
+   * @dataProvider getActivityDateData
+   */
+  public function testActivityRelativeDateFilter($params, $expected) {
+    $thisYear = date('Y');
+    $dates = [
+      date('Y-m-d', strtotime(($thisYear - 1) . '-01-01')),
+      date('Y-m-d', strtotime(($thisYear - 1) . '-12-31')),
+      date('Y-m-d', strtotime($thisYear . '-01-01')),
+      date('Y-m-d', strtotime($thisYear . '-12-31')),
+      date('Y-m-d', strtotime(($thisYear + 1) . '-01-01')),
+      date('Y-m-d', strtotime(($thisYear + 1) . '-12-31')),
+    ];
+    foreach ($dates as $date) {
+      $this->activityCreate(['activity_date_time' => $date]);
+    }
+    $activitiesDep = CRM_Activity_BAO_Activity::deprecatedGetActivities($params);
+    $activityCount = CRM_Activity_BAO_Activity::deprecatedGetActivitiesCount($params);
+    $this->assertEquals(count($activitiesDep), $activityCount);
+    foreach ($activitiesDep as $activity) {
+      $this->assertTrue(strtotime($activity['activity_date_time']) >= $expected['earliest'], $activity['activity_date_time'] . ' should be no earlier than ' . date('Y-m-d H:i:s', $expected['earliest']));
+      $this->assertTrue(strtotime($activity['activity_date_time']) < $expected['latest'], $activity['activity_date_time'] . ' should be before ' . date('Y-m-d H:i:s', $expected['latest']));
+    }
+
+  }
+
+  /**
+   * Get activity date data.
+   *
+   * Later we might migrate rework the rest of
+   * testByActivityDateAndStatus
+   * to use data provider methodology as it's way complex!
+   *
+   * @return array
+   */
+  public function getActivityDateData() {
+    return [
+      'last-year-activity' => [
+        'params' => [
+          'contact_id' => 1,
+          'admin' => TRUE,
+          'caseId' => NULL,
+          'context' => 'activity',
+          'activity_date_relative' => 'previous.year',
+          'activity_type_id' => NULL,
+          'offset' => 0,
+          'rowCount' => 0,
+          'sort' => NULL,
+        ],
+        'expected' => [
+          'count' => 2,
+          'earliest' => strtotime('first day of january last year'),
+          'latest' => strtotime('first day of january this year'),
+        ]
+      ],
+    ];
   }
 
   /**
