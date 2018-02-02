@@ -35,15 +35,17 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * getRecipients test
+   * Test CRM_Mailing_BAO_Mailing::getRecipients() on sms mode
    */
   public function testgetRecipients() {
-
     // Tests for SMS bulk mailing recipients
     // +CRM-21320 Ensure primary mobile number is selected over non-primary
 
     // Setup
-    $group = $this->groupCreate();
+    $smartGroupParams = array(
+      'formValues' => array('contact_type' => array('IN' => array('Individual'))),
+    );
+    $group = $this->smartGroupCreate($smartGroupParams);
     $sms_provider = $this->callAPISuccess('SmsProvider', 'create', array(
       'sequential' => 1,
       'name' => 1,
@@ -54,52 +56,59 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       'is_active' => 1,
     ));
 
-    // Contact 1
-    $contact_1 = $this->individualCreate(array(), 0);
-    $contact_1_primary = $this->callAPISuccess('Phone', 'create', array(
-      'contact_id' => $contact_1,
-      'phone' => "01 01",
-      'location_type_id' => "Home",
-      'phone_type_id' => "Mobile",
-      'is_primary' => 1,
-    ));
-    $contact_1_other = $this->callAPISuccess('Phone', 'create', array(
-      'contact_id' => $contact_1,
-      'phone' => "01 02",
-      'location_type_id' => "Work",
-      'phone_type_id' => "Mobile",
-      'is_primary' => 0,
-    ));
+    // Create Contact 1 and add in group
+    $contactID1 = $this->individualCreate(array(), 0);
     $this->callAPISuccess('GroupContact', 'Create', array(
       'group_id' => $group,
-      'contact_id' => $contact_1,
+      'contact_id' => $contactID1,
     ));
 
-    // Contact 2
-    $contact_2 = $this->individualCreate(array(), 1);
-    $contact_2_other = $this->callAPISuccess('Phone', 'create', array(
-      'contact_id' => $contact_2,
-      'phone' => "02 01",
-      'location_type_id' => "Home",
-      'phone_type_id' => "Mobile",
-      'is_primary' => 0,
-    ));
-    $contact_2_primary = $this->callAPISuccess('Phone', 'create', array(
-      'contact_id' => $contact_2,
-      'phone' => "02 02",
-      'location_type_id' => "Work",
-      'phone_type_id' => "Mobile",
-      'is_primary' => 1,
-    ));
+    // Create contact 2 and add in group
+    $contactID2 = $this->individualCreate(array(), 1);
     $this->callAPISuccess('GroupContact', 'Create', array(
       'group_id' => $group,
-      'contact_id' => $contact_2,
+      'contact_id' => $contactID2,
     ));
+
+    $contactIDPhoneRecords = array(
+      $contactID1 => array(
+        'primary_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
+          'contact_id' => $contactID1,
+          'phone' => "01 01",
+          'location_type_id' => "Home",
+          'phone_type_id' => "Mobile",
+          'is_primary' => 1,
+        ))),
+        'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
+          'contact_id' => $contactID1,
+          'phone' => "01 02",
+          'location_type_id' => "Work",
+          'phone_type_id' => "Mobile",
+          'is_primary' => 0,
+        ))),
+      ),
+      $contactID2 => array(
+        'primary_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
+          'contact_id' => $contactID2,
+          'phone' => "02 01",
+          'location_type_id' => "Home",
+          'phone_type_id' => "Mobile",
+          'is_primary' => 1,
+        ))),
+        'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
+          'contact_id' => $contactID2,
+          'phone' => "02 02",
+          'location_type_id' => "Work",
+          'phone_type_id' => "Mobile",
+          'is_primary' => 0,
+        ))),
+      ),
+    );
 
     // Prepare expected results
-    $check_ids = array(
-      $contact_1 => $contact_1_primary['id'],
-      $contact_2 => $contact_2_primary['id'],
+    $checkPhoneIDs = array(
+      $contactID1 => $contactIDPhoneRecords[$contactID1]['primary_phone_id'],
+      $contactID2 => $contactIDPhoneRecords[$contactID2]['primary_phone_id'],
     );
 
     // Create mailing
@@ -112,7 +121,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     ));
 
     // Populate the recipients table (job id doesn't matter)
-    CRM_Mailing_BAO_Mailing::getRecipients('123', $mailing['id'], TRUE, FALSE, 'sms');
+    CRM_Mailing_BAO_Mailing::getRecipients($mailing['id']);
 
     // Get recipients
     $recipients = $this->callAPISuccess('MailingRecipients', 'get', array('mailing_id' => $mailing['id']));
@@ -122,15 +131,15 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
 
     // Check we got the 'primary' mobile for both contacts
     foreach ($recipients['values'] as $value) {
-      $this->assertEquals($value['phone_id'], $check_ids[$value['contact_id']], 'Check correct phone number for contact ' . $value['contact_id']);
+      $this->assertEquals($value['phone_id'], $checkPhoneIDs[$value['contact_id']], 'Check correct phone number for contact ' . $value['contact_id']);
     }
 
     // Tidy up
     $this->deleteMailing($mailing['id']);
     $this->callAPISuccess('SmsProvider', 'Delete', array('id' => $sms_provider['id']));
     $this->groupDelete($group);
-    $this->contactDelete($contact_1);
-    $this->contactDelete($contact_2);
+    $this->contactDelete($contactID1);
+    $this->contactDelete($contactID2);
   }
 
 }

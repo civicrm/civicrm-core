@@ -145,8 +145,13 @@
                 mids.push(dv.entity_id);
               }
             }
+            // push non existant 0 group/mailing id in order when no recipents group or prior mailing is selected
+            //  this will allow to resuse the below code to handle datamap
             if (gids.length === 0) {
-              return;
+              gids.push(0);
+            }
+            if (mids.length === 0) {
+              mids.push(0);
             }
 
             CRM.api3('Group', 'getlist', { params: { id: { IN: gids }, options: { limit: 0 } }, extra: ["is_hidden"] } ).then(
