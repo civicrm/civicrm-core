@@ -920,21 +920,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     if ($durationUnit) {
       // We only have an end_date if frequency units match, otherwise membership won't be autorenewed and dates won't be calculated.
-      $renewedMembershipEndDate = new DateTime($membership['end_date']);
-      switch ($durationUnit) {
-        case 'year':
-          $renewedMembershipEndDate->add(new DateInterval('P1Y'));
-          break;
-
-        case 'month':
-          // We have to add 1 day first in case it's the end of the month, then subtract afterwards
-          // eg. 2018-02-28 should renew to 2018-03-31, if we just added 1 month we'd get 2018-03-28
-          $renewedMembershipEndDate->add(new DateInterval('P1D'));
-          $renewedMembershipEndDate->add(new DateInterval('P1M'));
-          $renewedMembershipEndDate->sub(new DateInterval('P1D'));
-          break;
-      }
-      $this->assertEquals($renewedMembershipEndDate->format('Y-m-d'), $renewedMembership['end_date']);
+      $renewedMembershipEndDate = $this->membershipRenewalDate($durationUnit, $membership['end_date']);
+      $this->assertEquals($renewedMembershipEndDate, $renewedMembership['end_date']);
     }
     $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
     $this->assertEquals($processor['payment_instrument_id'], $recurringContribution['payment_instrument_id']);
