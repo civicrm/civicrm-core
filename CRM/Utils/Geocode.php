@@ -52,16 +52,7 @@ class CRM_Utils_Geocode {
       ['civi.tag' => 'deprecated']
     );
 
-    $settings = Civi::settings();
-    if ($settings->get('geoProvider')) {
-      return 'CRM_Utils_Geocode_' . $settings->get('geoProvider');
-    }
-    elseif ($settings->get('mapProvider')) {
-      return 'CRM_Utils_Geocode_' . $settings->get('mapProvider');
-    }
-    else {
-      return '';
-    }
+    return (string) CRM_Utils_GeocodeProvider::getUsableClassName();
   }
 
 }
