@@ -267,9 +267,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   /**
    *  Test CRM_Member_Form_Membership::formRule() with a parameter
-   *  that has an override and no status
+   *  that has permanent override and no status
    */
-  public function testFormRuleOverrideNoStatus() {
+  public function testFormRulePermanentOverrideWithNoStatus() {
     $unixNow = time();
     $params = array(
       'join_date' => date('m/d/Y', $unixNow),
@@ -281,6 +281,34 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $rc = $obj->formRule($params, $files, $obj);
     $this->assertType('array', $rc);
     $this->assertTrue(array_key_exists('status_id', $rc));
+  }
+
+  public function testFormRuleUntilDateOverrideWithValidOverrideEndDate() {
+    $params = array(
+      'join_date' => date('m/d/Y', time()),
+      'membership_type_id' => array('23', '25'),
+      'is_override' => TRUE,
+      'status_id' => 1,
+      'status_override_end_date' => date('m/d/Y', time()),
+    );
+    $files = array();
+    $membershipForm = new CRM_Member_Form_Membership();
+    $validationResponse = $membershipForm->formRule($params, $files, $membershipForm);
+    $this->assertTrue($validationResponse);
+  }
+
+  public function testFormRuleUntilDateOverrideWithNoOverrideEndDate() {
+    $params = array(
+      'join_date' => date('m/d/Y', time()),
+      'membership_type_id' => array('23', '25'),
+      'is_override' => CRM_Member_StatusOverrideTypes::UNTIL_DATE,
+      'status_id' => 1,
+    );
+    $files = array();
+    $membershipForm = new CRM_Member_Form_Membership();
+    $validationResponse = $membershipForm->formRule($params, $files, $membershipForm);
+    $this->assertType('array', $validationResponse);
+    $this->assertEquals('Please enter the Membership override end date.', $validationResponse['status_override_end_date']);
   }
 
   /**

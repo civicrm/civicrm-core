@@ -102,7 +102,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    *  Test Import.
    */
   public function testImport() {
-    $contactId = $this->individualCreate();
+    $this->individualCreate();
     $contact2Params = array(
       'first_name' => 'Anthonita',
       'middle_name' => 'J.',
@@ -112,7 +112,8 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'email' => 'b@c.com',
       'contact_type' => 'Individual',
     );
-    $contactId = $this->individualCreate($contact2Params);
+
+    $this->individualCreate($contact2Params);
     $year = date('Y') - 1;
     $startDate2 = date('Y-m-d', mktime(0, 0, 0, 9, 10, $year));
     $params = array(
@@ -132,19 +133,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'mapper[1][0]' => 'membership_type_id',
       'mapper[2][0]' => 'membership_start_date',
     );
-    /*
 
-    $params = array(
-    'contact_id' => $contactId,
-    'membership_type_id' => $this->_membershipTypeID,
-    'join_date' => '2006-01-21',
-    'start_date' => '2006-01-21',
-    'end_date' => '2006-12-21',
-    'source' => 'Payment',
-    'is_override' => 1,
-    'status_id' => $this->_mebershipStatusID,
-    );
-     */
     $importObject = new CRM_Member_Import_Parser_Membership($fieldMapper);
     $importObject->init();
     $importObject->_contactType = 'Individual';
@@ -153,6 +142,114 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     }
     $result = $this->callAPISuccess('membership', 'get', array());
     $this->assertEquals(2, $result['count']);
+  }
+
+  public function testImportOverriddenMembershipButWithoutStatus() {
+    $this->individualCreate(array('email' => 'anthony_anderson2@civicrm.org'));
+
+    $fieldMapper = array(
+      'mapper[0][0]' => 'email',
+      'mapper[1][0]' => 'membership_type_id',
+      'mapper[2][0]' => 'membership_start_date',
+      'mapper[3][0]' => 'is_override',
+    );
+    $membershipImporter = new CRM_Member_Import_Parser_Membership($fieldMapper);
+    $membershipImporter->init();
+    $membershipImporter->_contactType = 'Individual';
+
+    $importValues = array(
+      'anthony_anderson2@civicrm.org',
+      $this->_membershipTypeID,
+      date('Y-m-d'),
+      TRUE,
+    );
+
+    $importResponse = $membershipImporter->import(CRM_Import_Parser::DUPLICATE_UPDATE, $importValues);
+    $this->assertEquals(CRM_Import_Parser::ERROR, $importResponse);
+    $this->assertContains('Required parameter missing: Status', $importValues);
+  }
+
+  public function testImportOverriddenMembershipWithStatus() {
+    $this->individualCreate(array('email' => 'anthony_anderson3@civicrm.org'));
+
+    $fieldMapper = array(
+      'mapper[0][0]' => 'email',
+      'mapper[1][0]' => 'membership_type_id',
+      'mapper[2][0]' => 'membership_start_date',
+      'mapper[3][0]' => 'is_override',
+      'mapper[4][0]' => 'status_id',
+    );
+    $membershipImporter = new CRM_Member_Import_Parser_Membership($fieldMapper);
+    $membershipImporter->init();
+    $membershipImporter->_contactType = 'Individual';
+
+    $importValues = array(
+      'anthony_anderson3@civicrm.org',
+      $this->_membershipTypeID,
+      date('Y-m-d'),
+      TRUE,
+      'New',
+    );
+
+    $importResponse = $membershipImporter->import(CRM_Import_Parser::DUPLICATE_UPDATE, $importValues);
+    $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
+  }
+
+  public function testImportOverriddenMembershipWithValidOverrideEndDate() {
+    $this->individualCreate(array('email' => 'anthony_anderson4@civicrm.org'));
+
+    $fieldMapper = array(
+      'mapper[0][0]' => 'email',
+      'mapper[1][0]' => 'membership_type_id',
+      'mapper[2][0]' => 'membership_start_date',
+      'mapper[3][0]' => 'is_override',
+      'mapper[4][0]' => 'status_id',
+      'mapper[5][0]' => 'status_override_end_date',
+    );
+    $membershipImporter = new CRM_Member_Import_Parser_Membership($fieldMapper);
+    $membershipImporter->init();
+    $membershipImporter->_contactType = 'Individual';
+
+    $importValues = array(
+      'anthony_anderson4@civicrm.org',
+      $this->_membershipTypeID,
+      date('Y-m-d'),
+      TRUE,
+      'New',
+      date('Y-m-d'),
+    );
+
+    $importResponse = $membershipImporter->import(CRM_Import_Parser::DUPLICATE_UPDATE, $importValues);
+    $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
+  }
+
+  public function testImportOverriddenMembershipWithInvalidOverrideEndDate() {
+    $this->individualCreate(array('email' => 'anthony_anderson5@civicrm.org'));
+
+    $fieldMapper = array(
+      'mapper[0][0]' => 'email',
+      'mapper[1][0]' => 'membership_type_id',
+      'mapper[2][0]' => 'membership_start_date',
+      'mapper[3][0]' => 'is_override',
+      'mapper[4][0]' => 'status_id',
+      'mapper[5][0]' => 'status_override_end_date',
+    );
+    $membershipImporter = new CRM_Member_Import_Parser_Membership($fieldMapper);
+    $membershipImporter->init();
+    $membershipImporter->_contactType = 'Individual';
+
+    $importValues = array(
+      'anthony_anderson5@civicrm.org',
+      'New',
+      date('Y-m-d'),
+      TRUE,
+      $this->_mebershipStatusID,
+      'abc',
+    );
+
+    $importResponse = $membershipImporter->import(CRM_Import_Parser::DUPLICATE_UPDATE, $importValues);
+    $this->assertEquals(CRM_Import_Parser::ERROR, $importResponse);
+    $this->assertContains('Required parameter missing: Status', $importValues);
   }
 
 }
