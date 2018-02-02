@@ -1340,4 +1340,24 @@ SELECT is_primary,
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
+  /**
+   * Add data from the configured geocoding provider.
+   *
+   * Generally this means latitude & longitude data.
+   *
+   * @param array $params
+   * @return bool
+   *   TRUE if params could be passed to a provider, else FALSE.
+   */
+  public static function addGeocoderData(&$params) {
+    try {
+      $provider = CRM_Utils_GeocodeProvider::getConfiguredProvider();
+    }
+    catch (CRM_Core_Exception $e) {
+      return FALSE;
+    }
+    $provider::format($params);
+    return TRUE;
+  }
+
 }
