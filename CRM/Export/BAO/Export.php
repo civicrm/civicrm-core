@@ -1903,7 +1903,9 @@ LIMIT $offset, $limit
         $row = array();
 
         foreach ($sqlColumns as $column => $dontCare) {
-          $row[$column] = $dao->$column;
+          if (isset($dao->column)) {
+            $row[$column] = $dao->$column;
+          }
         }
         $componentDetails[] = $row;
       }
