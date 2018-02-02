@@ -30,9 +30,7 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
       'geoProvider' => "Google",
     ));
 
-    // Set geocodeMethod to empty.
-    $config = CRM_Core_Config::singleton();
-    $config->geocodeMethod = '';
+    CRM_Utils_GeocodeProvider::disableForSession();
 
     // Save a contact with geo coding disabled.
     $params = array(
@@ -53,8 +51,7 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
     $this->assertArrayNotHasKey('geo_code_1', $address_values, 'No geocoding when geocodeMethod is empty');
 
     // Run the geocode job on that specific contact
-    $config->geocodeMethod = 'CRM_Utils_Geocode_Google';
-
+    CRM_Utils_GeocodeProvider::reset();
     try {
       $params_geocode = array(
         'start' => $contact_values['id'],
