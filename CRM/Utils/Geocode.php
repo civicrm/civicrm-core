@@ -37,10 +37,21 @@
 class CRM_Utils_Geocode {
 
   /**
+   * @deprecated
+   *
+   * @todo Remove this method. In case people are calling this downstream (which
+   *   is unsupported usage), we'll deprecate it for a few releases before
+   *   removing it altogether.
+   *
    * @return string|''
    *   Class name, or empty.
    */
   public static function getProviderClass() {
+    Civi::log()->warning(
+      'CRM_Utils_Geocode is deprecated and will be removed from core soon, use CRM_Utils_GeocodeProvider::getUsableClassName()',
+      ['civi.tag' => 'deprecated']
+    );
+
     $settings = Civi::settings();
     if ($settings->get('geoProvider')) {
       return 'CRM_Utils_Geocode_' . $settings->get('geoProvider');
