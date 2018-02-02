@@ -333,15 +333,12 @@ ACOS(
       )
     );
 
-    $fnName = isset($config->geocodeMethod) ? $config->geocodeMethod : NULL;
-    if (empty($fnName)) {
-      CRM_Core_Error::fatal(ts('Proximity searching requires you to set a valid geocoding provider'));
-    }
-
     $query->_tables['civicrm_address'] = $query->_whereTables['civicrm_address'] = 1;
 
-    require_once str_replace('_', DIRECTORY_SEPARATOR, $fnName) . '.php';
-    $fnName::format($proximityAddress);
+    if (!CRM_Core_BAO_Address::addGeocoderData($proximityAddress)) {
+      throw new CRM_Core_Exception(ts('Proximity searching requires you to set a valid geocoding provider'));
+    }
+
     if (
       !is_numeric(CRM_Utils_Array::value('geo_code_1', $proximityAddress)) ||
       !is_numeric(CRM_Utils_Array::value('geo_code_2', $proximityAddress))

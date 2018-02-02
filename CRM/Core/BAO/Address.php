@@ -342,8 +342,6 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       $params['country'] = CRM_Core_PseudoConstant::country($params['country_id']);
     }
 
-    $config = CRM_Core_Config::singleton();
-
     $asp = Civi::settings()->get('address_standardization_provider');
     // clean up the address via USPS web services if enabled
     if ($asp === 'USPS' &&
@@ -378,14 +376,12 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       $params = array_merge($params, $parsedFields);
     }
 
-    // check if geocode should be skipped (can be forced with an optional parameter through the api)
-    $skip_geocode = (isset($params['skip_geocode']) && $params['skip_geocode']) ? TRUE : FALSE;
-
-    // add latitude and longitude and format address if needed
-    if (!$skip_geocode && !empty($config->geocodeMethod) && ($config->geocodeMethod != 'CRM_Utils_Geocode_OpenStreetMaps') && empty($params['manual_geo_code'])) {
-      $class = $config->geocodeMethod;
-      $class::format($params);
+    // skip_geocode is an optional parameter through the api.
+    // manual_geo_code is on the contact edit form. They do the same thing....
+    if (empty($params['skip_geocode']) && empty($params['manual_geo_code'])) {
+      self::addGeocoderData($params);
     }
+
   }
 
   /**
