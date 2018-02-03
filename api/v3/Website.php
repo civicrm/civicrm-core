@@ -64,8 +64,6 @@ function _civicrm_api3_website_create_spec(&$params) {
 /**
  * Deletes an existing Website.
  *
- * @todo convert to using Basic delete - BAO function non standard
- *
  * @param array $params
  *
  * @return array
@@ -73,20 +71,7 @@ function _civicrm_api3_website_create_spec(&$params) {
  * @throws \API_Exception
  */
 function civicrm_api3_website_delete($params) {
-  //DO NOT USE THIS FUNCTION AS THE BASIS FOR A NEW API http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
-  civicrm_api3_verify_mandatory($params, NULL, array('id'));
-  _civicrm_api3_check_edit_permissions('CRM_Core_BAO_Website', array('id' => $params['id']));
-  $websiteDAO = new CRM_Core_DAO_Website();
-  $websiteDAO->id = $params['id'];
-  if ($websiteDAO->find()) {
-    while ($websiteDAO->fetch()) {
-      $websiteDAO->delete();
-      return civicrm_api3_create_success(1, $params, 'Website', 'delete');
-    }
-  }
-  else {
-    throw new API_Exception('Could not delete Website with id ' . $params['id']);
-  }
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
