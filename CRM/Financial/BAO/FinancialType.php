@@ -352,6 +352,32 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
+   * Bug Fix: CRM-21356 Membership Status is not updated after disabling a membership type
+   */
+  public static function getAllMembershipTypes(&$membershipTypes = NULL, $action = CRM_Core_Action::VIEW) {
+    if (empty($membershipTypes)) {
+      $membershipTypes = CRM_Member_PseudoConstant::allMembershipType();
+    }
+    if (!self::isACLFinancialTypeStatus()) {
+      return $membershipTypes;
+    }
+    $actions = array(
+      CRM_Core_Action::VIEW => 'view',
+      CRM_Core_Action::UPDATE => 'edit',
+      CRM_Core_Action::ADD => 'add',
+      CRM_Core_Action::DELETE => 'delete',
+    );
+    foreach ($membershipTypes as $memTypeId => $type) {
+      $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $memTypeId, 'financial_type_id');
+      $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
+      if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $finType)) {
+        unset($membershipTypes[$memTypeId]);
+      }
+    }
+    return $membershipTypes;
+  }
+
+  /**
    * Function to build a permissioned sql where clause based on available financial types.
    *
    * @param array $whereClauses

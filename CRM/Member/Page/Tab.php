@@ -50,7 +50,10 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    */
   public function browse() {
     $links = self::links('all', $this->_isPaymentProcessor, $this->_accessContribution);
-    CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes($membershipTypes);
+    //Original
+    //CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes($membershipTypes);
+    //Bug Fix: CRM-21356 Membership Status is not updated after disabling a membership type
+    CRM_Financial_BAO_FinancialType::getAllMembershipTypes($membershipTypes);
     $addWhere = "membership_type_id IN (0)";
     if (!empty($membershipTypes)) {
       $addWhere = "membership_type_id IN (" . implode(',', array_keys($membershipTypes)) . ")";
@@ -75,7 +78,10 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $mask = CRM_Core_Action::mask($permissions);
 
     // get deceased status id
-    $allStatus = CRM_Member_PseudoConstant::membershipStatus();
+    //Original
+    //$allStatus = CRM_Member_PseudoConstant::membershipStatus();
+    //Bug Fix: CRM-21356 Membership Status is not updated after disabling a membership type
+    $allStatus = CRM_Member_PseudoConstant::allMembershipStatus();
     $deceasedStatusId = array_search('Deceased', $allStatus);
 
     //get all campaigns.
@@ -219,7 +225,31 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     }
 
     $activeMembers = CRM_Member_BAO_Membership::activeMembers($membership);
+
+    $active = array();
+
+    //Bug Fix: CRM-21356 Membership Status is not updated after disabling a membership type
+    foreach ($activeMembers as $key => $value) {
+
+      $is_active = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($activeMembers[$key]['membership_type_id']);
+
+      if (!isset($is_active) || empty($is_active)) {
+        $activeMembers[$key]['is_active'] = "(DISABLED)";
+      }
+    }
+
     $inActiveMembers = CRM_Member_BAO_Membership::activeMembers($membership, 'inactive');
+
+    //Bug Fix: CRM-21356 Membership Status is not updated after disabling a membership type
+    foreach ($inActiveMembers as $key => $value) {
+
+      $is_active = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($inActiveMembers[$key]['membership_type_id']);
+
+      if (!isset($is_active) || empty($is_active)) {
+        $inActiveMembers[$key]['is_active'] = "(DISABLED)";
+      }
+    }
+
     $this->assign('activeMembers', $activeMembers);
     $this->assign('inActiveMembers', $inActiveMembers);
     $this->assign('membershipTypes', $membershipTypes);

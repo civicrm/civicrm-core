@@ -1477,10 +1477,6 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
           $params['createActivity'] = TRUE;
         }
 
-        //CRM-20707 - include start/end date
-        $params['start_date'] = $membership->start_date;
-        $params['end_date'] = $membership->end_date;
-
         // we should not created contribution record for related contacts, CRM-3371
         unset($params['contribution_status_id']);
 
@@ -2185,9 +2181,16 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   public static function updateAllMembershipStatus() {
 
     //get all active statuses of membership, CRM-3984
-    $allStatus = CRM_Member_PseudoConstant::membershipStatus();
+    //Original
+    /*$allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $statusLabels = CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label');
     $allTypes = CRM_Member_PseudoConstant::membershipType();
+     */
+
+    //Bug Fix: CRM-21356 Membership Status is not updated after disabling a membership type
+    $allStatus = CRM_Member_PseudoConstant::allMembershipStatus();
+    $statusLabels = CRM_Member_PseudoConstant::allMembershipStatus(NULL, NULL, 'label');
+    $allTypes = CRM_Member_PseudoConstant::allMembershipType();
 
     // get only memberships with active membership types
     $query = "
@@ -2206,8 +2209,13 @@ SELECT     civicrm_membership.id                    as membership_id,
 FROM       civicrm_membership
 INNER JOIN civicrm_contact ON ( civicrm_membership.contact_id = civicrm_contact.id )
 INNER JOIN civicrm_membership_type ON
-  (civicrm_membership.membership_type_id = civicrm_membership_type.id AND civicrm_membership_type.is_active = 1)
+  (civicrm_membership.membership_type_id = civicrm_membership_type.id)
 WHERE      civicrm_membership.is_test = 0";
+    /*  ORIGINAL CODE
+    INNER JOIN civicrm_membership_type ON
+    (civicrm_membership.membership_type_id = civicrm_membership_type.id AND civicrm_membership_type.is_active = 1)
+    WHERE      civicrm_membership.is_test = 0";
+     */
 
     $params = array();
     $dao = CRM_Core_DAO::executeQuery($query, $params);
@@ -2404,7 +2412,6 @@ WHERE      civicrm_membership.is_test = 0";
     $contributionParams['receipt_date'] = (CRM_Utils_Array::value('receipt_date', $params)) ? $params['receipt_date'] : 'null';
     $contributionParams['source'] = CRM_Utils_Array::value('contribution_source', $params);
     $contributionParams['non_deductible_amount'] = 'null';
-    $contributionParams['skipCleanMoney'] = TRUE;
     $contributionParams['payment_processor'] = CRM_Utils_Array::value('payment_processor_id', $params);
     $contributionSoftParams = CRM_Utils_Array::value('soft_credit', $params);
     $recordContribution = array(
