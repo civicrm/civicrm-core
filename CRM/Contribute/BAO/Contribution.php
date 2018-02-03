@@ -2618,6 +2618,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if (!empty($this->_relatedObjects['membership'])) {
         foreach ($this->_relatedObjects['membership'] as $membership) {
           if ($membership->id) {
+            $values['membership_id'] = $membership->id;
             $values['isMembership'] = TRUE;
             $values['membership_assign'] = TRUE;
 
@@ -5692,7 +5693,10 @@ LIMIT 1;";
    *
    */
   public static function createProportionalEntry($entityParams, $eftParams) {
-    $paid = $entityParams['line_item_amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
+    $paid = 0;
+    if ($entityParams['contribution_total_amount'] != 0) {
+      $paid = $entityParams['line_item_amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
+    }
     // Record Entity Financial Trxn; CRM-20145
     $eftParams['amount'] = CRM_Contribute_BAO_Contribution_Utils::formatAmount($paid);
     civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);

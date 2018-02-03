@@ -73,6 +73,34 @@ class System {
   }
 
   /**
+   * Execute checkConfig() on the payment processor Object.
+   * This function creates a new instance of the processor object and returns the output of checkConfig
+   *
+   * @param array $processor
+   *
+   * @return string|NULL
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function checkProcessorConfig($processor) {
+    $ext = \CRM_Extension_System::singleton()->getMapper();
+    if ($ext->isExtensionKey($processor['class_name'])) {
+      $paymentClass = $ext->keyToClass($processor['class_name'], 'payment');
+      require_once $ext->classToPath($paymentClass);
+    }
+    else {
+      $paymentClass = 'CRM_Core_' . $processor['class_name'];
+      if (empty($paymentClass)) {
+        throw new \CRM_Core_Exception('no class provided');
+      }
+      require_once str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php';
+    }
+
+    $processorObject = new $paymentClass(!empty($processor['is_test']) ? 'test' : 'live', $processor);
+    return $processorObject->checkConfig();
+  }
+
+  /**
    * Get payment processor by it's ID.
    *
    * @param int $id

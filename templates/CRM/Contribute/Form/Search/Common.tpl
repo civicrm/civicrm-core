@@ -40,8 +40,8 @@
 <tr>
   <td>
     <div class="float-left">
-      <label>{$form.payment_instrument_id.label}</label> <br />
-      {$form.payment_instrument_id.html|crmAddClass:twenty}
+      <label>{$form.contribution_payment_instrument_id.label}</label> <br />
+      {$form.contribution_payment_instrument_id.html|crmAddClass:twenty}
     </div>
     <div class="float-left" id="contribution_check_number_wrapper">
       {$form.contribution_check_number.label} <br />

@@ -927,8 +927,11 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -'))
     );
 
-    $form->addSelect('payment_instrument_id',
-      array('entity' => 'contribution', 'multiple' => 'multiple', 'label' => ts('Payment Method'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
+    // use contribution_payment_instrument_id instead of payment_instrument_id
+    // Contribution Edit form (pop-up on contribution/Contact(display Result as Contribution) open on search form),
+    // then payment method change action not working properly because of same html ID present two time on one page
+    $form->addSelect('contribution_payment_instrument_id',
+      array('entity' => 'contribution', 'field' => 'payment_instrument_id', 'multiple' => 'multiple', 'label' => ts('Payment Method'), 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
 
     $form->add('select',
