@@ -1243,8 +1243,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       );
     }
 
-    $membershipType = implode(', ', $membershipTypes);
-
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
     list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails($ids['userId']);
 

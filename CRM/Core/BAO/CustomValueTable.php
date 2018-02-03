@@ -641,6 +641,10 @@ AND    cf.id IN ( $fieldIDList )
           $cvParam['file_id'] = $fieldValue['value'];
         }
 
+        if ($cvParam['type'] == 'Memo' && $cvParam['value']) {
+          $cvParam['value'] = html_entity_decode($cvParam['value']);
+        }
+
         if (!array_key_exists($dao->table_name, $cvParams)) {
           $cvParams[$dao->table_name] = array();
         }

@@ -99,9 +99,11 @@ function civicrm_api3_custom_value_create($params) {
     $create['custom_' . $key] = $param;
   }
   $result = CRM_Core_BAO_CustomValueTable::setValues($create);
+
   if ($result['is_error']) {
     throw new Exception($result['error_message']);
   }
+
   return civicrm_api3_create_success(TRUE, $params, 'CustomValue');
 }
 

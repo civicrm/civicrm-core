@@ -129,6 +129,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @return CRM_Core_DAO_CustomField
    */
   public static function create(&$params) {
+
     $origParams = array_merge(array(), $params);
 
     $op = empty($params['id']) ? 'create' : 'edit';
@@ -2202,6 +2203,7 @@ ORDER BY html_type";
         );
       }
     }
+
     return $customData;
   }
 
