@@ -3525,8 +3525,9 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
     $obj = new $daoName();
     $obj->id = $id;
     $obj->find();
+    $hookParams = [];
     if ($obj->fetch()) {
-      CRM_Utils_Hook::pre('delete', $type, $id, CRM_Core_DAO::$_nullArray);
+      CRM_Utils_Hook::pre('delete', $type, $id, $hookParams);
       $contactId = $obj->contact_id;
       $obj->delete();
     }
