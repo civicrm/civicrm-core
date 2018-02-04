@@ -260,7 +260,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @dataProvider getPrimarySearchOptions
    */
-  public function testExportPrimaryAddress($isPrimaryOnly) {
+  public function testExportPrimaryAddress($isPrimaryOnly, $expectedCount) {
     \Civi::settings()->set('searchPrimaryDetailsOnly', $isPrimaryOnly);
     $this->setUpContactExportData();
 
@@ -288,7 +288,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->assertEquals('home@example.com', $dao->email);
     $this->assertEquals('work@example.com', $dao->work_email);
     $this->assertEquals('home@example.com', $dao->home_email);
-    $this->assertEquals(2, $dao->N);
+    $this->assertEquals($expectedCount, $dao->N);
     \Civi::settings()->set('searchPrimaryDetailsOnly', FALSE);
   }
 
@@ -297,7 +297,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @return array
    */
   public function getPrimarySearchOptions() {
-    return [[TRUE], [FALSE]];
+    return [[TRUE, 2], [FALSE, 3]];
   }
 
   /**
