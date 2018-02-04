@@ -1680,4 +1680,34 @@ class api_v3_JobTest extends CiviUnitTestCase {
     return $data;
   }
 
+  /**
+   * Test processing membership for deceased contacts.
+   */
+  public function testProcessMembership() {
+    $this->callAPISuccess('Job', 'process_membership', []);
+    $deadManWalkingID = $this->individualCreate();
+    $membershipID = $this->contactMembershipCreate(array('contact_id' => $deadManWalkingID));
+    $this->callAPISuccess('Contact', 'create', ['id' => $deadManWalkingID, 'is_deceased' => 1]);
+    $this->callAPISuccess('Job', 'process_membership', []);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipID]);
+    $deceasedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Deceased');
+    $this->assertEquals($deceasedStatusId, $membership['status_id']);
+  }
+
+  /**
+   * Test we get an error is deceased status is disabled.
+   */
+  public function testProcessMembershipNoDeceasedStatus() {
+    $deceasedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Deceased');
+    $this->callAPISuccess('MembershipStatus', 'create', ['is_active' => 0, 'id' => $deceasedStatusId]);
+    CRM_Core_PseudoConstant::flush();
+
+    $deadManWalkingID = $this->individualCreate();
+    $this->contactMembershipCreate(array('contact_id' => $deadManWalkingID));
+    $this->callAPISuccess('Contact', 'create', ['id' => $deadManWalkingID, 'is_deceased' => 1]);
+    $this->callAPIFailure('Job', 'process_membership', []);
+
+    $this->callAPISuccess('MembershipStatus', 'create', ['is_active' => 1, 'id' => $deceasedStatusId]);
+  }
+
 }
