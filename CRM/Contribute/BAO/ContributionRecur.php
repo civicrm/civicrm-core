@@ -897,7 +897,8 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @return array
    */
   public static function calculateRecurLineItems($recurId, $total_amount, $financial_type_id) {
-    $originalContribution = civicrm_api3('Contribution', 'getsingle', array('contribution_recur_id' => $recurId,
+    $originalContribution = civicrm_api3('Contribution', 'getsingle', array(
+    'contribution_recur_id' => $recurId,
     'contribution_test' => '',
     'return' => ['id', 'financial_type_id'],
     ));
