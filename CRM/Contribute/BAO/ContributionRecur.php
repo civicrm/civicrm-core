@@ -900,6 +900,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     $originalContribution = civicrm_api3('Contribution', 'getsingle', array(
     'contribution_recur_id' => $recurId,
     'contribution_test' => '',
+    'options' => ['limit' => 1],
     'return' => ['id', 'financial_type_id'],
     ));
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContribution['id']);
