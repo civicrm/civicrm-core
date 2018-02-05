@@ -396,7 +396,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    *
    * @param null $recordType
    */
-  public function select($recordType = NULL) {
+  public function select($recordType = 'target') {
     if (!array_key_exists("contact_{$recordType}", $this->_params['fields']) &&
       $recordType != 'final'
     ) {
@@ -499,7 +499,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    *
    * @param string $recordType
    */
-  public function from($recordType) {
+  public function from($recordType = 'target') {
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $activityTypeId = CRM_Core_DAO::getFieldValue("CRM_Core_DAO_OptionGroup", 'activity_type', 'id', 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
