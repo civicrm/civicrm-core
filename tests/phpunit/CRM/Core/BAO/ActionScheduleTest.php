@@ -1001,6 +1001,94 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ));
   }
 
+
+  /**
+   * CRM-21675: Support parent and smart group in 'Limit to' field
+   */
+  public function testScheduleReminderWithParentGroup() {
+    // Contact A with birth-date at '07-07-2005' and gender - Male, later got added in smart group
+    $contactID1 = $this->individualCreate(array('birth_date' => '20050707', 'gender_id' => 1, 'email' => 'abc@test.com'));
+    // Contact B with birth-date at '07-07-2005', later got added in regular group
+    $contactID2 = $this->individualCreate(array('birth_date' => '20050707', 'email' => 'def@test.com'), 1);
+    // Contact C with birth-date at '07-07-2005', but not included in any group
+    $contactID3 = $this->individualCreate(array('birth_date' => '20050707', 'email' => 'ghi@test.com'), 2);
+
+    // create regular group and add Contact B to it
+    $groupID = $this->groupCreate();
+    $this->callAPISuccess('GroupContact', 'Create', array(
+      'group_id' => $groupID,
+      'contact_id' => $contactID2,
+    ));
+
+    // create smart group which will contain all Male contacts
+    $smartGroupParams = array('formValues' => array('gender_id' => 1));
+    $smartGroupID = $this->smartGroupCreate(
+      $smartGroupParams,
+      array(
+        'name' => 'new_smart_group',
+        'title' => 'New Smart Group',
+        'parents' => array($groupID => 1),
+      )
+    );
+
+    $actionScheduleParams = array(
+      'name' => 'sched_contact_bday_yesterday',
+      'title' => 'sched_contact_bday_yesterday',
+      'absolute_date' => '',
+      'body_html' => '<p>you look like you were born yesterday!</p>',
+      'body_text' => 'you look like you were born yesterday!',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => 1,
+      'entity_value' => 'birth_date',
+      'limit_to' => 1,
+      'group_id' => $groupID,
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 6,
+      'msg_template_id' => '',
+      'recipient' => '2',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'date_field',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'day',
+      'subject' => 'subject sched_contact_bday_yesterday',
+    );
+
+    // Create schedule reminder where parent group ($groupID) is selectd to limit recipients,
+    // which contain a individual contact - $contactID2 and is parent to smart group.
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionScheduleParams);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+    $this->assertCronRuns(array(
+      array(
+        // On the birthday, no email.
+        'time' => '2005-07-07 01:00:00',
+        'recipients' => array(),
+      ),
+      array(
+        // The next day, send an email.
+        'time' => '2005-07-08 20:00:00',
+        'recipients' => array(
+          array(
+            'def@test.com',
+          ),
+          array(
+            'abc@test.com',
+          ),
+        ),
+      ),
+    ));
+    $this->groupDelete($smartGroupID);
+    $this->groupDelete($groupID);
+  }
+
   /**
    * Test end date email sent.
    *
