@@ -259,13 +259,22 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       $session = CRM_Core_Session::singleton();
       $params['created_id'] = $session->get('userID');
       $params['created_date'] = date('YmdHis');
+
+      // Add the best SMS provider as a default at this stage, so we can
+      // calculate recipients correctly.
+      $result = civicrm_api3('SmsProvider', 'get', array(
+        'is_active' => 1,
+        'options' => array('sort' => "is_default DESC, id ASC", 'limit' => 1),
+      ));
+      $params['sms_provider_id'] = !empty($result['id']) ? $result['id'] : NULL;
     }
 
+    // Create the mailing
     $mailing = CRM_Mailing_BAO_Mailing::create($params, $ids);
 
     $this->set('mailing_id', $mailing->id);
 
-    // also compute the recipients and store them in the mailing recipients table
+    // Compute the recipients and store them in the mailing recipients table
     CRM_Mailing_BAO_Mailing::getRecipients($mailing->id);
 
     $count = CRM_Mailing_BAO_Recipients::mailingSize($mailing->id);
