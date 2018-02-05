@@ -132,12 +132,13 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
    * @deprecated. Please use the buildOptions() method in the appropriate BAO object.
+   * TODO: buildOptions() doesn't replace this as it doesn't support filtering, which is used with this function.
    *
-   * Get all the financial Accounts
+   * Get all/filtered array of the financial Accounts
    *
    *
    * @param int $id
-   * @param int $financialAccountTypeId
+   * @param int $financialAccountTypeId Optional filer to return only financial accounts of type
    * @param string $retrieveColumn
    * @param string $key
    *
