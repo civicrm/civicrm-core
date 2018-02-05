@@ -370,8 +370,9 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       elseif ($membershipTypeDetails['duration_unit'] == 'month') {
         // Check if we are on or after rollover day of the month - CRM-10585
         // If so, set fixed_period_rollover TRUE so we increment end_date month below.
+        // Check as well if 'fixed_period_rollover_day' is null to prevent the increment of the month for issue CRM-20856
         $dateParts = explode('-', $actualStartDate);
-        if ($dateParts[2] >= $membershipTypeDetails['fixed_period_rollover_day']) {
+        if ($dateParts[2] >= $membershipTypeDetails['fixed_period_rollover_day'] && !is_null($membershipTypeDetails['fixed_period_rollover_day'])) {
           $fixed_period_rollover = TRUE;
         }
 
