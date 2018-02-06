@@ -1356,6 +1356,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'id' => $entity['id'],
         $field => isset($entity[$field]) ? $entity[$field] : NULL,
       );
+      if (!empty($specs['serialize'])) {
+        $updateParams[$field] = $entity[$field] = (array) $specs['serialize'];
+      }
       if (isset($updateParams['financial_type_id']) && in_array($entityName, array('Grant'))) {
         //api has special handling on these 2 fields for backward compatibility reasons
         $entity['contribution_type_id'] = $updateParams['financial_type_id'];
@@ -1377,6 +1380,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       );
 
       $checkEntity = $this->callAPISuccess($entityName, 'getsingle', $checkParams);
+      if (!empty($specs['serialize']) && !is_array($checkEntity[$field])) {
+        // Put into serialized format for comparison if 'get' has not returned serialized.
+        $entity[$field] = CRM_Core_DAO::serializeField($checkEntity[$field], $specs['serialize']);
+      }
 
       $this->assertAPIArrayComparison($entity, $checkEntity, array(), "checking if $fieldName was correctly updated\n" . print_r(array(
             'update-params' => $updateParams,
