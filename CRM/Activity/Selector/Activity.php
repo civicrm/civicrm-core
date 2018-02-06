@@ -181,6 +181,13 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       case 'Inbound Email':
         $url = 'civicrm/contact/view/activity';
         $qsView = "atype={$activityTypeId}&action=view&reset=1&id=%%id%%&cid=%%cid%%&context=%%cxt%%{$extraParams}";
+
+        if (CRM_Core_Permission::check('edit inbound email basic information')
+          || CRM_Core_Permission::check('edit inbound email basic information and content')
+        ) {
+          $showDelete = $showUpdate = TRUE;
+          $qsUpdate = "atype={$activityTypeId}&action=update&reset=1&id=%%id%%&cid=%%cid%%&context=%%cxt%%{$extraParams}";
+        }
         break;
 
       case 'Open Case':

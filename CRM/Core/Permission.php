@@ -759,6 +759,14 @@ class CRM_Core_Permission {
       'delete activities' => array(
         $prefix . ts('Delete activities'),
       ),
+      'edit inbound email basic information' => array(
+        $prefix . ts('edit inbound email basic information'),
+        ts('Edit all inbound email activities (for visible contacts) basic information. Content editing not allowed.'),
+      ),
+      'edit inbound email basic information and content' => array(
+        $prefix . ts('edit inbound email basic information and content'),
+        ts('Edit all inbound email activities (for visible contacts) basic information and content.'),
+      ),
       'access CiviCRM' => array(
         $prefix . ts('access CiviCRM'),
         ts('Master control for access to the main CiviCRM backend and API'),
