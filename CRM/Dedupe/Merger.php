@@ -1528,9 +1528,20 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     CRM_Core_OptionGroup::lookupValues($submitted, $names, TRUE);
 
     // fix custom fields so they're edible by createProfileContact()
-    static $treeCache = array();
+    $treeCache = array();
     if (!array_key_exists($migrationInfo['main_details']['contact_type'], $treeCache)) {
-      $treeCache[$migrationInfo['main_details']['contact_type']] = CRM_Core_BAO_CustomGroup::getTree($migrationInfo['main_details']['contact_type'], NULL, NULL, -1);
+      $treeCache[$migrationInfo['main_details']['contact_type']] = CRM_Core_BAO_CustomGroup::getTree(
+        $migrationInfo['main_details']['contact_type'],
+        NULL,
+        NULL,
+        -1,
+        array(),
+        NULL,
+        TRUE,
+        NULL,
+        FALSE,
+        FALSE
+      );
     }
 
     $cFields = array();
@@ -1696,12 +1707,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // move view only custom fields CRM-5362
     $viewOnlyCustomFields = array();
     foreach ($submitted as $key => $value) {
-      $fid = (int) substr($key, 7);
-      if (array_key_exists($fid, $cFields) && !empty($cFields[$fid]['attributes']['is_view'])) {
+      $fid = CRM_Core_BAO_CustomField::getKeyID($key);
+      if ($fid && array_key_exists($fid, $cFields) && !empty($cFields[$fid]['attributes']['is_view'])
+      ) {
         $viewOnlyCustomFields[$key] = $value;
       }
     }
-
     // special case to set values for view only, CRM-5362
     if (!empty($viewOnlyCustomFields)) {
       $viewOnlyCustomFields['entityID'] = $mainId;
