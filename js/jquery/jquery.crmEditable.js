@@ -29,6 +29,7 @@
         ret[fieldName] = $(this).text();
         if (this === el) {
           ret.field = fieldName;
+          ret.params = $(this).data('params');
         }
       }
     });
@@ -134,6 +135,9 @@
           $el = $($i),
           params = {},
           action = $i.data('action') || info.action;
+        if (info.params) {
+          params = info.params;
+        }
         if (!info.field) {
           return false;
         }
