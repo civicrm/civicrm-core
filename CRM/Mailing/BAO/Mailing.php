@@ -125,20 +125,25 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $isSMSmode = (!CRM_Utils_System::isNull($mailingObj->sms_provider_id));
 
     $mailingGroup = new CRM_Mailing_DAO_MailingGroup();
-    $recipientsGroup = $excludeSmartGroupIDs = $includeSmartGroupIDs = array();
+    $recipientsGroup = $excludeSmartGroupIDs = $includeSmartGroupIDs = $priorMailingIDs = array();
     $dao = CRM_Utils_SQL_Select::from('civicrm_mailing_group')
-             ->select('GROUP_CONCAT(entity_id SEPARATOR ",") as group_ids, group_type')
-             ->where('mailing_id = #mailing_id AND entity_table = "civicrm_group"')
-             ->groupBy('group_type')
+             ->select('GROUP_CONCAT(entity_id SEPARATOR ",") as group_ids, group_type, entity_table')
+             ->where('mailing_id = #mailing_id AND entity_table IN ("civicrm_group", "civicrm_mailing")')
+             ->groupBy(array('group_type', 'entity_table'))
              ->param('#mailing_id', $mailingID)
              ->execute();
     while ($dao->fetch()) {
-      $recipientsGroup[$dao->group_type] = explode(',', $dao->group_ids);
+      if ($dao->entity_table == 'civicrm_mailing') {
+        $priorMailingIDs[$dao->group_type] = explode(',', $dao->group_ids);
+      }
+      else {
+        $recipientsGroup[$dao->group_type] = explode(',', $dao->group_ids);
+      }
     }
 
     // there is no need to proceed further if no mailing group is selected to include recipients,
     // but before return clear the mailing recipients populated earlier since as per current params no group is selected
-    if (empty($recipientsGroup['Include'])) {
+    if (empty($recipientsGroup['Include']) && empty($priorMailingIDs['Include'])) {
       CRM_Core_DAO::executeQuery(" DELETE FROM civicrm_mailing_recipients WHERE  mailing_id = %1 ", array(1 => array($mailingID, 'Integer')));
       return;
     }
@@ -174,6 +179,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
             (contact_id int primary key)
             ENGINE=HEAP"
     );
+    // populate exclude temp-table with recipients to be excluded from the list
+    //  on basis of selected recipients groups and/or previous mailing
     if (!empty($recipientsGroup['Exclude'])) {
       CRM_Utils_SQL_Select::from('civicrm_group_contact')
         ->select('DISTINCT contact_id')
@@ -191,6 +198,14 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
           ->execute();
       }
     }
+    if (!empty($priorMailingIDs['Exclude'])) {
+      CRM_Utils_SQL_Select::from('civicrm_mailing_recipients')
+        ->select('DISTINCT contact_id')
+        ->where('mailing_id IN (#mailings)')
+        ->param('#mailings', $priorMailingIDs['Exclude'])
+        ->insertIgnoreInto($excludeTempTablename, array('contact_id'))
+        ->execute();
+    }
 
     if (!empty($recipientsGroup['Base'])) {
       CRM_Utils_SQL_Select::from('civicrm_group_contact')
@@ -201,79 +216,85 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         ->execute();
     }
 
-    $tempColumn = $isSMSmode ? 'phone_id' : 'email_id';
-    $email = CRM_Core_DAO_Email::getTableName();
+    $entityColumn = $isSMSmode ? 'phone_id' : 'email_id';
+    $entityTable = $isSMSmode ? CRM_Core_DAO_Phone::getTableName() : CRM_Core_DAO_Email::getTableName();
     // Get all the group contacts we want to include.
     $mailingGroup->query(
       "CREATE TEMPORARY TABLE $includedTempTablename
-            (contact_id int primary key, $tempColumn int)
+            (contact_id int primary key, $entityColumn int)
             ENGINE=HEAP"
     );
 
-    // Criterias to filter recipients that need to be included
-    $includeFilters = array(
-      "$contact.do_not_email = 0",
-      "$contact.is_opt_out = 0",
-      "$contact.is_deceased <> 1",
-      $location_filter,
-      "$email.email IS NOT NULL",
-      "$email.email != ''",
-      'temp.contact_id IS NULL',
-    );
-
     if ($isSMSmode) {
-      $phone = CRM_Core_DAO_Phone::getTableName();
-      CRM_Utils_SQL_Select::from($phone)
-        ->select(" DISTINCT $phone.id as phone_id ")
-        ->join($contact, " INNER JOIN $contact ON $phone.contact_id = $contact.id ")
-        ->join('gc', " INNER JOIN civicrm_group_contact gc ON $contact.id = gc.contact_id ")
-        ->join('mg', " INNER JOIN civicrm_mailing_group mg ON gc.group_id = mg.entity_id AND mg.entity_table = 'civicrm_group' ")
-        ->join('temp', " LEFT JOIN $excludeTempTablename temp ON $contact.id = temp.contact_id ")
-        ->where(array(
-            "mg.group_type = 'Include'",
-            'mg.search_id IS NULL',
-            "gc.status = 'Added'",
-            "$contact.do_not_sms",
-            "$contact.is_opt_out = 0",
-            "$contact.is_deceased <> 1",
-            "$phone.phone_type_id = " . CRM_Utils_Array::value('Mobile', CRM_Core_OptionGroup::values('phone_type', TRUE, FALSE, FALSE, NULL, 'name')),
-            "$phone.phone IS NOT NULL",
-            "$phone.phone != ''",
-            "mg.mailing_id = #mailingID",
-            'temp.contact_id IS null',
-        ))
-        ->param('#mailingID', $mailingID)
-        ->replaceInto($includedTempTablename, array('contact_id', 'phone_id'))
-        ->execute();
+      $includeFilters = array(
+        "mg.group_type = 'Include'",
+        'mg.search_id IS NULL',
+        "$contact.is_opt_out = 0",
+        "$contact.is_deceased <> 1",
+        "$entityTable.phone_type_id = " . CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_Phone', 'phone_type_id', 'Mobile'),
+        "$entityTable.phone IS NOT NULL",
+        "$entityTable.phone != ''",
+        "$entityTable.is_primary = 1",
+        "mg.mailing_id = #mailingID",
+        'temp.contact_id IS null',
+      );
+      $order_by = array("$entityTable.is_primary = 1");
     }
     else {
-      // Get the group contacts, but only those which are not in the
-      // exclusion temp table.
-      CRM_Utils_SQL_Select::from($email)
-        ->select("$contact.id as contact_id, $email.id as email_id")
-        ->join($contact, " INNER JOIN $contact ON $email.contact_id = $contact.id ")
+      // Criterias to filter recipients that need to be included
+      $includeFilters = array(
+        "$contact.do_not_email = 0",
+        "$contact.is_opt_out = 0",
+        "$contact.is_deceased <> 1",
+        $location_filter,
+        "$entityTable.email IS NOT NULL",
+        "$entityTable.email != ''",
+        "mg.mailing_id = #mailingID",
+        'temp.contact_id IS NULL',
+      );
+    }
+
+    // Get the group contacts, but only those which are not in the
+    // exclusion temp table.
+    if (!empty($recipientsGroup['Include'])) {
+      CRM_Utils_SQL_Select::from($entityTable)
+        ->select("$contact.id as contact_id, $entityTable.id as $entityColumn")
+        ->join($contact, " INNER JOIN $contact ON $entityTable.contact_id = $contact.id ")
         ->join('gc', " INNER JOIN civicrm_group_contact gc ON gc.contact_id = $contact.id ")
         ->join('mg', " INNER JOIN civicrm_mailing_group mg  ON  gc.group_id = mg.entity_id AND mg.search_id IS NULL ")
         ->join('temp', " LEFT JOIN $excludeTempTablename temp ON $contact.id = temp.contact_id ")
         ->where('gc.group_id IN (#groups) AND gc.status = "Added"')
         ->where($includeFilters)
-        ->groupBy(array("$contact.id", "$email.id"))
-        ->replaceInto($includedTempTablename, array('contact_id', 'email_id'))
+        ->groupBy(array("$contact.id", "$entityTable.id"))
+        ->replaceInto($includedTempTablename, array('contact_id', $entityColumn))
         ->param('#groups', $recipientsGroup['Include'])
+        ->param('#mailingID', $mailingID)
+        ->execute();
+    }
+
+    // Get recipients selected in prior mailings
+    if (!empty($priorMailingIDs['Include'])) {
+      CRM_Utils_SQL_Select::from('civicrm_mailing_recipients')
+        ->select("contact_id, $entityColumn")
+        ->where('mailing_id IN (#mailings)')
+        ->param('#mailings', $priorMailingIDs['Include'])
+        ->insertIgnoreInto($includedTempTablename, array('contact_id', $entityColumn))
         ->execute();
     }
 
     if (count($includeSmartGroupIDs)) {
-      CRM_Utils_SQL_Select::from($contact)
-        ->select("$contact.id as contact_id, $email.id as email_id")
-        ->join($email, " INNER JOIN $email ON $email.contact_id = $contact.id ")
-        ->join('gc', " INNER JOIN civicrm_group_contact_cache gc ON gc.contact_id = $contact.id ")
-        ->join('temp', " LEFT JOIN $excludeTempTablename temp ON temp.contact_id = $contact.id ")
+      $query = CRM_Utils_SQL_Select::from($contact)
+        ->select("$contact.id as contact_id, $entityTable.id as $entityColumn")
+        ->join($entityTable, " INNER JOIN $entityTable ON $entityTable.contact_id = $contact.id ")
+        ->join('gc', " INNER JOIN civicrm_group_contact_cache gc ON $contact.id = gc.contact_id ")
+        ->join('mg', " INNER JOIN civicrm_mailing_group mg  ON  gc.group_id = mg.entity_id AND mg.search_id IS NULL ")
+        ->join('temp', " LEFT JOIN $excludeTempTablename temp ON $contact.id = temp.contact_id ")
         ->where('gc.group_id IN (#groups)')
         ->where($includeFilters)
         ->orderBy($order_by)
-        ->replaceInto($includedTempTablename, array('contact_id', 'email_id'))
+        ->replaceInto($includedTempTablename, array('contact_id', $entityColumn))
         ->param('#groups', $includeSmartGroupIDs)
+        ->param('#mailingID', $mailingID)
         ->execute();
     }
 
@@ -288,7 +309,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         $dao->search_args,
         $dao->entity_id
       );
-      $query = "REPLACE INTO {$includedTempTablename} ($tempColumn, contact_id) {$customSQL} ";
+      $query = "REPLACE INTO {$includedTempTablename} ($entityColumn, contact_id) {$customSQL} ";
       $mailingGroup->query($query);
     }
 
@@ -297,16 +318,16 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     // clear all the mailing recipients before populating
     CRM_Core_DAO::executeQuery(" DELETE FROM civicrm_mailing_recipients WHERE  mailing_id = %1 ", array(1 => array($mailingID, 'Integer')));
 
-    $selectClause = array('#mailingID', 'i.contact_id', "i.$tempColumn");
+    $selectClause = array('#mailingID', 'i.contact_id', "i.$entityColumn");
     // CRM-3975
-    $orderBy = array("i.contact_id", "i.$tempColumn");
+    $orderBy = array("i.contact_id", "i.$entityColumn");
 
     $query = CRM_Utils_SQL_Select::from('civicrm_contact contact_a')->join('i', " INNER JOIN {$includedTempTablename} i ON contact_a.id = i.contact_id ");
-    if ($mailingObj->dedupe_email) {
-      $orderBy = array("MIN(i.contact_id)", "MIN(i.$tempColumn)");
+    if (!$isSMSmode && $mailingObj->dedupe_email) {
+      $orderBy = array("MIN(i.contact_id)", "MIN(i.$entityColumn)");
       $query = $query->join('e', " INNER JOIN civicrm_email e ON e.id = i.email_id ")->groupBy("e.email");
       if (CRM_Utils_SQL::supportsFullGroupBy()) {
-        $selectClause = array('#mailingID', 'ANY_VALUE(i.contact_id) contact_id', "ANY_VALUE(i.$tempColumn) $tempColumn", "e.email");
+        $selectClause = array('#mailingID', 'ANY_VALUE(i.contact_id) contact_id', "ANY_VALUE(i.$entityColumn) $entityColumn", "e.email");
       }
     }
 
@@ -326,12 +347,12 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
       $sql = $query->toSQL();
       CRM_Utils_SQL_Select::from("( $sql ) AS i ")
         ->select($selectClause)
-        ->insertInto('civicrm_mailing_recipients', array('mailing_id', 'contact_id', $tempColumn))
+        ->insertInto('civicrm_mailing_recipients', array('mailing_id', 'contact_id', $entityColumn))
         ->param('#mailingID', $mailingID)
         ->execute();
     }
     else {
-      $query->insertInto('civicrm_mailing_recipients', array('mailing_id', 'contact_id', $tempColumn))
+      $query->insertInto('civicrm_mailing_recipients', array('mailing_id', 'contact_id', $entityColumn))
         ->param('#mailingID', $mailingID)
         ->execute();
     }
