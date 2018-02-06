@@ -1313,7 +1313,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @param string $sql
    */
-  protected function addToDeveloperTab($sql) {
+  public function addToDeveloperTab($sql) {
     if (!CRM_Core_Permission::check('view report sql')) {
       return;
     }
