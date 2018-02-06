@@ -35,6 +35,17 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Things to test:
+   * - include static group(s)
+   * - include smart group(s)
+   * - exclude static group(s)
+   * - exclude smart group(s)
+   * - include previous recipients(ss)
+   * - exclude previous recipients(ss)
+   * Repeat for SMS.
+   */
+
+  /**
    * Test CRM_Mailing_BAO_Mailing::getRecipients() on sms mode
    */
   public function testgetRecipients() {
@@ -87,20 +98,21 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
           'is_primary' => 0,
         ))),
       ),
+      // Create the non-primary with a lower ID than the primary, to test CRM-21320
       $contactID2 => array(
-        'primary_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
+        'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
           'contact_id' => $contactID2,
           'phone' => "02 01",
           'location_type_id' => "Home",
           'phone_type_id' => "Mobile",
-          'is_primary' => 1,
+          'is_primary' => 0,
         ))),
-        'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
+        'primary_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
           'contact_id' => $contactID2,
           'phone' => "02 02",
           'location_type_id' => "Work",
           'phone_type_id' => "Mobile",
-          'is_primary' => 0,
+          'is_primary' => 1,
         ))),
       ),
     );
