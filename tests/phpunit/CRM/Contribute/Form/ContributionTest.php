@@ -863,12 +863,17 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
   /**
    * Test the submit function on the contribution page.
+   *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testSubmitUpdate() {
+  public function testSubmitUpdate($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit(array(
-        'total_amount' => 50,
+        'total_amount' => $this->formatMoneyInput(6100.10),
         'financial_type_id' => 1,
         'contact_id' => $this->_individualId,
         'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
@@ -878,8 +883,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       CRM_Core_Action::ADD);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
     $form->testSubmit(array(
-      'total_amount' => 45,
-      'net_amount' => 45,
+      'total_amount' => $this->formatMoneyInput(5200.20),
+      'net_amount' => $this->formatMoneyInput(5200.20),
       'financial_type_id' => 1,
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
@@ -889,25 +894,30 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     ),
       CRM_Core_Action::UPDATE);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
-    $this->assertEquals(45, (int) $contribution['total_amount']);
+    $this->assertEquals(5200.20, $contribution['total_amount'], 2);
 
     $financialTransactions = $this->callAPISuccess('FinancialTrxn', 'get', array('sequential' => TRUE));
     $this->assertEquals(2, $financialTransactions['count']);
-    $this->assertEquals(50, $financialTransactions['values'][0]['total_amount']);
-    $this->assertEquals(-5, $financialTransactions['values'][1]['total_amount']);
-    $this->assertEquals(-5, $financialTransactions['values'][1]['net_amount']);
+    $this->assertEquals(6100.10, $financialTransactions['values'][0]['total_amount']);
+    $this->assertEquals(-899.90, $financialTransactions['values'][1]['total_amount']);
+    $this->assertEquals(-899.90, $financialTransactions['values'][1]['net_amount']);
     $lineItem = $this->callAPISuccessGetSingle('LineItem', array());
-    $this->assertEquals(45, $lineItem['line_total']);
+    $this->assertEquals(5200.20, $lineItem['line_total']);
   }
 
   /**
    * Test the submit function if only payment instrument is changed from 'Check' to 'Credit Card'
+   *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testSubmitUpdateChangePaymentInstrument() {
+  public function testSubmitUpdateChangePaymentInstrument($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit(array(
-        'total_amount' => 50,
+        'total_amount' => 1200.55,
         'financial_type_id' => 1,
         'contact_id' => $this->_individualId,
         'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
@@ -918,8 +928,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       CRM_Core_Action::ADD);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
     $form->testSubmit(array(
-      'total_amount' => 50,
-      'net_amount' => 50,
+      'total_amount' => 1200.55,
+      'net_amount' => 1200.55,
       'financial_type_id' => 1,
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
@@ -931,22 +941,22 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     ),
       CRM_Core_Action::UPDATE);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
-    $this->assertEquals(50, (int) $contribution['total_amount']);
+    $this->assertEquals(1200.55, $contribution['total_amount']);
 
     $financialTransactions = $this->callAPISuccess('FinancialTrxn', 'get', array('sequential' => TRUE));
     $this->assertEquals(3, $financialTransactions['count']);
 
     list($oldTrxn, $reversedTrxn, $latestTrxn) = $financialTransactions['values'];
 
-    $this->assertEquals(50, $oldTrxn['total_amount']);
+    $this->assertEquals(1200.55, $oldTrxn['total_amount']);
     $this->assertEquals('123AX', $oldTrxn['check_number']);
     $this->assertEquals(array_search('Check', $this->paymentInstruments), $oldTrxn['payment_instrument_id']);
 
-    $this->assertEquals(-50, $reversedTrxn['total_amount']);
+    $this->assertEquals(-1200.55, $reversedTrxn['total_amount']);
     $this->assertEquals('123AX', $reversedTrxn['check_number']);
     $this->assertEquals(array_search('Check', $this->paymentInstruments), $reversedTrxn['payment_instrument_id']);
 
-    $this->assertEquals(50, $latestTrxn['total_amount']);
+    $this->assertEquals(1200.55, $latestTrxn['total_amount']);
     $this->assertEquals('1011', $latestTrxn['pan_truncation']);
     $this->assertEquals(array_search('Credit Card', $this->paymentInstruments), $latestTrxn['payment_instrument_id']);
     $lineItem = $this->callAPISuccessGetSingle('LineItem', array());
@@ -1015,14 +1025,19 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
   /**
    * Test the submit function for FT with tax.
+   *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testSubmitSaleTax() {
+  public function testSubmitSaleTax($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
     $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit(array(
-       'total_amount' => 100,
+       'total_amount' => $this->formatMoneyInput(1000.00),
         'financial_type_id' => $this->_financialTypeId,
         'contact_id' => $this->_individualId,
         'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
@@ -1037,13 +1052,13 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
         'return' => array('tax_amount', 'total_amount'),
       )
     );
-    $this->assertEquals(110, $contribution['total_amount']);
-    $this->assertEquals(10, $contribution['tax_amount']);
+    $this->assertEquals(1100, $contribution['total_amount']);
+    $this->assertEquals(100, $contribution['tax_amount']);
     $this->callAPISuccessGetCount('FinancialTrxn', array(), 1);
     $this->callAPISuccessGetCount('FinancialItem', array(), 2);
     $lineItem = $this->callAPISuccessGetSingle('LineItem', array('contribution_id' => $contribution['id']));
-    $this->assertEquals(100, $lineItem['line_total']);
-    $this->assertEquals(10, $lineItem['tax_amount']);
+    $this->assertEquals(1000, $lineItem['line_total']);
+    $this->assertEquals(100, $lineItem['tax_amount']);
 
     // CRM-20423: Upon simple submit of 'Edit Contribution' form ensure that total amount is same
     $form->testSubmit(array(
@@ -1058,7 +1073,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
     // Check if total amount is unchanged
-    $this->assertEquals(110, $contribution['total_amount']);
+    $this->assertEquals(1100, $contribution['total_amount']);
   }
 
   /**
@@ -1103,15 +1118,20 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   /**
    * Create a contribution & then edit it via backoffice form, checking tax with: default price_set
    *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
+   *
    * @throws \Exception
    */
-  public function testReSubmitSaleTax() {
+  public function testReSubmitSaleTax($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
     $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
     list($form, $contribution) = $this->doInitialSubmit();
-    $this->assertEquals(110, $contribution['total_amount']);
-    $this->assertEquals(10, $contribution['tax_amount']);
-    $this->assertEquals(110, $contribution['net_amount']);
+    $this->assertEquals(11000, $contribution['total_amount']);
+    $this->assertEquals(1000, $contribution['tax_amount']);
+    $this->assertEquals(11000, $contribution['net_amount']);
 
     $mut = new CiviMailUtils($this, TRUE);
     // Testing here if when we edit something trivial like adding a check_number tax, net, total amount stay the same:
@@ -1135,13 +1155,13 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
         'return' => array('tax_amount', 'total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'payment_instrument_id'),
       )
     );
-    $this->assertEquals(110, $contribution['total_amount']);
-    $this->assertEquals(10, $contribution['tax_amount']);
-    $this->assertEquals(110, $contribution['net_amount']);
+    $this->assertEquals(11000, $contribution['total_amount']);
+    $this->assertEquals(1000, $contribution['tax_amount']);
+    $this->assertEquals(11000, $contribution['net_amount']);
 
     $strings = array(
-      'Total Tax Amount : $ 10.00',
-      'Total Amount : $ 110.00',
+      'Total Tax Amount : $ ' . $this->formatMoneyInput(1000.00),
+      'Total Amount : $ ' . $this->formatMoneyInput(11000.00),
       'Date Received: April 21st, 2015',
       'Paid By: Check',
       'Check Number: 12345',
@@ -1154,16 +1174,21 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
     $this->assertEquals('Sales Tax', $items['values'][1]['description']);
 
-    $this->assertEquals(100, $items['values'][0]['amount']);
-    $this->assertEquals(10, $items['values'][1]['amount']);
+    $this->assertEquals(10000, $items['values'][0]['amount']);
+    $this->assertEquals(1000, $items['values'][1]['amount']);
   }
 
   /**
    * Create a contribution & then edit it via backoffice form, checking tax with: default price_set
    *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
+   *
    * @throws \Exception
    */
-  public function testReSubmitSaleTaxAlteredAmount() {
+  public function testReSubmitSaleTaxAlteredAmount($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
     $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
     list($form, $contribution) = $this->doInitialSubmit();
@@ -1172,8 +1197,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     // Testing here if when we edit something trivial like adding a check_number tax, net, total amount stay the same:
     $form->testSubmit(array(
       'id' => $contribution['id'],
-      'total_amount' => 200,
-      'tax_amount' => 20,
+      'total_amount' => $this->formatMoneyInput(20000),
+      'tax_amount' => $this->formatMoneyInput(2000),
       'financial_type_id' => $contribution['financial_type_id'],
       'receive_date' => $contribution['receive_date'],
       'payment_instrument_id' => $contribution['payment_instrument_id'],
@@ -1191,13 +1216,13 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
         'return' => array('tax_amount', 'total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'payment_instrument_id'),
       )
     );
-    $this->assertEquals(220, $contribution['total_amount']);
-    $this->assertEquals(20, $contribution['tax_amount']);
-    $this->assertEquals(220, $contribution['net_amount']);
+    $this->assertEquals(22000, $contribution['total_amount']);
+    $this->assertEquals(2000, $contribution['tax_amount']);
+    $this->assertEquals(22000, $contribution['net_amount']);
 
     $strings = array(
-      'Total Tax Amount : $ 20.00',
-      'Total Amount : $ 220.00',
+      'Total Tax Amount : $ ' . $this->formatMoneyInput(2000),
+      'Total Amount : $ ' . $this->formatMoneyInput(22000.00),
       'Date Received: April 21st, 2015',
       'Paid By: Check',
       'Check Number: 12345',
@@ -1212,10 +1237,10 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
     $this->assertEquals('Sales Tax', $items['values'][1]['description']);
 
-    $this->assertEquals(100, $items['values'][0]['amount']);
-    $this->assertEquals(10, $items['values'][1]['amount']);
-    $this->assertEquals(100, $items['values'][2]['amount']);
-    $this->assertEquals(10, $items['values'][3]['amount']);
+    $this->assertEquals(10000, $items['values'][0]['amount']);
+    $this->assertEquals(1000, $items['values'][1]['amount']);
+    $this->assertEquals(10000, $items['values'][2]['amount']);
+    $this->assertEquals(1000, $items['values'][3]['amount']);
   }
 
   /**
@@ -1229,7 +1254,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit(array(
-      'total_amount' => 100,
+      'total_amount' => $this->formatMoneyInput(10000),
       'financial_type_id' => $this->_financialTypeId,
       'receive_date' => '2015-04-21 00:00:00',
       'contact_id' => $this->_individualId,
@@ -1252,9 +1277,9 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
         ),
       )
     );
-    $this->assertEquals(110, $contribution['total_amount']);
-    $this->assertEquals(10, $contribution['tax_amount']);
-    $this->assertEquals(110, $contribution['net_amount']);
+    $this->assertEquals(11000, $contribution['total_amount']);
+    $this->assertEquals(1000, $contribution['tax_amount']);
+    $this->assertEquals(11000, $contribution['net_amount']);
     return array($form, $contribution);
   }
 

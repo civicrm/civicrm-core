@@ -1550,10 +1550,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       // get the required field value only.
 
-      $params = $ids = array();
-
-      $params['contact_id'] = $this->_contactID;
-      $params['currency'] = $this->getCurrency($submittedValues);
+      $params = [
+        'contact_id' => $this->_contactID,
+        'currency' => $this->getCurrency($submittedValues),
+        'skipCleanMoney' => TRUE,
+        'id' => $this->_id,
+      ];
 
       //format soft-credit/pcp param first
       CRM_Contribute_BAO_ContributionSoft::formatSoftCreditParams($submittedValues, $this);
@@ -1573,10 +1575,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params[$f] = CRM_Utils_Array::value($f, $formValues);
       }
 
-      // CRM-5740 if priceset is used, no need to cleanup money.
-      if ($priceSetId) {
-        $params['skipCleanMoney'] = 1;
-      }
       $params['revenue_recognition_date'] = NULL;
       if (!empty($formValues['revenue_recognition_date'])
         && count(array_filter($formValues['revenue_recognition_date'])) == 2
@@ -1609,8 +1607,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params['is_pay_later'] = 0;
       }
 
-      $ids['contribution'] = $params['id'] = $this->_id;
-
       // Add Additional common information to formatted params.
       CRM_Contribute_Form_AdditionalInfo::postProcessCommon($formValues, $params, $this);
       if ($pId) {
@@ -1636,7 +1632,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (!empty($params['note']) && !empty($submittedValues['note'])) {
         unset($params['note']);
       }
-      $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
+      $contribution = CRM_Contribute_BAO_Contribution::create($params);
 
       // process associated membership / participant, CRM-4395
       if ($contribution->id && $action & CRM_Core_Action::UPDATE) {
