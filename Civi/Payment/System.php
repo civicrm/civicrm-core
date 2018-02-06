@@ -52,10 +52,10 @@ class System {
         require_once $ext->classToPath($paymentClass);
       }
       else {
-        $paymentClass = 'CRM_Core_' . $processor['class_name'];
-        if (empty($paymentClass)) {
+        if (empty($processor['class_name'])) {
           throw new \CRM_Core_Exception('no class provided');
         }
+        $paymentClass = 'CRM_Core_' . $processor['class_name'];
         require_once str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php';
       }
 
