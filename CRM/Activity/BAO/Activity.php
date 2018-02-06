@@ -2197,7 +2197,8 @@ WHERE      activity.id IN ($activityIds)";
           $subject .= " - {$entityObj->source}";
         }
 
-        return $subject;
+        // Amount and source could exceed max length of subject column.
+        return CRM_Utils_String::ellipsify($subject, 255);
     }
   }
 
