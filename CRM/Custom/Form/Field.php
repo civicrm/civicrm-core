@@ -1002,7 +1002,6 @@ SELECT id
       $params['id'] = $this->_id;
     }
 
-
     $customField = CRM_Core_BAO_CustomField::create($params);
     $this->_id = $customField->id;
 
