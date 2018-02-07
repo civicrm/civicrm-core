@@ -37,54 +37,59 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    */
   public function checkPhpVersion() {
     $messages = array();
+    $phpVersion = phpversion();
 
-    if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) >= 0) {
+    if (version_compare($phpVersion, CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER) >= 0) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('This system uses PHP version %1 which meets or exceeds the minimum recommendation of %2.',
+        ts('This system uses PHP version %1 which meets or exceeds the recommendation of %2.',
           array(
-            1 => phpversion(),
-            2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+            1 => $phpVersion,
+            2 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
           )),
         ts('PHP Up-to-Date'),
         \Psr\Log\LogLevel::INFO,
         'fa-server'
       );
     }
-    elseif (version_compare(phpversion(), CRM_Upgrade_Incremental_General::PREVIOUS_MIN_RECOMMENDED_PHP_VER) >= 0) {
+    elseif (version_compare($phpVersion, CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) >= 0) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('This system uses PHP version %1. While this meets the minimum requirements for CiviCRM to function, upgrading to PHP version %2 or newer is recommended for maximum compatibility.',
+        ts('This system uses PHP version %1. This meets the minimum recommendations and you do not need to upgrade immediately, but the preferred version is %2.',
           array(
-            1 => phpversion(),
-            2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
-            3 => CRM_Upgrade_Incremental_General::MIN_DEFECT_PHP_VER,
+            1 => $phpVersion,
+            2 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
           )),
         ts('PHP Out-of-Date'),
         \Psr\Log\LogLevel::NOTICE,
         'fa-server'
       );
     }
-    else {
-      $date = '';
-      $dateFormat = Civi::Settings()->get('dateformatshortdate');
-      if (version_compare(phpversion(), 5.4) < 0) {
-        $date = CRM_Utils_Date::customFormat('2017-12-31', $dateFormat);
-      }
-      elseif (version_compare(phpversion(), 5.5) < 0) {
-        $date = CRM_Utils_Date::customFormat('2018-02-28', $dateFormat);
-      }
+    elseif (version_compare($phpVersion, CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER) >= 0) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('This system uses PHP version %1. CiviCRM can be installed on this version. However PHP version %1 will not work in releases published after %2, and version %3 is recommended. For more explanation see <a href="%4"> the announcement</a>',
+        ts('This system uses PHP version %1. This meets the minimum requirements for CiviCRM to function but is not recommended. At least PHP version %2 is recommended; the preferrred version is %3.',
           array(
-            1 => phpversion(),
-            2 => $date,
-            3 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
-            4 => 'https://civicrm.org/blog/totten/end-of-zombies-php-53-and-54',
+            1 => $phpVersion,
+            2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+            3 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
           )),
         ts('PHP Out-of-Date'),
         \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+    }
+    else {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('This system uses PHP version %1. To ensure the continued operation of CiviCRM, upgrade your server now. At least PHP version %2 is recommended; the preferrred version is %3.',
+          array(
+            1 => $phpVersion,
+            2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+            3 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
+          )),
+        ts('PHP Out-of-Date'),
+        \Psr\Log\LogLevel::ERROR,
         'fa-server'
       );
     }

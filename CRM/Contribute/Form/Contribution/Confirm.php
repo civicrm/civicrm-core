@@ -158,7 +158,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param array $params
    * @param int $financialTypeID
-   * @param float $nonDeductibleAmount
    * @param bool $pending
    * @param array $paymentProcessorOutcome
    * @param string $receiptDate
@@ -167,13 +166,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return array
    */
   public static function getContributionParams(
-    $params, $financialTypeID, $nonDeductibleAmount, $pending,
+    $params, $financialTypeID, $pending,
     $paymentProcessorOutcome, $receiptDate, $recurringContributionID) {
     $contributionParams = array(
       'financial_type_id' => $financialTypeID,
       'receive_date' => (CRM_Utils_Array::value('receive_date', $params)) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
-      'non_deductible_amount' => $nonDeductibleAmount,
-      'total_amount' => $params['amount'],
       'tax_amount' => CRM_Utils_Array::value('tax_amount', $params),
       'amount_level' => CRM_Utils_Array::value('amount_level', $params),
       'invoice_id' => $params['invoiceID'],
@@ -201,10 +198,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         'trxn_result_code' => CRM_Utils_Array::value('trxn_result_code', $paymentProcessorOutcome),
       );
     }
-
-    // CRM-4038: for non-en_US locales, CRM_Contribute_BAO_Contribution::add() expects localised amounts
-    $contributionParams['non_deductible_amount'] = trim(CRM_Utils_Money::format($contributionParams['non_deductible_amount'], ' '));
-    $contributionParams['total_amount'] = trim(CRM_Utils_Money::format($contributionParams['total_amount'], ' '));
 
     if ($recurringContributionID) {
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
@@ -299,7 +292,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // lineItem isn't set until Register postProcess
     $this->_lineItem = $this->get('lineItem');
     $this->_ccid = $this->get('ccid');
-    $this->_paymentProcessor = $this->get('paymentProcessor');
+
     $this->_params = $this->controller->exportValues('Main');
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->get('amount');
@@ -950,7 +943,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $params['is_recur'] = $isRecur;
     $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $contributionParams);
     $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $financialType);
-    $nonDeductibleAmount = self::getNonDeductibleAmount($params, $financialType, $online, $form);
 
     $now = date('YmdHis');
     $receiptDate = CRM_Utils_Array::value('receipt_date', $params);
@@ -960,10 +952,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if (isset($params['amount'])) {
       $contributionParams = array_merge(self::getContributionParams(
-        $params, $financialType->id, $nonDeductibleAmount, TRUE,
+        $params, $financialType->id, TRUE,
         $result, $receiptDate,
         $recurringContributionID), $contributionParams
       );
+      $contributionParams['non_deductible_amount'] = self::getNonDeductibleAmount($params, $financialType, $online, $form);
+      $contributionParams['skipCleanMoney'] = TRUE;
+      // @todo this is the wrong place for this - it should be done as close to form submission
+      // as possible
+      $contributionParams['total_amount'] = $params['amount'];
       $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
 
       $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
@@ -1988,6 +1985,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     $priceFields = $priceFields[$priceSetID]['fields'];
+    $lineItems = array();
     CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
     $form->_lineItem = array($priceSetID => $lineItems);
     $membershipPriceFieldIDs = array();

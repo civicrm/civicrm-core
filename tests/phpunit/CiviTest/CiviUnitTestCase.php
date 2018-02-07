@@ -2577,6 +2577,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $var = TRUE;
     CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
     $this->disableTaxAndInvoicing();
+    $this->setCurrencySeparators(',');
+    CRM_Core_PseudoConstant::flush('taxRates');
     System::singleton()->flushProcessors();
   }
 
@@ -3927,6 +3929,37 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Core_Controller();
     return $form;
+  }
+
+  /**
+   * Get possible thousand separators.
+   *
+   * @return array
+   */
+  public function getThousandSeparators() {
+    return array(array('.'), array(','));
+  }
+
+  /**
+   * Set the separators for thousands and decimal points.
+   *
+   * @param string $thousandSeparator
+   */
+  protected function setCurrencySeparators($thousandSeparator) {
+    Civi::settings()->set('monetaryThousandSeparator', $thousandSeparator);
+    Civi::settings()
+      ->set('monetaryDecimalPoint', ($thousandSeparator === ',' ? '.' : ','));
+  }
+
+  /**
+   * Format money as it would be input.
+   *
+   * @param string $amount
+   *
+   * @return string
+   */
+  protected function formatMoneyInput($amount) {
+    return CRM_Utils_Money::format($amount, NULL, '%a');
   }
 
 }

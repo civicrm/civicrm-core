@@ -341,6 +341,11 @@ WHERE li.contribution_id = %1";
    *   this is
    *                          lineItem array)
    * @param string $amount_override
+   *   Amount override must be in format 1000.00 - ie no thousand separator & if
+   *   a decimal point is used it should be a decimal
+   *
+   * @todo - this parameter is only used for partial payments. It's unclear why a partial
+   *  payment would change the line item price.
    */
   public static function format($fid, $params, $fields, &$values, $amount_override = NULL) {
     if (empty($params["price_{$fid}"])) {
@@ -363,10 +368,6 @@ WHERE li.contribution_id = %1";
 
     foreach ($params["price_{$fid}"] as $oid => $qty) {
       $price = $amount_override === NULL ? $options[$oid]['amount'] : $amount_override;
-
-      // lets clean the price in case it is not yet cleant
-      // CRM-10974
-      $price = CRM_Utils_Rule::cleanMoney($price);
 
       $participantsPerField = CRM_Utils_Array::value('count', $options[$oid], 0);
 

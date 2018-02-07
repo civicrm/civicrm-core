@@ -610,8 +610,14 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form for partial payment.
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testSubmitPartialPayment() {
+  public function testSubmitPartialPayment($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     // Step 1: submit a partial payment for a membership via backoffice
     $form = $this->getForm();
     $form->preProcess();
@@ -629,7 +635,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       // This format reflects the 23 being the organisation & the 25 being the type.
       'membership_type_id' => array(23, $this->membershipTypeAnnualFixedID),
       'record_contribution' => 1,
-      'total_amount' => $partiallyPaidAmount,
+      'total_amount' => $this->formatMoneyInput($partiallyPaidAmount),
       'receive_date' => date('m/d/Y', time()),
       'receive_date_time' => '08:36PM',
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
@@ -655,7 +661,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $submitParams = array(
       'contribution_id' => $contribution['contribution_id'],
       'contact_id' => $this->_individualId,
-      'total_amount' => $partiallyPaidAmount,
+      'total_amount' => $this->formatMoneyInput($partiallyPaidAmount),
       'currency' => 'USD',
       'financial_type_id' => 2,
       'receive_date' => '04/21/2015',
@@ -676,7 +682,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
     ));
     $this->assertEquals('Completed', $contribution['contribution_status']);
-    // $this->assertEquals(50.00, $contribution['total_amount']);
     // $this->assertEquals(50.00, $contribution['net_amount']);
   }
 

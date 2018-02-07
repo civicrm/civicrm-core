@@ -378,6 +378,11 @@ WHERE  title = %1
         $params['group_organization'] = $this->_groupOrganizationID;
       }
 
+      // CRM-21431 If all group_type are unchecked, the change will not be saved otherwise.
+      if (!isset($params['group_type'])) {
+        $params['group_type'] = array();
+      }
+
       $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
 
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
