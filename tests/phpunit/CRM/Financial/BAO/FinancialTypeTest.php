@@ -283,7 +283,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
       );
     }
     $contributionParams['line_item'] = $lineItems;
-    $contributions = CRM_Contribute_BAO_Contribution::create($contributionParams);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
     CRM_Financial_BAO_FinancialType::$_statusACLFt = array();
     $this->setACL();
 
@@ -292,7 +292,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     ));
 
     try {
-      CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributions->id, 'view');
+      CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contribution['id'], 'view');
       $this->fail("Missed expected exception");
     }
     catch (Exception $e) {
@@ -302,7 +302,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $this->setPermissions(array(
       'view contributions of type Donation',
     ));
-    $perm = CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributions->id, 'view');
+    $perm = CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contribution['id'], 'view');
     $this->assertEquals($perm, TRUE, 'Verify that lineitems now have permission.');
   }
 

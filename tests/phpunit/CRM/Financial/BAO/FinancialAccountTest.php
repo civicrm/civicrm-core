@@ -138,14 +138,13 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
     $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
 
     $contactId = $this->individualCreate();
-    $contributionParams = array(
-      'total_amount' => 300,
+    $this->callAPISuccess('Contribution', 'create', array(
+      'total_amount' => $this->formatMoneyInput(300.123),
       'currency' => 'USD',
       'contact_id' => $contactId,
       'financial_type_id' => $financialType->id,
       'contribution_status_id' => 1,
-    );
-    $contributions = CRM_Contribute_BAO_Contribution::create($contributionParams);
+    ));
     CRM_Financial_BAO_FinancialAccount::del($result->id);
     $params = array('id' => $result->id);
     $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);

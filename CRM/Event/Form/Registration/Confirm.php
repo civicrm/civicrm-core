@@ -977,6 +977,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
       'card_type_id' => CRM_Utils_Array::value('card_type_id', $params),
       'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $params),
+      'skipCleanMoney' => TRUE,
     );
 
     if ($paymentProcessor) {

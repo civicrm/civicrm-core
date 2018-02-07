@@ -513,7 +513,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         $params['actualBatchTotal'] += $value['total_amount'];
         $value['batch_id'] = $this->_batchId;
-        $value['skipRecentView'] = TRUE;
+        $value['skipRecentView'] = $value['skipCleanMoney'] = TRUE;
 
         // build line item params
         $this->_priceSet['fields'][$priceFieldID]['options'][$priceFieldValueID]['amount'] = $value['total_amount'];

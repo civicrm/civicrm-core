@@ -93,7 +93,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'contributeMode' => 'direct',
       'registerByID' => $individualID,
       'paymentProcessorObj' => CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID),
-      'totalAmount' => 800,
+      'totalAmount' => $this->formatMoneyInput(800.12),
       'params' => array(
         array(
           'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
@@ -133,7 +133,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'participant_role_id' => '1',
           'currencyID' => 'USD',
           'amount_level' => 'Tiny-tots (ages 5-8) - 1',
-          'amount' => '800.00',
+          'amount' => $this->formatMoneyInput(800.12),
           'tax_amount' => NULL,
           'year' => '2019',
           'month' => '1',
