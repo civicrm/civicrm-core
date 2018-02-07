@@ -55,24 +55,7 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
 
     if (!empty($this->_formValues)) {
       // add the country and state
-      if (!empty($this->_formValues['country_id'])) {
-        $this->_formValues['country'] = CRM_Core_PseudoConstant::country($this->_formValues['country_id']);
-      }
-
-      if (!empty($this->_formValues['state_province_id'])) {
-        $this->_formValues['state_province'] = CRM_Core_PseudoConstant::stateProvince($this->_formValues['state_province_id']);
-      }
-
-      // use the address to get the latitude and longitude
-      CRM_Core_BAO_Address::addGeocoderData($this->_formValues);
-
-      if (!is_numeric(CRM_Utils_Array::value('geo_code_1', $this->_formValues)) ||
-        !is_numeric(CRM_Utils_Array::value('geo_code_2', $this->_formValues)) ||
-        !isset($this->_formValues['distance'])
-      ) {
-        throw new CRM_Core_Exception(ts('Could not geocode input'));
-      }
-
+      self::addGeocodingData($this->_formValues);
       $this->_latitude = $this->_formValues['geo_code_1'];
       $this->_longitude = $this->_formValues['geo_code_2'];
 
@@ -321,6 +304,45 @@ AND cgc.group_id = {$this->_group}
    */
   public function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+  /**
+   * Validate form input.
+   *
+   * @param array $fields
+   * @param array $files
+   * @param CRM_Core_Form $self
+   *
+   * @return array
+   *   Input errors from the form.
+   */
+  public function formRule($fields, $files, $self) {
+    $this->addGeocodingData($fields);
+
+    if (!is_numeric(CRM_Utils_Array::value('geo_code_1', $fields)) ||
+      !is_numeric(CRM_Utils_Array::value('geo_code_2', $fields)) ||
+      !isset($fields['distance'])
+    ) {
+      $errorMessage = ts('Could not determine co-ordinates for provided data');
+      return array_fill_keys(['street_address', 'city', 'postal_code', 'country_id', 'state_province_id'], $errorMessage);
+    }
+    return [];
+  }
+
+  /**
+   * Add the geocoding data to the fields supplied.
+   *
+   * @param array $fields
+   */
+  protected function addGeocodingData(&$fields) {
+    if (!empty($fields['country_id'])) {
+      $fields['country'] = CRM_Core_PseudoConstant::country($fields['country_id']);
+    }
+
+    if (!empty($fields['state_province_id'])) {
+      $fields['state_province'] = CRM_Core_PseudoConstant::stateProvince($fields['state_province_id']);
+    }
+    CRM_Core_BAO_Address::addGeocoderData($fields);
   }
 
 }
