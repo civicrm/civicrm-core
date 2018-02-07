@@ -487,7 +487,8 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $this->assertEquals($case['expected_qill'], $qill);
     }
   }
-    /**
+
+  /**
    *  CRM-21343: Test CRM_Contribute_Form_Search Cancelled filters
    */
   public function testCancelledFilter() {
@@ -527,7 +528,6 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'cancel_reason' => 'Invalid Credit Card Number',
       'contact_id' => $contactID1,
     ));
-
 
     $useCases = array(
       // Case 1: Search for Cancelled Date
@@ -573,4 +573,5 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $this->assertEquals($case['expected_qill'], $qill);
     }
   }
+
 }
