@@ -5042,9 +5042,8 @@ SELECT COUNT( conts.total_amount ) as total_count,
       $where .= " AND contact_a.is_deleted = 0 ";
     }
 
-    $query = $this->getSummaryQuery($where, $from);
-    $where = $query[0];
-    $from  = $query[1];
+    $query = $this->appendFinancialTypeWhereAndFromToQueryStrings($where, $from);
+
     // make sure contribution is completed - CRM-4989
     $completedWhere = $where . " AND civicrm_contribution.contribution_status_id = 1 ";
 
@@ -5175,16 +5174,14 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
   }
 
   /**
-   * Function for getting the SummaryQuery of the respective financial type
+   * Append financial ACL limits to the query from & where clauses, if applicable.
    *
-   * @param $where
-   * @param $from
-   *
-   * @return array
+   * @param string $where
+   * @param string $from
    */
-  public function getSummaryQuery($where, $from) {
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-      $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+  public function appendFinancialTypeWhereAndFromToQueryStrings(&$where, &$from) {
+    if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      return;
     }
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
     if (!empty($financialTypes)) {
@@ -5196,7 +5193,6 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
     else {
       $where .= " AND civicrm_contribution.financial_type_id IN (0)";
     }
-    return array($where, $from, $financialTypes);
   }
 
   /**

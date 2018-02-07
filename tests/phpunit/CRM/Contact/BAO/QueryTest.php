@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
+  use CRMTraits_Financial_FinancialACLTrait;
 
   /**
    * @return CRM_Contact_BAO_QueryTestDataProvider
@@ -499,27 +500,35 @@ civicrm_relationship.is_active = 1 AND
     $this->fail('Test failed for some reason which is not good');
   }
 
+
+  /**
+   * Test the summary query does not add an acl clause when acls not enabled..
+   */
   public function testGetSummaryQueryWithFinancialACLDisabled() {
-    $where = NULL;
-    $from = NULL;
-    $CRM_Contact_BAO_Query = new CRM_Contact_BAO_Query();
-    $query = $CRM_Contact_BAO_Query->getSummaryQuery($where, $from);
-    $this->assertEquals(" AND civicrm_contribution.financial_type_id IN (" . implode(',', array_keys($query[2])) . ") AND li.id IS NULL", $query[0]);
+    $where = $from = NULL;
+    $queryObject = new CRM_Contact_BAO_Query();
+    $query = $queryObject->appendFinancialTypeWhereAndFromToQueryStrings($where,
+      $from);
+    $this->assertEquals($where, $query[0]);
+    $this->assertEquals($from, $query[1]);
   }
 
+  /**
+   * Test the summary query accurately adds financial acl filters.
+   */
   public function testGetSummaryQueryWithFinancialACLEnabled() {
-    $where = NULL;
-    $from = NULL;
-    $cid = $this->createLoggedInUser();
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'CiviCRM: view contributions of type Donation');
-    $CRM_Contact_BAO_Query = new CRM_Contact_BAO_Query();
-    $query = $CRM_Contact_BAO_Query->getSummaryQuery($where, $from);
-    $from  = $query[1];
-    $financialTypes = $query[2];
+    $where = $from = NULL;
+    $this->enableFinancialACLs();
+    $this->createLoggedInUserWithFinancialACL();
+    $queryObject = new CRM_Contact_BAO_Query();
+    $query = $queryObject->appendFinancialTypeWhereAndFromToQueryStrings($where,
+      $from);
+    $donationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation');
     $this->assertEquals(
       " LEFT JOIN civicrm_line_item li
                   ON civicrm_contribution.id = li.contribution_id AND
-                     li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ") ", $from);
+                     li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN ({$donationTypeID}) ", $from);
+    $this->disableFinancialACLs();
   }
 
 }
