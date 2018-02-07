@@ -378,7 +378,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-19346 Ensur that Option Values cannot share same value in the same option value group
+   * CRM-19346 Ensure that Option Values cannot share same value in the same option value group
    */
   public function testCreateOptionValueWithSameValue() {
     $og = $this->callAPISuccess('option_group', 'create', array(
@@ -390,9 +390,22 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       array('option_group_id' => $og['id'], 'label' => 'test option value')
     );
     // update option value without 'option_group_id'
-    $ov2 = $this->callAPIFailure('option_value', 'create',
+    $this->callAPIFailure('option_value', 'create',
       array('option_group_id' => $og['id'], 'label' => 'Test 2nd option value', 'value' => $ov['values'][$ov['id']]['value'])
     );
+  }
+
+  /**
+   * CRM-21737 Ensure that language Option Values CAN share same value.
+   */
+  public function testCreateOptionValueWithSameValueLanguagesException() {
+    $this->callAPISuccess('option_value', 'create',
+      ['option_group_id' => 'languages', 'label' => 'Quasi English', 'name' => 'en_Qu', 'value' => 'en']
+    );
+    $this->callAPISuccess('option_value', 'create',
+      ['option_group_id' => 'languages', 'label' => 'Semi English', 'name' => 'en_Se', 'value' => 'en']
+    );
+
   }
 
   public function testCreateOptionValueWithSameValueDiffOptionGroup() {
