@@ -474,7 +474,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     $this->_unparsedStreetAddressContacts = array();
     if (!$doGeocodeAddress) {
       // CRM-5854, reset the geocode method to null to prevent geocoding
-      $config->geocodeMethod = '';
+      CRM_Utils_GeocodeProvider::disableForSession();
     }
 
     // first make sure this is a valid line
