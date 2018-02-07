@@ -273,6 +273,8 @@ ACOS(
       'state_province' => 0,
       'country' => 0,
       'distance_unit' => 0,
+      'geo_code_1' => 0,
+      'geo_code_2' => 0,
     );
 
     $proximityAddress = array();
@@ -335,8 +337,10 @@ ACOS(
 
     $query->_tables['civicrm_address'] = $query->_whereTables['civicrm_address'] = 1;
 
-    if (!CRM_Core_BAO_Address::addGeocoderData($proximityAddress)) {
-      throw new CRM_Core_Exception(ts('Proximity searching requires you to set a valid geocoding provider'));
+    if (empty($proximityAddress['geo_code_1']) || empty($proximityAddress['geo_code_2'])) {
+      if (!CRM_Core_BAO_Address::addGeocoderData($proximityAddress)) {
+        throw new CRM_Core_Exception(ts('Proximity searching requires you to set a valid geocoding provider'));
+      }
     }
 
     if (
