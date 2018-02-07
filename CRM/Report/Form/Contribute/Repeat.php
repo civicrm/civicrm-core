@@ -513,9 +513,9 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
   }
 
   /**
-   * @param $fields
-   * @param $files
-   * @param $self
+   * @param array $fields
+   * @param array $files
+   * @param CRM_Core_Form $self
    *
    * @return array
    */

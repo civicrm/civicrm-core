@@ -417,9 +417,9 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
   }
 
   /**
-   * @param $fields
-   * @param $files
-   * @param $self
+   * @param array $fields
+   * @param array $files
+   * @param CRM_Core_Form $self
    *
    * @return array
    */

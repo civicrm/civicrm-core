@@ -257,4 +257,18 @@ class CRM_Contact_Form_Search_Custom_Base {
     }
   }
 
+  /**
+   * Validate form input.
+   *
+   * @param array $fields
+   * @param array $files
+   * @param CRM_Core_Form $self
+   *
+   * @return array
+   *   Input errors from the form.
+   */
+  public function formRule($fields, $files, $self) {
+    return [];
+  }
+
 }
