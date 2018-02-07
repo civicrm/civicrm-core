@@ -603,6 +603,56 @@ WHERE li.contribution_id = %1";
   }
 
   /**
+   * Build the line items for the submitted price field.
+   *
+   * This is when first building them - not an update where an entityId is already present
+   * as this is intended as a subfunction of that. Ideally getLineItemArray would call this
+   * (resolving to the same format regardless of what type of price set is being used first).
+   *
+   * @param array $priceParams
+   *   These are per the way the form processes them - ie
+   *   ['price_1' => 1, 'price_2' => 8]
+   *   This would mean price field id 1, option 1 (or 1 unit if using is_enter_qty).
+   * @param float|NULL $overrideAmount
+   *   Optional override of the amount.
+   *
+   * @param int|NULL $financialTypeID
+   *   Financial type ID is the type should be overridden.
+   *
+   * @return array
+   *   Line items formatted for processing. These will look like
+   *   [4] => ['price_field_id' => 4, 'price_field_value_id' => x, 'label....qty...unit_price...line_total...financial_type_id]
+   *   [5] => ['price_field_id' => 5, 'price_field_value_id' => x, 'label....qty...unit_price...line_total...financial_type_id]
+   *
+   */
+  public static function buildLineItemsForSubmittedPriceField($priceParams, $overrideAmount = NULL, $financialTypeID = NULL) {
+    $lineItems = array();
+    foreach ($priceParams as $key => $value) {
+      $priceField = self::getPriceFieldMetaData($key);
+
+      if ($priceField['html_type'] === 'Text') {
+        $valueSpec = reset($priceField['values']);
+      }
+      else {
+        $valueSpec = $priceField['values'][$value];
+      }
+      $qty = $priceField['is_enter_qty'] ? $value : 1;
+      $lineItems[$priceField['id']] = [
+        'price_field_id' => $priceField['id'],
+        'price_field_value_id' => $valueSpec['id'],
+        'label' => $valueSpec['label'],
+        'qty' => $qty,
+        'unit_price' => $overrideAmount ?: $valueSpec['amount'],
+        'line_total' => $qty * ($overrideAmount ?: $valueSpec['amount']),
+        'financial_type_id' => $financialTypeID ?: $valueSpec['financial_type_id'],
+        'membership_type_id' => $valueSpec['membership_type_id'],
+        'price_set_id' => $priceField['price_set_id'],
+      ];
+    }
+    return $lineItems;
+  }
+
+  /**
    * Function to update related contribution of a entity and
    *  add/update/cancel financial records
    *
@@ -1021,6 +1071,53 @@ WHERE li.contribution_id = %1";
       //activity creation
       CRM_Event_BAO_Participant::addActivityForSelection($entityID, 'Change Registration');
     }
+  }
+
+  /**
+   * Get the metadata for a price field.
+   *
+   * @param string|int $key
+   *   Price field id. Either as an integer or as 'price_4' where 4 is the id
+   *
+   * @return array
+   *   Metadata for the price field with a values key for option values.
+   */
+  protected static function getPriceFieldMetaData($key) {
+    $priceFieldID = str_replace('price_', '', $key);
+    if (!isset(Civi::$statics[__CLASS__]['price_fields'][$priceFieldID])) {
+      $values = civicrm_api3('PriceFieldValue', 'get', [
+        'price_field_id' => $priceFieldID,
+        'return' => [
+          'id',
+          'amount',
+          'financial_type_id',
+          'membership_type_id',
+          'label',
+          'price_field_id',
+          'price_field_id.price_set_id',
+          'price_field_id.html_type',
+          'is_enter_qty',
+        ],
+      ]);
+      $firstValue = reset($values['values']);
+      $values = $values['values'];
+      foreach ($values as $index => $value) {
+        // Let's be nice to calling functions & ensure membership_type_id is set
+        // so they don't have to handle notices on it. Handle one place not many.
+        if (!isset($value['membership_type_id'])) {
+          $values[$index]['membership_type_id'] = NULL;
+        }
+      }
+
+      Civi::$statics[__CLASS__]['price_fields'][$priceFieldID] = [
+        'price_set_id' => $firstValue['price_field_id.price_set_id'],
+        'id' => $firstValue['price_field_id'],
+        'html_type' => $firstValue['price_field_id.html_type'],
+        'is_enter_qty' => !empty($firstValue['is_enter_qty']),
+        'values' => $values,
+      ];
+    }
+    return Civi::$statics[__CLASS__]['price_fields'][$priceFieldID];
   }
 
   /**
