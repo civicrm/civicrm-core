@@ -21,7 +21,7 @@ trait CiviAcceptanceTesterTrait {
     else {
       $newPage = \CRM_Utils_System::url($params[0], $params[1], FALSE, NULL, FALSE);
     }
-    $this->amOnPage($newPage);
+    return $this->amOnPage($newPage);
   }
 
   /**
@@ -66,7 +66,7 @@ trait CiviAcceptanceTesterTrait {
    *   CiviCRM password for the login
    */
   public function loginToJoomla($username, $password) {
-    throw new CRM_Core_Exception("loginToJoomla is not implemented yet. Implement a corrosponding login function.");
+    throw new CRM_Core_Exception("loginToJoomla is not implemented yet. Implement a corresponding login function.");
   }
 
   /**
@@ -77,7 +77,7 @@ trait CiviAcceptanceTesterTrait {
    *   CiviCRM password for the login
    */
   public function loginToWordpress($username, $password) {
-    throw new CRM_Core_Exception("loginToWordpress is not implemented yet. Implement a corrosponding login function.");
+    throw new CRM_Core_Exception("loginToWordpress is not implemented yet. Implement a corresponding login function.");
   }
 
   /**
@@ -88,7 +88,7 @@ trait CiviAcceptanceTesterTrait {
    *   CiviCRM password for the login
    */
   public function loginToBackdrop($username, $password) {
-    throw new CRM_Core_Exception("loginToBackdrop is not implemented yet. Implement a corrosponding login function.");
+    throw new CRM_Core_Exception("loginToBackdrop is not implemented yet. Implement a corresponding login function.");
   }
 
   /**
