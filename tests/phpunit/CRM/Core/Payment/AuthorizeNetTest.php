@@ -59,7 +59,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate($nameParams);
 
     $invoiceID = sha1(rand());
-    $amount = rand(100, 1000) . '.00';
+    $amount = $this->formatMoneyInput(rand(100, 1000) . '.00');
 
     $contributionRecurParams = array(
       'contact_id' => $contactId,
