@@ -351,7 +351,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       'field' => array(
         1 => array(
           'financial_type' => 1,
-          'total_amount' =>  $this->formatMoneyInput(1500.15),
+          'total_amount' => $this->formatMoneyInput(1500.15),
           'receive_date' => '2013-07-24',
           'receive_date_time' => NULL,
           'payment_instrument' => 1,
