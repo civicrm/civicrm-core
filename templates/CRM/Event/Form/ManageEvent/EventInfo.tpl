@@ -175,7 +175,7 @@
     var $form = $('form.{/literal}{$form.formClass}{literal}');
     $('#template_id', $form).change(function() {
       $(this).closest('.crm-ajax-container, #crm-main-content-wrapper')
-        .crmSnippet({url: CRM.url('civicrm/event/add', {action: 'add', reset: 1, template_id: $(this).val()})})
+        .crmSnippet({url: CRM.url('civicrm/event/add', {action: 'add', reset: 1, template_id: $(this).val(), is_template: $("input[name='is_template']").val()})})
         .crmSnippet('refresh');
     })
   });
