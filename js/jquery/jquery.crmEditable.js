@@ -133,11 +133,8 @@
         var
           info = $i.crmEditableEntity(),
           $el = $($i),
-          params = {},
+          params = info.params || {},
           action = $i.data('action') || info.action;
-        if (info.params) {
-          params = info.params;
-        }
         if (!info.field) {
           return false;
         }
