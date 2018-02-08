@@ -883,6 +883,28 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the batch merge copes with view only custom data field.
+   */
+  public function testBatchMergeCustomDataViewOnlyField() {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'edit my contact');
+    $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email' => 'tha_mouse@mouse.com'];
+    $this->individualCreate($mouseParams);
+
+    $customGroup = $this->CustomGroupCreate();
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'is_view' => 1));
+    $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 'blah']));
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $this->assertEquals(1, count($result['values']['merged']));
+    $mouseParams['return'] = 'custom_' . $customField['id'];
+    $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
+    $this->assertEquals('blah', $mouse['custom_' . $customField['id']]);
+
+    $this->customFieldDelete($customGroup['id']);
+    $this->customGroupDelete($customGroup['id']);
+  }
+
+  /**
    * Test the batch merge function actually works!
    *
    * @dataProvider getMergeSets
