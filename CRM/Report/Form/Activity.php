@@ -468,9 +468,10 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           strstr($clause, 'civicrm_email_contact_source_email') ||
           strstr($clause, 'civicrm_email_contact_assignee_email') ||
           strstr($clause, 'civicrm_email_contact_target_email') ||
-          strstr($clause, 'civicrm_phone_contact_target_phone')
+          strstr($clause, 'civicrm_phone_contact_target_phone') ||
+          strstr($clause, 'civicrm_address_')
         ) {
-          $this->_selectClauses[$key] = "GROUP_CONCAT($clause SEPARATOR ';') as $clause";
+          $this->_selectClauses[$key] = "GROUP_CONCAT(DISTINCT $clause SEPARATOR ';') as $clause";
         }
       }
     }
@@ -1088,7 +1089,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
         }
       }
 
-      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'activity', 'List all activities for this ') ? TRUE : $entryFound;
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'activity', 'List all activities for this', ';') ? TRUE : $entryFound;
 
       if (!$entryFound) {
         break;

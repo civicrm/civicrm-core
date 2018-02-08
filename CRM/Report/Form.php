@@ -4166,70 +4166,51 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
 
   /**
    * Do AlterDisplay processing on Address Fields.
+   *  If there are multiple address field values then
+   *  on basis of provided separator the code values are translated into respective labels
    *
    * @param array $row
    * @param array $rows
    * @param int $rowNum
    * @param string $baseUrl
    * @param string $linkText
+   * @param string $separator
    *
    * @return bool
    */
-  public function alterDisplayAddressFields(&$row, &$rows, &$rowNum, $baseUrl, $linkText) {
+  public function alterDisplayAddressFields(&$row, &$rows, &$rowNum, $baseUrl, $linkText, $separator = ',') {
     $criteriaQueryParams = CRM_Report_Utils_Report::getPreviewCriteriaQueryParams($this->_defaults, $this->_params);
     $entryFound = FALSE;
-    // handle country
-    if (array_key_exists('civicrm_address_country_id', $row)) {
-      if ($value = $row['civicrm_address_country_id']) {
-        $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
-        if ($baseUrl) {
-          $url = CRM_Report_Utils_Report::getNextUrl($baseUrl,
-            "reset=1&force=1&{$criteriaQueryParams}&" .
-            "country_id_op=in&country_id_value={$value}",
-            $this->_absoluteUrl, $this->_id
-          );
-          $rows[$rowNum]['civicrm_address_country_id_link'] = $url;
-          $rows[$rowNum]['civicrm_address_country_id_hover'] = ts("%1 for this country.",
-            array(1 => $linkText)
-          );
+    $columnMap = array(
+      'civicrm_address_country_id' => 'country',
+      'civicrm_address_county_id' => 'county',
+      'civicrm_address_state_province_id' => 'stateProvince',
+    );
+    foreach ($columnMap as $fieldName => $fnName) {
+      if (array_key_exists($fieldName, $row)) {
+        if ($values = $row[$fieldName]) {
+          $values = (array) explode($separator, $values);
+          $rows[$rowNum][$fieldName] = [];
+          $addressField = $fnName == 'stateProvince' ? 'state' : $fnName;
+          foreach ($values as $value) {
+            $rows[$rowNum][$fieldName][] = CRM_Core_PseudoConstant::$fnName($value);
+          }
+          $rows[$rowNum][$fieldName] = implode($separator, $rows[$rowNum][$fieldName]);
+          if ($baseUrl) {
+            $url = CRM_Report_Utils_Report::getNextUrl($baseUrl,
+              sprintf("reset=1&force=1&%s&%s_op=in&%s_value=%s",
+                $criteriaQueryParams,
+                str_replace('civicrm_address_', '', $fieldName),
+                str_replace('civicrm_address_', '', $fieldName),
+                implode(',', $values)
+              ), $this->_absoluteUrl, $this->_id
+            );
+            $rows[$rowNum]["{$fieldName}_link"] = $url;
+            $rows[$rowNum]["{$fieldName}_hover"] = ts("%1 for this %2.", array(1 => $linkText, 2 => $addressField));
+          }
+          $entryFound = TRUE;
         }
       }
-
-      $entryFound = TRUE;
-    }
-    if (array_key_exists('civicrm_address_county_id', $row)) {
-      if ($value = $row['civicrm_address_county_id']) {
-        $rows[$rowNum]['civicrm_address_county_id'] = CRM_Core_PseudoConstant::county($value, FALSE);
-        if ($baseUrl) {
-          $url = CRM_Report_Utils_Report::getNextUrl($baseUrl,
-            "reset=1&force=1&{$criteriaQueryParams}&" .
-            "county_id_op=in&county_id_value={$value}",
-            $this->_absoluteUrl, $this->_id
-          );
-          $rows[$rowNum]['civicrm_address_county_id_link'] = $url;
-          $rows[$rowNum]['civicrm_address_county_id_hover'] = ts("%1 for this county.",
-            array(1 => $linkText)
-          );
-        }
-      }
-      $entryFound = TRUE;
-    }
-    // handle state province
-    if (array_key_exists('civicrm_address_state_province_id', $row)) {
-      if ($value = $row['civicrm_address_state_province_id']) {
-        $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
-        if ($baseUrl) {
-          $url = CRM_Report_Utils_Report::getNextUrl($baseUrl,
-            "reset=1&force=1&{$criteriaQueryParams}&state_province_id_op=in&state_province_id_value={$value}",
-            $this->_absoluteUrl, $this->_id
-          );
-          $rows[$rowNum]['civicrm_address_state_province_id_link'] = $url;
-          $rows[$rowNum]['civicrm_address_state_province_id_hover'] = ts("%1 for this state.",
-            array(1 => $linkText)
-          );
-        }
-      }
-      $entryFound = TRUE;
     }
 
     return $entryFound;
