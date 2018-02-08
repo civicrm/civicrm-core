@@ -86,6 +86,18 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Tes that the parameter _skip_evil_bao_auto_schedule_ is respected & prevents jobs being created.
+   */
+  public function testSkipAutoSchedule() {
+    $this->callAPISuccess('Mailing', 'create', array_merge($this->_params, [
+      '_skip_evil_bao_auto_schedule_' => TRUE,
+      'scheduled_date' => 'now'
+    ]));
+    $this->callAPISuccessGetCount('Mailing', [], 1);
+    $this->callAPISuccessGetCount('MailingJob', [], 0);
+  }
+
+  /**
    * Create a completed mailing (e.g when importing from a provider).
    */
   public function testMailerCreateCompleted() {

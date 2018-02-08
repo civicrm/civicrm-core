@@ -1630,7 +1630,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     // Create parent job if not yet created.
     // Condition on the existence of a scheduled date.
-    if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null') {
+    if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
       $job = new CRM_Mailing_BAO_MailingJob();
       $job->mailing_id = $mailing->id;
       // If we are creating a new Completed mailing (e.g. import from another system) set the job to completed.
