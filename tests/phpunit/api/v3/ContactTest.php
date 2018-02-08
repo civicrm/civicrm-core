@@ -1001,6 +1001,33 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test retrieval by addressee id.
+   */
+  public function testGetByAddresseeID() {
+    $individual1ID = $this->individualCreate([
+      'skip_greeting_processing' => 1,
+      'addressee_id' => 'null',
+      'email_greeting_id' => 'null',
+      'postal_greeting_id' => 'null'
+    ]);
+    $individual2ID = $this->individualCreate();
+
+    $this->assertEquals($individual1ID,
+      $this->callAPISuccessGetValue('Contact', ['contact_type' => 'Individual', 'addressee_id' => ['IS NULL' => 1], 'return' => 'id'])
+    );
+    $this->assertEquals($individual1ID,
+      $this->callAPISuccessGetValue('Contact', ['contact_type' => 'Individual', 'email_greeting_id' => ['IS NULL' => 1], 'return' => 'id'])
+    );
+    $this->assertEquals($individual1ID,
+      $this->callAPISuccessGetValue('Contact', ['contact_type' => 'Individual', 'postal_greeting_id' => ['IS NULL' => 1], 'return' => 'id'])
+    );
+
+    $this->assertEquals($individual2ID,
+      $this->callAPISuccessGetValue('Contact', ['contact_type' => 'Individual', 'addressee_id' => ['NOT NULL' => 1], 'return' => 'id'])
+    );
+  }
+
+  /**
    * Check with complete array + custom field.
    *
    * Note that the test is written on purpose without any
