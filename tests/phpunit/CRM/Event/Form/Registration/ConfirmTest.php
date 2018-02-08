@@ -81,9 +81,14 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   /**
    * Initial test of submit function for paid event.
    *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
+   *
    * @throws \Exception
    */
-  public function testPaidSubmit() {
+  public function testPaidSubmit($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $paymentProcessorID = $this->processorCreate();
     $params = array('is_monetary' => 1, 'financial_type_id' => 1);
     $event = $this->eventCreate($params);
@@ -93,7 +98,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'contributeMode' => 'direct',
       'registerByID' => $individualID,
       'paymentProcessorObj' => CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID),
-      'totalAmount' => 800,
+      'totalAmount' => $this->formatMoneyInput(8000.67),
       'params' => array(
         array(
           'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
@@ -133,7 +138,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'participant_role_id' => '1',
           'currencyID' => 'USD',
           'amount_level' => 'Tiny-tots (ages 5-8) - 1',
-          'amount' => '800.00',
+          'amount' => $this->formatMoneyInput(8000.67),
           'tax_amount' => NULL,
           'year' => '2019',
           'month' => '1',
@@ -147,6 +152,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ));
     $this->callAPISuccessGetCount('Participant', array(), 1);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array());
+    $this->assertEquals(8000.67, $contribution['total_amount']);
     $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
