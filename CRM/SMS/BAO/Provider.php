@@ -83,7 +83,7 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
     $dao->find();
     while ($dao->fetch()) {
       CRM_Core_DAO::storeValues($dao, $temp);
-      $providers[] = $temp;
+      $providers[$dao->id] = $temp;
     }
     return $providers;
   }
