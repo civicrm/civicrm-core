@@ -1296,6 +1296,23 @@ Expires: ',
     $this->assertEquals(50.00, $lineItem['line_total']);
     $this->assertEquals(5.00, $lineItem['tax_amount']);
 
+    // Simply save the 'Edit Contribution' form
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->_context = 'membership';
+    $form->_values = $this->callAPISuccessGetSingle('Contribution', array('id' => $lineItem['contribution_id'], 'return' => array('total_amount', 'net_amount', 'fee_amount', 'tax_amount')));
+    $form->testSubmit(array(
+      'contact_id' => $this->_individualId,
+      'id' => $lineItem['contribution_id'],
+      'financial_type_id' => 2,
+      'contribution_status_id' => CRM_Core_Pseudoconstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+    ),
+    CRM_Core_Action::UPDATE);
+
+    // ensure that the line-item values got unaffected
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', array('entity_id' => $membership['id'], 'entity_table' => 'civicrm_membership'));
+    $this->assertEquals(1, $lineItem['qty']);
+    $this->assertEquals(5.00, $lineItem['tax_amount']); // ensure that tax amount is not changed
+
     // reset the price options static variable so not leave any dummy data, that might hamper other unit tests
     \Civi::$statics['CRM_Price_BAO_PriceField']['priceOptions'] = NULL;
     $this->disableTaxAndInvoicing();
