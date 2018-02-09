@@ -49,6 +49,7 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
     CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civireport_contribution_detail_temp1');
     CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civireport_contribution_detail_temp2');
     CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civireport_contribution_detail_temp3');
+    CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civireport_activity_temp_target');
   }
 
   /**
@@ -80,6 +81,80 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
     //$obj->setParams($params);
     $obj->getResultSet();
     $this->assertTrue(TRUE, "Testo");
+  }
+
+  /**
+   * Ensure that activity detail report only shows addres fields of target contact
+   */
+  public function testTargetAddressFields() {
+    $countryNames = array_flip(CRM_Core_PseudoConstant::country());
+    // Create contact 1 and 2 with address fields, later considered as target contacts for activity
+    $contactID1 = $this->individualCreate(array(
+      'api.Address.create' => array(
+        'contact_id' => '$value.id',
+        'location_type_id' => 'Home',
+        'city' => 'ABC',
+        'country_id' => $countryNames['India'],
+      ),
+    ));
+    $contactID2 = $this->individualCreate(array(
+      'api.Address.create' => array(
+        'contact_id' => '$value.id',
+        'location_type_id' => 'Home',
+        'city' => 'DEF',
+        'country_id' => $countryNames['United States'],
+      ),
+    ));
+    // Create Contact 3 later considered as assignee contact of activity
+    $contactID3 = $this->individualCreate(array(
+      'api.Address.create' => array(
+        'contact_id' => '$value.id',
+        'location_type_id' => 'Home',
+        'city' => 'GHI',
+        'country_id' => $countryNames['China'],
+      ),
+    ));
+
+    // create dummy activity type
+    $activityTypeID = CRM_Utils_Array::value('id', $this->callAPISuccess('option_value', 'create', array(
+      'option_group_id' => 'activity_type',
+      'name' => 'Test activity type',
+      'label' => 'Test activity type',
+    )));
+    // create activity
+    $result = $this->callAPISuccess('activity', 'create', array(
+      'subject' => 'Make-it-Happen Meeting',
+      'activity_date_time' => date('Ymd'),
+      'duration' => 120,
+      'location' => 'Pennsylvania',
+      'details' => 'a test activity',
+      'status_id' => 1,
+      'activity_type_id' => 'Test activity type',
+      'source_contact_id' => $this->individualCreate(),
+      'target_contact_id' => array($contactID1, $contactID2),
+      'assignee_contact_id' => $contactID3,
+    ));
+    // display city and country field so that we can check its value
+    $input = array(
+      'fields' => array(
+        'city',
+        'country_id',
+      ),
+      'order_bys' => array(
+        'city' => array(),
+        'country_id' => array('default' => TRUE),
+      ),
+    );
+    // generate result
+    $obj = $this->getReportObject('CRM_Report_Form_Activity', $input);
+    $rows = $obj->getResultSet();
+
+    // ensure that only 1 activity is created
+    $this->assertEquals(1, count($rows));
+    // ensure that country values of respective target contacts are only shown
+    $this->assertEquals('India;United States', $rows[0]['civicrm_address_country_id']);
+    // ensure that city values of respective target contacts are only shown
+    $this->assertEquals('ABC;DEF', $rows[0]['civicrm_address_city']);
   }
 
 }
