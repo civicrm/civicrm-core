@@ -81,6 +81,7 @@ class CRM_Core_Config_Defaults {
   public static function formatUnitSize($size, $checkForPostMax = FALSE) {
     if ($size) {
       $last = strtolower($size{strlen($size) - 1});
+      $size = (int) $size;
       switch ($last) {
         // The 'G' modifier is available since PHP 5.1.0
 
