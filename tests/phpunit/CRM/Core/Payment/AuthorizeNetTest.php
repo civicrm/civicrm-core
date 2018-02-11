@@ -61,7 +61,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $invoiceID = sha1(rand());
     $amount = rand(100, 1000) . '.00';
 
-    $contributionRecurParams = array(
+    $recur = $this->callAPISuccess('ContributionRecur', 'create', array(
       'contact_id' => $contactId,
       'amount' => $amount,
       'currency' => 'USD',
@@ -74,21 +74,19 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
       'is_test' => 1,
       'payment_processor_id' => $this->_paymentProcessorID,
-    );
-    $recur = CRM_Contribute_BAO_ContributionRecur::add($contributionRecurParams);
+    ));
 
-    $contributionParams = array(
+    $contribution = $this->callAPISuccess('Contribution', 'create', array(
       'contact_id' => $contactId,
       'financial_type_id' => $this->_financialTypeId,
       'receive_date' => date('Ymd'),
       'total_amount' => $amount,
       'invoice_id' => $invoiceID,
       'currency' => 'USD',
-      'contribution_recur_id' => $recur->id,
+      'contribution_recur_id' => $recur['id'],
       'is_test' => 1,
       'contribution_status_id' => 2,
-    );
-    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    ));
 
     $params = array(
       'qfKey' => '08ed21c7ca00a1f7d32fff2488596ef7_4454',
@@ -157,9 +155,9 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'contributionPageID' => '',
       'email' => "{$firstName}.{$lastName}@example.com",
       'contactID' => $contactId,
-      'contributionID' => $contribution->id,
+      'contributionID' => $contribution['id'],
       'contributionTypeID' => $this->_financialTypeId,
-      'contributionRecurID' => $recur->id,
+      'contributionRecurID' => $recur['id'],
     );
 
     // turn verifySSL off
@@ -169,12 +167,12 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     Civi::settings()->set('verifySSL', '0');
 
     // if subscription was successful, processor_id / subscription-id must not be null
-    $this->assertDBNotNull('CRM_Contribute_DAO_ContributionRecur', $recur->id, 'processor_id',
+    $this->assertDBNotNull('CRM_Contribute_DAO_ContributionRecur', $recur['id'], 'processor_id',
       'id', 'Failed to create subscription with Authorize.'
     );
 
     // cancel it or the transaction will be rejected by A.net if the test is re-run
-    $subscriptionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $recur->id, 'processor_id');
+    $subscriptionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $recur['id'], 'processor_id');
     $message = '';
     $result = $this->processor->cancelSubscription($message, array('subscriptionId' => $subscriptionID));
     $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
