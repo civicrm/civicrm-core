@@ -2897,11 +2897,19 @@ class CRM_Contact_BAO_Query {
       }
     }
 
-    $ssClause = $this->addGroupContactCache($value, NULL, "contact_a", $op);
+    //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
+    $ssClause = NULL;
+    if (empty($gcsValues) || // if no status selected
+      in_array("'Added'", $statii) ||  // if both Added and Removed statuses are selected
+      (count($statii) == 1 && $statii[0] == 'Removed') // if only Removed status is selected
+    ) {
+      $ssClause = $this->addGroupContactCache($value, NULL, "contact_a", $op);
+    }
+
     $isSmart = (!$ssClause) ? FALSE : $isSmart;
     $groupClause = NULL;
 
-    if (!$isSmart) {
+    if (!$isSmart || in_array("'Added'", $statii)) {
       $groupIds = implode(',', (array) $value);
       $gcTable = "`civicrm_group_contact-{$groupIds}`";
       $joinClause = array("contact_a.id = {$gcTable}.contact_id");
