@@ -3163,7 +3163,7 @@ WHERE  contribution_id = %1 ";
           if ($fieldValues['tax_amount']) {
             $invoiceSettings = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME, 'contribution_invoice_settings');
             $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-            $itemParams['amount'] = $diff * $fieldValues['tax_amount'];
+            $itemParams['amount'] = $diff * (float) $fieldValues['tax_amount'];
             $itemParams['description'] = $taxTerm;
             if ($fieldValues['financial_type_id']) {
               $itemParams['financial_account_id'] = self::getFinancialAccountId($fieldValues['financial_type_id']);
