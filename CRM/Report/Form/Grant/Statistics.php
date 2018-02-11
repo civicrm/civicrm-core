@@ -306,7 +306,7 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
 
   public function groupBy() {
     $this->_groupBy = '';
-
+    $this->_groupByArray = array();
     if (!empty($this->_params['fields']) &&
       is_array($this->_params['fields']) &&
       !empty($this->_params['fields'])
@@ -315,14 +315,14 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
         if (array_key_exists('fields', $table)) {
           foreach ($table['fields'] as $fieldName => $field) {
             if (!empty($this->_params['fields'][$fieldName])) {
-              $this->_groupBy[] = $field['dbAlias'];
+              $this->_groupByArray[] = $field['dbAlias'];
             }
           }
         }
       }
     }
-    if (!empty($this->_groupBy)) {
-      $this->_groupBy = " GROUP BY " . implode(', ', $this->_groupBy);
+    if (!empty($this->_groupByArray)) {
+      $this->_groupBy = " GROUP BY " . implode(', ', $this->_groupByArray);
     }
   }
 
