@@ -687,8 +687,17 @@
           return _.omit(ufFieldModel.toStrictJSON(), ['id', 'uf_group_id']);
         })
       );
-      var copyLabel = ' ' + ts('(Copy)');
-      copy.set('title', copy.get('title').slice(0, 64 - copyLabel.length) + copyLabel);
+      var new_id = 1;
+      CRM.api3('UFGroup', 'getsingle', {
+        "return": ["id"],
+        "options": {"limit": 1, "sort": "id DESC"}
+      }).done(function(result) {
+        new_id = Number(result.id) + 1;
+        var copyLabel = ' ' + ts('(Copy)');
+        var nameSuffix = '_' + new_id;
+        copy.set('title', copy.get('title').slice(0, 64 - copyLabel.length) + copyLabel);
+        copy.set('name', copy.get('name').slice(0, 64 - nameSuffix.length) + nameSuffix);
+      });
       return copy;
     },
     getModelClass: function(entity_name) {
