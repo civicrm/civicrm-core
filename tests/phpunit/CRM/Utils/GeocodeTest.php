@@ -62,7 +62,7 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
       $result_geocode = civicrm_api3('Job', 'geocode', $params_geocode);
     }
     catch (CiviCRM_API3_Exception $e) {
-      if ($e->getMessage() == 'A fatal error was triggered: Aborting batch geocoding. Hit the over query limit on geocoder.') {
+      if ($e->getMessage() == 'Aborting batch geocoding. Hit the over query limit on geocoder.') {
         $this->markTestIncomplete('Job.geocode error_message: A fatal error was triggered: Aborting batch geocoding. Hit the over query limit on geocoder.');
       }
       else {
