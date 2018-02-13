@@ -26,9 +26,14 @@
         var found = false;
 
         for (var i = 0; i < relationshipTypes.length; i++) {
+
+          var isUndefinedContactType = typeof relationshipTypes[i].contact_type_b === 'undefined' ? true : false;
+          var isEmptyContactType = relationshipTypes[i].contact_type_b === '';
+          var areContactTypesEqual = relationshipTypes[i].contact_type_b === typeFilter;
+
           for (var j = 0; j < caseRoles.length; j++) {
             if (relationshipTypes[i].label_b_a === caseRoles[j].name &&
-              (relationshipTypes[i].contact_type_b === typeFilter || relationshipTypes[i].contact_type_b === '')
+              (isUndefinedContactType || isEmptyContactType || areContactTypesEqual)
             ) {
               $('#role_type').append(
                 $('<option>', {value: relationshipTypes[i].id, text: relationshipTypes[i].label_b_a})
