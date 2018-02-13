@@ -118,7 +118,12 @@
                {/if}
              </div>
           {else}
-            <div class="compressed crm-grid-cell">{$form.field.$rowNumber.$n.html}</div>
+            <div class="compressed crm-grid-cell">
+              {$form.field.$rowNumber.$n.html}
+              {if $fields.$n.html_type eq 'File' && !empty($form.field.$rowNumber.$fieldName.value.size)}
+                {ts}Attached{/ts}: {$form.field.$rowNumber.$fieldName.value.name}
+              {/if}
+            </div>
           {/if}
         {/foreach}
       </div>
