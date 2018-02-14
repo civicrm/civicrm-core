@@ -456,4 +456,66 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     $this->contactDelete($contactID2);
   }
 
+  /**
+   * Test alterMailingRecipients Hook which is called twice when we create a Mailing,
+   *  1. In the first call we will modify the mailing filter to include only deceased recipients
+   *  2. In the second call we will check if only deceased recipient is populated in MailingRecipient table
+   */
+  public function testAlterMailingRecipientsHook() {
+    $groupID = $this->groupCreate();
+
+    // Create deseased Contact 1 and add in group
+    $contactID1 = $this->individualCreate(array('email' => 'abc@test.com', 'is_deceased' => 1), 0);
+    // Create deseased Contact 2 and add in group
+    $contactID2 = $this->individualCreate(array('email' => 'def@test.com'), 1);
+    // Add both the created contacts in group
+    $this->callAPISuccess('GroupContact', 'Create', array(
+      'group_id' => $groupID,
+      'contact_id' => $contactID1,
+    ));
+    $this->callAPISuccess('GroupContact', 'Create', array(
+      'group_id' => $groupID,
+      'contact_id' => $contactID2,
+    ));
+    // trigger the alterMailingRecipients hook
+    $this->hookClass->setHook('civicrm_alterMailingRecipients', array($this, 'alterMailingRecipients'));
+
+    // create mailing that will trigger alterMailingRecipients hook
+    $params = array(
+      'name' => 'mailing name',
+      'subject' => 'Test Subject',
+      'body_html' => '<p>HTML Body</p>',
+      'text_html' => 'Text Body',
+      'created_id' => 1,
+      'groups' => array('include' => array($groupID)),
+      'scheduled_date' => 'now',
+    );
+    $this->callAPISuccess('Mailing', 'create', $params);
+  }
+
+  /**
+   * @implements CRM_Utils_Hook::alterMailingRecipients
+   *
+   * @param object $mailingObject
+   * @param array $params
+   * @param string $context
+   */
+  public function alterMailingRecipients(&$mailingObject, &$params, $context) {
+    if ($context == 'pre') {
+      // modify the filter to include only deceased recipient(s)
+      $params['filters']['is_deceased'] = 'civicrm_contact.is_deceased = 1';
+    }
+    else {
+      $mailingRecipients = $this->callAPISuccess('MailingRecipients', 'get', array(
+        'mailing_id' => $mailingObject->id,
+        'api.Email.getvalue' => array(
+          'id' => '$value.email_id',
+          'return' => 'email',
+        ),
+      ));
+      $this->assertEquals(1, $mailingRecipients['count'], 'Check recipient count');
+      $this->assertEquals('abc@test.com', $mailingRecipients['values'][$mailingRecipients['id']]['api.Email.getvalue'], 'Check if recipient email belong to deceased contact');
+    }
+  }
+
 }

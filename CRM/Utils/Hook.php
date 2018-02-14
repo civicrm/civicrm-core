@@ -2455,16 +2455,14 @@ abstract class CRM_Utils_Hook {
    *  Allows user to alter filter and/or search query to fetch mail recipients
    *
    * @param CRM_Mailing_DAO_Mailing $mailingObject
-   * @param CRM_Mailing_Event_BAO_Queue $mailingEventQueueObject
-   * @param int $mailingJobID
    * @param array $params
    * @param string $context
    *
    */
-  public static function alterMailingRecipients(&$mailingObject, &$mailingEventQueueObject, $mailingJobID, &$params, $context) {
-    return self::singleton()->invoke(array('mailingObject', 'mailingEventQueueObject', '$mailingJobID', 'params', 'context'),
-      $mailingObject, $mailingEventQueueObject, $mailingJobID, $params, $context,
-      self::$_nullObject,
+  public static function alterMailingRecipients(&$mailingObject, &$params, $context) {
+    return self::singleton()->invoke(array('mailingObject', 'params', 'context'),
+      $mailingObject, $params, $context,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_alterMailingRecipients'
     );
   }
