@@ -2244,6 +2244,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     $baseQuery = "
 SELECT     civicrm_membership.id                    as membership_id,
            civicrm_membership.is_override           as is_override,
+           civicrm_membership.status_override_end_date  as status_override_end_date,
            civicrm_membership.membership_type_id    as membership_type_id,
            civicrm_membership.status_id             as status_id,
            civicrm_membership.join_date             as join_date,
@@ -2284,6 +2285,8 @@ WHERE      civicrm_membership.is_test = 0";
       if ($dao->owner_membership_id) {
         continue;
       }
+
+      self::processOverriddenUntilDateMembership($dao);
 
       //update membership records where status is NOT - Pending OR Cancelled.
       //as well as membership is not override.
@@ -2346,6 +2349,38 @@ WHERE      civicrm_membership.is_test = 0";
       2 => $updateCount,
     ));
     return $result;
+  }
+
+  /**
+   * Set is_override for the 'overridden until date' membership to
+   * False and clears the 'until date' field in case the 'until date'
+   * is equal or after today date.
+   *
+   * @param CRM_Core_DAO $membership
+   *   The membership to be processed
+   */
+  private static function processOverriddenUntilDateMembership($membership) {
+    $isOverriddenUntilDate = !empty($membership->is_override) && !empty($membership->status_override_end_date);
+    if (!$isOverriddenUntilDate) {
+      return;
+    }
+
+    $todayDate = new DateTime();
+    $todayDate->setTime(0, 0);
+
+    $overrideEndDate = new DateTime($membership->status_override_end_date);
+    $overrideEndDate->setTime(0, 0);
+
+    $datesDifference = $todayDate->diff($overrideEndDate);
+    $daysDifference = (int) $datesDifference->format('%R%a');
+    if ($daysDifference <= 0) {
+      $params = array(
+        'id' => $membership->membership_id,
+        'is_override' => FALSE,
+        'status_override_end_date' => 'null',
+      );
+      civicrm_api3('membership', 'create', $params);
+    }
   }
 
   /**
