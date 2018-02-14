@@ -422,6 +422,7 @@ class CRM_Utils_Type {
       'MysqlOrderByDirection',
       'MysqlOrderBy',
       'ExtensionKey',
+      'Json',
     );
     if (!in_array($type, $possibleTypes)) {
       if ($isThrowException) {
@@ -527,6 +528,12 @@ class CRM_Utils_Type {
 
       case 'ExtensionKey':
         if (CRM_Utils_Rule::checkExtesnionKeyIsValid($data)) {
+          return $data;
+        }
+        break;
+
+      case 'Json':
+        if (CRM_Utils_Rule::json($data)) {
           return $data;
         }
         break;

@@ -63,8 +63,9 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
     $limit = CRM_Utils_Request::retrieve('limit', 'Integer', $this);
     $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this);
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, 0);
-    // Using a placeholder for criteria as it is intended to be able to pass this later.
-    $criteria = array();
+    $criteria = CRM_Utils_Request::retrieve('criteria', 'Json', $this, FALSE);
+    $this->assign('criteria', $criteria);
+
     $isConflictMode = ($context == 'conflicts');
     if ($cid) {
       $this->_cid = $cid;
@@ -79,8 +80,10 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       'rgid' => $rgid,
       'gid' => $gid,
       'limit' => $limit,
+      'criteria' => $criteria,
     );
     $this->assign('urlQuery', CRM_Utils_System::makeQueryString($urlQry));
+    $criteria = json_decode($criteria, TRUE);
 
     if ($context == 'search') {
       $context = 'search';

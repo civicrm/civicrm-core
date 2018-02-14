@@ -398,8 +398,17 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
     }
     elseif ($rgid) {
       $contactIDs = array();
+      // The thing we really need to filter out is any chaining that would 'DO SOMETHING' to the DB.
+      // criteria could be passed in via url so we want to ensure nothing could be in that url that
+      // would chain to a delete. Limiting to getfields for 'get' limits us to declared fields,
+      // although we might wish to revisit later to allow joins.
+      $validFieldsForRetrieval = civicrm_api3('Contact', 'getfields', ['action' => 'get'])['values'];
       if (!empty($criteria)) {
-        $contacts = civicrm_api3('Contact', 'get', array_merge(array('options' => array('limit' => 0), 'return' => 'id'), $criteria['contact']));
+        $contacts = civicrm_api3('Contact', 'get', array_merge([
+          'options' => ['limit' => 0],
+          'return' => 'id',
+          'check_permissions' => TRUE,
+        ], array_intersect_key($criteria['contact'], $validFieldsForRetrieval)));
         $contactIDs = array_keys($contacts['values']);
       }
       $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs, $checkPermissions, $searchLimit);
