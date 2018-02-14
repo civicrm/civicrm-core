@@ -486,7 +486,8 @@ WHERE ft.is_payment = 1
       if (!$ftTotalAmt) {
         $ftTotalAmt = 0;
       }
-      $value = $paymentVal = $lineItemTotal - $ftTotalAmt;
+      $currency = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'currency');
+      $value = $paymentVal = CRM_Utils_Money::subtractCurrencies($lineItemTotal, $ftTotalAmt, $currency);
       if ($returnType) {
         $value = array();
         if ($paymentVal < 0) {
