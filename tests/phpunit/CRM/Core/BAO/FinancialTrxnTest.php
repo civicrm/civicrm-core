@@ -240,4 +240,32 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->assertEquals($financialTrxn['pan_truncation'], 4567);
   }
 
+  /**
+   * Test getPartialPaymentWithType function.
+   */
+  public function testGetPartialPaymentWithType() {
+    //create the contribution that isn't paid yet
+    $contactId = $this->individualCreate();
+    $params = array(
+      'contact_id' => $contactId,
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'contribution_status_id' => 8,
+      'payment_instrument_id' => 4,
+      'total_amount' => 300.00,
+      'fee_amount' => 0.00,
+      'net_amount' => 300.00,
+    );
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][7];
+    //make a payment one cent short
+    $params = array(
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 299.99,
+    );
+    $this->callAPISuccess('Payment', 'create', $params);
+    //amount owed should be one cent
+    $amountOwed = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($contribution['id'], 'contribution')['amount_owed'];
+    $this->assertTrue(0.01 == $amountOwed, 'Amount does not match');
+  }
+
 }
