@@ -400,8 +400,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
   }
 
-  public function supportedAddressParsingLocales()
-  {
+  public function supportedAddressParsingLocales() {
     return array(
       'en_US',
       'en_CA',
@@ -426,8 +425,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertFalse($isNotSupported);
   }
 
-  public function sampleOFUnsupportedAddressParsingLocales()
-  {
+  public function sampleOFUnsupportedAddressParsingLocales() {
     return array(
       'en_GB',
       'af_ZA',

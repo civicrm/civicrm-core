@@ -877,7 +877,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    * @param string $locale
    *   The locale to be checked
    *
-   * @return boolean
+   * @return bool
    */
   public static function isSupportedParsingLocale($locale = NULL) {
     if (!$locale) {
