@@ -54,7 +54,8 @@
     "pear/Auth_SASL": "1.1.0",
     "pear/Net_SMTP": "1.6.*",
     "pear/Net_socket": "1.0.*",
-    "civicrm/civicrm-setup": "~0.2.0"
+    "civicrm/civicrm-setup": "~0.2.0",
+    "cweagans/composer-patches": "~1.0"
   },
   "repositories": [
     {
@@ -81,5 +82,16 @@
       "bash tools/scripts/composer/net-smtp-fix.sh",
       "bash tools/scripts/composer/phpword-jquery.sh"
     ]
+  },
+  "extra": {
+    "patches": {
+       "pear/net_smtp": {
+         "CRM-8744": "tools/scripts/composer/patches/net-smtp-patch.patch",
+         "TLS Stream crypto patch": "tools/scripts/composer/patches/net-smtp-tls-patch.patch",
+         "PHP 7 Compliance": "tools/scripts/composer/patches/net-smtp-php7-patch.patch",
+         "AUth_SASL Factory fix": "tools/scripts/composer/patches/net-smtp-ref-patch.patch"
+      }
+    }
   }
+
 }
