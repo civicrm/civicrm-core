@@ -184,6 +184,17 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
           }
         }
       }
+
+      if ($title == ts('Street Address Parsing')) {
+        if (isset($this->_params['address_options']) &&
+          !empty($this->_params['address_options'][$key])
+        ) {
+          if (!CRM_Core_BAO_Address::isSupportedParsingLocale()) {
+            CRM_Core_Session::setStatus(ts('Unsupported default locale specified to parse Street Address. en_US locale will be used instead.'), ts('Unsupported Locale'), 'alert');
+          }
+
+        }
+      }
     }
 
     $this->postProcessCommon();

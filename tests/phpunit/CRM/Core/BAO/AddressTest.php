@@ -383,6 +383,59 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   }
 
   /**
+   * @dataProvider supportedAddressParsingLocales
+   */
+  public function testIsSupportedByAddressParsingReturnTrueForSupportedLocales($locale) {
+    $isSupported = CRM_Core_BAO_Address::isSupportedParsingLocale($locale);
+    $this->assertTrue($isSupported);
+  }
+
+  /**
+   * @dataProvider supportedAddressParsingLocales
+   */
+  public function testIsSupportedByAddressParsingReturnTrueForSupportedDefaultLocales($locale) {
+    CRM_Core_Config::singleton()->lcMessages = $locale;
+    $isSupported = CRM_Core_BAO_Address::isSupportedParsingLocale();
+    $this->assertTrue($isSupported);
+
+  }
+
+  public function supportedAddressParsingLocales()
+  {
+    return array(
+      'en_US',
+      'en_CA',
+      'fr_CA',
+    );
+  }
+
+  /**
+   * @dataProvider sampleOFUnsupportedAddressParsingLocales
+   */
+  public function testIsSupportedByAddressParsingReturnFalseForUnSupportedLocales($locale) {
+    $isNotSupported = CRM_Core_BAO_Address::isSupportedParsingLocale($locale);
+    $this->assertFalse($isNotSupported);
+  }
+
+  /**
+   * @dataProvider sampleOFUnsupportedAddressParsingLocales
+   */
+  public function testIsSupportedByAddressParsingReturnFalseForUnSupportedDefaultLocales($locale) {
+    CRM_Core_Config::singleton()->lcMessages = $locale;
+    $isNotSupported = CRM_Core_BAO_Address::isSupportedParsingLocale();
+    $this->assertFalse($isNotSupported);
+  }
+
+  public function sampleOFUnsupportedAddressParsingLocales()
+  {
+    return array(
+      'en_GB',
+      'af_ZA',
+      'da_DK',
+    );
+  }
+
+  /**
    * CRM-21214 - Ensure all child addresses are updated correctly - 1.
    * 1. First, create three contacts: A, B, and C
    * 2. Create an address for contact A
