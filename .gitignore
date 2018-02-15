@@ -6,12 +6,10 @@ bower_components
 CRM/Case/xml/configuration
 CRM/Core/DAO/.listAll.php
 CRM/Core/DAO/listAll.php
-CRM/Core/I18n/SchemaStructure.php
 bin/setup.conf
 civicrm-version.php
 civicrm-version.txt
 civicrm.config.php
-install/langs.php
 node_modules
 settings_location.php
 sql/case_sample.mysql
