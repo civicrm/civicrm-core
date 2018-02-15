@@ -467,12 +467,15 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     $mainId = (int) $mainId;
     $otherId = (int) $otherId;
+    $multi_value_tables = array_keys(CRM_Dedupe_Merger::getMultiValueCustomSets('cidRefs'));
 
     $sqls = array();
     foreach ($affected as $table) {
-      // skipping non selected custom table's value migration
-      if ($customTableToCopyFrom !== NULL && in_array($table, $customTables) && !in_array($table, $customTableToCopyFrom)) {
-        continue;
+      // skipping non selected single-value custom table's value migration
+      if (!in_array($table, $multi_value_tables)) {
+        if ($customTableToCopyFrom !== NULL && in_array($table, $customTables) && !in_array($table, $customTableToCopyFrom)) {
+          continue;
+        }
       }
 
       // Call custom processing function for objects that require it
