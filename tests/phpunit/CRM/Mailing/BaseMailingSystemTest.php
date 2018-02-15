@@ -207,7 +207,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertRegExp(
         ";" .
         // body_html
-        "<p>You can go to <a href=['\"].*extern/url\.php\?u=\d+&amp\\;qid=\d+['\"]>Google</a>" .
+        "<p>You can go to <a href=['\"].*extern/url\.php\?u=\d+&amp\\;qid=\d+['\"] rel='nofollow'>Google</a>" .
         " or <a href=\"http.*civicrm/mailing/optout.*\">opt out</a>.</p>\n" .
         // Default footer
         "Sample Footer for HTML formatted content" .
