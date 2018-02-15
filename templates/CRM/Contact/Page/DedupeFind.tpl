@@ -324,6 +324,9 @@
       var is_selected = CRM.$('.crm-dedupe-select-all').prop('checked') ? 1 : 0;
     }
 
+    var criteria = {/literal}'{$criteria|escape}'{literal};
+    criteria  = criteria.length > 0 ? criteria : 0;
+
     var dataUrl = {/literal}"{crmURL p='civicrm/ajax/toggleDedupeSelect' h=0 q='snippet=4'}"{literal};
     var rgid = {/literal}"{$rgid}"{literal};
     var gid = {/literal}"{$gid}"{literal};
@@ -331,7 +334,7 @@
     rgid = rgid.length > 0 ? rgid : 0;
     gid  = gid.length > 0 ? gid : 0;
 
-    CRM.$.post(dataUrl, {pnid: id, rgid: rgid, gid: gid, is_selected: is_selected}, function (data) {
+    CRM.$.post(dataUrl, {pnid: id, rgid: rgid, gid: gid, is_selected: is_selected, criteria : criteria}, function (data) {
       // nothing to do for now
     }, 'json');
   }

@@ -646,13 +646,16 @@ LIMIT {$offset}, {$rowCount}
 
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive');
     $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive');
+    $null = NULL;
+    $criteria = CRM_Utils_Request::retrieve('criteria', 'Json', $null, FALSE, '{}');
     $selected    = isset($_REQUEST['selected']) ? CRM_Utils_Type::escape($_REQUEST['selected'], 'Integer') : 0;
     if ($rowCount < 0) {
       $rowCount = 0;
     }
 
     $whereClause = $orderByClause = '';
-    $cacheKeyString   = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
+    $cacheKeyString   = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, json_decode($criteria, TRUE));
+
     $searchRows       = array();
 
     $searchParams = self::getSearchOptionsFromRequest();
@@ -814,6 +817,7 @@ LIMIT {$offset}, {$rowCount}
             'oid' => $pairInfo['entity_id2'],
             'action' => 'update',
             'rgid' => $rgid,
+            'criteria' => $criteria,
             'limit' => CRM_Utils_Request::retrieve('limit', 'Integer'),
           ];
         if ($gid) {
@@ -1014,8 +1018,9 @@ LIMIT {$offset}, {$rowCount}
     $gid  = CRM_Utils_Type::escape($_REQUEST['gid'], 'Integer');
     $pnid = $_REQUEST['pnid'];
     $isSelected = CRM_Utils_Type::escape($_REQUEST['is_selected'], 'Boolean');
+    $criteria = CRM_Utils_Request::retrieve('criteria', 'Json', $null, FALSE, '{}');
 
-    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, json_decode($criteria, TRUE));
 
     $params = array(
       1 => array($isSelected, 'Boolean'),
