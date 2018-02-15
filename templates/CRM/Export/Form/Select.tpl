@@ -60,7 +60,7 @@
   <div class="crm-section crm-export-mergeOptions-section">
     <div class="label crm-label-mergeOptions">{ts}Merge Options{/ts} {help id="id-export_merge_options"}</div>
     <div class="content crm-content-mergeOptions">
-        &nbsp;{$form.mergeOption.html}
+      {$form.mergeOption.html}
     </div>
     <div id='greetings' class="content crm-content-greetings class='hiddenElement'">
       <table class="form-layout-compressed">
