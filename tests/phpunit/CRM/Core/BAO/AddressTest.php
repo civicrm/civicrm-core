@@ -402,9 +402,9 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
   public function supportedAddressParsingLocales() {
     return array(
-      'en_US',
-      'en_CA',
-      'fr_CA',
+      array('en_US'),
+      array('en_CA'),
+      array('fr_CA'),
     );
   }
 
@@ -427,9 +427,9 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
   public function sampleOFUnsupportedAddressParsingLocales() {
     return array(
-      'en_GB',
-      'af_ZA',
-      'da_DK',
+      array('en_GB'),
+      array('af_ZA'),
+      array('da_DK'),
     );
   }
 
