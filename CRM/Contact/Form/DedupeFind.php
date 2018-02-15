@@ -37,6 +37,11 @@
 class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
 
   /**
+   *  Indicate if this form should warn users of unsaved changes
+   */
+  protected $unsavedChangesWarn = FALSE;
+
+  /**
    * Pre processing.
    */
   public function preProcess() {
