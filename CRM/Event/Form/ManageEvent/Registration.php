@@ -387,6 +387,12 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       'entity_type' => 'ParticipantModel',
       'entity_sub_type' => '*',
     );
+    // CRM-21772: allow contribution profiles for payed events
+    if ($id) {
+      if (CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $id, 'is_monetary')) {
+        $configs['allowCoreTypes'][] = 'Contribution';
+      }
+    }
 
     return $configs;
   }
