@@ -979,6 +979,19 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $params),
     );
 
+    // CRM-21772: fetch contribution profile fields
+    $customParams = [];
+    foreach ($form->_fields as $key => $value) {
+      if ($value['field_type'] == 'Contribution') {
+        if (strpos($key, 'custom_') === 0) {
+          $customParams[$key] = $params[$key];
+        }
+        else {
+          $contribParams[$key] = $params[$key];
+        }
+      }
+    }
+
     if ($paymentProcessor) {
       $contribParams['payment_instrument_id'] = $paymentProcessor['payment_instrument_id'];
       $contribParams['payment_processor'] = $paymentProcessor['id'];
@@ -1041,6 +1054,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $contribParams['skipLineItem'] = 1;
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams, $ids);
+
+    // CRM-21772: save custom contribution profile fields
+    if(isset($contribution->id) && !empty($customParams)) {
+      CRM_Core_BAO_CustomValueTable::postProcess($customParams, 'civicrm_contribution', $contribution->id, 'Contribution');
+    }
+
     // CRM-11124
     CRM_Event_BAO_Participant::createDiscountTrxn($form->_eventId, $contribParams, NULL, CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
 
