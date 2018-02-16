@@ -709,8 +709,8 @@ class CRM_Core_I18n {
  *   the translated string
  */
 function ts($text, $params = array()) {
-  static $config = NULL;
-  static $locale = NULL;
+  static $areSettingsAvailable = FALSE;
+  static $lastLocale = NULL;
   static $i18n = NULL;
   static $function = NULL;
 
@@ -718,17 +718,21 @@ function ts($text, $params = array()) {
     return '';
   }
 
-  if (!$config) {
-    $config = CRM_Core_Config::singleton();
+  // When the settings become available, lookup customTranslateFunction.
+  if (!$areSettingsAvailable) {
+    $areSettingsAvailable = (bool) \Civi\Core\Container::getBootService('settings_manager');
+    if ($areSettingsAvailable) {
+      $config = CRM_Core_Config::singleton();
+      if (isset($config->customTranslateFunction) and function_exists($config->customTranslateFunction)) {
+        $function = $config->customTranslateFunction;
+      }
+    }
   }
 
-  $tsLocale = CRM_Core_I18n::getLocale();
-  if (!$i18n or $locale != $tsLocale) {
+  $activeLocale = CRM_Core_I18n::getLocale();
+  if (!$i18n or $lastLocale != $activeLocale) {
     $i18n = CRM_Core_I18n::singleton();
-    $locale = $tsLocale;
-    if (isset($config->customTranslateFunction) and function_exists($config->customTranslateFunction)) {
-      $function = $config->customTranslateFunction;
-    }
+    $lastLocale = $activeLocale;
   }
 
   if ($function) {
