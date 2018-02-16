@@ -1889,7 +1889,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       return NULL;
     }
 
-    $caseManagerContact = array();
     $caseManagerName = '---';
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
 
