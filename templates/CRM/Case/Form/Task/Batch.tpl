@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
@@ -23,21 +22,5 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
-
-/**
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
- */
-
-/**
- * This class generates form task actions for CiviCase.
- */
-class CRM_Case_Form_Task extends CRM_Core_Form_Task {
-
-  // Must be set to entity table name (eg. civicrm_participant) by child class
-  static $tableName = 'civicrm_case';
-  // Must be set to entity shortname (eg. event)
-  static $entityShortname = 'case';
-
-}
+*}
+{include file="CRM/Core/Form/Task/Batch.tpl"}

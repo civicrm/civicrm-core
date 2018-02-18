@@ -91,6 +91,14 @@ class CRM_Case_Task {
           'class' => 'CRM_Case_Form_Task_PDF',
           'result' => FALSE,
         ),
+        6 => array(
+          'title' => ts('Update multiple cases'),
+          'class' => array(
+            'CRM_Case_Form_Task_PickProfile',
+            'CRM_Case_Form_Task_Batch',
+          ),
+          'result' => FALSE,
+        ),
       );
 
       //CRM-4418, check for delete

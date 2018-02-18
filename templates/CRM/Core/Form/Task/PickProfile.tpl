@@ -1,5 +1,4 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
@@ -23,21 +22,19 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
-
-/**
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
- */
-
-/**
- * This class generates form task actions for CiviCase.
- */
-class CRM_Case_Form_Task extends CRM_Core_Form_Task {
-
-  // Must be set to entity table name (eg. civicrm_participant) by child class
-  static $tableName = 'civicrm_case';
-  // Must be set to entity shortname (eg. event)
-  static $entityShortname = 'case';
-
-}
+*}
+<div class="crm-form crm-form-block crm-{$taskComponent.lc}-task-pickprofile-form-block">
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+   <table class="form-layout-compressed">
+     <tr class="crm-{$taskComponent.lc}-task-pickprofile-form-block-uf_group_id">
+       <td class="label">{$form.uf_group_id.label}</td><td>{$form.uf_group_id.html}</td>
+     </tr>
+     <tr>
+       <td></td>
+       <td>
+         {assign var="ucfirst" value=$taskComponent.ucfirst}
+         {include file="CRM/$ucfirst/Form/Task.tpl"}</td>
+     </tr>
+ </table>
+   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+</div>

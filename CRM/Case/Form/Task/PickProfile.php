@@ -31,13 +31,22 @@
  */
 
 /**
- * This class generates form task actions for CiviCase.
+ * This class provides the functionality for batch profile update for case
  */
-class CRM_Case_Form_Task extends CRM_Core_Form_Task {
+class CRM_Case_Form_Task_PickProfile extends CRM_Core_Form_Task_PickProfile {
 
-  // Must be set to entity table name (eg. civicrm_participant) by child class
+  /**
+   * Must be set to entity table name (eg. civicrm_participant) by child class
+   *
+   * @var string
+   */
   static $tableName = 'civicrm_case';
-  // Must be set to entity shortname (eg. event)
+
+  /**
+   * Must be set to entity shortname (eg. event)
+   *
+   * @var string
+   */
   static $entityShortname = 'case';
 
 }
