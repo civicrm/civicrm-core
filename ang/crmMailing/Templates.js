@@ -7,7 +7,6 @@
           scope: {
             ngRequired: '@'
           },
-          templateUrl: '~/crmMailing/Templates.html',
           link: function(scope, element, attrs, ngModel) {
             scope.template = ngModel.$viewValue;
 
