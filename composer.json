@@ -47,7 +47,7 @@
     "totten/ca-config": "~17.05",
     "zetacomponents/base": "1.7.*",
     "zetacomponents/mail": "dev-1.7-civi",
-    "marcj/topsort": "dev-1.0-php53",
+    "marcj/topsort": "~1.1",
     "phpoffice/phpword": "^0.13.0",
     "pear/Validate_Finance_CreditCard": "dev-master",
     "civicrm/civicrm-cxn-rpc": "~0.17.07.01",
@@ -60,10 +60,6 @@
     {
       "type": "git",
       "url": "https://github.com/civicrm/zetacomponents-mail.git"
-    },
-    {
-      "type": "git",
-      "url": "https://github.com/totten/topsort.php.git"
     }
   ],
   "scripts": {
