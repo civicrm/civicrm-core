@@ -47,7 +47,7 @@ function civicrm_api3_membership_type_create($params) {
       $params[$field] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params[$field]);
     }
   }
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Membership_type');
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'MembershipType');
 }
 
 /**

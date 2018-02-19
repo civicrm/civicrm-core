@@ -438,7 +438,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Constant',
       'Entity',
       'Location',
-      'Domain',
       'Profile',
       'CustomValue',
       'SurveyRespondant',
@@ -452,8 +451,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'OptionGroup',
       'Membership',
       'Group',
-      'GroupOrganization',
-      'GroupNesting',
       'File',
       'EntityTag',
       'CustomField',
@@ -573,6 +570,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'definition',
         ),
       ),
+      'Domain' => ['cant_update' => ['domain_version']],
       'MembershipBlock' => array(
         'cant_update' => array(
           // The fake/auto-generated values leave us unable to properly cleanup fake data
