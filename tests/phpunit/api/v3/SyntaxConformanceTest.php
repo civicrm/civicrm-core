@@ -267,12 +267,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @return array
    */
   public static function custom_data_incl_non_std_entities_get() {
-    $customDataEntities = self::custom_data_entities();
-    $customDataEntities[] = ['UFGroup'];
-    $customDataEntities[] = ['PriceSet'];
-    $customDataEntities[] = ['PaymentToken'];
-    $customDataEntities[] = ['Mailing'];
-    return $customDataEntities;
+    return static::entities(static::toBeSkipped_custom_data_creatable(TRUE));
   }
 
   /**
@@ -359,6 +354,77 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'CustomValue',
       'Setting',
       'User',
+      'Logging',
+    );
+    if ($sequential === TRUE) {
+      return $entitiesWithout;
+    }
+    $entities = array();
+    foreach ($entitiesWithout as $e) {
+      $entities[] = array($e);
+    }
+    return $entities;
+  }
+
+  /**
+   * @param bool $sequential
+   *
+   * @return array
+   */
+  public static function toBeSkipped_custom_data_creatable($sequential = FALSE) {
+    $entitiesWithout = array(
+      // Ones to fix.
+      'CaseContact',
+      'CustomField',
+      'CustomGroup',
+      'DashboardContact',
+      'Domain',
+      'File',
+      'FinancialType',
+      'LocBlock',
+      'MailingEventConfirm',
+      'MailingEventResubscribe',
+      'MailingEventSubscribe',
+      'MailingEventUnsubscribe',
+      'MailingJob',
+      'MembershipPayment',
+      'Note',
+      'SavedSearch',
+      'UFJoin',
+      'UFField',
+      'PriceFieldValue',
+      'Website',
+      'JobLog',
+      'GroupContact',
+      'EntityTag',
+      'PledgePayment',
+      'PaymentProcessorType',
+      'Relationship',
+      'RelationshipType',
+      'ParticipantPayment',
+
+      // ones that are not real entities hence not extendable.
+      'ActivityType',
+      'Entity',
+      'Cxn',
+      'Constant',
+      'Attachment',
+      'CustomSearch',
+      'CustomValue',
+      'CxnApp',
+      'Extension',
+      'MailingContact',
+      'User',
+      'System',
+      'Setting',
+      'SystemLog',
+      'ReportTemplate',
+      'MailingRecipients',
+      'SurveyRespondant',
+      'Profile',
+      'Payment',
+      'Order',
+      'MailingGroup',
       'Logging',
     );
     if ($sequential === TRUE) {
@@ -784,27 +850,40 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @param $entityName
    */
   public function testCustomDataGet($entityName) {
+    $this->quickCleanup(array('civicrm_uf_match'));
     $this->createLoggedInUser();// so subsidiary activities are created
+
+    $entitiesWithNamingIssues = [
+      'MailingComponent' => 'Component',
+      'SmsProvider' => 'Provider',
+      'AclRole' => 'EntityRole',
+      'MailingEventQueue' => 'Queue',
+    ];
+
+    $usableName = !empty($entitiesWithNamingIssues[$entityName]) ? $entitiesWithNamingIssues[$entityName] : $entityName;
+    $optionName = CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($usableName));
 
     if (!isset(CRM_Core_BAO_CustomQuery::$extendsMap[$entityName])) {
       $createdValue = $this->callAPISuccess('OptionValue', 'create', [
         'option_group_id' => 'cg_extend_objects',
-        'label' => $entityName,
-        'value' => $entityName,
-        'name' => CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($entityName)),
+        'label' => $usableName,
+        'value' => $usableName,
+        'name' => $optionName,
       ]);
     }
     // We are not passing 'check_permissions' so the the more limited permissions *should* be
     // ignored but per CRM-17700 there is a history of custom data applying permissions when it shouldn't.
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'view my contact');
-    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, $entityName . 'Test.php');
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, $usableName . 'Test.php');
     $customFieldName = 'custom_' . $ids['custom_field_id'];
     $objects = $this->getMockableBAOObjects($entityName, 1);
     $params = array('id' => $objects[0]->id, 'custom_' . $ids['custom_field_id'] => "custom string");
     $result = $this->callAPISuccess($entityName, 'create', $params);
 
+    $this->assertTrue(isset($result['id']), 'no id on ' . $entityName);
     $getParams = array('id' => $result['id'], 'return' => array($customFieldName));
     $check = $this->callAPISuccess($entityName, 'get', $getParams);
+    $this->assertTrue(!empty($check['values'][$check['id']][$customFieldName]), 'Custom data not present for ' . $entityName);
     $this->assertEquals("custom string", $check['values'][$check['id']][$customFieldName], 'Custom data not present for ' . $entityName);
 
     $this->customFieldDelete($ids['custom_field_id']);
@@ -1464,7 +1543,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testInvalidID_delete($Entity) {
-    $result = $this->callAPIFailure($Entity, 'Delete', array('id' => 999));
+    $result = $this->callAPIFailure($Entity, 'Delete', array('id' => 999999));
   }
 
   /**

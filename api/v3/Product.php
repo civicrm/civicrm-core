@@ -43,7 +43,7 @@
  * @return array
  */
 function civicrm_api3_product_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Product');
 }
 
 /**
