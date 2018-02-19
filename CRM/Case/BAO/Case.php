@@ -1039,13 +1039,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
     $caseDeleted = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $caseID, 'is_deleted');
 
-    // define statuses which are handled like Completed status (others are assumed to be handled like Scheduled status)
-    $compStatusValues = array();
-    $compStatusNames = array('Left Message', 'Cancelled', 'Unreachable', 'Not Required');
-    foreach ($compStatusNames as $name) {
-      $compStatusValues[] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $name);
-    }
-    $compStatusValues = array_merge($compStatusValues, array_keys(CRM_Activity_BAO_Activity::getStatusesByType(CRM_Activity_BAO_Activity::COMPLETED)));
+    $compStatusValues = array_keys(
+      CRM_Activity_BAO_Activity::getStatusesByType(CRM_Activity_BAO_Activity::COMPLETED) +
+      CRM_Activity_BAO_Activity::getStatusesByType(CRM_Activity_BAO_Activity::CANCELLED)
+    );
 
     $contactViewUrl = CRM_Utils_System::url("civicrm/contact/view", "reset=1&cid=", FALSE, NULL, FALSE);
     $hasViewContact = CRM_Core_Permission::giveMeAllACLs();
