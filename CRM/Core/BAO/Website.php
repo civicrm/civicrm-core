@@ -40,12 +40,11 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * Takes an associative array and adds im.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   an assoc array of name/value pairs.
    *
-   * @return object
-   *   CRM_Core_BAO_Website object on success, null otherwise
+   * @return CRM_Core_BAO_Website
    */
-  public static function add(&$params) {
+  public static function add($params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Website', CRM_Utils_Array::value('id', $params), $params);
 
@@ -55,6 +54,31 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 
     CRM_Utils_Hook::post($hook, 'Website', $website->id, $website);
     return $website;
+  }
+
+  /**
+   * Create website.
+   *
+   * If called in a legacy manner this, temporarily, fails back to calling the legacy function.
+   *
+   * @param array $params
+   * @param int $contactID
+   * @param bool $skipDelete
+   *
+   * @return bool|CRM_Core_BAO_Website
+   */
+  public static function create($params, $contactID = NULL, $skipDelete = NULL) {
+    if ($skipDelete !== NULL || ($contactID && !is_array($contactID))) {
+      \Civi::log()->warning(ts('Calling website:create with vars other than $params is deprecated. Use process'), ['civi.tag' => 'deprecated']);
+      return self::process($params, $contactID, $skipDelete);
+    }
+    foreach ($params as $key => $value) {
+      if (is_numeric($key)) {
+        \Civi::log()->warning(ts('Calling website:create for multiple websites $params is deprecated. Use process'), ['civi.tag' => 'deprecated']);
+        return self::process($params, $contactID, $skipDelete);
+      }
+    }
+    return self::add($params);
   }
 
   /**
@@ -68,7 +92,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    *
    * @return bool
    */
-  public static function create(&$params, $contactID, $skipDelete) {
+  public static function process($params, $contactID, $skipDelete) {
     if (empty($params)) {
       return FALSE;
     }
