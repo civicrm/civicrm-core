@@ -808,9 +808,16 @@ LIMIT {$offset}, {$rowCount}
       $searchRows[$count]['weight'] = CRM_Utils_Array::value('weight', $pair);
 
       if (!empty($pairInfo['data']['canMerge'])) {
-        $mergeParams = "reset=1&cid={$pairInfo['entity_id1']}&oid={$pairInfo['entity_id2']}&action=update&rgid={$rgid}&limit=" . CRM_Utils_Request::retrieve('limit', 'Integer');
+        $mergeParams = [
+          'reset' => 1,
+            'cid' => $pairInfo['entity_id1'],
+            'oid' => $pairInfo['entity_id2'],
+            'action' => 'update',
+            'rgid' => $rgid,
+            'limit' => CRM_Utils_Request::retrieve('limit', 'Integer'),
+          ];
         if ($gid) {
-          $mergeParams .= "&gid={$gid}";
+          $mergeParams['gid'] = $gid;
         }
 
         $searchRows[$count]['actions']  = "<a class='crm-dedupe-flip' href='#' data-pnid={$pairInfo['prevnext_id']}>" . ts('flip') . "</a>&nbsp;|&nbsp;";

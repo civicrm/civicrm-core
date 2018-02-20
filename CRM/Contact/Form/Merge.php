@@ -74,7 +74,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $this->_gid = $gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE);
       $this->_mergeId = CRM_Utils_Request::retrieve('mergeId', 'Positive', $this, FALSE);
       $this->limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this, FALSE);
-      $urlParams = "reset=1&rgid={$this->_rgid}&gid={$this->_gid}&limit=" . $this->limit;
+
+      $urlParams = ['reset' => 1, 'rgid' => $this->_rgid, 'gid' => $this->_gid, 'limit' => $this->limit];
 
       $this->bounceIfInvalid($this->_cid, $this->_oid);
 
@@ -83,7 +84,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         'return' => 'contact_type',
       ));
 
-      $browseUrl = CRM_Utils_System::url('civicrm/contact/dedupefind', $urlParams . '&action=browse');
+      $browseUrl = CRM_Utils_System::url('civicrm/contact/dedupefind', array_merge($urlParams, ['action' => 'browse']));
 
       if (!$this->_rgid) {
         // Unset browse URL as we have come from the search screen.
@@ -124,13 +125,13 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         $this->assign('mainUfId', $mainUfId);
         $this->assign('mainUfName', $mainUser ? $mainUser->name : NULL);
       }
-
-      $flipUrl = CRM_Utils_System::url('civicrm/contact/merge',
-        "reset=1&action=update&cid={$this->_oid}&oid={$this->_cid}&rgid={$this->_rgid}&gid={$gid}"
-      );
+      $flipParams = array_merge($urlParams, ['action' => 'update', 'cid' => $this->_oid, 'oid' => $this->_cid]);
       if (!$flip) {
-        $flipUrl .= '&flip=1';
+        $flipParams['flip'] = '1';
       }
+      $flipUrl = CRM_Utils_System::url('civicrm/contact/merge',
+        $flipParams
+      );
       $this->assign('flip', $flipUrl);
 
       $this->prev = $this->next = NULL;
@@ -140,8 +141,13 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
                ) as $position) {
         if (!empty($pos[$position])) {
           if ($pos[$position]['id1'] && $pos[$position]['id2']) {
-            $urlParams .= "&cid={$pos[$position]['id1']}&oid={$pos[$position]['id2']}&mergeId={$pos[$position]['mergeId']}&action=update";
-            $this->$position = CRM_Utils_System::url('civicrm/contact/merge', $urlParams);
+            $rowParams = array_merge($urlParams, [
+              'action' => 'update',
+              'cid' => $pos[$position]['id1'],
+              'oid' => $pos[$position]['id2'],
+              'mergeId' => $pos[$position]['mergeId'],
+            ]);
+            $this->$position = CRM_Utils_System::url('civicrm/contact/merge', $rowParams);
             $this->assign($position, $this->$position);
           }
         }
@@ -294,18 +300,17 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $message = '<ul><li>' . ts('%1 has been updated.', array(1 => $name)) . '</li><li>' . ts('Contact ID %1 has been deleted.', array(1 => $this->_oid)) . '</li></ul>';
     CRM_Core_Session::setStatus($message, ts('Contacts Merged'), 'success');
 
-    $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->_cid}");
-    $urlParams = "reset=1&gid={$this->_gid}&rgid={$this->_rgid}&limit={$this->limit}";
+    $urlParams = ['reset' => 1, 'cid' => $this->_cid, 'rgid' => $this->_rgid, 'gid' => $this->_gid, 'limit' => $this->limit];
+    $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $this->_cid]);
 
     if (!empty($formValues['_qf_Merge_submit'])) {
-      $urlParams .= "&action=update";
-      $lisitingURL = CRM_Utils_System::url('civicrm/contact/dedupefind',
+      $urlParams['action'] = "update";
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/dedupefind',
         $urlParams
-      );
-      CRM_Utils_System::redirect($lisitingURL);
+      ));
     }
     if (!empty($formValues['_qf_Merge_done'])) {
-      CRM_Utils_System::redirect($url);
+      CRM_Utils_System::redirect($contactViewUrl);
     }
 
     if ($this->next && $this->_mergeId) {
@@ -321,12 +326,16 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         $pos['next']['id2']
       ) {
 
-        $urlParams .= "&cid={$pos['next']['id1']}&oid={$pos['next']['id2']}&mergeId={$pos['next']['mergeId']}&action=update";
-        $url = CRM_Utils_System::url('civicrm/contact/merge', $urlParams);
+        $urlParams['cid'] = $pos['next']['id1'];
+        $urlParams['oid'] = $pos['next']['id2'];
+        $urlParams['mergeId'] = $pos['next']['mergeId'];
+        $urlParams['action'] = 'update';
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/merge', $urlParams));
       }
     }
 
-    CRM_Utils_System::redirect($url);
+    // Perhaps never reached.
+    CRM_Utils_System::redirect($contactViewUrl);
   }
 
   /**
