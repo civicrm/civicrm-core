@@ -120,7 +120,7 @@ abstract class CRM_Core_Task {
   /**
    * Show tasks selectively based on the permission level
    * of the user
-   * This function should be call parent::corePermissionedTaskTitles
+   * This function should be overridden by the child class which would normally call parent::corePermissionedTaskTitles
    *
    * @param int $permission
    * @param array $params
@@ -129,7 +129,9 @@ abstract class CRM_Core_Task {
    * @return array
    *   set of tasks that are valid for the user
    */
-  abstract public static function permissionedTaskTitles($permission, $params);
+  public static function permissionedTaskTitles($permission, $params) {
+    return self::corePermissionedTaskTitles(self::tasks(), $permission, $params);
+  }
 
   /**
    * Show tasks selectively based on the permission level
