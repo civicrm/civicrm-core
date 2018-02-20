@@ -21,7 +21,6 @@ sql/civicrm_data.mysql
 sql/civicrm_drop.mysql
 sql/civicrm_navigation.mysql
 sql/civicrm_sample.mysql
-templates/CRM/common/version.tpl
 tests/phpunit/CiviTest/CiviSeleniumSettings.php
 tests/phpunit/CiviTest/civicrm.settings.php
 tools/stats/config.php
