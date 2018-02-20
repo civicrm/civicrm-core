@@ -75,6 +75,9 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
       $contributionRecur['membership_name'] = $membershipDetails['membership_name'];
     }
 
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('ContributionRecur', NULL, $contributionRecur['id']);
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $contributionRecur['id']);
+
     $this->assign('recur', $contributionRecur);
   }
 
