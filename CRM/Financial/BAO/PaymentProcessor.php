@@ -570,6 +570,26 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
   }
 
   /**
+   * Get the name of the payment processor
+   *
+   * @param $paymentProcessorId
+   *
+   * @return null|string
+   */
+  public static function getPaymentProcessorName($paymentProcessorId) {
+    try {
+      $paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle', array(
+        'return' => array('name'),
+        'id' => $paymentProcessorId,
+      ));
+      return $paymentProcessor['name'];
+    }
+    catch (Exception $e) {
+      return ts('Unknown') . ' (' . $paymentProcessorId . ')';
+    }
+  }
+
+  /**
    * Generate and assign an arbitrary value to a field of a test object.
    *
    * @param string $fieldName

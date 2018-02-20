@@ -130,50 +130,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     $controller->run();
 
     // add recurring block
-    try {
-      $contributionRecurResult = civicrm_api3('ContributionRecur', 'get', array(
-        'contact_id' => $this->_contactId,
-        'options' => array('limit' => 0, 'sort' => 'start_date ASC'),
-      ));
-      $recurContributions = CRM_Utils_Array::value('values', $contributionRecurResult);
-    }
-    catch (Exception $e) {
-      $recurContributions = NULL;
-    }
-
-    if (!empty($recurContributions)) {
-      foreach ($recurContributions as $recurId => $recurDetail) {
-        $action = array_sum(array_keys($this->recurLinks($recurId)));
-        // no action allowed if it's not active
-        $recurContributions[$recurId]['is_active'] = (!CRM_Contribute_BAO_Contribution::isContributionStatusNegative($recurDetail['contribution_status_id']));
-
-        if ($recurContributions[$recurId]['is_active']) {
-          $details = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurContributions[$recurId]['id'], 'recur');
-          $hideUpdate = $details->membership_id & $details->auto_renew;
-
-          if ($hideUpdate) {
-            $action -= CRM_Core_Action::UPDATE;
-          }
-
-          $recurContributions[$recurId]['action'] = CRM_Core_Action::formLink(self::recurLinks($recurId), $action,
-            array(
-              'cid' => $this->_contactId,
-              'crid' => $recurId,
-              'cxt' => 'contribution',
-            ),
-            ts('more'),
-            FALSE,
-            'contribution.selector.recurring',
-            'Contribution',
-            $recurId
-          );
-        }
-      }
-      // assign vars to templates
-      $this->assign('action', $this->_action);
-      $this->assign('recurRows', $recurContributions);
-      $this->assign('recur', TRUE);
-    }
+    $this->addRecurringContributionsBlock();
 
     // enable/disable soft credit records for test contribution
     $isTest = 0;
@@ -202,6 +159,65 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
       $this->assign('displayName', $displayName);
       $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId);
+    }
+  }
+
+  /**
+   * Get all the recurring contribution information and assign to the template
+   */
+  private function addRecurringContributionsBlock() {
+    try {
+      $contributionRecurResult = civicrm_api3('ContributionRecur', 'get', array(
+        'contact_id' => $this->_contactId,
+        'options' => array('limit' => 0, 'sort' => 'start_date ASC'),
+      ));
+      $recurContributions = CRM_Utils_Array::value('values', $contributionRecurResult);
+    }
+    catch (Exception $e) {
+      $recurContributions = NULL;
+    }
+
+    if (!empty($recurContributions)) {
+      foreach ($recurContributions as $recurId => $recurDetail) {
+        $action = array_sum(array_keys($this->recurLinks($recurId)));
+        // no action allowed if it's not active
+        $recurContributions[$recurId]['is_active'] = (!CRM_Contribute_BAO_Contribution::isContributionStatusNegative($recurDetail['contribution_status_id']));
+
+        // Get the name of the payment processor
+        if (!empty($recurDetail['payment_processor_id'])) {
+          $recurContributions[$recurId]['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName($recurDetail['payment_processor_id']);
+        }
+        // Get the label for the contribution status
+        if (!empty($recurDetail['contribution_status_id'])) {
+          $recurContributions[$recurId]['contribution_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $recurDetail['contribution_status_id']);
+        }
+
+        if ($recurContributions[$recurId]['is_active']) {
+          $details = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurContributions[$recurId]['id'], 'recur');
+          $hideUpdate = $details->membership_id & $details->auto_renew;
+
+          if ($hideUpdate) {
+            $action -= CRM_Core_Action::UPDATE;
+          }
+
+          $recurContributions[$recurId]['action'] = CRM_Core_Action::formLink(self::recurLinks($recurId), $action,
+            array(
+              'cid' => $this->_contactId,
+              'crid' => $recurId,
+              'cxt' => 'contribution',
+            ),
+            ts('more'),
+            FALSE,
+            'contribution.selector.recurring',
+            'Contribution',
+            $recurId
+          );
+        }
+      }
+      // assign vars to templates
+      $this->assign('action', $this->_action);
+      $this->assign('recurRows', $recurContributions);
+      $this->assign('recur', TRUE);
     }
   }
 
