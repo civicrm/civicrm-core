@@ -72,7 +72,7 @@
             <th scope="col">{ts}Start Date{/ts}</th>
             <th scope="col">{ts}Installments{/ts}</th>
             <th scope="col">{ts}Status{/ts}</th>
-            <th scope="col">&nbsp;</th>
+            <th scope="col"></th>
         </tr>
 
         {foreach from=$recurRows item=row}
@@ -83,9 +83,7 @@
                 <td>{$row.start_date|crmDate}</td>
                 <td>{$row.installments}</td>
                 <td>{$row.contribution_status}</td>
-                <td>
-                    {$row.action|replace:'xx':$row.recurId}
-                </td>
+                <td>{$row.action|replace:'xx':$row.recurId}</td>
             </tr>
         {/foreach}
     </table>
