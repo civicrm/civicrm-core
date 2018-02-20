@@ -337,8 +337,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
         INNER JOIN civicrm_mailing {$this->_aliases['civicrm_mailing']}
           ON civicrm_mailing_job.mailing_id = {$this->_aliases['civicrm_mailing']}.id
       ";
-
-    $this->addPhoneFromClause();
+    $this->joinPhoneFromClause();
   }
 
   public function where() {

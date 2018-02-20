@@ -463,10 +463,10 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     $this->_from = "
         FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}";
 
-    $this->addAddressFromClause();
-    $this->addCountryFromClause();
-    $this->addPhoneFromClause();
-    $this->addEmailFromClause();
+    $this->joinAddressFromClause();
+    $this->joinCountryFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
 
     $this->_from .= "{$group}";
 

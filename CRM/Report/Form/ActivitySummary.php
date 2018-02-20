@@ -337,7 +337,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
                LEFT JOIN civicrm_case_contact
                       ON civicrm_case_contact.case_id = civicrm_case.id ";
 
-      $this->addPhoneFromClause();
+      $this->joinPhoneFromClause();
     }
     else {
       $this->_from = "
@@ -350,7 +350,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
               {$this->_aclFrom}";
     }
 
-    $this->addEmailFromClause();
+    $this->joinEmailFromClause();
   }
 
   /**

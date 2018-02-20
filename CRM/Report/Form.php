@@ -4312,7 +4312,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param array $extra Additional options.
    *      Not currently used in core but may be used in override extensions.
    */
-  public function addAddressFromClause($prefix = '', $extra = array()) {
+  public function joinAddressFromContact($prefix = '', $extra = array()) {
     // include address field if address column is to be included
     if ((isset($this->_addressField) && $this->_addressField) || $this->isTableSelected($prefix . 'civicrm_address')) {
       $this->_from .= "
@@ -4333,7 +4333,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param array $extra Additional options.
    *      Not currently used in core but may be used in override extensions.
    */
-  public function addCountryFromClause($prefix = '', $extra = array()) {
+  public function joinCountryFromClause($prefix = '', $extra = array()) {
     // include country field if country column is to be included
     if ($this->isTableSelected($prefix . 'civicrm_country')) {
       $this->_from .= "
@@ -4353,7 +4353,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param array $extra Additional options.
    *      Not currently used in core but may be used in override extensions.
    */
-  public function addPhoneFromClause($prefix = '', $extra = array()) {
+  public function joinPhoneFromClause($prefix = '', $extra = array()) {
     // include phone field if phone column is to be included
     if ($this->isTableSelected($prefix . 'civicrm_phone')) {
       $this->_from .= "
@@ -4373,7 +4373,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param array $extra Additional options.
    *      Not currently used in core but may be used in override extensions.
    */
-  public function addEmailFromClause($prefix = '', $extra = array()) {
+  public function joinEmailFromClause($prefix = '', $extra = array()) {
     // include email field if email column is to be included
     if ($this->isTableSelected($prefix . 'civicrm_email')) {
       $this->_from .= "

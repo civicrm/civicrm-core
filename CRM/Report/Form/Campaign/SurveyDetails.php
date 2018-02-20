@@ -291,9 +291,9 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     $this->_from .= " INNER JOIN civicrm_activity_contact activity_contact_civireport ON
                       ( {$this->_aliases['civicrm_activity']}.id = activity_contact_civireport.activity_id  AND activity_contact_civireport.record_type_id = {$assigneeID} )\n";
 
-    $this->addAddressFromClause();
-    $this->addPhoneFromClause();
-    $this->addEmailFromClause();
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
 
     if ($this->_locationBasedPhoneField) {
       foreach ($this->_surveyResponseFields as $key => $value) {

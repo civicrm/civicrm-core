@@ -184,9 +184,9 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
 FROM       civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
 ";
 
-    $this->addAddressFromClause();
-    $this->addPhoneFromClause();
-    $this->addEmailFromClause();
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
   }
 
   public function where() {

@@ -402,9 +402,9 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $this->_relationshipFrom = " INNER JOIN civicrm_relationship {$this->_aliases['civicrm_relationship']}
                      ON (({$this->_aliases['civicrm_relationship']}.contact_id_a = {$relContacAlias}.id OR {$this->_aliases['civicrm_relationship']}.contact_id_b = {$relContacAlias}.id ) AND {$this->_aliases['civicrm_relationship']}.is_active = 1) ";
 
-    $this->addAddressFromClause();
-    $this->addPhoneFromClause();
-    $this->addEmailFromClause();
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
 
     // for credit card type
     $this->addFinancialTrxnFromClause();

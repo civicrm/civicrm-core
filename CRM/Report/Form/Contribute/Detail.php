@@ -941,16 +941,10 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
               INNER JOIN (SELECT c.id, IF(COUNT(oc.id) = 0, 0, 1) AS ordinality FROM civicrm_contribution c LEFT JOIN civicrm_contribution oc ON c.contact_id = oc.contact_id AND oc.receive_date < c.receive_date GROUP BY c.id) {$this->_aliases['civicrm_contribution_ordinality']}
                       ON {$this->_aliases['civicrm_contribution_ordinality']}.id = {$this->_aliases['civicrm_contribution']}.id";
     }
-    $this->addPhoneFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinAddressFromClause();
+    $this->joinEmailFromClause();
 
-    $this->addAddressFromClause();
-
-    if ($this->_emailField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                      {$this->_aliases['civicrm_email']}.is_primary = 1\n";
-    }
     // include contribution note
     if (!empty($this->_params['fields']['contribution_note']) ||
       !empty($this->_params['note_value'])

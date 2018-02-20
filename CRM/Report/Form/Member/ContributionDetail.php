@@ -522,9 +522,9 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           AND {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn')";
     }
 
-    $this->addAddressFromClause();
-    $this->addPhoneFromClause();
-    $this->addEmailFromClause();
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
   }
 
   /**

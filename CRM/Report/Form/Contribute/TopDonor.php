@@ -258,9 +258,9 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     // for credit card type
     $this->addFinancialTrxnFromClause();
 
-    $this->addAddressFromClause();
-    $this->addPhoneFromClause();
-    $this->addEmailFromClause();
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
   }
 
   public function where() {

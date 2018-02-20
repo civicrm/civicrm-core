@@ -443,7 +443,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
           ON civicrm_mailing_job.mailing_id = {$this->_aliases['civicrm_mailing']}.id
           AND civicrm_mailing_job.is_test = 0";
 
-    $this->addPhoneFromClause();
+    $this->joinPhoneFromClause();
   }
 
   public function where() {

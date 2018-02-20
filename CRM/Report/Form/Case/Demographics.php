@@ -313,8 +313,8 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
       }
     }
 
-    $this->addPhoneFromClause();
-    $this->addEmailFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
 
   }
 

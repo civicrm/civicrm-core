@@ -346,9 +346,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
           ON restricted_contacts.cid = {$this->_aliases['civicrm_contact']}.id";
 
-      $this->addAddressFromClause();
-      $this->addPhoneFromClause();
-      $this->addEmailFromClause();
+      $this->joinAddressFromClause();
+      $this->joinPhoneFromClause();
+      $this->joinEmailFromClause();
     }
     else {
       $this->setFromBase('civicrm_contact');

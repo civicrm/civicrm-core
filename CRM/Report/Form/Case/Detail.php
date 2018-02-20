@@ -414,9 +414,9 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
 ";
     }
 
-    $this->addAddressFromClause();
-    $this->addPhoneFromClause();
-    $this->addEmailFromClause();
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
 
     if ($this->_worldRegionField) {
       $this->_from .= "

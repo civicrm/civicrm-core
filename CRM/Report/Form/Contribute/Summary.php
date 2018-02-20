@@ -517,9 +517,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                      ON {$this->_aliases['civicrm_contribution']}.financial_type_id ={$this->_aliases['civicrm_financial_type']}.id
              ";
 
-    $this->addAddressFromClause();
-    $this->addPhoneFromClause();
-    $this->addEmailFromClause();
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
 
     //for contribution batches
     if ($this->isTableSelected('civicrm_batch')) {

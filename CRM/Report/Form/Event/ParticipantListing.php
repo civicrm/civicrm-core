@@ -515,9 +515,9 @@ ORDER BY  cv.label
              {$this->_aclFrom}
       ";
 
-    $this->addAddressFromClause();
-    $this->addPhoneFromClause();
-    $this->addEmailFromClause();
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
 
     if ($this->_contribField) {
       $this->_from .= "

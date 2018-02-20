@@ -352,13 +352,13 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
              {$this->_aclFrom}";
 
-    $this->addPhoneFromClause();
-    $this->addEmailFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
 
     // for credit card type
     $this->addFinancialTrxnFromClause();
 
-    $this->addAddressFromClause();
+    $this->joinAddressFromClause();
   }
 
   public function where() {

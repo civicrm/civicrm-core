@@ -254,9 +254,9 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
               AND {$this->_aliases['civicrm_relationship']}.contact_id_b={$this->_aliases['civicrm_contact']}.employer_id
               AND {$this->_aliases['civicrm_relationship']}.relationship_type_id={$relType})  ";
 
-    $this->addAddressFromClause();
-    $this->addPhoneFromClause();
-    $this->addEmailFromClause();
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
   }
 
   public function where() {

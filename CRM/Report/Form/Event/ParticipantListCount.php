@@ -465,9 +465,9 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
          LEFT JOIN civicrm_line_item {$this->_aliases['civicrm_line_item']}
               ON {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_participant' AND {$this->_aliases['civicrm_participant']}.id ={$this->_aliases['civicrm_line_item']}.entity_id";
 
-    $this->addAddressFromClause();
-    $this->addPhoneFromClause();
-    $this->addEmailFromClause();
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
   }
 
   public function storeWhereHavingClauseArray() {

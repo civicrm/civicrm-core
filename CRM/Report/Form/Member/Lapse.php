@@ -260,9 +260,9 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
                          ON {$this->_aliases['civicrm_membership']}.membership_type_id =
                             {$this->_aliases['civicrm_membership_type']}.id";
 
-    $this->addAddressFromClause();
-    $this->addPhoneFromClause();
-    $this->addEmailFromClause();
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
   }
 
   public function where() {

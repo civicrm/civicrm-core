@@ -286,9 +286,9 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
       ";
     }
 
-    $this->addPhoneFromClause();
-    $this->addAddressFromClause();
-    $this->addEmailFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinAddressFromClause();
+    $this->joinEmailFromClause();
   }
 
   /**
