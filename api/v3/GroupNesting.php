@@ -55,15 +55,10 @@ function civicrm_api3_group_nesting_get($params) {
  *   Parameters array - allowed array keys include:.
  *
  * @return array
- *   TBD
- * @todo Work out the return value.
+ *   API success array
  */
 function civicrm_api3_group_nesting_create($params) {
-  CRM_Contact_BAO_GroupNesting::add($params['parent_group_id'], $params['child_group_id']);
-
-  // FIXME: CRM_Contact_BAO_GroupNesting requires some work
-  $result = array('is_error' => 0);
-  return civicrm_api3_create_success($result, $params, 'GroupNesting');
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'GroupNesting');
 }
 
 /**
