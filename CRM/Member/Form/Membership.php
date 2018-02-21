@@ -382,6 +382,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->assign('endDate', $defaults['membership_end_date']);
     }
 
+    $defaults['from_email_address'] = CRM_Core_BAO_Email::getDefaultFromEmailAddress();
     return $defaults;
   }
 

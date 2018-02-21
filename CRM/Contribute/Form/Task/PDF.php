@@ -142,7 +142,11 @@ AND    {$this->_componentClause}";
    */
   public function setDefaultValues() {
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
-    return array('pdf_format_id' => $defaultFormat['id'], 'receipt_update' => 1, 'override_privacy' => 0);
+    $defaults['pdf_format_id'] = $defaultFormat['id'];
+    $defaults['receipt_update'] = 1;
+    $defaults['override_privacy'] = 0;
+    $defaults['from_email_address'] = CRM_Core_BAO_Email::getDefaultFromEmailAddress();
+    return $defaults;
   }
 
   /**
