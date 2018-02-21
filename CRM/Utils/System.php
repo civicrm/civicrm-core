@@ -1074,25 +1074,12 @@ class CRM_Utils_System {
 
     if (!$version) {
       $verFile = implode(DIRECTORY_SEPARATOR,
-        array(dirname(__FILE__), '..', '..', 'civicrm-version.php')
+        array(dirname(__FILE__), '..', '..', 'xml', 'version.xml')
       );
       if (file_exists($verFile)) {
-        require_once $verFile;
-        if (function_exists('civicrmVersion')) {
-          $info = civicrmVersion();
-          $version = $info['version'];
-        }
-      }
-      else {
-        // svn installs don't have version.txt by default. In that case version.xml should help -
-        $verFile = implode(DIRECTORY_SEPARATOR,
-          array(dirname(__FILE__), '..', '..', 'xml', 'version.xml')
-        );
-        if (file_exists($verFile)) {
-          $str = file_get_contents($verFile);
-          $xmlObj = simplexml_load_string($str);
-          $version = (string) $xmlObj->version_no;
-        }
+        $str = file_get_contents($verFile);
+        $xmlObj = simplexml_load_string($str);
+        $version = (string) $xmlObj->version_no;
       }
 
       // pattern check
