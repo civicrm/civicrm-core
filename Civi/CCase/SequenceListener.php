@@ -33,6 +33,10 @@ class SequenceListener implements CaseChangeListener {
   }
 
   /**
+   * Triggers next case activity in sequence if current activity status is updated
+   * to type=COMPLETED(See CRM-21598). The adjoining activity is created according
+   * to the sequence configured in case type.
+   *
    * @param \Civi\CCase\Event\CaseChangeEvent $event
    *
    * @throws \CiviCRM_API3_Exception
