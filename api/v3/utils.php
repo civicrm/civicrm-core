@@ -2441,13 +2441,13 @@ function _civicrm_api3_field_value_check(&$params, $fieldName, $type = NULL) {
  *   List of all records.
  * @param string $idCol
  *   The property which defines the ID of a record
- * @param array $fields
+ * @param array $filterableFields
  *   List of filterable fields.
  *
  * @return array
  * @throws \API_Exception
  */
-function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $fields) {
+function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $filterableFields) {
   $options = _civicrm_api3_get_options_from_params($params, TRUE, $entity, 'get');
   // TODO // $sort = CRM_Utils_Array::value('sort', $options, NULL);
   $offset = CRM_Utils_Array::value('offset', $options);
@@ -2465,7 +2465,7 @@ function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $fiel
       if ($k == 'id') {
         $k = $idCol;
       }
-      if (in_array($k, $fields) && $record[$k] != $v) {
+      if (in_array($k, $filterableFields) && $record[$k] != $v) {
         $match = FALSE;
         break;
       }
