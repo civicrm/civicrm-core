@@ -196,7 +196,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
   public function postProcess() {
     $session = CRM_Core_Session::singleton();
     $params = $this->exportValues();
-    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
+    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
     if ($this->_id) {
       $params['id'] = $this->_id;
     }
