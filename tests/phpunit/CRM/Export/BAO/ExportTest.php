@@ -29,6 +29,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   public function tearDown() {
     $this->quickCleanup(['civicrm_contact', 'civicrm_email', 'civicrm_address']);
+    $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
 
@@ -203,7 +204,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function setUpContributionExportData() {
     $this->setUpContactExportData();
-    $this->contributionIDs[] = $this->contributionCreate(array('contact_id' => $this->contactIDs[0]));
+    $this->contributionIDs[] = $this->contributionCreate(array('contact_id' => $this->contactIDs[0], 'trxn_id' => 'null', 'invoice_id' => 'null'));
+    $this->contributionIDs[] = $this->contributionCreate(array('contact_id' => $this->contactIDs[1], 'trxn_id' => 'null', 'invoice_id' => 'null'));
   }
 
   /**
@@ -218,7 +220,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up some data for us to do testing on.
    */
   public function setUpContactExportData() {
-    $this->contactIDs[] = $contactA = $this->individualCreate();
+    $this->contactIDs[] = $contactA = $this->individualCreate(['gender_id' => 'Female']);
     // Create address for contact A.
     $params = array(
       'contact_id' => $contactA,
@@ -298,6 +300,65 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function getPrimarySearchOptions() {
     return [[TRUE], [FALSE]];
+  }
+
+  /**
+   * Test that when exporting a pseudoField it is reset for NULL entries.
+   *
+   * ie. we have a contact WITH a gender & one without - make sure the latter one
+   * does NOT retain the gender of the former.
+   */
+  public function testExportPseudoField() {
+    $this->setUpContactExportData();
+    $selectedFields = [['Individual', 'gender_id']];
+    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
+      TRUE,
+      $this->contactIDs[1],
+      array(),
+      NULL,
+      $selectedFields,
+      NULL,
+      CRM_Export_Form_Select::CONTACT_EXPORT,
+      "contact_a.id IN (" . implode(",", $this->contactIDs) . ")",
+      NULL,
+      FALSE,
+      FALSE,
+      array(
+        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
+        'suppress_csv_for_testing' => TRUE,
+      )
+    );
+    $this->assertEquals('Female,', CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(gender_id) FROM {$tableName}"));
+  }
+
+  /**
+   * Test that when exporting a pseudoField it is reset for NULL entries.
+   *
+   * This is specific to the example in CRM-14398
+   */
+  public function testExportPseudoFieldCampaign() {
+    $this->setUpContributionExportData();
+    $campaign = $this->callAPISuccess('Campaign', 'create', ['title' => 'Big campaign']);
+    $this->callAPISuccess('Contribution', 'create', ['campaign_id' => 'Big_campaign', 'id' => $this->contributionIDs[0]]);
+    $selectedFields = [['Individual', 'gender_id'], ['Contribution', 'contribution_campaign_title']];
+    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
+      TRUE,
+      $this->contactIDs[1],
+      array(),
+      NULL,
+      $selectedFields,
+      NULL,
+      CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
+      "contact_a.id IN (" . implode(",", $this->contactIDs) . ")",
+      NULL,
+      FALSE,
+      FALSE,
+      array(
+        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
+        'suppress_csv_for_testing' => TRUE,
+      )
+    );
+    $this->assertEquals('Big campaign,', CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(contribution_campaign_title) FROM {$tableName}"));
   }
 
   /**

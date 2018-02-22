@@ -58,6 +58,7 @@ function civicrm_api3_campaign_create($params) {
  */
 function _civicrm_api3_campaign_create_spec(&$params) {
   $params['title']['api.required'] = 1;
+  $params['is_active']['api.default'] = 1;
 }
 
 /**
