@@ -770,27 +770,15 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $limitReached = FALSE;
     while (!$limitReached) {
       $limitQuery = "{$queryString} LIMIT {$offset}, {$rowCount}";
-      $dao = CRM_Core_DAO::executeQuery($limitQuery);
+      $iterationDAO = CRM_Core_DAO::executeQuery($limitQuery);
       // If this is less than our limit by the end of the iteration we do not need to run the query again to
       // check if some remain.
       $rowsThisIteration = 0;
 
-      while ($dao->fetch()) {
+      while ($iterationDAO->fetch()) {
         $count++;
         $rowsThisIteration++;
         $row = array();
-
-        //convert the pseudo constants
-        // CRM-14398 there is problem in this architecture that is not easily solved. For now we are using the cloned
-        // temporary iterationDAO object to get around it.
-        // the issue is that the convertToPseudoNames function is adding additional properties (e.g for campaign) to the DAO object
-        // these additional properties are NOT reset when the $dao cycles through the while loop
-        // nor are they overwritten as they are not in the loop
-        // the convertToPseudoNames will not adequately over-write them either as it doesn't 'kick-in' unless the
-        // relevant property is set.
-        // It may be that a long-term fix could be introduced there - however, it's probably necessary to figure out how to test the
-        // export class before tackling a better architectural fix
-        $iterationDAO = clone $dao;
         $query->convertToPseudoNames($iterationDAO);
 
         //first loop through output columns so that we return what is required, and in same order.
@@ -1070,7 +1058,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           $componentDetails = array();
         }
       }
-      $dao->free();
       if ($rowsThisIteration < self::EXPORT_ROW_COUNT) {
         $limitReached = TRUE;
       }
