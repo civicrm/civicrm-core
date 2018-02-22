@@ -268,6 +268,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
       'financial_type_id' => 1,
       'contribution_status_id' => 1,
+      'skipCleanMoney' => TRUE,
     );
 
     foreach ($priceFields['values'] as $key => $priceField) {

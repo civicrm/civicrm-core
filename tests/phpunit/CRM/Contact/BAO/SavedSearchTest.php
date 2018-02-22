@@ -97,6 +97,36 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test if relative dates are stored correctly
+   * in civicrm_saved_search table.
+   */
+  public function testRelativeDateValues() {
+    $savedSearch = new CRM_Contact_BAO_SavedSearch();
+    $formValues = array(
+      'operator' => 'AND',
+      'event_relative' => 'this.month',
+      'participant_relative' => 'today',
+      'contribution_date_relative' => 'this.week',
+      'participant_test' => 0,
+      'title' => 'testsmart',
+      'radio_ts' => 'ts_all',
+    );
+    $queryParams = array();
+    CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
+    CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
+    $savedSearch->form_values = serialize($queryParams);
+    $savedSearch->save();
+
+    $result = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
+    $expectedResult = array(
+      'event' => 'this.month',
+      'participant' => 'today',
+      'contribution' => 'this.week',
+    );
+    $this->checkArrayEquals($result['relative_dates'], $expectedResult);
+  }
+
 
   /**
    * Get variants of the fields we want to test.

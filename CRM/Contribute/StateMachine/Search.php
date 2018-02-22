@@ -78,7 +78,7 @@ class CRM_Contribute_StateMachine_Search extends CRM_Core_StateMachine {
    *
    * @param string $formName
    *
-   * @return string
+   * @return array [ 'class' => task classname, 'result' => TRUE ]
    *   the name of the form that will handle the task
    */
   public function taskName($controller, $formName = 'Search') {

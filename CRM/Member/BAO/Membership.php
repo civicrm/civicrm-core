@@ -1477,6 +1477,10 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
           $params['createActivity'] = TRUE;
         }
 
+        //CRM-20707 - include start/end date
+        $params['start_date'] = $membership->start_date;
+        $params['end_date'] = $membership->end_date;
+
         // we should not created contribution record for related contacts, CRM-3371
         unset($params['contribution_status_id']);
 
@@ -2114,6 +2118,57 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
+   * Update the status of all deceased members to deceased.
+   *
+   * @return int
+   *   Count of updated contacts.
+   */
+  protected static function updateDeceasedMembersStatuses() {
+    $count = 0;
+    // 'create' context for buildOptions returns only if enabled.
+    $allStatus = self::buildOptions('status_id', 'create');
+    if (($deceasedStatusId = array_search('Deceased', $allStatus)) === FALSE) {
+      // Deceased status is an admin status & is required. We want to fail early if
+      // it is not present or active.
+      // We could make the case 'some databases just don't use deceased so we will check
+      // for the presence of a deceased contact in the DB before rejecting.
+      if (CRM_Core_DAO::singleValueQuery('
+        SELECT count(*) FROM civicrm_contact WHERE is_deceased = 0'
+      )) {
+        throw new CRM_Core_Exception(
+          ts("Deceased Membership status is missing or not active. <a href='%1'>Click here to check</a>.",
+            [1 => CRM_Utils_System::url('civicrm/admin/member/membershipStatus', 'reset=1')]
+          ));
+      }
+    }
+    $deceasedDAO = CRM_Core_DAO::executeQuery(
+      $baseQuery = "
+       SELECT membership.id as membership_id
+       FROM civicrm_membership membership
+       INNER JOIN civicrm_contact ON membership.contact_id = civicrm_contact.id
+       INNER JOIN civicrm_membership_type ON membership.membership_type_id = civicrm_membership_type.id
+         AND civicrm_membership_type.is_active = 1
+       WHERE membership.is_test = 0
+         AND civicrm_contact.is_deceased = 1
+         AND membership.status_id <> %1
+      ",
+      [1 => [$deceasedStatusId, 'Integer']]
+    );
+    while ($deceasedDAO->fetch()) {
+      civicrm_api3('membership', 'create', [
+        'id' => $deceasedDAO->membership_id,
+        'status_id' => $deceasedStatusId,
+        'createActivity' => TRUE,
+        'skipStatusCal' => TRUE,
+        'skipRecentView' => TRUE,
+      ]);
+      $count++;
+    }
+    $deceasedDAO->free();
+    return $count;
+  }
+
+  /**
    * Process price set and line items.
    *
    * @param int $membershipId
@@ -2179,16 +2234,17 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * @return array
    */
   public static function updateAllMembershipStatus() {
+    // Tests for this function are in api_v3_JobTest. Please add tests for all updates.
 
-    //get all active statuses of membership, CRM-3984
-    $allStatus = CRM_Member_PseudoConstant::membershipStatus();
-    $statusLabels = CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label');
+    $updateCount = $processCount = self::updateDeceasedMembersStatuses();
+
     $allTypes = CRM_Member_PseudoConstant::membershipType();
 
-    // get only memberships with active membership types
-    $query = "
+    // This query retrieves ALL memberships of active types.
+    $baseQuery = "
 SELECT     civicrm_membership.id                    as membership_id,
            civicrm_membership.is_override           as is_override,
+           civicrm_membership.status_override_end_date  as status_override_end_date,
            civicrm_membership.membership_type_id    as membership_type_id,
            civicrm_membership.status_id             as status_id,
            civicrm_membership.join_date             as join_date,
@@ -2196,7 +2252,6 @@ SELECT     civicrm_membership.id                    as membership_id,
            civicrm_membership.end_date              as end_date,
            civicrm_membership.source                as source,
            civicrm_contact.id                       as contact_id,
-           civicrm_contact.is_deceased              as is_deceased,
            civicrm_membership.owner_membership_id   as owner_membership_id,
            civicrm_membership.contribution_recur_id as recur_id
 FROM       civicrm_membership
@@ -2205,19 +2260,12 @@ INNER JOIN civicrm_membership_type ON
   (civicrm_membership.membership_type_id = civicrm_membership_type.id AND civicrm_membership_type.is_active = 1)
 WHERE      civicrm_membership.is_test = 0";
 
-    $params = array();
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $dao = CRM_Core_DAO::executeQuery($baseQuery . " AND civicrm_contact.is_deceased = 0");
 
-    $processCount = 0;
-    $updateCount = 0;
-
-    $smarty = CRM_Core_Smarty::singleton();
-
+    $allStatus = self::buildOptions('status_id', 'create');
     while ($dao->fetch()) {
-      // echo ".";
       $processCount++;
 
-      // Put common parameters into array for easy access
       $memberParams = array(
         'id' => $dao->membership_id,
         'status_id' => $dao->status_id,
@@ -2232,48 +2280,13 @@ WHERE      civicrm_membership.is_test = 0";
         'skipRecentView' => TRUE,
       );
 
-      $smarty->assign_by_ref('memberParams', $memberParams);
-
-      //update membership record to Deceased if contact is deceased
-      if ($dao->is_deceased) {
-        // check for 'Deceased' membership status, CRM-5636
-        $deceaseStatusId = array_search('Deceased', $allStatus);
-        if (!$deceaseStatusId) {
-          CRM_Core_Error::fatal(ts("Deceased Membership status is missing or not active. <a href='%1'>Click here to check</a>.", array(1 => CRM_Utils_System::url('civicrm/admin/member/membershipStatus', 'reset=1'))));
-        }
-
-        //process only when status change.
-        if ($dao->status_id != $deceaseStatusId) {
-          //take all params that need to save.
-          $deceasedMembership = $memberParams;
-          $deceasedMembership['status_id'] = $deceaseStatusId;
-          $deceasedMembership['createActivity'] = TRUE;
-          $deceasedMembership['version'] = 3;
-
-          //since there is change in status.
-          $statusChange = array('status_id' => $deceaseStatusId);
-          $smarty->append_by_ref('memberParams', $statusChange, TRUE);
-          unset(
-            $deceasedMembership['contact_id'],
-            $deceasedMembership['membership_type_id'],
-            $deceasedMembership['membership_type'],
-            $deceasedMembership['join_date'],
-            $deceasedMembership['start_date'],
-            $deceasedMembership['end_date'],
-            $deceasedMembership['source']
-          );
-
-          //process membership record.
-          civicrm_api('membership', 'create', $deceasedMembership);
-        }
-        continue;
-      }
-
       //we fetch related, since we need to check for deceased
       //now further processing is handle w/ main membership record.
       if ($dao->owner_membership_id) {
         continue;
       }
+
+      self::processOverriddenUntilDateMembership($dao);
 
       //update membership records where status is NOT - Pending OR Cancelled.
       //as well as membership is not override.
@@ -2323,9 +2336,6 @@ WHERE      civicrm_membership.is_test = 0";
             $memParams['end_date'],
             $memParams['source']
           );
-          //since there is change in status.
-          $statusChange = array('status_id' => $statusId);
-          $smarty->append_by_ref('memberParams', $statusChange, TRUE);
 
           //process member record.
           civicrm_api('membership', 'create', $memParams);
@@ -2339,6 +2349,38 @@ WHERE      civicrm_membership.is_test = 0";
       2 => $updateCount,
     ));
     return $result;
+  }
+
+  /**
+   * Set is_override for the 'overridden until date' membership to
+   * False and clears the 'until date' field in case the 'until date'
+   * is equal or after today date.
+   *
+   * @param CRM_Core_DAO $membership
+   *   The membership to be processed
+   */
+  private static function processOverriddenUntilDateMembership($membership) {
+    $isOverriddenUntilDate = !empty($membership->is_override) && !empty($membership->status_override_end_date);
+    if (!$isOverriddenUntilDate) {
+      return;
+    }
+
+    $todayDate = new DateTime();
+    $todayDate->setTime(0, 0);
+
+    $overrideEndDate = new DateTime($membership->status_override_end_date);
+    $overrideEndDate->setTime(0, 0);
+
+    $datesDifference = $todayDate->diff($overrideEndDate);
+    $daysDifference = (int) $datesDifference->format('%R%a');
+    if ($daysDifference <= 0) {
+      $params = array(
+        'id' => $membership->membership_id,
+        'is_override' => FALSE,
+        'status_override_end_date' => 'null',
+      );
+      civicrm_api3('membership', 'create', $params);
+    }
   }
 
   /**

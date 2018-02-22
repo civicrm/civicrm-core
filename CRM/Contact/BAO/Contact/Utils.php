@@ -679,7 +679,7 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
   public static function contactDetails($componentIds, $componentName, $returnProperties = array()) {
     $contactDetails = array();
     if (empty($componentIds) ||
-      !in_array($componentName, array('CiviContribute', 'CiviMember', 'CiviEvent', 'Activity'))
+      !in_array($componentName, array('CiviContribute', 'CiviMember', 'CiviEvent', 'Activity', 'CiviCase'))
     ) {
       return $contactDetails;
     }
@@ -704,6 +704,9 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
       $compTable = 'civicrm_activity';
       $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     }
+    elseif ($componentName == 'CiviCase') {
+      $compTable = 'civicrm_case';
+    }
     else {
       $compTable = 'civicrm_participant';
     }
@@ -723,6 +726,12 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
             $from[$value] = "
 INNER JOIN civicrm_activity_contact acs ON (acs.activity_id = {$compTable}.id AND acs.record_type_id = {$sourceID})
 INNER JOIN civicrm_contact contact ON ( contact.id = acs.contact_id )";
+          }
+          elseif ($componentName == 'CiviCase') {
+            $select[] = "contact.$property as $property";
+            $from[$value] = "
+INNER JOIN civicrm_case_contact ccs ON (ccs.case_id = {$compTable}.id)
+INNER JOIN civicrm_contact contact ON ( contact.id = ccs.contact_id )";
           }
           else {
             $select[] = "$property as $property";

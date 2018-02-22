@@ -45,7 +45,7 @@
  *   api result array
  */
 function civicrm_api3_price_set_create($params) {
-  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'PriceSet');
   // Handle price_set_entity
   if (!empty($result['id']) && !empty($params['entity_table']) && !empty($params['entity_id'])) {
     $entityId = $params['entity_id'];

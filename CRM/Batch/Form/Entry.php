@@ -83,6 +83,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   public $_fields = array();
 
   /**
+   * Monetary fields that may be submitted.
+   *
+   * These should get a standardised format in the beginPostProcess function.
+   *
+   * These fields are common to many forms. Some may override this.
+   */
+  protected $submittableMoneyFields = ['total_amount', 'net_amount', 'non_deductible_amount', 'fee_amount'];
+
+  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
@@ -144,11 +153,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     // remove file type field and then limit fields
     $suppressFields = FALSE;
-    $removehtmlTypes = array('File', 'Autocomplete-Select');
     foreach ($this->_fields as $name => $field) {
-      if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) &&
-        in_array($this->_fields[$name]['html_type'], $removehtmlTypes)
-      ) {
+      if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) && $this->_fields[$name]['html_type'] == 'Autocomplete-Select') {
         $suppressFields = TRUE;
         unset($this->_fields[$name]);
       }
@@ -266,7 +272,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields && $buttonName != '_qf_Entry_next') {
-      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Update multiple records."), ts('Some Fields Excluded'), 'info');
+      CRM_Core_Session::setStatus(ts("File type field(s) in the selected profile are not supported for Update multiple records."), ts('Some Fields Excluded'), 'info');
     }
   }
 
@@ -443,6 +449,14 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    */
   private function processContribution(&$params) {
 
+    foreach ($this->submittableMoneyFields as $moneyField) {
+      foreach ($params['field'] as $index => $fieldValues) {
+        if (isset($fieldValues[$moneyField])) {
+          $params['field'][$index][$moneyField] = CRM_Utils_Rule::cleanMoney($params['field'][$index][$moneyField]);
+        }
+      }
+    }
+    $params['actualBatchTotal'] = CRM_Utils_Rule::cleanMoney($params['actualBatchTotal']);
     // get the price set associated with offline contribution record.
     $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
     $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
@@ -540,6 +554,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           }
         }
         $value['line_item'] = $lineItem;
+        $value['skipCleanMoney'] = TRUE;
         //finally call contribution create for all the magic
         $contribution = CRM_Contribute_BAO_Contribution::create($value);
         $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');

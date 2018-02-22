@@ -698,6 +698,9 @@ case_relation_type.id = case_relationship.relationship_type_id )";
       $accessAllCases = TRUE;
       $caseOwner = array(1 => ts('Search All Cases'), 2 => ts('Only My Cases'));
       $form->addRadio('case_owner', ts('Cases'), $caseOwner);
+      if ($form->get('context') != 'dashboard') {
+        $form->add('checkbox', 'upcoming', ts('Search Cases with Upcoming Activities'));
+      }
     }
     $form->assign('accessAllCases', $accessAllCases);
 

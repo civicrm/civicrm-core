@@ -55,14 +55,7 @@ function civicrm_api3_group_organization_get($params) {
  */
 function civicrm_api3_group_organization_create($params) {
 
-  $groupOrgBAO = CRM_Contact_BAO_GroupOrganization::add($params);
-
-  if (is_null($groupOrgBAO)) {
-    return civicrm_api3_create_error("group organization not created");
-  }
-
-  _civicrm_api3_object_to_array($groupOrgBAO, $values);
-  return civicrm_api3_create_success($values, $params, 'GroupOrganization', 'get', $groupOrgBAO);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'GroupOrganization');
 }
 
 /**

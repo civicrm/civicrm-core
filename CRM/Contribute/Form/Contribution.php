@@ -425,28 +425,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     else {
       $defaults['refund_trxn_id'] = isset($defaults['trxn_id']) ? $defaults['trxn_id'] : NULL;
     }
-    $dates = array(
-      'receive_date',
-      'receipt_date',
-      'cancel_date',
-      'thankyou_date',
-    );
-    foreach ($dates as $key) {
-      if (!empty($defaults[$key])) {
-        list($defaults[$key], $defaults[$key . '_time'])
-          = CRM_Utils_Date::setDateDefaults(CRM_Utils_Array::value($key, $defaults), 'activityDateTime');
-      }
-    }
 
     if (!$this->_id && empty($defaults['receive_date'])) {
-      list($defaults['receive_date'],
-        $defaults['receive_date_time']
-        ) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+      $defaults['receive_date'] = date('Y-m-d H:i:s');
     }
 
-    $this->assign('receive_date', CRM_Utils_Date::processDate(CRM_Utils_Array::value('receive_date', $defaults),
-      CRM_Utils_Array::value('receive_date_time', $defaults)
-    ));
     $currency = CRM_Utils_Array::value('currency', $defaults);
     $this->assign('currency', $currency);
     // Hack to get currency info to the js layer. CRM-11440.
@@ -467,6 +450,23 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Build the form object.
    */
   public function buildQuickForm() {
+    if ($this->_action & CRM_Core_Action::DELETE) {
+      $this->addButtons(array(
+          array(
+            'type' => 'next',
+            'name' => ts('Delete'),
+            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+            'isDefault' => TRUE,
+          ),
+          array(
+            'type' => 'cancel',
+            'name' => ts('Cancel'),
+          ),
+        )
+      );
+      return;
+    }
+
     // FIXME: This probably needs to be done in preprocess
     if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
       && $this->_action & CRM_Core_Action::UPDATE
@@ -599,23 +599,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->applyFilter('__ALL__', 'trim');
 
-    if ($this->_action & CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
-      return;
-    }
-
     //need to assign custom data type and subtype to the template
     $this->assign('customDataType', 'Contribution');
     $this->assign('customDataSubType', $this->_contributionType);
@@ -705,14 +688,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     // add various dates
-    $this->addDateTime('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
+    $this->addField('receive_date', array('entity' => 'contribution'), FALSE, FALSE);
+    $this->addField('receipt_date', array('entity' => 'contribution'), FALSE, FALSE);
+    $this->addField('cancel_date', array('entity' => 'contribution', 'label' => ts('Cancelled / Refunded Date')), FALSE, FALSE);
 
     if ($this->_online) {
       $this->assign('hideCalender', TRUE);
     }
-
-    $this->addDateTime('receipt_date', ts('Receipt Date'), FALSE, array('formatType' => 'activityDateTime'));
-    $this->addDateTime('cancel_date', ts('Cancelled / Refunded Date'), FALSE, array('formatType' => 'activityDateTime'));
 
     $this->add('textarea', 'cancel_reason', ts('Cancellation / Refund Reason'), $attributes['cancel_reason']);
 
@@ -1089,13 +1071,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       CRM_Core_Config::singleton()->defaultCurrency
     );
 
-    if (!empty($this->_params['receive_date'])) {
-      $this->_params['receive_date'] = CRM_Utils_Date::processDate($this->_params['receive_date'], $this->_params['receive_date_time']);
-    }
-    else {
-      $this->_params['receive_date'] = $now;
-    }
-
     $this->_params['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $params);
     $this->_params['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $params);
     $this->_params['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $params);
@@ -1140,11 +1115,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     if (!empty($this->_params['is_email_receipt'])) {
       $this->_params['receipt_date'] = $now;
-    }
-    else {
-      $this->_params['receipt_date'] = CRM_Utils_Date::processDate($this->_params['receipt_date'],
-        $params['receipt_date_time'], TRUE
-      );
     }
 
     $this->set('params', $this->_params);
@@ -1318,10 +1288,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public function testSubmit($params, $action, $creditCardMode = NULL) {
     $defaults = array(
       'soft_credit_contact_id' => array(),
+      'receive_date' => date('Y-m-d H:i:s'),
       'receipt_date' => '',
-      'receipt_date_time' => '',
       'cancel_date' => '',
-      'cancel_date_time' => '',
       'hidden_Premium' => 1,
     );
     $this->_bltID = 5;
@@ -1413,7 +1382,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // as a point of fragility rather than a logical 'if' clause.
     if ($priceSetId) {
       CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-        $submittedValues, $lineItem[$priceSetId]);
+        $submittedValues, $lineItem[$priceSetId], NULL, $priceSetId);
       // Unset tax amount for offline 'is_quick_config' contribution.
       // @todo WHY  - quick config was conceived as a quick way to configure contribution forms.
       // this is an example of 'other' functionality being hung off it.
@@ -1422,9 +1391,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       ) {
         unset($submittedValues['tax_amount']);
       }
-      // @todo - look to remove this line. I believe it relates to CRM-16460
-      // and possibly contributes to fixing the issue described there but
-      // would cause breakage for negative values in some cases.
       $submittedValues['total_amount'] = CRM_Utils_Array::value('amount', $submittedValues);
     }
 
@@ -1581,10 +1547,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       // get the required field value only.
 
-      $params = $ids = array();
-
-      $params['contact_id'] = $this->_contactID;
-      $params['currency'] = $this->getCurrency($submittedValues);
+      $params = [
+        'contact_id' => $this->_contactID,
+        'currency' => $this->getCurrency($submittedValues),
+        'skipCleanMoney' => TRUE,
+        'id' => $this->_id,
+      ];
 
       //format soft-credit/pcp param first
       CRM_Contribute_BAO_ContributionSoft::formatSoftCreditParams($submittedValues, $this);
@@ -1604,10 +1572,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params[$f] = CRM_Utils_Array::value($f, $formValues);
       }
 
-      // CRM-5740 if priceset is used, no need to cleanup money.
-      if ($priceSetId) {
-        $params['skipCleanMoney'] = 1;
-      }
       $params['revenue_recognition_date'] = NULL;
       if (!empty($formValues['revenue_recognition_date'])
         && count(array_filter($formValues['revenue_recognition_date'])) == 2
@@ -1615,17 +1579,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params['revenue_recognition_date'] = CRM_Utils_Date::processDate(
           '01-' . implode('-', $formValues['revenue_recognition_date'])
         );
-      }
-      $dates = array(
-        'receive_date',
-        'receipt_date',
-        'cancel_date',
-      );
-
-      foreach ($dates as $d) {
-        if (isset($formValues[$d])) {
-          $params[$d] = CRM_Utils_Date::processDate($formValues[$d], CRM_Utils_Array::value($d . '_time', $formValues), TRUE);
-        }
       }
 
       if (!empty($formValues['is_email_receipt'])) {
@@ -1651,8 +1604,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params['is_pay_later'] = 0;
       }
 
-      $ids['contribution'] = $params['id'] = $this->_id;
-
       // Add Additional common information to formatted params.
       CRM_Contribute_Form_AdditionalInfo::postProcessCommon($formValues, $params, $this);
       if ($pId) {
@@ -1665,9 +1616,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $params['line_item'] = $lineItem;
       $params['payment_processor_id'] = $params['payment_processor'] = CRM_Utils_Array::value('id', $this->_paymentProcessor);
-      if (isset($submittedValues['tax_amount'])) {
-        $params['tax_amount'] = $submittedValues['tax_amount'];
-      }
+      $params['tax_amount'] = CRM_Utils_Array::value('tax_amount', $submittedValues, CRM_Utils_Array::value('tax_amount', $this->_values));
       //create contribution.
       if ($isQuickConfig) {
         $params['is_quick_config'] = 1;
@@ -1678,7 +1627,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (!empty($params['note']) && !empty($submittedValues['note'])) {
         unset($params['note']);
       }
-      $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
+      $contribution = CRM_Contribute_BAO_Contribution::create($params);
 
       // process associated membership / participant, CRM-4395
       if ($contribution->id && $action & CRM_Core_Action::UPDATE) {
@@ -1703,7 +1652,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $formValues += CRM_Contribute_BAO_ContributionSoft::getSoftContribution($contribution->id);
 
         // to get 'from email id' for send receipt
-        $this->fromEmailId = $formValues['from_email_address'];
+        $this->fromEmailId = CRM_Utils_Array::value('from_email_address', $formValues);
         if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $formValues)) {
           $this->statusMessage[] = ts('A receipt has been emailed to the contributor.');
         }

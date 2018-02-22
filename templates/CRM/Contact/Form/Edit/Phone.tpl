@@ -56,7 +56,7 @@
 {if !$addBlock}
 <tr>
   <td colspan="4">
-  &nbsp;&nbsp;<a id='addPhone' href="#" title={ts}Add{/ts} onClick="buildAdditionalBlocks( 'Phone', '{$className}');return false;">{ts}Add another Phone number{/ts}</a>
+  &nbsp;&nbsp;<a id='addPhone' href="#" title={ts}Add{/ts} onClick="buildAdditionalBlocks( 'Phone', '{$className}');return false;">{ts}Add another phone number{/ts}</a>
   </td>
 </tr>
 {/if}

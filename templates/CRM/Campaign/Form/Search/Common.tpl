@@ -30,9 +30,8 @@
 {if $searchVoterFor}
   {assign var='searchForm' value="search_form_$searchVoterFor"}
 {/if}
-
   <div id="{$searchForm}" class="crm-accordion-wrapper crm-contribution_search_form-accordion {if $rows}collapsed{/if}">
-    <div class="crm-accordion-header crm-master-accordion-header">
+    <div class="crm-accordion-header {if !$votingTab} crm-master-accordion-header{/if}">
     {ts}Edit Search Criteria{/ts}
     </div><!-- /.crm-accordion-header -->
 

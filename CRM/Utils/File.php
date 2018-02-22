@@ -910,10 +910,16 @@ HTACCESS;
     $imageURL = CRM_Utils_String::unstupifyUrl($imageURL);
     parse_str(parse_url($imageURL, PHP_URL_QUERY), $query);
 
-    $path = CRM_Core_Config::singleton()->customFileUploadDir . $query['photo'];
+    $url = NULL;
+    if (!empty($query['photo'])) {
+      $path = CRM_Core_Config::singleton()->customFileUploadDir . $query['photo'];
+    }
+    else {
+      $path = $url = $imageURL;
+    }
     $mimeType = 'image/' . strtolower(pathinfo($path, PATHINFO_EXTENSION));
 
-    return self::getFileURL($path, $mimeType);
+    return self::getFileURL($path, $mimeType, $url);
   }
 
   /**

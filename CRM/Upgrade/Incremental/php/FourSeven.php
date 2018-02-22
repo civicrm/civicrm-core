@@ -437,7 +437,6 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       'civicrm_case', 'created_date', "timestamp NULL  DEFAULT NULL COMMENT 'When was the case was created.'");
     $this->addTask('CRM-20958 - Add modified_date to civicrm_case', 'addColumn',
       'civicrm_case', 'modified_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When was the case (or closely related entity) was created or modified or deleted.'");
-    $this->addTask('Rebuild Multilingual Schema', 'rebuildMultilingalSchema');
   }
 
   /**
@@ -481,7 +480,30 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       }
     }
 
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_31($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('CRM-21225: Add display title field to civicrm_uf_group', 'addColumn', 'civicrm_uf_group', 'frontend_title',
+      "VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL COMMENT 'Profile Form Public title'", TRUE);
     $this->addTask('Rebuild Multilingual Schema', 'rebuildMultilingalSchema');
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_32($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+
+    $this->addTask('CRM-21733: Add status_override_end_date field to civicrm_membership table', 'addColumn', 'civicrm_membership', 'status_override_end_date',
+      "date DEFAULT NULL COMMENT 'The end date of membership status override if (Override until selected date) override type is selected.'");
   }
 
   /*

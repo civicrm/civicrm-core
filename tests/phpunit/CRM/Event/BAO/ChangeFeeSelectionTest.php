@@ -9,6 +9,9 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   protected $_cheapFee = 80;
   protected $_expensiveFee = 100;
   protected $_veryExpensive = 120;
+  protected $expensiveFeeValueID;
+  protected $cheapFeeValueID;
+  protected $veryExpensiveFeeValueID;
 
   /**
    * @var int
@@ -32,7 +35,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    */
   public function setUp() {
     parent::setUp();
-    $this->cleanup();
     $this->_contactId = $this->individualCreate();
     $event = $this->eventCreate(array('is_monetary' => 1));
     $this->_eventId = $event['id'];
@@ -41,7 +43,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->_priceSetID, TRUE, FALSE);
     $priceSet = CRM_Utils_Array::value($this->_priceSetID, $priceSet);
     $this->_feeBlock = CRM_Utils_Array::value('fields', $priceSet);
-    $this->registerParticipantAndPay();
   }
 
   /**
@@ -50,24 +51,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   public function tearDown() {
     $this->eventDelete($this->_eventId);
     $this->quickCleanUpFinancialEntities();
-  }
-
-  /**
-   * Remove default price field stuff.
-   *
-   * This is not actually good. However resolving this requires
-   * a lot more fixes & we have a bit of work to do on event tests.
-   *
-   * @throws \Exception
-   */
-  protected function cleanup() {
-    $this->quickCleanup(
-      array(
-        'civicrm_price_field_value',
-        'civicrm_price_field',
-        'civicrm_price_set',
-      )
-      );
   }
 
   /**
@@ -129,6 +112,26 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       );
     }
     $field = CRM_Price_BAO_PriceField::create($paramsField);
+    $values = $this->callAPISuccess('PriceFieldValue', 'get', [
+      'price_field_id' => $field->id,
+      'return' => ['id', 'label']
+    ]);
+    foreach ($values['values'] as $value) {
+      switch ($value['label']) {
+        case 'Expensive Room':
+          $this->expensiveFeeValueID = $value['id'];
+          break;
+
+        case 'Cheap Room':
+          $this->cheapFeeValueID = $value['id'];
+          break;
+
+        case 'Very Expensive':
+          $this->veryExpensiveFeeValueID = $value['id'];
+          break;
+      }
+    }
+
     $this->priceSetFieldID = $field->id;
     return $priceSet->id;
   }
@@ -205,7 +208,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       'total_amount' => $actualPaidAmt,
       'source' => 'Testset with information',
       'currency' => 'USD',
-      'non_deductible_amount' => 'null',
       'receipt_date' => date('Y-m-d') . " 00:00:00",
       'contact_id' => $this->_contactId,
       'financial_type_id' => 4,
@@ -217,36 +219,39 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       'partial_amount_to_pay' => $actualPaidAmt,
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
-    $this->_contributionId = $contribution->id;
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $this->_contributionId = $contribution['id'];
 
     $this->callAPISuccess('participant_payment', 'create', array(
       'participant_id'  => $this->_participantId,
       'contribution_id' => $this->_contributionId,
     ));
 
-    $priceSetParams['price_1'] = 1; // 1 is the option of the expensive room
-    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
-    CRM_Price_BAO_PriceSet::processAmount($this->_feeBlock, $priceSetParams, $lineItem);
-    $lineItemVal[$this->_priceSetID] = $lineItem;
-    CRM_Price_BAO_LineItem::processPriceSet($participant['id'], $lineItemVal, $contribution, 'civicrm_participant');
+    $priceSetParams['price_' . $this->priceSetFieldID] = $this->expensiveFeeValueID;
+
+    $lineItems = CRM_Price_BAO_LineItem::buildLineItemsForSubmittedPriceField($priceSetParams);
+    CRM_Price_BAO_PriceSet::processAmount($this->_feeBlock, $priceSetParams, $lineItems);
+    $lineItemVal[$this->_priceSetID] = $lineItems;
+    CRM_Price_BAO_LineItem::processPriceSet($participant['id'], $lineItemVal, $this->getContributionObject($contribution['id']), 'civicrm_participant');
     $this->balanceCheck($this->_expensiveFee);
   }
 
   public function testCRM19273() {
-    $priceSetParams['price_1'] = 2;
+    $this->registerParticipantAndPay();
+
+    $priceSetParams['price_' . $this->priceSetFieldID] = $this->cheapFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee);
     $this->balanceCheck($this->_cheapFee);
 
-    $priceSetParams['price_1'] = 1;
+    $priceSetParams['price_' . $this->priceSetFieldID] = $this->expensiveFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
 
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee);
 
     $this->balanceCheck($this->_expensiveFee);
 
-    $priceSetParams['price_1'] = 3;
+    $priceSetParams['price_' . $this->priceSetFieldID] = $this->veryExpensiveFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, $this->_expensiveFee);
     $this->balanceCheck($this->_veryExpensive);
@@ -260,7 +265,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $partiallyPaidContribuitonStatus = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid');
     $this->assertEquals($this->callAPISuccessGetValue('Contribution', array('id' => $this->_contributionId, 'return' => 'contribution_status_id')), $partiallyPaidContribuitonStatus);
 
-    $priceSetParams['price_1'] = 3;
+    $priceSetParams['price_' . $this->priceSetFieldID] = $this->veryExpensiveFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $this->assertEquals($this->callAPISuccessGetValue('Contribution', array('id' => $this->_contributionId, 'return' => 'contribution_status_id')), $partiallyPaidContribuitonStatus);
@@ -270,12 +275,13 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * Test that proper financial items are recorded for cancelled line items
    */
   public function testCRM20611() {
-    $priceSetParams['price_1'] = 1;
+    $this->registerParticipantAndPay();
+    $priceSetParams['price_' . $this->priceSetFieldID] = $this->expensiveFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $this->balanceCheck($this->_expensiveFee);
 
-    $priceSetParams['price_1'] = 2;
+    $priceSetParams['price_' . $this->priceSetFieldID] = $this->cheapFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $this->balanceCheck($this->_cheapFee);
@@ -314,16 +320,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * Test to ensure that correct financial records are entered on text price field fee change on event registration
    */
   public function testCRM21513() {
-    $this->quickCleanup(
-      array(
-        'civicrm_price_field_value',
-        'civicrm_price_field',
-        'civicrm_price_set',
-        'civicrm_line_item',
-        'civicrm_financial_item',
-      )
-    );
-
     $this->_priceSetID = $this->priceSetCreate('Text');
     CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_eventId, $this->_priceSetID);
     $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->_priceSetID, TRUE, FALSE);
@@ -342,11 +338,11 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactId,
     );
     $participant = $this->callAPISuccess('Participant', 'create', $params);
+    $this->_participantId = $participant['id'];
     $contributionParams = array(
       'total_amount' => 10,
       'source' => 'Testset with information',
       'currency' => 'USD',
-      'non_deductible_amount' => 'null',
       'receipt_date' => date('Y-m-d') . " 00:00:00",
       'contact_id' => $this->_contactId,
       'financial_type_id' => 4,
@@ -356,8 +352,8 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       'skipLineItem' => 1,
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
-    $this->_contributionId = $contribution->id;
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $this->_contributionId = $contribution['id'];
 
     $this->callAPISuccess('participant_payment', 'create', array(
       'participant_id'  => $this->_participantId,
@@ -365,21 +361,21 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     ));
 
     // CASE 1: Choose text price qty 1 (x$10 = $10 amount)
-    $priceSetParams['price_1'] = 1;
+    $priceSetParams['price_' . $this->priceSetFieldID] = 1;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
     CRM_Price_BAO_PriceSet::processAmount($this->_feeBlock, $priceSetParams, $lineItem);
     $lineItemVal[$this->_priceSetID] = $lineItem;
-    CRM_Price_BAO_LineItem::processPriceSet($this->_participantId, $lineItemVal, $contribution, 'civicrm_participant');
+    CRM_Price_BAO_LineItem::processPriceSet($this->_participantId, $lineItemVal, $this->getContributionObject($contribution['id']), 'civicrm_participant');
 
     // CASE 2: Choose text price qty 3 (x$10 = $30 amount)
-    $priceSetParams['price_1'] = 3;
-    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, 0);
+    $priceSetParams['price_' . $this->priceSetFieldID] = 3;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($participant['id'], 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, 0);
 
     // CASE 3: Choose text price qty 2 (x$10 = $20 amount)
-    $priceSetParams['price_1'] = 2;
-    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, 0);
+    $priceSetParams['price_' . $this->priceSetFieldID] = 2;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($participant['id'], 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $this->_contributionId, $this->_feeBlock, $lineItem, 0);
 
     $financialItems = $this->callAPISuccess('FinancialItem', 'Get', array(
       'entity_table' => 'civicrm_line_item',
@@ -423,20 +419,22 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * CRM-17151: Test that Contribution status change to 'Completed' if balance is zero.
    */
   public function testCRM17151() {
+    $this->registerParticipantAndPay();
+
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
     $pendingRefundStatusId = array_search('Pending refund', $contributionStatuses);
     $completedStatusId = array_search('Completed', $contributionStatuses);
     $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $completedStatusId, 'Payment t be completed');
-    $priceSetParams['price_1'] = 2;
+    $priceSetParams['price_' . $this->priceSetFieldID] = $this->cheapFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $pendingRefundStatusId, 'Contribution must be refunding');
-    $priceSetParams['price_1'] = 1;
+    $priceSetParams['price_' . $this->priceSetFieldID] = $this->expensiveFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $completedStatusId, 'Contribution must, after complete payment be in state completed');
-    $priceSetParams['price_1'] = 3;
+    $priceSetParams['price_' . $this->priceSetFieldID] = $this->veryExpensiveFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $partiallyPaidStatusId, 'Partial Paid');

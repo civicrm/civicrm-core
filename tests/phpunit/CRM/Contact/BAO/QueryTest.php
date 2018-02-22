@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
+  use CRMTraits_Financial_FinancialACLTrait;
 
   /**
    * @return CRM_Contact_BAO_QueryTestDataProvider
@@ -234,7 +235,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       'contact_sub_type' => 1,
       'sort_name' => 1,
     );
-    $expectedSQL = "SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, civicrm_address.id as address_id, civicrm_address.city as `city`  FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 ) WHERE  (  ( LOWER(civicrm_address.city) = 'cool city' )  )  AND (contact_a.is_deleted = 0)    ORDER BY `contact_a`.`sort_name` asc, `contact_a`.`id` ";
+    $expectedSQL = "SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, civicrm_address.id as address_id, civicrm_address.city as `city`  FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 ) WHERE  (  ( LOWER(civicrm_address.city) = 'cool city' )  )  AND (contact_a.is_deleted = 0)    ORDER BY `contact_a`.`sort_name` ASC, `contact_a`.`id` ";
     $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
     try {
       $this->assertEquals($expectedSQL, $queryObj->searchQuery(0, 0, NULL,
@@ -370,6 +371,63 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test Relationship Clause
+   */
+  public function testRelationshipClause() {
+    $today = date('Ymd');
+    $where1 = "WHERE  ( (
+civicrm_relationship.is_active = 1 AND
+( civicrm_relationship.end_date IS NULL OR civicrm_relationship.end_date >= {$today} ) AND
+( civicrm_relationship.start_date IS NULL OR civicrm_relationship.start_date <= {$today} )
+) AND (contact_b.is_deleted = 0) AND civicrm_relationship.relationship_type_id IN (8) )  AND (contact_a.is_deleted = 0)";
+    $where2 = "WHERE  ( (
+civicrm_relationship.is_active = 1 AND
+( civicrm_relationship.end_date IS NULL OR civicrm_relationship.end_date >= {$today} ) AND
+( civicrm_relationship.start_date IS NULL OR civicrm_relationship.start_date <= {$today} )
+) AND (contact_b.is_deleted = 0) AND civicrm_relationship.relationship_type_id IN (8,10) )  AND (contact_a.is_deleted = 0)";
+    // Test Traditional single select format
+    $params1 = array(array('relation_type_id', '=', '8_a_b', 0, 0));
+    $query1 = new CRM_Contact_BAO_Query(
+      $params1, array('contact_id'),
+      NULL, TRUE, FALSE, 1,
+      TRUE,
+      TRUE, FALSE
+    );
+    $sql1 = $query1->query(FALSE);
+    $this->assertEquals($where1, $sql1[2]);
+    // Test single relationship type selected in multiple select.
+    $params2 = array(array('relation_type_id', 'IN', array('8_a_b'), 0, 0));
+    $query2 = new CRM_Contact_BAO_Query(
+      $params2, array('contact_id'),
+      NULL, TRUE, FALSE, 1,
+      TRUE,
+      TRUE, FALSE
+    );
+    $sql2 = $query2->query(FALSE);
+    $this->assertEquals($where1, $sql2[2]);
+    // Test multiple relationship types selected.
+    $params3 = array(array('relation_type_id', 'IN', array('8_a_b', '10_a_b'), 0, 0));
+    $query3 = new CRM_Contact_BAO_Query(
+      $params3, array('contact_id'),
+      NULL, TRUE, FALSE, 1,
+      TRUE,
+      TRUE, FALSE
+    );
+    $sql3 = $query3->query(FALSE);
+    $this->assertEquals($where2, $sql3[2]);
+    // Test Multiple Relationship type selected where one doesn't actually exist.
+    $params4 = array(array('relation_type_id', 'IN', array('8_a_b', '10_a_b', '14_a_b'), 0, 0));
+    $query4 = new CRM_Contact_BAO_Query(
+      $params4, array('contact_id'),
+      NULL, TRUE, FALSE, 1,
+      TRUE,
+      TRUE, FALSE
+    );
+    $sql4 = $query4->query(FALSE);
+    $this->assertEquals($where2, $sql4[2]);
+  }
+
+  /**
    * Test the group contact clause does not contain an OR.
    *
    * The search should return 3 contacts - 2 households in the smart group of
@@ -440,6 +498,37 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       return;
     }
     $this->fail('Test failed for some reason which is not good');
+  }
+
+
+  /**
+   * Test the summary query does not add an acl clause when acls not enabled..
+   */
+  public function testGetSummaryQueryWithFinancialACLDisabled() {
+    $where = $from = NULL;
+    $queryObject = new CRM_Contact_BAO_Query();
+    $query = $queryObject->appendFinancialTypeWhereAndFromToQueryStrings($where,
+      $from);
+    $this->assertEquals($where, $query[0]);
+    $this->assertEquals($from, $query[1]);
+  }
+
+  /**
+   * Test the summary query accurately adds financial acl filters.
+   */
+  public function testGetSummaryQueryWithFinancialACLEnabled() {
+    $where = $from = NULL;
+    $this->enableFinancialACLs();
+    $this->createLoggedInUserWithFinancialACL();
+    $queryObject = new CRM_Contact_BAO_Query();
+    $query = $queryObject->appendFinancialTypeWhereAndFromToQueryStrings($where,
+      $from);
+    $donationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation');
+    $this->assertEquals(
+      " LEFT JOIN civicrm_line_item li
+                  ON civicrm_contribution.id = li.contribution_id AND
+                     li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN ({$donationTypeID}) ", $from);
+    $this->disableFinancialACLs();
   }
 
 }

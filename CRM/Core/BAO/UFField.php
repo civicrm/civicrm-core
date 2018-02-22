@@ -975,6 +975,7 @@ SELECT  id
         'membership_type_id',
         'member_is_test',
         'is_override',
+        'status_override_end_date',
         'status_id',
         'member_is_pay_later'
       );
@@ -994,10 +995,7 @@ SELECT  id
         CRM_Utils_Array::remove($caseFields,
           'case_id',
           'case_type',
-          'case_start_date',
-          'case_end_date',
           'case_role',
-          'case_status',
           'case_deleted'
         );
       }

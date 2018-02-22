@@ -596,13 +596,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Activity', $activity->id, $activity);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Activity', $activity->id, $activity);
-    }
-
     // if the subject contains a ‘[case #…]’ string, file that activity on the related case (CRM-5916)
     $matches = array();
     $subjectToMatch = CRM_Utils_Array::value('subject', $params);
@@ -625,6 +618,12 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       else {
         self::logActivityAction($activity, "Case details for {$matches[1]} not found while recording an activity on case.");
       }
+    }
+    if (!empty($params['id'])) {
+      CRM_Utils_Hook::post('edit', 'Activity', $activity->id, $activity);
+    }
+    else {
+      CRM_Utils_Hook::post('create', 'Activity', $activity->id, $activity);
     }
 
     return $result;
@@ -2198,7 +2197,8 @@ WHERE      activity.id IN ($activityIds)";
           $subject .= " - {$entityObj->source}";
         }
 
-        return $subject;
+        // Amount and source could exceed max length of subject column.
+        return CRM_Utils_String::ellipsify($subject, 255);
     }
   }
 

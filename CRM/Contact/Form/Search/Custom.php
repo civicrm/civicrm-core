@@ -83,12 +83,21 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     // instantiate the new class
     $this->_customClass = new $this->_customSearchClass($this->_formValues);
 
+    $this->addFormRule(array($this->_customClass, 'formRule'), $this);
+
     // CRM-12747
     if (isset($this->_customClass->_permissionedComponent) &&
       !self::isPermissioned($this->_customClass->_permissionedComponent)
     ) {
       CRM_Utils_System::permissionDenied();
     }
+  }
+
+  /**
+   * Add local and global form rules.
+   */
+  public function addRules() {
+    $this->addFormRule(array($this->_customClass, 'formRule'));
   }
 
   /**

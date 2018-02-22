@@ -1018,12 +1018,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *   parameters for civicrm_contact_add api function call
    * @param int $seq
    *   sequence number if creating multiple individuals
+   * @param bool $random
    *
    * @return int
    *   id of Individual created
    */
-  public function individualCreate($params = array(), $seq = 0) {
-    $params = array_merge($this->sampleContact('Individual', $seq), $params);
+  public function individualCreate($params = array(), $seq = 0, $random = FALSE) {
+    $params = array_merge($this->sampleContact('Individual', $seq, $random), $params);
     return $this->_contactCreate($params);
   }
 
@@ -1054,7 +1055,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return array
    *   properties of sample contact (ie. $params for API call)
    */
-  public function sampleContact($contact_type, $seq = 0) {
+  public function sampleContact($contact_type, $seq = 0, $random = FALSE) {
     $samples = array(
       'Individual' => array(
         // The number of values in each list need to be coprime numbers to not have duplicates
@@ -1078,6 +1079,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $params = array('contact_type' => $contact_type);
     foreach ($samples[$contact_type] as $key => $values) {
       $params[$key] = $values[$seq % count($values)];
+      if ($random) {
+        $params[$key] .= substr(sha1(rand()), 0, 5);
+      }
     }
     if ($contact_type == 'Individual') {
       $params['email'] = strtolower(
@@ -1870,13 +1874,14 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param int $groupID
    * @param int $totalCount
+   * @param bool $random
    * @return int
    *    groupId of created group
    */
-  public function groupContactCreate($groupID, $totalCount = 10) {
+  public function groupContactCreate($groupID, $totalCount = 10, $random = FALSE) {
     $params = array('group_id' => $groupID);
     for ($i = 1; $i <= $totalCount; $i++) {
-      $contactID = $this->individualCreate();
+      $contactID = $this->individualCreate(array(), 0, $random);
       if ($i == 1) {
         $params += array('contact_id' => $contactID);
       }
@@ -2090,10 +2095,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     );
 
     $params = array_merge($defaults, $params);
-
-    if (strlen($params['title']) > 13) {
-      $params['title'] = substr($params['title'], 0, 13);
-    }
 
     //have a crack @ deleting it first in the hope this will prevent derailing our tests
     $this->callAPISuccess('custom_group', 'get', array(
@@ -2593,7 +2594,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   public function restoreDefaultPriceSetConfig() {
-    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_price_set WHERE id > 2');
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_price_set WHERE name NOT IN('default_contribution_amount', 'default_membership_type_amount')");
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_price_set SET id = 1 WHERE name ='default_contribution_amount'");
     CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field` (`id`, `price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `help_pre`, `help_post`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `active_on`, `expire_on`, `javascript`, `visibility_id`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', 'Text', 0, NULL, NULL, 1, 1, 1, 1, 1, NULL, NULL, NULL, 1)");
     CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field_value` (`id`, `price_field_id`, `name`, `label`, `description`, `amount`, `count`, `max_value`, `weight`, `membership_type_id`, `membership_num_terms`, `is_default`, `is_active`, `financial_type_id`, `non_deductible_amount`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', NULL, '1', NULL, NULL, 1, NULL, NULL, 0, 1, 1, 0.00)");
   }
@@ -3742,6 +3744,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Enable Tax and Invoicing
    */
   protected function disableTaxAndInvoicing($params = array()) {
+    if (!empty(\Civi::$statics['CRM_Core_PseudoConstant']) && isset(\Civi::$statics['CRM_Core_PseudoConstant']['taxRates'])) {
+      unset(\Civi::$statics['CRM_Core_PseudoConstant']['taxRates']);
+    }
     // Enable component contribute setting
     $contributeSetting = array_merge($params,
       array(
@@ -3773,6 +3778,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'entity_id' => $financialTypeId,
       'account_relationship' => key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' ")),
     );
+
+    // set tax rate (as 10) for provided financial type ID to static variable, later used to fetch tax rates of all financial types
+    \Civi::$statics['CRM_Core_PseudoConstant']['taxRates'][$financialTypeId] = 10;
 
     //CRM-20313: As per unique index added in civicrm_entity_financial_account table,
     //  first check if there's any record on basis of unique key (entity_table, account_relationship, entity_id)
@@ -3974,6 +3982,21 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    */
   protected function formatMoneyInput($amount) {
     return CRM_Utils_Money::format($amount, NULL, '%a');
+  }
+
+
+  /**
+   * Get the contribution object.
+   *
+   * @param int $contributionID
+   *
+   * @return \CRM_Contribute_BAO_Contribution
+   */
+  protected function getContributionObject($contributionID) {
+    $contributionObj = new CRM_Contribute_BAO_Contribution();
+    $contributionObj->id = $contributionID;
+    $contributionObj->find(TRUE);
+    return $contributionObj;
   }
 
 }

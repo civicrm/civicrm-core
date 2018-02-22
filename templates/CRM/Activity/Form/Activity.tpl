@@ -158,7 +158,7 @@
       </td>
       {else}
       <td class="view-value">
-       {$form.details.html|crmStripAlternatives}
+       {$form.details.html|crmStripAlternatives|nl2br}
       </td>
     {/if}
   </tr>

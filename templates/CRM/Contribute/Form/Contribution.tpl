@@ -139,7 +139,7 @@
     {if $contributionMode && $processorSupportsFutureStartDate}
     <tr id='start_date' class="crm-contribution-form-block-receive_date">
       <td class="label">{ts}Start Date{/ts}</td>
-      <td {$valueStyle}>{if $hideCalender neq true}{include file="CRM/common/jcalendar.tpl" elementName=receive_date}{else}{$receive_date|crmDate}{/if}<br />
+      <td {$valueStyle}>{if $hideCalender neq true}{$form.receive_date.html}{/if}<br />
         <span class="description">{ts}You can set a start date for recurring contributions and the first payment will be on that date. For a single post-dated contribution you must select recurring and choose one installment{/ts}</span>
       </td>
     </tr>
@@ -179,7 +179,7 @@
               <td class="label">{$form.cancel_date.label}</td>
               <td>
                 {if $hideCalendar neq true}
-                  {include file="CRM/common/jcalendar.tpl" elementName=cancel_date}
+                  {$form.cancel_date.html}
                 {else}
                   {$form.cancel_date.value|crmDate}
                 {/if}
@@ -203,7 +203,7 @@
       </tr>
       <tr class="crm-contribution-form-block-receive_date">
         <td class="label">{$form.receive_date.label}</td>
-        <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}<br />
+        <td>{$form.receive_date.html}<br />
           <span class="description">{ts}The date this contribution was received.{/ts}</span>
         </td>
       </tr>
@@ -231,11 +231,11 @@
     {/if}
     <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
       <td class="label">{$form.from_email_address.label}</td>
-      <td>{$form.from_email_address.html}</td>
+      <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
     </tr>
     <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
       <td class="label">{$form.receipt_date.label}</td>
-      <td>{include file="CRM/common/jcalendar.tpl" elementName=receipt_date}<br />
+      <td>{$form.receipt_date.html}<br />
         <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
       </td>
     </tr>

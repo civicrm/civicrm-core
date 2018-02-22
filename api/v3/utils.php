@@ -1111,7 +1111,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
 function _civicrm_api3_format_params_for_create(&$params, $entity) {
   $nonGenericEntities = array('Contact', 'Individual', 'Household', 'Organization');
 
-  $customFieldEntities = array_diff_key(CRM_Core_BAO_CustomQuery::$extendsMap, array_fill_keys($nonGenericEntities, 1));
+  $customFieldEntities = array_diff_key(CRM_Core_SelectValues::customGroupExtends(), array_fill_keys($nonGenericEntities, 1));
   if (!array_key_exists($entity, $customFieldEntities)) {
     return;
   }
@@ -1235,7 +1235,7 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
  * @return array
  */
 function _civicrm_api3_basic_get($bao_name, $params, $returnAsSuccess = TRUE, $entity = "", $sql = NULL, $uniqueFields = FALSE) {
-  $entity = CRM_Core_DAO_AllCoreTables::getBriefName(str_replace('_BAO_', '_DAO_', $bao_name));
+  $entity = $entity ?: CRM_Core_DAO_AllCoreTables::getBriefName(str_replace('_BAO_', '_DAO_', $bao_name));
   $options = _civicrm_api3_get_options_from_params($params);
 
   $query = new \Civi\API\Api3SelectQuery($entity, CRM_Utils_Array::value('check_permissions', $params, FALSE));
@@ -1311,6 +1311,11 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
     throw new API_Exception($msg);
   }
   else {
+    // If we have custom fields the BAO may have taken care of it or we may have to.
+    // $extendsMap provides a pretty good hard-coded list of BAOs that take care of the custom data.
+    if (isset($params['custom']) && empty(CRM_Core_BAO_CustomQuery::$extendsMap[$entity])) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($entity)), $bao->id);
+    }
     $values = array();
     _civicrm_api3_object_to_array($bao, $values[$bao->id]);
     return civicrm_api3_create_success($values, $params, $entity, 'create', $bao);
@@ -1346,7 +1351,7 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
 
   CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
   $instance = new $dao_name();
-  $instance->copyValues($params);
+  $instance->copyValues($params, TRUE);
   $instance->save();
   CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
 
@@ -1530,9 +1535,6 @@ function _civicrm_api3_validate_switch_cases($fieldName, $fieldInfo, $entity, $p
       break;
 
     case CRM_Utils_Type::T_TEXT:
-      _civicrm_api3_validate_html($params, $fieldName, $fieldInfo);
-      break;
-
     case CRM_Utils_Type::T_STRING:
       _civicrm_api3_validate_string($params, $fieldName, $fieldInfo, $entity);
       break;
@@ -1602,10 +1604,6 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields) {
         break;
 
       case CRM_Utils_Type::T_TEXT:
-        //blob
-        _civicrm_api3_validate_html($params, $fieldName, $fieldInfo);
-        break;
-
       case CRM_Utils_Type::T_STRING:
         _civicrm_api3_validate_string($params, $fieldName, $fieldInfo, $entity);
         break;
@@ -2203,15 +2201,13 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
   if (!is_array($fieldValue)) {
     $fieldValue = (string) $fieldValue;
   }
-  else {
-    //@todo what do we do about passed in arrays. For many of these fields
-    // the missing piece of functionality is separating them to a separated string
-    // & many save incorrectly. But can we change them wholesale?
-  }
+
   if ($fieldValue) {
-    foreach ((array) $fieldValue as $value) {
-      if (!CRM_Utils_Rule::xssString($fieldValue)) {
-        throw new Exception('Input contains illegal SCRIPT tag.');
+    foreach ((array) $fieldValue as $key => $value) {
+      foreach ([$fieldValue, $key, $value] as $input) {
+        if (!CRM_Utils_Rule::xssString($input)) {
+          throw new Exception('Input contains illegal SCRIPT tag.');
+        }
       }
       if ($fieldName == 'currency') {
         //When using IN operator $fieldValue is a array of currency codes

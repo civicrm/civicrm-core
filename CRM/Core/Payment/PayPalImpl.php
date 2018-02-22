@@ -139,7 +139,19 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   protected function addPaypalExpressCode(&$form) {
     // @todo use $this->isBackOffice() instead, test.
     if (empty($form->isBackOffice)) {
-      $form->_expressButtonName = $form->getButtonName('upload', 'express');
+
+      /**
+       * if payment method selected using ajax call then form object is of 'CRM_Financial_Form_Payment',
+       * instead of 'CRM_Contribute_Form_Contribution_Main' so it generate wrong button name
+       * and then clicking on express button it redirect to confirm screen rather than PayPal Express form
+       */
+
+      if ('CRM_Financial_Form_Payment' == get_class($form) && $form->_formName) {
+        $form->_expressButtonName = '_qf_' . $form->_formName . '_upload_express';
+      }
+      else {
+        $form->_expressButtonName = $form->getButtonName('upload', 'express');
+      }
       $form->assign('expressButtonName', $form->_expressButtonName);
       $form->add(
         'image',
@@ -476,7 +488,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $this->initialize($args, 'DoDirectPayment');
 
     $args['paymentAction'] = 'Sale';
-    $args['amt'] = $params['amount'];
+    $args['amt'] = $this->getAmount($params);
     $args['currencyCode'] = $this->getCurrency($params);
     $args['invnum'] = $params['invoiceID'];
     $args['ipaddress'] = $params['ip_address'];
@@ -512,7 +524,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
         $params['amount'] . " Per " .
         $params['frequency_interval'] . " " .
         $params['frequency_unit'];
-      $args['amt'] = $params['amount'];
+      $args['amt'] = $this->getAmount($params);
       $args['totalbillingcycles'] = CRM_Utils_Array::value('installments', $params);
       $args['version'] = 56.0;
       $args['PROFILEREFERENCE'] = "" .
@@ -715,7 +727,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $this->initialize($args, 'UpdateRecurringPaymentsProfile');
 
       $args['PROFILEID'] = $params['subscriptionId'];
-      $args['AMT'] = $params['amount'];
+      $args['AMT'] = $this->getAmount($params);
       $args['CURRENCYCODE'] = $config->defaultCurrency;
       $args['CREDITCARDTYPE'] = $params['credit_card_type'];
       $args['ACCT'] = $params['credit_card_number'];
@@ -753,7 +765,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $this->initialize($args, 'UpdateRecurringPaymentsProfile');
 
       $args['PROFILEID'] = $params['subscriptionId'];
-      $args['AMT'] = $params['amount'];
+      $args['AMT'] = $this->getAmount($params);
       $args['CURRENCYCODE'] = $config->defaultCurrency;
       $args['BILLINGFREQUENCY'] = $params['installments'];
 
@@ -897,7 +909,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
       $paypalParams += array(
         'cmd' => '_xclick-subscriptions',
-        'a3' => $params['amount'],
+        'a3' => $this->getAmount($params),
         'p3' => $params['frequency_interval'],
         't3' => ucfirst(substr($params['frequency_unit'], 0, 1)),
         'src' => 1,

@@ -444,8 +444,12 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return bool
    */
   public static function hasPaymentProcessorSupporting($capabilities = array()) {
-    $result = self::getPaymentProcessors($capabilities);
-    return (!empty($result)) ? TRUE : FALSE;
+    $capabilitiesString = implode('', $capabilities);
+    if (!isset(\Civi::$statics[__CLASS__]['supported_capabilities'][$capabilitiesString])) {
+      $result = self::getPaymentProcessors($capabilities);
+      \Civi::$statics[__CLASS__]['supported_capabilities'][$capabilitiesString] = (!empty($result)) ? TRUE : FALSE;
+    }
+    return \Civi::$statics[__CLASS__]['supported_capabilities'][$capabilitiesString];
   }
 
   /**
@@ -563,6 +567,23 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
       'return' => 'payment_processor_id',
     ));
     return Civi\Payment\System::singleton()->getById($paymentProcessorId);
+  }
+
+  /**
+   * Generate and assign an arbitrary value to a field of a test object.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   *   The globally-unique ID of the test object.
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName === 'class_name') {
+      $this->class_name = 'Payment_Dummy';
+    }
+    else {
+      parent::assignTestValue($fieldName, $fieldDef, $counter);
+    }
   }
 
 }

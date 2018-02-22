@@ -87,7 +87,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
         self::add($values);
       }
       elseif ($skipDelete && !empty($values['id'])) {
-        self::del(array($values['id']));
+        self::del($values['id']);
       }
     }
   }
@@ -95,15 +95,24 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   /**
    * Delete website.
    *
-   * @param array $ids
-   *   Website ids.
+   * @param int $id
    *
    * @return bool
    */
-  public static function del($ids) {
-    $query = 'DELETE FROM civicrm_website WHERE id IN ( ' . implode(',', $ids) . ')';
-    CRM_Core_DAO::executeQuery($query);
-    // FIXME: we should return false if the del was unsuccessful
+  public static function del($id) {
+    $obj = new self();
+    $obj->id = $id;
+    $obj->find();
+    if ($obj->fetch()) {
+      $params = [];
+      CRM_Utils_Hook::pre('delete', 'Website', $id, $params);
+      $obj->delete();
+    }
+    else {
+      return FALSE;
+    }
+    CRM_Utils_Hook::post('delete', 'Website', $id, $obj);
+    $obj->free();
     return TRUE;
   }
 

@@ -58,6 +58,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param CRM_Core_Form $form
    */
   public static function preProcess(&$form) {
+    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($form);
     $messageText = array();
     $messageSubject = array();
     $dao = new CRM_Core_BAO_MessageTemplate();

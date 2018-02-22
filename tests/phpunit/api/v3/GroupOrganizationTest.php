@@ -80,7 +80,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
       'sequential' => 1,
     );
     $getResult = $this->callAPISuccess('group_organization', 'get', $getParams);
-    $this->assertEquals($createResult['values'], $getResult['values'][0]);
+    $this->assertEquals($createResult['values'][$createResult['id']], $getResult['values'][0]);
   }
 
   /**

@@ -43,7 +43,7 @@ Required vars: caseTypes
                   {{ts('Enable')}}
                 </a>
               </li>
-              <li ng-show="caseType.is_active">
+              <li ng-show="caseType.is_active && !caseType.is_reserved">
                 <a class="action-item crm-hover-button"
                    crm-confirm="{type: 'disable', obj: caseType}"
                    on-yes="toggleCaseType(caseType)">
@@ -57,7 +57,7 @@ Required vars: caseTypes
                   {{ts('Revert')}}
                 </a>
               </li>
-              <li>
+              <li ng-show="!caseType.is_reserved">
                 <a class="action-item crm-hover-button"
                    crm-confirm="{type: 'delete', obj: caseType}"
                    on-yes="deleteCaseType(caseType)">

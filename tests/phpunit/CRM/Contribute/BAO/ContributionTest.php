@@ -61,22 +61,23 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => '22ereerwww444444',
       'invoice_id' => '86ed39c9e9ee6ef6031621ce0eafe7eb81',
       'thankyou_date' => '20080522',
+      'sequential' => TRUE,
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
 
-    $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transaction id creation.');
-    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+    $this->assertEquals($params['trxn_id'], $contribution['trxn_id'], 'Check for transaction id creation.');
+    $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
 
     //update contribution amount
-    $ids = array('contribution' => $contribution->id);
+    $params['id'] = $contribution['id'];
     $params['fee_amount'] = 10;
     $params['net_amount'] = 190;
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
 
-    $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id .');
-    $this->assertEquals($params['net_amount'], $contribution->net_amount, 'Check for Amount updation.');
+    $this->assertEquals($params['trxn_id'], $contribution['trxn_id'], 'Check for transcation id .');
+    $this->assertEquals($params['net_amount'], $contribution['net_amount'], 'Check for Amount updation.');
   }
 
   /**
@@ -116,6 +117,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => '22ereerwww322323',
       'invoice_id' => '22ed39c9e9ee6ef6031621ce0eafe6da70',
       'thankyou_date' => '20080522',
+      'skipCleanMoney' => TRUE,
     );
 
     $params['custom'] = array(
@@ -175,8 +177,8 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => '22ed39c9e9ee6ef6031621ce0eafe6da70',
       'thankyou_date' => '20080522',
     );
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
-    $testResult = $this->callAPISuccess('financial_type', 'create', array('is_active' => 0, 'id' => $finType['id']));
+    $this->callAPISuccess('Contribution', 'create', $params);
+    $this->callAPISuccess('financial_type', 'create', array('is_active' => 0, 'id' => $finType['id']));
     $contributionCount = CRM_Contribute_BAO_Contribution::contributionCount($contactId);
     $this->assertEquals(1, $contributionCount);
   }
@@ -204,16 +206,14 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => '33ereerwww322323',
       'invoice_id' => '33ed39c9e9ee6ef6031621ce0eafe6da70',
       'thankyou_date' => '20080522',
+      'sequential' => TRUE,
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
 
-    $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id creation.');
-    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+    CRM_Contribute_BAO_Contribution::deleteContribution($contribution['id']);
 
-    CRM_Contribute_BAO_Contribution::deleteContribution($contribution->id);
-
-    $this->assertDBNull('CRM_Contribute_DAO_Contribution', $contribution->trxn_id,
+    $this->assertDBNull('CRM_Contribute_DAO_Contribution', $contribution['trxn_id'],
       'id', 'trxn_id', 'Database check for deleted Contribution.'
     );
   }
@@ -260,14 +260,15 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'receive_date' => date('Ymd'),
       'total_amount' => 66,
+      'sequential' => 1,
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($param);
-    $id = $contribution->id;
+    $contribution = $this->callAPISuccess('Contribution', 'create', $param)['values'][0];
+    $id = $contribution['id'];
     $softParam['contact_id'] = $honoreeContactId;
     $softParam['contribution_id'] = $id;
-    $softParam['currency'] = $contribution->currency;
-    $softParam['amount'] = $contribution->total_amount;
+    $softParam['currency'] = $contribution['currency'];
+    $softParam['amount'] = $contribution['total_amount'];
 
     //Create Soft Contribution for honoree contact
     CRM_Contribute_BAO_ContributionSoft::add($softParam);
@@ -298,8 +299,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     //get annual contribution information
     $annual = CRM_Contribute_BAO_Contribution::annual($contactId);
 
-    $config = CRM_Core_Config::singleton();
-    $currencySymbol = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_Currency', $config->defaultCurrency, 'symbol', 'name');
+    $currencySymbol = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_Currency', CRM_Core_Config::singleton()->defaultCurrency, 'symbol', 'name');
     $this->assertDBCompareValue('CRM_Contribute_DAO_Contribution', $id, 'total_amount',
       'id', ltrim($annual[2], $currencySymbol), 'Check DB for total amount of the contribution'
     );
@@ -323,9 +323,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
 
     $contactId = $contact->id;
-
-    $ids = array('contribution' => NULL);
-
     $param = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
@@ -343,15 +340,16 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => '22ereerwww323',
       'invoice_id' => '22ed39c9e9ee621ce0eafe6da70',
       'thankyou_date' => '20080522',
+      'sequential' => TRUE,
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($param, $ids);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $param)['values'][0];
 
-    $this->assertEquals($param['trxn_id'], $contribution->trxn_id, 'Check for transcation id creation.');
-    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+    $this->assertEquals($param['trxn_id'], $contribution['trxn_id'], 'Check for transcation id creation.');
+    $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
 
     //display sort name during Update multiple contributions
-    $sortName = CRM_Contribute_BAO_Contribution::sortName($contribution->id);
+    $sortName = CRM_Contribute_BAO_Contribution::sortName($contribution['id']);
 
     $this->assertEquals('Whatson, Shane', $sortName, 'Check for sort name.');
   }
@@ -382,8 +380,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
     $this->assertEquals('TEST Premium', $premium->name, 'Check for premium  name.');
 
-    $ids = array('contribution' => NULL);
-
     $param = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
@@ -401,17 +397,17 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => '33erdfrwvw434',
       'invoice_id' => '98ed34f7u9hh672ce0eafe8fb92',
       'thankyou_date' => '20080522',
+      'sequential' => TRUE,
     );
+    $contribution = $this->callAPISuccess('Contribution', 'create', $param)['values'][0];
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($param, $ids);
-
-    $this->assertEquals($param['trxn_id'], $contribution->trxn_id, 'Check for transcation id creation.');
-    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+    $this->assertEquals($param['trxn_id'], $contribution['trxn_id'], 'Check for transcation id creation.');
+    $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
 
     //parameter for adding premium to contribution
     $data = array(
       'product_id' => $premium->id,
-      'contribution_id' => $contribution->id,
+      'contribution_id' => $contribution['id'],
       'product_option' => NULL,
       'quantity' => 1,
     );
@@ -450,19 +446,20 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => '76ereeswww835',
       'invoice_id' => '93ed39a9e9hd621bs0eafe3da82',
       'thankyou_date' => '20080522',
+      'sequential' => TRUE,
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($param);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $param)['values'][0];
 
-    $this->assertEquals($param['trxn_id'], $contribution->trxn_id, 'Check for transcation id creation.');
-    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+    $this->assertEquals($param['trxn_id'], $contribution['trxn_id'], 'Check for transcation id creation.');
+    $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
     $data = array(
-      'id' => $contribution->id,
-      'trxn_id' => $contribution->trxn_id,
-      'invoice_id' => $contribution->invoice_id,
+      'id' => $contribution['id'],
+      'trxn_id' => $contribution['trxn_id'],
+      'invoice_id' => $contribution['invoice_id'],
     );
     $contributionID = CRM_Contribute_BAO_Contribution::checkDuplicateIds($data);
-    $this->assertEquals($contributionID, $contribution->id, 'Check for duplicate transcation id .');
+    $this->assertEquals($contributionID, $contribution['id'], 'Check for duplicate transcation id .');
   }
 
   /**
@@ -490,12 +487,13 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => '76ereeswww835',
       'invoice_id' => '93ed39a9e9hd621bs0eafe3da82',
       'thankyou_date' => '20080522',
+      'sequential' => TRUE,
     );
 
     $creditNoteId = CRM_Contribute_BAO_Contribution::createCreditNoteId();
-    $contribution = CRM_Contribute_BAO_Contribution::create($param);
-    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
-    $this->assertEquals($creditNoteId, $contribution->creditnote_id, 'Check if credit note id is created correctly.');
+    $contribution = $this->callAPISuccess('Contribution', 'create', $param)['values'][0];
+    $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
+    $this->assertEquals($creditNoteId, $contribution['creditnote_id'], 'Check if credit note id is created correctly.');
   }
 
   /**
@@ -504,7 +502,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   public function testIsPaymentFlag() {
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'currency' => 'USD',
       'financial_type_id' => 1,
@@ -520,12 +518,12 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => '22ereerwww4444xx',
       'invoice_id' => '86ed39c9e9ee6ef6541621ce0eafe7eb81',
       'thankyou_date' => '20080522',
-    );
+      'sequential' => TRUE,
+    ];
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
-
-    $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id creation.');
-    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+    $this->assertEquals($params['trxn_id'], $contribution['trxn_id'], 'Check for transcation id creation.');
+    $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
 
     $trxnArray = array(
       'trxn_id' => $params['trxn_id'],
@@ -535,13 +533,12 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
     $this->assertEquals(1, $financialTrxn->N, 'Mismatch count for is payment flag.');
     //update contribution amount
-    $ids = array('contribution' => $contribution->id);
+    $params['id'] = $contribution['id'];
     $params['total_amount'] = 150;
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
-
-    $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id .');
-    $this->assertEquals($params['total_amount'], $contribution->total_amount, 'Check for Amount updation.');
+    $this->assertEquals($params['trxn_id'], $contribution['trxn_id'], 'Check for transcation id .');
+    $this->assertEquals($params['total_amount'], $contribution['total_amount'], 'Check for Amount updation.');
     $trxnArray = array(
       'trxn_id' => $params['trxn_id'],
       'is_payment' => 1,
@@ -577,12 +574,13 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => '22ereerwww4444yy',
       'invoice_id' => '86ed39c9e9yy6ef6541621ce0eafe7eb81',
       'thankyou_date' => '20080522',
+      'sequential' => TRUE,
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
 
-    $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id creation.');
-    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+    $this->assertEquals($params['trxn_id'], $contribution['trxn_id'], 'Check for transaction id creation.');
+    $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
 
     $trxnArray = array(
       'trxn_id' => $params['trxn_id'],
@@ -595,13 +593,13 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($trxnArray, $defaults);
     $this->assertEquals(NULL, $financialTrxn, 'Mismatch count for is payment flag.');
     //update contribution amount
-    $ids = array('contribution' => $contribution->id);
+    $params['id'] = $contribution['id'];
     $params['contribution_status_id'] = 1;
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
 
-    $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transcation id .');
-    $this->assertEquals($params['contribution_status_id'], $contribution->contribution_status_id, 'Check for status updation.');
+    $this->assertEquals($params['trxn_id'], $contribution['trxn_id'], 'Check for transcation id .');
+    $this->assertEquals($params['contribution_status_id'], $contribution['contribution_status_id'], 'Check for status updation.');
     $trxnArray = array(
       'trxn_id' => $params['trxn_id'],
       'is_payment' => 1,
@@ -619,7 +617,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    */
   public function testAddPayments() {
     list($lineItems, $contribution) = $this->addParticipantWithContribution();
-    CRM_Contribute_BAO_Contribution::addPayments(array($contribution));
+    CRM_Contribute_BAO_Contribution::addPayments([$contribution]);
     $this->checkItemValues($contribution);
   }
 
@@ -728,6 +726,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'partial_amount_to_pay' => 150,
       'contribution_mode' => 'participant',
       'participant_id' => $participant->id,
+      'sequential' => TRUE,
     );
 
     foreach ($priceFields['values'] as $key => $priceField) {
@@ -743,16 +742,20 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       );
     }
     $contributionParams['line_item'] = $lineItems;
-    $contributions = CRM_Contribute_BAO_Contribution::create($contributionParams);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams)['values'][0];
 
     $paymentParticipant = array(
       'participant_id' => $participant->id,
-      'contribution_id' => $contributions->id,
+      'contribution_id' => $contribution['id'],
     );
     $ids = array();
     CRM_Event_BAO_ParticipantPayment::create($paymentParticipant, $ids);
 
-    return array($lineItems, $contributions);
+    $contributionObject = new CRM_Contribute_BAO_Contribution();
+    $contributionObject->id = $contribution['id'];
+    $contributionObject->find(TRUE);
+
+    return array($lineItems, $contributionObject);
   }
 
   /**
@@ -824,37 +827,37 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'trxn_id' => '22ereerwww444444',
       'invoice_id' => '86ed39c9e9ee6ef6031621ce0eafe7eb81',
       'thankyou_date' => '20160519',
+      'sequential' => 1,
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
 
-    $this->assertEquals($params['total_amount'], $contribution->total_amount, 'Check for total amount in contribution.');
-    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+    $this->assertEquals($params['total_amount'], $contribution['total_amount'], 'Check for total amount in contribution.');
+    $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
 
     // Check amount in activity.
     $activityParams = array(
-      'source_record_id' => $contribution->id,
+      'source_record_id' => $contribution['id'],
       'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Contribution'),
     );
     // @todo use api instead.
     $activity = CRM_Activity_BAO_Activity::retrieve($activityParams, $defaults);
 
-    $this->assertEquals($contribution->id, $activity->source_record_id, 'Check for activity associated with contribution.');
+    $this->assertEquals($contribution['id'], $activity->source_record_id, 'Check for activity associated with contribution.');
     $this->assertEquals("$ 100.00 - STUDENT", $activity->subject, 'Check for total amount in activity.');
 
-    // Update contribution amount.
-    $ids = array('contribution' => $contribution->id);
+    $params['id'] = $contribution['id'];
     $params['total_amount'] = 200;
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params, $ids);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
 
-    $this->assertEquals($params['total_amount'], $contribution->total_amount, 'Check for total amount in contribution.');
-    $this->assertEquals($contactId, $contribution->contact_id, 'Check for contact id  creation.');
+    $this->assertEquals($params['total_amount'], $contribution['total_amount'], 'Check for total amount in contribution.');
+    $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
 
     // Retrieve activity again.
     $activity = CRM_Activity_BAO_Activity::retrieve($activityParams, $defaults);
 
-    $this->assertEquals($contribution->id, $activity->source_record_id, 'Check for activity associated with contribution.');
+    $this->assertEquals($contribution['id'], $activity->source_record_id, 'Check for activity associated with contribution.');
     $this->assertEquals("$ 200.00 - STUDENT", $activity->subject, 'Check for total amount in activity.');
   }
 
@@ -1055,8 +1058,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'partial_amount_to_pay' => '8,000.00',
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
-    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'DESC');
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
       array(
@@ -1116,6 +1119,44 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
     $trxnTestArray = array_merge($eftParams, array(
       'amount' => '50.00',
+    ));
+    $this->callAPISuccessGetSingle('EntityFinancialTrxn', $eftParams, $trxnTestArray);
+  }
+
+  /**
+   * Test for function createProportionalEntry with zero amount().
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
+   */
+  public function testCreateProportionalEntryZeroAmount($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
+    list($contribution, $financialAccount) = $this->createContributionWithTax(array('total_amount' => 0));
+    $params = array(
+      'total_amount' => 0,
+      'to_financial_account_id' => $financialAccount->financial_account_id,
+      'payment_instrument_id' => 1,
+      'trxn_date' => date('Ymd'),
+      'status_id' => 1,
+      'entity_id' => $contribution['id'],
+    );
+    $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'create', $params);
+    $entityParams = array(
+      'contribution_total_amount' => $contribution['total_amount'],
+      'trxn_total_amount' => 0,
+      'line_item_amount' => 0,
+    );
+    $previousLineItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
+    $eftParams = array(
+      'entity_table' => 'civicrm_financial_item',
+      'entity_id' => $previousLineItem['id'],
+      'financial_trxn_id' => (string) $financialTrxn['id'],
+    );
+    CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
+    $trxnTestArray = array_merge($eftParams, array(
+      'amount' => '0.00',
     ));
     $this->callAPISuccessGetSingle('EntityFinancialTrxn', $eftParams, $trxnTestArray);
   }
@@ -1193,7 +1234,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   /**
    * Function to create contribution with tax.
    */
-  public function createContributionWithTax() {
+  public function createContributionWithTax($params = array()) {
+    if (!isset($params['total_amount'])) {
+      $params['total_amount'] = 100;
+    }
     $contactId = $this->individualCreate();
     $this->enableTaxAndInvoicing();
     $financialType = $this->createFinancialType();
@@ -1201,10 +1245,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit(array(
-       'total_amount' => 100,
+       'total_amount' => $params['total_amount'],
         'financial_type_id' => $financialType['id'],
-        'receive_date' => '04/21/2015',
-        'receive_date_time' => '11:27PM',
         'contact_id' => $contactId,
         'contribution_status_id' => 1,
         'price_set_id' => 0,
