@@ -89,7 +89,27 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('extension', 'get', array());
     $testExtensionResult = $this->callAPISuccess('extension', 'get', array('key' => 'test.extension.manager.paymenttest'));
     $this->assertNotNull($result['values'][$testExtensionResult['id']]['typeInfo']);
-    $this->assertEquals(6, $result['count']);
+    $this->assertTrue($result['count'] >= 6);
+  }
+
+  /**
+   * Filtering by status=installed or status=uninstalled should produce different results.
+   */
+  public function testExtensionGetByStatus() {
+    $installed = $this->callAPISuccess('extension', 'get', array('status' => 'installed'));
+    $uninstalled = $this->callAPISuccess('extension', 'get', array('status' => 'uninstalled'));
+
+    // If the filter works, then results should be strictly independent.
+    $this->assertEquals(
+      array(),
+      array_intersect(
+        CRM_Utils_Array::collect('key', $installed['values']),
+        CRM_Utils_Array::collect('key', $uninstalled['values'])
+      )
+    );
+
+    $all = $this->callAPISuccess('extension', 'get', array());
+    $this->assertEquals($all['count'], $installed['count'] + $uninstalled['count']);
   }
 
   public function testGetMultipleExtensions() {
