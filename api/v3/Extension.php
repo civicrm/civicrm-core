@@ -368,7 +368,13 @@ function civicrm_api3_extension_get($params) {
       $result[] = $info;
     }
   }
-  $filterableFields = array('id', 'key', 'type', 'status', 'path');
+
+  // These fields have been filtered already, and they have special semantics.
+  unset($params['key']);
+  unset($params['keys']);
+  unset($params['full_name']);
+
+  $filterableFields = array('id', 'type', 'status', 'path');
   return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', $filterableFields);
 }
 
