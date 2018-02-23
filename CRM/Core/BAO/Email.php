@@ -359,4 +359,5 @@ AND    reset_date IS NULL
     ));
     return $defaultFromAddress;
   }
+
 }
