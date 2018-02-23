@@ -60,16 +60,25 @@
           <td class="font-size12pt">
             {$form.sort_name.label}
           </td>
-          <td>
+          <td colspan="3">
             {$form.sort_name.html|crmAddClass:'twenty'}
           </td>
-          <td><label>{ts}Contact Type(s){/ts}</label><br />
+        </tr>
+        <tr>
+          <td>
+            <label>{ts}Contact Type(s){/ts}</label>
+          </td>
+          <td>
             {$form.contact_type.html}
           </td>
-          <td><label>{ts}Group(s){/ts}</label>
+          <td>
+            <label>{ts}Group(s){/ts}</label>
+          </td>
+          <td >
             {$form.group.html}
           </td>
         </tr>
+
         <tr>
           <td class="font-size12pt">
             {$form.street_address.label}
