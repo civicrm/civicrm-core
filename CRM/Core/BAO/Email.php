@@ -345,4 +345,19 @@ AND    reset_date IS NULL
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Email', $id);
   }
 
+  /**
+   * For use with setDefaultValues on forms that implement a select element for choosing "From Email Address"
+   * Usage: $defaults['from_email_address'] = CRM_Core_BAO_Email::getDefaultFromEmailAddress()
+   *
+   * @return int
+   */
+  public static function getDefaultFromEmailAddress() {
+    $defaultFromAddress = civicrm_api3('OptionValue', 'getvalue', array(
+      'return' => 'label',
+      'option_group_id' => 'from_email_address',
+      'is_default' => 1,
+    ));
+    return $defaultFromAddress;
+  }
+
 }

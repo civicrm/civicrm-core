@@ -225,6 +225,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   public static function setDefaultValues() {
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
     $defaultFormat['format_id'] = $defaultFormat['id'];
+    $defaultFormat['from_email_address'] = CRM_Core_BAO_Email::getDefaultFromEmailAddress();
     return $defaultFormat;
   }
 

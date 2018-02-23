@@ -200,6 +200,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     // custom data set defaults
     $defaults += CRM_Custom_Form_CustomData::setDefaultValues($this);
 
+    $defaults['from_email_address'] = CRM_Core_BAO_Email::getDefaultFromEmailAddress();
     return $defaults;
   }
 

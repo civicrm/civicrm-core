@@ -442,6 +442,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['campaign_id'] = $this->_pledgeValues['campaign_id'];
     }
 
+    $defaults['from_email_address'] = CRM_Core_BAO_Email::getDefaultFromEmailAddress();
     $this->_defaults = $defaults;
     return $defaults;
   }
