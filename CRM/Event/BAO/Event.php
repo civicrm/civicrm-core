@@ -2074,11 +2074,11 @@ WHERE  ce.loc_block_id = $locBlockId";
           'limit' => 0,
         ),
       );
-
+/*
       if ($eventId) {
         $params['id'] = $eventId;
       }
-
+*/
       $result = civicrm_api3('Event', 'get', $params);
       $allEvents = CRM_Utils_Array::collect('title', $result['values']);
 
