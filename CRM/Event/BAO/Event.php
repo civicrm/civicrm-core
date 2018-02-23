@@ -2074,11 +2074,8 @@ WHERE  ce.loc_block_id = $locBlockId";
           'limit' => 0,
         ),
       );
-/*
-      if ($eventId) {
-        $params['id'] = $eventId;
-      }
-*/
+      // CRM-21798 removed setting the ID as a parameter as this meant we only
+      // got the first event for which to check permissions.
       $result = civicrm_api3('Event', 'get', $params);
       $allEvents = CRM_Utils_Array::collect('title', $result['values']);
 
