@@ -122,7 +122,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
       }
     }
     // Process / save websites
-    CRM_Core_BAO_Website::create($params['website'], $this->_contactId, TRUE);
+    CRM_Core_BAO_Website::process($params['website'], $this->_contactId, TRUE);
 
     $this->log();
     $this->response();
