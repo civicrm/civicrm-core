@@ -109,7 +109,7 @@ function _civicrm_api3_navigation_create_spec(&$params) {
  */
 function civicrm_api3_navigation_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('name', 'label'));
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Navigation');
 }
 
 /**
