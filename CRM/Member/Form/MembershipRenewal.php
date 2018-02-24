@@ -238,7 +238,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $allMembershipInfo = array();
 
-    if (is_array($defaults['membership_type_id'])) { //CRM-21485
+    // CRM-21485
+    if (is_array($defaults['membership_type_id'])) {
       $defaults['membership_type_id'] = $defaults['membership_type_id'][1];
     }
 
