@@ -393,7 +393,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'UFJoin',
       'UFField',
       'PriceFieldValue',
-      'Website',
       'JobLog',
       'GroupContact',
       'EntityTag',
@@ -401,7 +400,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'PaymentProcessorType',
       'Relationship',
       'RelationshipType',
-      'ParticipantPayment',
 
       // ones that are not real entities hence not extendable.
       'ActivityType',
@@ -466,7 +464,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailingContact',
       'EntityTag',
       'Participant',
-      'ParticipantPayment',
       'Setting',
       'SurveyRespondant',
       'MailingRecipients',
@@ -535,7 +532,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'GroupContact',
       'MembershipPayment',
       'Participant',
-      'ParticipantPayment',
       'LineItem',
       'PledgePayment',
       'ContributionPage',

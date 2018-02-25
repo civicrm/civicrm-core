@@ -1308,9 +1308,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         'participant_id' => $participants[0]->id,
         'contribution_id' => $contribution->id,
       );
-      $ids = array();
 
-      CRM_Event_BAO_ParticipantPayment::create($paymentParticipant, $ids);
+      CRM_Event_BAO_ParticipantPayment::create($paymentParticipant);
       $this->_contactIds[] = $this->_contactId;
     }
     else {

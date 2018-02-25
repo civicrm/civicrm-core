@@ -86,8 +86,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         'participant_id' => $participant->id,
         'contribution_id' => $params['contributionID'],
       );
-      $ids = array();
-      CRM_Event_BAO_ParticipantPayment::create($payment_params, $ids);
+      CRM_Event_BAO_ParticipantPayment::create($payment_params);
     }
 
     $transaction->commit();

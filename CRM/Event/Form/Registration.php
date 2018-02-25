@@ -761,8 +761,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         'participant_id' => $participant->id,
         'contribution_id' => $contribution->id,
       );
-      $ids = array();
-      $paymentPartcipant = CRM_Event_BAO_ParticipantPayment::create($paymentParams, $ids);
+      $paymentPartcipant = CRM_Event_BAO_ParticipantPayment::create($paymentParams);
     }
 
     //set only primary participant's params for transfer checkout.
