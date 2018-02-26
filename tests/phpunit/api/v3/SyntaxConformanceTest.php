@@ -396,7 +396,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'PledgePayment',
       'PaymentProcessorType',
       'Relationship',
-      'RelationshipType',
 
       // ones that are not real entities hence not extendable.
       'ActivityType',
