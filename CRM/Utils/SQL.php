@@ -78,7 +78,7 @@ class CRM_Utils_SQL {
    */
   public static function supportsFullGroupBy() {
     // CRM-21455 MariaDB 10.2 does not support ANY_VALUE
-    $version = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+    $version = self::getDatabaseVersion();
 
     if (stripos($version, 'mariadb') !== FALSE) {
       return FALSE;
@@ -120,6 +120,29 @@ class CRM_Utils_SQL {
       return FALSE;
     }
     return TRUE;
+  }
+
+  /**
+   * Does the database support multiple Locks.
+   *
+   * https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html#function_get-lock
+   */
+  public static function supportsMultipleLocks() {
+    $version = self::getDatabaseVersion();
+    if (stripos($version, 'mariadb') !== FALSE) {
+      return FALSE;
+    }
+
+    return version_compare($version, '5.7.5', '>=');
+  }
+
+  /**
+   * Get the version string for the database.
+   *
+   * @return string
+   */
+  public static function getDatabaseVersion() {
+    return CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
   }
 
 }
