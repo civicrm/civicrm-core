@@ -177,7 +177,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
    */
   public function acquire($timeout = NULL) {
     if (!$this->_hasLock) {
-      if (self::$jobLog && CRM_Core_DAO::singleValueQuery("SELECT IS_USED_LOCK( '" . self::$jobLog . "')")) {
+      if (!CRM_Utils_SQL::supportsMultipleLocks() && self::$jobLog && CRM_Core_DAO::singleValueQuery("SELECT IS_USED_LOCK( '" . self::$jobLog . "')")) {
         return $this->hackyHandleBrokenCode(self::$jobLog);
       }
 
