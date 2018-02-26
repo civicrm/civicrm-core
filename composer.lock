@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "a278afcb51b1e87282f6373cdc313769",
+    "content-hash": "3bf4a12287208a8b232989680663e7a2",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -662,34 +662,34 @@
         },
         {
             "name": "phpoffice/phpword",
-            "version": "v0.13.0",
+            "version": "v0.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPOffice/PHPWord.git",
-                "reference": "0a3f873972defb304de4fa2f5f53156558c11a7a"
+                "reference": "b614497ae6dd44280be1c2dda56772198bcd25ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPOffice/PHPWord/zipball/0a3f873972defb304de4fa2f5f53156558c11a7a",
-                "reference": "0a3f873972defb304de4fa2f5f53156558c11a7a",
+                "url": "https://api.github.com/repos/PHPOffice/PHPWord/zipball/b614497ae6dd44280be1c2dda56772198bcd25ae",
+                "reference": "b614497ae6dd44280be1c2dda56772198bcd25ae",
                 "shasum": ""
             },
             "require": {
                 "ext-xml": "*",
-                "php": ">=5.3.3",
-                "phpoffice/common": "0.2.*",
-                "zendframework/zend-escaper": "2.4.*",
-                "zendframework/zend-stdlib": "2.4.*",
-                "zendframework/zend-validator": "2.4.*"
+                "php": "^5.3.3 || ^7.0",
+                "phpoffice/common": "^0.2",
+                "zendframework/zend-escaper": "^2.2",
+                "zendframework/zend-stdlib": "^2.2 || ^3.0"
             },
             "require-dev": {
-                "dompdf/dompdf": "0.6.*",
-                "mpdf/mpdf": "5.*",
+                "dompdf/dompdf": "0.8.*",
+                "friendsofphp/php-cs-fixer": "^2.0",
+                "mpdf/mpdf": "5.* || 6.* || 7.*",
                 "phpdocumentor/phpdocumentor": "2.*",
-                "phploc/phploc": "2.*",
+                "phploc/phploc": "2.* || 3.* || 4.*",
                 "phpmd/phpmd": "2.*",
-                "phpunit/phpunit": "3.7.*",
-                "squizlabs/php_codesniffer": "1.*",
+                "phpunit/phpunit": "^4.8.36 || ^5.0",
+                "squizlabs/php_codesniffer": "^2.7",
                 "tecnickcom/tcpdf": "6.*"
             },
             "suggest": {
@@ -714,10 +714,6 @@
                     "name": "Mark Baker"
                 },
                 {
-                    "name": "Franck Lefevre",
-                    "homepage": "http://blog.rootslabs.net"
-                },
-                {
                     "name": "Gabriel Bull",
                     "email": "me@gabrielbull.com",
                     "homepage": "http://gabrielbull.com/"
@@ -729,6 +725,13 @@
                 {
                     "name": "Roman Syroeshko",
                     "homepage": "http://ru.linkedin.com/pub/roman-syroeshko/34/a53/994/"
+                },
+                {
+                    "name": "Franck Lefevre",
+                    "homepage": "https://rootslabs.net/blog/"
+                },
+                {
+                    "name": "Antoine de Troostembergh"
                 }
             ],
             "description": "PHPWord - A pure PHP library for reading and writing word processing documents (OOXML, ODF, RTF, HTML, PDF)",
@@ -758,7 +761,7 @@
                 "word",
                 "writer"
             ],
-            "time": "2016-07-31T08:53:39+00:00"
+            "time": "2017-12-29T01:30:53+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
