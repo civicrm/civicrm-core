@@ -43,17 +43,7 @@
  * @return array
  */
 function civicrm_api3_participant_payment_create($params) {
-
-  $ids = array();
-  if (!empty($params['id'])) {
-    $ids['id'] = $params['id'];
-  }
-  $participantPayment = CRM_Event_BAO_ParticipantPayment::create($params, $ids);
-
-  $payment = array();
-  _civicrm_api3_object_to_array($participantPayment, $payment[$participantPayment->id]);
-
-  return civicrm_api3_create_success($payment, $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'ParticipantPayment');
 }
 
 /**
