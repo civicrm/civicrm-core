@@ -716,14 +716,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public function postProcess() {
     $contactID = $this->getContactID();
-    $result = $this->processFormSubmission($contactID);
+    try {
+      $result = $this->processFormSubmission($contactID);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->bounceOnError($e->getMessage());
+    }
+
     if (is_array($result) && !empty($result['is_payment_failure'])) {
-      // We will probably have the function that gets this error throw an exception on the next round of refactoring.
-      CRM_Core_Session::singleton()->setStatus(ts("Payment Processor Error message :") .
-          $result['error']->getMessage());
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact',
-        "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"
-      ));
+      $this->bounceOnError($result['error']->getMessage());
     }
     // Presumably this is for hooks to access? Not quite clear & perhaps not required.
     $this->set('params', $this->_params);
@@ -966,6 +967,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // @todo this is the wrong place for this - it should be done as close to form submission
       // as possible
       $contributionParams['total_amount'] = $params['amount'];
+
       $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
 
       $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
@@ -989,10 +991,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $smarty = CRM_Core_Smarty::singleton();
         $smarty->assign('dataArray', $dataArray);
         $smarty->assign('totalTaxAmount', $params['tax_amount']);
-      }
-      if (is_a($contribution, 'CRM_Core_Error')) {
-        $message = CRM_Core_Error::getMessages($contribution);
-        CRM_Core_Error::fatal($message);
       }
 
       // lets store it in the form variable so postProcess hook can get to this and use it
@@ -1020,8 +1018,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       //handle custom data.
       $params['contribution_id'] = $contribution->id;
       if (!empty($params['custom']) &&
-        is_array($params['custom']) &&
-        !is_a($contribution, 'CRM_Core_Error')
+        is_array($params['custom'])
       ) {
         CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution', $contribution->id);
       }
@@ -2496,6 +2493,20 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
     }
+  }
+
+  /**
+   * Bounce the user back to retry when an error occurs.
+   *
+   * @param string $message
+   */
+  protected function bounceOnError($message) {
+    CRM_Core_Session::singleton()
+      ->setStatus(ts("Payment Processor Error message :") .
+        $message);
+    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact',
+      "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"
+    ));
   }
 
 }
