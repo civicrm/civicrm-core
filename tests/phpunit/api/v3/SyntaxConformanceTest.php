@@ -96,7 +96,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->toBeImplemented['create'] = array(
       'Cxn',
       'CxnApp',
-      'JobLog',
       'SurveyRespondant',
       'OptionGroup',
       'MailingRecipients',
@@ -114,7 +113,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->toBeImplemented['delete'] = array(
       'Cxn',
       'CxnApp',
-      'JobLog',
       'MembershipPayment',
       'OptionGroup',
       'SurveyRespondant',
@@ -393,7 +391,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'UFJoin',
       'UFField',
       'PriceFieldValue',
-      'JobLog',
       'GroupContact',
       'EntityTag',
       'PledgePayment',
@@ -730,6 +727,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'break_return' => array(
           'ignore_severity',
         ),
+      ),
+      'JobLog' => array(
+        // For better or worse triggers override.
+        'break_return' => ['run_time'],
+        'cant_update' => ['run_time'],
       ),
     );
     if (empty($knownFailures[$entity]) || empty($knownFailures[$entity][$key])) {
