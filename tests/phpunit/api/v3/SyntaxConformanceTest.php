@@ -386,7 +386,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailingEventUnsubscribe',
       'MailingJob',
       'MembershipPayment',
-      'Note',
       'SavedSearch',
       'UFJoin',
       'UFField',
@@ -394,7 +393,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'GroupContact',
       'EntityTag',
       'PledgePayment',
-      'PaymentProcessorType',
       'Relationship',
 
       // ones that are not real entities hence not extendable.
