@@ -35,6 +35,48 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Helper function to assert whether the calculated recipients of a mailing
+   * match the expected list
+   *
+   * @param $mailingID
+   * @param $expectedRecipients array
+   *   Array of contact ID that should be in the recipient list.
+   */
+  private function assertRecipientsCorrect($mailingID, $expectedRecipients) {
+
+    // Reset keys to ensure match
+    $expectedRecipients = array_values($expectedRecipients);
+
+    // Load the recipients as a list of contact IDs
+    CRM_Mailing_BAO_Mailing::getRecipients($mailingID);
+    $recipients = $this->callAPISuccess('MailingRecipients', 'get', array('mailing_id' => $mailingID));
+    $contactIDs = array();
+    foreach ($recipients['values'] as $recipient) {
+      $contactIDs[] = $recipient['contact_id'];
+    }
+
+    // Check the lists match
+    $this->assertTreeEquals($expectedRecipients, $contactIDs);
+  }
+
+  /**
+   * Helper function to create a mailing include/exclude group.
+   *
+   * @param $mailingID
+   * @param $groupID
+   * @param string $type
+   * @return array|int
+   */
+  private function createMailingGroup($mailingID, $groupID, $type = 'Include') {
+    return $this->callAPISuccess('MailingGroup', 'create', array(
+      'mailing_id' => $mailingID,
+      'group_type' => $type,
+      'entity_table' => "civicrm_group",
+      'entity_id' => $groupID,
+    ));
+  }
+
+  /**
    * @todo Missing tests:
    * - Ensure opt out emails are not mailed
    * - Ensure 'stop' emails are not mailed
@@ -160,48 +202,6 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Helper function to assert whether the calculated recipients of a mailing
-   * match the expected list
-   *
-   * @param $mailingID
-   * @param $expectedRecipients array
-   *   Array of contact ID that should be in the recipient list.
-   */
-  private function assertRecipientsCorrect($mailingID, $expectedRecipients) {
-
-    // Reset keys to ensure match
-    $expectedRecipients = array_values($expectedRecipients);
-
-    // Load the recipients as a list of contact IDs
-    CRM_Mailing_BAO_Mailing::getRecipients($mailingID);
-    $recipients = $this->callAPISuccess('MailingRecipients', 'get', array('mailing_id' => $mailingID));
-    $contactIDs = array();
-    foreach ($recipients['values'] as $recipient) {
-      $contactIDs[] = $recipient['contact_id'];
-    }
-
-    // Check the lists match
-    $this->assertTreeEquals($expectedRecipients, $contactIDs);
-  }
-
-  /**
-   * Helper function to create a mailing include/exclude group.
-   *
-   * @param $mailingID
-   * @param $groupID
-   * @param string $type
-   * @return array|int
-   */
-  private function createMailingGroup($mailingID, $groupID, $type = 'Include') {
-    return $this->callAPISuccess('MailingGroup', 'create', array(
-      'mailing_id' => $mailingID,
-      'group_type' => $type,
-      'entity_table' => "civicrm_group",
-      'entity_id' => $groupID,
-    ));
-  }
-
-  /**
    * Test CRM_Mailing_BAO_Mailing::getRecipients() on sms mode
    */
   public function testgetRecipientsSMS() {
@@ -281,17 +281,10 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
 
     // Create mailing
     $mailing = $this->callAPISuccess('Mailing', 'create', array('sms_provider_id' => $sms_provider['id']));
-    $mailing_include_group = $this->callAPISuccess('MailingGroup', 'create', array(
-      'mailing_id' => $mailing['id'],
-      'group_type' => "Include",
-      'entity_table' => "civicrm_group",
-      'entity_id' => $group,
-    ));
-
-    // Populate the recipients table (job id doesn't matter)
-    CRM_Mailing_BAO_Mailing::getRecipients($mailing['id']);
+    $mailingInclude = $this->createMailingGroup($mailing['id'], $group);
 
     // Get recipients
+    CRM_Mailing_BAO_Mailing::getRecipients($mailing['id']);
     $recipients = $this->callAPISuccess('MailingRecipients', 'get', array('mailing_id' => $mailing['id']));
 
     // Check the count is correct
