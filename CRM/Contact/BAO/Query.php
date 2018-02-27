@@ -4710,7 +4710,7 @@ civicrm_relationship.is_permission_a_b = 0
   public static function appendAnyValueToSelect($selectClauses, $groupBy, $aggregateFunction = 'ANY_VALUE') {
     if (!CRM_Utils_SQL::disableFullGroupByMode()) {
       $groupBy = array_map('trim', (array) $groupBy);
-      $aggregateFunctions = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
+      $aggregateFunctions = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN|IF)[[:blank:]]*\(/i';
       foreach ($selectClauses as $key => &$val) {
         list($selectColumn, $alias) = array_pad(preg_split('/ as /i', $val), 2, NULL);
         // append ANY_VALUE() keyword
@@ -4761,7 +4761,7 @@ civicrm_relationship.is_permission_a_b = 0
 
     //return if ONLY_FULL_GROUP_BY is not enabled.
     if (CRM_Utils_SQL::supportsFullGroupBy() && !empty($sqlMode) && in_array('ONLY_FULL_GROUP_BY', explode(',', $sqlMode))) {
-      $regexToExclude = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
+      $regexToExclude = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN|IF)[[:blank:]]*\(/i';
       foreach ($selectClauses as $key => $val) {
         $aliasArray = preg_split('/ as /i', $val);
         // if more than 1 alias we need to split by ','.
@@ -4961,7 +4961,8 @@ civicrm_relationship.is_permission_a_b = 0
     $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
     $order = " ORDER BY pnc.id";
     $groupByCol = array('contact_a.id', 'pnc.id');
-    $groupBy = self::getGroupByFromSelectColumns($this->_select, $groupByCol);
+    $select = self::appendAnyValueToSelect($this->_select, $groupByCol, 'GROUP_CONCAT');
+    $groupBy = " GROUP BY " . implode(', ', $groupByCol);
     $limit = " LIMIT $offset, $rowCount";
     $query = "$select $from $where $groupBy $order $limit";
 
