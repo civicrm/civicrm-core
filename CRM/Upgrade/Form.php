@@ -69,24 +69,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   public $locales;
 
   /**
-   * Number to string mapper.
-   *
-   * @var array
-   */
-  static $_numberMap = array(
-    0 => 'Zero',
-    1 => 'One',
-    2 => 'Two',
-    3 => 'Three',
-    4 => 'Four',
-    5 => 'Five',
-    6 => 'Six',
-    7 => 'Seven',
-    8 => 'Eight',
-    9 => 'Nine',
-  );
-
-  /**
    * Constructor for the basic form page.
    *
    * We should not use QuickForm directly. This class provides a lot
@@ -137,7 +119,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
     static $incrementalPhpObject = array();
 
     $versionParts = explode('.', $version);
-    $versionName = self::$_numberMap[$versionParts[0]] . self::$_numberMap[$versionParts[1]];
+    $versionName = CRM_Utils_EnglishNumber::toCamelCase($versionParts[0]) . CRM_Utils_EnglishNumber::toCamelCase($versionParts[1]);
 
     if (!array_key_exists($versionName, $incrementalPhpObject)) {
       $className = "CRM_Upgrade_Incremental_php_{$versionName}";
