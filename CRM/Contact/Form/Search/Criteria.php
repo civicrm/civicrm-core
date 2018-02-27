@@ -396,9 +396,9 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('text', 'changed_by', ts('Modified By'), NULL);
 
     $dates = array(1 => ts('Added'), 2 => ts('Modified'));
-    $form->addRadio('log_date', NULL, $dates, array('allowClear' => TRUE), '<br />');
+    $form->addRadio('log_date', NULL, $dates, array('allowClear' => TRUE));
 
-    CRM_Core_Form_Date::buildDateRange($form, 'log_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'log_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
   }
 
   /**
