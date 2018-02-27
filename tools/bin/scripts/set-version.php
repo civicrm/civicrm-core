@@ -61,6 +61,10 @@ updateFile("xml/version.xml", function ($content) use ($newVersion, $oldVersion)
   return str_replace($oldVersion, $newVersion, $content);
 });
 
+updateFile("civicrm-version.php", function ($content) use ($newVersion, $oldVersion) {
+  return str_replace($oldVersion, $newVersion, $content);
+});
+
 updateFile("sql/civicrm_generated.mysql", function ($content) use ($newVersion, $oldVersion) {
   return str_replace($oldVersion, $newVersion, $content);
 });
