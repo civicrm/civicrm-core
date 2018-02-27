@@ -866,7 +866,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
           if (empty($field['no_display'])) {
-            if (isset($field['required'])) {
+            if (!empty($field['required'])) {
               // set default
               $this->_defaults['fields'][$fieldName] = 1;
 
