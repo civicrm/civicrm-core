@@ -54,8 +54,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
   /**
    * Set default values for the form.
    *
-   *
-   * @return void
+   * @return array
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -174,7 +173,6 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
 
   /**
    * Process the form submission.
-   *
    *
    * @return void
    */
