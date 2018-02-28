@@ -1595,11 +1595,7 @@ class CRM_Contact_BAO_Query {
       }
     }
 
-    foreach ($formValues as $id => &$val) {
-      // CRM-19374 - we don't want to change $val in $formValues.
-      // Assign it to a temp variable which operates while iteration.
-      $values = $val;
-
+    foreach ($formValues as $id => $values) {
       if (self::isAlreadyProcessedForQueryFormat($values)) {
         $params[] = $values;
         continue;
