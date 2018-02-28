@@ -3465,7 +3465,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     ) {
       $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $entityId, 'event_id');
       $feeLevel[] = str_replace('', '', $params['prevContribution']->amount_level);
-      CRM_Event_BAO_Participant::createDiscountTrxn($eventID, $params, $feeLevel, CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
+      $priceFieldValueId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $params['id'], 'price_field_value_id', 'contribution_id');
+      CRM_Event_BAO_Participant::createDiscountTrxn($eventID, $params, $feeLevel, $priceFieldValueId);
     }
     unset($params['line_item']);
     self::$_trxnIDs = NULL;
