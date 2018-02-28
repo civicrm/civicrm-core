@@ -43,14 +43,21 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
   public $_freqUnits;
 
+  protected $_compId;
+
   /**
-   * Context of the form being loaded.
-   *
-   * 'event' or null
-   *
-   * @var string
+   * @return mixed
    */
-  protected $context;
+  public function getComponentID() {
+    return $this->_compId;
+  }
+
+  /**
+   * @param mixed $compId
+   */
+  public function setComponentID($compId) {
+    $this->_compId = $compId;
+  }
 
   /**
    * Build the form object.
@@ -59,21 +66,17 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     parent::buildQuickForm();
     $this->_mappingID = $mappingID = NULL;
     $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
-    $this->context = CRM_Utils_Request::retrieve('context', 'String', $this);
-    if ($this->context == 'event') {
-      $this->_compId = CRM_Utils_Request::retrieve('compId', 'Integer', $this);
-    }
+    $this->setContext();
+    $isEvent = $this->getContext() == 'event';
 
-    //CRM-16777: Don't provide access to administer schedule reminder page, with user that does not have 'administer CiviCRM' permission
-    if (!$this->context && !CRM_Core_Permission::check('administer CiviCRM')) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
-    }
-    //CRM-16777: When user have ACLs 'edit' permission for specific event, do not give access to add, delete & updtae
-    //schedule reminder for other events.
-    else {
-      if (!CRM_Event_BAO_Event::checkPermission($this->_compId, CRM_Core_Permission::EDIT)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    if ($isEvent) {
+      $this->setComponentID(CRM_Utils_Request::retrieve('compId', 'Integer', $this));
+      if (!CRM_Event_BAO_Event::checkPermission($this->getComponentID(), CRM_Core_Permission::EDIT)) {
+        throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
       }
+    }
+    elseif (!CRM_Core_Permission::check('administer CiviCRM')) {
+      throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
     }
 
     if ($this->_action & (CRM_Core_Action::DELETE)) {
@@ -84,8 +87,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     elseif ($this->_action & (CRM_Core_Action::UPDATE)) {
       $this->_mappingID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionSchedule', $this->_id, 'mapping_id');
     }
-    if ($this->context == 'event') {
-      $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_compId, 'is_template');
+    if ($isEvent) {
+      $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->getComponentID(), 'is_template');
       $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
         'id' => $isTemplate ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
       )));
@@ -93,16 +96,16 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         $this->_mappingID = $mapping->getId();
       }
       else {
-        CRM_Core_Error::fatal('Could not find mapping for event scheduled reminders.');
+        throw new CRM_Core_Exception('Could not find mapping for event scheduled reminders.');
       }
     }
 
-    if (!empty($_POST) && !empty($_POST['entity']) && empty($this->context)) {
+    if (!empty($_POST) && !empty($_POST['entity']) && empty($this->getContext())) {
       $mappingID = $_POST['entity'][0];
     }
     elseif ($this->_mappingID) {
       $mappingID = $this->_mappingID;
-      if ($this->context == 'event') {
+      if ($isEvent) {
         $this->add('hidden', 'mappingID', $mappingID);
       }
     }
@@ -125,7 +128,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels))
     ));
 
-    if (!$this->context) {
+    if (!$this->getContext()) {
       $sel = &$this->add(
         'hierselect',
         'entity',
@@ -160,7 +163,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $attributes = array('multiple' => 'multiple', 'class' => 'crm-select2 huge', 'placeholder' => $options[0]);
       unset($options[0]);
       $this->add('select', 'entity', ts('Recipient(s)'), $options, TRUE, $attributes);
-      $this->assign('context', $this->context);
+      $this->assign('context', $this->getContext());
     }
 
     //get the frequency units.
@@ -245,7 +248,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     );
 
     if (!empty($this->_submitValues['recipient_listing'])) {
-      if ($this->context) {
+      if ($this->getContext()) {
         $recipientListingOptions = CRM_Core_BAO_ActionSchedule::getRecipientListing($this->_mappingID, $this->_submitValues['recipient']);
       }
       else {
@@ -327,7 +330,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $errors['html_message'] = ts('The HTML message is a required field.');
     }
 
-    if (empty($self->context) && CRM_Utils_System::isNull(CRM_Utils_Array::value(1, $fields['entity']))) {
+    if (empty($self->getContext()) && CRM_Utils_System::isNull(CRM_Utils_Array::value(1, $fields['entity']))) {
       $errors['entity'] = ts('Please select entity value');
     }
 
@@ -386,7 +389,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $defaults = $this->_values;
       $entityValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, CRM_Utils_Array::value('entity_value', $defaults));
       $entityStatus = explode(CRM_Core_DAO::VALUE_SEPARATOR, CRM_Utils_Array::value('entity_status', $defaults));
-      if (empty($this->context)) {
+      if (empty($this->getContext())) {
         $defaults['entity'][0] = CRM_Utils_Array::value('mapping_id', $defaults);
         $defaults['entity'][1] = $entityValue;
         $defaults['entity'][2] = $entityStatus;
@@ -432,9 +435,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       // delete reminder
       CRM_Core_BAO_ActionSchedule::del($this->_id);
       CRM_Core_Session::setStatus(ts('Selected Reminder has been deleted.'), ts('Record Deleted'), 'success');
-      if ($this->context == 'event' && $this->_compId) {
+      if ($this->getContext() == 'event' && $this->getComponentID()) {
         $url = CRM_Utils_System::url('civicrm/event/manage/reminder',
-          "reset=1&action=browse&id={$this->_compId}&component={$this->context}&setTab=1"
+          "reset=1&action=browse&id=" . $this->getComponentID() . "&component=" . $this->getContext() . "&setTab=1"
         );
         $session = CRM_Core_Session::singleton();
         $session->pushUserContext($url);
@@ -459,8 +462,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         );
       }
 
-      if ($this->context == 'event' && $this->_compId) {
-        $url = CRM_Utils_System::url('civicrm/event/manage/reminder', "reset=1&action=browse&id={$this->_compId}&component={$this->context}&setTab=1");
+      if ($this->getContext() == 'event' && $this->getComponentID()) {
+        $url = CRM_Utils_System::url('civicrm/event/manage/reminder', "reset=1&action=browse&id=" . $this->getComponentID() . "&component=" . $this->getContext() . "&setTab=1");
         $session = CRM_Core_Session::singleton();
         $session->pushUserContext($url);
       }
@@ -545,9 +548,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params['group_id'] = $params['recipient_manual'] = $params['recipient_listing'] = 'null';
     }
 
-    if (!empty($this->_mappingID) && !empty($this->_compId)) {
+    if (!empty($this->_mappingID) && !empty($this->getComponentID())) {
       $params['mapping_id'] = $this->_mappingID;
-      $params['entity_value'] = $this->_compId;
+      $params['entity_value'] = $this->getComponentID();
       $params['entity_status'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $values['entity']);
     }
     else {
