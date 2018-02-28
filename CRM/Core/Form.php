@@ -180,6 +180,29 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public $urlPath = array();
 
   /**
+   * Context of the form being loaded.
+   *
+   * 'event' or null
+   *
+   * @var string
+   */
+  protected $context;
+
+  /**
+   * @return string
+   */
+  public function getContext() {
+    return $this->context;
+  }
+
+  /**
+   * Set context variable.
+   */
+  public function setContext() {
+    $this->context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
+  }
+
+  /**
    * @var CRM_Core_Controller
    */
   public $controller;
