@@ -60,6 +60,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->_mappingID = $mappingID = NULL;
     $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
     $this->context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    if ($this->context == 'event') {
+      $this->_compId = CRM_Utils_Request::retrieve('compId', 'Integer', $this);
+    }
 
     //CRM-16777: Don't provide access to administer schedule reminder page, with user that does not have 'administer CiviCRM' permission
     if (!$this->context && !CRM_Core_Permission::check('administer CiviCRM')) {
@@ -68,7 +71,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     //CRM-16777: When user have ACLs 'edit' permission for specific event, do not give access to add, delete & updtae
     //schedule reminder for other events.
     else {
-      $this->_compId = CRM_Utils_Request::retrieve('compId', 'Integer', $this);
       if (!CRM_Event_BAO_Event::checkPermission($this->_compId, CRM_Core_Permission::EDIT)) {
         CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
@@ -76,20 +78,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     if ($this->_action & (CRM_Core_Action::DELETE)) {
       $reminderName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionSchedule', $this->_id, 'title');
-      if ($this->context == 'event') {
-        $this->_compId = CRM_Utils_Request::retrieve('compId', 'Integer', $this);
-      }
       $this->assign('reminderName', $reminderName);
       return;
     }
     elseif ($this->_action & (CRM_Core_Action::UPDATE)) {
       $this->_mappingID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionSchedule', $this->_id, 'mapping_id');
-      if ($this->context == 'event') {
-        $this->_compId = CRM_Utils_Request::retrieve('compId', 'Integer', $this);
-      }
     }
     if ($this->context == 'event') {
-      $this->_compId = CRM_Utils_Request::retrieve('compId', 'Integer', $this);
       $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_compId, 'is_template');
       $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
         'id' => $isTemplate ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
