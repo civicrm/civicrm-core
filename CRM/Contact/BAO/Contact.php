@@ -984,6 +984,10 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       $contact->delete();
     }
     else {
+       // CRM-21685 set relationships to disabled before trashing the contact
+      if (method_exists('CRM_Contact_BAO_Relationship', 'disableRelationshipsForContact')) {
+        CRM_Contact_BAO_Relationship::disableRelationshipsForContact($id);
+      }
       self::contactTrashRestore($contact);
     }
 
