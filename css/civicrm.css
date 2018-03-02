@@ -3124,6 +3124,10 @@ div.m ul#civicrm-menu,
 .crm-container .select2-container[class*=" fa-"]:before {
   display: none;
 }
+.crm-container .select2-results .select2-result.select2-disabled > .select2-result-label {
+  opacity: .6;
+  cursor: default;
+}
 
 /* Restore this property otherwise our css overrides it */
 .select2-search input {

@@ -51,10 +51,22 @@
     }
   }
 
+  function getOptionList() {
+    var list = [];
+    _.forEach(options, function(option) {
+      var opt = _.cloneDeep(option);
+      if ($('[name="config_' + opt.id + '"]').length) {
+        opt.disabled = true;
+      }
+      list.push(opt);
+    });
+    return {results: list, text: 'id'};
+  }
+
   function addOption() {
     $('#crm-custom-config-options').append($(configRowTpl({})));
     $('div:last input.crm-config-option-name', '#crm-custom-config-options').crmSelect2({
-      data: {results: options, text: 'id'},
+      data: getOptionList,
       formatSelection: function(field) {
         return '<strong>' + field.id + '</strong> (' + field.type + ')';
       },
