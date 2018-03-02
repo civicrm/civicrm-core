@@ -1444,11 +1444,7 @@ class CRM_Contact_BAO_Query {
         }
       }
 
-      $select = "SELECT ";
-      if (isset($this->_distinctComponentClause)) {
-        $select .= "{$this->_distinctComponentClause}, ";
-      }
-      $select .= implode(', ', $this->_select);
+      $select = $this->getSelect();
       $from = $this->_fromClause;
     }
 
@@ -6540,6 +6536,20 @@ AND   displayRelType.is_active = 1
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Get Select Clause.
+   *
+   * @return string
+   */
+  public function getSelect() {
+    $select = "SELECT ";
+    if (isset($this->_distinctComponentClause)) {
+      $select .= "{$this->_distinctComponentClause}, ";
+    }
+    $select .= implode(', ', $this->_select);
+    return $select;
   }
 
 }

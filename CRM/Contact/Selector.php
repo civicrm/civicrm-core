@@ -1005,15 +1005,14 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // For custom searches, use the contactIDs method
     if (is_a($this, 'CRM_Contact_Selector_Custom')) {
       $sql = $this->_search->contactIDs($start, $end, $sort, TRUE);
-      $replaceSQL = "SELECT contact_a.id as contact_id";
       $coreSearch = FALSE;
     }
     // For core searches use the searchQuery method
     else {
       $sql = $this->_query->searchQuery($start, $end, $sort, FALSE, $this->_query->_includeContactIds,
         FALSE, TRUE, TRUE);
-      $replaceSQL = "SELECT contact_a.id as id";
     }
+    $replaceSQL = $this->_query->getSelect();
 
     // CRM-9096
     // due to limitations in our search query writer, the above query does not work
@@ -1030,20 +1029,17 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
 ";
 
     $sql = str_replace($replaceSQL, $insertSQL, $sql);
-
-    $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-    $result = CRM_Core_DAO::executeQuery($sql);
-    unset($errorScope);
-
-    if (is_a($result, 'DB_Error')) {
-      // check if we get error during core search
+    try {
+      CRM_Core_DAO::executeQuery($sql);
+    }
+    catch (CRM_Core_Exception $e) {
       if ($coreSearch) {
         // in the case of error, try rebuilding cache using full sql which is used for search selector display
         // this fixes the bugs reported in CRM-13996 & CRM-14438
         $this->rebuildPreNextCache($start, $end, $sort, $cacheKey);
       }
       else {
-        // return if above query fails
+        CRM_Core_Session::setStatus(ts('Query Failed'));
         return;
       }
     }
