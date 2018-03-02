@@ -2149,4 +2149,28 @@ AND cc.sort_name LIKE '%$name%'";
     return $relationshipsDT;
   }
 
+  /**
+   * Method to disable relationships of a specific contact
+   *
+   * @param $contactId
+   */
+  public static function disableRelationshipsForContact($contactId) {
+    try {
+      $result = civicrm_api3('Relationship', 'get', array(
+        'contact_id' => $contactId,
+        'is_active' => 1,
+        'options' => array('limit' => 0),
+      ));
+      foreach ($result['values'] as $relationshipId => $relationship) {
+        civicrm_api3('Relationship', 'create', array(
+          'id' => $relationshipId,
+          'is_active' => 0,
+        ));
+      }
+    }
+    catch (CiviCRM_API3_Exception $ex) {
+      CRM_Core_Error::debug_log_message('Unexpected error from API Relationship in ' .__METHOD__ . ', error message from API : ' . $ex->getMessage());
+    }
+  }
+
 }
