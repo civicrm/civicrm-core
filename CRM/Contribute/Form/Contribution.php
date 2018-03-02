@@ -237,6 +237,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // Get the contribution id if update
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     if (!empty($this->_id)) {
+      $this->assignPaymentInfoBlock();
       $this->assign('contribID', $this->_id);
     }
 
@@ -627,11 +628,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $paymentInstrument = FALSE;
     if (!$this->_mode) {
+      // payment_instrument isn't required in edit and will not be present when payment block is enabled.
+      $required = $this->_id ? FALSE : TRUE;
       $checkPaymentID = array_search('Check', CRM_Contribute_PseudoConstant::paymentInstrument('name'));
       $paymentInstrument = $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-        TRUE, array('onChange' => "return showHideByValue('payment_instrument_id','{$checkPaymentID}','checkNumber','table-row','select',false);")
+        $required, array('onChange' => "return showHideByValue('payment_instrument_id','{$checkPaymentID}','checkNumber','table-row','select',false);")
       );
     }
 
