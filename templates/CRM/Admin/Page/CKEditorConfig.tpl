@@ -60,6 +60,10 @@
     border-bottom: 0 none;
     padding: 3px 10px 1px !important;
   }
+  .crm-config-option-row span.crm-error:after {
+    font-family: FontAwesome;
+    content: " \f071 Invalid JSON"
+  }
 {/literal}</style>
 {* Force the custom config file to reload by appending a new query string *}
 <script type="text/javascript">
