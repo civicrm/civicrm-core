@@ -70,6 +70,13 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
     foreach ($dataSet['expected_query'] as $index => $queryString) {
       $this->assertEquals($this->strWrangle($queryString), $this->strWrangle($sql[$index]));
     }
+    // Ensure that search builder return individual contact as per criteria
+    if (!empty($dataSet['context'] == 'builder')) {
+      $contactID = $this->individualCreate();
+      $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
+      $this->assertEquals(1, count($rows));
+      $this->assertEquals($contactID, key($rows));
+    }
   }
 
   /**
@@ -151,6 +158,29 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
             0 => 'default',
             1 => 'default',
             2 => "WHERE  ( civicrm_email.email = 'mickey@mouseville.com'  AND ( ( ( contact_a.sort_name LIKE 'mouse%' ) OR ( civicrm_email.email LIKE 'mouse%' ) ) ) ) AND (contact_a.is_deleted = 0)",
+          ),
+        ),
+      ),
+      array(
+        array(
+          'description' => 'Normal search builder behaviour',
+          'class' => 'CRM_Contact_Selector',
+          'settings' => array(),
+          'form_values' => array('contact_type' => 'Individual'),
+          'params' => array(),
+          'return_properties' => array(
+            'contact_type' => 1,
+            'contact_sub_type' => 1,
+            'sort_name' => 1,
+          ),
+          'context' => 'builder',
+          'action' => CRM_Core_Action::NONE,
+          'includeContactIds' => NULL,
+          'searchDescendentGroups' => FALSE,
+          'expected_query' => array(
+            0 => 'SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`',
+            1 => ' FROM civicrm_contact contact_a',
+            2 => 'WHERE  ( contact_a.contact_type IN ("Individual") )  AND (contact_a.is_deleted = 0)',
           ),
         ),
       ),
