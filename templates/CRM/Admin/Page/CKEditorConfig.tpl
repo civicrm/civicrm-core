@@ -105,7 +105,7 @@
     <div class="crm-block crm-form-block">
       <fieldset>
         <legend>{ts}Advanced Options{/ts}</legend>
-        <div class="description">{ts 1='href="http://docs.ckeditor.com/#!/api/CKEDITOR.config" target="_blank"'}Refer to the <a %1>CKEditor Api Documentation</a> for details.{/ts}</div>
+        <div class="description">{ts 1='href="https://docs.ckeditor.com/ckeditor4/latest/api/CKEDITOR_config.html" target="_blank"'}Refer to the <a %1>CKEditor Api Documentation</a> for details.{/ts}</div>
         <div id="crm-custom-config-options"></div>
       </fieldset>
     </div>
