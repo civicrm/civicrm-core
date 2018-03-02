@@ -2455,13 +2455,17 @@ abstract class CRM_Utils_Hook {
    *  Allows user to alter filter and/or search query to fetch mail recipients
    *
    * @param CRM_Mailing_DAO_Mailing $mailingObject
-   * @param array $params
+   * @param array $criteria
+   *   A list of SQL criteria; you can add/remove/replace/modify criteria.
+   *   Array(string $name => CRM_Utils_SQL_Select $criterion).
+   *   Ex: array('do_not_email' => CRM_Utils_SQL_Select::fragment()->where("$contact.do_not_email = 0")).
    * @param string $context
-   *
+   *   Ex: 'pre', 'post'
+   * @return mixed
    */
-  public static function alterMailingRecipients(&$mailingObject, &$params, $context) {
+  public static function alterMailingRecipients(&$mailingObject, &$criteria, $context) {
     return self::singleton()->invoke(array('mailingObject', 'params', 'context'),
-      $mailingObject, $params, $context,
+      $mailingObject, $criteria, $context,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_alterMailingRecipients'
     );
