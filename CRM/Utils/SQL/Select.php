@@ -177,13 +177,20 @@ class CRM_Utils_SQL_Select implements ArrayAccess {
   /**
    * Merge something or other.
    *
-   * @param CRM_Utils_SQL_Select $other
+   * @param array|CRM_Utils_SQL_Select $other
    * @param array|NULL $parts
    *   ex: 'joins', 'wheres'
    * @return CRM_Utils_SQL_Select
    */
   public function merge($other, $parts = NULL) {
     if ($other === NULL) {
+      return $this;
+    }
+
+    if (is_array($other)) {
+      foreach ($other as $fragment) {
+        $this->merge($fragment, $parts);
+      }
       return $this;
     }
 
