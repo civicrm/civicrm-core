@@ -132,7 +132,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
       $val = trim($val);
       if (strpos($key, 'config_') === 0 && strlen($val)) {
         if ($val != 'true' && $val != 'false' && $val != 'null' && $val[0] != '{' && $val[0] != '[' && !is_numeric($val)) {
-          $val = json_encode($val);
+          $val = json_encode($val, JSON_UNESCAPED_SLASHES);
         }
         $pos = strrpos($config, '};');
         $key = preg_replace('/^config_/', 'config.', $key);
