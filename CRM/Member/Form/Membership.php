@@ -926,11 +926,29 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
     // get the submitted form values.
     $this->_params = $this->controller->exportValues($this->_name);
-    $this->convertIsOverrideValue();
+    $this->prepareStatusOverrideValues();
 
     $this->submit();
 
     $this->setUserContext();
+  }
+
+  /**
+   * Prepares the values related to status override.
+   */
+  private function prepareStatusOverrideValues() {
+    $this->setOverrideDateValue();
+    $this->convertIsOverrideValue();
+  }
+
+  /**
+   * Sets status override end date to empty value if
+   * the selected override option is not 'until date'.
+   */
+  private function setOverrideDateValue() {
+    if (!CRM_Member_StatusOverrideTypes::isUntilDate($this->_params['is_override'])) {
+      $this->_params['status_override_end_date'] = '';
+    }
   }
 
   /**
