@@ -109,7 +109,7 @@
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-elements">
-        <td class="label">{ts}Elements{/ts}</td>
+        <td class="label"><label>{ts}Elements{/ts}</label></td>
         <td>
           <table class="form-layout-compressed">
             <tr>
