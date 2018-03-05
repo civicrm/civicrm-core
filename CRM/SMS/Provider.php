@@ -76,11 +76,11 @@ abstract class CRM_SMS_Provider {
         require_once "{$providerClass}.php";
       }
       else {
-        // If we are running unit tests we simulate an SMS provider with the name "testSmsProvider"
-        if ($providerName !== 'testSmsProvider') {
+        // If we are running unit tests we simulate an SMS provider with the name "CiviTestSMSProvider"
+        if ($providerName !== 'CiviTestSMSProvider') {
           CRM_Core_Error::fatal("Could not locate extension for {$providerName}.");
         }
-        $providerClass = 'testSmsProvider';
+        $providerClass = 'CiviTestSMSProvider';
       }
 
       self::$_singleton[$cacheKey] = $providerClass::singleton($providerParams, $force);

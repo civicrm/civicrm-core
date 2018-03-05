@@ -9,6 +9,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     parent::setUp();
     $this->prepareForACLs();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('view all contacts', 'access CiviCRM');
+    $this->setupForSmsTests();
   }
 
   /**
@@ -24,7 +25,41 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     );
     $this->quickCleanup($tablesToTruncate);
     $this->cleanUpAfterACLs();
+    $this->setupForSmsTests(TRUE);
     parent::tearDown();
+  }
+
+  /**
+   * Setup or clean up SMS tests
+   * @param bool $teardown
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function setupForSmsTests($teardown = FALSE) {
+    require_once 'CiviTest/CiviTestSMSProvider.php';
+
+    // Option value params for CiviTestSMSProvider
+    $groupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'sms_provider_name', 'id', 'name');
+    $params = array(
+      'option_group_id' => $groupID,
+      'label' => 'unittestSMS',
+      'value' => 'unit.test.sms',
+      'name'  => 'CiviTestSMSProvider',
+      'is_default' => 1,
+      'is_active'  => 1,
+      'version'    => 3,
+    );
+
+    if ($teardown) {
+      // Test completed, delete provider
+      $providerOptionValueResult = civicrm_api3('option_value', 'get', $params);
+      civicrm_api3('option_value', 'delete', array('id' => $providerOptionValueResult['id']));
+      return;
+    }
+
+    // Create an SMS provider "CiviTestSMSProvider". Civi handles "CiviTestSMSProvider" as a special case and allows it to be instantiated
+    //  in CRM/Sms/Provider.php even though it is not an extension.
+    civicrm_api3('option_value', 'create', $params);
   }
 
   /**
@@ -1152,6 +1187,128 @@ $text
       $dummy,
       $session->get('userID')
     );
+  }
+
+  public function testSendSmsNoPhoneNumber() {
+    list($sent, $activityId, $success) = $this->createSendSmsTest(0);
+    $activity = $this->civicrm_api('activity', 'getsingle', array('id' => $activityId, 'version' => $this->_apiversion));
+
+    $outBoundSmsActivityId = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS');
+    $activityStatusCompleted = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
+    $details = 'createSendSmsTest text';
+    $this->assertEquals($activity['activity_type_id'], $outBoundSmsActivityId, 'Wrong activity type is set.');
+    $this->assertEquals($activity['status_id'], $activityStatusCompleted, 'Expected activity status Completed.');
+    $this->assertEquals($activity['subject'], 'createSendSmsTest subject', 'Activity subject does not match.');
+    $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
+    $this->assertEquals("Recipient phone number is invalid or recipient does not want to receive SMS", $sent[0]->message, "Expected error doesn't match");
+    $this->assertEquals(0, $success, "Expected success to be 0");
+  }
+
+  public function testSendSmsFixedPhoneNumber() {
+    list($sent, $activityId, $success) = $this->createSendSmsTest(1);
+    $activity = $this->civicrm_api('activity', 'getsingle', array('id' => $activityId, 'version' => $this->_apiversion));
+
+    $outBoundSmsActivityId = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS');
+    $activityStatusCompleted = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
+    $details = 'createSendSmsTest text';
+    $this->assertEquals($activity['activity_type_id'], $outBoundSmsActivityId, 'Wrong activity type is set.');
+    $this->assertEquals($activity['status_id'], $activityStatusCompleted, 'Expected activity status Completed.');
+    $this->assertEquals($activity['subject'], 'createSendSmsTest subject', 'Activity subject does not match.');
+    $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
+    $this->assertEquals("Recipient phone number is invalid or recipient does not want to receive SMS", $sent[0]->message, "Expected error doesn't match");
+    $this->assertEquals(0, $success, "Expected success to be 0");
+  }
+
+  public function testSendSmsMobilePhoneNumber() {
+    list($sent, $activityId, $success) = $this->createSendSmsTest(2);
+    $activity = $this->civicrm_api('activity', 'getsingle', array('id' => $activityId, 'version' => $this->_apiversion));
+
+    $outBoundSmsActivityId = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS');
+    $activityStatusCompleted = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
+    $details = 'createSendSmsTest text';
+    $this->assertEquals($activity['activity_type_id'], $outBoundSmsActivityId, 'Wrong activity type is set.');
+    $this->assertEquals($activity['status_id'], $activityStatusCompleted, 'Expected activity status Completed.');
+    $this->assertEquals($activity['subject'], 'createSendSmsTest subject', 'Activity subject does not match.');
+    $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
+    $this->assertEquals(TRUE, $sent, "Expected sent should be true");
+    $this->assertEquals(1, $success, "Expected success to be 1");
+  }
+
+  /**
+   * @param int $phoneType (0=no phone, phone_type option group (1=fixed, 2=mobile)
+   */
+  public function createSendSmsTest($phoneType = 0) {
+    $provider = civicrm_api3('SmsProvider', 'create', array(
+      'name' => "CiviTestSMSProvider",
+      'api_type' => "1",
+      "username" => "1",
+      "password" => "1",
+      "api_type" => "1",
+      "api_url" => "1",
+      "api_params" => "a=1",
+      "is_default" => "1",
+      "is_active" => "1",
+      "domain_id" => "1",
+    ));
+    $smsProviderParams['provider_id'] = $provider['id'];
+
+    // Create a contact
+    $contactId = $this->individualCreate();
+    $contactsResult = $this->civicrm_api('contact', 'get', array('id' => $contactId, 'version' => $this->_apiversion));
+    $contactDetails = $contactsResult['values'];
+
+    // Get contactIds from contact details
+    foreach ($contactDetails as $contact) {
+      $contactIds[] = $contact['contact_id'];
+    }
+
+    $activityParams['sms_text_message'] = __FUNCTION__ . ' text';
+    $activityParams['activity_subject'] = __FUNCTION__ . ' subject';
+
+    // ActivityParams is overwritten by sendSms but we need it for results
+    $activityParamsCopy = $activityParams;
+
+    // Get a "logged in" user to set as source of Sms.
+    $session = CRM_Core_Session::singleton();
+    $sourceContactId = $session->get('userID');
+
+    // Create a user, then a phone number
+    $this->_testSmsContactId = $this->createLoggedInUser();
+    // Create phone number
+    switch ($phoneType) {
+      case 0:
+        // No phone number
+        break;
+
+      case 2:
+        // Create a mobile phone number
+        $phone = civicrm_api3('Phone', 'create', array(
+          'contact_id' => $contactId,
+          'phone' => 123456,
+          'phone_type_id' => "Mobile",
+        ));
+        break;
+
+      case 1:
+        // Create a fixed phone number
+        $phone = civicrm_api3('Phone', 'create', array(
+          'contact_id' => $contactId,
+          'phone' => 654321,
+          'phone_type_id' => "Phone",
+        ));
+        break;
+    }
+
+    // Now run the actual test
+    list($sent, $activityId, $success) = CRM_Activity_BAO_Activity::sendSms(
+      $contactDetails,
+      $activityParams,
+      $smsProviderParams,
+      $contactIds,
+      $sourceContactId
+    );
+
+    return array($sent, $activityId, $success);
   }
 
 }
