@@ -41,6 +41,12 @@ INSERT INTO
 VALUES
   (@option_group_id_adOpt, {localize}'{ts escape="sql"}Supplemental Address 3{/ts}'{/localize}, (SELECT @max_val := @max_val + 1), 'supplemental_address_3', NULL, 0, NULL, (SELECT @supp2_wt := @supp2_wt + 1), {localize}''{/localize}, 0, 0, 1, NULL, NULL, NULL);
 
+-- Some legacy sites have `0000-00-00 00:00:00` values in
+-- `civicrm_financial_trxn.trxn_date` which correspond to the same value in
+-- `civicrm_contribution.receive_date`
+UPDATE civicrm_financial_trxn SET trxn_date = NULL WHERE trxn_date = '0000-00-00 00:00:00';
+UPDATE civicrm_contribution SET receive_date = NULL WHERE receive_date = '0000-00-00 00:00:00';
+
 -- CRM-20439 rename card_type to card_type_id of civicrm_financial_trxn table (IIDA-126)
 ALTER TABLE `civicrm_financial_trxn` CHANGE `card_type` `card_type_id` INT(10) UNSIGNED NULL DEFAULT NULL COMMENT 'FK to accept_creditcard option group values';
 
