@@ -1,6 +1,8 @@
 ![](i/logo_lg.png) Welcome to CiviCRM
 =====================================
 
+TESTING THE CI
+
 About
 -----
 
