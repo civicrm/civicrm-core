@@ -205,8 +205,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
         $this->addRowSelectors($rows);
       }
 
-      $permission = CRM_Core_Permission::getPermission();
-      $allTasks = CRM_Campaign_Task::permissionedTaskTitles($permission);
+      $allTasks = CRM_Campaign_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission());
 
       //hack to serve right page to state machine.
       $taskMapping = array(
