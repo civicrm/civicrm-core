@@ -4890,7 +4890,10 @@ civicrm_relationship.is_permission_a_b = 0
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
 
     if (!empty($groupByCols)) {
-      $select = self::appendAnyValueToSelect($this->_select, $groupByCols, 'GROUP_CONCAT');
+      // It doesn't matter to include columns in SELECT clause, which are present in GROUP BY when we just want the contact IDs
+      if (!$groupContacts) {
+        $select = self::appendAnyValueToSelect($this->_select, $groupByCols, 'GROUP_CONCAT');
+      }
       $groupBy = " GROUP BY " . implode(', ', $groupByCols);
       if (!empty($order)) {
         // retrieve order by columns from ORDER BY clause
