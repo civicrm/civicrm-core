@@ -69,9 +69,9 @@
     <td class="crm-membership-status crm-membership-status_{$row.membership_status}">{$row.membership_status}</td>
     <td class="crm-membership-auto_renew">
       {if $row.auto_renew eq 1}
-        <i class="fa fa-check" aria-hidden="true" title="{ts}Auto-renew active{/ts}"></i>
+        <i class="crm-i fa-check" aria-hidden="true" title="{ts}Auto-renew active{/ts}"></i>
       {elseif $row.auto_renew eq 2}
-        <i class="fa fa-exclamation" aria-hidden="true" title="{ts}Auto-renew error{/ts}"></i>
+        <i class="crm-i fa-ban" aria-hidden="true" title="{ts}Auto-renew error{/ts}"></i>
       {/if}
     </td>
     <td>
