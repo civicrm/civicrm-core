@@ -172,7 +172,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
       $domainID = CRM_Core_Config::domainID();
       $query = "
 SELECT id, label, parent_id, weight, is_active, name
-FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY parent_id, weight ASC";
+FROM civicrm_navigation WHERE domain_id = $domainID";
       $result = CRM_Core_DAO::executeQuery($query);
 
       $pidGroups = array();
@@ -350,7 +350,6 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
    * ensure that any items added by the hook are also in the correct order.
    */
   private static function orderByWeight(&$navigations) {
-
     // sort each item in navigations by weight
     usort($navigations, function($a, $b) {
 
