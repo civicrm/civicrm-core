@@ -186,6 +186,9 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
         'sequential' => 1,
       ));
     $this->assertEquals(2, $contribution['count']);
+    // Ensure both contributions are coded as credit card contributions.
+    $this->assertEquals(1, $contribution['values'][0]['payment_instrument_id']);
+    $this->assertEquals(1, $contribution['values'][1]['payment_instrument_id']);
     $this->assertEquals('second_one', $contribution['values'][1]['trxn_id']);
     $this->callAPISuccessGetSingle('membership_payment', array('contribution_id' => $contribution['values'][1]['id']));
     $this->callAPISuccessGetSingle('line_item', array(
