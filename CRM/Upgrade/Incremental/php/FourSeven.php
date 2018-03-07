@@ -1410,4 +1410,26 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     return TRUE;
   }
 
+  /**
+   * 'Related Cases' tab for organizations: Add enable/disable 'Related Cases' setting
+   * @return bool
+   */
+  public static function settingForRelatedCasesTab() {
+    $domains = CRM_Core_DAO::executeQuery("SELECT DISTINCT d.id FROM civicrm_domain d LEFT JOIN civicrm_setting s ON d.id=s.domain_id AND s.name = 'civicaseRelatedCasesTab' WHERE s.id IS NULL");
+    while ($domains->fetch()) {
+      CRM_Core_DAO::executeQuery(
+        "INSERT INTO civicrm_setting (`name`, `value`, `domain_id`, `is_domain`, `contact_id`, `component_id`, `created_date`, `created_id`)
+          VALUES (%2, %3, %4, %5, NULL, NULL, %6, NULL)",
+        array(
+          2 => array('civicaseRelatedCasesTab', 'String'),
+          3 => array('s:1:"1";', 'String'),
+          4 => array($domains->id, 'Integer'),
+          5 => array(1, 'Integer'),
+          6 => array(date('Y-m-d H:i:s'), 'String'),
+        )
+      );
+    }
+    return TRUE;
+  }
+
 }

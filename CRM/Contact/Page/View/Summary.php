@@ -276,6 +276,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     // show the tabs only if user has generic access to CiviCRM
     $accessCiviCRM = CRM_Core_Permission::check('access CiviCRM');
 
+    $entityType = $this->get('contactType');
     $changeLog = $this->_viewOptions['log'];
     $this->assign_by_ref('changeLog', $changeLog);
     $components = CRM_Core_Component::getEnabledComponents();
@@ -310,6 +311,18 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
           'count' => CRM_Contact_BAO_Contact::getCountComponent($u, $this->_contactId),
           'class' => 'livePage',
         );
+        // Add "Related Cases" tab
+        if($i == 'case' && $entityType == 'Organization' && Civi::settings()->get('civicaseRelatedCasesTab')) {
+          $relIds = CRM_Case_BAO_Case::getOrganizationRelatedCaseIds($this->_contactId);
+          $allTabs[] = array(
+            'id' => 'relatedcases',
+            'url' => CRM_Utils_System::url("civicrm/contact/view/$u", $q."&relatedCases=1"),
+            'title' => 'Related Cases',
+            'weight' => $elem['weight']+1,
+            'count' => CRM_Contact_BAO_Contact::getCountComponent($u, $relIds),
+            'class' => 'livePage',
+          );
+        }
         // make sure to get maximum weight, rest of tabs go after
         // FIXME: not very elegant again
         if ($weight < $elem['weight']) {
@@ -359,7 +372,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
 
     // now add all the custom tabs
-    $entityType = $this->get('contactType');
     $activeGroups = CRM_Core_BAO_CustomGroup::getActiveGroups(
       $entityType,
       'civicrm/contact/view/cd',

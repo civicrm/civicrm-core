@@ -41,6 +41,7 @@ class CRM_Admin_Form_Setting_Case extends CRM_Admin_Form_Setting {
     'civicaseAllowMultipleClients' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'civicaseNaturalActivityTypeSort' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'civicaseActivityRevisions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'civicaseRelatedCasesTab' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
 
   /**
