@@ -137,6 +137,15 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     $mapFields = $this->get('fields');
 
+    // Check if CiviMember is enabled
+    $config = CRM_Core_Config::singleton();
+    $memberEnabled = in_array("CiviMember", $config->enableComponents);
+    if ($memberEnabled) {
+      // Add membership_id and external_membership_id fields
+      $mapFields['membership_id'] = ts('Membership ID');
+      $mapFields['external_membership_id'] = ts('Membership ID (External)');
+    }
+
     foreach ($mapper as $key => $value) {
       $header = array();
       if (isset($mapFields[$mapper[$key][0]])) {
