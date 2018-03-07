@@ -596,6 +596,14 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       $object->find(TRUE);
 
       CRM_Core_BAO_RecurringEntity::quickAdd($object->id, $newObject->id, $entityTable);
+      CRM_Core_DAO::copyCustomFields($object->id, $newObject->id, $entityTable);
+      CRM_Core_DAO::copyGeneric('CRM_Core_DAO_EntityTag',
+        array(
+          'entity_id' => $object->id,
+          'entity_table' => $entityTable,
+        ),
+        array('entity_id' => $newObject->id)
+      );
     }
     return $newObject;
   }
