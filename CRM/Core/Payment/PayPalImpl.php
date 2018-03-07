@@ -702,15 +702,30 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     if (is_numeric($lastParam)) {
       $params['processor_id'] = $lastParam;
     }
-    if (civicrm_api3('PaymentProcessor', 'getvalue', array(
-        'id' => $params['processor_id'],
-        'return' => 'class_name')
-      ) == 'Payment_PayPalImpl') {
-      $paypalIPN = new CRM_Core_Payment_PayPalIPN($params);
+    $result = civicrm_api3('PaymentProcessor', 'get', array(
+      'sequential' => 1,
+      'id' => $params['processor_id'],
+      'api.PaymentProcessorType.getvalue' => array('return' => "name"),
+    ));
+    switch ($result['values'][0]['api.PaymentProcessorType.getvalue']) {
+      case 'PayPal':
+        // "PayPal - Website Payments Pro"
+        $paypalIPN = new CRM_Core_Payment_PayPalProIPN($params);
+        break;
+
+      case 'PayPal_Standard':
+        // "PayPal - Website Payments Standard"
+        $paypalIPN = new CRM_Core_Payment_PayPalIPN($params);
+        break;
+
+      default:
+        // If we don't have PayPal Standard or PayPal Pro, something's wrong.
+        // Log an error and exit.
+        CRM_Core_Error::debug_log_message("The processor_id value '{$params['processor_id']}' is for a processor of type '{$result['values'][0]['api.PaymentProcessorType.getvalue']}', which is invalid in this context.");
+        echo "Failure: Invalid processor: " . CRM_Utils_Type::escape($params['processor_id'], 'String');
+        exit();
     }
-    else {
-      $paypalIPN = new CRM_Core_Payment_PayPalProIPN($params);
-    }
+
     $paypalIPN->main();
   }
 
