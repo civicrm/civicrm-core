@@ -33,7 +33,6 @@
     <div class="crm-content-block crm-block">
     {if $rows}
     <div id="mapping">
-    <p></p>
         <div class="form-item">
             {strip}
             <table cellpadding="0" cellspacing="0" border="0">
