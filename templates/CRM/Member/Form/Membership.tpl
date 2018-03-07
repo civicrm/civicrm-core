@@ -153,6 +153,10 @@
             <span class="description">{ts}Latest membership period expiration date. End Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span>
           </td>
         </tr>
+        <tr class="crm-membership-form-block-external_membership_id">
+          <td class="label">{$form.external_membership_id.label}</td>
+          <td class="view-value">{$form.external_membership_id.html}</td>
+        </tr>
         {if !$membershipMode}
           <tr>
             <td class="label">{$form.is_override.label} {help id="id-status-override"}</td>

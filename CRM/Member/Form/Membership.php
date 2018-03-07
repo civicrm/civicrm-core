@@ -597,6 +597,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         array('' => ts('- select -')) + CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label')
       );
 
+      // add External Identifier Element
+      $this->add('text', 'external_membership_id', ts('External Membership ID'),
+        CRM_Core_DAO::getAttribute('CRM_Member_DAO_Membership', 'external_membership_id'), FALSE
+      );
+
       $statusOverride = $this->addElement('select', 'is_override', ts('Status Override?'),
         CRM_Member_StatusOverrideTypes::getSelectOptions()
       );
@@ -1221,6 +1226,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       'is_override',
       'status_override_end_date',
       'campaign_id',
+      'external_membership_id',
     );
 
     foreach ($fields as $f) {

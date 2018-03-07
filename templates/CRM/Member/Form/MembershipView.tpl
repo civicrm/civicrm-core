@@ -60,6 +60,7 @@
         <tr><td class="label">{ts}Member Since{/ts}</td><td>{$join_date|crmDate}</td></tr>
         <tr><td class="label">{ts}Start date{/ts}</td><td>{$start_date|crmDate}</td></tr>
         <tr><td class="label">{ts}End date{/ts}</td><td>{$end_date|crmDate}</td></tr>
+        <tr><td class="label">{ts}External Membership ID{/ts}</td><td>{$external_membership_id}</td></tr>
         <tr><td class="label">{ts}Auto-renew{/ts}</td><td>{$auto_renew}</td></tr>
      {if $contribution_recur_id}
           <tr>

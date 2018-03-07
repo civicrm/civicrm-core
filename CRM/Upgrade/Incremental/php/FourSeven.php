@@ -504,6 +504,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
     $this->addTask('CRM-21733: Add status_override_end_date field to civicrm_membership table', 'addColumn', 'civicrm_membership', 'status_override_end_date',
       "date DEFAULT NULL COMMENT 'The end date of membership status override if (Override until selected date) override type is selected.'");
+    $this->addTask('CRM-21827: Add Membership External Id as a new field', 'civiMembershipAddExternalIdColumn');
   }
 
   /*
@@ -1407,6 +1408,19 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       $dataType = 'datetime';
     }
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_mailing CHANGE created_date created_date {$dataType} NULL DEFAULT NULL COMMENT 'Date and time this mailing was created.'");
+    return TRUE;
+  }
+
+  /**
+   * CRM-21827: Add Membership External Id as a new field
+   * @return bool
+   */
+  public static function civiMembershipAddExternalIdColumn(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_price_field_value`
+      ADD COLUMN `external_membership_id` varchar(64) COLLATE utf8_unicode_ci COMMENT 'Unique trusted external ID (generally from a legacy app/datasource). Particularly useful for deduping operations.'");
+    CRM_Core_BAO_SchemaHandler::createIndexes(array(
+      'civicrm_membership' => array('external_membership_id'),
+    ));
     return TRUE;
   }
 
