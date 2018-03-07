@@ -96,10 +96,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
         'settings' => $settings,
       ));
 
-    $configUrl = self::getConfigUrl($this->preset);
-    if (!$configUrl) {
-      $configUrl = self::getConfigUrl('default');
-    }
+    $configUrl = self::getConfigUrl($this->preset) ?: self::getConfigUrl('default');
 
     $this->assign('preset', $this->preset);
     $this->assign('presets', CRM_Core_OptionGroup::values('wysiwyg_presets', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name'));
@@ -207,10 +204,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    */
   private function getConfigSettings() {
     $matches = $result = array();
-    $file = self::getConfigFile($this->preset);
-    if (!$file) {
-      $file = self::getConfigFile('default');
-    }
+    $file = self::getConfigFile($this->preset) ?: self::getConfigFile('default');
     $result['skin'] = 'moono';
     if ($file) {
       $contents = file_get_contents($file);
@@ -276,7 +270,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
       if (!is_dir(Civi::paths()->getPath('[civicrm.files]/persist'))) {
         mkdir(Civi::paths()->getPath('[civicrm.files]/persist'));
       }
-      $newFileName = Civi::paths()->getPath('[civicrm.files]/persist/crm-ckeditor-default.js');
+      $newFileName = Civi::paths()->getPath(self::CONFIG_FILEPATH . 'default.js');
       file_put_contents($newFileName, $config);
     }
   }
