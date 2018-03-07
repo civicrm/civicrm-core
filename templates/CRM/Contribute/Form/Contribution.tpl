@@ -97,6 +97,9 @@
       <td class="label">{$form.total_amount.label}</td>
       <td {$valueStyle}>
         <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>
+        {if $freezeFinancialType}
+          {help id="id-total_amount"}
+        {/if}
         {if !$payNow}
           {if $hasPriceSets}
             <span id='totalAmountORPriceSet'> {ts}OR{/ts}</span>
