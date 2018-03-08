@@ -10,9 +10,21 @@ class CRM_Core_CodeGen_Util_Template {
   protected $beautifier;
 
   /**
-   * @param string $filetype
+   * @var array
+   *   'beautifier' => bool
+   *   'fudging' => bool
+   *   'arraySyntax' => bool
    */
-  public function __construct($filetype) {
+  protected $filters;
+
+  /**
+   * @param string $filetype
+   * @praam array $filters
+   *   'beautifier' => bool
+   *   'fudging' => bool
+   *   'arraySyntax' => bool
+   */
+  public function __construct($filetype, $filters = array()) {
     $this->filetype = $filetype;
 
     $this->smarty = CRM_Core_CodeGen_Util_Smarty::singleton()->createSmarty();
@@ -28,7 +40,12 @@ class CRM_Core_CodeGen_Util_Template {
       $this->beautifier->setIndentChar(' ');
       $this->beautifier->setIndentNumber(2);
       $this->beautifier->setNewLine("\n");
+
+      $phpDefaultFilters = ['beautifier' => TRUE, 'fudging' => TRUE, 'arraySyntax' => TRUE];
+      $filters = array_merge($phpDefaultFilters, $filters);
     }
+
+    $this->filters = $filters;
   }
 
   /**
@@ -59,20 +76,28 @@ class CRM_Core_CodeGen_Util_Template {
     $contents = $this->smarty->fetch($infile);
 
     if ($this->filetype === 'php') {
-      $this->beautifier->setInputString($contents);
-      $this->beautifier->process();
-      $contents = $this->beautifier->get();
+      if ($this->filters['beautifier']) {
+        $this->beautifier->setInputString($contents);
+        $this->beautifier->process();
+        $contents = $this->beautifier->get();
+      }
+
       // The beautifier isn't as beautiful as one would hope. Here's some extra string fudging.
-      $replacements = [
-        ') ,' => '),',
-        "\n  }\n}\n" => "\n  }\n\n}\n",
-        '=> true,' => '=> TRUE,',
-        '=> false,' => '=> FALSE,',
-      ];
-      $contents = str_replace(array_keys($replacements), array_values($replacements), $contents);
-      $contents = preg_replace('#(\s*)\\/\\*\\*#', "\n\$1/**", $contents);
+      if ($this->filters['fudging']) {
+        $replacements = [
+          ') ,' => '),',
+          "\n  }\n}\n" => "\n  }\n\n}\n",
+          '=> true,' => '=> TRUE,',
+          '=> false,' => '=> FALSE,',
+        ];
+        $contents = str_replace(array_keys($replacements), array_values($replacements), $contents);
+        $contents = preg_replace('#(\s*)\\/\\*\\*#', "\n\$1/**", $contents);
+      }
+
       // Convert old array syntax to new square brackets
-      $contents = CRM_Core_CodeGen_Util_ArraySyntaxConverter::convert($contents);
+      if ($this->filters['arraySyntax']) {
+        $contents = CRM_Core_CodeGen_Util_ArraySyntaxConverter::convert($contents);
+      }
       file_put_contents($outpath, $contents);
     }
     else {
