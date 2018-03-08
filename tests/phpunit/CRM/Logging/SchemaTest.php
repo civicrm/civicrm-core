@@ -30,4 +30,15 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertEquals($expectedQuery, CRM_Logging_Schema::fixTimeStampAndNotNullSQL($query));
   }
 
+  public function testLogEngine() {
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+    $log_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_acl");
+    while ($log_table->fetch()) {
+      $this->assertRegexp('/ENGINE=ARCHIVE/', $log_table->Create_Table);
+    }
+    $schema->disableLogging();
+    $schema->dropAllLogTables();
+  }
+
 }
