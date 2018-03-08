@@ -673,7 +673,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->assertArrayNotHasKey('status_override_end_date', $membershipAfterProcess);
   }
 
-  public function testUpdateAllMembershipStatusDoesNotConvertOverridenMembershipWithoutEndOverrideDateToNormal() {
+  public function testUpdateAllMembershipStatusDoesNotConvertOverriddenMembershipWithoutEndOverrideDateToNormal() {
     $params = array(
       'contact_id' => $this->individualCreate(),
       'membership_type_id' => $this->_membershipTypeID,
@@ -697,6 +697,36 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $this->assertEquals($createdMembership->id, $membershipAfterProcess['id']);
     $this->assertEquals(1, $membershipAfterProcess['is_override']);
+  }
+
+  public function testUpdateAllMembershipCanProcessExpiredOverriddenUntilDateMembershipWithCancelledStatus() {
+    $cancelledStatusID = array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus());
+    $params = array(
+      'contact_id' => $this->individualCreate(),
+      'membership_type_id' => $this->_membershipTypeID,
+      'join_date' => date('Ymd', time()),
+      'start_date' => date('Ymd', time()),
+      'end_date' => date('Ymd', strtotime('+1 year')),
+      'source' => 'Payment',
+      'is_override' => 1,
+      'status_override_end_date' => date('Ymd', time()),
+      'status_id' => $cancelledStatusID,
+    );
+    $ids = array();
+    $createdMembership = CRM_Member_BAO_Membership::create($params, $ids);
+
+    CRM_Member_BAO_Membership::updateAllMembershipStatus();
+
+    $membershipAfterProcess = civicrm_api3('Membership', 'get', array(
+      'sequential' => 1,
+      'id' => $createdMembership->id,
+      'return' => array('id', 'is_override', 'status_override_end_date', 'status_id'),
+    ))['values'][0];
+
+    $this->assertEquals($createdMembership->id, $membershipAfterProcess['id']);
+    $this->assertArrayNotHasKey('is_override', $membershipAfterProcess);
+    $this->assertArrayNotHasKey('status_override_end_date', $membershipAfterProcess);
+    $this->assertNotEquals($cancelledStatusID, $membershipAfterProcess['status_id']);
   }
 
 }
