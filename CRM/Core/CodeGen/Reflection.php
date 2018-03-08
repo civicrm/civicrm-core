@@ -20,7 +20,7 @@ class CRM_Core_CodeGen_Reflection extends CRM_Core_CodeGen_BaseTask {
    */
   public function run() {
     echo "Generating table list\n";
-    $template = new CRM_Core_CodeGen_Util_Template('php');
+    $template = new CRM_Core_CodeGen_Util_Template('php', ['beautifier' => FALSE]);
     $template->assign('tables', $this->tables);
     $template->assign('genCodeChecksum', 'IGNORE');
     $template->run('listAll.tpl', $this->getAbsFileName());
