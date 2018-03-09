@@ -381,9 +381,9 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     if ($cid) {
-    $relc = CRM_Utils_Request::retrieve('relatedCases', 'Positive', $this);
-      if ($relc) {
-        $this->_formValues['contact_id'] = CRM_Case_BAO_Case::getOrganizationRelatedCaseIds($cid);
+    $relatedCases = CRM_Utils_Request::retrieve('relatedCases', 'Positive', $this);
+      if ($relatedCases) {
+        $this->_formValues['contact_id'] = CRM_Case_BAO_Case::getOrganizationRelatedCaseContactIds($cid);
       }
       else if ($cid > 0) {
       $cid = CRM_Utils_Type::escape($cid, 'Integer');

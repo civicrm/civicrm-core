@@ -313,13 +313,12 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         );
         // Add "Related Cases" tab
         if($i == 'case' && $entityType == 'Organization' && Civi::settings()->get('civicaseRelatedCasesTab')) {
-          $relIds = CRM_Case_BAO_Case::getOrganizationRelatedCaseIds($this->_contactId);
           $allTabs[] = array(
             'id' => 'relatedcases',
             'url' => CRM_Utils_System::url("civicrm/contact/view/$u", $q."&relatedCases=1"),
             'title' => 'Related Cases',
             'weight' => $elem['weight']+1,
-            'count' => CRM_Contact_BAO_Contact::getCountComponent($u, $relIds),
+            'count' => CRM_Case_BAO_Case::getOrganizationRelatedCasesCount($this->_contactId),
             'class' => 'livePage',
           );
         }

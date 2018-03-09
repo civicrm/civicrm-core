@@ -1994,35 +1994,46 @@ SELECT civicrm_contact.id as casemanager_id,
   }
 
   /**
-   * Retrieve case ids of all contacts related to given Organization contact.
+   * Retrieve contact ids of all contacts(with cases) related to given Organization contact.
    *
-   * @param int $orgId
+   * @param int $organizationId
    *
    * @return array
    */
-  public static function getOrganizationRelatedCaseIds($orgId) {
-    if(!$orgId) {
+  public static function getOrganizationRelatedCaseContactIds($organizationId, $countOnly=FALSE) {
+    if(!$organizationId) {
       return array();
     }
     $sql = "SELECT rel.contact_id_a as id FROM civicrm_case_contact AS cc
       INNER JOIN civicrm_relationship AS rel ON rel.contact_id_a = cc.contact_id
       INNER JOIN civicrm_relationship_type AS rtype ON rel.relationship_type_id = rtype.id
-      WHERE
-      'Organization' IN (rtype.contact_type_a, rtype.contact_type_b) AND
-      %1 = CASE
-      WHEN (rtype.contact_type_a = 'Organization')
-      THEN rel.contact_id_a
-      ELSE rel.contact_id_b
-      END ";
+      WHERE 'Organization' IN (rtype.contact_type_a, rtype.contact_type_b)
+      AND %1 = CASE
+        WHEN (rtype.contact_type_a = 'Organization') THEN rel.contact_id_a
+        ELSE rel.contact_id_b
+      END";
     $all = CRM_Core_DAO::executeQuery($sql, array(
-      1 => array($orgId, 'Integer'),
+      1 => array($organizationId, 'Integer'),
     ))->fetchAll();
     $ids = array();
+    if($countOnly) {
+      return count($all);
+    }
     foreach($all as $each) {
       if(!in_array($each['id'], $ids))
         $ids[] = $each['id'];
     }
     return $ids;
+  }
+
+  /**
+   * Retrieve count of all cases of all contacts that are related to given Organization contact.
+   *
+   * @param int $organizationId
+   * @return int
+   */
+  public static function getOrganizationRelatedCasesCount($organizationId) {
+    return self::getOrganizationRelatedCaseContactIds($organizationId, TRUE);
   }
 
   /**

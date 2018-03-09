@@ -504,6 +504,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
     $this->addTask('CRM-21733: Add status_override_end_date field to civicrm_membership table', 'addColumn', 'civicrm_membership', 'status_override_end_date',
       "date DEFAULT NULL COMMENT 'The end date of membership status override if (Override until selected date) override type is selected.'");
+    $this->addTask('CRM-21829: Show Related Cases For Organizations', 'settingForRelatedCasesTab');
   }
 
   /*
