@@ -146,6 +146,13 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       }
     }
 
+    // when custom data is included in this page
+    if (!empty($_POST['hidden_custom'])) {
+      CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'ContributionRecur', $this->contributionRecurID);
+      CRM_Custom_Form_CustomData::buildQuickForm($this);
+      CRM_Custom_Form_CustomData::setDefaultValues($this);
+    }
+
     $this->assign('editableScheduleFields', array_diff($this->editableScheduleFields, $alreadyHardCodedFields));
 
     if ($this->_subscriptionDetails->contact_id) {
@@ -171,7 +178,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     $this->_defaults['financial_type_id'] = $this->_subscriptionDetails->financial_type_id;
     $this->_defaults['is_notify'] = 1;
     foreach ($this->editableScheduleFields as $field) {
-      $this->_defaults[$field] = $this->_subscriptionDetails->$field;
+      $this->_defaults[$field] = isset($this->_subscriptionDetails->$field) ? $this->_subscriptionDetails->$field : NULL;
     }
 
     return $this->_defaults;
@@ -204,6 +211,10 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     if (CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($this->contributionRecurID)) {
       $this->addEntityRef('financial_type_id', ts('Financial Type'), array('entity' => 'FinancialType'), !$this->_selfService);
     }
+
+    // Add custom data
+    $this->assign('customDataType', 'ContributionRecur');
+    $this->assign('entityID', $this->contributionRecurID);
 
     $type = 'next';
     if ($this->_selfService) {
@@ -253,8 +264,10 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       $msgType = 'error';
     }
     elseif ($updateSubscription) {
+      // Handle custom data
+      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->contributionRecurID, 'ContributionRecur');
       // save the changes
-      $result = CRM_Contribute_BAO_ContributionRecur::add($params);
+      CRM_Contribute_BAO_ContributionRecur::add($params);
       $status = ts('Recurring contribution has been updated to: %1, every %2 %3(s) for %4 installments.',
         array(
           1 => CRM_Utils_Money::format($params['amount'], $this->_subscriptionDetails->currency),
