@@ -2004,7 +2004,14 @@ SELECT civicrm_contact.id as casemanager_id,
     if(!$organizationId) {
       return array();
     }
-    $sql = "SELECT rel.contact_id_a as id FROM civicrm_case_contact AS cc
+    $sql = 'SELECT';
+    if($countOnly) {
+      $sql .= ' COUNT(cc.case_id) ';
+    }
+    else {
+      $sql .= ' rel.contact_id_a as id ';
+    }
+    $sql .= "FROM civicrm_case_contact AS cc
       INNER JOIN civicrm_relationship AS rel ON rel.contact_id_a = cc.contact_id
       INNER JOIN civicrm_relationship_type AS rtype ON rel.relationship_type_id = rtype.id
       WHERE 'Organization' IN (rtype.contact_type_a, rtype.contact_type_b)
@@ -2014,11 +2021,12 @@ SELECT civicrm_contact.id as casemanager_id,
       END";
     $all = CRM_Core_DAO::executeQuery($sql, array(
       1 => array($organizationId, 'Integer'),
-    ))->fetchAll();
-    $ids = array();
+    ));
     if($countOnly) {
-      return count($all);
+      return $all->fetchValue();
     }
+    $all = $all->fetchAll();
+    $ids = array();
     foreach($all as $each) {
       if(!in_array($each['id'], $ids))
         $ids[] = $each['id'];
