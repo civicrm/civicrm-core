@@ -54,6 +54,13 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     $url = CRM_Utils_System::url('civicrm/admin/member/membershipType', 'reset=1');
     $session->pushUserContext($url);
 
+    // when custom data is included in this page
+    if (!empty($_POST['hidden_custom'])) {
+      CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'MembershipType', $this->_id);
+      CRM_Custom_Form_CustomData::buildQuickForm($this);
+      CRM_Custom_Form_CustomData::setDefaultValues($this);
+    }
+
     $this->setPageTitle(ts('Membership Type'));
   }
 
@@ -109,6 +116,9 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    * Build the form object.
    *
    * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \HTML_QuickForm_Error
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -133,7 +143,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
     $this->addSelect('duration_unit', array(), TRUE);
 
-    //period type
+    // period type
     $this->addSelect('period_type', array(), TRUE);
 
     $this->add('text', 'duration_interval', ts('Duration Interval'),
@@ -148,7 +158,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       CRM_Core_SelectValues::date(NULL, 'M d'), FALSE
     );
 
-    //Auto-renew Option
+    // Auto-renew Option
     $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
     $isAuthorize = FALSE;
     $options = array();
@@ -160,7 +170,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     $this->addRadio('auto_renew', ts('Auto-renew Option'), $options);
     $this->assign('authorize', $isAuthorize);
 
-    //rollover day
+    // rollover day
     $this->add('date', 'fixed_period_rollover_day', ts('Fixed Period Rollover Day'),
       CRM_Core_SelectValues::date(NULL, 'M d'), FALSE
     );
@@ -193,6 +203,10 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
         $memberRel->freeze();
       }
     }
+
+    // Add custom data
+    $this->assign('customDataType', 'MembershipType');
+    $this->assign('entityID', $this->_id);
 
     $this->assign('membershipRecordsExists', $membershipRecords);
 
@@ -292,7 +306,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   /**
    * Process the form submission.
    *
-   *
    * @return void
    */
   public function postProcess() {
@@ -333,7 +346,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
         $params[$fld] = CRM_Utils_Array::value($fld, $submitted, 'NULL');
       }
 
-      //clean money.
       if ($params['minimum_fee']) {
         $params['minimum_fee'] = CRM_Utils_Rule::cleanMoney($params['minimum_fee']);
       }
@@ -398,7 +410,11 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $ids['membershipType'] = $this->_id;
+        $params['id'] = $this->_id;
       }
+
+      // Handle custom data
+      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($submitted, $this->_id, 'MembershipType');
 
       $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
 
