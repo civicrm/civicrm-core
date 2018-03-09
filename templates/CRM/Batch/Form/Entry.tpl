@@ -38,9 +38,9 @@
     <div class="status message status-warning">
       <i class="crm-i fa-exclamation-triangle"></i> {ts}Total for amounts entered below does not match the expected batch total.{/ts}
     </div>
-    <div class="crm-button crm-button_qf_Entry_upload_force-save">
+    <span class="crm-button crm-button_qf_Entry_upload_force-save">
       {$form._qf_Entry_upload_force.html}
-    </div>
+    </span>
     <div class="clear"></div>
   {/if}
   <table class="form-layout-compressed batch-totals">
