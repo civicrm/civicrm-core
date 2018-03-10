@@ -34,7 +34,7 @@
      </div>
   {else}
      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-        <table class="form-layout-compressed">
+      <table class="form-layout-compressed">
       {if $context eq 'standalone'}
         <tr class="crm-grant-form-block-contact_id">
           <td class="label">{$form.contact_id.label}</td>
