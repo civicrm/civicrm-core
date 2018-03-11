@@ -66,9 +66,12 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       $values = $this->controller->exportValues('Basic');
     }
 
+    // Get Task name
+    $modeValue = CRM_Contact_Form_Search::getModeValue($values['component_mode']);
+    $className = $modeValue['taskClassName'];
+    $taskList = $className::taskTitles();
     $this->_task = CRM_Utils_Array::value('task', $values);
-    $crmContactTaskTasks = CRM_Contact_Task::taskTitles();
-    $this->assign('taskName', CRM_Utils_Array::value($this->_task, $crmContactTaskTasks));
+    $this->assign('taskName', CRM_Utils_Array::value($this->_task, $taskList));
   }
 
   /**
@@ -208,12 +211,9 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     $params = array();
     $params['title'] = $formValues['title'];
     $params['description'] = $formValues['description'];
-    if (isset($formValues['group_type']) &&
-      is_array($formValues['group_type'])
-    ) {
+    if (isset($formValues['group_type']) && is_array($formValues['group_type']) && count($formValues['group_type'])) {
       $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-          array_keys($formValues['group_type'])
-        ) . CRM_Core_DAO::VALUE_SEPARATOR;
+          array_keys($formValues['group_type'])) . CRM_Core_DAO::VALUE_SEPARATOR;
     }
     else {
       $params['group_type'] = '';
