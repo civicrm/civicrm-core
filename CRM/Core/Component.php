@@ -406,21 +406,6 @@ class CRM_Core_Component {
   }
 
   /**
-   * FIXME: This function does not appear to do anything. The is_array() check runs on a bunch of objects and (always?) returns false
-   */
-  public static function &taskList() {
-    $info = self::_info();
-
-    $tasks = array();
-    foreach ($info as $name => $value) {
-      if (is_array($info[$name]) && isset($info[$name]['task'])) {
-        $tasks += $info[$name]['task'];
-      }
-    }
-    return $tasks;
-  }
-
-  /**
    * Handle table dependencies of components.
    *
    * @param array $tables
