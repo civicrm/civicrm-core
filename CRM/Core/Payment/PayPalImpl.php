@@ -707,7 +707,12 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       'id' => $params['processor_id'],
       'api.PaymentProcessorType.getvalue' => array('return' => "name"),
     ));
-    switch ($result['values'][0]['api.PaymentProcessorType.getvalue']) {
+    if (!$result['count']) {
+      throw new CRM_Core_Exception("Could not find a processor with the given processor_id value '{$params['processor_id']}'.");
+    }
+
+    $paymentProcessorType = CRM_Utils_Array::value('api.PaymentProcessorType.getvalue', $result['values'][0]);
+    switch ($paymentProcessorType) {
       case 'PayPal':
         // "PayPal - Website Payments Pro"
         $paypalIPN = new CRM_Core_Payment_PayPalProIPN($params);
@@ -721,9 +726,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       default:
         // If we don't have PayPal Standard or PayPal Pro, something's wrong.
         // Log an error and exit.
-        CRM_Core_Error::debug_log_message("The processor_id value '{$params['processor_id']}' is for a processor of type '{$result['values'][0]['api.PaymentProcessorType.getvalue']}', which is invalid in this context.");
-        echo "Failure: Invalid processor: " . CRM_Utils_Type::escape($params['processor_id'], 'String');
-        exit();
+        throw new CRM_Core_Exception("The processor_id value '{$params['processor_id']}' is for a processor of type '{$paymentProcessorType}', which is invalid in this context.");
     }
 
     $paypalIPN->main();
