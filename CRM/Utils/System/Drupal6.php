@@ -763,7 +763,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     // to the doc for the overridden method, ought to be returned as a region string
     // (e.g., America/Havana).
     if (strlen($timezone)) {
-      $timezone = timezone_name_from_abbr("", (int) $timezone, 0);
+      $timezone = timezone_name_from_abbr("", (int) $timezone);
     }
 
     if (!$timezone) {
