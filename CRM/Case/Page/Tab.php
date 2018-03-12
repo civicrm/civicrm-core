@@ -147,7 +147,13 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     if ($this->_contactId) {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
       $this->assign('displayName', $displayName);
-      $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('case', $this->_contactId);
+      $relatedCases = CRM_Utils_Request::retrieve('relatedCases', 'Positive', $this);
+      if($relatedCases) {
+        $this->ajaxResponse['tabCount'] = CRM_Case_BAO_Case::getOrganizationRelatedCasesCount($this->_contactId);
+      }
+      else {
+        $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('case', $this->_contactId);
+      }
     }
   }
 

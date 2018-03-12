@@ -504,6 +504,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
 
     $this->addTask('CRM-21733: Add status_override_end_date field to civicrm_membership table', 'addColumn', 'civicrm_membership', 'status_override_end_date',
       "date DEFAULT NULL COMMENT 'The end date of membership status override if (Override until selected date) override type is selected.'");
+    $this->addTask('CRM-21829: Show Related Cases For Organizations', 'settingForRelatedCasesTab');
   }
 
   /*
@@ -1407,6 +1408,28 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
       $dataType = 'datetime';
     }
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_mailing CHANGE created_date created_date {$dataType} NULL DEFAULT NULL COMMENT 'Date and time this mailing was created.'");
+    return TRUE;
+  }
+
+  /**
+   * 'Related Cases' tab for organizations: Add enable/disable 'Related Cases' setting
+   * @return bool
+   */
+  public static function settingForRelatedCasesTab() {
+    $domains = CRM_Core_DAO::executeQuery("SELECT DISTINCT d.id FROM civicrm_domain d LEFT JOIN civicrm_setting s ON d.id=s.domain_id AND s.name = 'civicaseRelatedCasesTab' WHERE s.id IS NULL");
+    while ($domains->fetch()) {
+      CRM_Core_DAO::executeQuery(
+        "INSERT INTO civicrm_setting (`name`, `value`, `domain_id`, `is_domain`, `contact_id`, `component_id`, `created_date`, `created_id`)
+          VALUES (%2, %3, %4, %5, NULL, NULL, %6, NULL)",
+        array(
+          2 => array('civicaseRelatedCasesTab', 'String'),
+          3 => array('s:1:"1";', 'String'),
+          4 => array($domains->id, 'Integer'),
+          5 => array(1, 'Integer'),
+          6 => array(date('Y-m-d H:i:s'), 'String'),
+        )
+      );
+    }
     return TRUE;
   }
 

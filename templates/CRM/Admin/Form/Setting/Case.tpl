@@ -53,6 +53,12 @@
         <span class="description">{ts}Enable embedded tracking to activity revisions within the "civicrm_activity" table. Alternatively, see "Administer => System Settings => Misc => Logging".{/ts}</span>
       </td>
     </tr>
+    <tr class="crm-case-form-block-civicaseRelatedCasesTab">
+      <td class="label">{$form.civicaseRelatedCasesTab.label}</td>
+      <td>{$form.civicaseRelatedCasesTab.html}<br />
+        <span class="description">{ts}With this checkbox enabled cases from individuals who are directly related to the organisation will be displayed on the organisation records on a tab called "Related Cases".{/ts}</span>
+      </td>
+    </tr>
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

@@ -382,7 +382,11 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     if ($cid) {
       $cid = CRM_Utils_Type::escape($cid, 'Integer');
-      if ($cid > 0) {
+      $relatedCases = CRM_Utils_Request::retrieve('relatedCases', 'Positive', $this);
+      if ($relatedCases) {
+        $this->_formValues['contact_id'] = CRM_Case_BAO_Case::getOrganizationRelatedCaseContactIds($cid);
+      }
+      else if ($cid > 0) {
         $this->_formValues['contact_id'] = $cid;
         list($display, $image) = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
         $this->_defaults['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid,
