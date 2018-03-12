@@ -460,7 +460,11 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @return bool
    */
   public static function isEnabledBackOfficeCreditCardPayments() {
-    return CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('BackOffice'));
+    $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(array('BackOffice'));
+    if (empty($processors) || array_keys($processors) === array(0)) {
+      return FALSE;
+    }
+    return TRUE;
   }
 
   /**
