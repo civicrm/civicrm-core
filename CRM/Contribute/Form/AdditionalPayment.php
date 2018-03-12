@@ -38,13 +38,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   public $_contributeMode = 'direct';
 
   /**
-   * Related component whose financial payment is being processed.
-   *
-   * @var string
-   */
-  protected $_component = NULL;
-
-  /**
    * Id of the component entity
    */
   public $_id = NULL;

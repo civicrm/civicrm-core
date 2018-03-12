@@ -211,6 +211,13 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $paymentInstrumentID;
 
   /**
+   * Component - event, membership or contribution.
+   *
+   * @var string
+   */
+  protected $_component;
+
+  /**
    * Array of fields to display on billingBlock.tpl - this is not fully implemented but basically intent is the panes/fieldsets on this page should
    * be all in this array in order like
    *  'credit_card' => array('credit_card_number' ...
