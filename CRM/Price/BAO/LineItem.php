@@ -454,9 +454,14 @@ WHERE li.contribution_id = %1";
           }
           // CRM-19094: entity_table is set to civicrm_membership then ensure
           // the entityId is set to membership ID not contribution by default
-          elseif ($line['entity_table'] == 'civicrm_membership' && !empty($line['entity_id']) && $line['entity_id'] == $contributionDetails->id) {
-            $membershipId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', 'contribution_id', $line['entity_id'], 'membership_id');
-            $line['entity_id'] = $membershipId ? $membershipId : $line['entity_id'];
+          // we don't update entity table and entity id during update mode, so
+          // no need to worry about the value of $line['entity_id'] while updating.
+          elseif (!$update && $line['entity_table'] == 'civicrm_membership' && !empty($line['entity_id']) && $line['entity_id'] == $contributionDetails->id) {
+            $membershipId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $contributionDetails->id, 'membership_id', 'contribution_id');
+            if (!empty($membershipId) && $line['entity_id'] != $membershipId) {
+              Civi::log()->warning('Per https://lab.civicrm.org/dev/core/issues/15 this data fix should not be required. Please log a ticket at https://lab.civicrm.org/dev/core with steps to get this.', array('civi.tag' => 'deprecated'));
+              $line['entity_id'] = $membershipId;
+            }
           }
         }
 
