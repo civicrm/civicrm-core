@@ -837,6 +837,49 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
   }
 
   /**
+   * Pause a mailing
+   */
+  public static function pause($mailingID) {
+    $sql = "
+      UPDATE civicrm_mailing_job
+      SET status = 'Paused'
+      WHERE mailing_id = %1
+      AND is_test = 0
+      AND status IN ('Scheduled', 'Running')
+    ";
+    CRM_Core_DAO::executeQuery($sql, array(1 => array($mailingID, 'Integer')));
+
+    CRM_Core_Session::setStatus(ts('The mailing has been paused.'), ts('Paused'), 'success');
+  }
+
+  /**
+   * Resume a mailing
+   */
+  public static function resume($mailingID) {
+    $sql = "
+      UPDATE civicrm_mailing_job
+      SET status = 'Scheduled'
+      WHERE mailing_id = %1
+      AND is_test = 0
+      AND start_date IS NULL
+      AND status = 'Paused'
+    ";
+    CRM_Core_DAO::executeQuery($sql, array(1 => array($mailingID, 'Integer')));
+
+    $sql = "
+      UPDATE civicrm_mailing_job
+      SET status = 'Running'
+      WHERE mailing_id = %1
+      AND is_test = 0
+      AND start_date IS NOT NULL
+      AND status = 'Paused'
+    ";
+    CRM_Core_DAO::executeQuery($sql, array(1 => array($mailingID, 'Integer')));
+
+    CRM_Core_Session::setStatus(ts('The mailing has been resumed.'), ts('Resumed'), 'success');
+  }
+
+  /**
    * Return a translated status enum string.
    *
    * @param string $status
