@@ -153,7 +153,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
       }
     }
     if (!empty($setStatus)) {
-      CRM_Core_Session::setStatus("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php.", '', 'info', array('expires' => 0));
+      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', array('expires' => 0));
     }
     // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
     $this->assign('setting_descriptions', $descriptions);
