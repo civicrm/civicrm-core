@@ -402,7 +402,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    */
   public function split_job($offset = 200) {
     $recipient_count = CRM_Mailing_BAO_Recipients::mailingSize($this->mailing_id);
-
+    $transaction = new CRM_Core_Transaction();
     $jobTable = CRM_Mailing_DAO_MailingJob::getTableName();
 
     $dao = new CRM_Core_DAO();
@@ -439,6 +439,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         CRM_Core_DAO::executeQuery($sql, $params);
       }
     }
+    $transaction->commit();
   }
 
   /**
