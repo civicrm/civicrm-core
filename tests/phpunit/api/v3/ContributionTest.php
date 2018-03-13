@@ -682,15 +682,26 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Create test with unique field name on source.
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testCreateDefaultNow() {
-
+  public function testCreateDefaultNow($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $params = $this->_params;
-    unset($params['receive_date']);
+    unset($params['receive_date'], $params['net_amount']);
+
+    $params['total_amount'] = $this->formatMoneyInput(5000.77);
+    $params['fee_amount'] = $this->formatMoneyInput(.77);
 
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $contribution = $this->callAPISuccessGetSingle('contribution', array('id' => $contribution['id']));
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['receive_date'])));
+    $this->assertEquals(5000.77, $contribution['total_amount'], 'failed to handle ' . $this->formatMoneyInput(5000.77));
+    $this->assertEquals(.77, $contribution['fee_amount']);
+    $this->assertEquals(5000, $contribution['net_amount']);
   }
 
   /**
