@@ -1663,6 +1663,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       case CRM_Report_Form::OP_SELECT:
         $result = array(
           'eq' => ts('Is equal to'),
+          'neq' => ts('Is not equal to'),
         );
         return $result;
 
