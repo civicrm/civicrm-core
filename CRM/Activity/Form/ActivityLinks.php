@@ -73,7 +73,7 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
         }
       }
       elseif ($act['name'] == 'SMS') {
-        if (!$contactId || !CRM_SMS_BAO_Provider::activeProviderCount()) {
+        if (!$contactId || !CRM_SMS_BAO_Provider::activeProviderCount() || !CRM_Core_Permission::check('send SMS')) {
           continue;
         }
         // Check for existence of a mobile phone and ! do not SMS privacy setting

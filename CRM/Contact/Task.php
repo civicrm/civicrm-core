@@ -162,7 +162,7 @@ class CRM_Contact_Task extends CRM_Core_Task {
 
       //CRM-16329, if SMS provider is configured show sms action.
       $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
-      if ($providersCount) {
+      if ($providersCount && CRM_Core_Permission::check('send SMS')) {
         self::$_tasks[self::TASK_SMS] = array(
           'title' => ts('SMS - schedule/send'),
           'class' => 'CRM_Contact_Form_Task_SMS',
@@ -308,6 +308,7 @@ class CRM_Contact_Task extends CRM_Core_Task {
       ) {
         $tasks[self::CREATE_MAILING] = self::$_tasks[self::CREATE_MAILING]['title'];
       }
+
     }
 
     $tasks = parent::corePermissionedTaskTitles($tasks, $permission, $params);

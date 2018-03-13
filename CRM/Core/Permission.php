@@ -889,6 +889,10 @@ class CRM_Core_Permission {
         $prefix . ts('edit own api keys'),
         ts('Edit user\'s own API keys'),
       ),
+      'send SMS' => array(
+        $prefix . ts('send SMS'),
+        ts('Send an SMS'),
+      ),
     );
 
     return $permissions;

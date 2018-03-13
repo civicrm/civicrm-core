@@ -1135,4 +1135,23 @@ $text
     $this->assertEquals($activity['campaign_id'], $campaign_id, 'Activity campaign_id does not match.');
   }
 
+  /**
+   * @expectedException CRM_Core_Exception
+   * @expectedExceptionMessage You do not have the 'send SMS' permission
+   */
+  public function testSendSMSWithoutPermission() {
+    $dummy = NULL;
+    $session = CRM_Core_Session::singleton();
+    $config = &CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array('access CiviCRM');
+
+    CRM_Activity_BAO_Activity::sendSMS(
+      $dummy,
+      $dummy,
+      $dummy,
+      $dummy,
+      $session->get('userID')
+    );
+  }
+
 }
