@@ -116,17 +116,21 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     Civi::settings()->add(array(
       'mailerBatchLimit' => 2,
     ));
+    $this->_mut->clearMessages();
     //Create a test mailing and check if the status is set to Scheduled.
     $result = $this->callAPISuccess('mailing', 'create', $this->_params);
     $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
     $this->assertEquals('Scheduled', $jobs['values'][$jobs['id']]['status']);
 
+    //Pause the mailing.
     CRM_Mailing_BAO_MailingJob::pause($result['id']);
     $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
     $this->assertEquals('Paused', $jobs['values'][$jobs['id']]['status']);
 
     //Verify if Paused mailing isn't considered in process_mailing job.
     $this->callAPISuccess('job', 'process_mailing', array());
+    //Check if mail log is empty.
+    $this->_mut->assertMailLogEmpty();
     $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
     $this->assertEquals('Paused', $jobs['values'][$jobs['id']]['status']);
 
@@ -134,6 +138,10 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     CRM_Mailing_BAO_MailingJob::resume($result['id']);
     $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
     $this->assertEquals('Scheduled', $jobs['values'][$jobs['id']]['status']);
+
+    //Execute the job and it should send the mailing to the recipients now.
+    $this->callAPISuccess('job', 'process_mailing', array());
+    $this->_mut->assertRecipients($this->getRecipients(1, 2));
   }
 
   /**

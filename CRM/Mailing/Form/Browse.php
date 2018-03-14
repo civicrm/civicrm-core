@@ -82,6 +82,7 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
     }
     elseif ($this->_action & CRM_Core_Action::DISABLE) {
       CRM_Mailing_BAO_MailingJob::cancel($this->_mailingId);
+      CRM_Core_Session::setStatus(ts('The mailing has been canceled.'), ts('Canceled'), 'success');
     }
     elseif ($this->_action & CRM_Core_Action::RENEW) {
       //set is_archived to 1

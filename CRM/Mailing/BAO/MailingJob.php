@@ -831,13 +831,14 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
         2 => array(date('YmdHis'), 'Timestamp'),
       );
       CRM_Core_DAO::executeQuery($sql, $params);
-
-      CRM_Core_Session::setStatus(ts('The mailing has been canceled.'), ts('Canceled'), 'success');
     }
   }
 
   /**
    * Pause a mailing
+   *
+   * @param int $mailingID
+   *   The id of the mailing to be paused.
    */
   public static function pause($mailingID) {
     $sql = "
@@ -848,12 +849,13 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
       AND status IN ('Scheduled', 'Running')
     ";
     CRM_Core_DAO::executeQuery($sql, array(1 => array($mailingID, 'Integer')));
-
-    CRM_Core_Session::setStatus(ts('The mailing has been paused.'), ts('Paused'), 'success');
   }
 
   /**
    * Resume a mailing
+   *
+   * @param int $mailingID
+   *   The id of the mailing to be resumed.
    */
   public static function resume($mailingID) {
     $sql = "
@@ -875,8 +877,6 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
       AND status = 'Paused'
     ";
     CRM_Core_DAO::executeQuery($sql, array(1 => array($mailingID, 'Integer')));
-
-    CRM_Core_Session::setStatus(ts('The mailing has been resumed.'), ts('Resumed'), 'success');
   }
 
   /**

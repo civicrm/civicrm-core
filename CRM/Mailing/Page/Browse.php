@@ -165,6 +165,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     if ($this->_action & CRM_Core_Action::DISABLE) {
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {
         CRM_Mailing_BAO_MailingJob::cancel($this->_mailingId);
+        CRM_Core_Session::setStatus(ts('The mailing has been canceled.'), ts('Canceled'), 'success');
         CRM_Utils_System::redirect($context);
       }
       else {
@@ -181,6 +182,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
         CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
       CRM_Mailing_BAO_MailingJob::pause($this->_mailingId);
+      CRM_Core_Session::setStatus(ts('The mailing has been paused.'), ts('Paused'), 'success');
       CRM_Utils_System::redirect($context);
     }
     elseif ($this->_action & CRM_Core_Action::REOPEN) {
@@ -188,6 +190,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
         CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
       CRM_Mailing_BAO_MailingJob::resume($this->_mailingId);
+      CRM_Core_Session::setStatus(ts('The mailing has been resumed.'), ts('Resumed'), 'success');
       CRM_Utils_System::redirect($context);
     }
     elseif ($this->_action & CRM_Core_Action::DELETE) {
