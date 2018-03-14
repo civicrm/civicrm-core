@@ -1636,6 +1636,28 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Alter redirect.
+   *
+   * This hook is called when the browser is being re-directed and allows the url
+   * to be altered.
+   *
+   * @param \Psr\Http\Message\UriInterface $url
+   * @param array $context
+   *   Additional information about context
+   *   - output - if this is 'json' then it will return json.
+   *
+   * @return null
+   *   the return value is ignored
+   */
+  public static function alterRedirect($url, &$context) {
+    return self::singleton()->invoke(array('url', 'context'), $url,
+      $context, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_alterRedirect'
+    );
+  }
+
+  /**
    * @param $varType
    * @param $var
    * @param $object
