@@ -113,7 +113,10 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
           $metadata['id']['api.aliases'] = array($lowercase_entity . '_id');
         }
       }
-      else {
+      // dirty hack to exclude acl_role entity from auto-aliasing, since acl_role_id is the name of an actual
+      // field in that entity's table. without this, values intended to be passed to acl_role_id are instead
+      // passed to field id, rendering the API unusable
+      elseif ($lowercase_entity !== 'acl_role') {
         // really the preference would be to set the unique name in the xml
         // question is which is a less risky fix this close to a release - setting in xml for the known failure
         // (note) or setting for all api where fields is returning 'id' & we want to accept 'note_id' @ the api layer
