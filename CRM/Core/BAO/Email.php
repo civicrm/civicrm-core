@@ -237,6 +237,7 @@ ORDER BY e.is_primary DESC, email_id ASC ";
    *   Email object.
    */
   public static function holdEmail(&$email) {
+    $email->on_hold = intval($email->on_hold);
     //check for update mode
     if ($email->id) {
       $params = array(1 => array($email->id, 'Integer'));
