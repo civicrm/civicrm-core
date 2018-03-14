@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {* This template is used for adding/editing/deleting offline Event Registrations *}
-
 {* Ajax callback for showing event fee snippet *}
 {if $showFeeBlock}
   {if $priceSet}
@@ -215,6 +214,16 @@
           {$form.delete_participant.html}
         {/if}
         {else} {* If action is other than Delete *}
+            {if $newCredit AND $action EQ 1 AND $participantMode EQ null}
+            <div class="action-link css_right crm-link-credit-card-mode">
+              {if $contactId}
+                {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
+              {else}
+                {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
+              {/if}
+             <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card event participation{/ts}</a>
+            </div>
+            {/if}            
         <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout-compressed">
           {if $single and $context neq 'standalone'}
