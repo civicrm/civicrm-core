@@ -209,9 +209,9 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
 
       //hack to serve right page to state machine.
       $taskMapping = array(
-        'interview' => 1,
-        'reserve' => 2,
-        'release' => 3,
+        'interview' => CRM_Campaign_Task::INTERVIEW,
+        'reserve' => CRM_Campaign_Task::RESERVE,
+        'release' => CRM_Campaign_Task::RELEASE,
       );
 
       $currentTaskValue = CRM_Utils_Array::value($this->_operation, $taskMapping);
