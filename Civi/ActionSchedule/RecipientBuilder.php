@@ -477,6 +477,10 @@ class RecipientBuilder {
       // This is weird. Waddupwidat?
       if ($this->mapping->getEntity() == 'civicrm_participant') {
         $startDateClauses[] = $operator . "(!casNow, INTERVAL 1 DAY ) {$op} " . '!casDateField';
+        //Exclude event that has a past end date of one year from now.
+        if ($actionSchedule->start_action_date == 'event_end_date' && $op == '>=') {
+          $startDateClauses[] = "DATE_SUB(!casNow, INTERVAL 1 YEAR) <= !casDateField";
+        }
       }
       else {
         $startDateClauses[] = "DATE_SUB(!casNow, INTERVAL 1 DAY ) <= {$date}";

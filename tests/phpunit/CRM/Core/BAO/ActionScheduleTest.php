@@ -1623,6 +1623,22 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ));
     $c = $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $participant->contact_id)));
 
+    //Create old event participant with event ending in 1990
+    $this->fixtures['participant']['event_id'] = array(
+      'is_active' => 1,
+      'is_template' => 0,
+      'title' => 'Old Example Event',
+      'start_date' => '19900315',
+      'end_date' => '19900615',
+    );
+    // Create event+participant with start_date = 19900315, end_date = 19900615.
+    $oldParticipant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], array('status_id' => 2)));
+    $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $oldParticipant->contact_id,
+      'email' => 'old-event@example.com',
+    ));
+    $c = $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $oldParticipant->contact_id)));
+
     $actionSchedule = $this->fixtures['sched_eventtype_end_2month_repeat_twice_2_weeks'];
     $actionSchedule['entity_value'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $participant->event_id, 'event_type_id');
     $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
