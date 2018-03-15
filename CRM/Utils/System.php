@@ -433,8 +433,10 @@ class CRM_Utils_System {
    *
    * @param string $url
    *   The URL to provide to the browser via the Location header.
+   * @param array $context
+   *   Optional additional information for the hook.
    */
-  public static function redirect($url = NULL) {
+  public static function redirect($url = NULL, $context = []) {
     if (!$url) {
       $url = self::url('civicrm/dashboard', 'reset=1');
     }
@@ -442,8 +444,14 @@ class CRM_Utils_System {
     // this is kinda hackish but not sure how to do it right
     $url = str_replace('&amp;', '&', $url);
 
+    $context['output'] = CRM_Utils_Array::value('snippet', $_GET);
+
+    $parsedUrl = CRM_Utils_Url::parseUrl($url);
+    CRM_Utils_Hook::alterRedirect($parsedUrl, $context);
+    $url = CRM_Utils_Url::unparseUrl($parsedUrl);
+
     // If we are in a json context, respond appropriately
-    if (CRM_Utils_Array::value('snippet', $_GET) === 'json') {
+    if ($context['output'] === 'json') {
       CRM_Core_Page_AJAX::returnJsonResponse(array(
         'status' => 'redirect',
         'userContext' => $url,
