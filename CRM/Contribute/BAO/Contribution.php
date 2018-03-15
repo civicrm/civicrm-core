@@ -5035,7 +5035,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    *
    * @param int $contributionID
    *
-   * @return boolean
+   * @return bool
    */
   public static function isOfflineRecurring($contributionID) {
     $contribution = self::findById($contributionID);
