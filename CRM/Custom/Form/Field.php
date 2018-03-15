@@ -1001,6 +1001,7 @@ SELECT id
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
     }
+
     $customField = CRM_Core_BAO_CustomField::create($params);
     $this->_id = $customField->id;
 
