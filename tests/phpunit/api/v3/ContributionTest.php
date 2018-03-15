@@ -2944,11 +2944,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test if renewal activity is create after changing Pending contribution to Completed via offline
    */
   public function testPendingToCompleteContribution() {
-    $contributionPage = $this->createPriceSetWithPage('membership');
-    $stateOfGrace = $this->callAPISuccess('MembershipStatus', 'getvalue', array(
-      'name' => 'Grace',
-      'return' => 'id')
-    );
+    $this->createPriceSetWithPage('membership');
     $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
     $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
     // Case 1: Assert that Membership Signup Activity is created on Pending to Completed Contribution via backoffice
@@ -2961,7 +2957,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     // change pending contribution to completed
     $form = new CRM_Contribute_Form_Contribution();
-    $error = FALSE;
+
     $form->_params = array(
       'id' => $this->_ids['contribution'],
       'total_amount' => 20,
@@ -2991,12 +2987,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_mode' => 'membership',
       'source' => 'Membership Signup and Renewal',
     );
-    try {
-      $form->testSubmit($form->_params, CRM_Core_Action::UPDATE);
-    }
-    catch (Civi\Payment\Exception\PaymentProcessorException $e) {
-      $error = TRUE;
-    }
+
+    $form->testSubmit($form->_params, CRM_Core_Action::UPDATE);
+
     // Case 2: After successful payment for Pending backoffice there are three activities created
     //  2.a Update status of existing Scheduled Membership Signup (created in step 1) to Completed
     $activity = $this->callAPISuccess('Activity', 'get', array(
@@ -3036,6 +3029,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'source' => 'SSF',
       'contribution_status_id' => 2,
       'contribution_page_id' => $this->_ids['contribution_page'],
+      // We can't rely on contribution api to link line items correctly to membership
+      'skipLineItem' => TRUE,
       'api.membership_payment.create' => array('membership_id' => $this->_ids['membership']),
     ));
 
@@ -3048,18 +3043,26 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'unit_price' => 20,
       'line_total' => 20,
       'financial_type_id' => 1,
+      'price_field_value_id' => $this->_ids['price_field_value']['cont'],
+    ));
+    $this->callAPISuccess('line_item', 'create', array(
+      'entity_id' => $this->_ids['membership'],
+      'entity_table' => 'civicrm_membership',
+      'contribution_id' => $contribution['id'],
+      'price_field_id' => $this->_ids['price_field'][0],
+      'qty' => 1,
+      'unit_price' => 20,
+      'line_total' => 20,
+      'financial_type_id' => 1,
       'price_field_value_id' => $this->_ids['price_field_value'][0],
+      'membership_type_id' => $this->_ids['membership_type'],
     ));
 
     //Update it to Failed.
     $form->_params['id'] = $contribution['id'];
     $form->_params['contribution_status_id'] = 4;
-    try {
-      $form->testSubmit($form->_params, CRM_Core_Action::UPDATE);
-    }
-    catch (Civi\Payment\Exception\PaymentProcessorException $e) {
-      $error = TRUE;
-    }
+
+    $form->testSubmit($form->_params, CRM_Core_Action::UPDATE);
     //Existing membership should not get updated to expired.
     $membership = $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
     $this->assertNotEquals($membership['status_id'], 4);
