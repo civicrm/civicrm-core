@@ -45,11 +45,15 @@
   {/if}
   <table class="form-layout-compressed batch-totals">
     <tr>
-      <td class="label">{ts}Total amount expected{/ts}</td>
+      <td class="label">
+        <label>{ts}Total amount expected{/ts}</label>
+      </td>
       <td class="right"><span class="batch-expected-total">{$batchTotal|crmMoney}</span></td>
     </tr>
     <tr>
-      <td class="label">{ts}Total amount entered{/ts}</td>
+      <td class="label">
+        <label>{ts}Total amount entered{/ts}</label>
+      </td>
       <td class="right">{$config->defaultCurrencySymbol} <span class="batch-actual-total"></span></td>
     </tr>
   </table>
