@@ -456,17 +456,22 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
   /**
    * Get the number of terms for this contribution for a given membership type
-   * based on querying the line item table and relevant price field values
+   * based on querying the line item table and relevant price field values.
    * Note that any one contribution should only be able to have one line item relating to a particular membership
-   * type
+   * type.
+   *
+   * For offline recurring Contribution we return '0' to not extend Membership.
    *
    * @param int $membershipTypeID
-   *
    * @param int $contributionID
    *
    * @return int
    */
   public function getNumTermsByContributionAndMembershipType($membershipTypeID, $contributionID) {
+    if (self::isOfflineRecurring($contributionID)) {
+      return 0;
+    }
+
     $numTerms = CRM_Core_DAO::singleValueQuery("
       SELECT membership_num_terms FROM civicrm_line_item li
       LEFT JOIN civicrm_price_field_value v ON li.price_field_value_id = v.id
@@ -2152,7 +2157,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $contactContributionsSQL = "
       SELECT contribution.id AS id
       FROM civicrm_contribution contribution
-      LEFT JOIN civicrm_line_item i ON i.contribution_id = contribution.id AND i.entity_table = 'civicrm_contribution' $liWhere
+      LEFT JOIN civicrm_line_item i ON i.contribution_id = contribution.id AND i.contribution_id IS NOT NULL $liWhere
       WHERE contribution.is_test = 0 AND contribution.contact_id = {$contactId}
       $additionalWhere
       AND i.id IS NULL";
@@ -2400,7 +2405,20 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $ids
     ));
 
-    if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $this->contribution_page_id) {
+    $ids['contributionType'] = $this->financial_type_id;
+    $ids['financialType'] = $this->financial_type_id;
+    if ($this->contribution_page_id) {
+      $ids['contributionPage'] = $this->contribution_page_id;
+    }
+    $this->loadRelatedEntitiesByID($ids);
+
+    $recurPaymentProcessor = FALSE;
+    if (!empty($this->_relatedObjects['contributionRecur']) && !$paymentProcessorID) {
+      $recurPaymentProcessor = TRUE;
+      $paymentProcessorID = $this->_relatedObjects['contributionRecur']->payment_processor_id;
+    }
+
+    if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $this->contribution_page_id && !$recurPaymentProcessor) {
       $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
         $this->contribution_page_id,
         'payment_processor'
@@ -2408,18 +2426,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if ($paymentProcessorID) {
         $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage;
       }
-    }
-
-    $ids['contributionType'] = $this->financial_type_id;
-    $ids['financialType'] = $this->financial_type_id;
-    if ($this->contribution_page_id) {
-      $ids['contributionPage'] = $this->contribution_page_id;
-    }
-
-    $this->loadRelatedEntitiesByID($ids);
-
-    if (!empty($ids['contributionRecur']) && !$paymentProcessorID) {
-      $paymentProcessorID = $this->_relatedObjects['contributionRecur']->payment_processor_id;
     }
 
     if (!empty($ids['pledge_payment'])) {
@@ -2522,6 +2528,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     $template = $this->_assignMessageVariablesToTemplate($values, $input, $returnMessageText);
+    $paymentObject = NULL;
     //what does recur 'mean here - to do with payment processor return functionality but
     // what is the importance
     if (!empty($this->contribution_recur_id) && !empty($this->_relatedObjects['paymentProcessor'])) {
@@ -5036,6 +5043,28 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       );
     }
     return $default;
+  }
+
+  /**
+   * Checks if Contribution of specified ID has its Recurring Contribution with
+   * multiple installments and offline payment (no payment processor).
+   *
+   * @param int $contributionID
+   *
+   * @return bool
+   */
+  public static function isOfflineRecurring($contributionID) {
+    $contribution = self::findById($contributionID);
+    if (empty($contribution->contribution_recur_id)) {
+      return FALSE;
+    }
+
+    $recurringContribution = CRM_Contribute_BAO_ContributionRecur::findById($contribution->contribution_recur_id);
+    if ($recurringContribution->installments > 1 && empty($recurringContribution->payment_processor_id)) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**
