@@ -31,6 +31,8 @@
  * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
+  protected $defaultAssigneeOptionsValues = [];
+
   /**
    * Run.
    *
@@ -314,6 +316,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
   /**
    * @param SimpleXMLElement $caseTypeXML
+   *
    * @return array<string> symbolic activity-type names
    */
   public function getDeclaredActivityTypes($caseTypeXML) {
@@ -342,6 +345,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
   /**
    * @param SimpleXMLElement $caseTypeXML
+   *
    * @return array<string> symbolic relationship-type names
    */
   public function getDeclaredRelationshipTypes($caseTypeXML) {
@@ -474,6 +478,8 @@ AND        a.is_deleted = 0
       );
     }
 
+    $activityParams['assignee_contact_id'] = $this->getDefaultAssigneeForActivity($activityParams, $activityTypeXML);
+
     //parsing date to default preference format
     $params['activity_date_time'] = CRM_Utils_Date::processDate($params['activity_date_time']);
 
@@ -569,6 +575,119 @@ AND        a.is_deleted = 0
   }
 
   /**
+   * Return the default assignee contact for the activity.
+   *
+   * @param array $activityParams
+   * @param object $activityTypeXML
+   *
+   * @return int|null the ID of the default assignee contact or null if none.
+   */
+  protected function getDefaultAssigneeForActivity($activityParams, $activityTypeXML) {
+    if (!isset($activityTypeXML->default_assignee_type)) {
+      return NULL;
+    }
+
+    $defaultAssigneeOptionsValues = $this->getDefaultAssigneeOptionValues();
+
+    switch ($activityTypeXML->default_assignee_type) {
+      case $defaultAssigneeOptionsValues['BY_RELATIONSHIP']:
+        return $this->getDefaultAssigneeByRelationship($activityParams, $activityTypeXML);
+
+      break;
+      case $defaultAssigneeOptionsValues['SPECIFIC_CONTACT']:
+        return $this->getDefaultAssigneeBySpecificContact($activityTypeXML);
+
+      break;
+      case $defaultAssigneeOptionsValues['USER_CREATING_THE_CASE']:
+        return $activityParams['source_contact_id'];
+
+      break;
+      case $defaultAssigneeOptionsValues['NONE']:
+      default:
+        return NULL;
+    }
+  }
+
+  /**
+   * Fetches and caches the activity's default assignee options.
+   *
+   * @return array
+   */
+  protected function getDefaultAssigneeOptionValues() {
+    if (!empty($this->defaultAssigneeOptionsValues)) {
+      return $this->defaultAssigneeOptionsValues;
+    }
+
+    $defaultAssigneeOptions = civicrm_api3('OptionValue', 'get', [
+      'option_group_id' => 'activity_default_assignee',
+      'options' => [ 'limit' => 0 ]
+    ]);
+
+    foreach ($defaultAssigneeOptions['values'] as $option) {
+      $this->defaultAssigneeOptionsValues[$option['name']] = $option['value'];
+    }
+
+    return $this->defaultAssigneeOptionsValues;
+  }
+
+  /**
+   * Returns the default assignee for the activity by searching for the target's
+   * contact relationship type defined in the activity's details.
+   *
+   * @param array $activityParams
+   * @param object $activityTypeXML
+   *
+   * @return int|null the ID of the default assignee contact or null if none.
+   */
+  protected function getDefaultAssigneeByRelationship($activityParams, $activityTypeXML) {
+    if (!isset($activityTypeXML->default_assignee_relationship)) {
+      return NULL;
+    }
+
+    $targetContactId = is_array($activityParams['target_contact_id'])
+      ? CRM_Utils_Array::first($activityParams['target_contact_id'])
+      : $activityParams['target_contact_id'];
+
+    $relationships = civicrm_api3('Relationship', 'get', [
+      'contact_id_b' => $targetContactId,
+      'relationship_type_id.name_b_a' => (string) $activityTypeXML->default_assignee_relationship,
+      'is_active' => 1,
+      'sequential' => 1,
+    ]);
+
+    if ($relationships['count']) {
+      return $relationships['values'][0]['contact_id_a'];
+    }
+    else {
+      return NULL;
+    }
+  }
+
+  /**
+   * Returns the activity's default assignee for a specific contact if the contact exists,
+   * otherwise returns null.
+   *
+   * @param object $activityTypeXML
+   *
+   * @return int|null
+   */
+  protected function getDefaultAssigneeBySpecificContact($activityTypeXML) {
+    if (!$activityTypeXML->default_assignee_contact) {
+      return NULL;
+    }
+
+    $contact = civicrm_api3('Contact', 'get', [
+      'id' => $activityTypeXML->default_assignee_contact
+    ]);
+
+    if ($contact['count'] == 1) {
+      return $activityTypeXML->default_assignee_contact;
+    }
+
+    return NULL;
+  }
+
+  /**
    * @param $activitySetsXML
    *
    * @return array
@@ -617,6 +736,7 @@ AND        a.is_deleted = 0
 
   /**
    * @param string $caseType
+   *
    * @return array<\Civi\CCase\CaseChangeListener>
    */
   public function getListeners($caseType) {
@@ -662,6 +782,7 @@ AND        a.is_deleted = 0
    * @param string $settingKey
    * @param string $xmlTag
    * @param mixed $default
+   *
    * @return int
    */
   private function getBoolSetting($settingKey, $xmlTag, $default = 0) {

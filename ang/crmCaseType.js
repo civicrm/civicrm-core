@@ -67,6 +67,13 @@
                 limit: 0
               }
             }];
+            reqs.defaultAssigneeTypes = ['OptionValue', 'get', {
+              option_group_id: 'activity_default_assignee',
+              sequential: 1,
+              options: {
+                limit: 0
+              }
+            }];
             reqs.relTypes = ['RelationshipType', 'get', {
               sequential: 1,
               options: {
@@ -230,43 +237,78 @@
   });
 
   crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls) {
-    // CRM_Case_XMLProcessor::REL_TYPE_CNAME
-    var REL_TYPE_CNAME = CRM.crmCaseType.REL_TYPE_CNAME,
+    var REL_TYPE_CNAME, defaultAssigneeDefaultValue, ts;
 
-    ts = $scope.ts = CRM.ts(null);
+    (function init () {
+      // CRM_Case_XMLProcessor::REL_TYPE_CNAME
+      REL_TYPE_CNAME = CRM.crmCaseType.REL_TYPE_CNAME;
 
-    $scope.activityStatuses = apiCalls.actStatuses.values;
-    $scope.caseStatuses = _.indexBy(apiCalls.caseStatuses.values, 'name');
-    $scope.activityTypes = _.indexBy(apiCalls.actTypes.values, 'name');
-    $scope.activityTypeOptions = _.map(apiCalls.actTypes.values, formatActivityTypeOption);
-    $scope.relationshipTypeOptions = _.map(apiCalls.relTypes.values, function(type) {
-      return {id: type[REL_TYPE_CNAME], text: type.label_b_a};
-    });
-    $scope.locks = {caseTypeName: true, activitySetName: true};
+      ts = $scope.ts = CRM.ts(null);
+      $scope.locks = { caseTypeName: true, activitySetName: true };
+      $scope.workflows = { timeline: 'Timeline', sequence: 'Sequence' };
+      defaultAssigneeDefaultValue = _.find(apiCalls.defaultAssigneeTypes.values, { is_default: '1' }) || {};
 
-    $scope.workflows = {
-      'timeline': 'Timeline',
-      'sequence': 'Sequence'
-    };
+      storeApiCallsResults();
+      initCaseType();
+      initCaseTypeDefinition();
+      initSelectedStatuses();
+    })();
 
-    $scope.caseType = apiCalls.caseType ? apiCalls.caseType : _.cloneDeep(newCaseTypeTemplate);
-    $scope.caseType.definition = $scope.caseType.definition || [];
-    $scope.caseType.definition.activityTypes = $scope.caseType.definition.activityTypes || [];
-    $scope.caseType.definition.activitySets = $scope.caseType.definition.activitySets || [];
-    _.each($scope.caseType.definition.activitySets, function (set) {
-      _.each(set.activityTypes, function (type, name) {
-        type.label = $scope.activityTypes[type.name].label;
+    /// Stores the api calls results in the $scope object
+    function storeApiCallsResults() {
+      $scope.activityStatuses = apiCalls.actStatuses.values;
+      $scope.caseStatuses = _.indexBy(apiCalls.caseStatuses.values, 'name');
+      $scope.activityTypes = _.indexBy(apiCalls.actTypes.values, 'name');
+      $scope.activityTypeOptions = _.map(apiCalls.actTypes.values, formatActivityTypeOption);
+      $scope.defaultAssigneeTypes = apiCalls.defaultAssigneeTypes.values;
+      $scope.relationshipTypeOptions = _.map(apiCalls.relTypes.values, function(type) {
+        return {id: type[REL_TYPE_CNAME], text: type.label_b_a};
       });
-    });
-    $scope.caseType.definition.caseRoles = $scope.caseType.definition.caseRoles || [];
-    $scope.caseType.definition.statuses = $scope.caseType.definition.statuses || [];
+      // stores the default assignee values indexed by their option name:
+      $scope.defaultAssigneeTypeValues = _.chain($scope.defaultAssigneeTypes)
+        .indexBy('name').mapValues('value').value();
+    }
 
-    $scope.caseType.definition.timelineActivityTypes = $scope.caseType.definition.timelineActivityTypes || [];
+    /// initializes the case type object
+    function initCaseType() {
+      var isNewCaseType = !apiCalls.caseType;
 
-    $scope.selectedStatuses = {};
-    _.each(apiCalls.caseStatuses.values, function (status) {
-      $scope.selectedStatuses[status.name] = !$scope.caseType.definition.statuses.length || $scope.caseType.definition.statuses.indexOf(status.name) > -1;
-    });
+      if (isNewCaseType) {
+        $scope.caseType = _.cloneDeep(newCaseTypeTemplate);
+      } else {
+        $scope.caseType = apiCalls.caseType;
+      }
+    }
+
+    /// initializes the case type definition object
+    function initCaseTypeDefinition() {
+      $scope.caseType.definition = $scope.caseType.definition || [];
+      $scope.caseType.definition.activityTypes = $scope.caseType.definition.activityTypes || [];
+      $scope.caseType.definition.activitySets = $scope.caseType.definition.activitySets || [];
+      $scope.caseType.definition.caseRoles = $scope.caseType.definition.caseRoles || [];
+      $scope.caseType.definition.statuses = $scope.caseType.definition.statuses || [];
+      $scope.caseType.definition.timelineActivityTypes = $scope.caseType.definition.timelineActivityTypes || [];
+
+      _.each($scope.caseType.definition.activitySets, function (set) {
+        _.each(set.activityTypes, function (type, name) {
+          var isDefaultAssigneeTypeUndefined = _.isUndefined(type.default_assignee_type);
+          type.label = $scope.activityTypes[type.name].label;
+
+          if (isDefaultAssigneeTypeUndefined) {
+            type.default_assignee_type = defaultAssigneeDefaultValue.value;
+          }
+        });
+      });
+    }
+
+    /// initializes the selected statuses
+    function initSelectedStatuses() {
+      $scope.selectedStatuses = {};
+
+      _.each(apiCalls.caseStatuses.values, function (status) {
+        $scope.selectedStatuses[status.name] = !$scope.caseType.definition.statuses.length || $scope.caseType.definition.statuses.indexOf(status.name) > -1;
+      });
+    }
 
     $scope.addActivitySet = function(workflow) {
       var activitySet = {};
@@ -296,7 +338,8 @@
           status: 'Scheduled',
           reference_activity: 'Open Case',
           reference_offset: '1',
-          reference_select: 'newest'
+          reference_select: 'newest',
+          default_assignee_type: $scope.defaultAssigneeTypeValues.NONE
       };
       activitySet.activityTypes.push(activity);
       if(typeof activitySet.timeline !== "undefined" && activitySet.timeline == "1") {
@@ -347,6 +390,12 @@
           });
         }
       }
+    };
+
+    /// Clears the activity's default assignee values for relationship and contact
+    $scope.clearActivityDefaultAssigneeValues = function(activity) {
+      activity.default_assignee_relationship = null;
+      activity.default_assignee_contact = null;
     };
 
     /// Add a new role

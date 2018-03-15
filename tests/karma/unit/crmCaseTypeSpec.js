@@ -11,6 +11,7 @@ describe('crmCaseType', function() {
   var apiCalls;
   var ctrl;
   var compile;
+  var defaultAssigneeDefaultValue;
   var scope;
 
   beforeEach(function() {
@@ -231,8 +232,65 @@ describe('crmCaseType', function() {
               }
             ]
           }
+        },
+        defaultAssigneeTypes: {
+          values: [
+              {
+                "id": "1174",
+                "option_group_id": "152",
+                "label": "None",
+                "value": "1",
+                "name": "NONE",
+                "filter": "0",
+                "is_default": "1",
+                "weight": "1",
+                "is_optgroup": "0",
+                "is_reserved": "0",
+                "is_active": "1"
+              },
+              {
+                "id": "1175",
+                "option_group_id": "152",
+                "label": "By relationship to workflow client",
+                "value": "2",
+                "name": "BY_RELATIONSHIP",
+                "filter": "0",
+                "is_default": "0",
+                "weight": "2",
+                "is_optgroup": "0",
+                "is_reserved": "0",
+                "is_active": "1"
+              },
+              {
+                "id": "1176",
+                "option_group_id": "152",
+                "label": "Specific contact",
+                "value": "3",
+                "name": "SPECIFIC_CONTACT",
+                "filter": "0",
+                "is_default": "0",
+                "weight": "3",
+                "is_optgroup": "0",
+                "is_reserved": "0",
+                "is_active": "1"
+              },
+              {
+                "id": "1177",
+                "option_group_id": "152",
+                "label": "User creating the workflow",
+                "value": "4",
+                "name": "USER_CREATING_THE_CASE",
+                "filter": "0",
+                "is_default": "0",
+                "weight": "4",
+                "is_optgroup": "0",
+                "is_reserved": "0",
+                "is_active": "1"
+              }
+          ]
         }
       };
+      defaultAssigneeDefaultValue = _.find(apiCalls.defaultAssigneeTypes.values, { is_default: '1' });
       scope = $rootScope.$new();
       ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
     });
@@ -243,6 +301,17 @@ describe('crmCaseType', function() {
 
     it('should load activity types', function() {
       expect(scope.activityTypes['ADC referral']).toEqualData(apiCalls.actTypes.values[0]);
+    });
+
+    it('should store the default assignee types', function() {
+      expect(scope.defaultAssigneeTypes).toBe(apiCalls.defaultAssigneeTypes.values);
+    });
+
+    it('should store the default assignee types values indexed by name', function() {
+      var defaultAssigneeTypeValues = _.chain(apiCalls.defaultAssigneeTypes.values)
+        .indexBy('name').mapValues('value').value();
+
+      expect(scope.defaultAssigneeTypeValues).toEqual(defaultAssigneeTypeValues);
     });
 
     it('addActivitySet should add an activitySet to the case type', function() {
@@ -262,6 +331,75 @@ describe('crmCaseType', function() {
       expect(newSet.name).toBe('timeline_2');
       expect(newSet.timeline).toBe('1');
       expect(newSet.label).toBe('Timeline #2');
+    });
+
+    describe('when clearing the activity\'s default assignee type values', function() {
+      var activity;
+
+      beforeEach(function() {
+        activity = {
+          default_assignee_relationship: 1,
+          default_assignee_contact: 2
+        };
+
+        scope.clearActivityDefaultAssigneeValues(activity);
+      });
+
+      it('clears the default assignee relationship for the activity', function() {
+        expect(activity.default_assignee_relationship).toBe(null);
+      });
+
+      it('clears the default assignee contact for the activity', function() {
+        expect(activity.default_assignee_contact).toBe(null);
+      });
+    });
+
+    describe('when adding a new activity to a set', function() {
+      var activitySet;
+
+      beforeEach(function() {
+        activitySet = { activityTypes: [] };
+        scope.activityTypes = { comment: { label: 'Add a new comment' } };
+
+        scope.addActivity(activitySet, 'comment');
+      });
+
+      it('adds a new Comment activity to the set', function() {
+        expect(activitySet.activityTypes[0]).toEqual({
+          name: 'comment',
+          label: scope.activityTypes.comment.label,
+          status: 'Scheduled',
+          reference_activity: 'Open Case',
+          reference_offset: '1',
+          reference_select: 'newest',
+          default_assignee_type: defaultAssigneeDefaultValue.value
+        });
+      });
+    });
+
+    describe('when creating a new workflow', function() {
+      beforeEach(inject(function ($controller) {
+        apiCalls.caseType = null;
+
+        ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
+      }));
+
+      it('sets default values for the case type title, name, and active status', function() {
+        expect(scope.caseType).toEqual(jasmine.objectContaining({
+          title: '',
+          name: '',
+          is_active: '1'
+        }));
+      });
+
+      it('adds an Open Case activty to the default activty set', function() {
+        expect(scope.caseType.definition.activitySets[0].activityTypes).toEqual([{
+          name: 'Open Case',
+          label: 'Open Case',
+          status: 'Completed',
+          default_assignee_type: defaultAssigneeDefaultValue.value
+        }]);
+      });
     });
   });
 
