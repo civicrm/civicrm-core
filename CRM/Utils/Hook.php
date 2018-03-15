@@ -1649,7 +1649,7 @@ abstract class CRM_Utils_Hook {
    * @return null
    *   the return value is ignored
    */
-  public static function alterRedirect($url, &$context) {
+  public static function alterRedirect(&$url, &$context) {
     return self::singleton()->invoke(array('url', 'context'), $url,
       $context, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
