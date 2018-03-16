@@ -460,7 +460,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
     // also send to default error log
     foreach (explode("\n", self::formatTextException($exception)) as $line) {
-      error_log($line);
+      error_log("CiviCRM " . $line);
     };
 
     // print to screen
