@@ -458,6 +458,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     CRM_Core_Error::debug_var('Fatal Error Details', $vars, FALSE);
     CRM_Core_Error::backtrace('backTrace', TRUE);
 
+    // also send to default error log
+    foreach (explode("\n", self::formatTextException($exception)) as $line) {
+      error_log($line);
+    };
+
     // print to screen
     $template = CRM_Core_Smarty::singleton();
     $template->assign($vars);
