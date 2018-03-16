@@ -1397,7 +1397,7 @@ class CRM_Utils_System {
    */
   public static function civiExit($status = 0) {
 
-    if($status > 0){
+    if ($status > 0) {
       http_response_code(500);
     }
     // move things to CiviCRM cache as needed
