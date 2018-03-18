@@ -197,7 +197,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
   public static function isHtmlTokenInTableCell($token, $entity, $textToSearch) {
     $tokenToMatch = $entity . '.' . $token;
     $dontCare = array();
-    $within = preg_match_all("|<td.+?{" . $tokenToMatch . "}.+?</td|si", $textToSearch, $dontCare);
+    $within = preg_match_all("|<td.+?{" . $tokenToMatch . "}.*</td|si", $textToSearch, $dontCare);
     $total = preg_match_all("|{" . $tokenToMatch . "}|", $textToSearch, $dontCare);
     return ($within == $total);
   }
