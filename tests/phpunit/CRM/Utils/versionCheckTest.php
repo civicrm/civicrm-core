@@ -278,7 +278,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
 
     // See CRM_Utils_VersionCheck::getSiteStats where alpha versions don't get
     // full stats generated
-    if (array_key_exists('version', $stats) && strpos($stats['version'], 'alpha') !== FALSE) {
+    if (array_key_exists('version', $stats) && strpos($stats['version'], 'alpha') === FALSE) {
       $this->assertArrayHasKey('hash', $stats);
       $this->assertArrayHasKey('uf', $stats);
       $this->assertArrayHasKey('lang', $stats);
