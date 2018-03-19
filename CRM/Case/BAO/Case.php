@@ -274,16 +274,16 @@ WHERE civicrm_case.id = %1";
    *   ID of the case.
    *
    * @param int $contactID
+   * @param int $startArrayAt This is to support legacy calls to Case.Get API which may rely on the first array index being set to 1
    *
    * @return array
    */
-  public static function retrieveContactIdsByCaseId($caseId, $contactID = NULL) {
+  public static function retrieveContactIdsByCaseId($caseId, $contactID = NULL, $startArrayAt = 0) {
     $caseContact = new CRM_Case_DAO_CaseContact();
     $caseContact->case_id = $caseId;
     $caseContact->find();
     $contactArray = array();
-    // FIXME: Why does this return a 1-based array?
-    $count = 1;
+    $count = $startArrayAt;
     while ($caseContact->fetch()) {
       if ($contactID != $caseContact->contact_id) {
         $contactArray[$count] = $caseContact->contact_id;
@@ -1087,7 +1087,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
     $contactViewUrl = CRM_Utils_System::url("civicrm/contact/view", "reset=1&cid=", FALSE, NULL, FALSE);
     $hasViewContact = CRM_Core_Permission::giveMeAllACLs();
-    $clientIds = self::retrieveContactIdsByCaseId($caseID);
 
     if (!$userID) {
       $session = CRM_Core_Session::singleton();
