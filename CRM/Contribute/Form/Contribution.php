@@ -239,6 +239,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (!empty($this->_id)) {
       $this->assignPaymentInfoBlock();
       $this->assign('contribID', $this->_id);
+      $this->assign('isUsePaymentBlock', TRUE);
     }
 
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
