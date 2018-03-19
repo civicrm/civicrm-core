@@ -42,6 +42,16 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function preProcess() {
     $this->_mapperFields = $this->get('fields');
+
+    // Check if CiviMember is enabled
+    $config = CRM_Core_Config::singleton();
+    $memberEnabled = in_array("CiviMember", $config->enableComponents);
+    if ($memberEnabled) {
+      // Add membership_id and external_membership_id fields
+      $this->_mapperFields['membership_id'] = ts('Membership ID');
+      $this->_mapperFields['external_membership_id'] = ts('Membership ID (External)');
+    }
+
     asort($this->_mapperFields);
 
     $this->_columnCount = $this->get('columnCount');
@@ -66,7 +76,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     //CRM-2219 removing other required fields since for updation only
     //invoice id or trxn id or contribution id is required.
     if ($this->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
-      $remove = array('contribution_contact_id', 'email', 'first_name', 'last_name', 'external_identifier');
+      $remove = array('contribution_contact_id', 'email', 'first_name', 'last_name', 'external_identifier', 'membership_id', 'external_membership_id');
       foreach ($remove as $value) {
         unset($this->_mapperFields[$value]);
       }
@@ -447,7 +457,6 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function postProcess() {
     $params = $this->controller->exportValues('MapField');
-
     //reload the mapfield if load mapping is pressed
     if (!empty($params['savedMapping'])) {
       $this->set('savedMapping', $params['savedMapping']);

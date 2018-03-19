@@ -80,6 +80,14 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           'softCredit' => TRUE,
           'headerPattern' => '/Soft Credit/i',
         ),
+        'membership_id' => array(
+          'title' => ts('Membership ID'),
+          'headerPattern' => '/Membership /i',
+        ),
+        'external_membership_id' => array(
+          'title' => ts('External Membership ID'),
+          'headerPattern' => '/External Membership /i',
+        ),
       )
     );
 
@@ -286,6 +294,23 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
             $params[$key] = CRM_Utils_String::strtobool($val);
             break;
 
+          case 'membership_id':
+            $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+            $params['financial_type_id'] = array_search ($params['financial_type'], $financialTypes);
+            CRM_Member_BAO_Membership::recordMembershipContribution($params);
+            unset($params['external_membership_id']);
+            break;
+          case 'external_membership_id':
+            $sql = 'SELECT id
+            FROM civicrm_membership
+            WHERE external_membership_id = %1';
+            $params['membership_id'] = CRM_Core_DAO::executeQuery($sql, array(1 => array($val, 'String')))->fetchValue();
+            $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+            $params['financial_type_id'] = array_search($params['financial_type'], $financialTypes);
+            CRM_Member_BAO_Membership::recordMembershipContribution($params);
+            unset($params['membership_id']);
+            unset($params['external_membership_id']);
+            break;
         }
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
           if ($customFields[$customFieldID]['data_type'] == 'Date') {
