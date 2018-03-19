@@ -81,6 +81,11 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'title' => ts('Contact Name'),
             'operator' => 'like',
           ),
+          'is_deleted' => array(
+            'title' => ts('Is Deleted'),
+            'default' => 0,
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+          ),
           'id' => array('no_display' => TRUE),
         ),
         'order_bys' => array(

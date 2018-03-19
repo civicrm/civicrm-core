@@ -73,7 +73,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       'fields_defaults' => array('sort_name'),
       'fields_excluded' => array('id'),
       'fields_required' => array('id'),
-      'filters_defaults' => array('is_deleted' => FALSE),
+      'filters_defaults' => array('is_deleted' => 0),
       'no_field_disambiguation' => TRUE,
     )), array(
       'civicrm_email' => array(
