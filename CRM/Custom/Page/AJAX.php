@@ -57,6 +57,7 @@ class CRM_Custom_Page_AJAX {
     $selectorElements = array(
       'label',
       'value',
+      'description',
       'is_default',
       'is_active',
       'links',

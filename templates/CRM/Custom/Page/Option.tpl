@@ -42,6 +42,7 @@
           <tr class="columnheader">
             <th class='crm-custom_option-label'>{ts}Label{/ts}</th>
             <th class='crm-custom_option-value'>{ts}Value{/ts}</th>
+	          <th class='crm-custom_option-description'>{ts}Description{/ts}</th>
             <th class='crm-custom_option-default_value'>{ts}Default{/ts}</th>
             <th class='crm-custom_option-is_active'>{ts}Enabled?{/ts}</th>
             <th class='crm-custom_option-links'>&nbsp;</th>
@@ -70,6 +71,7 @@
                               {sClass:'crm-custom_option-label'},
                               {sClass:'crm-custom_option-value'},
                               {sClass:'crm-custom_option-default_value'},
+                              {sClass:'crm-custom_option-default_description'},
                               {sClass:'crm-custom_option-is_active'},
                               {sClass:'crm-custom_option-links'},
                               {sClass:'hiddenElement'}

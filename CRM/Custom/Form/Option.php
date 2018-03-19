@@ -181,6 +181,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
 
       $this->add('text', 'value', ts('Option Value'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'), TRUE);
 
+      $this->add('textarea', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'description'));
       // weight
       $this->add('text', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'weight'), TRUE);
       $this->addRule('weight', ts('is a numeric field'), 'numeric');
@@ -406,6 +407,7 @@ SELECT count(*)
     $customOption->label = $params['label'];
     $customOption->name = CRM_Utils_String::titleToVar($params['label']);
     $customOption->weight = $params['weight'];
+    $customOption->description = $params['description'];
     $customOption->value = $params['value'];
     $customOption->is_active = CRM_Utils_Array::value('is_active', $params, FALSE);
 
