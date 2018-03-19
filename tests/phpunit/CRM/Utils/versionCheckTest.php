@@ -275,59 +275,64 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
 
     // Stats array should have correct elements.
     $this->assertArrayHasKey('version', $stats);
-    $this->assertArrayHasKey('hash', $stats);
-    $this->assertArrayHasKey('uf', $stats);
-    $this->assertArrayHasKey('lang', $stats);
-    $this->assertArrayHasKey('co', $stats);
-    $this->assertArrayHasKey('ufv', $stats);
-    $this->assertArrayHasKey('PHP', $stats);
-    $this->assertArrayHasKey('MySQL', $stats);
-    $this->assertArrayHasKey('communityMessagesUrl', $stats);
-    $this->assertArrayHasKey('domain_isoCode', $stats);
-    $this->assertArrayHasKey('PPTypes', $stats);
-    $this->assertArrayHasKey('entities', $stats);
-    $this->assertArrayHasKey('extensions', $stats);
-    $this->assertType('array', $stats['entities']);
-    $this->assertType('array', $stats['extensions']);
 
-    // Assert $stats['domain_isoCode'] is correct.
-    $this->assertEquals($country['iso_code'], $stats['domain_isoCode']);
+    // See CRM_Utils_VersionCheck::getSiteStats where alpha versions don't get
+    // full stats generated
+    if (array_key_exists('version', $stats) && strpos($stats['version'], 'alpha') !== FALSE) {
+      $this->assertArrayHasKey('hash', $stats);
+      $this->assertArrayHasKey('uf', $stats);
+      $this->assertArrayHasKey('lang', $stats);
+      $this->assertArrayHasKey('co', $stats);
+      $this->assertArrayHasKey('ufv', $stats);
+      $this->assertArrayHasKey('PHP', $stats);
+      $this->assertArrayHasKey('MySQL', $stats);
+      $this->assertArrayHasKey('communityMessagesUrl', $stats);
+      $this->assertArrayHasKey('domain_isoCode', $stats);
+      $this->assertArrayHasKey('PPTypes', $stats);
+      $this->assertArrayHasKey('entities', $stats);
+      $this->assertArrayHasKey('extensions', $stats);
+      $this->assertType('array', $stats['entities']);
+      $this->assertType('array', $stats['extensions']);
 
-    $entity_names = array();
-    foreach ($stats['entities'] as $entity) {
-      $entity_names[] = $entity['name'];
-      $this->assertType('int', $entity['size'], "Stats entity {$entity['name']} has integer size?");
+      // Assert $stats['domain_isoCode'] is correct.
+      $this->assertEquals($country['iso_code'], $stats['domain_isoCode']);
+
+      $entity_names = array();
+      foreach ($stats['entities'] as $entity) {
+        $entity_names[] = $entity['name'];
+        $this->assertType('int', $entity['size'], "Stats entity {$entity['name']} has integer size?");
+      }
+
+      $expected_entity_names = array(
+        'Activity',
+        'Case',
+        'Contact',
+        'Relationship',
+        'Campaign',
+        'Contribution',
+        'ContributionPage',
+        'ContributionProduct',
+        'Widget',
+        'Discount',
+        'PriceSetEntity',
+        'UFGroup',
+        'Event',
+        'Participant',
+        'Friend',
+        'Grant',
+        'Mailing',
+        'Membership',
+        'MembershipBlock',
+        'Pledge',
+        'PledgeBlock',
+        'Delivered',
+      );
+      sort($entity_names);
+      sort($expected_entity_names);
+      $this->assertEquals($expected_entity_names, $entity_names);
+
+      // TODO: Also test for enabled extensions.
     }
-
-    $expected_entity_names = array(
-      'Activity',
-      'Case',
-      'Contact',
-      'Relationship',
-      'Campaign',
-      'Contribution',
-      'ContributionPage',
-      'ContributionProduct',
-      'Widget',
-      'Discount',
-      'PriceSetEntity',
-      'UFGroup',
-      'Event',
-      'Participant',
-      'Friend',
-      'Grant',
-      'Mailing',
-      'Membership',
-      'MembershipBlock',
-      'Pledge',
-      'PledgeBlock',
-      'Delivered',
-    );
-    sort($entity_names);
-    sort($expected_entity_names);
-    $this->assertEquals($expected_entity_names, $entity_names);
-
-    // TODO: Also test for enabled extensions.
   }
 
 }
