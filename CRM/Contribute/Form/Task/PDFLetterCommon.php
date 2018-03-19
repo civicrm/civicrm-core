@@ -188,17 +188,17 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * Check that the token only appears in a table cell. The '</td><td>' separator cannot otherwise work
    * Calculate the number of times it appears IN the cell & the number of times it appears - should be the same!
    *
-   * @param $token
-   * @param $entity
-   * @param $textToSearch
+   * @param string $token
+   * @param string $entity
+   * @param string $textToSearch
    *
    * @return bool
    */
   public static function isHtmlTokenInTableCell($token, $entity, $textToSearch) {
-    $tokenToMatch = $entity . '.' . $token;
-    $dontCare = array();
-    $within = preg_match_all("|<td.+?{" . $tokenToMatch . "}.+?</td|si", $textToSearch, $dontCare);
-    $total = preg_match_all("|{" . $tokenToMatch . "}|", $textToSearch, $dontCare);
+    $tokenToMatch = $entity . '\.' . $token;
+    $pattern = '|<td(?![\w-])((?!</td>).)*\{' . $tokenToMatch . '\}.*?</td>|si';
+    $within = preg_match_all($pattern, $textToSearch);
+    $total = preg_match_all("|{" . $tokenToMatch . "}|", $textToSearch);
     return ($within == $total);
   }
 

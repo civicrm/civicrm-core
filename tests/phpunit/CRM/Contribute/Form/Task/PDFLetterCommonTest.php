@@ -376,4 +376,78 @@ value=$contact_aggregate+$contribution.total_amount}
     }
   }
 
+  /**
+   * @param string $token
+   * @param string $entity
+   * @param string $textToSearch
+   * @param bool $expected
+   *
+   * @dataProvider isHtmlTokenInTableCellProvider
+   */
+  public function testIsHtmlTokenInTableCell($token, $entity, $textToSearch, $expected) {
+    $this->assertEquals($expected,
+      CRM_Contribute_Form_Task_PDFLetterCommon::isHtmlTokenInTableCell($token, $entity, $textToSearch)
+    );
+  }
+
+  public function isHtmlTokenInTableCellProvider() {
+    return [
+
+      'simplest TRUE' => [
+        'token',
+        'entity',
+        '<td>{entity.token}</td>',
+        TRUE,
+      ],
+
+      'simplest FALSE' => [
+        'token',
+        'entity',
+        '{entity.token}',
+        FALSE,
+      ],
+
+      'token between two tables' => [
+        'token',
+        'entity',
+        ' <table><tr><td>Top</td></tr></table>
+          {entity.token}
+          <table><tr><td>Bottom</td></tr></table>',
+        FALSE,
+      ],
+
+      'token in two tables' => [
+        'token',
+        'entity',
+        ' <table><tr><td>{entity.token}</td></tr><tr><td>foo</td></tr></table>
+          <table><tr><td>{entity.token}</td></tr><tr><td>foo</td></tr></table>',
+        TRUE,
+      ],
+
+      'token outside of table and inside of table' => [
+        'token',
+        'entity',
+        ' {entity.token}
+          <table><tr><td>{entity.token}</td></tr><tr><td>foo</td></tr></table>',
+        FALSE,
+      ],
+
+      'token inside more complicated table' => [
+        'token',
+        'entity',
+        ' <table><tr><td class="foo"><em>{entity.token}</em></td></tr></table>',
+        TRUE,
+      ],
+
+      'token inside something that looks like table cell' => [
+        'token',
+        'entity',
+        ' <tdata>{entity.token}</tdata>
+          <table><tr><td>Bottom</td></tr></table>',
+        FALSE,
+      ],
+
+    ];
+  }
+
 }
