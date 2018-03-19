@@ -28,7 +28,7 @@
 <div class="crm-block crm-form-block crm-export-form-block">
 
  <div class="help">
-    <p>{ts}<strong>Export {if $exportCustomSearchField}custom search{else}PRIMARY{/if} fields</strong> provides the most commonly used data values. This includes primary address information, preferred phone and email.{/ts}</p>
+    <p>{ts}<strong>Export PRIMARY fields</strong> provides the most commonly used data values. This includes primary address information, preferred phone and email.{/ts}</p>
     <p>{ts}Click <strong>Select fields for export</strong> and then <strong>Continue</strong> to choose a subset of fields for export. This option allows you to export multiple specific locations (Home, Work, etc.) as well as custom data. You can also save your selections as a 'field mapping' so you can use it again later.{/ts}</p>
  </div>
 
