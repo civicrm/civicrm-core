@@ -414,24 +414,10 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
 ";
     }
 
-    if ($this->_addressField) {
-      $this->_from .= "
-             LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                    ON {$conact}.id = {$this->_aliases['civicrm_address']}.contact_id AND
-                       {$this->_aliases['civicrm_address']}.is_primary = 1 ";
-    }
-    if ($this->_emailField) {
-      $this->_from .= "
-             LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                   ON {$conact}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                       {$this->_aliases['civicrm_email']}.is_primary = 1 ";
-    }
-    if ($this->_phoneField) {
-      $this->_from .= "
-             LEFT JOIN  civicrm_phone {$this->_aliases['civicrm_phone']}
-                       ON ( {$conact}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                          {$this->_aliases['civicrm_phone']}.is_primary = 1) ";
-    }
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
+
     if ($this->_worldRegionField) {
       $this->_from .= "
              LEFT JOIN civicrm_country {$this->_aliases['civicrm_country']}

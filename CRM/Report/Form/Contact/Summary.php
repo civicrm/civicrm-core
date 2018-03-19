@@ -192,27 +192,9 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
             LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
                    ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
                       {$this->_aliases['civicrm_address']}.is_primary = 1 ) ";
-
-    if ($this->isTableSelected('civicrm_email')) {
-      $this->_from .= "
-            LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']}
-                   ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                      {$this->_aliases['civicrm_email']}.is_primary = 1) ";
-    }
-
-    if ($this->_phoneField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                      {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
-    }
-
-    if ($this->isTableSelected('civicrm_country')) {
-      $this->_from .= "
-            LEFT JOIN civicrm_country {$this->_aliases['civicrm_country']}
-                   ON {$this->_aliases['civicrm_address']}.country_id = {$this->_aliases['civicrm_country']}.id AND
-                      {$this->_aliases['civicrm_address']}.is_primary = 1 ";
-    }
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
+    $this->joinCountryFromClause();
   }
 
   public function postProcess() {

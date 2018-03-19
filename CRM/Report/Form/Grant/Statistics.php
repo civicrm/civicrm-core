@@ -241,15 +241,11 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
         FROM civicrm_grant {$this->_aliases['civicrm_grant']}
                         LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                     ON ({$this->_aliases['civicrm_grant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  ) ";
+
+    $this->joinAddressFromClause();
+    $this->joinCountryFromClause();
     if ($this->_addressField) {
       $this->_from .= "
-                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                         ON {$this->_aliases['civicrm_contact']}.id =
-                            {$this->_aliases['civicrm_address']}.contact_id AND
-                            {$this->_aliases['civicrm_address']}.is_primary = 1\n
-                  LEFT JOIN civicrm_country country
-                         ON {$this->_aliases['civicrm_address']}.country_id =
-                            country.id
                   LEFT JOIN civicrm_worldregion {$this->_aliases['civicrm_world_region']}
                          ON country.region_id =
                             {$this->_aliases['civicrm_world_region']}.id";

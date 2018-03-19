@@ -41,7 +41,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   protected $_customGroupExtends = array('Contribution', 'Contact', 'Individual');
   protected $_customGroupGroupBy = TRUE;
 
-  public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
+  public $_drilldownReport = array('contribute/summary' => 'Link to Summary Report');
 
   /**
    * To what frequency group-by a date column
@@ -515,15 +515,12 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
              {$softCreditJoin}
              LEFT  JOIN civicrm_financial_type  {$this->_aliases['civicrm_financial_type']}
                      ON {$this->_aliases['civicrm_contribution']}.financial_type_id ={$this->_aliases['civicrm_financial_type']}.id
-             LEFT  JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                        {$this->_aliases['civicrm_email']}.is_primary = 1)
+             ";
 
-             LEFT  JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                        {$this->_aliases['civicrm_phone']}.is_primary = 1)";
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
 
-    $this->addAddressFromClause();
     //for contribution batches
     if ($this->isTableSelected('civicrm_batch')) {
       $this->_from .= "

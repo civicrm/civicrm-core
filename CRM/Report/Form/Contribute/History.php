@@ -398,23 +398,13 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND
                         {$this->_aliases['civicrm_contribution']}.is_test = 0 ";
 
-    if ($this->_emailField) {
-      $this->_from .= " LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                        {$this->_aliases['civicrm_email']}.is_primary = 1) ";
-    }
-
-    if ($this->_phoneField) {
-      $this->_from .= " LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                        {$this->_aliases['civicrm_phone']}.is_primary = 1) ";
-    }
-
     $relContacAlias = 'contact_relationship';
     $this->_relationshipFrom = " INNER JOIN civicrm_relationship {$this->_aliases['civicrm_relationship']}
                      ON (({$this->_aliases['civicrm_relationship']}.contact_id_a = {$relContacAlias}.id OR {$this->_aliases['civicrm_relationship']}.contact_id_b = {$relContacAlias}.id ) AND {$this->_aliases['civicrm_relationship']}.is_active = 1) ";
 
-    $this->addAddressFromClause();
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
 
     // for credit card type
     $this->addFinancialTrxnFromClause();

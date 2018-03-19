@@ -248,8 +248,6 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
   }
 
   public function from() {
-    $this->_from = NULL;
-
     $this->_from = "
         FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
               INNER JOIN civicrm_membership {$this->_aliases['civicrm_membership']}
@@ -262,27 +260,9 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
                          ON {$this->_aliases['civicrm_membership']}.membership_type_id =
                             {$this->_aliases['civicrm_membership_type']}.id";
 
-    //  include address field if address column is to be included
-    if ($this->_addressField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
-
-    // include email field if email column is to be included
-    if ($this->_emailField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND {$this->_aliases['civicrm_email']}.is_primary = 1\n";
-    }
-
-    // include phone field if phone column is to be included
-    if ($this->_phoneField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id
-                     AND {$this->_aliases['civicrm_phone']}.is_primary = 1\n";
-    }
+    $this->joinAddressFromClause();
+    $this->joinPhoneFromClause();
+    $this->joinEmailFromClause();
   }
 
   public function where() {
