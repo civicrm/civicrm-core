@@ -703,12 +703,20 @@ COLS;
     // - prepend the name with log_
     // - drop AUTO_INCREMENT columns
     // - drop non-column rows of the query (keys, constraints, etc.)
-    // - set the ENGINE to the specified engine (default is archive)
+    // - set the ENGINE to the specified engine (default is archive or if archive is disabled or nor installed INNODB)
     // - add log-specific columns (at the end of the table)
+    $mysqlEngines = [];
+    $engines = CRM_Core_DAO::executeQuery("SHOW ENGINES");
+    while ($engines->fetch()) {
+      if ($engines->Support == 'YES' || $engines->Support == 'DEFAULT') {
+        $mysqlEngines[] = $engines->Engine;
+      }
+    }
+    $logEngine = in_array('ARCHIVE', $mysqlEngines) ? 'ARCHIVE' : 'INNODB';
     $query = preg_replace("/^CREATE TABLE `$table`/i", "CREATE TABLE `{$this->db}`.log_$table", $query);
     $query = preg_replace("/ AUTO_INCREMENT/i", '', $query);
     $query = preg_replace("/^  [^`].*$/m", '', $query);
-    $engine = strtoupper(CRM_Utils_Array::value('engine', $this->logTableSpec[$table], 'ARCHIVE'));
+    $engine = strtoupper(CRM_Utils_Array::value('engine', $this->logTableSpec[$table], $logEngine));
     $engine .= " " . CRM_Utils_Array::value('engine_config', $this->logTableSpec[$table]);
     $query = preg_replace("/^\) ENGINE=[^ ]+ /im", ') ENGINE=' . $engine . ' ', $query);
 
