@@ -182,8 +182,11 @@ class AngularLoader {
    * @param array $settings
    *   A list of settings. Accepted values:
    *    - activeRoute: string, the route to open up immediately
-   *    - defaultRoute: string, use this to redirect the default route to another page
+   *      Ex: '/case/list'
+   *    - defaultRoute: string, use this to redirect the default route (`/`) to another page
+   *      Ex: '/case/list'
    *    - region: string, the place on the page where we should insert the angular app
+   *      Ex: 'page-body'
    * @return AngularLoader
    * @link https://code.angularjs.org/1.5.11/docs/guide/bootstrap
    */
