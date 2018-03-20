@@ -293,6 +293,43 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   }
 
   /**
+   * check function getDatesForMembershipType( )
+   *
+   */
+  public function testGetDatesWithFixedPeriodForMembershipType() {
+    $ids = array();
+    $params = array(
+      'name' => 'General',
+      'description' => NULL,
+      'minimum_fee' => 100,
+      'join_date' => '20180205000000',  
+      'domain_id' => 1,
+      'duration_unit' => 'month',
+      'member_of_contact_id' => $this->_orgContactID,
+      'period_type' => 'fixed',
+      'duration_interval' => 1,
+      'financial_type_id' => $this->_financialTypeId,
+      'relationship_type_id' => $this->_relationshipTypeId,
+      'visibility' => 'Public',
+      'fixed_period_rollover_day' => null,
+      'is_active' => 1,
+    );
+    $membership = CRM_Member_BAO_MembershipType::add($params, $ids);    
+    $membershipDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membership->id);
+    
+    //Generate end date with the logic it have in the CRM_Member_BAO_MembershipType::getDatesForMembershipType for fixed_period_rollover_day is null
+    $date = explode('-', $membershipDates['start_date']);
+    $year = $date[0];
+    $month = $date[1];
+    $day = $date[2];
+    $month = $month + (1 * $membershipDates['duration_interval']);
+    $extectedEndDate = $endDate = date('Y-m-d', mktime(0, 0, 0, $month, $day - 1, $year));
+    
+    $this->assertEquals($membershipDates['end_date'], $extectedEndDate, 'Verify membership types details.');
+    $this->membershipTypeDelete(array('id' => $membership->id));
+  }
+ 
+  /**
    * check function getRenewalDatesForMembershipType( )
    *
    */
