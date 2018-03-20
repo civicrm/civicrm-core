@@ -1091,6 +1091,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $options[] = $this->createElement('radio', NULL, NULL, $var, $key, $attributes);
     }
     $group = $this->addGroup($options, $name, $title, $separator);
+
+    $optionEditKey = 'data-option-edit-path';
+    if (!empty($attributes[$optionEditKey])) {
+      $group->setAttribute($optionEditKey, $attributes[$optionEditKey]);
+    }
+
     if ($required) {
       $this->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
     }
@@ -1144,25 +1150,29 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($javascriptMethod) {
       foreach ($values as $key => $var) {
         if (!$flipValues) {
-          $options[] = $this->createElement('checkbox', $var, NULL, $key, $javascriptMethod);
+          $options[] = $this->createElement('checkbox', $var, NULL, $key, $javascriptMethod, $attributes);
         }
         else {
-          $options[] = $this->createElement('checkbox', $key, NULL, $var, $javascriptMethod);
+          $options[] = $this->createElement('checkbox', $key, NULL, $var, $javascriptMethod, $attributes);
         }
       }
     }
     else {
       foreach ($values as $key => $var) {
         if (!$flipValues) {
-          $options[] = $this->createElement('checkbox', $var, NULL, $key);
+          $options[] = $this->createElement('checkbox', $var, NULL, $key, $attributes);
         }
         else {
-          $options[] = $this->createElement('checkbox', $key, NULL, $var);
+          $options[] = $this->createElement('checkbox', $key, NULL, $var, $attributes);
         }
       }
     }
 
-    $this->addGroup($options, $id, $title, $separator);
+    $group = $this->addGroup($options, $id, $title, $separator);
+    $optionEditKey = 'data-option-edit-path';
+    if (!empty($attributes[$optionEditKey])) {
+      $group->setAttribute($optionEditKey, $attributes[$optionEditKey]);
+    }
 
     if ($other) {
       $this->addElement('text', $id . '_other', ts('Other'), $attributes[$id . '_other']);
@@ -1425,8 +1435,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
 
       // Add data for popup link.
-      if ((!empty($props['option_url']) || !array_key_exists('option_url', $props)) && ($context != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM'))) {
-        $props['data-option-edit-path'] = !empty($props['option_url']) ? $props['option_url'] : CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
+      $canEditOptions = CRM_Core_Permission::check('administer CiviCRM');
+      $hasOptionUrl = !empty($props['option_url']);
+      $optionUrlKeyIsSet = array_key_exists('option_url', $props);
+      $shouldAdd = $context !== 'search' && $isSelect && $canEditOptions;
+
+      // Only add if key is not set, or if non-empty option url is provided
+      if (($hasOptionUrl || !$optionUrlKeyIsSet) && $shouldAdd) {
+        $optionUrl = $hasOptionUrl ? $props['option_url'] :
+          CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
+        $props['data-option-edit-path'] = $optionUrl;
         $props['data-api-entity'] = $props['entity'];
         $props['data-api-field'] = $props['name'];
       }

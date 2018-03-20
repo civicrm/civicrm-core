@@ -803,6 +803,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $field = self::getFieldObject($fieldId);
     $widget = $field->html_type;
     $element = NULL;
+    $customFieldAttributes = array();
 
     // Custom field HTML should indicate group+field name
     $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $field->custom_group_id);
@@ -837,23 +838,27 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       if ($search || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
         $widget = 'Select';
       }
-      $selectAttributes = array(
-        'data-crm-custom' => $dataCrmCustomVal,
-        'class' => 'crm-select2',
-      );
+
+      $customFieldAttributes['data-crm-custom'] = $dataCrmCustomVal;
+      $selectAttributes = array('class' => 'crm-select2');
+
       // Search field is always multi-select
       if ($search || strpos($field->html_type, 'Multi') !== FALSE) {
         $selectAttributes['class'] .= ' huge';
         $selectAttributes['multiple'] = 'multiple';
         $selectAttributes['placeholder'] = $placeholder;
       }
+
       // Add data for popup link. Normally this is handled by CRM_Core_Form->addSelect
-      if ($field->option_group_id && !$search && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM')) {
-        $selectAttributes += array(
+      $isSupportedWidget = in_array($widget, ['Select', 'Radio']);
+      $canEditOptions = CRM_Core_Permission::check('administer CiviCRM');
+      if ($field->option_group_id && !$search && $isSelect && $canEditOptions) {
+        $customFieldAttributes += array(
           'data-api-entity' => $field->getEntity(),
           'data-api-field' => 'custom_' . $field->id,
           'data-option-edit-path' => 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $field->option_group_id),
         );
+        $selectAttributes += $customFieldAttributes;
       }
     }
 
@@ -933,10 +938,18 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'Radio':
         $choice = array();
+        parse_str($field->attributes, $radioAttributes);
+        $radioAttributes = array_merge($radioAttributes, $customFieldAttributes);
+
         foreach ($options as $v => $l) {
-          $choice[] = $qf->createElement('radio', NULL, '', $l, (string) $v, $field->attributes);
+          $choice[] = $qf->createElement('radio', NULL, '', $l, (string) $v, $radioAttributes);
         }
         $element = $qf->addGroup($choice, $elementName, $label);
+        $optionEditKey = 'data-option-edit-path';
+        if (isset($selectAttributes[$optionEditKey])) {
+          $element->setAttribute($optionEditKey, $selectAttributes[$optionEditKey]);
+        }
+
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
         }
@@ -988,9 +1001,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'CheckBox':
         $check = array();
         foreach ($options as $v => $l) {
-          $check[] = &$qf->addElement('advcheckbox', $v, NULL, $l, array('data-crm-custom' => $dataCrmCustomVal));
+          $check[] = &$qf->addElement('advcheckbox', $v, NULL, $l, $customFieldAttributes);
         }
-        $element = $qf->addGroup($check, $elementName, $label);
+
+        $group = $element = $qf->addGroup($check, $elementName, $label);
+        $optionEditKey = 'data-option-edit-path';
+        if (isset($customFieldAttributes[$optionEditKey])) {
+          $group->setAttribute($optionEditKey, $customFieldAttributes[$optionEditKey]);
+        }
+
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
         }
