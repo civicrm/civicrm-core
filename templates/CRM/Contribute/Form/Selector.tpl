@@ -32,7 +32,9 @@
       {if !$single and $context eq 'Search' }
         <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
       {/if}
+      {if !$single}
       <th scope="col"></th>
+      {/if}
       {foreach from=$columnHeaders item=header}
         <th scope="col">
           {if $header.sort}
