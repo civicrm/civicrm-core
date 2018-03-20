@@ -522,6 +522,14 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
         $entryFound = TRUE;
       }
 
+      if (array_key_exists('civicrm_activity_activity_date_time', $row)) {
+        $value = $row['civicrm_activity_activity_date_time'];
+        if ($value) {
+          $rows[$rowNum]['civicrm_activity_activity_date_time'] = CRM_Utils_Date::customFormat($value);
+        }
+        $entryFound = TRUE;
+      }
+
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
       if (!$entryFound) {
