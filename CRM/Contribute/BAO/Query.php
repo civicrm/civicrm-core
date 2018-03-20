@@ -385,7 +385,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'contribution_recur_payment_made':
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_recur.id", 'IS NOT EMPTY');
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_recur.id", 'IS NOT NULL');
         if ($value == 2) {
           $query->_qill[$grouping][] = ts("Recurring contributions with at least one payment");
           self::$_contribRecurPayment = TRUE;
