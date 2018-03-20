@@ -100,7 +100,7 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
     }
 
     if (defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
-      $this->configAndLogDir = CRM_Utils_File::baseFilePath() . 'ConfigAndLog' . DIRECTORY_SEPARATOR;
+      $this->configAndLogDir = CRM_Utils_File::basePrivateFilePath() . 'ConfigAndLog' . DIRECTORY_SEPARATOR;
       CRM_Utils_File::createDir($this->configAndLogDir);
       CRM_Utils_File::restrictAccess($this->configAndLogDir);
 
