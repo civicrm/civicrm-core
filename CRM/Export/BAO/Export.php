@@ -944,7 +944,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           ) {
             //check for custom data
             if ($cfID = CRM_Core_BAO_CustomField::getKeyID($field)) {
-              $row[$field] = CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
+              $row[$field] = CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID, NULL, 'get');
             }
 
             elseif (in_array($field, array(

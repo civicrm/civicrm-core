@@ -390,7 +390,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         FALSE,
         FALSE,
         'label',
-        !($context == 'validate' || $context == 'get')
+        !($context == 'validate' || $context == 'get' || $context == 'export')
       );
     }
     elseif ($this->data_type === 'StateProvince') {
@@ -1165,7 +1165,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @return string
    * @throws \Exception
    */
-  public static function displayValue($value, $field, $entityId = NULL) {
+  public static function displayValue($value, $field, $entityId = NULL, $context = NULL) {
     $field = is_array($field) ? $field['id'] : $field;
     $fieldId = is_object($field) ? $field->id : (int) str_replace('custom_', '', $field);
 
@@ -1177,7 +1177,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $field = self::getFieldObject($fieldId);
     }
 
-    $fieldInfo = array('options' => $field->getOptions()) + (array) $field;
+    $fieldInfo = array('options' => $field->getOptions($context = $context)) + (array) $field;
 
     return self::formatDisplayValue($value, $fieldInfo, $entityId);
   }
