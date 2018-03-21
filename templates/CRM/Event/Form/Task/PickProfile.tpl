@@ -33,10 +33,9 @@
            <td>&nbsp;</td>
            <td>{include file="CRM/Event/Form/Task.tpl"}</td>
         </tr>
-        <tr>
-           <td>&nbsp;</td>
-           <td>{include file="CRM/common/formButtons.tpl" location="bottom"}</td>
-        </tr>
     </table>
+    <div class="crm-submit-buttons">
+      {include file="CRM/common/formButtons.tpl" location="bottom"}
+    </div>
 </div>
 
