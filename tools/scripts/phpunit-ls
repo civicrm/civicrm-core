@@ -14,7 +14,7 @@ if (!class_exists('PHPUnit_Framework_TestCase')) {
   class PHPUnit_Framework_TestCase {}
   class PHPUnit_Extensions_Database_TestCase {}
   class PHPUnit_Extensions_SeleniumTestCase {}
-  \');
+  ');
 }
 
 \Civi\CiUtil\Command\LsCommand::main($argv);
