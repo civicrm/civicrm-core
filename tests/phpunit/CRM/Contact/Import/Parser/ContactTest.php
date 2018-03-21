@@ -47,6 +47,55 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that import parser will add contact with employee of relationship.
+   *
+   * @throws \Exception
+   */
+  public function testImportParserWtihEmployeeOfRelationship() {
+    $this->organizationCreate(array(
+      "organization_name" => "Agileware",
+      "legal_name"        => "Agileware",
+    ));
+    $contactImportValues = array(
+      "first_name"  => "Alok",
+      "last_name"   => "Patel",
+      "Employee of" => "Agileware",
+    );
+
+    $fields = array_keys($contactImportValues);
+    $values = array_values($contactImportValues);
+    $parser = new CRM_Contact_Import_Parser_Contact($fields, NULL);
+    $parser->_contactType = 'Individual';
+    $parser->init();
+    $this->mapRelationshipFields($fields, $parser->getAllFields());
+
+    $parser = new CRM_Contact_Import_Parser_Contact($fields, NULL, NULL, NULL, array(
+      NULL,
+      NULL,
+      $fields[2],
+    ), array(
+      NULL,
+      NULL,
+      "Organization",
+    ), array(
+      NULL,
+      NULL,
+      "organization_name",
+    ), NULL, NULL, NULL, NULL, NULL);
+
+    $parser->_contactType = 'Individual';
+    $parser->_onDuplicate = CRM_Import_Parser::DUPLICATE_UPDATE;
+    $parser->init();
+
+    $this->assertEquals(CRM_Import_Parser::VALID, $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values), 'Return code from parser import was not as expected');
+    $this->callAPISuccess("Contact", "get", array(
+        "first_name"        => "Alok",
+        "last_name"         => "Patel",
+        "organization_name" => "Agileware",
+    ));
+  }
+
+  /**
    * Test that import parser will not fail when same external_identifier found of deleted contact.
    *
    * @throws \Exception
@@ -511,6 +560,19 @@ class CRM_Contact_Imports_Parser_ContactTest extends CiviUnitTestCase {
     $parser->_onDuplicate = $onDuplicateAction;
     $parser->init();
     $this->assertEquals($expectedResult, $parser->import($onDuplicateAction, $values), 'Return code from parser import was not as expected');
+  }
+
+  /**
+   * @param array $fields Array of fields to be imported
+   * @param array $allfields Array of all fields which can be part of import
+   */
+  private function mapRelationshipFields(&$fields, $allfields) {
+    foreach ($allfields as $key => $fieldtocheck) {
+      $elementIndex = array_search($fieldtocheck->_title, $fields);
+      if ($elementIndex !== FALSE) {
+        $fields[$elementIndex] = $key;
+      }
+    }
   }
 
   /**

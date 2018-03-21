@@ -457,6 +457,16 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
+   * Get Array of all the fields that could potentially be part
+   * import process
+   *
+   * @return array
+   */
+  public function getAllFields() {
+    return $this->_fields;
+  }
+
+  /**
    * Handle the values in import mode.
    *
    * @param int $onDuplicate
