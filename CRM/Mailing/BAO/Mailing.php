@@ -249,6 +249,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         $location_filter,
         "$entityTable.email IS NOT NULL",
         "$entityTable.email != ''",
+        "$entityTable.on_hold = 0",
         "mg.mailing_id = #mailingID",
         'temp.contact_id IS NULL',
       );
