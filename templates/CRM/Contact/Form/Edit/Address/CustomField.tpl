@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {assign var="element_name" value=$element.element_custom_name}
-{if $element.is_view eq 0}{* fix for CRM-3510 *}
+
     {if $element.help_pre}
         <tr>
             <td>&nbsp;</td>
@@ -103,5 +103,4 @@
 <td class="description">{$element.help_post}<br />&nbsp;</td>
 </tr>
         {/if}
-    {/if}
 {/if}
