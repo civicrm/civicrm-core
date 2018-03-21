@@ -36,7 +36,8 @@
             {/if}
             <table class="form-layout-compressed">
                 {foreach from=$cd_edit.fields item=element key=field_id}
-                    {include file="CRM/Contact/Form/Edit/Address/CustomField.tpl"}
+                  {assign var="element_name" value=$element.element_custom_name}
+                  {include file="CRM/Custom/Form/Edit/CustomField.tpl" formElement=$form.address.$blockId.$element_name}
                 {/foreach}
             </table>
             <div class="spacer"></div>
