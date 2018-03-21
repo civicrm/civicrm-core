@@ -30,10 +30,13 @@ jQuery(function($) {
    */
   function rebuildOptions($existing, rebuilder) {
     if ($existing.data('api-entity') && $existing.data('api-field')) {
-      CRM.api3($existing.data('api-entity'), 'getoptions', {
+      var params = {
         sequential: 1,
         field: $existing.data('api-field')
-      })
+      };
+      $.extend(params, $existing.data('option-edit-context'));
+
+      CRM.api3($existing.data('api-entity'), 'getoptions', params)
       .done(function(data) {
         rebuilder($existing, data.values);
       });
