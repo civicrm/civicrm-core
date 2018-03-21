@@ -2149,4 +2149,73 @@ AND cc.sort_name LIKE '%$name%'";
     return $relationshipsDT;
   }
 
+  /**
+   * @inheritdoc
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    if ($fieldName === 'relationship_type_id') {
+      return self::buildRelationshipTypeOptions($props);
+    }
+
+    return parent::buildOptions($fieldName, $context, $props);
+  }
+
+  /**
+   * Builds a list of options available for relationship types
+   *
+   * @param array $params
+   *   - contact_type: Limits by contact type on the "A" side
+   *   - relationship_id: Used to find the value for contact type for "B" side.
+   *     If contact_a matches provided contact_id then type of contact_b will
+   *     be used. Otherwise uses type of contact_a. Must be used with contact_id
+   *   - contact_id: Limits by contact types of this contact on the "A" side
+   *   - is_form: Returns array with keys indexed for use in a quickform
+   *   - relationship_direction: For relationship types with duplicate names
+   *     on both sides, defines which option should be returned, a_b or b_a
+   *
+   * @return array
+   */
+  public static function buildRelationshipTypeOptions($params = array()) {
+    $contactId = CRM_Utils_Array::value('contact_id', $params);
+    $direction = CRM_Utils_Array::value('relationship_direction', $params, 'a_b');
+    $relationshipId = CRM_Utils_Array::value('relationship_id', $params);
+    $contactType = CRM_Utils_Array::value('contact_type', $params);
+    $isForm = CRM_Utils_Array::value('is_form', $params);
+    $showAll = FALSE;
+
+    // getContactRelationshipType will return an empty set if these are not set
+    if (!$contactId && !$relationshipId && !$contactType) {
+      $showAll = TRUE;
+    }
+
+    $labels = self::getContactRelationshipType(
+      $contactId,
+      $direction,
+      $relationshipId,
+      $contactType,
+      $showAll,
+      'label'
+    );
+
+    if ($isForm) {
+      return $labels;
+    }
+
+    $names = self::getContactRelationshipType(
+      $contactId,
+      $direction,
+      $relationshipId,
+      $contactType,
+      $showAll,
+      'name'
+    );
+
+    // ensure $names contains only entries in $labels
+    $names = array_intersect_key($names, $labels);
+
+    $nameToLabels = array_combine($names, $labels);
+
+    return $nameToLabels;
+  }
+
 }
