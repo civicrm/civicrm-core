@@ -582,7 +582,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       $this->_aliases['civicrm_contact'] = 'civicrm_contact_source';
     }
 
-    $this->addAddressFromClause();
+    $this->joinAddressFromContact();
   }
 
   /**
