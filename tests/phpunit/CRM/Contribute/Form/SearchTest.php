@@ -57,7 +57,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $batchTitle = CRM_Batch_BAO_Batch::generateBatchName();
 
     // create batch
-    $batch = civicrm_api3('Batch', 'create', array(
+    $batch = $this->callAPISuccess('Batch', 'create', array(
       'created_id' => $this->_individual,
       'created_date' => CRM_Utils_Date::processDate(date("Y-m-d"), date("H:i:s")),
       'status_id' => CRM_Core_Pseudoconstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Data Entry'),
@@ -98,7 +98,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     );
 
     // create random contribution to check IS NULL filter more precisely
-    $nonBatchContri = civicrm_api3('Contribution', 'create', array(
+    $nonBatchContri = $this->callAPISuccess('Contribution', 'create', array(
       'financial_type_id' => 1,
       'total_amount' => 123,
       'receive_date' => '2014-07-24',
@@ -116,7 +116,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $form->testProcessContribution($batchEntry);
 
     // fetch created contributions
-    $entities = civicrm_api3('EntityBatch', 'get', array('batch_id' => $batchID));
+    $entities = $this->callAPISuccess('EntityBatch', 'get', array('batch_id' => $batchID));
     $ids = array();
     foreach ($entities['values'] as $value) {
       $ids[] = $value['entity_id'];
@@ -201,7 +201,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'contact_id' => $contactID1,
     ));
-    $Contribution3 = civicrm_api3('Contribution', 'create', array(
+    $Contribution3 = $this->callAPISuccess('Contribution', 'create', array(
       'financial_type_id' => 1,
       'total_amount' => 200,
       'receive_date' => date('Ymd'),
@@ -307,7 +307,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'contact_id' => $contactID1,
     ));
-    $Contribution3 = civicrm_api3('Contribution', 'create', array(
+    $Contribution3 = $this->callAPISuccess('Contribution', 'create', array(
       'financial_type_id' => 1,
       'total_amount' => 200,
       'receive_date' => date('Ymd'),
