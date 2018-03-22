@@ -31,17 +31,7 @@
             {$cd_edit.title}
         </div>
         <div>
-            {if $cd_edit.help_pre}
-                <div class="messages help">{$cd_edit.help_pre}</div>
-            {/if}
-            <table class="form-layout-compressed">
-                {foreach from=$cd_edit.fields item=element key=field_id}
-                  {assign var="element_name" value=$element.element_custom_name}
-                  {include file="CRM/Custom/Form/Edit/CustomField.tpl" formElement=$form.address.$blockId.$element_name}
-                {/foreach}
-            </table>
-            <div class="spacer"></div>
-            {if $cd_edit.help_post}<div class="messages help">{$cd_edit.help_post}</div>{/if}
+        {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity='address'}
         </div>
     </div>
 
