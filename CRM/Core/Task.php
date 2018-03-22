@@ -82,7 +82,7 @@ abstract class CRM_Core_Task {
    *            ]
    */
   public static function tasks() {
-    CRM_Utils_Hook::searchTasks(self::$objectType, self::$_tasks);
+    CRM_Utils_Hook::searchTasks(static::$objectType, self::$_tasks);
     asort(self::$_tasks);
 
     return self::$_tasks;
