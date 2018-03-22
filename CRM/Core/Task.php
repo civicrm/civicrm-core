@@ -172,8 +172,8 @@ abstract class CRM_Core_Task {
     static::tasks();
 
     if (!CRM_Utils_Array::value($value, self::$_tasks)) {
-      // Children can specify a default task (eg. print), we don't here
-      return array();
+      // Children can specify a default task (eg. print), pick another if it is not valid.
+      $value = key(self::$_tasks);
     }
     return array(
       CRM_Utils_Array::value('class', self::$_tasks[$value]),
