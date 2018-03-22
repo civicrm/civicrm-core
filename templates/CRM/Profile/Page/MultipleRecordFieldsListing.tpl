@@ -49,7 +49,7 @@
               {literal}
               <script type="text/javascript">
                 (function($) {
-                  var ZeroRecordText = {/literal}'{ts 1=$customGroupTitle}No records of type \'%1\' found.{/ts}'{literal};
+                  var ZeroRecordText = {/literal}'{ts 1=$customGroupTitle|escape}No records of type \'%1\' found.{/ts}'{literal};
                   var $table = $('#records-' + {/literal}'{$customGroupId}'{literal});
                   $('table.crm-multifield-selector').data({
                     "ajax": {
