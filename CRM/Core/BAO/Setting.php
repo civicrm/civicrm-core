@@ -476,21 +476,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   /**
-   * Civicrm_setting didn't exist before 4.1.alpha1 and this function helps taking decisions during upgrade
-   *
-   * @return bool
-   */
-  public static function isUpgradeFromPreFourOneAlpha1() {
-    if (CRM_Core_Config::isUpgradeMode()) {
-      $currentVer = CRM_Core_BAO_Domain::version();
-      if (version_compare($currentVer, '4.1.alpha1') < 0) {
-        return TRUE;
-      }
-    }
-    return FALSE;
-  }
-
-  /**
    * Check if environment is explicitly set.
    *
    * @return bool
