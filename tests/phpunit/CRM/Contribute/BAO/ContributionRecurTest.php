@@ -99,7 +99,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    */
   public function testSupportFinancialTypeChange() {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
-    $this->callAPISuccess('contribution', 'create', array(
+    $this->callAPISuccess('Contribution', 'create', array(
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
       'financial_type_id' => 1,
