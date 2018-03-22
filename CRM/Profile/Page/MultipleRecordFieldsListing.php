@@ -199,10 +199,10 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
     elseif ($this->_pageViewType == 'customDataView') {
       // require custom group id for _pageViewType of customDataView
       $customGroupId = $this->_customGroupId;
+      $this->assign('customGroupId', $customGroupId);
       $reached = CRM_Core_BAO_CustomGroup::hasReachedMaxLimit($customGroupId, $this->_contactId);
       if (!$reached) {
         $this->assign('contactId', $this->_contactId);
-        $this->assign('customGroupId', $customGroupId);
         $this->assign('ctype', $this->_contactType);
       }
       $this->assign('reachedMax', $reached);
