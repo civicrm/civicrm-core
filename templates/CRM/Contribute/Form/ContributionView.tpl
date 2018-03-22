@@ -90,10 +90,7 @@
   {else}
     <tr>
       <td class="label">{ts}Total Amount{/ts}</td>
-      <td><strong><a class="nowrap bold crm-expand-row" title="{ts}view payments{/ts}"
-        href="{crmURL p='civicrm/payment' q="view=transaction&component=contribution&action=browse&cid=`$contact_id`&id=`$contribution_id`&selector=1"}">
-               &nbsp; {$total_amount|crmMoney:$currency}
-            </strong></a>&nbsp;
+      <td><strong>{$total_amount|crmMoney:$currency}</strong>
         {if $contribution_recur_id}
           <a class="crm-hover-button" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contact_id`&context=contribution"}'>
             <strong>{ts}Recurring Contribution{/ts}</strong>
@@ -239,9 +236,13 @@
       <td>{$thankyou_date|crmDate}</td>
     </tr>
   {/if}
+  <tr>
+    <td class="label">{ts}Payment Details{/ts}</td>
+    <td>{include file="CRM/Contribute/Form/PaymentInfoBlock.tpl"}</td>
+  </tr>
   {if $addRecordPayment}
     <tr>
-      <td class='label'>{ts}Fees{/ts}</td>
+      <td class='label'>{ts}Payment Summary{/ts}</td>
       <td id='payment-info'></td>
     </tr>
   {/if}
