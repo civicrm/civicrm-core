@@ -244,7 +244,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       'type' => 'next',
       'name' => $this->next ? ts('Merge and go to Next Pair') : ts('Merge'),
       'isDefault' => TRUE,
-      'icon' => $this->next ? 'circle-triangle-e' : 'check',
+      'icon' => $this->next ? 'fa-play-circle' : 'check',
     );
 
     if ($this->next || $this->prev) {
