@@ -1726,19 +1726,7 @@ ORDER BY civicrm_custom_group.weight,
             }
           }
           elseif ($field['data_type'] == 'Date') {
-            if (!empty($value)) {
-              $time = NULL;
-              if (!empty($field['time_format'])) {
-                $time = CRM_Utils_Request::retrieve($fieldName .
-                  '_time', 'String', $form, FALSE, NULL, 'GET');
-              }
-              list($value, $time) = CRM_Utils_Date::setDateDefaults($value .
-                ' ' . $time);
-              if (!empty($field['time_format'])) {
-                $customValue[$fieldName . '_time'] = $time;
-              }
-            }
-            $valid = TRUE;
+            $valid = CRM_Utils_Rule::date($value);
           }
 
           if ($valid) {
