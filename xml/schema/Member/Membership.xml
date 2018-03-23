@@ -155,6 +155,28 @@
     <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>
+    <name>external_membership_id</name>
+    <type>varchar</type>
+    <title>External Membership ID</title>
+    <length>64</length>
+    <html>
+      <type>Text</type>
+      <size>8</size>
+    </html>
+
+    <import>true</import>
+    <headerPattern>/external\s?m(embership\s)?id/i</headerPattern>
+    <dataPattern>/^\d{11,}$/</dataPattern>
+    <comment>Unique trusted external ID (generally from a legacy app/datasource). Particularly useful for deduping operations.</comment>
+    <add>4.7</add>
+  </field>
+  <index>
+    <name>UI_external_membership_id</name>
+    <unique>true</unique>
+    <fieldName>external_membership_id</fieldName>
+    <add>4.7</add>
+  </index>
+  <field>
     <name>is_override</name>
     <title>Status Override</title>
     <import>true</import>

@@ -282,6 +282,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
           'end_date',
           'is_current_member',
           'status',
+          'external_membership_id',
         );
 
         while ($dao->fetch()) {

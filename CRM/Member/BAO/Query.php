@@ -454,6 +454,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         'member_campaign_id' => 1,
         'member_is_override' => 1,
         'member_auto_renew' => 1,
+        'external_membership_id' => 1,
       );
 
       if ($includeCustomFields) {
@@ -492,6 +493,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
 
     $form->addElement('text', 'member_source', ts('Source'));
     $form->add('number', 'membership_id', ts('Membership ID'), array('class' => 'four', 'min' => 1));
+    $form->addElement('text', 'external_membership_id', ts('External Membership ID'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'member_join_date', 1, '_low', '_high', ts('From'), FALSE);
     $form->addElement('hidden', 'member_join_date_range_error');
