@@ -203,6 +203,10 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   protected $addPaging = TRUE;
 
+  protected $isForceGroupBy = FALSE;
+
+  protected $groupConcatTested = FALSE;
+
   /**
    * An attribute for checkbox/radio form field layout
    *
@@ -461,6 +465,18 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
 
   protected $sql;
+
+  /**
+   * An instruction not to add a Group By.
+   *
+   * This is relevant where the group by might be otherwise added after the code that determines the group by array.
+   *
+   * e.g. where stat fields are being added but other settings cause it to not be desirable to add a group by
+   * such as in pivot charts when no row header is set
+   *
+   * @var bool
+   */
+  protected $noGroupBy = FALSE;
 
   /**
    * SQL being run in this report as an array.
@@ -2420,6 +2436,32 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * @return bool
    */
   public function selectClause(&$tableName, $tableKey, &$fieldName, &$field) {
+    if (!empty($field['pseudofield'])) {
+      $alias = "{$tableName}_{$fieldName}";
+      $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
+      $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+      $this->_columnHeaders["{$tableName}_{$fieldName}"]['dbAlias'] = CRM_Utils_Array::value('dbAlias', $field);
+      $this->_selectAliases[] = $alias;
+      return ' 1 as  ' . $alias;
+    }
+
+    if ($this->groupConcatTested && (!empty($this->_groupByArray) || $this->isForceGroupBy)) {
+      if ($tableKey === 'fields' && (empty($field['statistics']) || in_array('GROUP_CONCAT', $field['statistics']))) {
+        $label = CRM_Utils_Array::value('title', $field);
+        $alias = "{$tableName}_{$fieldName}";
+        $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $label;
+        if (!empty($field['type'])) {
+          // Ideally it would always be set but we need to fix up some reports before we can allow this
+          // to e-notice. We should add a deprecation tag on this line after Mar 2018.
+          $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'];
+        }
+        $this->_selectAliases[] = $alias;
+        if (empty($this->_groupByArray[$tableName . '_' . $fieldName])) {
+          return "GROUP_CONCAT(DISTINCT {$field['dbAlias']}) as $alias";
+        }
+        return "({$field['dbAlias']}) as $alias";
+      }
+    }
     return FALSE;
   }
 
@@ -5283,7 +5325,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       !empty($this->_params['group_bys'])
     ) {
       foreach ($this->_columns as $tableName => $table) {
-        $table = $this->_columns[$tableName];
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $fieldData) {
             $field = $this->_columns[$tableName]['metadata'][$fieldName];
