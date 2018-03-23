@@ -55,12 +55,64 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       NULL,
       NULL,
       FALSE,
+      TRUE,
+      array(
+        'exportOption' => 1,
+        'suppress_csv_for_testing' => TRUE,
+      )
+    );
+
+    // delete the export temp table and component table
+    $sql = "DROP TABLE IF EXISTS {$tableName}";
+    CRM_Core_DAO::executeQuery($sql);
+  }
+
+  /**
+   * Test to ensure that 'Merge All Contacts with the Same Address' works on export.
+   */
+  public function testMergeSameAddressOnExport() {
+    // Here's how this test case works - 3 contacts are created A, B and C where A and B are individual contacts that share same address via master_id.
+    //  C is a household contact whose member is contact A. These 3 contacts are selected for export with 'Merge All Contacts with the Same Address' = TRUE
+    //  And at the end export table contain only 1 contact i.e. is C as A and B got merged into 1 as they share same address but then A is Household member of C.
+    //  So C take preference over A and thus C is exported as result.
+    $addressID = $this->setUpContactExportData();
+    $householdID = $this->householdCreate();
+    $this->callAPISuccess('relationship', 'create', [
+      'contact_id_a' => $this->contactIDs[0],
+      'contact_id_b' => $householdID,
+      'relationship_type_id' => CRM_Core_DAO::getFieldValue('CRM_Contact_BAO_RelationshipType', 'Household Member of', 'id', 'name_a_b'),
+    ]);
+
+    $contactIDs = array_merge($this->contactIDs, [$householdID]);
+    $params = ['contact_id' => $contactIDs];
+    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
+      FALSE,
+      $contactIDs,
+      CRM_Contact_BAO_Query::convertFormValues($params),
+      NULL,
+      NULL,
+      NULL,
+      CRM_Export_Form_Select::CONTACT_EXPORT,
+      NULL,
+      NULL,
+      TRUE,
       FALSE,
       array(
         'exportOption' => 1,
         'suppress_csv_for_testing' => TRUE,
       )
     );
+
+    $exportedRows = CRM_Utils_SQL_Select::from($tableName)->execute()->fetchAll();
+    $this->assertEquals(1, count($exportedRows));
+
+    $expectedValues = [
+      'civicrm_primary_id' => $householdID,
+      'contact_type' => 'Household',
+    ];
+    foreach ($expectedValues as $columnName => $expectedValue) {
+      $this->assertEquals($expectedValue, $exportedRows[0][$columnName]);
+    }
 
     // delete the export temp table and component table
     $sql = "DROP TABLE IF EXISTS {$tableName}";
@@ -257,9 +309,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'contact_id' => $contactB,
       'location_type_id' => "Home",
       'master_id' => $addressId,
+      'is_primary' => 1,
     ));
     $this->masterAddressID = $addressId;
 
+    return $addressId;
   }
 
   /**

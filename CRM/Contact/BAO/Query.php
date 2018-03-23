@@ -4713,10 +4713,11 @@ civicrm_relationship.is_permission_a_b = 0
    * @param array $selectClauses
    * @param array $groupBy - Columns already included in GROUP By clause.
    * @param string $aggregateFunction
+   * @param bool $appendAlias - Append select column alias as it's name itself
    *
    * @return string
    */
-  public static function appendAnyValueToSelect($selectClauses, $groupBy, $aggregateFunction = 'ANY_VALUE') {
+  public static function appendAnyValueToSelect($selectClauses, $groupBy, $aggregateFunction = 'ANY_VALUE', $appendAlias = FALSE) {
     if (!CRM_Utils_SQL::disableFullGroupByMode()) {
       $groupBy = array_map('trim', (array) $groupBy);
       $aggregateFunctions = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN|IF)[[:blank:]]*\(/i';
@@ -4727,6 +4728,7 @@ civicrm_relationship.is_permission_a_b = 0
           $val = ($aggregateFunction == 'GROUP_CONCAT') ?
             str_replace($selectColumn, "$aggregateFunction(DISTINCT {$selectColumn})", $val) :
             str_replace($selectColumn, "$aggregateFunction({$selectColumn})", $val);
+          $val .= $appendAlias ? " as $selectColumn " : '';
         }
       }
     }
