@@ -75,11 +75,22 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
       ),
     );
     $obj = $this->getReportObject('CRM_Report_Form_Activity', $input);
-    //$params = $obj->_params;
-    //$params['fields'] = array('custom_' . $custom_field_id);
-    //$obj->setParams($params);
     $obj->getResultSet();
     $this->assertTrue(TRUE, "Testo");
+  }
+
+  /**
+   * Test to check the report with custom fields with larger group name. (e.g. >64 characters).
+   */
+  public function testAliasNamesLength() {
+    try {
+      $ids = $this->CustomGroupMultipleCreateWithFields(array('title' => 'Professional qualifications and Work Practice', 'extends' => 'Activity'));
+      // Adding custom field as param in output.
+      $this->getReportOutputAsCsv('CRM_Report_Form_Activity', ['fields' => [0 => 'custom_' . $ids['custom_group_id']]]);
+    }
+    catch(PEAR_Exception $e) {
+      $this->fail('PEAR_Exception occured: ' . $e->getMessage());
+    }
   }
 
 }
