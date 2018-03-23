@@ -55,7 +55,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       NULL,
       NULL,
       FALSE,
-      FALSE,
+      TRUE,
       array(
         'exportOption' => 1,
         'suppress_csv_for_testing' => TRUE,
