@@ -30,13 +30,14 @@
     <tr id="soft-credit-row-{$rowNumber}"
         class="crm-contribution-form-block-soft_credit_to {if $rowNumber gte $showSoftCreditRow}hiddenElement{/if}">
       <td>
-        {$form.soft_credit_contact_id.$rowNumber.label}&nbsp;{$form.soft_credit_contact_id.$rowNumber.html|crmAddClass:twenty}
+        {$form.soft_credit_contact_id.$rowNumber.label}<br>{$form.soft_credit_contact_id.$rowNumber.html|crmAddClass:twenty}
       </td>
       <td>
-        {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
+        {$form.soft_credit_amount.$rowNumber.label}<br>{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
       </td>
       <td>
-        {$form.soft_credit_type.$rowNumber.label}&nbsp;{$form.soft_credit_type.$rowNumber.html}
+        {$form.soft_credit_type.$rowNumber.label}<br>
+        {$form.soft_credit_type.$rowNumber.html}
         &nbsp;<a class="crm-hover-button soft-credit-delete-link" href="#"><span class="icon delete-icon"></span></a>
       </td>
     </tr>

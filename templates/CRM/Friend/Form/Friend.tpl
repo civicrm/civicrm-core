@@ -42,9 +42,6 @@
 </div>
    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout">
-        <tr>
-           <td></td>
-        </tr>
         <tr class="crm-friend-manage-form-block-tf_is_active">
            <td class="label"">{$form.tf_is_active.html}</td>
            <td>{$form.tf_is_active.label}</td>
