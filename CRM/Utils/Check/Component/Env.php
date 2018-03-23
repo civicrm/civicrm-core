@@ -855,6 +855,25 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
+   * ensure reply id is set to any default value
+   * @return array
+   */
+  public function checkReplyIdForMailing() {
+    $messages = array();
+
+    if (!CRM_Mailing_PseudoConstant::defaultComponent('Reply', '')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('Reply Auto Responder is not set to any default value in <a %1>Headers, Footers, and Automated Messages</a>. This will disable the submit operation on any mailing created from CiviMail.', array(1 => 'href="' . CRM_Utils_System::url('civicrm/admin/component', 'reset=1') . '"')),
+        ts('No Default value for Auto Responder.'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-reply'
+      );
+    }
+    return $messages;
+  }
+
+  /**
    * Check for required mbstring extension
    * @return array
    */
