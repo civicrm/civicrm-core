@@ -1656,6 +1656,10 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     &$contactIds = NULL,
     $sourceContactId = NULL
   ) {
+    if (!CRM_Core_Permission::check('send SMS')) {
+      throw new CRM_Core_Exception("You do not have the 'send SMS' permission");
+    }
+
     if (!isset($contactDetails) && !isset($contactIds)) {
       Throw new CRM_Core_Exception('You must specify either $contactDetails or $contactIds');
     }
@@ -1674,10 +1678,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
       foreach ($contactDetails as $contact) {
         $contactIds[] = $contact['contact_id'];
       }
-    }
-
-    if (!CRM_Core_Permission::check('send SMS')) {
-      throw new CRM_Core_Exception("You do not have the 'send SMS' permission");
     }
 
     // Get logged in User Id
