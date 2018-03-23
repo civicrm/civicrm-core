@@ -807,20 +807,71 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test submit recurring membership with immediate confirmation (IATS style).
+   * Test submit recurring (yearly) membership with immediate confirmation (IATS style).
    *
    * - we process 2 membership transactions against with a recurring contribution against a contribution page with an immediate
    * processor (IATS style - denoted by returning trxn_id)
    * - the first creates a new membership, completed contribution, in progress recurring. Check these
    * - create another - end date should be extended
    */
-  public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPayment() {
+  public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPaymentYear() {
+    $this->doSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPayment(array('duration_unit' => 'year', 'recur_frequency_unit' => 'year'));
+  }
+
+  /**
+   * Test submit recurring (monthly) membership with immediate confirmation (IATS style).
+   *
+   * - we process 2 membership transactions against with a recurring contribution against a contribution page with an immediate
+   * processor (IATS style - denoted by returning trxn_id)
+   * - the first creates a new membership, completed contribution, in progress recurring. Check these
+   * - create another - end date should be extended
+   */
+  public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPaymentMonth() {
+    $this->doSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPayment(array('duration_unit' => 'month', 'recur_frequency_unit' => 'month'));
+  }
+
+  /**
+   * Test submit recurring (mismatched frequency unit) membership with immediate confirmation (IATS style).
+   *
+   * - we process 2 membership transactions against with a recurring contribution against a contribution page with an immediate
+   * processor (IATS style - denoted by returning trxn_id)
+   * - the first creates a new membership, completed contribution, in progress recurring. Check these
+   * - create another - end date should be extended
+   */
+  //public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPaymentDifferentFrequency() {
+  //  $this->doSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPayment(array('duration_unit' => 'year', 'recur_frequency_unit' => 'month'));
+  //}
+
+  /**
+   * Helper function for testSubmitMembershipPriceSetPaymentProcessorRecurInstantPayment*
+   * @param array $params
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Exception
+   */
+  public function doSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPayment($params = array()) {
     $this->params['is_recur'] = 1;
-    $this->params['recur_frequency_unit'] = 'month';
-    $this->setUpMembershipContributionPage();
+    $this->params['recur_frequency_unit'] = $params['recur_frequency_unit'];
+    $membershipTypeParams['duration_unit'] = $params['duration_unit'];
+    if ($params['recur_frequency_unit'] === $params['duration_unit']) {
+      $durationUnit = $params['duration_unit'];
+    }
+    else {
+      $durationUnit = NULL;
+    }
+    $this->setUpMembershipContributionPage(FALSE, FALSE, $membershipTypeParams);
     $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_first_success'));
     $processor = $dummyPP->getPaymentProcessor();
+
+    if ($params['recur_frequency_unit'] === $params['duration_unit']) {
+      // Membership will be in "New" state because it will get confirmed as payment matches
+      $expectedMembershipStatus = 1;
+    }
+    else {
+      // Membership will still be in "Pending" state as it won't get confirmed as payment doesn't match
+      $expectedMembershipStatus = 5;
+    }
 
     $submitParams = array(
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
@@ -838,7 +889,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'cvv2' => 123,
       'is_recur' => 1,
       'frequency_interval' => 1,
-      'frequency_unit' => 'month',
+      'frequency_unit' => $this->params['recur_frequency_unit'],
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
@@ -853,7 +904,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
-    $this->assertEquals(1, $membership['status_id']);
+    $this->assertEquals($expectedMembershipStatus, $membership['status_id']);
     $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
 
     $this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $contribution['id'], 'entity_id' => $membership['id']));
@@ -867,7 +918,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     ));
     $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
-    $this->assertEquals(date('Y-m-d', strtotime('+ 1 year', strtotime($membership['end_date']))), $renewedMembership['end_date']);
+    if ($durationUnit) {
+      // We only have an end_date if frequency units match, otherwise membership won't be autorenewed and dates won't be calculated.
+      $renewedMembershipEndDate = $this->membershipRenewalDate($durationUnit, $membership['end_date']);
+      $this->assertEquals($renewedMembershipEndDate, $renewedMembership['end_date']);
+    }
     $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
     $this->assertEquals($processor['payment_instrument_id'], $recurringContribution['payment_instrument_id']);
     $this->assertEquals(5, $recurringContribution['contribution_status_id']);
@@ -883,10 +938,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testSubmitMembershipComplexNonPriceSetPaymentPaymentProcessorRecurInstantPayment() {
     $this->params['is_recur'] = 1;
-    $this->params['recur_frequency_unit'] = 'month';
+    $this->params['recur_frequency_unit'] = $membershipTypeParams['duration_unit'] = 'year';
     // Add a membership so membership & contribution are not both 1.
     $preExistingMembershipID = $this->contactMembershipCreate(array('contact_id' => $this->contactIds[0]));
-    $this->setUpMembershipContributionPage();
+    $this->setUpMembershipContributionPage(FALSE, FALSE, $membershipTypeParams);
     $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 1, 'trxn_id' => 'create_first_success'));
     $processor = $dummyPP->getPaymentProcessor();
@@ -908,7 +963,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'cvv2' => 123,
       'is_recur' => 1,
       'frequency_interval' => 1,
-      'frequency_unit' => 'month',
+      'frequency_unit' => $this->params['recur_frequency_unit'],
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
@@ -951,7 +1006,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($renewContribution['id'], $lines['values'][1]['entity_id']);
 
     $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
-    $this->assertEquals(date('Y-m-d', strtotime('+ 1 year', strtotime($membership['end_date']))), $renewedMembership['end_date']);
+    $this->assertEquals(date('Y-m-d', strtotime('+ 1 ' . $this->params['recur_frequency_unit'], strtotime($membership['end_date']))), $renewedMembership['end_date']);
     $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
     $this->assertEquals($processor['payment_instrument_id'], $recurringContribution['payment_instrument_id']);
     $this->assertEquals(5, $recurringContribution['contribution_status_id']);
@@ -967,7 +1022,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testSubmitMembershipComplexPriceSetPaymentPaymentProcessorRecurInstantPayment() {
     $this->params['is_recur'] = 1;
-    $this->params['recur_frequency_unit'] = 'month';
+    $this->params['recur_frequency_unit'] = $membershipTypeParams['duration_unit'] = 'year';
     // Add a membership so membership & contribution are not both 1.
     $preExistingMembershipID = $this->contactMembershipCreate(array('contact_id' => $this->contactIds[0]));
     $this->createPriceSetWithPage();
@@ -995,7 +1050,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
       'cvv2' => 123,
       'frequency_interval' => 1,
-      'frequency_unit' => 'month',
+      'frequency_unit' => $this->params['recur_frequency_unit'],
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
@@ -1040,7 +1095,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($renewContribution['id'], $lines['values'][1]['entity_id']);
 
     $renewedMembership = $this->callAPISuccessGetSingle('membership', array('id' => $preExistingMembershipID + 1));
-    $this->assertEquals(date('Y-m-d', strtotime('+ 1 year', strtotime($membership['end_date']))), $renewedMembership['end_date']);
+    $this->assertEquals(date('Y-m-d', strtotime('+ 1 ' . $this->params['recur_frequency_unit'], strtotime($membership['end_date']))), $renewedMembership['end_date']);
   }
 
   /**
@@ -1148,7 +1203,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurDelayed() {
     $this->params['is_recur'] = 1;
-    $this->params['recur_frequency_unit'] = 'month';
+    $this->params['recur_frequency_unit'] = $membershipTypeParams['duration_unit'] = 'year';
     $this->setUpMembershipContributionPage();
     $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 2));
@@ -1176,7 +1231,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'cvv2' => 123,
       'is_recur' => 1,
       'frequency_interval' => 1,
-      'frequency_unit' => 'month',
+      'frequency_unit' => $this->params['recur_frequency_unit'],
     );
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
@@ -1210,7 +1265,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
         'contact_id' => $contribution['contact_id'],
         'is_recur' => 1,
         'frequency_interval' => 1,
-        'frequency_unit' => 'month',
+        'frequency_unit' => $this->params['recur_frequency_unit'],
       )
     );
 
@@ -1274,9 +1329,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Set up membership contribution page.
    * @param bool $isSeparatePayment
    * @param bool $isRecur
+   * @param array $membershipTypeParams Parameters to pass to membershiptype.create API
    */
-  public function setUpMembershipContributionPage($isSeparatePayment = FALSE, $isRecur = FALSE) {
-    $this->setUpMembershipBlockPriceSet();
+  public function setUpMembershipContributionPage($isSeparatePayment = FALSE, $isRecur = FALSE, $membershipTypeParams = array()) {
+    $this->setUpMembershipBlockPriceSet($membershipTypeParams);
     $this->setupPaymentProcessor();
     $this->setUpContributionPage($isRecur);
 
@@ -1310,13 +1366,16 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    *
    * This function ensures it exists & populates $this->_ids with it's data
    */
-  public function setUpMembershipBlockPriceSet() {
+  public function setUpMembershipBlockPriceSet($membershipTypeParams = array()) {
     $this->_ids['price_set'][] = $this->callAPISuccess('price_set', 'getvalue', array(
       'name' => 'default_membership_type_amount',
       'return' => 'id',
     ));
     if (empty($this->_ids['membership_type'])) {
-      $this->_ids['membership_type'] = array($this->membershipTypeCreate(array('minimum_fee' => 2)));
+      $membershipTypeParams = array_merge(array(
+        'minimum_fee' => 2,
+      ), $membershipTypeParams);
+      $this->_ids['membership_type'] = array($this->membershipTypeCreate($membershipTypeParams));
     }
     $priceField = $this->callAPISuccess('price_field', 'create', array(
       'price_set_id' => reset($this->_ids['price_set']),
