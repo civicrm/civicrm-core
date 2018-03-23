@@ -1029,7 +1029,10 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
 
     $sql = str_replace(array("SELECT contact_a.id as contact_id", "SELECT contact_a.id as id"), $insertSQL, $sql);
     try {
-      CRM_Core_DAO::executeQuery($sql);
+      $result = CRM_Core_DAO::executeQuery($sql, [], FALSE, NULL, FALSE, TRUE, TRUE);
+      if (is_a($result, 'DB_Error')) {
+        throw new CRM_Core_Exception($result->message);
+      }
     }
     catch (CRM_Core_Exception $e) {
       if ($coreSearch) {
@@ -1038,7 +1041,10 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
         $this->rebuildPreNextCache($start, $end, $sort, $cacheKey);
       }
       else {
-        CRM_Core_Session::setStatus(ts('Query Failed'));
+        // This will always show for CiviRules :-( as a) it orders by 'rule_label'
+        // which is not available in the query & b) it uses contact not contact_a
+        // as an alias.
+        // CRM_Core_Session::setStatus(ts('Query Failed'));
         return;
       }
     }
