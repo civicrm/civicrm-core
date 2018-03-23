@@ -76,7 +76,7 @@
   </tr>
 
   <tr class="crm-group-form-block-isReserved">
-    <td class="report-label">{$form.is_reserved.label}</td>
+    <td class="label">{$form.is_reserved.label}</td>
     <td>{$form.is_reserved.html}
       <span class="description">{ts}If reserved, only users with 'administer reserved groups' permission can disable, delete, or change settings for this group. The reserved flag does NOT affect users ability to add or remove contacts from a group.{/ts}</span>
     </td>
