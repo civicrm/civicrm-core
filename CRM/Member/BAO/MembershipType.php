@@ -91,11 +91,15 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param array $ids
    *   Array contains the id (deprecated).
    *
-   *
-   * @return object
+   * @return \CRM_Member_DAO_MembershipType
+   * @throws \CiviCRM_API3_Exception
    */
   public static function add(&$params, $ids = array()) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membershipType', $ids));
+    if (empty($params['id'])) {
+      $params['id'] = CRM_Utils_Array::value('membershipType', $ids);
+    }
+    $id = CRM_Utils_Array::value('id', $params);
+
     if (!$id) {
       if (!isset($params['is_active'])) {
         // do we need this?
@@ -106,18 +110,18 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       }
     }
 
-    // action is taken depending upon the mode
-    $membershipType = new CRM_Member_DAO_MembershipType();
-    $membershipType->copyValues($params);
-    $membershipType->id = $id;
-
     // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an organization is changed.
     $previousID = NULL;
     if ($id) {
       $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $id, 'member_of_contact_id');
     }
 
+    // action is taken depending upon the mode
+    $membershipType = new CRM_Member_DAO_MembershipType();
+    $membershipType->copyValues($params);
+    $membershipType->find(TRUE);
     $membershipType->save();
+
     if ($id) {
       // on update we may need to retrieve some details for the price field function - otherwise we get e-notices on attempts to retrieve
       // name etc - the presence of previous id tells us this is an update
@@ -128,6 +132,20 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     if ($id) {
       self::updateAllPriceFieldValue($id, $params);
     }
+
+    if (!empty($params['custom']) &&
+      is_array($params['custom'])
+    ) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_membership_type', $membershipType->id);
+    }
+
+    if (!empty($id)) {
+      CRM_Utils_Hook::post('edit', 'MembershipType', $membershipType->id, $membershipType);
+    }
+    else {
+      CRM_Utils_Hook::post('create', 'MembershipType', $membershipType->id, $membershipType);
+    }
+
     self::flush();
     return $membershipType;
   }

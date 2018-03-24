@@ -1813,6 +1813,9 @@ ORDER BY civicrm_custom_group.weight,
       case 'Membership':
         return 'civicrm_membership';
 
+      case 'MembershipType':
+        return 'civicrm_membership_type';
+
       case 'Participant':
       case 'ParticipantRole':
       case 'ParticipantEventName':
