@@ -1265,16 +1265,17 @@ $text
     $activityParams['sms_text_message'] = __FUNCTION__ . ' text';
     $activityParams['activity_subject'] = __FUNCTION__ . ' subject';
 
-    // ActivityParams is overwritten by sendSms but we need it for results
-    $activityParamsCopy = $activityParams;
-
     // Get a "logged in" user to set as source of Sms.
     $session = CRM_Core_Session::singleton();
     $sourceContactId = $session->get('userID');
 
-    // Create a user, then a phone number
+    // Create a user
     $this->_testSmsContactId = $this->createLoggedInUser();
-    // Create phone number
+
+    // Give user permission to 'send SMS'
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'send SMS');
+
+    // Create a phone number
     switch ($phoneType) {
       case 0:
         // No phone number
