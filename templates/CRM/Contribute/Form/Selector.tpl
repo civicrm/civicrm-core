@@ -26,6 +26,7 @@
 {include file="CRM/common/pager.tpl" location="top"}
 
 {strip}
+  <div class="crm-contact-contribute-contributions">
   <table class="selector row-highlight">
     <thead class="sticky">
     <tr>
@@ -48,9 +49,6 @@
     </tr>
     </thead>
 
-    <p class="description">
-      {ts}Click arrow to view payment details.{/ts}
-    </p>
     {counter start=0 skip=1 print=false}
     {foreach from=$rows item=row}
       <tr id="rowid{$row.contribution_id}" class="{cycle values="odd-row,even-row"} {if $row.cancel_date} cancelled{/if} crm-contribution_{$row.contribution_id}">
@@ -111,6 +109,7 @@
     {/foreach}
 
   </table>
+  </div>
 {/strip}
 
 {include file="CRM/common/pager.tpl" location="bottom"}

@@ -56,6 +56,8 @@
               <td><a class="crm-hover-button" href='{crmURL p="civicrm/contact/view/membership" q="action=view&reset=1&cid=`$contactId`&id=`$recur.membership_id`&context=membership&selectedChild=member"}'>{$recur.membership_name}</a></td>
               </tr>
             {/if}
+            {include file="CRM/Custom/Page/CustomDataView.tpl"}
+
           </table>
           <div class="crm-submit-buttons"><a class="button cancel crm-form-submit" href="{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=contribute'}">{ts}Done{/ts}</a></div>
         </div>
@@ -70,7 +72,7 @@
             <th scope="col">{ts}Start Date{/ts}</th>
             <th scope="col">{ts}Installments{/ts}</th>
             <th scope="col">{ts}Status{/ts}</th>
-            <th scope="col">&nbsp;</th>
+            <th scope="col"></th>
         </tr>
 
         {foreach from=$recurRows item=row}
@@ -81,9 +83,7 @@
                 <td>{$row.start_date|crmDate}</td>
                 <td>{$row.installments}</td>
                 <td>{$row.contribution_status}</td>
-                <td>
-                    {$row.action|replace:'xx':$row.recurId}
-                </td>
+                <td>{$row.action|replace:'xx':$row.recurId}</td>
             </tr>
         {/foreach}
     </table>
