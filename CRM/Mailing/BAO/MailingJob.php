@@ -685,9 +685,16 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       if (is_a($result, 'PEAR_Error') && !$mailing->sms_provider_id) {
         // CRM-9191
         $message = $result->getMessage();
+        // SMTP response code is buried in the message.
+        $code = preg_match('/ \(code: (.+), response: /', $message, $matches) ? $matches[1] : '';
         if (
           strpos($message, 'Failed to write to socket') !== FALSE ||
-          strpos($message, 'Failed to set sender') !== FALSE
+          ((
+            strpos($message, 'Failed to set sender') !== FALSE ||
+            strpos($message, 'Failed to add recipient') !== FALSE ||
+            strpos($message, 'Failed to send data') !== FALSE
+          // Register 5xx SMTP response code (permanent failure) as bounce.
+          ) && substr($code, 0, 1) !== '5')
         ) {
           // lets log this message and code
           $code = $result->getCode();
