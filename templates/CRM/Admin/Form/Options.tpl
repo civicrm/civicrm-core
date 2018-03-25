@@ -113,11 +113,13 @@
               <tr class="crm-admin-options-form-block-desciption">
                 <td class="label">{$form.description.label}</td>
                 <td>{$form.description.html}<br />
-            {if $gName eq 'activity_type'}
-               <span class="description">{ts}Description is included at the top of the activity edit and view pages for this type of activity.{/ts}</span>
+                {if $gName eq 'activity_type'}
+                <span class="description">{ts}Description is included at the top of the activity edit and view pages for this type of activity.{/ts}</span>
+                {else if $gName eq 'email_greeting' || $gName eq 'postal_greeting' || $gName eq  'addressee'}
+                <span class="description">{ts}Description will be appended to processed greeting.{/ts}</span>
+                {/if}
                 </td>
               </tr>
-            {/if}
         {/if}
         {if $gName eq 'participant_status'}
               <tr class="crm-admin-options-form-block-visibility_id">
