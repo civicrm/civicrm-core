@@ -293,14 +293,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
         ON civicrm_mailing_job.mailing_id = {$this->_aliases['civicrm_mailing']}.id
         AND civicrm_mailing_job.is_test = 0
     ";
-
-    if ($this->_phoneField) {
-      $this->_from .= "
-        LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id
-          AND {$this->_aliases['civicrm_phone']}.is_primary = 1
-      ";
-    }
+    $this->joinPhoneFromContact();
   }
 
   public function where() {
