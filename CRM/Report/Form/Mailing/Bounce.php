@@ -337,13 +337,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
         INNER JOIN civicrm_mailing {$this->_aliases['civicrm_mailing']}
           ON civicrm_mailing_job.mailing_id = {$this->_aliases['civicrm_mailing']}.id
       ";
-
-    if ($this->_phoneField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                      {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
-    }
+    $this->joinPhoneFromContact();
   }
 
   public function where() {
