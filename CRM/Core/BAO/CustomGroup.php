@@ -128,8 +128,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       $fields[] = 'is_public';
     }
     foreach ($fields as $field) {
-      if (isset($params[$field]) || $field == 'is_multiple') {
-        $group->$field = CRM_Utils_Array::value($field, $params, FALSE);
+      if (isset($params[$field])) {
+        $group->$field = $params[$field];
       }
     }
     $group->max_multiple = isset($params['is_multiple']) ? (isset($params['max_multiple']) &&
