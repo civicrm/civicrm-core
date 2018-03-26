@@ -4373,7 +4373,10 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   protected function joinCountryFromAddress($prefix = '', $extra = array()) {
     // include country field if country column is to be included
-    if ($this->isTableSelected($prefix . 'civicrm_country')) {
+    if ($this->isTableSelected($prefix . 'civicrm_country') || $this->isTableSelected($prefix . 'civicrm_worldregion')) {
+      if (empty($this->_aliases[$prefix . 'civicrm_country'])) {
+        $this->_aliases[$prefix . 'civicrm_country'] = $prefix . '_report_country';
+      }
       $this->_from .= "
             LEFT JOIN civicrm_country {$this->_aliases[$prefix . 'civicrm_country']}
                    ON {$this->_aliases[$prefix . 'civicrm_address']}.country_id = {$this->_aliases[$prefix . 'civicrm_country']}.id AND
