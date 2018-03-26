@@ -286,16 +286,9 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
       ";
     }
 
-    $this->addPhoneFromClause();
-    $this->addAddressFromClause();
-    // include email field if email column is to be included
-    if ($this->_emailField) {
-      $this->_from .= "
-                 LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                           ON ({$this->_aliases['civicrm_contact']}.id =
-                               {$this->_aliases['civicrm_email']}.contact_id) AND
-                               {$this->_aliases['civicrm_email']}.is_primary = 1\n";
-    }
+    $this->joinPhoneFromContact();
+    $this->joinAddressFromContact();
+    $this->joinEmailFromContact();
   }
 
   /**
