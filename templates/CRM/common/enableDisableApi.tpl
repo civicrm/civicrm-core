@@ -36,7 +36,13 @@
     }
 
     function refresh() {
-      $a.trigger('crmPopupFormSuccess');
+      // the opposite of the current status based on row class
+      var newStatus = $row.hasClass('disabled');
+      $a.trigger('crmPopupFormSuccess', {
+        'entity': info.entity,
+        'id': info.id,
+        'enabled': newStatus
+      });
       CRM.refreshParent($row);
     }
 
