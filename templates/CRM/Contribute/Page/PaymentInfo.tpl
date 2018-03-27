@@ -55,7 +55,7 @@ CRM.$(function($) {
     {if $component eq "event"}
       <th>{ts}Total Fee(s){/ts}</th>
     {else}
-      <th>{ts}Contribution Amount(s){/ts}</th>
+      <th>{ts}Contribution Total{/ts}</th>
     {/if}
     <th class="right">{ts}Total Paid{/ts}</th>
     <th class="right">{ts}Balance{/ts}</th>
