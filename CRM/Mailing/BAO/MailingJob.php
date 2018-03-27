@@ -685,17 +685,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       if (is_a($result, 'PEAR_Error') && !$mailing->sms_provider_id) {
         // CRM-9191
         $message = $result->getMessage();
-        // SMTP response code is buried in the message.
-        $code = preg_match('/ \(code: (.+), response: /', $message, $matches) ? $matches[1] : '';
-        if (
-          strpos($message, 'Failed to write to socket') !== FALSE ||
-          ((
-            strpos($message, 'Failed to set sender') !== FALSE ||
-            strpos($message, 'Failed to add recipient') !== FALSE ||
-            strpos($message, 'Failed to send data') !== FALSE
-          // Register 5xx SMTP response code (permanent failure) as bounce.
-          ) && substr($code, 0, 1) !== '5')
-        ) {
+        if ($this->isTemporaryError($message)) {
           // lets log this message and code
           $code = $result->getCode();
           CRM_Core_Error::debug_log_message("SMTP Socket Error or failed to set sender error. Message: $message, Code: $code");
@@ -794,6 +784,43 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     );
 
     return $result;
+  }
+
+  /**
+   * Determine if an SMTP error is temporary or permanent.
+   *
+   * @param string $message
+   *   PEAR error message.
+   * @return bool
+   *   TRUE - Temporary/retriable error
+   *   FALSE - Permanent/non-retriable error
+   */
+  protected function isTemporaryError($message) {
+    // SMTP response code is buried in the message.
+    $code = preg_match('/ \(code: (.+), response: /', $message, $matches) ? $matches[1] : '';
+
+    if (strpos($message, 'Failed to write to socket') !== FALSE) {
+      return TRUE;
+    }
+
+    // Register 5xx SMTP response code (permanent failure) as bounce.
+    if ($code{0} === '5') {
+      return FALSE;
+    }
+
+    if (strpos($message, 'Failed to set sender') !== FALSE) {
+      return TRUE;
+    }
+
+    if (strpos($message, 'Failed to add recipient') !== FALSE) {
+      return TRUE;
+    }
+
+    if (strpos($message, 'Failed to send data') !== FALSE) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**
