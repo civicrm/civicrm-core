@@ -539,7 +539,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       $relationship->id = $relationshipId;
       if ($relationship->find(TRUE)) {
         $contact = new CRM_Contact_DAO_Contact();
-        $contact->id = ((int) $relationship->contact_id_a === $contactId) ? $relationship->contact_id_b : $relationship->contact_id_a;
+        $contact->id = ($relationship->contact_id_a == $contactId) ? $relationship->contact_id_b : $relationship->contact_id_a;
 
         if ($contact->find(TRUE)) {
           $otherContactType = $contact->contact_type;
