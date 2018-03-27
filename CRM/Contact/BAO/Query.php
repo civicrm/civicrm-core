@@ -4760,7 +4760,6 @@ civicrm_relationship.is_permission_a_b = 0
    */
   public static function getGroupByFromSelectColumns($selectClauses, $groupBy = NULL) {
     $groupBy = (array) $groupBy;
-    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
     $sqlMode = CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode');
 
     //return if ONLY_FULL_GROUP_BY is not enabled.
@@ -4785,7 +4784,7 @@ civicrm_relationship.is_permission_a_b = 0
           $primaryKey = "{$tableName}.id";
           // exclude columns which are already included in groupBy and aggregate functions from select
           // CRM-18439 - Also exclude the columns which are functionally dependent on columns in $groupBy (MySQL 5.7+)
-          if (!in_array($selectColumn, $groupBy) && !in_array($primaryKey, $groupBy) && preg_match($regexToExclude, trim($selectColumn)) !== 1) {
+          if (!in_array($selectColumn, $groupBy) && preg_match($regexToExclude, trim($selectColumn)) !== 1) {
             if (!empty($alias) && preg_match($dateRegex, trim($selectColumn))) {
               $groupBy[] = $alias;
             }
@@ -5068,7 +5067,7 @@ SELECT COUNT( conts.total_amount ) as total_count,
     $innerQuery = "SELECT civicrm_contribution.total_amount, COUNT(civicrm_contribution.total_amount) as civicrm_contribution_total_amount_count,
       civicrm_contribution.currency $from $completedWhere";
     $query = "$select FROM (
-      $innerQuery GROUP BY civicrm_contribution.id
+      $innerQuery GROUP BY civicrm_contribution.id, civicrm_contribution.total_amount, civicrm_contribution.currency
     ) as conts
     GROUP BY currency";
 
@@ -5113,7 +5112,7 @@ SELECT COUNT( conts.total_amount ) as total_count,
       $query = "
         $select FROM (
           SELECT civicrm_contribution_soft.amount as total_amount, civicrm_contribution_soft.currency $from $softCreditWhere
-          GROUP BY civicrm_contribution_soft.id
+          GROUP BY civicrm_contribution_soft.id, civicrm_contribution_soft.amount, civicrm_contribution_soft.currency
         ) as conts
         GROUP BY currency";
       $dao = CRM_Core_DAO::executeQuery($query);
@@ -5160,7 +5159,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
 
     $query = "$select FROM (
       SELECT civicrm_contribution.total_amount, civicrm_contribution.currency $from $where
-      GROUP BY civicrm_contribution.id
+      GROUP BY civicrm_contribution.id, civicrm_contribution.total_amount, civicrm_contribution.currency
     ) as conts
     GROUP BY currency";
 
