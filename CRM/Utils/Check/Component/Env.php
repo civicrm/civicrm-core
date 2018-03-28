@@ -581,7 +581,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     elseif (!is_writable($basedir)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('Your extensions directory (%1) is read-only. If you would like perform downloads or upgrades, then change the file permissions.',
+        ts('Your extensions directory (%1) is read-only. If you would like to perform downloads or upgrades, then change the file permissions.',
           array(1 => $basedir)),
         ts('Read-Only Extensions'),
         \Psr\Log\LogLevel::WARNING,
