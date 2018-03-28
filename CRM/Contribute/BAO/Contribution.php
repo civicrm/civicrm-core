@@ -2891,6 +2891,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    */
   public function _assignMessageVariablesToTemplate(&$values, $input, $returnMessageText = TRUE) {
     $template = CRM_Core_Smarty::singleton();
+    $template->clearTemplateVars();
     $template->assign('first_name', $this->_relatedObjects['contact']->first_name);
     $template->assign('last_name', $this->_relatedObjects['contact']->last_name);
     $template->assign('displayName', $this->_relatedObjects['contact']->display_name);
