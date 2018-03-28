@@ -1432,24 +1432,24 @@ UPDATE  civicrm_participant
 
       //check is it primary and has additional.
       if (array_key_exists($participantId, $primaryANDAdditonalIds)) {
-        foreach ($primaryANDAdditonalIds[$participantId] as $additonalId) {
+        foreach ($primaryANDAdditonalIds[$participantId] as $additionalId) {
 
           if ($emailType) {
-            $mail = self::sendTransitionParticipantMail($additonalId,
-              $participantDetails[$additonalId],
-              $eventDetails[$participantDetails[$additonalId]['event_id']],
-              $contactDetails[$participantDetails[$additonalId]['contact_id']],
+            $mail = self::sendTransitionParticipantMail($additionalId,
+              $participantDetails[$additionalId],
+              $eventDetails[$participantDetails[$additionalId]['event_id']],
+              $contactDetails[$participantDetails[$additionalId]['contact_id']],
               $domainValues,
               $emailType
             );
 
             //get the mail participant ids
             if ($mail) {
-              $mailedParticipants[$additonalId] = $contactDetails[$participantDetails[$additonalId]['contact_id']]['display_name'];
+              $mailedParticipants[$additionalId] = $contactDetails[$participantDetails[$additionalId]['contact_id']]['display_name'];
             }
           }
-          $updateParticipantIds[] = $additonalId;
-          $processedParticipantIds[] = $additonalId;
+          $updateParticipantIds[] = $additionalId;
+          $processedParticipantIds[] = $additionalId;
         }
       }
 
@@ -1898,13 +1898,11 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     $date = CRM_Utils_Date::currentDBDate();
     $event = CRM_Event_BAO_Event::getEvents(0, $eventId);
     $subject = sprintf("Registration selections changed for %s", CRM_Utils_Array::value($eventId, $event));
-    $targetCid = $contactId;
-    $srcRecId = $participantId;
 
     // activity params
     $activityParams = array(
-      'source_contact_id' => $targetCid,
-      'source_record_id' => $srcRecId,
+      'source_contact_id' => $contactId,
+      'source_record_id' => $participantId,
       'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', $activityType),
       'subject' => $subject,
       'activity_date_time' => $date,
@@ -1913,11 +1911,10 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     );
 
     // create activity with target contacts
-    $session = CRM_Core_Session::singleton();
-    $id = $session->get('userID');
+    $id = CRM_Core_Session::singleton()->getLoggedInContactID();;
     if ($id) {
       $activityParams['source_contact_id'] = $id;
-      $activityParams['target_contact_id'][] = $targetCid;
+      $activityParams['target_contact_id'][] = $contactId;
     }
     // @todo use api & also look at duplication of similar methods.
     CRM_Activity_BAO_Activity::create($activityParams);
