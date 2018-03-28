@@ -413,7 +413,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       'uploadDir' => ts('Temporary Files Directory'),
       'imageUploadDir' => ts('Images Directory'),
       'customFileUploadDir' => ts('Custom Files Directory'),
-      'extensionsDir' => ts('CiviCRM Extensions Directory'),
     );
 
     foreach ($directories as $directory => $label) {
