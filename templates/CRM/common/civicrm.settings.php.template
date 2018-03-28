@@ -421,6 +421,13 @@ if (!defined('CIVICRM_DB_CACHE_PREFIX')) {
 // }
 
 /**
+ * Define how many times to retry a transaction when the DB hits a deadlock
+ * (ie. the database is locked by another transaction). This is an
+ * advanced setting intended for high-traffic databases & experienced developers/ admins.
+ */
+define('CIVICRM_DEADLOCK_RETRIES', 3);
+
+/**
  * Configure MySQL to throw more errors when encountering unusual SQL expressions.
  *
  * If undefined, the value is determined automatically. For CiviCRM tarballs, it defaults
