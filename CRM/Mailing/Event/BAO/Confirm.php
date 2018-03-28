@@ -110,7 +110,10 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $localpart = CRM_Core_BAO_MailSettings::defaultLocalpart();
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
 
-    $bounce_address = $localpart . "@$emailDomain";
+    $bounce_address = CRM_Core_BAO_MailSettings::defaultReturnPath();
+    if (empty($bounce_address)) {
+      $bounce_address = $localpart . 'b' . "@$emailDomain";
+    }
 
     list($display_name, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($se->contact_id);
 
