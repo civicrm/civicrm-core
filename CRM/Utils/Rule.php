@@ -954,7 +954,7 @@ class CRM_Utils_Rule {
    * @param string $key Extension Key to check
    * @return bool
    */
-  public static function checkExtesnionKeyIsValid($key = NULL) {
+  public static function checkExtensionKeyIsValid($key = NULL) {
     if (!empty($key) && !preg_match('/^[0-9a-zA-Z._-]+$/', $key)) {
       return FALSE;
     }
