@@ -791,8 +791,8 @@ class CRM_Utils_Date {
    * Get start date and end from
    * the given relative term and unit
    *
-   * @param date $relative
-   *   Eg: term.unit.
+   * @param string $relative Relative format in the format term.unit.
+   *   Eg: previous.day
    *
    * @param string $from
    * @param string $to
@@ -808,14 +808,13 @@ class CRM_Utils_Date {
       $dateRange = self::relativeToAbsolute($term, $unit);
       $from = substr($dateRange['from'], 0, 8);
       $to = substr($dateRange['to'], 0, 8);
-      // relativeToAbsolute returns 8 char date strings or 14 char
-      // time strings.
-      if (strlen($dateRange['from']) === 14) {
-        $fromTime = substr($dateRange['from'], -6, 6);
-      }
-      if (strlen($dateRange['to']) === 14) {
-        $fromTime = substr($dateRange['to'], -6, 6);
-      }
+      // @todo fix relativeToAbsolute & add tests
+      // relativeToAbsolute returns 8 char date strings
+      // or 14 char date + time strings.
+      // We should use those. However, it turns out to be unreliable.
+      // e.g. this.week does NOT return 235959 for 'from'
+      // so our defaults are more reliable.
+      // Currently relativeToAbsolute only supports 'whole' days so that is ok
     }
 
     $from = self::processDate($from, $fromTime);
