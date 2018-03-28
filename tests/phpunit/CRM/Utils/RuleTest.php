@@ -129,7 +129,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @dataProvider extenionKeyTests
    */
   public function testExtenionKeyValid($key, $expectedResult) {
-    $this->assertEquals($expectedResult, CRM_Utils_Rule::checkExtesnionKeyIsValid($key));
+    $this->assertEquals($expectedResult, CRM_Utils_Rule::checkExtensionKeyIsValid($key));
   }
 
 }
