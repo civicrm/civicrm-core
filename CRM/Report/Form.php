@@ -2064,10 +2064,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @return array
    */
-  public function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = NULL) {
-    if (empty($toTime)) {
-      $toTime = '235959';
-    }
+  public function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = '235959') {
     //FIX ME not working for relative
     if ($relative) {
       list($term, $unit) = CRM_Utils_System::explode('.', $relative, 2);

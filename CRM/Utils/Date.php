@@ -794,23 +794,32 @@ class CRM_Utils_Date {
    * @param date $relative
    *   Eg: term.unit.
    *
-   * @param $from
-   * @param $to
+   * @param string $from
+   * @param string $to
+   * @param string $fromTime
+   * @param string $toTime
    *
    * @return array
    *   start date, end date
    */
-  public static function getFromTo($relative, $from, $to) {
+  public static function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = '235959') {
     if ($relative) {
-      list($term, $unit) = explode('.', $relative);
+      list($term, $unit) = explode('.', $relative, 2);
       $dateRange = self::relativeToAbsolute($term, $unit);
-      $from = $dateRange['from'];
-      //Take only Date Part, Sometime Time part is also present in 'to'
+      $from = substr($dateRange['from'], 0, 8);
       $to = substr($dateRange['to'], 0, 8);
+      // relativeToAbsolute returns 8 char date strings or 14 char
+      // time strings.
+      if (strlen($dateRange['from']) === 14) {
+        $fromTime = substr($dateRange['from'], -6, 6);
+      }
+      if (strlen($dateRange['to']) === 14) {
+        $fromTime = substr($dateRange['to'], -6, 6);
+      }
     }
 
-    $from = self::processDate($from);
-    $to = self::processDate($to, '235959');
+    $from = self::processDate($from, $fromTime);
+    $to = self::processDate($to, $toTime);
 
     return array($from, $to);
   }
