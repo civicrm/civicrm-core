@@ -699,6 +699,10 @@ class CRM_Core_Permission {
       'edit my contact' => array(
         $prefix . ts('edit my contact'),
       ),
+      'edit related contacts' => array(
+        $prefix . ts('edit related contacts'),
+        ts('Edit contacts with a permissioned relationship'),
+      ),
       'delete contacts' => array(
         $prefix . ts('delete contacts'),
       ),

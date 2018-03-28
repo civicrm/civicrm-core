@@ -113,12 +113,16 @@ WHERE contact_id IN ({$contact_id_list})
     }
 
     // if some have been rejected, double check for permissions inherited by relationship
-    if (count($result_set) < count($contact_ids)) {
-      $rejected_contacts       = array_diff_key($contact_ids, $result_set);
-      // @todo consider storing these to the acl cache for next time, since we have fetched.
-      $allowed_by_relationship = self::relationshipList($rejected_contacts);
-      foreach ($allowed_by_relationship as $contact_id) {
-        $result_set[(int) $contact_id] = TRUE;
+    // if the logged in user has the appropriate permission
+    if ($type == CRM_Core_Permission::VIEW
+     || ($type == CRM_Core_Permission::EDIT && CRM_Core_Permission::check('edit related contacts'))) {
+      if (count($result_set) < count($contact_ids)) {
+        $rejected_contacts       = array_diff_key($contact_ids, $result_set);
+        // @todo consider storing these to the acl cache for next time, since we have fetched.
+        $allowed_by_relationship = self::relationshipList($rejected_contacts);
+        foreach ($allowed_by_relationship as $contact_id) {
+          $result_set[(int) $contact_id] = TRUE;
+        }
       }
     }
 
@@ -161,8 +165,11 @@ WHERE contact_id IN ({$contact_id_list})
     }
 
     // check permission based on relationship, CRM-2963
-    if (self::relationshipList(array($id))) {
-      return TRUE;
+    if ($type == CRM_Core_Permission::VIEW
+     || ($type == CRM_Core_Permission::EDIT && CRM_Core_Permission::check('edit related contacts'))) {
+      if (self::relationshipList(array($id))) {
+        return TRUE;
+      }
     }
 
     // We should probably do a cheap check whether it's in the cache first.
