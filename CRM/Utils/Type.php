@@ -526,7 +526,7 @@ class CRM_Utils_Type {
         break;
 
       case 'ExtensionKey':
-        if (CRM_Utils_Rule::checkExtesnionKeyIsValid($data)) {
+        if (CRM_Utils_Rule::checkExtensionKeyIsValid($data)) {
           return $data;
         }
         break;
