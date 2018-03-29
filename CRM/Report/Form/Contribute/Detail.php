@@ -844,35 +844,35 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       $showsumcontribs = FALSE;
 
       if (array_search("civicrm_contribution_total_amount", $this->_selectAliases) !== FALSE) {
-          $addtotals = ", sum(civicrm_contribution_total_amount) as sumcontribs";
-          $showsumcontribs = TRUE;
+        $addtotals = ", sum(civicrm_contribution_total_amount) as sumcontribs";
+        $showsumcontribs = TRUE;
       }
-        $query = $this->_select .
-        "$addtotals, count(*) as ct from civireport_contribution_detail_temp3 group by " .
-        implode(", ", $sectionAliases);
-        // initialize array of total counts
-        $sumcontribs = $totals = array();
-        $dao = CRM_Core_DAO::executeQuery($query);
-        while ($dao->fetch()) {
+      $query = $this->_select .
+      "$addtotals, count(*) as ct from civireport_contribution_detail_temp3 group by " .
+      implode(", ", $sectionAliases);
+      // initialize array of total counts
+      $sumcontribs = $totals = array();
+      $dao = CRM_Core_DAO::executeQuery($query);
+      while ($dao->fetch()) {
 
-          // let $this->_alterDisplay translate any integer ids to human-readable values.
-          // $rows[0] = $dao->toArray();
-          $this->alterDisplay($rows);
-          $row = $rows[0];
+        // let $this->_alterDisplay translate any integer ids to human-readable values.
+        // $rows[0] = $dao->toArray();
+        $this->alterDisplay($rows);
+        $row = $rows[0];
 
-          // add totals for all permutations of section values
-          $values = array();
-          $i = 1;
-          $aliasCount = count($sectionAliases);
-          foreach ($sectionAliases as $alias) {
-            $values[] = $row[$alias];
-            $key = implode(CRM_Core_DAO::VALUE_SEPARATOR, $values);
-            if ($i == $aliasCount) {
-              // the last alias is the lowest-level section header; use count as-is
-              $totals[$key] = $dao->ct;
-              if ($showsumcontribs) {
-                $sumcontribs[$key] = $dao->sumcontribs;
-              }
+        // add totals for all permutations of section values
+        $values = array();
+        $i = 1;
+        $aliasCount = count($sectionAliases);
+        foreach ($sectionAliases as $alias) {
+          $values[] = $row[$alias];
+          $key = implode(CRM_Core_DAO::VALUE_SEPARATOR, $values);
+          if ($i == $aliasCount) {
+            // the last alias is the lowest-level section header; use count as-is
+            $totals[$key] = $dao->ct;
+            if ($showsumcontribs) {
+              $sumcontribs[$key] = $dao->sumcontribs;
+            }
           }
           else {
             // other aliases are higher level; roll count into their total
