@@ -38,8 +38,11 @@
     <h3>{ts}Current Relationships{/ts}</h3>
     {include file="CRM/Contact/Page/View/RelationshipSelector.tpl" context="current"}
     <div id="permission-legend" class="crm-content-block">
-      <span class="crm-marker">* </span>
-      {ts}Indicates a permissioned relationship. This contact can be viewed and updated by the other.{/ts}
+      <span class="label">Permissioned Relationships: </span>&nbsp;
+      <span class="crm-marker"> +</span>
+      {ts}This contact can be viewed by the other.{/ts}&nbsp;
+      <span class="crm-marker"> *</span>
+      {ts}This contact can be viewed and updated by the other.{/ts}
     </div>
 
     <div class="spacer"></div>

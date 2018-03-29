@@ -57,18 +57,34 @@
                 {if $row.is_permission_a_b}
                   <div>
                   {if $row.rtype EQ 'a_b' AND $is_contact_id_a}
-                    {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view and update information about %2.{/ts}
+                    {if $row.is_permission_a_b == 1}
+                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view and update information about %2.{/ts}
+                    {else}
+                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view information about %2.{/ts}
+                    {/if}
                   {else}
-                    {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view and update information about %2.{/ts}
+                    {if $row.is_permission_a_b == 1}
+                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view and update information about %2.{/ts}
+                    {else}
+                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view information about %2.{/ts}
+                    {/if}
                   {/if}
                   </div>
                 {/if}
                 {if $row.is_permission_b_a}
                   <div>
                   {if $row.rtype EQ 'a_b' AND $is_contact_id_a}
-                    {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view and update information about %2.{/ts}
+                    {if $row.is_permission_b_a == 1}
+                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view and update information about %2.{/ts}
+                    {else}
+                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view information about %2.{/ts}
+                    {/if}
                   {else}
-                    {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view and update information about %2.{/ts}
+                    {if $row.is_permission_b_a == 1}
+                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view and update information about %2.{/ts}
+                    {else}
+                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view and update information about %2.{/ts}
+                    {/if}
                   {/if}
                   </div>
                 {/if}
@@ -116,15 +132,15 @@
           {capture assign="contact_b"}{if $action eq 1}{ts}selected contact(s){/ts}{else}{$display_name_b}{/if}{/capture}
           <td class="label"><label>{ts}Permissions{/ts}</label></td>
           <td>
+            {ts 1=$display_name_a 2=$contact_b}Permission for <strong>%1</strong> to access information about %2.{/ts}<br />
             {$form.is_permission_a_b.html}
-            {ts 1=$display_name_a 2=$contact_b}<strong>%1</strong> can view and update information about %2.{/ts}
           </td>
         </tr>
         <tr class="crm-relationship-form-block-is_permission_b_a">
           <td class="label"></td>
           <td>
+            {ts 1=$contact_b|ucfirst 2=$display_name_a}Permission for <strong>%1</strong> to access information about %2.{/ts}<br />
             {$form.is_permission_b_a.html}
-            {ts 1=$contact_b|ucfirst 2=$display_name_a}<strong>%1</strong> can view and update information about %2.{/ts}
           </td>
         </tr>
         <tr class="crm-relationship-form-block-is_active">

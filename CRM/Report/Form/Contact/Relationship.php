@@ -256,10 +256,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'title' => ts('Relationship End Date'),
           ),
           'is_permission_a_b' => array(
-            'title' => ts('Is permission A over B?'),
+            'title' => ts('Permission A has to access B'),
           ),
           'is_permission_b_a' => array(
-            'title' => ts('Is permission B over A?'),
+            'title' => ts('Permission B has to access A'),
           ),
           'description' => array(
             'title' => ts('Description'),
@@ -310,22 +310,14 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ),
           'is_permission_a_b' => array(
             'title' => ts('Does contact A have permission over contact B?'),
-            'operatorType' => CRM_Report_Form::OP_SELECT,
-            'options' => array(
-              '' => ts('- Any -'),
-              1 => ts('Yes'),
-              0 => ts('No'),
-            ),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contact_BAO_Relationship::buildOptions('is_permission_a_b'),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'is_permission_b_a' => array(
             'title' => ts('Does contact B have permission over contact A?'),
-            'operatorType' => CRM_Report_Form::OP_SELECT,
-            'options' => array(
-              '' => ts('- Any -'),
-              1 => ts('Yes'),
-              0 => ts('No'),
-            ),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contact_BAO_Relationship::buildOptions('is_permission_b_a'),
             'type' => CRM_Utils_Type::T_INT,
           ),
         ),
@@ -792,12 +784,38 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      // Handle permissioned relationships
+      if (array_key_exists('civicrm_relationship_is_permission_a_b', $row)) {
+        $rows[$rowNum]['civicrm_relationship_is_permission_a_b']
+          = ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_a_b']));
+        $entryFound = TRUE;
+      }
+
+      if (array_key_exists('civicrm_relationship_is_permission_b_a', $row)) {
+        $rows[$rowNum]['civicrm_relationship_is_permission_b_a']
+          = ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_b_a']));
+        $entryFound = TRUE;
+      }
+
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
       if (!$entryFound) {
         break;
       }
     }
+  }
+
+  /**
+   * Convert values to permissioned relationship descriptions
+   * @param  [int] $key
+   * @return [string]
+   */
+  public static function permissionedRelationship($key) {
+    static $lookup;
+    if (!$lookup) {
+      $lookup = CRM_Contact_BAO_Relationship::buildOptions("is_permission_a_b");
+    };
+    return CRM_Utils_Array::value($key, $lookup);
   }
 
   /**
