@@ -2125,9 +2125,12 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    */
   protected static function updateDeceasedMembersStatuses() {
     $count = 0;
+
+    $deceasedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Deceased');
+
     // 'create' context for buildOptions returns only if enabled.
     $allStatus = self::buildOptions('status_id', 'create');
-    if (($deceasedStatusId = array_search('Deceased', $allStatus)) === FALSE) {
+    if (array_key_exists($deceasedStatusId, $allStatus) === FALSE) {
       // Deceased status is an admin status & is required. We want to fail early if
       // it is not present or active.
       // We could make the case 'some databases just don't use deceased so we will check
