@@ -32,10 +32,6 @@
  */
 class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
 
-  protected $_addressField = FALSE;
-
-  protected $_emailField = FALSE;
-
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   protected $_summary = NULL;
@@ -238,17 +234,12 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
   }
 
   public function select() {
+    // @todo remove this in favour of using parent function
     $this->_columnHeaders = $select = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
           if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
-            if ($tableName == 'civicrm_address') {
-              $this->_addressField = TRUE;
-            }
-            elseif ($tableName == 'civicrm_email') {
-              $this->_emailField = TRUE;
-            }
 
             if (!empty($field['statistics'])) {
               foreach ($field['statistics'] as $stat => $label) {
@@ -285,18 +276,8 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
             INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']} ON
                       ({$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_relationship']}.$this->otherContact ) AND {$this->_aliases['civicrm_contribution']}.is_test = 0  ";
 
-    if ($this->_addressField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_address  {$this->_aliases['civicrm_address']} ON
-                      {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
-                      {$this->_aliases['civicrm_address']}.is_primary = 1\n ";
-    }
-    if ($this->_emailField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} ON
-                      {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                      {$this->_aliases['civicrm_email']}.is_primary = 1\n ";
-    }
+    $this->joinAddressFromContact();
+    $this->joinEmailFromContact();
 
     // for credit card type
     $this->addFinancialTrxnFromClause();

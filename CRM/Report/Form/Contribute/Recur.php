@@ -273,14 +273,9 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
     $this->_from .= "
       LEFT JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
         ON {$this->_aliases['civicrm_contribution_recur']}.id = {$this->_aliases['civicrm_contribution']}.contribution_recur_id";
-    $this->_from .= "
-      LEFT JOIN civicrm_email  {$this->_aliases['civicrm_email']}
-        ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-        {$this->_aliases['civicrm_email']}.is_primary = 1)";
-    $this->_from .= "
-      LEFT  JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-        ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-        {$this->_aliases['civicrm_phone']}.is_primary = 1)";
+
+    $this->joinPhoneFromContact();
+    $this->joinEmailFromContact();
 
     // for credit card type
     $this->addFinancialTrxnFromClause();
