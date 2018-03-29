@@ -240,6 +240,15 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   }
 
   /**
+   * This method set cache key, later used in test environment
+   *
+   * @param string $key
+   */
+  public function setKey($key) {
+    $this->_key = $key;
+  }
+
+  /**
    * This method returns the links that are given for each search row.
    * currently the links added for each row are
    *
@@ -545,7 +554,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    *   the total number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
-
     if (($output == CRM_Core_Selector_Controller::EXPORT ||
         $output == CRM_Core_Selector_Controller::SCREEN
       ) &&
