@@ -164,6 +164,7 @@ class Container {
       'js_strings' => 'js_strings',
       'community_messages' => 'community_messages',
       'checks' => 'checks',
+      'session' => 'CiviCRM Session',
     );
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $container->setDefinition("cache.{$cacheSvc}", new Definition(
