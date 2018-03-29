@@ -160,12 +160,16 @@ class Container {
 
     $container->setDefinition('psr_log', new Definition('CRM_Core_Error_Log', array()));
 
-    foreach (array('js_strings', 'community_messages') as $cacheName) {
-      $container->setDefinition("cache.{$cacheName}", new Definition(
+    $basicCaches = array(
+      'js_strings' => 'js_strings',
+      'community_messages' => 'community_messages',
+    );
+    foreach ($basicCaches as $cacheSvc => $cacheGrp) {
+      $container->setDefinition("cache.{$cacheSvc}", new Definition(
         'CRM_Utils_Cache_Interface',
         array(
           array(
-            'name' => $cacheName,
+            'name' => $cacheGrp,
             'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
           ),
         )
