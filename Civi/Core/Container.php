@@ -163,6 +163,7 @@ class Container {
     $basicCaches = array(
       'js_strings' => 'js_strings',
       'community_messages' => 'community_messages',
+      'checks' => 'checks',
     );
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $container->setDefinition("cache.{$cacheSvc}", new Definition(

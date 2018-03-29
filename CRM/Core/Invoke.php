@@ -350,7 +350,7 @@ class CRM_Core_Invoke {
       return;
     }
     // always use cached results - they will be refreshed by the session timer
-    $status = Civi::settings()->get('systemStatusCheckResult');
+    $status = Civi::cache('checks')->get('systemStatusCheckResult');
     $template->assign('footer_status_severity', $status);
     $template->assign('footer_status_message', CRM_Utils_Check::toStatusLabel($status));
   }
