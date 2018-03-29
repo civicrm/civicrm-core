@@ -252,17 +252,11 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
      LEFT JOIN civicrm_relationship {$this->_aliases['civicrm_relationship']}
           ON ( {$this->_aliases['civicrm_relationship']}.contact_id_a={$this->_aliases['civicrm_contact']}.id
               AND {$this->_aliases['civicrm_relationship']}.contact_id_b={$this->_aliases['civicrm_contact']}.employer_id
-              AND {$this->_aliases['civicrm_relationship']}.relationship_type_id={$relType})
-     LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-          ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id
-             AND {$this->_aliases['civicrm_address']}.is_primary = 1 )
+              AND {$this->_aliases['civicrm_relationship']}.relationship_type_id={$relType})  ";
 
-     LEFT JOIN  civicrm_phone {$this->_aliases['civicrm_phone']}
-          ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id
-             AND {$this->_aliases['civicrm_phone']}.is_primary = 1)
-     LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']}
-          ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
-             AND {$this->_aliases['civicrm_email']}.is_primary = 1) ";
+    $this->joinAddressFromContact();
+    $this->joinPhoneFromContact();
+    $this->joinEmailFromContact();
   }
 
   public function where() {
