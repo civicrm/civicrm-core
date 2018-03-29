@@ -413,7 +413,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       'uploadDir' => ts('Temporary Files Directory'),
       'imageUploadDir' => ts('Images Directory'),
       'customFileUploadDir' => ts('Custom Files Directory'),
-      'extensionsDir' => ts('CiviCRM Extensions Directory'),
     );
 
     foreach ($directories as $directory => $label) {
@@ -582,10 +581,10 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     elseif (!is_writable($basedir)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('Directory %1 is not writable.  Please change your file permissions.',
+        ts('Your extensions directory (%1) is read-only. If you would like to perform downloads or upgrades, then change the file permissions.',
           array(1 => $basedir)),
-        ts('Directory not writable'),
-        \Psr\Log\LogLevel::ERROR,
+        ts('Read-Only Extensions'),
+        \Psr\Log\LogLevel::WARNING,
         'fa-plug'
       );
       return $messages;
