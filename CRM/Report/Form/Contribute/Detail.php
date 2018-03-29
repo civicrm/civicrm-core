@@ -839,14 +839,18 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
        * overriding this method in the report class.
        */
 
-      $addtotals = '';
+       /**
+        * Bug: https://issues.civicrm.org/jira/browse/CRM-21831
+        * Alias civicrm_contribution_total_amount is DEPRECATED
+        */
+       $addtotals = '';
+       $showsumcontribs = FALSE;
 
-      if (array_search("civicrm_contribution_total_amount_sum", $this->_selectAliases) !==
-        FALSE
-      ) {
-        $addtotals = ", sum(civicrm_contribution_total_amount_sum) as sumcontribs";
-        $showsumcontribs = TRUE;
-      }
+       if (array_search("civicrm_contribution_total_amount", $this->_selectAliases) !== FALSE ) {
+         $addtotals = ", sum(civicrm_contribution_total_amount) as sumcontribs";
+         $showsumcontribs = TRUE;
+       }
+
 
       $query = $this->_select .
         "$addtotals, count(*) as ct from civireport_contribution_detail_temp3 group by " .
