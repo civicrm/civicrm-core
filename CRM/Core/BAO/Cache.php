@@ -237,7 +237,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         if (!empty($_SESSION[$sessionName[0]][$sessionName[1]])) {
           $value = $_SESSION[$sessionName[0]][$sessionName[1]];
         }
-        self::setItem($value, 'CiviCRM Session', "{$sessionName[0]}_{$sessionName[1]}");
+        Civi::cache('session')->set("{$sessionName[0]}_{$sessionName[1]}", $value);
         if ($resetSession) {
           $_SESSION[$sessionName[0]][$sessionName[1]] = NULL;
           unset($_SESSION[$sessionName[0]][$sessionName[1]]);
@@ -248,7 +248,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         if (!empty($_SESSION[$sessionName])) {
           $value = $_SESSION[$sessionName];
         }
-        self::setItem($value, 'CiviCRM Session', $sessionName);
+        Civi::cache('session')->set($sessionName, $value);
         if ($resetSession) {
           $_SESSION[$sessionName] = NULL;
           unset($_SESSION[$sessionName]);
@@ -275,17 +275,13 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   public static function restoreSessionFromCache($names) {
     foreach ($names as $key => $sessionName) {
       if (is_array($sessionName)) {
-        $value = self::getItem('CiviCRM Session',
-          "{$sessionName[0]}_{$sessionName[1]}"
-        );
+        $value = Civi::cache('session')->get("{$sessionName[0]}_{$sessionName[1]}");
         if ($value) {
           $_SESSION[$sessionName[0]][$sessionName[1]] = $value;
         }
       }
       else {
-        $value = self::getItem('CiviCRM Session',
-          $sessionName
-        );
+        $value = Civi::cache('session')->get($sessionName);
         if ($value) {
           $_SESSION[$sessionName] = $value;
         }
@@ -308,28 +304,34 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     // first delete all sessions more than 20 minutes old which are related to any potential transaction
     $timeIntervalMins = (int) Civi::settings()->get('secure_cache_timeout_minutes');
     if ($timeIntervalMins && $session) {
-      $transactionPages = array(
-        'CRM_Contribute_Controller_Contribution',
-        'CRM_Event_Controller_Registration',
-      );
+      if (Civi::cache('session') instanceof CRM_Utils_Cache_SqlGroup) {
+        $transactionPages = array(
+          'CRM_Contribute_Controller_Contribution',
+          'CRM_Event_Controller_Registration',
+        );
 
-      $params = array(
-        1 => array(
-          date('Y-m-d H:i:s', time() - $timeIntervalMins * 60),
-          'String',
-        ),
-      );
-      foreach ($transactionPages as $trPage) {
-        $params[] = array("%${trPage}%", 'String');
-        $where[] = 'path LIKE %' . count($params);
-      }
+        $params = array(
+          1 => array(
+            date('Y-m-d H:i:s', time() - $timeIntervalMins * 60),
+            'String',
+          ),
+        );
+        foreach ($transactionPages as $trPage) {
+          $params[] = array("%${trPage}%", 'String');
+          $where[] = 'path LIKE %' . count($params);
+        }
 
-      $sql = "
+        $sql = "
 DELETE FROM civicrm_cache
 WHERE       group_name = 'CiviCRM Session'
 AND         created_date <= %1
 AND         (" . implode(' OR ', $where) . ")";
-      CRM_Core_DAO::executeQuery($sql, $params);
+        CRM_Core_DAO::executeQuery($sql, $params);
+      }
+      else {
+        Civi::log()->warning('secure_cache_timeout_minutes is only supported on SQL-backed caches'); // FIXME
+        // throw new \RuntimeException('secure_cache_timeout_minutes is only supported on SQL-backed caches');
+      }
     }
     // clean up the session cache every $cacheCleanUpNumber probabilistically
     $cleanUpNumber = 757;
@@ -355,13 +357,18 @@ AND         (" . implode(' OR ', $where) . ")";
     }
 
     if ($session) {
-
-      $sql = "
+      if (Civi::cache('session') instanceof CRM_Utils_Cache_SqlGroup) {
+        $sql = "
 DELETE FROM civicrm_cache
 WHERE       group_name = 'CiviCRM Session'
 AND         created_date < date_sub( NOW( ), INTERVAL $timeIntervalDays DAY )
 ";
-      CRM_Core_DAO::executeQuery($sql);
+        CRM_Core_DAO::executeQuery($sql);
+      }
+      else {
+        Civi::log()->warning('Session expiration is only supported on SQL-backed caches'); // FIXME
+        // throw new \RuntimeException('secure_cache_timeout_minutes is only supported on SQL-backed caches');
+      }
     }
   }
 
