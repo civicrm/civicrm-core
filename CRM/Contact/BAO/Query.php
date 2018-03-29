@@ -4042,7 +4042,6 @@ WHERE  $smartGroupClause
     $relationType = $this->getWhereValues('relation_type_id', $grouping);
     $targetName = $this->getWhereValues('relation_target_name', $grouping);
     $relStatus = $this->getWhereValues('relation_status', $grouping);
-    $relPermission = $this->getWhereValues('relation_permission', $grouping);
     $targetGroup = $this->getWhereValues('relation_target_group', $grouping);
 
     $nameClause = $name = NULL;
@@ -4188,21 +4187,7 @@ civicrm_relationship.start_date > {$today}
     }
     $where[$grouping][] = "(contact_b.is_deleted = {$onlyDeleted})";
 
-    //check for permissioned, non-permissioned and all permissioned relations
-    if ($relPermission[2] == 1) {
-      $where[$grouping][] = "(
-civicrm_relationship.is_permission_a_b = 1
-)";
-      $this->_qill[$grouping][] = ts('Relationship - Permissioned');
-    }
-    elseif ($relPermission[2] == 2) {
-      //non-allowed permission relationship.
-      $where[$grouping][] = "(
-civicrm_relationship.is_permission_a_b = 0
-)";
-      $this->_qill[$grouping][] = ts('Relationship - Non-permissioned');
-    }
-
+    $this->addRelationshipPermissionClauses($grouping, $where);
     $this->addRelationshipDateClauses($grouping, $where);
     $this->addRelationshipActivePeriodClauses($grouping, $where);
     if (!empty($relTypes)) {
@@ -4232,6 +4217,23 @@ civicrm_relationship.is_permission_a_b = 0
             $whereClause )
       ";
       CRM_Core_DAO::executeQuery($sql);
+    }
+  }
+
+  public function addRelationshipPermissionClauses($grouping, &$where) {
+    $relPermission = $this->getWhereValues('relation_permission', $grouping);
+    if ($relPermission) {
+      $where[$grouping][] = "(civicrm_relationship.is_permission_a_b IN (" . implode(",", $relPermission[2]) . "))";
+
+      $allRelationshipPermissions = CRM_Contact_BAO_Relationship::buildOptions('is_permission_a_b');
+      $relQill = '';
+      foreach ($relPermission[2] as $rel) {
+        if (!empty($relQill)) {
+          $relQill .= ' OR ';
+        }
+        $relQill .= ts($allRelationshipPermissions[$rel]);
+      }
+      $this->_qill[$grouping][] = ts('Permissioned Relationships') . ' - ' . $relQill;
     }
   }
 

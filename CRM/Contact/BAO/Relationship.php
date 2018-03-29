@@ -38,6 +38,12 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   const ALL = 0, PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
 
   /**
+   * Constants for is_permission fields.
+   * Note: the slightly non-obvious ordering is due to history...
+   */
+  const NONE = 0, EDIT = 1, VIEW = 2;
+
+  /**
    * Create function - use the API instead.
    *
    * Note that the previous create function has been renamed 'legacyCreateMultiple'
@@ -470,8 +476,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   public static function getdefaults() {
     return array(
       'is_active' => 0,
-      'is_permission_a_b' => 0,
-      'is_permission_b_a' => 0,
+      'is_permission_a_b' => self::NONE,
+      'is_permission_b_a' => self::NONE,
       'description' => '',
       'start_date' => 'NULL',
       'case_id' => NULL,
@@ -2118,16 +2124,28 @@ AND cc.sort_name LIKE '%$name%'";
           "action=view&reset=1&cid={$values['cid']}&id={$values['id']}&rtype={$values['rtype']}");
 
         if ($params['context'] == 'current') {
-          if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
-            ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
+          if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::EDIT) OR
+            ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::EDIT)
           ) {
             $relationship['sort_name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> *</span>';
           }
 
-          if (($values['cid'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
-            ($values['cid'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
+          if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::VIEW) OR
+            ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::VIEW)
+          ) {
+            $relationship['sort_name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> +</span>';
+          }
+
+          if (($values['cid'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::EDIT) OR
+            ($values['cid'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::EDIT)
           ) {
             $relationship['relation'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> *</span>';
+          }
+
+          if (($values['cid'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::VIEW) OR
+            ($values['cid'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::VIEW)
+          ) {
+            $relationship['relation'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> +</span>';
           }
         }
 

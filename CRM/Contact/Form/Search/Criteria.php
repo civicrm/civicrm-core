@@ -467,9 +467,9 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addRadio('relation_status', ts('Relationship Status'), $relStatusOption);
     $form->setDefaults(array('relation_status' => 0));
     // relation permission
-    $relPermissionOption = array(ts('Any'), ts('Yes'), ts('No'));
-    $form->addRadio('relation_permission', ts('Permissioned Relationship?'), $relPermissionOption);
-    $form->setDefaults(array('relation_permission' => 0));
+    $allRelationshipPermissions = CRM_Contact_BAO_Relationship::buildOptions('is_permission_a_b');
+    $form->add('select', 'relation_permission', ts('Permissioned Relationship'),
+     array('' => ts('- select -')) + $allRelationshipPermissions, FALSE, array('multiple' => TRUE, 'class' => 'crm-select2'));
 
     //add the target group
     if ($form->_group) {

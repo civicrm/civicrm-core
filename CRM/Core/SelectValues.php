@@ -1096,4 +1096,17 @@ class CRM_Core_SelectValues {
     );
   }
 
+  /**
+   * Relationship permissions
+   *
+   * @return array
+   */
+  public static function getPermissionedRelationshipOptions() {
+    return array(
+      CRM_Contact_BAO_Relationship::NONE => ts('None'),
+      CRM_Contact_BAO_Relationship::VIEW => ts('View only'),
+      CRM_Contact_BAO_Relationship::EDIT => ts('View and update'),
+    );
+  }
+
 }
