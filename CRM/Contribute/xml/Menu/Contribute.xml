@@ -329,4 +329,10 @@
     <page_callback>CRM_Contribute_Page_ContributionRecurPayments</page_callback>
     <access_arguments>access CiviContribute</access_arguments>
   </item>
+  <item>
+    <path>civicrm/membership/recurring-contributions</path>
+    <title>Membership Recurring Contributions</title>
+    <page_callback>CRM_Member_Page_RecurringContributions</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
 </menu>

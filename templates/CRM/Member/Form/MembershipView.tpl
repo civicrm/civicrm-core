@@ -73,11 +73,41 @@
 
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
 
-    {if $accessContribution and $rows.0.contribution_id}
-        <div class="crm-accordion-wrapper">
-              <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
-              <div class="crm-accordion-body">{include file="CRM/Contribute/Form/Selector.tpl" context="Search"}</div>
+    {if $accessContribution}
+      <div class="crm-accordion-wrapper">
+        <div class="crm-accordion-header">
+          {ts}Related Contributions and Recurring Contributions{/ts}
         </div>
+        <div class="crm-accordion-body">
+          {if $rows.0.contribution_id}
+            {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
+          {/if}
+          <script type="text/javascript">
+            var membershipID = {$id};
+            var contactID = {$contactId};
+            {literal}
+            CRM.$(function($) {
+              CRM.loadPage(
+                CRM.url(
+                  'civicrm/membership/recurring-contributions',
+                  {
+                    reset: 1,
+                    membershipID: membershipID,
+                    cid: contactID
+                  },
+                  'back'
+                ),
+                {
+                  target : '#membership-recurring-contributions',
+                  dialog : false
+                }
+              );
+            });
+            {/literal}
+          </script>
+          <div id="membership-recurring-contributions"></div>
+        </div>
+      </div>
     {/if}
 
     {if $softCredit}
