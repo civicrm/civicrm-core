@@ -490,14 +490,16 @@ WHERE ceft.entity_id = %1";
    */
   public static function getTotalPayments($contributionId) {
     $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    $refundStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
 
     $sql = "SELECT SUM(ft.total_amount) FROM civicrm_financial_trxn ft
       INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution')
-      WHERE eft.entity_id = %1 AND ft.is_payment = 1 AND ft.status_id = %2";
+      WHERE eft.entity_id = %1 AND ft.is_payment = 1 AND ft.status_id IN (%2, %3)";
 
     $params = array(
       1 => array($contributionId, 'Integer'),
       2 => array($statusId, 'Integer'),
+      3 => array($refundStatusId, 'Integer'),
     );
 
     return CRM_Core_DAO::singleValueQuery($sql, $params);

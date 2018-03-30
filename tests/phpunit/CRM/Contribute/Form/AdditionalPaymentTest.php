@@ -148,6 +148,48 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test paynow functionality to complete partially paid Contribution.
+   */
+  public function testPayNowForPartialPayment() {
+    $this->createContribution('Partially paid');
+
+    // pay additional amount
+    $this->submitPaymentFromFrontEndContributionPage(70);
+    $this->checkResults(array(30, 70), 2);
+  }
+
+  /**
+   * Function to submit payments from front-end contribution page.
+   *
+   * @param float $amount
+   */
+  public function submitPaymentFromFrontEndContributionPage($amount) {
+    $paymentProcessorID = $this->paymentProcessorCreate(array('payment_processor_type_id' => 'Dummy'));
+
+    // create a contribution page which is later used to make online payment for pending contribution
+    $contributionPage = $this->callAPISuccess('ContributionPage', 'create', array(
+      'title' => 'Test Contribution Page',
+      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Campaign Contribution'),
+      'currency' => 'USD',
+      'financial_account_id' => 1,
+      'payment_processor' => $paymentProcessorID,
+      'is_active' => 1,
+      'is_allow_other_amount' => 1,
+      'min_amount' => 10,
+      'max_amount' => 1000,
+    ));
+
+    $params = array(
+      'id' => $contributionPage['id'],
+      'amount' => $amount,
+      'payment_processor_id' => $paymentProcessorID,
+      'isPartialPayment' => TRUE,
+      'contributionId' => $this->_contributionId,
+    );
+    CRM_Contribute_Form_Contribution_Confirm::submit($params);
+  }
+
+  /**
    * Test the submit function that completes the partially paid Contribution with multiple payments.
    */
   public function testMultiplePaymentForPartialyPaidContribution() {

@@ -100,7 +100,12 @@
         {ts}Contribution Information{/ts}{if $display_name} &ndash; {$display_name}{/if}
       </div>
       {assign var="totalAmount" value=$pendingAmount}
-      {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
+      {if $totalAmountForPartialPayment}
+        {assign var="totalAmountForPartialPayment" value=$totalAmountForPartialPayment}
+        {include file="CRM/Price/Page/LineItem.tpl" context="PartialPayment"}
+      {else}
+        {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
+      {/if}
     {else}
       <div class="display-block">
         <td class="label">{$form.total_amount.label}</td>

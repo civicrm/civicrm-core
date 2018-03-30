@@ -1310,20 +1310,34 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       return;
     }
     if (!$this->getContactID()) {
-      CRM_Core_Error::statusBounce(ts("Returning since there is no contact attached to this contribution id."));
+      throw new CRM_Core_Exception(ts("Returning since there is no contact attached to this contribution id."));
     }
 
     $paymentBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_ccid);
     //bounce if the contribution is not pending.
     if ((int) $paymentBalance <= 0) {
-      CRM_Core_Error::statusBounce(ts("Returning since contribution has already been handled."));
+      throw new CRM_Core_Exception(ts("This contribution is already fully paid."));
     }
-    if (!empty($paymentBalance)) {
-      $this->_pendingAmount = $paymentBalance;
+    $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $this->_ccid));
+    if (!in_array($contribution['contribution_status'], array('Pending', 'Partially paid'))) {
+      throw new CRM_Core_Exception(ts("Only Pending or Partially Paid contributions can be submitted."));
+    }
+
+    $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_ccid, 'contribution');
+    $pendingAmount = CRM_Utils_Array::value('amount_owed', $paymentInfo);
+    if ($payment['contribution_status'] == 'Partially paid') {
+      $totalAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_ccid, 'total_amount');
+      $this->set('isPartialPayment', TRUE);
+      $this->assign('totalAmountForPartialPayment', $totalAmount);
+    }
+
+    if (!empty($pendingAmount)) {
+      $this->_pendingAmount = $pendingAmount;
       $this->assign('pendingAmount', $this->_pendingAmount);
     }
 
-    if ($taxAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_ccid, 'tax_amount')) {
+    $taxAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_ccid, 'tax_amount');
+    if (!empty($taxAmount) && $taxAmount != 0.00) {
       $this->set('tax_amount', $taxAmount);
       $this->assign('taxAmount', $taxAmount);
     }

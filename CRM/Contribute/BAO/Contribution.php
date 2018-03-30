@@ -3771,6 +3771,37 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     return FALSE;
   }
 
+  /**
+   * Function to process additional payment for partial and refund contributions. This function
+   * is called from backend 'Record Payment' form and also when a partial payment is completed
+   * from the front-end contribution page.
+   *
+   * @param int $contributionId
+   *   is the invoice contribution id (got created after processing participant payment).
+   * @param array $params
+   *   to take user provided input of transaction details.
+   * @param string $paymentType
+   *   'owed' for purpose of recording partial payments, 'refund' for purpose of recording refund payments.
+   * @param int $participantId
+   *
+   * @return array
+   */
+  public static function processAdditionalPayment($contributionId, $params, $paymentType = 'owed', $participantId = NULL) {
+    $defaults = array();
+    $contribution = civicrm_api3('Contribution', 'getsingle', array(
+      'return' => array("contribution_status_id"),
+      'id' => $contributionId,
+    ));
+    $contributionStatusId = CRM_Utils_Array::value('contribution_status_id', $contribution);
+    $result = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionId, $params, $paymentType, $participantId);
+    // Fetch the contribution & do proportional line item assignment
+    $params = array('id' => $contributionId);
+    $contribution = CRM_Contribute_BAO_Contribution::retrieve($params, $defaults, $params);
+    CRM_Contribute_BAO_Contribution::addPayments(array($contribution), $contributionStatusId);
+
+    return array($result, $contribution);
+  }
+
 
   /**
    * Function to record additional payment for partial and refund contributions.
@@ -4502,10 +4533,20 @@ WHERE ft.is_payment = 1
    * @param int $recur
    * @param CRM_Contribute_BAO_Contribution $contribution
    *
-   * @return array
+   * @return NULL|array
    */
   public static function completeOrder(&$input, &$ids, $objects, $transaction, $recur, $contribution) {
     $primaryContributionID = isset($contribution->id) ? $contribution->id : $objects['first_contribution']->id;
+
+    $partiallyPaidStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid');
+    if (!empty($contribution->contribution_status_id) && $contribution->contribution_status_id == $partiallyPaidStatusID) {
+      $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($primaryContributionID, 'contribution');
+      if (!empty($paymentInfo['amount_owed'])) {
+        $input['amount'] = $input['total_amount'] = $paymentInfo['amount_owed'];
+        CRM_Contribute_BAO_Contribution::processAdditionalPayment($primaryContributionID, $input);
+        return NULL;
+      }
+    }
     // The previous details are used when calculating line items so keep it before any code that 'does something'
     if (!empty($contribution->id)) {
       $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues(array('id' => $contribution->id),
