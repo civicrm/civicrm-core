@@ -105,7 +105,9 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
       echo 'Could not connect to redisd server';
       CRM_Utils_System::civiExit();
     }
-    $this->_cache->auth(CIVICRM_DB_CACHE_PASSWORD);
+    if (CRM_Utils_Constant::value('CIVICRM_DB_CACHE_PASSWORD')) {
+      $this->_cache->auth(CIVICRM_DB_CACHE_PASSWORD);
+    }
   }
 
   /**
