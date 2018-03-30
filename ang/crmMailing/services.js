@@ -275,6 +275,7 @@
               id: '$value.id'
             }
           });
+          delete params.scheduled_date;
           delete params.recipients; // the content was merged in
           params._skip_evil_bao_auto_recipients_ = 1; // skip recipient rebuild on mail preview
           return qApi('Mailing', 'create', params).then(function(result) {
@@ -300,6 +301,7 @@
             'api.email.getvalue': {'return': 'email'}
           }
         });
+        delete params.scheduled_date;
         delete params.recipients; // the content was merged in
         return qApi('Mailing', 'create', params).then(function (recipResult) {
           // changes rolled back, so we don't care about updating mailing
@@ -332,6 +334,7 @@
             });
             crmMailingCache.put('mailing-' + mailing.id + '-recipient-params', params.recipients);
           }
+          delete params.scheduled_date;
           delete params.recipients; // the content was merged in
           recipientCount = qApi('Mailing', 'create', params).then(function (recipResult) {
             // changes rolled back, so we don't care about updating mailing
