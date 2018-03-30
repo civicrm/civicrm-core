@@ -228,7 +228,6 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     );
 
     if ($isSMSmode) {
-
       $criteria = array(
         'is_opt_out' => CRM_Utils_SQL_Select::fragment()->where("$contact.is_opt_out = 0"),
         'is_deceased' => CRM_Utils_SQL_Select::fragment()->where("$contact.is_deceased <> 1"),
@@ -250,6 +249,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         'location_filter' => CRM_Utils_SQL_Select::fragment()->where($location_filter),
         'email_not_null' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.email IS NOT NULL"),
         'email_not_empty' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.email != ''"),
+        'email_not_on_hold' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.on_hold = 0"),
         'mailing_id' => CRM_Utils_SQL_Select::fragment()->where("mg.mailing_id = #mailingID"),
         'temp_contact_null' => CRM_Utils_SQL_Select::fragment()->where('temp.contact_id IS NULL'),
         'order_by' => CRM_Utils_SQL_Select::fragment()->orderBy($order_by),
