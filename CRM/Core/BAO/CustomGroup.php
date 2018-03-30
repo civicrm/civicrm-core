@@ -216,7 +216,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $transaction->commit();
 
     // reset the cache
-    CRM_Utils_System::flushCache();
+    CRM_Utils_System::flushFields();
 
     if ($tableName) {
       CRM_Utils_Hook::post('create', 'CustomGroup', $group->id, $group);

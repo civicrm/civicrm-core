@@ -183,7 +183,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
     //cache contact fields retaining localized titles
     //though we changed localization, so reseting cache.
-    \Civi::cache('fields')->flush();
+    CRM_Utils_System::flushFields();
 
     //CRM-8559, cache navigation do not respect locale if it is changed, so reseting cache.
     CRM_Core_BAO_Cache::deleteGroup('navigation');
