@@ -130,7 +130,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    */
   public function get($key) {
     $result = $this->_cache->get($this->_prefix . $key);
-    return unserialize($result);
+    return ($result === FALSE) ? NULL : unserialize($result);
   }
 
   /**
