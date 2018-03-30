@@ -1147,8 +1147,7 @@ class CRM_GCD {
     //In this function when we add groups that time we are cache the contact fields
     //But at the end of setup we are appending sample custom data, so for consistency
     //reset the cache.
-    require_once 'CRM/Core/BAO/Cache.php';
-    CRM_Core_BAO_Cache::deleteGroup('contact fields');
+    \Civi::cache('fields')->flush();
   }
 
   /**

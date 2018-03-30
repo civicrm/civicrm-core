@@ -1302,7 +1302,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
     if (!$fields) {
       // check if we can retrieve from database cache
-      $fields = CRM_Core_BAO_Cache::getItem('contact fields', $cacheKeyString);
+      $fields = \Civi::cache('fields')->get($cacheKeyString);
     }
 
     if (!$fields) {
@@ -1441,7 +1441,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       //Sorting fields in alphabetical order(CRM-1507)
       $fields = CRM_Utils_Array::crmArraySortByField($fields, 'title');
 
-      CRM_Core_BAO_Cache::setItem($fields, 'contact fields', $cacheKeyString);
+      \Civi::cache('fields')->set($cacheKeyString, $fields);
     }
 
     self::$_importableFields[$cacheKeyString] = $fields;
@@ -1499,7 +1499,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       }
 
       // check if we can retrieve from database cache
-      $fields = CRM_Core_BAO_Cache::getItem('contact fields', $cacheKeyString);
+      $fields = \Civi::cache('fields')->get($cacheKeyString);
 
       if (!$fields) {
         $fields = CRM_Contact_DAO_Contact::export();
@@ -1690,7 +1690,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
           }
         }
 
-        CRM_Core_BAO_Cache::setItem($fields, 'contact fields', $cacheKeyString);
+        \Civi::cache('fields')->set($cacheKeyString, $fields);
       }
       self::$_exportableFields[$cacheKeyString] = $fields;
     }

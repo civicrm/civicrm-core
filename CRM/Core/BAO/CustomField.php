@@ -507,7 +507,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       }
 
       // check if we can retrieve from database cache
-      $fields = CRM_Core_BAO_Cache::getItem('contact fields', "custom importableFields $cacheKey");
+      $fields = \Civi::cache('fields')->get("custom importableFields $cacheKey");
 
       if ($fields === NULL) {
         $cfTable = self::getTableName();
@@ -634,10 +634,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           self::getOptionsForField($fields[$dao->id], $dao->option_group_name);
         }
 
-        CRM_Core_BAO_Cache::setItem($fields,
-          'contact fields',
-          "custom importableFields $cacheKey"
-        );
+        \Civi::cache('fields')->set("custom importableFields $cacheKey", $fields);
       }
       self::$_importFields[$cacheKey] = $fields;
     }

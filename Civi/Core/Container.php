@@ -164,6 +164,7 @@ class Container {
       'js_strings' => 'js_strings',
       'community_messages' => 'community_messages',
       'checks' => 'checks',
+      'fields' => 'contact fields',
       'session' => 'CiviCRM Session',
     );
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
