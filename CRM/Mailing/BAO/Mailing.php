@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2017
  */
 require_once 'Mail/mime.php';
 
@@ -123,15 +123,16 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
     $contact = CRM_Contact_DAO_Contact::getTableName();
     $isSMSmode = (!CRM_Utils_System::isNull($mailingObj->sms_provider_id));
-
     $mailingGroup = new CRM_Mailing_DAO_MailingGroup();
+    $mgtable = CRM_Mailing_DAO_MailingGroup::getTableName();
+    $group = CRM_Contact_BAO_Group::getTableName();
     $recipientsGroup = $excludeSmartGroupIDs = $includeSmartGroupIDs = $priorMailingIDs = array();
-    $dao = CRM_Utils_SQL_Select::from('civicrm_mailing_group')
-             ->select('GROUP_CONCAT(entity_id SEPARATOR ",") as group_ids, group_type, entity_table')
-             ->where('mailing_id = #mailing_id AND entity_table IN ("civicrm_group", "civicrm_mailing")')
-             ->groupBy(array('group_type', 'entity_table'))
-             ->param('#mailing_id', $mailingID)
-             ->execute();
+    $dao = CRM_Utils_SQL_Select::from($mgtable)
+      ->select('GROUP_CONCAT(entity_id SEPARATOR ",") as group_ids, group_type, entity_table')
+      ->where('mailing_id = #mailing_id AND entity_table IN ("' . $group . '", "' . $mailing . '")')
+      ->groupBy(array('group_type', 'entity_table'))
+      ->param('#mailing_id', $mailingID)
+      ->execute();
     while ($dao->fetch()) {
       if ($dao->entity_table == 'civicrm_mailing') {
         $priorMailingIDs[$dao->group_type] = explode(',', $dao->group_ids);
@@ -249,7 +250,6 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         $location_filter,
         "$entityTable.email IS NOT NULL",
         "$entityTable.email != ''",
-        "$entityTable.on_hold = 0",
         "mg.mailing_id = #mailingID",
         'temp.contact_id IS NULL',
       );
