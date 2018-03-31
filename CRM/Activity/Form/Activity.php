@@ -742,6 +742,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           'combined' => ts('Create one activity with all contacts together'),
         )
       );
+      $this->addRule('separation', ts('Activity separation is a required field'), 'required');
     }
 
     $this->addRule('duration',
