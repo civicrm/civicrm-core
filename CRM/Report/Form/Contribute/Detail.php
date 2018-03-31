@@ -31,9 +31,6 @@
  * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
-  protected $_addressField = FALSE;
-
-  protected $_emailField = FALSE;
 
   protected $_summary = NULL;
 
@@ -413,6 +410,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $group = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     $sql = "{$select} {$this->_from} {$this->_where} {$group}";
     $dao = CRM_Core_DAO::executeQuery($sql);
+    $this->addToDeveloperTab($sql);
 
     while ($dao->fetch()) {
       $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency) . " (" . $dao->count . ")";
@@ -463,6 +461,7 @@ SELECT COUNT(contribution_soft_civireport.amount ) as count,
 {$this->_softFrom}
 GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
       $dao = CRM_Core_DAO::executeQuery($sql);
+      $this->addToDeveloperTab($sql);
       while ($dao->fetch()) {
         $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency) . " (" .
           $dao->count . ")";
@@ -526,6 +525,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     // 1. use main contribution query to build temp table 1
     $sql = $this->buildQuery();
     $tempQuery = "CREATE TEMPORARY TABLE civireport_contribution_detail_temp1 {$this->_databaseAttributes} AS {$sql}";
+    $this->addToDeveloperTab($tempQuery);
     CRM_Core_DAO::executeQuery($tempQuery);
     $this->setPager();
 
@@ -544,6 +544,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     // we inner join with temp1 to restrict soft contributions to those in temp1 table
     $sql = "{$select} {$this->_from} {$this->_where} {$this->_groupBy}";
     $tempQuery = "CREATE TEMPORARY TABLE civireport_contribution_detail_temp2 {$this->_databaseAttributes} AS {$sql}";
+    $this->addToDeveloperTab($tempQuery);
     CRM_Core_DAO::executeQuery($tempQuery);
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'soft_credits_only'
@@ -582,6 +583,7 @@ UNION ALL
 
     // 4. build temp table 3
     $sql = "CREATE TEMPORARY TABLE civireport_contribution_detail_temp3 {$this->_databaseAttributes} AS {$tempQuery}";
+    $this->addToDeveloperTab($sql);
     CRM_Core_DAO::executeQuery($sql);
 
     // 5. Re-construct order-by to make sense for final query on temp3 table
@@ -753,6 +755,7 @@ UNION ALL
 SELECT civicrm_contact_id, civicrm_contact_sort_name, civicrm_contribution_total_amount_sum, civicrm_contribution_currency
 FROM   civireport_contribution_detail_temp2
 WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribution_id']}";
+        $this->addToDeveloperTab($query);
         $dao = CRM_Core_DAO::executeQuery($query);
         $string = '';
         $separator = ($this->_outputMode !== 'csv') ? "<br/>" : ' ';
@@ -775,6 +778,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
 SELECT civicrm_contact_id, civicrm_contact_sort_name
 FROM   civireport_contribution_detail_temp1
 WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribution_id']}";
+        $this->addToDeveloperTab($query);
         $dao = CRM_Core_DAO::executeQuery($query);
         $string = '';
         while ($dao->fetch()) {
@@ -854,6 +858,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       // initialize array of total counts
       $sumcontribs = $totals = array();
       $dao = CRM_Core_DAO::executeQuery($query);
+      $this->addToDeveloperTab($query);
       while ($dao->fetch()) {
 
         // let $this->_alterDisplay translate any integer ids to human-readable values.
@@ -941,16 +946,10 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
               INNER JOIN (SELECT c.id, IF(COUNT(oc.id) = 0, 0, 1) AS ordinality FROM civicrm_contribution c LEFT JOIN civicrm_contribution oc ON c.contact_id = oc.contact_id AND oc.receive_date < c.receive_date GROUP BY c.id) {$this->_aliases['civicrm_contribution_ordinality']}
                       ON {$this->_aliases['civicrm_contribution_ordinality']}.id = {$this->_aliases['civicrm_contribution']}.id";
     }
-    $this->addPhoneFromClause();
+    $this->joinPhoneFromContact();
+    $this->joinAddressFromContact();
+    $this->joinEmailFromContact();
 
-    $this->addAddressFromClause();
-
-    if ($this->_emailField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                      {$this->_aliases['civicrm_email']}.is_primary = 1\n";
-    }
     // include contribution note
     if (!empty($this->_params['fields']['contribution_note']) ||
       !empty($this->_params['note_value'])
