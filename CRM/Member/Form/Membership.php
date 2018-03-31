@@ -243,12 +243,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $this->_memType = $params['membership_type_id'][1];
       }
     }
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_memType, 1, 'Membership', $this->_id);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
+
+    $this->addCustomDataToFormIfSubmitted('Membership', $this->_memType, $this->_id);
 
     // CRM-4395, get the online pending contribution id.
     $this->_onlinePendingContributionId = NULL;
