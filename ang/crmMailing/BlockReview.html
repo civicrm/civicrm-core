@@ -11,7 +11,7 @@ Required vars: mailing, attachments
       <div crm-ui-field="{title: ts('Recipients')}">
         <div ng-controller="ViewRecipCtrl">
           <div ng-controller="EditRecipCtrl">
-            <div><a crm-icon="fa-users" class="crm-hover-button action-item" ng-click="previewRecipients()">{{getRecipientsEstimate()}}</a></div>
+            <div><a crm-icon="fa-users" class="crm-hover-button action-item" ng-click="previewRecipients()">{{getRecipientCount()}}</a></div>
             <div ng-show="getIncludesAsString(mailing)">
               (<strong>{{ts('Include:')}}</strong> {{getIncludesAsString(mailing)}})
             </div>
