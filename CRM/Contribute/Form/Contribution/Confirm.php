@@ -740,21 +740,18 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * Comments from previous refactor indicate doubt as to what was going on.
    *
-   * @param int $contributionTypeId
+   * @param int $financialTypeID
    *
    * @return null|string
    */
-  public function wrangleFinancialTypeID($contributionTypeId) {
-    if (isset($paymentParams['financial_type'])) {
-      $contributionTypeId = $paymentParams['financial_type'];
-    }
-    elseif (!empty($this->_values['pledge_id'])) {
-      $contributionTypeId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
+  public function wrangleFinancialTypeID($financialTypeID) {
+    if (empty($financialTypeID) && !empty($this->_values['pledge_id'])) {
+      $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
         $this->_values['pledge_id'],
         'financial_type_id'
       );
     }
-    return $contributionTypeId;
+    return $financialTypeID;
   }
 
   /**
