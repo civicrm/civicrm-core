@@ -141,4 +141,17 @@ class CRM_Utils_Money {
     return 2;
   }
 
+  /**
+   * Subtract currencies using integers instead of floats, to preserve precision
+   *
+   * @return float
+   *   Result of subtracting $rightOp from $leftOp to the precision of $currency
+   */
+  public static function subtractCurrencies($leftOp, $rightOp, $currency) {
+    if (is_numeric($leftOp) && is_numeric($rightOp)) {
+      $precision = pow(10, self::getCurrencyPrecision($currency));
+      return (($leftOp * $precision) - ($rightOp * $precision)) / $precision;
+    }
+  }
+
 }
