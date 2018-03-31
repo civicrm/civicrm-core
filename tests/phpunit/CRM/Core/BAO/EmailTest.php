@@ -149,4 +149,22 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
+  /**
+   * Test getting list of Emails for use in Receipts and Single Email sends
+   */
+  public function testGetFromEmail() {
+    $this->createLoggedInUser();
+    $fromEmails = CRM_Core_BAO_Email::getFromEmail();
+    $emails = array_values($fromEmails);
+    $this->assertContains("(preferred)", $emails[0]);
+    Civi::settings()->set("allow_mail_from_logged_in_contact", 0);
+    $this->callAPISuccess('system', 'flush', []);
+    $fromEmails = CRM_Core_BAO_Email::getFromEmail();
+    $emails = array_values($fromEmails);
+    $this->assertNotContains("(preferred)", $emails[0]);
+    $this->assertContains("info@EXAMPLE.ORG", $emails[0]);
+    Civi::settings()->set("allow_mail_from_logged_in_contact", 1);
+    $this->callAPISuccess('system', 'flush', []);
+  }
+
 }
