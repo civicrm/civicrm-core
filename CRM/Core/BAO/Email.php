@@ -304,6 +304,7 @@ AND    reset_date IS NULL
       return $fromEmailValues;
     }
 
+    $contactFromEmails = [];
     // add logged in user's active email ids
     $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
     if ($contactID) {
@@ -321,10 +322,10 @@ AND    reset_date IS NULL
         if (!empty($emailVal['is_primary'])) {
           $fromEmailHtml .= ' ' . ts('(preferred)');
         }
-        $fromEmailValues[$emailId] = $fromEmailHtml;
+        $contactFromEmails[$fromEmail] = $fromEmailHtml;
       }
     }
-    return $fromEmailValues;
+    return CRM_Utils_Array::crmArrayMerge($contactFromEmails, $fromEmailValues);
   }
 
   /**
