@@ -39,6 +39,8 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
   static $_links = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
+  public $_id = NULL;
+  public $_action = NULL;
 
   /**
    * View details of a recurring contribution.
@@ -57,7 +59,9 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
       CRM_Core_Error::statusBounce('Recurring contribution not found (ID: ' . $this->_id);
     }
 
-    $contributionRecur['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName($contributionRecur['payment_processor_id']);
+    $contributionRecur['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName(
+      CRM_Utils_Array::value('payment_processor_id', $contributionRecur)
+    );
     $idFields = array('contribution_status_id', 'campaign_id', 'financial_type_id');
     foreach ($idFields as $idField) {
       if (!empty($contributionRecur[$idField])) {
@@ -97,6 +101,30 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
       $this->_permission = CRM_Core_Permission::VIEW;
       $this->assign('permission', 'view');
     }
+
+    $this->loadRelatedContributions();
+  }
+
+  /**
+   * Loads contributions associated to the current recurring contribution being
+   * viewed.
+   */
+  private function loadRelatedContributions() {
+    $controller = new CRM_Core_Controller_Simple(
+      'CRM_Contribute_Form_Search',
+      ts('Contributions'),
+      $this->_action,
+      FALSE, FALSE, TRUE
+    );
+    $controller->setEmbedded(TRUE);
+    $controller->reset();
+    $controller->set('cid', $this->_contactId);
+    $controller->set('recur', $this->_id);
+    $controller->set('force', 1);
+    $controller->set('context', 'contribution');
+    $controller->set('limit', 50);
+    $controller->process();
+    $controller->run();
   }
 
   /**

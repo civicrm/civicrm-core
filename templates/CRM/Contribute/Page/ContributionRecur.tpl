@@ -62,6 +62,17 @@
           <div class="crm-submit-buttons"><a class="button cancel crm-form-submit" href="{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=contribute'}">{ts}Done{/ts}</a></div>
         </div>
     {/if}
+
+  {if $rows}
+    {include file="CRM/Contribute/Page/ContributionTotals.tpl" mode="view"}
+    <div class='clear'></div>
+    {include file="CRM/Contribute/Form/Selector.tpl"}
+  {else}
+    <div class="messages status no-popup">
+      <div class="icon inform-icon"></div>
+      {ts}No contributions have been recorded for this recurring contribution.{/ts}
+    </div>
+  {/if}
 {/if}
 {if $recurRows}
     {strip}
