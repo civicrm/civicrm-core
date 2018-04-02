@@ -1393,7 +1393,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('group_bys', $table)) {
         foreach ($table['group_bys'] as $fieldName => $field) {
-          if (!empty($field)) {
+          if (!empty($field) && empty($field['no_display'])) {
             $options[$field['title']] = $fieldName;
             if (!empty($field['frequency'])) {
               $freqElements[$field['title']] = $fieldName;
@@ -5291,45 +5291,45 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   protected function storeGroupByArray() {
 
-    if (CRM_Utils_Array::value('group_bys', $this->_params) &&
-      is_array($this->_params['group_bys']) &&
-      !empty($this->_params['group_bys'])
-    ) {
-      foreach ($this->_columns as $tableName => $table) {
-        $table = $this->_columns[$tableName];
-        if (array_key_exists('group_bys', $table)) {
-          foreach ($table['group_bys'] as $fieldName => $fieldData) {
-            $field = $this->_columns[$tableName]['metadata'][$fieldName];
-            if (!empty($this->_params['group_bys'][$fieldName])) {
-              if (!empty($field['chart'])) {
-                $this->assign('chartSupported', TRUE);
+    if (!CRM_Utils_Array::value('group_bys', $this->_params)
+      || !is_array($this->_params['group_bys'])) {
+      $this->_params['group_bys'] = [];
+    }
+
+    foreach ($this->_columns as $tableName => $table) {
+      $table = $this->_columns[$tableName];
+      if (array_key_exists('group_bys', $table)) {
+        foreach ($table['group_bys'] as $fieldName => $fieldData) {
+          $field = $this->_columns[$tableName]['metadata'][$fieldName];
+          if (!empty($this->_params['group_bys'][$fieldName]) || !empty($fieldData['required'])) {
+            if (!empty($field['chart'])) {
+              $this->assign('chartSupported', TRUE);
+            }
+
+            if (!empty($table['group_bys'][$fieldName]['frequency']) &&
+              !empty($this->_params['group_bys_freq'][$fieldName])
+            ) {
+
+              switch ($this->_params['group_bys_freq'][$fieldName]) {
+                case 'FISCALYEAR':
+                  $this->_groupByArray[$tableName . '_' . $fieldName . '_start'] = self::fiscalYearOffset($field['dbAlias']);
+
+                case 'YEAR':
+                  $this->_groupByArray[$tableName . '_' . $fieldName . '_start'] = " {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
+
+                default:
+                  $this->_groupByArray[$tableName . '_' . $fieldName . '_start'] = "EXTRACT(YEAR_{$this->_params['group_bys_freq'][$fieldName]} FROM {$field['dbAlias']})";
+
               }
-
-              if (!empty($table['group_bys'][$fieldName]['frequency']) &&
-                !empty($this->_params['group_bys_freq'][$fieldName])
-              ) {
-
-                switch ($this->_params['group_bys_freq'][$fieldName]) {
-                  case 'FISCALYEAR':
-                    $this->_groupByArray[$tableName . '_' . $fieldName . '_start'] = self::fiscalYearOffset($field['dbAlias']);
-
-                  case 'YEAR':
-                    $this->_groupByArray[$tableName . '_' . $fieldName . '_start'] = " {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
-
-                  default:
-                    $this->_groupByArray[$tableName . '_' . $fieldName . '_start'] = "EXTRACT(YEAR_{$this->_params['group_bys_freq'][$fieldName]} FROM {$field['dbAlias']})";
-
-                }
-              }
-              else {
-                if (!in_array($field['dbAlias'], $this->_groupByArray)) {
-                  $this->_groupByArray[$tableName . '_' . $fieldName] = $field['dbAlias'];
-                }
+            }
+            else {
+              if (!in_array($field['dbAlias'], $this->_groupByArray)) {
+                $this->_groupByArray[$tableName . '_' . $fieldName] = $field['dbAlias'];
               }
             }
           }
-
         }
+
       }
     }
   }
