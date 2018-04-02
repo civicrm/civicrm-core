@@ -211,7 +211,10 @@ SELECT     civicrm_email.id as email_id
         )
       ) . "@$emailDomain";
 
-    $bounce_address = $localpart . "@$emailDomain";
+    $bounce_address = CRM_Core_BAO_MailSettings::defaultReturnPath();
+    if (empty($bounce_address)) {
+      $bounce_address = $localpart . 'b' . "@$emailDomain";
+    }
 
     $group = new CRM_Contact_BAO_Group();
     $group->id = $this->group_id;
