@@ -841,20 +841,19 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       /* Group (un-limited) report by all aliases and get counts. This might
        * be done more efficiently when the contents of $sql are known, ie. by
        * overriding this method in the report class.
+       * Bug: https://issues.civicrm.org/jira/browse/CRM-21831
+       * Alias civicrm_contribution_total_amount is DEPRECATED
        */
-
       $addtotals = '';
+      $showsumcontribs = FALSE;
 
-      if (array_search("civicrm_contribution_total_amount_sum", $this->_selectAliases) !==
-        FALSE
-      ) {
-        $addtotals = ", sum(civicrm_contribution_total_amount_sum) as sumcontribs";
+      if (array_search("civicrm_contribution_total_amount", $this->_selectAliases) !== FALSE) {
+        $addtotals = ", sum(civicrm_contribution_total_amount) as sumcontribs";
         $showsumcontribs = TRUE;
       }
-
       $query = $this->_select .
-        "$addtotals, count(*) as ct from civireport_contribution_detail_temp3 group by " .
-        implode(", ", $sectionAliases);
+      "$addtotals, count(*) as ct from civireport_contribution_detail_temp3 group by " .
+      implode(", ", $sectionAliases);
       // initialize array of total counts
       $sumcontribs = $totals = array();
       $dao = CRM_Core_DAO::executeQuery($query);
@@ -862,7 +861,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       while ($dao->fetch()) {
 
         // let $this->_alterDisplay translate any integer ids to human-readable values.
-        $rows[0] = $dao->toArray();
+        // $rows[0] = $dao->toArray();
         $this->alterDisplay($rows);
         $row = $rows[0];
 
