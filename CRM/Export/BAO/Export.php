@@ -2048,8 +2048,6 @@ WHERE  {$whereClause}";
       else {
         $fieldValue = '';
       }
-      $field = $field . '_';
-      $relPrefix = $field . $relationField;
 
       if (is_object($relDAO) && $relationField == 'id') {
         $row[$relPrefix][$relationField] = $relDAO->contact_id;
@@ -2066,7 +2064,7 @@ WHERE  {$whereClause}";
             // and state_province (‘province’ context)
             switch (TRUE) {
               case (!is_object($relDAO)):
-                $row[$relPrefix . '_' . $fldValue] = '';
+                $row[$relPrefix][$fldValue] = '';
                 break;
 
               case in_array('country', $type):
