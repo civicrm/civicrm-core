@@ -188,7 +188,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   public static function getReportTemplates() {
     $reportsToSkip = array(
       'activity' => 'does not respect function signature on from clause',
-      'contribute/topDonor' => 'construction of query in postProcess makes inaccessible ',
       'event/income' => 'I do no understand why but error is Call to undefined method CRM_Report_Form_Event_Income::from() in CRM/Report/Form.php on line 2120',
       'logging/contact/summary' => '(likely to be test related) probably logging off Undefined index: Form/Contact/LoggingSummary.php(231): PHP',
       'logging/contribute/summary' => '(likely to be test related) probably logging off DB Error: no such table',

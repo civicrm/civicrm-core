@@ -104,12 +104,13 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           ),
         ),
         'filters' => $this->getBasicContactFilters(),
+        'group_bys' => ['contact_contact_id' => ['name' => 'id', 'required' => 1, 'no_display' => 1]],
       ),
       'civicrm_line_item' => array(
         'dao' => 'CRM_Price_DAO_LineItem',
       ),
     );
-    $this->_columns += $this->getAddressColumns();
+    $this->_columns += $this->getAddressColumns(['group_by' => FALSE]);
     $this->_columns += array(
       'civicrm_contribution' => array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
@@ -159,6 +160,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             'default' => array(1),
           ),
         ),
+        'group_bys' => ['contribution_currency' => ['name' => 'currency', 'required' => 1, 'no_display' => 1]],
       ),
       'civicrm_financial_trxn' => array(
         'dao' => 'CRM_Financial_DAO_FinancialTrxn',
@@ -206,19 +208,6 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $this->_tagFilter = TRUE;
     $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
-  }
-
-  public function preProcess() {
-    parent::preProcess();
-  }
-
-  /**
-   * Select only contact ID when adding to group.
-   *
-   * @todo consider moving that to parent to support AddToGroup in general.
-   */
-  public function select() {
-    parent::select();
   }
 
   /**
@@ -317,10 +306,6 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     if ($this->_aclWhere) {
       $this->_where .= " AND {$this->_aclWhere} ";
     }
-  }
-
-  public function groupBy() {
-    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, array("{$this->_aliases['civicrm_contact']}.id", "{$this->_aliases['civicrm_contribution']}.currency"));
   }
 
   /**
