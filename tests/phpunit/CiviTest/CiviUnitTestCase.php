@@ -3999,4 +3999,21 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     return $contributionObj;
   }
 
+  /**
+   * Enable multilingual.
+   */
+  public function enableMultilingual() {
+    $this->callAPISuccess('Setting', 'create', array(
+      'lcMessages' => 'en_US',
+      'languageLimit' => array(
+        'en_US' => 1,
+      ),
+    ));
+
+    CRM_Core_I18n_Schema::makeMultilingual('en_US');
+
+    global $dbLocale;
+    $dbLocale = '_en_US';
+  }
+
 }
