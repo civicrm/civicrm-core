@@ -40,4 +40,13 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
   // Must be set to entity shortname (eg. event)
   static $entityShortname = 'case';
 
+  /**
+   * @inheritDoc
+   */
+  public function setContactIDs() {
+    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_entityIds,
+      'civicrm_case_contact', 'case_id'
+    );
+  }
+
 }
