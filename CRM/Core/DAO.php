@@ -1662,10 +1662,10 @@ FROM   civicrm_domain
    *
    * @param $componentIDs
    * @param string $tableName
-   *
+   * @param string $idField
    * @return array
    */
-  public static function &getContactIDsFromComponent(&$componentIDs, $tableName) {
+  public static function getContactIDsFromComponent($componentIDs, $tableName, $idField = 'id') {
     $contactIDs = array();
 
     if (empty($componentIDs)) {
@@ -1676,7 +1676,7 @@ FROM   civicrm_domain
     $query = "
 SELECT contact_id
   FROM $tableName
- WHERE id IN ( $IDs )
+ WHERE $idField IN ( $IDs )
 ";
 
     $dao = CRM_Core_DAO::executeQuery($query);

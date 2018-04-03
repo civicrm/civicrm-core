@@ -41,9 +41,10 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
   static $entityShortname = 'case';
 
   /**
-   * The array that holds all the case ids
+   * Deprecated copy of $_entityIds
    *
    * @var array
+   * @deprecated
    */
   public $_caseIds;
 
@@ -111,6 +112,15 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
         $urlParams
       ));
     }
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setContactIDs() {
+    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_entityIds,
+      'civicrm_case_contact', 'case_id'
+    );
   }
 
 }
