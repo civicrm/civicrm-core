@@ -148,26 +148,6 @@
         else {
           params[info.field] = value;
         }
-
-        /*
-        * Additional Extends Edit editable
-         * This new functionality extends the ... to add several additional columns and send it by ajax
-         * additional-class-name-save: is a data-additional-class-name-save name name of the class  that the value
-         * will be taken.
-         *  column-name: is a data-column-name: Is the name of column
-         *
-        */
-         if($i.data('additional-class-name-save') !== "undefined"){
-                var class_name_additional =$i.data('additional-class-name-save');
-                var name_column =$i.data('column-name');
-                if(name_column  !== "undefined"){
-                 var values_name_column =  $("."+class_name_additional).children().html();
-                 params[name_column] =  values_name_column;
-            }
-
-          }
-          /**EndParche**/
-
         CRM.api3(info.entity, action, params, {error: null})
           .done(function(data) {
             if (data.is_error) {
