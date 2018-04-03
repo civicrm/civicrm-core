@@ -128,7 +128,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $recipientsGroup = $excludeSmartGroupIDs = $includeSmartGroupIDs = $priorMailingIDs = array();
     $dao = CRM_Utils_SQL_Select::from('civicrm_mailing_group')
              ->select('GROUP_CONCAT(entity_id SEPARATOR ",") as group_ids, group_type, entity_table')
-             ->where('mailing_id = #mailing_id AND entity_table IN ("!groupTableName", "civicrm_mailing")')
+             ->where('mailing_id = #mailing_id AND entity_table RLIKE "^civicrm_(group.*|mailing)$" ')
              ->groupBy(array('group_type', 'entity_table'))
              ->param('!groupTableName', CRM_Contact_BAO_Group::getTableName())
              ->param('#mailing_id', $mailingID)
@@ -138,7 +138,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         $priorMailingIDs[$dao->group_type] = explode(',', $dao->group_ids);
       }
       else {
-        $recipientsGroup[$dao->group_type] = explode(',', $dao->group_ids);
+        $recipientsGroup[$dao->group_type] = empty($recipientsGroup[$dao->group_type]) ? explode(',', $dao->group_ids) : array_merge($recipientsGroup[$dao->group_type], explode(',', $dao->group_ids));
       }
     }
 
