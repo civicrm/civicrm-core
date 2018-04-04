@@ -769,7 +769,7 @@ WHERE li.contribution_id = %1";
           ));
           unset($updateFinancialItemInfoValues['financialTrxn']);
         }
-        elseif (!empty($updateFinancialItemInfoValues['link-financial-trxn'])) {
+        elseif (!empty($updateFinancialItemInfoValues['link-financial-trxn']) && $newFinancialItem->amount != 0) {
           civicrm_api3('EntityFinancialTrxn', 'create', array(
             'entity_id' => $newFinancialItem->id,
             'entity_table' => 'civicrm_financial_item',
