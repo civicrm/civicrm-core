@@ -133,9 +133,20 @@ class CRM_Core_DAO extends DB_DataObject {
    *   The database connection string.
    */
   public static function init($dsn) {
+    $runtime = \Civi\Core\Container::getBootService('runtime');
+
     Civi::$statics[__CLASS__]['init'] = 1;
+
+    if (!isset(Civi::$statics[__CLASS__]['activeDb'])) {
+      Civi::$statics[__CLASS__]['activeDb'] = [$runtime->defaultDsnType];
+    }
+
     $options = &PEAR::getStaticProperty('DB_DataObject', 'options');
-    $options['database'] = $dsn;
+    $options['database'] = $runtime->dsn;
+    $options['database_rw'] = $runtime->dsn;
+    $options['database_ro'] = $runtime->roDsn;
+    $options['database_cms'] = $runtime->userFrameworkDSN;
+
     if (defined('CIVICRM_DAO_DEBUG')) {
       self::DebugLevel(CIVICRM_DAO_DEBUG);
     }
@@ -424,6 +435,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * we need to set the links manually.
    */
   public function initialize() {
+    $this->_database = isset(Civi::$statics[__CLASS__]['activeDb'][0]) ? Civi::$statics[__CLASS__]['activeDb'][0] : \Civi\Core\Container::getBootService('runtime')->defaultDsnType;
     $this->_connect();
     if (empty(Civi::$statics[__CLASS__]['init'])) {
       // CRM_Core_DAO::init() must be called before CRM_Core_DAO->initialize().
@@ -1416,11 +1428,12 @@ FROM   civicrm_domain
   ) {
     $queryStr = self::composeQuery($query, $params, $abort);
 
-    static $_dao = NULL;
+    $db = isset(Civi::$statics[__CLASS__]['activeDb'][0]) ? Civi::$statics[__CLASS__]['activeDb'][0] : \Civi\Core\Container::getBootService('runtime')->defaultDsnType;
 
-    if (!$_dao) {
-      $_dao = new CRM_Core_DAO();
+    if (!isset(Civi::$statics[__CLASS__]['svq'][$db])) {
+      Civi::$statics[__CLASS__]['svq'][$db] = new CRM_Core_DAO();
     }
+    $_dao = Civi::$statics[__CLASS__]['svq'][$db];
 
     $_dao->query($queryStr, $i18nRewrite);
 
