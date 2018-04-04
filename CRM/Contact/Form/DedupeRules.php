@@ -249,8 +249,7 @@ UPDATE civicrm_dedupe_rule_group
     $substrLenghts = array();
 
     $tables = array();
-    $daoObj = new CRM_Core_DAO();
-    $database = $daoObj->database();
+    $database = CRM_Core_DAO::getDatabaseName();
     for ($count = 0; $count < self::RULES_COUNT; $count++) {
       if (empty($values["where_$count"])) {
         continue;

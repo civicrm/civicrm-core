@@ -407,13 +407,11 @@ class CRM_Contact_Import_ImportJob {
    * @return array
    */
   public static function getIncompleteImportTables() {
-    $dao = new CRM_Core_DAO();
-    $database = $dao->database();
     $query = "SELECT   TABLE_NAME FROM INFORMATION_SCHEMA
-                  WHERE    TABLE_SCHEMA = ? AND
+                  WHERE    TABLE_SCHEMA = database() AND
                            TABLE_NAME LIKE 'civicrm_import_job_%'
                   ORDER BY TABLE_NAME";
-    $result = CRM_Core_DAO::executeQuery($query, array($database));
+    $result = CRM_Core_DAO::executeQuery($query);
     $incompleteImportTables = array();
     while ($importTable = $result->fetch()) {
       if (!$this->isComplete($importTable)) {

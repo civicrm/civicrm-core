@@ -833,7 +833,7 @@ LIKE %1
     $dao = CRM_Core_DAO::executeQuery(
       "SELECT TABLE_NAME
        FROM information_schema.TABLES
-       WHERE TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
+       WHERE TABLE_SCHEMA = database()
          AND TABLE_NAME LIKE 'civicrm_%'
          AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
          AND TABLE_NAME NOT LIKE '%_temp%'
@@ -856,7 +856,7 @@ LIKE %1
       "SELECT count(*)
        FROM information_schema.TABLES
        WHERE ENGINE = 'MyISAM'
-         AND TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
+         AND TABLE_SCHEMA = database()
          AND TABLE_NAME LIKE 'civicrm_%'
          AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
          AND TABLE_NAME NOT LIKE '%_temp%'
@@ -869,8 +869,7 @@ LIKE %1
    * @return string
    */
   public static function getDatabaseName() {
-    $daoObj = new CRM_Core_DAO();
-    return $daoObj->database();
+    return CRM_Core_DAO::singleValueQuery('SELECT database()');
   }
 
   /**

@@ -119,13 +119,10 @@ class CRM_Logging_Schema {
    * Populate $this->tables and $this->logs with current db state.
    */
   public function __construct() {
-    $dao = new CRM_Contact_DAO_Contact();
-    $civiDBName = $dao->_database;
-
     $dao = CRM_Core_DAO::executeQuery("
 SELECT TABLE_NAME
 FROM   INFORMATION_SCHEMA.TABLES
-WHERE  TABLE_SCHEMA = '{$civiDBName}'
+WHERE  TABLE_SCHEMA = database()
 AND    TABLE_TYPE = 'BASE TABLE'
 AND    TABLE_NAME LIKE 'civicrm_%'
 ");
@@ -565,8 +562,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     }
     if (empty(\Civi::$statics[__CLASS__]['columnSpecs']) || !isset(\Civi::$statics[__CLASS__]['columnSpecs'][$table])) {
       if (!$civiDB) {
-        $dao = new CRM_Contact_DAO_Contact();
-        $civiDB = $dao->_database;
+        $civiDB = CRM_Core_DAO::getDatabaseName();
       }
       CRM_Core_TemporaryErrorScope::ignoreException();
       // NOTE: W.r.t Performance using one query to find all details and storing in static array is much faster
