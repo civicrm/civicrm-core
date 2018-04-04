@@ -316,12 +316,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $endDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('end_date', $this->_values));
       $now = date('YmdHis');
       if ($endDate && $endDate < $now) {
-        throw new CRM_Contribute_Exception_PastContributionPageException(ts('The page you requested has past its end date on '. CRM_Utils_Date::customFormat($endDate) ), $this->_id);
+        throw new CRM_Contribute_Exception_PastContributionPageException(ts('The page you requested has past its end date on ' . CRM_Utils_Date::customFormat($endDate)), $this->_id);
       }
 
       $startDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('start_date', $this->_values));
       if ($startDate && $startDate > $now) {
-        throw new CRM_Contribute_Exception_FutureContributionPageException(ts('The page you requested will be active from '. CRM_Utils_Date::customFormat($startDate)), $this->_id);
+        throw new CRM_Contribute_Exception_FutureContributionPageException(ts('The page you requested will be active from ' . CRM_Utils_Date::customFormat($startDate)), $this->_id);
       }
 
       $this->assignBillingType();
