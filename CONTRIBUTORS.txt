@@ -10,7 +10,7 @@ AGH Strategies - Andrew Hunt
 Agileware - Alok Patel
 Australian Greens - Seamus Lee
 CiviDesk - Yashodha Chaku
-CompuCorp - Mukesh Ram, Omar Abu Hussein, Vinu Varshith Sekar
+CompuCorp - Mukesh Ram, Omar Abu Hussein, René Olivo, Vinu Varshith Sekar
 Coop SymbioTIC - Samuel Vanhove
 Davis Media Access - Darrick Servis
 Fuzion - Jitendra Purohit
@@ -25,7 +25,6 @@ MJW Consulting - Matthew Wire
 myDropWizard - David Snopek
 Oxfam Germany - Thomas Schüttler
 Progressive Technology Project - Jamie McClelland
-René Olivo
 Systopia - Björn Endres
 Tadpole Collective - Kevin Cristiano
 Third Sector Design - Michael McAndrew
