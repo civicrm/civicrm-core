@@ -71,11 +71,11 @@
     </tr>
     <tr>
       <td><label>{ts}Phone 1:{/ts}</label></td>
-      <td>{$form.phone.1.phone.html|crmAddClass:phone}&nbsp;x&nbsp;{$form.phone.1.phone_ext.html|crmAddClass:four}&nbsp;{$form.phone.1.phone_type_id.html}</td>
+      <td>{$form.phone.1.phone.html|crmAddClass:phone} {ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.1.phone_ext.html|crmAddClass:four}&nbsp;{$form.phone.1.phone_type_id.html}</td>
     </tr>
     <tr>
       <td><label>{ts}Phone 2:{/ts}</label></td>
-      <td>{$form.phone.2.phone.html|crmAddClass:phone}&nbsp;x&nbsp;{$form.phone.2.phone_ext.html|crmAddClass:four}&nbsp;{$form.phone.2.phone_type_id.html}</td>
+      <td>{$form.phone.2.phone.html|crmAddClass:phone} {ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.2.phone_ext.html|crmAddClass:four}&nbsp;{$form.phone.2.phone_type_id.html}</td>
     </tr>
   </table>
 
@@ -166,4 +166,3 @@
       {/literal}
     </script>
   {/if}
-
