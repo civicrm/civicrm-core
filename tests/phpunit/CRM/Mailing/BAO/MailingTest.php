@@ -34,6 +34,14 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
+  public function tearDown() {
+    global $dbLocale;
+    if ($dbLocale) {
+      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+    }
+    parent::tearDown();
+  }
+
   /**
    * Helper function to assert whether the calculated recipients of a mailing
    * match the expected list
@@ -71,7 +79,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     return $this->callAPISuccess('MailingGroup', 'create', array(
       'mailing_id' => $mailingID,
       'group_type' => $type,
-      'entity_table' => "civicrm_group",
+      'entity_table' => CRM_Contact_BAO_Group::getTableName(),
       'entity_id' => $groupID,
     ));
   }
@@ -100,7 +108,6 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * contact 7 : smart 4 (inc)
    */
   public function testgetRecipientsEmailGroupIncludeExclude() {
-
     // Set up groups; 3 standard, 3 smart
     $groupIDs = array();
     for ($i = 0; $i < 6; $i++) {
@@ -172,6 +179,8 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
 
     // Check that we can include smart groups in the mailing too.
     // Expected: All contacts should be included.
+    // Also (dev/mail/6): Enable multilingual mode to check that restructing group doesn't affect recipient rebuilding
+    $this->enableMultilingual();
     $this->createMailingGroup($mailing['id'], $groupIDs[3]);
     $this->createMailingGroup($mailing['id'], $groupIDs[4]);
     $this->assertRecipientsCorrect($mailing['id'], $contactIDs);
@@ -198,7 +207,6 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     foreach ($contactIDs as $contactID) {
       $this->contactDelete($contactID);
     }
-
   }
 
   /**

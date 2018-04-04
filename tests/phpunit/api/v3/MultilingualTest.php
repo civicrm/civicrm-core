@@ -141,18 +141,4 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
     }
   }
 
-  public function enableMultilingual() {
-    $this->callAPISuccess('Setting', 'create', array(
-      'lcMessages' => 'en_US',
-      'languageLimit' => array(
-        'en_US' => 1,
-      ),
-    ));
-
-    CRM_Core_I18n_Schema::makeMultilingual('en_US');
-
-    global $dbLocale;
-    $dbLocale = '_en_US';
-  }
-
 }
