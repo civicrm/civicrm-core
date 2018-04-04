@@ -140,6 +140,9 @@
   organization: British Humanist Association
   jira        : awestbha
 
+- name        : Matthias Bärnthaler
+  jira        : baerm
+
 - github      : BorislavZlatanov
   name        : Borislav Zlatanov
   jira        : BorislavZlatanov
