@@ -140,6 +140,9 @@
   organization: British Humanist Association
   jira        : awestbha
 
+- name        : Matthias Bärnthaler
+  jira        : baerm
+
 - github      : BorislavZlatanov
   name        : Borislav Zlatanov
   jira        : BorislavZlatanov
@@ -201,6 +204,10 @@
   name        : René Nieuwburg
   organization: Comunica2
   jira        : ñull
+
+- github      : cor73x
+  name        : Łukasz Krutul
+  jira        : n3o
 
 - github      : coolbit
   name        : Chandana Bandara
@@ -272,8 +279,9 @@
   name        : Arun Singh
   jira        : aruns6578
 
-- name        : Adam Kwiatkowski
-  organization: DevMate
+- github      : adam-devapp
+  name        : Adam Kwiatkowski
+  organization: DevApp
   jira        : devmate
 
 - github      : dlobo
@@ -682,6 +690,9 @@
   name        : Kevin Reynen
   jira        : kreynen
 
+- name        : Kristine Chan
+  jira        : KristineC
+
 - github      : kryptothesuperdog
   name        : Andrew West
   organization: British Humanist Association
@@ -750,6 +761,11 @@
 - github      : magnolia61
   name        : Richard van Oosterhout
   jira        : magnolia61
+
+- github      : maitrepylos
+  name        : Gérard Ernaelsten
+  organization: Formatux
+  jira        : maitrepylos
 
 - name        : Manish Zope
   jira        : manish
@@ -986,6 +1002,9 @@
   name        : Pradeep Nayak
   jira        : pradeep.nayak
 
+- name        : Paul Treadaway
+  jira        : ptreadaway
+
 - name        : Angela Cacciola
   organization: Canine Companions for Independence
   jira        : princessang417
@@ -1001,6 +1020,9 @@
 - name        : Renaee Churches
   organization: Play Australia
   jira        : Renz56c.o
+
+- github      : reneolivo
+  name        : René Olivo
 
 - name        : Robyn Perry
   organization: Progressive Technology Project
@@ -1245,7 +1267,12 @@
 
 - github      : varshith
   name        : Vinu Varshith Sekar
+  organization: CompuCorp
   jira        : varshith
+
+- github      : vinuvarshith
+  name        : Vinu Varshith Sekar
+  organization: CompuCorp
 
 - github      : VasanthaKaje
   name        : Vasantha Kaje
