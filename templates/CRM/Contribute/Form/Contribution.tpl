@@ -345,25 +345,17 @@
     <div id="customData" class="crm-contribution-form-block-customData"></div>
   {/if}
 
-  {*include custom data js file*}
-  {include file="CRM/common/customData.tpl"}
+  {include file="CRM/Custom/Form/Edit.tpl"}
 
-    {literal}
-    <script type="text/javascript">
-      CRM.$(function($) {
+  {literal}
+  <script type="text/javascript">
+    CRM.$(function($) {
     {/literal}
-    CRM.buildCustomData( '{$customDataType}' );
-    {if $customDataSubType}
-      CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-    {/if}
-
-    {if $buildPriceSet}{literal}buildAmount( );{/literal}{/if}
+      {if $buildPriceSet}{literal}buildAmount();{/literal}{/if}
     {literal}
-    });
 
     // bind first click of accordion header to load crm-accordion-body with snippet
     // everything else taken care of by cj().crm-accordions()
-    CRM.$(function($) {
       cj('#adjust-option-type').hide();
       cj('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
         loadPanes(cj(this).attr('id'));
