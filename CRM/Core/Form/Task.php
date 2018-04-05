@@ -136,6 +136,12 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
 
     $form->_entityIds = $form->_componentIds = $ids;
 
+    // Some functions (eg. PDF letter tokens) rely on Ids being in specific fields rather than the generic $form->_entityIds
+    // So we set that specific field here (eg. for cases $form->_caseIds = $form->_entityIds).
+    // FIXME: This is really to handle legacy code that should probably be updated to use $form->_entityIds
+    $entitySpecificIdsName = '_' . $form::$entityShortname . 'Ids';
+    $form->$entitySpecificIdsName = $form->_entityIds;
+
     //set the context for redirection for any task actions
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
     $urlParams = 'force=1';
