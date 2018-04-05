@@ -69,8 +69,11 @@ class CRM_Contact_Form_Task_EmailCommon {
 
     $form->_emails = array();
 
-    $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
-    $form->_contactIds = array($contactID);
+    // If we don't have any contact IDs, use the logged in contact ID
+    if (empty($form->_contactIds)) {
+      $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
+      $form->_contactIds = array($contactID);
+    }
 
     $fromEmailValues = CRM_Core_BAO_Email::getFromEmail();
 
