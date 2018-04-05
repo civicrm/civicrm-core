@@ -62,6 +62,41 @@ function civicrm_api3_job_create($params) {
 }
 
 /**
+ * Adjust metadata for clone spec action.
+ *
+ * @param array $spec
+ */
+function _civicrm_api3_job_clone_spec(&$spec) {
+  $spec['id']['title'] = 'Job ID to clone';
+  $spec['id']['type'] = CRM_Utils_Type::T_INT;
+  $spec['id']['api.required'] = 1;
+  $spec['is_active']['title'] = 'Job is Active?';
+  $spec['is_active']['type'] = CRM_Utils_Type::T_BOOLEAN;
+  $spec['is_active']['api.required'] = 0;
+}
+
+/**
+ * Clone Job.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
+ */
+function civicrm_api3_job_clone($params) {
+  if (empty($params['id'])) {
+    throw new API_Exception("Mandatory key(s) missing from params array: id field is required");
+  }
+  $id = $params['id'];
+  unset($params['id']);
+  $params['last_run'] = 'null';
+  $params['scheduled_run_date'] = 'null';
+  $newJobDAO = CRM_Core_BAO_Job::copy($id, $params);
+  return civicrm_api3('Job', 'get', array('id' => $newJobDAO->id));
+}
+
+/**
  * Retrieve one or more job.
  *
  * @param array $params
