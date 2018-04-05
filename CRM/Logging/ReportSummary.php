@@ -243,6 +243,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     // temp table to hold all altered contact-ids
     $sql = "CREATE TEMPORARY TABLE civicrm_temp_civireport_logsummary ( {$tempColumns} ) ENGINE=HEAP";
     CRM_Core_DAO::executeQuery($sql);
+    $this->addToDeveloperTab($sql);
 
     $logTypes = CRM_Utils_Array::value('log_type_value', $this->_params);
     unset($this->_params['log_type_value']);
@@ -271,6 +272,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
         $sql = str_replace("entity_log_civireport.log_type as", "'{$entity}' as", $sql);
         $sql = "INSERT IGNORE INTO civicrm_temp_civireport_logsummary {$sql}";
         CRM_Core_DAO::executeQuery($sql);
+        $this->addToDeveloperTab($sql);
       }
     }
 
@@ -280,6 +282,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     // alterDisplay() counts sync with pager counts
     $sql = "SELECT DISTINCT log_type FROM civicrm_temp_civireport_logsummary";
     $dao = CRM_Core_DAO::executeQuery($sql);
+    $this->addToDeveloperTab($sql);
     $replaceWith = array();
     while ($dao->fetch()) {
       $type = $this->getLogType($dao->log_type);
@@ -296,9 +299,11 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
 
     $sql = "ALTER TABLE civicrm_temp_civireport_logsummary ADD COLUMN log_civicrm_entity_log_type_label varchar(64)";
     CRM_Core_DAO::executeQuery($sql);
+    $this->addToDeveloperTab($sql);
     foreach ($replaceWith as $type => $in) {
       $sql = "UPDATE civicrm_temp_civireport_logsummary SET log_civicrm_entity_log_type_label='{$type}', log_date=log_date WHERE log_type IN('$in')";
       CRM_Core_DAO::executeQuery($sql);
+      $this->addToDeveloperTab($sql);
     }
 
     // note the group by columns are same as that used in alterDisplay as $newRows - $key
@@ -317,6 +322,7 @@ GROUP BY log_civicrm_entity_log_date, log_civicrm_entity_log_type_label, log_civ
       'altered_by_contact_civireport.',
     ), 'entity_log_civireport.', $sql);
     $this->buildRows($sql, $rows);
+    $this->addToDeveloperTab($sql);
 
     // format result set.
     $this->formatDisplay($rows);
