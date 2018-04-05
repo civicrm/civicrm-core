@@ -45,7 +45,8 @@
              image: function(src) { return "<img src='data:image/png;base64," + $('#'+src)[0].get_img_binary() + "' />"},
              popup: function(src) {
              var img_win = window.open('', 'Save Chart as Image');
-           img_win.document.write('<html><head><title>Save Chart as Image<\/title><\/head><body>' + OFC.jquery.image(src) + ' <\/body><\/html>');
+             var html = 'html', head = 'head', body = 'body';             
+           img_win.document.write('<' + html + '><' + head + '><title>Save Chart as Image<\/title><\/' + head + '><' + body + '>' + OFC.jquery.image(src) + ' <\/' + body + '><\/' + html + '>');
            img_win.document.close();
                        }
                  }
