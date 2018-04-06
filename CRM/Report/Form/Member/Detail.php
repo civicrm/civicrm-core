@@ -306,7 +306,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
   public function postProcess() {
 
     $this->beginPostProcess();
-	// CRM-6181- commenting out the below as buildACLClause taking care in buildquery
+    // CRM-6181- commenting out the below as buildACLClause taking care in buildquery
     // get the acl clauses built before we assemble the query
     //$this->buildACLClause($this->_aliases['civicrm_contact']);
     $sql = $this->buildQuery(TRUE);
