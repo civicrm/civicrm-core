@@ -119,6 +119,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $contacts = CRM_Contact_BAO_Contact::getTableName();
     $domain_id = CRM_Core_Config::domainID();
     $domainValues = civicrm_api3('Domain', 'get', array('sequential' => 1, 'id' => $domain_id));
+    $fromEmail = CRM_Core_BAO_Domain::getNoReplyEmailAddress();
 
     $eq = new CRM_Core_DAO();
     $eq->query("SELECT     $contacts.display_name as display_name,
@@ -145,6 +146,10 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
       // to the forward goes to the sender of the reply
       $parsed->setHeader('Reply-To', $replyto instanceof ezcMailAddress ? $replyto : $parsed->from->__toString());
 
+      // Using the original from address may not be permitted by the mailer.
+      $fromName = empty($parsed->from->name) ? $parsed->from->email : "{$parsed->from->name} ({$parsed->from->email})";
+      $parsed->from = new ezcMailAddress($fromEmail, $fromName);
+
       // CRM-17754 Include re-sent headers to indicate that we have forwarded on the email
       $domainEmail = $domainValues['values'][0]['from_email'];
       $parsed->setHeader('Resent-From', $domainEmail);
@@ -156,9 +161,12 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
       $h = $parsed->headers->getCaseSensitiveArray();
       $b = $parsed->generateBody();
 
-      // strip Return-Path of possible bounding brackets, CRM-4502
+      // Rewrite any invalid Return-Path headers.
       if (!empty($h['Return-Path'])) {
-        $h['Return-Path'] = trim($h['Return-Path'], '<>');
+        $h['Return-Path'] = $fromEmail;
+      }
+      if (!empty($h['Return-path'])) {
+        $h['Return-path'] = $fromEmail;
       }
 
       // FIXME: ugly hack - find the first MIME boundary in
@@ -173,19 +181,14 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
       }
     }
     else {
-      if (empty($eq->display_name)) {
-        $from = $eq->email;
-      }
-      else {
-        $from = "\"{$eq->display_name}\" <{$eq->email}>";
-      }
+      $fromName = empty($eq->display_name) ? $eq->email : "{$eq->display_name} ({$eq->email})";
 
       $message = new Mail_mime("\n");
 
       $headers = array(
         'Subject' => "Re: {$mailing->subject}",
         'To' => $mailing->replyto_email,
-        'From' => $from,
+        'From' => "\"$fromName\" <$fromEmail>",
         'Reply-To' => empty($replyto) ? $eq->email : $replyto,
         'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
         // CRM-17754 Include re-sent headers to indicate that we have forwarded on the email
