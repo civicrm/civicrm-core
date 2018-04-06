@@ -1206,7 +1206,20 @@ class CRM_Utils_Token {
       $params[] = array('on_hold', '=', 0, 0, 0);
     }
 
+    // $extraParams is used in CRM_Contact_BAO_Utils::updateGreeting() and nowhere else!
+    //  it passes the array (contact_type, =, ...) through to filter the search.
+    // $contactExtraDetails is an array of extra parameters (eg membership_id) that can be passed through for use by custom token hooks
+    //  Anything added to the $extraParams['contact_details'] array will be included in this.
+    $contactExtraDetails = array();
     if ($extraParams) {
+      foreach ($extraParams as $key => $value) {
+        switch ($key) {
+          case 'contact_details':
+            $contactExtraDetails = $value;
+            unset($extraParams['contact_details']);
+            break;
+        }
+      }
       $params = array_merge($params, $extraParams);
     }
 
@@ -1237,9 +1250,14 @@ class CRM_Utils_Token {
 
     $details = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs), TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, TRUE);
 
+    // These are the parameters that will be passed through to custom hooks.
     $contactDetails = &$details[0];
 
     foreach ($contactIDs as $key => $contactID) {
+      // Merge in extra details that were passed in for use in custom hooks
+      foreach ($contactExtraDetails[$contactID] as $extraDetailKey => $extraDetailVal) {
+        $contactDetails[$contactID][$extraDetailKey] = $extraDetailVal;
+      }
       if (array_key_exists($contactID, $contactDetails)) {
         if (!empty($contactDetails[$contactID]['preferred_communication_method'])
         ) {
