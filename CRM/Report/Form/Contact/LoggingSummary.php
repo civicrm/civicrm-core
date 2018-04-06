@@ -352,4 +352,11 @@ LEFT  JOIN civicrm_contact altered_by_contact_civireport
     return $row;
   }
 
+  /**
+   * Calculate section totals.
+   *
+   * Override to do nothing as this does not work / make sense on this report.
+   */
+  public function sectionTotals() {}
+
 }
