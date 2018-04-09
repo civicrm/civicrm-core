@@ -2138,8 +2138,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $row['bounce_rate'] = (100.0 * $mailing->bounce) / $mailing->queue;
         $row['unsubscribe_rate'] = (100.0 * $row['unsubscribe']) / $mailing->queue;
         $row['optout_rate'] = (100.0 * $row['optout']) / $mailing->queue;
-        $row['opened_rate'] = $row['opened'] / $mailing->delivered * 100.0;
-        $row['clickthrough_rate'] = $mailing->url / $mailing->delivered * 100.0;
+        $row['opened_rate'] = $mailing->delivered ? (($row['opened'] / $mailing->delivered) * 100.0) : 0;
+        $row['clickthrough_rate'] = $mailing->delivered ? (($mailing->url / $mailing->delivered) * 100.0) : 0;
       }
       else {
         $row['delivered_rate'] = 0;
@@ -2211,8 +2211,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['event_totals']['bounce_rate'] = (100.0 * $report['event_totals']['bounce']) / $report['event_totals']['queue'];
       $report['event_totals']['unsubscribe_rate'] = (100.0 * $report['event_totals']['unsubscribe']) / $report['event_totals']['queue'];
       $report['event_totals']['optout_rate'] = (100.0 * $report['event_totals']['optout']) / $report['event_totals']['queue'];
-      $report['event_totals']['opened_rate'] = $report['event_totals']['opened'] / $report['event_totals']['delivered'] * 100.0;
-      $report['event_totals']['clickthrough_rate'] = $report['event_totals']['url'] / $report['event_totals']['delivered'] * 100.0;
+      $report['event_totals']['opened_rate'] = !empty($report['event_totals']['delivered']) ? (($report['event_totals']['opened'] / $report['event_totals']['delivered']) * 100.0) : 0;
+      $report['event_totals']['clickthrough_rate'] = !empty($report['event_totals']['delivered']) ? (($report['event_totals']['url'] / $report['event_totals']['delivered']) * 100.0) : 0;
     }
     else {
       $report['event_totals']['delivered_rate'] = 0;

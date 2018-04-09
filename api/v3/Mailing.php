@@ -760,9 +760,14 @@ function civicrm_api3_mailing_stats($params) {
         break;
     }
   }
-  $stats[$params['mailing_id']]['delivered_rate'] = round((100.0 * $stats[$params['mailing_id']]['Delivered']) / CRM_Mailing_Event_BAO_Queue::getTotalCount($params['mailing_id'], $params['job_id']), 2) . '%';
-  $stats[$params['mailing_id']]['opened_rate'] = round($stats[$params['mailing_id']]['Opened'] / $stats[$params['mailing_id']]['Delivered'] * 100.0, 2) . '%';
-  $stats[$params['mailing_id']]['clickthrough_rate'] = round($stats[$params['mailing_id']]['Unique Clicks'] / $stats[$params['mailing_id']]['Delivered'] * 100.0, 2) . '%';
+  $stats[$params['mailing_id']]['delivered_rate'] = $stats[$params['mailing_id']]['opened_rate'] = $stats[$params['mailing_id']]['clickthrough_rate'] = '0.00%';
+  if (!empty(CRM_Mailing_Event_BAO_Queue::getTotalCount($params['mailing_id'], $params['job_id']))) {
+    $stats[$params['mailing_id']]['delivered_rate'] = round((100.0 * $stats[$params['mailing_id']]['Delivered']) / CRM_Mailing_Event_BAO_Queue::getTotalCount($params['mailing_id'], $params['job_id']), 2) . '%';
+  }
+  if (!empty($stats[$params['mailing_id']]['Delivered'])) {
+    $stats[$params['mailing_id']]['opened_rate'] = round($stats[$params['mailing_id']]['Opened'] / $stats[$params['mailing_id']]['Delivered'] * 100.0, 2) . '%';
+    $stats[$params['mailing_id']]['clickthrough_rate'] = round($stats[$params['mailing_id']]['Unique Clicks'] / $stats[$params['mailing_id']]['Delivered'] * 100.0, 2) . '%';
+  }
   return civicrm_api3_create_success($stats);
 }
 
