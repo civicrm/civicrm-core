@@ -232,6 +232,11 @@ WHERE  option_group_id = %1";
       CRM_Core_Error::fatal("You cannot add or edit muliple choice options in a reserved custom field-set.");
     }
 
+    $optionGroupId = $this->getOptionGroupId($this->_fid);
+    $isOptionGroupLocked = $optionGroupId ? $this->isOptionGroupLocked($optionGroupId) : FALSE;
+    $this->assign('optionGroupId', $optionGroupId);
+    $this->assign('isOptionGroupLocked', $isOptionGroupLocked);
+
     //as url contain $gid so append breadcrumb dynamically.
     $breadcrumb = array(
       array(
@@ -279,6 +284,36 @@ WHERE  option_group_id = %1";
 
     // Call the parents run method
     return parent::run();
+  }
+
+  /**
+   * Gets the "is_locked" status for the provided option group
+   *
+   * @param int $optionGroupId
+   *
+   * @return bool
+   */
+  private function isOptionGroupLocked($optionGroupId) {
+    return (bool) CRM_Core_DAO::getFieldValue(
+      CRM_Core_DAO_OptionGroup::class,
+      $optionGroupId,
+      'is_locked'
+    );
+  }
+
+  /**
+   * Gets the associated "option_group_id" for a custom field
+   *
+   * @param int $customFieldId
+   *
+   * @return int
+   */
+  private function getOptionGroupId($customFieldId) {
+    return (int) CRM_Core_DAO::getFieldValue(
+      CRM_Core_DAO_CustomField::class,
+      $customFieldId,
+      'option_group_id'
+    );
   }
 
 }

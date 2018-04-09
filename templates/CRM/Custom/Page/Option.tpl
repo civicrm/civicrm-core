@@ -160,7 +160,9 @@
 
       <div class="action-link">
           {crmButton q="reset=1&action=map&fid=$fid&gid=$gid" class="action-item open-inline-noreturn" icon="sort-alpha-asc"}{ts}Alphabetize Options{/ts}{/crmButton}
-          {crmButton q="reset=1&action=add&fid=$fid&gid=$gid" class="action-item" icon="plus-circle"}{ts}Add Option{/ts}{/crmButton}
+          {if !$isOptionGroupLocked}
+            {crmButton q="reset=1&action=add&fid=$fid&gid=$gid" class="action-item" icon="plus-circle"}{ts}Add Option{/ts}{/crmButton}
+          {/if}
           {crmButton p="civicrm/admin/custom/group/field" q="reset=1&action=browse&gid=$gid" class="action-item cancel" icon="times"}{ts}Done{/ts}{/crmButton}
       </div>
     </div>
