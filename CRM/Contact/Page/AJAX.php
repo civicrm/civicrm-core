@@ -261,8 +261,11 @@ class CRM_Contact_Page_AJAX {
       }
       // Save activity only for the primary (first) client
       if ($i == 0 && empty($result['is_error'])) {
-        CRM_Case_BAO_Case::createCaseRoleActivity($caseID, $result['id'], $relContactID);
+        CRM_Case_BAO_Case::createCaseRoleActivity($caseID, $result['id'], $relContactID, $sourceContactID);
       }
+    }
+    if (!empty($_REQUEST['is_unit_test'])) {
+      return $ret;
     }
 
     CRM_Utils_JSON::output($ret);
