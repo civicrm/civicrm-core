@@ -695,6 +695,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $params['total_amount'] = $this->formatMoneyInput(5000.77);
     $params['fee_amount'] = $this->formatMoneyInput(.77);
+    $params['skipCleanMoney'] = FALSE;
 
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $contribution = $this->callAPISuccessGetSingle('contribution', array('id' => $contribution['id']));
