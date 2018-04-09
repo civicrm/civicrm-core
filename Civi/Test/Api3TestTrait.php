@@ -256,6 +256,9 @@ trait Api3TestTrait {
    * @return array|int
    */
   public function civicrm_api($entity, $action, $params) {
+    if (strtolower($entity) === 'contribution' && !isset($params['skipCleanMoney']) && strtolower($action) === 'create') {
+      $params['skipCleanMoney'] = TRUE;
+    }
     return civicrm_api($entity, $action, $params);
   }
 
