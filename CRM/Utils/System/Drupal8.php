@@ -440,7 +440,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     CRM_Utils_Hook::config($config);
 
     if ($loadUser) {
-      if (!empty($params['uid']) && $username = \Drupal\user\Entity\User::load($uid)->getUsername()) {
+      if (!empty($params['uid']) && $username = \Drupal\user\Entity\User::load($params['uid'])->getUsername()) {
         $this->loadUser($username);
       }
       elseif (!empty($params['name']) && !empty($params['pass']) && \Drupal::service('user.auth')->authenticate($params['name'], $params['pass'])) {
