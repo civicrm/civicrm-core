@@ -1185,6 +1185,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'invoice_id' => 67990,
         'source' => 'SSF',
         'contribution_status_id' => 1,
+        'skipCleanMoney' => 1,
       ),
       'api.website.create' => array(
         'url' => "http://civicrm.org",
@@ -1226,6 +1227,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'invoice_id' => 67890,
         'source' => 'SSF',
         'contribution_status_id' => 1,
+        'skipCleanMoney' => 1,
       ),
       'api.website.create' => array(
         array(
@@ -2283,6 +2285,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'net_amount' => 90.00,
         'source' => 'SSF',
         'contribution_status_id' => 1,
+        'skipCleanMoney' => 1,
       ),
       'api.contribution.create.1' => array(
         'receive_date' => '2011-01-01',
@@ -2294,6 +2297,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'net_amount' => 90.00,
         'source' => 'SSF',
         'contribution_status_id' => 1,
+        'skipCleanMoney' => 1,
       ),
       'api.website.create' => array(
         array(
@@ -2351,6 +2355,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'invoice_id' => 67890,
         'source' => 'SSF',
         'contribution_status_id' => 1,
+        'skipCleanMoney' => 1,
       ),
       'api.contribution.create.1' => array(
         'receive_date' => '2011-01-01',
@@ -2364,6 +2369,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'invoice_id' => 67830,
         'source' => 'SSF',
         'contribution_status_id' => 1,
+        'skipCleanMoney' => 1,
       ),
       'api.website.create' => array(
         array(
