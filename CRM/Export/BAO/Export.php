@@ -1906,13 +1906,8 @@ WHERE  {$whereClause}";
     elseif ($field == 'provider_id') {
       $headerRows[] = ts('IM Service Provider');
     }
-    elseif (substr($field, 0, 5) == 'case_') {
-      if ($query->_fields['case'][$field]['title']) {
-        $headerRows[] = $query->_fields['case'][$field]['title'];
-      }
-      elseif ($query->_fields['activity'][$field]['title']) {
-        $headerRows[] = $query->_fields['activity'][$field]['title'];
-      }
+    elseif (substr($field, 0, 5) == 'case_' && $query->_fields['case'][$field]['title']) {
+      $headerRows[] = $query->_fields['case'][$field]['title'];
     }
     elseif (array_key_exists($field, $contactRelationshipTypes)) {
       foreach ($value as $relationField => $relationValue) {
