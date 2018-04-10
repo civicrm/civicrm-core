@@ -10,7 +10,13 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
     parent::setUp();
 
     //here, we would create two memberships for the same contact, one expired and one current
-    $this->_contactId = $this->individualCreate();
+    $this->_indiviParams = array(
+      'first_name' => 'Foo',
+      'last_name' => 'Bar',
+      'contact_type' => 'Individual',
+    );
+
+    $this->_contactId = $this->individualCreate($this->_indiviParams);
 
     $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactId));
 
