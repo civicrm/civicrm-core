@@ -137,14 +137,12 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       CRM_Core_Session::setStatus(ts('Selected Relationship type has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {
-      $ids = array();
-
       // store the submitted values in an array
       $params = $this->exportValues();
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
-        $ids['relationshipType'] = $this->_id;
+        $params['id'] = $this->_id;
       }
 
       $cTypeA = CRM_Utils_System::explode('__',
@@ -162,7 +160,15 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       $params['contact_sub_type_a'] = $cTypeA[1] ? $cTypeA[1] : 'NULL';
       $params['contact_sub_type_b'] = $cTypeB[1] ? $cTypeB[1] : 'NULL';
 
-      $result = CRM_Contact_BAO_RelationshipType::add($params, $ids);
+      // if label B to A is blank, insert the value label A to B for it
+      if (!strlen(trim(CRM_Utils_Array::value('name_b_a', $params)))) {
+        $params['name_b_a'] = CRM_Utils_Array::value('name_a_b', $params);
+      }
+      if (!strlen(trim(CRM_Utils_Array::value('label_b_a', $params)))) {
+        $params['label_b_a'] = CRM_Utils_Array::value('label_a_b', $params);
+      }
+
+      $result = CRM_Contact_BAO_RelationshipType::add($params);
 
       $this->ajaxResponse['relationshipType'] = $result->toArray();
 
