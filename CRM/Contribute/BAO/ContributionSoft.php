@@ -186,6 +186,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
           ),
           'honor_id' => $honorId,
           'honor_profile_id' => $form->_values['honoree_profile_id'],
+          'honoree_profile_id' => $form->_values['honoree_profile_id'],
           'honor_profile_values' => $params['honor'],
         );
       }

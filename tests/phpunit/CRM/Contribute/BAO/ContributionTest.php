@@ -222,30 +222,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    * Create honor-contact method.
    */
   public function testCreateAndGetHonorContact() {
-    $firstName = 'John_' . substr(sha1(rand()), 0, 7);
-    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
-    $email = "{$firstName}.{$lastName}@example.com";
-
-    //Get profile id of name honoree_individual used to create profileContact
-    $honoreeProfileId = NULL;
-    $ufGroupDAO = new CRM_Core_DAO_UFGroup();
-    $ufGroupDAO->name = 'honoree_individual';
-    if ($ufGroupDAO->find(TRUE)) {
-      $honoreeProfileId = $ufGroupDAO->id;
-    }
-
-    $params = array(
-      'prefix_id' => 3,
-      'first_name' => $firstName,
-      'last_name' => $lastName,
-      'email-1' => $email,
-    );
-    $softParam = array('soft_credit_type_id' => 1);
-
-    $honoreeContactId = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray,
-      NULL, NULL, $honoreeProfileId
-    );
-
+    $honoreeContactId = $this->getHonoreeContact();
     $this->assertDBCompareValue('CRM_Contact_DAO_Contact', $honoreeContactId, 'first_name', 'id', $firstName,
       'Database check for created honor contact record.'
     );
