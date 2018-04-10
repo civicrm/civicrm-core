@@ -427,3 +427,21 @@ function civicrm_api3_system_createmissinglogtables() {
   }
   return civicrm_api3_create_success(1);
 }
+
+/**
+ * Rebuild Multilingual Schema
+ *
+ */
+function civicrm_api3_system_rebuildmultilingualschema() {
+  $domain = new CRM_Core_DAO_Domain();
+  $domain->find(TRUE);
+
+  if ($domain->locales) {
+    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+    CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales);
+    return civicrm_api3_create_success(1);
+  }
+  else {
+    throw new API_Exception('Cannot call rebuild Multilingual schema on non Multilingual database');
+  }
+}
