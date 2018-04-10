@@ -78,7 +78,7 @@
           class="crm-hover-button action-item"
           ng-href="{{statUrl(am.mailing, statType, 'events')}}"
           title="{{ts('Browse events of type \'%1\'', {1: statType.title})}}"
-          >{{stats[am.name][statType.name] || ts('n/a')}}</a>
+          >{{stats[am.name][statType.name] || ts('n/a')}} </a> {{stats[am.name][rateStats[statType.name]] || ' '}}
         <a
           class="crm-hover-button action-item"
           ng-href="{{statUrl(am.mailing, statType, 'report')}}"
