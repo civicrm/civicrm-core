@@ -259,7 +259,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'Honor',
     );
     $mails = $mut->getAllMessages('raw');
-    foreach($mails as $mail) {
+    foreach ($mails as $mail) {
       $mut->checkMailForStrings(array(), $shouldNotBeInMailing, '', $mail);
     }
     $mut->stop();
