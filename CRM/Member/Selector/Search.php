@@ -372,6 +372,25 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         }
       }
 
+      /*
+       * check if the contact has an active membership CRM-21403
+       */
+
+      //first, lets make sure the search is for not a current member
+      if (isset($_POST['membership_is_current_member']) &&
+          $_POST['membership_is_current_member'] == false) {
+
+          $hasAnActiveMembership = civicrm_api3('Membership', 'getcount', array(
+              'contact_id' => $result->contact_id,
+              'active_only' => 1,
+          ));
+
+          //skip the contact if there is an active membership
+          if ($hasAnActiveMembership == true) {
+              continue;
+          }
+      }
+
       //carry campaign on selectors.
       $row['campaign'] = CRM_Utils_Array::value($result->member_campaign_id, $allCampaigns);
       $row['campaign_id'] = $result->member_campaign_id;
