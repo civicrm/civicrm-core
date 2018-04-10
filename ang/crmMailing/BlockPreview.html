@@ -46,7 +46,7 @@ Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
     </div>
     <div>
       <input
-        crm-entityref="{entity: 'Group', select: {allowClear:true}}"
+        crm-entityref="{entity: 'Group', api: {params: {is_hidden: 0, is_active: 1}}, select: {allowClear:true, minimumInputLength: 0}}"
         ng-model="testGroup.gid"
         class="crm-action-menu fa-envelope-o"
         />
