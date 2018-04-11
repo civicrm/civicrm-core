@@ -69,9 +69,8 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
         'active_only' => 1,
     ));
 
-    $this->assertEquals($activeMembership, true);
+    $this->assertEquals($activeMembership, TRUE);
 
   }
-
 
 }
