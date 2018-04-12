@@ -203,6 +203,10 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   protected $addPaging = TRUE;
 
+  protected $isForceGroupBy = FALSE;
+
+  protected $groupConcatTested = FALSE;
+
   /**
    * An attribute for checkbox/radio form field layout
    *
@@ -461,6 +465,18 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
 
   protected $sql;
+
+  /**
+   * An instruction not to add a Group By.
+   *
+   * This is relevant where the group by might be otherwise added after the code that determines the group by array.
+   *
+   * e.g. where stat fields are being added but other settings cause it to not be desirable to add a group by
+   * such as in pivot charts when no row header is set
+   *
+   * @var bool
+   */
+  protected $noGroupBy = FALSE;
 
   /**
    * SQL being run in this report as an array.
@@ -760,6 +776,10 @@ class CRM_Report_Form extends CRM_Core_Form {
             // set name = fieldName, unless already set
             if (!isset($this->_columns[$tableName][$fieldGrp][$fieldName]['name'])) {
               $this->_columns[$tableName][$fieldGrp][$fieldName]['name'] = $name;
+            }
+
+            if (!isset($this->_columns[$tableName][$fieldGrp][$fieldName]['table_name'])) {
+              $this->_columns[$tableName][$fieldGrp][$fieldName]['table_name'] = $tableName;
             }
 
             // set dbAlias = alias.name, unless already set
@@ -2319,7 +2339,14 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
               $select = $this->addStatisticsToSelect($field, $tableName, $fieldName, $select);
             }
             else {
-              $select = $this->addBasicFieldToSelect($tableName, $fieldName, $field, $select);
+
+              $selectClause = $this->getSelectClauseWithGroupConcatIfNotGroupedBy($tableName, $fieldName, $field);
+              if ($selectClause) {
+                $select[] = $selectClause;
+              }
+              else {
+                $select = $this->addBasicFieldToSelect($tableName, $fieldName, $field, $select);
+              }
             }
           }
         }
@@ -2420,6 +2447,14 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * @return bool
    */
   public function selectClause(&$tableName, $tableKey, &$fieldName, &$field) {
+    if (!empty($field['pseudofield'])) {
+      $alias = "{$tableName}_{$fieldName}";
+      $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
+      $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+      $this->_columnHeaders["{$tableName}_{$fieldName}"]['dbAlias'] = CRM_Utils_Array::value('dbAlias', $field);
+      $this->_selectAliases[] = $alias;
+      return ' 1 as  ' . $alias;
+    }
     return FALSE;
   }
 
@@ -2629,10 +2664,12 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->groupBy();
     $this->orderBy();
 
-    // order_by columns not selected for display need to be included in SELECT
-    $unselectedSectionColumns = $this->unselectedSectionColumns();
-    foreach ($unselectedSectionColumns as $alias => $section) {
-      $this->_select .= ", {$section['dbAlias']} as {$alias}";
+    foreach ($this->unselectedOrderByColumns() as $alias => $field) {
+      $clause = $this->getSelectClauseWithGroupConcatIfNotGroupedBy($field['table_name'], $field['name'], $field);
+      if (!$clause) {
+        $clause = "{$field['dbAlias']} as {$alias}";
+      }
+      $this->_select .= ", $clause ";
     }
 
     if ($applyLimit && empty($this->_params['charts'])) {
@@ -2712,7 +2749,16 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
         if (!empty($orderByField)) {
           $this->_orderByFields[$orderByField['tplField']] = $orderByField;
-          $orderBys[] = "{$orderByField['dbAlias']} {$orderBy['order']}";
+          if ($this->groupConcatTested) {
+            $orderBys[$orderByField['tplField']] = "{$orderByField['tplField']} {$orderBy['order']}";
+          }
+          else {
+            // Not sure when this is preferable to using tplField (which has
+            // definitely been tested to work in cases then this does not.
+            // in caution not switching unless report has been tested for
+            // group concat functionality.
+            $orderBys[$orderByField['tplField']] = "{$orderByField['dbAlias']} {$orderBy['order']}";
+          }
 
           // Record any section headers for assignment to the template
           if (!empty($orderBy['section'])) {
@@ -2726,6 +2772,15 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->_orderByArray = $orderBys;
 
     $this->assign('sections', $this->_sections);
+  }
+
+  /**
+   * Determine unselected columns.
+   *
+   * @return array
+   */
+  public function unselectedOrderByColumns() {
+    return array_diff_key($this->_orderByFields, $this->getSelectColumns());
   }
 
   /**
@@ -5347,6 +5402,33 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'order_bys_defaults' => $options['order_bys_defaults'],
     );
     return $defaults;
+  }
+
+  /**
+   * Get the select clause for a field, wrapping in GROUP_CONCAT if appropriate.
+   *
+   * Full group by mode dictates that a field must either be in the group by function or
+   * wrapped in a aggregate function. Here we wrap the field in GROUP_CONCAT if it is not in the
+   * group concat.
+   *
+   * @param string $tableName
+   * @param string $fieldName
+   * @param string $field
+   * @return string
+   */
+  protected function getSelectClauseWithGroupConcatIfNotGroupedBy($tableName, &$fieldName, &$field) {
+    if ($this->groupConcatTested && (!empty($this->_groupByArray) || $this->isForceGroupBy)) {
+      if ((empty($field['statistics']) || in_array('GROUP_CONCAT', $field['statistics']))) {
+        $label = CRM_Utils_Array::value('title', $field);
+        $alias = "{$tableName}_{$fieldName}";
+        $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $label;
+        $this->_selectAliases[] = $alias;
+        if (empty($this->_groupByArray[$tableName . '_' . $fieldName])) {
+          return "GROUP_CONCAT(DISTINCT {$field['dbAlias']}) as $alias";
+        }
+        return "({$field['dbAlias']}) as $alias";
+      }
+    }
   }
 
 }

@@ -44,6 +44,8 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     'Contribution',
   );
 
+  protected $groupConcatTested = TRUE;
+
   /**
    * This report has been optimised for group filtering.
    *
@@ -221,6 +223,13 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'payment_instrument_id' => array('title' => ts('Payment Method')),
           'receive_date' => array('title' => ts('Date Received')),
         ),
+        'group_bys' => array(
+          'contribution_id' => array(
+            'name' => 'id',
+            'required' => TRUE,
+            'title' => ts('Contribution'),
+          ),
+        ),
         'grouping' => 'contri-fields',
       ),
       'civicrm_contribution_soft' => array(
@@ -243,7 +252,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         'fields' => array(
           'card_type_id' => array(
             'title' => ts('Credit Card Type'),
-            'dbAlias' => 'GROUP_CONCAT(financial_trxn_civireport.card_type_id SEPARATOR ",")',
           ),
         ),
         'filters' => array(
@@ -332,30 +340,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     parent::__construct();
   }
 
-  public function preProcess() {
-    parent::preProcess();
-  }
-
-  public function select() {
-    $this->_columnHeaders = array();
-
-    parent::select();
-  }
-
-  public function orderBy() {
-    parent::orderBy();
-
-    // please note this will just add the order-by columns to select query, and not display in column-headers.
-    // This is a solution to not throw fatal errors when there is a column in order-by, not present in select/display columns.
-    foreach ($this->_orderByFields as $orderBy) {
-      if (!array_key_exists($orderBy['name'], $this->_params['fields']) &&
-        empty($orderBy['section']) && (strpos($this->_select, $orderBy['dbAlias']) === FALSE)
-      ) {
-        $this->_select .= ", {$orderBy['dbAlias']} as {$orderBy['tplField']}";
-      }
-    }
-  }
-
   /**
    * Set the FROM clause for the report.
    */
@@ -379,11 +363,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                          ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id";
     }
     $this->appendAdditionalFromJoins();
-  }
-
-  public function groupBy() {
-    $groupBy = array("{$this->_aliases['civicrm_contact']}.id", "{$this->_aliases['civicrm_contribution']}.id");
-    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
   /**
@@ -584,34 +563,9 @@ UNION ALL
     $this->addToDeveloperTab($sql);
     CRM_Core_DAO::executeQuery($sql);
 
-    // 5. Re-construct order-by to make sense for final query on temp3 table
-    $orderBy = '';
-    if (!empty($this->_orderByArray)) {
-      $aliases = array_flip($this->_aliases);
-      $orderClause = array();
-      foreach ($this->_orderByArray as $clause) {
-        list($alias, $rest) = explode('.', $clause);
-        // CRM-17280 -- In case, we are ordering by custom fields
-        // modify $rest to match the alias used for them in temp3 table
-        $grp = new CRM_Core_DAO_CustomGroup();
-        $grp->table_name = $aliases[$alias];
-        if ($grp->find()) {
-          list($fld, $order) = explode(' ', $rest);
-          foreach ($this->_columns[$aliases[$alias]]['fields'] as $fldName => $value) {
-            if ($value['name'] == $fld) {
-              $fld = $fldName;
-            }
-          }
-          $rest = "{$fld} {$order}";
-        }
-        $orderClause[] = $aliases[$alias] . "_" . $rest;
-      }
-      $orderBy = (!empty($orderClause)) ? "ORDER BY " . implode(', ', $orderClause) : '';
-    }
-
     // 6. show result set from temp table 3
     $rows = array();
-    $sql = "SELECT * FROM civireport_contribution_detail_temp3 {$orderBy}";
+    $sql = "SELECT * FROM civireport_contribution_detail_temp3 $this->_orderBy";
     $this->buildRows($sql, $rows);
 
     // format result set.
