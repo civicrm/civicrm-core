@@ -10,3 +10,8 @@ b87620c | CRM-21206 Ensure that the recipients field of AB Test results is fille
 b6978b8 | CRM-21400 Add a static var to hold the trxn_id so it can be accessed through hook_civicrm_buildForm | Core PR merged into 4.7.29
 eaf140c | CRM-21435 Duplicate reporting of aggregates in Top Donor reports | PR available - needs testing
 74856bd | CRM-21458 Add/Edit Scheduled reminder page broken if there's a backslash in an event name | PR available - needs testing
+05dfb81 | CRM-21717 / PR-11595 Allow for Multiple Relationship Types to be selected in Advanced search |
+0bc1e62 | CRM-20292 removed permission checks for custom data caching in views | Core PR merged into 4.7.30
+26498a7 | CRM-21489 Deadlock retries have been accidentally blocked | Core PR to be released in Civi 5.1
+e339e04 | PR-11836 Wrap the split_job funtion in a transaction | Core PR merged
+ca4f343 | PR-11957 Add in clickthrough and opened stats, Add in stats to AB test reports | Core PR merged
