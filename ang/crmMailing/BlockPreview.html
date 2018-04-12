@@ -45,16 +45,11 @@ Vars: mailing:obj, testContact:obj, testGroup:obj, crmMailing:FormController
       <a crm-ui-help="hs({id: 'test', title: ts('Test Email')})"></a>
     </div>
     <div>
-      <select
-        name="preview_test_group"
-        ui-jq="crmSelect2"
-        ui-options="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Select Group')}"
+      <input
+        crm-entityref="{entity: 'Group', api: {params: {is_hidden: 0, is_active: 1}}, select: {allowClear:true, minimumInputLength: 0}}"
         ng-model="testGroup.gid"
-        ng-options="group.id as group.title for group in crmMailingConst.testGroupNames|orderBy:'title'"
         class="crm-action-menu fa-envelope-o"
-        >
-        <option value=""></option>
-      </select>
+        />
     </div>
     <button crm-icon="fa-paper-plane" title="{{crmMailing.$invalid || !testGroup.gid ? ts('Complete all required fields first') : ts('Send test message to group')}}" ng-disabled="crmMailing.$invalid || !testGroup.gid" crm-confirm="{resizable: true, width: '40%', height: '40%', open: previewTestGroup}" on-yes="doSend({gid: testGroup.gid})">{{ts('Send test')}}</button>
   </div>
