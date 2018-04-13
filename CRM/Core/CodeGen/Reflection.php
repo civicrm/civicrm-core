@@ -12,6 +12,12 @@ class CRM_Core_CodeGen_Reflection extends CRM_Core_CodeGen_BaseTask {
   public function needsUpdate() {
     // Generating this file is fairly cheap, and we don't have robust heuristic
     // for the checksum.
+
+    // skip this task on test environment as the schema generation should only be triggered during installation/upgrade
+    if (CIVICRM_UF == 'UnitTests') {
+      return FALSE;
+    }
+
     return TRUE;
   }
 
