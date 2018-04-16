@@ -63,10 +63,13 @@
         </div>
     {/if}
 
-  {if $rows}
-    {include file="CRM/Contribute/Page/ContributionTotals.tpl" mode="view"}
-    <div class='clear'></div>
-    {include file="CRM/Contribute/Form/Selector.tpl"}
+  {if $relatedContributions}
+    <div class="crm-accordion-wrapper">
+      <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
+      <div class="crm-accordion-body">
+        {include file="CRM/Contribute/Page/RelatedContributions.tpl"}
+      </div>
+    </div>
   {else}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
