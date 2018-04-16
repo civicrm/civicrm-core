@@ -144,10 +144,113 @@
       CRM.$(function($) {
         var
           $form = $("form.{/literal}{$form.formClass}{literal}"),
-          relationshipData = {/literal}{$relationshipData|@json_encode}{literal};
-        $('[name=relationship_type_id]', $form).change(function() {
+          $relationshipTypeSelect = $('[name=relationship_type_id]', $form),
+          relationshipData = {},
+          contactTypes = {};
+
+        $('body').on('crmOptionsEdited', 'a.crm-option-edit-link', refreshRelationshipData);
+
+        // Initial load and trigger change on select
+        refreshRelationshipData().done(function() {
+          $relationshipTypeSelect.change();
+        });
+
+        /**
+         * Fetch contact types and reset relationship data
+         */
+        function refreshRelationshipData() {
+          var defer = $.Deferred();
+
+          // reset
+          relationshipData = {};
+
+          getContactTypes().then(function() {
+            getRelationshipData().then(function() {
+              defer.resolve();
+            });
+          });
+
+          return defer.promise();
+        }
+
+        /**
+         * Fetches the relationship data using latest relationship types
+         */
+        function getRelationshipData() {
+          var subtype,
+            type,
+            label,
+            placeholder,
+            defer = $.Deferred();
+
+          if ($.isEmptyObject(relationshipData)) {
+            CRM.api3("RelationshipType", "get").done(function (data) {
+              $.each(data.values, function (key, relType) {
+                $.each(["a", "b"], function (index, suffix) {
+                  subtype = relType["contact_subtype_" + suffix];
+                  type = subtype || relType["contact_type_" + suffix];
+                  label = getContactTypeLabel(type) || "Contact";
+                  placeholder = "- select " + label.toLowerCase() + " -";
+                  relType["placeholder_" + suffix] = placeholder;
+                });
+                relationshipData[relType["id"]] = relType;
+              });
+
+              defer.resolve(relationshipData);
+            });
+          } else {
+            defer.resolve(relationshipData);
+          }
+
+          return defer.promise();
+        }
+
+        /**
+         * Gets a contact type label based on a provided name
+         * @param {String} name - the name of the contact type
+         */
+        function getContactTypeLabel(name) {
+          var label = "";
+
+          $.each(contactTypes, function(index, contactType) {
+            if (contactType.name === name) {
+              label = contactType.label;
+              return false;
+            }
+          });
+
+          return label;
+        }
+
+        /**
+         * Fetches contact types
+         */
+        function getContactTypes() {
+          var defer = $.Deferred();
+          if ($.isEmptyObject(contactTypes)) {
+            CRM.api3("ContactType", "get").done(function (data) {
+              contactTypes = data.values;
+              defer.resolve(contactTypes);
+            });
+          } else {
+            defer.resolve(contactTypes);
+          }
+
+          return defer.promise();
+        }
+
+        $relationshipTypeSelect.change(function() {
+          var $select = $(this);
+
+          // ensure we have relationship data before changing anything
+          getRelationshipData().then(function() {
+            updateSelect($select);
+          })
+        });
+
+        function updateSelect($select) {
           var
-            val = $(this).val(),
+            val = $select.val(),
             $contactField = $('#related_contact_id[type=text]', $form);
           if (!val && $contactField.length) {
             $contactField
@@ -190,7 +293,7 @@
 
             CRM.buildCustomData('Relationship', rType);
           }
-        }).change();
+        }
       });
       {/literal}
     </script>
