@@ -2056,6 +2056,8 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * Get values for from and to for date ranges.
    *
+   * @deprecated
+   *
    * @param bool $relative
    * @param string $from
    * @param string $to
@@ -2064,7 +2066,13 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * @return array
    */
-  public function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = '235959') {
+  public function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = NULL) {
+    if (empty($toTime)) {
+      // odd legacy behaviour to treat NULL as 'end of the day'
+      // recommend updating reports to call CRM_Utils_Date::getFromTo
+      //directly (default on the function is the actual default there).
+      $toTime = '235959';
+    }
     return CRM_Utils_Date::getFromTo($relative, $from, $to, $fromTime, $toTime);
   }
 
