@@ -2056,6 +2056,8 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * Get values for from and to for date ranges.
    *
+   * @deprecated
+   *
    * @param bool $relative
    * @param string $from
    * @param string $to
@@ -2066,19 +2068,12 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   public function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = NULL) {
     if (empty($toTime)) {
+      // odd legacy behaviour to treat NULL as 'end of the day'
+      // recommend updating reports to call CRM_Utils_Date::getFromTo
+      //directly (default on the function is the actual default there).
       $toTime = '235959';
     }
-    //FIX ME not working for relative
-    if ($relative) {
-      list($term, $unit) = CRM_Utils_System::explode('.', $relative, 2);
-      $dateRange = CRM_Utils_Date::relativeToAbsolute($term, $unit);
-      $from = substr($dateRange['from'], 0, 8);
-      //Take only Date Part, Sometime Time part is also present in 'to'
-      $to = substr($dateRange['to'], 0, 8);
-    }
-    $from = CRM_Utils_Date::processDate($from, $fromTime);
-    $to = CRM_Utils_Date::processDate($to, $toTime);
-    return array($from, $to);
+    return CRM_Utils_Date::getFromTo($relative, $from, $to, $fromTime, $toTime);
   }
 
   /**
