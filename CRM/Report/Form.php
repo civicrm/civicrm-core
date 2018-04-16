@@ -2019,14 +2019,14 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @param string $from
    * @param string $to
    * @param string $type
-   * @param string $fromTime
-   * @param string $toTime
+   * @param int $fromTime
+   * @param int $toTime
    *
    * @return null|string
    */
   public function dateClause(
     $fieldName,
-    $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
+    $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = 235959
   ) {
     $clauses = array();
     if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_Form::OP_DATE)))) {
@@ -2059,26 +2059,13 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @param bool $relative
    * @param string $from
    * @param string $to
-   * @param string $fromTime
-   * @param string $toTime
+   * @param int $fromTime
+   * @param int $toTime
    *
    * @return array
    */
-  public function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = NULL) {
-    if (empty($toTime)) {
-      $toTime = '235959';
-    }
-    //FIX ME not working for relative
-    if ($relative) {
-      list($term, $unit) = CRM_Utils_System::explode('.', $relative, 2);
-      $dateRange = CRM_Utils_Date::relativeToAbsolute($term, $unit);
-      $from = substr($dateRange['from'], 0, 8);
-      //Take only Date Part, Sometime Time part is also present in 'to'
-      $to = substr($dateRange['to'], 0, 8);
-    }
-    $from = CRM_Utils_Date::processDate($from, $fromTime);
-    $to = CRM_Utils_Date::processDate($to, $toTime);
-    return array($from, $to);
+  public function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = 235959) {
+    return CRM_Utils_Date::getFromTo($relative, $from, $to, $fromTime, $toTime);
   }
 
   /**
@@ -2516,7 +2503,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
               $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
               $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
               $fromTime = CRM_Utils_Array::value("{$fieldName}_from_time", $this->_params);
-              $toTime = CRM_Utils_Array::value("{$fieldName}_to_time", $this->_params);
+              $toTime = CRM_Utils_Array::value("{$fieldName}_to_time", $this->_params, 235959);
               $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to, $field['type'], $fromTime, $toTime);
             }
           }
@@ -3025,7 +3012,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                 CRM_Utils_Array::value("{$fieldName}_from", $this->_params),
                 CRM_Utils_Array::value("{$fieldName}_to", $this->_params),
                 CRM_Utils_Array::value("{$fieldName}_from_time", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_to_time", $this->_params)
+                CRM_Utils_Array::value("{$fieldName}_to_time", $this->_params, 235959)
               );
             $from_time_format = !empty($this->_params["{$fieldName}_from_time"]) ? 'h' : 'd';
             $from = CRM_Utils_Date::customFormat($from, NULL, array($from_time_format));
