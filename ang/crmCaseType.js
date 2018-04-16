@@ -103,7 +103,9 @@
         };
 
         $(input).crmSelect2({
-          data: scope[attrs.crmOptions],
+          data: function () {
+            return { results: scope[attrs.crmOptions] };
+          },
           createSearchChoice: function(term) {
             return {id: term, text: term + ' (' + ts('new') + ')'};
           },
@@ -115,11 +117,6 @@
           scope.$evalAsync(attrs.crmOnAdd);
           scope.$evalAsync('_resetSelection()');
           e.preventDefault();
-        });
-
-        scope.$watch(attrs.crmOptions, function(value) {
-          $(input).select2('data', scope[attrs.crmOptions]);
-          $(input).select2('val', '');
         });
       }
     };
