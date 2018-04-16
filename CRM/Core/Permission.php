@@ -736,7 +736,7 @@ class CRM_Core_Permission {
       ),
       'profile listings' => array(
         $prefix . ts('profile listings'),
-        ts('Warning: Give to trusted roles only; this permission has privacy implications. Access public searchable directories.')
+        ts('Warning: Give to trusted roles only; this permission has privacy implications. Access public searchable directories.'),
       ),
       'profile create' => array(
         $prefix . ts('profile create'),
@@ -748,7 +748,7 @@ class CRM_Core_Permission {
       ),
       'profile view' => array(
         $prefix . ts('profile view'),
-        ts('View data in a profile.')
+        ts('View data in a profile.'),
       ),
       'access all custom data' => array(
         $prefix . ts('access all custom data'),
