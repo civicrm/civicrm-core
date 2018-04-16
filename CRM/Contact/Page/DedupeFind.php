@@ -142,7 +142,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
         $urlQry['selected'] = 1;
       }
 
-      $this->assign('sourceUrl', CRM_Utils_System::url('civicrm/ajax/dedupefind', $urlQry));
+      $this->assign('sourceUrl', CRM_Utils_System::url('civicrm/ajax/dedupefind', $urlQry, FALSE, NULL, FALSE));
 
       //reload from cache table
       $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria);
