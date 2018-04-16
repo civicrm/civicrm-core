@@ -148,59 +148,62 @@
           relationshipData = {},
           contactTypes = {};
 
-        $('body').on('crmOptionsEdited', 'a.crm-option-edit-link', refreshRelationshipData);
+        (function init () {
+          // Refresh options if relationship types were edited
+          $('body').on('crmOptionsEdited', 'a.crm-option-edit-link', refreshRelationshipData);
+          // Initial load and trigger change on select
+          refreshRelationshipData().done(function() {
+            $relationshipTypeSelect.change();
+          });
+          $relationshipTypeSelect.change(function() {
+            var $select = $(this);
 
-        // Initial load and trigger change on select
-        refreshRelationshipData().done(function() {
-          $relationshipTypeSelect.change();
-        });
+            // ensure we have relationship data before changing anything
+            getRelationshipData().then(function() {
+              updateSelect($select);
+            })
+          });
+        })();
 
         /**
          * Fetch contact types and reset relationship data
          */
         function refreshRelationshipData() {
-          var defer = $.Deferred();
-
           // reset
           relationshipData = {};
 
-          getContactTypes().then(function() {
-            getRelationshipData().then(function() {
-              defer.resolve();
-            });
+          return getContactTypes().then(function() {
+            return getRelationshipData();
           });
-
-          return defer.promise();
         }
 
         /**
          * Fetches the relationship data using latest relationship types
          */
         function getRelationshipData() {
-          var subtype,
-            type,
-            label,
-            placeholder,
-            defer = $.Deferred();
+          var defer = $.Deferred();
 
-          if ($.isEmptyObject(relationshipData)) {
-            CRM.api3("RelationshipType", "get").done(function (data) {
+          if (!$.isEmptyObject(relationshipData)) {
+            defer.resolve(relationshipData);
+          }
+
+          CRM.api3("RelationshipType", "get")
+            .done(function (data) {
               $.each(data.values, function (key, relType) {
+                // Loop over the suffixes for a relationship type
                 $.each(["a", "b"], function (index, suffix) {
-                  subtype = relType["contact_subtype_" + suffix];
-                  type = subtype || relType["contact_type_" + suffix];
-                  label = getContactTypeLabel(type) || "Contact";
-                  placeholder = "- select " + label.toLowerCase() + " -";
-                  relType["placeholder_" + suffix] = placeholder;
+                  var subtype = relType["contact_subtype_" + suffix];
+                  var type = subtype || relType["contact_type_" + suffix];
+                  var label = getContactTypeLabel(type) || "Contact";
+                  var placeholder = "- select " + label.toLowerCase() + " -";
+                  relType["placeholder_" + suffix] = placeholder
                 });
+
                 relationshipData[relType["id"]] = relType;
               });
 
               defer.resolve(relationshipData);
             });
-          } else {
-            defer.resolve(relationshipData);
-          }
 
           return defer.promise();
         }
@@ -238,15 +241,6 @@
 
           return defer.promise();
         }
-
-        $relationshipTypeSelect.change(function() {
-          var $select = $(this);
-
-          // ensure we have relationship data before changing anything
-          getRelationshipData().then(function() {
-            updateSelect($select);
-          })
-        });
 
         function updateSelect($select) {
           var
