@@ -1462,12 +1462,7 @@ input.crm-form-entityref {
 .crm-container .btn-slide .action-item {
   white-space: normal;
 }
-.crm-container .crm-accordion-header .crm-hover-button {
-  opacity: 1;
-  position: relative;
-  top: -2px;
-  color: inherit;
-}
+
 .crm-container .crm-hover-button:hover,
 .crm-container a.crm-hover-button:hover,
 .crm-container a.crm-hover-button:active {
@@ -2027,8 +2022,7 @@ input.crm-form-entityref {
 
 .crm-container .button .icon,
 .crm-container a.invoiceButton .icon,
-.crm-container .crm-button .icon,
-.crm-accordion-header .icon {
+.crm-container .crm-button .icon {
   position: relative;
   top: -2px;
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
@@ -2227,78 +2221,10 @@ div.crm-master-accordion-header a.helpicon {
 
 /* accordion styles */
 
-.crm-container .crm-accordion-header {
-  background-image: url("../i/TreeMinusWhite.gif");
-  background-repeat: no-repeat;
-  background-position: 2px center;
-  cursor: pointer;
-  color: #F5F6F1;
-  font-weight: normal;
-  padding: 4px 8px 4px 20px;
-  background-color: #5D677B;
-}
-
-.crm-container .crm-accordion-header:hover {
-  background-color: #32414f;
-}
-
-.crm-container .collapsed .crm-accordion-header {
-  background-image: url("../i/TreePlusWhite.gif");
-}
-
-.crm-container .collapsed .crm-accordion-body,
-.crm-container .crm-collapsible.collapsed .collapsible-title + * {
-  display: none;
-}
-
 .crm-container .crm-expand-row {
   min-width: 16px;
   min-height: 16px;
   display: inline-block;
-}
-
-.crm-container .crm-accordion-inner .crm-accordion-header,
-.crm-container .crm-accordion-wrapper .crm-master-accordion-header,
-.crm-container .crm-collapsible .collapsible-title {
-  background-image: url("../i/TreeMinus.gif");
-  background-color: transparent;
-  color: #3E3E3E;
-}
-
-.crm-container .crm-accordion-inner.collapsed .crm-accordion-header,
-.crm-container .crm-accordion-wrapper.collapsed .crm-master-accordion-header,
-.crm-container .crm-collapsible.collapsed .collapsible-title {
-  background-image: url("../i/TreePlus.gif");
-}
-
-.crm-container .crm-accordion-wrapper .crm-master-accordion-header {
-  background-color: transparent;
-  font-size: 16px;
-  color: #3e3e3e;
-  margin-bottom: 0;
-}
-
-.crm-container .crm-accordion-inner .crm-accordion-header {
-  font-size: 13px;
-}
-
-.crm-container .crm-accordion-wrapper {
-  margin-bottom: 4px;
-}
-
-.crm-container .crm-accordion-header {
-  border-radius: 4px 4px 0 0;
-}
-
-.crm-container .collapsed .crm-accordion-header {
-  border-radius: 4px;
-}
-
-.crm-container .crm-accordion-body {
-  border-radius: 0 0 4px 4px;
-  border: 1px solid #70716B;
-  border-top: 0;
-  padding: 4px 0;
 }
 
 .crm-container .crm-collapsible .collapsible-title {
@@ -2307,26 +2233,6 @@ div.crm-master-accordion-header a.helpicon {
   background-repeat: no-repeat;
   background-position: 0 center;
   cursor: pointer;
-}
-
-.crm-container .crm-master-accordion-header+.crm-accordion-body {
-  border: none;
-  padding: 0;
-}
-
-.crm-container .crm-accordion-header.active {
-  font-weight: bold;
-  background-color: #41477E;
-}
-
-.crm-container .crm-accordion-header.active:hover {
-  background-color: #2E3471;
-}
-
-.crm-container .crm-master-accordion-header.crm-accordion-header:hover,
-.crm-container .crm-collapsible .collapsible-title:hover {
-  background-color: transparent;
-  color: #0200A0;
 }
 
 .crm-container .crm-child-row > td {
@@ -3855,4 +3761,57 @@ span.crm-status-icon {
   padding: 1px 5px;
   border-radius: 3px;
   border: 1px solid grey;
+}
+
+.crm-accordion-wrapper[aria-hidden=true] {
+   display: none;
+}
+
+.crm-accordion-wrapper {
+  border-radius: 0 0 4px 4px;
+  border: 1px solid #70716B;
+  border-top: 0;
+  padding: 4px 0;
+  margin-bottom: 4px;
+}
+
+.crm-accordion-wrapper[role="tabpanel"] .crm-accordion-header {
+  display: none;
+}
+
+button.crm-accordion-header {
+  display: block;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  color: #F5F6F1;
+  font-weight: normal;
+  padding: 4px 8px 4px 20px;
+  background-color: #5D677B;
+  width: 100%;
+  text-align: justify;
+  font-size: 16px;
+  background-position: 2px center;
+}
+
+.crm-accordion-header:hover {
+  background-color: #32414f;
+}
+
+.crm-accordion-header {
+  background-color: transparent;
+  font-size: 16px;
+  color: #3e3e3e;
+  margin-bottom: 0;
+}
+
+button.crm-accordion-header[aria-expanded="true"] {
+  position: relative;
+  top: -2px;
+  background-image: url("../i/TreeMinusWhite.gif");
+  border-radius: 4px 4px 0 0;
+}
+
+button.crm-accordion-header[aria-expanded="false"] {
+  background-image: url("../i/TreePlusWhite.gif");
+  border-radius: 4px;
 }

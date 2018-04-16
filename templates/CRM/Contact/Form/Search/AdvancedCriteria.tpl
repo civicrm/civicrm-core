@@ -109,6 +109,7 @@ CRM.$(function($) {
 {/if}
 
 {strip}
+<div class="crm-accessible-accordion">
   <div class="crm-accordion-wrapper crm-search_criteria_basic-accordion ">
     <div class="crm-accordion-header">
       {ts}Display Settings For Results{/ts}
@@ -157,4 +158,5 @@ CRM.$(function($) {
       </td>
     </tr>
   </table>
+</div>
 {/strip}
