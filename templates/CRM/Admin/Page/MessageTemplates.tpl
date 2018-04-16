@@ -89,12 +89,10 @@
 <div class="crm-content-block crm-block">
   <div id='mainTabContainer'>
     <ul>
-      {if call_user_func(array('CRM_Core_Permission','check'), 'edit user-driven message templates')
-      or call_user_func(array('CRM_Core_Permission','check'), 'edit message templates')}
-        <li id='tab_user'>    <a href='#user'     title='{ts}User-driven Messages{/ts}'>    {ts}User-driven Messages{/ts}    </a></li>
+      {if $canEditUserDrivenMessageTemplates or $canEditMessageTemplates}
+        <li id='tab_user'><a href='#user' title='{ts}User-driven Messages{/ts}'>{ts}User-driven Messages{/ts}</a></li>
       {/if}
-      {if call_user_func(array('CRM_Core_Permission','check'), 'edit system workflow message templates')
-      or call_user_func(array('CRM_Core_Permission','check'), 'edit message templates')}
+      {if $canEditSystemTemplates or $canEditMessageTemplates}
         <li id='tab_workflow'><a href='#workflow' title='{ts}System Workflow Messages{/ts}'>{ts}System Workflow Messages{/ts}</a></li>
       {/if}
     </ul>
@@ -104,14 +102,9 @@
     {include file="CRM/common/jsortable.tpl"}
     {foreach from=$rows item=template_row key=type}
       {if (
-        $type ne 'userTemplates' and (
-        call_user_func(array('CRM_Core_Permission','check'), 'edit system workflow message templates')
-        or call_user_func(array('CRM_Core_Permission','check'), 'edit message templates'))
-      ) or
-      (
-      $type eq 'userTemplates'and (
-      call_user_func(array('CRM_Core_Permission','check'), 'edit user-driven message templates')
-      or call_user_func(array('CRM_Core_Permission','check'), 'edit message templates'))
+        $type ne 'userTemplates' and ($canEditSystemTemplates or $canEditMessageTemplates)
+      ) or (
+        $type eq 'userTemplates'and ($canEditUserDrivenMessageTemplates or $canEditMessageTemplates)
       )}
       <div id="{if $type eq 'userTemplates'}user{else}workflow{/if}" class='ui-tabs-panel ui-widget-content ui-corner-bottom'>
           <div class="help">

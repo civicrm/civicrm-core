@@ -289,6 +289,9 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
     );
 
     $this->assign('rows', $rows);
+    $this->assign('canEditSystemTemplates', CRM_Core_Permission::check('edit system workflow message templates'));
+    $this->assign('canEditMessageTemplates', CRM_Core_Permission::check('edit message templates'));
+    $this->assign('canEditUserDrivenMessageTemplates', CRM_Core_Permission::check('edit user-driven message templates'));
   }
 
 }

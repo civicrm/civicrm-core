@@ -223,11 +223,12 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   private function checkUserPermission($workflowId) {
     if (isset($workflowId)) {
       $canView = CRM_Core_Permission::check('edit system workflow message templates');
-    } else {
+    }
+    else {
       $canView = CRM_Core_Permission::check('edit user-driven message templates');
     }
 
-    if (! $canView && ! CRM_Core_Permission::check('edit message templates')) {
+    if (!$canView && !CRM_Core_Permission::check('edit message templates')) {
       CRM_Core_Session::setStatus(ts('You do not have permission to view requested page.'), ts('Access Denied'));
       $url = CRM_Utils_System::url('civicrm/admin/messageTemplates', "reset=1");
       CRM_Utils_System::redirect($url);
