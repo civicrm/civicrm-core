@@ -6,7 +6,7 @@
     active = 'a.action-item:not(.crm-enable-disable), a.crm-popup';
 
   function clearTaskMenu() {
-    $('select#task', form).val('').select2().val('').trigger('change').prop('disabled', true).select2('disable');
+    $('select#task', form).val('').select2().val('').trigger('change').prop('disabled', true).select2({minimumResultsForSearch: -1});
   }
 
   function enableTaskMenu() {
