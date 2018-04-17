@@ -185,7 +185,7 @@
             defer.resolve(relationshipData);
           }
 
-          CRM.api3("RelationshipType", "get")
+          CRM.api3("RelationshipType", "get", {"options": {"limit":0}})
             .done(function (data) {
               $.each(data.values, function (key, relType) {
                 // Loop over the suffixes for a relationship type
