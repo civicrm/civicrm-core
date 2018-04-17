@@ -526,7 +526,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     if ($this->_addressField_b) {
       $this->_from .= "
              LEFT JOIN civicrm_address {$this->_aliases['civicrm_address_b']}
-                       ON ( {$this->_aliases['civicrm_contact']}.id =
+                       ON ( {$this->_aliases['civicrm_contact_b']}.id =
                             {$this->_aliases['civicrm_address_b']}.contact_id AND
                             {$this->_aliases['civicrm_address_b']}.is_primary = 1 )";
     }
