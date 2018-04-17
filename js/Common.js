@@ -414,10 +414,10 @@ if (!CRM.vars) CRM.vars = {};
         $el = $(this),
         iconClass,
         settings = {
-          placeholder: $el.data('placeholder') || $el.attr('placeholder') || $('option[value=""]', $el).text(),
+          placeholder: $el.attr('placeholder') || $el.data('placeholder') || $('option[value=""]', $el).text(),
           allowClear: !$el.hasClass('required'),
-          formatResult: formatCrmSelect2,
-          formatSelection: formatCrmSelect2
+          templateResult: formatCrmSelect2,
+          templateSelection: formatCrmSelect2
         };
       // quickform doesn't support optgroups so here's a hack :(
       $('option[value^=crm_optgroup]', this).each(function () {
@@ -497,13 +497,13 @@ if (!CRM.vars) CRM.vars = {};
               json: JSON.stringify(params)
             };
           },
-          results: function(data) {
+          processResults: function (data, page) {
             return {more: data.more_results, results: data.values || []};
           }
         },
         minimumInputLength: 1,
-        formatResult: CRM.utils.formatSelect2Result,
-        formatSelection: formatEntityRefSelection,
+        templateResult: CRM.utils.formatSelect2Result,
+        templateSelection: formatEntityRefSelection,
         escapeMarkup: _.identity,
         current: function(callback) {
           var
@@ -535,7 +535,7 @@ if (!CRM.vars) CRM.vars = {};
         };
         selectParams.tokenSeparators = [','];
         selectParams.createSearchChoicePosition = 'bottom';
-        $el.on('select2-selecting.crmEntity', function(e) {
+        $el.on('select2:selecting.crmEntity', function(e) {
           if (e.val === "0") {
             // Create a new term
             e.object.label = e.object.term;
@@ -558,20 +558,22 @@ if (!CRM.vars) CRM.vars = {};
         });
       }
       else {
-        selectParams.formatInputTooShort = function() {
-          var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
+        selectParams.inputTooShort = function() {
+          var txt = $el.data('select-params').inputTooShort || $.fn.select2.defaults.inputTooShort.call(this);
           txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
           return txt;
         };
-        selectParams.formatNoMatches = function() {
-          var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
-          txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
-          return txt;
+        selectParams.language = {
+          noResults: function() {
+            var txt = $el.data('select-params').noMatches || $.fn.select2.defaults.noMatches;
+            txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
+            return txt;
+          }
         };
-        $el.on('select2-open.crmEntity', function() {
+        $el.on('select2:open.crmEntity', function() {
           var $el = $(this);
           renderEntityRefFilterValue($el);
-          $('#select2-drop')
+          $('span .select2-dropdown', this)
             .off('.crmEntity')
             .on('click.crmEntity', 'a.crm-add-entity', function(e) {
               var extra = $el.data('api-params').extra,
