@@ -116,10 +116,12 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
     else {
       $queryParams = $form->get('queryParams');
       $isTest = FALSE;
-      foreach ($queryParams as $fields) {
-        if ($fields[0] == 'contribution_test') {
-          $isTest = TRUE;
-          break;
+      if (is_array($queryParams)) {
+        foreach ($queryParams as $fields) {
+          if ($fields[0] == 'contribution_test') {
+            $isTest = TRUE;
+            break;
+          }
         }
       }
       if (!$isTest) {
