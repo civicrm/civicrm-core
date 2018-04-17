@@ -231,15 +231,15 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           'street_address_a' => array(
             'title' => ts('Street address (Contact A)'),
             'name' => 'street_address',
-					),
+          ),
           'city_a' => array(
             'title' => ts('City (Contact A)'),
-            'name' => 'city'
-					),
+            'name' => 'city',
+          ),
           'postal_code_a' => array(
             'title' => ts('Postal code (Contact A)'),
             'name' => 'postal_code',
-					),
+          ),
           'state_province_id_a' => array(
             'title' => ts('State/Province (Contact A)'),
             'name' => 'state_province_id',
@@ -254,15 +254,15 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           'street_address_b' => array(
             'title' => ts('Street address (Contact B)'),
             'name' => 'street_address',
-					),
+          ),
           'city_b' => array(
             'title' => ts('City (Contact B)'),
-            'name' => 'city'
-					),
+            'name' => 'city',
+          ),
           'postal_code_b' => array(
             'title' => ts('Postal code (Contact B)'),
             'name' => 'postal_code',
-					),
+          ),
           'state_province_id_b' => array(
             'title' => ts('State/Province (Contact B)'),
             'name' => 'state_province_id',
@@ -436,12 +436,12 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             if ($fieldName == 'phone_b') {
               $this->_phoneField_b = TRUE;
             }
-						if ($tableName == 'civicrm_address_a') {
-							$this->_addressField_a = TRUE;
-						}
-						if ($tableName == 'civicrm_address_b') {
-							$this->_addressField_b = TRUE;
-						}
+            if ($tableName == 'civicrm_address_a') {
+              $this->_addressField_a = TRUE;
+            }
+            if ($tableName == 'civicrm_address_b') {
+              $this->_addressField_b = TRUE;
+            }
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
@@ -860,17 +860,17 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_relationship_relationship_id_hover'] = ts("Edit this relationship.");
         $entryFound = TRUE;
       }
-			
-			// Handle state province contact A
-			if (array_key_exists('civicrm_address_a_state_province_id_a', $row)) {
+
+      // Handle state province contact A
+      if (array_key_exists('civicrm_address_a_state_province_id_a', $row)) {
         if ($value = $row['civicrm_address_a_state_province_id_a']) {
           $rows[$rowNum]['civicrm_address_a_state_province_id_a'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
         }
         $entryFound = TRUE;
       }
 
-			// Handle state province contact B
-			if (array_key_exists('civicrm_address_b_state_province_id_b', $row)) {
+      // Handle state province contact B
+      if (array_key_exists('civicrm_address_b_state_province_id_b', $row)) {
         if ($value = $row['civicrm_address_b_state_province_id_b']) {
           $rows[$rowNum]['civicrm_address_b_state_province_id_b'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
         }
