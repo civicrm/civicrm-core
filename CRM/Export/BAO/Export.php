@@ -804,9 +804,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
               $masterAddressId = NULL;
               if (isset($iterationDAO->$field)) {
                 $masterAddressId = $iterationDAO->$field;
+                // get display name of contact that address is shared.
+                $fieldValue = CRM_Contact_BAO_Contact::getMasterDisplayName($masterAddressId, $iterationDAO->contact_id);
               }
-              // get display name of contact that address is shared.
-              $fieldValue = CRM_Contact_BAO_Contact::getMasterDisplayName($masterAddressId, $iterationDAO->contact_id);
             }
           }
 
