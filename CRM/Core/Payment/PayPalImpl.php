@@ -994,6 +994,14 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $url = $this->_paymentProcessor['url_api'] . 'nvp';
     }
 
+    $p = array();
+    foreach ($args as $n => $v) {
+      $p[] = "$n=" . urlencode($v);
+    }
+
+    //NVPRequest for submitting to server
+    $nvpreq = implode('&', $p);
+
     if (!function_exists('curl_init')) {
       CRM_Core_Error::fatal("curl functions NOT available.");
     }
@@ -1009,14 +1017,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
-
-    $p = array();
-    foreach ($args as $n => $v) {
-      $p[] = "$n=" . urlencode($v);
-    }
-
-    //NVPRequest for submitting to server
-    $nvpreq = implode('&', $p);
 
     //setting the nvpreq as POST FIELD to curl
     curl_setopt($ch, CURLOPT_POSTFIELDS, $nvpreq);
@@ -1039,9 +1039,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       curl_close($ch);
     }
 
-    if (strtolower($result['ack']) != 'success' &&
-      strtolower($result['ack']) != 'successwithwarning'
-    ) {
+    $outcome = strtolower(CRM_Utils_Array::value('ack', $result));
+
+    if ($outcome != 'success' && $outcome != 'successwithwarning') {
       throw new PaymentProcessorException("{$result['l_shortmessage0']} {$result['l_longmessage0']}");
       $e = CRM_Core_Error::singleton();
       $e->push($result['l_errorcode0'],
