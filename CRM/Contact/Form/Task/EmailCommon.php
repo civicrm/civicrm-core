@@ -69,11 +69,10 @@ class CRM_Contact_Form_Task_EmailCommon {
 
     $form->_emails = array();
 
+    // @TODO remove these line and to it somewhere more appropriate. Currently some classes (e.g Case
+    // are having to re-write contactIds afterwards due to this inappropriate variable setting
     // If we don't have any contact IDs, use the logged in contact ID
-    if (empty($form->_contactIds)) {
-      $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
-      $form->_contactIds = array($contactID);
-    }
+    $form->_contactIds = $form->_contactIds ?: [CRM_Core_Session::getLoggedInContactID()];
 
     $fromEmailValues = CRM_Core_BAO_Email::getFromEmail();
 
