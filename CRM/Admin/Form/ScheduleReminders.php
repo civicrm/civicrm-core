@@ -334,7 +334,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         $errors['absolute_date'] = ts('Absolute date cannot be earlier than the current time.');
       }
     }
-
+    if (!CRM_Utils_Rule::email($fields['from_email'])) {
+      $errors['from_email'] = ts('Please enter a valid email address.');
+    }
     $recipientKind = array(
       'participant_role' => array(
         'name' => 'participant role',
