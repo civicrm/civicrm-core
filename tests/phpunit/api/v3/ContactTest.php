@@ -3763,4 +3763,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->customGroupDelete($ids['custom_group_id']);
   }
 
+  /**
+   * Test getunique api call for Contact entity
+   */
+  public function testContactGetUnique() {
+    $result = $this->callAPIAndDocument($this->_entity, 'getunique', array(), __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(array('external_identifier'), $result['values']['UI_external_identifier']);
+  }
+
 }
