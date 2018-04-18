@@ -253,6 +253,34 @@ describe('crmCaseType', function() {
       expect(newSet.timeline).toBe('1');
       expect(newSet.label).toBe('Timeline #2');
     });
+  });
 
+  describe('crmAddName', function () {
+    var scope;
+    var element;
+
+    beforeEach(inject(function($rootScope, $compile) {
+      scope = $rootScope.$new();
+      scope.activityTypeOptions = [1, 2, 3];
+      element = '<span crm-add-name crm-options="activityTypeOptions"></span>';
+
+      spyOn(CRM.$.fn, 'crmSelect2').and.callThrough();
+
+      element = $compile(element)(scope);
+      scope.$digest();
+    }));
+
+    describe('when initialized', function () {
+      var returnValue;
+
+      beforeEach (function () {
+        var dataFunction = CRM.$.fn.crmSelect2.calls.argsFor(0)[0].data;
+        returnValue = dataFunction();
+      });
+
+      it('updates the UI with updated value of scope variable', function () {
+        expect(returnValue).toEqual({ results: scope.activityTypeOptions });
+      });
+    });
   });
 });
