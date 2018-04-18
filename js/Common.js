@@ -558,14 +558,14 @@ if (!CRM.vars) CRM.vars = {};
         });
       }
       else {
-        selectParams.inputTooShort = function() {
-          var txt = $el.data('select-params').inputTooShort || $.fn.select2.defaults.inputTooShort.call(this);
-          txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
-          return txt;
-        };
         selectParams.language = {
           noResults: function() {
             var txt = $el.data('select-params').noMatches || $.fn.select2.defaults.noMatches;
+            txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
+            return txt;
+          },
+          inputTooShort: function() {
+            var txt = $el.data('select-params').inputTooShort || $.fn.select2.defaults.inputTooShort.call($el);
             txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
             return txt;
           }
