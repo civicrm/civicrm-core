@@ -476,7 +476,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $updatedAttachment = $this->callAPISuccess('Attachment', 'get', array(
       'id' => $fileId,
       'entity_id' => $attachmentParams['entity_id'],
-      'entity_table' => $attachmentParams['entity_table']
+      'entity_table' => $attachmentParams['entity_table'],
     ));
 
     $this->assertNotEmpty($loggedInUser);

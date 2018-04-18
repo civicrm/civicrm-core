@@ -889,6 +889,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         1 => 'scheduled_id',
         2 => 'approver_id',
       ),
+      'civicrm_file' => array(
+        'created_id',
+      ),
       'civicrm_mailing_abtest' => array(
         0 => 'created_id',
       ),

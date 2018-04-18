@@ -69,13 +69,13 @@
     <type>int unsigned</type>
     <title>Created By Contact ID</title>
     <comment>FK to civicrm_contact, who uploaded this file</comment>
-    <add>4.7</add>
+    <add>5.3</add>
   </field>
   <foreignKey>
     <name>created_id</name>
     <table>civicrm_contact</table>
     <key>id</key>
-    <add>4.7</add>
+    <add>5.3</add>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
 </table>

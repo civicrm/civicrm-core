@@ -117,7 +117,8 @@ function civicrm_api3_attachment_create($params) {
   $entityFileDao = new CRM_Core_DAO_EntityFile();
 
   if ($id) {
-    $fileDao->id = $id;
+    $file['id'] = $fileDao->id = $id;
+
     if (!$fileDao->find(TRUE)) {
       throw new API_Exception("Invalid ID");
     }
@@ -144,12 +145,11 @@ function civicrm_api3_attachment_create($params) {
     throw new API_Exception("Cannot modify name");
   }
 
-  $fileDao->copyValues($file);
   if (!$id) {
-    $fileDao->uri = CRM_Utils_File::makeFileName($name);
-    $fileDao->created_id = CRM_Core_Session::getLoggedInContactID();
+    $file['uri'] = CRM_Utils_File::makeFileName($name);
   }
-  $fileDao->save();
+  $fileDao = CRM_Core_BAO_File::create($file);
+  $fileDao->find(TRUE);
 
   $entityFileDao->copyValues($entityFile);
   $entityFileDao->file_id = $fileDao->id;
@@ -495,6 +495,11 @@ function _civicrm_api3_attachment_getfields() {
     'title' => 'Content',
     'description' => 'File content (not searchable, not returned by default)',
     'type' => CRM_Utils_Type::T_STRING,
+  );
+  $spec['created_id'] = array(
+    'title' => 'Created By Contact ID',
+    'type' => CRM_Utils_Type::T_INT,
+    'description' => 'FK to civicrm_contact, who uploaded this file',
   );
 
   return $spec;
