@@ -131,7 +131,7 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
         ),
         'grouping' => 'contact-fields',
       ),
-    ) + $this->getAddressColumns(array('group_by' => FALSE));
+    ) + $this->getAddressColumns(array('group_bys' => FALSE));
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -140,29 +140,6 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
 
   public function preProcess() {
     parent::preProcess();
-  }
-
-  public function select() {
-    $select = array();
-    $this->_columnHeaders = array();
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('fields', $table)) {
-        foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) ||
-            !empty($this->_params['fields'][$fieldName])
-          ) {
-
-            $alias = "{$tableName}_{$fieldName}";
-            $select[] = "{$field['dbAlias']} as {$alias}";
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
-            $this->_selectAliases[] = $alias;
-          }
-        }
-      }
-    }
-
-    $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
   /**
@@ -179,10 +156,8 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
 
   public function from() {
     $this->_from = "
-        FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
-            LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                   ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
-                      {$this->_aliases['civicrm_address']}.is_primary = 1 ) ";
+        FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom} ";
+    $this->joinAddressFromContact();
     $this->joinPhoneFromContact();
     $this->joinEmailFromContact();
     $this->joinCountryFromAddress();
@@ -229,20 +204,6 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts('View Contact Detail Report for this contact');
-        $entryFound = TRUE;
-      }
-
-      if (array_key_exists('civicrm_address_state_province_id', $row)) {
-        if ($value = $row['civicrm_address_state_province_id']) {
-          $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
-        }
-        $entryFound = TRUE;
-      }
-
-      if (array_key_exists('civicrm_address_country_id', $row)) {
-        if ($value = $row['civicrm_address_country_id']) {
-          $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
-        }
         $entryFound = TRUE;
       }
 
