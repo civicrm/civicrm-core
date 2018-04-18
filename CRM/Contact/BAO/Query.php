@@ -4734,17 +4734,26 @@ civicrm_relationship.is_permission_a_b = 0
    *  on full_group_by mode, then append the those missing columns to GROUP BY clause
    * keyword to select fields not present in groupBy
    *
-   * @param string $groupBy - GROUP BY clause where missing ORDER BY columns will be appended
+   * @param string|array $groupBy - GROUP BY clause or array of columns where missing ORDER BY columns will be appended if not present
    * @param array $orderBys - ORDER BY sub-clauses
    *
    */
   public static function getGroupByFromOrderBy(&$groupBy, $orderBys) {
     if (!CRM_Utils_SQL::disableFullGroupByMode()) {
       foreach ($orderBys as $orderBy) {
-        $orderBy = str_replace(array(' DESC', ' ASC', '`'), '', $orderBy); // remove sort syntax from ORDER BY clauses if present
+        $orderBy = str_ireplace(array(' DESC', ' ASC', '`'), '', $orderBy); // remove sort syntax from ORDER BY clauses if present
         // if ORDER BY column is not present in GROUP BY then append it to end
-        if (preg_match('/(MAX|MIN)\(/i', trim($orderBy)) !== 1 && !strstr($groupBy, $orderBy)) {
-          $groupBy .= ", {$orderBy}";
+        if (preg_match('/(MAX|MIN)\(/i', trim($orderBy)) !== 1) {
+          if (is_array($groupBy)) {
+            // retrieve and add all the ORDER BY columns which are not in GROUP BY list of columns
+            $groupBy += array_filter($groupBy,
+              function($var) use ($orderBy) {
+                return !strstr($var, $orderBy);
+              });
+          }
+          elseif (!strstr($groupBy, $orderBy)) {
+            $groupBy .= ", {$orderBy}";
+          }
         }
       }
     }
@@ -4905,16 +4914,16 @@ civicrm_relationship.is_permission_a_b = 0
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
 
     if (!empty($groupByCols)) {
+      if (!empty($order)) {
+        // retrieve order by columns from ORDER BY clause
+        $orderBys = explode(",", str_replace('ORDER BY ', '', $order));
+        self::getGroupByFromOrderBy($groupByCols, $orderBys);
+      }
       // It doesn't matter to include columns in SELECT clause, which are present in GROUP BY when we just want the contact IDs
       if (!$groupContacts && !$sortByChar) {
         $select = self::appendAnyValueToSelect($this->_select, $groupByCols, 'GROUP_CONCAT');
       }
       $groupBy = " GROUP BY " . implode(', ', $groupByCols);
-      if (!empty($order)) {
-        // retrieve order by columns from ORDER BY clause
-        $orderBys = explode(",", str_replace('ORDER BY ', '', $order));
-        self::getGroupByFromOrderBy($groupBy, $orderBys);
-      }
     }
 
     if ($additionalWhereClause) {
