@@ -309,7 +309,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $this->_individualId));
     $this->assertTrue(empty($contact['source']));
     $msgs = $mut->getAllMessages();
-    $this->assertEquals(1, count($msgs));
+    $this->assertEquals(1, count($msgs), CRM_Core_Session::singleton()->getStatus());
     $mut->stop();
   }
 
