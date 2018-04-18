@@ -40,15 +40,14 @@ function civicrm_api3_generic_getUnique($apiRequest) {
   $entity = _civicrm_api_get_entity_name_from_camel($apiRequest['entity']);
   $uniqueFields = array();
 
-  $baoName = _civicrm_api3_get_BAO($entity);
-  $bao = new $baoName();
-  $_entityTable = $bao->tableName();
+  $dao = _civicrm_api3_get_DAO($entity);
+  $uFields = $dao::indices();
 
-  $sql = 'SHOW INDEX FROM '.$_entityTable.' WHERE Non_unique = 0';
-  $uFields = CRM_Core_DAO::executeQuery($sql)->fetchAll();
-  foreach($uFields as $field) {
-    // group by Key_name to handle combination indexes
-    $uniqueFields[$field['Key_name']][] = $field['Column_name'];
+  foreach($uFields as $fieldKey => $field) {
+    if(!isset($field['unique']) || !$field['unique']) {
+      continue;
+    }
+    $uniqueFields[$fieldKey] = $field['field'];
   }
 
   return civicrm_api3_create_success($uniqueFields);
