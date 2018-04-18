@@ -641,6 +641,16 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
+  public function getUser($contactID) {
+    $user_details = parent::getUser($contactID);
+    $user = JFactory::getUser($user_details['id']);
+    $user_details['name'] = $user->name;
+    return $user_details;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getUserIDFromUserObject($user) {
     return !empty($user->id) ? $user->id : NULL;
   }

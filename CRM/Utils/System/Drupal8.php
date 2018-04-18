@@ -572,6 +572,16 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
+  public function getUser($contactID) {
+    $user_details = parent::getUser($contactID);
+    $user_details['name'] = $user_details['name']->value;
+    $user_details['email'] = $user_details['email']->value;
+    return $user_details;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getUniqueIdentifierFromUserObject($user) {
     return $user->get('mail')->value;
   }
