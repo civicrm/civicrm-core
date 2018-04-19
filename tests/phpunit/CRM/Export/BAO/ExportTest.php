@@ -27,6 +27,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected $activityIDs = [];
 
+  /**
+   * Master Address ID created for testing.
+   *
+   * @var int
+   */
+  protected $masterAddressId;
+
+
   public function tearDown() {
     $this->quickCleanup(['civicrm_contact', 'civicrm_email', 'civicrm_address']);
     $this->quickCleanUpFinancialEntities();
@@ -252,6 +260,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'location_type_id' => "Home",
       'master_id' => $addressId,
     ));
+    $this->masterAddressId = $addressId;
 
   }
 
@@ -392,7 +401,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     //assert the exported result
     $masterName = CRM_Core_DAO::singleValueQuery("SELECT {$field} FROM {$tableName}");
-    $displayName = CRM_Contact_BAO_Contact::getMasterDisplayName(NULL, $this->contactIDs[1]);
+    $displayName = CRM_Contact_BAO_Contact::getMasterDisplayName($this->masterAddressId);
     $this->assertEquals($displayName, $masterName);
 
     // delete the export temp table and component table
