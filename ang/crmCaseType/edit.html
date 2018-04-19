@@ -19,10 +19,14 @@ Required vars: caseType
       <li><a href="#acttab-statuses">{{ts('Case Statuses')}}</a></li>
       <li><a href="#acttab-actType">{{ts('Activity Types')}}</a></li>
       <li ng-repeat="activitySet in caseType.definition.activitySets">
-        <a href="#acttab-{{$index}}">{{ activitySet.label }}</a>
+        <a href="#acttab-{{$index}}" class="crmCaseType-editable">
+          <div crm-editable-tab-title title="{{ts('Click to edit')}}">
+            <span>{{ activitySet.label }}</span>
+          </div>
+        </a>
         <span class="crm-i fa-trash" title="{{ts('Remove')}}"
           ng-hide="activitySet.name == 'standard_timeline'"
-          ng-click="removeItem(caseType.definition.activitySets, activitySet)">{{ts('Remove')}}</span>
+          ng-click="removeItem(caseType.definition.activitySets, activitySet)"></span>
         <!-- Weird spacing:
         <a class="crm-hover-button" ng-click="removeItem(caseType.definition.activitySets, activitySet)">
           <span class="crm-i fa-trash" title="Remove">Remove</span>
@@ -44,11 +48,6 @@ Required vars: caseType
 
     <div ng-repeat="activitySet in caseType.definition.activitySets" id="acttab-{{$index}}">
       <div ng-include="activityTableTemplate(activitySet)"></div>
-
-      <div class="crm-accordion-wrapper collapsed">
-        <div class="crm-accordion-header">{{ts('Advanced')}}</div>
-        <div class="crm-accordion-body" ng-include="'~/crmCaseType/activitySetDetails.html'"></div>
-      </div>
     </div>
   </div>
 
