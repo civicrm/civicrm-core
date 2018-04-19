@@ -335,7 +335,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
 
     $query = $query->select($selectClause)->orderBy($orderBy);
     if (!CRM_Utils_System::isNull($aclFrom)) {
-      $query = $query->from('acl', $aclFrom);
+      $query = $query->join('acl', $aclFrom);
     }
     if (!CRM_Utils_System::isNull($aclWhere)) {
       $query = $query->where($aclWhere);

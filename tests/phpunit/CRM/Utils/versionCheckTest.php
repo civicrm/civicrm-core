@@ -6,17 +6,6 @@
  */
 class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
 
-  /**
-   * @return array
-   */
-  public function get_info() {
-    return array(
-      'name' => 'VersionCheck Test',
-      'description' => 'Test versionCheck functionality',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
-
   public function setUp() {
     parent::setUp();
   }
@@ -100,100 +89,12 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     ),
   );
 
-  /**
-   * @dataProvider newerVersionDataProvider
-   * @param string $localVersion
-   * @param array $versionInfo
-   * @param mixed $expectedResult
-   */
-  public function testNewerVersion($localVersion, $versionInfo, $expectedResult) {
+  public function tearDown() {
+    parent::tearDown();
     $vc = new CRM_Utils_VersionCheck();
-    // These values are set by the constructor but for testing we override them
-    $vc->localVersion = $localVersion;
-    $vc->localMajorVersion = $vc->getMajorVersion($localVersion);
-    $vc->setVersionInfo($versionInfo);
-    $available = $vc->isNewerVersionAvailable();
-    $this->assertEquals($available['version'], $expectedResult);
-  }
-
-  /**
-   * @return array
-   *   (localVersion, versionInfo, expectedResult)
-   */
-  public function newerVersionDataProvider() {
-    $data = array();
-
-    // Make sure we do not get unstable release updates for a stable localVersion
-    $data[] = array('4.5.5', $this->sampleVersionInfo, NULL);
-
-    // Make sure we do get unstable release updates for unstable localVersion
-    $data[] = array('4.6.alpha1', $this->sampleVersionInfo, '4.6.beta1');
-
-    // Make sure we get nothing (and no errors) if no versionInfo available
-    $data[] = array('4.7.beta1', array(), NULL);
-
-    // Make sure alerts prioritize the localMajorVersion
-    $data[] = array('4.4.1', $this->sampleVersionInfo, '4.4.11');
-
-    // Make sure new security release on newest version doesn't trigger security
-    // notice on site running LTS version that doesn't have a security release
-    $data[] = array('4.3.9', $this->sampleVersionInfo, NULL);
-
-    // Make sure new security release on newest version DOES trigger security
-    // notice on site running EOL version that doesn't have a security release
-    $data[] = array('4.2.19', $this->sampleVersionInfo, '4.5.5');
-
-    return $data;
-  }
-
-  /**
-   * @dataProvider securityUpdateDataProvider
-   * @param string $localVersion
-   * @param array $versionInfo
-   * @param bool $expectedResult
-   */
-  public function testSecurityUpdate($localVersion, $versionInfo, $expectedResult) {
-    $vc = new CRM_Utils_VersionCheck();
-    // These values are set by the constructor but for testing we override them
-    $vc->localVersion = $localVersion;
-    $vc->localMajorVersion = $vc->getMajorVersion($localVersion);
-    $vc->setVersionInfo($versionInfo);
-    $available = $vc->isNewerVersionAvailable();
-    $this->assertEquals($available['upgrade'], $expectedResult);
-  }
-
-  /**
-   * @return array
-   *   (localVersion, versionInfo, expectedResult)
-   */
-  public function securityUpdateDataProvider() {
-    $data = array();
-
-    // Make sure we get alerted if a security release is available
-    $data[] = array('4.5.1', $this->sampleVersionInfo, 'security');
-
-    // Make sure we do not get alerted if a security release is not available
-    $data[] = array('4.5.5', $this->sampleVersionInfo, NULL);
-
-    // Make sure we get false (and no errors) if no versionInfo available (this will be the case for pre-alphas)
-    $data[] = array('4.7.alpha1', array(), NULL);
-
-    // If there are 2 security updates on the same day (e.g. lts and stable majorVersions)
-    // we should not get alerted to one if we are using the other
-    $data[] = array('4.4.11', $this->sampleVersionInfo, FALSE);
-
-    // This version predates the ones in the info array, it should be assumed to be EOL and insecure
-    $data[] = array('4.0.1', $this->sampleVersionInfo, 'security');
-
-    // Make sure new security release on newest version doesn't trigger security
-    // notice on site running LTS version that doesn't have a security release
-    $data[] = array('4.3.9', $this->sampleVersionInfo, NULL);
-
-    // Make sure new security release on newest version DOES trigger security
-    // notice on site running EOL version that doesn't have a security release
-    $data[] = array('4.2.19', $this->sampleVersionInfo, 'security');
-
-    return $data;
+    if (file_exists($vc->cacheFile)) {
+      unlink($vc->cacheFile);
+    }
   }
 
   public function testCronFallback() {
