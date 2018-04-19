@@ -408,6 +408,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
     }
 
+    // Add context for the editing of option groups
+    if (isset($extra['option_context'])) {
+      $context = json_encode($extra['option_context']);
+      $element->setAttribute('data-option-edit-context', $context);
+    }
+
     return $element;
   }
 
