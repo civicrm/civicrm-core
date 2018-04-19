@@ -1595,10 +1595,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     //create the contact using create profile contact.
     $fields = CRM_Contact_BAO_Contact::exportableFields('Individual');
 
-    // for this test, we need to make CiviCRM think we are logged in
-    // so that updateBlankLocInfo is set to 1 (erase blank value from the database)
-    CRM_Core_Session::singleton()->set('authSrc', CRM_Core_Permission::AUTH_SRC_LOGIN);
-
+    $this->createLoggedInUser();
     // now, emulate the contact update using a profile
     $contactID = CRM_Contact_BAO_Contact::createProfileContact($updatePfParams, $fields, $contactId,
       NULL, NULL, NULL, TRUE
