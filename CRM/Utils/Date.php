@@ -1167,7 +1167,15 @@ class CRM_Utils_Date {
             $from['Y'] = $fYear;
             $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
             $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
+            $to['d'] = $fiscalEnd['2'];
+            $to['M'] = $fiscalEnd['1'];
+            $to['Y'] = $fiscalEnd['0'];
+            break;
 
+          case 'previous_before':
+            $from['Y'] = $fYear - 2;
+            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
+            $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
             $to['d'] = $fiscalEnd['2'];
             $to['M'] = $fiscalEnd['1'];
             $to['Y'] = $fiscalEnd['0'];
@@ -1182,9 +1190,84 @@ class CRM_Utils_Date {
             $to['Y'] = $fiscalEnd['0'];
             break;
 
+          case 'previous_2':
+            $from['Y'] = $fYear - 2;
+            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 2);
+            $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
+            $to['d'] = $fiscalEnd['2'];
+            $to['M'] = $fiscalEnd['1'];
+            $to['Y'] = $fiscalEnd['0'];
+            break;
+
+          case 'previous_3':
+            $from['Y'] = $fYear - 3;
+            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 3);
+            $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
+            $to['d'] = $fiscalEnd['2'];
+            $to['M'] = $fiscalEnd['1'];
+            $to['Y'] = $fiscalEnd['0'];
+            break;
+
+          case 'earlier':
+            $from['Y'] = $fYear - 1;
+            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
+            $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
+            $to['d'] = $fiscalEnd['2'];
+            $to['M'] = $fiscalEnd['1'];
+            $to['Y'] = $fiscalEnd['0'];
+            unset($from);
+            break;
+
+          case 'greater':
+            $from['Y'] = $fYear;
+            unset($to);
+            break;
+
+          case 'greater_previous':
+            $from['Y'] = $fYear - 1;
+            unset($to);
+            break;
+
+          case 'current':
+            $from['Y'] = $fYear;
+            $to['d'] = $now['mday'];
+            $to['M'] = $now['mon'];
+            $to['Y'] = $now['year'];
+            $to['H'] = 23;
+            $to['i'] = $to['s'] = 59;
+            break;
+
+          case 'less':
+            $from['Y'] = $fYear;
+            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
+            $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
+            $to['d'] = $fiscalEnd['2'];
+            $to['M'] = $fiscalEnd['1'];
+            $to['Y'] = $fiscalEnd['0'];
+            unset($from);
+            break;
+
           case 'next':
             $from['Y'] = $fYear + 1;
             $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
+            $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
+            $to['d'] = $fiscalEnd['2'];
+            $to['M'] = $fiscalEnd['1'];
+            $to['Y'] = $fiscalEnd['0'];
+            break;
+
+          case 'this_2':
+            $from['Y'] = $fYear - 2;
+            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 3);
+            $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
+            $to['d'] = $fiscalEnd['2'];
+            $to['M'] = $fiscalEnd['1'];
+            $to['Y'] = $fiscalEnd['0'];
+            break;
+
+          case 'this_3':
+            $from['Y'] = $fYear - 3;
+            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 4);
             $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
             $to['d'] = $fiscalEnd['2'];
             $to['M'] = $fiscalEnd['1'];
@@ -1745,7 +1828,7 @@ class CRM_Utils_Date {
    *   Fiscal Start Month.
    *
    * @return int
-   *   $fy       Current Fiscl Year
+   *   $fy       Current Fiscal Year
    */
   public static function calculateFiscalYear($fyDate, $fyMonth) {
     $date = date("Y-m-d");
