@@ -36,7 +36,7 @@
  *
  * @return mixed
  */
-function civicrm_api3_generic_getUnique($apiRequest) {
+function civicrm_api3_generic_getunique($apiRequest) {
   $entity = _civicrm_api_get_entity_name_from_camel($apiRequest['entity']);
   $uniqueFields = array();
 
