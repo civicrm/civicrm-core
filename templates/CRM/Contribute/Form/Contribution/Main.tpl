@@ -66,6 +66,12 @@
   {include file="CRM/Contribute/Form/Contribution/PreviewHeader.tpl"}
   {/if}
 
+  {if $displayCaptchaWarning}
+  <div class="messages status no-popup">
+      {ts}To display reCAPTCHA on form you must get an API key from<br /> <a href='https://www.google.com/recaptcha/admin/create'>https://www.google.com/recaptcha/admin/create</a>{/ts}
+  </div>
+  {/if}
+
   {include file="CRM/common/TrackingFields.tpl"}
 
   <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block">
