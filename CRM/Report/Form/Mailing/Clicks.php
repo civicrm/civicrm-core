@@ -369,7 +369,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
       // If the email address has been deleted
       if (array_key_exists('civicrm_email_email', $row)) {
         if (empty($rows[$rowNum]['civicrm_email_email'])) {
-          $rows[$rowNum]['civicrm_email_email'] = '<del>Email address deleted</del>';
+          $rows[$rowNum]['civicrm_email_email'] = ts('<del>Email address deleted</del>');
         }
         $entryFound = TRUE;
       }

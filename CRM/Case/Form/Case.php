@@ -204,9 +204,9 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     $this->assign('multiClient', $isMultiClient);
 
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
-      $title = 'Delete';
+      $title = ts('Delete');
       if ($this->_action & CRM_Core_Action::RENEW) {
-        $title = 'Restore';
+        $title = ts('Restore');
       }
       $this->addButtons(array(
           array(

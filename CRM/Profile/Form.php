@@ -849,7 +849,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   public static function validateContactActivityProfile($activityId, $contactId, $gid) {
     $errors = array();
     if (!$activityId) {
-      $errors[] = 'Profile is using one or more activity fields, and is missing the activity Id (aid) in the URL.';
+      $errors[] = ts('Profile is using one or more activity fields, and is missing the activity Id (aid) in the URL.');
       return $errors;
     }
 
@@ -858,7 +858,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     CRM_Activity_BAO_Activity::retrieve($activityParams, $activityDetails);
 
     if (empty($activityDetails)) {
-      $errors[] = 'Invalid Activity Id (aid).';
+      $errors[] = ts('Invalid Activity Id (aid).');
       return $errors;
     }
 
@@ -871,7 +871,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         !in_array($contactId, $activityDetails['target_contact'])
       )
     ) {
-      $errors[] = 'This activity cannot be edited or viewed via this profile.';
+      $errors[] = ts('This activity cannot be edited or viewed via this profile.');
     }
 
     return $errors;
