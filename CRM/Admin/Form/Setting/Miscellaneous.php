@@ -49,6 +49,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'recaptchaOptions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'recaptchaPublicKey' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'recaptchaPrivateKey' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'forceRecaptcha' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'wkhtmltopdfPath' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'recentItemsMaxCount' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'recentItemsProviders' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
