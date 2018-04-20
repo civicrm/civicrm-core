@@ -579,7 +579,6 @@ class CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db.
    * nex time it's requested.
    *
-   *
    * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {
@@ -606,6 +605,7 @@ class CRM_Core_PseudoConstant {
    *   array reference of all activity types.
    */
   public static function &activityType() {
+    CRM_Utils_System::deprecatedFunctionWarning('buildOptions() method in the appropriate BAO object');
     $args = func_get_args();
     $all = CRM_Utils_Array::value(0, $args, TRUE);
     $includeCaseActivities = CRM_Utils_Array::value(1, $args, FALSE);
@@ -931,6 +931,7 @@ WHERE  id = %1";
    *   array reference of all groups.
    */
   public static function allGroup($groupType = NULL, $excludeHidden = TRUE) {
+    CRM_Utils_System::deprecatedFunctionWarning('buildOptions() method in the appropriate BAO object');
     if ($groupType === 'validate') {
       // validate gets passed through from getoptions. Handle in the deprecated
       // fn rather than change the new pattern.
@@ -1142,6 +1143,7 @@ WHERE  id = %1";
    *   array of all payment processors
    */
   public static function paymentProcessor($all = FALSE, $test = FALSE, $additionalCond = NULL) {
+    CRM_Utils_System::deprecatedFunctionWarning('buildOptions() method in the appropriate BAO object');
     $condition = "is_test = ";
     $condition .= ($test) ? '1' : '0';
 
@@ -1177,6 +1179,7 @@ WHERE  id = %1";
    *   array of all payment processor types
    */
   public static function &paymentProcessorType($all = FALSE, $id = NULL, $return = 'title') {
+    CRM_Utils_System::deprecatedFunctionWarning('buildOptions() method in the appropriate BAO object');
     $cacheKey = $id . '_' . $return;
     if (empty(self::$paymentProcessorType[$cacheKey])) {
       self::populate(self::$paymentProcessorType[$cacheKey], 'CRM_Financial_DAO_PaymentProcessorType', $all, $return, 'is_active', NULL, "is_default, $return", 'id');
@@ -1227,6 +1230,7 @@ WHERE  id = %1";
    *   array reference of all activity statuses
    */
   public static function &activityStatus($column = 'label') {
+    CRM_Utils_System::deprecatedFunctionWarning('buildOptions() method in the appropriate BAO object');
     if (NULL === self::$activityStatus) {
       self::$activityStatus = array();
     }
@@ -1253,6 +1257,7 @@ WHERE  id = %1";
    *   array reference of all Visibility levels.
    */
   public static function &visibility($column = 'label') {
+    CRM_Utils_System::deprecatedFunctionWarning('buildOptions() method in the appropriate BAO object');
     if (!isset(self::$visibility)) {
       self::$visibility = array();
     }

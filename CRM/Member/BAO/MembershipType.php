@@ -622,7 +622,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *   array of the details of membership types
    */
   public static function getMembershipTypesByOrg($orgID) {
-    Civi::log()->warning('Deprecated function getMembershipTypesByOrg, please user membership_type api', array('civi.tag' => 'deprecated'));
+    CRM_Utils_System::deprecatedFunctionWarning('membership_type api');
     $memberTypesSameParentOrg = civicrm_api3('MembershipType', 'get', array(
       'member_of_contact_id' => $orgID,
       'options' => array(
