@@ -526,7 +526,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
       if ($isMembershipType) {
         $graphRows['value'] = $display;
         $chartInfo = array(
-	  'legend' => ts('Membership Summary'),
+          'legend' => ts('Membership Summary'),
           'xname' => ts('Member Since / Member Type'),
           'yname' => ts('Fees'),
         );

@@ -386,7 +386,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
 
       if ((!empty($rows)) && $countEvent != 1) {
         $chartInfo = array(
-	  'legend' => ts('Participants Summary'),
+          'legend' => ts('Participants Summary'),
           'xname' => ts('Event'),
           'yname' => ts('Total Participants'),
         );
