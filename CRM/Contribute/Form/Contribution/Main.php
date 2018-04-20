@@ -302,6 +302,15 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->buildComponentForm($this->_id, $this);
     }
 
+    if (count($this->_paymentProcessors) >= 1 && !isset($this->_paymentProcessors[0]) && !$this->get_template_vars("isCaptcha") && $this->hasToAddForcefully()) {
+      if (!$this->_userID) {
+        $this->enableCaptchaOnForm();
+      }
+      else {
+        $this->displayCaptchaWarning();
+      }
+    }
+
     // Build payment processor form
     CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
 
