@@ -15,3 +15,4 @@ eaf140c | CRM-21435 Duplicate reporting of aggregates in Top Donor reports | PR 
 26498a7 | CRM-21489 Deadlock retries have been accidentally blocked | Core PR to be released in Civi 5.1
 e339e04 | PR-11836 Wrap the split_job funtion in a transaction | Core PR merged
 ca4f343 | PR-11957 Add in clickthrough and opened stats, Add in stats to AB test reports | Core PR merged
+572d4d3 | CRM-21104 Force reCaptcha option for Contribution pages | Core PR open but no sign of it being merged soon
