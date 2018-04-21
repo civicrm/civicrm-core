@@ -33,6 +33,7 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
 
   private $basicTokens;
   private $customFieldTokens;
+  private $specialTokens;
 
   /**
    * Mapping from tokenName to api return field
@@ -53,7 +54,8 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
   public function __construct() {
     parent::__construct('activity', array_merge(
       $this->getBasicTokens(),
-      $this->getCustomFieldTokens()
+      $this->getCustomFieldTokens(),
+      $this->getSpecialTokens()
     ));
   }
 
@@ -148,6 +150,10 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     ]);
     $prefetch['activity'] = $activities['values'];
 
+    // Get data for special tokens
+    list($prefetch['activityContact'], $prefetch['contact'])
+      = self::prefetchSpecialTokens($this->activeTokens, $activityIds);
+
     // Store the activity types if needed
     if (in_array('activity_type', $this->activeTokens)) {
       $this->activityTypes = \CRM_Core_OptionGroup::values('activity_type');
@@ -164,6 +170,54 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     }
 
     return $prefetch;
+  }
+
+  /**
+   * Do the prefetch for the special tokens
+   * @param  array $activeTokens The list of active tokens
+   * @param  array $activityIds  list of activity ids
+   *
+   * @return array               the prefetched data for these tokens
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function prefetchSpecialTokens($activeTokens, $activityIds) {
+    $activityContacts = $contacts = [];
+    // See if we need activity contacts
+    $needContacts = FALSE;
+    foreach ($activeTokens as $token) {
+      if (preg_match('/^source|target|assignee/', $token)) {
+        $needContacts = TRUE;
+        break;
+      }
+    }
+
+    // If we need ActivityContacts, load them
+    if ($needContacts) {
+      $result = civicrm_api3('ActivityContact', 'get', [
+        'sequential' => 1,
+        'activity_id' => ['IN' => $activityIds],
+        'options' => ['limit' => 0],
+      ]);
+      $contactIds = [];
+      $types = ['1' => 'assignee', '2' => 'source', '3' => 'target'];
+      foreach ($result['values'] as $ac) {
+        if ($ac['record_type_id'] == 2) {
+          $activityContacts[$ac['activity_id']][$types[$ac['record_type_id']]] = $ac['contact_id'];
+        }
+        else {
+          $activityContacts[$ac['activity_id']][$types[$ac['record_type_id']]][] = $ac['contact_id'];
+        }
+        $contactIds[$ac['contact_id']] = 1;
+      }
+      // @TODO only return the wanted fields
+      // maybe use CRM_Contact_Tokens::prefetch() ?
+      $result = civicrm_api3('Contact', 'get', [
+        'id' => ['IN' => array_keys($contactIds)],
+        'options' => ['limit' => 0],
+      ]);
+      $contacts = $result['values'];
+    }
+    return [$activityContacts, $contacts];
   }
 
   /**
@@ -207,6 +261,37 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     elseif (isset($activity->$field)) {
       $row->tokens($entity, $field, $activity->$field);
     }
+    elseif (preg_match('/^(target|assignee|source)_/', $field, $match)) {
+      if ($match[1] == 'source') {
+        $fieldParts = explode('_', $field, 2);
+        $contactId = \CRM_Utils_Array::value($fieldParts[0], $prefetch['activityContact'][$activity->id]);
+        $wantedField = $fieldParts[1];
+      }
+      else {
+        $fieldParts = explode('_', $field, 3);
+        $contactIds = \CRM_Utils_Array::value($fieldParts[0], $prefetch['activityContact'][$activity->id]);
+        $selectedId = (int) $fieldParts[1] > 0 ? $fieldParts[1] - 1 : 0;
+        $contactId = \CRM_Utils_Array::value($selectedId, $contactIds);
+        $wantedField = $fieldParts[2];
+      }
+      $contact = \CRM_Utils_Array::value($contactId, $prefetch['contact']);
+      if (!$contact) {
+        $row->tokens($entity, $field, '');
+      }
+      else {
+        $contact = (object) $contact;
+        // This is OK for simple tokens, but would be better for this to be handled by
+        // CRM_Contact_Tokens ... but that doesn't exist yet.
+        $row->tokens($entity, $field, $contact->$wantedField);
+      }
+    }
+    elseif (preg_match('/^(targets|assignees)_count/', $field, $match)) {
+      $type = rtrim($match[1], 's');
+      ;
+      $row->tokens($entity, $field, count(
+        \CRM_Utils_Array::value($type, $prefetch['activityContact'][$activity->id], [])
+      ));
+    }
   }
 
   /**
@@ -230,6 +315,8 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         'duration' => ts('Activity Duration'),
         'campaign' => ts('Activity Campaign'),
         'campaign_id' => ts('Activity Campaign ID'),
+        'targets_count' => ts('Count of Activity Targets'),
+        'assignees_count' => ts('Count of Activity Assignees'),
       ];
       if (array_key_exists('CiviCase', CRM_Core_Component::getEnabledComponents())) {
         $this->basicTokens['case_id'] = ts('Activity Case ID');
@@ -247,6 +334,25 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       $this->customFieldTokens = \CRM_Utils_Token::getCustomFieldTokens('Activity');
     }
     return $this->customFieldTokens;
+  }
+
+  /**
+   * Get the special tokens - ie tokens that need special handling
+   * @return array token name => token label
+   */
+  protected function getSpecialTokens() {
+    if (!isset($this->specialTokens)) {
+      $this->specialTokens = [];
+      foreach (\CRM_Core_SelectValues::contactTokens() as $label => $name) {
+        $match = [];
+        if (preg_match('/{contact\.(.*)}/', $label, $match)) {
+          $this->specialTokens['source_' . $match[1]] = "(Source) " . $name;
+          $this->specialTokens['target_N_' . $match[1]] = "(Target N) " . $name;
+          $this->specialTokens['assignee_N_' . $match[1]] = "(Assignee N) " . $name;
+        }
+      }
+    }
+    return $this->specialTokens;
   }
 
 }

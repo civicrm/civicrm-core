@@ -64,7 +64,6 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   }
 
   public function testCreateDocumentSpecialTokens() {
-    $this->markTestIncomplete('special tokens not yet merged - see https://github.com/civicrm/civicrm-core/pull/12012');
     $activity = $this->activityCreate();
     $data = [
       ["Source First Name: {activity.source_first_name}", "Source First Name: Anthony"],
