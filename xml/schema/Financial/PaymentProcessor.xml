@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Financial</base>
+  <class>PaymentProcessor</class>
+  <name>civicrm_payment_processor</name>
+  <add>1.8</add>
+  <field>
+    <name>id</name>
+    <title>Payment Processor ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Payment Processor ID</comment>
+    <add>1.8</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>domain_id</name>
+    <title>Payment Processor Domain</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>Which Domain is this match entry for</comment>
+    <add>3.0</add>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <add>3.0</add>
+  </foreignKey>
+  <field>
+    <name>name</name>
+    <title>Payment Processor</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Payment Processor Name.</comment>
+    <add>1.8</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>description</name>
+    <title>Processor Description</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Payment Processor Description.</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>payment_processor_type</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Payment Processor Type.</comment>
+    <add>1.8</add>
+    <drop>4.3</drop>
+  </field>
+  <field>
+    <name>payment_processor_type_id</name>
+    <title>Payment Processor Type ID</title>
+    <type>int unsigned</type>
+    <pseudoconstant>
+      <table>civicrm_payment_processor_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <length>10</length>
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>payment_processor_type_id</name>
+    <table>civicrm_payment_processor_type</table>
+    <key>id</key>
+    <add>4.3</add>
+  </foreignKey>
+  <field>
+    <name>is_active</name>
+    <title>Processor is Active?</title>
+    <type>boolean</type>
+    <comment>Is this processor active?</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>is_default</name>
+    <title>Processor Is Default?</title>
+    <type>boolean</type>
+    <comment>Is this processor the default?</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>is_test</name>
+    <title>Is Test Processor?</title>
+    <type>boolean</type>
+    <comment>Is this processor for a test site?</comment>
+    <add>1.8</add>
+  </field>
+  <index>
+    <name>UI_name_test_domain_id</name>
+    <fieldName>name</fieldName>
+    <fieldName>is_test</fieldName>
+    <fieldName>domain_id</fieldName>
+    <unique>true</unique>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>user_name</name>
+    <title>User Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <add>1.8</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>password</name>
+    <title>Password</title>
+    <type>varchar</type>
+    <length>255</length>
+    <add>1.8</add>
+    <html>
+      <type>Password</type>
+    </html>
+  </field>
+  <field>
+    <name>signature</name>
+    <title>Signature</title>
+    <type>text</type>
+    <add>1.8</add>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>40</cols>
+    </html>
+  </field>
+  <field>
+    <name>url_site</name>
+    <title>Site URL</title>
+    <type>varchar</type>
+    <length>255</length>
+    <add>1.8</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>url_api</name>
+    <title>API URL</title>
+    <type>varchar</type>
+    <length>255</length>
+    <add>1.8</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>url_recur</name>
+    <title>Recurring Payments URL</title>
+    <type>varchar</type>
+    <length>255</length>
+    <add>1.8</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>url_button</name>
+    <title>Button URL</title>
+    <type>varchar</type>
+    <length>255</length>
+    <add>1.8</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>subject</name>
+    <title>Subject</title>
+    <type>varchar</type>
+    <length>255</length>
+    <add>1.8</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>class_name</name>
+    <title>Suffix for PHP class name implementation</title>
+    <type>varchar</type>
+    <length>255</length>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>billing_mode</name>
+    <title>Processor Billing Mode</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Billing Mode (deprecated)</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>is_recur</name>
+    <title>Processor Supports Recurring?</title>
+    <type>boolean</type>
+    <comment>Can process recurring contributions</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>payment_type</name>
+    <title>Payment Type</title>
+    <type>int unsigned</type>
+    <default>1</default>
+    <comment>Payment Type: Credit or Debit (deprecated)</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>payment_instrument_id</name>
+    <title>Payment Method</title>
+    <type>int unsigned</type>
+    <default>1</default>
+    <comment>Payment Instrument ID</comment>
+    <pseudoconstant>
+      <optionGroupName>payment_instrument</optionGroupName>
+    </pseudoconstant>
+    <add>4.7</add>
+  </field>
+<field>
+    <name>accepted_credit_cards</name>
+    <title>Accepted Credit Cards</title>
+    <type>text</type>
+    <default>NULL</default>
+    <comment>array of accepted credit card types</comment>
+    <serialize>JSON</serialize>
+    <add>4.7</add>
+  </field>
+</table>

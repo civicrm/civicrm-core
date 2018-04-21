@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -89,10 +89,11 @@
       function updateMode() {
         var mode = $('input[name=recur_mode]:checked', this).val(),
           entityID = parseInt('{/literal}{$entityID}{literal}'),
-          entityTable = '{/literal}{$entityTable}{literal}';
+          entityTable = '{/literal}{$entityTable}{literal}',
+	  priceSet = $('#price_set_id').val();
         if (entityID != "" && mode && mapper.hasOwnProperty(formClass) && entityTable !="") {
           $.getJSON(CRM.url("civicrm/ajax/recurringentity/update-mode",
-              {mode: mode, entityId: entityID, entityTable: entityTable, linkedEntityTable: mapper[formClass]})
+              {mode: mode, entityId: entityID, entityTable: entityTable, linkedEntityTable: mapper[formClass], priceSet: priceSet})
           ).done(function (result) {
               if (result.status != "" && result.status == 'Done') {
                 $form.submit();

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing/Event</base>
+  <class>Bounce</class>
+  <name>civicrm_mailing_event_bounce</name>
+  <comment>Tracks when and why an email bounced.</comment>
+  <archive>true</archive>
+  <field>
+    <name>id</name>
+    <title>Bounce ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>event_queue_id</name>
+    <title>Event Queue</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to EventQueue</comment>
+  </field>
+  <foreignKey>
+    <name>event_queue_id</name>
+    <table>civicrm_mailing_event_queue</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>bounce_type_id</name>
+    <title>Bounce Type</title>
+    <type>int unsigned</type>
+    <comment>What type of bounce was it?</comment>
+    <pseudoconstant>
+      <table>civicrm_mailing_bounce_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>bounce_reason</name>
+    <title>Bounce Reason</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>The reason the email bounced.</comment>
+  </field>
+  <field>
+    <name>time_stamp</name>
+    <title>Timestamp</title>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
+    <required>true</required>
+    <comment>When this bounce event occurred.</comment>
+  </field>
+</table>

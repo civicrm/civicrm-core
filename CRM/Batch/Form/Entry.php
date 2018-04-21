@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -83,6 +83,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   public $_fields = array();
 
   /**
+   * Monetary fields that may be submitted.
+   *
+   * These should get a standardised format in the beginPostProcess function.
+   *
+   * These fields are common to many forms. Some may override this.
+   */
+  protected $submittableMoneyFields = ['total_amount', 'net_amount', 'non_deductible_amount', 'fee_amount'];
+
+  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
@@ -135,22 +144,17 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
     elseif ($this->_batchInfo['type_id'] == $batchTypes['Membership']) {
       CRM_Utils_System::setTitle(ts('Batch Data Entry for Memberships'));
-      $customFields = CRM_Core_BAO_CustomField::getFields('Membership');
     }
     elseif ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
       CRM_Utils_System::setTitle(ts('Batch Data Entry for Pledge Payments'));
-      $customFields = CRM_Core_BAO_CustomField::getFields('Contribution');
     }
     $this->_fields = array();
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($this->_profileId, FALSE, CRM_Core_Action::VIEW);
 
     // remove file type field and then limit fields
     $suppressFields = FALSE;
-    $removehtmlTypes = array('File', 'Autocomplete-Select');
     foreach ($this->_fields as $name => $field) {
-      if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) &&
-        in_array($this->_fields[$name]['html_type'], $removehtmlTypes)
-      ) {
+      if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) && $this->_fields[$name]['html_type'] == 'Autocomplete-Select') {
         $suppressFields = TRUE;
         unset($this->_fields[$name]);
       }
@@ -187,7 +191,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $this->assign('rowCount', $this->_batchInfo['item_count'] + 1);
 
-    $fileFieldExists = FALSE;
     $preserveDefaultsArray = array(
       'first_name',
       'last_name',
@@ -198,7 +201,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
     $contactReturnProperties = array();
-    $config = CRM_Core_Config::singleton();
 
     for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
       $this->addEntityRef("primary_contact_id[{$rowNumber}]", '', array(
@@ -270,7 +272,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields && $buttonName != '_qf_Entry_next') {
-      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Update multiple records."), ts('Some Fields Excluded'), 'info');
+      CRM_Core_Session::setStatus(ts("File type field(s) in the selected profile are not supported for Update multiple records."), ts('Some Fields Excluded'), 'info');
     }
   }
 
@@ -447,6 +449,14 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    */
   private function processContribution(&$params) {
 
+    foreach ($this->submittableMoneyFields as $moneyField) {
+      foreach ($params['field'] as $index => $fieldValues) {
+        if (isset($fieldValues[$moneyField])) {
+          $params['field'][$index][$moneyField] = CRM_Utils_Rule::cleanMoney($params['field'][$index][$moneyField]);
+        }
+      }
+    }
+    $params['actualBatchTotal'] = CRM_Utils_Rule::cleanMoney($params['actualBatchTotal']);
     // get the price set associated with offline contribution record.
     $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
     $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
@@ -544,6 +554,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           }
         }
         $value['line_item'] = $lineItem;
+        $value['skipCleanMoney'] = TRUE;
         //finally call contribution create for all the magic
         $contribution = CRM_Contribute_BAO_Contribution::create($value);
         $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', array('flip' => 1), 'validate');
@@ -633,6 +644,11 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       // @todo - most of the wrangling in this function is because the api is not being used, especially date stuff.
       $customFields = array();
       foreach ($params['field'] as $key => $value) {
+        foreach ($value as $fieldKey => $fieldValue) {
+          if (isset($this->_fields[$fieldKey]) && $this->_fields[$fieldKey]['data_type'] === 'Money') {
+            $value[$fieldKey] = CRM_Utils_Rule::cleanMoney($fieldValue);
+          }
+        }
         // if contact is not selected we should skip the row
         if (empty($params['primary_contact_id'][$key])) {
           continue;
@@ -790,6 +806,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
           // make contribution entry
           $contrbutionParams = array_merge($value, array('membership_id' => $membership->id));
+          $contrbutionParams['skipCleanMoney'] = TRUE;
           // @todo - calling this from here is pretty hacky since it is called from membership.create anyway
           // This form should set the correct params & not call this fn directly.
           CRM_Member_BAO_Membership::recordMembershipContribution($contrbutionParams);

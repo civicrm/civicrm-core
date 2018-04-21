@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -71,6 +71,10 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
       $defaults = Civi::service('settings_manager')
         ->getBagByContact(NULL, $userID)
         ->get('activity_tab_filter');
+    }
+    // set Activity status 'Scheduled' by default only for dashlet
+    elseif (strstr(CRM_Utils_Array::value('q', $_GET), 'dashlet')) {
+      $defaults['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled');
     }
     return $defaults;
   }

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Financial</base>
+  <class>FinancialItem</class>
+  <name>civicrm_financial_item</name>
+  <add>4.3</add>
+  <comment>Financial data for civicrm_line_item, etc.</comment>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Financial Item ID</title>
+    <length>10</length>
+    <required>true</required>
+    <comment></comment>
+    <add>4.3</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>created_date</name>
+    <type>timestamp</type>
+    <title>Financial Item Created Date</title>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP</default>
+    <comment>Date and time the item was created</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>transaction_date</name>
+    <type>datetime</type>
+    <title>Financial Item Transaction Date</title>
+    <required>true</required>
+    <comment>Date and time of the source transaction</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <title>Financial Item Contact ID</title>
+    <required>true</required>
+    <export>true</export>
+    <comment>FK to Contact ID of contact the item is from</comment>
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+    <add>4.3</add>
+  </foreignKey>
+  <field>
+    <name>description</name>
+    <type>varchar</type>
+    <title>Financial Item Description</title>
+    <length>255</length>
+    <comment>Human readable description of this item, to ease display without lookup of source item.</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>amount</name>
+    <title>Amount</title>
+    <type>decimal</type>
+    <default>0</default>
+    <required>true</required>
+    <headerPattern>/unit?.?amoun/i</headerPattern>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
+    <comment>Total amount of this item</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>currency</name>
+    <export>true</export>
+    <type>varchar</type>
+    <title>Financial Item Currency</title>
+    <length>3</length>
+    <comment>Currency for the amount</comment>
+    <add>4.3</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>financial_account_id</name>
+    <type>int unsigned</type>
+    <title>Financial Account ID</title>
+    <comment>FK to civicrm_financial_account</comment>
+    <add>4.3</add>
+    <pseudoconstant>
+      <table>civicrm_financial_account</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>financial_account_id</name>
+    <table>civicrm_financial_account</table>
+    <key>id</key>
+    <add>4.3</add>
+  </foreignKey>
+  <field>
+    <name>status_id</name>
+    <export>true</export>
+    <title>Financial Item Status ID</title>
+    <type>int unsigned</type>
+    <comment>Payment status: test, paid, part_paid, unpaid (if empty assume unpaid)</comment>
+    <add>4.3</add>
+    <pseudoconstant>
+      <optionGroupName>financial_item_status</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>entity_table</name>
+    <type>varchar</type>
+    <title>Entity Table</title>
+    <length>64</length>
+    <comment>The table providing the source of this item such as civicrm_line_item</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>Entity ID</title>
+    <type>int unsigned</type>
+    <comment>The specific source item that is responsible for the creation of this financial_item</comment>
+    <add>4.3</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>4.3</add>
+  </dynamicForeignKey>
+  <index>
+    <name>UI_id</name>
+    <fieldName>id</fieldName>
+    <unique>true</unique>
+    <add>4.3</add>
+    <drop>4.7</drop>
+  </index>
+  <index>
+    <name>IX_created_date</name>
+    <fieldName>created_date</fieldName>
+    <add>4.3</add>
+  </index>
+  <index>
+    <name>IX_transaction_date</name>
+    <fieldName>transaction_date</fieldName>
+    <add>4.3</add>
+  </index>
+  <index>
+    <name>IX_entity</name>
+    <fieldName>entity_table</fieldName>
+    <fieldName>entity_id</fieldName>
+    <add>4.3</add>
+    <drop>4.7</drop>
+  </index>
+  <index>
+    <name>index_entity_id_entity_table</name>
+    <fieldName>entity_id</fieldName>
+    <fieldName>entity_table</fieldName>
+    <add>4.7</add>
+  </index>
+</table>

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -197,6 +197,44 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    */
   public function getDefaultContext() {
     return 'search';
+  }
+
+  /**
+   * Add generic fields that specify the contact.
+   */
+  protected function addContactSearchFields() {
+    if (!$this->isFormInViewOrEditMode()) {
+      return;
+    }
+    $this->addSortNameField();
+
+    $this->_group = CRM_Core_PseudoConstant::nestedGroup();
+    if ($this->_group) {
+      $this->add('select', 'group', $this->getGroupLabel(), $this->_group, FALSE,
+        array(
+          'id' => 'group',
+          'multiple' => 'multiple',
+          'class' => 'crm-select2',
+        )
+      );
+    }
+
+    $contactTags = CRM_Core_BAO_Tag::getTags();
+    if ($contactTags) {
+      $this->add('select', 'contact_tags', $this->getTagLabel(), $contactTags, FALSE,
+        array(
+          'id' => 'contact_tags',
+          'multiple' => 'multiple',
+          'class' => 'crm-select2',
+        )
+      );
+    }
+    $this->addField('contact_type', array('entity' => 'Contact'));
+
+    if (CRM_Core_Permission::check('access deleted contacts') && Civi::settings()->get('contact_undelete')) {
+      $this->addElement('checkbox', 'deleted_contacts', ts('Search in Trash') . '<br />' . ts('(deleted contacts)'));
+    }
+
   }
 
 }

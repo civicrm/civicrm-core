@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Event/Cart</base>
+  <class>Cart</class>
+  <name>civicrm_event_carts</name>
+  <field>
+    <name>id</name>
+    <title>Cart ID</title>
+    <uniqueName>cart_id</uniqueName>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Cart Id</comment>
+    <add>4.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>user_id</name>
+    <title>Created By</title>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_contact who created this cart</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>completed</name>
+    <title>Complete?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <add>4.1</add>
+  </field>
+  <foreignKey>
+    <name>user_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.1</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+</table>
+

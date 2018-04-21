@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
@@ -78,7 +78,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     }
 
     $instance = new CRM_Report_DAO_ReportInstance();
-    $instance->copyValues($params);
+    $instance->copyValues($params, TRUE);
 
     if (CRM_Core_Config::singleton()->userFramework == 'Joomla') {
       $instance->permission = 'null';

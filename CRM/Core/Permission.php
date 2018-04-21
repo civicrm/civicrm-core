@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -806,6 +806,10 @@ class CRM_Core_Permission {
         $prefix . ts('view all notes'),
         ts("View notes (for visible contacts) even if they're marked admin only"),
       ),
+      'add contact notes' => array(
+        $prefix . ts('add contact notes'),
+        ts("Create notes for contacts"),
+      ),
       'access AJAX API' => array(
         $prefix . ts('access AJAX API'),
         ts('Allow API access even if Access CiviCRM is not granted'),
@@ -884,6 +888,10 @@ class CRM_Core_Permission {
       'edit own api keys' => array(
         $prefix . ts('edit own api keys'),
         ts('Edit user\'s own API keys'),
+      ),
+      'send SMS' => array(
+        $prefix . ts('send SMS'),
+        ts('Send an SMS'),
       ),
     );
 
@@ -1603,8 +1611,7 @@ class CRM_Core_Permission {
    *   invoices permission and the invoice author is the current user.
    */
   public static function checkDownloadInvoice() {
-    global $user;
-    $cid = CRM_Core_BAO_UFMatch::getContactId($user->uid);
+    $cid = CRM_Core_Session::getLoggedInContactID();
     if (CRM_Core_Permission::check('access CiviContribute') ||
       (CRM_Core_Permission::check('view my invoices') && $_GET['cid'] == $cid)
     ) {

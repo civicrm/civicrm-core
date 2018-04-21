@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -48,6 +48,15 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @var float
    */
   public $_totalAmount;
+
+  /**
+   * Monetary fields that may be submitted.
+   *
+   * These should get a standardised format in the beginPostProcess function.
+   *
+   * These fields are common to many forms. Some may override this.
+   */
+  protected $submittableMoneyFields = ['total_amount', 'net_amount', 'non_deductible_amount', 'fee_amount', 'tax_amount', 'amount'];
 
   /**
    * Set variables up before form is built.
@@ -205,6 +214,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       $taxAmount = 0;
       foreach ($this->_params as $k => $v) {
+        $this->cleanMoneyFields($v);
         if ($v == 'skip') {
           continue;
         }
@@ -398,6 +408,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $now = date('YmdHis');
 
     $this->_params = $this->get('params');
+    $this->cleanMoneyFields($this->_params);
+
     if (!empty($this->_params[0]['contact_id'])) {
       // unclear when this would be set & whether it could be checked in getContactID.
       // perhaps it relates to when cid is in the url
@@ -1039,8 +1051,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     $contribParams['skipLineItem'] = 1;
+    $contribParams['skipCleanMoney'] = 1;
     // create contribution record
-    $contribution = CRM_Contribute_BAO_Contribution::add($contribParams, $ids);
+    $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
     // CRM-11124
     CRM_Event_BAO_Participant::createDiscountTrxn($form->_eventId, $contribParams, NULL, CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
 
@@ -1296,7 +1309,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $_REQUEST['id'] = $form->_eventId = $params['id'];
     $form->controller = new CRM_Event_Controller_Registration();
     $form->_params = $params['params'];
-    $form->_amount = $form->_totalAmount = CRM_Utils_Array::value('totalAmount', $params);
+    // This happens in buildQuickForm so emulate here.
+    $form->_amount = $form->_totalAmount = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('totalAmount', $params));
     $form->set('params', $params['params']);
     $form->_values['custom_pre_id'] = array();
     $form->_values['custom_post_id'] = array();
@@ -1330,6 +1344,21 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
     }
     return array();
+  }
+
+  /**
+   * Clean money fields from the form.
+   *
+   * @param array $params
+   */
+  protected function cleanMoneyFields(&$params) {
+    foreach ($this->submittableMoneyFields as $moneyField) {
+      foreach ($params as $index => $paramField) {
+        if (isset($paramField[$moneyField])) {
+          $params[$index][$moneyField] = CRM_Utils_Rule::cleanMoney($paramField[$moneyField]);
+        }
+      }
+    }
   }
 
 }

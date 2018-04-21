@@ -21,7 +21,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Build the $data array for CiviLineItem related tables
@@ -60,41 +60,41 @@ function _civicrm_lineitem_data(&$data, $enabled) {
 
   // Line-item ID field
   $data['civicrm_line_item']['id'] = array(
-      'title' => t('ID'),
-      'help' => t('The numeric Line-item\'s ID.'),
-      'field' => array(
-          'handler' => 'views_handler_field_numeric',
-      ),
-      'argument' => array(
-          'handler' => 'views_handler_argument_numeric',
-      ),
-      'filter' => array(
-          'handler' => 'views_handler_filter_numeric',
-          'allow empty' => TRUE,
-      ),
-      'sort' => array(
-          'handler' => 'views_handler_sort',
-      ),
+    'title' => t('ID'),
+    'help' => t("The numeric Line-item's ID."),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+      'allow empty' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
   );
 
   // Line-item label
   $data['civicrm_line_item']['label'] = array(
-      'title' => t('Label'),
-      'help' => t('The line item label, display the formatted amount'),
-      'field' => array(
-          'handler' => 'views_handler_field',
-          'click sortable' => TRUE,
-      ),
-      'argument' => array(
-          'handler' => 'views_handler_argument_string',
-      ),
-      'filter' => array(
-          'handler' => 'views_handler_filter_string',
-          'allow empty' => TRUE,
-      ),
-      'sort' => array(
-          'handler' => 'views_handler_sort',
-      ),
+    'title' => t('Label'),
+    'help' => t('The line item label, display the formatted amount'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+      'allow empty' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
   );
 
   // Line-item - price field relationship
@@ -125,101 +125,100 @@ function _civicrm_lineitem_data(&$data, $enabled) {
 
   // Line-item - contribution relationship
   $data['civicrm_line_item']['entity_id'] = array(
-      'title' => t('Contribution Record ID'),
-      'help' => t('Bring Contribution Record the complete contribution record to the party'),
-      'relationship' => array(
-          'base' => 'civicrm_contribution',
-          'left_field' => 'id',
-          'field' => 'entity_id',
-          'handler' => 'views_handler_relationship',
-          'label' => t('CiviCRM Contribution, with custom fields'),
-      ),
+    'title' => t('Contribution Record ID'),
+    'help' => t('Bring Contribution Record the complete contribution record to the party'),
+    'relationship' => array(
+      'base' => 'civicrm_contribution',
+      'left_field' => 'id',
+      'field' => 'entity_id',
+      'handler' => 'views_handler_relationship',
+      'label' => t('CiviCRM Contribution, with custom fields'),
+    ),
   );
 
   // Line-Item Total amount
   $data['civicrm_line_item']['line_total'] = array(
-      'title' => t('Total Line Item'),
-      'help' => t('The Total for the line item'),
-      'field' => array(
-          'handler' => 'views_handler_field_numeric',
-          'click sortable' => TRUE,
-      ),
-      'argument' => array(
-          'handler' => 'views_handler_argument_numeric',
-          'numeric' => TRUE,
-      ),
-      'filter' => array(
-          'handler' => 'views_handler_filter_numeric',
-      ),
-      'sort' => array(
-          'handler' => 'views_handler_sort',
-      ),
+    'title' => t('Total Line Item'),
+    'help' => t('The Total for the line item'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+      'numeric' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
   );
 
   // Line-Item unit price
   $data['civicrm_line_item']['unit_price'] = array(
-      'title' => t('Unit Price Item'),
-      'help' => t('The unit price for this line-item'),
-      'field' => array(
-          'handler' => 'civicrm_handler_field_money',
-          'click sortable' => TRUE,
-      ),
-      'argument' => array(
-          'handler' => 'views_handler_argument_numeric',
-          'numeric' => TRUE,
-      ),
-      'filter' => array(
-          'handler' => 'views_handler_filter_numeric',
-      ),
-      'sort' => array(
-          'handler' => 'views_handler_sort',
-      ),
+    'title' => t('Unit Price Item'),
+    'help' => t('The unit price for this line-item'),
+    'field' => array(
+      'handler' => 'civicrm_handler_field_money',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+      'numeric' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
   );
 
   // Line-Item quantity
   $data['civicrm_line_item']['qty'] = array(
-      'title' => t('Item quantity'),
-      'help' => t('The quantity for this line-item'),
-      'field' => array(
-          'handler' => 'views_handler_field_numeric',
-          'click sortable' => TRUE,
-      ),
-      'argument' => array(
-          'handler' => 'views_handler_argument_numeric',
-          'numeric' => TRUE,
-      ),
-      'filter' => array(
-          'handler' => 'views_handler_filter_numeric',
-      ),
-      'sort' => array(
-          'handler' => 'views_handler_sort',
-      ),
+    'title' => t('Item quantity'),
+    'help' => t('The quantity for this line-item'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+      'numeric' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
   );
 
   // Line-item financial type
   $data['civicrm_line_item']['financial_type'] = array(
-      'title' => t('Line item Financial Type'),
-      'help' => t('Financial type for Line Item, ie Member Dues, Event Fees etc'),
-      'real field' => 'financial_type_id',
-      'field' => array(
-          'handler' => 'civicrm_handler_field_pseudo_constant',
-          'click sortable' => TRUE,
-          'pseudo class' => 'CRM_Contribute_PseudoConstant',
-          'pseudo method' => 'financialType',
-      ),
-      'argument' => array(
-          'handler' => 'views_handler_argument',
-      ),
-      'filter' => array(
-          'handler' => 'civicrm_handler_filter_pseudo_constant',
-          'allow empty' => TRUE,
-          'pseudo class' => 'CRM_Contribute_PseudoConstant',
-          'pseudo method' => 'financialType',
-      ),
-      'sort' => array(
-          'handler' => 'views_handler_sort',
-      ),
+    'title' => t('Line item Financial Type'),
+    'help' => t('Financial type for Line Item, ie Member Dues, Event Fees etc'),
+    'real field' => 'financial_type_id',
+    'field' => array(
+      'handler' => 'civicrm_handler_field_pseudo_constant',
+      'click sortable' => TRUE,
+      'pseudo class' => 'CRM_Contribute_PseudoConstant',
+      'pseudo method' => 'financialType',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+    ),
+    'filter' => array(
+      'handler' => 'civicrm_handler_filter_pseudo_constant',
+      'allow empty' => TRUE,
+      'pseudo class' => 'CRM_Contribute_PseudoConstant',
+      'pseudo method' => 'financialType',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
   );
 
 }
-

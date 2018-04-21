@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -154,7 +154,13 @@
           </td>
         </tr>
         {if !$membershipMode}
-          <tr><td class="label">{$form.is_override.label} {help id="id-status-override"}</td><td>{$form.is_override.html}</td></tr>
+          <tr>
+            <td class="label">{$form.is_override.label} {help id="id-status-override"}</td>
+            <td>
+              <span id="is-override">{$form.is_override.html}</span>
+              <span id="status-override-end-date">{$form.status_override_end_date.html}</span>
+            </td>
+          </tr>
           {* Show read-only Status block - when action is UPDATE and is_override is FALSE *}
           <tr id="memberStatus_show">
             {if $action eq 2}
@@ -164,7 +170,7 @@
 
           {* Show editable status field when is_override is TRUE *}
           <tr id="memberStatus"><td class="label">{$form.status_id.label}</td><td>{$form.status_id.html}<br />
-            <span class="description">{ts}If <strong>Status Override</strong> is checked, the selected status will remain in force (it will NOT be modified by the automated status update script).{/ts}</span></td></tr>
+            <span class="description">{ts}When <strong>Status Override</strong> is active, the selected status will remain in force (it will NOT be subject to membership status rules) until it is cancelled or become inactive.{/ts}</span></td></tr>
         {/if}
 
         {if $accessContribution and !$membershipMode AND ($action neq 2 or (!$rows.0.contribution_id AND !$softCredit) or $onlinePendingContributionId)}
@@ -190,9 +196,9 @@
             <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
           </tr>
         {/if}
-        <tr id="fromEmail" style="display:none;">
+        <tr id="fromEmail" style="display: none" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html}</td>
+          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
         </tr>
         <tr id='notice' style="display:none;">
           <td class="label">{$form.receipt_text.label}</td>
@@ -401,15 +407,34 @@
     <script type="text/javascript">
 
     {/literal}{if !$membershipMode}{literal}
+    cj( "#is_override" ).change(function() {
+      showHideMemberStatus();
+    });
+
     showHideMemberStatus();
     function showHideMemberStatus() {
-      if ( cj( "#is_override" ).prop('checked') ) {
-        cj('#memberStatus').show( );
-        cj('#memberStatus_show').hide( );
-      }
-      else {
-        cj('#memberStatus').hide( );
-        cj('#memberStatus_show').show( );
+      var isOverride = cj( "#is_override" ).val();
+      switch (isOverride) {
+        case '0':
+          cj('#memberStatus').hide();
+          cj('#memberStatus_show').show();
+          cj('#status-override-end-date').hide();
+          break;
+        case '1':
+          cj('#memberStatus').show();
+          cj('#memberStatus_show').hide();
+          cj('#status-override-end-date').hide();
+          break;
+        case '2':
+          cj('#memberStatus').show();
+          cj('#memberStatus_show').hide();
+          cj('#status-override-end-date').show();
+          break;
+        default :
+          cj('#memberStatus').hide( );
+          cj('#memberStatus_show').show( );
+          cj('#status-override-end-date').hide();
+          break;
       }
     }
     {/literal}{/if}

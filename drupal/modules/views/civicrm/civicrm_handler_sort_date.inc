@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * sort handler to properly pass the field type for date fields.
@@ -33,7 +33,7 @@ class civicrm_handler_sort_date extends views_handler_sort_date {
    * Called to add the sort to a query.
    * Overridden to pass the field type
    */
-  function query() {
+  public function query() {
     $this->ensure_my_table();
     switch ($this->options['granularity']) {
       case 'second':
@@ -64,5 +64,5 @@ class civicrm_handler_sort_date extends views_handler_sort_date {
     // Add the field.
     $this->query->add_orderby(NULL, $formula, $this->options['order'], $this->table_alias . '_' . $this->field . '_' . $this->options['granularity']);
   }
-}
 
+}

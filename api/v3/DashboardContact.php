@@ -51,7 +51,7 @@ function civicrm_api3_dashboard_contact_create($params) {
   if ($errors !== NULL) {
     return $errors;
   }
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'DashboardContact');
 }
 
 /**

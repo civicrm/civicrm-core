@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
@@ -51,10 +51,17 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   public $isBackOffice = FALSE;
 
   /**
+   * @var String
+   */
+  public $_formName = '';
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
     parent::preProcess();
+
+    $this->_formName = CRM_Utils_Request::retrieve('formName', 'String', $this);
 
     $this->_values['custom_pre_id'] = CRM_Utils_Request::retrieve('pre_profile_id', 'Integer', $this);
 
@@ -82,9 +89,14 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   }
 
   /**
+   * Get currency
+   *
+   * @param array $submittedValues
+   *   Required for consistency with other form methods.
+   *
    * @return string
    */
-  public function getCurrency() {
+  public function getCurrency($submittedValues = array()) {
     return $this->currency;
   }
 

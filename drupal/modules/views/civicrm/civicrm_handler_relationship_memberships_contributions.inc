@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Field handler to provide relationship between memberships and contributions
@@ -33,16 +33,17 @@ class civicrm_handler_relationship_memberships_contributions extends views_handl
   /**
    * Called to implement a relationship in a query.
    */
-  function query() {
+  public function query() {
     $join = new views_join();
-    if($this->options['table'] == "civicrm_membership"){
+    if ($this->options['table'] == "civicrm_membership") {
       $join->definition = array(
         'left_table' => 'civicrm_membership',
         'left_field' => 'id',
         'table' => 'civicrm_membership_payment',
         'field' => 'membership_id',
       );
-    }else{
+    }
+    else {
       $join->definition = array(
         'left_table' => 'civicrm_contribution',
         'left_field' => 'id',
@@ -60,7 +61,6 @@ class civicrm_handler_relationship_memberships_contributions extends views_handl
     $join->construct();
 
     $this->first_join = $this->query->add_table('civicrm_membership_payment', $this->relationship, $join);
-
 
     // Then, create a relationship on that table:
     $join = new views_join();
@@ -81,5 +81,5 @@ class civicrm_handler_relationship_memberships_contributions extends views_handl
 
     $this->alias = $this->query->add_relationship($alias, $join, $this->definition['base'], $this->relationship);
   }
-}
 
+}

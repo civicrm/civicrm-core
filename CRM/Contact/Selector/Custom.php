@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id: Selector.php 11510 2007-09-18 09:21:34Z lobo $
  */
 
@@ -297,7 +297,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
       $contactQueryObj = $this->_search->getQueryObj();
     }
 
-    $dao = CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($sql);
 
     $columns = $this->_search->columns();
     $columnNames = array_values($columns);
@@ -424,7 +424,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    * @return Object
    */
-  public function contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
+  public function contactIDQuery($params, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
     // $action, $displayRelationshipType and $queryOperator are unused. I have
     // no idea why they are there.
 

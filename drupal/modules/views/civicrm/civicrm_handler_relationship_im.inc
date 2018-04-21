@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Field handler to provide relationship to CiviCRM Instant Messaging.
@@ -31,7 +31,7 @@
 class civicrm_handler_relationship_im extends civicrm_handler_relationship_location {
 
   static $_provider;
-  function construct() {
+  public function construct() {
     parent::construct();
     if (!self::$_provider) {
       if (!civicrm_initialize()) {
@@ -41,13 +41,13 @@ class civicrm_handler_relationship_im extends civicrm_handler_relationship_locat
     }
   }
 
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['provider'] = array('default' => 0);
     return $options;
   }
 
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $imOptions = array(0 => 'Any');
     foreach (self::$_provider as $id => $type) {
@@ -63,7 +63,7 @@ class civicrm_handler_relationship_im extends civicrm_handler_relationship_locat
     );
   }
 
-  function join_im($join = array()) {
+  public function join_im($join = array()) {
     $extra = array();
     if (isset($join->extra)) {
       $extra = $join->extra;
@@ -82,7 +82,7 @@ class civicrm_handler_relationship_im extends civicrm_handler_relationship_locat
     return $join;
   }
 
-  function get_join() {
+  public function get_join() {
     $join = parent::get_join();
     $join = $this->join_im($join);
     return $join;
@@ -91,7 +91,7 @@ class civicrm_handler_relationship_im extends civicrm_handler_relationship_locat
   /**
    * Called to implement a relationship in a query.
    */
-  function query() {
+  public function query() {
     $join = $this->get_join();
     $this->alias = $this->query->add_table($this->table, $this->relationship, $join);
     //register relationship
@@ -102,5 +102,5 @@ class civicrm_handler_relationship_im extends civicrm_handler_relationship_locat
       'base' => $this->table,
     );
   }
-}
 
+}

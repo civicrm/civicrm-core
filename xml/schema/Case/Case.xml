@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<table>
+  <base>CRM/Case</base>
+  <class>Case</class>
+  <name>civicrm_case</name>
+  <comment>This table stores information about cases grouping activities.</comment>
+  <add>1.8</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <uniqueName>case_id</uniqueName>
+    <required>true</required>
+    <import>true</import>
+    <title>Case ID</title>
+    <comment>Unique Case ID</comment>
+    <add>1.8</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <uniqueName>case_contact_id</uniqueName>
+    <required>true</required>
+    <comment>Contact ID of contact record given case belongs to.</comment>
+    <add>1.8</add>
+    <drop>2.1</drop>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.8</add>
+    <drop>2.1</drop>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>case_type_id</name>
+    <type>int unsigned</type>
+    <import>true</import>
+    <export>false</export>
+    <title>Case Type</title>
+    <required>true</required>
+    <comment>FK to civicrm_case_type.id</comment>
+    <html>
+      <type>Select</type>
+    </html>
+    <pseudoconstant>
+      <table>civicrm_case_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <add>2.0</add>
+  </field>
+  <index>
+    <name>index_case_type_id</name>
+    <fieldName>case_type_id</fieldName>
+    <add>2.0</add>
+  </index>
+  <foreignKey>
+    <name>case_type_id</name>
+    <table>civicrm_case_type</table>
+    <key>id</key>
+    <add>4.5</add>
+  </foreignKey>
+  <field>
+    <name>casetag1_id</name>
+    <type>varchar</type>
+    <length>128</length>
+    <required>true</required>
+    <comment>Id of first case category.</comment>
+    <add>1.8</add>
+    <drop>2.0</drop>
+  </field>
+  <index>
+    <name>index_casetag1_id</name>
+    <fieldName>casetag1_id</fieldName>
+    <add>1.8</add>
+    <drop>2.0</drop>
+  </index>
+  <field>
+    <name>casetag2_id</name>
+    <type>varchar</type>
+    <length>128</length>
+    <required>true</required>
+    <comment>Id of second case category.</comment>
+    <add>1.8</add>
+    <drop>2.0</drop>
+  </field>
+  <index>
+    <name>index_casetag2_id</name>
+    <fieldName>casetag2_id</fieldName>
+    <add>1.8</add>
+    <drop>2.0</drop>
+  </index>
+  <field>
+    <name>casetag3_id</name>
+    <type>varchar</type>
+    <length>128</length>
+    <required>true</required>
+    <comment>Id of third case category.</comment>
+    <add>1.8</add>
+    <drop>2.0</drop>
+  </field>
+  <index>
+    <name>index_casetag3_id</name>
+    <fieldName>casetag3_id</fieldName>
+    <add>1.8</add>
+    <drop>2.0</drop>
+  </index>
+  <field>
+    <name>subject</name>
+    <type>varchar</type>
+    <length>128</length>
+    <title>Case Subject</title>
+    <import>true</import>
+    <uniqueName>case_subject</uniqueName>
+    <comment>Short name of the case.</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>start_date</name>
+    <uniqueName>case_start_date</uniqueName>
+    <title>Case Start Date</title>
+    <import>true</import>
+    <type>date</type>
+    <comment>Date on which given case starts.</comment>
+    <html>
+      <type>Select Date</type>
+    </html>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>end_date</name>
+    <uniqueName>case_end_date</uniqueName>
+    <title>Case End Date</title>
+    <import>true</import>
+    <type>date</type>
+    <comment>Date on which given case ends.</comment>
+    <html>
+      <type>Select Date</type>
+    </html>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>details</name>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>8</rows>
+      <cols>60</cols>
+    </html>
+    <comment>Details about the meeting (agenda, notes, etc).</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>status_id</name>
+    <type>int unsigned</type>
+    <uniqueName>case_status_id</uniqueName>
+    <required>true</required>
+    <import>true</import>
+    <export>false</export>
+    <title>Case Status</title>
+    <comment>Id of case status.</comment>
+    <pseudoconstant>
+      <optionGroupName>case_status</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>is_deleted</name>
+    <title>Case is in the Trash</title>
+    <uniqueName>case_deleted</uniqueName>
+    <type>boolean</type>
+    <default>0</default>
+    <import>true</import>
+    <title>Case Deleted</title>
+    <add>2.2</add>
+  </field>
+  <index>
+    <name>index_is_deleted</name>
+    <fieldName>is_deleted</fieldName>
+    <add>2.2</add>
+  </index>
+  <field>
+    <name>created_date</name>
+    <uniqueName>case_created_date</uniqueName>
+    <type>timestamp</type>
+    <comment>When was the case was created.</comment>
+    <required>false</required>
+    <export>true</export>
+    <default>NULL</default>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <uniqueName>case_modified_date</uniqueName>
+    <type>timestamp</type>
+    <comment>When was the case (or closely related entity) was created or modified or deleted.</comment>
+    <required>false</required>
+    <export>true</export>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <add>4.7</add>
+  </field>
+</table>

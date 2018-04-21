@@ -46,7 +46,7 @@ function civicrm_api3_payment_processor_create($params) {
       'return' => 'payment_instrument_id',
     ));
   }
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'PaymentProcessor');
 }
 
 /**

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contribute</base>
+  <class>ContributionProduct</class>
+  <name>civicrm_contribution_product</name>
+  <add>1.4</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Contribution Product ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>1.4</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>product_id</name>
+    <title>Product ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>contribution_id</name>
+    <title>Contribution ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>1.4</add>
+  </field>
+  <foreignKey>
+    <name>contribution_id</name>
+    <table>civicrm_contribution</table>
+    <key>id</key>
+    <add>1.4</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>product_option</name>
+    <title>Product Option</title>
+    <type>varchar</type>
+    <length>255</length>
+    <export>true</export>
+    <comment>Option value selected if applicable - e.g. color, size etc.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>quantity</name>
+    <title>Quantity</title>
+    <type>int</type>
+    <export>true</export>
+    <comment></comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>total_cost</name>
+    <type>decimal</type>
+    <required>true</required>
+    <import>true</import>
+    <headerPattern>/^total|(.?^am(ou)?nt)/i</headerPattern>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
+    <comment>quantity X civicrm_product.cost.</comment>
+    <add>1.3</add>
+    <drop>4.1</drop>
+  </field>
+  <field>
+    <name>fulfilled_date</name>
+    <type>date</type>
+    <title>Fulfilled Date</title>
+    <export>true</export>
+    <comment>Optional. Can be used to record the date this product was fulfilled or shipped.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>start_date</name>
+    <uniqueName>contribution_start_date</uniqueName>
+    <title>Start date for premium</title>
+    <type>date</type>
+    <export>true</export>
+    <comment>Actual start date for a time-delimited premium (subscription, service or membership)</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>end_date</name>
+    <uniqueName>contribution_end_date</uniqueName>
+    <type>date</type>
+    <title>End date for premium</title>
+    <export>true</export>
+    <comment>Actual end date for a time-delimited premium (subscription, service or membership)</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>comment</name>
+    <title>Premium comment</title>
+    <type>text</type>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>financial_type_id</name>
+    <title>Financial Type</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>FK to Financial Type(for membership price sets only).</comment>
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+    <add>4.3</add>
+  </foreignKey>
+</table>

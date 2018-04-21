@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * sort handler to properly pass the field type for date fields.
@@ -35,11 +35,11 @@ class civicrm_handler_sort_address_pseudoconstant extends views_handler_sort {
    */
   private   $_join_alias;
 
-  function ensure_my_table() {
+  public function ensure_my_table() {
     $join_table = $this->definition['join_table'];
     $join_field = $this->definition['join_field'];
     $join_left_field = $this->definition['join_left_field'];
-    
+
     $alias = parent::ensure_my_table();
 
     // Use the relationship if one is specified; otherwise, use the base table_alias.
@@ -67,10 +67,9 @@ class civicrm_handler_sort_address_pseudoconstant extends views_handler_sort {
     return $table_alias;
   }
 
-  function query() {
+  public function query() {
     $this->ensure_my_table();
     $this->query->add_orderby($this->_join_alias, 'name', $this->options['order']);
   }
 
 }
-

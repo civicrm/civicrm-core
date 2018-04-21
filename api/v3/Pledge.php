@@ -42,10 +42,7 @@
  */
 function civicrm_api3_pledge_create($params) {
   _civicrm_api3_pledge_format_params($params, TRUE);
-  $values = $params;
-  //format the custom fields
-  _civicrm_api3_custom_format_params($params, $values, 'Pledge');
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $values);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Pledge');
 }
 
 /**

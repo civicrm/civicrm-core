@@ -40,7 +40,7 @@
  * @throws \API_Exception
  */
 function civicrm_api3_message_template_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'MessageTemplate');
 }
 
 /**

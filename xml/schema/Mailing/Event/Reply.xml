@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing/Event</base>
+  <class>Reply</class>
+  <name>civicrm_mailing_event_reply</name>
+  <comment>Tracks when a contact replies to a mailing</comment>
+  <archive>true</archive>
+  <field>
+    <name>id</name>
+    <title>Reply ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>event_queue_id</name>
+    <title>Event Queue</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to EventQueue</comment>
+  </field>
+  <foreignKey>
+    <name>event_queue_id</name>
+    <table>civicrm_mailing_event_queue</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>time_stamp</name>
+    <title>Reply Timestamp</title>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
+    <required>true</required>
+    <comment>When this reply event occurred.</comment>
+  </field>
+</table>

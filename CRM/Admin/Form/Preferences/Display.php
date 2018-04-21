@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -37,6 +37,7 @@
 class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('Settings - Display Preferences'));
+    $optionValues = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
 
     $this->_varNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
@@ -103,6 +104,13 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'html_type' => 'checkbox',
           'title' => ts('Enable Popup Forms'),
           'weight' => 13,
+        ),
+        'do_not_notify_assignees_for' => array(
+          'html_type' => 'select',
+          'option_values' => $optionValues,
+          'attributes' => array('multiple' => 1, "class" => "huge crm-select2"),
+          'title' => ts('Do not notify assignees for'),
+          'weight' => 14,
         ),
       ),
     );

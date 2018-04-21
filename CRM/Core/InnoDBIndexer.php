@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -91,6 +91,10 @@ class CRM_Core_InnoDBIndexer {
    *   Specification of the setting (per *.settings.php).
    */
   public static function onToggleFts($oldValue, $newValue, $metadata) {
+    if (empty($oldValue) && empty($newValue)) {
+      return;
+    }
+
     $indexer = CRM_Core_InnoDBIndexer::singleton();
     $indexer->setActive($newValue);
     $indexer->fixSchemaDifferences();

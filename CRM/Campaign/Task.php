@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -36,22 +36,15 @@
  *
  * Used by the search forms.
  */
-class CRM_Campaign_Task {
-  const INTERVIEW = 1, RESERVE = 2, RELEASE = 3, PRINT_VOTERS = 4;
+class CRM_Campaign_Task extends CRM_Core_Task {
 
-  /**
-   * The task array
-   *
-   * @var array
-   */
-  static $_tasks = NULL;
+  const
+    // Campaign tasks
+    INTERVIEW = 601,
+    RESERVE = 602,
+    RELEASE = 603;
 
-  /**
-   * The optional task array
-   *
-   * @var array
-   */
-  static $_optionalTasks = NULL;
+  static $objectType = 'campaign';
 
   /**
    * These tasks are the core set of tasks that the user can perform
@@ -60,10 +53,10 @@ class CRM_Campaign_Task {
    * @return array
    *   the set of tasks for a group of voters.
    */
-  public static function &tasks() {
+  public static function tasks() {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
-        1 => array(
+        self::INTERVIEW => array(
           'title' => ts('Record Respondents Interview'),
           'class' => array(
             'CRM_Campaign_Form_Task_Interview',
@@ -71,7 +64,7 @@ class CRM_Campaign_Task {
           ),
           'result' => FALSE,
         ),
-        2 => array(
+        self::RESERVE => array(
           'title' => ts('Reserve Respondents'),
           'class' => array(
             'CRM_Campaign_Form_Task_Reserve',
@@ -80,40 +73,22 @@ class CRM_Campaign_Task {
           ),
           'result' => FALSE,
         ),
-        3 => array(
+        self::RELEASE => array(
           'title' => ts('Release Respondents'),
           'class' => 'CRM_Campaign_Form_Task_Release',
           'result' => FALSE,
         ),
-        4 => array(
+        self::TASK_PRINT => array(
           'title' => ts('Print Respondents'),
           'class' => 'CRM_Campaign_Form_Task_Print',
           'result' => FALSE,
         ),
       );
 
-      CRM_Utils_Hook::searchTasks('campaign', self::$_tasks);
-      asort(self::$_tasks);
+      parent::tasks();
     }
 
     return self::$_tasks;
-  }
-
-  /**
-   * These tasks are the core set of task titles
-   * on voters.
-   *
-   * @return array
-   *   the set of task titles
-   */
-  public static function &taskTitles() {
-    self::tasks();
-    $titles = array();
-    foreach (self::$_tasks as $id => $value) {
-      $titles[$id] = $value['title'];
-    }
-
-    return $titles;
   }
 
   /**
@@ -121,13 +96,15 @@ class CRM_Campaign_Task {
    * of the user
    *
    * @param int $permission
+   * @param array $params
    *
    * @return array
    *   set of tasks that are valid for the user
    */
-  public static function &permissionedTaskTitles($permission) {
+  public static function permissionedTaskTitles($permission, $params = array()) {
     $tasks = self::taskTitles();
 
+    $tasks = parent::corePermissionedTaskTitles($tasks, $permission, $params);
     return $tasks;
   }
 
@@ -143,8 +120,8 @@ class CRM_Campaign_Task {
   public static function getTask($value) {
     self::tasks();
     if (!$value || !CRM_Utils_Array::value($value, self::$_tasks)) {
-      // make the interview task by default
-      $value = 1;
+      // Set the interview task as default
+      $value = self::INTERVIEW;
     }
 
     return array(

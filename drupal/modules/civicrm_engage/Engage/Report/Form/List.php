@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * @copyright DharmaTech  (c) 2009
  * $Id$
  *
@@ -42,59 +42,59 @@ require_once 'CRM/Core/DAO.php';
  */
 class Engage_Report_Form_List extends CRM_Report_Form {
   /*
-     * Note: In order to detect column names of a particular custom group, we need to know 
-     * custom field ID or LABEL. Since labels are less likely to change on initial setup of the module, 
-     * we 'll use label constants for now.
-     *
-     * Please note these values 'll need to be adjusted if custom field labels are modified.
-     *
-     */
-  CONST CF_CONSTITUENT_TYPE_NAME = 'constituent_type', CF_OTHER_NAME_NAME = 'other_name', CG_VOTER_INFO_TABLE = 'civicrm_value_voter_info', CF_PARTY_REG_NAME = 'party_registration', CF_VOTER_HISTORY_NAME = 'voter_history', CG_DEMOGROPHICS_TABLE = 'civicrm_value_demographics';
+   * Note: In order to detect column names of a particular custom group, we need to know
+   * custom field ID or LABEL. Since labels are less likely to change on initial setup of the module,
+   * we 'll use label constants for now.
+   *
+   * Please note these values 'll need to be adjusted if custom field labels are modified.
+   *
+   */
+  const CF_CONSTITUENT_TYPE_NAME = 'constituent_type', CF_OTHER_NAME_NAME = 'other_name', CG_VOTER_INFO_TABLE = 'civicrm_value_voter_info', CF_PARTY_REG_NAME = 'party_registration', CF_VOTER_HISTORY_NAME = 'voter_history', CG_DEMOGROPHICS_TABLE = 'civicrm_value_demographics';
 
   /**
-   *  Address information needed in output
-   *  @var boolean
+   * Address information needed in output
+   * @var boolean
    */
   protected $_addressField = FALSE;
 
   /**
-   *  Email address needed in output
-   *  @var boolean
+   * Email address needed in output
+   * @var boolean
    */
   protected $_emailField = FALSE;
 
   /**
-   *  Demographic information needed in output
-   *  @var boolean
+   * Demographic information needed in output
+   * @var boolean
    */
   protected $_demoField = FALSE;
 
   protected $_coreField = FALSE;
 
   /**
-   *  Phone number needed in output
-   *  @var boolean
+   * Phone number needed in output
+   * @var boolean
    */
   protected $_phoneField = FALSE;
 
   /**
-   *  Group membership information needed in output
-   *  @var boolean
+   * Group membership information needed in output
+   * @var boolean
    */
   protected $_groupField = FALSE;
 
   /**
-   *  Voter Info information needed in output
-   *  @var boolean
+   * Voter Info information needed in output
+   * @var boolean
    */
   protected $_voterInfoField = FALSE;
 
   protected $_contributionField = FALSE;
 
   /**
-   *  Constituent individual table name has changed
-   *  between versions of civicrm. Populate this field
-   *  dynamically to ensure backward compatability
+   * Constituent individual table name has changed
+   * between versions of civicrm. Populate this field
+   * dynamically to ensure backward compatability
    */
   protected $_constituentIndividualTable = FALSE;
 
@@ -107,36 +107,36 @@ class Engage_Report_Form_List extends CRM_Report_Form {
   protected $_summary = NULL;
 
   /**
-   *  Available contact type options
-   *  @var string[]
+   * Available contact type options
+   * @var string[]
    */
   protected $_contactType = NULL;
 
   /**
-   *  Available gender options
-   *  @var string[]
+   * Available gender options
+   * @var string[]
    */
   protected $_gender = NULL;
 
   /**
-   *  Available group options
-   *  @var string[]
+   * Available group options
+   * @var string[]
    */
   protected $_groups = NULL;
 
   protected $_groupDescr = NULL;
 
   /**
-   *  Available primary language options
-   *  @var string[]
+   * Available primary language options
+   * @var string
    */
   protected $_languages = NULL;
 
   protected $_orgName = NULL;
 
   /**
-   *  Table with Voter Info group information
-   *  @var string
+   * Table with Voter Info group information
+   * @var string
    */
   protected $_voterInfoTable;
 
@@ -151,20 +151,20 @@ class Engage_Report_Form_List extends CRM_Report_Form {
   protected $_coreOtherCol;
 
   /**
-   *  Column in $_voterInfoTable with party registration information
-   *  @var string
+   * Column in $_voterInfoTable with party registration information
+   * @var string
    */
   protected $_partyCol;
 
   /**
-   *  Available party registration options
-   *  @var string[]
+   * Available party registration options
+   * @var string[]
    */
   protected $_partyRegs = array();
 
   /**
-   *  Column in $_voterInfoTable with voter history information
-   *  @var string
+   * Column in $_voterInfoTable with voter history information
+   * @var string
    */
   protected $_vhCol; function __construct() {
     // Find the invidual constituent table (varies between versions)
@@ -221,7 +221,6 @@ WHERE ov.option_group_id = (
       $this->_contactType[$dao->value] = $dao->label;
     }
 
-
     // ** demographics ** //
     $query = "SELECT id, table_name FROM civicrm_custom_group WHERE table_name='" . self::CG_DEMOGROPHICS_TABLE . "'";
     $dao = CRM_Core_DAO::executeQuery($query);
@@ -260,7 +259,6 @@ WHERE custom_group_id={$coreInfoTableID} AND column_name='" . self::CF_CONSTITUE
     $dao->fetch();
     $this->_coreTypeCol = $dao->column_name;
 
-
     //  Get language option values, English on top
     $this->_languages = array('' => '');
     $query = "
@@ -285,7 +283,7 @@ ORDER BY ov.label
     parent::__construct();
   }
 
-  function setDefaultValues($freeze = TRUE) {
+  public function setDefaultValues($freeze = TRUE) {
     $defaults = parent::setDefaultValues($freeze);
     $defaults['report_header'] = '
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -348,13 +346,14 @@ ORDER BY ov.label
     return $defaults;
   }
 
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
   }
 
-  function getOperationPair($type = "string", $fieldName = NULL) {
+  public function getOperationPair($type = "string", $fieldName = NULL) {
     if ($fieldName == 'gid' && $type == CRM_Report_Form::OP_MULTISELECT) {
-      return array('in' => ts('Is one of'),
+      return array(
+        'in' => ts('Is one of'),
         'mand' => ts('Is equal to'),
       );
     }
@@ -363,7 +362,7 @@ ORDER BY ov.label
     }
   }
 
-  function engageWhereGroupClause($clause) {
+  public function engageWhereGroupClause($clause) {
     $smartGroupQuery = "";
     require_once 'CRM/Contact/DAO/Group.php';
     require_once 'CRM/Contact/BAO/SavedSearch.php';
@@ -418,7 +417,7 @@ ORDER BY ov.label
     }
   }
 
-  function select() {
+  public function select() {
     $select = array();
     //var_dump($this->_params);
     $this->_columnHeaders = array();
@@ -465,7 +464,7 @@ ORDER BY ov.label
   }
 
   /**
-   *  Generate FROM clause for SQL SELECT
+   * Generate FROM clause for SQL SELECT
    */
   protected function from() {
 
@@ -502,14 +501,13 @@ ORDER BY ov.label
       $this->_from .= " LEFT JOIN " . $this->_coreInfoTable . "   AS " . $this->_aliases[$this->_coreInfoTable] . " ON {$this->_aliases['civicrm_contact']}.id =" . $this->_aliases[$this->_coreInfoTable] . ".entity_id\n";
     }
 
-
     if ($this->_voterInfoField) {
       $this->_from .= " LEFT JOIN {$this->_voterInfoTable}" . "   AS {$this->_aliases[$this->_voterInfoTable]}" . " ON {$this->_aliases['civicrm_contact']}.id =" . "{$this->_aliases[$this->_voterInfoTable]}.entity_id\n";
     }
   }
 
   /**
-   *  Interpret the 'order_by' keys in selected fields
+   * Interpret the 'order_by' keys in selected fields
    */
   public function orderBy() {
     $this->_orderBy = "";
@@ -524,10 +522,10 @@ ORDER BY ov.label
   }
 
   /**
-   *  Convert a string of fields separated by \x01 to a
-   *  string of fields separated by commas
+   * Convert a string of fields separated by \x01 to a
+   * string of fields separated by commas
    */
-  function hexOne2str($hexOne) {
+  public function hexOne2str($hexOne) {
     $hexOneArray = explode("\x01", $hexOne);
     foreach ($hexOneArray as $key => $value) {
       if (empty($value)) {
@@ -538,24 +536,24 @@ ORDER BY ov.label
   }
 
   /**
-   *  Convert MySQL YYYY-MM-DD HH:MM:SS date of birth timestamp to
-   *  current age
+   * Convert MySQL YYYY-MM-DD HH:MM:SS date of birth timestamp to
+   * current age
    */
-  function dob2age($myTimestamp) {
+  public function dob2age($myTimestamp) {
     //  Separate parts of DOB timestamp
     $matches = array();
     preg_match('/(\d\d\d\d)-(\d\d)-(\d\d)/',
       $myTimestamp, $matches
     );
     //var_dump($matches);
-    $dobYear  = (int)$matches[1];
-    $dobMonth = (int)$matches[2];
-    $dobDay   = (int)$matches[3];
+    $dobYear = (int) $matches[1];
+    $dobMonth = (int) $matches[2];
+    $dobDay  = (int) $matches[3];
     //echo "DOB year=$dobYear month=$dobMonth day=$dobDay<br>";
 
-    $nowYear  = (int)strftime('%Y');
-    $nowMonth = (int)strftime('%m');
-    $nowDay   = (int)strftime('%d');
+    $nowYear = (int) strftime('%Y');
+    $nowMonth = (int) strftime('%m');
+    $nowDay  = (int) strftime('%d');
     //echo "Now year=$nowYear month=$nowMonth day=$nowDay<br>";
     //  Calculate age
     if ($dobMonth < $nowMonth) {
@@ -581,5 +579,5 @@ ORDER BY ov.label
     //echo "age=$age years<br>";
     return $age;
   }
-}
 
+}

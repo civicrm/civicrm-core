@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -986,7 +986,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     if ($this->_isPaidEvent) {
 
-      $contributionParams = array();
+      $contributionParams = array('skipCleanMoney' => TRUE);
       $lineItem = array();
       $additionalParticipantDetails = array();
       if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
@@ -1029,6 +1029,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
         //lets carry currency, CRM-4453
         $params['fee_currency'] = $config->defaultCurrency;
+        if (!isset($lineItem[0])) {
+          $lineItem[0] = array();
+        }
         CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'],
           $params, $lineItem[0]
         );
@@ -1305,9 +1308,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         'participant_id' => $participants[0]->id,
         'contribution_id' => $contribution->id,
       );
-      $ids = array();
 
-      CRM_Event_BAO_ParticipantPayment::create($paymentParticipant, $ids);
+      CRM_Event_BAO_ParticipantPayment::create($paymentParticipant);
       $this->_contactIds[] = $this->_contactId;
     }
     else {
@@ -1666,7 +1668,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           //add dataArray in the receipts in ADD and UPDATE condition
           $dataArray = array();
           if ($this->_action & CRM_Core_Action::ADD) {
-            $line = $lineItem[0];
+            $line = isset($lineItem[0]) ? $lineItem[0] : array();
           }
           elseif ($this->_action & CRM_Core_Action::UPDATE) {
             $line = $this->_values['line_items'];

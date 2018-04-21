@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Field handler to provide acess control for the state field (which is a lookup)
@@ -31,7 +31,7 @@
 class civicrm_handler_field_state extends civicrm_handler_field_address {
   static $_states;
   static $_states_full;
-  function construct() {
+  public function construct() {
     parent::construct();
     if (!self::$_states || !self::$_states_full) {
       if (!civicrm_initialize()) {
@@ -43,31 +43,29 @@ class civicrm_handler_field_state extends civicrm_handler_field_address {
     }
   }
 
-  function render($values) {
+  public function render($values) {
     $sid = $values->{$this->field_alias};
-    if (empty($sid) ||
-      (int ) $sid <= 0
-    ) {
+    if (empty($sid) || (int) $sid <= 0) {
       return NULL;
     }
 
     if ($this->options['prov_display'] == 1) {
-      return  isset(self::$_states[$values->{$this->field_alias}])
-        ? self::$_states[$values->{$this->field_alias}]: NULL;
+      return isset(self::$_states[$values->{$this->field_alias}])
+        ? self::$_states[$values->{$this->field_alias}] : NULL;
     }
     else {
       return isset(self::$_states_full[$values->{$this->field_alias}])
-        ? self::$_states_full[$values->{$this->field_alias}]: NULL;
+        ? self::$_states_full[$values->{$this->field_alias}] : NULL;
     }
   }
 
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['prov_display'] = array('default' => '');
     return $options;
   }
 
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $form['prov_display'] = array(
       '#type' => 'radios',
@@ -77,5 +75,5 @@ class civicrm_handler_field_state extends civicrm_handler_field_address {
       '#default_value' => $this->options['prov_display'],
     );
   }
-}
 
+}

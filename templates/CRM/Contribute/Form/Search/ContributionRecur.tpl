@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -68,6 +68,13 @@
         <td>{ts}Cancel Date{/ts}</td>
         <td>
           {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_cancel_date" from='_low' to='_high'}
+        </td>
+      </tr>
+      <tr>
+        <td>{ts}Recurring Contribution Status{/ts}</td>
+        <td></td>
+        <td col='span2'>
+          {$form.contribution_recur_contribution_status_id.html|crmAddClass:twenty}
         </td>
       </tr>
       {if $contributionRecurGroupTree}

@@ -26,7 +26,7 @@
  * Drupal module file.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 require_once 'civicrm_user.inc';
 
@@ -187,27 +187,24 @@ function civicrm_initialize() {
       )
     );
 
-    if (!include_once($settingsFile)) {
+    if (!include_once $settingsFile) {
       $failure = TRUE;
-      drupal_set_message("<strong><p class='error'>" .
-        t("Oops! - The CiviCRM settings file (civicrm.settings.php) was not found in the expected location ") .
-        "(" . $settingsFile . "). </p><p class='error'>" .
-        $errorMsgAdd . '</p></strong>'
-      );
+      $message = t("<strong><p class='error'> Oops! - The CiviCRM settings file (civicrm.settings.php) was not found in the expected location (!1) </p><p class='error'> !2 </p></strong>", array(
+        '!1' => $settingsFile,
+        '!2' => $errorMsgAdd,
+      ));
+      drupal_set_message($message);
       return FALSE;
     }
 
     // this does pretty much all of the civicrm initialization
-    if (!include_once('CRM/Core/Config.php')) {
+    if (!include_once 'CRM/Core/Config.php') {
       $failure = TRUE;
-      drupal_set_message("<strong><p class='error'>" .
-        t("Oops! - The path for including CiviCRM code files is not set properly. Most likely there is an error in the <em>civicrm_root</em> setting in your CiviCRM settings file (!1).",
-          array('!1' => $settingsFile)
-        ) .
-        "</p><p class='error'> &raquo; " .
-        t("civicrm_root is currently set to: <em>!1</em>.", array(
-          '!1' => $civicrm_root)) .
-        "</p><p class='error'>" . $errorMsgAdd . "</p></strong>"
+      drupal_set_message(t("<strong><p class='error'>Oops! - The path for including CiviCRM code files is not set properly. Most likely there is an error in the <em>civicrm_root</em> setting in your CiviCRM settings file (!1). </p><p class='error'> &raquo; civicrm_root is currently set to: <em>!2</em></p><p class='error'>!3</p></strong>", array(
+          '!1' => $settingsFile,
+          '!2' => $civicrm_root,
+          '!3' => $errorMsgAdd,
+        ))
       );
       return FALSE;
     }
@@ -477,7 +474,7 @@ function _civicrm_categories_access($profile_id) {
   }
 }
 
-/*
+/**
  * Translating profile menu title dynamicaly to overide caching
  */
 function civicrm_menu_alter(&$items) {
@@ -603,7 +600,6 @@ function civicrm_form_data($edit, &$user, $category, $reset, $doNotProcess = FAL
 
   $html = CRM_Core_BAO_UFGroup::getEditHTML($userID, $category, NULL, FALSE, $reset, $profileID, $doNotProcess, $ctype);
 
-
   if ($html) {
     $title = CRM_Core_DAO::getFieldValue("CRM_Core_DAO_UFGroup", $profileID, 'title', 'id');
     $html = civicrm_add_jquery($html);
@@ -644,7 +640,7 @@ function _civicrm_get_user_profile_id($name) {
     $profiles = civicrm_api3('uf_group', 'get', array(
       'title' => $name,
       'is_active' => 1,
-      'options' => array('limit' => 1,),
+      'options' => array('limit' => 1),
     ));
   }
 
@@ -696,8 +692,7 @@ function civicrm_user_form_validate($form, &$form_state) {
   $validated = TRUE;
 
   // check for either user/register or admin/people/create
-  $register =
-    ((arg(0) == 'user' && arg(1) == 'register') ||
+  $register = ((arg(0) == 'user' && arg(1) == 'register') ||
     (arg(0) == 'admin' && arg(1) == 'people' && arg(2) == 'create')
   ) ? TRUE : FALSE;
   $userID = NULL;
@@ -736,37 +731,6 @@ function civicrm_key_disable() {
   }
 
   CRM_Core_Config::singleton()->keyDisable = TRUE;
-}
-
-/**
- * Enable CiviCRM.
- */
-function civicrm_enable() {
-  db_query("UPDATE {system} SET weight = 100 WHERE name = 'civicrm'");
-
-  menu_rebuild();
-
-  menu_link_maintain('civicrm', 'delete', 'civicrm', 'CiviCRM');
-
-  $options = array(
-    'link_title' => 'CiviCRM',
-    'link_path' => 'civicrm/dashboard',
-    'module' => 'civicrm',
-    'options' => array('alter' => TRUE),
-  );
-  menu_link_save($options);
-
-  if (!civicrm_initialize()) {
-    return;
-  }
-
-  // also invoke civicrm menu rebuild
-  CRM_Core_Menu::store();
-
-  // Update the 'blocks' DB table with the blocks.
-  if (module_exists('block')) {
-    _block_rehash();
-  }
 }
 
 /**
@@ -942,7 +906,7 @@ function civicrm_user_admin_permissions_submit($form, &$form_state) {
   }
 }
 
-/*
+/**
  *
  * Implements hook_theme_registry_alter().
  *
@@ -954,7 +918,6 @@ function civicrm_user_admin_permissions_submit($form, &$form_state) {
  * Also, add civicrm parameters to links so they are not truncated by the
  * language switcher.
  *
- * @param array $theme_registry
  *   Registry theme metadata.
  */
 function civicrm_theme_registry_alter(&$theme_registry) {
@@ -1250,8 +1213,6 @@ function civicrm_reviews() {
 
 /**
  * Implements hook_modules_installed().
- *
- * @param array $modules
  */
 function civicrm_modules_installed($modules) {
   civicrm_initialize();
@@ -1290,7 +1251,6 @@ function civicrm_modules_uninstalled($modules) {
  *
  * If the metatag module is not installed this function will not fire.
  *
- * @param array $cid_parts
  */
 function civicrm_metatag_page_cache_cid_parts_alter(&$cid_parts) {
   // Avoid substr() because it will not work with Drupal language prefixes.

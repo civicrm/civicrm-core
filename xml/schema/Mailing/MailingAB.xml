@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing</base>
+  <class>MailingAB</class>
+  <name>civicrm_mailing_abtest</name>
+  <comment>Stores information about abtesting</comment>
+  <archive>true</archive>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>MailingAB ID</title>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <type>varchar</type>
+    <length>128</length>
+    <title>Name</title>
+    <comment>Name of the A/B test</comment>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>status</name>
+    <type>varchar</type>
+    <length>32</length>
+    <title>Status</title>
+    <comment>Status</comment>
+    <pseudoconstant>
+      <callback>CRM_Mailing_PseudoConstant::abStatus</callback>
+    </pseudoconstant>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>mailing_id_a</name>
+    <type>int unsigned</type>
+    <title>Mailing ID (A)</title>
+    <comment>The first experimental mailing ("A" condition)</comment>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>mailing_id_b</name>
+    <type>int unsigned</type>
+    <title>Mailing ID (B)</title>
+    <comment>The second experimental mailing ("B" condition)</comment>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>mailing_id_c</name>
+    <type>int unsigned</type>
+    <title>Mailing ID (C)</title>
+    <comment>The final, general mailing (derived from A or B)</comment>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>domain_id</name>
+    <type>int unsigned</type>
+    <title>Domain ID</title>
+    <comment>Which site is this mailing for</comment>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>testing_criteria</name>
+    <type>varchar</type>
+    <length>32</length>
+    <title>Testing Criteria</title>
+    <pseudoconstant>
+      <callback>CRM_Mailing_PseudoConstant::abTestCriteria</callback>
+    </pseudoconstant>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>winner_criteria</name>
+    <type>varchar</type>
+    <length>32</length>
+    <title>Winner Criteria</title>
+    <pseudoconstant>
+      <callback>CRM_Mailing_PseudoConstant::abWinnerCriteria</callback>
+    </pseudoconstant>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>specific_url</name>
+    <type>varchar</type>
+    <title>URL for Winner Criteria</title>
+    <length>255</length>
+    <comment>What specific url to track</comment>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>declare_winning_time</name>
+    <type>datetime</type>
+    <title>Declaration Time</title>
+    <comment>In how much time to declare winner</comment>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>group_percentage</name>
+    <type>int unsigned</type>
+    <title>Group Percentage</title>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>created_id</name>
+    <title>AB Test Created By</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>4.6</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.6</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>created_date</name>
+    <title>AB Test Created Date</title>
+    <type>timestamp</type>
+    <required>false</required>
+    <default>CURRENT_TIMESTAMP</default>
+    <comment>When was this item created</comment>
+    <add>4.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+</table>

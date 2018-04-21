@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -81,6 +81,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
         5 => 'https://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles',
       );
       $preUpgradeMessage .= '<p>' . ts('A new set of batch permissions has been added called "%1", "%2", "%3" and "%4". These permissions are now used to control access to the Accounting Batches tasks. If your users need to be able to Reopen or Close batches you may need to give them additional permissions. <a href=%5>Read more</a>', $params) . '</p>';
+    }
+    if ($rev == '4.7.32') {
+      $preUpgradeMessage .= '<p>' . ts('A new %1 permission has been added. It is not granted by default. If you use SMS, you may wish to review your permissions.', array(1 => 'send SMS')) . '</p>';
     }
   }
 
@@ -437,7 +440,6 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       'civicrm_case', 'created_date', "timestamp NULL  DEFAULT NULL COMMENT 'When was the case was created.'");
     $this->addTask('CRM-20958 - Add modified_date to civicrm_case', 'addColumn',
       'civicrm_case', 'modified_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When was the case (or closely related entity) was created or modified or deleted.'");
-    $this->addTask('Rebuild Multilingual Schema', 'rebuildMultilingalSchema');
   }
 
   /**
@@ -447,6 +449,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    */
   public function upgrade_4_7_27($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('CRM-20892 Change created_date to default to NULL', 'civiMailingCreatedDateNull');
     $this->addTask('CRM-21234 Missing subdivisions of Tajikistan', 'tajikistanMissingSubdivisions');
     $this->addTask('CRM-20892 - Add modified_date to civicrm_mailing', 'addColumn',
       'civicrm_mailing', 'modified_date', "timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When the mailing (or closely related entity) was created or modified or deleted.'");
@@ -455,6 +458,55 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask('CRM-12167 - Add visibility column to civicrm_price_field_value', 'addColumn',
       'civicrm_price_field_value', 'visibility_id', 'int(10) unsigned DEFAULT 1 COMMENT "Implicit FK to civicrm_option_group with name = \'visibility\'"');
     $this->addTask('Remove broken Contribution_logging reports', 'removeContributionLoggingReports');
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_28($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('CRM-20572: Fix date fields in save search criteria of Contrib Sybunt custom search ', 'fixDateFieldsInSmartGroups');
+    // CRM-20868 : Update invoice_numbers (in batch) with value in [invoice prefix][contribution id] format
+    if ($invoicePrefix = CRM_Contribute_BAO_Contribution::checkContributeSettings('invoice_prefix', TRUE)) {
+      list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
+        FROM civicrm_contribution ")->getDatabaseResult()->fetchRow();
+      for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
+        $endId = $startId + self::BATCH_SIZE - 1;
+        $title = ts("Upgrade DB to %1: Update Contribution Invoice number (%2 => %3)", array(
+          1 => $rev,
+          2 => $startId,
+          3 => $endId,
+        ));
+        $this->addTask($title, 'updateContributionInvoiceNumber', $startId, $endId, $invoicePrefix);
+      }
+    }
+
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_31($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('CRM-21225: Add display title field to civicrm_uf_group', 'addColumn', 'civicrm_uf_group', 'frontend_title',
+      "VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL COMMENT 'Profile Form Public title'", TRUE);
+    $this->addTask('Rebuild Multilingual Schema', 'rebuildMultilingalSchema');
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_4_7_32($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+
+    $this->addTask('CRM-21733: Add status_override_end_date field to civicrm_membership table', 'addColumn', 'civicrm_membership', 'status_override_end_date',
+      "date DEFAULT NULL COMMENT 'The end date of membership status override if (Override until selected date) override type is selected.'");
   }
 
   /*
@@ -588,6 +640,27 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     }
 
     return $settings;
+  }
+
+  /**
+   * Update Invoice number for all completed contribution.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function updateContributionInvoiceNumber(CRM_Queue_TaskContext $ctx, $startID, $endID, $invoicePrefix) {
+    CRM_Core_DAO::executeQuery("
+      UPDATE `civicrm_contribution` SET `invoice_number` = CONCAT(%1, `id`)
+       WHERE `id` >= %2 AND `id` <= %3 AND `invoice_number` IS NOT NULL",
+      array(
+        1 => array($invoicePrefix, 'String'),
+        2 => array($startID, 'Integer'),
+        3 => array($endID, 'Integer'),
+      )
+    );
+
+    return TRUE;
   }
 
   /**
@@ -1308,6 +1381,36 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
     $config = CRM_Core_Config::singleton();
     $check = new CRM_Utils_Check_Component_Security();
     return $config->imageUploadDir && $config->imageUploadURL && $check->isDirAccessible($config->imageUploadDir, $config->imageUploadURL);
+  }
+
+  /**
+   * CRM-20572 - Format date fields in Contrib Sybunt custom search's saved criteria.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function fixDateFieldsInSmartGroups(CRM_Queue_TaskContext $ctx) {
+    $dao = CRM_Core_DAO::executeQuery("SELECT id, form_values FROM civicrm_saved_search WHERE form_values LIKE '%CRM_Contact_Form_Search_Custom_ContribSYBNT%'");
+    while ($dao->fetch()) {
+      $formValues = unserialize($dao->form_values);
+      CRM_Contact_Form_Search_Custom_ContribSYBNT::formatSavedSearchFields($formValues);
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_saved_search SET form_values = %1 WHERE id = {$dao->id}", array(1 => array(serialize($formValues), 'String')));
+    }
+    return TRUE;
+  }
+
+  /**
+   * CRM-20892 Convert default of created_date in civicrm_mailing table to NULL
+   * @return bool
+   */
+  public static function civiMailingCreatedDateNull(CRM_Queue_TaskContext $ctx) {
+    $dataType = 'timestamp';
+    if (CRM_Utils_Check_Component_Timestamps::isFieldType('civicrm_mailing', 'created_date', 'datetime')) {
+      $dataType = 'datetime';
+    }
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_mailing CHANGE created_date created_date {$dataType} NULL DEFAULT NULL COMMENT 'Date and time this mailing was created.'");
+    return TRUE;
   }
 
 }

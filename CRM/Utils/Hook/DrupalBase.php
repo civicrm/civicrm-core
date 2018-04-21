@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
 
@@ -91,10 +91,7 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
   public function buildModuleList() {
     if ($this->isBuilt === FALSE) {
       if ($this->drupalModules === NULL) {
-        if (function_exists('module_list')) {
-          // copied from user_module_invoke
-          $this->drupalModules = module_list();
-        }
+        $this->drupalModules = $this->getDrupalModules();
       }
 
       if ($this->civiModules === NULL) {
@@ -125,6 +122,20 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
         // both CRM and CMS have bootstrapped, so this is the final list
         $this->isBuilt = TRUE;
       }
+    }
+  }
+
+  /**
+   * Gets modules installed on the Drupal site.
+   *
+   * @return array|null
+   *   The machine names of the modules installed in Drupal, or NULL if unable
+   *   to determine the modules.
+   */
+  protected function getDrupalModules() {
+    if (function_exists('module_list')) {
+      // copied from user_module_invoke
+      return module_list();
     }
   }
 

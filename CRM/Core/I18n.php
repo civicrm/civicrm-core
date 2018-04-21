@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Core_I18n {
 
@@ -39,6 +39,34 @@ class CRM_Core_I18n {
    */
   const NONE = 'none', AUTO = 'auto';
 
+  /**
+   * @var callable|NULL
+   *   A callback function which handles SQL string encoding.
+   *   Set NULL to use the default, CRM_Core_DAO::escapeString().
+   *   This is used by `ts(..., [escape=>sql])`.
+   *
+   * This option is not intended for general consumption. It is only intended
+   * for certain pre-boot/pre-install contexts.
+   *
+   * You might ask, "Why on Earth does string-translation have an opinion on
+   * SQL escaping?" Good question!
+   */
+  public static $SQL_ESCAPER = NULL;
+
+  /**
+   * Encode a string for use in SQL.
+   *
+   * @param string $text
+   * @return string
+   */
+  protected static function escapeSql($text) {
+    if (self::$SQL_ESCAPER == NULL) {
+      return CRM_Core_DAO::escapeString($text);
+    }
+    else {
+      return call_user_func(self::$SQL_ESCAPER, $text);
+    }
+  }
 
   /**
    * A PHP-gettext instance for string translation;
@@ -289,7 +317,7 @@ class CRM_Core_I18n {
     // in such cases we return early, only doing SQL/JS escaping
     if (isset($params['skip']) and $params['skip']) {
       if (isset($escape) and ($escape == 'sql')) {
-        $text = CRM_Core_DAO::escapeString($text);
+        $text = self::escapeSql($text);
       }
       if (isset($escape) and ($escape == 'js')) {
         $text = addcslashes($text, "'");
@@ -351,7 +379,7 @@ class CRM_Core_I18n {
 
     // escape SQL if we were asked for it
     if (isset($escape) and ($escape == 'sql')) {
-      $text = CRM_Core_DAO::escapeString($text);
+      $text = self::escapeSql($text);
     }
 
     // escape for JavaScript (if requested)
@@ -709,8 +737,8 @@ class CRM_Core_I18n {
  *   the translated string
  */
 function ts($text, $params = array()) {
-  static $config = NULL;
-  static $locale = NULL;
+  static $areSettingsAvailable = FALSE;
+  static $lastLocale = NULL;
   static $i18n = NULL;
   static $function = NULL;
 
@@ -718,17 +746,21 @@ function ts($text, $params = array()) {
     return '';
   }
 
-  if (!$config) {
-    $config = CRM_Core_Config::singleton();
+  // When the settings become available, lookup customTranslateFunction.
+  if (!$areSettingsAvailable) {
+    $areSettingsAvailable = (bool) \Civi\Core\Container::getBootService('settings_manager');
+    if ($areSettingsAvailable) {
+      $config = CRM_Core_Config::singleton();
+      if (isset($config->customTranslateFunction) and function_exists($config->customTranslateFunction)) {
+        $function = $config->customTranslateFunction;
+      }
+    }
   }
 
-  $tsLocale = CRM_Core_I18n::getLocale();
-  if (!$i18n or $locale != $tsLocale) {
+  $activeLocale = CRM_Core_I18n::getLocale();
+  if (!$i18n or $lastLocale != $activeLocale) {
     $i18n = CRM_Core_I18n::singleton();
-    $locale = $tsLocale;
-    if (isset($config->customTranslateFunction) and function_exists($config->customTranslateFunction)) {
-      $function = $config->customTranslateFunction;
-    }
+    $lastLocale = $activeLocale;
   }
 
   if ($function) {

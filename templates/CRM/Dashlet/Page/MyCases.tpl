@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,10 +23,11 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $upcomingCases}
-   <div class="form-item">
-       {include file="CRM/Case/Page/DashboardSelector.tpl" context="$context" list="upcoming" rows=$upcomingCases}
-   </div>
+{if $casePresent}
+  {include file="CRM/Case/Form/CaseFilter.tpl" context="$context" list="my-cases" all="0"}
+  <div class="form-item">
+    {include file="CRM/Case/Page/DashboardSelector.tpl" context="$context" list="my-cases" all="0"}
+  </div>
 {else}
     <div class="messages status no-popup">
      {capture assign="findCasesURL"}{crmURL p='civicrm/case/search' q='reset=1'}{/capture}

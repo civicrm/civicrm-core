@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -127,7 +127,7 @@
                   <td>{$form.assignee_contact_id.html}
                     {if $activityAssigneeNotification}
                       <br />
-                      <span class="description"><i class="crm-i fa-paper-plane"></i> {ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+                      <span id="notify_assignee_msg" class="description"><i class="crm-i fa-paper-plane"></i> {ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
                     {/if}
                   </td>
                 </tr>
@@ -271,18 +271,28 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 
   {if $action eq 1 or $action eq 2}
-  {*include custom data js file*}
-  {include file="CRM/common/customData.tpl"}
+    {*include custom data js file*}
+    {include file="CRM/common/customData.tpl"}
     {literal}
     <script type="text/javascript">
     CRM.$(function($) {
-    {/literal}
-    {if $customDataSubType}
-      CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-      {else}
-      CRM.buildCustomData( '{$customDataType}' );
-    {/if}
-    {literal}
+      var doNotNotifyAssigneeFor = {/literal}{$doNotNotifyAssigneeFor|@json_encode}{literal};
+      $('#activity_type_id').change(function() {
+        if ($.inArray($(this).val(), doNotNotifyAssigneeFor) != -1) {
+          $('#notify_assignee_msg').hide();
+        }
+        else {
+          $('#notify_assignee_msg').show();
+        }
+      });
+
+      {/literal}
+      {if $customDataSubType}
+        CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
+        {else}
+        CRM.buildCustomData( '{$customDataType}' );
+      {/if}
+      {literal}
     });
     </script>
     {/literal}

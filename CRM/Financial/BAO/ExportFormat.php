@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                             |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -49,6 +49,12 @@ abstract class CRM_Financial_BAO_ExportFormat {
    * @var CRM_Core_Smarty
    */
   static protected $_template;
+
+  /**
+   * Download Exported file.
+   * @var boolean
+   */
+  public $_isDownloadFile;
 
   /**
    * Class constructor.
@@ -141,6 +147,9 @@ abstract class CRM_Financial_BAO_ExportFormat {
   }
 
   public function initiateDownload() {
+    if (!$this->_isDownloadFile) {
+      return NULL;
+    }
     $config = CRM_Core_Config::singleton();
     // zip files if more than one.
     if (count($this->_downloadFile) > 1) {

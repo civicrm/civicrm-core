@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -166,25 +166,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->addSortNameField();
-
-    $this->_group = CRM_Core_PseudoConstant::nestedGroup();
-
-    // multiselect for groups
-    if ($this->_group) {
-      $this->add('select', 'group', ts('Groups'), $this->_group, FALSE,
-        array('id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2')
-      );
-    }
-
-    // multiselect for tags
-    $contactTags = CRM_Core_BAO_Tag::getTags();
-
-    if ($contactTags) {
-      $this->add('select', 'contact_tags', ts('Tags'), $contactTags, FALSE,
-        array('id' => 'contact_tags', 'multiple' => 'multiple', 'class' => 'crm-select2')
-      );
-    }
+    $this->addContactSearchFields();
 
     CRM_Contribute_BAO_Query::buildSearchForm($this);
 
@@ -197,11 +179,11 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       $permission = CRM_Core_Permission::getPermission();
 
       $queryParams = $this->get('queryParams');
-      $softCreditFiltering = FALSE;
+      $taskParams['softCreditFiltering'] = FALSE;
       if (!empty($queryParams)) {
-        $softCreditFiltering = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($queryParams);
+        $taskParams['softCreditFiltering'] = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($queryParams);
       }
-      $tasks = CRM_Contribute_Task::permissionedTaskTitles($permission, $softCreditFiltering);
+      $tasks = CRM_Contribute_Task::permissionedTaskTitles($permission, $taskParams);
       $this->addTaskMenu($tasks);
     }
 
@@ -227,6 +209,36 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    */
   protected function getSortNameLabelWithOutEmail() {
     return ts('Contributor Name');
+  }
+
+  /**
+   * Get the label for the tag field.
+   *
+   * We do this in a function so the 'ts' wraps the whole string to allow
+   * better translation.
+   *
+   * @return string
+   */
+  protected function getTagLabel() {
+    return ts('Contributor Tag(s)');
+  }
+
+  /**
+   * Get the label for the group field.
+   *
+   * @return string
+   */
+  protected function getGroupLabel() {
+    return ts('Contributor Group(s)');
+  }
+
+  /**
+   * Get the label for the group field.
+   *
+   * @return string
+   */
+  protected function getContactTypeLabel() {
+    return ts('Contributor Contact Type');
   }
 
   /**

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
 
@@ -283,7 +283,10 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
 
     $query .= $groupBy;
 
-    $orderBy = "sort_name ASC, {$open}.time_stamp DESC";
+    $orderBy = "sort_name ASC";
+    if (!$is_distinct) {
+      $orderBy .= ", {$open}.time_stamp DESC";
+    }
     if ($sort) {
       if (is_string($sort)) {
         $sort = CRM_Utils_Type::escape($sort, 'String');

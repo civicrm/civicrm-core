@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<table>
+  <base>CRM/Pledge</base>
+  <class>Pledge</class>
+  <name>civicrm_pledge</name>
+  <add>2.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <uniqueName>pledge_id</uniqueName>
+    <title>Pledge ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Pledge ID</comment>
+    <import>true</import>
+    <add>2.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <uniqueName>pledge_contact_id</uniqueName>
+    <title>Contact ID</title>
+    <import>true</import>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Foreign key to civicrm_contact.id .</comment>
+    <add>2.1</add>
+    <html>
+       <type>EntityRef</type>
+     </html>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>2.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>contribution_type_id</name>
+    <uniqueName>pledge_contribution_type_id</uniqueName>
+    <export>false</export>
+    <type>int unsigned</type>
+    <comment>FK to Contribution Type. This is propagated to contribution record when pledge payments are made.</comment>
+    <add>2.1</add>
+    <drop>4.3</drop>
+  </field>
+  <foreignKey>
+    <name>contribution_type_id</name>
+    <table>civicrm_contribution_type</table>
+    <key>id</key>
+    <add>2.1</add>
+    <drop>4.3</drop>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>financial_type_id</name>
+    <title>Type</title>
+    <uniqueName>pledge_financial_type_id</uniqueName>
+    <type>int unsigned</type>
+    <comment>FK to Financial Type</comment>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <add>4.3</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
+    <add>4.3</add>
+  </foreignKey>
+  <field>
+    <name>contribution_page_id</name>
+    <uniqueName>pledge_contribution_page_id</uniqueName>
+    <title>Pledge Contribution Page</title>
+    <type>int unsigned</type>
+    <comment>The Contribution Page which triggered this contribution</comment>
+    <add>2.1</add>
+  </field>
+  <foreignKey>
+    <name>contribution_page_id</name>
+    <table>civicrm_contribution_page</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>amount</name>
+    <uniqueName>pledge_amount</uniqueName>
+    <title>Total Pledged</title>
+    <type>decimal</type>
+    <required>true</required>
+    <import>true</import>
+    <comment>Total pledged amount.</comment>
+    <add>2.1</add>
+    <html>
+     <type>Text</type>
+   </html>
+  </field>
+  <field>
+    <name>original_installment_amount</name>
+    <uniqueName>pledge_original_installment_amount</uniqueName>
+    <title>Original Installment Amount</title>
+    <type>decimal</type>
+    <required>true</required>
+    <comment>Original amount for each of the installments.</comment>
+    <add>3.2</add>
+    <html>
+      <type>Text</type>
+    </html>
+    <export>true</export>
+  </field>
+  <field>
+    <name>currency</name>
+    <type>varchar</type>
+    <title>Pledge Currency</title>
+    <length>3</length>
+    <default>NULL</default>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <add>3.2</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>frequency_unit</name>
+    <uniqueName>pledge_frequency_unit</uniqueName>
+    <title>Pledge Frequency Unit</title>
+    <type>varchar</type>
+    <length>8</length>
+    <default>'month'</default>
+    <comment>Time units for recurrence of pledge payments.</comment>
+    <pseudoconstant>
+      <optionGroupName>recur_frequency_units</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
+    <add>2.1</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>frequency_interval</name>
+    <uniqueName>pledge_frequency_interval</uniqueName>
+    <title>Pledge Frequency Interval</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <default>1</default>
+    <comment>Number of time units for recurrence of pledge payments.</comment>
+    <add>2.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>frequency_day</name>
+    <type>int unsigned</type>
+    <title>Pledge day</title>
+    <default>3</default>
+    <required>true</required>
+    <comment>Day in the period when the pledge payment is due e.g. 1st of month, 15th etc. Use this to set the scheduled dates for pledge payments.</comment>
+    <add>2.1</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>installments</name>
+    <type>int unsigned</type>
+    <title>Pledge Number of Installments</title>
+    <default>1</default>
+    <comment>Total number of payments to be made.</comment>
+    <add>2.1</add>
+    <html>
+     <type>Text</type>
+   </html>
+   <export>true</export>
+  </field>
+  <field>
+    <name>start_date</name>
+    <type>datetime</type>
+    <title>Pledge Start Date</title>
+    <required>true</required>
+    <comment>The date the first scheduled pledge occurs.</comment>
+    <add>2.1</add>
+    <html>
+        <type>Select Date</type>
+      </html>
+  </field>
+  <field>
+    <name>create_date</name>
+    <type>datetime</type>
+    <uniqueName>pledge_create_date</uniqueName>
+    <title>Pledge Made</title>
+    <required>true</required>
+    <import>true</import>
+    <comment>When this pledge record was created.</comment>
+    <add>2.1</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>acknowledge_date</name>
+    <type>datetime</type>
+    <title>Pledge Acknowledged</title>
+    <comment>When a pledge acknowledgement message was sent to the contributor.</comment>
+    <add>2.1</add>
+    <html>
+        <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <type>datetime</type>
+    <title>Pledge Modified Date</title>
+    <comment>Last updated date for this pledge record.</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>cancel_date</name>
+    <type>datetime</type>
+    <title>Pledge Cancelled Date</title>
+    <comment>Date this pledge was cancelled by contributor.</comment>
+    <add>2.1</add>
+    <html>
+        <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>end_date</name>
+    <type>datetime</type>
+    <title>Pledge End Date</title>
+    <comment>Date this pledge finished successfully (total pledge payments equal to or greater than pledged amount).</comment>
+    <add>2.1</add>
+    <html>
+        <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>max_reminders</name>
+    <title>Maximum Number of Reminders</title>
+    <type>int unsigned</type>
+    <default>1</default>
+    <comment>The maximum number of payment reminders to send for any given payment.</comment>
+    <html>
+         <type>Text</type>
+       </html>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>initial_reminder_day</name>
+    <title>Initial Reminder Day</title>
+    <type>int unsigned</type>
+    <default>5</default>
+    <comment>Send initial reminder this many days prior to the payment due date.</comment>
+    <add>2.1</add>
+    <html>
+          <type>Select</type>
+        </html>
+  </field>
+  <field>
+    <name>additional_reminder_day</name>
+    <title>Additional Reminder Days</title>
+    <type>int unsigned</type>
+    <default>5</default>
+    <comment>Send additional reminder this many days after last one sent, up to maximum number of reminders.</comment>
+    <add>2.1</add>
+    <html>
+         <type>Text</type>
+       </html>
+  </field>
+  <field>
+    <name>status_id</name>
+    <title>Pledge Status Id</title>
+    <uniqueName>pledge_status_id</uniqueName>
+    <import>true</import>
+    <export>false</export>
+    <type>int unsigned</type>
+    <pseudoconstant>
+      <optionGroupName>pledge_status</optionGroupName>
+    </pseudoconstant>
+    <comment>Implicit foreign key to civicrm_option_values in the pledge_status option group.</comment>
+    <add>2.1</add>
+  </field>
+  <index>
+    <name>index_status</name>
+    <fieldName>status_id</fieldName>
+    <add>2.1</add>
+  </index>
+  <field>
+    <name>is_test</name>
+    <uniqueName>pledge_is_test</uniqueName>
+    <import>true</import>
+    <title>Test</title>
+    <type>boolean</type>
+    <default>0</default>
+    <html>
+     <type>CheckBox</type>
+   </html>
+  </field>
+  <field>
+    <name>campaign_id</name>
+    <uniqueName>pledge_campaign_id</uniqueName>
+    <type>int unsigned</type>
+    <title>Campaign</title>
+    <import>true</import>
+    <comment>The campaign for which this pledge has been initiated.</comment>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <add>3.4</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>campaign_id</name>
+    <table>civicrm_campaign</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+</table>

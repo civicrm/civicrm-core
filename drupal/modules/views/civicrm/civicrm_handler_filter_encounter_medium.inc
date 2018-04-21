@@ -21,10 +21,10 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
-/*
+/**
  * Heavily based on anonymous code contribution. No claim.
  * CiviCRM Views Integration
  *
@@ -34,7 +34,7 @@
  */
 class civicrm_handler_filter_encounter_medium extends views_handler_filter_in_operator {
   static $_encounter_medium;
-  function construct() {
+  public function construct() {
     parent::construct();
     if (!self::$_encounter_medium) {
       if (!civicrm_initialize()) {
@@ -45,7 +45,7 @@ class civicrm_handler_filter_encounter_medium extends views_handler_filter_in_op
     }
   }
 
-  function get_value_options() {
+  public function get_value_options() {
     if (!isset($this->value_options)) {
       $this->value_title = t('Encounter Medium');
       $options = array();
@@ -55,5 +55,5 @@ class civicrm_handler_filter_encounter_medium extends views_handler_filter_in_op
       $this->value_options = $options;
     }
   }
-}
 
+}

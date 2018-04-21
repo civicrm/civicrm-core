@@ -1,0 +1,11 @@
+#!/usr/bin/env php
+<?php
+
+include __DIR__ . '/../vendor/autoload.php';
+
+use MJS\TopSort\Command\BenchmarkCommand;
+use Symfony\Component\Console\Application;
+
+$application = new Application();
+$application->add(new BenchmarkCommand);
+$application->run();

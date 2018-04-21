@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -70,7 +70,7 @@
 <table class="crm-info-panel">
   <tr>
     <td class="label">{ts}From{/ts}</td>
-    <td class="bold">{$displayName}</td>
+    <td class="bold"><a href="{crmURL p='civicrm/contact/view' q="cid=$contact_id"}">{$displayName}</a></td>
   </tr>
   <tr>
     <td class="label">{ts}Financial Type{/ts}</td>
@@ -95,7 +95,9 @@
                &nbsp; {$total_amount|crmMoney:$currency}
             </strong></a>&nbsp;
         {if $contribution_recur_id}
-          <strong>{ts}Recurring Contribution{/ts}</strong>
+          <a class="crm-hover-button" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contact_id`&context=contribution"}'>
+            <strong>{ts}Recurring Contribution{/ts}</strong>
+          </a>
           <br/>
           {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
         {/if}

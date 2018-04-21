@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -61,15 +61,12 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
   }
 
   /**
-   * Takes an associative array and creates a Survey object.
-   *
-   * the function extract all the params it needs to initialize the create a
-   * survey object.
-   *
+   * Takes an associative array and creates a Survey object based on the
+   * supplied values.
    *
    * @param array $params
    *
-   * @return CRM_Survey_DAO_Survey
+   * @return bool|CRM_Campaign_DAO_Survey
    */
   public static function create(&$params) {
     if (empty($params)) {
@@ -90,11 +87,23 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
       if (!(CRM_Utils_Array::value('created_date', $params))) {
         $params['created_date'] = date('YmdHis');
       }
+
+      CRM_Utils_Hook::pre('create', 'Survey', NULL, $params);
+    }
+    else {
+      CRM_Utils_Hook::pre('edit', 'Survey', $params['id'], $params);
     }
 
     $dao = new CRM_Campaign_DAO_Survey();
     $dao->copyValues($params);
     $dao->save();
+
+    if (!empty($params['id'])) {
+      CRM_Utils_Hook::post('edit', 'Survey', $dao->id, $dao);
+    }
+    else {
+      CRM_Utils_Hook::post('create', 'Survey', $dao->id, $dao);
+    }
 
     if (!empty($params['custom']) &&
       is_array($params['custom'])

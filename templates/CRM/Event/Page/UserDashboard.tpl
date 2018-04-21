@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-event-userdashboard-pre"}
+{/crmRegion}
 <div class="view-content">
     {if $event_rows}
         {strip}
@@ -70,3 +72,5 @@
         </div>
     {/if}
 </div>
+{crmRegion name="crm-event-userdashboard-post"}
+{/crmRegion}

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -594,8 +594,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             continue;
           }
           elseif ($hideAdminValues && !in_array($className, $formClasses)) {
+            $publicVisibilityID = CRM_Price_BAO_PriceField::getVisibilityOptionID('public');
+            $adminVisibilityID = CRM_Price_BAO_PriceField::getVisibilityOptionID('admin');
+
             foreach ($options as $key => $currentOption) {
-              if ($currentOption['visibility_id'] == CRM_Price_BAO_PriceField::getVisibilityOptionID('admin')) {
+              $optionVisibility = CRM_Utils_Array::value('visibility_id', $currentOption, $publicVisibilityID);
+              if ($optionVisibility == $adminVisibilityID) {
                 unset($options[$key]);
               }
             }

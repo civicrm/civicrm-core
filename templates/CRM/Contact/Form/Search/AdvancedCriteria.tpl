@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -146,7 +146,15 @@ CRM.$(function($) {
 
   <table class="form-layout">
     <tr>
-      <td>{include file="CRM/common/formButtons.tpl" location="botton"}</td>
+      <td>
+        {include file="CRM/common/formButtons.tpl" location="bottom"}
+        <div class="crm-submit-buttons reset-advanced-search">
+          <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button" title="{ts}Clear all search criteria{/ts}">
+            <i class="crm-i fa-undo"></i>
+            &nbsp;{ts}Reset Form{/ts}
+          </a>
+        </div>
+      </td>
     </tr>
   </table>
 {/strip}

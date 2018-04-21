@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,29 +27,16 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
  * class to represent the actions that can be performed on a group of contacts
  * used by the search forms.
  */
-class CRM_Pledge_Task {
-  const DELETE_PLEDGES = 1, PRINT_PLEDGES = 2, EXPORT_PLEDGES = 3;
+class CRM_Pledge_Task extends CRM_Core_Task {
 
-  /**
-   * The task array
-   *
-   * @var array
-   */
-  static $_tasks = NULL;
-
-  /**
-   * The optional task array
-   *
-   * @var array
-   */
-  static $_optionalTasks = NULL;
+  static $objectType = 'pledge';
 
   /**
    * These tasks are the core set of tasks that the user can perform
@@ -58,20 +45,20 @@ class CRM_Pledge_Task {
    * @return array
    *   the set of tasks for a group of contacts
    */
-  public static function &tasks() {
+  public static function tasks() {
     if (!self::$_tasks) {
       self::$_tasks = array(
-        1 => array(
+        self::TASK_DELETE => array(
           'title' => ts('Delete pledges'),
           'class' => 'CRM_Pledge_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array(
+        self::TASK_PRINT => array(
           'title' => ts('Print selected rows'),
           'class' => 'CRM_Pledge_Form_Task_Print',
           'result' => FALSE,
         ),
-        3 => array(
+        self::TASK_EXPORT => array(
           'title' => ts('Export pledges'),
           'class' => array(
             'CRM_Export_Form_Select',
@@ -83,40 +70,13 @@ class CRM_Pledge_Task {
 
       // CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete in CiviPledge')) {
-        unset(self::$_tasks[1]);
+        unset(self::$_tasks[self::TASK_DELETE]);
       }
 
-      CRM_Utils_Hook::searchTasks('pledge', self::$_tasks);
-      asort(self::$_tasks);
+      parent::tasks();
     }
 
     return self::$_tasks;
-  }
-
-  /**
-   * These tasks are the core set of task titles.
-   *
-   * @return array
-   *   the set of task titles
-   */
-  public static function &taskTitles() {
-    self::tasks();
-    $titles = array();
-    foreach (self::$_tasks as $id => $value) {
-      $titles[$id] = $value['title'];
-    }
-    return $titles;
-  }
-
-  /**
-   * These tasks get added based on the context the user is in.
-   *
-   * @return array
-   *   the set of optional tasks for a group of contacts
-   */
-  public static function &optionalTaskTitle() {
-    $tasks = array();
-    return $tasks;
   }
 
   /**
@@ -124,12 +84,12 @@ class CRM_Pledge_Task {
    * of the user
    *
    * @param int $permission
+   * @param array $params
    *
    * @return array
    *   set of tasks that are valid for the user
    */
-  public static function &permissionedTaskTitles($permission) {
-    $tasks = array();
+  public static function permissionedTaskTitles($permission, $params = array()) {
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('edit pledges')
     ) {
@@ -137,13 +97,15 @@ class CRM_Pledge_Task {
     }
     else {
       $tasks = array(
-        3 => self::$_tasks[3]['title'],
+        self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
       );
       //CRM-4418,
       if (CRM_Core_Permission::check('delete in CiviPledge')) {
-        $tasks[1] = self::$_tasks[1]['title'];
+        $tasks[self::TASK_DELETE] = self::$_tasks[self::TASK_DELETE]['title'];
       }
     }
+
+    $tasks = parent::corePermissionedTaskTitles($tasks, $permission, $params);
     return $tasks;
   }
 
@@ -158,14 +120,12 @@ class CRM_Pledge_Task {
    */
   public static function getTask($value) {
     self::tasks();
-    if (!$value || !CRM_Utils_Array::value($value, self::$_tasks)) {
-      // make the print task by default
-      $value = 2;
+
+    if (!CRM_Utils_Array::value($value, self::$_tasks)) {
+      // make it the print task by default
+      $value = self::TASK_PRINT;
     }
-    return array(
-      self::$_tasks[$value]['class'],
-      self::$_tasks[$value]['result'],
-    );
+    return parent::getTask($value);
   }
 
 }

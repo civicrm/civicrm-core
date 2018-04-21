@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,7 +35,7 @@
         {* Table for adding search criteria. *}
         {include file="CRM/Contact/Form/Search/table.tpl"}
         <div class="clear"></div>
-        <div id="crm-submit-buttons">
+        <div id="crm-submit-buttons" class="crm-submit-buttons">
           {$form.buttons.html}
         </div>
       </div>

@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -50,6 +50,7 @@
     <p>{ts}Click 'Import Now' if you are ready to proceed.{/ts}</p>
  </div>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+ {include file="CRM/common/importProgress.tpl"}
  {* Summary Preview (record counts) *}
  <table id="preview-counts" class="report">
     <tr><td class="label">{ts}Total Rows{/ts}</td>

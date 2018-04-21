@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Field handler to provide relationship to Drupal User ID
@@ -33,7 +33,7 @@ class civicrm_handler_relationship_contact2users extends views_handler_relations
   /**
    * Called to implement a relationship in a query.
    */
-  function query() {
+  public function query() {
 
     $join = new views_join();
     $join->definition = array(
@@ -51,7 +51,6 @@ class civicrm_handler_relationship_contact2users extends views_handler_relations
     $join->construct();
 
     $this->first_join = $this->query->add_table('civicrm_uf_match', $this->relationship, $join);
-
 
     // Then, create a relationship on that table:
     $join = new views_join();
@@ -72,5 +71,5 @@ class civicrm_handler_relationship_contact2users extends views_handler_relations
 
     $this->alias = $this->query->add_relationship($alias, $join, 'users');
   }
-}
 
+}

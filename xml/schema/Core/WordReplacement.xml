@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>WordReplacement</class>
+  <name>civicrm_word_replacement</name>
+  <comment>Top-level hierarchy to support word replacement.</comment>
+  <add>4.4</add>
+  <field>
+    <name>id</name>
+    <title>Word Replacement ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Word replacement ID</comment>
+    <add>4.4</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>find_word</name>
+    <title>Replaced Word</title>
+    <type>varchar</type>
+    <length>255</length>
+    <collate>utf8_bin</collate>
+    <comment>Word which need to be replaced</comment>
+    <add>4.4</add>
+  </field>
+  <field>
+    <name>replace_word</name>
+    <title>Replacement Word</title>
+    <type>varchar</type>
+    <length>255</length>
+    <collate>utf8_bin</collate>
+    <comment>Word which will replace the word in find</comment>
+    <add>4.4</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Word Replacement is Active</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this entry active?</comment>
+    <add>4.4</add>
+  </field>
+  <index>
+    <name>UI_domain_find</name>
+    <fieldName>domain_id</fieldName>
+    <fieldName>find_word</fieldName>
+    <unique>true</unique>
+    <add>4.4</add>
+  </index>
+  <field>
+     <name>match_type</name>
+     <title>Word Replacement Match Type</title>
+     <type>varchar</type>
+     <length>16</length>
+     <default>"wildcardMatch"</default>
+     <pseudoconstant>
+       <callback>CRM_Core_SelectValues::getWordReplacementMatchType</callback>
+     </pseudoconstant>
+     <add>4.4</add>
+     <html>
+       <type>Select</type>
+     </html>
+  </field>
+  <field>
+    <name>domain_id</name>
+    <title>Word Replacement Domain ID</title>
+    <type>int unsigned</type>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+        <keyColumn>id</keyColumn>
+        <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>FK to Domain ID. This is for Domain specific word replacement</comment>
+    <add>1.1</add>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <add>1.1</add>
+  </foreignKey>
+</table>

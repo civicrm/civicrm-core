@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -50,11 +50,7 @@
     <tr id="Website_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
       <td>{$form.website.$blockId.url.html|crmAddClass:url}&nbsp;</td>
       <td>{$form.website.$blockId.website_type_id.html}</td>
-      <td>
-        {if $blockId > 1}
-          <a class="crm-delete-inline crm-hover-button action-item" href="#" title="{ts}Delete Website{/ts}"><span class="icon delete-icon"></span></a>
-        {/if}
-       </td>
+      <td><a class="crm-delete-inline crm-hover-button action-item" href="#" title="{ts}Delete Website{/ts}"><span class="icon delete-icon"></span></a></td>
     </tr>
     {/section}
 </table>

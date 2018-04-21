@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -43,8 +43,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
   protected $_summary = NULL;
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     self::validRelationships();
@@ -77,7 +76,13 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
-          'household_name' => array('title' => ts('Household Name')),
+          'household_name' => array(
+            'title' => ts('Household Name'),
+          ),
+          'is_deleted' => array(
+            'default' => 0,
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+          ),
         ),
         'grouping' => 'household-fields',
       ),
@@ -138,6 +143,9 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             'required' => TRUE,
             'no_display' => TRUE,
           ),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
+          ),
           'trxn_id' => NULL,
           'receive_date' => array('default' => TRUE),
           'receipt_date' => NULL,
@@ -157,6 +165,11 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),
+          ),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
         ),
         'grouping' => 'contri-fields',
@@ -523,6 +536,12 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
       if (array_key_exists('civicrm_contribution_contribution_status_id', $row)) {
         if ($value = $row['civicrm_contribution_contribution_status_id']) {
           $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = CRM_Contribute_PseudoConstant::contributionStatus($value);
+        }
+      }
+
+      if (array_key_exists('civicrm_contribution_financial_type_id', $row)) {
+        if ($value = $row['civicrm_contribution_financial_type_id']) {
+          $rows[$rowNum]['civicrm_contribution_financial_type_id'] = CRM_Contribute_PseudoConstant::financialType($value);
         }
       }
 

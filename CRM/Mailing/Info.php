@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
@@ -79,7 +79,9 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       $result = civicrm_api3('ReportInstance', 'get', array(
         'sequential' => 1,
         'report_id' => 'mailing/' . $report));
-      $reportIds[$report] = $result['values'][0]['id'];
+      if (!empty($result['values'])) {
+        $reportIds[$report] = $result['values'][0]['id'];
+      }
     }
     $result = array();
     $result['crmMailing'] = include "$civicrm_root/ang/crmMailing.ang.php";
@@ -127,6 +129,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ));
     $enabledLanguages = CRM_Core_I18n::languages(TRUE);
     $isMultiLingual = (count($enabledLanguages) > 1);
+    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
+    $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS, array()) : CRM_Utils_Token::getRequiredTokens();
     CRM_Core_Resources::singleton()
       ->addSetting(array(
         'crmMailing' => array(
@@ -141,7 +145,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
           'emailAdd' => $emailAdd['values'],
           'mailTokens' => $mailTokens['values'],
           'contactid' => $contactID,
-          'requiredTokens' => CRM_Utils_Token::getRequiredTokens(),
+          'requiredTokens' => $requiredTokens,
           'enableReplyTo' => (int) Civi::settings()->get('replyTo'),
           'disableMandatoryTokensCheck' => (int) Civi::settings()->get('disable_mandatory_tokens_check'),
           'fromAddress' => $fromAddress['values'],

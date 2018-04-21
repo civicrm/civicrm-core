@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -56,7 +56,8 @@ class CRM_Contact_BAO_Query {
     // There is no 4,
     MODE_MEMBER = 8,
     MODE_EVENT = 16,
-    // No 32, no 64.
+    MODE_CONTACTSRELATED = 32,
+    // no 64.
     MODE_GRANT = 128,
     MODE_PLEDGEBANK = 256,
     MODE_PLEDGE = 512,
@@ -66,6 +67,13 @@ class CRM_Contact_BAO_Query {
     MODE_CAMPAIGN = 8192,
     MODE_MAILING = 16384,
     MODE_ALL = 17407;
+
+  /**
+   * Constants for search operators
+   */
+  const
+    SEARCH_OPERATOR_AND = 'AND',
+    SEARCH_OPERATOR_OR = 'OR';
 
   /**
    * The default set of return properties.
@@ -1444,11 +1452,7 @@ class CRM_Contact_BAO_Query {
         }
       }
 
-      $select = "SELECT ";
-      if (isset($this->_distinctComponentClause)) {
-        $select .= "{$this->_distinctComponentClause}, ";
-      }
-      $select .= implode(', ', $this->_select);
+      $select = $this->getSelect();
       $from = $this->_fromClause;
     }
 
@@ -2002,6 +2006,8 @@ class CRM_Contact_BAO_Query {
       case 'prox_postal_code':
       case 'prox_state_province_id':
       case 'prox_country_id':
+      case 'prox_geo_code_1':
+      case 'prox_geo_code_2':
         // handled by the proximity_distance clause
         return;
 
@@ -2142,6 +2148,7 @@ class CRM_Contact_BAO_Query {
       }
 
       $this->_where[$grouping][] = self::buildClause($where, $op, $value);
+      $this->_tables[$aName] = $this->_whereTables[$aName] = 1;
       list($qillop, $qillVal) = self::buildQillForFieldValue('CRM_Core_DAO_Address', "state_province_id", $value, $op);
       $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['title'], 2 => $qillop, 3 => $qillVal));
     }
@@ -2170,6 +2177,7 @@ class CRM_Contact_BAO_Query {
       }
 
       $this->_where[$grouping][] = self::buildClause($where, $op, $value, 'Positive');
+      $this->_tables[$aName] = $this->_whereTables[$aName] = 1;
 
       list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $name, $value, $op);
       $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['title'], 2 => $qillop, 3 => $qillVal));
@@ -4699,32 +4707,47 @@ civicrm_relationship.is_permission_a_b = 0
    *
    * @param array $selectClauses
    * @param array $groupBy - Columns already included in GROUP By clause.
+   * @param string $aggregateFunction
    *
    * @return string
    */
-  public static function appendAnyValueToSelect($selectClauses, $groupBy) {
-    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
-    $sqlMode = explode(',', CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode'));
-
-    // Disable only_full_group_by mode for lower sql versions.
-    if (version_compare($mysqlVersion, '5.7', '<') || (!empty($sqlMode) && !in_array('ONLY_FULL_GROUP_BY', $sqlMode))) {
-      $key = array_search('ONLY_FULL_GROUP_BY', $sqlMode);
-      unset($sqlMode[$key]);
-      CRM_Core_DAO::executeQuery("SET SESSION sql_mode = '" . implode(',', $sqlMode) . "'");
-    }
-    else {
+  public static function appendAnyValueToSelect($selectClauses, $groupBy, $aggregateFunction = 'ANY_VALUE') {
+    if (!CRM_Utils_SQL::disableFullGroupByMode()) {
       $groupBy = array_map('trim', (array) $groupBy);
-      $aggregateFunctions = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
+      $aggregateFunctions = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN|IF)[[:blank:]]*\(/i';
       foreach ($selectClauses as $key => &$val) {
         list($selectColumn, $alias) = array_pad(preg_split('/ as /i', $val), 2, NULL);
         // append ANY_VALUE() keyword
         if (!in_array($selectColumn, $groupBy) && preg_match($aggregateFunctions, trim($selectColumn)) !== 1) {
-          $val = str_replace($selectColumn, "ANY_VALUE({$selectColumn})", $val);
+          $val = ($aggregateFunction == 'GROUP_CONCAT') ?
+            str_replace($selectColumn, "$aggregateFunction(DISTINCT {$selectColumn})", $val) :
+            str_replace($selectColumn, "$aggregateFunction({$selectColumn})", $val);
         }
       }
     }
 
     return "SELECT " . implode(', ', $selectClauses) . " ";
+  }
+
+  /**
+   * For some special cases, where if non-aggregate ORDER BY columns are not present in GROUP BY
+   *  on full_group_by mode, then append the those missing columns to GROUP BY clause
+   * keyword to select fields not present in groupBy
+   *
+   * @param string $groupBy - GROUP BY clause where missing ORDER BY columns will be appended
+   * @param array $orderBys - ORDER BY sub-clauses
+   *
+   */
+  public static function getGroupByFromOrderBy(&$groupBy, $orderBys) {
+    if (!CRM_Utils_SQL::disableFullGroupByMode()) {
+      foreach ($orderBys as $orderBy) {
+        $orderBy = str_replace(array(' DESC', ' ASC', '`'), '', $orderBy); // remove sort syntax from ORDER BY clauses if present
+        // if ORDER BY column is not present in GROUP BY then append it to end
+        if (preg_match('/(MAX|MIN)\(/i', trim($orderBy)) !== 1 && !strstr($groupBy, $orderBy)) {
+          $groupBy .= ", {$orderBy}";
+        }
+      }
+    }
   }
 
   /**
@@ -4741,8 +4764,8 @@ civicrm_relationship.is_permission_a_b = 0
     $sqlMode = CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode');
 
     //return if ONLY_FULL_GROUP_BY is not enabled.
-    if (!version_compare($mysqlVersion, '5.7', '<') && !empty($sqlMode) && in_array('ONLY_FULL_GROUP_BY', explode(',', $sqlMode))) {
-      $regexToExclude = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN)\(/i';
+    if (CRM_Utils_SQL::supportsFullGroupBy() && !empty($sqlMode) && in_array('ONLY_FULL_GROUP_BY', explode(',', $sqlMode))) {
+      $regexToExclude = '/(ROUND|AVG|COUNT|GROUP_CONCAT|SUM|MAX|MIN|IF)[[:blank:]]*\(/i';
       foreach ($selectClauses as $key => $val) {
         $aliasArray = preg_split('/ as /i', $val);
         // if more than 1 alias we need to split by ','.
@@ -4840,21 +4863,19 @@ civicrm_relationship.is_permission_a_b = 0
     }
 
     // building the query string
-    $groupBy = $groupByCol = NULL;
+    $groupBy = $groupByCols = NULL;
     if (!$count) {
       if (isset($this->_groupByComponentClause)) {
         $groupBy = $this->_groupByComponentClause;
-        $groupCols = preg_replace('/^GROUP BY /', '', trim($this->_groupByComponentClause));
-        $groupByCol = explode(', ', $groupCols);
+        $groupByCols = preg_replace('/^GROUP BY /', '', trim($this->_groupByComponentClause));
+        $groupByCols = explode(', ', $groupByCols);
       }
       elseif ($this->_useGroupBy) {
-        $groupByCol = 'contact_a.id';
-        $groupBy = ' GROUP BY contact_a.id';
+        $groupByCols = array('contact_a.id');
       }
     }
     if ($this->_mode & CRM_Contact_BAO_Query::MODE_ACTIVITY && (!$count)) {
-      $groupByCol = 'civicrm_activity.id';
-      $groupBy = 'GROUP BY civicrm_activity.id ';
+      $groupByCols = array('civicrm_activity.id');
     }
 
     $order = $orderBy = $limit = '';
@@ -4876,8 +4897,17 @@ civicrm_relationship.is_permission_a_b = 0
 
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
 
-    if (!empty($groupByCol)) {
-      $groupBy = self::getGroupByFromSelectColumns($this->_select, $groupByCol);
+    if (!empty($groupByCols)) {
+      // It doesn't matter to include columns in SELECT clause, which are present in GROUP BY when we just want the contact IDs
+      if (!$groupContacts) {
+        $select = self::appendAnyValueToSelect($this->_select, $groupByCols, 'GROUP_CONCAT');
+      }
+      $groupBy = " GROUP BY " . implode(', ', $groupByCols);
+      if (!empty($order)) {
+        // retrieve order by columns from ORDER BY clause
+        $orderBys = explode(",", str_replace('ORDER BY ', '', $order));
+        self::getGroupByFromOrderBy($groupBy, $orderBys);
+      }
     }
 
     if ($additionalWhereClause) {
@@ -4938,7 +4968,8 @@ civicrm_relationship.is_permission_a_b = 0
     $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
     $order = " ORDER BY pnc.id";
     $groupByCol = array('contact_a.id', 'pnc.id');
-    $groupBy = self::getGroupByFromSelectColumns($this->_select, $groupByCol);
+    $select = self::appendAnyValueToSelect($this->_select, $groupByCol, 'GROUP_CONCAT');
+    $groupBy = " GROUP BY " . implode(', ', $groupByCol);
     $limit = " LIMIT $offset, $rowCount";
     $query = "$select $from $where $groupBy $order $limit";
 
@@ -5025,16 +5056,8 @@ SELECT COUNT( conts.total_amount ) as total_count,
     if ($context == 'search') {
       $where .= " AND contact_a.is_deleted = 0 ";
     }
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-    if (!empty($financialTypes)) {
-      $where .= " AND civicrm_contribution.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ") AND li.id IS NULL";
-      $from .= " LEFT JOIN civicrm_line_item li
-                      ON civicrm_contribution.id = li.contribution_id AND
-                         li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ") ";
-    }
-    else {
-      $where .= " AND civicrm_contribution.financial_type_id IN (0)";
-    }
+
+    $query = $this->appendFinancialTypeWhereAndFromToQueryStrings($where, $from);
 
     // make sure contribution is completed - CRM-4989
     $completedWhere = $where . " AND civicrm_contribution.contribution_status_id = 1 ";
@@ -5163,6 +5186,28 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
     }
 
     return $summary;
+  }
+
+  /**
+   * Append financial ACL limits to the query from & where clauses, if applicable.
+   *
+   * @param string $where
+   * @param string $from
+   */
+  public function appendFinancialTypeWhereAndFromToQueryStrings(&$where, &$from) {
+    if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      return;
+    }
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    if (!empty($financialTypes)) {
+      $where .= " AND civicrm_contribution.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ") AND li.id IS NULL";
+      $from .= " LEFT JOIN civicrm_line_item li
+                  ON civicrm_contribution.id = li.contribution_id AND
+                     li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ") ";
+    }
+    else {
+      $where .= " AND civicrm_contribution.financial_type_id IN (0)";
+    }
   }
 
   /**
@@ -6345,7 +6390,7 @@ AND   displayRelType.is_active = 1
         $orderByArray = array("UPPER(LEFT(contact_a.sort_name, 1)) asc");
       }
       else {
-        $order = " ORDER BY contact_a.sort_name asc, contact_a.id";
+        $order = " ORDER BY contact_a.sort_name ASC, contact_a.id";
       }
     }
     if (!$order && empty($orderByArray)) {
@@ -6502,6 +6547,20 @@ AND   displayRelType.is_active = 1
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Get Select Clause.
+   *
+   * @return string
+   */
+  public function getSelect() {
+    $select = "SELECT ";
+    if (isset($this->_distinctComponentClause)) {
+      $select .= "{$this->_distinctComponentClause}, ";
+    }
+    $select .= implode(', ', $this->_select);
+    return $select;
   }
 
 }

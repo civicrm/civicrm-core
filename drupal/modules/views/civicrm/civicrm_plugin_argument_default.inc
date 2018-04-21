@@ -21,14 +21,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Default argument plugin to extract a civicrm user id via menu_get_object
  */
 class civicrm_plugin_argument_default extends views_plugin_argument_default {
   var $option_name = 'default_argument_civicrm';
-  function argument_form(&$form, &$form_state) {
+  public function argument_form(&$form, &$form_state) {
     $form[$this->option_name] = array(
       '#type' => 'checkbox',
       '#title' => t('Also look for a node and use the node author'),
@@ -42,7 +42,7 @@ class civicrm_plugin_argument_default extends views_plugin_argument_default {
     );
   }
 
-  function get_argument() {
+  public function get_argument() {
     foreach (range(1, 3) as $i) {
       $user = menu_get_object('user', $i);
       if (!empty($user)) {
@@ -66,6 +66,5 @@ class civicrm_plugin_argument_default extends views_plugin_argument_default {
       }
     }
   }
+
 }
-
-

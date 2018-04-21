@@ -129,6 +129,10 @@ function _civicrm_api_get_camel_name($entity) {
  */
 function _civicrm_api_replace_variables(&$params, &$parentResult, $separator = '.') {
   foreach ($params as $field => &$value) {
+    if (substr($field, 0, 4) == 'api.') {
+      // CRM-21246 - Leave nested calls alone.
+      continue;
+    }
     if (is_string($value) && substr($value, 0, 6) == '$value') {
       $value = _civicrm_api_replace_variable($value, $parentResult, $separator);
     }

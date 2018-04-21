@@ -60,7 +60,7 @@ function civicrm_api3_saved_search_create($params) {
     }
   }
 
-  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'SavedSearch');
   _civicrm_api3_saved_search_result_cleanup($result);
   return $result;
 }

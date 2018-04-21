@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -758,9 +758,18 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     else {
       $timezone = variable_get('date_default_timezone', NULL);
     }
+
+    // Retrieved timezone will be represented as GMT offset in seconds but, according
+    // to the doc for the overridden method, ought to be returned as a region string
+    // (e.g., America/Havana).
+    if (strlen($timezone)) {
+      $timezone = timezone_name_from_abbr("", (int) $timezone);
+    }
+
     if (!$timezone) {
       $timezone = parent::getTimeZoneString();
     }
+
     return $timezone;
   }
 

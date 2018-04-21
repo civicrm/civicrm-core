@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>OptionGroup</class>
+  <name>civicrm_option_group</name>
+  <add>1.5</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Option Group ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Option Group ID</comment>
+    <add>1.5</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>Option Group Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>Option group name. Used as selection key by class properties which lookup options in civicrm_option_value.</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>title</name>
+    <title>Option Group title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Option Group title.</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>description</name>
+    <title>Option Group Description</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Option group description.</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>data_type</name>
+    <title>Data Type for this option group</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Option group description.</comment>
+    <pseudoconstant>
+      <callback>CRM_Utils_Type::dataTypes</callback>
+    </pseudoconstant>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>is_reserved</name>
+    <title>Option Group Is Reserved?</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this a predefined system option group (i.e. it can not be deleted)?</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Option Group Is Active?</title>
+    <type>boolean</type>
+    <comment>Is this option group active?</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>is_locked</name>
+    <title>Option Group Is Locked</title>
+    <type>boolean</type>
+    <comment>A lock to remove the ability to add new options via the UI.</comment>
+    <add>4.5</add>
+  </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>2.1</add>
+  </index>
+</table>

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -613,7 +613,7 @@ LEFT JOIN civicrm_participant_payment cpp ON cc.id = cpp.contribution_id
 LEFT JOIN civicrm_price_set_entity cpse on cpse.entity_table = 'civicrm_contribution_page' AND cpse.entity_id = cc.contribution_page_id
 WHERE     (cc.id BETWEEN %1 AND %2)
 AND       cli.entity_id IS NULL AND cc.contribution_page_id IS NOT NULL AND cpp.contribution_id IS NULL
-GROUP BY  cc.id
+GROUP BY  cc.id, cmp.membership_id
 ";
     $result = CRM_Core_DAO::executeQuery($sql, $sqlParams);
 

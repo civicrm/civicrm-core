@@ -1,0 +1,49 @@
+--- ./CRM/Core/Payment/Form.php	2014-07-01 20:52:02.000000000 -0400
++++ ./CRM/Core/Payment/Form.php	2014-09-12 08:27:20.564179607 -0400
+@@ -363,9 +363,9 @@
+         $errors['cvv2'] = ts('Please enter a valid Card Verification Number');
+       }
+     }
+-    elseif (!empty($values['credit_card_number'])) {
+-      $errors['credit_card_number'] = ts('Please enter a valid Card Number');
+-    }
++    /* elseif (!empty($values['credit_card_number'])) {
++      $errors['credit_card_number'] = ts('Please enter a Card Number');
++    } */
+   }
+ 
+   /**
+--- ./CRM/Member/Form/Membership.php	2014-07-01 20:52:02.000000000 -0400
++++ ./CRM/Member/Form/Membership.php	2014-09-11 13:42:33.470862876 -0400
+@@ -150,7 +150,7 @@
+     if ($this->_mode) {
+       $this->_paymentProcessor = array('billing_mode' => 1);
+       $validProcessors = array();
+-      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'billing_mode IN ( 1, 3 )');
++      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'billing_mode IN ( 1, 3 ) AND payment_type = 1');
+ 
+       foreach ($processors as $ppID => $label) {
+         $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $this->_mode);
+--- ./CRM/Event/Form/Participant.php	2014-07-01 20:52:02.000000000 -0400
++++ ./CRM/Event/Form/Participant.php	2014-09-11 12:36:41.549807505 -0400
+@@ -264,7 +264,7 @@
+       $this->_paymentProcessor = array('billing_mode' => 1);
+ 
+       $validProcessors = array();
+-      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, "billing_mode IN ( 1, 3 )");
++      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, "billing_mode IN ( 1, 3 ) AND payment_type = 1");
+ 
+       foreach ($processors as $ppID => $label) {
+         $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $this->_mode);
+--- ./CRM/Event/Form/Participant.php    2015-03-26 19:51:15.208118122 -0400
++++ ./CRM/Event/Form/Participant.php    2015-03-26 19:52:20.455620537 -0400
+@@ -1340,7 +1340,8 @@
+       $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this);
+ 
+       // CRM-15622: fix for incorrect contribution.fee_amount
+-      $paymentParams['fee_amount'] = NULL;
++      // KG 4.4 issue only
++      // $paymentParams['fee_amount'] = NULL;
+       $result = $payment->doDirectPayment($paymentParams);
+ 
+       if (is_a($result, 'CRM_Core_Error')) {

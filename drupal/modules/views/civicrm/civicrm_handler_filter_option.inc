@@ -21,10 +21,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
+
+/**
+ * CiviCRM handler for options with the in operator.
+ */
 class civicrm_handler_filter_option extends views_handler_filter_in_operator {
   static $_options;
-  function get_value_options() {
+  public function get_value_options() {
     $this->initialize();
 
     if (!isset($this->value_options)) {
@@ -36,6 +40,5 @@ class civicrm_handler_filter_option extends views_handler_filter_in_operator {
       $this->value_options = $options;
     }
   }
+
 }
-
-

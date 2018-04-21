@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,51 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-import-preview-form-block">
-
-{literal}
-<script type="text/javascript">
-function setIntermediate( ) {
-  var dataUrl = "{/literal}{$statusUrl}{literal}";
-  cj.getJSON( dataUrl, function( response ) {
-
-     var dataStr = response.toString();
-     var result  = dataStr.split(",");
-     cj("#intermediate").html( result[1] );
-           if( result[0] < 100 ){
-          cj("#importProgressBar .ui-progressbar-value").animate({width: result[0]+"%"}, 500);
-    cj("#status").text( result[0]+"% Completed");
-             }
-   });
-}
-
-function pollLoop( ){
-  setIntermediate( );
-  window.setTimeout( pollLoop, 10*1000 ); // 10 sec
-}
-
-function verify( ) {
-    if (! confirm('Backing up your database before importing is recommended, as there is no Undo for this. {/literal}{ts escape='js'}Are you sure you want to Import now{/ts}{literal}?') ) {
-        return false;
-    }
-
-  cj("#id-processing").show( ).dialog({
-    modal         : true,
-    width         : 350,
-    height        : 160,
-    resizable     : false,
-    draggable     : true,
-    closeOnEscape : false,
-    open          : function ( ) {
-        cj("#id-processing").dialog().parents(".ui-dialog").find(".ui-dialog-titlebar").remove();
-    }
-  });
-  cj("#importProgressBar" ).progressbar({value:0});
-      cj("#importProgressBar").show( );
-  pollLoop( );
-}
-</script>
-{/literal}
-
 {* Import Wizard - Step 3 (preview import results prior to actual data loading) *}
 {* @var $form Contains the array for the form elements and other form associated information assigned to the template by the controller *}
 
@@ -94,14 +49,7 @@ function verify( ) {
     <p>{ts}Click 'Import Now' if you are ready to proceed.{/ts}</p>
 </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-{* Import Progress Bar and Info *}
-<div id="id-processing" class="hiddenElement">
-  <h3>Importing records...</h3><br />
-       <div id="status" style="margin-left:6px;"></div>
-  <div class="progressBar" id="importProgressBar" style="margin-left:6px;display:none;"></div>
-  <div id="intermediate"></div>
-  <div id="error_status"></div>
-</div>
+{include file="CRM/common/importProgress.tpl"}
 
 <div id="preview-info">
  {* Summary Preview (record counts) *}

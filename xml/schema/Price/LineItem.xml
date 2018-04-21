@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Price</base>
+  <class>LineItem</class>
+  <name>civicrm_line_item</name>
+  <add>1.7</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Line Item ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Line Item</comment>
+    <add>1.7</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>entity_table</name>
+    <title>Line Item Entity Type</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>table which has the transaction</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>Line Item Entity</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>entry in table</comment>
+    <add>1.7</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>1.7</add>
+  </dynamicForeignKey>
+  <field>
+    <name>contribution_id</name>
+    <title>Line Item Contribution</title>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_contribution</comment>
+    <add>4.5</add>
+  </field>
+  <foreignKey>
+    <name>contribution_id</name>
+    <table>civicrm_contribution</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>price_field_id</name>
+    <title>Line Item Price Field</title>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_price_field</comment>
+    <!-- changed to not required in 4.3 in order to change ON DELETE CASCADE FK constraint to SET NULL -->
+    <add>1.7</add>
+  </field>
+  <foreignKey>
+    <name>price_field_id</name>
+    <table>civicrm_price_field</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>option_group_id</name>
+    <title>Line Item Option Group</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to option group</comment>
+    <add>1.7</add>
+    <drop>3.3</drop>
+  </field>
+  <field>
+    <name>label</name>
+    <title>Line Item Label</title>
+    <type>varchar</type>
+    <length>255</length>
+    <default>NULL</default>
+    <!-- changed to not required in 4.2.3 -->
+    <comment>descriptive label for item - from price_field_value.label</comment>
+    <add>1.7</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>qty</name>
+    <title>Line Item Quantity</title>
+    <type>decimal</type>
+    <required>true</required>
+    <comment>How many items ordered</comment>
+    <add>1.7</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>unit_price</name>
+    <type>decimal</type>
+    <required>true</required>
+    <comment>price of each item</comment>
+    <add>1.7</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>line_total</name>
+    <title>Line Item Total</title>
+    <type>decimal</type>
+    <required>true</required>
+    <comment>qty * unit_price</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>participant_count</name>
+    <title>Line Item Participant Count</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>Participant count for field</comment>
+      <html>
+        <type>Text</type>
+      </html>
+    <add>3.2</add>
+
+  </field>
+  <index>
+    <name>index_entity</name>
+    <fieldName>entity_table</fieldName>
+    <fieldName>entity_id</fieldName>
+    <add>1.7</add>
+  </index>
+  <index>
+    <name>UI_line_item_value</name>
+    <fieldName>entity_table</fieldName>
+    <fieldName>entity_id</fieldName>
+    <fieldName>contribution_id</fieldName>
+    <fieldName>price_field_value_id</fieldName>
+    <fieldName>price_field_id</fieldName>
+    <unique>true</unique>
+    <add>3.3</add>
+    <change>4.5</change>
+    <!-- Add contribution_id to unique index in 4.5  -->
+  </index>
+  <field>
+    <name>price_field_value_id</name>
+    <title>Line Item Option</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>FK to civicrm_price_field_value</comment>
+    <add>3.3</add>
+  </field>
+  <foreignKey>
+    <name>price_field_value_id</name>
+    <table>civicrm_price_field_value</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>financial_type_id</name>
+    <title>Financial Type</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>FK to Financial Type.</comment>
+    <add>4.3</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+    <add>4.3</add>
+  </foreignKey>
+  <field>
+    <name>non_deductible_amount</name>
+    <title>Non-deductible Amount</title>
+    <type>decimal</type>
+    <default>0.0</default>
+    <headerPattern>/non?.?deduct/i</headerPattern>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
+    <required>true</required>
+    <comment>Portion of total amount which is NOT tax deductible.</comment>
+    <add>4.7</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>tax_amount</name>
+    <title>Tax Amount</title>
+    <type>decimal</type>
+    <import>true</import>
+    <headerPattern>/tax(.?am(ou)?nt)?/i</headerPattern>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
+    <comment>tax of each item</comment>
+    <add>4.6</add>
+    <html>
+     <type>Text</type>
+   </html>
+  </field>
+</table>
+

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -72,7 +72,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
     $result = parent::preProcess();
 
-    $scheduleStatusId = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
+    $scheduleStatusId = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Scheduled');
     $this->assign('scheduleStatusId', $scheduleStatusId);
 
     if (!$this->_caseId && $this->_activityId) {
@@ -100,8 +100,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     if ($this->_caseId &&
       !CRM_Core_Permission::check('access all cases and activities')
     ) {
-      $session = CRM_Core_Session::singleton();
-      $allCases = CRM_Case_BAO_Case::getCases(TRUE, $session->get('userID'), 'any');
+      $params = array('type' => 'any');
+      $allCases = CRM_Case_BAO_Case::getCases(TRUE, $params);
       if (count(array_intersect($this->_caseId, array_keys($allCases))) == 0) {
         CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
       }
@@ -197,6 +197,11 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
     }
 
+    // Turn off the prompt which asks the user if they want to create separate
+    // activities when specifying multiple contacts "with" a new activity.
+    // Instead, always create one activity with all contacts together.
+    $this->supportsActivitySeparation = FALSE;
+
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext($url);
   }
@@ -253,7 +258,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
 
       // remove Open Case activity type since we're inside an existing case
-      $openCaseID = CRM_Core_OptionGroup::getValue('activity_type', 'Open Case', 'name');
+      $openCaseID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
       unset($aTypes[$openCaseID]);
       asort($aTypes);
       $this->_fields['followup_activity_type_id']['attributes'] = array('' => '- select activity type -') + $aTypes;

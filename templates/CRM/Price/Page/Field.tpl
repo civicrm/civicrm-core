@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,6 +43,7 @@
 {/if}
 
 {if $action NEQ 8 and $priceField}
+<div class="crm-content-block crm-block">
   <div class="action-link">
     {if !$isReserved}
       {crmButton q="reset=1&action=add&sid=$sid" id="newPriceField"  icon="plus-circle"}{ts}Add Price Field{/ts}{/crmButton}
@@ -100,7 +101,7 @@
     {/if}
     {crmButton p="civicrm/admin/price" q="action=preview&sid=`$sid`&reset=1&context=field" icon="television"}{ts}Preview (all fields){/ts}{/crmButton}
   </div>
-
+</div>
 {else}
   {if $action eq 16}
     <div class="messages status no-popup crm-empty-table">

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>StateProvince</class>
+  <name>civicrm_state_province</name>
+  <add>1.1</add>
+  <field>
+    <name>id</name>
+    <title>State ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>State/Province ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>false</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>State</title>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <headerPattern>/state|prov(ince)?/i</headerPattern>
+    <dataPattern>/[A-Z]{2}/</dataPattern>
+    <comment>Name of State/Province</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>abbreviation</name>
+    <title>State Abbreviation</title>
+    <type>varchar</type>
+    <length>4</length>
+    <comment>2-4 Character Abbreviation of State/Province</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>country_id</name>
+    <title>Country</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>ID of Country that State/Province belong</comment>
+    <add>1.1</add>
+  </field>
+  <foreignKey>
+    <name>country_id</name>
+    <table>civicrm_country</table>
+    <key>id</key>
+    <add>1.1</add>
+  </foreignKey>
+  <index>
+    <name>UI_name_country_id</name>
+    <fieldName>name</fieldName>
+    <fieldName>country_id</fieldName>
+    <unique>true</unique>
+    <add>1.1</add>
+  </index>
+</table>

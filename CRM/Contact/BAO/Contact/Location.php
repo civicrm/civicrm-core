@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Contact_BAO_Contact_Location {
 
@@ -45,34 +45,25 @@ class CRM_Contact_BAO_Contact_Location {
    *   Array of display_name, email, location type and location id if found, or (null,null,null, null)
    */
   public static function getEmailDetails($id, $isPrimary = TRUE, $locationTypeID = NULL) {
-    $primaryClause = NULL;
+    $params = array(
+      'location_type_id' => $locationTypeID,
+      'contact_id' => $id,
+      'return' => array('contact_id.display_name', 'email', 'location_type_id', 'id'),
+    );
     if ($isPrimary) {
-      $primaryClause = " AND civicrm_email.is_primary = 1";
+      $params['is_primary'] = 1;
     }
+    $emails = civicrm_api3('Email', 'get', $params);
 
-    $locationClause = NULL;
-    if ($locationTypeID) {
-      $locationClause = " AND civicrm_email.location_type_id = $locationTypeID";
-    }
-
-    $sql = "
-SELECT    civicrm_contact.display_name,
-          civicrm_email.email,
-          civicrm_email.location_type_id,
-          civicrm_email.id
-FROM      civicrm_contact
-LEFT JOIN civicrm_email ON ( civicrm_contact.id = civicrm_email.contact_id {$primaryClause} {$locationClause} )
-WHERE     civicrm_contact.id = %1";
-
-    $params = array(1 => array($id, 'Integer'));
-    $dao = CRM_Core_DAO::executeQuery($sql, $params);
-    if ($dao->fetch()) {
-      return array($dao->display_name, $dao->email, $dao->location_type_id, $dao->id);
+    if ($emails['count'] > 0) {
+      $email = reset($emails['values']);
+      return array($email['contact_id.display_name'], $email['email'], $email['location_type_id'], $email['id']);
     }
     return array(NULL, NULL, NULL, NULL);
   }
 
   /**
+   * @deprecated Not used anywhere, use the Phone API instead
    * Get the sms number and display name of a contact.
    *
    * @param int $id
@@ -84,6 +75,7 @@ WHERE     civicrm_contact.id = %1";
    *   tuple of display_name and sms if found, or (null,null)
    */
   public static function getPhoneDetails($id, $type = NULL) {
+    Civi::log()->warning('Deprecated function CRM_Contact_BAO_Contact_Location::getPhoneDetails, use Phone.get API instead', array('civi.tag' => 'deprecated'));
     if (!$id) {
       return array(NULL, NULL);
     }

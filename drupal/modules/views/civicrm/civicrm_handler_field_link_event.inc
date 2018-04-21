@@ -21,19 +21,19 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /*
-   * Copyright (C) 2009 James Rakich
-   * Licensed to CiviCRM under the Academic Free License version 3.0.
-   *
-   *
-   * civicrm_handler_field_link_event.inc
-   * Completely customizable text that can be linked to numerous places related to the event.
-   * Info, Register, Config etc pages, as well as a custom Drupal Link with the Event ID appended,
-   * which is great for linking to other views using the event or participant base table.
-   *
-   */
+ * Copyright (C) 2009 James Rakich
+ * Licensed to CiviCRM under the Academic Free License version 3.0.
+ */
+
+/**
+ * civicrm_handler_field_link_event.inc
+ * Completely customizable text that can be linked to numerous places related to the event.
+ * Info, Register, Config etc pages, as well as a custom Drupal Link with the Event ID appended,
+ * which is great for linking to other views using the event or participant base table.
+ */
 
 /**
  * Field handler to provide simple renderer that allows linking to various pages involving the event.
@@ -43,12 +43,12 @@ class civicrm_handler_field_link_event extends views_handler_field {
   /**
    * Constructor to provide additional field to add.
    */
-  function construct() {
+  public function construct() {
     parent::construct();
     $this->additional_fields['id'] = 'id';
   }
 
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['link_to_civicrm_event'] = array('default' => 'view');
     $options['custom_link'] = array('default' => '');
@@ -56,7 +56,7 @@ class civicrm_handler_field_link_event extends views_handler_field {
     return $options;
   }
 
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $form['link_to_civicrm_event'] = array(
       '#type' => 'select',
@@ -91,7 +91,7 @@ class civicrm_handler_field_link_event extends views_handler_field {
     );
   }
 
-  function render_link($data, $values) {
+  public function render_link($data, $values) {
 
     $link_text = $this->options['link_text'];
     $link_choice = $this->options['link_to_civicrm_event'];
@@ -99,7 +99,6 @@ class civicrm_handler_field_link_event extends views_handler_field {
     if ($link_choice == 'custom') {
       $custom_link = $this->options['custom_link'];
     }
-
 
     switch ($link_choice) {
 
@@ -170,13 +169,13 @@ class civicrm_handler_field_link_event extends views_handler_field {
     }
   }
 
-  function query() {
+  public function query() {
     $this->ensure_my_table();
     $this->add_additional_fields();
   }
 
-  function render($values) {
+  public function render($values) {
     return $this->render_link(NULL, $values);
   }
-}
 
+}

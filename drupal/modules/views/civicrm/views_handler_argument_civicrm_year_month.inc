@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Argument handler for a year plus month (CCYYMM)
@@ -31,17 +31,17 @@ class views_handler_argument_civicrm_year_month extends views_handler_argument_d
   /**
    * Constructor implementation
    */
-  function construct() {
+  public function construct() {
     parent::construct();
     $this->format     = 'F Y';
     $this->arg_format = 'Ym';
-    $this->formula    = views_date_sql_format($this->arg_format, "***table***.$this->real_field", "datetime",0);
+    $this->formula    = views_date_sql_format($this->arg_format, "***table***.$this->real_field", "datetime", 0);
   }
 
   /**
    * Provide a link to the next level of the view
    */
-  function summary_name($data) {
+  public function summary_name($data) {
     $timestamp = $data->{$this->name_alias};
     $timestamp = strtotime($timestamp . " UTC");
     if ($timestamp !== FALSE) {
@@ -52,11 +52,11 @@ class views_handler_argument_civicrm_year_month extends views_handler_argument_d
   /**
    * Provide a link to the next level of the view
    */
-  function title() {
+  public function title() {
     $timestamp = strtotime($this->argument . " UTC");
     if ($timestamp !== FALSE) {
       return format_date($timestamp, 'custom', $this->format, 'UTC');
     }
   }
-}
 
+}

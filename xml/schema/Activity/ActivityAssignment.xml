@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<table>
+  <base>CRM/Activity</base>
+  <class>ActivityAssignment</class>
+  <name>civicrm_activity_assignment</name>
+  <comment>Activity assignments</comment>
+  <add>1.8</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Activity Assignment ID</title>
+    <required>true</required>
+    <comment>Activity assignment id</comment>
+    <add>1.8</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>activity_entity_table</name>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>Name of table where item being referenced is stored (activity, phonecall or meeting).</comment>
+    <add>1.8</add>
+    <drop>2.0</drop>
+  </field>
+
+  <field>
+    <name>activity_entity_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Entity (activity, phonecall or meeting) id for which the assigment is created</comment>
+    <add>1.8</add>
+    <drop>2.0</drop>
+  </field>
+
+  <dynamicForeignKey>
+    <idColumn>activity_entity_id</idColumn>
+    <typeColumn>activity_entity_table</typeColumn>
+    <add>1.8</add>
+    <drop>2.0</drop>
+  </dynamicForeignKey>
+
+  <field>
+    <name>target_entity_table</name>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>Name of table where item being referenced is stored (contact assigned to given activity).</comment>
+    <add>1.8</add>
+    <drop>2.0</drop>
+  </field>
+
+  <field>
+    <name>target_entity_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Foreign key to the referenced item.</comment>
+    <add>1.1</add>
+    <drop>2.0</drop>
+  </field>
+
+  <dynamicForeignKey>
+    <idColumn>target_entity_id</idColumn>
+    <typeColumn>target_entity_table</typeColumn>
+    <add>1.8</add>
+    <drop>2.0</drop>
+  </dynamicForeignKey>
+
+  <field>
+    <name>activity_id</name>
+    <type>int unsigned</type>
+    <title>Activity ID</title>
+    <required>true</required>
+    <comment>Foreign key to the activity for this assignment.</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>activity_id</name>
+    <table>civicrm_activity</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>assignee_contact_id</name>
+    <type>int unsigned</type>
+    <title>Assignee Contact ID</title>
+    <required>true</required>
+    <comment>Foreign key to the contact for this assignment.</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>assignee_contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <index>
+    <name>UI_activity_assignee_contact_id</name>
+    <fieldName>assignee_contact_id</fieldName>
+    <fieldName>activity_id</fieldName>
+    <unique>true</unique>
+    <add>2.0</add>
+  </index>
+
+
+</table>

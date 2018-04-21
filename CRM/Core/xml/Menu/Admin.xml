@@ -711,7 +711,7 @@
      <path>civicrm/sms/send</path>
      <title>New Mass SMS</title>
      <page_callback>CRM_SMS_Controller_Send</page_callback>
-     <access_arguments>administer CiviCRM</access_arguments>
+     <access_arguments>send SMS</access_arguments>
      <page_type>1</page_type>
      <weight>610</weight>
   </item>

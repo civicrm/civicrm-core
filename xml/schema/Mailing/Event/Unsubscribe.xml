@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing/Event</base>
+  <class>Unsubscribe</class>
+  <name>civicrm_mailing_event_unsubscribe</name>
+  <comment>Tracks when a recipient unsubscribes from a group/domain</comment>
+  <archive>true</archive>
+  <field>
+    <name>id</name>
+    <title>Unsubscribe ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>event_queue_id</name>
+    <title>Mailing Event Queue</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to EventQueue</comment>
+  </field>
+  <foreignKey>
+    <name>event_queue_id</name>
+    <table>civicrm_mailing_event_queue</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>org_unsubscribe</name>
+    <title>Unsubscribe is for Organization?</title>
+    <type>boolean</type>
+    <required>true</required>
+    <comment>Unsubscribe at org- or group-level</comment>
+  </field>
+  <field>
+    <name>time_stamp</name>
+    <title>Unsubscribe Timestamp</title>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
+    <required>true</required>
+    <comment>When this delivery event occurred.</comment>
+  </field>
+</table>

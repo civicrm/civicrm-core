@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -85,7 +85,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     $gcid = CRM_Utils_Request::retrieve('gcid', 'Positive', $this);
 
     if (!$gcid) {
-      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     }
     else {
       $this->_contactId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_GroupContact', $gcid, 'contact_id');

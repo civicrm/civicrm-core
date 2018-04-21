@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -1005,14 +1005,12 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // For custom searches, use the contactIDs method
     if (is_a($this, 'CRM_Contact_Selector_Custom')) {
       $sql = $this->_search->contactIDs($start, $end, $sort, TRUE);
-      $replaceSQL = "SELECT contact_a.id as contact_id";
       $coreSearch = FALSE;
     }
     // For core searches use the searchQuery method
     else {
       $sql = $this->_query->searchQuery($start, $end, $sort, FALSE, $this->_query->_includeContactIds,
         FALSE, TRUE, TRUE);
-      $replaceSQL = "SELECT contact_a.id as id";
     }
 
     // CRM-9096
@@ -1026,24 +1024,27 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
     $insertSQL = "
 INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cacheKey, data )
-SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.display_name
+SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.sort_name
 ";
 
-    $sql = str_replace($replaceSQL, $insertSQL, $sql);
-
-    $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-    $result = CRM_Core_DAO::executeQuery($sql);
-    unset($errorScope);
-
-    if (is_a($result, 'DB_Error')) {
-      // check if we get error during core search
+    $sql = str_replace(array("SELECT contact_a.id as contact_id", "SELECT contact_a.id as id"), $insertSQL, $sql);
+    try {
+      $result = CRM_Core_DAO::executeQuery($sql, [], FALSE, NULL, FALSE, TRUE, TRUE);
+      if (is_a($result, 'DB_Error')) {
+        throw new CRM_Core_Exception($result->message);
+      }
+    }
+    catch (CRM_Core_Exception $e) {
       if ($coreSearch) {
         // in the case of error, try rebuilding cache using full sql which is used for search selector display
         // this fixes the bugs reported in CRM-13996 & CRM-14438
         $this->rebuildPreNextCache($start, $end, $sort, $cacheKey);
       }
       else {
-        // return if above query fails
+        // This will always show for CiviRules :-( as a) it orders by 'rule_label'
+        // which is not available in the query & b) it uses contact not contact_a
+        // as an alias.
+        // CRM_Core_Session::setStatus(ts('Query Failed'));
         return;
       }
     }
@@ -1182,14 +1183,13 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
 
   /**
    * @param array $params
-   * @param $action
    * @param int $sortID
    * @param null $displayRelationshipType
    * @param string $queryOperator
    *
    * @return CRM_Contact_DAO_Contact
    */
-  public function contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
+  public function contactIDQuery($params, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
     $sortOrder = &$this->getSortOrder($this->_action);
     $sort = new CRM_Utils_Sort($sortOrder, $sortID);
 

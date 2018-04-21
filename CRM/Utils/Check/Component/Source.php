@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
 
@@ -50,6 +50,7 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
     $files[] = '[civicrm.vendor]/pear/net_smtp/tests';
     $files[] = '[civicrm.vendor]/pear/net_smtp/phpdoc.sh';
     $files[] = '[civicrm.vendor]/phpoffice/phpword/samples';
+    $files[] = '[civicrm.root]/templates/CRM/common/version.tpl';
 
     return $files;
   }

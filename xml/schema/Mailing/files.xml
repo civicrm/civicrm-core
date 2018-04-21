@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<tables xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<xi:include href="Component.xml"     parse="xml" />
+<xi:include href="Mailing.xml"       parse="xml" />
+<xi:include href="MailingAB.xml"     parse="xml" />
+<xi:include href="MailingGroup.xml"  parse="xml" />
+<xi:include href="TrackableURL.xml"  parse="xml" />
+<xi:include href="MailingJob.xml"    parse="xml" />
+<xi:include href="Recipients.xml"    parse="xml" />
+<xi:include href="BounceType.xml"    parse="xml" />
+<xi:include href="BouncePattern.xml" parse="xml" />
+<xi:include href="Spool.xml"         parse="xml" />
+</tables>

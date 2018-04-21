@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -54,6 +54,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
     $this->_params = $this->get('params');
     $this->_lineItem = $this->get('lineItem');
+    $this->_useForMember = $this->get('useForMember');
     $is_deductible = $this->get('is_deductible');
     $this->assign('is_deductible', $is_deductible);
     $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->_values));
@@ -104,8 +105,33 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     if ($productID) {
       CRM_Contribute_BAO_Premium::buildPremiumBlock($this, $this->_id, FALSE, $productID, $option);
     }
+
+    $params = $this->_params;
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
+    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    // Make a copy of line items array to use for display only
+    $tplLineItems = $this->_lineItem;
+    if ($invoicing) {
+      $getTaxDetails = FALSE;
+      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+      foreach ($this->_lineItem as $key => $value) {
+        foreach ($value as $k => $v) {
+          if (isset($v['tax_rate'])) {
+            if ($v['tax_rate'] != '') {
+              $getTaxDetails = TRUE;
+              // Cast to float to display without trailing zero decimals
+              $tplLineItems[$key][$k]['tax_rate'] = (float) $v['tax_rate'];
+            }
+          }
+        }
+      }
+      $this->assign('getTaxDetails', $getTaxDetails);
+      $this->assign('taxTerm', $taxTerm);
+      $this->assign('totalTaxAmount', $params['tax_amount']);
+    }
+
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
-      $this->assign('lineItem', $this->_lineItem);
+      $this->assign('lineItem', $tplLineItems);
     }
     else {
       if (is_array($membershipTypeID)) {
@@ -117,25 +143,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('priceSetID', $this->_priceSetId);
     $this->assign('useForMember', $this->get('useForMember'));
 
-    $params = $this->_params;
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-    if ($invoicing) {
-      $getTaxDetails = FALSE;
-      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-      foreach ($this->_lineItem as $value) {
-        foreach ($value as $v) {
-          if (isset($v['tax_rate'])) {
-            if ($v['tax_rate'] != '') {
-              $getTaxDetails = TRUE;
-            }
-          }
-        }
-      }
-      $this->assign('getTaxDetails', $getTaxDetails);
-      $this->assign('taxTerm', $taxTerm);
-      $this->assign('totalTaxAmount', $params['tax_amount']);
-    }
     if (!empty($this->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
 

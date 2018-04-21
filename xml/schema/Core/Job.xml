@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Job</class>
+  <name>civicrm_job</name>
+  <comment>Scheduled job.</comment>
+  <add>4.1</add>
+  <log>false</log>
+  <field>
+    <name>id</name>
+    <title>Job ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Job Id</comment>
+    <add>4.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>domain_id</name>
+    <title>Job Domain</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>Which Domain is this scheduled job for</comment>
+    <add>4.1</add>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <add>4.1</add>
+  </foreignKey>
+  <field>
+    <name>run_frequency</name>
+    <title>Job Frequency</title>
+    <type>varchar</type>
+    <length>8</length>
+    <default>"Daily"</default>
+    <comment>Scheduled job run frequency.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getJobFrequency</callback>
+    </pseudoconstant>
+    <add>4.1</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>last_run</name>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
+    <comment>When was this cron entry last run</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>scheduled_run_date</name>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
+    <comment>When is this cron entry scheduled to run</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>name</name>
+    <title>Job Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Title of the job</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>description</name>
+    <title>Job Description</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Description of the job</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>api_prefix</name>
+    <type>varchar</type>
+    <length>255</length>
+    <default>"civicrm_api3"</default>
+    <comment>Prefix of the job api call</comment>
+    <add>4.1</add>
+    <drop>4.3</drop>
+  </field>
+  <field>
+    <name>api_entity</name>
+    <title>API Entity</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Entity of the job api call</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>api_action</name>
+    <title>API Action</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Action of the job api call</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>parameters</name>
+    <title>API Parameters</title>
+    <type>text</type>
+    <comment>List of parameters to the command.</comment>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
+    </html>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Job Is Active?</title>
+    <type>boolean</type>
+    <comment>Is this job active?</comment>
+    <add>4.1</add>
+  </field>
+</table>

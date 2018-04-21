@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Field hanlder to allow filtering by CiviCRM domain.
@@ -30,7 +30,7 @@ class civicrm_handler_filter_domain extends views_handler_filter_numeric {
   /**
    * Add an additonal operator which takes no arguments to the existing list provided by views_handler_filter_numeric.
    */
-  function operators() {
+  public function operators() {
     $operators = parent::operators();
     $operators['current_domain'] = array(
       'title' => t('Current CiviCRM domain'),
@@ -44,7 +44,7 @@ class civicrm_handler_filter_domain extends views_handler_filter_numeric {
   /**
    * Grab the current domain id using the civicrm api and filter the query.
    */
-  function current_domain($field) {
+  public function current_domain($field) {
     if (!civicrm_initialize()) {
       return FALSE;
     }
@@ -58,4 +58,5 @@ class civicrm_handler_filter_domain extends views_handler_filter_numeric {
       $this->query->add_where($this->options['group'], $field, $domain['id']);
     }
   }
+
 }

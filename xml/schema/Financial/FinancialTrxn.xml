@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Financial</base>
+  <class>FinancialTrxn</class>
+  <name>civicrm_financial_trxn</name>
+  <add>1.3</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Financial Transaction ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>1.3</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>from_account_id</name>
+    <type>int unsigned</type>
+    <comment>FK to financial_account table.</comment>
+    <add>3.2</add>
+    <drop>4.3</drop>
+  </field>
+  <foreignKey>
+    <name>from_account_id</name>
+    <table>civicrm_financial_account</table>
+    <key>id</key>
+    <add>3.2</add>
+    <drop>4.3</drop>
+  </foreignKey>
+  <field>
+    <name>to_account_id</name>
+    <type>int unsigned</type>
+    <comment>FK to financial_account table.</comment>
+    <add>3.2</add>
+    <drop>4.3</drop>
+  </field>
+  <foreignKey>
+    <name>to_account_id</name>
+    <table>civicrm_financial_account</table>
+    <key>id</key>
+    <add>3.2</add>
+    <drop>4.3</drop>
+  </foreignKey>
+  <field>
+    <name>from_financial_account_id</name>
+    <type>int unsigned</type>
+    <title>Financial Transaction From Account</title>
+    <comment>FK to financial_account table.</comment>
+    <add>4.3</add>
+    <pseudoconstant>
+      <table>civicrm_financial_account</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>from_financial_account_id</name>
+    <table>civicrm_financial_account</table>
+    <key>id</key>
+    <add>4.3</add>
+  </foreignKey>
+  <field>
+    <name>to_financial_account_id</name>
+    <title>Financial Transaction To Account</title>
+    <type>int unsigned</type>
+    <comment>FK to financial_financial_account table.</comment>
+    <add>4.3</add>
+    <pseudoconstant>
+      <table>civicrm_financial_account</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>to_financial_account_id</name>
+    <table>civicrm_financial_account</table>
+    <key>id</key>
+    <add>4.3</add>
+  </foreignKey>
+  <field>
+    <name>trxn_date</name>
+    <title>Financial Transaction Date</title>
+    <type>datetime</type>
+    <default>NULL</default>
+    <comment>date transaction occurred</comment>
+    <add>1.3</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
+  </field>
+  <field>
+    <name>trxn_type</name>
+    <title>Financial Transaction Type</title>
+    <type>enum</type>
+    <values>Debit,Credit</values>
+    <required>true</required>
+    <add>1.3</add>
+    <drop>4.3</drop>
+  </field>
+  <field>
+    <name>total_amount</name>
+    <title>Financial Total Amount</title>
+    <type>decimal</type>
+    <required>true</required>
+    <comment>amount of transaction</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>fee_amount</name>
+    <title>Financial Fee Amount</title>
+    <type>decimal</type>
+    <comment>actual processor fee if known - may be 0.</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>net_amount</name>
+    <title>Financial Net Amount</title>
+    <type>decimal</type>
+    <comment>actual funds transfer amount. total less fees. if processor does not report actual fee during transaction, this is set to total_amount.</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>currency</name>
+    <title>Financial Currency</title>
+    <type>varchar</type>
+    <length>3</length>
+    <default>NULL</default>
+    <import>true</import>
+    <headerPattern>/cur(rency)?/i</headerPattern>
+    <dataPattern>/^[A-Z]{3}$/</dataPattern>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <add>1.3</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>is_payment</name>
+    <title>Is Payment?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <import>true</import>
+    <comment>Is this entry either a payment or a reversal of a payment?</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>payment_processor</name>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>derived from Processor setting in civicrm.settings.php.</comment>
+    <add>1.3</add>
+    <drop>4.3</drop>
+  </field>
+  <field>
+    <name>trxn_id</name>
+    <title>Transaction ID</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Transaction id supplied by external processor. This may not be unique.</comment>
+    <html>
+      <type>Text</type>
+      <size>10</size>
+    </html>
+    <add>1.3</add>
+  </field>
+  <index>
+    <name>UI_ftrxn_trxn_id</name>
+    <fieldName>trxn_id</fieldName>
+    <add>4.7</add>
+  </index>
+  <field>
+    <name>trxn_result_code</name>
+    <title>Transaction Result Code</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>processor result code</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>status_id</name>
+    <title>Financial Transaction Status Id</title>
+    <type>int unsigned</type>
+    <import>true</import>
+    <export>true</export>
+    <pseudoconstant>
+      <optionGroupName>contribution_status</optionGroupName>
+    </pseudoconstant>
+    <comment>pseudo FK to civicrm_option_value of contribution_status_id option_group</comment>
+    <headerPattern>/status/i</headerPattern>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>payment_processor_id</name>
+    <title>Payment Processor</title>
+    <type>int unsigned</type>
+    <comment>Payment Processor for this financial transaction</comment>
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>payment_processor_id</name>
+    <table>civicrm_payment_processor</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+    <add>4.3</add>
+  </foreignKey>
+  <field>
+    <name>payment_instrument_id</name>
+    <uniqueName>financial_trxn_payment_instrument_id</uniqueName>
+    <title>Payment Method</title>
+    <type>int unsigned</type>
+    <comment>FK to payment_instrument option group values</comment>
+    <pseudoconstant>
+      <optionGroupName>payment_instrument</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>4.3</add>
+  </field>
+  <index>
+    <name>UI_ftrxn_payment_instrument_id</name>
+    <fieldName>payment_instrument_id</fieldName>
+    <add>4.3</add>
+  </index>
+  <field>
+    <name>card_type_id</name>
+    <uniqueName>financial_trxn_card_type_id</uniqueName>
+    <title>Card Type ID</title>
+    <type>int unsigned</type>
+    <comment>FK to accept_creditcard option group values</comment>
+    <pseudoconstant>
+      <optionGroupName>accept_creditcard</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>check_number</name>
+    <uniqueName>financial_trxn_check_number</uniqueName>
+    <title>Check Number</title>
+    <comment>Check number</comment>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <type>Text</type>
+      <size>6</size>
+    </html>
+    <add>4.3</add>
+  </field>
+  <index>
+    <name>UI_ftrxn_check_number</name>
+    <fieldName>check_number</fieldName>
+    <add>4.3</add>
+  </index>
+  <field>
+    <name>pan_truncation</name>
+    <uniqueName>financial_trxn_pan_truncation</uniqueName>
+    <title>Pan Truncation</title>
+    <type>varchar</type>
+    <length>4</length>
+    <html>
+      <type>Text</type>
+      <size>4</size>
+    </html>
+    <comment>Last 4 digits of credit card</comment>
+    <add>4.7</add>
+  </field>
+</table>

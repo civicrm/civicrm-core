@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing/Event</base>
+  <class>Confirm</class>
+  <name>civicrm_mailing_event_confirm</name>
+  <comment>Tracks when a subscription event is confirmed by email</comment>
+  <archive>true</archive>
+  <field>
+    <name>id</name>
+    <title>Mailing Confirmation ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>event_subscribe_id</name>
+    <title>Mailing Subscribe ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm_mailing_event_subscribe</comment>
+  </field>
+  <foreignKey>
+    <name>event_subscribe_id</name>
+    <table>civicrm_mailing_event_subscribe</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>time_stamp</name>
+    <title>Confirm Timestamp</title>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
+    <required>true</required>
+    <comment>When this confirmation event occurred.</comment>
+  </field>
+</table>

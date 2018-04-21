@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -133,9 +133,9 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *   (reference) an assoc array of name/value pairs.
    * @param array $ids
    *   (deprecated) associated array with note id - preferably set $params['id'].
-   *
-   * @return object|null
+   * @return null|object $note
    *   $note CRM_Core_BAO_Note object
+   * @throws \CRM_Exception
    */
   public static function add(&$params, $ids = array()) {
     $dataExists = self::dataExists($params);
@@ -161,7 +161,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
 
     $note->copyValues($params);
     if (empty($params['contact_id'])) {
-      if ($params['entity_table'] == 'civicrm_contact') {
+      if (CRM_Utils_Array::value('entity_table', $params) == 'civicrm_contact') {
         $note->contact_id = $params['entity_id'];
       }
     }
@@ -183,9 +183,10 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
       $displayName = CRM_Contact_BAO_Contact::displayName($note->entity_id);
 
       $noteActions = FALSE;
-      $session = CRM_Core_Session::singleton();
-      if ($session->get('userID')) {
-        if ($session->get('userID') == $note->entity_id) {
+
+      $loggedInContactID = CRM_Core_Session::singleton()->getLoggedInContactID();
+      if ($loggedInContactID) {
+        if ($loggedInContactID == $note->entity_id) {
           $noteActions = TRUE;
         }
         elseif (CRM_Contact_BAO_Contact_Permission::allow($note->entity_id, CRM_Core_Permission::EDIT)) {
@@ -231,7 +232,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    */
   public static function dataExists(&$params) {
     // return if no data present
-    if (!strlen($params['note'])) {
+    if (empty($params['id']) && !strlen($params['note'])) {
       return FALSE;
     }
     return TRUE;

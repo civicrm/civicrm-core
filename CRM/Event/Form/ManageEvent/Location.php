@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -147,16 +147,13 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    * Function to build location block.
    */
   public function buildQuickForm() {
-    //load form for child blocks
-    if ($this->_addBlockName) {
-      $className = "CRM_Contact_Form_Edit_{$this->_addBlockName}";
-      return $className::buildQuickForm($this);
-    }
+    CRM_Contact_Form_Edit_Address::buildQuickForm($this, 1);
+    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 1);
+    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 2);
+    CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 1);
+    CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 2);
 
     $this->applyFilter('__ALL__', 'trim');
-
-    //build location blocks.
-    CRM_Contact_Form_Location::buildQuickForm($this);
 
     //fix for CRM-1971
     $this->assign('action', $this->_action);
@@ -184,7 +181,6 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
       $locationEvents = array_unique($locationEvents);
     }
 
-    $events = array();
     if (!empty($locationEvents)) {
       $this->assign('locEvents', TRUE);
       $optionTypes = array(
@@ -256,6 +252,9 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
           $values['is_primary'] = 1;
         }
         $values['location_type_id'] = ($defaultLocationType->id) ? $defaultLocationType->id : 1;
+        if (isset($this->_values[$block][$count])) {
+          $values['id'] = $this->_values[$block][$count]['id'];
+        }
       }
     }
 

@@ -1,0 +1,15 @@
+/* Disable the display of the direct debit fields that are injected by Core templates/CRM/Core/BillingBlock */
+
+.account_holder-section {
+  display: none;
+}
+.bank_account_number-section {
+  display: none;
+}
+.bank_identification_number-section {
+  display: none;
+}
+.bank_name-section {
+  display: none;
+}
+

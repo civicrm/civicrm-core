@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Field handler to provide a formatted monetary string
@@ -29,7 +29,7 @@
  * @ingroup civicrm_field_handlers
  */
 class civicrm_handler_field_money extends views_handler_field {
-  function construct() {
+  public function construct() {
     parent::construct();
     if (!civicrm_initialize()) {
       return;
@@ -41,11 +41,16 @@ class civicrm_handler_field_money extends views_handler_field {
     }
   }
 
-  function render($values) {
+  public function render($values) {
     $value = $this->get_value($values);
-    $currency = $this->get_value($values, 'currency');
+    if (!empty($this->definition['currency field'])) {
+      $currency = $this->get_value($values, 'currency');
+    }
+    else {
+      $currency = CRM_Core_Config::singleton()->defaultCurrency;
+    }
 
-    switch ($this->options ['display_format']) {
+    switch ($this->options['display_format']) {
       case 'formatted':
         return CRM_Utils_Money::format($value, $currency);
 
@@ -54,24 +59,25 @@ class civicrm_handler_field_money extends views_handler_field {
     }
   }
 
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
 
-    $options ['display_format'] = array('default' => 'formatted');
+    $options['display_format'] = array('default' => 'formatted');
 
     return $options;
   }
 
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
-    $form ['display_format'] = array(
+    $form['display_format'] = array(
       '#type' => 'select',
       '#title' => t('Display format'),
       '#options' => array(
         'formatted' => t('Currency formatted amount ($123.45)'),
         'raw' => t('Raw amount (123.45)'),
       ),
-      '#default_value' => $this->options ['display_format'],
+      '#default_value' => $this->options['display_format'],
     );
   }
+
 }

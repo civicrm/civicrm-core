@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -208,6 +208,17 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             }
             else {
               CRM_Contact_Import_Parser_Contact::addToErrorMsg('End date', $errorMessage);
+            }
+            break;
+
+          case 'status_override_end_date':
+            if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
+              if (!CRM_Utils_Rule::date($params[$key])) {
+                CRM_Contact_Import_Parser_Contact::addToErrorMsg('Status Override End Date', $errorMessage);
+              }
+            }
+            else {
+              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Status Override End Date', $errorMessage);
             }
             break;
 

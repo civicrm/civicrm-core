@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contact</base>
+  <class>DashboardContact</class>
+  <name>civicrm_dashboard_contact</name>
+  <comment>Table to store dashboard for each contact.</comment>
+  <add>3.1</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Dashboard Contact ID</title>
+    <required>true</required>
+    <add>3.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>dashboard_id</name>
+    <type>int unsigned</type>
+    <title>Dashboard</title>
+    <required>true</required>
+    <comment>Dashboard ID</comment>
+    <add>3.1</add>
+  </field>
+  <foreignKey>
+    <name>dashboard_id</name>
+    <table>civicrm_dashboard</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+    <add>3.1</add>
+  </foreignKey>
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <title>Dashboard Contact</title>
+    <required>true</required>
+    <comment>Contact ID</comment>
+    <add>3.1</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+    <add>3.1</add>
+  </foreignKey>
+  <index>
+    <name>index_dashboard_id_contact_id</name>
+    <fieldName>dashboard_id</fieldName>
+    <fieldName>contact_id</fieldName>
+    <unique>true</unique>
+    <add>4.7</add>
+  </index>
+  <field>
+    <name>column_no</name>
+    <type>boolean</type>
+    <comment>column no for this widget</comment>
+    <default>0</default>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>is_minimized</name>
+    <type>boolean</type>
+    <title>Dashlet is Minimized?</title>
+    <comment>Is Minimized?</comment>
+    <default>0</default>
+    <add>3.1</add>
+    <drop>4.7</drop>
+  </field>
+  <field>
+    <name>is_fullscreen</name>
+    <type>boolean</type>
+    <title>Dashlet is FullScreen?</title>
+    <comment>Is Fullscreen?</comment>
+    <default>1</default>
+    <add>3.1</add>
+    <drop>4.7</drop>
+  </field>
+  <field>
+    <name>is_active</name>
+    <type>boolean</type>
+    <title>Dashlet is Active?</title>
+    <comment>Is this widget active?</comment>
+    <default>0</default>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>weight</name>
+    <title>Order</title>
+    <type>int</type>
+    <comment>Ordering of the widgets.</comment>
+    <default>0</default>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>content</name>
+    <type>longtext</type>
+    <comment>dashlet content</comment>
+    <add>3.3</add>
+    <drop>4.7</drop>
+  </field>
+  <field>
+    <name>created_date</name>
+    <type>datetime</type>
+    <title>Dashlet Created On</title>
+    <comment>When was content populated</comment>
+    <add>3.3</add>
+    <drop>4.7</drop>
+  </field>
+</table>

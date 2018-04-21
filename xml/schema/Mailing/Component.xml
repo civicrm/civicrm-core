@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing</base>
+  <class>Component</class>
+  <name>civicrm_mailing_component</name>
+  <comment>Stores information about the mailing components (header/footer).</comment>
+  <field>
+    <name>id</name>
+    <title>Mailing Component ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>Component Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>The name of this component</comment>
+  </field>
+  <field>
+    <name>component_type</name>
+    <title>Mailing Component Type</title>
+    <type>varchar</type>
+    <length>12</length>
+    <comment>Type of Component.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::mailingComponents</callback>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>subject</name>
+    <type>varchar</type>
+    <length>255</length>
+  </field>
+  <field>
+    <name>body_html</name>
+    <title>Mailing Component Body HTML</title>
+    <type>text</type>
+    <comment>Body of the component in html format.</comment>
+    <html>
+      <type>TextArea</type>
+      <rows>8</rows>
+      <cols>80</cols>
+    </html>
+  </field>
+  <field>
+    <name>body_text</name>
+    <type>text</type>
+    <comment>Body of the component in text format.</comment>
+    <html>
+      <type>TextArea</type>
+      <rows>8</rows>
+      <cols>80</cols>
+    </html>
+  </field>
+  <field>
+    <name>is_default</name>
+    <title>Mailing Component is Default?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this the default component for this component_type?</comment>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Mailing Component Is Active?</title>
+    <type>boolean</type>
+    <comment>Is this property active?</comment>
+  </field>
+</table>

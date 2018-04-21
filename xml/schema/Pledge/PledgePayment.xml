@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Pledge</base>
+  <class>PledgePayment</class>
+  <name>civicrm_pledge_payment</name>
+  <comment>Pledge Payment</comment>
+  <add>2.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <uniqueName>pledge_payment_id</uniqueName>
+    <title>Payment ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <import>true</import>
+    <add>2.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>pledge_id</name>
+    <title>Pledge</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Pledge table</comment>
+    <add>2.1</add>
+  </field>
+  <foreignKey>
+    <name>pledge_id</name>
+    <table>civicrm_pledge</table>
+    <key>id</key>
+    <add>2.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>contribution_id</name>
+    <title>Contribution</title>
+    <type>int unsigned</type>
+    <comment>FK to contribution table.</comment>
+    <add>2.1</add>
+  </field>
+  <foreignKey>
+    <name>contribution_id</name>
+    <table>civicrm_contribution</table>
+    <key>id</key>
+    <add>2.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <index>
+    <name>index_contribution_pledge</name>
+    <fieldName>contribution_id</fieldName>
+    <fieldName>pledge_id</fieldName>
+    <add>2.1</add>
+  </index>
+  <field>
+    <name>scheduled_amount</name>
+    <uniqueName>pledge_payment_scheduled_amount</uniqueName>
+    <title>Scheduled Amount</title>
+    <import>true</import>
+    <type>decimal</type>
+    <required>true</required>
+    <comment>Pledged amount for this payment (the actual contribution amount might be different).</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>actual_amount</name>
+    <uniqueName>pledge_payment_actual_amount</uniqueName>
+    <title>Actual Amount</title>
+    <import>true</import>
+    <type>decimal</type>
+    <comment>Actual amount that is paid as the Pledged installment amount.</comment>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>currency</name>
+    <title>Currency</title>
+    <type>varchar</type>
+    <length>3</length>
+    <default>NULL</default>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <add>3.2</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>scheduled_date</name>
+    <uniqueName>pledge_payment_scheduled_date</uniqueName>
+    <title>Scheduled Date</title>
+    <import>true</import>
+    <type>datetime</type>
+    <required>true</required>
+    <comment>The date the pledge payment is supposed to happen.</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>reminder_date</name>
+    <uniqueName>pledge_payment_reminder_date</uniqueName>
+    <title>Last Reminder</title>
+    <import>true</import>
+    <type>datetime</type>
+    <comment>The date that the most recent payment reminder was sent.</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>reminder_count</name>
+    <uniqueName>pledge_payment_reminder_count</uniqueName>
+    <title>Reminders Sent</title>
+    <import>true</import>
+    <type>int unsigned</type>
+    <default>0</default>
+    <comment>The number of payment reminders sent.</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>status_id</name>
+    <title>Payment Status</title>
+    <uniqueName>pledge_payment_status_id</uniqueName>
+    <import>true</import>
+    <export>false</export>
+    <type>int unsigned</type>
+    <add>2.1</add>
+    <pseudoconstant>
+      <optionGroupName>contribution_status</optionGroupName>
+    </pseudoconstant>
+  </field>
+  <index>
+    <name>index_status</name>
+    <fieldName>status_id</fieldName>
+    <add>2.1</add>
+  </index>
+</table>

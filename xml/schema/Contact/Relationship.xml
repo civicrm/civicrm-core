@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contact</base>
+  <class>Relationship</class>
+  <name>civicrm_relationship</name>
+  <comment>Relationship between any 2 types of contacts.</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Relationship ID</title>
+    <required>true</required>
+    <comment>Relationship ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id_a</name>
+    <type>int unsigned</type>
+    <title>Contact A</title>
+    <required>true</required>
+    <comment>id of the first contact</comment>
+    <add>1.1</add>
+  </field>
+  <foreignKey>
+    <name>contact_id_a</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>contact_id_b</name>
+    <type>int unsigned</type>
+    <title>Contact B</title>
+    <required>true</required>
+    <comment>id of the second contact</comment>
+    <add>1.1</add>
+    <html>
+      <type>EntityRef</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>contact_id_b</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>relationship_type_id</name>
+    <type>int unsigned</type>
+    <title>Relationship Type</title>
+    <required>true</required>
+    <comment>id of the relationship</comment>
+    <add>1.1</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>relationship_type_id</name>
+    <table>civicrm_relationship_type</table>
+    <key>id</key>
+    <add>1.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>start_date</name>
+    <type>date</type>
+    <title>Relationship Start Date</title>
+    <comment>date when the relationship started</comment>
+    <add>1.1</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>end_date</name>
+    <type>date</type>
+    <title>Relationship End Date</title>
+    <comment>date when the relationship ended</comment>
+    <add>1.1</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>is_active</name>
+    <type>boolean</type>
+    <title>Relationship Is Active</title>
+    <default>1</default>
+    <comment>is the relationship active ?</comment>
+    <add>1.1</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>description</name>
+    <type>varchar</type>
+    <title>Relationship Description</title>
+    <length>255</length>
+    <comment>Optional verbose description for the relationship.</comment>
+    <add>1.5</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>is_permission_a_b</name>
+    <type>boolean</type>
+    <title>Contact A has Permission Over Contact B</title>
+    <default>0</default>
+    <comment>is contact a has permission to view / edit contact and
+      related data for contact b ?
+    </comment>
+    <add>2.1</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>is_permission_b_a</name>
+    <type>boolean</type>
+    <title>Contact B has Permission Over Contact A</title>
+    <default>0</default>
+    <comment>is contact b has permission to view / edit contact and
+      related data for contact a ?
+    </comment>
+    <add>2.1</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>case_id</name>
+    <type>int unsigned</type>
+    <title>Relationship Case</title>
+    <default>NULL</default>
+    <comment>FK to civicrm_case</comment>
+    <add>2.2</add>
+  </field>
+  <foreignKey>
+    <name>case_id</name>
+    <table>civicrm_case</table>
+    <key>id</key>
+    <add>2.2</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+</table>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Setting</class>
+  <name>civicrm_setting</name>
+  <comment>Table to store civicrm settings for civicrm core and components.</comment>
+  <add>4.1</add>
+  <field>
+    <name>id</name>
+    <title>Setting ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>4.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>group_name</name>
+    <title>Setting Group</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>group name for setting element, useful in caching setting elements</comment>
+    <add>4.1</add>
+    <drop>4.7</drop>
+  </field>
+  <field>
+    <name>name</name>
+    <title>Setting Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Unique name for setting</comment>
+    <add>4.1</add>
+  </field>
+  <index>
+    <name>index_group_name</name>
+    <fieldName>group_name</fieldName>
+    <fieldName>name</fieldName>
+    <add>4.1</add>
+    <drop>4.7</drop>
+  </index>
+  <field>
+    <name>value</name>
+    <type>text</type>
+    <comment>data associated with this group / name combo</comment>
+    <serialize>PHP</serialize>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>domain_id</name>
+    <title>Setting Domain</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>Which Domain is this menu item for</comment>
+    <add>4.1</add>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+    <add>4.1</add>
+  </foreignKey>
+  <field>
+    <name>contact_id</name>
+    <title>Setting Contact</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID if the setting is localized to a contact</comment>
+    <add>4.1</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+    <add>4.1</add>
+  </foreignKey>
+  <field>
+    <name>is_domain</name>
+    <title>Is Domain Setting?</title>
+    <type>boolean</type>
+    <comment>Is this setting a contact specific or site wide setting?</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>component_id</name>
+    <title>Setting Component</title>
+    <type>int unsigned</type>
+    <comment>Component that this menu item belongs to</comment>
+    <add>4.1</add>
+    <pseudoconstant>
+      <table>civicrm_component</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>component_id</name>
+    <table>civicrm_component</table>
+    <key>id</key>
+    <add>4.1</add>
+  </foreignKey>
+  <field>
+    <name>created_date</name>
+    <title>Setting Created Date</title>
+    <type>datetime</type>
+    <comment>When was the setting created</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>created_id</name>
+    <title>Setting Created By</title>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_contact, who created this setting</comment>
+    <add>4.1</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.1</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <index>
+    <name>index_domain_contact_name</name>
+    <fieldName>domain_id</fieldName>
+    <fieldName>contact_id</fieldName>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>4.7</add>
+  </index>
+
+</table>

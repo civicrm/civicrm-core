@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -228,12 +228,12 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     }
     $this->_showHide->addToTemplate();
     $this->assign('inDate', $this->_inDate);
-
     if (!empty($defaults['payment_processor'])) {
-      $defaults['payment_processor'] = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',',
+      $defaults['payment_processor'] = array_fill_keys(explode(CRM_Core_DAO::VALUE_SEPARATOR,
         $defaults['payment_processor']
-      );
+      ), '1');
     }
+
     return $defaults;
   }
 
@@ -255,15 +255,11 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor();
 
     $this->assign('paymentProcessor', $paymentProcessor);
-
-    $this->addEntityRef('payment_processor', ts('Payment Processor'), array(
-      'entity' => 'PaymentProcessor',
-      'multiple' => TRUE,
-      'api' => array(
-        'params' => array('domain_id' => CRM_Core_Config::domainID()),
-      ),
-      'select' => array('minimumInputLength' => 0),
-    ));
+    $this->addCheckBox('payment_processor', ts('Payment Processor'),
+      array_flip($paymentProcessor),
+      NULL, NULL, NULL, NULL,
+      array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
+    );
 
     // financial type
     if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() ||
@@ -564,7 +560,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     }
 
     if (!empty($params['payment_processor'])) {
-      $params['payment_processor'] = str_replace(',', CRM_Core_DAO::VALUE_SEPARATOR, $params['payment_processor']);
+      $params['payment_processor'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($params['payment_processor']));
     }
     else {
       $params['payment_processor'] = 'null';

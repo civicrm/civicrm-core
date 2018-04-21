@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -168,11 +166,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->addSortNameField();
-
-    if (CRM_Core_Permission::check('access deleted contacts') and Civi::settings()->get('contact_undelete')) {
-      $this->addElement('checkbox', 'deleted_contacts', ts('Search in Trash') . '<br />' . ts('(deleted contacts)'));
-    }
+    $this->addContactSearchFields();
 
     CRM_Event_BAO_Query::buildSearchForm($this);
 
@@ -229,14 +223,10 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->assign('participantCount', $participantCount);
       $this->assign('lineItems', $lineItems);
 
-      $permission = CRM_Core_Permission::getPermission();
+      $taskParams['ssID'] = isset($this->_ssID) ? $this->_ssID : NULL;
+      $tasks = CRM_Event_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission(), $taskParams);
 
-      $tasks = CRM_Event_Task::permissionedTaskTitles($permission);
       if (isset($this->_ssID)) {
-        if ($permission == CRM_Core_Permission::EDIT) {
-          $tasks = $tasks + CRM_Event_Task::optionalTaskTitle();
-        }
-
         $savedSearchValues = array(
           'id' => $this->_ssID,
           'name' => CRM_Contact_BAO_SavedSearch::getName($this->_ssID, 'title'),
@@ -270,6 +260,36 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    */
   protected function getSortNameLabelWithOutEmail() {
     return ts('Participant Name');
+  }
+
+  /**
+   * Get the label for the tag field.
+   *
+   * We do this in a function so the 'ts' wraps the whole string to allow
+   * better translation.
+   *
+   * @return string
+   */
+  protected function getTagLabel() {
+    return ts('Participant Tag(s)');
+  }
+
+  /**
+   * Get the label for the group field.
+   *
+   * @return string
+   */
+  protected function getGroupLabel() {
+    return ts('Participant Group(s)');
+  }
+
+  /**
+   * Get the label for the group field.
+   *
+   * @return string
+   */
+  protected function getContactTypeLabel() {
+    return ts('Participant Contact Type');
   }
 
   /**

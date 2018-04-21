@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -130,16 +130,13 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/case', "reset=1&id={$this->_entityID}&cid={$this->_contactID}&action=view"));
 
     $session = CRM_Core_Session::singleton();
-    $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'Change Custom Data', 'name');
+    $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Custom Data');
     $activityParams = array(
       'activity_type_id' => $activityTypeID,
       'source_contact_id' => $session->get('userID'),
       'is_auto' => TRUE,
       'subject' => $this->_customTitle . " : change data",
-      'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
-        'Completed',
-        'name'
-      ),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
       'target_contact_id' => $this->_contactID,
       'details' => json_encode($this->_defaults),
       'activity_date_time' => date('YmdHis'),

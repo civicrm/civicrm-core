@@ -16,19 +16,25 @@ class CRM_Core_CodeGen_Specification {
    * @param string $buildVersion
    *   Which version of the schema to build.
    */
-  public function parse($schemaPath, $buildVersion) {
+  public function parse($schemaPath, $buildVersion, $verbose = TRUE) {
     $this->buildVersion = $buildVersion;
 
-    echo "Parsing schema description " . $schemaPath . "\n";
+    if ($verbose) {
+      echo "Parsing schema description " . $schemaPath . "\n";
+    }
     $dbXML = CRM_Core_CodeGen_Util_Xml::parse($schemaPath);
 
-    echo "Extracting database information\n";
+    if ($verbose) {
+      echo "Extracting database information\n";
+    }
     $this->database = &$this->getDatabase($dbXML);
 
     $this->classNames = array();
 
     # TODO: peel DAO-specific stuff out of getTables, and spec reading into its own class
-    echo "Extracting table information\n";
+    if ($verbose) {
+      echo "Extracting table information\n";
+    }
     $this->tables = $this->getTables($dbXML, $this->database);
 
     $this->resolveForeignKeys($this->tables, $this->classNames);
@@ -231,8 +237,6 @@ class CRM_Core_CodeGen_Specification {
       $this->getPrimaryKey($tableXML->primaryKey, $fields, $table);
     }
 
-    // some kind of refresh?
-    CRM_Core_Config::singleton(FALSE);
     if ($this->value('index', $tableXML)) {
       $index = array();
       foreach ($tableXML->index as $indexXML) {
@@ -361,6 +365,7 @@ class CRM_Core_CodeGen_Specification {
     $field['headerPattern'] = $this->value('headerPattern', $fieldXML);
     $field['dataPattern'] = $this->value('dataPattern', $fieldXML);
     $field['uniqueName'] = $this->value('uniqueName', $fieldXML);
+    $field['serialize'] = $this->value('serialize', $fieldXML);
     $field['html'] = $this->value('html', $fieldXML);
     if (!empty($field['html'])) {
       $validOptions = array(

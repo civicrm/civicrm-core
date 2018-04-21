@@ -25,7 +25,6 @@ class CRM_Core_CodeGen_Util_Template {
       $this->beautifier = new PHP_Beautifier();
       $this->beautifier->addFilter('ArrayNested');
       // add one or more filters
-      $this->beautifier->addFilter('NewLines', array('after' => 'class, public, require, comment'));
       $this->beautifier->setIndentChar(' ');
       $this->beautifier->setIndentNumber(2);
       $this->beautifier->setNewLine("\n");
@@ -57,16 +56,27 @@ class CRM_Core_CodeGen_Util_Template {
    *   Full path to the desired output file.
    */
   public function run($infile, $outpath) {
-    $renderedContents = $this->smarty->fetch($infile);
+    $contents = $this->smarty->fetch($infile);
 
     if ($this->filetype === 'php') {
-      $this->beautifier->setInputString($renderedContents);
-      $this->beautifier->setOutputFile($outpath);
+      $this->beautifier->setInputString($contents);
       $this->beautifier->process();
-      $this->beautifier->save();
+      $contents = $this->beautifier->get();
+      // The beautifier isn't as beautiful as one would hope. Here's some extra string fudging.
+      $replacements = [
+        ') ,' => '),',
+        "\n  }\n}\n" => "\n  }\n\n}\n",
+        '=> true,' => '=> TRUE,',
+        '=> false,' => '=> FALSE,',
+      ];
+      $contents = str_replace(array_keys($replacements), array_values($replacements), $contents);
+      $contents = preg_replace('#(\s*)\\/\\*\\*#', "\n\$1/**", $contents);
+      // Convert old array syntax to new square brackets
+      $contents = CRM_Core_CodeGen_Util_ArraySyntaxConverter::convert($contents);
+      file_put_contents($outpath, $contents);
     }
     else {
-      file_put_contents($outpath, $renderedContents);
+      file_put_contents($outpath, $contents);
     }
   }
 

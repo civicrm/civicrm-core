@@ -45,16 +45,41 @@
       }
       else {
         $el.after('<span>&nbsp; = &nbsp;<input class="crm-form-text ' + (type==='Number' ? 'eight" type="number"' : 'huge" type="text"') + ' name="config_' + name + '"/></span>');
+        $el.next('span').find('input.crm-form-text[type=text]').change(validateJson);
       }
     } else {
       $el.closest('div').remove();
     }
   }
 
+  function getOptionList() {
+    var list = [];
+    _.forEach(options, function(option) {
+      var opt = _.cloneDeep(option);
+      if ($('[name="config_' + opt.id + '"]').length) {
+        opt.disabled = true;
+      }
+      list.push(opt);
+    });
+    return {results: list, text: 'id'};
+  }
+
+  function validateJson() {
+    var val = $(this).val();
+    $(this).parent().removeClass('crm-error');
+    if (val[0] === '[' || val[0] === '{') {
+      try {
+        JSON.parse(val);
+      } catch (e) {
+        $(this).parent().addClass('crm-error');
+      }
+    }
+  }
+
   function addOption() {
     $('#crm-custom-config-options').append($(configRowTpl({})));
-    $('div:last input.crm-config-option-name', '#crm-custom-config-options').crmSelect2({
-      data: {results: options, text: 'id'},
+    $('.crm-config-option-row:last input.crm-config-option-name', '#crm-custom-config-options').crmSelect2({
+      data: getOptionList,
       formatSelection: function(field) {
         return '<strong>' + field.id + '</strong> (' + field.type + ')';
       },

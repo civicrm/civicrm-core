@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Build the $data array for Price Set related tables
@@ -32,11 +32,11 @@
  * civicrm_price_field_value
  */
 function _civicrm_price_set_data(&$data, $enabled) {
-  
+
   //----------------------------------------------------------------
   // CIVICRM Price Set Entity - BASE TABLE
   //----------------------------------------------------------------
-  
+
   $data['civicrm_price_set_entity']['table']['group'] = t('CiviCRM Price Set Entities');
 
   $data['civicrm_price_set_entity']['table']['base'] = array(
@@ -44,11 +44,11 @@ function _civicrm_price_set_data(&$data, $enabled) {
     'title' => t('CiviCRM Price Set Entities'),
     'help' => t("View displays CiviCRM Price Set to Entity mapping info"),
   );
-  
+
   //----------------------------------------------------------------
   // CIVICRM Price Set Entity - TABLE JOINS
   //----------------------------------------------------------------
-    
+
   $data['civicrm_price_set_entity']['table']['join'] = array(
     // Directly links to event table.
     'civicrm_event' => array(
@@ -56,11 +56,11 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'field' => 'entity_id',
     ),
   );
-  
+
   //----------------------------------------------------------------
   // CIVICRM Price Set Entity - FIELDS
   //----------------------------------------------------------------
-      
+
   // Numeric: Price Set ID
   $data['civicrm_price_set_entity']['price_set_id'] = array(
     'title' => t('Price Set ID'),
@@ -100,11 +100,11 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //----------------------------------------------------------------
   // CIVICRM Price Set Entity - RELATIONSHIPS
   //----------------------------------------------------------------
-    
+
   // Price Set
   $data['civicrm_price_set_entity']['price_set'] = array(
     'title' => t('Price Set'),
@@ -117,7 +117,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'label' => t('Price Set'),
     ),
   );
-  
+
   //----------------------------------------------------------------
   // CIVICRM Price Set - BASE TABLE
   //----------------------------------------------------------------
@@ -129,11 +129,11 @@ function _civicrm_price_set_data(&$data, $enabled) {
     'title' => t('CiviCRM Price Sets'),
     'help' => t("View displays CiviCRM Price Sets"),
   );
-  
+
   //----------------------------------------------------------------
   // CIVICRM Price Set - FIELDS
   //----------------------------------------------------------------
-    
+
   // Numeric: Price Set ID
   $data['civicrm_price_set']['id'] = array(
     'title' => t('Price Set ID'),
@@ -177,7 +177,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
   // Name
   $data['civicrm_price_set']['name'] = array(
     'title' => t('Name'),
-    'help' => t('The Price Set\'s machine name'),
+    'help' => t("The Price Set's machine name"),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -193,11 +193,11 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Title
   $data['civicrm_price_set']['title'] = array(
     'title' => t('Title'),
-    'help' => t('The Price Set\'s title'),
+    'help' => t("The Price Set's title"),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -213,7 +213,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Boolean: Is Active
   $data['civicrm_price_set']['is_active'] = array(
     'title' => t('Is Active'),
@@ -232,7 +232,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
- 
+
   // Extends
   $data['civicrm_price_set']['extends'] = array(
     'title' => t('Extends'),
@@ -252,7 +252,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Financial Type
   $data['civicrm_price_set']['financial_type'] = array(
     'title' => t('Financial Type'),
@@ -275,7 +275,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Boolean: Is Quick Config
   $data['civicrm_price_set']['is_quick_config'] = array(
     'title' => t('Is Quick Config'),
@@ -294,7 +294,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Boolean: Is Reserved
   $data['civicrm_price_set']['is_reserved'] = array(
     'title' => t('Is Reserved'),
@@ -313,23 +313,23 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //----------------------------------------------------------------
   // CIVICRM Price Field - BASE TABLE
   //----------------------------------------------------------------
-  
+
   $data['civicrm_price_field']['table']['group'] = t('CiviCRM Price Fields');
-  
+
   $data['civicrm_price_field']['table']['base'] = array(
     'field' => 'id',
     'title' => t('CiviCRM Price Fields'),
     'help' => t("View displays CiviCRM Price Fields"),
   );
-  
+
   //----------------------------------------------------------------
   // CIVICRM Price Field - FIELDS
   //----------------------------------------------------------------
-  
+
   // Numeric: Price Field ID
   $data['civicrm_price_field']['id'] = array(
     'title' => t('Price Field ID'),
@@ -373,7 +373,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
   // Name
   $data['civicrm_price_field']['name'] = array(
     'title' => t('Name'),
-    'help' => t('The Price Field\'s machine name'),
+    'help' => t("The Price Field's machine name"),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -389,11 +389,11 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Label
   $data['civicrm_price_field']['label'] = array(
     'title' => t('Label'),
-    'help' => t('The Price Field\'s label'),
+    'help' => t("The Price Field's label"),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -413,7 +413,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
   // HTML Type
   $data['civicrm_price_field']['html_type'] = array(
     'title' => t('HTML Type'),
-    'help' => t('The Price Field\'s HTML type (Text, Select, Radio, or Checkbox)'),
+    'help' => t("The Price Field's HTML type (Text, Select, Radio, or Checkbox)"),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -429,7 +429,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Boolean: Is Enter Quantity
   $data['civicrm_price_field']['is_enter_qty'] = array(
     'title' => t('Is Enter Quantity'),
@@ -448,7 +448,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
- 
+
   // Numeric: Weight
   $data['civicrm_price_field']['weight'] = array(
     'title' => t('Weight'),
@@ -468,7 +468,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Boolean: Is Display Amounts
   $data['civicrm_price_field']['is_display_amounts'] = array(
     'title' => t('Is Display Amounts'),
@@ -487,7 +487,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
- 
+
   // Boolean: Is Active
   $data['civicrm_price_field']['is_active'] = array(
     'title' => t('Is Active'),
@@ -506,7 +506,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
- 
+
   // Boolean: Is Required
   $data['civicrm_price_field']['is_required'] = array(
     'title' => t('Is Required'),
@@ -525,7 +525,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Date: Active On
   $data['civicrm_price_field']['active_on'] = array(
     'title' => t('Active On'),
@@ -547,7 +547,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'is date' => TRUE,
     ),
   );
-  
+
   // Date: Expire On
   $data['civicrm_price_field']['expire_on'] = array(
     'title' => t('Expire On'),
@@ -569,7 +569,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'is date' => TRUE,
     ),
   );
-  
+
   // Visibility
   $data['civicrm_price_field']['visibility'] = array(
     'title' => t('Visibility'),
@@ -592,11 +592,11 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //----------------------------------------------------------------
   // CIVICRM Price Field - RELATIONSHIPS
   //----------------------------------------------------------------
-  
+
   // Price Field Value
   $data['civicrm_price_field']['price_field_value'] = array(
     'title' => t('Price Field Value'),
@@ -622,23 +622,23 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'label' => t('Price Set'),
     ),
   );
-  
+
   //----------------------------------------------------------------
   // CIVICRM Price Field Value - BASE TABLE
   //----------------------------------------------------------------
-  
+
   $data['civicrm_price_field_value']['table']['group'] = t('CiviCRM Price Field Values');
-  
+
   $data['civicrm_price_field_value']['table']['base'] = array(
     'field' => 'id',
     'title' => t('CiviCRM Price Field Values'),
     'help' => t("View displays CiviCRM Price Field Values"),
   );
-  
+
   //----------------------------------------------------------------
   // CIVICRM Price Field Value - FIELDS
   //----------------------------------------------------------------
-  
+
   // Numeric: Price Field Value ID
   $data['civicrm_price_field_value']['id'] = array(
     'title' => t('Price Field Value ID'),
@@ -682,7 +682,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
   // Name
   $data['civicrm_price_field_value']['name'] = array(
     'title' => t('Name'),
-    'help' => t('The Price Field Value\'s machine name'),
+    'help' => t("The Price Field Value's machine name"),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -698,11 +698,11 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Label
   $data['civicrm_price_field_value']['label'] = array(
     'title' => t('Label'),
-    'help' => t('The Price Field\'s label'),
+    'help' => t("The Price Field's label"),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -722,17 +722,17 @@ function _civicrm_price_set_data(&$data, $enabled) {
   // Description
   $data['civicrm_price_field_value']['description'] = array(
     'title' => t('Description'),
-    'help' => t('The Price Field Value\'s Description'),
+    'help' => t("The Price Field Value's Description"),
     'field' => array(
       'handler' => 'civicrm_handler_field_markup',
       'click sortable' => TRUE,
     ),
   );
-  
+
   // Numeric: Amount
   $data['civicrm_price_field_value']['amount'] = array(
     'title' => t('Amount'),
-    'help' => t('The Price Field Value\'s amount'),
+    'help' => t("The Price Field Value's amount"),
     'field' => array(
       'handler' => 'civicrm_handler_field_money',
       'click sortable' => TRUE,
@@ -748,7 +748,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Numeric: Count
   $data['civicrm_price_field_value']['count'] = array(
     'title' => t('Count'),
@@ -768,7 +768,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Numeric: Max Value
   $data['civicrm_price_field_value']['max_value'] = array(
     'title' => t('Max Value'),
@@ -790,7 +790,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Numeric: Weight
   $data['civicrm_price_field_value']['weight'] = array(
     'title' => t('Weight'),
@@ -810,7 +810,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Numeric: Membership Type ID
   $data['civicrm_price_field_value']['membership_type_id'] = array(
     'title' => t('Membership Type ID'),
@@ -830,7 +830,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Membership Num Terms
   $data['civicrm_price_field_value']['membership_num_terms'] = array(
     'title' => t('Membership Number of Terms'),
@@ -850,7 +850,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Boolean: Is Default
   $data['civicrm_price_field_value']['is_default'] = array(
     'title' => t('Is Default'),
@@ -869,7 +869,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Boolean: Is Active
   $data['civicrm_price_field_value']['is_active'] = array(
     'title' => t('Is Active'),
@@ -888,7 +888,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   // Financial Type
   $data['civicrm_price_field_value']['financial_type'] = array(
     'title' => t('Financial Type'),
@@ -909,7 +909,7 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-   
+
   // Numeric: Deductible Amount
   $data['civicrm_price_field_value']['deductible_amount'] = array(
     'title' => t('Deductible Amount'),
@@ -929,5 +929,5 @@ function _civicrm_price_set_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
 }

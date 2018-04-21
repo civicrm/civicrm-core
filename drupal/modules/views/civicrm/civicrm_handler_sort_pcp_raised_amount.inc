@@ -21,14 +21,14 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * sorting handler to calcuate the total amount raised for PCPs.
  *
  */
 class civicrm_handler_sort_pcp_raised_amount extends views_handler_sort {
-  function query() {
+  public function query() {
     $this->ensure_my_table();
 
     // @see CRM_PCP_BAO_PCP::thermoMeter for the source of this SQL
@@ -41,5 +41,5 @@ WHERE pcp2.id = " . $this->table_alias . "." . $this->real_field . " AND cc.cont
 
     $this->query->add_orderby(NULL, $formula, $this->options['order'], $this->table_alias . '_' . $this->field);
   }
-}
 
+}

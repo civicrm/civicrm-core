@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * CiviCRM components
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -139,7 +139,7 @@ class CRM_Core_Component {
   }
 
   static public function flushEnabledComponents() {
-    self::getEnabledComponents(TRUE);
+    unset(Civi::$statics[__CLASS__]);
   }
 
   /**
@@ -403,21 +403,6 @@ class CRM_Core_Component {
       return $properties[$subType][$op];
     }
     return CRM_Core_DAO::$_nullObject;
-  }
-
-  /**
-   * FIXME: This function does not appear to do anything. The is_array() check runs on a bunch of objects and (always?) returns false
-   */
-  public static function &taskList() {
-    $info = self::_info();
-
-    $tasks = array();
-    foreach ($info as $name => $value) {
-      if (is_array($info[$name]) && isset($info[$name]['task'])) {
-        $tasks += $info[$name]['task'];
-      }
-    }
-    return $tasks;
   }
 
   /**

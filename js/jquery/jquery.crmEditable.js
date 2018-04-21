@@ -29,6 +29,7 @@
         ret[fieldName] = $(this).text();
         if (this === el) {
           ret.field = fieldName;
+          ret.params = $(this).data('params');
         }
       }
     });
@@ -132,7 +133,7 @@
         var
           info = $i.crmEditableEntity(),
           $el = $($i),
-          params = {},
+          params = info.params || {},
           action = $i.data('action') || info.action;
         if (!info.field) {
           return false;

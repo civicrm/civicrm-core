@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,6 +49,10 @@
         <tr class="crm-uf_group-form-block-title">
             <td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_group' field='title' id=$gid}{/if}</td>
             <td class="html-adjust">{$form.title.html}</td>
+        </tr>
+        <tr class="crm-uf_group-form-block-frontend_title">
+            <td class="label">{$form.frontend_title.label}</td>
+            <td class="html-adjust">{$form.frontend_title.html}</td>
         </tr>
         <tr class="crm-uf_group-form-block-description">
             <td class="label">{$form.description.label} {help id='id-description' file="CRM/UF/Form/Group.hlp"}</td>

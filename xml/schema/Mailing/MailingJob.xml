@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing</base>
+  <class>MailingJob</class>
+  <name>civicrm_mailing_job</name>
+  <comment>Stores information about the job that executes this mailing</comment>
+  <archive>true</archive>
+  <field>
+    <name>id</name>
+    <title>Mailing Job ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>mailing_id</name>
+    <title>Mailing</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>The ID of the mailing this Job will send.</comment>
+  </field>
+  <foreignKey>
+    <name>mailing_id</name>
+    <table>civicrm_mailing</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>scheduled_date</name>
+    <title>Mailing Scheduled Date</title>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
+    <comment>date on which this job was scheduled.</comment>
+  </field>
+  <field>
+    <name>start_date</name>
+    <title>Mailing Job Start Date</title>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
+    <comment>date on which this job was started.</comment>
+  </field>
+  <field>
+    <name>end_date</name>
+    <title>Mailing Job End Date</title>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
+    <comment>date on which this job ended.</comment>
+  </field>
+  <field>
+    <name>status</name>
+    <title>Mailing Job Status</title>
+    <type>varchar</type>
+    <length>12</length>
+    <comment>The state of this job</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getMailingJobStatus</callback>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>is_test</name>
+    <title>Mailing Job Is Test?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this job for a test mail?</comment>
+    <add>1.9</add>
+  </field>
+  <field>
+    <name>job_type</name>
+    <title>Mailing Job Type</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Type of mailling job: null | child </comment>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>parent_id</name>
+    <title>Mailing Job Parent</title>
+    <type>int unsigned</type>
+    <comment>Parent job id</comment>
+    <default>NULL</default>
+    <add>3.3</add>
+  </field>
+  <foreignKey>
+    <name>parent_id</name>
+    <table>civicrm_mailing_job</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>job_offset</name>
+    <title>Mailing Job Offset</title>
+    <type>int</type>
+    <comment>Offset of the child job</comment>
+    <default>0</default>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>job_limit</name>
+    <title>Mailing Job Limit</title>
+    <type>int</type>
+    <comment>Queue size limit for each child job</comment>
+    <default>0</default>
+    <add>3.3</add>
+  </field>
+</table>

@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Field handler to provide amount raised by given Personal Campaign Page
@@ -29,7 +29,7 @@
  * @ingroup civicrm_field_handlers
  */
 class civicrm_handler_field_pcp_raised_amount extends views_handler_field {
-  function construct() {
+  public function construct() {
     parent::construct();
     if (!civicrm_initialize()) {
       return;
@@ -38,7 +38,7 @@ class civicrm_handler_field_pcp_raised_amount extends views_handler_field {
     require_once 'CRM/Utils/Money.php';
   }
 
-  function render($values) {
+  public function render($values) {
     // retrieve the value of the "real field"
     $pcp_id = $values->{$this->field_alias};
     // get the total amount raised
@@ -49,6 +49,5 @@ class civicrm_handler_field_pcp_raised_amount extends views_handler_field {
     }
     return CRM_Utils_Money::format($amount);
   }
+
 }
-
-

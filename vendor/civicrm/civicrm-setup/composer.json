@@ -1,0 +1,19 @@
+{
+    "name": "civicrm/civicrm-setup",
+    "description": "CiviCRM installation library",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "CiviCRM LLC",
+            "email": "info@civicrm.org"
+        }
+    ],
+    "autoload": {
+        "files": ["civicrm-setup-autoload.php"]
+    },
+    "require": {
+        "psr/log": "~1.0",
+        "symfony/event-dispatcher": "^2.6.13 || ~3.0"
+    }
+}

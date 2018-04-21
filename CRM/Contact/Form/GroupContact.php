@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -80,7 +80,17 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
     // get the list of all the groups
     if ($this->_context == 'user') {
       $onlyPublicGroups = CRM_Utils_Request::retrieve('onlyPublicGroups', 'Boolean', $this, FALSE);
-      $allGroups = CRM_Core_PseudoConstant::staticGroup($onlyPublicGroups);
+      $ids = CRM_Core_PseudoConstant::allGroup();
+      $heirGroups = CRM_Contact_BAO_Group::getGroupsHierarchy($ids);
+
+      $allGroups = array();
+      foreach ($heirGroups as $id => $group) {
+        // make sure that this group has public visibility
+        if ($onlyPublicGroups && $group['visibility'] == 'User and User Admin Only') {
+          continue;
+        }
+        $allGroups[$id] = $group;
+      }
     }
     else {
       $allGroups = CRM_Core_PseudoConstant::group();

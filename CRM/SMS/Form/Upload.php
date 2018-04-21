@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -39,9 +39,6 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
   public function preProcess() {
     $this->_mailingID = $this->get('mailing_id');
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $this->assign('isAdmin', 1);
-    }
   }
 
   /**
@@ -126,25 +123,6 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     // this seems so hacky, not sure what we are doing here and why. Need to investigate and fix
     $session->getVars($options,
       "CRM_SMS_Controller_Send_{$this->controller->_key}"
-    );
-
-    $providers = CRM_SMS_BAO_Provider::getProviders(array('id', 'title'));
-
-    if (empty($providers)) {
-      //redirect user to configure sms provider.
-      $url = CRM_Utils_System::url('civicrm/admin/sms/provider', 'action=add&reset=1');
-      $status = ts("There is no SMS Provider Configured. You can add here <a href='%1'>Add SMS Provider</a>", array(1 => $url));
-      $session->setStatus($status);
-    }
-    else {
-      $providerSelect[''] = '- select -';
-      foreach ($providers as $provider) {
-        $providerSelect[$provider['id']] = $provider['title'];
-      }
-    }
-
-    $this->add('select', 'sms_provider_id',
-      ts('SMS Provider'), $providerSelect, TRUE
     );
 
     $attributes = array('onclick' => "showHideUpload();");
@@ -271,12 +249,6 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     }
 
     $ids['mailing_id'] = $this->_mailingID;
-
-    // Get the from email address.
-    $params['sms_provider_id'] = $formValues['sms_provider_id'];
-
-    // Get the from Name.
-    $params['from_name'] = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_Provider', $params['sms_provider_id'], 'username');
 
     // Build SMS in mailing table.
     CRM_Mailing_BAO_Mailing::create($params, $ids);

@@ -21,9 +21,9 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
-/*
+/**
  * Developed by Jim Taylor.
  *
  * civicrm_handler_field_pseudo_constant.inc
@@ -33,7 +33,7 @@
 class civicrm_handler_field_pseudo_constant extends views_handler_field {
   public $_pseudo_constant;
 
-  function construct() {
+  public function construct() {
     parent::construct();
     parent::construct();
     if (!civicrm_initialize() ||
@@ -53,18 +53,17 @@ class civicrm_handler_field_pseudo_constant extends views_handler_field {
     else {
       $pseudo_args = array();
     }
-      
 
     // Include and call the Pseudo Class method
     $this->_pseudo_constant = call_user_func_array($this->definition['pseudo class'] . "::" . $this->definition['pseudo method'], $pseudo_args);
   }
 
-  function render($values) {
+  public function render($values) {
     if (!empty($values->{$this->field_alias})) {
       $val = $values->{$this->field_alias};
       $val = str_replace("\x01", '', $val); // TODO This fix should be replaced as described in  CRM-12853
       return $this->_pseudo_constant[$val];
     }
   }
-}
 
+}

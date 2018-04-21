@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -45,6 +45,12 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     if (!isset($form->_caseId)) {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
     }
+
+    $form->addElement('checkbox', 'updateLinkedCases', NULL, NULL, array('class' => 'select-row'));
+
+    $caseID = CRM_Utils_Array::first($form->_caseId);
+    $cases = CRM_Case_BAO_Case::getRelatedCases($caseID);
+    $form->assign('linkedCases', $cases);
   }
 
   /**
@@ -136,23 +142,33 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
   /**
    * Process the form submission.
    *
-   *
    * @param CRM_Core_Form $form
    * @param array $params
    */
   public static function beginPostProcess(&$form, &$params) {
     $params['id'] = CRM_Utils_Array::value('case_id', $params);
+
+    if ($params['updateLinkedCases'] === '1') {
+      $caseID = CRM_Utils_Array::first($form->_caseId);
+      $cases = CRM_Case_BAO_Case::getRelatedCases($caseID);
+
+      foreach ($cases as $currentCase) {
+        if ($currentCase['status_id'] != $params['case_status_id']) {
+          $form->_caseId[] = $currentCase['case_id'];
+        }
+      }
+    }
   }
 
   /**
    * Process the form submission.
-   *
    *
    * @param CRM_Core_Form $form
    * @param array $params
    * @param CRM_Activity_BAO_Activity $activity
    */
   public static function endPostProcess(&$form, &$params, $activity) {
+
     $groupingValues = CRM_Core_OptionGroup::values('case_status', FALSE, TRUE, FALSE, NULL, 'value');
 
     // Set case end_date if we're closing the case. Clear end_date if we're (re)opening it.
@@ -187,7 +203,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
         }
       }
     }
-    $params['status_id'] = CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name');
+    $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
     $activity->status_id = $params['status_id'];
     $params['priority_id'] = CRM_Core_OptionGroup::getValue('priority', 'Normal', 'name');
     $activity->priority_id = $params['priority_id'];

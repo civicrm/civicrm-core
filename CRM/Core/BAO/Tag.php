@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
@@ -551,22 +551,39 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   /**
    * Get child tags IDs
    *
+   * @param string $searchString
+   *
    * @return array $childTagIDs
    *   associated array of child tags in Array('Parent Tag ID' => Array('Child Tag 1', ...)) format
    */
-  public static function getChildTags() {
+  public static function getChildTags($searchString = NULL) {
     $childTagIDs = array();
 
+    $whereClauses = array('parent.is_tagset <> 1');
+    if ($searchString) {
+      $whereClauses[] = " child.name LIKE '%$searchString%' ";
+    }
+
     // only fetch those tags which has child tags
-    $getChildGroupSQL = "SELECT parent.id as parent_id, GROUP_CONCAT(child.id) as child_id
-        FROM civicrm_tag parent,
-        civicrm_tag child
-        WHERE parent.is_tagset <> 1 AND child.parent_id = parent.id
-        GROUP BY parent.id
-    ";
-    $dao = CRM_Core_DAO::executeQuery($getChildGroupSQL);
+    $dao = CRM_Utils_SQL_Select::from('civicrm_tag parent')
+              ->join('child', 'INNER JOIN civicrm_tag child ON child.parent_id = parent.id ')
+              ->select('parent.id as parent_id, GROUP_CONCAT(child.id) as child_id')
+              ->where($whereClauses)
+              ->groupBy('parent.id')
+              ->execute();
     while ($dao->fetch()) {
       $childTagIDs[$dao->parent_id] = (array) explode(',', $dao->child_id);
+      $parentID = $dao->parent_id;
+      if ($searchString) {
+        // recursively search for parent tag ID and it's child if any
+        while ($parentID) {
+          $newParentID = CRM_Core_DAO::singleValueQuery(" SELECT parent_id FROM civicrm_tag WHERE id = $parentID ");
+          if ($newParentID) {
+            $childTagIDs[$newParentID] = array($parentID);
+          }
+          $parentID = $newParentID;
+        }
+      }
     }
 
     // check if child tag has any childs, if found then include those child tags inside parent tag

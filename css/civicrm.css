@@ -1073,6 +1073,7 @@ input.crm-form-entityref {
 #crm-recently-viewed ul {
   list-style-image: none;
   font-size: .9em;
+  padding: 0;
 }
 
 #crm-recently-viewed li.crm-recently-viewed {
@@ -1123,6 +1124,11 @@ input.crm-form-entityref {
 
 #crm-recently-viewed li.crm-recently-viewed:hover .crm-recentview-wrapper {
   display: block;
+}
+
+.crm-recentview-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #crm-recently-viewed .crm-recentview-wrapper a:hover {
@@ -1626,11 +1632,6 @@ input.crm-form-entityref {
   padding: 4px;
   line-height: 1.4em;
   clear: both;
-}
-
-#crm-container table.caseSelector td.status-urgent {
-  font-weight: bold;
-  text-transform: uppercase;
 }
 
 .crm-container .crm-clearfix:after {
@@ -3122,6 +3123,10 @@ div.m ul#civicrm-menu,
 }
 .crm-container .select2-container[class*=" fa-"]:before {
   display: none;
+}
+.crm-container .select2-results .select2-result.select2-disabled > .select2-result-label {
+  opacity: .6;
+  cursor: default;
 }
 
 /* Restore this property otherwise our css overrides it */

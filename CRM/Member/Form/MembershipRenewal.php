@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -237,6 +237,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $selOrgMemType[0][0] = $selMemTypeOrg[0] = ts('- select -');
 
     $allMembershipInfo = array();
+
+    // CRM-21485
+    if (is_array($defaults['membership_type_id'])) {
+      $defaults['membership_type_id'] = $defaults['membership_type_id'][1];
+    }
 
     //CRM-16950
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();

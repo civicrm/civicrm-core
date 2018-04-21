@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -53,10 +53,7 @@ class CRM_Case_Form_Activity_OpenCase {
 
     if ($form->_context == 'caseActivity') {
       $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $form);
-      $atype = CRM_Core_OptionGroup::getValue('activity_type',
-        'Change Case Start Date',
-        'name'
-      );
+      $atype = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Case Start Date');
       $caseId = CRM_Utils_Array::first($form->_caseId);
       $form->assign('changeStartURL', CRM_Utils_System::url('civicrm/case/activity',
           "action=add&reset=1&cid=$contactID&caseid={$caseId}&atype=$atype"
@@ -230,11 +227,6 @@ class CRM_Case_Form_Activity_OpenCase {
 
     // for open case start date should be set to current date
     $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
-    $caseStatus = CRM_Case_PseudoConstant::caseStatus('name');
-    // for resolved case the end date should set to now
-    if ($params['status_id'] == array_search('Closed', $caseStatus)) {
-      $params['end_date'] = $params['now'];
-    }
 
     // rename activity_location param to the correct column name for activity DAO
     $params['location'] = CRM_Utils_Array::value('activity_location', $params);
@@ -329,6 +321,7 @@ class CRM_Case_Form_Activity_OpenCase {
       'duration' => CRM_Utils_Array::value('duration', $params),
       'medium_id' => $params['medium_id'],
       'details' => $params['activity_details'],
+      'relationship_end_date' => CRM_Utils_Array::value('end_date', $params),
     );
 
     if (array_key_exists('custom', $params) && is_array($params['custom'])) {

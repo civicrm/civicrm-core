@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -70,27 +70,26 @@ function civicrm_engage_civicrm_buildForm($formName, &$form) {
 
 function civicrm_engage_civicrm_alterReportVar($varType, &$var, &$form) {
   $formName = get_class($form);
-  if ( $formName == 'CRM_Report_Form_Campaign_SurveyDetails' ) {
-    if ( $varType == 'columns' ) {
-      $var['civicrm_contribution'] =
-        array(
-              'dao' => 'CRM_Contribute_DAO_Contribution',
-              'fields' =>
-              array(
-                    'receive_date' =>
-                    array('title' => ts('Latest Contribution Date'),
-                          ),
-                    'total_amount' =>
-                    array('title' => ts('Latest Contribution Amount'),
-                          ),
-                    ),
-              'grouping' => 'survey-activity-fields',
-              );
-    } else if ( $varType == 'sql' ) {
-      $params = $form->getVar( '_params' );
-      if ( CRM_Utils_Array::value('receive_date', $params['fields']) || CRM_Utils_Array::value('total_amount', $params['fields']) ) {
+  if ($formName == 'CRM_Report_Form_Campaign_SurveyDetails') {
+    if ($varType == 'columns') {
+      $var['civicrm_contribution'] = array(
+        'dao' => 'CRM_Contribute_DAO_Contribution',
+        'fields' => array(
+          'receive_date' => array(
+            'title' => ts('Latest Contribution Date'),
+          ),
+          'total_amount' => array(
+            'title' => ts('Latest Contribution Amount'),
+          ),
+        ),
+        'grouping' => 'survey-activity-fields',
+      );
+    }
+    elseif ($varType == 'sql') {
+      $params = $form->getVar('_params');
+      if (CRM_Utils_Array::value('receive_date', $params['fields']) || CRM_Utils_Array::value('total_amount', $params['fields'])) {
         $var->_from .= "
-LEFT JOIN civicrm_contribution {$form->_aliases['civicrm_contribution']} ON ({$form->_aliases['civicrm_contribution']}.id = (select id from civicrm_contribution con where con.contact_id = {$form->_aliases['civicrm_contact']}.id ORDER BY con.receive_date DESC LIMIT 1 ))\n";
+          LEFT JOIN civicrm_contribution {$form->_aliases['civicrm_contribution']} ON ({$form->_aliases['civicrm_contribution']}.id = (select id from civicrm_contribution con where con.contact_id = {$form->_aliases['civicrm_contact']}.id ORDER BY con.receive_date DESC LIMIT 1 ))\n";
       }
     }
   }
@@ -130,19 +129,19 @@ function civicrm_engage_civicrm_postProcess($class, &$form) {
   }
 }
 
- /** The big picture is:
+/* The big picture is:
  * set our custom demographics group of fields to be a
  * tab; hide the tab; shove the fields into the core
  * Demographics display.
- **/
+ */
 
- /**
+/**
  * Alter the page as displayed on the contact summary
  * and inline demographics. This is the function where we
  * stick the custom demographics fields into the core
  * demographics displayed. It goes with the custom
  * Demographics.tpl file we are shipping.
- **/
+ */
 function civicrm_engage_civicrm_pageRun(&$page) {
   if ($page->getVar('_name') == 'CRM_Contact_Page_View_Summary' ||
     $page->getVar('_name') == 'CRM_Contact_Page_Inline_Demographics') {
@@ -151,7 +150,7 @@ function civicrm_engage_civicrm_pageRun(&$page) {
       return;
     }
     $contactId = $page->getVar('_contactId');
-    if(empty($contactId)) {
+    if (empty($contactId)) {
       $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE, NULL, $_REQUEST);
     }
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Individual',
@@ -176,7 +175,7 @@ function civicrm_engage_civicrm_pageRun(&$page) {
  * Hide the custom demographics tab because we are handling
  * the custom demographics fields inline in the
  * civicrm_engage_civicrm_pageRun() function.
- **/
+ */
 function civicrm_engage_civicrm_tabs(&$tabs, $contactID) {
   foreach ($tabs as $tabID => $tabValue) {
     if ($tabValue['title'] == CIVICRM_ENGAGE_DEMOGRAPHICS_TITLE) {
@@ -196,9 +195,7 @@ function civicrm_engage_civicrm_config(&$config) {
   $templateDir = $engageRoot . 'templates' . DIRECTORY_SEPARATOR;
   $template = CRM_Core_Smarty::singleton();
   if (is_array($template->template_dir)) {
-    $template->template_dir = array_merge(array($templateDir),
-      $template->template_dir
-    );
+    $template->template_dir = array_merge(array($templateDir), $template->template_dir);
   }
   else {
     $template->template_dir = array($templateDir, $template->template_dir);
@@ -206,12 +203,12 @@ function civicrm_engage_civicrm_config(&$config) {
 }
 
 /**
- * Implementation of hook_perm().
+ * Implements hook_permission().
  */
 function civicrm_engage_permission() {
   return array(
-    'access civiengage settings' =>
-    array('title' => t('Access CiviCRM engage setting'),
+    'access civiengage settings' => array(
+      'title' => t('Access CiviCRM engage setting'),
       'description' => t('Access CiviCRM engage setting.'),
     ),
   );
@@ -220,16 +217,16 @@ function civicrm_engage_permission() {
 function civicrm_engage_menu() {
 
   $items['admin/config/civicrm/civicrm_engage'] = array(
-    'title' => t('Civicrm engage settings'),
-    'description' => t('CiviCRM Engage Configuration'),
+    'title' => 'Civicrm engage settings',
+    'description' => 'CiviCRM Engage Configuration',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('civicrm_engage_admin_settings'),
     'access arguments' => array('access civiengage settings'),
     'file' => 'civicrm_engage.admin.inc',
   );
   $items['admin/config/civicrm/civicrm_engage/settings'] = array(
-    'title' => t('Civicrm engage settings'),
-    'description' => t('CiviCRM Engage Configuration'),
+    'title' => 'Civicrm engage settings',
+    'description' => 'CiviCRM Engage Configuration',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('civicrm_engage_admin_settings'),
     'access arguments' => array('access civiengage settings'),
@@ -237,8 +234,8 @@ function civicrm_engage_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
   $items['admin/config/civicrm/civicrm_engage/load-data'] = array(
-    'title' => t('Civicrm engage load default data'),
-    'description' => t('CiviCRM Engage Load Data'),
+    'title' => 'Civicrm engage load default data',
+    'description' => 'CiviCRM Engage Load Data',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('civicrm_engage_admin_load_data'),
     'access arguments' => array('access civiengage settings'),
@@ -247,5 +244,3 @@ function civicrm_engage_menu() {
   );
   return $items;
 }
-
-
