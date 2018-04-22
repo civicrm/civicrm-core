@@ -45,7 +45,7 @@
           <div crm-mailing-block-review crm-mailing="mailing" crm-mailing-attachments="attachments"></div>
         </div>
         <center>
-          <a class="button crmMailing-submit-button" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailingSubform.$invalid}">
+          <a class="button crmMailing-submit-button crmMailing-btn-primary" ng-click="submit()" ng-class="{blocking: block.check(), disabled: crmMailingSubform.$invalid}">
             <div>{{ts('Submit Mailing')}}</div>
           </a>
         </center>
@@ -55,10 +55,11 @@
         <button
           crm-icon="fa-trash"
           ng-show="checkPerm('delete in CiviMail')"
+          class="crmMailing-btn-danger-outline"
           ng-disabled="block.check()"
           crm-confirm="{title:ts('Delete Draft'), message:ts('Are you sure you want to permanently delete this mailing?')}"
           on-yes="delete()">{{ts('Delete Draft')}}</button>
-        <button crm-icon="fa-floppy-o" ng-disabled="block.check()" ng-click="save().then(leave)">{{ts('Save Draft')}}</button>
+        <button crm-icon="fa-floppy-o" class="crmMailing-btn-secondary-outline" ng-disabled="block.check()" ng-click="save().then(leave)">{{ts('Save Draft')}}</button>
       </span>
     </div>
   </div>
