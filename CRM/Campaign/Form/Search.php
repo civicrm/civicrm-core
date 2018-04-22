@@ -81,7 +81,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     //useful when we are being driven by the wizard framework
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'search');
     $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
 
     //operation for state machine.

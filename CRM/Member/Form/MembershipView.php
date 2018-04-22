@@ -166,7 +166,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
     $this->contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
     // Make sure context is assigned to template for condition where we come here view civicrm/membership/view
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $context);
 
     if ($this->membershipID) {

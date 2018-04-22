@@ -63,7 +63,7 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
     // check that the user has permission to access mailing id
     CRM_Mailing_BAO_Mailing::checkPermission($mailing_id);
 
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     if ($context == 'activitySelector') {
       $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);

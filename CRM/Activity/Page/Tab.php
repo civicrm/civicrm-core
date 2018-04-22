@@ -63,7 +63,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
    */
   public function edit() {
     // used for ajax tabs
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $context);
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this);
@@ -159,7 +159,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
    * Perform actions and display for activities.
    */
   public function run() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $action = CRM_Utils_Request::retrieve('action', 'String', $this);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);

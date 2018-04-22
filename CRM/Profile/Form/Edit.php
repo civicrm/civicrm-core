@@ -62,7 +62,7 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
     $this->assign('onPopupClose', $this->_onPopupClose);
 
     //set the context for the profile
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     //set the block no
     $this->_blockNo = CRM_Utils_Request::retrieve('blockNo', 'String', $this);

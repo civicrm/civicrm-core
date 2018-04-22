@@ -223,7 +223,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // @todo eliminate this duplication.
     $this->_contactId = $this->_contactID;
     $this->_eID = CRM_Utils_Request::retrieve('eid', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $this->_context);
 
     if ($this->_contactID) {
