@@ -398,8 +398,8 @@
       // elsewhere some script determines if there is a paying contact the
       // email should go to instead (e.g gift membership). This should be checked for here
       // and that merged into that code as currently behaviour is inconsistent.
-      var emailExists = '{$emailExists}';
-      var isStandalone = ('{$context}' == 'standalone');
+      var emailExists = {$emailExists|json_encode};
+      var isStandalone = {if $context == 'standalone'}true{else}false{/if};
       var isEmailEnabledForSite = {if $isEmailEnabledForSite}true{else}false{/if};
 
       {literal}
