@@ -248,7 +248,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     $this->assign('contactID', $this->_contactID);
     CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $this->_contactID));
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
-    $this->_mode = empty($this->_mode) ? CRM_Utils_Request::retrieve('mode', 'String', $this) : $this->_mode;
+    $this->_mode = empty($this->_mode) ? CRM_Utils_Request::retrieve('mode', 'Alphanumeric', $this) : $this->_mode;
     $this->assign('isBackOffice', $this->isBackOffice);
     $this->assignPaymentRelatedVariables();
   }
