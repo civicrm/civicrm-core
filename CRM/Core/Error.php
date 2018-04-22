@@ -329,7 +329,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function fatal($message = NULL, $code = NULL, $email = NULL) {
     $vars = array(
-      'message' => htmlspecialchars($message),
+      'message' => $message,
       'code' => $code,
     );
 
