@@ -234,6 +234,13 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
       }
     }
 
+    if ($this->get('customSearchID')) {
+      CRM_Export_BAO_Export::exportCustom($this->get('customSearchClass'),
+        $this->get('formValues'),
+        $this->get(CRM_Utils_Sort::SORT_ORDER),
+        CRM_Export_BAO_Export::getReturnPropertiesFromChoosenField($mapperKeys, $this->get('exportMode'))
+      );
+    }
     //get the csv file
     CRM_Export_BAO_Export::exportComponents($this->get('selectAll'),
       $this->get('componentIds'),

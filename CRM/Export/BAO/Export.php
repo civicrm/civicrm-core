@@ -327,121 +327,7 @@ class CRM_Export_BAO_Export {
     $queryMode = self::getQueryMode($exportMode);
 
     if ($fields) {
-      //construct return properties
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-      $locationTypeFields = array(
-        'street_address',
-        'supplemental_address_1',
-        'supplemental_address_2',
-        'supplemental_address_3',
-        'city',
-        'postal_code',
-        'postal_code_suffix',
-        'geo_code_1',
-        'geo_code_2',
-        'state_province',
-        'country',
-        'phone',
-        'email',
-        'im',
-      );
-
-      foreach ($fields as $key => $value) {
-        $phoneTypeId = $imProviderId = $relationField = NULL;
-        $relationshipTypes = $fieldName = CRM_Utils_Array::value(1, $value);
-        if (!$fieldName) {
-          continue;
-        }
-        // get phoneType id and IM service provider id separately
-        if ($fieldName == 'phone') {
-          $phoneTypeId = CRM_Utils_Array::value(3, $value);
-        }
-        elseif ($fieldName == 'im') {
-          $imProviderId = CRM_Utils_Array::value(3, $value);
-        }
-
-        if (array_key_exists($relationshipTypes, $contactRelationshipTypes)) {
-          if (!empty($value[2])) {
-            $relationField = CRM_Utils_Array::value(2, $value);
-            if (trim(CRM_Utils_Array::value(3, $value))) {
-              $relLocTypeId = CRM_Utils_Array::value(3, $value);
-            }
-            else {
-              $relLocTypeId = 'Primary';
-            }
-
-            if ($relationField == 'phone') {
-              $relPhoneTypeId = CRM_Utils_Array::value(4, $value);
-            }
-            elseif ($relationField == 'im') {
-              $relIMProviderId = CRM_Utils_Array::value(4, $value);
-            }
-          }
-          elseif (!empty($value[4])) {
-            $relationField = CRM_Utils_Array::value(4, $value);
-            $relLocTypeId = CRM_Utils_Array::value(5, $value);
-            if ($relationField == 'phone') {
-              $relPhoneTypeId = CRM_Utils_Array::value(6, $value);
-            }
-            elseif ($relationField == 'im') {
-              $relIMProviderId = CRM_Utils_Array::value(6, $value);
-            }
-          }
-        }
-
-        $locTypeId = CRM_Utils_Array::value(2, $value);
-
-        if ($relationField) {
-          if (in_array($relationField, $locationTypeFields) && is_numeric($relLocTypeId)) {
-            if ($relPhoneTypeId) {
-              $returnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]]['phone-' . $relPhoneTypeId] = 1;
-            }
-            elseif ($relIMProviderId) {
-              $returnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]]['im-' . $relIMProviderId] = 1;
-            }
-            else {
-              $returnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]][$relationField] = 1;
-            }
-            $relPhoneTypeId = $relIMProviderId = NULL;
-          }
-          else {
-            $returnProperties[$relationshipTypes][$relationField] = 1;
-          }
-        }
-        elseif (is_numeric($locTypeId)) {
-          if ($phoneTypeId) {
-            $returnProperties['location'][$locationTypes[$locTypeId]]['phone-' . $phoneTypeId] = 1;
-          }
-          elseif ($imProviderId) {
-            $returnProperties['location'][$locationTypes[$locTypeId]]['im-' . $imProviderId] = 1;
-          }
-          else {
-            $returnProperties['location'][$locationTypes[$locTypeId]][$fieldName] = 1;
-          }
-        }
-        else {
-          //hack to fix component fields
-          //revert mix of event_id and title
-          if ($fieldName == 'event_id') {
-            $returnProperties['event_id'] = 1;
-          }
-          elseif (
-            $exportMode == CRM_Export_Form_Select::EVENT_EXPORT &&
-            array_key_exists($fieldName, self::componentPaymentFields())
-          ) {
-            $selectedPaymentFields = TRUE;
-            $paymentTableId = 'participant_id';
-            $returnProperties[$fieldName] = 1;
-          }
-          else {
-            $returnProperties[$fieldName] = 1;
-          }
-        }
-      }
-      $defaultExportMode = self::defaultReturnProperty($exportMode);
-      if ($defaultExportMode) {
-        $returnProperties[$defaultExportMode] = 1;
-      }
+      $returnProperties = self::getReturnPropertiesFromChoosenField($fields, $exportMode);
     }
     else {
       $primary = TRUE;
@@ -1092,11 +978,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   }
 
   /**
-   * @param $customSearchClass
-   * @param $formValues
-   * @param $order
+   * @param string $customSearchClass
+   * @param array $formValues
+   * @param string|obj $order
+   * @param array $returnProperties
    */
-  public static function exportCustom($customSearchClass, $formValues, $order) {
+  public static function exportCustom($customSearchClass, $formValues, $order, $returnProperties = NULL) {
     $ext = CRM_Extension_System::singleton()->getMapper();
     if (!$ext->isExtensionClass($customSearchClass)) {
       require_once str_replace('_', DIRECTORY_SEPARATOR, $customSearchClass) . '.php';
@@ -1114,9 +1001,24 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $sql = $search->all(0, 0, $order, $includeContactIDs);
 
     $columns = $search->columns();
-
-    $header = array_keys($columns);
-    $fields = array_values($columns);
+    if (!empty($returnProperties)) {
+      $header = $fields = [];
+      foreach (array_keys($returnProperties) as $returnProperty) {
+        if ($returnProperty == 'id') {
+          $returnProperty = 'contact_id';
+        }
+        // There is a possiblity that the selected column might not be present in list of SELECTed custom search column.
+        //  In this case indicate the same in header title e.g. 'contact_type (column not found)' and it's value would be empty
+        $header[] = array_search($returnProperty, $columns) ?
+                      CRM_Utils_Array::key($returnProperty, $columns) :
+                      ts('%1 (column not found)', [1 => $returnProperty]);
+        $fields[] = $returnProperty;
+      }
+    }
+    else {
+      $header = array_keys($columns);
+      $fields = array_values($columns);
+    }
 
     $rows = array();
     $dao = CRM_Core_DAO::executeQuery($sql);
@@ -1129,7 +1031,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
       foreach ($fields as $field) {
         $unqualified_field = CRM_Utils_Array::First(array_slice(explode('.', $field), -1));
-        $row[$field] = $dao->$unqualified_field;
+        // if the selected column is not present in Custom Search's selected columns then then provide empty string
+        $row[$field] = property_exists($dao, $unqualified_field) ? $dao->$unqualified_field : '';
       }
       if ($alterRow) {
         $search->alterRow($row);
@@ -2170,6 +2073,144 @@ WHERE  {$whereClause}";
         $row[$field . $relationField] = '';
       }
     }
+  }
+
+  /**
+   * Get list of return properties from chosen fields in mapping page
+   *
+   * @param array $fields
+   * @param int $exportMode
+   *
+   * @return array $returnProperties
+   */
+  public static function getReturnPropertiesFromChoosenField($fields, $exportMode) {
+    $returnProperties = [];
+    //construct return properties
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationTypeFields = array(
+      'street_address',
+      'supplemental_address_1',
+      'supplemental_address_2',
+      'supplemental_address_3',
+      'city',
+      'postal_code',
+      'postal_code_suffix',
+      'geo_code_1',
+      'geo_code_2',
+      'state_province',
+      'country',
+      'phone',
+      'email',
+      'im',
+    );
+    $contactRelationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      TRUE,
+      'name',
+      FALSE
+    );
+
+    foreach ($fields as $key => $value) {
+      $phoneTypeId = $imProviderId = $relationField = NULL;
+      $relationshipTypes = $fieldName = CRM_Utils_Array::value(1, $value);
+      if (!$fieldName) {
+        continue;
+      }
+      // get phoneType id and IM service provider id separately
+      if ($fieldName == 'phone') {
+        $phoneTypeId = CRM_Utils_Array::value(3, $value);
+      }
+      elseif ($fieldName == 'im') {
+        $imProviderId = CRM_Utils_Array::value(3, $value);
+      }
+
+      if (array_key_exists($relationshipTypes, $contactRelationshipTypes)) {
+        if (!empty($value[2])) {
+          $relationField = CRM_Utils_Array::value(2, $value);
+          if (trim(CRM_Utils_Array::value(3, $value))) {
+            $relLocTypeId = CRM_Utils_Array::value(3, $value);
+          }
+          else {
+            $relLocTypeId = 'Primary';
+          }
+
+          if ($relationField == 'phone') {
+            $relPhoneTypeId = CRM_Utils_Array::value(4, $value);
+          }
+          elseif ($relationField == 'im') {
+            $relIMProviderId = CRM_Utils_Array::value(4, $value);
+          }
+        }
+        elseif (!empty($value[4])) {
+          $relationField = CRM_Utils_Array::value(4, $value);
+          $relLocTypeId = CRM_Utils_Array::value(5, $value);
+          if ($relationField == 'phone') {
+            $relPhoneTypeId = CRM_Utils_Array::value(6, $value);
+          }
+          elseif ($relationField == 'im') {
+            $relIMProviderId = CRM_Utils_Array::value(6, $value);
+          }
+        }
+      }
+
+      $locTypeId = CRM_Utils_Array::value(2, $value);
+
+      if ($relationField) {
+        if (in_array($relationField, $locationTypeFields) && is_numeric($relLocTypeId)) {
+          if ($relPhoneTypeId) {
+            $returnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]]['phone-' . $relPhoneTypeId] = 1;
+          }
+          elseif ($relIMProviderId) {
+            $returnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]]['im-' . $relIMProviderId] = 1;
+          }
+          else {
+            $returnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]][$relationField] = 1;
+          }
+          $relPhoneTypeId = $relIMProviderId = NULL;
+        }
+        else {
+          $returnProperties[$relationshipTypes][$relationField] = 1;
+        }
+      }
+      elseif (is_numeric($locTypeId)) {
+        if ($phoneTypeId) {
+          $returnProperties['location'][$locationTypes[$locTypeId]]['phone-' . $phoneTypeId] = 1;
+        }
+        elseif ($imProviderId) {
+          $returnProperties['location'][$locationTypes[$locTypeId]]['im-' . $imProviderId] = 1;
+        }
+        else {
+          $returnProperties['location'][$locationTypes[$locTypeId]][$fieldName] = 1;
+        }
+      }
+      else {
+        //hack to fix component fields
+        //revert mix of event_id and title
+        if ($fieldName == 'event_id') {
+          $returnProperties['event_id'] = 1;
+        }
+        elseif (
+          $exportMode == CRM_Export_Form_Select::EVENT_EXPORT &&
+          array_key_exists($fieldName, self::componentPaymentFields())
+        ) {
+          $selectedPaymentFields = TRUE;
+          $paymentTableId = 'participant_id';
+          $returnProperties[$fieldName] = 1;
+        }
+        else {
+          $returnProperties[$fieldName] = 1;
+        }
+      }
+    }
+    $defaultExportMode = self::defaultReturnProperty($exportMode);
+    if ($defaultExportMode) {
+      $returnProperties[$defaultExportMode] = 1;
+    }
+
+    return $returnProperties;
   }
 
 }
