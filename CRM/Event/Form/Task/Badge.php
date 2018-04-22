@@ -57,7 +57,7 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
    * @return void
    */
   public function preProcess() {
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     if ($this->_context == 'view') {
       $this->_single = TRUE;
 

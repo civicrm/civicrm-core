@@ -406,7 +406,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * @param $action
    */
   public function setContext($id, $action) {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     //we need to differentiate context for update and preview profile.
     if (!$context && !($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::PREVIEW))) {

@@ -42,7 +42,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
   public function preProcess() {
     $id = $this->get('id');
     $params = array('id' => $id);
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $context);
 
     $values = CRM_Contribute_BAO_Contribution::getValuesWithMappings($params);

@@ -75,7 +75,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     if ($this->_id) {
       $this->_grantType = CRM_Core_DAO::getFieldValue('CRM_Grant_DAO_Grant', $this->_id, 'grant_type_id');
     }
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $this->assign('action', $this->_action);
     $this->assign('context', $this->_context);

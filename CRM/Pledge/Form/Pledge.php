@@ -75,7 +75,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $this, FALSE, 'add'
     );
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     // check for action permissions.
     if (!CRM_Core_Permission::checkActionPermission('CiviPledge', $this->_action)) {
