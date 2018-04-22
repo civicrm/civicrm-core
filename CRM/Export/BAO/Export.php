@@ -1040,6 +1040,10 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       $rows[] = $row;
     }
 
+    if (!empty($formValues['is_unit_test'])) {
+      return array($header, $rows);
+    }
+
     CRM_Core_Report_Excel::writeCSVFile(self::getExportFileName(), $header, $rows);
     CRM_Utils_System::civiExit();
   }

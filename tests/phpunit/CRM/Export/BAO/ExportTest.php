@@ -101,6 +101,89 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test to ensure on proper values are returned for selected fields on doing export on Custom Search
+   */
+  public function testExportOnCustomSearch() {
+    $this->setUpContributionExportData();
+    $selectedFields = [
+      'id' => 1,
+      'contact_type' => 1,
+      'donation_amount' => 1,
+    ];
+    $formValues = [
+      'is_unit_test' => TRUE,
+      'min_amount' => 100.00,
+      'max_amount' => 1000.00,
+      'contribution_date_relative' => NULL,
+      'contribution_date_low' => NULL,
+      'contribution_date_high' => NULL,
+      'radio_ts' => 'ts_all',
+      'customSearchClass' => 'CRM_Contact_Form_Search_Custom_ContributionAggregate',
+      'operator' => 'AND',
+    ];
+    $order = "`contact_id` asc";
+
+    // CASE 1: When user chose to export selected columns on Mapping page, identified by $selectedFields
+    list($actualHeaders, $actualRecords) = CRM_Export_BAO_Export::exportCustom('CRM_Contact_Form_Search_Custom_ContributionAggregate',
+      $formValues,
+      $order,
+      $selectedFields
+    );
+
+    $expectedHeaders = [
+      'Contact ID',
+      'contact_type (column not found)', // expected title as 'contact_type' is not among the columns of provided Custom Search
+      'Contribution Amount',
+    ];
+    $expectedRecords = [
+      [
+        'contact_id' => $this->contactIDs[0],
+        'contact_type' => NULL,
+        'donation_amount' => 100.00,
+      ],
+      [
+        'contact_id' => $this->contactIDs[1],
+        'contact_type' => NULL,
+        'donation_amount' => 100.00,
+      ],
+    ];
+    $this->checkArrayEquals($expectedHeaders, $actualHeaders);
+    foreach ($actualRecords as $key => $actualRecord) {
+      $this->checkArrayEquals($expectedRecords[$key], $actualRecord);
+    }
+
+    // CASE 2: When user chose to export all custom search columns
+    list($actualHeaders, $actualRecords) = CRM_Export_BAO_Export::exportCustom('CRM_Contact_Form_Search_Custom_ContributionAggregate',
+      $formValues,
+      $order
+    );
+    $expectedHeaders = [
+      'Contact ID',
+      'Name',
+      'Contribution Count',
+      'Contribution Amount',
+    ];
+    $expectedRecords = [
+      [
+        'contact_id' => $this->contactIDs[0],
+        'sort_name' => 'Anderson, Anthony',
+        'donation_count' => 1,
+        'donation_amount' => 100.00,
+      ],
+      [
+        'contact_id' => $this->contactIDs[1],
+        'sort_name' => 'Anderson, Anthony',
+        'donation_count' => 1,
+        'donation_amount' => 100.00,
+      ],
+    ];
+    $this->checkArrayEquals($expectedHeaders, $actualHeaders);
+    foreach ($actualRecords as $key => $actualRecord) {
+      $this->checkArrayEquals($expectedRecords[$key], $actualRecord);
+    }
+  }
+
+  /**
    * Basic test to ensure the exportComponents function can export selected fields for contribution.
    */
   public function testExportComponentsActivity() {

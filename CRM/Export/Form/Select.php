@@ -231,7 +231,7 @@ FROM   {$this->_componentTable}
     $exportOptions = $mergeOptions = $postalMailing = array();
     $exportOptions[] = $this->createElement('radio',
       NULL, NULL,
-      ts('Export %1 fields', array(1 => empty($this->_customSearchID) ? 'PRIMARY' : 'custom search')),
+      empty($this->_customSearchID) ? ts('Export PRIMARY fields') : ts('Export custom search fields'),
       self::EXPORT_ALL,
       array('onClick' => 'showMappingOption( );')
     );
