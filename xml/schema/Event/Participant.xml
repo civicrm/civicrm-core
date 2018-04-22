@@ -135,6 +135,9 @@
     <type>varchar</type>
     <length>128</length>
     <comment>Source of this event registration.</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>1.7</add>
   </field>
   <field>

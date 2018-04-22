@@ -203,6 +203,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
+   * Default form context used as part of addField()
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @return void
@@ -733,7 +740,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     $this->addElement('checkbox', 'is_notify', ts('Send Notification'), NULL);
 
-    $this->add('text', 'source', ts('Event Source'));
+    $this->addField('source', array('entity' => 'Participant', 'name' => 'source'));
     $noteAttributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Note');
     $this->add('textarea', 'note', ts('Notes'), $noteAttributes['note']);
 
