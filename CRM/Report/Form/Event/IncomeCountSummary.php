@@ -395,7 +395,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
             $graph[$val] = $graphRows['value'][$key];
           }
           $chartInfo['values'] = $graph;
-          $chartInfo['tip'] =  ts('Participants : %1', array(1 => '#val#'));
+          $chartInfo['tip'] = ts('Participants : %1', array(1 => '#val#'));
           $chartInfo['xLabelAngle'] = 20;
 
           // build the chart.
