@@ -189,8 +189,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
         CRM_Core_Config::domainID(),
       ));
 
-    $this->add('text', 'key', ts('Key'),
-      $attributes['key'], FALSE
+    $this->add('text', 'key_name', ts('Key'),
+      $attributes['key_name'], FALSE
     );
     $this->addFormRule(array(self::class, 'validateKeyName'));
 
@@ -473,14 +473,16 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   /**
    * Validates key name for the payment processor.
    *
-   * @param $values
+   * @return bool|array
    */
   public static function validateKeyName($values) {
-    $keyName = trim(CRM_Utils_Array::value('key', $values));
+    $keyName = trim(CRM_Utils_Array::value('key_name', $values));
 
     if (!empty($keyName) && !preg_match('/^[A-Za-z0-9_]+$/', $keyName)) {
-      $errors['key'][] = 'Key should only contain alphanumeric characters or underscores!';
+      $errors['key_name'] = 'Key should only contain alphanumeric characters or underscores!';
     }
+
+    return empty($errors) ? TRUE : $errors;
   }
 
 }

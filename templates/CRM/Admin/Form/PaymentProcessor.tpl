@@ -42,8 +42,8 @@
         <td class="label">{$form.name.label}</td><td>{$form.name.html}</td>
     </tr>
     {if $action eq 1}
-      <tr class="crm-paymentProcessor-form-block-key">
-        <td class="label">{$form.key.label}</td><td>{$form.key.html} {help id='key-name'}</td>
+      <tr class="crm-paymentProcessor-form-block-key-name">
+        <td class="label">{$form.key_name.label}</td><td>{$form.key_name.html} {help id='key-name'}</td>
       </tr>
     {/if}
     <tr class="crm-paymentProcessor-form-block-description">

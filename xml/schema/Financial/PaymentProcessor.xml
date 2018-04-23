@@ -58,12 +58,6 @@
       <type>Text</type>
     </html>
   </field>
-  <index>
-    <name>UI_key_name</name>
-    <fieldName>key_name</fieldName>
-    <unique>true</unique>
-    <add>4.7</add>
-  </index>
   <field>
     <name>description</name>
     <title>Processor Description</title>
@@ -126,6 +120,14 @@
     <fieldName>domain_id</fieldName>
     <unique>true</unique>
     <add>1.8</add>
+  </index>
+  <index>
+    <name>UI_key_name_is_test_domain_id</name>
+    <fieldName>key_name</fieldName>
+    <fieldName>is_test</fieldName>
+    <fieldName>domain_id</fieldName>
+    <unique>true</unique>
+    <add>4.7</add>
   </index>
   <field>
     <name>user_name</name>

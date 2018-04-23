@@ -61,7 +61,7 @@ class CRM_Upgrade_Incremental_php_FiveTwo extends CRM_Upgrade_Incremental_Base {
     // }
   }
 
-  public function upgrade_5_2_0($rev) {
+  public function upgrade_5_2_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
 
     $this->addTask(
@@ -69,9 +69,12 @@ class CRM_Upgrade_Incremental_php_FiveTwo extends CRM_Upgrade_Incremental_Base {
       'addColumn',
       'civicrm_payment_processor',
       'key_name',
-      "VARCHAR(64) DEFAULT NULL COMMENT 'Internal machine name used to unequivocally identify the payment processor.'
-    ");
-    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_payment_processor ADD UNIQUE INDEX index_key_name (key_name)');
+      "VARCHAR(64) DEFAULT NULL COMMENT 'Internal machine name used to unequivocally identify the payment processor.'"
+    );
+    CRM_Core_DAO::executeQuery('
+      ALTER TABLE civicrm_payment_processor 
+      ADD UNIQUE INDEX `UI_key_name_is_test_domain_id` (key_name, is_test, domain_id)
+    ');
   }
 
   /*
