@@ -261,7 +261,6 @@ describe('crmCaseType', function() {
   });
 
   describe('crmAddName', function () {
-    var scope;
     var element;
 
     beforeEach(function() {
@@ -286,6 +285,29 @@ describe('crmCaseType', function() {
       it('updates the UI with updated value of scope variable', function () {
         expect(returnValue).toEqual({ results: scope.activityTypeOptions });
       });
+    });
+  });
+
+  describe('CaseTypeListCtrl', function () {
+    var caseTypes;
+
+    beforeEach(function () {
+      caseTypes = {
+        values: {
+          1: { id: 1 },
+          2: { id: 2 },
+          3: { id: 3 }
+        }
+      };
+      scope = $rootScope.$new();
+      ctrl = $controller('CaseTypeListCtrl', {
+        $scope: scope,
+        caseTypes: caseTypes
+      });
+    });
+
+    it('should store an index of case types', function() {
+      expect(scope.caseTypes).toEqual(caseTypes.values);
     });
   });
 });
