@@ -368,6 +368,25 @@ function _civicrm_event_data(&$data, $enabled) {
       'label' => t('CiviCRM Contact of the event creator'),
     ),
   );
+
+  // Domain information
+  $data['civicrm_event']['domain_id'] = array(
+    'title' => t('Domain Id'),
+    'help' => t('The Numeric ID of the domain this event was created in'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+    ),
+  );
+
+  $data['civicrm_event']['domain_url'] = array(
+    'title' => t('Domain URL'),
+    'help' => t('Domain URL for registration'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
+    ),
+  );
+
   // Link to Campaign Table
   if (isset($enabled['CiviCampaign'])) {
     $data['civicrm_event']['campaign_id'] = array(
