@@ -191,6 +191,7 @@ class CRM_Core_ManagedEntities {
     $in = CRM_Core_DAO::escapeStrings(array_keys($this->moduleIndex[FALSE]));
     $dao = new CRM_Core_DAO_Managed();
     $dao->whereAdd("module in ($in)");
+    $dao->orderBy('id DESC');
     $dao->find();
     while ($dao->fetch()) {
       $this->disableEntity($dao);
@@ -215,6 +216,7 @@ class CRM_Core_ManagedEntities {
     if (!empty($knownModules)) {
       $in = CRM_Core_DAO::escapeStrings($knownModules);
       $dao->whereAdd("module NOT IN ($in)");
+      $dao->orderBy('id DESC');
     }
     $dao->find();
     while ($dao->fetch()) {
