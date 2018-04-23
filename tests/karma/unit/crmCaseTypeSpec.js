@@ -4,6 +4,7 @@ describe('crmCaseType', function() {
   var $controller;
   var $compile;
   var $httpBackend;
+  var $q;
   var $rootScope;
   var apiCalls;
   var ctrl;
@@ -25,10 +26,11 @@ describe('crmCaseType', function() {
     });
   });
 
-  beforeEach(inject(function(_$controller_, _$compile_, _$httpBackend_, _$rootScope_) {
+  beforeEach(inject(function(_$controller_, _$compile_, _$httpBackend_, _$q_, _$rootScope_) {
     $controller = _$controller_;
     $compile = _$compile_;
     $httpBackend = _$httpBackend_;
+    $q = _$q_;
     $rootScope = _$rootScope_;
   }));
 
@@ -288,10 +290,10 @@ describe('crmCaseType', function() {
     });
   });
 
-  describe('CaseTypeListCtrl', function () {
-    var caseTypes;
+  describe('CaseTypeListCtrl', function() {
+    var caseTypes, crmApiSpy;
 
-    beforeEach(function () {
+    beforeEach(function() {
       caseTypes = {
         values: {
           1: { id: 1 },
@@ -299,15 +301,51 @@ describe('crmCaseType', function() {
           3: { id: 3 }
         }
       };
+      crmApiSpy = jasmine.createSpy('crmApi').and.returnValue($q.resolve());
       scope = $rootScope.$new();
       ctrl = $controller('CaseTypeListCtrl', {
         $scope: scope,
-        caseTypes: caseTypes
+        caseTypes: caseTypes,
+        crmApi: crmApiSpy
       });
     });
 
     it('should store an index of case types', function() {
       expect(scope.caseTypes).toEqual(caseTypes.values);
+    });
+
+    describe('toggleCaseType', function() {
+      var caseType = { id: _.uniqueId() };
+
+      describe('when the case is active', function() {
+        beforeEach(function() {
+          caseType.is_active = '1';
+
+          scope.toggleCaseType(caseType);
+        });
+
+        it('sets the case type as inactive', function() {
+          expect(crmApiSpy).toHaveBeenCalledWith('CaseType', 'create', jasmine.objectContaining({
+            id: caseType.id,
+            is_active: '0'
+          }), true);
+        });
+      });
+
+      describe('when the case is inactive', function() {
+        beforeEach(function() {
+          caseType.is_active = '0';
+
+          scope.toggleCaseType(caseType);
+        });
+
+        it('sets the case type as active', function() {
+          expect(crmApiSpy).toHaveBeenCalledWith('CaseType', 'create', jasmine.objectContaining({
+            id: caseType.id,
+            is_active: '1'
+          }), true);
+        });
+      });
     });
   });
 });
