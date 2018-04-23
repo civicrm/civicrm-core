@@ -1,6 +1,14 @@
 'use strict';
 
 describe('crmCaseType', function() {
+  var $controller;
+  var $compile;
+  var $httpBackend;
+  var $rootScope;
+  var apiCalls;
+  var ctrl;
+  var compile;
+  var scope;
 
   beforeEach(function() {
     CRM.resourceUrls = {
@@ -17,19 +25,15 @@ describe('crmCaseType', function() {
     });
   });
 
-  describe('CaseTypeCtrl', function() {
-    var apiCalls;
-    var ctrl;
-    var compile;
-    var $httpBackend;
-    var scope;
-    var timeout;
+  beforeEach(inject(function(_$controller_, _$compile_, _$httpBackend_, _$rootScope_) {
+    $controller = _$controller_;
+    $compile = _$compile_;
+    $httpBackend = _$httpBackend_;
+    $rootScope = _$rootScope_;
+  }));
 
-    beforeEach(inject(function(_$httpBackend_, $rootScope, $controller, $compile, $timeout) {
-      $httpBackend = _$httpBackend_;
-      scope = $rootScope.$new();
-      compile = $compile;
-      timeout = $timeout;
+  describe('CaseTypeCtrl', function() {
+    beforeEach(function () {
       apiCalls = {
         actStatuses: {
           values: [
@@ -224,8 +228,9 @@ describe('crmCaseType', function() {
           }
         }
       };
+      scope = $rootScope.$new();
       ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
-    }));
+    });
 
     it('should load activity statuses', function() {
       expect(scope.activityStatuses).toEqualData(apiCalls.actStatuses.values);
@@ -259,7 +264,7 @@ describe('crmCaseType', function() {
     var scope;
     var element;
 
-    beforeEach(inject(function($rootScope, $compile) {
+    beforeEach(function() {
       scope = $rootScope.$new();
       scope.activityTypeOptions = [1, 2, 3];
       element = '<span crm-add-name crm-options="activityTypeOptions"></span>';
@@ -268,7 +273,7 @@ describe('crmCaseType', function() {
 
       element = $compile(element)(scope);
       scope.$digest();
-    }));
+    });
 
     describe('when initialized', function () {
       var returnValue;
