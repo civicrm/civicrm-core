@@ -36,6 +36,13 @@
 <p>{ts 1="https://civicrm.org/extensions/civicrm?cat=125"}If your desired processor is not in the list, check the <a href="%1">Extensions Directory</a> for more payment processors you can download. If you still can't find it, consider partnering with a developer and contributing a new extension.{/ts}</p>
 {/htxt}
 
+{htxt id='key-name-title'}
+{ts}Key{/ts}
+{/htxt}
+{htxt id='key-name'}
+  <p>{ts}Machine name for this payment processor. Please only use alphanumeric characters and underscores.{/ts}</p>
+{/htxt}
+
 {htxt id='AuthNet-live-user-name'}
 {ts}Generate your API Login and Transaction Key by logging in to your Merchant Account and navigating to <strong>Settings &raquo; General Security Settings</strong>.{/ts}</p>
 {/htxt}

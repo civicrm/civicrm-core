@@ -189,6 +189,11 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
         CRM_Core_Config::domainID(),
       ));
 
+    $this->add('text', 'key', ts('Key'),
+      $attributes['key'], FALSE
+    );
+    $this->addFormRule(array(self::class, 'validateKeyName'));
+
     $this->add('text', 'description', ts('Description'),
       $attributes['description']
     );
@@ -463,6 +468,19 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     ), $values);
 
     civicrm_api3('PaymentProcessor', 'create', $params);
+  }
+
+  /**
+   * Validates key name for the payment processor.
+   *
+   * @param $values
+   */
+  public static function validateKeyName($values) {
+    $keyName = trim(CRM_Utils_Array::value('key', $values));
+
+    if (!empty($keyName) && !preg_match('/^[A-Za-z0-9_]+$/', $keyName)) {
+      $errors['key'][] = 'Key should only contain alphanumeric characters or underscores!';
+    }
   }
 
 }
