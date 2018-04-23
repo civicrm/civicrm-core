@@ -347,5 +347,49 @@ describe('crmCaseType', function() {
         });
       });
     });
+
+    describe('deleteCaseType', function() {
+      var caseType = { id: _.uniqueId() };
+
+      beforeEach(function() {
+        crmApiSpy.and.returnValue($q.resolve(caseType));
+        scope.caseTypes[caseType.id] = caseType;
+
+        scope.deleteCaseType(caseType);
+        scope.$digest();
+      });
+
+      describe('when the case type can be deleted', function() {
+        it('deletes the case from the api', function() {
+          expect(crmApiSpy).toHaveBeenCalledWith('CaseType', 'delete', { id: caseType.id }, jasmine.any(Object));
+        });
+
+        it('removes the case type from the list', function() {
+          expect(scope.caseTypes[caseType.id]).toBeUndefined();
+        });
+      });
+
+      describe('when the case type cannot be delted', function() {
+        var error = { error_message: 'Error Message' };
+
+        beforeEach(function() {
+          var errorHandler;
+
+          crmApiSpy.and.returnValue($q.reject(error));
+          scope.caseTypes[caseType.id] = caseType;
+
+          spyOn(CRM, 'alert');
+          scope.deleteCaseType(caseType);
+          scope.$digest();
+
+          errorHandler = crmApiSpy.calls.mostRecent().args[3].error;
+          errorHandler(error);
+        });
+
+        it('displays the error message', function() {
+          expect(CRM.alert).toHaveBeenCalledWith(error.error_message, ts('Error'), 'error');
+        });
+      });
+    });
   });
 });

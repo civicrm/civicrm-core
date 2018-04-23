@@ -377,7 +377,6 @@
       })
         .then(function (data) {
           delete caseTypes.values[caseType.id];
-          $scope.$digest();
         });
     };
     $scope.revertCaseType = function (caseType) {
