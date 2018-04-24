@@ -1,6 +1,16 @@
+/* global $, _, CRM:true */
 'use strict';
 
 describe('crmCaseType', function() {
+  var $controller;
+  var $compile;
+  var $httpBackend;
+  var $q;
+  var $rootScope;
+  var apiCalls;
+  var ctrl;
+  var compile;
+  var scope;
 
   beforeEach(function() {
     CRM.resourceUrls = {
@@ -17,19 +27,16 @@ describe('crmCaseType', function() {
     });
   });
 
-  describe('CaseTypeCtrl', function() {
-    var apiCalls;
-    var ctrl;
-    var compile;
-    var $httpBackend;
-    var scope;
-    var timeout;
+  beforeEach(inject(function(_$controller_, _$compile_, _$httpBackend_, _$q_, _$rootScope_) {
+    $controller = _$controller_;
+    $compile = _$compile_;
+    $httpBackend = _$httpBackend_;
+    $q = _$q_;
+    $rootScope = _$rootScope_;
+  }));
 
-    beforeEach(inject(function(_$httpBackend_, $rootScope, $controller, $compile, $timeout) {
-      $httpBackend = _$httpBackend_;
-      scope = $rootScope.$new();
-      compile = $compile;
-      timeout = $timeout;
+  describe('CaseTypeCtrl', function() {
+    beforeEach(function () {
       apiCalls = {
         actStatuses: {
           values: [
@@ -224,8 +231,9 @@ describe('crmCaseType', function() {
           }
         }
       };
+      scope = $rootScope.$new();
       ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
-    }));
+    });
 
     it('should load activity statuses', function() {
       expect(scope.activityStatuses).toEqualData(apiCalls.actStatuses.values);
@@ -256,10 +264,9 @@ describe('crmCaseType', function() {
   });
 
   describe('crmAddName', function () {
-    var scope;
     var element;
 
-    beforeEach(inject(function($rootScope, $compile) {
+    beforeEach(function() {
       scope = $rootScope.$new();
       scope.activityTypeOptions = [1, 2, 3];
       element = '<span crm-add-name crm-options="activityTypeOptions"></span>';
@@ -268,7 +275,7 @@ describe('crmCaseType', function() {
 
       element = $compile(element)(scope);
       scope.$digest();
-    }));
+    });
 
     describe('when initialized', function () {
       var returnValue;
@@ -280,6 +287,131 @@ describe('crmCaseType', function() {
 
       it('updates the UI with updated value of scope variable', function () {
         expect(returnValue).toEqual({ results: scope.activityTypeOptions });
+      });
+    });
+  });
+
+  describe('CaseTypeListCtrl', function() {
+    var caseTypes, crmApiSpy;
+
+    beforeEach(function() {
+      caseTypes = {
+        values: {
+          1: { id: 1 },
+          2: { id: 2 },
+          3: { id: 3 }
+        }
+      };
+      crmApiSpy = jasmine.createSpy('crmApi').and.returnValue($q.resolve());
+      scope = $rootScope.$new();
+      ctrl = $controller('CaseTypeListCtrl', {
+        $scope: scope,
+        caseTypes: caseTypes,
+        crmApi: crmApiSpy
+      });
+    });
+
+    it('should store an index of case types', function() {
+      expect(scope.caseTypes).toEqual(caseTypes.values);
+    });
+
+    describe('toggleCaseType', function() {
+      var caseType = { id: _.uniqueId() };
+
+      describe('when the case is active', function() {
+        beforeEach(function() {
+          caseType.is_active = '1';
+
+          scope.toggleCaseType(caseType);
+        });
+
+        it('sets the case type as inactive', function() {
+          expect(crmApiSpy).toHaveBeenCalledWith('CaseType', 'create', jasmine.objectContaining({
+            id: caseType.id,
+            is_active: '0'
+          }), true);
+        });
+      });
+
+      describe('when the case is inactive', function() {
+        beforeEach(function() {
+          caseType.is_active = '0';
+
+          scope.toggleCaseType(caseType);
+        });
+
+        it('sets the case type as active', function() {
+          expect(crmApiSpy).toHaveBeenCalledWith('CaseType', 'create', jasmine.objectContaining({
+            id: caseType.id,
+            is_active: '1'
+          }), true);
+        });
+      });
+    });
+
+    describe('deleteCaseType', function() {
+      var caseType = { id: _.uniqueId() };
+
+      beforeEach(function() {
+        crmApiSpy.and.returnValue($q.resolve(caseType));
+        scope.caseTypes[caseType.id] = caseType;
+
+        scope.deleteCaseType(caseType);
+        scope.$digest();
+      });
+
+      describe('when the case type can be deleted', function() {
+        it('deletes the case from the api', function() {
+          expect(crmApiSpy).toHaveBeenCalledWith('CaseType', 'delete', { id: caseType.id }, jasmine.any(Object));
+        });
+
+        it('removes the case type from the list', function() {
+          expect(scope.caseTypes[caseType.id]).toBeUndefined();
+        });
+      });
+
+      describe('when the case type cannot be delted', function() {
+        var error = { error_message: 'Error Message' };
+
+        beforeEach(function() {
+          var errorHandler;
+
+          crmApiSpy.and.returnValue($q.reject(error));
+          scope.caseTypes[caseType.id] = caseType;
+
+          spyOn(CRM, 'alert');
+          scope.deleteCaseType(caseType);
+          scope.$digest();
+
+          errorHandler = crmApiSpy.calls.mostRecent().args[3].error;
+          errorHandler(error);
+        });
+
+        it('displays the error message', function() {
+          expect(CRM.alert).toHaveBeenCalledWith(error.error_message, 'Error', 'error');
+        });
+      });
+
+      describe('revertCaseType', function() {
+        var caseType = {
+          id: _.uniqueId(),
+          definition: {},
+          is_forked: '1'
+        };
+
+        describe('when reverting a case type', function() {
+          beforeEach(function() {
+            scope.revertCaseType(caseType);
+          });
+
+          it('resets the case type information using the api', function() {
+            expect(crmApiSpy).toHaveBeenCalledWith('CaseType', 'create', jasmine.objectContaining({
+              id: caseType.id,
+              definition: 'null',
+              is_forked: '0'
+            }), true);
+          });
+        });
       });
     });
   });
