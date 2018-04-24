@@ -423,6 +423,7 @@ class CRM_Utils_Type {
       'MysqlOrderBy',
       'ExtensionKey',
       'Json',
+      'Alphanumeric',
     );
     if (!in_array($type, $possibleTypes)) {
       if ($isThrowException) {
@@ -534,6 +535,12 @@ class CRM_Utils_Type {
 
       case 'Json':
         if (CRM_Utils_Rule::json($data)) {
+          return $data;
+        }
+        break;
+
+      case 'Alphanumeric':
+        if (CRM_Utils_Rule::alphanumeric($data)) {
           return $data;
         }
         break;
