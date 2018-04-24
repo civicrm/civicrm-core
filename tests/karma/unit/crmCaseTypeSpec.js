@@ -1,3 +1,4 @@
+/* global $, _, CRM:true */
 'use strict';
 
 describe('crmCaseType', function() {
@@ -387,7 +388,7 @@ describe('crmCaseType', function() {
         });
 
         it('displays the error message', function() {
-          expect(CRM.alert).toHaveBeenCalledWith(error.error_message, ts('Error'), 'error');
+          expect(CRM.alert).toHaveBeenCalledWith(error.error_message, 'Error', 'error');
         });
       });
 
