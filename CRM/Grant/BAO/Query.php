@@ -208,15 +208,15 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
       case 'grant_report_received':
 
         if ($value == 1) {
-          $yesNo = 'Yes';
+          $yesNo = ts('Yes');
           $query->_where[$grouping][] = "civicrm_grant.grant_report_received $op $value";
         }
         elseif ($value == 0) {
-          $yesNo = 'No';
+          $yesNo = ts('No');
           $query->_where[$grouping][] = "civicrm_grant.grant_report_received IS NULL";
         }
 
-        $query->_qill[$grouping][] = "Grant Report Received = $yesNo ";
+        $query->_qill[$grouping][] = ts('Grant Report Received = %1', array(1 => $yesNo));
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
 
         return;

@@ -294,7 +294,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
       $actionLinks = self::actionLinks();
       //CRM-10117
       if ($dao->is_reserved) {
-        $actionLinks[CRM_Core_Action::BROWSE]['name'] = 'View Price Fields';
+        $actionLinks[CRM_Core_Action::BROWSE]['name'] = ts('View Price Fields');
       }
       $priceSet[$dao->id]['action'] = CRM_Core_Action::formLink($actionLinks, $action,
         array('sid' => $dao->id),
