@@ -26,7 +26,7 @@
     "jquery-validation": "~1.13",
     "datatables": "~1.10",
     "jstree": "~3",
-    "ckeditor": "~4.5",
+    "ckeditor": "~4.9",
     "font-awesome": "~4",
     "angular-bootstrap": "^2.5.0",
     "angular-sanitize": "~1.5.0",
