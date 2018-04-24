@@ -390,6 +390,28 @@ describe('crmCaseType', function() {
           expect(CRM.alert).toHaveBeenCalledWith(error.error_message, ts('Error'), 'error');
         });
       });
+
+      describe('revertCaseType', function() {
+        var caseType = {
+          id: _.uniqueId(),
+          definition: {},
+          is_forked: '1'
+        };
+
+        describe('when reverting a case type', function() {
+          beforeEach(function() {
+            scope.revertCaseType(caseType);
+          });
+
+          it('resets the case type information using the api', function() {
+            expect(crmApiSpy).toHaveBeenCalledWith('CaseType', 'create', jasmine.objectContaining({
+              id: caseType.id,
+              definition: 'null',
+              is_forked: '0'
+            }), true);
+          });
+        });
+      });
     });
   });
 });
