@@ -227,11 +227,14 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     $columns = $this->_search->columns();
-    if ($output == CRM_Core_Selector_Controller::EXPORT) {
-      return array_keys($columns);
+    $headers = array();
+    if ($output == CRM_Core_Selector_Controller::EXPORT || $output == CRM_Core_Selector_Controller::SCREEN) {
+      foreach ($columns as $name => $key) {
+        $headers[$key] = $name;
+      }
+      return $headers;
     }
     else {
-      $headers = array();
       foreach ($columns as $name => $key) {
         if (!empty($name)) {
           $headers[] = array(
