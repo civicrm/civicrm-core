@@ -27,7 +27,7 @@
 <span>{$form.$n.html|crmAddClass:big}</span>&nbsp;<span id="{$customGreeting}_html" class="hiddenElement">{$form.$customGreeting.html|crmAddClass:big}</span>
 
 <script type="text/javascript">
-var fieldName = '{$n}';
+var fieldName = {$n|@json_encode};
 {literal}
 cj( "#" + fieldName ).change( function( ) {
     var fldName = cj(this).attr( 'id' );

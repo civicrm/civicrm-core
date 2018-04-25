@@ -43,7 +43,7 @@
 {literal}
 <script type="text/Javascript">
   function checkCustomDataField( ) {
-    var srcHtmlType = '{/literal}{$srcHtmlType}{literal}';
+    var srcHtmlType = {/literal}{$srcHtmlType|@json_encode}{literal};
     var singleValOps = ['Text', 'Select', 'Radio', 'Autocomplete-Select'];
     var multiValOps  = ['CheckBox', 'Multi-Select'];
     var dstHtmlType = cj('#dst_html_type').val( );

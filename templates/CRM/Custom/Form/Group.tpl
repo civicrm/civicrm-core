@@ -93,7 +93,7 @@ CRM.$(function($) {
 
   $('#extends_0').each(showHideStyle).change(showHideStyle);
 
-  var isGroupEmpty = "{/literal}{$isGroupEmpty}{literal}";
+  var isGroupEmpty = {/literal}{$isGroupEmpty|@json_encode}{literal};
   if (isGroupEmpty) {
     showRange(true);
   }
