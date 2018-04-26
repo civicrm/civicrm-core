@@ -68,6 +68,13 @@ class TokenProcessor {
    */
   protected $tokens = NULL;
 
+  /**
+   * A list of available tokens formatted for display
+   * @var array
+   *   Array('{' . $dottedName . '}' => 'labelString')
+   */
+  protected $listTokens = NULL;
+
   protected $next = 0;
 
   /**
@@ -218,6 +225,22 @@ class TokenProcessor {
       $this->dispatcher->dispatch(Events::TOKEN_REGISTER, $event);
     }
     return $this->tokens;
+  }
+
+  /**
+   * Get the list of available tokens, formatted for display
+   *
+   * @return array
+   *   Ex: $tokens[ '{token.name}' ] = "Token label"
+   */
+  public function listTokens() {
+    if ($this->listTokens === NULL) {
+      $this->listTokens = array();
+      foreach ($this->getTokens() as $token => $values) {
+        $this->listTokens['{' . $token . '}'] = $values['label'];
+      }
+    }
+    return $this->listTokens;
   }
 
   /**
