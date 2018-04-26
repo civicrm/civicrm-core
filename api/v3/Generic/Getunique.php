@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
@@ -43,8 +43,8 @@ function civicrm_api3_generic_getunique($apiRequest) {
   $dao = _civicrm_api3_get_DAO($entity);
   $uFields = $dao::indices();
 
-  foreach($uFields as $fieldKey => $field) {
-    if(!isset($field['unique']) || !$field['unique']) {
+  foreach ($uFields as $fieldKey => $field) {
+    if (!isset($field['unique']) || !$field['unique']) {
       continue;
     }
     $uniqueFields[$fieldKey] = $field['field'];
@@ -52,4 +52,3 @@ function civicrm_api3_generic_getunique($apiRequest) {
 
   return civicrm_api3_create_success($uniqueFields);
 }
-
