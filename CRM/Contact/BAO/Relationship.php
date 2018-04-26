@@ -300,7 +300,9 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     if ($type == 6) {
       CRM_Contact_BAO_Household::updatePrimaryContact($params['contact_id_b'], $params['contact_id_a']);
     }
-
+    if (!empty($relationshipId) && self::isCurrentEmployerNeedingToBeCleared($params, $relationshipId, $type)) {
+      CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($params['contact_id_a']);
+    }
     $relationship = new CRM_Contact_BAO_Relationship();
     //@todo this code needs to be updated for the possibility that not all fields are set
     // by using $relationship->copyValues($params);
@@ -2216,6 +2218,40 @@ AND cc.sort_name LIKE '%$name%'";
     $nameToLabels = array_combine($names, $labels);
 
     return $nameToLabels;
+  }
+
+  /**
+   * Process the params from api, form and check if current
+   * employer should be set or unset.
+   *
+   * @param array $params
+   * @param int $relationshipId
+   * @param int|NULL $updatedRelTypeID
+   *
+   * @return bool
+   *   TRUE if current employer needs to be cleared.
+   */
+  public static function isCurrentEmployerNeedingToBeCleared($params, $relationshipId, $updatedRelTypeID = NULL) {
+    $existingTypeID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Relationship', $relationshipId, 'relationship_type_id');
+    $existingTypeName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $existingTypeID, 'name_b_a');
+    $updatedRelTypeID = $updatedRelTypeID ? $updatedRelTypeID : $existingTypeID;
+
+    if ($existingTypeName !== 'Employer of') {
+      return FALSE;
+    }
+    //Clear employer if relationship is expired.
+    if (!empty($params['end_date']) && strtotime($params['end_date']) < time()) {
+      return TRUE;
+    }
+    //current employer checkbox is disabled on the form.
+    //inactive or relationship type(employer of) is updated.
+    if ((isset($params['is_current_employer']) && empty($params['is_current_employer']))
+      || ((isset($params['is_active']) && empty($params['is_active'])))
+      || $existingTypeID != $updatedRelTypeID) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
 }

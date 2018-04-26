@@ -110,6 +110,46 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test Current Employer is correctly set.
+   */
+  public function testCurrentEmployerRelationship() {
+    $employerRelationshipID = $this->callAPISuccessGetValue('RelationshipType', array(
+      'return' => "id",
+      'name_b_a' => "Employer Of",
+    ));
+    $employerRelationship = $this->callAPISuccess('Relationship', 'create', array(
+      'contact_id_a' => $this->_cId_a,
+      'contact_id_b' => $this->_cId_b,
+      'relationship_type_id' => $employerRelationshipID,
+    ));
+    $params = array($this->_cId_a => $this->_cId_b);
+    CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($params);
+
+    //Check if current employer is correctly set.
+    $employer = $this->callAPISuccessGetValue('Contact', array(
+      'return' => "current_employer",
+      'id' => $this->_cId_a,
+    ));
+    $organisation = $this->callAPISuccessGetValue('Contact', array(
+      'return' => "sort_name",
+      'id' => $this->_cId_b,
+    ));
+    $this->assertEquals($employer, $organisation);
+
+    //Update relationship type
+    $update = $this->callAPISuccess('Relationship', 'create', array(
+      'id' => $employerRelationship['id'],
+      'relationship_type_id' => $this->_relTypeID,
+    ));
+    $employeeContact = $this->callAPISuccessGetSingle('Contact', array(
+      'return' => array("current_employer"),
+      'id' => $this->_cId_a,
+    ));
+    //current employer should be removed.
+    $this->assertEmpty($employeeContact['current_employer']);
+  }
+
+  /**
    * Check if required fields are not passed.
    */
   public function testRelationshipCreateWithoutRequired() {
