@@ -373,4 +373,17 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     }
   }
 
+  public function testUpdateCustomGroup() {
+    $customGroup = $this->customGroupCreate();
+    $customGroupId = $customGroup['id'];
+
+    //update is_active
+    $params = ['id' => $customGroupId, 'is_active' => 0];
+    $result = $this->callAPISuccess('CustomGroup', 'create', $params);
+    $result = array_shift($result['values']);
+
+    $this->assertEquals(0, $result['is_active']);
+    $this->customGroupDelete($customGroupId);
+  }
+
 }
