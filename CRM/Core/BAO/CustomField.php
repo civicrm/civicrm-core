@@ -193,21 +193,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
 
     $transaction = new CRM_Core_Transaction();
+
+    $htmlType = CRM_Utils_Array::value('html_type', $params);
+    $dataType = CRM_Utils_Array::value('data_type', $params);
+    $allowedOptionTypes = array('String', 'Int', 'Float', 'Money');
+
     // create any option group & values if required
-    if ($params['html_type'] != 'Text' &&
-      in_array($params['data_type'], array(
-        'String',
-        'Int',
-        'Float',
-        'Money',
-      ))
+    if ($htmlType != 'Text' && in_array($dataType, $allowedOptionTypes)
     ) {
-
-      $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
-        $params['custom_group_id'],
-        'table_name'
-      );
-
       //CRM-16659: if option_value then create an option group for this custom field.
       if ($params['option_type'] == 1 && (empty($params['option_group_id']) || !empty($params['option_value']))) {
         // first create an option group for this custom group
@@ -215,7 +208,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $optionGroup->name = "{$columnName}_" . date('YmdHis');
         $optionGroup->title = $params['label'];
         $optionGroup->is_active = 1;
-        $optionGroup->data_type = $params['data_type'];
+        $optionGroup->data_type = $dataType;
         $optionGroup->save();
         $params['option_group_id'] = $optionGroup->id;
         if (!empty($params['option_value']) && is_array($params['option_value'])) {
@@ -225,7 +218,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
               $optionValue->option_group_id = $optionGroup->id;
               $optionValue->label = $params['option_label'][$k];
               $optionValue->name = CRM_Utils_String::titleToVar($params['option_label'][$k]);
-              switch ($params['data_type']) {
+              switch ($dataType) {
                 case 'Money':
                   $optionValue->value = CRM_Utils_Rule::cleanMoney($v);
                   break;
@@ -262,7 +255,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       if (empty($params['default_value'])) {
         //don't insert only value separator as default value, CRM-4579
         $defaultValue = self::getOptionGroupDefault($params['option_group_id'],
-          $params['html_type']
+          $htmlType
         );
 
         if (!CRM_Utils_System::isNull(explode(CRM_Core_DAO::VALUE_SEPARATOR,
@@ -275,7 +268,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
 
     // since we need to save option group id :)
-    if (!isset($params['attributes']) && strtolower($params['html_type']) == 'textarea') {
+    if (!isset($params['attributes']) && strtolower($htmlType) == 'textarea') {
       $params['attributes'] = 'rows=4, cols=60';
     }
 

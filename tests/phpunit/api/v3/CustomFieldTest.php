@@ -544,6 +544,17 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->assertEquals($attachment['id'], $result[$cfId]);
   }
 
+  public function testUpdateCustomField() {
+    $customGroup = $this->customGroupCreate(array('extends' => 'Individual'));
+    $params = array('id' => $customGroup['id'], 'is_active' => 0);
+    $result = $this->callAPISuccess('CustomGroup', 'create', $params);
+    $result = array_shift($result['values']);
+
+    $this->assertEquals(0, $result['is_active']);
+
+    $this->customGroupDelete($customGroup['id']);
+  }
+
   /**
    * @param $getFieldsResult
    *
