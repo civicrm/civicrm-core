@@ -771,10 +771,11 @@ class uploader {
         }
         else {
           $js = $this->callBack_ckeditor($url, $message);
-          if (!isset($js))
+          if (!isset($js)) {
             $js = $this->callBack_default($url, $message);
             header("Content-Type: text/html; charset={$this->charset}");
             echo "<html><body>$js</body></html>";
+          }
         }
     }
 
