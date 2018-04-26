@@ -528,6 +528,34 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
+  public function getUFLocale() {
+    // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
+    // (for CRM-6281), Drupal’s xx_YY or is retrieved based on Drupal’s xx
+    // sometimes for CLI based on order called, this might not be set and/or empty
+    $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+
+    if (empty($language)) {
+      return NULL;
+    }
+
+    if ($language == 'zh-hans') {
+      return 'zh_CN';
+    }
+
+    if ($language == 'zh-hant') {
+      return 'zh_TW';
+    }
+
+    if (preg_match('/^.._..$/', $language)) {
+      return $language;
+    }
+
+    return CRM_Core_I18n_PseudoConstant::longForShort(substr($language, 0, 2));
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getLoggedInUfID() {
     if ($id = \Drupal::currentUser()->id()) {
       return $id;
