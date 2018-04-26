@@ -529,6 +529,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function getUFLocale() {
+    // Drupal might not be bootstrapped if being called by the REST API.
+    if (!class_exists('Drupal')) {
+      return NULL;
+    }
+
     // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
     // (for CRM-6281), Drupal’s xx_YY or is retrieved based on Drupal’s xx
     // sometimes for CLI based on order called, this might not be set and/or empty
