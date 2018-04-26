@@ -67,20 +67,26 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       // load post ids in $ids
       $this->getIDs($ids, $input);
 
-      // This is an unreliable method as there could be more than one instance.
-      // Recommended approach is to use the civicrm/payment/ipn/xx url where xx is the payment
-      // processor id & the handleNotification function (which should call the completetransaction api & by-pass this
-      // entirely). The only thing the IPN class should really do is extract data from the request, validate it
-      // & call completetransaction or call fail? (which may not exist yet).
-      $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
-        'AuthNet', 'id', 'name'
-      );
-      $paymentProcessorID = (int) civicrm_api3('PaymentProcessor', 'getvalue', array(
-        'is_test' => 0,
-        'options' => array('limit' => 1),
-        'payment_processor_type_id' => $paymentProcessorTypeID,
-         'return' => 'id',
-      ));
+      // Attempt to get payment processor ID from URL
+      if (!empty($this->_inputParameters['processor_id'])) {
+        $paymentProcessorID = $this->_inputParameters['processor_id'];
+      }
+      else {
+        // This is an unreliable method as there could be more than one instance.
+        // Recommended approach is to use the civicrm/payment/ipn/xx url where xx is the payment
+        // processor id & the handleNotification function (which should call the completetransaction api & by-pass this
+        // entirely). The only thing the IPN class should really do is extract data from the request, validate it
+        // & call completetransaction or call fail? (which may not exist yet).
+        $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
+          'AuthNet', 'id', 'name'
+        );
+        $paymentProcessorID = (int) civicrm_api3('PaymentProcessor', 'getvalue', array(
+          'is_test' => 0,
+          'options' => array('limit' => 1),
+          'payment_processor_type_id' => $paymentProcessorTypeID,
+           'return' => 'id',
+        ));
+      }
 
       if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
         return FALSE;
