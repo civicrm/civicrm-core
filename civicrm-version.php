@@ -86,6 +86,9 @@ class Version {
    * Get the current path
    */
   public static function getSearchDir() {
+    if ($_SERVER['SCRIPT_FILENAME']) {
+      return dirname($_SERVER['SCRIPT_FILENAME']);
+    }
     // getenv('PWD') works better with symlinked source trees, but it's
     // not portable to Windows.
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
