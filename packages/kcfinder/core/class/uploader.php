@@ -766,6 +766,7 @@ class uploader {
                 $js = $this->$method($url, $message);
         }
         if ($this->outputFormat == 'json') {
+          header('Content-Type: application/json');
           $json = $this->callBack_json($url, $message);
           echo json_encode($json);
         }
