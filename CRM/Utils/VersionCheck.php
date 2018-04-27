@@ -337,6 +337,15 @@ class CRM_Utils_VersionCheck {
   }
 
   /**
+   * Removes cached version info.
+   */
+  public function flushCache() {
+    if (file_exists($this->cacheFile)) {
+      unlink($this->cacheFile);
+    }
+  }
+
+  /**
    * Lookup version_check scheduled job
    */
   private function getJob() {
