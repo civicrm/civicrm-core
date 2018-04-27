@@ -100,6 +100,23 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     }
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
 
+    // CRM-20879: Show 'Transfer or Cancel' option beside 'Change fee selection'
+    //  only if logged in user have 'edit event participants' permission and
+    //  participant status is not Cancelled or Transferred
+    if (CRM_Core_Permission::check('edit event participants') && !in_array($status, array('Cancelled', 'Transferred'))) {
+      $this->assign('transferOrCancelLink',
+        CRM_Utils_System::url(
+          'civicrm/event/selfsvcupdate',
+          array(
+            'reset' => 1,
+            'is_backoffice' => 1,
+            'pid' => $participantID,
+            'cs' => CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, 'inf'),
+          )
+        )
+      );
+    }
+
     if ($values[$participantID]['is_test']) {
       $values[$participantID]['status'] .= ' (test) ';
     }
