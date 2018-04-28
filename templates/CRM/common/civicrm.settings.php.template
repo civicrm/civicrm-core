@@ -304,6 +304,13 @@ if (!defined('CIVICRM_MAIL_SMARTY')) {
 // define( 'CIVICRM_MAIL_LOG', '%%templateCompileDir%%/mail.log');
 // }
 
+/**
+ * This setting will only work if CIVICRM_MAIL_LOG is defined.  Mail will be logged and then sent.
+ */
+//if (!defined('CIVICRM_MAIL_LOG_AND_SEND')) {
+//  define( 'CIVICRM_MAIL_LOG_AND_SEND', 1);
+//}
+
 
 if (!defined('CIVICRM_DOMAIN_ID')) {
   define( 'CIVICRM_DOMAIN_ID', 1);
