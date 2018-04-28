@@ -1229,6 +1229,11 @@ abstract class CRM_Core_Payment {
       return $result;
     }
 
+    // Set some "Standard" parameters for payment
+    $this->getIpAddress($params);
+    $this->getCountry($params);
+    $this->getStateProvince($params);
+
     if ($this->_paymentProcessor['billing_mode'] == 4) {
       $result = $this->doTransferCheckout($params, $component);
       if (is_array($result) && !isset($result['payment_status_id'])) {
