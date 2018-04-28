@@ -291,8 +291,11 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'default' => TRUE,
           ),
           'invoice_id' => array(
-            'title' => ts('Invoice ID'),
+            'title' => ts('Invoice Reference'),
             'default' => TRUE,
+          ),
+          'invoice_number' => array(
+            'title' => ts('Invoice Number'),
           ),
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
