@@ -738,6 +738,9 @@ SET    version = '$version'
     $config = CRM_Core_Config::singleton();
     $config->cleanupCaches(1);
 
+    $versionCheck = new CRM_Utils_VersionCheck();
+    $versionCheck->flushCache();
+
     // Rebuild all triggers and re-enable logging if needed
     $logging = new CRM_Logging_Schema();
     $logging->fixSchemaDifferences();
