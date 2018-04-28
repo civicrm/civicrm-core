@@ -430,7 +430,6 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
           $paymentProcessorID,
           'payment_processor_type_id'
         );
-        $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, $paymentProcessorTypeId, 'name');
       }
     }
 
