@@ -453,7 +453,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
       $page->_defaults['pcp_is_anonymous'] = 0;
 
       $page->add('text', 'pcp_roll_nickname', ts('Name'), array('maxlength' => 30));
-      $page->add('textarea', "pcp_personal_note", ts('Personal Note'), array('style' => 'height: 3em; width: 40em;'));
+      $page->add('textarea', "pcp_personal_note", ts('Personal Note'), array('maxlength' => '250', 'style' => 'height: 3em; width: 40em;'));
     }
     else {
       $page->assign('is_honor_roll', FALSE);
