@@ -412,7 +412,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * Add PCP form elements to a form.
    *
    * @param int $pcpId
-   * @param CRM_Core_Page $page
+   * @param CRM_Core_Form $page
    * @param null $elements
    */
   public static function buildPcp($pcpId, &$page, &$elements = NULL) {
