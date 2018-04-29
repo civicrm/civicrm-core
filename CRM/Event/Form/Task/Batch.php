@@ -474,6 +474,14 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
           $key,
           'Participant'
         );
+        foreach (array_keys($value) as $fieldName) {
+          // Unset the original custom field now that it has been formatting to the 'custom'
+          // array as it may not be in the right format for the api as is (notably for
+          // multiple checkbox values).
+          if (substr($fieldName, 0, 7) === 'custom_') {
+            unset($value[$fieldName]);
+          }
+        }
 
         $value['id'] = $key;
 
