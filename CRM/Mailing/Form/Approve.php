@@ -93,13 +93,10 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
 
     $this->addElement('textarea', 'approval_note', ts('Approve/Reject Note'));
 
-    $mailApprovalStatus = CRM_Core_OptionGroup::values('mail_approval_status');
+    $mailApprovalStatus = CRM_Core_PseudoConstant::get('CRM_Mailing_BAO_Mailing', 'approval_status_id');
 
     // eliminate the none option
-    $noneOptionID = CRM_Core_OptionGroup::getValue('mail_approval_status',
-      'None',
-      'name'
-    );
+    $noneOptionID = CRM_Core_PseudoConstant::getKey('CRM_Mailing_BAO_Mailing', 'approval_status_id', 'None');
     if ($noneOptionID) {
       unset($mailApprovalStatus[$noneOptionID]);
     }
@@ -164,10 +161,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
     $params['approval_date'] = date('YmdHis');
 
     // if rejected, then we need to reset the scheduled date and scheduled id
-    $rejectOptionID = CRM_Core_OptionGroup::getValue('mail_approval_status',
-      'Rejected',
-      'name'
-    );
+    $rejectOptionID = CRM_Core_PseudoConstant::getKey('CRM_Mailing_BAO_Mailing', 'approval_status_id', 'Rejected');
     if ($rejectOptionID &&
       $params['approval_status_id'] == $rejectOptionID
     ) {
