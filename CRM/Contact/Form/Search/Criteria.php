@@ -158,6 +158,7 @@ class CRM_Contact_Form_Search_Criteria {
     );
 
     $componentModes = CRM_Contact_Form_Search::getModeSelect();
+    $form->assign('component_mappings', json_encode(CRM_Contact_Form_Search::getModeToComponentMapping()));
     if (count($componentModes) > 1) {
       $form->add('select',
         'component_mode',
