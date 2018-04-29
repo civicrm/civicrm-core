@@ -209,6 +209,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           'resultFile' => 'CRM/Contact/Form/Selector.tpl',
           'resultContext' => NULL,
           'taskClassName' => 'CRM_Contact_Task',
+          'component' => '',
         ),
         CRM_Contact_BAO_Query::MODE_CONTRIBUTE => array(
           'selectorName' => 'CRM_Contribute_Selector_Search',
@@ -218,6 +219,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           'resultFile' => 'CRM/Contribute/Form/Selector.tpl',
           'resultContext' => 'Search',
           'taskClassName' => 'CRM_Contribute_Task',
+          'component' => 'CiviContribute',
         ),
         CRM_Contact_BAO_Query::MODE_EVENT => array(
           'selectorName' => 'CRM_Event_Selector_Search',
@@ -227,6 +229,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           'resultFile' => 'CRM/Event/Form/Selector.tpl',
           'resultContext' => 'Search',
           'taskClassName' => 'CRM_Event_Task',
+          'component' => 'CiviEvent',
         ),
         CRM_Contact_BAO_Query::MODE_ACTIVITY => array(
           'selectorName' => 'CRM_Activity_Selector_Search',
@@ -236,6 +239,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           'resultFile' => 'CRM/Activity/Form/Selector.tpl',
           'resultContext' => 'Search',
           'taskClassName' => 'CRM_Activity_Task',
+          'component' => 'activity',
         ),
         CRM_Contact_BAO_Query::MODE_MEMBER => array(
           'selectorName' => 'CRM_Member_Selector_Search',
@@ -245,6 +249,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           'resultFile' => 'CRM/Member/Form/Selector.tpl',
           'resultContext' => 'Search',
           'taskClassName' => 'CRM_Member_Task',
+          'component' => 'CiviMember',
         ),
         CRM_Contact_BAO_Query::MODE_CASE => array(
           'selectorName' => 'CRM_Case_Selector_Search',
@@ -254,6 +259,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           'resultFile' => 'CRM/Case/Form/Selector.tpl',
           'resultContext' => 'Search',
           'taskClassName' => 'CRM_Case_Task',
+          'component' => 'CiviCase',
         ),
         CRM_Contact_BAO_Query::MODE_CONTACTSRELATED => array(
           'selectorName' => self::$_selectorName,
@@ -263,6 +269,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           'resultFile' => 'CRM/Contact/Form/Selector.tpl',
           'resultContext' => NULL,
           'taskClassName' => 'CRM_Contact_Task',
+          'component' => 'related_contact',
         ),
         CRM_Contact_BAO_Query::MODE_MAILING => array(
           'selectorName' => 'CRM_Mailing_Selector_Search',
@@ -272,6 +279,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           'resultFile' => 'CRM/Mailing/Form/Selector.tpl',
           'resultContext' => 'Search',
           'taskClassName' => 'CRM_Mailing_Task',
+          'component' => 'CiviMail',
         ),
       );
     }
@@ -290,6 +298,24 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
 
     return self::$_modeValues[$mode];
+  }
+
+  /**
+   * Get a mapping of modes to components.
+   *
+   * This will map the integers to the components. Contact has an empty component
+   * an pseudo-components exist for activity & related_contact.
+   *
+   * @return array
+   */
+  public static function getModeToComponentMapping() {
+    $mapping = [];
+    self::setModeValues();
+
+    foreach (self::$_modeValues as $id => $metadata) {
+      $mapping[$id] = $metadata['component'];
+    }
+    return $mapping;
   }
 
   /**
