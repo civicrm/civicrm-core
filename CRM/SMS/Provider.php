@@ -158,7 +158,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       return FALSE;
     }
 
-    $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'SMS delivery', 'name');
+    $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS delivery');
     // note: lets not pass status here, assuming status will be updated by callback
     $activityParams = array(
       'source_contact_id' => $sourceContactID,
