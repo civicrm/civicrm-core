@@ -212,7 +212,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $this->initialize($args, 'SetExpressCheckout');
 
     $args['paymentAction'] = 'Sale';
-    $args['amt'] = $params['amount'];
+    $args['amt'] = $this->getAmountDotDecimalSeparator($params);
     $args['currencyCode'] = $params['currencyID'];
     $args['desc'] = CRM_Utils_Array::value('description', $params);
     $args['invnum'] = $params['invoiceID'];
@@ -224,7 +224,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     if (!empty($params['is_recur'])) {
       $args['L_BILLINGTYPE0'] = 'RecurringPayments';
       //$args['L_BILLINGAGREEMENTDESCRIPTION0'] = 'Recurring Contribution';
-      $args['L_BILLINGAGREEMENTDESCRIPTION0'] = $params['amount'] . " Per " . $params['frequency_interval'] . " " . $params['frequency_unit'];
+      $args['L_BILLINGAGREEMENTDESCRIPTION0'] = $this->getAmount($params) . " Per " . $params['frequency_interval'] . " " . $params['frequency_unit'];
       $args['L_PAYMENTTYPE0'] = 'Any';
     }
 
@@ -321,7 +321,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $this->initialize($args, 'DoExpressCheckoutPayment');
     $args['token'] = $params['token'];
     $args['paymentAction'] = 'Sale';
-    $args['amt'] = $params['amount'];
+    $args['amt'] = $this->getAmountDotDecimalSeparator($params);
     $args['currencyCode'] = $params['currencyID'];
     $args['payerID'] = $params['payer_id'];
     $args['invnum'] = $params['invoiceID'];
@@ -376,7 +376,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $args['token'] = $params['token'];
     $args['paymentAction'] = 'Sale';
-    $args['amt'] = $params['amount'];
+    $args['amt'] = $this->getAmountDotDecimalSeparator($params);
     $args['currencyCode'] = $params['currencyID'];
     $args['payerID'] = $params['payer_id'];
     $args['invnum'] = $params['invoiceID'];
@@ -386,7 +386,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['method'] = 'CreateRecurringPaymentsProfile';
     $args['billingfrequency'] = $params['frequency_interval'];
     $args['billingperiod'] = ucwords($params['frequency_unit']);
-    $args['desc'] = $params['amount'] . " Per " . $params['frequency_interval'] . " " . $params['frequency_unit'];
+    $args['desc'] = $this->getAmount($params) . " Per " . $params['frequency_interval'] . " " . $params['frequency_unit'];
     //$args['desc']           = 'Recurring Contribution';
     $args['totalbillingcycles'] = $params['installments'];
     $args['version'] = '56.0';
@@ -521,7 +521,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $args['profilestartdate'] = $start_date;
       $args['desc'] = "" .
         $params['description'] . ": " .
-        $params['amount'] . " Per " .
+        $this->getAmount($params) . " Per " .
         $params['frequency_interval'] . " " .
         $params['frequency_unit'];
       $args['amt'] = $this->getAmount($params);
@@ -940,7 +940,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     else {
       $paypalParams += array(
         'cmd' => '_xclick',
-        'amount' => $params['amount'],
+        'amount' => $this->getAmountDotDecimalSeparator($params),
       );
     }
 
