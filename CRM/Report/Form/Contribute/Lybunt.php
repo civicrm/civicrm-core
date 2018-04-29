@@ -77,6 +77,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
+    $this->optimisedForOnlyFullGroupBy = FALSE;
     $this->_rollup = 'WITH ROLLUP';
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
     $yearsInPast = 10;
