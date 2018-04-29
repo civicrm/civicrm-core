@@ -1090,7 +1090,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return int
    *   $id of participant created
    */
-  public function participantCreate($params) {
+  public function participantCreate($params = []) {
     if (empty($params['contact_id'])) {
       $params['contact_id'] = $this->individualCreate();
     }
