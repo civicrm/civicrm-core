@@ -56,14 +56,7 @@ CRM.$(function($) {
     return false;
   });
   // TODO: Why are the modes numeric? If they used the string there would be no need for this map
-  var modes = {
-    '2': 'CiviContribute',
-    '3': 'CiviEvent',
-    '4': 'activity',
-    '5': 'CiviMember',
-    '6': 'CiviCase',
-    '8': 'CiviMail'
-  };
+  var modes = {/literal}{$component_mappings}{literal};
   // Handle change of results mode
   $('#component_mode').change(function() {
     // Reset task dropdown
@@ -73,7 +66,7 @@ CRM.$(function($) {
       $('.crm-' + mode + '-accordion.collapsed').crmAccordionToggle();
       loadPanes(mode);
     }
-    if ($('#component_mode').val() == '7') {
+    if ('related_contact' === modes[$('#component_mode').val()]) {
       $('#crm-display_relationship_type').show();
     }
     else {
