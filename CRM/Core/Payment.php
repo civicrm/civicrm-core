@@ -999,9 +999,24 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Get the currency for the transaction.
+   * Get the amount to be processed, rounded to the proscribed decimal places.
    *
-   * Handle any inconsistency about how it is passed in here.
+   * The amount value should always be 'clean' (using dot separator) by the time it reaches this
+   * function as we are cleaning close to point of submit, so only rounding takes place here.
+   *
+   * @param array $params
+   * @param int $decimalPlaces
+   * @return float
+   */
+  protected function getAmountDotDecimalSeparator($params, $decimalPlaces = 2) {
+    return round($params['amount'], $decimalPlaces);
+  }
+
+  /**
+   * Get the amount for the transaction formatted using system/ locale separators.
+   *
+   * This should be used for display purposes as it may add locale specific
+   * formatting.
    *
    * @param $params
    *
