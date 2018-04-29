@@ -478,6 +478,8 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
           // Unset the original custom field now that it has been formatting to the 'custom'
           // array as it may not be in the right format for the api as is (notably for
           // multiple checkbox values).
+          // @todo extract submit functions on other Batch update classes &
+          // extend CRM_Event_Form_Task_BatchTest::testSubmit with a data provider to test them.
           if (substr($fieldName, 0, 7) === 'custom_') {
             unset($value[$fieldName]);
           }

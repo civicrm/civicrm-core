@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2018
- * $Id$
- *
  */
 
 /**
@@ -208,6 +206,9 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    */
   public function postProcess() {
     $params = $this->exportValues();
+    // @todo extract submit functions &
+    // extend CRM_Event_Form_Task_BatchTest::testSubmit with a data provider to test
+    // handling of custom data, specifically checkbox fields.
     $dates = array(
       'join_date',
       'membership_start_date',
