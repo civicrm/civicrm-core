@@ -1279,11 +1279,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $params = array('id' => $contributionSoft->pcp_id);
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $params, $pcpInfo);
     $ownerNotifyID = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCPBlock', $pcpInfo['pcp_block_id'], 'owner_notify_id');
+    $ownerNotifyOption = CRM_Core_PseudoConstant::getName('CRM_PCP_DAO_PCPBlock', 'owner_notify_id', $ownerNotifyID);
 
-    if ($ownerNotifyID != CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'no_notifications', 'name') &&
-        (($ownerNotifyID == CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'owner_chooses', 'name') &&
+    if ($ownerNotifyOption != 'no_notifications' &&
+        (($ownerNotifyOption == 'owner_chooses' &&
         CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $contributionSoft->pcp_id, 'is_notify')) ||
-        $ownerNotifyID == CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'all_owners', 'name'))) {
+        $ownerNotifyOption == 'all_owners')) {
       $pcpInfoURL = CRM_Utils_System::url('civicrm/pcp/info',
         "reset=1&id={$contributionSoft->pcp_id}",
         TRUE, NULL, FALSE, TRUE
