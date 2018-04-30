@@ -102,7 +102,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       'CVV2' => $params['cvv2'],
       'EXPDATE' => urlencode(sprintf('%02d', (int) $params['month']) . substr($params['year'], 2, 2)),
       'ACCTTYPE' => urlencode($params['credit_card_type']),
-      'AMT' => urlencode($params['amount']),
+      'AMT' => urlencode($this->getAmount($params)),
       'CURRENCY' => urlencode($params['currency']),
       'FIRSTNAME' => $params['billing_first_name'],
       //credit card name
@@ -131,7 +131,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
 
       $payflow_query_array['TRXTYPE'] = 'R';
       $payflow_query_array['OPTIONALTRX'] = 'S';
-      $payflow_query_array['OPTIONALTRXAMT'] = $params['amount'];
+      $payflow_query_array['OPTIONALTRXAMT'] = $this->getAmount($params);
       //Amount of the initial Transaction. Required
       $payflow_query_array['ACTION'] = 'A';
       //A for add recurring (M-modify,C-cancel,R-reactivate,I-inquiry,P-payment
