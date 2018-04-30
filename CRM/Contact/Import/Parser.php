@@ -275,9 +275,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
         break;
       }
 
-      // clean up memory from dao's
-      CRM_Core_DAO::freeResult();
-
       // see if we've hit our timeout yet
       /* if ( $the_thing_with_the_stuff ) {
       do_something( );

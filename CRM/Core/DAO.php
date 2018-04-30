@@ -120,6 +120,13 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * Class destructor.
+   */
+  public function __destruct() {
+    $this->free();
+  }
+
+  /**
    * Empty definition for virtual function.
    */
   public static function getTableName() {

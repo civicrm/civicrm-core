@@ -1445,7 +1445,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $otherTree = CRM_Core_BAO_CustomGroup::getTree($main['contact_type'], NULL, $otherId, -1,
       CRM_Utils_Array::value('contact_sub_type', $other), NULL, TRUE, NULL, TRUE, $checkPermissions
     );
-    CRM_Core_DAO::freeResult();
 
     foreach ($otherTree as $gid => $group) {
       $foundField = FALSE;
@@ -2318,8 +2317,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       // pair may have been flipped, so make sure we delete using both orders
       CRM_Core_BAO_PrevNextCache::deletePair($mainId, $otherId, $cacheKeyString, TRUE);
     }
-
-    CRM_Core_DAO::freeResult();
   }
 
 }
