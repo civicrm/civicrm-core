@@ -122,4 +122,17 @@ class CRM_Utils_SQL {
     return TRUE;
   }
 
+  /**
+   * Is the Database set up to handle acceents.
+   * @return bool
+   */
+  public static function supportStorageOfAccents() {
+    $charSetDB = CRM_Core_DAO::executeQuery("SHOW VARIABLES LIKE 'character_set_database'")->fetchAll();
+    $charSet = $charSetDB[0]['Value'];
+    if ($charSet == 'utf8') {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }

@@ -144,19 +144,27 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test for international string acceptance (CRM-10210).
+   * Requires the databsase to be in utf8.
    *
    * @dataProvider getInternationalStrings
    *
    * @param string $string
    *   String to be tested.
+   * @param bool $checkCharSet
+   *   Bool to see if we should check charset.
    *
    * @throws \Exception
    */
-  public function testInternationalStrings($string) {
+  public function testInternationalStrings($string, $checkCharSet = FALSE) {
     $this->callAPISuccess('Contact', 'create', array_merge(
       $this->_params,
       array('first_name' => $string)
     ));
+    if ($checkCharSet) {
+      if (!CRM_Utils_SQL::supportStorageOfAccents()) {
+        $this->markTestIncomplete('Database is not Charset UTF8 therefore can not store accented strings properly');
+      }
+    }
     $result = $this->callAPISuccessGetSingle('Contact', array('first_name' => $string));
     $this->assertEquals($string, $result['first_name']);
 
@@ -175,8 +183,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function getInternationalStrings() {
     $invocations = array();
-    $invocations[] = array('Scarabée');
-    $invocations[] = array('Iñtërnâtiônàlizætiøn');
+    $invocations[] = array('Scarabée', TRUE);
+    $invocations[] = array('Iñtërnâtiônàlizætiøn', TRUE);
     $invocations[] = array('これは日本語のテキストです。読めますか');
     $invocations[] = array('देखें हिन्दी कैसी नजर आती है। अरे वाह ये तो नजर आती है।');
     return $invocations;
