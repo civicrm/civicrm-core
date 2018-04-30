@@ -896,7 +896,7 @@ class CRM_Core_SelectValues {
    * @return array
    */
   public static function getSearchBuilderOperators($fieldType = NULL) {
-    $builderOperators = array(
+    return [
       '=' => '=',
       '!=' => '≠',
       '>' => '>',
@@ -912,18 +912,7 @@ class CRM_Core_SelectValues {
       'IS NOT EMPTY' => ts('Not Empty'),
       'IS NULL' => ts('Is Null'),
       'IS NOT NULL' => ts('Not Null'),
-    );
-    if ($fieldType) {
-      switch ($fieldType) {
-        case CRM_Utils_Type::T_STRING:
-          unset($builderOperators['>']);
-          unset($builderOperators['<']);
-          unset($builderOperators['>=']);
-          unset($builderOperators['<=']);
-          break;
-      }
-    }
-    return $builderOperators;
+    ];
   }
 
   /**
