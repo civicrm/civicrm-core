@@ -140,6 +140,26 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test payment processor is correctly assigned for the IPN payment.
+   */
+  public function testIPNPaymentRecurSuccessMultiAuthNetProcessor() {
+    //Create and set up recur payment using second instance of AuthNet Processor.
+    $this->_paymentProcessorID2 = $this->paymentProcessorAuthorizeNetCreate(array('name' => 'Authorize2', 'is_test' => 0));
+    $this->setupRecurringPaymentProcessorTransaction(array('payment_processor_id' => $this->_paymentProcessorID2));
+
+    //Call IPN with processor id.
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction(array('processor_id' => $this->_paymentProcessorID2)));
+    $IPN->main();
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
+    $this->assertEquals(1, $contribution['contribution_status_id']);
+    $this->assertEquals('6511143069', $contribution['trxn_id']);
+    // source gets set by processor
+    $this->assertTrue(substr($contribution['contribution_source'], 0, 20) == "Online Contribution:");
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $this->_contributionRecurID));
+    $this->assertEquals(5, $contributionRecur['contribution_status_id']);
+  }
+
+  /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
    */
   public function testIPNPaymentRecurSuccessSuppliedReceiveDate() {
