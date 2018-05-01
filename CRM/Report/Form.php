@@ -2962,7 +2962,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       CRM_Core_DAO::disableFullGroupByMode();
     }
     $dao = CRM_Core_DAO::executeQuery($sql);
-    CRM_Core_DAO::enableFullGroupByMode();
+    CRM_Core_DAO::reenableFullGroupByMode();
     if (!is_array($rows)) {
       $rows = array();
     }

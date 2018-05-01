@@ -1007,11 +1007,11 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       // delete the export temp table and component table
       $sql = "DROP TABLE IF EXISTS {$exportTempTable}";
       CRM_Core_DAO::executeQuery($sql);
-      CRM_Core_DAO::enableFullGroupByMode();
+      CRM_Core_DAO::reenableFullGroupByMode();
       CRM_Utils_System::civiExit();
     }
     else {
-      CRM_Core_DAO::enableFullGroupByMode();
+      CRM_Core_DAO::reenableFullGroupByMode();
       throw new CRM_Core_Exception(ts('No records to export'));
     }
   }
