@@ -274,10 +274,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->buildValuesAndAssignOnline_Note_Type($this->_id, $this->_values);
     }
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      $this->applyCustomData('Contribution', CRM_Utils_Array::value('financial_type_id', $_POST), $this->_id);
-    }
+    $this->addCustomDataToFormIfSubmitted('Contribution', CRM_Utils_Array::value('financial_type_id', $_POST), $this->_id);
 
     $this->_lineItems = array();
     if ($this->_id) {
