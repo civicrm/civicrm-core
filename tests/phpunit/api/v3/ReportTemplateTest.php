@@ -166,6 +166,36 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test logging report when a custom data table has a table removed by hook.
+   *
+   * Here we are checking that no fatal is triggered.
+   */
+  public function testLoggingReportWithHookRemovalOfCustomDataTable() {
+    Civi::settings()->set('logging', 1);
+    $group1 = $this->customGroupCreate();
+    $group2 = $this->customGroupCreate(['name' => 'second_one', 'title' => 'second one', 'table_name' => 'civicrm_value_second_one']);
+    $this->customFieldCreate(array('custom_group_id' => $group1['id'], 'label' => 'field one'));
+    $this->customFieldCreate(array('custom_group_id' => $group2['id'], 'label' => 'field two'));
+    $this->hookClass->setHook('civicrm_alterLogTables', array($this, 'alterLogTablesRemoveCustom'));
+
+    $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => 'logging/contact/summary',
+    ));
+    Civi::settings()->set('logging', 0);
+    $this->customGroupDelete($group1['id']);
+    $this->customGroupDelete($group2['id']);
+  }
+
+  /**
+   * Remove one log table from the logging spec.
+   *
+   * @param array $logTableSpec
+   */
+  public function alterLogTablesRemoveCustom(&$logTableSpec) {
+    unset($logTableSpec['civicrm_value_second_one']);
+  }
+
+  /**
    * Test get statistics.
    *
    * @dataProvider getReportTemplates

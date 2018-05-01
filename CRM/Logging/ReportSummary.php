@@ -232,26 +232,6 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     $this->_where .= " AND (entity_log_civireport.log_action != 'Initialization')";
   }
 
-  public function postProcess() {
-    $this->beginPostProcess();
-    $rows = array();
-
-    $this->buildTemporaryTables();
-    $sql = $this->buildQuery();
-
-    $this->buildRows($sql, $rows);
-    $this->addToDeveloperTab($sql);
-
-    // format result set.
-    $this->formatDisplay($rows);
-
-    // assign variables to templates
-    $this->doTemplateAssignment($rows);
-
-    // do print / pdf / instance stuff if needed
-    $this->endPostProcess($rows);
-  }
-
   /**
    * Get log type.
    *
