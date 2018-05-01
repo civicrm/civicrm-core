@@ -1,5 +1,5 @@
 // http://civicrm.org/licensing
-(function($, CRM) {
+(function($, CRM, _) {
   'use strict';
 
   /* jshint validthis: true */
@@ -14,16 +14,19 @@
     var field = $('select[id^=mapper][id$="_1"]', row).val();
     var operator = $('select[id^=operator]', row);
     var op = operator.val();
-    
+
     var patt = /_1$/; // pattern to check if the change event came from field name
     if (field !== null && patt.test(this.id)) {
-      if ($.inArray(field, CRM.searchBuilder.stringFields) >= 0) {
-        // string operators
-        buildOperator(operator, CRM.searchBuilder.stringOperators);
-      } else {
-        // general operators
-        buildOperator(operator, CRM.searchBuilder.generalOperators);
+      // based on data type remove invalid operators e.g. IS EMPTY doesn't work with Boolean type column
+      if ((field in CRM.searchBuilder.fieldTypes) === true) {
+        if (CRM.searchBuilder.fieldTypes[field] == 'Boolean') {
+          CRM.searchBuilder.generalOperators = _.omit(CRM.searchBuilder.generalOperators, ['IS NOT EMPTY', 'IS EMPTY']);
+        }
+        else if (CRM.searchBuilder.fieldTypes[field] == 'String') {
+          CRM.searchBuilder.generalOperators = _.omit(CRM.searchBuilder.generalOperators, ['>', '<', '>=', '<=']);
+        }
       }
+      buildOperator(operator, CRM.searchBuilder.generalOperators);
     }
 
     // These Ops don't get any input field.
@@ -43,11 +46,13 @@
       buildSelect(row, field, op);
     }
 
-    if ($.inArray(field, CRM.searchBuilder.dateFields) < 0) {
-      removeDate(row);
+    if ((field in CRM.searchBuilder.fieldTypes) === true &&
+      CRM.searchBuilder.fieldTypes[field] == 'Date'
+    ) {
+      buildDate(row, op);
     }
     else {
-      buildDate(row, op);
+      removeDate(row);
     }
   }
 
@@ -296,4 +301,4 @@
       $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
     }
   });
-})(cj, CRM);
+})(cj, CRM, CRM._);
