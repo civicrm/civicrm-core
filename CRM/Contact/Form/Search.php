@@ -286,13 +286,20 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
+   * Get the metadata for the query mode (this includes task class names)
+   *
    * @param int $mode
    *
-   * @return mixed
+   * @return array
+   * @throws \CRM_Core_Exception
    */
   public static function getModeValue($mode = CRM_Contact_BAO_Query::MODE_CONTACTS) {
-    self::setModeValues();
+    $searchPane = CRM_Utils_Request::retrieve('searchPane', 'String');
+    if (!empty($searchPane)) {
+      $mode = array_search($searchPane, self::getModeToComponentMapping());
+    }
 
+    self::setModeValues();
     if (!array_key_exists($mode, self::$_modeValues)) {
       $mode = CRM_Contact_BAO_Query::MODE_CONTACTS;
     }

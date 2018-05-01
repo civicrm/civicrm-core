@@ -103,13 +103,11 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
     }
     $this->_controller->set('task', $value);
 
-    if ($value) {
-      $componentMode = $this->_controller->get('component_mode');
-      $modeValue = CRM_Contact_Form_Search::getModeValue($componentMode);
-      $taskClassName = $modeValue['taskClassName'];
-      return $taskClassName::getTask($value);
-    }
-    return CRM_Contact_Task::getTask($value);
+    $componentMode = $this->_controller->get('component_mode');
+
+    $modeValue = CRM_Contact_Form_Search::getModeValue($componentMode);
+    $taskClassName = $modeValue['taskClassName'];
+    return $taskClassName::getTask($value);
   }
 
   /**
