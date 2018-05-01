@@ -199,90 +199,88 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   public static function setModeValues() {
-    if (!self::$_modeValues) {
-      self::$_modeValues = array(
-        CRM_Contact_BAO_Query::MODE_CONTACTS => array(
-          'selectorName' => self::$_selectorName,
-          'selectorLabel' => ts('Contacts'),
-          'taskFile' => 'CRM/Contact/Form/Search/ResultTasks.tpl',
-          'taskContext' => NULL,
-          'resultFile' => 'CRM/Contact/Form/Selector.tpl',
-          'resultContext' => NULL,
-          'taskClassName' => 'CRM_Contact_Task',
-          'component' => '',
-        ),
-        CRM_Contact_BAO_Query::MODE_CONTRIBUTE => array(
-          'selectorName' => 'CRM_Contribute_Selector_Search',
-          'selectorLabel' => ts('Contributions'),
-          'taskFile' => 'CRM/common/searchResultTasks.tpl',
-          'taskContext' => 'Contribution',
-          'resultFile' => 'CRM/Contribute/Form/Selector.tpl',
-          'resultContext' => 'Search',
-          'taskClassName' => 'CRM_Contribute_Task',
-          'component' => 'CiviContribute',
-        ),
-        CRM_Contact_BAO_Query::MODE_EVENT => array(
-          'selectorName' => 'CRM_Event_Selector_Search',
-          'selectorLabel' => ts('Event Participants'),
-          'taskFile' => 'CRM/common/searchResultTasks.tpl',
-          'taskContext' => NULL,
-          'resultFile' => 'CRM/Event/Form/Selector.tpl',
-          'resultContext' => 'Search',
-          'taskClassName' => 'CRM_Event_Task',
-          'component' => 'CiviEvent',
-        ),
-        CRM_Contact_BAO_Query::MODE_ACTIVITY => array(
-          'selectorName' => 'CRM_Activity_Selector_Search',
-          'selectorLabel' => ts('Activities'),
-          'taskFile' => 'CRM/common/searchResultTasks.tpl',
-          'taskContext' => NULL,
-          'resultFile' => 'CRM/Activity/Form/Selector.tpl',
-          'resultContext' => 'Search',
-          'taskClassName' => 'CRM_Activity_Task',
-          'component' => 'activity',
-        ),
-        CRM_Contact_BAO_Query::MODE_MEMBER => array(
-          'selectorName' => 'CRM_Member_Selector_Search',
-          'selectorLabel' => ts('Memberships'),
-          'taskFile' => "CRM/common/searchResultTasks.tpl",
-          'taskContext' => NULL,
-          'resultFile' => 'CRM/Member/Form/Selector.tpl',
-          'resultContext' => 'Search',
-          'taskClassName' => 'CRM_Member_Task',
-          'component' => 'CiviMember',
-        ),
-        CRM_Contact_BAO_Query::MODE_CASE => array(
-          'selectorName' => 'CRM_Case_Selector_Search',
-          'selectorLabel' => ts('Cases'),
-          'taskFile' => "CRM/common/searchResultTasks.tpl",
-          'taskContext' => NULL,
-          'resultFile' => 'CRM/Case/Form/Selector.tpl',
-          'resultContext' => 'Search',
-          'taskClassName' => 'CRM_Case_Task',
-          'component' => 'CiviCase',
-        ),
-        CRM_Contact_BAO_Query::MODE_CONTACTSRELATED => array(
-          'selectorName' => self::$_selectorName,
-          'selectorLabel' => ts('Related Contacts'),
-          'taskFile' => 'CRM/Contact/Form/Search/ResultTasks.tpl',
-          'taskContext' => NULL,
-          'resultFile' => 'CRM/Contact/Form/Selector.tpl',
-          'resultContext' => NULL,
-          'taskClassName' => 'CRM_Contact_Task',
-          'component' => 'related_contact',
-        ),
-        CRM_Contact_BAO_Query::MODE_MAILING => array(
-          'selectorName' => 'CRM_Mailing_Selector_Search',
-          'selectorLabel' => ts('Mailings'),
-          'taskFile' => "CRM/common/searchResultTasks.tpl",
-          'taskContext' => NULL,
-          'resultFile' => 'CRM/Mailing/Form/Selector.tpl',
-          'resultContext' => 'Search',
-          'taskClassName' => 'CRM_Mailing_Task',
-          'component' => 'CiviMail',
-        ),
-      );
-    }
+    self::$_modeValues = array(
+      CRM_Contact_BAO_Query::MODE_CONTACTS => array(
+        'selectorName' => self::$_selectorName,
+        'selectorLabel' => ts('Contacts'),
+        'taskFile' => 'CRM/Contact/Form/Search/ResultTasks.tpl',
+        'taskContext' => NULL,
+        'resultFile' => 'CRM/Contact/Form/Selector.tpl',
+        'resultContext' => NULL,
+        'taskClassName' => 'CRM_Contact_Task',
+        'component' => '',
+      ),
+      CRM_Contact_BAO_Query::MODE_CONTRIBUTE => array(
+        'selectorName' => 'CRM_Contribute_Selector_Search',
+        'selectorLabel' => ts('Contributions'),
+        'taskFile' => 'CRM/common/searchResultTasks.tpl',
+        'taskContext' => 'Contribution',
+        'resultFile' => 'CRM/Contribute/Form/Selector.tpl',
+        'resultContext' => 'Search',
+        'taskClassName' => 'CRM_Contribute_Task',
+        'component' => 'CiviContribute',
+      ),
+      CRM_Contact_BAO_Query::MODE_EVENT => array(
+        'selectorName' => 'CRM_Event_Selector_Search',
+        'selectorLabel' => ts('Event Participants'),
+        'taskFile' => 'CRM/common/searchResultTasks.tpl',
+        'taskContext' => NULL,
+        'resultFile' => 'CRM/Event/Form/Selector.tpl',
+        'resultContext' => 'Search',
+        'taskClassName' => 'CRM_Event_Task',
+        'component' => 'CiviEvent',
+      ),
+      CRM_Contact_BAO_Query::MODE_ACTIVITY => array(
+        'selectorName' => 'CRM_Activity_Selector_Search',
+        'selectorLabel' => ts('Activities'),
+        'taskFile' => 'CRM/common/searchResultTasks.tpl',
+        'taskContext' => NULL,
+        'resultFile' => 'CRM/Activity/Form/Selector.tpl',
+        'resultContext' => 'Search',
+        'taskClassName' => 'CRM_Activity_Task',
+        'component' => 'activity',
+      ),
+      CRM_Contact_BAO_Query::MODE_MEMBER => array(
+        'selectorName' => 'CRM_Member_Selector_Search',
+        'selectorLabel' => ts('Memberships'),
+        'taskFile' => "CRM/common/searchResultTasks.tpl",
+        'taskContext' => NULL,
+        'resultFile' => 'CRM/Member/Form/Selector.tpl',
+        'resultContext' => 'Search',
+        'taskClassName' => 'CRM_Member_Task',
+        'component' => 'CiviMember',
+      ),
+      CRM_Contact_BAO_Query::MODE_CASE => array(
+        'selectorName' => 'CRM_Case_Selector_Search',
+        'selectorLabel' => ts('Cases'),
+        'taskFile' => "CRM/common/searchResultTasks.tpl",
+        'taskContext' => NULL,
+        'resultFile' => 'CRM/Case/Form/Selector.tpl',
+        'resultContext' => 'Search',
+        'taskClassName' => 'CRM_Case_Task',
+        'component' => 'CiviCase',
+      ),
+      CRM_Contact_BAO_Query::MODE_CONTACTSRELATED => array(
+        'selectorName' => self::$_selectorName,
+        'selectorLabel' => ts('Related Contacts'),
+        'taskFile' => 'CRM/Contact/Form/Search/ResultTasks.tpl',
+        'taskContext' => NULL,
+        'resultFile' => 'CRM/Contact/Form/Selector.tpl',
+        'resultContext' => NULL,
+        'taskClassName' => 'CRM_Contact_Task',
+        'component' => 'related_contact',
+      ),
+      CRM_Contact_BAO_Query::MODE_MAILING => array(
+        'selectorName' => 'CRM_Mailing_Selector_Search',
+        'selectorLabel' => ts('Mailings'),
+        'taskFile' => "CRM/common/searchResultTasks.tpl",
+        'taskContext' => NULL,
+        'resultFile' => 'CRM/Mailing/Form/Selector.tpl',
+        'resultContext' => 'Search',
+        'taskClassName' => 'CRM_Mailing_Task',
+        'component' => 'CiviMail',
+      ),
+    );
   }
 
   /**
@@ -690,9 +688,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     if (!isset($this->_componentMode)) {
       $this->_componentMode = CRM_Contact_BAO_Query::MODE_CONTACTS;
     }
-    self::setModeValues();
-
     self::$_selectorName = $this->_modeValue['selectorName'];
+    self::setModeValues();
 
     $setDynamic = FALSE;
     if (strpos(self::$_selectorName, 'CRM_Contact_Selector') !== FALSE) {
