@@ -112,9 +112,6 @@ class CRM_Utils_SQL {
    * @return bool
    */
   public static function isGroupByModeInDefault() {
-    if (!self::supportsFullGroupBy()) {
-      return FALSE;
-    }
     $sqlModes = explode(',', CRM_Core_DAO::singleValueQuery('SELECT @@global.sql_mode'));
     if (!in_array('ONLY_FULL_GROUP_BY', $sqlModes)) {
       return FALSE;
