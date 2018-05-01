@@ -54,6 +54,9 @@ function civicrm_api3_contribution_create(&$params) {
       }
     }
   }
+  if (!isset($params['skipCleanMoney']) && !empty($params['total_amount'])) {
+    Civi::log()->warning('Calling Contribution create without skipCleanMoney is deprecated as core determination whether the money is clean is unreliable', array('civi.tag' => 'deprecated'));
+  }
   $params['skipCleanMoney'] = TRUE;
 
   if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {

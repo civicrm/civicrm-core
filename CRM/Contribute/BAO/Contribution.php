@@ -2245,6 +2245,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         $contributionParams['contribution_page_id'] = $contribution->contribution_page_id;
       }
 
+      // Local-formatted amounts should not be used for the repeattransaction api.
+      $contributionParams['skipCleanMoney'] = TRUE;
       $createContribution = civicrm_api3('Contribution', 'create', $contributionParams);
       $contribution->id = $createContribution['id'];
       CRM_Contribute_BAO_ContributionRecur::copyCustomValues($contributionParams['contribution_recur_id'], $contribution->id);
