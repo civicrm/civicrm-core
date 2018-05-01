@@ -46,6 +46,15 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
   protected $currentLogTable;
 
   /**
+   * Clause used in the final run of buildQuery but not when doing preliminary work.
+   *
+   * (We do this to all the api to run this report since it doesn't call postProcess).
+   *
+   * @var string
+   */
+  protected $logTypeTableClause;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -254,9 +263,9 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
       }
     }
 
-    $logTypeTableClause = '(1)';
+    $this->logTypeTableClause = '(1)';
     if ($logTypeTableValue = CRM_Utils_Array::value("log_type_table_value", $this->_params)) {
-      $logTypeTableClause = $this->whereClause($this->_columns['log_civicrm_entity']['filters']['log_type_table'],
+      $this->logTypeTableClause = $this->whereClause($this->_columns['log_civicrm_entity']['filters']['log_type_table'],
         $this->_params['log_type_table_op'], $logTypeTableValue, NULL, NULL);
       unset($this->_params['log_type_table_value']);
     }
@@ -305,22 +314,8 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
       CRM_Core_DAO::executeQuery($sql);
       $this->addToDeveloperTab($sql);
     }
+    $sql = $this->buildQuery();
 
-    // note the group by columns are same as that used in alterDisplay as $newRows - $key
-    $this->limit();
-    $this->orderBy();
-    $sql = "{$this->_select}
-FROM civicrm_temp_civireport_logsummary entity_log_civireport
-WHERE {$logTypeTableClause}
-GROUP BY log_civicrm_entity_log_date, log_civicrm_entity_log_type_label, log_civicrm_entity_log_conn_id, log_civicrm_entity_log_user_id, log_civicrm_entity_altered_contact_id, log_civicrm_entity_log_grouping
-{$this->_orderBy}
-{$this->_limit} ";
-    $sql = str_replace('modified_contact_civireport.display_name', 'entity_log_civireport.altered_contact', $sql);
-    $sql = str_replace('modified_contact_civireport.id', 'entity_log_civireport.altered_contact_id', $sql);
-    $sql = str_replace(array(
-      'modified_contact_civireport.',
-      'altered_by_contact_civireport.',
-    ), 'entity_log_civireport.', $sql);
     $this->buildRows($sql, $rows);
     $this->addToDeveloperTab($sql);
 
@@ -436,6 +431,37 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
       return $newAction;
     }
     return NULL;
+  }
+
+  /**
+   * Build the report query.
+   *
+   * We override this in order to be able to run from the api.
+   *
+   * @param bool $applyLimit
+   *
+   * @return string
+   */
+  public function buildQuery($applyLimit = TRUE) {
+    if (!$this->logTypeTableClause) {
+      return parent::buildQuery($applyLimit);
+    }
+    // note the group by columns are same as that used in alterDisplay as $newRows - $key
+    $this->limit();
+    $this->orderBy();
+    $sql = "{$this->_select}
+FROM civicrm_temp_civireport_logsummary entity_log_civireport
+WHERE {$this->logTypeTableClause}
+GROUP BY log_civicrm_entity_log_date, log_civicrm_entity_log_type_label, log_civicrm_entity_log_conn_id, log_civicrm_entity_log_user_id, log_civicrm_entity_altered_contact_id, log_civicrm_entity_log_grouping
+{$this->_orderBy}
+{$this->_limit} ";
+    $sql = str_replace('modified_contact_civireport.display_name', 'entity_log_civireport.altered_contact', $sql);
+    $sql = str_replace('modified_contact_civireport.id', 'entity_log_civireport.altered_contact_id', $sql);
+    $sql = str_replace(array(
+      'modified_contact_civireport.',
+      'altered_by_contact_civireport.',
+    ), 'entity_log_civireport.', $sql);
+    return $sql;
   }
 
 }
