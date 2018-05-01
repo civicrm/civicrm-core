@@ -137,6 +137,19 @@ class CRM_Utils_Money {
   }
 
   /**
+   * Format money in "cents" or the smallest denominator for the currency:
+   * Example £12.34 returns 1234
+   * @param $amount
+   * @param null $currency
+   *
+   * @return int
+   */
+  public static function formatCents($amount, $currency = NULL) {
+    $amount = self::formatDecimalRounded($amount, self::getCurrencyPrecision($currency));
+    return (int) preg_replace('/[^\d]/', '', strval($amount));
+  }
+
+  /**
    * Format money for display (with symbols etc). Specify format or use formatLocaleFull() instead.
    * Example: Depends on parameters it is called with
    *
