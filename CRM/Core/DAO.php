@@ -177,9 +177,9 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Enables ONLY_FULL_GROUP_BY sql_mode as necessary..
+   * Re-enables ONLY_FULL_GROUP_BY sql_mode as necessary..
    */
-  public static function enableFullGroupByMode() {
+  public static function reenableFullGroupByMode() {
     $currentModes = CRM_Utils_SQL::getSqlModes();
     if (CRM_Utils_SQL::supportsFullGroupBy() && !in_array('ONLY_FULL_GROUP_BY', $currentModes) && CRM_Utils_SQL::isGroupByModeInDefault()) {
       $currentModes[] = 'ONLY_FULL_GROUP_BY';

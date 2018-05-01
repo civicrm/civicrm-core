@@ -359,7 +359,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
     }
     CRM_Core_DAO::disableFullGroupByMode();
     $dao->query($query);
-    CRM_Core_DAO::enableFullGroupByMode();
+    CRM_Core_DAO::reenableFullGroupByMode();
     $results = array();
 
     while ($dao->fetch()) {
