@@ -453,7 +453,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
       $page->_defaults['pcp_is_anonymous'] = 0;
 
       $page->add('text', 'pcp_roll_nickname', ts('Name'), array('maxlength' => 30));
-      $page->add('textarea', "pcp_personal_note", ts('Personal Note'), array('style' => 'height: 3em; width: 40em;'));
+      $page->addField('pcp_personal_note', array('entity' => 'ContributionSoft', 'context' => 'create', 'style' => 'height: 3em; width: 40em;'));
     }
     else {
       $page->assign('is_honor_roll', FALSE);
@@ -476,8 +476,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
     if (!$pcpId) {
       return FALSE;
     }
-
-    $approvedId = CRM_Core_OptionGroup::getValue('pcp_status', 'Approved', 'name');
 
     $pcpStatus = CRM_Core_OptionGroup::values("pcp_status");
 
@@ -507,12 +505,13 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
 
     // define redirect url back to contrib page or event if needed
     $url = CRM_Utils_System::url($urlBase, "reset=1&id={$pcpBlock['entity_id']}", FALSE, NULL, FALSE, TRUE);
+    $currentPCPStatus = CRM_Core_PseudoConstant::getName('CRM_PCP_BAO_PCP', 'status_id', $pcpInfo['status_id']);
 
     if ($pcpBlock['target_entity_id'] != $entity['id']) {
       $statusMessage = ts('This page is not related to the Personal Campaign Page you have just visited. However you can still make a contribution here.');
       CRM_Core_Error::statusBounce($statusMessage, $url);
     }
-    elseif ($pcpInfo['status_id'] != $approvedId) {
+    elseif ($currentPCPStatus !== 'Approved') {
       $statusMessage = ts('The Personal Campaign Page you have just visited is currently %1. However you can still support the campaign here.', array(1 => $pcpStatus[$pcpInfo['status_id']]));
       CRM_Core_Error::statusBounce($statusMessage, $url);
     }

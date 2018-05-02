@@ -484,7 +484,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $this->addGroup($elements, 'pcp_is_anonymous', NULL, '&nbsp;&nbsp;&nbsp;');
 
         $this->add('text', 'pcp_roll_nickname', ts('Name'), array('maxlength' => 30));
-        $this->add('textarea', 'pcp_personal_note', ts('Personal Note'), array('style' => 'height: 3em; width: 40em;'));
+        $this->addField('pcp_personal_note', array('entity' => 'ContributionSoft', 'context' => 'create', 'style' => 'height: 3em; width: 40em;'));
       }
     }
     if (empty($this->_values['fee']) && empty($this->_ccid)) {

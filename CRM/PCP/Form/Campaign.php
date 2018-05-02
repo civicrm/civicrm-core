@@ -140,7 +140,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     else {
       $owner_notification_option = CRM_PCP_BAO_PCP::getOwnerNotificationId($this->controller->get('component_page_id'), $this->_component ? $this->_component : 'contribute');
     }
-    if ($owner_notification_option == CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'owner_chooses', 'name')) {
+    if ($owner_notification_option == CRM_Core_PseudoConstant::getKey('CRM_PCP_BAO_PCPBlock', 'owner_notify_id', 'owner_chooses')) {
       $this->assign('owner_notification_option', TRUE);
       $this->addElement('checkbox', 'is_notify', ts('Notify me via email when someone donates to my page'), NULL);
     }

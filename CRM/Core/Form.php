@@ -1475,6 +1475,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         //Set default columns and rows for textarea.
         $props['rows'] = isset($props['rows']) ? $props['rows'] : 4;
         $props['cols'] = isset($props['cols']) ? $props['cols'] : 60;
+        if (!$props['maxlength'] && isset($fieldSpec['length'])) {
+          $props['maxlength'] = $fieldSpec['length'];
+        }
         return $this->add('textarea', $name, $label, $props, $required);
 
       case 'Select Date':
