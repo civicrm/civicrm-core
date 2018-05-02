@@ -33,6 +33,13 @@
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
   /**
+   * Array with statuses that mark a recurring contribution as inactive.
+   *
+   * @var array
+   */
+  private static $inactiveStatuses = array('Cancelled', 'Chargeback', 'Refunded', 'Completed');
+
+  /**
    * Create recurring contribution.
    *
    * @param array $params
@@ -936,6 +943,16 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     }
 
     return $lineSets;
+  }
+
+  /**
+   * Returns array with statuses that are considered to make a recurring
+   * contribution inacteve.
+   *
+   * @return array
+   */
+  public static function getInactiveStatuses() {
+    return self::$inactiveStatuses;
   }
 
 }

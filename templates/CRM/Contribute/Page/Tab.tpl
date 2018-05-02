@@ -103,11 +103,11 @@
         </div>
         <div id="recurring-subtab" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
           {if $recur}
-            <div class="crm-block crm-contact-contribute-recur">
+            <div class="crm-block crm-contact-contribute-recur crm-contact-contribute-recur-active">
               <h3>{ts}Active Recurring Contributions{/ts}</h3>
               {include file="CRM/Contribute/Page/ContributionRecur.tpl" recurRows=$activeRecurRows}
             </div>
-            <div class="crm-block crm-contact-contribute-recur">
+            <div class="crm-block crm-contact-contribute-recur crm-contact-contribute-recur-inactive">
               <h3>{ts}Inactive Recurring Contributions{/ts}</h3>
               {include file="CRM/Contribute/Page/ContributionRecur.tpl" recurRows=$inactiveRecurRows}
             </div>

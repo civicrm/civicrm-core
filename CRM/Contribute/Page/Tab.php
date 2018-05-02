@@ -44,13 +44,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   public $_crid = NULL;
 
   /**
-   * Array with statuses that mark a recurring contribution as inactive.
-   *
-   * @var array
-   */
-  private $inactiveStatuses = array('Cancelled', 'Chargeback', 'Refunded', 'Completed');
-
-  /**
    * This method returns the links that are given for recur search row.
    * currently the links added for each row are:
    * - View
@@ -195,7 +188,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     try {
       $contributionRecurResult = civicrm_api3('ContributionRecur', 'get', array(
         'contact_id' => $this->_contactId,
-        'contribution_status_id' => array('NOT IN' => $this->inactiveStatuses),
+        'contribution_status_id' => array('NOT IN' => CRM_Contribute_BAO_ContributionRecur::getInactiveStatuses()),
         'options' => array('limit' => 0, 'sort' => 'start_date ASC'),
       ));
       $recurContributions = CRM_Utils_Array::value('values', $contributionRecurResult);
@@ -217,7 +210,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     try {
       $contributionRecurResult = civicrm_api3('ContributionRecur', 'get', array(
         'contact_id' => $this->_contactId,
-        'contribution_status_id' => array('IN' => $this->inactiveStatuses),
+        'contribution_status_id' => array('IN' => CRM_Contribute_BAO_ContributionRecur::getInactiveStatuses()),
         'options' => array('limit' => 0, 'sort' => 'start_date ASC'),
       ));
       $recurContributions = CRM_Utils_Array::value('values', $contributionRecurResult);
