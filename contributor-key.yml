@@ -66,7 +66,8 @@
   name        : Andrew Cormick-Dockery
   jira        : andrew_dockery
 
-- name        : Andrew Perry
+- github      : andrewperry
+  name        : Andrew Perry
   organization: Community Builders
   jira        : andrew
 
@@ -135,13 +136,16 @@
   organization: Squiffle Consulting
   jira        : ayduns
 
+- name        : Matthias Bärnthaler
+  jira        : baerm
+
 - github      : bhahumanists
   name        : Andrew West
   organization: British Humanist Association
   jira        : awestbha
 
-- name        : Matthias Bärnthaler
-  jira        : baerm
+- name        : Ben Jarlett
+  jira        : benjarlett
 
 - github      : BorislavZlatanov
   name        : Borislav Zlatanov
@@ -754,6 +758,11 @@
   name        : Lionel Smith-Gordon
   jira        : lsmithgo
 
+- github      : lyyana
+  name        : Yuliyana Liyana
+  organization: Oxfam Germany
+  jira        : liyana
+
 - name        : Madura Krishnamoorthy
   organization: CompuCorp
   jira        : madura
@@ -981,6 +990,11 @@
   name        : Philipp Batroff
   organization: Systopia
 
+- github      : penguintrax
+  name        : Barbara Forbes-Lyons
+  organization: Lyons Digital Media
+  jira        : penguintrax
+
 - github      : petednz
   name        : Peter Davis
   organization: Fuzion
@@ -1001,6 +1015,10 @@
 - github      : pradpnayak
   name        : Pradeep Nayak
   jira        : pradeep.nayak
+
+- github      : pratik-joshi
+  name        : Pratik Joshi
+  jira        : pratik.joshi
 
 - name        : Paul Treadaway
   jira        : ptreadaway
