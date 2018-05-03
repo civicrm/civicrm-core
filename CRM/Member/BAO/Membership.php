@@ -2289,23 +2289,22 @@ WHERE      civicrm_membership.is_test = 0";
         continue;
       }
 
-      self::processOverriddenUntilDateMembership($dao);
-
-      //update membership records where status is NOT - Pending OR Cancelled.
+      //update membership records where status is NOT  Pending OR Cancelled.
       //as well as membership is not override.
       //skipping Expired membership records -> reduced extra processing( kiran )
-      if (!$dao->is_override &&
-        !in_array($dao->status_id, array(
-          array_search('Pending', $allStatus),
-          // CRM-15475
-          array_search(
-            'Cancelled',
-            CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)
-          ),
-          array_search('Expired', $allStatus),
-        ))
-      ) {
+      $isOverrideUntilDateDueDate = self::isOverrideUntilDateDueDate($dao);
+      $shouldProcessTheMembership = $isOverrideUntilDateDueDate || (!$dao->is_override &&
+          !in_array($dao->status_id, array(
+            array_search('Pending', $allStatus),
+            // CRM-15475
+            array_search(
+              'Cancelled',
+              CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)
+            ),
+            array_search('Expired', $allStatus),
+          )));
 
+      if ($shouldProcessTheMembership) {
         // CRM-7248: added excludeIsAdmin param to the following fn call to prevent moving to admin statuses
         //get the membership status as per id.
         $newStatus = civicrm_api('membership_status', 'calc',
@@ -2316,6 +2315,14 @@ WHERE      civicrm_membership.is_test = 0";
           ), TRUE
         );
         $statusId = CRM_Utils_Array::value('id', $newStatus);
+
+        if ($isOverrideUntilDateDueDate) {
+          civicrm_api3('membership', 'create', array(
+            'id' => $dao->membership_id,
+            'is_override' => FALSE,
+            'status_override_end_date' => 'null',
+          ));
+        }
 
         //process only when status change.
         if ($statusId &&
@@ -2355,17 +2362,19 @@ WHERE      civicrm_membership.is_test = 0";
   }
 
   /**
-   * Set is_override for the 'overridden until date' membership to
-   * False and clears the 'until date' field in case the 'until date'
-   * is equal or after today date.
+   * Returns True if the membership status is
+   * overridden until date and its end date is after or
+   * equal today date, otherwise return False.
    *
    * @param CRM_Core_DAO $membership
    *   The membership to be processed
+   *
+   * @return bool
    */
-  private static function processOverriddenUntilDateMembership($membership) {
+  private static function isOverrideUntilDateDueDate($membership) {
     $isOverriddenUntilDate = !empty($membership->is_override) && !empty($membership->status_override_end_date);
     if (!$isOverriddenUntilDate) {
-      return;
+      return FALSE;
     }
 
     $todayDate = new DateTime();
@@ -2377,13 +2386,10 @@ WHERE      civicrm_membership.is_test = 0";
     $datesDifference = $todayDate->diff($overrideEndDate);
     $daysDifference = (int) $datesDifference->format('%R%a');
     if ($daysDifference <= 0) {
-      $params = array(
-        'id' => $membership->membership_id,
-        'is_override' => FALSE,
-        'status_override_end_date' => 'null',
-      );
-      civicrm_api3('membership', 'create', $params);
+      return TRUE;
     }
+
+    return FALSE;
   }
 
   /**
