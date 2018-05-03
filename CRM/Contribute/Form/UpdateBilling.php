@@ -335,17 +335,15 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
       $activityParams = array(
         'source_contact_id' => $this->_subscriptionDetails->contact_id,
-        'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
-          'Update Recurring Contribution Billing Details',
-          'name'
+        'activity_type_id' => CRM_Core_PseudoConstant::getKey(
+          'CRM_Activity_BAO_Activity',
+          'activity_type_id',
+          'Update Recurring Contribution Billing Details'
         ),
         'subject' => ts('Recurring Contribution Billing Details Updated'),
         'details' => $message,
         'activity_date_time' => date('YmdHis'),
-        'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
-          'Completed',
-          'name'
-        ),
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
       );
       $session = CRM_Core_Session::singleton();
       $cid = $session->get('userID');
