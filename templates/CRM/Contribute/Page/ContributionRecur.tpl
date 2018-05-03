@@ -63,19 +63,30 @@
         </div>
     {/if}
 
-  {if $relatedContributions}
-    <div class="crm-accordion-wrapper">
-      <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
-      <div class="crm-accordion-body">
-        {include file="CRM/Contribute/Page/RelatedContributions.tpl"}
-      </div>
-    </div>
-  {else}
-    <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
-      {ts}No contributions have been recorded for this recurring contribution.{/ts}
-    </div>
-  {/if}
+  <script type="text/javascript">
+    var recurContribID = {$recur.id};
+    var contactID = {$contactId};
+    {literal}
+    CRM.$(function($) {
+      CRM.loadPage(
+        CRM.url(
+          'civicrm/contribute/contributionrecur-payments',
+          {
+            reset: 1,
+            id: recurContribID,
+            cid: contactID
+          },
+          'back'
+        ),
+        {
+          target : '#recurring-contribution-payments',
+          dialog : false
+        }
+      );
+    });
+    {/literal}
+  </script>
+  <div id="recurring-contribution-payments"></div>
 {/if}
 {if $recurRows}
     {strip}
