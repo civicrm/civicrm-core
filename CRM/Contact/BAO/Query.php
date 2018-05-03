@@ -4841,6 +4841,13 @@ civicrm_relationship.is_permission_a_b = 0
     $additionalFromClause = NULL, $skipOrderAndLimit = FALSE
   ) {
 
+    // In this case we are expecting the search query to return all the first single letter characters of contacts ONLY,
+    //  but when FGB (FULL_GROUP_BY_MODE) is enabled MySQL expect the columns present in GROUP BY must be present in SELECT clause
+    //  and that results into error and needless to have other columns. In order to resolve this disable FGB to fulfill both the cases
+    if ($sortByChar) {
+      CRM_Core_DAO::disableFullGroupByMode();
+    }
+
     if ($includeContactIds) {
       $this->_includeContactIds = TRUE;
       $this->_whereClause = $this->whereClause();
@@ -4899,7 +4906,7 @@ civicrm_relationship.is_permission_a_b = 0
 
     if (!empty($groupByCols)) {
       // It doesn't matter to include columns in SELECT clause, which are present in GROUP BY when we just want the contact IDs
-      if (!$groupContacts) {
+      if (!$groupContacts && !$sortByChar) {
         $select = self::appendAnyValueToSelect($this->_select, $groupByCols, 'GROUP_CONCAT');
       }
       $groupBy = " GROUP BY " . implode(', ', $groupByCols);
@@ -4940,6 +4947,11 @@ civicrm_relationship.is_permission_a_b = 0
     }
 
     $dao = CRM_Core_DAO::executeQuery($query);
+
+    if ($sortByChar) {
+      CRM_Core_DAO::reenableFullGroupByMode();
+    }
+
     if ($groupContacts) {
       $ids = array();
       while ($dao->fetch()) {
