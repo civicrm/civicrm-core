@@ -25,9 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-
 /**
  * Test that the core actions for APIv3 entities comply with standard syntax+behavior.
  *
@@ -395,7 +392,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     return $entities;
   }
-
 
   /**
    * At this stage exclude the ones that don't pass & add them as we can troubleshoot them
@@ -1496,7 +1492,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     return $baos;
   }
-
 
   /**
    * Verify that HTML metacharacters provided as inputs appear consistently.

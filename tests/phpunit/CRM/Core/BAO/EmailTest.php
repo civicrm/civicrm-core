@@ -1,5 +1,5 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 require_once 'CiviTest/Contact.php';
 
 /**

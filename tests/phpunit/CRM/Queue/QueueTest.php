@@ -25,9 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Ensure that various queue implementations comply with the interface
  */

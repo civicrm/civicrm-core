@@ -24,8 +24,6 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  *  Test APIv3 civicrm_activity_* functions
  *

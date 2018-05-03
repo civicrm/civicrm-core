@@ -30,8 +30,6 @@
  * File for the CRM_Contact_Imports_Parser_ContactTest class.
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  *  Test contact import parser.
  *

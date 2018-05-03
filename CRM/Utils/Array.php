@@ -106,7 +106,7 @@ class CRM_Utils_Array {
    * @return int|string|null
    *   Returns the key, which could be an int or a string, or NULL on failure.
    */
-  public static function key($value, &$list) {
+  public static function key($value, $list) {
     if (is_array($list)) {
       $key = array_search($value, $list);
 

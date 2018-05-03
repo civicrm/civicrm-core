@@ -25,8 +25,6 @@
  * +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class contains api test cases for "civicrm_relationship"
  */

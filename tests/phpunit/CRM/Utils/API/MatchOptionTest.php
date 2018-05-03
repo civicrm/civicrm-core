@@ -1,7 +1,5 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Test that the API accepts the 'match' and 'match-mandatory' options.
  */

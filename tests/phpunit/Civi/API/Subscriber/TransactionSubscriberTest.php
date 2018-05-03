@@ -1,8 +1,6 @@
 <?php
 namespace Civi\API\Subscriber;
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  */
 class TransactionSubscriberTest extends \CiviUnitTestCase {

@@ -25,9 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-
 /**
  * Test class for GroupOrganization API - civicrm_group_organization_*
  *

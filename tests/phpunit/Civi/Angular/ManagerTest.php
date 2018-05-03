@@ -27,8 +27,6 @@
 
 namespace Civi\Angular;
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Test the Angular base page.
  */

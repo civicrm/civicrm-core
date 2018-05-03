@@ -28,7 +28,6 @@
 /**
  *  Include parent class definition
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  *  Include class under test
@@ -84,8 +83,6 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testCount($fv, $count, $ids, $full) {
-    $this->foreignKeyChecksOff();
-
     $this->quickCleanup($this->_tablesToTruncate);
 
     // echo "testCount\n";

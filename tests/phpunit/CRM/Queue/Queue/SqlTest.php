@@ -25,9 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Ensure that the extended interface for SQL-backed queues
  * work. For example, the createItem() interface supports
