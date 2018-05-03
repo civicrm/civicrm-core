@@ -61,7 +61,13 @@
     <title>Custom Group Subtype List</title>
     <default>NULL</default>
     <comment>FK to civicrm_option_value.id (for option group custom_data_type.)</comment>
+    <pseudoconstant>
+      <optionGroupName>custom_data_type</optionGroupName>
+    </pseudoconstant>
     <add>2.2</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>extends_entity_column_value</name>
