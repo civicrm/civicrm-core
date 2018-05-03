@@ -285,7 +285,7 @@
     var initialFields = {}, fetchFields = false;
     $('select[id^=mapper][id$="_1"] option:selected', '#Builder').each(function() {
       var field = $(this).attr('value');
-      if (typeof(CRM.searchBuilder.fieldOptions[field]) == 'string') {
+      if (typeof(CRM.searchBuilder.fieldOptions[field]) == 'string' && CRM.searchBuilder.fieldOptions[field] !== 'yesno') {
         initialFields[field] = [CRM.searchBuilder.fieldOptions[field], 'getoptions', {field: field, sequential: 1}];
         fetchFields = true;
       }
