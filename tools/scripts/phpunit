@@ -14,7 +14,7 @@ if (PHP_SAPI !== 'cli') {
   die("phpunit can only be run from command line.");
 }
 
-$phpunit = findCommand('phpunit4');
+$phpunit = findCommand('phpunit5');
 if (!$phpunit) {
   $phpunit = findCommand('phpunit');
 }
