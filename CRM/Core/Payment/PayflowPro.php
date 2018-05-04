@@ -637,7 +637,10 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       $nvpArray[$keyval] = $valval;
       $result = substr($result, $valuepos + 1, strlen($result));
     }
-    // get the result code to validate.
+
+    // @TODO Function is named getRecurringTransactionStatus() which
+    // suggests it returns a result. It sets a $result_code but doesn't return
+    // it, printing output instead?
     $result_code = $nvpArray['RESULT'];
     print_r($responseData);
 
