@@ -57,7 +57,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    */
   public function doDirectPayment(&$params) {
     if (!defined('CURLOPT_SSLCERT')) {
-      CRM_Core_Error::fatal(ts('PayFlowPro requires curl with SSL support'));
+      CRM_Core_Error::fatal(ts('Payflow Pro requires curl with SSL support'));
     }
 
     /*
@@ -504,7 +504,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       }
     }
     if ($responseHeaders['http_code'] != 200) {
-      return self::errorExit(9015, "Error connecting to the payflo API server.");
+      return self::errorExit(9015, "Error connecting to the Payflow Pro API server.");
     }
 
     /*
@@ -575,7 +575,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    */
   public function getRecurringTransactionStatus($recurringProfileID, $processorID) {
     if (!defined('CURLOPT_SSLCERT')) {
-      CRM_Core_Error::fatal(ts('PayFlowPro requires curl with SSL support'));
+      CRM_Core_Error::fatal(ts('Payflow Pro requires curl with SSL support'));
     }
 
     /*
