@@ -2036,7 +2036,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertTrue(is_numeric($ufMatch->id));
 
     // setup - mock the calls to CRM_Utils_System_*::getUfId
-    $userSystem = $this->createMock('CRM_Utils_System_UnitTests', array('getUfId'));
+    $mockFunction = $this->mockMethod;
+    $userSystem = $this->$mockFunction('CRM_Utils_System_UnitTests', array('getUfId'));
     $userSystem->expects($this->once())
       ->method('getUfId')
       ->with($this->equalTo('exampleUser'))
@@ -2111,7 +2112,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testContactGetByUnknownUsername() {
     // setup - mock the calls to CRM_Utils_System_*::getUfId
-    $userSystem = $this->createMock('CRM_Utils_System_UnitTests', array('getUfId'));
+    $mockFunction = $this->mockMethod;
+    $userSystem = $this->$mockFunction('CRM_Utils_System_UnitTests', array('getUfId'));
     $userSystem->expects($this->once())
       ->method('getUfId')
       ->with($this->equalTo('exampleUser'))
