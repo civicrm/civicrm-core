@@ -71,7 +71,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   public $_priceSet;
 
   /**
-   * The id of the participation that we are proceessing.
+   * The id of the participation that we are processing.
    *
    * @var int
    */
@@ -372,6 +372,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
+      $eventId = (int) CRM_Utils_Array::value('event_id', $_POST);
       // Custom data of type participant role
       // Note: Some earlier commits imply $_POST['role_id'] could be a comma separated string,
       //       not sure if that ever really happens
@@ -384,13 +385,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
 
       //custom data of type participant event
-      CRM_Custom_Form_CustomData::preProcess($this, $this->_eventNameCustomDataTypeID, $_POST['event_id'], 1, 'Participant', $this->_id);
+      CRM_Custom_Form_CustomData::preProcess($this, $this->_eventNameCustomDataTypeID, $eventId, 1, 'Participant', $this->_id);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
       CRM_Custom_Form_CustomData::setDefaultValues($this);
 
       // custom data of type participant event type
       $eventTypeId = NULL;
-      if ($eventId = CRM_Utils_Array::value('event_id', $_POST)) {
+      if ($eventId) {
         $eventTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventId, 'event_type_id', 'id');
       }
       CRM_Custom_Form_CustomData::preProcess($this, $this->_eventTypeCustomDataTypeID, $eventTypeId,
@@ -1209,10 +1210,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       );
       $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEvent, $customFields);
       $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEventType, $customFields);
-      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-        $this->_id,
-        'Participant'
-      );
+
+      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->_id, $this->getDefaultEntity());
     }
 
     //do cleanup line  items if participant edit the Event Fee.

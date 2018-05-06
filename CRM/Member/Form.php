@@ -85,6 +85,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   public $_priceSet;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Membership';
+  }
+
+  /**
    * Values submitted to the form, processed along the way.
    *
    * @var array
