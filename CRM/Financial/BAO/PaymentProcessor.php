@@ -422,6 +422,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *  - supportsBackOffice
    *  - supportsLiveMode
    *  - supportsFutureRecurDate
+   *  - supportsRecurring
    *  - supportsCancelRecurring
    *  - supportsRecurContributionsForPledges
    *
