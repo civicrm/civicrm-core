@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2018
- * $Id$
  *
  */
 
@@ -50,6 +49,9 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
     $this->assign('action', $this->_action);
 
+    // Add custom data to form
+    CRM_Custom_Form_CustomData::addToForm($this);
+
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/admin/member/membershipType', 'reset=1');
     $session->pushUserContext($url);
@@ -61,8 +63,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   *
-   * @return void
+   * @return array
+   *   defaults
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
@@ -111,7 +113,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    * @return void
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
-   * @throws \HTML_QuickForm_Error
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -151,11 +152,10 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       CRM_Core_SelectValues::date(NULL, 'M d'), FALSE
     );
 
-    // Auto-renew Option
-    $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
+    // Add Auto-renew options if we have a payment processor that supports recurring contributions
     $isAuthorize = FALSE;
     $options = array();
-    if (is_array($paymentProcessor) && !empty($paymentProcessor)) {
+    if (CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('Recurring'))) {
       $isAuthorize = TRUE;
       $options = CRM_Core_SelectValues::memberAutoRenew();
     }
@@ -332,7 +332,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
       $params = $ids = array();
       foreach ($fields as $fld) {
-        $params[$fld] = CRM_Utils_Array::value($fld, $submitted, 'NULL');
+        $params[$fld] = CRM_Utils_Array::value($fld, $submitted, 'null');
       }
 
       if ($params['minimum_fee']) {
@@ -360,7 +360,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
         }
       }
       if (!$hasRelTypeVal) {
-        $params['relationship_type_id'] = $params['relationship_direction'] = $params['max_related'] = 'NULL';
+        $params['relationship_type_id'] = $params['relationship_direction'] = $params['max_related'] = 'null';
       }
 
       if ($params['duration_unit'] == 'lifetime' &&
@@ -369,22 +369,32 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
         $params['duration_interval'] = 1;
       }
 
-      $periods = array('fixed_period_start_day', 'fixed_period_rollover_day');
-      foreach ($periods as $per) {
-        if (!empty($params[$per]['M']) && !empty($params[$per]['d'])) {
-          $mon = $params[$per]['M'];
-          $dat = $params[$per]['d'];
-          $mon = ($mon < 10) ? '0' . $mon : $mon;
-          $dat = ($dat < 10) ? '0' . $dat : $dat;
-          $params[$per] = $mon . $dat;
-        }
-        elseif ($per == 'fixed_period_rollover_day' && !empty($params['month_fixed_period_rollover_day'])) {
-          $params['fixed_period_rollover_day'] = $params['month_fixed_period_rollover_day']['d'];
-          unset($params['month_fixed_period_rollover_day']);
-        }
-        else {
-          $params[$per] = 'NULL';
-        }
+      switch ($params['period_type']) {
+        case 'fixed':
+          $periods = array('fixed_period_start_day', 'fixed_period_rollover_day');
+          foreach ($periods as $period) {
+            if (!empty($params[$period]['M']) && !empty($params[$period]['d'])) {
+              $mon = $params[$period]['M'];
+              $dat = $params[$period]['d'];
+              $mon = ($mon < 10) ? '0' . $mon : $mon;
+              $dat = ($dat < 10) ? '0' . $dat : $dat;
+              $params[$period] = $mon . $dat;
+            }
+            elseif ($period == 'fixed_period_rollover_day' && !empty($params['month_fixed_period_rollover_day'])) {
+              $params['fixed_period_rollover_day'] = $params['month_fixed_period_rollover_day']['d'];
+              unset($params['month_fixed_period_rollover_day']);
+            }
+            else {
+              $params[$period] = 'null';
+            }
+          }
+          break;
+
+        case 'rolling':
+          $fieldsToUnset = array('fixed_period_start_day', 'fixed_period_rollover_day', 'month_fixed_period_rollover_day');
+          foreach ($fieldsToUnset as $field) {
+            unset($params[$field]);
+          }
       }
       $oldWeight = NULL;
 
@@ -398,13 +408,20 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       );
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
-        $ids['membershipType'] = $this->_id;
+        $params['id'] = $this->_id;
       }
 
-      $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
+      // postProcess custom data
+      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($submitted, $this->_id, $this->getDefaultEntity());
+
+      $membershipTypeResult = civicrm_api3('MembershipType', 'create', $params);
+      $membershipTypeName = civicrm_api3('MembershipType', 'getvalue', array(
+        'return' => "name",
+        'id' => $membershipTypeResult['id'],
+      ));
 
       CRM_Core_Session::setStatus(ts('The membership type \'%1\' has been saved.',
-        array(1 => $membershipType->name)
+        array(1 => $membershipTypeName)
       ), ts('Saved'), 'success');
       $session = CRM_Core_Session::singleton();
       if ($buttonName == $this->getButtonName('upload', 'new')) {

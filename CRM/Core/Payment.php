@@ -1543,6 +1543,18 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
   }
 
   /**
+   * Checks if payment processor supports recurring contributions
+   *
+   * @return bool
+   */
+  public function supportsRecurring() {
+    if (!empty($this->_paymentProcessor['is_recur'])) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
    * Should a receipt be sent out for a pending payment.
    *
    * e.g for traditional pay later & ones with a delayed settlement a pending receipt makes sense.
