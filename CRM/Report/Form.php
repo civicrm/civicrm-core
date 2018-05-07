@@ -2813,8 +2813,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->select();
     $this->from();
     $this->customDataFrom();
-    $this->buildPermissionClause();
     $this->where();
+    $this->buildPermissionClause();
     $this->groupBy();
     $this->orderBy();
 
