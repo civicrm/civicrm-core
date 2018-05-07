@@ -242,16 +242,16 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
         break;
 
       case 'payment_instrument':
-        require_once 'CRM/Core/OptionGroup.php';
-        $values['payment_instrument_id'] = CRM_Core_OptionGroup::getValue('payment_instrument', $value);
+        require_once 'CRM/Core/PseudoConstant.php';
+        $values['payment_instrument_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $value);
         if (empty($values['payment_instrument_id'])) {
           return civicrm_api3_create_error("Payment Instrument is not valid: $value");
         }
         break;
 
       case 'contribution_status_id':
-        require_once 'CRM/Core/OptionGroup.php';
-        if (!$values['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', $value)) {
+        require_once 'CRM/Core/PseudoConstant.php';
+        if (!$values['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $value)) {
           return civicrm_api3_create_error("Contribution Status is not valid: $value");
         }
         break;

@@ -477,7 +477,8 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
       return FALSE;
     }
 
-    $pcpStatus = CRM_Core_OptionGroup::values("pcp_status");
+    $pcpStatus = CRM_Core_PseudoConstant::get('CRM_PCP_BAO_PCP', 'status_id');
+    $approvedId = array_search('Approved', $pcpStatus);
 
     $params = array('id' => $pcpId);
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $params, $pcpInfo);
