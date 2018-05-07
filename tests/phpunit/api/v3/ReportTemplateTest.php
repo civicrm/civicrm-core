@@ -140,7 +140,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Tet api to get rows from reports.
+   * Test api to get rows from reports.
    *
    * @dataProvider getReportTemplates
    *
@@ -149,12 +149,20 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testReportTemplateGetRowsAllReports($reportID) {
+    //$reportID = 'logging/contact/summary';
     if (stristr($reportID, 'has existing issues')) {
       $this->markTestIncomplete($reportID);
     }
+    if (substr($reportID, 0, '7') === 'logging') {
+      Civi::settings()->set('logging', 1);
+    }
+
     $this->callAPISuccess('report_template', 'getrows', array(
       'report_id' => $reportID,
     ));
+    if (substr($reportID, 0, '7') === 'logging') {
+      Civi::settings()->set('logging', 0);
+    }
   }
 
   /**
@@ -189,8 +197,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $reportsToSkip = array(
       'activity' => 'does not respect function signature on from clause',
       'event/income' => 'I do no understand why but error is Call to undefined method CRM_Report_Form_Event_Income::from() in CRM/Report/Form.php on line 2120',
-      'logging/contact/summary' => '(likely to be test related) probably logging off Undefined index: Form/Contact/LoggingSummary.php(231): PHP',
-      'logging/contribute/summary' => '(likely to be test related) probably logging off DB Error: no such table',
       'contribute/history' => 'Declaration of CRM_Report_Form_Contribute_History::buildRows() should be compatible with CRM_Report_Form::buildRows($sql, &$rows)',
       'activitySummary' => 'We use temp tables for the main query generation and name are dynamic. These names are not available in stats() when called directly.',
     );
