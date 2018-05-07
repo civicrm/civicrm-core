@@ -455,8 +455,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
      * 'ack' => 'Success',
      * 'version' => '56.0',
      * 'build' => '39949200',)
-    */
-
+     */
     $params['trxn_id'] = $result['profileid'];
     $params['payment_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
 

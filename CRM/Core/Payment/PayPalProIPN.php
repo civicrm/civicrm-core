@@ -542,6 +542,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
 
   /**
    * Handle payment express IPNs.
+   *
    * For one off IPNS no actual response is required
    * Recurring is more difficult as we have limited confirmation material
    * lets look up invoice id in recur_contribution & rely on the unique transaction id to ensure no
@@ -560,23 +561,25 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     // as membership id etc can be derived by the load objects fn
     $objects = $ids = $input = array();
     $isFirst = FALSE;
+    $input['invoice'] = self::getValue('i', FALSE);
     $input['txnType'] = $this->retrieve('txn_type', 'String');
-    if ($input['txnType'] != 'recurring_payment') {
+    $contributionRecur = civicrm_api3('contribution_recur', 'getsingle', array(
+      'return' => 'contact_id, id, payment_processor_id',
+      'invoice_id' => $input['invoice'],
+    ));
+
+    if ($input['txnType'] !== 'recurring_payment' && $input['txnType'] !== 'recurring_payment_profile_created') {
       throw new CRM_Core_Exception('Paypal IPNS not handled other than recurring_payments');
     }
-    $input['invoice'] = self::getValue('i', FALSE);
+
     $this->getInput($input, $ids);
-    if ($this->transactionExists($input['trxn_id'])) {
+    if ($input['txnType'] === 'recurring_payment' && $this->transactionExists($input['trxn_id'])) {
       throw new CRM_Core_Exception('This transaction has already been processed');
     }
 
-    $contributionRecur = civicrm_api3('contribution_recur', 'getsingle', array(
-        'return' => 'contact_id, id',
-        'invoice_id' => $input['invoice'],
-      ));
     $ids['contact'] = $contributionRecur['contact_id'];
     $ids['contributionRecur'] = $contributionRecur['id'];
-    $result = civicrm_api3('contribution', 'getsingle', array('invoice_id' => $input['invoice']));
+    $result = civicrm_api3('contribution', 'getsingle', ['invoice_id' => $input['invoice'], 'contribution_test' => '']);
 
     $ids['contribution'] = $result['id'];
     //@todo hard - coding 'pending' for now
@@ -595,12 +598,12 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     // membership would be an easy add - but not relevant to my customer...
     $this->_component = $input['component'] = 'contribute';
     $input['trxn_date'] = date('Y-m-d-H-i-s', strtotime(self::retrieve('time_created', 'String')));
-    $paymentProcessorID = self::getPayPalPaymentProcessorID();
+    $paymentProcessorID = $contributionRecur['payment_processor_id'];
 
     if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
       throw new CRM_Core_Exception('Data did not validate');
     }
-    return $this->recur($input, $ids, $objects, $isFirst);
+    $this->recur($input, $ids, $objects, $isFirst);
   }
 
   /**

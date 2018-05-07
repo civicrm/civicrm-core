@@ -285,7 +285,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'amount_per_cycle' => '5.00',
       'payer_status' => 'unverified',
       'currency_code' => 'USD',
-      'business' => 'mpa@mainepeoplesalliance.org',
+      'business' => 'mpa@example.com',
       'address_country' => 'UNITED STATES',
       'address_city' => 'Limestone',
       'verify_sign' => 'AXi4DULbes8quzIiq2YNsdTJH5ciPPPzG9PcQvkQg4BjfvWi8aY9GgDb',
@@ -297,7 +297,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'payment_type' => 'instant',
       'last_name' => 'Morrissette',
       'address_state' => 'ME',
-      'receiver_email' => 'info@civicrm.org',
+      'receiver_email' => 'info@example.com',
       'payment_fee' => '0.41',
       'receiver_id' => 'GTH8P7UQWWTY6',
       'txn_type' => 'recurring_payment',
@@ -369,6 +369,60 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    */
   public function getPaypalProRecurSubsequentTransaction() {
     return array_merge($this->getPaypalProRecurTransaction(), array('txn_id' => 'secondone'));
+  }
+
+  /**
+   * Test IPN response update for a paypal express profile creation confirmation.
+   */
+  public function testIPNPaymentExpressRecurSuccess() {
+    $this->setupRecurringPaymentProcessorTransaction(['processor_id' => '']);
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalExpressRecurSubscriptionConfirmation());
+    $paypalIPN->main();
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $this->_contributionRecurID));
+    $this->assertEquals('I-JW77S1PY2032', $contributionRecur['processor_id']);
+  }
+
+  /**
+   * Get response consistent with creating a new profile.
+   *
+   * @return array
+   */
+  public function getPaypalExpressRecurSubscriptionConfirmation() {
+    return [
+      'payment_cycle' => 'Monthly',
+      'txn_type' => 'recurring_payment_profile_created',
+      'last_name' => 'buyer',
+      'next_payment_date' => '03:00:00 May 09, 2018 PDT',
+      'residence_country' => 'GB',
+      'initial_payment_amount' => '0.00',
+      'rp_invoice_id' => 'i=' . $this->_invoiceID
+        . '&m=&c=' . $this->_contributionID
+        . '&r=' . $this->_contributionRecurID
+        . '&b=' . $this->_contactID
+        . '&p=' . $this->_contributionPageID,
+      'currency_code' => 'GBP',
+      'time_created' => '12:39:01 May 09, 2018 PDT',
+      'verify_sign' => 'AUg223oCjn4HgJXKkrICawXQ3fyUA2gAd1.f1IPJ4r.9sln-nWcB-EJG',
+      'period_type' => 'Regular',
+      'payer_status' => 'verified',
+      'test_ipn' => '1',
+      'tax' => '0.00',
+      'payer_email' => 'payer@example.com',
+      'first_name' => 'test',
+      'receiver_email' => 'shop@example.com',
+      'payer_id' => 'BWXXXM8111HDS',
+      'product_type' => 1,
+      'shipping' => '0.00',
+      'amount_per_cycle' => '6.00',
+      'profile_status' => 'Active',
+      'charset' => 'windows-1252',
+      'notify_version' => '3.9',
+      'amount' => '6.00',
+      'outstanding_balance' => '0.00',
+      'recurring_payment_id' => 'I-JW77S1PY2032',
+      'product_name' => '6 Per 1 month',
+      'ipn_track_id' => '6255554274055',
+    ];
   }
 
 }
