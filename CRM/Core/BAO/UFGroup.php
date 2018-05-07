@@ -3041,7 +3041,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
         $groupTypeName = "{$customGroups->extends}Type";
         if ($customGroups->extends == 'Participant' && $customGroups->extends_entity_column_id) {
-          $groupTypeName = CRM_Core_OptionGroup::getValue('custom_data_type', $customGroups->extends_entity_column_id, 'value', 'String', 'name');
+          $groupTypeName = CRM_Core_PseudoConstant::getName('CRM_Core_DAO_CustomGroup', 'extends_entity_column_id', $customGroups->extends_entity_column_id);
         }
 
         foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, $customGroups->extends_entity_column_value) as $val) {
