@@ -71,6 +71,20 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
   public $_componentTable;
 
   /**
+   * Must be set to entity table name (eg. civicrm_participant) by child class
+   *
+   * @var string
+   */
+  static $tableName = NULL;
+
+  /**
+   * Must be set to entity shortname (eg. event)
+   *
+   * @var string
+   */
+  static $entityShortname = NULL;
+
+  /**
    * Build all the data structures needed to build the form.
    *
    * @param
@@ -120,6 +134,8 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
       if (in_array($componentName[1], $components)) {
         $this->_exportMode = constant('CRM_Export_Form_Select::' . strtoupper($componentName[1]) . '_EXPORT');
         $className = "CRM_{$componentName[1]}_Form_Task";
+        $this::$entityShortname = $className::$entityShortname;
+        $this::$tableName = $className::$tableName;
         $className::preProcessCommon($this, !$isStandalone);
         $values = $this->controller->exportValues('Search');
       }
