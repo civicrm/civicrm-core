@@ -21,17 +21,17 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 
-/*
+/**
  * Heavily based on anonymous code contribution. No claim.
  * CiviCRM Views Integration
  */
 class civicrm_handler_filter_group_status extends views_handler_filter_in_operator {
 
   static $groupContactStatus = NULL;
-  function construct() {
+  public function construct() {
     parent::construct();
 
     if (!self::$groupContactStatus) {
@@ -46,7 +46,7 @@ class civicrm_handler_filter_group_status extends views_handler_filter_in_operat
     }
   }
 
-  function get_value_options() {
+  public function get_value_options() {
     if (!isset($this->value_options)) {
       $this->value_title = t('Contact Group Status');
       $options = array();
@@ -56,7 +56,5 @@ class civicrm_handler_filter_group_status extends views_handler_filter_in_operat
       $this->value_options = $options;
     }
   }
+
 }
-
-
-

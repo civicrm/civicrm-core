@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Just another collection of static utils functions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Utils_SQL {
 
@@ -57,6 +57,69 @@ class CRM_Utils_SQL {
       $clauses[] = "IN (SELECT `$joinColumn` FROM `" . $bao->tableName() . "` WHERE " . implode(' AND ', $subclauses) . ")";
     }
     return $clauses;
+  }
+
+  /**
+   * Get current sqlModes of the session
+   * @return array
+   */
+  public static function getSqlModes() {
+    $sqlModes = explode(',', CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode'));
+    return $sqlModes;
+  }
+
+  /**
+   * Checks if this system enforce the MYSQL mode ONLY_FULL_GROUP_BY.
+   * This function should be named supportsAnyValueAndEnforcesFullGroupBY(),
+   * but should be deprecated instead.
+   *
+   * @return mixed
+   * @deprecated
+   */
+  public static function supportsFullGroupBy() {
+    // CRM-21455 MariaDB 10.2 does not support ANY_VALUE
+    $version = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+
+    if (stripos($version, 'mariadb') !== FALSE) {
+      return FALSE;
+    }
+
+    return version_compare($version, '5.7', '>=');
+  }
+
+  /**
+   * Disable ONLY_FULL_GROUP_BY for MySQL versions lower then 5.7
+   *
+   * @return bool
+   */
+  public static function disableFullGroupByMode() {
+    $sqlModes = self::getSqlModes();
+
+    // Disable only_full_group_by mode for lower sql versions.
+    if (!self::supportsFullGroupBy() || (!empty($sqlModes) && !in_array('ONLY_FULL_GROUP_BY', $sqlModes))) {
+      if ($key = array_search('ONLY_FULL_GROUP_BY', $sqlModes)) {
+        unset($sqlModes[$key]);
+        CRM_Core_DAO::executeQuery("SET SESSION sql_mode = '" . implode(',', $sqlModes) . "'");
+      }
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * CHeck if ONLY_FULL_GROUP_BY is in the global sql_modes
+   * @return bool
+   */
+  public static function isGroupByModeInDefault() {
+    if (!self::supportsFullGroupBy()) {
+      return FALSE;
+    }
+    $sqlModes = explode(',', CRM_Core_DAO::singleValueQuery('SELECT @@global.sql_mode'));
+    if (!in_array('ONLY_FULL_GROUP_BY', $sqlModes)) {
+      return FALSE;
+    }
+    return TRUE;
   }
 
 }

@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -175,7 +175,7 @@
     var $form = $('form.{/literal}{$form.formClass}{literal}');
     $('#template_id', $form).change(function() {
       $(this).closest('.crm-ajax-container, #crm-main-content-wrapper')
-        .crmSnippet({url: CRM.url('civicrm/event/add', {action: 'add', reset: 1, template_id: $(this).val()})})
+        .crmSnippet({url: CRM.url('civicrm/event/add', {action: 'add', reset: 1, template_id: $(this).val(), is_template: $("input[name='is_template']").val()})})
         .crmSnippet('refresh');
     })
   });

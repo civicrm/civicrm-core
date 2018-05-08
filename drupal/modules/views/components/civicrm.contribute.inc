@@ -21,7 +21,7 @@
   | GNU Affero General Public License or the licensing of CiviCRM,     |
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Build the $data array for CiviContribute related tables
@@ -60,7 +60,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
   );
 
   //TABLE JOINS FOR CIVICRM CONTRIBUTIONS GO HERE!
-  
+
   $data['civicrm_contribution']['table']['join']['civicrm_contact'] = array(
     'left_table' => 'civicrm_contact',
     'left_field' => 'id',
@@ -186,8 +186,6 @@ function _civicrm_contribute_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-
-
 
   //Contribution Receive Date
   $data['civicrm_contribution']['receive_date'] = array(
@@ -523,7 +521,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
   );
   $data['civicrm_contribution']['check_number'] = array(
     'title' => t('Check Number'),
-    'help' => t('Contribution\'s Check Number'),
+    'help' => t("Contribution's Check Number"),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -576,13 +574,9 @@ function _civicrm_contribute_data(&$data, $enabled) {
       'label' => t('Contribution -> line-item'),
     ),
   );
-  
-  /*
-   * Soft Credits
-   */
 
+  // Soft Credits
   $data['civicrm_contribution_soft']['table']['group'] = t('CiviCRM  Soft Credits');
-
 
   //TABLE JOINS FOR CIVICRM CONTRIBUTIONS GO HERE!
   $data['civicrm_contribution_soft']['table']['join']['civicrm_contribution'] = array(
@@ -698,14 +692,8 @@ function _civicrm_contribute_data(&$data, $enabled) {
     ),
   );
 
-
-  /*
-     * Soft Credits
-     */
-
-
+  // Soft Credits
   $data['civicrm_contribution_recur']['table']['group'] = t('CiviCRM  Recurring Contributions');
-
 
   //TABLE JOINS FOR CIVICRM CONTRIBUTIONS GO HERE!
   $data['civicrm_contribution_recur']['table']['join']['civicrm_contribution'] = array(
@@ -1007,7 +995,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
   $data['civicrm_contribution_recur']['contribution_status'] = array(
     'title' => t('Contribution Status'),
     'real field' => 'contribution_status_id',
-    'help' => t('The Contribution\'s Status'),
+    'help' => t("The Contribution's Status"),
     'field' => array(
       'handler' => 'civicrm_handler_field_pseudo_constant',
       'click sortable' => TRUE,
@@ -1347,7 +1335,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
 
   // contribution page
   $data['civicrm_pcp']['contribution_page'] = array(
-    'title' => t('Associated Contribution or Event Page'),
+    'title' => t('Associated Contribution Page'),
     'real field' => 'page_id',
     'help' => t('The Contribution or Event Page with which this Personal Campaign Page is associated.'),
     'field' => array(
@@ -1365,6 +1353,34 @@ function _civicrm_contribute_data(&$data, $enabled) {
       'allow empty' => TRUE,
       'pseudo class' => 'CRM_Contribute_PseudoConstant',
       'pseudo method' => 'contributionPage',
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
+  // event page
+  $data['civicrm_pcp']['event_page'] = array(
+    'title' => t('Associated Event Page'),
+    'real field' => 'page_id',
+    'help' => t('The Event or Event Page with which this Personal Campaign Page is associated.'),
+    'field' => array(
+      'handler' => 'civicrm_handler_field_pseudo_constant',
+      'click sortable' => TRUE,
+      'pseudo class' => 'CRM_Event_PseudoConstant',
+      'pseudo method' => 'event',
+      'pseudo args' => array(NULL, FALSE, 'is_template = 0'),
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument',
+      'numeric' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'civicrm_handler_filter_pseudo_constant',
+      'allow empty' => TRUE,
+      'pseudo class' => 'CRM_Event_PseudoConstant',
+      'pseudo method' => 'event',
+      'pseudo args' => array(NULL, FALSE, 'is_template = 0'),
     ),
     'sort' => array(
       'handler' => 'views_handler_sort',
@@ -1530,4 +1546,3 @@ function _civicrm_contribute_data(&$data, $enabled) {
     ),
   );
 }
-

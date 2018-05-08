@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -116,7 +116,7 @@ class CRM_Utils_Recent {
 
     // make sure item is not already present in list
     for ($i = 0; $i < count(self::$_recent); $i++) {
-      if (self::$_recent[$i]['url'] == $url) {
+      if (self::$_recent[$i]['type'] === $type && self::$_recent[$i]['id'] === $id) {
         // delete item from array
         array_splice(self::$_recent, $i, 1);
         break;

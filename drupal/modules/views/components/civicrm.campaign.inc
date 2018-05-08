@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Build the $data array for CiviCampaign related tables
@@ -66,7 +66,7 @@ function _civicrm_campaign_data(&$data, $enabled) {
   // Campaign's Name
   $data['civicrm_campaign']['name'] = array(
     'title' => t('Name'),
-    'help' => t('Campaign\'s name'),
+    'help' => t("Campaign's name"),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -85,7 +85,7 @@ function _civicrm_campaign_data(&$data, $enabled) {
   // Campaign Title
   $data['civicrm_campaign']['title'] = array(
     'title' => t('Title'),
-    'help' => t('Campaing\'s title'),
+    'help' => t("Campaing's title"),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -104,7 +104,7 @@ function _civicrm_campaign_data(&$data, $enabled) {
   //Campaign Description
   $data['civicrm_campaign']['description'] = array(
     'title' => t('Description'),
-    'help' => t('Campaing\'s description'),
+    'help' => t("Campaing's description"),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -113,7 +113,7 @@ function _civicrm_campaign_data(&$data, $enabled) {
   //Mailing finish date
   $data['civicrm_campaign']['start_date'] = array(
     'title' => t('Start Date'),
-    'help' => t('The Campaign\'s Start Date'),
+    'help' => t("The Campaign's Start Date"),
     'field' => array(
       'handler' => 'civicrm_handler_field_datetime',
       'click sortable' => TRUE,
@@ -138,7 +138,7 @@ function _civicrm_campaign_data(&$data, $enabled) {
   //Mailing finish date
   $data['civicrm_campaign']['end_date'] = array(
     'title' => t('End Date'),
-    'help' => t('The Campaign\'s End Date'),
+    'help' => t("The Campaign's End Date"),
     'field' => array(
       'handler' => 'civicrm_handler_field_datetime',
       'click sortable' => TRUE,
@@ -211,7 +211,7 @@ function _civicrm_campaign_data(&$data, $enabled) {
   // Parent Campaign ID
   $data['civicrm_campaign']['parent_id'] = array(
     'title' => t('Parent Campaign ID'),
-    'help' => t('The ID of the campaign\'s parent campaign'),
+    'help' => t("The ID of the campaign's parent campaign"),
     'field' => array(
       'handler' => 'views_handler_field_numeric',
       'click sortable' => TRUE,
@@ -249,7 +249,7 @@ function _civicrm_campaign_data(&$data, $enabled) {
   // Campaign's General Goal
   $data['civicrm_campaign']['goal_general'] = array(
     'title' => t('General Goal'),
-    'help' => t('Campaing\'s general goal'),
+    'help' => t("Campaing's general goal"),
     'field' => array(
       'handler' => 'views_handler_field',
       'click sortable' => TRUE,
@@ -288,7 +288,6 @@ function _civicrm_campaign_data(&$data, $enabled) {
 
   // Add Support of Survey Fields.
   $data['civicrm_survey']['table']['group'] = t('CiviCRM Surveys');
-
 
   $data['civicrm_survey']['table']['base'] = array(
     // Governs the whole mozilla
@@ -340,8 +339,6 @@ function _civicrm_campaign_data(&$data, $enabled) {
       'label' => t('Survey -> Campaign'),
     ),
   );
-
-
 
   //Activity Type
   $data['civicrm_survey']['activity_type'] = array(
@@ -408,4 +405,3 @@ function _civicrm_campaign_data(&$data, $enabled) {
   //$skipFields = array( );
   civicrm_views_add_fields($fields, $data['civicrm_survey'], 'civicrm_survey');
 }
-

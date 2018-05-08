@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Website</class>
+  <name>civicrm_website</name>
+  <comment>Website information for a specific location.</comment>
+  <add>3.2</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Website ID</title>
+    <required>true</required>
+    <comment>Unique Website ID</comment>
+    <add>3.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <title>Contact</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>3.2</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.2</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>url</name>
+    <title>Website</title>
+    <type>varchar</type>
+    <length>128</length>
+    <html>
+      <type>Text</type>
+      <size>30</size>
+    </html>
+    <import>true</import>
+    <headerPattern>/Website/i</headerPattern>
+    <dataPattern>/^[A-Za-z][0-9A-Za-z]{20,}$/</dataPattern>
+    <comment>Website</comment>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>website_type_id</name>
+    <title>Website Type</title>
+    <type>int unsigned</type>
+    <comment>Which Website type does this website belong to.</comment>
+    <add>3.2</add>
+    <pseudoconstant>
+      <optionGroupName>website_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <index>
+    <name>UI_website_type_id</name>
+    <fieldName>website_type_id</fieldName>
+    <add>3.2</add>
+  </index>
+</table>

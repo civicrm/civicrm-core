@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -97,7 +97,7 @@
   {elseif !empty($ccid)}
     {if $lineItem && $priceSetID && !$is_quick_config}
       <div class="header-dark">
-        {ts}Contribution Information{/ts}
+        {ts}Contribution Information{/ts}{if $display_name} &ndash; {$display_name}{/if}
       </div>
       {assign var="totalAmount" value=$pendingAmount}
       {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
@@ -361,7 +361,7 @@
     }
     else {
       cj('#recurHelp').hide();
-      cj('#amount_sum_label').text('{/literal}{ts escape='js'}Total amount{/ts}{literal}');
+      cj('#amount_sum_label').text('{/literal}{ts escape='js'}Total Amount{/ts}{literal}');
     }
   }
 

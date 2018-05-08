@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
 
@@ -125,7 +125,9 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
     $skipColumnHeader = FALSE,
     $mode = self::MODE_PREVIEW,
     $contactType = self::CONTACT_INDIVIDUAL,
-    $onDuplicate = self::DUPLICATE_SKIP
+    $onDuplicate = self::DUPLICATE_SKIP,
+    $statusID = NULL,
+    $totalRowCount = NULL
   ) {
     if (!is_array($fileName)) {
       CRM_Core_Error::fatal();
@@ -165,6 +167,10 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
     $this->_conflicts = array();
     $this->_pledgePaymentErrors = array();
     $this->_softCreditErrors = array();
+    if ($statusID) {
+      $this->progressImport($statusID);
+      $startTimestamp = $currTimestamp = $prevTimestamp = time();
+    }
 
     $this->_fileSize = number_format(filesize($fileName) / 1024.0, 2);
 
@@ -215,6 +221,9 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
       }
       elseif ($mode == self::MODE_IMPORT) {
         $returnCode = $this->import($onDuplicate, $values);
+        if ($statusID && (($this->_lineCount % 50) == 0)) {
+          $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
+        }
       }
       else {
         $returnCode = self::ERROR;
@@ -256,38 +265,32 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
 
       if ($returnCode == self::ERROR) {
         $this->_invalidRowCount++;
-        if ($this->_invalidRowCount < $this->_maxErrorCount) {
-          $recordNumber = $this->_lineCount;
-          if ($this->_haveColumnHeader) {
-            $recordNumber--;
-          }
-          array_unshift($values, $recordNumber);
-          $this->_errors[] = $values;
+        $recordNumber = $this->_lineCount;
+        if ($this->_haveColumnHeader) {
+          $recordNumber--;
         }
+        array_unshift($values, $recordNumber);
+        $this->_errors[] = $values;
       }
 
       if ($returnCode == self::PLEDGE_PAYMENT_ERROR) {
         $this->_invalidPledgePaymentRowCount++;
-        if ($this->_invalidPledgePaymentRowCount < $this->_maxErrorCount) {
-          $recordNumber = $this->_lineCount;
-          if ($this->_haveColumnHeader) {
-            $recordNumber--;
-          }
-          array_unshift($values, $recordNumber);
-          $this->_pledgePaymentErrors[] = $values;
+        $recordNumber = $this->_lineCount;
+        if ($this->_haveColumnHeader) {
+          $recordNumber--;
         }
+        array_unshift($values, $recordNumber);
+        $this->_pledgePaymentErrors[] = $values;
       }
 
       if ($returnCode == self::SOFT_CREDIT_ERROR) {
         $this->_invalidSoftCreditRowCount++;
-        if ($this->_invalidSoftCreditRowCount < $this->_maxErrorCount) {
-          $recordNumber = $this->_lineCount;
-          if ($this->_haveColumnHeader) {
-            $recordNumber--;
-          }
-          array_unshift($values, $recordNumber);
-          $this->_softCreditErrors[] = $values;
+        $recordNumber = $this->_lineCount;
+        if ($this->_haveColumnHeader) {
+          $recordNumber--;
         }
+        array_unshift($values, $recordNumber);
+        $this->_softCreditErrors[] = $values;
       }
 
       if ($returnCode == self::CONFLICT) {

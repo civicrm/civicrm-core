@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -62,10 +62,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
   public static function setDefaultValues(&$form) {
     $defaults = array();
 
-    $openCaseActivityType = CRM_Core_OptionGroup::getValue('activity_type',
-      'Open Case',
-      'name'
-    );
+    $openCaseActivityType = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
     $caseId = CRM_Utils_Array::first($form->_caseId);
     $openCaseParams = array('activity_type_id' => $openCaseActivityType);
     $openCaseInfo = CRM_Case_BAO_Case::getCaseActivityDates($caseId, $openCaseParams, TRUE);
@@ -156,7 +153,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
 
     $config = CRM_Core_Config::singleton();
 
-    $params['status_id'] = CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name');
+    $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
     $activity->status_id = $params['status_id'];
     $params['priority_id'] = CRM_Core_OptionGroup::getValue('priority', 'Normal', 'name');
     $activity->priority_id = $params['priority_id'];

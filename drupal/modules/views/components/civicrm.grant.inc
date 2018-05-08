@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Build the $data array for CiviGrant related tables
@@ -330,4 +330,3 @@ function _civicrm_grant_data(&$data, $enabled) {
     ),
   );
 }
-

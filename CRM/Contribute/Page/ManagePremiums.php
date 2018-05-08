@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -108,7 +108,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
     $id = $this->getIdAndAction();
 
     // what action to take ?
-    if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD | CRM_Core_Action::PREVIEW)) {
+    if (!($this->_action & CRM_Core_Action::BROWSE)) {
       $this->edit($this->_action, $id, TRUE);
     }
     // finally browse the custom groups

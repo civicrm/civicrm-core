@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -99,6 +99,7 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
       'downloadConflictRecordsUrl',
       'downloadMismatchRecordsUrl',
     );
+    $this->setStatusUrl();
 
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));
@@ -161,14 +162,15 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
       $skipColumnHeader,
       CRM_Import_Parser::MODE_IMPORT,
       $this->get('contactType'),
-      $onDuplicate
+      $onDuplicate,
+      $this->get('statusID'),
+      $this->get('totalRowCount')
     );
 
     // add all the necessary variables to the form
     $parser->set($this, CRM_Import_Parser::MODE_IMPORT);
 
     // check if there is any error occurred
-
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();
     $errorMessage = array();

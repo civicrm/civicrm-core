@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -54,17 +54,20 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $this->skipOnHold = $this->skipDeceased = FALSE;
     CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
     // store case id if present
-    $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'Positive', $this, FALSE);
+    $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'CommaSeparatedIntegers', $this, FALSE);
+    if (!empty($this->_caseId) && strpos($this->_caseId, ',')) {
+      $this->_caseIds = explode(',', $this->_caseId);
+      unset($this->_caseId);
+    }
 
     // retrieve contact ID if this is 'single' mode
-    $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE);
+    $cid = CRM_Utils_Request::retrieve('cid', 'CommaSeparatedIntegers', $this, FALSE);
 
     $this->_activityId = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
 
     if ($cid) {
       CRM_Contact_Form_Task_PDFLetterCommon::preProcessSingle($this, $cid);
       $this->_single = TRUE;
-      $this->_cid = $cid;
     }
     else {
       parent::preProcess();
@@ -105,8 +108,8 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     //enable form element
     $this->assign('suppressForm', FALSE);
 
-    // use contact form as a base
-    CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($this);
+    // Build common form elements
+    CRM_Contribute_Form_Task_PDFLetterCommon::buildQuickForm($this);
 
     // specific need for contributions
     $this->add('static', 'more_options_header', NULL, ts('Thank-you Letter Options'));

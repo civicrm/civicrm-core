@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Field handler to provide acess control for an "pseudo constant / option value" pair
@@ -30,18 +30,15 @@
  */
 class civicrm_handler_field_option extends civicrm_handler_field {
   static $_options;
-  function render($values) {
+  public function render($values) {
     $this->initialize();
 
     $id = $values->{$this->field_alias};
-    if (empty($id) ||
-      (int ) $id <= 0
-    ) {
+    if (empty($id) || (int) $id <= 0) {
       return NULL;
     }
 
     return self::$_options[$values->{$this->field_alias}];
   }
+
 }
-
-

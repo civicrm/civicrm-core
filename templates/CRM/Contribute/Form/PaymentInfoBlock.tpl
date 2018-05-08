@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -55,4 +55,9 @@
    {/if}
    {ts 1=$entity}No payments found for this %1 record{/ts}
 {/if}
+
+  {foreach from=$paymentLinks item=paymentLink}
+    <a class="open-inline action-item crm-hover-button" href="{$paymentLink.url}">&raquo; {ts}{$paymentLink.title}{/ts}</a>
+  {/foreach}
+
 {/crmRegion}

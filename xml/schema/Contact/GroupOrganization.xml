@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contact</base>
+  <class>GroupOrganization</class>
+  <name>civicrm_group_organization</name>
+  <comment>Integrate Organization information into Groups</comment>
+  <add>2.0</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Group Organization ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Relationship ID</comment>
+    <add>2.0</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>group_id</name>
+    <title>Group</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>ID of the group</comment>
+    <add>2.0</add>
+    <pseudoconstant>
+      <table>civicrm_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>group_id</name>
+    <table>civicrm_group</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+    <add>2.0</add>
+  </foreignKey>
+  <field>
+    <name>organization_id</name>
+    <title>Organization</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>ID of the Organization Contact</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>organization_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+    <add>2.0</add>
+  </foreignKey>
+  <index>
+    <name>UI_group_organization</name>
+    <unique>true</unique>
+    <fieldName>group_id</fieldName>
+    <fieldName>organization_id</fieldName>
+    <add>2.0</add>
+  </index>
+</table>

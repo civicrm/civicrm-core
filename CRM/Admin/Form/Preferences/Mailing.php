@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id: Display.php 36505 2011-10-03 14:19:56Z lobo $
  *
  */
@@ -106,7 +106,13 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
           'html_type' => 'checkbox',
           'title' => ts('Hashed Mailing URL\'s'),
           'weight' => 11,
-          'description' => 'If enabled, a randomized hash key will be used to reference the mailing URL in the mailing.viewUrl token, instead of the mailing ID',
+          'description' => ts('If enabled, a randomized hash key will be used to reference the mailing URL in the mailing.viewUrl token, instead of the mailing ID'),
+        ),
+        'auto_recipient_rebuild' => array(
+          'html_type' => 'checkbox',
+          'title' => ts('Enable automatic CiviMail recipient count display'),
+          'weight' => 12,
+          'description' => ts('Enable this setting to rebuild recipient list automatically during composing mail. Disable will allow you to rebuild recipient manually.'),
         ),
       ),
     );

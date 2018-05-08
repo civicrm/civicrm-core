@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,6 +31,7 @@
    {include file="CRM/Admin/Form/PaymentProcessor.tpl"}
 {else}
 
+<div class="crm-content-block crm-block">
 {if $rows}
 <div id="ltype">
         {strip}
@@ -43,7 +44,7 @@
             <th >{ts}Description{/ts}</th>
             <th >{ts}Financial Account{/ts}</th>
             <th >{ts}Enabled?{/ts}</th>
-      <th >{ts}Default?{/ts}</th>
+            <th >{ts}Default?{/ts}</th>
             <th ></th>
         </tr>
         {foreach from=$rows item=row}
@@ -53,8 +54,10 @@
             <td class="crmf-description">{$row.description}</td>
             <td class="crmf-financial_account_id">{$row.financialAccount}</td>
             <td class="crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td class="crmf-is_default">{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
+            <td class="crmf-is_default">
+              {if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}"/>{/if}&nbsp;
+            </td>
+            <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
         </table>
@@ -75,4 +78,6 @@
        {crmButton p='civicrm/admin/paymentProcessor' q="action=add&reset=1&pp=$defaultPaymentProcessorType" id="newPaymentProcessor"  icon="plus-circle"}{ts}Add Payment Processor{/ts}{/crmButton}
      </div>
 {/if}
+</div>
+
 {/if}

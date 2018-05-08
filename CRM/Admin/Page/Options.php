@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -151,6 +151,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
       $this->assign('showCounted', TRUE);
     }
     $this->assign('isLocked', self::$_isLocked);
+    $this->assign('allowLoggedIn', Civi::settings()->get('allow_mail_from_logged_in_contact'));
     $config = CRM_Core_Config::singleton();
     if (self::$_gName == 'activity_type') {
       $this->assign('showComponent', TRUE);

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 abstract class CRM_Import_Parser {
   /**
    * Settings
    */
-  const MAX_ERRORS = 250, MAX_WARNINGS = 25, DEFAULT_TIMEOUT = 30;
+  const MAX_WARNINGS = 25, DEFAULT_TIMEOUT = 30;
 
   /**
    * Return codes
@@ -78,11 +78,6 @@ abstract class CRM_Import_Parser {
    * @var int
    */
   protected $_maxLinesToProcess;
-
-  /**
-   * Maximum number of invalid rows to store
-   */
-  protected $_maxErrorCount;
 
   /**
    * Array of error lines, bounded by MAX_ERROR
@@ -192,7 +187,6 @@ abstract class CRM_Import_Parser {
    */
   public function __construct() {
     $this->_maxLinesToProcess = 0;
-    $this->_maxErrorCount = self::MAX_ERRORS;
   }
 
   /**
@@ -290,6 +284,61 @@ abstract class CRM_Import_Parser {
       }
     }
     return $params;
+  }
+
+  /**
+   * Add progress bar to the import process. Calculates time remaining, status etc.
+   *
+   * @param $statusID
+   *   status id of the import process saved in $config->uploadDir.
+   * @param bool $startImport
+   *   True when progress bar is to be initiated.
+   * @param $startTimestamp
+   *   Initial timstamp when the import was started.
+   * @param $prevTimestamp
+   *   Previous timestamp when this function was last called.
+   * @param $totalRowCount
+   *   Total number of rows in the import file.
+   *
+   * @return NULL|$currTimestamp
+   */
+  public function progressImport($statusID, $startImport = TRUE, $startTimestamp = NULL, $prevTimestamp = NULL, $totalRowCount = NULL) {
+    $config = CRM_Core_Config::singleton();
+    $statusFile = "{$config->uploadDir}status_{$statusID}.txt";
+
+    if ($startImport) {
+      $status = "<div class='description'>&nbsp; " . ts('No processing status reported yet.') . "</div>";
+      //do not force the browser to display the save dialog, CRM-7640
+      $contents = json_encode(array(0, $status));
+      file_put_contents($statusFile, $contents);
+    }
+    else {
+      $rowCount = isset($this->_rowCount) ? $this->_rowCount : $this->_lineCount;
+      $currTimestamp = time();
+      $totalTime = ($currTimestamp - $startTimestamp);
+      $time = ($currTimestamp - $prevTimestamp);
+      $recordsLeft = $totalRowCount - $rowCount;
+      if ($recordsLeft < 0) {
+        $recordsLeft = 0;
+      }
+      $estimatedTime = ($recordsLeft / 50) * $time;
+      $estMinutes = floor($estimatedTime / 60);
+      $timeFormatted = '';
+      if ($estMinutes > 1) {
+        $timeFormatted = $estMinutes . ' ' . ts('minutes') . ' ';
+        $estimatedTime = $estimatedTime - ($estMinutes * 60);
+      }
+      $timeFormatted .= round($estimatedTime) . ' ' . ts('seconds');
+      $processedPercent = (int ) (($rowCount * 100) / $totalRowCount);
+      $statusMsg = ts('%1 of %2 records - %3 remaining',
+        array(1 => $rowCount, 2 => $totalRowCount, 3 => $timeFormatted)
+      );
+      $status = "<div class=\"description\">&nbsp; <strong>{$statusMsg}</strong></div>";
+      $contents = json_encode(array($processedPercent, $status));
+
+      file_put_contents($statusFile, $contents);
+      return $currTimestamp;
+    }
   }
 
   /**

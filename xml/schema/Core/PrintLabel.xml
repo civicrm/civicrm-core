@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>PrintLabel</class>
+  <name>civicrm_print_label</name>
+  <comment>Table to store the labels created by user.</comment>
+  <add>4.4</add>
+  <field>
+    <name>id</name>
+    <title>Print Label ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>4.4</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>title</name>
+    <title>Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>User title for for this label layout</comment>
+    <add>4.4</add>
+  </field>
+  <field>
+    <name>name</name>
+    <title>Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>variable name/programmatic handle for this field.</comment>
+    <add>4.4</add>
+  </field>
+  <field>
+    <name>description</name>
+    <type>text</type>
+    <comment>Description of this label layout</comment>
+    <add>4.4</add>
+  </field>
+  <field>
+    <name>label_format_name</name>
+    <title>Label Format</title>
+    <type>varchar</type>
+    <length>255</length>
+    <pseudoconstant>
+      <optionGroupName>name_badge</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <comment>This refers to name column of civicrm_option_value row in name_badge option group</comment>
+    <add>4.4</add>
+  </field>
+  <field>
+    <name>label_type_id</name>
+    <title>Label Type</title>
+    <type>int unsigned</type>
+    <pseudoconstant>
+      <optionGroupName>label_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <comment>Implicit FK to civicrm_option_value row in NEW label_type option group</comment>
+    <add>4.4</add>
+  </field>
+  <field>
+    <name>data</name>
+    <type>longtext</type>
+    <comment>contains json encode configurations options</comment>
+    <add>4.4</add>
+    <serialize>JSON</serialize>
+  </field>
+  <field>
+    <name>is_default</name>
+    <title>Label is Default?</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this default?</comment>
+    <add>4.4</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Label Is Active?</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this option active?</comment>
+    <add>4.4</add>
+  </field>
+  <field>
+    <name>is_reserved</name>
+    <title>Is Label Reserved?</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this reserved label?</comment>
+    <add>4.4</add>
+  </field>
+  <field>
+    <name>created_id</name>
+    <title>Label Created By</title>
+    <type>int unsigned</type>
+    <title>Created By Contact ID</title>
+    <comment>FK to civicrm_contact, who created this label layout</comment>
+    <add>4.4</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.4</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+</table>

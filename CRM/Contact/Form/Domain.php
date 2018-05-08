@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -118,19 +118,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
       $params['id'] = $this->_id;
       CRM_Core_BAO_Domain::retrieve($params, $domainDefaults);
       $this->_contactId = $domainDefaults['contact_id'];
-      //get the default domain from email address. fix CRM-3552
-      $optionValues = array();
-      $grpParams['name'] = 'from_email_address';
-      CRM_Core_OptionValue::getValues($grpParams, $optionValues);
-      foreach ($optionValues as $Id => $value) {
-        if ($value['is_default'] && $value['is_active']) {
-          $this->_fromEmailId = $Id;
-          $list = explode('"', $value['label']);
-          $domainDefaults['email_name'] = CRM_Utils_Array::value(1, $list);
-          $domainDefaults['email_address'] = CRM_Utils_Mail::pluckEmailFromHeader($value['label']);
-          break;
-        }
-      }
 
       unset($params['id']);
       $locParams = array('contact_id' => $domainDefaults['contact_id']);
@@ -156,9 +143,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   public function buildQuickForm() {
     $this->addField('name', array('label' => ts('Organization Name')), TRUE);
     $this->addField('description', array('label' => ts('Description'), 'size' => 30));
-    $this->add('text', 'email_name', ts('FROM Name'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', 'email'), TRUE);
-    $this->add('text', 'email_address', ts('FROM Email Address'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email', 'email'), TRUE);
-    $this->addRule('email_address', ts('Domain Email Address must use a valid email address format (e.g. \'info@example.org\').'), 'email');
 
     //build location blocks.
     CRM_Contact_Form_Location::buildQuickForm($this);
@@ -207,16 +191,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
       $errors = array();
     }
 
-    //fix for CRM-3552,
-    //as we use "fromName"<emailaddresss> format for domain email.
-    if (strpos($fields['email_name'], '"') !== FALSE) {
-      $errors['email_name'] = ts('Double quotes are not allow in from name.');
-    }
-
-    // Check for default from email address and organization (domain) name. Force them to change it.
-    if ($fields['email_address'] == 'info@EXAMPLE.ORG') {
-      $errors['email_address'] = ts('Please enter a valid default FROM email address for system-generated emails.');
-    }
     if ($fields['name'] == 'Default Domain Name') {
       $errors['name'] = ts('Please enter the name of the organization or entity which owns this CiviCRM site.');
     }
@@ -274,36 +248,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     CRM_Core_BAO_Location::create($params, TRUE);
 
     CRM_Core_BAO_Domain::edit($params, $this->_id);
-
-    //set domain from email address, CRM-3552
-    $emailName = '"' . $params['email_name'] . '" <' . $params['email_address'] . '>';
-
-    $emailParams = array(
-      'label' => $emailName,
-      'description' => $params['description'],
-      'is_active' => 1,
-      'is_default' => 1,
-    );
-
-    $groupParams = array('name' => 'from_email_address');
-
-    //get the option value wt.
-    if ($this->_fromEmailId) {
-      $action = $this->_action;
-      $emailParams['weight'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_fromEmailId, 'weight');
-    }
-    else {
-      //add from email address.
-      $action = CRM_Core_Action::ADD;
-      $grpId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'from_email_address', 'id', 'name');
-      $fieldValues = array('option_group_id' => $grpId);
-      $emailParams['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue', $fieldValues);
-    }
-
-    //reset default within domain.
-    $emailParams['reset_default_for'] = array('domain_id' => CRM_Core_Config::domainID());
-
-    CRM_Core_OptionValue::addOptionValue($emailParams, $groupParams, $action, $this->_fromEmailId);
 
     CRM_Core_Session::setStatus(ts("Domain information for '%1' has been saved.", array(1 => $domain->name)), ts('Saved'), 'success');
     $session = CRM_Core_Session::singleton();

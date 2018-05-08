@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -58,6 +58,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param CRM_Core_Form $form
    */
   public static function preProcess(&$form) {
+    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($form);
     $messageText = array();
     $messageSubject = array();
     $dao = new CRM_Core_BAO_MessageTemplate();
@@ -78,9 +79,11 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param int $cid
    */
   public static function preProcessSingle(&$form, $cid) {
-    $form->_contactIds = array($cid);
+    $form->_contactIds = explode(',', $cid);
     // put contact display name in title for single contact mode
-    CRM_Utils_System::setTitle(ts('Print/Merge Document for %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name'))));
+    if (count($form->_contactIds) === 1) {
+      CRM_Utils_System::setTitle(ts('Print/Merge Document for %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name'))));
+    }
   }
 
   /**
@@ -363,14 +366,13 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
     $html = $activityIds = array();
 
-    // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
-    if ($buttonName == '_qf_PDF_upload') {
+    // CRM-21255 - Hrm, CiviCase 4+5 seem to report buttons differently...
+    $c = $form->controller->container();
+    $isLiveMode = ($buttonName == '_qf_PDF_upload') || isset($c['values']['PDF']['buttons']['_qf_PDF_upload']);
 
-      // This seems silly, but the old behavior was to first check `_cid`
-      // and then use the provided `$contactIds`. Probably not even necessary,
-      // but difficult to audit.
-      $contactIds = $form->_cid ? array($form->_cid) : $form->_contactIds;
-      $activityIds = self::createActivities($form, $html_message, $contactIds, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
+    // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
+    if ($isLiveMode) {
+      $activityIds = self::createActivities($form, $html_message, $form->_contactIds, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
     }
 
     if (!empty($formValues['document_file_path'])) {
@@ -418,7 +420,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     }
 
     $tee = NULL;
-    if (Civi::settings()->get('recordGeneratedLetters') === 'combined-attached') {
+    if ($isLiveMode && Civi::settings()->get('recordGeneratedLetters') === 'combined-attached') {
       if (count($activityIds) !== 1) {
         throw new CRM_Core_Exception("When recordGeneratedLetters=combined-attached, there should only be one activity.");
       }
@@ -502,10 +504,17 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
       case 'multiple':
         // One activity per contact.
-        foreach ($contactIds as $contactId) {
+        foreach ($contactIds as $i => $contactId) {
           $fullParams = array(
             'target_contact_id' => $contactId,
           ) + $activityParams;
+          if (!empty($form->_caseId)) {
+            $fullParams['case_id'] = $form->_caseId;
+          }
+          elseif (!empty($form->_caseIds[$i])) {
+            $fullParams['case_id'] = $form->_caseIds[$i];
+          }
+
           if (isset($perContactHtml[$contactId])) {
             $fullParams['details'] = implode('<hr>', $perContactHtml[$contactId]);
           }
@@ -521,19 +530,18 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
         $fullParams = array(
           'target_contact_id' => $contactIds,
         ) + $activityParams;
-        $activity = CRM_Activity_BAO_Activity::create($fullParams);
-        $activityIds[] = $activity->id;
+        if (!empty($form->_caseId)) {
+          $fullParams['case_id'] = $form->_caseId;
+        }
+        elseif (!empty($form->_caseIds)) {
+          $fullParams['case_id'] = $form->_caseIds;
+        }
+        $activity = civicrm_api3('Activity', 'create', $fullParams);
+        $activityIds[] = $activity['id'];
         break;
 
       default:
         throw new CRM_Core_Exception("Unrecognized option in recordGeneratedLetters: " . Civi::settings()->get('recordGeneratedLetters'));
-    }
-
-    if (!empty($form->_caseId)) {
-      foreach ($activityIds as $activityId) {
-        $caseActivityParams = array('activity_id' => $activityId, 'case_id' => $form->_caseId);
-        CRM_Case_BAO_Case::processCaseActivity($caseActivityParams);
-      }
     }
 
     return $activityIds;

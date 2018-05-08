@@ -1,0 +1,884 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contact</base>
+  <class>Contact</class>
+  <name>civicrm_contact</name>
+  <comment>Contact objects are defined by a civicrm_contact record plus a related civicrm_contact_type record.</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Contact ID</title>
+    <import>true</import>
+    <headerPattern>/internal|contact?|id$/i</headerPattern>
+    <required>true</required>
+    <comment>Unique Contact ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_type</name>
+    <title>Contact Type</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Type of Contact.</comment>
+    <export>true</export>
+    <pseudoconstant>
+      <table>civicrm_contact_type</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>label</labelColumn>
+      <condition>parent_id IS NULL</condition>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>1.1</add>
+    <change>3.1</change>
+  </field>
+  <index>
+    <name>index_contact_type</name>
+    <fieldName>contact_type</fieldName>
+    <add>2.1</add>
+  </index>
+  <field>
+    <name>contact_sub_type</name>
+    <title>Contact Subtype</title>
+    <type>varchar</type>
+    <length>255</length>
+    <export>true</export>
+    <import>true</import>
+    <headerPattern>/C(ontact )?(subtype|sub-type|sub type)/i</headerPattern>
+    <comment>May be used to over-ride contact view and edit templates.</comment>
+    <pseudoconstant>
+      <table>civicrm_contact_type</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>label</labelColumn>
+      <condition>parent_id IS NOT NULL</condition>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+      <multiple>1</multiple>
+    </html>
+    <serialize>SEPARATOR_BOOKEND</serialize>
+    <add>1.5</add>
+  </field>
+  <index>
+    <name>index_contact_sub_type</name>
+    <fieldName>contact_sub_type</fieldName>
+    <add>2.1</add>
+  </index>
+  <field>
+    <name>do_not_email</name>
+    <type>boolean</type>
+    <import>true</import>
+    <headerPattern>/d(o )?(not )?(email)/i</headerPattern>
+    <dataPattern>/^\d{1,}$/</dataPattern>
+    <default>0</default>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>do_not_phone</name>
+    <type>boolean</type>
+    <default>0</default>
+    <import>true</import>
+    <headerPattern>/d(o )?(not )?(call|phone)/i</headerPattern>
+    <dataPattern>/^\d{1,}$/</dataPattern>
+    <add>1.1</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>do_not_mail</name>
+    <type>boolean</type>
+    <import>true</import>
+    <headerPattern>/^(d(o\s)?n(ot\s)?mail)|(\w*)?bulk\s?(\w*)$/i</headerPattern>
+    <dataPattern>/^\d{1,}$/</dataPattern>
+    <default>0</default>
+    <add>1.1</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>do_not_sms</name>
+    <type>boolean</type>
+    <import>true</import>
+    <headerPattern>/d(o )?(not )?(sms)/i</headerPattern>
+    <dataPattern>/^\d{1,}$/</dataPattern>
+    <default>0</default>
+    <add>3.0</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>do_not_trade</name>
+    <type>boolean</type>
+    <import>true</import>
+    <headerPattern>/d(o )?(not )?(trade)/i</headerPattern>
+    <dataPattern>/^\d{1,}$/</dataPattern>
+    <default>0</default>
+    <add>1.1</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>is_opt_out</name>
+    <type>boolean</type>
+    <title>No Bulk Emails (User Opt Out)</title>
+    <default>0</default>
+    <import>true</import>
+    <required>true</required>
+    <comment>Has the contact opted out from receiving all bulk email from the organization or site domain?</comment>
+    <add>1.1</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>legal_identifier</name>
+    <type>varchar</type>
+    <length>32</length>
+    <import>true</import>
+    <headerPattern>/legal\s?id/i</headerPattern>
+    <dataPattern>/\w+?\d{5,}/</dataPattern>
+    <comment>May be used for SSN, EIN/TIN, Household ID (census) or other applicable unique legal/government ID.
+    </comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>external_identifier</name>
+    <type>varchar</type>
+    <length>64</length>
+    <html>
+      <type>Text</type>
+      <size>8</size>
+    </html>
+
+    <import>true</import>
+    <headerPattern>/external\s?id/i</headerPattern>
+    <dataPattern>/^\d{11,}$/</dataPattern>
+    <comment>Unique trusted external ID (generally from a legacy app/datasource). Particularly useful for deduping operations.</comment>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>UI_external_identifier</name>
+    <unique>true</unique>
+    <fieldName>external_identifier</fieldName>
+    <add>1.7</add>
+  </index>
+  <field>
+    <name>sort_name</name>
+    <title>Sort Name</title>
+    <type>varchar</type>
+    <length>128</length>
+    <html>
+      <type>Text</type>
+      <size>30</size>
+    </html>
+
+    <export>true</export>
+    <comment>Name used for sorting different contact types</comment>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>index_sort_name</name>
+    <fieldName>sort_name</fieldName>
+    <add>2.1</add>
+  </index>
+  <field>
+    <name>display_name</name>
+    <title>Display Name</title>
+    <type>varchar</type>
+    <length>128</length>
+    <html>
+      <type>Text</type>
+      <size>30</size>
+    </html>
+
+    <export>true</export>
+    <comment>Formatted name representing preferred format for display/print/other output.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>nick_name</name>
+    <title>Nickname</title>
+    <type>varchar</type>
+    <length>128</length>
+    <html>
+      <type>Text</type>
+      <size>30</size>
+    </html>
+
+    <import>true</import>
+    <headerPattern>/n(ick\s)name|nick$/i</headerPattern>
+    <dataPattern>/^\w+$/</dataPattern>
+    <comment>Nickname.</comment>
+    <fulltext/>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>legal_name</name>
+    <type>varchar</type>
+    <length>128</length>
+    <html>
+      <type>Text</type>
+      <size>30</size>
+    </html>
+
+    <import>true</import>
+    <headerPattern>/^legal|(l(egal\s)?name)$/i</headerPattern>
+    <comment>Legal Name.</comment>
+    <fulltext/>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>home_URL</name>
+    <rule>url</rule>
+    <title>Website</title>
+    <type>varchar</type>
+    <length>128</length>
+    <html>
+      <type>Text</type>
+      <size>30</size>
+    </html>
+
+    <import>true</import>
+    <headerPattern>/^(home\sURL)|URL|web|site/i</headerPattern>
+    <dataPattern>/^[\w\/\:\.]+$/</dataPattern>
+    <comment>optional "home page" URL for this contact.</comment>
+    <add>1.1</add>
+    <drop>3.2</drop>
+  </field>
+  <field>
+    <name>image_URL</name>
+    <type>text</type>
+    <import>true</import>
+    <comment>optional URL for preferred image (photo, logo, etc.) to display for this contact.</comment>
+    <add>1.1</add>
+    <html>
+      <type>File</type>
+      <size>30</size>
+    </html>
+  </field>
+  <field>
+    <name>preferred_communication_method</name>
+    <title>Preferred Communication Method</title>
+    <type>varchar</type>
+    <length>255</length>
+    <import>true</import>
+    <headerPattern>/^p(ref\w*\s)?c(omm\w*)|( meth\w*)$/i</headerPattern>
+    <dataPattern>/^\w+$/</dataPattern>
+    <comment>What is the preferred mode of communication.</comment>
+    <add>1.1</add>
+    <pseudoconstant>
+      <optionGroupName>preferred_communication_method</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+      <multiple>1</multiple>
+    </html>
+    <serialize>SEPARATOR_BOOKEND</serialize>
+  </field>
+  <index>
+    <name>index_preferred_communication_method</name>
+    <fieldName>preferred_communication_method</fieldName>
+    <add>1.6</add>
+  </index>
+  <field>
+    <name>preferred_language</name>
+    <title>Preferred Language</title>
+    <type>varchar</type>
+    <length>5</length>
+    <comment>Which language is preferred for communication. FK to languages in civicrm_option_value.</comment>
+    <headerPattern>/^lang/i</headerPattern>
+    <import>true</import>
+    <pseudoconstant>
+      <optionGroupName>languages</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>preferred_mail_format</name>
+    <type>varchar</type>
+    <length>8</length>
+    <default>"Both"</default>
+    <import>true</import>
+    <headerPattern>/^p(ref\w*\s)?m(ail\s)?f(orm\w*)$/i</headerPattern>
+    <comment>What is the preferred mode of sending an email.</comment>
+    <add>1.1</add>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::pmf</callback>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>hash</name>
+    <title>Contact Hash</title>
+    <type>varchar</type>
+    <length>32</length>
+    <comment>Key for validating requests related to this contact.</comment>
+    <add>1.1</add>
+    <change>1.5</change>
+    <export>true</export>
+  </field>
+  <index>
+    <name>index_hash</name>
+    <fieldName>hash</fieldName>
+    <add>2.1</add>
+  </index>
+  <field>
+    <name>api_key</name>
+    <type>varchar</type>
+    <length>32</length>
+    <comment>API Key for validating requests related to this contact.</comment>
+    <add>2.2</add>
+  </field>
+  <index>
+    <name>index_api_key</name>
+    <fieldName>api_key</fieldName>
+    <add>2.1</add>
+  </index>
+  <field>
+    <name>source</name>
+    <title>Contact Source</title>
+    <uniqueName>contact_source</uniqueName>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <type>Text</type>
+      <size>30</size>
+    </html>
+
+    <import>true</import>
+    <headerPattern>/(C(ontact\s)?Source)$/i</headerPattern>
+    <comment>where contact come from, e.g. import, donate module insert...</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>first_name</name>
+    <type>varchar</type>
+    <length>64</length>
+    <html>
+      <type>Text</type>
+      <size>30</size>
+    </html>
+    <import>true</import>
+    <headerPattern>/^first|(f(irst\s)?name)$/i</headerPattern>
+    <dataPattern>/^\w+$/</dataPattern>
+    <fulltext/>
+    <comment>First Name.</comment>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>index_first_name</name>
+    <fieldName>first_name</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>middle_name</name>
+    <type>varchar</type>
+    <length>64</length>
+    <html>
+      <type>Text</type>
+      <size>30</size>
+    </html>
+    <import>true</import>
+    <headerPattern>/^middle|(m(iddle\s)?name)$/i</headerPattern>
+    <dataPattern>/^\w+$/</dataPattern>
+    <fulltext/>
+    <comment>Middle Name.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>last_name</name>
+    <type>varchar</type>
+    <length>64</length>
+    <html>
+      <type>Text</type>
+      <size>30</size>
+    </html>
+    <import>true</import>
+    <headerPattern>/^last|(l(ast\s)?name)$/i</headerPattern>
+    <dataPattern>/^\w+(\s\w+)?+$/</dataPattern>
+    <comment>Last Name.</comment>
+    <fulltext/>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>index_last_name</name>
+    <fieldName>last_name</fieldName>
+    <add>1.8</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </index>
+  <field>
+    <name>prefix_id</name>
+    <title>Individual Prefix</title>
+    <type>int unsigned</type>
+    <comment>Prefix or Title for name (Ms, Mr...). FK to prefix ID</comment>
+    <pseudoconstant>
+      <optionGroupName>individual_prefix</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <headerPattern>/^(prefix|title)/i</headerPattern>
+    <dataPattern>/^(mr|ms|mrs|sir|dr)\.?$/i</dataPattern>
+    <import>true</import>
+    <add>1.2</add>
+  </field>
+  <index>
+    <name>UI_prefix</name>
+    <fieldName>prefix_id</fieldName>
+    <add>1.6</add>
+  </index>
+  <field>
+    <name>suffix_id</name>
+    <title>Individual Suffix</title>
+    <type>int unsigned</type>
+    <pseudoconstant>
+      <optionGroupName>individual_suffix</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <import>true</import>
+    <comment>Suffix for name (Jr, Sr...). FK to suffix ID</comment>
+    <headerPattern>/^suffix$/i</headerPattern>
+    <dataPattern>/^(sr|jr)\.?|i{2,}$/</dataPattern>
+    <add>1.2</add>
+  </field>
+  <index>
+    <name>UI_suffix</name>
+    <fieldName>suffix_id</fieldName>
+    <add>1.6</add>
+  </index>
+  <field>
+    <name>formal_title</name>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <html>
+      <type>Text</type>
+    </html>
+    <headerPattern>/^title/i</headerPattern>
+    <comment>Formal (academic or similar) title in front of name. (Prof., Dr. etc.)</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>communication_style_id</name>
+    <title>Communication Style</title>
+    <type>int unsigned</type>
+    <pseudoconstant>
+      <optionGroupName>communication_style</optionGroupName>
+    </pseudoconstant>
+    <export>true</export>
+    <comment>Communication style (e.g. formal vs. familiar) to use with this contact. FK to communication styles in civicrm_option_value.</comment>
+    <add>4.4</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <index>
+    <name>index_communication_style_id</name>
+    <fieldName>communication_style_id</fieldName>
+    <add>4.4</add>
+  </index>
+  <field>
+    <name>greeting_type</name>
+    <type>varchar</type>
+    <length>128</length>
+    <import>true</import>
+    <comment>Preferred greeting format.</comment>
+    <add>1.1</add>
+    <drop>2.2</drop>
+  </field>
+  <field>
+    <name>greeting_type_id</name>
+    <title>Greeting Type</title>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_option_value.id, that has to be valid, registered Greeting type.</comment>
+    <add>2.2</add>
+    <drop>3.0</drop>
+  </field>
+  <field>
+    <name>custom_greeting</name>
+    <type>varchar</type>
+    <length>128</length>
+    <import>true</import>
+    <comment>Custom greeting message.</comment>
+    <add>1.1</add>
+    <drop>3.0</drop>
+  </field>
+  <field>
+    <name>email_greeting_id</name>
+    <type>int unsigned</type>
+    <title>Email Greeting ID</title>
+    <export>true</export>
+    <comment>FK to civicrm_option_value.id, that has to be valid registered Email Greeting.</comment>
+    <add>3.0</add>
+    <pseudoconstant>
+      <optionGroupName>email_greeting</optionGroupName>
+    </pseudoconstant>
+  </field>
+  <field>
+    <name>email_greeting_custom</name>
+    <type>varchar</type>
+    <length>128</length>
+    <import>true</import>
+    <export>false</export>
+    <comment>Custom Email Greeting.</comment>
+    <add>3.0</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>email_greeting_display</name>
+    <title>Email Greeting</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Cache Email Greeting.</comment>
+    <add>3.0</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>postal_greeting_id</name>
+    <type>int unsigned</type>
+    <title>Postal Greeting ID</title>
+    <export>true</export>
+    <comment>FK to civicrm_option_value.id, that has to be valid registered Postal Greeting.</comment>
+    <add>3.0</add>
+    <html>
+      <type>Text</type>
+    </html>
+    <pseudoconstant>
+      <optionGroupName>postal_greeting</optionGroupName>
+    </pseudoconstant>
+  </field>
+  <field>
+    <name>postal_greeting_custom</name>
+    <type>varchar</type>
+    <length>128</length>
+    <import>true</import>
+    <export>false</export>
+    <comment>Custom Postal greeting.</comment>
+    <add>3.0</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>postal_greeting_display</name>
+    <title>Postal Greeting</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Cache Postal greeting.</comment>
+    <add>3.0</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>addressee_id</name>
+    <type>int unsigned</type>
+    <title>Addressee ID</title>
+    <comment>FK to civicrm_option_value.id, that has to be valid registered Addressee.</comment>
+    <add>3.0</add>
+    <export>true</export>
+    <pseudoconstant>
+      <optionGroupName>addressee</optionGroupName>
+    </pseudoconstant>
+  </field>
+  <field>
+    <name>addressee_custom</name>
+    <type>varchar</type>
+    <length>128</length>
+    <import>true</import>
+    <export>false</export>
+    <comment>Custom Addressee.</comment>
+    <add>3.0</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>addressee_display</name>
+    <title>Addressee</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Cache Addressee.</comment>
+    <add>3.0</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>job_title</name>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <type>Text</type>
+      <size>30</size>
+    </html>
+    <import>true</import>
+    <headerPattern>/^job|(j(ob\s)?title)$/i</headerPattern>
+    <dataPattern>//</dataPattern>
+    <comment>Job Title</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>gender_id</name>
+    <title>Gender</title>
+    <type>int unsigned</type>
+    <pseudoconstant>
+      <optionGroupName>gender</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <headerPattern>/^gender$/i</headerPattern>
+    <comment>FK to gender ID</comment>
+    <import>true</import>
+    <add>1.2</add>
+  </field>
+  <index>
+    <name>UI_gender</name>
+    <fieldName>gender_id</fieldName>
+    <add>1.6</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </index>
+  <field>
+    <name>birth_date</name>
+    <type>date</type>
+    <import>true</import>
+    <headerPattern>/^birth|(b(irth\s)?date)|D(\W*)O(\W*)B(\W*)$/i</headerPattern>
+    <dataPattern>/\d{4}-?\d{2}-?\d{2}/</dataPattern>
+    <comment>Date of birth</comment>
+    <add>1.1</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>birth</formatType>
+    </html>
+  </field>
+  <field>
+    <name>is_deceased</name>
+    <title>Deceased</title>
+    <import>true</import>
+    <export>true</export>
+    <headerPattern>/i(s\s)?d(eceased)$/i</headerPattern>
+    <type>boolean</type>
+    <default>0</default>
+    <add>1.1</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <index>
+    <name>index_is_deceased</name>
+    <fieldName>is_deceased</fieldName>
+    <add>4.7</add>
+  </index>
+  <field>
+    <name>deceased_date</name>
+    <type>date</type>
+    <import>true</import>
+    <export>true</export>
+    <headerPattern>/^deceased|(d(eceased\s)?date)$/i</headerPattern>
+    <comment>Date of deceased</comment>
+    <add>1.5</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>birth</formatType>
+    </html>
+  </field>
+  <field>
+    <name>mail_to_household_id</name>
+    <title>Mail to Household ID</title>
+    <type>int unsigned</type>
+    <comment>OPTIONAL FK to civicrm_contact_household record. If NOT NULL, direct mail communications to household rather than individual location. </comment>
+    <export>true</export>
+    <add>1.1</add>
+    <drop>3.3</drop>
+  </field>
+  <foreignKey>
+    <name>mail_to_household_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>2.1</add>
+    <onDelete>SET NULL</onDelete>
+    <drop>3.3</drop>
+  </foreignKey>
+  <field>
+    <name>household_name</name>
+    <type>varchar</type>
+    <length>128</length>
+    <html>
+      <type>Text</type>
+      <size>30</size>
+    </html>
+    <import>true</import>
+    <headerPattern>/^household|(h(ousehold\s)?name)$/i</headerPattern>
+    <dataPattern>/^\w+$/</dataPattern>
+    <comment>Household Name.</comment>
+    <fulltext/>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>index_household_name</name>
+    <fieldName>household_name</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>primary_contact_id</name>
+    <type>int unsigned</type>
+    <title>Household Primary Contact ID</title>
+    <comment>Optional FK to Primary Contact for this household.</comment>
+    <add>1.1</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>primary_contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.1</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>organization_name</name>
+    <type>varchar</type>
+    <length>128</length>
+    <html>
+      <type>Text</type>
+      <size>30</size>
+    </html>
+    <import>true</import>
+    <headerPattern>/^organization|(o(rganization\s)?name)$/i</headerPattern>
+    <dataPattern>/^\w+$/</dataPattern>
+    <comment>Organization Name.</comment>
+    <fulltext/>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>index_organization_name</name>
+    <fieldName>organization_name</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>sic_code</name>
+    <type>varchar</type>
+    <length>8</length>
+    <import>true</import>
+    <headerPattern>/^sic|(s(ic\s)?code)$/i</headerPattern>
+    <comment>Standard Industry Classification Code.</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>user_unique_id</name>
+    <rule>url</rule>
+    <title>Unique ID (OpenID)</title>
+    <type>varchar</type>
+    <length>255</length>
+    <import>true</import>
+    <headerPattern>/^Open\s?ID|u(niq\w*)?\s?ID/i</headerPattern>
+    <dataPattern>/^[\w\/\:\.]+$/</dataPattern>
+    <comment>the OpenID (or OpenID-style http://username.domain/) unique identifier for this contact mainly used for logging in to CiviCRM</comment>
+    <add>2.0</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>employer_id</name>
+    <title>Current Employer</title>
+    <uniqueName>current_employer_id</uniqueName>
+    <type>int unsigned</type>
+    <comment>OPTIONAL FK to civicrm_contact record.</comment>
+    <export>true</export>
+    <add>2.1</add>
+    <html>
+      <type>EntityRef</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>employer_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>2.1</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>is_deleted</name>
+    <title>Contact is in Trash</title>
+    <uniqueName>contact_is_deleted</uniqueName>
+    <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
+    <export>true</export>
+    <add>3.2</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <index>
+    <name>index_is_deleted</name>
+    <fieldName>is_deleted</fieldName>
+    <add>3.2</add>
+    <drop>4.4</drop>
+  </index>
+  <index>
+    <name>index_is_deleted_sort_name</name>
+    <fieldName>is_deleted</fieldName>
+    <fieldName>sort_name</fieldName>
+    <fieldName>id</fieldName>
+    <add>4.4</add>
+  </index>
+  <field>
+    <name>created_date</name>
+    <type>timestamp</type>
+    <comment>When was the contact was created.</comment>
+    <required>false</required>
+    <export>true</export>
+    <default>NULL</default>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <type>timestamp</type>
+    <comment>When was the contact (or closely related entity) was created or modified or deleted.</comment>
+    <required>false</required>
+    <export>true</export>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <add>4.3</add>
+  </field>
+</table>

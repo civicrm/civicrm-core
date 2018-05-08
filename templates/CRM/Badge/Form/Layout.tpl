@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -109,7 +109,7 @@
         </td>
       </tr>
       <tr class="crm-badge-layout-form-block-elements">
-        <td class="label">{ts}Elements{/ts}</td>
+        <td class="label"><label>{ts}Elements{/ts}</label></td>
         <td>
           <table class="form-layout-compressed">
             <tr>

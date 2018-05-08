@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,7 +43,7 @@
  * This provides greater consistency/predictability after flushing.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Core_PseudoConstant {
 
@@ -154,12 +154,6 @@ class CRM_Core_PseudoConstant {
    * @var array
    */
   private static $greeting;
-
-  /**
-   * Default Greetings
-   * @var array
-   */
-  private static $greetingDefaults;
 
   /**
    * Extensions of type module
@@ -594,6 +588,9 @@ class CRM_Core_PseudoConstant {
     }
     if ($name == 'cache') {
       CRM_Core_OptionGroup::flushAll();
+      if (isset(\Civi::$statics[__CLASS__])) {
+        unset(\Civi::$statics[__CLASS__]);
+      }
     }
   }
 
@@ -781,6 +778,32 @@ WHERE  id = %1";
   }
 
   /**
+   * Get all the State/Province abbreviations from the database for the specified country.
+   *
+   * @param int $countryID
+   *
+   * @return array
+   *   array of all State/Province abbreviations for the given country.
+   */
+  public static function stateProvinceAbbreviationForCountry($countryID) {
+    if (!isset(\Civi::$statics[__CLASS__]['stateProvinceAbbreviationForCountry'][$countryID])) {
+      \Civi::$statics[__CLASS__]['stateProvinceAbbreviationForCountry'][$countryID] = array();
+    }
+    self::populate(\Civi::$statics[__CLASS__]['stateProvinceAbbreviationForCountry'][$countryID], 'CRM_Core_DAO_StateProvince', TRUE, 'abbreviation', 'is_active', "country_id = " . (int) $countryID, 'abbreviation');
+    return \Civi::$statics[__CLASS__]['stateProvinceAbbreviationForCountry'][$countryID];
+  }
+
+  /**
+   * Get all the State/Province abbreviations from the database for the default country.
+   *
+   * @return array
+   *   array of all State/Province abbreviations for the given country.
+   */
+  public static function stateProvinceAbbreviationForDefaultCountry() {
+    return CRM_Core_PseudoConstant::stateProvinceAbbreviationForCountry(Civi::settings()->get('defaultContactCountry'));
+  }
+
+  /**
    * Get all the countries from database.
    *
    * The static array country is returned, and if it's
@@ -908,6 +931,11 @@ WHERE  id = %1";
    *   array reference of all groups.
    */
   public static function allGroup($groupType = NULL, $excludeHidden = TRUE) {
+    if ($groupType === 'validate') {
+      // validate gets passed through from getoptions. Handle in the deprecated
+      // fn rather than change the new pattern.
+      $groupType = NULL;
+    }
     $condition = CRM_Contact_BAO_Group::groupTypeCondition($groupType, $excludeHidden);
     $groupKey = ($groupType ? $groupType : 'null') . !empty($excludeHidden);
 
@@ -1052,275 +1080,13 @@ WHERE  id = %1";
    */
   public static function &currencyCode() {
     if (!self::$currencyCode) {
-      self::$currencyCode = array(
-        'AFN',
-        'ALL',
-        'DZD',
-        'USD',
-        'EUR',
-        'AOA',
-        'XCD',
-        'XCD',
-        'ARS',
-        'AMD',
-        'AWG',
-        'AUD',
-        'EUR',
-        'AZM',
-        'BSD',
-        'BHD',
-        'BDT',
-        'BBD',
-        'BYR',
-        'EUR',
-        'BZD',
-        'XOF',
-        'BMD',
-        'INR',
-        'BTN',
-        'BOB',
-        'BOV',
-        'BAM',
-        'BWP',
-        'NOK',
-        'BRL',
-        'USD',
-        'BND',
-        'BGN',
-        'XOF',
-        'BIF',
-        'KHR',
-        'XAF',
-        'CAD',
-        'CVE',
-        'KYD',
-        'XAF',
-        'XAF',
-        'CLP',
-        'CLF',
-        'CNY',
-        'AUD',
-        'AUD',
-        'COP',
-        'COU',
-        'KMF',
-        'XAF',
-        'CDF',
-        'NZD',
-        'CRC',
-        'XOF',
-        'HRK',
-        'CUP',
-        'CYP',
-        'CZK',
-        'DKK',
-        'DJF',
-        'XCD',
-        'DOP',
-        'USD',
-        'EGP',
-        'SVC',
-        'USD',
-        'XAF',
-        'ERN',
-        'EEK',
-        'ETB',
-        'FKP',
-        'DKK',
-        'FJD',
-        'EUR',
-        'EUR',
-        'EUR',
-        'XPF',
-        'EUR',
-        'XAF',
-        'GMD',
-        'GEL',
-        'EUR',
-        'GHC',
-        'GIP',
-        'EUR',
-        'DKK',
-        'XCD',
-        'EUR',
-        'USD',
-        'GTQ',
-        'GNF',
-        'GWP',
-        'XOF',
-        'GYD',
-        'HTG',
-        'USD',
-        'AUD',
-        'EUR',
-        'HNL',
-        'HKD',
-        'HUF',
-        'ISK',
-        'INR',
-        'IDR',
-        'XDR',
-        'IRR',
-        'IQD',
-        'EUR',
-        'ILS',
-        'EUR',
-        'JMD',
-        'JPY',
-        'JOD',
-        'KZT',
-        'KES',
-        'AUD',
-        'KPW',
-        'KRW',
-        'KWD',
-        'KGS',
-        'LAK',
-        'LVL',
-        'LBP',
-        'ZAR',
-        'LSL',
-        'LRD',
-        'LYD',
-        'CHF',
-        'LTL',
-        'EUR',
-        'MOP',
-        'MKD',
-        'MGA',
-        'MWK',
-        'MYR',
-        'MVR',
-        'XOF',
-        'MTL',
-        'USD',
-        'EUR',
-        'MRO',
-        'MUR',
-        'EUR',
-        'MXN',
-        'MXV',
-        'USD',
-        'MDL',
-        'EUR',
-        'MNT',
-        'XCD',
-        'MAD',
-        'MZM',
-        'MMK',
-        'ZAR',
-        'NAD',
-        'AUD',
-        'NPR',
-        'EUR',
-        'ANG',
-        'XPF',
-        'NZD',
-        'NIO',
-        'XOF',
-        'NGN',
-        'NZD',
-        'AUD',
-        'USD',
-        'NOK',
-        'OMR',
-        'PKR',
-        'USD',
-        'PAB',
-        'USD',
-        'PGK',
-        'PYG',
-        'PEN',
-        'PHP',
-        'NZD',
-        'PLN',
-        'EUR',
-        'USD',
-        'QAR',
-        'EUR',
-        'ROL',
-        'RON',
-        'RUB',
-        'RWF',
-        'SHP',
-        'XCD',
-        'XCD',
-        'EUR',
-        'XCD',
-        'WST',
-        'EUR',
-        'STD',
-        'SAR',
-        'XOF',
-        'CSD',
-        'EUR',
-        'SCR',
-        'SLL',
-        'SGD',
-        'SKK',
-        'SIT',
-        'SBD',
-        'SOS',
-        'ZAR',
-        'EUR',
-        'LKR',
-        'SDD',
-        'SRD',
-        'NOK',
-        'SZL',
-        'SEK',
-        'CHF',
-        'CHW',
-        'CHE',
-        'SYP',
-        'TWD',
-        'TJS',
-        'TZS',
-        'THB',
-        'USD',
-        'XOF',
-        'NZD',
-        'TOP',
-        'TTD',
-        'TND',
-        'TRY',
-        'TRL',
-        'TMM',
-        'USD',
-        'AUD',
-        'UGX',
-        'UAH',
-        'AED',
-        'GBP',
-        'USD',
-        'USS',
-        'USN',
-        'USD',
-        'UYU',
-        'UZS',
-        'VUV',
-        'VEB',
-        'VND',
-        'USD',
-        'USD',
-        'XPF',
-        'MAD',
-        'YER',
-        'ZMK',
-        'ZWD',
-        'XAU',
-        'XBA',
-        'XBB',
-        'XBC',
-        'XBD',
-        'XPD',
-        'XPT',
-        'XAG',
-        'XFU',
-        'XFO',
-        'XTS',
-        'XXX',
-      );
+
+      $query = "SELECT name FROM civicrm_currency";
+      $dao = CRM_Core_DAO::executeQuery($query);
+      $currencyCode = array();
+      while ($dao->fetch()) {
+        self::$currencyCode[] = $dao->name;
+      }
     }
     return self::$currencyCode;
   }
@@ -1650,6 +1416,10 @@ WHERE  id = %1
    *   array reference of all greetings.
    */
   public static function greeting($filter, $columnName = 'label') {
+    if (!isset(Civi::$statics[__CLASS__]['greeting'])) {
+      Civi::$statics[__CLASS__]['greeting'] = array();
+    }
+
     $index = $filter['greeting_type'] . '_' . $columnName;
 
     // also add contactType to the array
@@ -1658,11 +1428,7 @@ WHERE  id = %1
       $index .= '_' . $contactType;
     }
 
-    if (NULL === self::$greeting) {
-      self::$greeting = array();
-    }
-
-    if (!CRM_Utils_Array::value($index, self::$greeting)) {
+    if (!CRM_Utils_Array::value($index, Civi::$statics[__CLASS__]['greeting'])) {
       $filterCondition = NULL;
       if ($contactType) {
         $filterVal = 'v.filter =';
@@ -1682,40 +1448,10 @@ WHERE  id = %1
         $filterCondition .= "AND (v.filter = 0 OR {$filterVal}) ";
       }
 
-      self::$greeting[$index] = CRM_Core_OptionGroup::values($filter['greeting_type'], NULL, NULL, NULL, $filterCondition, $columnName);
+      Civi::$statics[__CLASS__]['greeting'][$index] = CRM_Core_OptionGroup::values($filter['greeting_type'], NULL, NULL, NULL, $filterCondition, $columnName);
     }
 
-    return self::$greeting[$index];
-  }
-
-  /**
-   * Construct array of default greeting values for contact type.
-   *
-   *
-   * @return array
-   *   array reference of default greetings.
-   */
-  public static function &greetingDefaults() {
-    if (!self::$greetingDefaults) {
-      $defaultGreetings = array();
-      $contactTypes = self::get('CRM_Contact_DAO_Contact', 'contact_type', array(
-          'keyColumn' => 'id',
-          'labelColumn' => 'name',
-        ));
-
-      foreach ($contactTypes as $filter => $contactType) {
-        $filterCondition = " AND (v.filter = 0 OR v.filter = $filter) AND v.is_default = 1 ";
-
-        foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
-          $tokenVal = CRM_Core_OptionGroup::values($greeting, NULL, NULL, NULL, $filterCondition, 'label');
-          $defaultGreetings[$contactType][$greeting] = $tokenVal;
-        }
-      }
-
-      self::$greetingDefaults = $defaultGreetings;
-    }
-
-    return self::$greetingDefaults;
+    return Civi::$statics[__CLASS__]['greeting'][$index];
   }
 
   /**

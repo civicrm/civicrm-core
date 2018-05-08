@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -67,8 +67,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
       if ($this->_id && ($this->_action & CRM_Core_Action::VIEW)) {
         //user might have special permissions to view this case, CRM-5666
         if (!CRM_Core_Permission::check('access all cases and activities')) {
-          $session = CRM_Core_Session::singleton();
-          $userCases = CRM_Case_BAO_Case::getCases(FALSE, $session->get('userID'), 'any');
+          $userCases = CRM_Case_BAO_Case::getCases(FALSE, array('type' => 'any'));
           if (!array_key_exists($this->_id, $userCases)) {
             CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
           }

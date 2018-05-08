@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Field handler to provide relationship to CiviCRM email.
@@ -33,7 +33,7 @@ class civicrm_handler_relationship_mail extends civicrm_handler_relationship_loc
   /**
    * Called to implement a relationship in a query.
    */
-  function query() {
+  public function query() {
     $join = $this->get_join();
     $this->alias = $this->query->add_table($this->table, $this->relationship, $join);
     //register relationship
@@ -44,5 +44,5 @@ class civicrm_handler_relationship_mail extends civicrm_handler_relationship_loc
       'base' => $this->table,
     );
   }
-}
 
+}

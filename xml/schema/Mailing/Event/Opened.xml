@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing/Event</base>
+  <class>Opened</class>
+  <name>civicrm_mailing_event_opened</name>
+  <comment>Tracks when a delivered email is opened by the recipient</comment>
+  <archive>true</archive>
+  <field>
+    <name>id</name>
+    <title>Mailing Opened ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>event_queue_id</name>
+    <title>Event Queue</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to EventQueue</comment>
+  </field>
+  <foreignKey>
+    <name>event_queue_id</name>
+    <table>civicrm_mailing_event_queue</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>time_stamp</name>
+    <title>Timestamp</title>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
+    <required>true</required>
+    <comment>When this open event occurred.</comment>
+  </field>
+</table>

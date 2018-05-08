@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Email</class>
+  <name>civicrm_email</name>
+  <comment>Email information for a specific location.</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Email ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique Email ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <title>Email Contact</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>location_type_id</name>
+    <title>Email Location Type</title>
+    <type>int unsigned</type>
+    <comment>Which Location does this email belong to.</comment>
+    <add>2.0</add>
+    <pseudoconstant>
+      <table>civicrm_location_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>display_name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <index>
+    <name>index_location_type</name>
+    <fieldName>location_type_id</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>email</name>
+    <title>Email</title>
+    <type>varchar</type>
+    <length>254</length>
+    <html>
+      <type>Text</type>
+      <size>30</size>
+    </html>
+    <import>true</import>
+    <headerPattern>/e.?mail/i</headerPattern>
+    <dataPattern>/^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/</dataPattern>
+    <rule>email</rule>
+    <comment>Email address</comment>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>UI_email</name>
+    <fieldName>email</fieldName>
+    <add>1.5</add>
+  </index>
+  <field>
+    <name>is_primary</name>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this the primary email for this contact and location.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>is_primary</name>
+    <title>Is Primary email</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this the primary?</comment>
+    <add>2.0</add>
+  </field>
+  <index>
+    <name>index_is_primary</name>
+    <fieldName>is_primary</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>is_billing</name>
+    <title>Is Billing Email?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this the billing?</comment>
+    <add>2.0</add>
+  </field>
+  <index>
+    <name>index_is_billing</name>
+    <fieldName>is_billing</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>on_hold</name>
+    <export>true</export>
+    <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
+    <comment>Is this address on bounce hold?</comment>
+    <add>1.1</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>is_bulkmail</name>
+    <title>Use for Bulk Mail</title>
+    <export>true</export>
+    <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
+    <comment>Is this address for bulk mail ?</comment>
+    <add>1.9</add>
+  </field>
+  <field>
+    <name>hold_date</name>
+    <type>datetime</type>
+    <comment>When the address went on bounce hold</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>reset_date</name>
+    <type>datetime</type>
+    <comment>When the address bounce status was last reset</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>signature_text</name>
+    <type>text</type>
+    <import>true</import>
+    <default>NULL</default>
+    <comment>Text formatted signature for the email.</comment>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>signature_html</name>
+    <type>text</type>
+    <import>true</import>
+    <default>NULL</default>
+    <comment>HTML formatted signature for the email.</comment>
+    <add>3.2</add>
+  </field>
+</table>

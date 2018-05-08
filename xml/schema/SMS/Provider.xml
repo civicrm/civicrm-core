@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/SMS</base>
+  <class>Provider</class>
+  <name>civicrm_sms_provider</name>
+  <comment>Table to add different sms providers </comment>
+  <add>4.2</add>
+  <field>
+    <name>id</name>
+    <title>SMS Provider ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>SMS Provider ID</comment>
+    <add>4.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>SMS Provider Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Provider internal name points to option_value of option_group sms_provider_name</comment>
+    <add>4.2</add>
+  </field>
+  <field>
+    <name>title</name>
+    <title>SMS Provider Title</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Provider name visible to user</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>4.2</add>
+  </field>
+  <field>
+    <name>username</name>
+    <title>SMS Provider Username</title>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>4.2</add>
+  </field>
+  <field>
+    <name>password</name>
+    <title>SMS Provider Password</title>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>4.2</add>
+  </field>
+  <field>
+    <name>api_type</name>
+    <title>SMS Provider API</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>points to value in civicrm_option_value for group sms_api_type</comment>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>4.2</add>
+  </field>
+  <field>
+    <name>api_url</name>
+    <title>SMS Provider API URL</title>
+    <type>varchar</type>
+    <length>128</length>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>4.2</add>
+  </field>
+  <field>
+    <name>api_params</name>
+    <title>SMS Provider API Params</title>
+    <type>text</type>
+    <comment>the api params in xml, http or smtp format</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>4.2</add>
+  </field>
+  <field>
+    <name>is_default</name>
+    <title>SMS Provider is Default?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <add>4.2</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>SMS Provider is Active?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <add>4.2</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>domain_id</name>
+    <title>SMS Domain</title>
+    <type>int unsigned</type>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>Which Domain is this sms provider for</comment>
+    <add>4.7</add>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <add>4.7</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+</table>

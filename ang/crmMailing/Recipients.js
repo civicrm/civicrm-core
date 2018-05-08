@@ -112,13 +112,13 @@
           }
         }
 
-	var rcpAjaxState = {
-	  input: '',
-	  entity: 'civicrm_group',
-	  type: 'include',
-	  page_n: 0,
-	  page_i: 0,
-	};
+        var rcpAjaxState = {
+         input: '',
+         entity: 'civicrm_group',
+         type: 'include',
+         page_n: 0,
+         page_i: 0,
+        };
 
         $(element).select2({
           width: '36em',
@@ -145,10 +145,18 @@
                 mids.push(dv.entity_id);
               }
             }
+            // push non existant 0 group/mailing id in order when no recipents group or prior mailing is selected
+            //  this will allow to resuse the below code to handle datamap
+            if (gids.length === 0) {
+              gids.push(0);
+            }
+            if (mids.length === 0) {
+              mids.push(0);
+            }
 
-            CRM.api3('Group', 'getlist', { params: { id: { IN: gids } }, extra: ["is_hidden"] }).then(
+            CRM.api3('Group', 'getlist', { params: { id: { IN: gids }, options: { limit: 0 } }, extra: ["is_hidden"] } ).then(
               function(glist) {
-                CRM.api3('Mailing', 'getlist', { params: { id: { IN: mids } } }).then(
+                CRM.api3('Mailing', 'getlist', { params: { id: { IN: mids }, options: { limit: 0 } } }).then(
                   function(mlist) {
                     var datamap = [];
 
@@ -196,16 +204,16 @@
             url: CRM.url('civicrm/ajax/rest'),
             quietMillis: 300,
             data: function(input, page_num) {
-	      if (page_num <= 1) {
-		rcpAjaxState = {
-		  input: input,
-		  entity: 'civicrm_group',
-		  type: 'include',
-		  page_n: 0,
-		};
-	      }
+              if (page_num <= 1) {
+                rcpAjaxState = {
+                  input: input,
+                  entity: 'civicrm_group',
+                  type: 'include',
+                  page_n: 0,
+                };
+              }
 
-	      rcpAjaxState.page_i = page_num - rcpAjaxState.page_n;
+              rcpAjaxState.page_i = page_num - rcpAjaxState.page_n;
               var filterParams = {};
               switch(rcpAjaxState.entity) {
               case 'civicrm_group':
@@ -224,41 +232,41 @@
               return params;
             },
             transport: function(params) {
-	      switch(rcpAjaxState.entity) {
-	      case 'civicrm_group':
-		CRM.api3('Group', 'getlist', params.data).then(params.success, params.error);
-		break;
+              switch(rcpAjaxState.entity) {
+              case 'civicrm_group':
+                CRM.api3('Group', 'getlist', params.data).then(params.success, params.error);
+                break;
 
-	      case 'civicrm_mailing':
+              case 'civicrm_mailing':
                 params.data.params.options = { sort: "is_archived asc, scheduled_date desc" };
                 CRM.api3('Mailing', 'getlist', params.data).then(params.success, params.error);
-		break;
-	      }
+                break;
+              }
             },
             results: function(data) {
               results = {
-		children: $.map(data.values, function(obj) {
+                children: $.map(data.values, function(obj) {
                   return {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type,
                              text: obj.label };
-		})
-	      };
+                })
+              };
 
-	      if(rcpAjaxState.page_i == 1 && data.count) {
-		results.text = ts((rcpAjaxState.type == 'include'? 'Include ' : 'Exclude ') +
-				     (rcpAjaxState.entity == 'civicrm_group'? 'Group' : 'Mailing'));
-	      }
+              if (rcpAjaxState.page_i == 1 && data.count) {
+                results.text = ts((rcpAjaxState.type == 'include'? 'Include ' : 'Exclude ') +
+                  (rcpAjaxState.entity == 'civicrm_group'? 'Group' : 'Mailing'));
+              }
 
-	      more = data.more_results || !(rcpAjaxState.entity == 'civicrm_mailing' && rcpAjaxState.type == 'exclude');
+              more = data.more_results || !(rcpAjaxState.entity == 'civicrm_mailing' && rcpAjaxState.type == 'exclude');
 
-	      if (more && !data.more_results) {
-		if (rcpAjaxState.type == 'include') {
-		  rcpAjaxState.type = 'exclude';
-		} else {
-		  rcpAjaxState.type = 'include';
-		  rcpAjaxState.entity = 'civicrm_mailing';
-		}
-		rcpAjaxState.page_n += rcpAjaxState.page_i;
-	      }
+              if (more && !data.more_results) {
+                if (rcpAjaxState.type == 'include') {
+                  rcpAjaxState.type = 'exclude';
+                } else {
+                 rcpAjaxState.type = 'include';
+                 rcpAjaxState.entity = 'civicrm_mailing';
+                }
+                rcpAjaxState.page_n += rcpAjaxState.page_i;
+              }
 
               return { more: more, results: [ results ] };
             },

@@ -291,14 +291,14 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
 
     if ($event_in_cart) {
       return array(
-        'label' => "Remove from Cart",
+        'label' => ts("Remove from Cart"),
         'path' => 'civicrm/event/remove_from_cart',
         'query' => "reset=1&id={$event_id}",
       );
     }
     else {
       return array(
-        'label' => "Add to Cart",
+        'label' => ts("Add to Cart"),
         'path' => 'civicrm/event/add_to_cart',
         'query' => "reset=1&id={$event_id}",
       );

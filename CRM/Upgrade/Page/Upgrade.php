@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
 
@@ -194,6 +194,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     $template->assign('message', $postUpgradeMessage);
     $template->assign('upgraded', TRUE);
     $template->assign('sid', CRM_Utils_System::getSiteID());
+    $template->assign('newVersion', $latestVer);
 
     // Render page header
     if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {

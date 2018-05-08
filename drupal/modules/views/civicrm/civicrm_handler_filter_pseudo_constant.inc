@@ -21,10 +21,9 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
-
-/*
+/**
  * Developed by Jim Taylor.
  * CiviCRM Views Integration
  *
@@ -33,7 +32,8 @@
  *
  */
 class civicrm_handler_filter_pseudo_constant extends views_handler_filter_in_operator {
-  public $_pseudo_constant; function construct() {
+  public $_pseudo_constant;
+  public function construct() {
     parent::construct();
     if (!civicrm_initialize() ||
       !isset($this->definition['pseudo class']) ||
@@ -58,7 +58,7 @@ class civicrm_handler_filter_pseudo_constant extends views_handler_filter_in_ope
     $this->_pseudo_constant = call_user_func_array($this->definition['pseudo class'] . "::" . $this->definition['pseudo method'], $pseudo_args);
   }
 
-  function get_value_options() {
+  public function get_value_options() {
     if (!isset($this->value_options)) {
       $this->value_title = $this->definition['title'];
       $options = array();
@@ -68,5 +68,5 @@ class civicrm_handler_filter_pseudo_constant extends views_handler_filter_in_ope
       $this->value_options = $options;
     }
   }
-}
 
+}

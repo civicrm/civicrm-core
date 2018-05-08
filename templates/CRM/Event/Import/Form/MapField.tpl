@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -39,7 +39,7 @@
  <table class="form-layout">
    <tr>
      <td>
-  <div id="crm-submit-buttons">
+  <div class="crm-submit-buttons">
          {include file="CRM/common/formButtons.tpl" location="top"}
   </div>
      </td>
@@ -51,7 +51,7 @@
    </tr>
    <tr>
      <td>
-  <div id="crm-submit-buttons">
+  <div class="crm-submit-buttons">
          {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>
      </td>

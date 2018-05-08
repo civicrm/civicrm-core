@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -78,6 +78,8 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
+    $this->preventAjaxSubmit();
+
     //special case for custom search, directly give option to download csv file
     $customSearchID = $this->get('customSearchID');
     if ($customSearchID) {
@@ -92,6 +94,10 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
     $this->_componentIds = array();
     $this->_componentClause = NULL;
 
+    $stateMachine = $this->controller->getStateMachine();
+    $formName = CRM_Utils_System::getClassName($stateMachine);
+    $isStandalone = $formName == 'CRM_Export_StateMachine_Standalone';
+
     // get the submitted values based on search
     if ($this->_action == CRM_Core_Action::ADVANCED) {
       $values = $this->controller->exportValues('Advanced');
@@ -104,45 +110,17 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
     }
     else {
       // we need to determine component export
-      $stateMachine = $this->controller->getStateMachine();
-
-      $formName = CRM_Utils_System::getClassName($stateMachine);
       $componentName = explode('_', $formName);
       $components = array('Contribute', 'Member', 'Event', 'Pledge', 'Case', 'Grant', 'Activity');
 
+      if ($isStandalone) {
+        $componentName = array('CRM', $this->controller->get('entity'));
+      }
+
       if (in_array($componentName[1], $components)) {
-        switch ($componentName[1]) {
-          case 'Contribute':
-            $this->_exportMode = self::CONTRIBUTE_EXPORT;
-            break;
-
-          case 'Member':
-            $this->_exportMode = self::MEMBER_EXPORT;
-            break;
-
-          case 'Event':
-            $this->_exportMode = self::EVENT_EXPORT;
-            break;
-
-          case 'Pledge':
-            $this->_exportMode = self::PLEDGE_EXPORT;
-            break;
-
-          case 'Case':
-            $this->_exportMode = self::CASE_EXPORT;
-            break;
-
-          case 'Grant':
-            $this->_exportMode = self::GRANT_EXPORT;
-            break;
-
-          case 'Activity':
-            $this->_exportMode = self::ACTIVITY_EXPORT;
-            break;
-        }
-
+        $this->_exportMode = constant('CRM_Export_Form_Select::' . strtoupper($componentName[1]) . '_EXPORT');
         $className = "CRM_{$componentName[1]}_Form_Task";
-        $className::preProcessCommon($this, TRUE);
+        $className::preProcessCommon($this, !$isStandalone);
         $values = $this->controller->exportValues('Search');
       }
       else {
@@ -167,31 +145,31 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
     $componentMode = $this->get('component_mode');
     switch ($componentMode) {
       case 2:
-        CRM_Contribute_Form_Task::preProcessCommon($this, TRUE);
+        CRM_Contribute_Form_Task::preProcessCommon($this, !$isStandalone);
         $this->_exportMode = self::CONTRIBUTE_EXPORT;
         $componentName = array('', 'Contribute');
         break;
 
       case 3:
-        CRM_Event_Form_Task::preProcessCommon($this, TRUE);
+        CRM_Event_Form_Task::preProcessCommon($this, !$isStandalone);
         $this->_exportMode = self::EVENT_EXPORT;
         $componentName = array('', 'Event');
         break;
 
       case 4:
-        CRM_Activity_Form_Task::preProcessCommon($this, TRUE);
+        CRM_Activity_Form_Task::preProcessCommon($this, !$isStandalone);
         $this->_exportMode = self::ACTIVITY_EXPORT;
         $componentName = array('', 'Activity');
         break;
 
       case 5:
-        CRM_Member_Form_Task::preProcessCommon($this, TRUE);
+        CRM_Member_Form_Task::preProcessCommon($this, !$isStandalone);
         $this->_exportMode = self::MEMBER_EXPORT;
         $componentName = array('', 'Member');
         break;
 
       case 6:
-        CRM_Case_Form_Task::preProcessCommon($this, TRUE);
+        CRM_Case_Form_Task::preProcessCommon($this, !$isStandalone);
         $this->_exportMode = self::CASE_EXPORT;
         $componentName = array('', 'Case');
         break;
@@ -202,7 +180,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
       $contactTasks = CRM_Contact_Task::taskTitles();
       $taskName = $contactTasks[$this->_task];
       $component = FALSE;
-      CRM_Contact_Form_Task::preProcessCommon($this, TRUE);
+      CRM_Contact_Form_Task::preProcessCommon($this, !$isStandalone);
     }
     else {
       $this->assign('taskName', "Export $componentName[1]");
@@ -420,7 +398,7 @@ FROM   {$this->_componentTable}
     if ($exportOption == self::EXPORT_ALL) {
       CRM_Export_BAO_Export::exportComponents($this->_selectAll,
         $this->_componentIds,
-        $this->get('queryParams'),
+        (array) $this->get('queryParams'),
         $this->get(CRM_Utils_Sort::SORT_ORDER),
         NULL,
         $this->get('returnProperties'),
@@ -485,8 +463,7 @@ FROM   {$this->_componentTable}
         break;
     }
 
-    $mappingTypeId = CRM_Core_OptionGroup::getValue('mapping_type', $exportType, 'name');
-    $this->set('mappingTypeId', $mappingTypeId);
+    $this->set('mappingTypeId', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', $exportType));
 
     $mappings = CRM_Core_BAO_Mapping::getMappings($exportType);
     if (!empty($mappings)) {

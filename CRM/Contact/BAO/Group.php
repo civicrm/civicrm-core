@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2018                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
@@ -356,16 +356,13 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
 
+    if (!empty($params['parents'])) {
+      $params['parents'] = CRM_Utils_Array::convertCheckboxFormatToArray((array) $params['parents']);
+    }
+
     // convert params if array type
     if (isset($params['group_type'])) {
-      if (is_array($params['group_type'])) {
-        $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-            CRM_Utils_Array::convertCheckboxFormatToArray($params['group_type'])
-          ) . CRM_Core_DAO::VALUE_SEPARATOR;
-      }
-      else {
-        $params['group_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $params['group_type'] . CRM_Core_DAO::VALUE_SEPARATOR;
-      }
+      $params['group_type'] = CRM_Utils_Array::convertCheckboxFormatToArray((array) $params['group_type']);
     }
     else {
       $params['group_type'] = NULL;
@@ -391,17 +388,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
     }
     $group = new CRM_Contact_BAO_Group();
-    $group->copyValues($params);
-    //@todo very hacky fix for the fact this function wants to receive 'parents' as an array further down but
-    // needs it as a separated string for the DB. Preferred approaches are having the copyParams or save fn
-    // use metadata to translate the array to the appropriate DB type or altering the param in the api layer,
-    // or at least altering the param in same section as 'group_type' rather than repeating here. However, further down
-    // we need the $params one to be in it's original form & we are not sure what test coverage we have on that
-    if (isset($group->parents) && is_array($group->parents)) {
-      $group->parents = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-          array_keys($group->parents)
-        ) . CRM_Core_DAO::VALUE_SEPARATOR;
-    }
+    $group->copyValues($params, TRUE);
+
     if (empty($params['id']) &&
       !$nameParam
     ) {
@@ -437,14 +425,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       ) {
         // if no parent present and the group doesn't already have any parents,
         // make sure site group goes as parent
-        $params['parents'] = array($domainGroupID => 1);
-      }
-      elseif (array_key_exists('parents', $params) && !is_array($params['parents'])) {
-        $params['parents'] = array($params['parents'] => 1);
+        $params['parents'] = array($domainGroupID);
       }
 
       if (!empty($params['parents'])) {
-        foreach ($params['parents'] as $parentId => $dnc) {
+        foreach ($params['parents'] as $parentId) {
           if ($parentId && !CRM_Contact_BAO_GroupNesting::isParentChild($parentId, $group->id)) {
             CRM_Contact_BAO_GroupNesting::add($parentId, $group->id);
           }
@@ -602,16 +587,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
    * Get permission relevant clauses.
-   * CRM-12209
-   *
-   * @param bool $force
    *
    * @return array
    */
-  public static function getPermissionClause($force = FALSE) {
-    static $clause = 1;
-    static $retrieved = FALSE;
-    if (!$retrieved || $force) {
+  public static function getPermissionClause() {
+    if (!isset(Civi::$statics[__CLASS__]['permission_clause'])) {
       if (CRM_Core_Permission::check('view all contacts') || CRM_Core_Permission::check('edit all contacts')) {
         $clause = 1;
       }
@@ -626,9 +606,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           $clause = '1 = 0';
         }
       }
+      Civi::$statics[__CLASS__]['permission_clause'] = $clause;
     }
-    $retrieved = TRUE;
-    return $clause;
+    return Civi::$statics[__CLASS__]['permission_clause'];
   }
 
   /**
@@ -642,6 +622,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       'CRM_Core_PseudoConstant' => 'groups',
       'CRM_ACL_API' => 'group_permission',
       'CRM_ACL_BAO_ACL' => 'permissioned_groups',
+      'CRM_Contact_BAO_Group' => 'permission_clause',
     );
     foreach ($staticCaches as $class => $key) {
       if (isset(Civi::$statics[$class][$key])) {
@@ -677,10 +658,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       if (!$ssId) {
         //save record in mapping table
         $mappingParams = array(
-          'mapping_type_id' => CRM_Core_OptionGroup::getValue('mapping_type',
-            'Search Builder',
-            'name'
-          ),
+          'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Search Builder'),
         );
         $mapping = CRM_Core_BAO_Mapping::add($mappingParams);
         $mappingId = $mapping->id;
@@ -735,10 +713,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         'id' => $mappingId,
         'name' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $smartGroupId, 'name', 'id'),
         'description' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $smartGroupId, 'description', 'id'),
-        'mapping_type_id' => CRM_Core_OptionGroup::getValue('mapping_type',
-          'Search Builder',
-          'name'
-        ),
+        'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Search Builder'),
       );
       CRM_Core_BAO_Mapping::add($mappingParams);
     }
@@ -1081,9 +1056,9 @@ FROM   civicrm_group
 WHERE  id IN $groupIdString
 ";
     if ($parents) {
-      // group can have > 1 parent so parents may be comma separated list (eg. '1,2,5'). We just grab and match on 1st parent.
+      // group can have > 1 parent so parents may be comma separated list (eg. '1,2,5').
       $parentArray = explode(',', $parents);
-      $parent = $parentArray[0];
+      $parent = self::filterActiveGroups($parentArray);
       $args[2] = array($parent, 'Integer');
       $query .= " AND SUBSTRING_INDEX(parents, ',', 1) = %2";
     }
@@ -1099,7 +1074,7 @@ WHERE  id IN $groupIdString
     while ($dao->fetch()) {
       if ($dao->parents) {
         $parentArray = explode(',', $dao->parents);
-        $parent = $parentArray[0];
+        $parent = self::filterActiveGroups($parentArray);
         $tree[$parent][] = array(
           'id' => $dao->id,
           'title' => $dao->title,
@@ -1384,6 +1359,32 @@ WHERE {$whereClause}";
     }
 
     return $childGroupIDs;
+  }
+
+  /**
+   * Check parent groups and filter out the disabled ones.
+   *
+   * @param array $parentArray
+   *   Array of group Ids.
+   *
+   * @return int
+   */
+  public static function filterActiveGroups($parentArray) {
+    if (count($parentArray) > 1) {
+      $result = civicrm_api3('Group', 'get', array(
+        'id' => array('IN' => $parentArray),
+        'is_active' => TRUE,
+        'return' => 'id',
+      ));
+      $activeParentGroupIDs = CRM_Utils_Array::collect('id', $result['values']);
+      foreach ($parentArray as $key => $groupID) {
+        if (!array_key_exists($groupID, $activeParentGroupIDs)) {
+          unset($parentArray[$key]);
+        }
+      }
+    }
+
+    return reset($parentArray);
   }
 
 }

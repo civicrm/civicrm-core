@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/PCP</base>
+  <class>PCP</class>
+  <name>civicrm_pcp</name>
+  <add>2.2</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <uniqueName>pcp_id</uniqueName>
+    <type>int unsigned</type>
+    <required>true</required>
+    <title>Personal Campaign Page ID</title>
+    <comment>Personal Campaign Page ID</comment>
+    <add>2.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <uniqueName>pcp_contact_id</uniqueName>
+    <title>Contact ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Contact ID</comment>
+    <add>2.2</add>
+    <html>
+      <type>EntityRef</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>2.2</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>status_id</name>
+    <title>Personal Campaign Page Status</title>
+    <required>true</required>
+    <type>int unsigned</type>
+    <add>2.2</add>
+    <pseudoconstant>
+      <optionGroupName>pcp_status</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>title</name>
+    <title>Personal Campaign Page Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <default>NULL</default>
+    <add>2.2</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>intro_text</name>
+    <type>text</type>
+    <default>NULL</default>
+    <add>2.2</add>
+    <html>
+      <type>TextArea</type>
+    </html>
+  </field>
+  <field>
+    <name>page_text</name>
+    <type>text</type>
+    <default>NULL</default>
+    <add>2.2</add>
+    <html>
+      <type>TextArea</type>
+    </html>
+  </field>
+  <field>
+    <name>donate_link_text</name>
+    <title>Donate Link Text</title>
+    <type>varchar</type>
+    <length>255</length>
+    <default>NULL</default>
+    <add>2.2</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>contribution_page_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>The Contribution Page which triggered this pcp</comment>
+    <add>2.2</add>
+    <drop>4.1</drop>
+  </field>
+  <foreignKey>
+    <name>contribution_page_id</name>
+    <table>civicrm_contribution_page</table>
+    <key>id</key>
+    <drop>4.1</drop>
+  </foreignKey>
+  <field>
+    <name>page_id</name>
+    <title>Contribution Page</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>The Contribution or Event Page which triggered this pcp</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>page_type</name>
+    <title>PCP Page Type</title>
+    <comment>The type of PCP this is: contribute or event</comment>
+    <type>varchar</type>
+    <length>64</length>
+    <default>'contribute'</default>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>pcp_block_id</name>
+    <title>PCP Block</title>
+    <comment>The pcp block that this pcp page was created from</comment>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>is_thermometer</name>
+    <title>Use Thermometer?</title>
+    <type>int unsigned</type>
+    <default>0</default>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>is_honor_roll</name>
+    <title>Show Honor Roll?</title>
+    <type>int unsigned</type>
+    <default>0</default>
+    <add>2.2</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>goal_amount</name>
+    <title>Goal Amount</title>
+    <type>decimal</type>
+    <comment>Goal amount of this Personal Campaign Page.</comment>
+    <add>2.2</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>currency</name>
+    <title>Currency</title>
+    <type>varchar</type>
+    <length>3</length>
+    <default>NULL</default>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <add>3.2</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>referer</name>
+    <title>Referer</title>
+    <type>varchar</type>
+    <length>255</length>
+    <default>NULL</default>
+    <add>2.2</add>
+    <drop>4.1</drop>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Enabled?</title>
+    <type>boolean</type>
+    <comment>Is Personal Campaign Page enabled/active?</comment>
+    <default>0</default>
+    <add>2.2</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>is_notify</name>
+    <title>Notify Owner?</title>
+    <type>boolean</type>
+    <comment>Notify owner via email when someone donates to page?</comment>
+    <default>0</default>
+    <add>4.6</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+</table>

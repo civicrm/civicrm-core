@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -147,7 +147,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    * @param CRM_Mailing_DAO_MailingAB $dao
    */
   public static function distributeRecipients(CRM_Mailing_DAO_MailingAB $dao) {
-    CRM_Mailing_BAO_Mailing::getRecipients($dao->mailing_id_a, $dao->mailing_id_a, TRUE);
+    CRM_Mailing_BAO_Mailing::getRecipients($dao->mailing_id_a);
 
     //calculate total number of random recipients for mail C from group_percentage selected
     $totalCount = CRM_Mailing_BAO_Recipients::mailingSize($dao->mailing_id_a);

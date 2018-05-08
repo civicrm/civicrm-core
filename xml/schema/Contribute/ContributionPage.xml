@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contribute</base>
+  <class>ContributionPage</class>
+  <name>civicrm_contribution_page</name>
+  <comment>A Contribution object store meta information about a single customized contribution page</comment>
+  <add>1.3</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Contribution Page ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Contribution Id</comment>
+    <add>1.3</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>title</name>
+    <title>Contribution Page Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Contribution Page title. For top of page display</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>intro_text</name>
+    <title>Contribution Page Introduction Text</title>
+    <type>text</type>
+    <html>
+      <type>RichTextEditor</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>Text and html allowed. Displayed below title.</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>contribution_type_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>default Contribution type assigned to contributions submitted via this page, e.g. Contribution, Campaign Contribution</comment>
+    <add>1.3</add>
+    <drop>4.3</drop>
+  </field>
+  <foreignKey>
+    <name>contribution_type_id</name>
+    <table>civicrm_contribution_type</table>
+    <key>id</key>
+    <drop>4.3</drop>
+  </foreignKey>
+  <field>
+    <name>financial_type_id</name>
+    <title>Financial Type</title>
+    <type>int unsigned</type>
+    <comment>default financial type assigned to contributions submitted via this page, e.g. Contribution, Campaign Contribution</comment>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
+    <add>4.3</add>
+  </foreignKey>
+  <field>
+    <name>payment_processor</name>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Payment Processors configured for this contribution Page</comment>
+    <pseudoconstant>
+      <table>civicrm_payment_processor</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>is_credit_card_only</name>
+    <title>Is Credit Card Only?</title>
+    <type>boolean</type>
+    <comment>if true - processing logic must reject transaction at confirmation stage if pay method != credit card</comment>
+    <default>0</default>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>is_monetary</name>
+    <title>Is Monetary</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>if true - allows real-time monetary transactions otherwise non-monetary transactions</comment>
+    <add>1.6</add>
+  </field>
+  <field>
+    <name>is_recur</name>
+    <title>Is Recurring</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>if true - allows recurring contributions, valid only for PayPal_Standard</comment>
+    <add>1.6</add>
+  </field>
+  <field>
+    <name>is_confirm_enabled</name>
+    <title>Confirmation Page?</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>if false, the confirm page in contribution pages gets skipped</comment>
+    <add>4.2</add>
+  </field>
+  <field>
+    <name>recur_frequency_unit</name>
+    <title>Recurring Frequency</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Supported recurring frequency units.</comment>
+    <pseudoconstant>
+      <optionGroupName>recur_frequency_units</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+      <multiple>1</multiple>
+    </html>
+    <serialize>SEPARATOR_TRIMMED</serialize>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>is_recur_interval</name>
+    <title>Support Recurring Intervals</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>if true - supports recurring intervals</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>is_recur_installments</name>
+    <title>Recurring Installments?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>if true - asks user for recurring installments</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>adjust_recur_start_date</name>
+    <title>Adjust Recurring Start Date</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>if true - user is able to adjust payment start date</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>is_pay_later</name>
+    <title>Pay Later</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>if true - allows the user to send payment directly to the org later</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>pay_later_text</name>
+    <title>Pay Later Text</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>The text displayed to the user in the main form</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>pay_later_receipt</name>
+    <title>Pay Later Receipt</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>The receipt sent to the user instead of the normal receipt text</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>is_partial_payment</name>
+    <title>Allow Partial Payment</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>is partial payment enabled for this online contribution page</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>initial_amount_label</name>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Initial amount label for partial payment</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>initial_amount_help_text</name>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>Initial amount help text for partial payment</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>min_initial_amount</name>
+    <type>decimal</type>
+    <comment>Minimum initial amount for partial payment</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>is_allow_other_amount</name>
+    <title>Allow Other Amounts</title>
+    <type>boolean</type>
+    <comment>if true, page will include an input text field where user can enter their own amount</comment>
+    <default>0</default>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>default_amount_id</name>
+    <title>Default Amount</title>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_option_value.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>min_amount</name>
+    <title>Minimum Amount</title>
+    <type>decimal</type>
+    <comment>if other amounts allowed, user can configure minimum allowed.</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>max_amount</name>
+    <title>Maximum Amount</title>
+    <type>decimal</type>
+    <comment>if other amounts allowed, user can configure maximum allowed.</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>goal_amount</name>
+    <type>decimal</type>
+    <comment>The target goal for this page, allows people to build a goal meter</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>thankyou_title</name>
+    <title>Thank-you Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Title for Thank-you page (header title tag, and display at the top of the page).</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>thankyou_text</name>
+    <title>Thank-you Text</title>
+    <type>text</type>
+    <html>
+      <type>RichTextEditor</type>
+      <rows>8</rows>
+      <cols>60</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>text and html allowed. displayed above result on success page</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>thankyou_footer</name>
+    <title>Thank-you Footer</title>
+    <type>text</type>
+    <html>
+      <type>RichTextEditor</type>
+      <rows>8</rows>
+      <cols>60</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>Text and html allowed. displayed at the bottom of the success page. Common usage is to include link(s) to other pages such as tell-a-friend, etc.</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>is_email_receipt</name>
+    <title>Send email Receipt</title>
+    <type>boolean</type>
+    <comment>if true, receipt is automatically emailed to contact on success</comment>
+    <default>0</default>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>receipt_from_name</name>
+    <title>Receipt From</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>FROM email name used for receipts generated by contributions to this contribution page.</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>receipt_from_email</name>
+    <title>Receipt From email</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>FROM email address used for receipts generated by contributions to this contribution page.</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>cc_receipt</name>
+    <title>Receipt cc</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>comma-separated list of email addresses to cc each time a receipt is sent</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>bcc_receipt</name>
+    <title>Receipt bcc</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>comma-separated list of email addresses to bcc each time a receipt is sent</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>receipt_text</name>
+    <title>Receipt Text</title>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>text to include above standard receipt info on receipt email. emails are text-only, so do not allow html for now</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Is Page Active?</title>
+    <type>boolean</type>
+    <comment>Is this property active?</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>footer_text</name>
+    <title>Footer Text</title>
+    <type>text</type>
+    <html>
+      <type>RichTextEditor</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>Text and html allowed. Displayed at the bottom of the first page of the contribution wizard.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>amount_block_is_active</name>
+    <title>Is Amount Block Active?</title>
+    <type>boolean</type>
+    <comment>Is this property active?</comment>
+    <default>1</default>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>start_date</name>
+    <title>Contribution Page Start Date</title>
+    <type>datetime</type>
+    <title>Contribution Page Start Date</title>
+    <comment>Date and time that this page starts.</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>end_date</name>
+    <type>datetime</type>
+    <title>Contribution Page End Date</title>
+    <comment>Date and time that this page ends. May be NULL if no defined end date/time</comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>created_id</name>
+    <title>Contribution Page Created By</title>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_contact, who created this contribution page</comment>
+    <add>3.0</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.0</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>created_date</name>
+    <type>datetime</type>
+    <title>Contribution Page Created Date</title>
+    <comment>Date and time that contribution page was created.</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>currency</name>
+    <title>Contribution Page Currency</title>
+    <type>varchar</type>
+    <length>3</length>
+    <default>NULL</default>
+    <headerPattern>/cur(rency)?/i</headerPattern>
+    <dataPattern>/^[A-Z]{3}$/i</dataPattern>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <add>3.3</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>campaign_id</name>
+    <title>Contribution Page Campaign ID</title>
+    <type>int unsigned</type>
+    <comment>The campaign for which we are collecting contributions with this page.</comment>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <add>3.4</add>
+  </field>
+  <foreignKey>
+    <name>campaign_id</name>
+    <table>civicrm_campaign</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>is_share</name>
+    <title>Is Contribution Page Shared?</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Can people share the contribution page through social media?</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>is_billing_required</name>
+    <title>Is billing block required</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>if true - billing block is required for online contribution page</comment>
+    <add>4.6</add>
+  </field>
+</table>

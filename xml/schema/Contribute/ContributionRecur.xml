@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<table>
+  <base>CRM/Contribute</base>
+  <class>ContributionRecur</class>
+  <name>civicrm_contribution_recur</name>
+  <add>1.6</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Recurring Contribution ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Contribution Recur ID</comment>
+    <add>1.6</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <title>Contact ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Foreign key to civicrm_contact.id .</comment>
+    <add>1.6</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.6</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>amount</name>
+    <title>Amount</title>
+    <type>decimal</type>
+    <required>true</required>
+    <comment>Amount to be contributed or charged each recurrence.</comment>
+    <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>currency</name>
+    <title>Currency</title>
+    <type>varchar</type>
+    <length>3</length>
+    <default>NULL</default>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <add>3.2</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>frequency_unit</name>
+    <title>Frequency Unit</title>
+    <type>varchar</type>
+    <length>8</length>
+    <default>'month'</default>
+    <comment>Time units for recurrence of payment.</comment>
+    <pseudoconstant>
+      <optionGroupName>recur_frequency_units</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
+    <add>1.6</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>frequency_interval</name>
+    <title>Interval (number of units)</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Number of time units for recurrence of payment.</comment>
+    <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>installments</name>
+    <title>Number of Installments</title>
+    <type>int unsigned</type>
+    <comment>Total number of payments to be made. Set this to 0 if this is an open-ended commitment i.e. no set end date.</comment>
+    <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>start_date</name>
+    <title>Recurring Contribution Started Date</title>
+    <type>datetime</type>
+    <required>true</required>
+    <comment>The date the first scheduled recurring contribution occurs.</comment>
+    <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>create_date</name>
+    <title>Recurring Contribution Created Date</title>
+    <type>datetime</type>
+    <required>true</required>
+    <comment>When this recurring contribution record was created.</comment>
+    <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <title>Recurring Contribution Modified Date</title>
+    <type>datetime</type>
+    <comment>Last updated date for this record. mostly the last time a payment was received</comment>
+    <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>cancel_date</name>
+    <title>Recurring Contribution Cancel Date</title>
+    <type>datetime</type>
+    <comment>Date this recurring contribution was cancelled by contributor- if we can get access to it</comment>
+    <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>end_date</name>
+    <title>Recurring Contribution End Date</title>
+    <type>datetime</type>
+    <comment>Date this recurring contribution finished successfully</comment>
+    <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>processor_id</name>
+    <title>Processor ID</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Possibly needed to store a unique identifier for this recurring payment order - if this is available from the processor??</comment>
+    <add>1.6</add>
+  </field>
+  <field>
+    <name>payment_token_id</name>
+    <title>Payment Token ID</title>
+    <type>int unsigned</type>
+    <comment>Optionally used to store a link to a payment token used for this recurring contribution.</comment>
+    <add>4.6</add>
+  </field>
+  <foreignKey>
+    <name>payment_token_id</name>
+    <table>civicrm_payment_token</table>
+    <key>id</key>
+    <add>4.6</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>trxn_id</name>
+    <title>Transaction ID</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>unique transaction id. may be processor id, bank id + trans id, or account number + check number... depending on payment_method</comment>
+    <add>1.6</add>
+  </field>
+  <field>
+    <name>invoice_id</name>
+    <title>Invoice ID</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>unique invoice id, system generated or passed in</comment>
+    <add>1.6</add>
+  </field>
+  <index>
+    <name>UI_contrib_trxn_id</name>
+    <fieldName>trxn_id</fieldName>
+    <unique>true</unique>
+    <add>2.1</add>
+  </index>
+  <index>
+    <name>UI_contrib_invoice_id</name>
+    <fieldName>invoice_id</fieldName>
+    <unique>true</unique>
+    <add>2.1</add>
+  </index>
+  <field>
+    <name>contribution_status_id</name>
+    <title>Recurring Contribution Status</title>
+    <type>int unsigned</type>
+    <default>1</default>
+    <import>true</import>
+    <add>1.6</add>
+    <pseudoconstant>
+      <optionGroupName>contribution_status</optionGroupName>
+    </pseudoconstant>
+  </field>
+  <index>
+    <name>index_contribution_status</name>
+    <fieldName>contribution_status_id</fieldName>
+    <add>1.6</add>
+  </index>
+  <field>
+    <name>is_test</name>
+    <title>Test</title>
+    <type>boolean</type>
+    <default>0</default>
+    <import>true</import>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>cycle_day</name>
+    <title>Number of Cycle Day</title>
+    <type>int unsigned</type>
+    <default>1</default>
+    <required>true</required>
+    <comment>Day in the period when the payment should be charged e.g. 1st of month, 15th etc.</comment>
+    <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>next_sched_contribution</name>
+    <type>datetime</type>
+    <comment>At Groundspring this was used by the cron job which triggered payments. If we''re not doing that but we know about payments, it might still be useful to store for display to org andor contributors.</comment>
+    <add>1.6</add>
+    <drop>4.4</drop>
+  </field>
+    <field>
+    <name>next_sched_contribution_date</name>
+    <title>Next Scheduled Contribution Date</title>
+    <type>datetime</type>
+    <comment>Next scheduled date</comment>
+    <add>4.4</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>failure_count</name>
+    <title>Number of Failures</title>
+    <type>int unsigned</type>
+    <default>0</default>
+    <comment>Number of failed charge attempts since last success. Business rule could be set to deactivate on more than x failures.</comment>
+    <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>failure_retry_date</name>
+    <type>datetime</type>
+    <title>Retry Failed Attempt Date</title>
+    <comment>Date to retry failed attempt</comment>
+    <add>1.6</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>auto_renew</name>
+    <title>Auto Renew</title>
+    <type>boolean</type>
+    <required>true</required>
+    <default>0</default>
+    <comment>Some systems allow contributor to set a number of installments - but then auto-renew the subscription or commitment if they do not cancel.</comment>
+    <add>1.6</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>payment_processor_id</name>
+    <title>Payment Processor</title>
+    <type>int unsigned</type>
+    <comment>Foreign key to civicrm_payment_processor.id</comment>
+    <add>3.3</add>
+  </field>
+  <foreignKey>
+    <name>payment_processor_id</name>
+    <table>civicrm_payment_processor</table>
+    <key>id</key>
+    <add>3.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>contribution_type_id</name>
+    <title>Contribution Type</title>
+    <export>false</export>
+    <type>int unsigned</type>
+    <comment>FK to Contribution Type</comment>
+    <add>4.1</add>
+    <drop>4.3</drop>
+  </field>
+  <foreignKey>
+    <name>contribution_type_id</name>
+    <table>civicrm_contribution_type</table>
+    <key>id</key>
+    <add>4.1</add>
+    <drop>4.3</drop>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>financial_type_id</name>
+    <title>Financial Type</title>
+    <export>false</export>
+    <type>int unsigned</type>
+    <comment>FK to Financial Type</comment>
+    <add>4.3</add>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+  </field>
+  <foreignKey>
+    <name>financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
+    <add>4.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>payment_instrument_id</name>
+    <title>Payment Method</title>
+    <type>int unsigned</type>
+    <comment>FK to Payment Instrument</comment>
+    <pseudoconstant>
+      <optionGroupName>payment_instrument</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>4.1</add>
+  </field>
+  <index>
+    <name>UI_contribution_recur_payment_instrument_id</name>
+    <fieldName>payment_instrument_id</fieldName>
+    <add>4.1</add>
+  </index>
+  <field>
+    <name>campaign_id</name>
+    <uniqueName>contribution_campaign_id</uniqueName>
+    <type>int unsigned</type>
+    <title>Campaign</title>
+    <import>true</import>
+    <comment>The campaign for which this contribution has been triggered.</comment>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <add>4.1</add>
+  </field>
+  <foreignKey>
+    <name>campaign_id</name>
+    <table>civicrm_campaign</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>is_email_receipt</name>
+    <title>Send email Receipt?</title>
+    <type>boolean</type>
+    <comment>if true, receipt is automatically emailed to contact on each successful payment</comment>
+    <default>1</default>
+    <add>4.1</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+</table>

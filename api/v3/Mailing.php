@@ -66,10 +66,19 @@ function civicrm_api3_mailing_create($params) {
   else {
     $safeParams = $params;
   }
-  $safeParams['_evil_bao_validator_'] = 'CRM_Mailing_BAO_Mailing::checkSendable';
-  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $safeParams);
-  return _civicrm_api3_mailing_get_formatResult($result);
+  $timestampCheck = TRUE;
+  if (!empty($params['id']) && !empty($params['modified_date'])) {
+    $timestampCheck = _civicrm_api3_compare_timestamps($safeParams['modified_date'], $safeParams['id'], 'Mailing');
+    unset($safeParams['modified_date']);
+  }
+  if (!$timestampCheck) {
+    throw new API_Exception("Mailing has not been saved, Content maybe out of date, please refresh the page and try again");
+  }
 
+  // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
+  $safeParams['_evil_bao_validator_'] = \CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_SENDABLE', 'CRM_Mailing_BAO_Mailing::checkSendable');
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $safeParams, 'Mailing');
+  return _civicrm_api3_mailing_get_formatResult($result);
 }
 
 /**
@@ -151,7 +160,7 @@ function _civicrm_api3_mailing_create_spec(&$params) {
   $params['resubscribe_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Resubscribe', '');
   $params['unsubscribe_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Unsubscribe', '');
   $params['mailing_type']['api.default'] = 'standalone';
-  $defaultAddress = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
+  $defaultAddress = CRM_Core_BAO_Domain::getNameAndEmail(TRUE, TRUE);
   foreach ($defaultAddress as $value) {
     if (preg_match('/"(.*)" <(.*)>/', $value, $match)) {
       $params['from_email']['api.default'] = $match[2];

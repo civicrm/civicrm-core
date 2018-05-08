@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -216,14 +216,14 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       //build the sort name.
       $format = Civi::settings()->get('sort_name_format');
       $sortName = CRM_Utils_Address::format($formatted, $format,
-        FALSE, FALSE, TRUE, $tokenFields
+        FALSE, FALSE, $tokenFields
       );
       $sortName = trim($sortName);
 
       //build the display name.
       $format = Civi::settings()->get('display_name_format');
       $displayName = CRM_Utils_Address::format($formatted, $format,
-        FALSE, FALSE, TRUE, $tokenFields
+        FALSE, FALSE, $tokenFields
       );
       $displayName = trim($displayName);
     }

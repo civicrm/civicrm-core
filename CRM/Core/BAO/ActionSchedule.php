@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2018                                |
    +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -556,10 +556,7 @@ FROM civicrm_action_schedule cas
       'provider_id' => $schedule->sms_provider_id,
       'activity_subject' => $messageSubject,
     );
-    $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
-      'SMS',
-      'name'
-    );
+    $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS');
     $activityParams = array(
       'source_contact_id' => $userID,
       'activity_type_id' => $activityTypeID,

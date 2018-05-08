@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,13 +27,14 @@
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 32 or $action eq 64}
     {include file="CRM/Admin/Form/Extensions.tpl"}
 {else}
+  <div class="crm-content-block crm-block">
     {if $action ne 1 and $action ne 2}
         {include file="CRM/Admin/Page/Extensions/Refresh.tpl"}
     {/if}
 
     {if $extDbUpgrades}
       <div class="messages warning">
-        <p>{ts 1=$extDbUpgradeUrl}Your extensions require database updates. Please <a href="%1">execute the updates</a>.{/ts}
+        <p>{ts 1=$extDbUpgradeUrl}Your extensions require database updates. Please <a href="%1">execute the updates</a>.{/ts}</p>
       </div>
     {/if}
 
@@ -79,7 +80,7 @@
     {if $action ne 1 and $action ne 2}
         {include file="CRM/Admin/Page/Extensions/Refresh.tpl"}
     {/if}
-
+  </div>
     {* Expand/Collapse *}
     {literal}
     <script type="text/javascript">

@@ -3,7 +3,7 @@
    +--------------------------------------------------------------------+
    | CiviCRM version 4.7                                                |
    +--------------------------------------------------------------------+
-   | Copyright CiviCRM LLC (c) 2004-2017                                |
+   | Copyright CiviCRM LLC (c) 2004-2018                                |
    +--------------------------------------------------------------------+
    | This file is a part of CiviCRM.                                    |
    |                                                                    |
@@ -29,7 +29,7 @@
  * This class handles all REST client requests.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Utils_REST {
 
@@ -146,6 +146,7 @@ class CRM_Utils_REST {
     if (!empty($requestParams['json'])) {
       if (!empty($requestParams['prettyprint'])) {
         // Don't set content-type header for api explorer output
+        return json_encode(array_merge($result), JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES + JSON_UNESCAPED_UNICODE);
         return self::jsonFormated(array_merge($result));
       }
       CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
@@ -179,100 +180,6 @@ class CRM_Utils_REST {
 
     $xml .= "</ResultSet>\n";
     return $xml;
-  }
-
-  /**
-   * @param $data
-   *
-   * @deprecated - switch to native JSON_PRETTY_PRINT when we drop support for php 5.3
-   *
-   * @return string
-   */
-  public static function jsonFormated($data) {
-    // If php is 5.4+ we can use the native method
-    if (defined('JSON_PRETTY_PRINT')) {
-      return json_encode($data, JSON_PRETTY_PRINT + JSON_UNESCAPED_SLASHES + JSON_UNESCAPED_UNICODE);
-    }
-
-    // PHP 5.3 shim
-    $json = str_replace('\/', '/', json_encode($data));
-    $tabcount = 0;
-    $result = '';
-    $inquote = FALSE;
-    $inarray = FALSE;
-    $ignorenext = FALSE;
-
-    $tab = "\t";
-    $newline = "\n";
-
-    for ($i = 0; $i < strlen($json); $i++) {
-      $char = $json[$i];
-
-      if ($ignorenext) {
-        $result .= $char;
-        $ignorenext = FALSE;
-      }
-      else {
-        switch ($char) {
-          case '{':
-            if ($inquote) {
-              $result .= $char;
-            }
-            else {
-              $inarray = FALSE;
-              $tabcount++;
-              $result .= $char . $newline . str_repeat($tab, $tabcount);
-            }
-            break;
-
-          case '}':
-            if ($inquote) {
-              $result .= $char;
-            }
-            else {
-              $tabcount--;
-              $result = trim($result) . $newline . str_repeat($tab, $tabcount) . $char;
-            }
-            break;
-
-          case ',':
-            if ($inquote || $inarray) {
-              $result .= $char;
-            }
-            else {
-              $result .= $char . $newline . str_repeat($tab, $tabcount);
-            }
-            break;
-
-          case '"':
-            $inquote = !$inquote;
-            $result .= $char;
-            break;
-
-          case '\\':
-            if ($inquote) {
-              $ignorenext = TRUE;
-            }
-            $result .= $char;
-            break;
-
-          case '[':
-            $inarray = TRUE;
-            $result .= $char;
-            break;
-
-          case ']':
-            $inarray = FALSE;
-            $result .= $char;
-            break;
-
-          default:
-            $result .= $char;
-        }
-      }
-    }
-
-    return $result;
   }
 
   /**

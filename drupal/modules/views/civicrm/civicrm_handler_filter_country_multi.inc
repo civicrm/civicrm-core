@@ -21,22 +21,23 @@
    | GNU Affero General Public License or the licensing of CiviCRM,     |
    | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
    +--------------------------------------------------------------------+
+ */
 
-   **
-   * @file Provides Views integration for CiviCRM Multi-Select Country custom fields
-   *
-   * @author DaveJ
-   * based on civicrm_handler_filter_custom_option and civicrm_handler_filter_country
-   */
+/**
+ * @file Provides Views integration for CiviCRM Multi-Select Country custom fields
+ *
+ * @author DaveJ
+ * based on civicrm_handler_filter_custom_option and civicrm_handler_filter_country
+ */
 class civicrm_handler_filter_country_multi extends views_handler_filter_in_operator {
-  function construct() {
+  public function construct() {
     parent::construct();
     if (!civicrm_initialize()) {
       return;
     }
   }
 
-  function get_value_options() {
+  public function get_value_options() {
     if (!isset($this->value_options)) {
       $countries = CRM_Core_PseudoConstant::country();
       $options = array();
@@ -49,7 +50,7 @@ class civicrm_handler_filter_country_multi extends views_handler_filter_in_opera
     }
   }
 
-  function operators() {
+  public function operators() {
     $operators = parent::operators();
     $operators += array(
       'all' => array(
@@ -57,13 +58,13 @@ class civicrm_handler_filter_country_multi extends views_handler_filter_in_opera
         'short' => t('all'),
         'method' => 'op_simple',
         'values' => 1,
-        ),
-      );
+      ),
+    );
 
     return $operators;
   }
 
-  function op_simple() {
+  public function op_simple() {
     if (empty($this->value)) {
       return;
     }
@@ -71,17 +72,19 @@ class civicrm_handler_filter_country_multi extends views_handler_filter_in_opera
     $this->ensure_my_table();
 
     // negated operator uses AND, positive uses OR
-    $op = $glue = null;
+    $op = $glue = NULL;
     switch ($this->operator) {
       case 'in':
         $op = ' = ';
         $glue = ' OR ';
         break;
+
       case 'not in':
         $op = ' != ';
         $glue = ' AND ';
         break;
-      case 'all' :
+
+      case 'all':
         $clause = "$this->table_alias.$this->real_field IN (" . implode(',', $this->value) . ")";
         break;
     }
@@ -95,5 +98,5 @@ class civicrm_handler_filter_country_multi extends views_handler_filter_in_opera
 
     $this->query->add_where_expression($this->options['group'], $clause);
   }
-}
 
+}

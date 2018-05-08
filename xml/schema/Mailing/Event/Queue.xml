@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing/Event</base>
+  <class>Queue</class>
+  <name>civicrm_mailing_event_queue</name>
+  <comment>A collection of all intended recipients of a job</comment>
+  <archive>true</archive>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Mailing Event Queue ID</title>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>job_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <title>Job ID</title>
+    <comment>FK to Job</comment>
+  </field>
+  <foreignKey>
+    <name>job_id</name>
+    <table>civicrm_mailing_job</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>email_id</name>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <title>Email ID</title>
+    <comment>FK to Email</comment>
+  </field>
+  <foreignKey>
+    <name>email_id</name>
+    <table>civicrm_email</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <title>Contact ID</title>
+    <comment>FK to Contact</comment>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>hash</name>
+    <type>varchar</type>
+    <length>255</length>
+    <required>true</required>
+    <title>Security Hash</title>
+    <comment>Security hash</comment>
+  </field>
+  <index>
+    <name>index_hash</name>
+    <fieldName>hash</fieldName>
+    <add>4.7</add>
+  </index>
+  <field>
+    <name>phone_id</name>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <title>Phone ID</title>
+    <comment>FK to Phone</comment>
+  </field>
+  <foreignKey>
+    <name>phone_id</name>
+    <table>civicrm_phone</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+</table>

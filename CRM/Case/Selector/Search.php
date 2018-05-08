@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -349,12 +349,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
 
       //adding case manager to case selector.CRM-4510.
       $caseType = CRM_Case_BAO_Case::getCaseType($result->case_id, 'name');
-      $caseManagerContact = CRM_Case_BAO_Case::getCaseManagerContact($caseType, $result->case_id);
-
-      if (!empty($caseManagerContact)) {
-        $row['casemanager_id'] = CRM_Utils_Array::value('casemanager_id', $caseManagerContact);
-        $row['casemanager'] = CRM_Utils_Array::value('casemanager', $caseManagerContact);
-      }
+      $row['casemanager'] = CRM_Case_BAO_Case::getCaseManagerContact($caseType, $result->case_id);
 
       if (isset($result->case_status_id) &&
         array_key_exists($result->case_status_id, $caseStatus)

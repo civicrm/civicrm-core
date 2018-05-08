@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-contribute-pcp-userdashboard-pre"}
+{/crmRegion}
 <div class="view-content">
 
 {if $pcpInfo}
@@ -88,3 +90,5 @@
 {/if}
 
 </div>
+{crmRegion name="crm-contribute-pcp-userdashboard-post"}
+{/crmRegion}

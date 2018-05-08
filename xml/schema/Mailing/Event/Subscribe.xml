@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing/Event</base>
+  <class>Subscribe</class>
+  <name>civicrm_mailing_event_subscribe</name>
+  <comment>Tracks when a (new) contact subscribes to a group by email</comment>
+  <archive>true</archive>
+  <field>
+    <name>id</name>
+    <title>Mailing Subscribe ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>group_id</name>
+    <title>Mailing Subscribe Group</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Group</comment>
+    <pseudoconstant>
+      <table>civicrm_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>group_id</name>
+    <table>civicrm_group</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>contact_id</name>
+    <title>Mailing Subscribe Contact</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Contact</comment>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>hash</name>
+    <title>Mailing Subscribe Hash</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>true</required>
+    <comment>Security hash</comment>
+  </field>
+  <field>
+    <name>time_stamp</name>
+    <title>Mailing Subscribe Timestamp</title>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
+    <required>true</required>
+    <comment>When this subscription event occurred.</comment>
+  </field>
+</table>

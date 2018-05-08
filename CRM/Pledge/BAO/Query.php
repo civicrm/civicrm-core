@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
   /**
@@ -60,6 +60,18 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
     if (!empty($query->_returnProperties['pledge_amount'])) {
       $query->_select['pledge_amount'] = 'civicrm_pledge.amount as pledge_amount';
       $query->_element['pledge_amount'] = 1;
+      $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
+    }
+
+    if (!empty($query->_returnProperties['pledge_original_installment_amount'])) {
+      $query->_select['pledge_original_installment_amount'] = 'civicrm_pledge.original_installment_amount as pledge_original_installment_amount';
+      $query->_element['pledge_original_installment_amount'] = 1;
+      $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
+    }
+
+    if (!empty($query->_returnProperties['installments'])) {
+      $query->_select['installments'] = 'civicrm_pledge.installments as installments';
+      $query->_element['installments'] = 1;
       $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
     }
 

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
 
@@ -171,7 +171,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
         'time_stamp' => array(
           'title' => ts('Bounce Date'),
           'operatorType' => CRM_Report_Form::OP_DATE,
-          'type' => CRM_Utils_Type::T_DATE,
+          'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
         ),
       ),
       'order_bys' => array(
@@ -230,6 +230,9 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
         ),
       ),
       'filters' => array(
+        'email' => array(
+          'title' => ts('Email'),
+        ),
         'on_hold' => array(
           'title' => ts('On hold'),
         ),

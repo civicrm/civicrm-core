@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Worldregion</class>
+  <name>civicrm_worldregion</name>
+  <add>1.8</add>
+  <field>
+    <name>id</name>
+    <title>World Region ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Country Id</comment>
+    <add>1.8</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <uniqueName>world_region</uniqueName>
+    <title>World Region</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Region name to be associated with countries</comment>
+    <export>true</export>
+    <add>1.8</add>
+  </field>
+</table>

@@ -1,0 +1,31 @@
+{
+  "name": "marcj/topsort",
+  "type": "library",
+  "description": "High-Performance TopSort/Dependency resolving algorithm",
+  "keywords": [
+    "topological sort",
+    "topsort",
+    "dependency resolving"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Marc J. Schmidt",
+      "email": "marc@marcjschmidt.de"
+    }
+  ],
+  "require": {
+    "php": ">=5.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.0",
+    "symfony/console": "~2.5",
+    "codeclimate/php-test-reporter": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "MJS\\TopSort\\": "src/",
+      "MJS\\TopSort\\Tests\\": "tests/Tests/"
+    }
+  }
+}

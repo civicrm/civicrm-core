@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -98,7 +98,7 @@
 
 {/if}
 
-{if $permission EQ 'edit' AND ($action eq 16)}
+{if ($permission EQ 'edit' OR $canAddNotes) AND ($action eq 16)}
    <div class="action-link">
    <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button medium-popup"><span><i class="crm-i fa-comment"></i> {ts}Add Note{/ts}</span></a>
    </div>

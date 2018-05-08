@@ -40,11 +40,11 @@ class civicrm_handler_relationship extends views_handler_relationship {
    * Init handler to let relationships live on tables other than
    * the table they operate on.
    */
-  function init(&$view, &$options) {
+  public function init(&$view, &$options) {
     parent::init($view, $options);
   }
 
-  function construct() {
+  public function construct() {
     parent::construct();
     if (!civicrm_initialize()) {
       return;
@@ -70,14 +70,14 @@ class civicrm_handler_relationship extends views_handler_relationship {
   /**
    * Get this field's label.
    */
-  function label() {
+  public function label() {
     if (!isset($this->options['label'])) {
       return '';
     }
     return $this->options['label'];
   }
 
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $label = !empty($this->definition['label']) ? $this->definition['label'] : $this->definition['title'];
     $options['label'] = array('default' => $label, 'translatable' => TRUE);
@@ -90,7 +90,7 @@ class civicrm_handler_relationship extends views_handler_relationship {
    * Default options form that provides the label widget that all fields
    * should have.
    */
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $form['label'] = array(
       '#type' => 'textfield',
@@ -111,14 +111,14 @@ class civicrm_handler_relationship extends views_handler_relationship {
       '#type' => 'checkbox',
       '#title' => t('Limit results only to active relationships?'),
       '#default_value' => $this->options['relationship_state'],
-      '#description' => t('Exclude relationships that are inactive.')
+      '#description' => t('Exclude relationships that are inactive.'),
     );
   }
 
   /**
    * Called to implement a relationship in a query.
    */
-  function query() {
+  public function query() {
 
     // Figure out what base table this relationship brings to the party.
     $table_data        = views_fetch_data($this->definition['base']);
@@ -144,7 +144,7 @@ class civicrm_handler_relationship extends views_handler_relationship {
     }
 
     if (!empty($def['join_handler']) && class_exists($def['join_handler'])) {
-      $join = new $def['join_handler'];
+      $join = new $def['join_handler']();
     }
     else {
       $join = new views_join();
@@ -178,5 +178,5 @@ class civicrm_handler_relationship extends views_handler_relationship {
 
     $this->alias = $this->query->add_relationship($alias, $join, $this->definition['base'], $this->relationship);
   }
-}
 
+}

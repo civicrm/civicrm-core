@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Generic field handler for address and location fields
@@ -33,7 +33,7 @@ class civicrm_handler_field_location extends civicrm_handler_field {
   static $_locationOps;
   static $location_op;
 
-  function construct() {
+  public function construct() {
     parent::construct();
     if (!self::$_locationTypes) {
       if (!civicrm_initialize()) {
@@ -45,7 +45,7 @@ class civicrm_handler_field_location extends civicrm_handler_field {
     }
   }
 
-  function option_definition() {
+  public function option_definition() {
     $options = parent::option_definition();
     $options['location_type'] = array('default' => 0);
     $options['location_op'] = array('default' => 0);
@@ -53,7 +53,7 @@ class civicrm_handler_field_location extends civicrm_handler_field {
     return $options;
   }
 
-  function options_form(&$form, &$form_state) {
+  public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
     $locationOptions = array(0 => 'Any');
@@ -66,7 +66,7 @@ class civicrm_handler_field_location extends civicrm_handler_field {
       '#title' => t('Label'),
       '#default_value' => $label,
       '#dependency' => array(
-          'edit-options-custom-label' => array(1),
+        'edit-options-custom-label' => array(1),
       ),
       '#weight' => -102,
     );
@@ -104,23 +104,25 @@ class civicrm_handler_field_location extends civicrm_handler_field {
     );
   }
 
-  function ensure_my_table() {
+  public function ensure_my_table() {
     if (!isset($this->table_alias)) {
       if (!method_exists($this->query, 'ensure_table')) {
         vpr_trace();
         exit;
       }
       $join = $this->get_join();
-      if (empty($this->relationship)) { //https://www.drupal.org/node/2617032
+      if (empty($this->relationship)) {
+        //https://www.drupal.org/node/2617032
         $this->table_alias = $this->query->add_table($this->table, $this->relationship, $join);
-      } else {
+      }
+      else {
         $this->table_alias = $this->query->ensure_table($this->table, $this->relationship, $join);
       }
     }
     return $this->table_alias;
   }
 
-  function location_extras() {
+  public function location_extras() {
     $extra = array();
     if (!empty($this->options['location_type'])) {
       $extra[] = array(
@@ -141,7 +143,7 @@ class civicrm_handler_field_location extends civicrm_handler_field {
     return $extra;
   }
 
-  function join_location($join = array()) {
+  public function join_location($join = array()) {
     $extra = array();
     if (isset($join->extra)) {
       $extra = $join->extra;
@@ -154,9 +156,10 @@ class civicrm_handler_field_location extends civicrm_handler_field {
     return $join;
   }
 
-  function get_join() {
+  public function get_join() {
     $join = parent::get_join();
     $join = $this->join_location($join);
     return $join;
   }
+
 }

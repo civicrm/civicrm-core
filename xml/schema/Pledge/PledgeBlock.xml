@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<table>
+  <base>CRM/Pledge</base>
+  <class>PledgeBlock</class>
+  <name>civicrm_pledge_block</name>
+  <add>2.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Pledge Block ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Pledge ID</comment>
+    <add>2.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>entity_table</name>
+    <title>Entity Table</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>physical tablename for entity being joined to pledge, e.g. civicrm_contact</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>Entity Id</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to entity table specified in entity_table column.</comment>
+    <add>2.1</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>2.1</add>
+  </dynamicForeignKey>
+  <index>
+    <name>index_entity</name>
+    <fieldName>entity_table</fieldName>
+    <fieldName>entity_id</fieldName>
+    <add>2.1</add>
+  </index>
+  <field>
+    <name>pledge_frequency_unit</name>
+    <title>Pledge Frequency Unit</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Delimited list of supported frequency units</comment>
+    <serialize>SEPARATOR_TRIMMED</serialize>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>is_pledge_interval</name>
+    <title>Expose Frequency Interval?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is frequency interval exposed on the contribution form.</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>max_reminders</name>
+    <title>Maximum Number of Reminders</title>
+    <type>int unsigned</type>
+    <default>1</default>
+    <comment>The maximum number of payment reminders to send for any given payment.</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>initial_reminder_day</name>
+    <title>Initial Reminder Day</title>
+    <type>int unsigned</type>
+    <default>5</default>
+    <comment>Send initial reminder this many days prior to the payment due date.</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>additional_reminder_day</name>
+    <title>Additional Reminder Days</title>
+    <type>int unsigned</type>
+    <default>5</default>
+    <comment>Send additional reminder this many days after last one sent, up to maximum number of reminders.</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>pledge_start_date</name>
+    <type>varchar</type>
+    <length>64</length>
+    <title>Pledge Start Date</title>
+    <comment>The date the first scheduled pledge occurs.</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>is_pledge_start_date_visible</name>
+    <type>boolean</type>
+    <title>Show Recurring Donation Start Date?</title>
+    <default>0</default>
+    <required>true</required>
+    <comment>If true - recurring start date is shown.</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>is_pledge_start_date_editable</name>
+    <type>boolean</type>
+    <title>Allow Edits to Recurring Donation Start Date?</title>
+    <default>0</default>
+    <required>true</required>
+    <comment>If true - recurring start date is editable.</comment>
+    <add>4.7</add>
+  </field>
+</table>

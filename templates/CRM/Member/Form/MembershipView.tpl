@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -61,6 +61,14 @@
         <tr><td class="label">{ts}Start date{/ts}</td><td>{$start_date|crmDate}</td></tr>
         <tr><td class="label">{ts}End date{/ts}</td><td>{$end_date|crmDate}</td></tr>
         <tr><td class="label">{ts}Auto-renew{/ts}</td><td>{$auto_renew}</td></tr>
+     {if $contribution_recur_id}
+          <tr>
+            <td class="label">{ts}Recurring Contribution{/ts}</td>
+            <td>
+              <a class="crm-hover-button" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contactId`&context=contribution"}'>View Recurring Contribution</a>
+            </td>
+          </tr>
+     {/if}
     </table>
 
     {include file="CRM/Custom/Page/CustomDataView.tpl"}

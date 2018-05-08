@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contribute</base>
+  <class>Product</class>
+  <comment>able - stores "product info" for premiums and can be used for non-incentive products </comment>
+  <name>civicrm_product</name>
+  <add>1.4</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Product ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>1.4</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <uniqueName>product_name</uniqueName>
+    <title>Product Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>true</required>
+    <export>true</export>
+    <localizable>true</localizable>
+    <comment>Required product/premium name</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>description</name>
+    <title>Description</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>Optional description of the product/premium.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>sku</name>
+    <title>SKU</title>
+    <type>varchar</type>
+    <length>50</length>
+    <export>true</export>
+    <comment>Optional product sku or code.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>options</name>
+    <title>Options</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>Store comma-delimited list of color, size, etc. options for the product.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>image</name>
+    <title>Image</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Full or relative URL to uploaded image - fullsize.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>thumbnail</name>
+    <title>Thumbnail</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Full or relative URL to image thumbnail.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>price</name>
+    <title>Price</title>
+    <type>decimal</type>
+    <comment>Sell price or market value for premiums. For tax-deductible contributions, this will be stored as non_deductible_amount in the contribution record.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>currency</name>
+    <type>varchar</type>
+    <length>3</length>
+    <default>NULL</default>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <add>3.2</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>financial_type_id</name>
+    <title>Financial Type</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>FK to Financial Type.</comment>
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+    <add>4.3</add>
+  </foreignKey>
+
+  <field>
+    <name>min_contribution</name>
+    <title>Minimum Contribution</title>
+    <type>decimal</type>
+    <comment>Minimum contribution required to be eligible to select this premium.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>cost</name>
+    <title>Cost</title>
+    <type>decimal</type>
+    <comment>Actual cost of this product. Useful to determine net return from sale or using this as an incentive.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Is Active</title>
+    <type>boolean</type>
+    <required>true</required>
+    <comment>Disabling premium removes it from the premiums_premium join table below.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>period_type</name>
+    <title>Period Type</title>
+    <type>varchar</type>
+    <length>8</length>
+    <default>'rolling'</default>
+    <comment>Rolling means we set start/end based on current day, fixed means we set start/end for current year or month
+      (e.g. 1 year + fixed -> we would set start/end for 1/1/06 thru 12/31/06 for any premium chosen in 2006) </comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::periodType</callback>
+    </pseudoconstant>
+    <add>1.4</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>fixed_period_start_day</name>
+    <title>Fixed Period Start Day</title>
+    <type>int</type>
+    <default>0101</default>
+    <comment>Month and day (MMDD) that fixed period type subscription or membership starts.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>duration_unit</name>
+    <title>Duration Unit</title>
+    <type>varchar</type>
+    <length>8</length>
+    <default>'year'</default>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getPremiumUnits</callback>
+    </pseudoconstant>
+    <add>1.4</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>duration_interval</name>
+    <title>Duration Interval</title>
+    <type>int</type>
+    <comment>Number of units for total duration of subscription, service, membership (e.g. 12 Months).</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>frequency_unit</name>
+    <title>Frequency Unit</title>
+    <type>varchar</type>
+    <length>8</length>
+    <default>'month'</default>
+    <comment>Frequency unit and interval allow option to store actual delivery frequency for a subscription or service.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getPremiumUnits</callback>
+    </pseudoconstant>
+    <add>1.4</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>frequency_interval</name>
+    <title>Frequency Interval</title>
+    <type>int</type>
+    <comment>Number of units for delivery frequency of subscription, service, membership (e.g. every 3 Months).</comment>
+    <add>1.4</add>
+  </field>
+</table>

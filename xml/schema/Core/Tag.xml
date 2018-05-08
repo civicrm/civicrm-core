@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Tag</class>
+  <name>civicrm_tag</name>
+  <comment>Provides support for flat or hierarchical classification of various types of entities (contacts, groups, actions...).</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Tag ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Tag ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>Tag Name</title>
+    <type>varchar</type>
+    <required>true</required>
+    <length>64</length>
+    <comment>Name of Tag.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>description</name>
+    <title>Description</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Optional verbose description of the tag.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>parent_id</name>
+    <title>Parent Tag</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>Optional parent id for this tag.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>is_selectable</name>
+    <title>Display Tag?</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this tag selectable / displayed</comment>
+    <add>2.1</add>
+  </field>
+  <foreignKey>
+    <name>parent_id</name>
+    <table>civicrm_tag</table>
+    <key>id</key>
+    <add>1.1</add>
+  </foreignKey>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>2.1</add>
+  </index>
+  <field>
+    <name>is_reserved</name>
+    <title>Reserved</title>
+    <type>boolean</type>
+    <default>0</default>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>is_tagset</name>
+    <title>Tagset</title>
+    <type>boolean</type>
+    <default>0</default>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>used_for</name>
+    <title>Used For</title>
+    <type>varchar</type>
+    <length>64</length>
+    <default>NULL</default>
+    <html>
+      <type>Select</type>
+    </html>
+    <pseudoconstant>
+      <optionGroupName>tag_used_for</optionGroupName>
+    </pseudoconstant>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>created_id</name>
+    <title>Tag Created By</title>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_contact, who created this tag</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>color</name>
+    <title>Color</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Hex color value e.g. #ffffff</comment>
+    <default>NULL</default>
+    <add>4.7</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.4</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>created_date</name>
+    <type>datetime</type>
+    <title>Tag Created Date</title>
+    <comment>Date and time that tag was created.</comment>
+    <add>3.4</add>
+  </field>
+</table>

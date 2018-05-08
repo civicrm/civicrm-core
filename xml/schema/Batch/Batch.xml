@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Batch</base>
+  <class>Batch</class>
+  <name>civicrm_batch</name>
+  <comment>Stores the details of a batch operation Used primarily when doing batch operations with an external system.</comment>
+  <add>3.3</add>
+  <field>
+    <name>id</name>
+    <title>Batch ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique Address ID</comment>
+    <add>3.3</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>Batch Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Variable name/programmatic handle for this batch.</comment>
+    <add>3.3</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>4.2</add>
+  </index>
+  <field>
+    <name>label</name>
+    <type>varchar</type>
+    <length>64</length>
+    <localizable>true</localizable>
+    <comment>Friendly Name.</comment>
+    <add>3.3</add>
+    <drop>4.2</drop>
+  </field>
+  <field>
+    <name>title</name>
+    <title>Batch Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Friendly Name.</comment>
+    <add>4.2</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>description</name>
+    <title>Batch Description</title>
+    <type>text</type>
+    <comment>Description of this batch set.</comment>
+    <localizable>true</localizable>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>80</cols>
+    </html>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>created_id</name>
+    <title>Batch Created By</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>3.3</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>created_date</name>
+    <title>Batch Created Date</title>
+    <type>datetime</type>
+    <comment>When was this item created</comment>
+    <add>3.3</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>modified_id</name>
+    <title>Batch Modified By</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <title>Batch Modified Date</title>
+    <type>datetime</type>
+    <comment>When was this item created</comment>
+    <add>3.3</add>
+  </field>
+  <foreignKey>
+    <name>modified_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>saved_search_id</name>
+    <title>Batch Smart Group</title>
+    <type>int unsigned</type>
+    <comment>FK to Saved Search ID</comment>
+    <add>4.1</add>
+    <html>
+      <type>EntityRef</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>saved_search_id</name>
+    <table>civicrm_saved_search</table>
+    <key>id</key>
+    <add>4.2</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>status_id</name>
+    <title>Batch Status</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>fk to Batch Status options in civicrm_option_values</comment>
+    <add>4.2</add>
+    <pseudoconstant>
+      <optionGroupName>batch_status</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>type_id</name>
+    <title>Batch Type</title>
+    <type>int unsigned</type>
+    <comment>fk to Batch Type options in civicrm_option_values</comment>
+    <add>4.2</add>
+    <pseudoconstant>
+      <optionGroupName>batch_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>mode_id</name>
+    <title>Batch Mode</title>
+    <type>int unsigned</type>
+    <comment>fk to Batch mode options in civicrm_option_values</comment>
+    <add>4.2</add>
+    <pseudoconstant>
+      <optionGroupName>batch_mode</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>total</name>
+    <title>Batch Total</title>
+    <type>decimal</type>
+    <comment>Total amount for this batch.</comment>
+    <add>4.2</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>item_count</name>
+    <title>Batch Number of Items</title>
+    <type>int unsigned</type>
+    <comment>Number of items in a batch.</comment>
+    <add>4.2</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>payment_instrument_id</name>
+    <title>Batch Payment Method</title>
+    <type>int unsigned</type>
+    <comment>fk to Payment Instrument options in civicrm_option_values</comment>
+    <pseudoconstant>
+      <optionGroupName>payment_instrument</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>exported_date</name>
+    <title>Batch Exported Date</title>
+    <type>datetime</type>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>data</name>
+    <title>Batch Data</title>
+    <type>longtext</type>
+    <comment>cache entered data</comment>
+    <add>4.4</add>
+  </field>
+</table>

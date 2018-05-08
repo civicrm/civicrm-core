@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,11 +23,11 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+<div class="help">
+  {ts}Configure CiviCRM for your country and language.{/ts}
+  {docURL page="i18n Administrator's Guide: Using CiviCRM in your own language" resource="wiki"}
+</div>
 <div class="crm-block crm-form-block crm-localization-form-block">
-  <div class="help">
-    {ts}Configure CiviCRM for your country and language.{/ts}
-    {docURL page="i18n Administrator's Guide: Using CiviCRM in your own language" resource="wiki"}
-  </div>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"} </div>
     <h3>{ts}Language and Currency{/ts}</h3>
         <table class="form-layout-compressed">
@@ -123,19 +123,19 @@
               <td class="label">{$form.makeSinglelingual.label}</td>
               <td>{$form.makeSinglelingual.html}<br />
               <span class="description">{ts}Check this box and click 'Save' to switch this installation from multi- to single-language.{/ts}</span><br /><br />
-              <span class="description" style="color:red">{$warning}</span></td>
+              <span class="description font-red">{$warning}</span></td>
           </tr>
         {elseif $form.makeMultilingual}
           <tr class="crm-localization-form-block-makeMultilingual">
               <td class="label">{$form.makeMultilingual.label}</td>
               <td>{$form.makeMultilingual.html}<br />
               <span class="description">{ts}Check this box and click 'Save' to switch this installation from single- to multi-language, then add further languages.{/ts}</span><br /><br />
-              <span class="description" style="color:red">{$warning}</span></td>
+              <span class="description font-red">{$warning}</span></td>
         {else}
           <tr class="crm-localization-form-block-description">
               <td>
               <span class="description">{ts}In order to use this functionality, the installation's database user must have privileges to create triggers and views (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.{/ts} {ts}(Multilingual support currently cannot be enabled on installations with enabled logging.){/ts}</span><br /><br />
-              <span class="description" style="color:red">{$warning}</span></td>
+              <span class="description font-red">{$warning}</span></td>
           </tr>
         {/if}
       </table>

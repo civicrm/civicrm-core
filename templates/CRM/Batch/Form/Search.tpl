@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,7 +37,7 @@
     </tr>
   </table>
 </div>
-<div class="crm-submit-buttons">
+<div class="action-link">
   {crmButton accesskey="N" p="civicrm/batch/add" q="reset=1&action=add" id="newBatch" icon="crm-i fa-plus-circle"}{ts}New Data Entry Batch{/ts}{/crmButton}<br/>
 </div>
 <table class="crm-batch-selector">

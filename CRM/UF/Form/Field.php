@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -196,6 +196,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       ));
       return;
     }
+    $addressCustomFields = array_keys(CRM_Core_BAO_CustomField::getFieldsForImport('Address'));
 
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
@@ -204,8 +205,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       // set it to null if so (avoids crappy E_NOTICE errors below
       $defaults['location_type_id'] = CRM_Utils_Array::value('location_type_id', $defaults);
 
-      $specialFields = CRM_Core_BAO_UFGroup::getLocationFields();
-
+      //CRM-20861 - Include custom fields defined for address to set its default location type to 0.
+      $specialFields = array_merge(CRM_Core_BAO_UFGroup::getLocationFields(), $addressCustomFields);
       if (!$defaults['location_type_id'] &&
         $defaults["field_type"] != "Formatting" &&
         in_array($defaults['field_name'], $specialFields)
@@ -245,7 +246,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $fields = CRM_Core_BAO_UFField::getAvailableFields($this->_gid, $defaults);
 
     $noSearchable = $hasWebsiteTypes = array();
-    $addressCustomFields = array_keys(CRM_Core_BAO_CustomField::getFieldsForImport('Address'));
 
     foreach ($fields as $key => $value) {
       foreach ($value as $key1 => $value1) {

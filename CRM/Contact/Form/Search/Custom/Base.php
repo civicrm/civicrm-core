@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Contact_Form_Search_Custom_Base {
 
@@ -255,6 +255,20 @@ class CRM_Contact_Form_Search_Custom_Base {
     else {
       CRM_Utils_System::setTitle(ts('Search'));
     }
+  }
+
+  /**
+   * Validate form input.
+   *
+   * @param array $fields
+   * @param array $files
+   * @param CRM_Core_Form $self
+   *
+   * @return array
+   *   Input errors from the form.
+   */
+  public function formRule($fields, $files, $self) {
+    return [];
   }
 
 }

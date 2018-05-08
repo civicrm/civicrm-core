@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -239,7 +239,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     $feeBlock = $this->_values['fee'];
     $lineItems = $this->_values['line_items'];
-    CRM_Price_BAO_LineItem::changeFeeSelections($params, $this->_participantId, 'participant', $this->_contributionId, $feeBlock, $lineItems, $this->_paidAmount);
+    CRM_Price_BAO_LineItem::changeFeeSelections($params, $this->_participantId, 'participant', $this->_contributionId, $feeBlock, $lineItems);
     $this->contributionAmt = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'total_amount');
     // email sending
     if (!empty($params['send_receipt'])) {

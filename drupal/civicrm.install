@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,19 +23,49 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
-function civicrm_install() {}
 
 /**
- * Implementation of hook_uninstall( )
+ * Enable CiviCRM.
+ */
+function civicrm_enable() {
+  db_query("UPDATE {system} SET weight = 100 WHERE name = 'civicrm'");
+
+  menu_rebuild();
+
+  menu_link_maintain('civicrm', 'delete', 'civicrm', 'CiviCRM');
+
+  $options = array(
+    'link_title' => 'CiviCRM',
+    'link_path' => 'civicrm/dashboard',
+    'module' => 'civicrm',
+    'options' => array('alter' => TRUE),
+  );
+  menu_link_save($options);
+
+  if (!civicrm_initialize()) {
+    return;
+  }
+
+  // also invoke civicrm menu rebuild
+  CRM_Core_Menu::store();
+
+  // Update the 'blocks' DB table with the blocks.
+  if (module_exists('block')) {
+    _block_rehash();
+  }
+}
+
+/**
+ * Implements hook_uninstall().
  */
 function civicrm_uninstall() {
   require_once 'civicrm.module';
@@ -58,7 +88,7 @@ function civicrm_requirements($phase) {
   //remove the last occurrence of 'drupal' from path
   $pos = strrpos($civicrm_path, 'drupal');
 
-  if ($pos !== false) {
+  if ($pos !== FALSE) {
     $civicrm_path = substr_replace($civicrm_path, '', $pos, strlen($civicrm_path));
   }
 
@@ -66,11 +96,12 @@ function civicrm_requirements($phase) {
 
   $settings = glob('sites/*/civicrm.settings.php');
   $problems = array();
+  $t = get_t();
   if (empty($settings) && $phase == 'install') {
     $problems[] = array(
-      'title' => t('CiviCRM settings does not exist'),
+      'title' => $t('CiviCRM settings does not exist'),
       'value' =>
-      t('CiviCRM settings file does not exist. It should be created by CiviCRM <a href="!link">install</a>',
+      $t('CiviCRM settings file does not exist. It should be created by CiviCRM <a href="!link">install</a>',
         array('!link' => $url)),
       'severity' => REQUIREMENT_ERROR,
     );
@@ -94,4 +125,3 @@ function civicrm_update_7401($sandbox) {
   // cleared when update_finished() is called.
   return t('TZ changes in CiviCRM Views picked up.');
 }
-

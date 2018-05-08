@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,19 +23,18 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
 
 /**
- * Implementation of hook_enable().
- *
+ * Implements hook_enable().
  */
 function civicrm_engage_enable() {
   db_query("UPDATE {system} SET weight = 110 WHERE name = 'civicrm_engage'");
@@ -44,14 +43,12 @@ function civicrm_engage_enable() {
 }
 
 /**
- * Fix the Participant Role field in the Update Event Invite Responses 
- **/
+ * Fix the Participant Role field in the Update Event Invite Responses
+ */
 function civicrm_engage_update_7001() {
   civicrm_initialize();
-  $sql = "UPDATE civicrm_uf_field SET field_name = 'participant_role' WHERE ".
-    "field_name = 'participant_role_id' AND uf_group_id IN (SELECT id FROM ".
+  $sql = "UPDATE civicrm_uf_field SET field_name = 'participant_role' WHERE " .
+    "field_name = 'participant_role_id' AND uf_group_id IN (SELECT id FROM " .
     "civicrm_uf_group WHERE name = 'update_event_invite_responses') ";
-
   CRM_Core_DAO::executeQuery($sql);
-
 }

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Financial</base>
+  <class>EntityFinancialAccount</class>
+  <name>civicrm_entity_financial_account</name>
+  <add>4.3</add>
+  <comment>Map between an entity and a financial account, where there is a specific relationship between the financial account and the entity, e.g. Income Account for or AR Account for</comment>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Entity Financial Account ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>ID</comment>
+    <add>4.3</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>entity_table</name>
+    <title>Entity Table</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <import>true</import>
+    <add>4.3</add>
+    <comment>Links to an entity_table like civicrm_financial_type</comment>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>Entity ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>4.3</add>
+    <comment>Links to an id in the entity_table, such as vid in civicrm_financial_type</comment>
+  </field>
+      <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>4.3</add>
+  </dynamicForeignKey>
+  <field>
+    <name>account_relationship</name>
+    <title>Account Relationship</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>4.3</add>
+    <comment>FK to a new civicrm_option_value (account_relationship)</comment>
+    <pseudoconstant>
+      <optionGroupName>account_relationship</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>financial_account_id</name>
+    <type>int unsigned</type>
+    <title>Financial Account</title>
+    <required>true</required>
+    <add>4.3</add>
+    <comment>FK to the financial_account_id</comment>
+    <pseudoconstant>
+      <table>civicrm_financial_account</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>financial_account_id</name>
+    <table>civicrm_financial_account</table>
+    <key>id</key>
+    <add>4.3</add>
+    <onDelete>RESTRICT</onDelete>
+  </foreignKey>
+  <index>
+    <name>index_entity_id_entity_table_account_relationship</name>
+    <fieldName>entity_id</fieldName>
+    <fieldName>entity_table</fieldName>
+    <fieldName>account_relationship</fieldName>
+    <unique>true</unique>
+    <add>4.7</add>
+  </index>
+</table>

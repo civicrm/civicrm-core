@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -55,7 +55,7 @@
     <td colspan="2">
         {$form.grant_application_received_date_high.label}<br />
         {include file="CRM/common/jcalendar.tpl" elementName=grant_application_received_date_high}
-        &nbsp;{$form.grant_application_received_notset.html}&nbsp;&nbsp;{ts}Date is not set{/ts}
+        &nbsp;{$form.grant_application_received_notset.html}&nbsp;&nbsp;{$form.grant_application_received_notset.label}
     </td>
 </tr>
 <tr>
@@ -66,7 +66,7 @@
     <td colspan="2">
         {$form.grant_decision_date_high.label}<br />
         {include file="CRM/common/jcalendar.tpl" elementName=grant_decision_date_high}
-        &nbsp;{$form.grant_decision_date_notset.html}&nbsp;&nbsp;{ts}Date is not set{/ts}
+        &nbsp;{$form.grant_decision_date_notset.html}&nbsp;&nbsp;{$form.grant_decision_date_notset.label}
     </td>
 </tr>
 <tr>
@@ -77,7 +77,7 @@
     <td colspan="2">
         {$form.grant_money_transfer_date_high.label}<br />
         {include file="CRM/common/jcalendar.tpl" elementName=grant_money_transfer_date_high}
-        &nbsp;{$form.grant_money_transfer_date_notset.html}&nbsp;&nbsp;{ts}Date is not set{/ts}
+        &nbsp;{$form.grant_money_transfer_date_notset.html}&nbsp;&nbsp;{$form.grant_money_transfer_date_notset.label}
     </td>
 </tr>
 <tr>
@@ -88,7 +88,7 @@
     <td colspan="2">
         {$form.grant_due_date_high.label}<br />
         {include file="CRM/common/jcalendar.tpl" elementName=grant_due_date_high}
-        &nbsp;{$form.grant_due_date_notset.html}&nbsp;&nbsp;{ts}Date is not set{/ts}
+        &nbsp;{$form.grant_due_date_notset.html}&nbsp;&nbsp;{$form.grant_due_date_notset.label}
     </td>
 </tr>
 {if $grantGroupTree}

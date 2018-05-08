@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -100,6 +100,8 @@ class CRM_Contribute_BAO_Widget extends CRM_Contribute_DAO_Widget {
     else {
       $data['num_donors'] = $data['money_raised'] = $data->money_raised = 0;
     }
+
+    $data['money_raised_amount'] = CRM_Utils_Money::format($data['money_raised']);
 
     $query = "
             SELECT goal_amount, start_date, end_date, is_active

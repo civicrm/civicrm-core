@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -65,6 +65,16 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
         if (!empty($values[$idField])) {
           $values[substr($idField, 0, -3)] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', $idField, $values[$idField]);
         }
+      }
+
+      // Add linked membership
+      $membership = civicrm_api3('Membership', 'get', array(
+        'contribution_recur_id' => $recur->id,
+      ));
+      if (!empty($membership['count'])) {
+        $membershipDetails = reset($membership['values']);
+        $values['membership_id'] = $membershipDetails['id'];
+        $values['membership_name'] = $membershipDetails['membership_name'];
       }
 
       $this->assign('recur', $values);

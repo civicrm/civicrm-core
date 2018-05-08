@@ -21,14 +21,13 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Build the $data array for CiviCase related tables
  * Includes the following tables
  * civicrm_case
  */
-
 function _civicrm_case_data(&$data, $enabled) {
 
   /**
@@ -133,7 +132,7 @@ function _civicrm_case_data(&$data, $enabled) {
   //CASE Start DATE
   $data['civicrm_case']['start_date'] = array(
     'title' => t('Start Date'),
-    'help' => t('The Case\'s Start Date'),
+    'help' => t("The Case's Start Date"),
     'field' => array(
       'handler' => 'civicrm_handler_field_datetime',
       'click sortable' => TRUE,
@@ -160,7 +159,7 @@ function _civicrm_case_data(&$data, $enabled) {
   //CASE END DATE
   $data['civicrm_case']['end_date'] = array(
     'title' => t('End Date'),
-    'help' => t('The Case\'s End Date'),
+    'help' => t("The Case's End Date"),
     'field' => array(
       'handler' => 'civicrm_handler_field_datetime',
       'click sortable' => TRUE,
@@ -233,7 +232,7 @@ function _civicrm_case_data(&$data, $enabled) {
     'field' => array(
       'handler' => 'views_handler_field_boolean',
       'click sortable' => TRUE,
-   ),
+    ),
     'argument' => array(
       'handler' => 'views_handler_argument',
     ),
@@ -244,7 +243,6 @@ function _civicrm_case_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-
 
   //----------------------------------------------------------------
   // CIVICRM Case Activities are here, base tabling it up.
@@ -300,8 +298,8 @@ function _civicrm_case_data(&$data, $enabled) {
     'help' => t('The numeric ID of the Case'),
     'relationship' => array(
       'base' => 'civicrm_case',
-                                                                             'field' => 'case_id',
-                                                                             'left_field' => 'id',
+      'field' => 'case_id',
+      'left_field' => 'id',
       'handler' => 'views_handler_relationship',
       'label' => t('CiviCRM Case, with custom fields'),
     ),
@@ -309,7 +307,7 @@ function _civicrm_case_data(&$data, $enabled) {
 
   //Numeric Activity ID
   $data['civicrm_case_activity']['activity_id'] = array(
-    'title' => t('Case Activity\'s Activity ID'),
+    'title' => t("Case Activity's Activity ID"),
     'help' => t('The numeric ID of the Activity of the Case'),
     'field' => array(
       'handler' => 'views_handler_field_numeric',
@@ -401,8 +399,8 @@ function _civicrm_case_data(&$data, $enabled) {
     'help' => t('The numeric ID of the Case'),
     'relationship' => array(
       'base' => 'civicrm_case',
-                                                                             'field' => 'case_id',
-                                                                             'left_field' => 'id',
+      'field' => 'case_id',
+      'left_field' => 'id',
       'handler' => 'views_handler_relationship',
       'label' => t('CiviCRM Case, with custom fields'),
     ),
@@ -410,7 +408,7 @@ function _civicrm_case_data(&$data, $enabled) {
 
   //Numeric Contact ID
   $data['civicrm_case_contact']['contact_id'] = array(
-    'title' => t('Case Contact\'s Contact ID'),
+    'title' => t("Case Contact's Contact ID"),
     'help' => t('The numeric ID of the Contact of the Case'),
     'field' => array(
       'handler' => 'views_handler_field_numeric',
@@ -464,14 +462,14 @@ function _civicrm_case_data(&$data, $enabled) {
     'real field' => 'title',
     'help' => t('The Name of the Case Type'),
     'field' => array(
-    'handler' => 'views_handler_field',
-    'click sortable' => TRUE,
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
     ),
     'argument' => array(
-     'handler' => 'views_handler_argument',
+      'handler' => 'views_handler_argument',
     ),
     'sort' => array(
-    'handler' => 'views_handler_sort',
+      'handler' => 'views_handler_sort',
     ),
   );
 }

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Cache</class>
+  <name>civicrm_cache</name>
+  <comment>Table to cache items for civicrm components.</comment>
+  <add>2.1</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>2.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>group_name</name>
+    <type>varchar</type>
+    <length>32</length>
+    <required>true</required>
+    <comment>group name for cache element, useful in cleaning cache elements</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>path</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Unique path name for cache element</comment>
+    <add>2.1</add>
+  </field>
+  <index>
+    <name>UI_group_path</name>
+    <fieldName>group_name</fieldName>
+    <fieldName>path</fieldName>
+    <unique>true</unique>
+    <add>2.1</add>
+    <drop>4.2</drop>
+  </index>
+  <index>
+    <name>UI_group_path_date</name>
+    <fieldName>group_name</fieldName>
+    <fieldName>path</fieldName>
+    <fieldName>created_date</fieldName>
+    <unique>true</unique>
+    <add>4.2</add>
+  </index>
+  <field>
+    <name>data</name>
+    <type>longtext</type>
+    <comment>data associated with this path</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>component_id</name>
+    <type>int unsigned</type>
+    <comment>Component that this menu item belongs to</comment>
+    <add>2.1</add>
+    <pseudoconstant>
+      <table>civicrm_component</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>component_id</name>
+    <table>civicrm_component</table>
+    <key>id</key>
+    <add>2.1</add>
+  </foreignKey>
+  <field>
+    <name>created_date</name>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
+    <comment>When was the cache item created</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>expired_date</name>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
+    <comment>When should the cache item expire</comment>
+    <add>2.1</add>
+  </field>
+</table>

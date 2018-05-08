@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@ use Civi\Payment\System;
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 
@@ -72,11 +72,7 @@ class CRM_Core_Payment_ProcessorForm {
 
     $form->assign('suppressSubmitButton', $form->_paymentObject->isSuppressSubmitButtons());
 
-    $currency = CRM_Utils_Array::value('currency', $form->_values);
-    // For event forms, currency is in a different spot
-    if (empty($currency)) {
-      $currency = CRM_Utils_Array::value('currency', $form->_values['event']);
-    }
+    $currency = $form->getCurrency();
     $form->assign('currency', $currency);
 
     // also set cancel subscription url

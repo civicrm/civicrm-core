@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
 
@@ -55,8 +53,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
   protected $otherContact;
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     self::validRelationships();
@@ -89,7 +86,13 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
-          'organization_name' => array('title' => ts('Organization Name')),
+          'organization_name' => array(
+            'title' => ts('Organization Name'),
+          ),
+          'is_deleted' => array(
+            'default' => 0,
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+          ),
         ),
         'grouping' => 'organization-fields',
       ),

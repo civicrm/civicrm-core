@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,28 +34,8 @@
       <div class="crm-accordion-body">
         {strip}
           <table class="form-layout">
-            <tr>
-              <td class="font-size12pt" colspan="2">                    {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}&nbsp;&nbsp;&nbsp;{$form.buttons.html}
-              </td>
-            </tr>
-            <tr>
-              {if $form.contact_tags}
-                <td><label>{ts}Contributor Tag(s){/ts}</label>
-                    {$form.contact_tags.html}
-                </td>
-              {else}
-                <td>&nbsp;</td>
-              {/if}
-
-              {if $form.group}
-                <td><label>{ts}Contributor Group(s){/ts}</label>
-                    {$form.group.html}
-                </td>
-              {else}
-                <td>&nbsp;</td>
-              {/if}
-            </tr>
-{include file="CRM/Contribute/Form/Search/Common.tpl"}
+            {include file="CRM/Contact/Form/Search/ContactSearchFields.tpl"}
+            {include file="CRM/Contribute/Form/Search/Common.tpl"}
             <tr>
                <td colspan="2">{$form.buttons.html}</td>
             </tr>

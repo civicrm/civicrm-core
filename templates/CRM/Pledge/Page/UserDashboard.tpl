@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-pledge-userdashboard-pre"}
+{/crmRegion}
 {if $context eq 'user'}
 <div class="view-content">
 {if $pledge_rows}
@@ -99,3 +101,5 @@
 </div>
 {* main if close*}
 {/if}
+{crmRegion name="crm-pledge-userdashboard-post"}
+{/crmRegion}

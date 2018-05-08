@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Domain</class>
+  <name>civicrm_domain</name>
+  <comment>Top-level hierarchy to support multi-org/domain installations. Define domains for multi-org installs, else all contacts belong to one domain.</comment>
+  <add>1.1</add>
+  <field>
+    <name>id</name>
+    <title>Domain ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Domain ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <type>varchar</type>
+    <title>Domain Name</title>
+    <length>64</length>
+    <comment>Name of Domain / Organization</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>description</name>
+    <type>varchar</type>
+    <title>Domain Description</title>
+    <length>255</length>
+    <comment>Description of Domain.</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>1.1</add>
+  </index>
+  <field>
+    <name>contact_name</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Name of the person responsible for this domain</comment>
+    <add>1.1</add>
+    <drop>1.9</drop>
+  </field>
+  <field>
+    <name>email_name</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>The default email name that is used in the from address for all outgoing emails</comment>
+    <add>1.9</add>
+    <drop>2.2</drop>
+  </field>
+  <field>
+    <name>email_address</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>The default email address that is used as the from address for all outgoing emails</comment>
+    <add>1.9</add>
+    <drop>2.2</drop>
+  </field>
+  <field>
+    <name>email_domain</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>The domain from which outgoing email for this domain will appear to originate</comment>
+    <add>1.1</add>
+    <drop>2.2</drop>
+  </field>
+  <field>
+    <name>email_return_path</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>The domain from which outgoing email for this domain will appear to originate</comment>
+    <add>1.1</add>
+    <drop>2.2</drop>
+  </field>
+  <field>
+    <name>config_backend</name>
+    <type>text</type>
+    <title>Domain Configuration</title>
+    <comment>Backend configuration.</comment>
+    <serialize>PHP</serialize>
+    <add>1.6</add>
+  </field>
+  <field>
+    <name>version</name>
+    <type>varchar</type>
+    <title>CiviCRM Version</title>
+    <length>32</length>
+    <comment>The civicrm version this instance is running</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>loc_block_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Location Block ID. This is specifically not an FK to avoid circular constraints</comment>
+    <add>2.0</add>
+    <drop>4.3</drop>
+  </field>
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <title>Domain Contact</title>
+    <comment>FK to Contact ID. This is specifically not an FK to avoid circular constraints</comment>
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.3</add>
+  </foreignKey>
+  <field>
+    <name>locales</name>
+    <type>text</type>
+    <title>Supported Languages</title>
+    <comment>list of locales supported by the current db state (NULL for single-lang install)</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>locale_custom_strings</name>
+    <type>text</type>
+    <title>Language Customizations</title>
+    <comment>Locale specific string overrides</comment>
+    <serialize>PHP</serialize>
+    <add>3.2</add>
+  </field>
+</table>

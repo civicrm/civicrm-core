@@ -21,22 +21,23 @@
    | GNU Affero General Public License or the licensing of CiviCRM,     |
    | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
    +--------------------------------------------------------------------+
+ */
 
-   **
-   * @file Provides Views integration for multi valued fields like
-   * contact subtype and CiviCRM custom field option groups
-   *
-   * @author Matt Chapman <Matt@NinjitsuWeb.com>
-   */
+/**
+ * @file Provides Views integration for multi valued fields like
+ * contact subtype and CiviCRM custom field option groups
+ *
+ * @author Matt Chapman <Matt@NinjitsuWeb.com>
+ */
 class civicrm_handler_filter_custom_option extends views_handler_filter_in_operator {
-  function construct() {
+  public function construct() {
     parent::construct();
     if (!civicrm_initialize()) {
       return;
     }
   }
 
-  function get_value_options() {
+  public function get_value_options() {
     if (!isset($this->value_options)) {
       if ($this->real_field == 'contact_sub_type') {
         require_once 'CRM/Contact/BAO/ContactType.php';
@@ -57,7 +58,7 @@ class civicrm_handler_filter_custom_option extends views_handler_filter_in_opera
     }
   }
 
-  function operators() {
+  public function operators() {
     $operators = parent::operators();
     $operators += array(
       'all' => array(
@@ -71,7 +72,7 @@ class civicrm_handler_filter_custom_option extends views_handler_filter_in_opera
     return $operators;
   }
 
-  function op_simple() {
+  public function op_simple() {
     if (empty($this->value)) {
       return;
     }
@@ -89,5 +90,5 @@ class civicrm_handler_filter_custom_option extends views_handler_filter_in_opera
     $clause = implode($glue, $clauses);
     $this->query->add_where_expression($this->options['group'], $clause);
   }
-}
 
+}

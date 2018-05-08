@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Argument handler for a full date (CCYYMMDD)
@@ -31,7 +31,7 @@ class views_handler_argument_civicrm_fulldate extends views_handler_argument_dat
   /**
    * Constructor implementation
    */
-  function construct() {
+  public function construct() {
     parent::construct();
     $this->format     = 'F j, Y';
     $this->arg_format = 'Ymd';
@@ -43,7 +43,7 @@ class views_handler_argument_civicrm_fulldate extends views_handler_argument_dat
   /**
    * Provide a link to the next level of the view
    */
-  function summary_name($data) {
+  public function summary_name($data) {
     $created = $data->{$this->name_alias};
     return format_date(strtotime($created . " 00:00:00 UTC"), 'custom', $this->format, 'UTC');
   }
@@ -51,8 +51,8 @@ class views_handler_argument_civicrm_fulldate extends views_handler_argument_dat
   /**
    * Provide a link to the next level of the view
    */
-  function title() {
+  public function title() {
     return format_date(strtotime($this->argument . " 00:00:00 UTC"), 'custom', $this->format, 'UTC');
   }
-}
 
+}

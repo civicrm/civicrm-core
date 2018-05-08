@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -67,7 +67,13 @@
     <td class="crm-membership-end_date">{$row.membership_end_date|truncate:10:''|crmDate}</td>
     <td class="crm-membership-source">{$row.membership_source}</td>
     <td class="crm-membership-status crm-membership-status_{$row.membership_status}">{$row.membership_status}</td>
-    <td class="crm-membership-auto_renew">{if $row.auto_renew}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Auto-renew{/ts}" /> {/if}</td>
+    <td class="crm-membership-auto_renew">
+      {if $row.auto_renew eq 1}
+        <i class="crm-i fa-check" aria-hidden="true" title="{ts}Auto-renew active{/ts}"></i>
+      {elseif $row.auto_renew eq 2}
+        <i class="crm-i fa-ban" aria-hidden="true" title="{ts}Auto-renew error{/ts}"></i>
+      {/if}
+    </td>
     <td>
         {$row.action|replace:'xx':$row.membership_id}
         {if $row.owner_membership_id}

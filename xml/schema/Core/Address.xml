@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Address</class>
+  <name>civicrm_address</name>
+  <comment>Stores the physical street / mailing address. This format should be capable of storing ALL international addresses.</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Address ID</title>
+    <required>true</required>
+    <comment>Unique Address ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <title>Contact ID</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>location_type_id</name>
+    <title>Address Location Type</title>
+    <type>int unsigned</type>
+    <comment>Which Location does this address belong to.</comment>
+    <add>2.0</add>
+    <pseudoconstant>
+      <table>civicrm_location_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>display_name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <index>
+    <name>index_location_type</name>
+    <fieldName>location_type_id</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>is_primary</name>
+    <title>Is Address Primary?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this the primary address.</comment>
+    <add>2.0</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <index>
+    <name>index_is_primary</name>
+    <fieldName>is_primary</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>is_billing</name>
+    <title>Is Billing Address</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this the billing address.</comment>
+    <add>2.0</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <index>
+    <name>index_is_billing</name>
+    <fieldName>is_billing</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>street_address</name>
+    <title>Street Address</title>
+    <type>varchar</type>
+    <length>96</length>
+    <import>true</import>
+    <headerPattern>/(street|address)/i</headerPattern>
+    <dataPattern>/^(\d{1,5}( [0-9A-Za-z]+)+)$|^(P\.?O\.\? Box \d{1,5})$/i</dataPattern>
+    <comment>Concatenation of all routable street address components (prefix, street number, street name, suffix, unit
+      number OR P.O. Box). Apps should be able to determine physical location with this data (for mapping, mail
+      delivery, etc.).
+    </comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>street_number</name>
+    <title>Street Number</title>
+    <type>int</type>
+    <export>true</export>
+    <comment>Numeric portion of address number on the street, e.g. For 112A Main St, the street_number = 112.</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>street_number_suffix</name>
+    <title>Street Number Suffix</title>
+    <type>varchar</type>
+    <length>8</length>
+    <export>true</export>
+    <comment>Non-numeric portion of address number on the street, e.g. For 112A Main St, the street_number_suffix = A
+    </comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>street_number_predirectional</name>
+    <title>Street Direction Prefix</title>
+    <type>varchar</type>
+    <length>8</length>
+    <comment>Directional prefix, e.g. SE Main St, SE is the prefix.</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>street_name</name>
+    <type>varchar</type>
+    <title>Street Name</title>
+    <length>64</length>
+    <export>true</export>
+    <comment>Actual street name, excluding St, Dr, Rd, Ave, e.g. For 112 Main St, the street_name = Main.</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <index>
+    <name>index_street_name</name>
+    <fieldName>street_name</fieldName>
+    <add>1.1</add>
+  </index>
+  <field>
+    <name>street_type</name>
+    <title>Street Type</title>
+    <type>varchar</type>
+    <length>8</length>
+    <comment>St, Rd, Dr, etc.</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>street_number_postdirectional</name>
+    <title>Street Direction Suffix</title>
+    <type>varchar</type>
+    <length>8</length>
+    <comment>Directional prefix, e.g. Main St S, S is the suffix.</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>street_unit</name>
+    <title>Street Unit</title>
+    <type>varchar</type>
+    <length>16</length>
+    <export>true</export>
+    <comment>Secondary unit designator, e.g. Apt 3 or Unit # 14, or Bldg 1200</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>supplemental_address_1</name>
+    <title>Supplemental Address 1</title>
+    <type>varchar</type>
+    <length>96</length>
+    <import>true</import>
+    <headerPattern>/(supplemental(\s)?)?address(\s\d+)?/i</headerPattern>
+    <dataPattern>/unit|ap(ar)?t(ment)?\s(\d|\w)+/i</dataPattern>
+    <comment>Supplemental Address Information, Line 1</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>supplemental_address_2</name>
+    <title>Supplemental Address 2</title>
+    <type>varchar</type>
+    <length>96</length>
+    <import>true</import>
+    <headerPattern>/(supplemental(\s)?)?address(\s\d+)?/i</headerPattern>
+    <dataPattern>/unit|ap(ar)?t(ment)?\s(\d|\w)+/i</dataPattern>
+    <comment>Supplemental Address Information, Line 2</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>supplemental_address_3</name>
+    <title>Supplemental Address 3</title>
+    <type>varchar</type>
+    <length>96</length>
+    <import>true</import>
+    <headerPattern>/(supplemental(\s)?)?address(\s\d+)?/i</headerPattern>
+    <dataPattern>/unit|ap(ar)?t(ment)?\s(\d|\w)+/i</dataPattern>
+    <comment>Supplemental Address Information, Line 3</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>city</name>
+    <title>City</title>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <headerPattern>/city/i</headerPattern>
+    <dataPattern>/^[A-Za-z]+(\.?)(\s?[A-Za-z]+){0,2}$/</dataPattern>
+    <comment>City, Town or Village Name.</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <index>
+    <name>index_city</name>
+    <fieldName>city</fieldName>
+    <add>1.1</add>
+  </index>
+  <field>
+    <name>county_id</name>
+    <type>int unsigned</type>
+    <title>County</title>
+    <comment>Which County does this address belong to.</comment>
+    <pseudoconstant>
+      <table>civicrm_county</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>ChainSelect</type>
+    </html>
+    <add>1.1</add>
+  </field>
+  <foreignKey>
+    <name>county_id</name>
+    <table>civicrm_county</table>
+    <key>id</key>
+    <import>true</import>
+    <headerPattern>/county/i</headerPattern>
+    <dataPattern>/[A-Z]{2}/</dataPattern>
+    <add>1.1</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>state_province_id</name>
+    <title>State/Province</title>
+    <type>int unsigned</type>
+    <comment>Which State_Province does this address belong to.</comment>
+    <pseudoconstant>
+      <table>civicrm_state_province</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>ChainSelect</type>
+    </html>
+    <add>1.1</add>
+  </field>
+  <foreignKey>
+    <name>state_province_id</name>
+    <table>civicrm_state_province</table>
+    <key>id</key>
+    <import>true</import>
+    <headerPattern>/state|prov(ince)?/i</headerPattern>
+    <dataPattern>
+      /A[LKSZRAP]|C[AOT]|D[EC]|F[LM]|G[AU]|HI|I[ADLN]|K[SY]|LA|M[ADEHINOPST]|N[CDEHJMVY]|O[HKR]|P[ARW]|RI|S[CD]|T[NX]|UT|V[AIT]|W[AIVY]/i
+    </dataPattern>
+    <add>1.1</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>postal_code_suffix</name>
+    <title>Postal Code Suffix</title>
+    <type>varchar</type>
+    <length>12</length>
+    <import>true</import>
+    <headerPattern>/p(ostal)\sc(ode)\ss(uffix)/i</headerPattern>
+    <dataPattern>/\d?\d{4}(-\d{4})?/</dataPattern>
+    <comment>Store the suffix, like the +4 part in the USPS system.</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+      <size>3</size>
+    </html>
+  </field>
+  <field>
+    <name>postal_code</name>
+    <title>Postal Code</title>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <headerPattern>/postal|zip/i</headerPattern>
+    <dataPattern>/\d?\d{4}(-\d{4})?/</dataPattern>
+    <comment>Store both US (zip5) AND international postal codes. App is responsible for country/region appropriate validation.</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+      <size>6</size>
+    </html>
+  </field>
+  <field>
+    <name>usps_adc</name>
+    <title>USPS Code</title>
+    <type>varchar</type>
+    <length>32</length>
+    <comment>USPS Bulk mailing code.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>country_id</name>
+    <title>Country</title>
+    <type>int unsigned</type>
+    <comment>Which Country does this address belong to.</comment>
+    <pseudoconstant>
+      <table>civicrm_country</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+      <nameColumn>iso_code</nameColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>1.1</add>
+  </field>
+  <foreignKey>
+    <name>country_id</name>
+    <table>civicrm_country</table>
+    <key>id</key>
+    <import>true</import>
+    <headerPattern>/country/i</headerPattern>
+    <dataPattern>/\w+(\s\w+)?/</dataPattern>
+    <add>1.1</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>geo_code_1</name>
+    <title>Latitude</title>
+    <type>float</type>
+    <import>true</import>
+    <headerPattern>/geo/i</headerPattern>
+    <comment>Latitude</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+      <size>9</size>
+    </html>
+  </field>
+  <field>
+    <name>geo_code_2</name>
+    <title>Longitude</title>
+    <type>float</type>
+    <comment>Longitude</comment>
+    <import>true</import>
+    <headerPattern>/geo/i</headerPattern>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+      <size>9</size>
+    </html>
+  </field>
+  <field>
+    <name>manual_geo_code</name>
+    <title>Is manually geocoded</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this a manually entered geo code</comment>
+    <add>4.3</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>timezone</name>
+    <title>Timezone</title>
+    <type>varchar</type>
+    <length>8</length>
+    <comment>Timezone expressed as a UTC offset - e.g. United States CST would be written as "UTC-6".</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>name</name>
+    <uniqueName>address_name</uniqueName>
+    <title>Address Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <import>true</import>
+    <headerPattern>/^location|(l(ocation\s)?name)$/i</headerPattern>
+    <dataPattern>/^\w+$/</dataPattern>
+    <add>2.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>master_id</name>
+    <title>Master Address Belongs To</title>
+    <type>int unsigned</type>
+    <import>true</import>
+    <comment>FK to Address ID</comment>
+    <add>3.3</add>
+  </field>
+  <foreignKey>
+    <name>master_id</name>
+    <table>civicrm_address</table>
+    <key>id</key>
+    <add>3.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+</table>

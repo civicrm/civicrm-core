@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 4.7                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2018                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -41,20 +41,19 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    */
   public function buildQuickForm() {
 
-    CRM_Utils_System::setTitle('Wordpress Access Control');
+    CRM_Utils_System::setTitle('WordPress Access Control');
 
     // Get the core permissions array
     $permissionsArray = self::getPermissionArray();
     $permissionsDesc = self::getPermissionArray(TRUE);
 
-    // Get the wordpress roles, default capabilities and assign to the form
-    // TODO: Create a new wordpress role (Anonymous user) and define capabilities in Wordpress Access Control
+    // Get the WordPress roles, default capabilities and assign to the form
     global $wp_roles;
     if (!isset($wp_roles)) {
       $wp_roles = new WP_Roles();
     }
     foreach ($wp_roles->role_names as $role => $name) {
-      // Dont show the permissions options for administrator, as they have all permissions
+      // Don't show the permissions options for administrator, as they have all permissions
       if ($role !== 'administrator') {
         $roleObj = $wp_roles->get_role($role);
         if (!empty($roleObj->capabilities)) {
@@ -84,7 +83,36 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
         $descArray[$perm] = $attr[1];
       }
     }
-    $this->assign('permDesc', $descArray);
+
+    // build table rows by merging role perms
+    $rows = array();
+    foreach ($rolePerms as $role => $perms) {
+      foreach ($perms as $name => $title) {
+        $rows[$name] = $title;
+      }
+    }
+
+    // Build array keyed by permission
+    $table = array();
+    foreach ($rows as $perm => $label) {
+
+      // Init row with permission label
+      $table[$perm] = array(
+        'label' => $label,
+        'roles' => array(),
+      );
+
+      // Add permission description and role names
+      foreach ($roles as $key => $label) {
+        if (isset($descArray[$perm])) {
+          $table[$perm]['desc'] = $descArray[$perm];
+        }
+        $table[$perm]['roles'][] = $key;
+      }
+
+    }
+
+    $this->assign('table', $table);
     $this->assign('rolePerms', $rolePerms);
     $this->assign('roles', $roles);
 

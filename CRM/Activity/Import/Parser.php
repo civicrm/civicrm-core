@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
 
@@ -73,7 +73,9 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
     &$mapper,
     $skipColumnHeader = FALSE,
     $mode = self::MODE_PREVIEW,
-    $onDuplicate = self::DUPLICATE_SKIP
+    $onDuplicate = self::DUPLICATE_SKIP,
+    $statusID = NULL,
+    $totalRowCount = NULL
   ) {
     if (!is_array($fileName)) {
       CRM_Core_Error::fatal();
@@ -106,6 +108,10 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
     }
     else {
       $this->_activeFieldCount = count($this->_activeFields);
+    }
+    if ($statusID) {
+      $this->progressImport($statusID);
+      $startTimestamp = $currTimestamp = $prevTimestamp = time();
     }
 
     while (!feof($fd)) {
@@ -148,6 +154,9 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
       }
       elseif ($mode == self::MODE_IMPORT) {
         $returnCode = $this->import($onDuplicate, $values);
+        if ($statusID && (($this->_lineCount % 50) == 0)) {
+          $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
+        }
       }
       else {
         $returnCode = self::ERROR;
@@ -171,14 +180,12 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
 
       if ($returnCode & self::ERROR) {
         $this->_invalidRowCount++;
-        if ($this->_invalidRowCount < $this->_maxErrorCount) {
-          $recordNumber = $this->_lineCount;
-          if ($this->_haveColumnHeader) {
-            $recordNumber--;
-          }
-          array_unshift($values, $recordNumber);
-          $this->_errors[] = $values;
+        $recordNumber = $this->_lineCount;
+        if ($this->_haveColumnHeader) {
+          $recordNumber--;
         }
+        array_unshift($values, $recordNumber);
+        $this->_errors[] = $values;
       }
 
       if ($returnCode & self::CONFLICT) {

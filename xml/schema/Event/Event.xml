@@ -1,0 +1,881 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Event</base>
+  <class>Event</class>
+  <name>civicrm_event</name>
+  <add>1.7</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Event ID</title>
+    <required>true</required>
+    <comment>Event</comment>
+    <add>1.7</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>title</name>
+    <uniqueName>event_title</uniqueName>
+    <type>varchar</type>
+    <import>true</import>
+    <title>Event Title</title>
+    <headerPattern>/(event.)?title$/i</headerPattern>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Event Title (e.g. Fall Fundraiser Dinner)</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>summary</name>
+    <type>text</type>
+    <title>Event Summary</title>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>Brief summary of event. Text and html allowed. Displayed on Event Registration form and can be used on other CMS pages which need an event summary.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>description</name>
+    <type>text</type>
+    <uniqueName>event_description</uniqueName>
+    <title>Event Description</title>
+    <html>
+      <type>TextArea</type>
+      <rows>8</rows>
+      <cols>60</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>Full description of event. Text and html allowed. Displayed on built-in Event Information screens.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>event_type_id</name>
+    <type>int unsigned</type>
+    <uniqueName>event_type_id</uniqueName>
+    <title>Event Type</title>
+    <default>0</default>
+    <pseudoconstant>
+      <optionGroupName>event_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <comment>Event Type ID.Implicit FK to civicrm_option_value where option_group = event_type.</comment>
+    <add>1.7</add>
+  </field>
+  <index>
+    <name>index_event_type_id</name>
+    <fieldName>event_type_id</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>participant_listing_id</name>
+    <type>int unsigned</type>
+    <uniqueName>participant_listing_id</uniqueName>
+    <title>Participant Listing</title>
+    <default>0</default>
+    <pseudoconstant>
+      <optionGroupName>participant_listing</optionGroupName>
+    </pseudoconstant>
+    <comment>Should we expose the participant list? Implicit FK to civicrm_option_value where option_group = participant_listing.</comment>
+    <add>2.0</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <index>
+    <name>index_participant_listing_id</name>
+    <fieldName>participant_listing_id</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>is_public</name>
+    <type>boolean</type>
+    <title>Is Event Public</title>
+    <default>1</default>
+    <comment>Public events will be included in the iCal feeds. Access to private event information may be limited using ACLs.</comment>
+    <add>1.7</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>start_date</name>
+    <type>datetime</type>
+    <uniqueName>event_start_date</uniqueName>
+    <title>Event Start Date</title>
+    <headerPattern>/^start|(s(tart\s)?date)$/i</headerPattern>
+    <import>true</import>
+    <comment>Date and time that event starts.</comment>
+    <add>1.7</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>end_date</name>
+    <type>datetime</type>
+    <uniqueName>event_end_date</uniqueName>
+    <title>Event End Date</title>
+    <headerPattern>/^end|(e(nd\s)?date)$/i</headerPattern>
+    <import>true</import>
+    <comment>Date and time that event ends. May be NULL if no defined end date/time</comment>
+    <add>1.7</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>is_online_registration</name>
+    <type>boolean</type>
+    <title>Is Online Registration</title>
+    <default>0</default>
+    <comment>If true, include registration link on Event Info page.</comment>
+    <add>1.7</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>registration_link_text</name>
+    <type>varchar</type>
+    <title>Event Registration Link Text</title>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Text for link to Event Registration form which is displayed on Event Information screen when is_online_registration is true.</comment>
+    <add>1.7</add>
+    <html>
+     <type>Text</type>
+   </html>
+  </field>
+  <field>
+    <name>registration_start_date</name>
+    <type>datetime</type>
+    <comment>Date and time that online registration starts.</comment>
+    <add>1.8</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>registration_end_date</name>
+    <type>datetime</type>
+    <comment>Date and time that online registration ends.</comment>
+    <add>1.8</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>max_participants</name>
+    <type>int unsigned</type>
+    <title>Max Participants</title>
+    <default>NULL</default>
+    <comment>Maximum number of registered participants to allow. After max is reached, a custom Event Full message is displayed. If NULL, allow unlimited number of participants.</comment>
+    <add>1.7</add>
+    <html>
+     <type>Text</type>
+   </html>
+  </field>
+  <field>
+    <name>event_full_text</name>
+    <type>text</type>
+    <title>Event Information</title>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>Message to display on Event Information page and INSTEAD OF Event Registration form if maximum participants are signed up. Can include email address/info about getting on a waiting list, etc. Text and html allowed.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>is_monetary</name>
+    <title>Is this a PAID event?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>If true, one or more fee amounts must be set and a Payment Processor must be configured for Online Event Registration.</comment>
+    <add>1.7</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>contribution_type_id</name>
+    <type>int unsigned</type>
+    <default>0</default>
+    <comment>Contribution type assigned to paid event registrations for this event. Required if is_monetary is true.</comment>
+    <add>1.7</add>
+    <drop>4.3</drop>
+  </field>
+  <field>
+    <name>financial_type_id</name>
+    <type>int unsigned</type>
+    <title>Financial Type</title>
+    <default>NULL</default>
+    <comment>Financial type assigned to paid event registrations for this event. Required if is_monetary is true.</comment>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>payment_processor</name>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Payment Processors configured for this Event (if is_monetary is true)</comment>
+    <pseudoconstant>
+      <table>civicrm_payment_processor</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>is_map</name>
+    <title>Map Enabled</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Include a map block on the Event Information page when geocode info is available and a mapping provider has been specified?</comment>
+    <add>1.7</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Is Active</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this Event enabled or disabled/cancelled?</comment>
+    <add>1.7</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>fee_label</name>
+    <type>varchar</type>
+    <import>true</import>
+    <title>Fee Label</title>
+    <headerPattern>/^fee|(f(ee\s)?label)$/i</headerPattern>
+    <length>255</length>
+    <localizable>true</localizable>
+    <html>
+     <type>Text</type>
+   </html>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>is_show_location</name>
+    <type>boolean</type>
+    <title>show location</title>
+    <default>1</default>
+    <comment>If true, show event location.</comment>
+    <add>1.7</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>loc_block_id</name>
+    <type>int unsigned</type>
+    <title>Location Block ID</title>
+    <comment>FK to Location Block ID</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>loc_block_id</name>
+    <table>civicrm_loc_block</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+    <add>2.0</add>
+  </foreignKey>
+  <field>
+    <name>receipt_text</name>
+    <type>varchar</type>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <length>255</length>
+    <comment>Receipt Text for off-line event participation</comment>
+    <add>2.0</add>
+    <drop>2.1</drop>
+  </field>
+  <field>
+    <name>default_role_id</name>
+    <uniqueName>default_role_id</uniqueName>
+    <title>Default Role</title>
+    <import>true</import>
+    <type>int unsigned</type>
+    <default>1</default>
+    <pseudoconstant>
+      <optionGroupName>participant_role</optionGroupName>
+    </pseudoconstant>
+    <comment>Participant role ID. Implicit FK to civicrm_option_value where option_group = participant_role.</comment>
+    <add>2.0</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>intro_text</name>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <title>Introductory Message</title>
+    <localizable>true</localizable>
+    <comment>Introductory message for Event Registration page. Text and html allowed. Displayed at the top of Event Registration form.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>footer_text</name>
+    <title>Footer Message</title>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>Footer message for Event Registration page. Text and html allowed. Displayed at the bottom of Event Registration form.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>confirm_title</name>
+    <type>varchar</type>
+    <title>Confirmation Title</title>
+    <length>255</length>
+    <default>NULL</default>
+    <localizable>true</localizable>
+    <comment>Title for Confirmation page.</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>confirm_text</name>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <title>Confirm Text</title>
+    <localizable>true</localizable>
+    <comment>Introductory message for Event Registration page. Text and html allowed. Displayed at the top of Event Registration form.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>confirm_footer_text</name>
+    <type>text</type>
+    <title>Footer Text</title>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>Footer message for Event Registration page. Text and html allowed. Displayed at the bottom of Event Registration form.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>is_email_confirm</name>
+    <type>boolean</type>
+    <title>Is confirm email</title>
+    <default>0</default>
+    <comment>If true, confirmation is automatically emailed to contact on successful registration.</comment>
+    <add>1.7</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>confirm_email_text</name>
+    <type>text</type>
+    <title>Confirmation Email Text</title>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>50</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>text to include above standard event info on confirmation email. emails are text-only, so do not allow html for now</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>confirm_from_name</name>
+    <type>varchar</type>
+    <title>Confirm From Name</title>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>FROM email name used for confirmation emails.</comment>
+    <add>1.7</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>confirm_from_email</name>
+    <type>varchar</type>
+    <title>Confirm From Email</title>
+    <length>255</length>
+    <comment>FROM email address used for confirmation emails.</comment>
+    <add>1.7</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>cc_confirm</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>comma-separated list of email addresses to cc each time a confirmation is sent</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>bcc_confirm</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>comma-separated list of email addresses to bcc each time a confirmation is sent</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>default_fee_id</name>
+    <type>int unsigned</type>
+    <title>Default Fee ID</title>
+    <comment>FK to civicrm_option_value.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>default_discount_fee_id</name>
+    <type>int unsigned</type>
+    <title>Default Discount Fee ID</title>
+    <comment>FK to civicrm_option_value.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>thankyou_title</name>
+    <type>varchar</type>
+    <title>ThankYou Title</title>
+    <length>255</length>
+    <default>NULL</default>
+    <localizable>true</localizable>
+    <comment>Title for ThankYou page.</comment>
+    <add>1.7</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>thankyou_text</name>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <title>ThankYou Text</title>
+    <localizable>true</localizable>
+    <comment>ThankYou Text.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>thankyou_footer_text</name>
+    <type>text</type>
+    <title>Footer Text</title>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>Footer message.</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>is_pay_later</name>
+    <title>Pay Later Allowed</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>if true - allows the user to send payment directly to the org later</comment>
+    <add>2.0</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>pay_later_text</name>
+    <title>Pay Later Text</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>The text displayed to the user in the main form</comment>
+    <add>2.0</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>pay_later_receipt</name>
+    <title>Pay Later Receipt Text</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>The receipt sent to the user instead of the normal receipt text</comment>
+    <add>2.0</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>is_partial_payment</name>
+    <title>Partial Payments Enabled</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>is partial payment enabled for this event</comment>
+    <add>4.3</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>initial_amount_label</name>
+    <title>Initial Amount Label</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Initial amount label for partial payment</comment>
+    <add>4.3</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>initial_amount_help_text</name>
+    <title>Initial Amount Help Text</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>Initial amount help text for partial payment</comment>
+    <add>4.3</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>min_initial_amount</name>
+    <title>Minimum Initial Amount</title>
+    <type>decimal</type>
+    <comment>Minimum initial amount for partial payment</comment>
+    <add>4.3</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>is_multiple_registrations</name>
+    <title>Allow Multiple Registrations</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>if true - allows the user to register multiple participants for event</comment>
+    <add>2.1</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>max_additional_participants</name>
+    <type>int unsigned</type>
+    <title>Maximum number of additional participants per registration</title>
+    <default>0</default>
+    <comment>Maximum number of additional participants that can be registered on a single booking</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>allow_same_participant_emails</name>
+    <type>boolean</type>
+    <title>Does Event allow multiple registrations from same email address?</title>
+    <default>0</default>
+    <comment>if true - allows the user to register multiple registrations from same email address.</comment>
+    <add>2.2</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>has_waitlist</name>
+    <title>Waitlist Enabled</title>
+    <type>boolean</type>
+    <comment>Whether the event has waitlist support.</comment>
+    <add>3.0</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>requires_approval</name>
+    <type>boolean</type>
+    <comment>Whether participants require approval before they can finish registering.</comment>
+    <add>3.0</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>expiration_time</name>
+    <type>int unsigned</type>
+    <comment>Expire pending but unconfirmed registrations after this many hours.</comment>
+    <add>3.0</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>allow_selfcancelxfer</name>
+    <type>boolean</type>
+    <default>0</default>
+    <title>Allow Self-service Cancellation or Transfer</title>
+    <comment>Allow self service cancellation or transfer for event?</comment>
+    <add>4.7</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>selfcancelxfer_time</name>
+    <type>int unsigned</type>
+    <default>0</default>
+    <title>Self-service Cancellation or Transfer Time</title>
+    <comment>Number of hours prior to event start date to allow self-service cancellation or transfer.</comment>
+    <add>4.7</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>waitlist_text</name>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>Text to display when the event is full, but participants can signup for a waitlist.</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>approval_req_text</name>
+    <type>text</type>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
+    </html>
+    <localizable>true</localizable>
+    <comment>Text to display when the approval is required to complete registration for an event.</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>is_template</name>
+    <title>Is an Event Template</title>
+    <type>boolean</type>
+    <default>0</default>
+    <required>true</required>
+    <comment>whether the event has template</comment>
+    <add>3.0</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>template_title</name>
+    <uniqueName>template_title</uniqueName>
+    <type>varchar</type>
+    <import>true</import>
+    <title>Event Template Title</title>
+    <headerPattern>/(template.)?title$/i</headerPattern>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Event Template Title</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>created_id</name>
+    <type>int unsigned</type>
+    <title>Created By Contact ID</title>
+    <comment>FK to civicrm_contact, who created this event</comment>
+    <add>3.0</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.0</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>created_date</name>
+    <type>datetime</type>
+    <title>Event Created Date</title>
+    <comment>Date and time that event was created.</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>currency</name>
+    <type>varchar</type>
+    <length>3</length>
+    <import>true</import>
+    <headerPattern>/cur(rency)?/i</headerPattern>
+    <dataPattern>/^[A-Z]{3}$/i</dataPattern>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <add>3.3</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>campaign_id</name>
+    <type>int unsigned</type>
+    <title>Campaign</title>
+    <comment>The campaign for which this event has been created.</comment>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <add>3.4</add>
+    <html>
+       <type>EntityRef</type>
+     </html>
+  </field>
+  <foreignKey>
+    <name>campaign_id</name>
+    <table>civicrm_campaign</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>is_share</name>
+    <title>Is shared through social media</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Can people share the event through social media?</comment>
+    <add>4.1</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>is_confirm_enabled</name>
+    <title>Is the booking confirmation screen enabled?</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>If false, the event booking confirmation screen gets skipped</comment>
+    <add>4.5</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>parent_event_id</name>
+    <type>int unsigned</type>
+    <title>Parent Event ID</title>
+    <default>NULL</default>
+    <comment>Implicit FK to civicrm_event: parent event</comment>
+    <html>
+       <type>EntityRef</type>
+     </html>
+    <add>4.1</add>
+  </field>
+  <index>
+    <name>index_parent_event_id</name>
+    <fieldName>parent_event_id</fieldName>
+    <add>4.1</add>
+  </index>
+  <field>
+    <name>slot_label_id</name>
+    <type>int unsigned</type>
+    <title>Subevent Slot Label ID</title>
+    <default>NULL</default>
+    <comment>Subevent slot label. Implicit FK to civicrm_option_value where option_group = conference_slot.</comment>
+    <add>4.1</add>
+    <html>
+          <type>Select</type>
+        </html>
+  </field>
+  <field>
+    <name>dedupe_rule_group_id</name>
+    <type>int unsigned</type>
+    <title>Dedupe Rule</title>
+    <default>NULL</default>
+    <comment>Rule to use when matching registrations for this event</comment>
+    <pseudoconstant>
+      <table>civicrm_dedupe_rule_group</table>
+      <keyColumn>id</keyColumn>
+      <nameColumn>name</nameColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <add>4.5</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>dedupe_rule_group_id</name>
+    <table>civicrm_dedupe_rule_group</table>
+    <key>id</key>
+    <add>4.5</add>
+  </foreignKey>
+  <field>
+    <name>is_billing_required</name>
+    <title>Is billing block required</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>if true than billing block is required this event</comment>
+    <add>4.6</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+</table>

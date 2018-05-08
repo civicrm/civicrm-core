@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
 -- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2017                                |
+-- | Copyright CiviCRM LLC (c) 2004-2018                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -297,7 +297,7 @@ INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated
 -- +--------------------------------------------------------------------+
 -- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2017                                |
+-- | Copyright CiviCRM LLC (c) 2004-2018                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -797,7 +797,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1847, 1033, "10", "Kyustendil"),
 (1848, 1033, "11", "Lovech"),
 (1849, 1033, "12", "Montana"),
-(1850, 1033, "13", "Pazardzik"),
+(1850, 1033, "13", "Pazardzhik"),
 (1851, 1033, "14", "Pernik"),
 (1852, 1033, "15", "Pleven"),
 (1853, 1033, "16", "Plovdiv"),
@@ -1168,7 +1168,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (2237, 1058, "US", "Ústecký kraj"),
 (2238, 1058, "VY", "Vysočina"),
 (2239, 1058, "ZL", "Zlínský kraj"),
-(2240, 1082, "BW", "Baden-Wuerttemberg"),
+(2240, 1082, "BW", "Baden-Württemberg"),
 (2241, 1082, "BY", "Bayern"),
 (2242, 1082, "HB", "Bremen"),
 (2243, 1082, "HH", "Hamburg"),
@@ -1178,12 +1178,12 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (2247, 1082, "RP", "Rheinland-Pfalz"),
 (2248, 1082, "SL", "Saarland"),
 (2249, 1082, "SH", "Schleswig-Holstein"),
-(2250, 1082, "BR", "Berlin"),
+(2250, 1082, "BE", "Berlin"),
 (2251, 1082, "BB", "Brandenburg"),
 (2252, 1082, "MV", "Mecklenburg-Vorpommern"),
 (2253, 1082, "SN", "Sachsen"),
 (2254, 1082, "ST", "Sachsen-Anhalt"),
-(2255, 1082, "TH", "Thueringen"),
+(2255, 1082, "TH", "Thüringen"),
 (2256, 1060, "AS", "Ali Sabiah"),
 (2257, 1060, "DI", "Dikhil"),
 (2258, 1060, "DJ", "Djibouti"),
@@ -2924,44 +2924,44 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4172, 1176, "B", "Bucuresti"),
 (4173, 1176, "AB", "Alba"),
 (4174, 1176, "AR", "Arad"),
-(4175, 1176, "AG", "Arges"),
-(4176, 1176, "BC", "Bacau"),
+(4175, 1176, "AG", "Argeș"),
+(4176, 1176, "BC", "Bacău"),
 (4177, 1176, "BH", "Bihor"),
-(4178, 1176, "BN", "Bistrita-Nasaud"),
-(4179, 1176, "BT", "Boto\'ani"),
-(4180, 1176, "BV", "Bra\'ov"),
-(4181, 1176, "BR", "Braila"),
-(4182, 1176, "BZ", "Buzau"),
-(4183, 1176, "CS", "Caras-Severin"),
-(4184, 1176, "CL", "Ca la ras\'i"),
+(4178, 1176, "BN", "Bistrița-Năsăud"),
+(4179, 1176, "BT", "Botoșani"),
+(4180, 1176, "BV", "Brașov"),
+(4181, 1176, "BR", "Brăila"),
+(4182, 1176, "BZ", "Buzău"),
+(4183, 1176, "CS", "Caraș-Severin"),
+(4184, 1176, "CL", "Călărași"),
 (4185, 1176, "CJ", "Cluj"),
-(4186, 1176, "CT", "Constant\'a"),
+(4186, 1176, "CT", "Constanța"),
 (4187, 1176, "CV", "Covasna"),
-(4188, 1176, "DB", "Dambovit\'a"),
+(4188, 1176, "DB", "Dâmbovița"),
 (4189, 1176, "DJ", "Dolj"),
-(4190, 1176, "GL", "Galat\'i"),
+(4190, 1176, "GL", "Galați"),
 (4191, 1176, "GR", "Giurgiu"),
 (4192, 1176, "GJ", "Gorj"),
 (4193, 1176, "HR", "Harghita"),
 (4194, 1176, "HD", "Hunedoara"),
-(4195, 1176, "IL", "Ialomit\'a"),
-(4196, 1176, "IS", "Ias\'i"),
+(4195, 1176, "IL", "Ialomița"),
+(4196, 1176, "IS", "Iași"),
 (4197, 1176, "IF", "Ilfov"),
-(4198, 1176, "MM", "Maramures"),
-(4199, 1176, "MH", "Mehedint\'i"),
-(4200, 1176, "MS", "Mures"),
-(4201, 1176, "NT", "Neamt"),
+(4198, 1176, "MM", "Maramureș"),
+(4199, 1176, "MH", "Mehedinți"),
+(4200, 1176, "MS", "Mureș"),
+(4201, 1176, "NT", "Neamț"),
 (4202, 1176, "OT", "Olt"),
 (4203, 1176, "PH", "Prahova"),
 (4204, 1176, "SM", "Satu Mare"),
-(4205, 1176, "SJ", "Sa laj"),
+(4205, 1176, "SJ", "Sălaj"),
 (4206, 1176, "SB", "Sibiu"),
 (4207, 1176, "SV", "Suceava"),
 (4208, 1176, "TR", "Teleorman"),
-(4209, 1176, "TM", "Timis"),
+(4209, 1176, "TM", "Timiș"),
 (4210, 1176, "TL", "Tulcea"),
 (4211, 1176, "VS", "Vaslui"),
-(4212, 1176, "VL", "Valcea"),
+(4212, 1176, "VL", "Vâlcea"),
 (4213, 1176, "VN", "Vrancea"),
 (4214, 1177, "AD", "Adygeya, Respublika"),
 (4215, 1177, "AL", "Altay, Respublika"),
@@ -4377,11 +4377,50 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 
 -- CRM-21234 Missing subdivisions of Tajikistan.
 (NULL, 1209, "DU", "Dushanbe"),
-(NULL, 1209, "RA", "Nohiyahoi Tobei Jumhurí");
+(NULL, 1209, "RA", "Nohiyahoi Tobei Jumhurí"),
+
+-- CRM-21268 Missing French overseas departments.
+(NULL, 1076, "WF", "Wallis-et-Futuna"),
+(NULL, 1076, "NC", "Nouvelle-Calédonie"),
+
+-- CRM-21532 Add French state/departments
+(NULL, 1076, "52", "Haute-Marne"),
+
+-- Add states for: Barbados and Antigua and Barbuda
+(NULL, 1009, "03", "Saint George"),
+(NULL, 1009, "04", "Saint John"),
+(NULL, 1009, "05", "Saint Mary"),
+(NULL, 1009, "06", "Saint Paul"),
+(NULL, 1009, "07", "Saint Peter"),
+(NULL, 1009, "08", "Saint Philip"),
+(NULL, 1009, "10", "Barbuda"),
+(NULL, 1009, "11", "Redonda"),
+(NULL, 1018, "01", "Christ Church"),
+(NULL, 1018, "02", "Saint Andrew"),
+(NULL, 1018, "03", "Saint George"),
+(NULL, 1018, "04", "Saint James"),
+(NULL, 1018, "05", "Saint John"),
+(NULL, 1018, "06", "Saint Joseph"),
+(NULL, 1018, "07", "Saint Lucy"),
+(NULL, 1018, "08", "Saint Michael"),
+(NULL, 1018, "09", "Saint Peter"),
+(NULL, 1018, "10", "Saint Philip"),
+(NULL, 1018, "11", "Saint Thomas"),
+
+-- CRM-21837 - Missing states for Gabon
+(NULL, 1080, "01", "Estuaire"),
+(NULL, 1080, "02", "Haut-Ogooué"),
+(NULL, 1080, "03", "Moyen-Ogooué"),
+(NULL, 1080, "04", "Ngounié"),
+(NULL, 1080, "05", "Nyanga"),
+(NULL, 1080, "06", "Ogooué-Ivindo"),
+(NULL, 1080, "07", "Ogooué-Lolo"),
+(NULL, 1080, "08", "Ogooué-Maritime"),
+(NULL, 1080, "09", "Woleu-Ntem");
 -- +--------------------------------------------------------------------+
 -- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2017                                |
+-- | Copyright CiviCRM LLC (c) 2004-2018                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -4591,11 +4630,10 @@ INSERT INTO civicrm_currency (id, name, symbol, numeric_code, full_name) VALUES
 (183, "YER",  "﷼", "886", "Yemeni Rial"),
 (184, "ZMK", NULL, "894", "Zambian Kwacha"),
 (185, "ZWD", "Z$", "716", "Zimbabwe Dollar");
-
 -- +--------------------------------------------------------------------+
 -- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2017                                |
+-- | Copyright CiviCRM LLC (c) 2004-2018                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -6273,7 +6311,8 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'has a policy that( [^ ]*)? prohibited the mail that you sent'),
     (@bounceTypeID, 'is likely unsolicited mail'),
     (@bounceTypeID, 'Local Policy Violation'),
-    (@bounceTypeID, 'ni bilo mogo..?e dostaviti zaradi varnostnega pravilnika');
+    (@bounceTypeID, 'ni bilo mogo..?e dostaviti zaradi varnostnega pravilnika'),
+    (@bounceTypeID, 'abuse report');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)
@@ -6433,7 +6472,7 @@ INSERT INTO `civicrm_contact_type`
 -- +--------------------------------------------------------------------+
 -- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2017                                |
+-- | Copyright CiviCRM LLC (c) 2004-2018                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -23106,7 +23145,7 @@ VALUES
 -- +--------------------------------------------------------------------+
 -- | CiviCRM version 4.7                                                |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2017                                |
+-- | Copyright CiviCRM LLC (c) 2004-2018                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -23292,7 +23331,7 @@ VALUES
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, NULL, 'Mailings', 'Mailings', 'access CiviMail,create mailings,approve mailings,schedule mailings', 'OR', NULL, '1', NULL, 50 );
+    ( @domainID, NULL, 'Mailings', 'Mailings', 'access CiviMail,create mailings,approve mailings,schedule mailings,send SMS', 'OR', NULL, '1', NULL, 50 );
 
 SET @mailinglastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
@@ -23306,8 +23345,8 @@ VALUES
     ( @domainID, 'civicrm/admin/component?reset=1',                         'Headers, Footers, and Automated Messages', 'Headers, Footers, and Automated Messages', 'access CiviMail,administer CiviCRM', 'AND', @mailinglastID, '1', NULL, 6 ),
     ( @domainID, 'civicrm/admin/messageTemplates?reset=1',                  'Message Templates', 'Message Templates',                 'edit message templates', '', @mailinglastID, '1', NULL, 7 ),
     ( @domainID, 'civicrm/admin/options/from_email_address?reset=1', 'From Email Addresses', 'From Email Addresses', 'administer CiviCRM', '', @mailinglastID, '1', 1, 8 ),
-    ( @domainID, 'civicrm/sms/send?reset=1',  'New SMS', 'New SMS', 'administer CiviCRM', NULL, @mailinglastID, '1', NULL, 9 ),
-    ( @domainID, 'civicrm/mailing/browse?reset=1&sms=1', 'Find Mass SMS', 'Find Mass SMS', 'administer CiviCRM', NULL, @mailinglastID, '1', 1, 10 ),
+    ( @domainID, 'civicrm/sms/send?reset=1',  'New SMS', 'New SMS', 'send SMS', NULL, @mailinglastID, '1', NULL, 9 ),
+    ( @domainID, 'civicrm/mailing/browse?reset=1&sms=1', 'Find Mass SMS', 'Find Mass SMS', 'send SMS', NULL, @mailinglastID, '1', 1, 10 ),
     ( @domainID, 'civicrm/a/#/abtest/new',                                  'New A/B Test', 'New A/B Test',                                        'access CiviMail', '', @mailinglastID, '1', NULL, 15 ),
     ( @domainID, 'civicrm/a/#/abtest',                                      'Manage A/B Tests', 'Manage A/B Tests',                                'access CiviMail', '', @mailinglastID, '1', 1, 16 );
 
@@ -23922,5 +23961,4 @@ INSERT INTO `civicrm_report_instance`
     ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
 VALUES
     (  @domainID, 'Survey Details', 'survey/detail', 'Detailed report for canvassing, phone-banking, walk lists or other surveys.', 'access CiviReport', 'a:39:{s:6:"fields";a:2:{s:9:"sort_name";s:1:"1";s:6:"result";s:1:"1";}s:22:"assignee_contact_id_op";s:2:"eq";s:25:"assignee_contact_id_value";s:0:"";s:12:"sort_name_op";s:3:"has";s:15:"sort_name_value";s:0:"";s:17:"street_number_min";s:0:"";s:17:"street_number_max";s:0:"";s:16:"street_number_op";s:3:"lte";s:19:"street_number_value";s:0:"";s:14:"street_name_op";s:3:"has";s:17:"street_name_value";s:0:"";s:15:"postal_code_min";s:0:"";s:15:"postal_code_max";s:0:"";s:14:"postal_code_op";s:3:"lte";s:17:"postal_code_value";s:0:"";s:7:"city_op";s:3:"has";s:10:"city_value";s:0:"";s:20:"state_province_id_op";s:2:"in";s:23:"state_province_id_value";a:0:{}s:13:"country_id_op";s:2:"in";s:16:"country_id_value";a:0:{}s:12:"survey_id_op";s:2:"in";s:15:"survey_id_value";a:0:{}s:12:"status_id_op";s:2:"eq";s:15:"status_id_value";s:1:"1";s:11:"custom_1_op";s:2:"in";s:14:"custom_1_value";a:0:{}s:11:"custom_2_op";s:2:"in";s:14:"custom_2_value";a:0:{}s:17:"custom_3_relative";s:1:"0";s:13:"custom_3_from";s:0:"";s:11:"custom_3_to";s:0:"";s:11:"description";s:75:"Detailed report for canvassing, phone-banking, walk lists or other surveys.";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:17:"access CiviReport";s:6:"groups";s:0:"";s:9:"domain_id";i:1;}');
-
-UPDATE civicrm_domain SET version = '4.7.27';
+UPDATE civicrm_domain SET version = '5.0.1';

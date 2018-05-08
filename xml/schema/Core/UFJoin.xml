@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>UFJoin</class>
+  <name>civicrm_uf_join</name>
+  <comment>User framework join table. This links various internal civicrm object with a profile. Initial use cases are the donation object and the user module</comment>
+  <add>1.3</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>UF Join ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique table ID</comment>
+    <add>1.3</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>is_active</name>
+    <title>Profile Use is active</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this join currently active?</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>module</name>
+    <title>Profile Module</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>Module which owns this uf_join instance, e.g. User Registration, CiviDonate, etc.</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>entity_table</name>
+    <title>Profile Entity Table</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Name of table where item being referenced is stored. Modules which only need a single collection of uf_join instances may choose not to populate entity_table and entity_id.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_UFJoin::entityTables</callback>
+    </pseudoconstant>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>Profile Entity ID</title>
+    <type>int unsigned</type>
+    <comment>Foreign key to the referenced item.</comment>
+    <add>1.3</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>1.3</add>
+  </dynamicForeignKey>
+  <index>
+    <name>index_entity</name>
+    <fieldName>entity_table</fieldName>
+    <fieldName>entity_id</fieldName>
+    <add>1.3</add>
+  </index>
+  <field>
+    <name>weight</name>
+    <title>Order</title>
+    <type>int</type>
+    <required>true</required>
+    <default>1</default>
+    <comment>Controls display order when multiple user framework groups are setup for concurrent display.</comment>
+    <add>1.3</add>
+  </field>
+  <field>
+    <name>uf_group_id</name>
+    <title>Profile ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Which form does this field belong to.</comment>
+    <add>1.3</add>
+    <pseudoconstant>
+      <table>civicrm_uf_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>uf_group_id</name>
+    <table>civicrm_uf_group</table>
+    <key>id</key>
+    <add>1.3</add>
+  </foreignKey>
+  <field>
+    <name>module_data</name>
+    <title>Profile Use Data</title>
+    <type>longtext</type>
+    <comment>Json serialized array of data used by the ufjoin.module</comment>
+    <serialize>JSON</serialize>
+    <add>4.5</add>
+  </field>
+</table>

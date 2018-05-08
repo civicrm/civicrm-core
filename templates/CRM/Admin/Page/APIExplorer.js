@@ -278,6 +278,8 @@
     fields = [];
     joins = [];
     getFieldData = {};
+    // Sequential doesn't make sense in getsingle context, and is only a sensible default for get
+    $('label[for=sequential-checkbox]').toggle(action !== 'getsingle').find('input').prop('checked', action === 'get').change();
     // Special case for getfields
     if (action === 'getfields') {
       fields.push({

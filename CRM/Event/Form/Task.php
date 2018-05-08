@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -88,8 +88,11 @@ class CRM_Event_Form_Task extends CRM_Core_Form {
     $values = $form->controller->exportValues($form->get('searchFormName'));
 
     $form->_task = $values['task'];
-    $eventTasks = CRM_Event_Task::tasks();
-    $form->assign('taskName', $eventTasks[$form->_task]);
+    $tasks = CRM_Event_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission());
+    if (!array_key_exists($form->_task, $tasks)) {
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+    }
+    $form->assign('taskName', $tasks[$form->_task]);
 
     $ids = array();
     if ($values['radio_ts'] == 'ts_sel') {
@@ -127,7 +130,7 @@ class CRM_Event_Form_Task extends CRM_Core_Form {
     //set the context for redirection for any task actions
     $session = CRM_Core_Session::singleton();
 
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
+    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
     $urlParams = 'force=1';
     if (CRM_Utils_Rule::qfKey($qfKey)) {
       $urlParams .= "&qfKey=$qfKey";

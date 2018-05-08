@@ -28,7 +28,7 @@
  *
  * @ingroup civicrm_field_handlers
  */
-class civicrm_handler_field_website extends civicrm_handler_field_location {
+class civicrm_handler_field_website extends civicrm_handler_field {
   static $_websiteType;
 
   public function construct() {

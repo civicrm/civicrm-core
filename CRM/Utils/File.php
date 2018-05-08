@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -890,7 +890,7 @@ HTACCESS;
         break;
 
       default:
-        $url = sprintf('<a href="%s">%s</a>', $url, basename($path));
+        $url = sprintf('<a href="%s">%s</a>', $url, self::cleanFileName(basename($path)));
         break;
     }
 
@@ -910,10 +910,16 @@ HTACCESS;
     $imageURL = CRM_Utils_String::unstupifyUrl($imageURL);
     parse_str(parse_url($imageURL, PHP_URL_QUERY), $query);
 
-    $path = CRM_Core_Config::singleton()->customFileUploadDir . $query['photo'];
+    $url = NULL;
+    if (!empty($query['photo'])) {
+      $path = CRM_Core_Config::singleton()->customFileUploadDir . $query['photo'];
+    }
+    else {
+      $path = $url = $imageURL;
+    }
     $mimeType = 'image/' . strtolower(pathinfo($path, PATHINFO_EXTENSION));
 
-    return self::getFileURL($path, $mimeType);
+    return self::getFileURL($path, $mimeType, $url);
   }
 
   /**

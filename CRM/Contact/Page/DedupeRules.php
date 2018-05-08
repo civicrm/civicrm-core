@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
 
@@ -132,7 +132,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
     // get all rule groups
     $ruleGroups = array();
     $dao = new CRM_Dedupe_DAO_RuleGroup();
-    $dao->orderBy('contact_type,used ASC');
+    $dao->orderBy('contact_type ASC, used ASC, title ASC');
     $dao->find();
 
     $dedupeRuleTypes = CRM_Core_SelectValues::getDedupeRuleTypes();

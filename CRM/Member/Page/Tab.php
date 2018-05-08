@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -156,11 +156,14 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         );
       }
 
-      //does membership have auto renew CRM-7137.
-      if (!empty($membership[$dao->id]['contribution_recur_id']) &&
-        !CRM_Member_BAO_Membership::isSubscriptionCancelled($membership[$dao->id]['membership_id'])
-      ) {
-        $membership[$dao->id]['auto_renew'] = 1;
+      // Display Auto-renew status on page (0=disabled, 1=enabled, 2=enabled, but error
+      if (!empty($membership[$dao->id]['contribution_recur_id'])) {
+        if (CRM_Member_BAO_Membership::isSubscriptionCancelled($membership[$dao->id]['membership_id'])) {
+          $membership[$dao->id]['auto_renew'] = 2;
+        }
+        else {
+          $membership[$dao->id]['auto_renew'] = 1;
+        }
       }
       else {
         $membership[$dao->id]['auto_renew'] = 0;

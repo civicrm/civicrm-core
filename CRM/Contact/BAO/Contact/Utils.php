@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Contact_BAO_Contact_Utils {
 
@@ -679,7 +679,7 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
   public static function contactDetails($componentIds, $componentName, $returnProperties = array()) {
     $contactDetails = array();
     if (empty($componentIds) ||
-      !in_array($componentName, array('CiviContribute', 'CiviMember', 'CiviEvent', 'Activity'))
+      !in_array($componentName, array('CiviContribute', 'CiviMember', 'CiviEvent', 'Activity', 'CiviCase'))
     ) {
       return $contactDetails;
     }
@@ -704,6 +704,9 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
       $compTable = 'civicrm_activity';
       $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     }
+    elseif ($componentName == 'CiviCase') {
+      $compTable = 'civicrm_case';
+    }
     else {
       $compTable = 'civicrm_participant';
     }
@@ -723,6 +726,12 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
             $from[$value] = "
 INNER JOIN civicrm_activity_contact acs ON (acs.activity_id = {$compTable}.id AND acs.record_type_id = {$sourceID})
 INNER JOIN civicrm_contact contact ON ( contact.id = acs.contact_id )";
+          }
+          elseif ($componentName == 'CiviCase') {
+            $select[] = "contact.$property as $property";
+            $from[$value] = "
+INNER JOIN civicrm_case_contact ccs ON (ccs.case_id = {$compTable}.id)
+INNER JOIN civicrm_contact contact ON ( contact.id = ccs.contact_id )";
           }
           else {
             $select[] = "$property as $property";
@@ -800,7 +809,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
    * Function handles shared contact address processing.
    * In this function we just modify submitted values so that new address created for the user
    * has same address as shared contact address. We copy the address so that search etc will be
-   * much efficient.
+   * much more efficient.
    *
    * @param array $address
    *   This is associated array which contains submitted form values.
@@ -810,20 +819,20 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
       return;
     }
 
-    // Sharing contact address during create mode is pretty straight forward.
-    // In update mode we should check following:
-    // - We should check if user has uncheck shared contact address
-    // - If yes then unset the master_id or may be just delete the address that copied master
-    //    Normal update process will automatically create new address with submitted values
+    // In create mode sharing a contact's address is pretty straight forward.
+    // In update mode we should check if the user stops sharing. If yes:
+    // - Set the master_id to an empty value
+    // Normal update process will automatically create new address with submitted values
 
-    // 1. loop through entire subnitted address array
-    $masterAddress = array();
+    // 1. loop through entire submitted address array
     $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'master_id');
     foreach ($address as & $values) {
-      // 2. check if master id exists, if not continue
-      if (empty($values['master_id']) || empty($values['use_shared_address'])) {
-        // we should unset master id when use uncheck share address for existing address
-        $values['master_id'] = 'null';
+      // 2. check if "Use another contact's address" is checked, if not continue
+      // Additionally, if master_id is set (address was shared), set master_id to empty value.
+      if (empty($values['use_shared_address'])) {
+        if (!empty($values['master_id'])) {
+          $values['master_id'] = '';
+        }
         continue;
       }
 
@@ -1094,6 +1103,34 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
     if (!empty($id)) {
       return current($id);
     }
+  }
+
+  /**
+   * Get the tokens that will need to be resolved to populate the contact's greetings.
+   *
+   * @param array $contactParams
+   *
+   * @return array
+   *   Array of tokens. The ALL ke
+   */
+  public static function getTokensRequiredForContactGreetings($contactParams) {
+    $tokens = array();
+    foreach (array('addressee', 'email_greeting', 'postal_greeting') as $greeting) {
+      $string = '';
+      if (!empty($contactParams[$greeting . '_id'])) {
+        $string = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $greeting . '_id', $contactParams[$greeting . '_id']);
+      }
+      $string = isset($contactParams[$greeting . '_custom']) ? $contactParams[$greeting . '_custom'] : $string;
+      if (empty($string)) {
+        $tokens[$greeting] = array();
+      }
+      else {
+        $tokens[$greeting] = CRM_Utils_Token::getTokens($string);
+      }
+    }
+    $allTokens = array_merge_recursive($tokens['addressee'], $tokens['email_greeting'], $tokens['postal_greeting']);
+    $tokens['all'] = $allTokens;
+    return $tokens;
   }
 
   /**

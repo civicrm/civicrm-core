@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType {
 
@@ -85,7 +85,8 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    *
    * @return CRM_Contact_DAO_RelationshipType
    */
-  public static function add(&$params, &$ids) {
+  public static function add(&$params, $ids = []) {
+    $params['id'] = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('relationshipType', $ids));
     //to change name, CRM-3336
     if (empty($params['label_a_b']) && !empty($params['name_a_b'])) {
       $params['label_a_b'] = $params['name_a_b'];
@@ -97,7 +98,7 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
 
     // set label to name if it's not set - but *only* for
     // ADD action. CRM-3336 as part from (CRM-3522)
-    if (empty($ids['relationshipType'])) {
+    if (!$params['id']) {
       if (empty($params['name_a_b']) && !empty($params['label_a_b'])) {
         $params['name_a_b'] = $params['label_a_b'];
       }
@@ -118,8 +119,6 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
     if (!strlen(trim($strName = CRM_Utils_Array::value('label_b_a', $params)))) {
       $relationshipType->label_b_a = CRM_Utils_Array::value('label_a_b', $params);
     }
-
-    $relationshipType->id = CRM_Utils_Array::value('relationshipType', $ids);
 
     $result = $relationshipType->save();
 

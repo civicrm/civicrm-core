@@ -499,7 +499,7 @@ function _civicrm_member_roles_sync($ext_uid = NULL, $cid = NULL, $sync_type = N
       ORDER BY RAND() LIMIT " . $cron_limit;
     }
     else {
-      $sql = "SELECT DISTINCT uf.contact_id FROM civicrm_uf_match uf
+      $sql = "SELECT DISTINCT uf.contact_id, m.end_date FROM civicrm_uf_match uf
       LEFT JOIN civicrm_membership m ON uf.contact_id = m.contact_id
       WHERE m.id IS NOT NULL AND m.membership_type_id IN (" . implode(',', array_keys($memberroles)) . ")
       ORDER BY m.end_date DESC";
@@ -576,7 +576,7 @@ function _civicrm_member_roles_sync($ext_uid = NULL, $cid = NULL, $sync_type = N
       }
       foreach ($memberships['values'] as $key => $membership) {
         if (in_array($membership['status_id'], $inactive)) {
-          unset($membership['values'][$key]);
+          unset($memberships['values'][$key]);
         }
       }
     }

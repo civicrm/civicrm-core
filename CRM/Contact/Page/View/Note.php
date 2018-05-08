@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -93,6 +93,8 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
       $permissions[] = CRM_Core_Permission::DELETE;
     }
     $mask = CRM_Core_Action::mask($permissions);
+
+    $this->assign('canAddNotes', CRM_Core_Permission::check('add contact notes'));
 
     $values = array();
     $links = self::links();
@@ -212,10 +214,27 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->view();
     }
-    elseif ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
+    elseif ($this->_action & CRM_Core_Action::ADD) {
+      if (
+        $this->_permission != CRM_Core_Permission::EDIT &&
+        !CRM_Core_Permission::check('add contact notes')
+        ) {
+        CRM_Core_Error::statusBounce(ts('You do not have access to add notes.'));
+      }
+
+      $this->edit();
+    }
+    elseif ($this->_action & CRM_Core_Action::UPDATE) {
+      if ($this->_permission != CRM_Core_Permission::EDIT) {
+        CRM_Core_Error::statusBounce(ts('You do not have access to edit this note.'));
+      }
+
       $this->edit();
     }
     elseif ($this->_action & CRM_Core_Action::DELETE) {
+      if ($this->_permission != CRM_Core_Permission::EDIT) {
+        CRM_Core_Error::statusBounce(ts('You do not have access to delete this note.'));
+      }
       // we use the edit screen the confirm the delete
       $this->edit();
     }

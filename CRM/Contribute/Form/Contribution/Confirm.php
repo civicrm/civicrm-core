@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -158,7 +158,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param array $params
    * @param int $financialTypeID
-   * @param float $nonDeductibleAmount
    * @param bool $pending
    * @param array $paymentProcessorOutcome
    * @param string $receiptDate
@@ -167,13 +166,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return array
    */
   public static function getContributionParams(
-    $params, $financialTypeID, $nonDeductibleAmount, $pending,
+    $params, $financialTypeID, $pending,
     $paymentProcessorOutcome, $receiptDate, $recurringContributionID) {
     $contributionParams = array(
       'financial_type_id' => $financialTypeID,
       'receive_date' => (CRM_Utils_Array::value('receive_date', $params)) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
-      'non_deductible_amount' => $nonDeductibleAmount,
-      'total_amount' => $params['amount'],
       'tax_amount' => CRM_Utils_Array::value('tax_amount', $params),
       'amount_level' => CRM_Utils_Array::value('amount_level', $params),
       'invoice_id' => $params['invoiceID'],
@@ -191,6 +188,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if ($paymentProcessorOutcome) {
       $contributionParams['payment_processor'] = CRM_Utils_Array::value('payment_processor', $paymentProcessorOutcome);
     }
+    if (!empty($params["is_email_receipt"])) {
+      $contributionParams += array(
+        'receipt_date' => $receiptDate,
+      );
+    }
     if (!$pending && $paymentProcessorOutcome) {
       $contributionParams += array(
         'fee_amount' => CRM_Utils_Array::value('fee_amount', $paymentProcessorOutcome),
@@ -201,10 +203,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         'trxn_result_code' => CRM_Utils_Array::value('trxn_result_code', $paymentProcessorOutcome),
       );
     }
-
-    // CRM-4038: for non-en_US locales, CRM_Contribute_BAO_Contribution::add() expects localised amounts
-    $contributionParams['non_deductible_amount'] = trim(CRM_Utils_Money::format($contributionParams['non_deductible_amount'], ' '));
-    $contributionParams['total_amount'] = trim(CRM_Utils_Money::format($contributionParams['total_amount'], ' '));
 
     if ($recurringContributionID) {
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
@@ -299,7 +297,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // lineItem isn't set until Register postProcess
     $this->_lineItem = $this->get('lineItem');
     $this->_ccid = $this->get('ccid');
-    $this->_paymentProcessor = $this->get('paymentProcessor');
+
     $this->_params = $this->controller->exportValues('Main');
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->get('amount');
@@ -520,14 +518,18 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    // Make a copy of line items array to use for display only
+    $tplLineItems = $this->_lineItem;
     if ($invoicing) {
       $getTaxDetails = FALSE;
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       foreach ($this->_lineItem as $key => $value) {
-        foreach ($value as $v) {
+        foreach ($value as $k => $v) {
           if (isset($v['tax_rate'])) {
             if ($v['tax_rate'] != '') {
               $getTaxDetails = TRUE;
+              // Cast to float to display without trailing zero decimals
+              $tplLineItems[$key][$k]['tax_rate'] = (float) $v['tax_rate'];
             }
           }
         }
@@ -591,7 +593,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_separateMembershipPayment = $this->get('separateMembershipPayment');
     $this->assign('is_separate_payment', $this->_separateMembershipPayment);
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
-      $this->assign('lineItem', $this->_lineItem);
+      $this->assign('lineItem', $tplLineItems);
     }
     else {
       $this->assign('is_quick_config', 1);
@@ -714,14 +716,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public function postProcess() {
     $contactID = $this->getContactID();
-    $result = $this->processFormSubmission($contactID);
+    try {
+      $result = $this->processFormSubmission($contactID);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->bounceOnError($e->getMessage());
+    }
+
     if (is_array($result) && !empty($result['is_payment_failure'])) {
-      // We will probably have the function that gets this error throw an exception on the next round of refactoring.
-      CRM_Core_Session::singleton()->setStatus(ts("Payment Processor Error message :") .
-          $result['error']->getMessage());
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact',
-        "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"
-      ));
+      $this->bounceOnError($result['error']->getMessage());
     }
     // Presumably this is for hooks to access? Not quite clear & perhaps not required.
     $this->set('params', $this->_params);
@@ -946,7 +949,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $params['is_recur'] = $isRecur;
     $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $contributionParams);
     $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $financialType);
-    $nonDeductibleAmount = self::getNonDeductibleAmount($params, $financialType, $online, $form);
 
     $now = date('YmdHis');
     $receiptDate = CRM_Utils_Array::value('receipt_date', $params);
@@ -956,10 +958,16 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if (isset($params['amount'])) {
       $contributionParams = array_merge(self::getContributionParams(
-        $params, $financialType->id, $nonDeductibleAmount, TRUE,
+        $params, $financialType->id, TRUE,
         $result, $receiptDate,
         $recurringContributionID), $contributionParams
       );
+      $contributionParams['non_deductible_amount'] = self::getNonDeductibleAmount($params, $financialType, $online, $form);
+      $contributionParams['skipCleanMoney'] = TRUE;
+      // @todo this is the wrong place for this - it should be done as close to form submission
+      // as possible
+      $contributionParams['total_amount'] = $params['amount'];
+
       $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
 
       $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
@@ -983,10 +991,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $smarty = CRM_Core_Smarty::singleton();
         $smarty->assign('dataArray', $dataArray);
         $smarty->assign('totalTaxAmount', $params['tax_amount']);
-      }
-      if (is_a($contribution, 'CRM_Core_Error')) {
-        $message = CRM_Core_Error::getMessages($contribution);
-        CRM_Core_Error::fatal($message);
       }
 
       // lets store it in the form variable so postProcess hook can get to this and use it
@@ -1014,8 +1018,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       //handle custom data.
       $params['contribution_id'] = $contribution->id;
       if (!empty($params['custom']) &&
-        is_array($params['custom']) &&
-        !is_a($contribution, 'CRM_Core_Error')
+        is_array($params['custom'])
       ) {
         CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution', $contribution->id);
       }
@@ -1984,7 +1987,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     $priceFields = $priceFields[$priceSetID]['fields'];
-    CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
+    $lineItems = array();
+    CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution', $priceSetID);
     $form->_lineItem = array($priceSetID => $lineItems);
     $membershipPriceFieldIDs = array();
     foreach ((array) $lineItems as $lineItem) {
@@ -2433,6 +2437,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       try {
         $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams, $membershipLineItems);
       }
+      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+        CRM_Core_Session::singleton()->setStatus($e->getMessage());
+        if (!empty($this->_contributionID)) {
+          CRM_Contribute_BAO_Contribution::failPayment($this->_contributionID,
+            $contactID, $e->getMessage());
+        }
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"));
+      }
       catch (CRM_Core_Exception $e) {
         CRM_Core_Session::singleton()->setStatus($e->getMessage());
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"));
@@ -2481,6 +2493,20 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
     }
+  }
+
+  /**
+   * Bounce the user back to retry when an error occurs.
+   *
+   * @param string $message
+   */
+  protected function bounceOnError($message) {
+    CRM_Core_Session::singleton()
+      ->setStatus(ts("Payment Processor Error message :") .
+        $message);
+    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact',
+      "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"
+    ));
   }
 
 }

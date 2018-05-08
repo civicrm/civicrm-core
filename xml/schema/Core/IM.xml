@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>IM</class>
+  <name>civicrm_im</name>
+  <comment>IM information for a specific location.</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Instant Messenger ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique IM ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <title>IM Contact</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>location_type_id</name>
+    <title>IM Location Type</title>
+    <type>int unsigned</type>
+    <comment>Which Location does this email belong to.</comment>
+    <pseudoconstant>
+      <table>civicrm_location_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>display_name</labelColumn>
+    </pseudoconstant>
+    <add>2.0</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <index>
+    <name>index_location_type</name>
+    <fieldName>location_type_id</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>name</name>
+    <title>IM Screen Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <headerPattern>/I(nstant )?M(ess.*)?|screen(\s+)?name/i</headerPattern>
+    <dataPattern>/^[A-Za-z][0-9A-Za-z]{20,}$/</dataPattern>
+    <comment>IM screen name</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>provider_id</name>
+    <title>IM Provider</title>
+    <type>int unsigned</type>
+    <comment>Which IM Provider does this screen name belong to.</comment>
+    <add>1.1</add>
+    <pseudoconstant>
+      <optionGroupName>instant_messenger_service</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <index>
+    <name>UI_provider_id</name>
+    <fieldName>provider_id</fieldName>
+    <add>1.6</add>
+  </index>
+  <field>
+    <name>is_primary</name>
+    <title>Is IM Primary?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this the primary IM for this contact and location.</comment>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>index_is_primary</name>
+    <fieldName>is_primary</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>is_billing</name>
+    <title>Is IM Billing?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this the billing?</comment>
+    <add>2.0</add>
+  </field>
+  <index>
+    <name>index_is_billing</name>
+    <fieldName>is_billing</fieldName>
+    <add>2.0</add>
+  </index>
+</table>

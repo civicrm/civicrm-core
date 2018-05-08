@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -81,12 +81,12 @@
     </div>
   </div>
 
-  <div id="crm-submit-buttons">{$form.buttons.html}</div>
+  <div id="crm-submit-buttons" class="crm-submit-buttons">{$form.buttons.html}</div>
   </fieldset>
 {/if}
 
 {if $rows and $action ne 2 and $action ne 4}
-
+<div class="crm-content-block crm-block">
   <div id='mainTabContainer'>
     <ul>
       <li id='tab_user'>    <a href='#user'     title='{ts}User-driven Messages{/ts}'>    {ts}User-driven Messages{/ts}    </a></li>
@@ -162,7 +162,7 @@
       </div>
     {/foreach}
   </div>
-
+</div>
   <script type='text/javascript'>
     var selectedTab = 'user';
     {if $selectedChild}selectedTab = '{$selectedChild}';{/if}

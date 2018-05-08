@@ -396,6 +396,24 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Check if user registration is permitted.
+   *
+   * @return bool
+   */
+  public function isUserRegistrationPermitted() {
+    return FALSE;
+  }
+
+  /**
+   * Check if user can create passwords or is initially assigned a system-generated one.
+   *
+   * @return bool
+   */
+  public function isPasswordUserGenerated() {
+    return FALSE;
+  }
+
+  /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
    * @param string $destination
@@ -706,6 +724,11 @@ abstract class CRM_Utils_System_Base {
       $tzObj = new DateTimeZone($timezone);
       $dateTime = new DateTime("now", $tzObj);
       $tz = $tzObj->getOffset($dateTime);
+
+      if ($tz === 0) {
+        // CRM-21422
+        return '+00:00';
+      }
 
       if (empty($tz)) {
         return FALSE;

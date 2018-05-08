@@ -21,7 +21,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * Build the $data array for CiviMail related tables
@@ -40,9 +40,7 @@
  * civicrm_mailing_event_unsubscribe
  */
 function _civicrm_mail_data(&$data, $enabled) {
-  /*
-     * CivicRM Mailings tables
-     */
+  // CivicRM Mailings tables
 
   $data['civicrm_mailing']['table']['group'] = t('CiviCRM Mailings');
 
@@ -67,7 +65,7 @@ function _civicrm_mail_data(&$data, $enabled) {
   // expose the ID to Views to allow users to drill down to a specific mailing.
   $data['civicrm_mailing']['id'] = array(
     'title' => t('ID'),
-    'help' => t('The mailing\'s ID in the database.'),
+    'help' => t("The mailing's ID in the database."),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
     ),
@@ -82,11 +80,11 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //expose the domain_id to Views to allow users to specify a domain.
   $data['civicrm_mailing']['domain_id'] = array(
     'title' => t('Domain ID'),
-    'help' => t('The mailing\'s Domain ID in the database.'),
+    'help' => t("The mailing's Domain ID in the database."),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
     ),
@@ -101,11 +99,11 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //expose the header_id to Views to choose mailings based on a header type
   $data['civicrm_mailing']['header_id'] = array(
     'title' => t('Header ID'),
-    'help' => t('The mailing\'s Header ID in the database.'),
+    'help' => t("The mailing's Header ID in the database."),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
     ),
@@ -120,11 +118,11 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //expose the footer_id to Views to choose mailings based on a footer type
   $data['civicrm_mailing']['footer_id'] = array(
     'title' => t('Footer ID'),
-    'help' => t('The mailing\'s Footer ID in the database.'),
+    'help' => t("The mailing's Footer ID in the database."),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
     ),
@@ -139,12 +137,12 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //expose the reply_id to Views to choose mailings based on a reply type
   //Or maybe this is to drill down to a single reply
   $data['civicrm_mailing']['reply_id'] = array(
     'title' => t('Reply ID'),
-    'help' => t('The mailing\'s Reply ID in the database.'),
+    'help' => t("The mailing's Reply ID in the database."),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
     ),
@@ -159,12 +157,12 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //expose the unsubscribe_id to Views to choose mailings based on an unsubscribe type
   //Or maybe this is to drill down to a single unsubscribe request
   $data['civicrm_mailing']['unsubscribe_id'] = array(
     'title' => t('Unsubscribe ID'),
-    'help' => t('The mailing\'s Unsubscribe ID in the database.'),
+    'help' => t("The mailing\'s Unsubscribe ID in the database."),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
     ),
@@ -179,12 +177,12 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //expose the resubscribe_id to Views to choose mailings based on an resubscribe type
   //Or maybe this is to drill down to a single rensubscribe request
   $data['civicrm_mailing']['resubscribe_id'] = array(
     'title' => t('Resubscribe ID'),
-    'help' => t('The mailing\'s Resubscribe ID in the database.'),
+    'help' => t("The mailing's Resubscribe ID in the database."),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
     ),
@@ -199,12 +197,12 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //expose the optout_id to Views to choose mailings based on an optout type
   //Or maybe this is to drill down to a single optout request
   $data['civicrm_mailing']['optout_id'] = array(
     'title' => t('Optout ID'),
-    'help' => t('The mailing\'s Optout ID in the database.'),
+    'help' => t("The mailing's Optout ID in the database."),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
     ),
@@ -219,7 +217,7 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //Mailing Name
   $data['civicrm_mailing']['name'] = array(
     'title' => t('Name'),
@@ -243,7 +241,7 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //From Name
   $data['civicrm_mailing']['from_name'] = array(
     'title' => t('From Name'),
@@ -263,7 +261,7 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //Mailing From e-mail
   $data['civicrm_mailing']['from_email'] = array(
     'title' => t('From Email'),
@@ -283,7 +281,7 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //Mailing reply to e-mail
   $data['civicrm_mailing']['replyto_email'] = array(
     'title' => t('Reply to Email'),
@@ -363,7 +361,7 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //Does the mailng track click throughs
   $data['civicrm_mailing']['url_tracking'] = array(
     'title' => t('Track URLs?'),
@@ -382,7 +380,7 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //forward_replies
   //Should we forward replies back to the author?
   $data['civicrm_mailing']['forward_replies'] = array(
@@ -402,8 +400,8 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
-  //auto_responder 
+
+  //auto_responder
   //Should we enable the auto-responder?
   $data['civicrm_mailing']['auto_responder'] = array(
     'title' => t('Auto Responder?'),
@@ -422,7 +420,7 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //Does the e-mail track opens
   $data['civicrm_mailing']['open_tracking'] = array(
     'title' => t('Track Opens?'),
@@ -459,12 +457,12 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
-  //msg_template_id 
+
+  //msg_template_id
   //FK to the message template
   $data['civicrm_mailing']['msg_template_id'] = array(
     'title' => t('Messaage Template ID'),
-    'help' => t('The mailing\'s Message Template ID in the database.'),
+    'help' => t("The mailing's Message Template ID in the database."),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
     ),
@@ -479,8 +477,8 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
-  //override_verp 
+
+  //override_verp
   //Should we overrite VERP address in Reply-To
   $data['civicrm_mailing']['is_completed'] = array(
     'title' => t('Overrite VERP?'),
@@ -499,12 +497,12 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
-  //created_id 
+
+  //created_id
   //FK to Contact ID who first created this mailing
   $data['civicrm_mailing']['created_id'] = array(
     'title' => t('Creator ID'),
-    'help' => t('The user ID of the mailing\'s creator in the database.'),
+    'help' => t("The user ID of the mailing's creator in the database."),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
     ),
@@ -519,11 +517,11 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
-  //created_date	 
+
+  //created_date
   $data['civicrm_mailing']['created_date'] = array(
     'title' => t('Created Date'),
-    'help' => t('The Mailing\'s Created Date'),
+    'help' => t("The Mailing's Created Date"),
     'field' => array(
       'handler' => 'civicrm_handler_field_datetime',
       'click sortable' => TRUE,
@@ -544,13 +542,13 @@ function _civicrm_mail_data(&$data, $enabled) {
     'title' => 'Created Date',
       'name' => 'created_date',
     ));
-  
-  //scheduled_id	
-  
-  //scheduled_date	
+
+  //scheduled_id
+
+  //scheduled_date
   //Dealt with below: see $data['civicrm_mailing_job']['scheduled_date']
-  
-  //approver_id	
+
+  //approver_id
   // FK to Contact ID who approved this mailing
   $data['civicrm_mailing']['approver_id'] = array(
     'title' => t('Approver ID'),
@@ -569,12 +567,12 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
-  //approval_date	
+
+  //approval_date
   // Date and time this mailing was approved.
   $data['civicrm_mailing']['approval_date'] = array(
     'title' => t('Approval Date'),
-    'help' => t('The Mailing\'s Approval Date'),
+    'help' => t("The Mailing's Approval Date"),
     'field' => array(
       'handler' => 'civicrm_handler_field_datetime',
       'click sortable' => TRUE,
@@ -595,7 +593,7 @@ function _civicrm_mail_data(&$data, $enabled) {
     'title' => 'Approval Date',
       'name' => 'approval_date',
     ));
-    
+
   //approval_status_id
   //Based on an option value. This value is an integer
   //Can we link the integer to the option value in the display?
@@ -616,7 +614,7 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //approval_note
   $data['civicrm_mailing']['approval_note'] = array(
     'title' => t('Approval Note'),
@@ -721,7 +719,6 @@ function _civicrm_mail_data(&$data, $enabled) {
     ),
   );
 
-
   // mailing_component table aliased as mailing_footer
   $data['civicrm_mailing_footer']['table']['group'] = ts('CiviCRM Mailings');
 
@@ -752,7 +749,6 @@ function _civicrm_mail_data(&$data, $enabled) {
     ),
   );
 
-
   //Mailing Job table
   $data['civicrm_mailing_job']['table']['group'] = ts('CiviCRM Mailing Job');
 
@@ -767,7 +763,7 @@ function _civicrm_mail_data(&$data, $enabled) {
   //When is the mailing sceduled to go out
   $data['civicrm_mailing_job']['scheduled_date'] = array(
     'title' => t('Scheduled Date'),
-    'help' => t('The Mailing\'s Scheduled Date'),
+    'help' => t("The Mailing's Scheduled Date"),
     'field' => array(
       'handler' => 'civicrm_handler_field_datetime',
       'click sortable' => TRUE,
@@ -791,7 +787,7 @@ function _civicrm_mail_data(&$data, $enabled) {
   //When did the mailing start to send
   $data['civicrm_mailing_job']['start_date'] = array(
     'title' => t('Start Date'),
-    'help' => t('The Mailing\'s Start Date'),
+    'help' => t("The Mailing's Start Date"),
     'field' => array(
       'handler' => 'civicrm_handler_field_datetime',
       'click sortable' => TRUE,
@@ -812,7 +808,7 @@ function _civicrm_mail_data(&$data, $enabled) {
   //Mailing finish date
   $data['civicrm_mailing_job']['end_date'] = array(
     'title' => t('End Date'),
-    'help' => t('The Mailing\'s End Date'),
+    'help' => t("The Mailing's End Date"),
     'field' => array(
       'handler' => 'civicrm_handler_field_datetime',
       'click sortable' => TRUE,
@@ -830,7 +826,6 @@ function _civicrm_mail_data(&$data, $enabled) {
     'title' => 'End Date',
       'name' => 'end_date',
     ));
-
 
   //Is this a test mailing
   $data['civicrm_mailing_job']['is_test'] = array(
@@ -958,8 +953,6 @@ function _civicrm_mail_data(&$data, $enabled) {
     ),
   );
 
-
-
   $data['civicrm_mailing_event_bounce']['table']['group'] = ts('CiviCRM Mailing Bounced');
 
   $data['civicrm_mailing_event_bounce']['table']['join'] = array(
@@ -1075,7 +1068,6 @@ function _civicrm_mail_data(&$data, $enabled) {
     ),
   );
 
-
   $data['civicrm_mailing_event_opened']['table']['group'] = ts('CiviCRM Mailing Opened');
 
   $data['civicrm_mailing_event_opened']['table']['join'] = array(
@@ -1123,7 +1115,6 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-
 
   $data['civicrm_mailing_event_reply']['table']['group'] = ts('CiviCRM Mailing Replied');
 
@@ -1222,9 +1213,9 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //Remaining tables in civicrm_mailing_event_unsubscribe:
-  //event_queue_id FK to EventQueue	
+  //event_queue_id FK to EventQueue
   $data['civicrm_mailing_event_unsubscribe']['event_queue_id'] = array(
     'title' => t('Event Queue ID'),
     'help' => t('The event queue ID of the unsubscribe record'),
@@ -1244,7 +1235,7 @@ function _civicrm_mail_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-  
+
   //org_unsubscribe Unsubscribe at org- or group-level
   $data['civicrm_mailing_event_unsubscribe']['org_unsubscribe'] = array(
     'title' => t('Unsubscribe at organisation or group level?'),
@@ -1264,4 +1255,3 @@ function _civicrm_mail_data(&$data, $enabled) {
     ),
   );
 }
-

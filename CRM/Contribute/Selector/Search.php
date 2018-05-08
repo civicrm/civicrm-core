@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -179,7 +179,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
 
     // type of selector
     $this->_action = $action;
-    $returnProperties = CRM_Contribute_BAO_Query::selectorReturnProperties();
+    $returnProperties = CRM_Contribute_BAO_Query::selectorReturnProperties($this->_queryParams);
     $this->_includeSoftCredits = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($this->_queryParams);
     $this->_query = new CRM_Contact_BAO_Query(
       $this->_queryParams,

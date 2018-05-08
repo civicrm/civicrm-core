@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>MappingField</class>
+  <name>civicrm_mapping_field</name>
+  <comment>Individual field mappings for Mapping</comment>
+  <add>1.2</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Mapping Field ID</title>
+    <required>true</required>
+    <comment>Mapping Field ID</comment>
+    <add>1.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+    <add>1.2</add>
+  </primaryKey>
+  <field>
+    <name>mapping_id</name>
+    <type>int unsigned</type>
+    <title>Mapping ID</title>
+    <required>true</required>
+    <comment>Mapping to which this field belongs</comment>
+    <add>1.2</add>
+  </field>
+  <foreignKey>
+    <name>mapping_id</name>
+    <table>civicrm_mapping</table>
+    <key>id</key>
+    <add>1.2</add>
+  </foreignKey>
+  <field>
+    <name>name</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Mapping field key</comment>
+    <add>1.2</add>
+  </field>
+  <field>
+    <name>contact_type</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Contact Type in mapping</comment>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>1.2</add>
+  </field>
+  <field>
+    <name>column_number</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Column number for mapping set</comment>
+    <add>1.2</add>
+  </field>
+  <field>
+    <name>location_type_id</name>
+    <type>int unsigned</type>
+    <title>Location type ID</title>
+    <comment>Location type of this mapping, if required</comment>
+    <add>1.2</add>
+  </field>
+  <foreignKey>
+    <name>location_type_id</name>
+    <table>civicrm_location_type</table>
+    <key>id</key>
+    <add>1.2</add>
+  </foreignKey>
+  <field>
+    <name>phone_type</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Phone type, if required</comment>
+    <add>1.2</add>
+    <drop>2.2</drop>
+  </field>
+  <field>
+    <name>phone_type_id</name>
+    <type>int unsigned</type>
+    <title>Phone type ID</title>
+    <comment>Which type of phone does this number belongs.</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>im_provider_id</name>
+    <type>int unsigned</type>
+    <title>IM provider ID</title>
+    <comment>Which type of IM Provider does this name belong.</comment>
+    <add>3.0</add>
+    <pseudoconstant>
+      <optionGroupName>instant_messenger_service</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>website_type_id</name>
+    <type>int unsigned</type>
+    <title>Website type ID</title>
+    <comment>Which type of website does this site belong</comment>
+    <add>3.2</add>
+    <pseudoconstant>
+      <optionGroupName>website_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>relationship_type_id</name>
+    <type>int unsigned</type>
+    <title>Relationship type ID</title>
+    <comment>Relationship type, if required</comment>
+    <add>1.2</add>
+  </field>
+  <foreignKey>
+    <name>relationship_type_id</name>
+    <table>civicrm_relationship_type</table>
+    <key>id</key>
+    <add>1.2</add>
+  </foreignKey>
+  <field>
+    <name>relationship_direction</name>
+    <type>varchar</type>
+    <length>6</length>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>grouping</name>
+    <type>int unsigned</type>
+    <default>1</default>
+    <comment>Used to group mapping_field records into related sets (e.g. for criteria sets in search builder
+      mappings).
+    </comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>operator</name>
+    <type>varchar</type>
+    <length>16</length>
+    <type>enum</type>
+    <comment>SQL WHERE operator for search-builder mapping fields (search criteria).</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getSearchBuilderOperators</callback>
+    </pseudoconstant>
+    <add>1.5</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>value</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>SQL WHERE value for search-builder mapping fields.</comment>
+    <add>1.5</add>
+  </field>
+</table>

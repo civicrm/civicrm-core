@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,11 +27,13 @@
  <h3>{ts}Find Events{/ts}</h3>
   <table class="form-layout">
     <tr class="crm-event-searchevent-form-block-title">
-        <td>{$form.title.html|crmAddClass:twenty}
-             <div class="description font-italic">
-                    {ts}Complete OR partial Event name.{/ts}
-             </div>
-             <div style="height: auto; vertical-align: bottom">{$form.eventsByDates.html}</div>
+        <td>
+          <label>{$form.title.label}</label>
+          {$form.title.html|crmAddClass:twenty}
+          <div class="description font-italic">
+                 {ts}Complete OR partial Event name.{/ts}
+          </div>
+          <div style="height: auto; vertical-align: bottom">{$form.eventsByDates.html}</div>
         </td>
         <td rowspan="2"><label>{ts}Event Type{/ts}</label>
           {$form.event_type_id.html}

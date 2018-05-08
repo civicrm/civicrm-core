@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>PrevNextCache</class>
+  <name>civicrm_prevnext_cache</name>
+  <comment>Table to cache items for navigation on civicrm searched results.</comment>
+  <add>3.4</add>
+  <field>
+    <name>id</name>
+    <title>Prev Next Cache ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>3.4</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>entity_table</name>
+    <title>Prev Next Entity Table</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>physical tablename for entity being joined to discount, e.g. civicrm_event</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>entity_id1</name>
+    <title>Prev Next Entity ID 1</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to entity table specified in entity_table column.</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>entity_id2</name>
+    <title>Prev Next Entity ID 2</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to entity table specified in entity_table column.</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>cacheKey</name>
+    <title>Cache Key</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Unique path name for cache element of the searched item</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>data</name>
+    <title>Prev Next Data</title>
+    <type>longtext</type>
+    <comment>cached snapshot of the serialized data</comment>
+    <serialize>PHP</serialize>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>is_selected</name>
+    <title>Is Selected</title>
+    <type>boolean</type>
+    <default>0</default>
+    <add>4.2</add>
+  </field>
+  <index>
+    <name>index_all</name>
+    <fieldName>cacheKey</fieldName>
+    <fieldName>entity_id1</fieldName>
+    <fieldName>entity_id2</fieldName>
+    <fieldName>entity_table</fieldName>
+    <fieldName>is_selected</fieldName>
+  </index>
+</table>

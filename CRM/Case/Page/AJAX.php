@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  *
  */
 
@@ -77,9 +77,9 @@ class CRM_Case_Page_AJAX {
 
     $activityParams = array();
     $activityParams['source_contact_id'] = $session->get('userID');
-    $activityParams['activity_type_id'] = CRM_Core_OptionGroup::getValue('activity_type', 'Change Case Tags', 'name');
+    $activityParams['activity_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Case Tags');
     $activityParams['activity_date_time'] = date('YmdHis');
-    $activityParams['status_id'] = CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name');
+    $activityParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
     $activityParams['case_id'] = $caseId;
     $activityParams['is_auto'] = 0;
     $activityParams['subject'] = 'Change Case Tags';
@@ -150,9 +150,9 @@ class CRM_Case_Page_AJAX {
 
     $activityParams = array();
     $activityParams['source_contact_id'] = $session->get('userID');
-    $activityParams['activity_type_id'] = CRM_Core_OptionGroup::getValue('activity_type', 'Add Client To Case', 'name');
+    $activityParams['activity_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Add Client To Case');
     $activityParams['activity_date_time'] = date('YmdHis');
-    $activityParams['status_id'] = CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name');
+    $activityParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
     $activityParams['case_id'] = $caseId;
     $activityParams['is_auto'] = 0;
     $activityParams['subject'] = 'Client Added To Case';
@@ -184,6 +184,32 @@ class CRM_Case_Page_AJAX {
 
     CRM_Case_BAO_Case::endCaseRole($caseId, $b, $cid, $relTypeId);
     CRM_Utils_System::civiExit();
+  }
+
+  public static function getCases() {
+    $requiredParameters = array(
+      'type' => 'String',
+    );
+    $optionalParameters = array(
+      'case_type_id' => 'String',
+      'status_id' => 'String',
+      'all' => 'Positive',
+    );
+    $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
+    $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);
+
+    $allCases = (bool) $params['all'];
+
+    $cases = CRM_Case_BAO_Case::getCases($allCases, $params);
+
+    $casesDT = array(
+      'recordsFiltered' => $cases['total'],
+      'recordsTotal' => $cases['total'],
+    );
+    unset($cases['total']);
+    $casesDT['data'] = $cases;
+
+    CRM_Utils_JSON::output($casesDT);
   }
 
 }

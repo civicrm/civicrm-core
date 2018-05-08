@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contact</base>
+  <class>SubscriptionHistory</class>
+  <name>civicrm_subscription_history</name>
+  <comment>History information of subscribe/unsubscribe actions</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Group Membership History ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Internal Id</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <title>Contact ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Contact Id</comment>
+    <add>1.1</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>group_id</name>
+    <title>Group</title>
+    <type>int unsigned</type>
+    <comment>Group Id</comment>
+    <add>1.1</add>
+    <pseudoconstant>
+      <table>civicrm_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>group_id</name>
+    <table>civicrm_group</table>
+    <key>id</key>
+    <add>1.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>date</name>
+    <title>Group Membership Action Date</title>
+    <type>timestamp</type>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP</default>
+    <comment>Date of the (un)subscription</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>method</name>
+    <title>Group Membership Action</title>
+    <type>varchar</type>
+    <length>8</length>
+    <comment>How the (un)subscription was triggered</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getSubscriptionHistoryMethods</callback>
+    </pseudoconstant>
+    <add>1.1</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>status</name>
+    <title>Group Membership Status</title>
+    <type>varchar</type>
+    <length>8</length>
+    <comment>The state of the contact within the group</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::groupContactStatus</callback>
+    </pseudoconstant>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>tracking</name>
+    <title>Group Membership Tracking</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>IP address or other tracking info</comment>
+    <add>1.1</add>
+  </field>
+</table>

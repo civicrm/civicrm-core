@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CiviCRM_Hook
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
   /**
@@ -122,6 +122,12 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
         $result = $finalResult;
       }
       return $result;
+    }
+    else {
+      // CRM-20904: We should still call Civi extension hooks even if Joomla isn't online yet.
+      return $this->commonInvoke($numParams,
+        $arg1, $arg2, $arg3, $arg4, $arg5, $arg6,
+        $fnSuffix, 'joomla');
     }
   }
 

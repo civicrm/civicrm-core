@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,41 +26,25 @@
  */
 
 /**
- *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
- * This class generates task actions for CiviEvent.
+ * This class generates form task actions for CiviCase.
  */
-class CRM_Case_Form_Task extends CRM_Core_Form {
+class CRM_Case_Form_Task extends CRM_Core_Form_Task {
+
+  // Must be set to entity table name (eg. civicrm_participant) by child class
+  static $tableName = 'civicrm_case';
+  // Must be set to entity shortname (eg. event)
+  static $entityShortname = 'case';
 
   /**
-   * The task being performed
-   *
-   * @var int
-   */
-  protected $_task;
-
-  /**
-   * The additional clause that we restrict the search with
-   *
-   * @var string
-   */
-  protected $_componentClause = NULL;
-
-  /**
-   * The array that holds all the component ids
+   * Deprecated copy of $_entityIds
    *
    * @var array
-   */
-  protected $_componentIds;
-
-  /**
-   * The array that holds all the case ids
-   *
-   * @var array
+   * @deprecated
    */
   public $_caseIds;
 
@@ -73,9 +57,8 @@ class CRM_Case_Form_Task extends CRM_Core_Form {
 
   /**
    * @param CRM_Core_Form $form
-   * @param bool $useTable
    */
-  public static function preProcessCommon(&$form, $useTable = FALSE) {
+  public static function preProcessCommon(&$form) {
     $form->_caseIds = array();
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
@@ -110,7 +93,7 @@ class CRM_Case_Form_Task extends CRM_Core_Form {
       $form->assign('totalSelectedCases', count($ids));
     }
 
-    $form->_caseIds = $form->_componentIds = $ids;
+    $form->_caseIds = $form->_entityIds = $form->_componentIds = $ids;
 
     //set the context for redirection for any task actions
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
@@ -132,38 +115,11 @@ class CRM_Case_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * Given the signer id, compute the contact id
-   * since its used for things like send email
+   * @inheritDoc
    */
   public function setContactIDs() {
-    $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent($this->_caseIds,
-      'civicrm_case_contact'
-    );
-  }
-
-  /**
-   * Simple shell that derived classes can call to add buttons to
-   * the form with a customized title for the main Submit
-   *
-   * @param string $title
-   *   Title of the main button.
-   * @param string $nextType
-   *   Button type for the form after processing.
-   * @param string $backType
-   * @param bool $submitOnce
-   */
-  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons(array(
-        array(
-          'type' => $nextType,
-          'name' => $title,
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => $backType,
-          'name' => ts('Cancel'),
-        ),
-      )
+    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_entityIds,
+      'civicrm_case_contact', 'case_id'
     );
   }
 

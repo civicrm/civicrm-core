@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<table>
+  <base>CRM/Core</base>
+  <class>Persistent</class>
+  <name>civicrm_persistent</name>
+  <comment>DB Template Customization strings</comment>
+  <add>3.2</add>
+  <field>
+    <name>id</name>
+    <title>Persistent ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Persistent Record Id</comment>
+    <add>3.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>false</autoincrement>
+  </primaryKey>
+  <field>
+    <name>context</name>
+    <title>Context</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Context for which name data pair is to be stored</comment>
+    <required>true</required>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>name</name>
+    <title>Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Name of Context</comment>
+    <required>true</required>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>data</name>
+    <title>Data</title>
+    <type>longtext</type>
+    <comment>data associated with name</comment>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>is_config</name>
+    <title>Is Configuration?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Config Settings</comment>
+    <required>true</required>
+    <add>3.2</add>
+  </field>
+</table>

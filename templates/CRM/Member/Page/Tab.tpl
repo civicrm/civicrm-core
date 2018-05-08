@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -94,7 +94,13 @@
                 <td class="crm-membership-end_date" data-order="{$activeMember.end_date}">{$activeMember.end_date|crmDate}</td>
                 <td class="crm-membership-status">{$activeMember.status}</td>
                 <td class="crm-membership-source">{$activeMember.source}</td>
-                <td class="crm-membership-auto_renew">{if $activeMember.auto_renew}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Auto-renew{/ts}" /> {/if}</td>
+                <td class="crm-membership-auto_renew">
+                  {if $activeMember.auto_renew eq 1}
+                      <i class="crm-i fa-check" aria-hidden="true" title="{ts}Auto-renew active{/ts}"></i>
+                  {elseif $activeMember.auto_renew eq 2}
+                      <i class="crm-i fa-ban" aria-hidden="true" title="{ts}Auto-renew error{/ts}"></i>
+                  {/if}
+                </td>
                 <td class="crm-membership-related_count">{$activeMember.related_count}</td>
     <td>
                     {$activeMember.action|replace:'xx':$activeMember.id}
@@ -137,7 +143,13 @@
                 <td class="crm-membership-end_date" data-order="{$inActiveMember.end_date}">{$inActiveMember.end_date|crmDate}</td>
                 <td class="crm-membership-status">{$inActiveMember.status}</td>
                 <td class="crm-membership-source">{$inActiveMember.source}</td>
-                <td class="crm-membership-auto_renew">{if $inActiveMember.auto_renew}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Auto-renew{/ts}" /> {/if}</td>
+                <td class="crm-membership-auto_renew">
+                  {if $inActiveMember.auto_renew eq 1}
+                    <i class="crm-i fa-check" aria-hidden="true" title="{ts}Auto-renew active{/ts}"></i>
+                  {elseif $inActiveMember.auto_renew eq 2}
+                    <i class="crm-i fa-ban" aria-hidden="true" title="{ts}Auto-renew error{/ts}"></i>
+                  {/if}
+                </td>
     <td>{$inActiveMember.action|replace:'xx':$inActiveMember.id}
     {if $inActiveMember.owner_membership_id}
       <a href="{crmURL p='civicrm/membership/view' q="reset=1&id=`$inActiveMember.owner_membership_id`&action=view&context=membership&selectedChild=member"}" title="{ts}View Primary member record{/ts}" class="crm-hover-button action-item">{ts}View Primary{/ts}

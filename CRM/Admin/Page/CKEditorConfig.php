@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.7                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -96,10 +96,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
         'settings' => $settings,
       ));
 
-    $configUrl = self::getConfigUrl($this->preset);
-    if (!$configUrl) {
-      $configUrl = self::getConfigUrl('default');
-    }
+    $configUrl = self::getConfigUrl($this->preset) ?: self::getConfigUrl('default');
 
     $this->assign('preset', $this->preset);
     $this->assign('presets', CRM_Core_OptionGroup::values('wysiwyg_presets', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name'));
@@ -132,7 +129,13 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
       $val = trim($val);
       if (strpos($key, 'config_') === 0 && strlen($val)) {
         if ($val != 'true' && $val != 'false' && $val != 'null' && $val[0] != '{' && $val[0] != '[' && !is_numeric($val)) {
-          $val = json_encode($val);
+          $val = json_encode($val, JSON_UNESCAPED_SLASHES);
+        }
+        elseif ($val[0] == '{' || $val[0] == '[') {
+          if (!is_array(json_decode($val, TRUE))) {
+            // Invalid JSON. Do not save.
+            continue;
+          }
         }
         $pos = strrpos($config, '};');
         $key = preg_replace('/^config_/', 'config.', $key);
@@ -201,10 +204,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    */
   private function getConfigSettings() {
     $matches = $result = array();
-    $file = self::getConfigFile($this->preset);
-    if (!$file) {
-      $file = self::getConfigFile('default');
-    }
+    $file = self::getConfigFile($this->preset) ?: self::getConfigFile('default');
     $result['skin'] = 'moono';
     if ($file) {
       $contents = file_get_contents($file);
@@ -270,7 +270,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
       if (!is_dir(Civi::paths()->getPath('[civicrm.files]/persist'))) {
         mkdir(Civi::paths()->getPath('[civicrm.files]/persist'));
       }
-      $newFileName = Civi::paths()->getPath('[civicrm.files]/persist/crm-ckeditor-default.js');
+      $newFileName = Civi::paths()->getPath(self::CONFIG_FILEPATH . 'default.js');
       file_put_contents($newFileName, $config);
     }
   }
