@@ -4734,7 +4734,7 @@ civicrm_relationship.is_permission_a_b = 0
    *  on full_group_by mode, then append the those missing columns to GROUP BY clause
    * keyword to select fields not present in groupBy
    *
-   * @param string|array $groupBy - GROUP BY clause or array of columns where missing ORDER BY columns will be appended if not present
+   * @param string $groupBy - GROUP BY clause where missing ORDER BY columns will be appended if not present
    * @param array $orderBys - ORDER BY sub-clauses
    *
    */
@@ -4743,17 +4743,8 @@ civicrm_relationship.is_permission_a_b = 0
       foreach ($orderBys as $orderBy) {
         $orderBy = str_ireplace(array(' DESC', ' ASC', '`'), '', $orderBy); // remove sort syntax from ORDER BY clauses if present
         // if ORDER BY column is not present in GROUP BY then append it to end
-        if (preg_match('/(MAX|MIN)\(/i', trim($orderBy)) !== 1) {
-          if (is_array($groupBy)) {
-            // retrieve and add all the ORDER BY columns which are not in GROUP BY list of columns
-            $groupBy += array_filter($groupBy,
-              function($var) use ($orderBy) {
-                return !strstr($var, $orderBy);
-              });
-          }
-          elseif (!strstr($groupBy, $orderBy)) {
-            $groupBy .= ", {$orderBy}";
-          }
+        if (preg_match('/(MAX|MIN)\(/i', trim($orderBy)) !== 1 && !strstr($groupBy, $orderBy)) {
+          $groupBy .= ", {$orderBy}";
         }
       }
     }
@@ -4850,13 +4841,6 @@ civicrm_relationship.is_permission_a_b = 0
     $additionalFromClause = NULL, $skipOrderAndLimit = FALSE
   ) {
 
-    // In this case we are expecting the search query to return all the first single letter characters of contacts ONLY,
-    //  but when FGB (FULL_GROUP_BY_MODE) is enabled MySQL expect the columns present in GROUP BY must be present in SELECT clause
-    //  and that results into error and needless to have other columns. In order to resolve this disable FGB to fulfill both the cases
-    if ($sortByChar) {
-      CRM_Core_DAO::disableFullGroupByMode();
-    }
-
     if ($includeContactIds) {
       $this->_includeContactIds = TRUE;
       $this->_whereClause = $this->whereClause();
@@ -4904,6 +4888,16 @@ civicrm_relationship.is_permission_a_b = 0
         $limit = " LIMIT $offset, $rowCount ";
       }
     }
+    // Two cases where we are disabling FGB (FULL_GROUP_BY_MODE):
+    //   1. Expecting the search query to return all the first single letter characters of contacts ONLY, but when FGB is enabled
+    //      MySQL expect the columns present in GROUP BY, must be present in SELECT clause and that results into error, needless to have other columns.
+    //   2. When GROUP BY columns are present then disable FGB otherwise it demands to add ORDER BY columns in GROUP BY and eventually in SELECT
+    //     clause. This will impact the search query output.
+    $disableFullGroupByMode = ($sortByChar || !empty($groupByCols));
+
+    if ($disableFullGroupByMode) {
+      CRM_Core_DAO::disableFullGroupByMode();
+    }
 
     // CRM-15231
     $this->_sort = $sort;
@@ -4914,15 +4908,6 @@ civicrm_relationship.is_permission_a_b = 0
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
 
     if (!empty($groupByCols)) {
-      if (!empty($order)) {
-        // retrieve order by columns from ORDER BY clause
-        $orderBys = explode(",", str_replace('ORDER BY ', '', $order));
-        self::getGroupByFromOrderBy($groupByCols, $orderBys);
-      }
-      // It doesn't matter to include columns in SELECT clause, which are present in GROUP BY when we just want the contact IDs
-      if (!$groupContacts && !$sortByChar) {
-        $select = self::appendAnyValueToSelect($this->_select, $groupByCols, 'GROUP_CONCAT');
-      }
       $groupBy = " GROUP BY " . implode(', ', $groupByCols);
     }
 
@@ -4957,7 +4942,7 @@ civicrm_relationship.is_permission_a_b = 0
 
     $dao = CRM_Core_DAO::executeQuery($query);
 
-    if ($sortByChar) {
+    if ($disableFullGroupByMode) {
       CRM_Core_DAO::reenableFullGroupByMode();
     }
 
