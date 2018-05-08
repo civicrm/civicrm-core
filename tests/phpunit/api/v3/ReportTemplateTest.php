@@ -158,6 +158,27 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test api to get rows from reports with ACLs enabled.
+   *
+   * Checking for lack of fatal error at the moment.
+   *
+   * @dataProvider getReportTemplates
+   *
+   * @param $reportID
+   *
+   * @throws \PHPUnit_Framework_IncompleteTestError
+   */
+  public function testReportTemplateGetRowsAllReportsACL($reportID) {
+    if (stristr($reportID, 'has existing issues')) {
+      $this->markTestIncomplete($reportID);
+    }
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookNoResults'));
+    $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => $reportID,
+    ));
+  }
+
+  /**
    * Test get statistics.
    *
    * @dataProvider getReportTemplates
