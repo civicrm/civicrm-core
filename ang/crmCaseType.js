@@ -41,8 +41,8 @@
           caseTypes: function($route, crmApi) {
             return crmApi('CaseType', 'get', {options: {limit: 0}});
           },
-          caseTypeCategories: function (crmApi) {
-            return crmApi('OptionValue', 'get', {options: {limit: 0}})
+          caseTypeCategories: function(crmApi) {
+            return crmApi('OptionValue', 'get', {options: {limit: 0}});
           }
         }
       });
@@ -136,7 +136,7 @@
 
     ts = $scope.ts = CRM.ts(null),
     isNewCaseType = !apiCalls.caseType,
-    defaultCategory = _.find(apiCalls.caseTypeCategories.values, { name: 'WORKFLOW' }) || {};
+    defaultCategory = _.find(apiCalls.caseTypeCategories.values, { is_default: '1' }) || {};
 
     $scope.activityStatuses = apiCalls.actStatuses.values;
     $scope.caseStatuses = _.indexBy(apiCalls.caseStatuses.values, 'name');
@@ -378,7 +378,7 @@
     var ts = $scope.ts = CRM.ts(null);
 
     $scope.caseTypes = caseTypes.values;
-    $scope.caseTypeCategoriesIndex = _.indexBy(caseTypeCategories.values, 'value');
+    $scope.caseTypeCategoriesIndexed = _.indexBy(caseTypeCategories.values, 'value');
     $scope.toggleCaseType = function (caseType) {
       caseType.is_active = (caseType.is_active == '1') ? '0' : '1';
       crmApi('CaseType', 'create', caseType, true)

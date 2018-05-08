@@ -268,16 +268,16 @@ describe('crmCaseType', function() {
     });
 
     describe('when creating a new case type', function() {
-      var defaultCategory;
+      var expectedDefaultCategory;
 
       beforeEach(inject(function ($controller) {
         apiCalls.caseType = null;
-        defaultCategory = _.find(apiCalls.caseTypeCategories.values, { name: 'WORKFLOW' }) || {};
+        expectedDefaultCategory = _.find(apiCalls.caseTypeCategories.values, { is_default: '1' }) || {};
         ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
       }));
 
-      it('sets workflow as the default category', function() {
-        expect(scope.caseType.category).toEqual(defaultCategory.value);
+      it('sets the case type category equal to the default one', function() {
+        expect(scope.caseType.category).toEqual(expectedDefaultCategory.value);
       });
     });
   });
@@ -311,7 +311,7 @@ describe('crmCaseType', function() {
   });
 
   describe('CaseTypeListCtrl', function() {
-    var caseTypes, caseTypeCategoriesIndex, crmApiSpy;
+    var caseTypes, crmApiSpy, expectedCaseTypeCategoriesIndexed;
 
     beforeEach(function() {
       var caseTypeCategories = getCaseTypeCategoriesSampleData();
@@ -323,7 +323,7 @@ describe('crmCaseType', function() {
           3: { id: 3 }
         }
       };
-      caseTypeCategoriesIndex = _.indexBy(caseTypeCategories.values, 'value');
+      expectedCaseTypeCategoriesIndexed = _.indexBy(caseTypeCategories.values, 'value');
       crmApiSpy = jasmine.createSpy('crmApi').and.returnValue($q.resolve());
       scope = $rootScope.$new();
       ctrl = $controller('CaseTypeListCtrl', {
@@ -339,7 +339,7 @@ describe('crmCaseType', function() {
     });
 
     it('should store a list of case type categories indexed by value', function() {
-      expect(scope.caseTypeCategoriesIndex).toEqual(caseTypeCategoriesIndex);
+      expect(scope.caseTypeCategoriesIndexed).toEqual(expectedCaseTypeCategoriesIndexed);
     });
 
     describe('toggleCaseType', function() {
@@ -444,7 +444,7 @@ describe('crmCaseType', function() {
   });
 
   /**
-   * Returns a sample api response for case type categories option values.
+   * Returns a sample API response for case type categories option values.
    */
   function getCaseTypeCategoriesSampleData() {
     return {
@@ -456,7 +456,7 @@ describe('crmCaseType', function() {
           "value": "1",
           "name": "WORKFLOW",
           "filter": "0",
-          "is_default": "0",
+          "is_default": "1",
           "weight": "1",
           "is_optgroup": "0",
           "is_reserved": "1",

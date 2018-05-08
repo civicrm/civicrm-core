@@ -67,8 +67,8 @@ class CRM_Upgrade_Incremental_php_FiveTwo extends CRM_Upgrade_Incremental_Base {
     CRM_Core_PseudoConstant::flush();
 
     $options = [
-      ['name' => 'WORKFLOW', 'label' => ts('Workflow')],
-      ['name' => 'VACANCY', 'label' => ts('Vacancy')]
+      ['name' => 'WORKFLOW', 'label' => ts('Workflow'), 'is_default' => TRUE],
+      ['name' => 'VACANCY', 'label' => ts('Vacancy'), 'is_default' => FALSE]
     ];
 
     foreach ($options as $option) {
@@ -76,6 +76,7 @@ class CRM_Upgrade_Incremental_php_FiveTwo extends CRM_Upgrade_Incremental_Base {
         'option_group_id' => 'case_type_category',
         'name' => $option['name'],
         'label' => $option['label'],
+        'is_default' => $option['is_default'],
         'is_active' => TRUE,
         'is_reserved' => TRUE
       ]);
@@ -99,7 +100,7 @@ class CRM_Upgrade_Incremental_php_FiveTwo extends CRM_Upgrade_Incremental_Base {
         'id' => $caseType['id'],
         'category' => $category
       ]);
-     }
+    }
   }
 
   /**
