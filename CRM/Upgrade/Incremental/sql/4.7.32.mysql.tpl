@@ -12,3 +12,7 @@ INSERT INTO `civicrm_state_province` (`id`, `country_id`, `abbreviation`, `name`
 (NULL, @country_id, "07", "Ogooué-Lolo"),
 (NULL, @country_id, "08", "Ogooué-Maritime"),
 (NULL, @country_id, "09", "Woleu-Ntem");
+
+-- CRM-21740
+ALTER TABLE  civicrm_relationship_type ADD weight INT NOT NULL;
+UPDATE civicrm_relationship_type SET weight = id;

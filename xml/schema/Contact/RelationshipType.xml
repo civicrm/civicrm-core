@@ -140,6 +140,15 @@
     <add>1.1</add>
   </field>
   <field>
+    <name>weight</name>
+    <type>int</type>
+    <title>Order</title>
+    <required>true</required>
+    <default>1</default>
+    <comment>Weight of the relationship type.</comment>
+    <add>4.7</add>
+  </field>
+  <field>
     <name>is_active</name>
     <title>Relationship Type is Active</title>
     <type>boolean</type>

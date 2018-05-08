@@ -1123,7 +1123,9 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
                               civicrm_relationship.is_active as is_active,
                               civicrm_relationship.is_permission_a_b as is_permission_a_b,
                               civicrm_relationship.is_permission_b_a as is_permission_b_a,
-                              civicrm_relationship.case_id as case_id';
+                              civicrm_relationship.case_id as case_id,
+                              civicrm_relationship_type.weight as wt
+';
 
       if ($direction == 'a_b') {
         $select .= ', civicrm_relationship_type.label_a_b as label_a_b,
@@ -1262,7 +1264,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     $order = $limit = '';
     if (!$count) {
       if (empty($params['sort'])) {
-        $order = ' ORDER BY civicrm_relationship_type_id, sort_name ';
+        $order = ' ORDER BY wt ';
       }
       else {
         $order = " ORDER BY {$params['sort']} ";
@@ -1280,7 +1282,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
     // building the query string
     $queryString = $select1 . $from1 . $where1 . $select2 . $from2 . $where2;
-
     $relationship = new CRM_Contact_DAO_Relationship();
 
     $relationship->query($queryString . $order . $limit);
