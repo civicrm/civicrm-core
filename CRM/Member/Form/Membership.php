@@ -243,12 +243,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $this->_memType = $params['membership_type_id'][1];
       }
     }
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_memType, 1, 'Membership', $this->_id);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
+
+    // Add custom data to form
+    CRM_Custom_Form_CustomData::addToForm($this, $this->_memType);
 
     // CRM-4395, get the online pending contribution id.
     $this->_onlinePendingContributionId = NULL;
@@ -454,11 +451,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
       $this->assign('hasPriceSets', $buildPriceSet);
     }
-
-    //need to assign custom data type and subtype to the template
-    $this->assign('customDataType', 'Membership');
-    $this->assign('customDataSubType', $this->_memType);
-    $this->assign('entityID', $this->_id);
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(array(
