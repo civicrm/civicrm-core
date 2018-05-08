@@ -16,6 +16,7 @@ Required vars: caseTypes
       <th>{{ts('Title')}}</th>
       <th>{{ts('Name')}}</th>
       <th>{{ts('Description')}}</th>
+      <th>{{ts('Category')}}</th>
       <th>{{ts('Enabled?')}}</th>
       <th></th>
     </tr>
@@ -29,6 +30,7 @@ Required vars: caseTypes
       <td>{{caseType.title}}</td>
       <td>{{caseType.name}}</td>
       <td>{{caseType.description}}</td>
+      <td>{{caseTypeCategoriesIndex[caseType.category].label}}</td>
       <td>{{caseType.is_active == 1 ? ts('Yes') : ts('No')}}</td>
       <!-- FIXME: Can't figure out how styling in other tables gets the nowrap effect... in absence of a consistent fix, KISS -->
       <td style="white-space: nowrap">

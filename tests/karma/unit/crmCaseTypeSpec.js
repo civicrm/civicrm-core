@@ -311,9 +311,11 @@ describe('crmCaseType', function() {
   });
 
   describe('CaseTypeListCtrl', function() {
-    var caseTypes, crmApiSpy;
+    var caseTypes, caseTypeCategoriesIndex, crmApiSpy;
 
     beforeEach(function() {
+      var caseTypeCategories = getCaseTypeCategoriesSampleData();
+
       caseTypes = {
         values: {
           1: { id: 1 },
@@ -321,17 +323,23 @@ describe('crmCaseType', function() {
           3: { id: 3 }
         }
       };
+      caseTypeCategoriesIndex = _.indexBy(caseTypeCategories.values, 'value');
       crmApiSpy = jasmine.createSpy('crmApi').and.returnValue($q.resolve());
       scope = $rootScope.$new();
       ctrl = $controller('CaseTypeListCtrl', {
         $scope: scope,
         caseTypes: caseTypes,
+        caseTypeCategories: caseTypeCategories,
         crmApi: crmApiSpy
       });
     });
 
     it('should store an index of case types', function() {
       expect(scope.caseTypes).toEqual(caseTypes.values);
+    });
+
+    it('should store a list of case type categories indexed by value', function() {
+      expect(scope.caseTypeCategoriesIndex).toEqual(caseTypeCategoriesIndex);
     });
 
     describe('toggleCaseType', function() {

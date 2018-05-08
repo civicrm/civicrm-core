@@ -40,6 +40,9 @@
         resolve: {
           caseTypes: function($route, crmApi) {
             return crmApi('CaseType', 'get', {options: {limit: 0}});
+          },
+          caseTypeCategories: function (crmApi) {
+            return crmApi('OptionValue', 'get', {options: {limit: 0}})
           }
         }
       });
@@ -371,10 +374,11 @@
     }
   });
 
-  crmCaseType.controller('CaseTypeListCtrl', function($scope, crmApi, caseTypes) {
+  crmCaseType.controller('CaseTypeListCtrl', function($scope, crmApi, caseTypes, caseTypeCategories) {
     var ts = $scope.ts = CRM.ts(null);
 
     $scope.caseTypes = caseTypes.values;
+    $scope.caseTypeCategoriesIndex = _.indexBy(caseTypeCategories.values, 'value');
     $scope.toggleCaseType = function (caseType) {
       caseType.is_active = (caseType.is_active == '1') ? '0' : '1';
       crmApi('CaseType', 'create', caseType, true)
