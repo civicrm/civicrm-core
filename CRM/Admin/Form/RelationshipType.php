@@ -37,6 +37,13 @@
 class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'RelationshipType';
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
@@ -49,40 +56,32 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
 
     $this->applyFilter('__ALL__', 'trim');
 
-    $this->add('text', 'label_a_b', ts('Relationship Label-A to B'),
-      CRM_Core_DAO::getAttribute('CRM_Contact_DAO_RelationshipType', 'label_a_b'), TRUE
-    );
+    $this->addField('label_a_b');
+    $this->addField('label_b_a');
     $this->addRule('label_a_b', ts('Label already exists in Database.'),
       'objectExists', array('CRM_Contact_DAO_RelationshipType', $this->_id, 'label_a_b')
     );
-
-    $this->add('text', 'label_b_a', ts('Relationship Label-B to A'),
-      CRM_Core_DAO::getAttribute('CRM_Contact_DAO_RelationshipType', 'label_b_a')
-    );
-
     $this->addRule('label_b_a', ts('Label already exists in Database.'),
       'objectExists', array('CRM_Contact_DAO_RelationshipType', $this->_id, 'label_b_a')
     );
 
-    $this->add('text', 'description', ts('Description'),
-      CRM_Core_DAO::getAttribute('CRM_Contact_DAO_RelationshipType', 'description')
-    );
+    $this->addField('description');
 
     $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '__');
 
     // add select for contact type
-    $contactTypeA = &$this->add('select', 'contact_types_a', ts('Contact Type A') . ' ',
+    $this->add('select', 'contact_types_a', ts('Contact Type A') . ' ',
       array(
         '' => ts('All Contacts'),
       ) + $contactTypes
     );
-    $contactTypeB = &$this->add('select', 'contact_types_b', ts('Contact Type B') . ' ',
+    $this->add('select', 'contact_types_b', ts('Contact Type B') . ' ',
       array(
         '' => ts('All Contacts'),
       ) + $contactTypes
     );
 
-    $isActive = &$this->add('checkbox', 'is_active', ts('Enabled?'));
+    $this->addField('is_active');
 
     //only selected field should be allow for edit, CRM-4888
     if ($this->_id &&
@@ -157,20 +156,22 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       $params['contact_type_a'] = $cTypeA[0];
       $params['contact_type_b'] = $cTypeB[0];
 
-      $params['contact_sub_type_a'] = $cTypeA[1] ? $cTypeA[1] : 'NULL';
-      $params['contact_sub_type_b'] = $cTypeB[1] ? $cTypeB[1] : 'NULL';
+      $params['contact_sub_type_a'] = $cTypeA[1] ? $cTypeA[1] : 'null';
+      $params['contact_sub_type_b'] = $cTypeB[1] ? $cTypeB[1] : 'null';
 
-      // if label B to A is blank, insert the value label A to B for it
-      if (!strlen(trim(CRM_Utils_Array::value('name_b_a', $params)))) {
-        $params['name_b_a'] = CRM_Utils_Array::value('name_a_b', $params);
-      }
       if (!strlen(trim(CRM_Utils_Array::value('label_b_a', $params)))) {
         $params['label_b_a'] = CRM_Utils_Array::value('label_a_b', $params);
       }
 
-      $result = CRM_Contact_BAO_RelationshipType::add($params);
+      if (empty($params['id'])) {
+        // Set name on created but don't update on update as the machine name is not exposed.
+        $params['name_b_a'] = CRM_Utils_String::munge($params['label_b_a']);
+        $params['name_a_b'] = CRM_Utils_String::munge($params['label_a_b']);
+      }
 
-      $this->ajaxResponse['relationshipType'] = $result->toArray();
+      $result = civicrm_api3('RelationshipType', 'create', $params);
+
+      $this->ajaxResponse['relationshipType'] = $result['values'];
 
       CRM_Core_Session::setStatus(ts('The Relationship Type has been saved.'), ts('Saved'), 'success');
     }
