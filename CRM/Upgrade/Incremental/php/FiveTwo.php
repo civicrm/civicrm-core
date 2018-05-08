@@ -29,6 +29,59 @@
 class CRM_Upgrade_Incremental_php_FiveTwo extends CRM_Upgrade_Incremental_Base {
 
   /**
+   * Upgrade function for version 5.2.beta1. This version adds the category column
+   * to case types. The category is an option value that can be Workflow or
+   * Vacancy.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_2_beta1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [ 1 => $rev ]), 'runSql', $rev);
+
+    $this->addCategoryColumnToCaseType();
+    $this->createCaseTypeCategories();
+  }
+
+  /**
+   * Adds a new category column to the case type entity. This column references
+   * option values.
+   */
+  private function addCategoryColumnToCaseType() {
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_case_type
+      ADD COLUMN category INT(10)');
+  }
+
+  /**
+   * Creates the option group and values for the case type categories. The
+   * values can be Vacancy or Workflow types.
+   */
+  private function createCaseTypeCategories() {
+    CRM_Core_BAO_OptionGroup::ensureOptionGroupExists([
+      'name' => 'case_type_category',
+      'title' => ts('Case Type Category'),
+      'is_reserved' => 1,
+    ]);
+
+    // flush the pseudo constant cache so it includes the newly created option group:
+    CRM_Core_PseudoConstant::flush();
+
+    $options = [
+      ['name' => 'WORKFLOW', 'label' => ts('Workflow')],
+      ['name' => 'VACANCY', 'label' => ts('Vacancy')]
+    ];
+
+    foreach ($options as $option) {
+      CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+        'option_group_id' => 'case_type_category',
+        'name' => $option['name'],
+        'label' => $option['label'],
+        'is_active' => TRUE,
+        'is_reserved' => TRUE
+      ]);
+    }
+  }
+
+  /**
    * Compute any messages which should be displayed beforeupgrade.
    *
    * Note: This function is called iteratively for each upcoming
