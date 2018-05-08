@@ -40,6 +40,7 @@ class CRM_Upgrade_Incremental_php_FiveTwo extends CRM_Upgrade_Incremental_Base {
 
     $this->addCategoryColumnToCaseType();
     $this->createCaseTypeCategories();
+    $this->setDefaultCategoriesForCaseTypes();
   }
 
   /**
@@ -79,6 +80,26 @@ class CRM_Upgrade_Incremental_php_FiveTwo extends CRM_Upgrade_Incremental_Base {
         'is_reserved' => TRUE
       ]);
     }
+  }
+
+  /**
+   * Updates current case types so they have a category assigned. All case types
+   * are assigned the Workflow category by default except for the Application case
+   * type, which gets the Vacancy category.
+   */
+  private function setDefaultCategoriesForCaseTypes() {
+    $caseTypes = civicrm_api3('CaseType', 'get', [
+      'options' => [ 'limit' => 0 ]
+    ]);
+
+    foreach ($caseTypes['values'] as $caseType) {
+      $category = $caseType['name'] === 'Application' ? 'VACANCY' : 'WORKFLOW';
+
+      civicrm_api3('CaseType', 'create', [
+        'id' => $caseType['id'],
+        'category' => $category
+      ]);
+     }
   }
 
   /**
