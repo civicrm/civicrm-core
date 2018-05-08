@@ -206,21 +206,7 @@
             {$form.receipt_text.html|crmAddClass:huge}</td>
         </tr>
       </table>
-      <div id="customData"></div>
-      {*include custom data js file*}
-      {include file="CRM/common/customData.tpl"}
-      {literal}
-      <script type="text/javascript">
-      CRM.$(function($) {
-      {/literal}
-        CRM.buildCustomData( '{$customDataType}' );
-        {if $customDataSubType}
-          CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-        {/if}
-        {literal}
-      });
-      </script>
-      {/literal}
+      {include file="CRM/common/customDataBlock.tpl"}
       {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
         <div class="crm-accordion-wrapper">
           <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
