@@ -59,6 +59,11 @@
               sequential: 1,
               options: {limit: 0}
             }];
+            reqs.caseTypeCategories = ['OptionValue', 'get', {
+              option_group_id: 'case_type_category',
+              sequential: 1,
+              options: {limit: 0}
+            }];
             reqs.actTypes = ['OptionValue', 'get', {
               option_group_id: 'activity_type',
               sequential: 1,
@@ -126,10 +131,13 @@
     // CRM_Case_XMLProcessor::REL_TYPE_CNAME
     var REL_TYPE_CNAME = CRM.crmCaseType.REL_TYPE_CNAME,
 
-    ts = $scope.ts = CRM.ts(null);
+    ts = $scope.ts = CRM.ts(null),
+    isNewCaseType = !apiCalls.caseType,
+    defaultCategory = _.find(apiCalls.caseTypeCategories.values, { name: 'WORKFLOW' }) || {};
 
     $scope.activityStatuses = apiCalls.actStatuses.values;
     $scope.caseStatuses = _.indexBy(apiCalls.caseStatuses.values, 'name');
+    $scope.caseTypeCategories = apiCalls.caseTypeCategories.values;
     $scope.activityTypes = _.indexBy(apiCalls.actTypes.values, 'name');
     $scope.activityTypeOptions = _.map(apiCalls.actTypes.values, formatActivityTypeOption);
     $scope.relationshipTypeOptions = _.map(apiCalls.relTypes.values, function(type) {
@@ -142,7 +150,13 @@
       'sequence': 'Sequence'
     };
 
-    $scope.caseType = apiCalls.caseType ? apiCalls.caseType : _.cloneDeep(newCaseTypeTemplate);
+    if (isNewCaseType) {
+      $scope.caseType = _.cloneDeep(newCaseTypeTemplate);
+      $scope.caseType.category = defaultCategory.value;
+    } else {
+      $scope.caseType = apiCalls.caseType;
+    }
+
     $scope.caseType.definition = $scope.caseType.definition || [];
     $scope.caseType.definition.activityTypes = $scope.caseType.definition.activityTypes || [];
     $scope.caseType.definition.activitySets = $scope.caseType.definition.activitySets || [];

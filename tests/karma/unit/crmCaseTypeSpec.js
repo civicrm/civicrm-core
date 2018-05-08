@@ -38,6 +38,7 @@ describe('crmCaseType', function() {
   describe('CaseTypeCtrl', function() {
     beforeEach(function () {
       apiCalls = {
+        caseTypeCategories: getCaseTypeCategoriesSampleData(),
         actStatuses: {
           values: [
             {
@@ -243,6 +244,10 @@ describe('crmCaseType', function() {
       expect(scope.activityTypes['ADC referral']).toEqualData(apiCalls.actTypes.values[0]);
     });
 
+    it('should load case type categories', function() {
+      expect(scope.caseTypeCategories).toEqual(apiCalls.caseTypeCategories.values);
+    });
+
     it('addActivitySet should add an activitySet to the case type', function() {
       scope.addActivitySet('timeline');
       var activitySets = scope.caseType.definition.activitySets;
@@ -260,6 +265,20 @@ describe('crmCaseType', function() {
       expect(newSet.name).toBe('timeline_2');
       expect(newSet.timeline).toBe('1');
       expect(newSet.label).toBe('Timeline #2');
+    });
+
+    describe('when creating a new case type', function() {
+      var defaultCategory;
+
+      beforeEach(inject(function ($controller) {
+        apiCalls.caseType = null;
+        defaultCategory = _.find(apiCalls.caseTypeCategories.values, { name: 'WORKFLOW' }) || {};
+        ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
+      }));
+
+      it('sets workflow as the default category', function() {
+        expect(scope.caseType.category).toEqual(defaultCategory.value);
+      });
     });
   });
 
@@ -415,4 +434,40 @@ describe('crmCaseType', function() {
       });
     });
   });
+
+  /**
+   * Returns a sample api response for case type categories option values.
+   */
+  function getCaseTypeCategoriesSampleData() {
+    return {
+      values: [
+        {
+          "id": "1170",
+          "option_group_id": "153",
+          "label": "Workflow",
+          "value": "1",
+          "name": "WORKFLOW",
+          "filter": "0",
+          "is_default": "0",
+          "weight": "1",
+          "is_optgroup": "0",
+          "is_reserved": "1",
+          "is_active": "1"
+        },
+        {
+          "id": "1171",
+          "option_group_id": "153",
+          "label": "Vacancy",
+          "value": "2",
+          "name": "VACANCY",
+          "filter": "0",
+          "is_default": "0",
+          "weight": "2",
+          "is_optgroup": "0",
+          "is_reserved": "1",
+          "is_active": "1"
+        }
+      ]
+    };
+  }
 });
