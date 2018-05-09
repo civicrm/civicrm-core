@@ -31,6 +31,8 @@
  * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
+
+  public $optimisedForOnlyFullGroupBy = FALSE;
   /**
    * Class constructor.
    */
@@ -299,6 +301,10 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
    * Generate From Clause.
    */
   public function from() {
+    if (!$this->currentLogTable) {
+      // From has already been built in this case.
+      return;
+    }
     $entity = $this->currentLogTable;
 
     $detail = $this->_logTables[$entity];
