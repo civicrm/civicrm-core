@@ -585,13 +585,13 @@
       $.each(val, function(k, v) {
         ret += (ret ? ', ' : '') + "'" + k + "' => " + phpFormat(v);
       });
-      return 'array(' + ret + ')';
+      return '[' + ret + ']';
     }
     if ($.isArray(val)) {
       $.each(val, function(k, v) {
         ret += (ret ? ', ' : '') + phpFormat(v);
       });
-      return 'array(' + ret + ')';
+      return '[' + ret + ']';
     }
     return JSON.stringify(val).replace(/\$/g, '\\$');
   }
@@ -716,7 +716,7 @@
         js = key === 'return' && action !== 'getvalue' ? JSON.stringify(evaluate(value, true)) : json,
         php = key === 'return' && action !== 'getvalue' ? phpFormat(evaluate(value, true)) : phpFormat(value);
       if (!(i++)) {
-        q.php += ", array(\n";
+        q.php += ", [\n";
         q.json += ", {\n";
       } else {
         q.json += ",\n";
@@ -733,10 +733,10 @@
       q.wpcli += key + '=' + json + ' ';
     });
     if (i) {
-      q.php += ")";
+      q.php += "]";
       q.json += "\n}";
     }
-    q.php += ");";
+    q.php += "];";
     q.json += ").done(function(result) {\n  // do something\n});";
     q.smarty += "}\n{foreach from=$result.values item=" + entity.toLowerCase() + "}\n  {$" + entity.toLowerCase() + ".some_field}\n{/foreach}";
     if (!_.includes(action, 'get')) {
