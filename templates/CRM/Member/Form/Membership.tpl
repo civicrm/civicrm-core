@@ -224,7 +224,33 @@
       {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
         <div class="crm-accordion-wrapper">
           <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
-          <div class="crm-accordion-body">{include file="CRM/Contribute/Form/Selector.tpl" context="Search"}</div>
+          <div class="crm-accordion-body">
+            {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
+            <script type="text/javascript">
+              var membershipID = {$entityID};
+              var contactID = {$contactId};
+              {literal}
+              CRM.$(function($) {
+                CRM.loadPage(
+                  CRM.url(
+                    'civicrm/membership/recurring-contributions',
+                    {
+                      reset: 1,
+                      membershipID: membershipID,
+                      cid: contactID
+                    },
+                    'back'
+                  ),
+                  {
+                    target : '#membership-recurring-contributions',
+                    dialog : false
+                  }
+                );
+              });
+              {/literal}
+            </script>
+            <div id="membership-recurring-contributions"></div>
+          </div>
         </div>
       {/if}
       {if $softCredit}
