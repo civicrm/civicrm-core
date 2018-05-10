@@ -67,6 +67,6 @@ module.exports = function(config) {
       outputFile: 'tests/output/karma.xml',
       suite: ''
     },
-    singleRun: true
+    singleRun: false
   });
 };
