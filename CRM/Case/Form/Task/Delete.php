@@ -73,7 +73,7 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
    */
   public function postProcess() {
     $deleted = $failed = 0;
-    foreach ($this->_caseIds as $caseId) {
+    foreach ($this->_entityIds as $caseId) {
       if (CRM_Case_BAO_Case::deleteCase($caseId, $this->_moveToTrash)) {
         $deleted++;
       }

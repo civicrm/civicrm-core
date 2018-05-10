@@ -77,16 +77,30 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
 
   /**
    * Build all the data structures needed to build the form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $this->_entityIds = array();
+    self::preProcessCommon($this);
+  }
 
-    $values = $this->controller->exportValues($this->get('searchFormName'));
+  /**
+   * Common pre-processing function.
+   *
+   * @param CRM_Core_Form $form
+   * @param bool $useTable FIXME This parameter could probably be deprecated as it's not used here
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function preProcessCommon(&$form, $useTable = FALSE) {
+    $form->_entityIds = array();
 
-    $this->_task = $values['task'];
-    $className = 'CRM_' . ucfirst($this::$entityShortname) . '_Task';
+    $values = $form->controller->exportValues($form->get('searchFormName'));
+
+    $form->_task = $values['task'];
+    $className = 'CRM_' . ucfirst($form::$entityShortname) . '_Task';
     $entityTasks = $className::tasks();
-    $this->assign('taskName', $entityTasks[$this->_task]);
+    $form->assign('taskName', $entityTasks[$form->_task]);
 
     $ids = array();
     if ($values['radio_ts'] == 'ts_sel') {
@@ -97,42 +111,48 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
       }
     }
     else {
-      $queryParams = $this->get('queryParams');
+      $queryParams = $form->get('queryParams');
       $sortOrder = NULL;
-      if ($this->get(CRM_Utils_Sort::SORT_ORDER)) {
-        $sortOrder = $this->get(CRM_Utils_Sort::SORT_ORDER);
+      if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {
+        $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
       }
 
       $query = new CRM_Contact_BAO_Query($queryParams, NULL, NULL, FALSE, FALSE,
         CRM_Contact_BAO_Query::MODE_CASE
       );
-      $query->_distinctComponentClause = " ( " . $this::$tableName . ".id )";
-      $query->_groupByComponentClause = " GROUP BY " . $this::$tableName . ".id ";
+      $query->_distinctComponentClause = " ( " . $form::$tableName . ".id )";
+      $query->_groupByComponentClause = " GROUP BY " . $form::$tableName . ".id ";
       $result = $query->searchQuery(0, 0, $sortOrder);
-      $selector = $this::$entityShortname . '_id';
+      $selector = $form::$entityShortname . '_id';
       while ($result->fetch()) {
         $ids[] = $result->$selector;
       }
     }
 
     if (!empty($ids)) {
-      $this->_componentClause = ' ' . $this::$tableName . '.id IN ( ' . implode(',', $ids) . ' ) ';
-      $this->assign('totalSelected' . ucfirst($this::$entityShortname) . 's', count($ids));
+      $form->_componentClause = ' ' . $form::$tableName . '.id IN ( ' . implode(',', $ids) . ' ) ';
+      $form->assign('totalSelected' . ucfirst($form::$entityShortname) . 's', count($ids));
     }
 
-    $this->_entityIds = $this->_componentIds = $ids;
+    $form->_entityIds = $form->_componentIds = $ids;
+
+    // Some functions (eg. PDF letter tokens) rely on Ids being in specific fields rather than the generic $form->_entityIds
+    // So we set that specific field here (eg. for cases $form->_caseIds = $form->_entityIds).
+    // FIXME: This is really to handle legacy code that should probably be updated to use $form->_entityIds
+    $entitySpecificIdsName = '_' . $form::$entityShortname . 'Ids';
+    $form->$entitySpecificIdsName = $form->_entityIds;
 
     //set the context for redirection for any task actions
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
+    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
     $urlParams = 'force=1';
     if (CRM_Utils_Rule::qfKey($qfKey)) {
       $urlParams .= "&qfKey=$qfKey";
     }
 
     $session = CRM_Core_Session::singleton();
-    $searchFormName = strtolower($this->get('searchFormName'));
+    $searchFormName = strtolower($form->get('searchFormName'));
     if ($searchFormName == 'search') {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/' . $this::$entityShortname . '/search', $urlParams));
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/' . $form::$entityShortname . '/search', $urlParams));
     }
     else {
       $session->replaceUserContext(CRM_Utils_System::url("civicrm/contact/search/$searchFormName",
@@ -142,8 +162,8 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
   }
 
   /**
-   * Given the signer id, compute the contact id
-   * since its used for things like send email
+   * Given the entity id, compute the contact id since its used for things like send email
+   * For example, for cases we need to override this function as the table name is civicrm_case_contact
    */
   public function setContactIDs() {
     $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent($this->_entityIds,
