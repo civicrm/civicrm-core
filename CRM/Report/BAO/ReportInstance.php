@@ -41,10 +41,16 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return CRM_Report_DAO_ReportInstance
+   * @return \CRM_Report_DAO_ReportInstance
+   * @throws \CRM_Core_Exception
    */
   public static function add(&$params) {
+    if (!CRM_Core_Permission::check('save Report Criteria')) {
+      // This exception isn't properly caught. But normally you can't save
+      // a report via the UI if you don't have the save Report Criteria
+      // permission. (see also CRM-20430.)
+      throw new CRM_Core_Exception("You don't have the permissions to save a report.");
+    }
     $instance = new CRM_Report_DAO_ReportInstance();
     if (empty($params)) {
       return NULL;
@@ -364,24 +370,35 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    *  - general script-add.
    */
   public static function getActionMetadata() {
-    $actions = array(
-      'report_instance.save' => array('title' => ts('Save')),
-      'report_instance.copy' => array(
+    $actions = array();
+    if (CRM_Core_Permission::check('save Report Criteria')) {
+      $actions['report_instance.save'] = array('title' => ts('Save'));
+      $actions['report_instance.copy'] = array(
         'title' => ts('Save a Copy'),
         'data' => array(
           'is_confirm' => TRUE,
           'confirm_title' => ts('Save a copy...'),
           'confirm_refresh_fields' => json_encode(array(
-            'title' => array('selector' => '.crm-report-instanceForm-form-block-title', 'prepend' => ts('(Copy) ')),
-            'description' => array('selector' => '.crm-report-instanceForm-form-block-description', 'prepend' => ''),
-            'parent_id' => array('selector' => '.crm-report-instanceForm-form-block-parent_id', 'prepend' => ''),
+            'title' => array(
+              'selector' => '.crm-report-instanceForm-form-block-title',
+              'prepend' => ts('(Copy) '),
+            ),
+            'description' => array(
+              'selector' => '.crm-report-instanceForm-form-block-description',
+              'prepend' => '',
+            ),
+            'parent_id' => array(
+              'selector' => '.crm-report-instanceForm-form-block-parent_id',
+              'prepend' => '',
+            ),
           )),
         ),
-      ),
-      'report_instance.print' => array('title' => ts('Print Report')),
-      'report_instance.pdf' => array('title' => ts('Print to PDF')),
-      'report_instance.csv' => array('title' => ts('Export as CSV')),
-    );
+      );
+    }
+    $actions['report_instance.print'] = array('title' => ts('Print Report'));
+    $actions['report_instance.pdf'] = array('title' => ts('Print to PDF'));
+    $actions['report_instance.csv'] = array('title' => ts('Export as CSV'));
+
     if (CRM_Core_Permission::check('administer Reports')) {
       $actions['report_instance.delete'] = array(
         'title' => ts('Delete report'),

@@ -84,6 +84,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     }
     if ($rev == '4.7.32') {
       $preUpgradeMessage .= '<p>' . ts('A new %1 permission has been added. It is not granted by default. If you use SMS, you may wish to review your permissions.', array(1 => 'send SMS')) . '</p>';
+      $preUpgradeMessage .= '<p>' . ts('A new %1 permission has been added. It is not granted by default. If your users create reports, you may wish to review your permissions.', array(1 => 'save Report Criteria')) . '</p>';
     }
   }
 
