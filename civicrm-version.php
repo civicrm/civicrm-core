@@ -117,6 +117,7 @@ namespace {
    * TODO : For now this function is not included in \Civi\Version class so not to break any code
    *   which directly call civicrmVersion(). So those call need to replaced with \Civi\Version::civicrmVersion()
    *   when included in the class
+   * @deprecated
    */
   function civicrmVersion() {
     return [
