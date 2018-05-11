@@ -1081,14 +1081,9 @@ class CRM_Utils_System {
     static $version;
 
     if (!$version) {
-      $verFile = implode(DIRECTORY_SEPARATOR,
-        array(dirname(__FILE__), '..', '..', 'xml', 'version.xml')
-      );
-      if (file_exists($verFile)) {
-        $str = file_get_contents($verFile);
-        $xmlObj = simplexml_load_string($str);
-        $version = (string) $xmlObj->version_no;
-      }
+      $verFile = implode(DIRECTORY_SEPARATOR, [dirname(__FILE__), '..', '..', 'civicrm-version.php']);
+      require_once $verFile;
+      $version = \Civi\Version::findVersion();
 
       // pattern check
       if (!CRM_Utils_System::isVersionFormatValid($version)) {
