@@ -1,8 +1,8 @@
 <?php
 
-namespace Civi {
+namespace _CiviVersion_ {
 
-  class Version {
+  class Util {
 
     /**
      * Get the CiviCRM version
@@ -111,8 +111,8 @@ namespace {
    */
   function civicrmVersion() {
     return [
-      'version' => \Civi\Version::findVersion(),
-      'cms' => \Civi\Version::findCMS(),
+      'version' => \_CiviVersion_\Util::findVersion(),
+      'cms' => \_CiviVersion_\Util::findCMS(),
     ];
   }
 }
