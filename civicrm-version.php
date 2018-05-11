@@ -35,6 +35,9 @@ namespace _CiviVersion_ {
       elseif (function_exists('drupal_bootstrap') && version_compare(VERSION, '7.0', '>=') && version_compare(VERSION, '8.0', '<')) {
         return 'Drupal';
       }
+      elseif (defined('ABSPATH') && function_exists('get_bloginfo')) {
+        return 'WordPress';
+      }
       else {
         // guess CMS name from the current path
         list($cmsType,) = self::findCMSRootPath();
