@@ -26,6 +26,9 @@ namespace _CiviVersion_ {
       if (defined('CIVICRM_UF')) {
         return CIVICRM_UF;
       }
+      elseif (defined('BACKDROP_VERSION')) {
+        return 'Backdrop';
+      }
       elseif (function_exists('drupal_bootstrap') && version_compare(VERSION, '6.0', '>=') && version_compare(VERSION, '7.0', '<')) {
         return 'Drupal6';
       }
