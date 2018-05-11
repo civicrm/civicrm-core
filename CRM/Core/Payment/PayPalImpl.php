@@ -721,7 +721,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function cancelSubscription(&$message = '', $params = array()) {
-    if ($this->isPayPalType($this::PAYPAL_PRO)) {
+    if ($this->isPayPalType($this::PAYPAL_PRO) || $this->isPayPalType($this::PAYPAL_EXPRESS)) {
       $args = array();
       $this->initialize($args, 'ManageRecurringPaymentsProfileStatus');
 
