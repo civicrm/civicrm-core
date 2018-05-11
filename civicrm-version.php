@@ -38,6 +38,9 @@ namespace _CiviVersion_ {
       elseif (defined('ABSPATH') && function_exists('get_bloginfo')) {
         return 'WordPress';
       }
+      elseif (defined('DRUPAL_ROOT') && class_exists('Drupal') && version_compare(\Drupal::VERSION, '8.0', '>=') && version_compare(\Drupal::VERSION, '9.0', '<')) {
+        return 'Drupal8';
+      }
       else {
         // guess CMS name from the current path
         list($cmsType,) = self::findCMSRootPath();
