@@ -33,4 +33,61 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * @dataProvider currenciesDataProvider
+   * @param $currency
+   */
+  public function testGetCurrencyPrecision($currency) {
+    $this->assertEquals($currency['precision'], CRM_Utils_Money::getCurrencyPrecision($currency['name']));
+  }
+
+  /**
+   * FIXME: This needs to use a proper source for currency precision (but we don't have one in CiviCRM yet (maybe MoneyPHP?)
+   * @return array
+   */
+  public function currenciesDataProvider() {
+    $currencies = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array(
+      'labelColumn' => 'name',
+      'orderColumn' => TRUE,
+    ));
+    foreach ($currencies as $currency) {
+      $currencyList[]['name'] = $currency;
+      $currencyList[]['precision'] = 2;
+    }
+    return $currencyList;
+  }
+
+
+  /**
+   * @dataProvider longDecimalDataProvider
+   * @param $input
+   * @param $expected
+   */
+  public function testFormatLongDecimal($input, $expected) {
+    $this->assertEquals($expected, CRM_Utils_Money::formatLongDecimal($input));
+  }
+
+  /**
+   * @return array
+   */
+  public function longDecimalDataProvider() {
+    return array(
+      // array(input, expected)
+      array('10', '10'),
+      array('10.23', '10.23'),
+      array('10.2345678', '10.2345678'),
+      array('-10.2345678', '-10.2345678'),
+      array('10,2345678', '10.2345678'),
+      array('£10,2345678', '10.2345678'),
+    );
+  }
+
+  /*CRM_Utils_Money::formatDecimalRounded();
+  CRM_Utils_Money::formatFull();
+  CRM_Utils_Money::formatLocaleFull();
+  CRM_Utils_Money::formatLocaleNumeric();
+  CRM_Utils_Money::formatNumeric();
+  CRM_Utils_Money::formatCents();
+  */
+
 }

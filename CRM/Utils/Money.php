@@ -38,7 +38,179 @@ class CRM_Utils_Money {
   static $_currencySymbols = NULL;
 
   /**
-   * Format a monetary string.
+   * Warn if php money_format() doesn't exist as they are likely to experience issues displaying currency.
+   * @return bool
+   */
+  private static function moneyFormatExists() {
+    // money_format() exists only in certain PHP install (CRM-650)
+    if (!function_exists('money_format')) {
+      Civi::log()->warning('PHP money_format function does not exist. Monetary amounts may not format correctly for display.');
+      return FALSE;
+    };
+    return TRUE;
+  }
+
+  /**
+   * Format a number according to standard decimal notation, allowing fractions and using dot as decimal separator.
+   * Example: 12.34567
+   *
+   * @param $amount
+   *
+   * @return mixed
+   */
+  public static function formatLongDecimal($amount) {
+    return filter_var($amount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+  }
+
+  /**
+   * Format money in "standard" decimal format, rounded to a specific number of decimal places
+   * Example: 12.34
+   *
+   * @param $amount
+   * @param null $decimalPlaces
+   *     If specified, amount will be rounded to this number of decimal places, otherwise it will be rounded according to currency/locale.
+   * @param null $currency
+   *     If specified, amount will be rounded according to the standard for this currency.
+   *
+   * @return float
+   */
+  public static function formatDecimalRounded($amount, $decimalPlaces = NULL, $currency = NULL) {
+    if (!$decimalPlaces) {
+      $decimalPlaces = self::getCurrencyPrecision($currency);
+    }
+    $amount = self::formatLongDecimal($amount);
+    return round($amount, $decimalPlaces);
+  }
+
+  /**
+   * Format money for display (just numeric part) according to the current locale
+   * Example 12,34 or 12.34
+   *
+   * @param $amount
+   *
+   * @return string
+   */
+  public static function formatLocaleNumeric($amount) {
+    $config = CRM_Core_Config::singleton();
+    $format = $config->moneyvalueformat;
+    return self::formatNumeric($amount, $format);
+  }
+
+  /**
+   * Format money for display (just numeric part). Specify format or use formatLocaleNumeric() instead.
+   * Example: Depends on parameters it is called with
+   *
+   * @param $amount
+   * @param $valueFormat
+   *
+   * @return string
+   */
+  public static function formatNumeric($amount, $valueFormat) {
+    if (CRM_Utils_System::isNull($amount)) {
+      return '';
+    }
+
+    $moneyFormatExists = self::moneyFormatExists();
+    if (is_numeric($amount) && $moneyFormatExists) {
+      $lc = setlocale(LC_MONETARY, 0);
+      setlocale(LC_MONETARY, 'en_US.utf8', 'en_US', 'en_US.utf8', 'en_US', 'C');
+      $amount = money_format($valueFormat, $amount);
+      setlocale(LC_MONETARY, $lc);
+    }
+    return $amount;
+  }
+
+  /**
+   * Format money for display (with symbols etc) according to the current locale
+   * Example €12,34 or £12.34
+   *
+   * @param $amount
+   * @param null $currency
+   *
+   * @return string
+   */
+  public static function formatLocaleFull($amount, $currency = NULL) {
+    $config = CRM_Core_Config::singleton();
+    $format = $config->moneyformat;
+    $valueFormat = $config->moneyvalueformat;
+    return self::formatFull($amount, $format, $valueFormat, $currency);
+  }
+
+  /**
+   * Format money in "cents" or the smallest denominator for the currency:
+   * Example £12.34 returns 1234
+   * @param $amount
+   * @param null $currency
+   *
+   * @return int
+   */
+  public static function formatCents($amount, $currency = NULL) {
+    $amount = self::formatDecimalRounded($amount, self::getCurrencyPrecision($currency));
+    return (int) preg_replace('/[^\d]/', '', strval($amount));
+  }
+
+  /**
+   * Format money for display (with symbols etc). Specify format or use formatLocaleFull() instead.
+   * Example: Depends on parameters it is called with
+   *
+   * @param $amount
+   * @param $format
+   * @param $valueFormat
+   * @param null $currency
+   *
+   * @return string
+   */
+  public static function formatFull($amount, $format, $valueFormat, $currency = NULL) {
+    if (CRM_Utils_System::isNull($amount)) {
+      return '';
+    }
+
+    // If it contains tags, means that HTML was passed and the
+    // amount is already converted properly, so don't mess with it again.
+    if (strpos($amount, '<') !== FALSE) {
+      return $amount;
+    }
+
+    if (!self::$_currencySymbols) {
+      self::$_currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array(
+        'keyColumn' => 'name',
+        'labelColumn' => 'symbol',
+      ));
+    }
+
+    if (!$currency) {
+      $config = CRM_Core_Config::singleton();
+      $currency = $config->defaultCurrency;
+    }
+
+    $moneyFormatExists = self::moneyFormatExists();
+    // setlocale() affects native gettext (CRM-11054, CRM-9976)
+    if (is_numeric($amount) && $moneyFormatExists) {
+      $lc = setlocale(LC_MONETARY, 0);
+      setlocale(LC_MONETARY, 'en_US.utf8', 'en_US', 'en_US.utf8', 'en_US', 'C');
+      $amount = money_format($valueFormat, $amount);
+      setlocale(LC_MONETARY, $lc);
+    }
+
+    // Replace separators
+    $rep = array(
+      ',' => $config->monetaryThousandSeparator,
+      '.' => $config->monetaryDecimalPoint,
+    );
+    $amount = strtr($amount, $rep);
+
+    // Final formatting
+    $replacements = array(
+      '%a' => $amount,
+      '%C' => $currency,
+      '%c' => CRM_Utils_Array::value($currency, self::$_currencySymbols, $currency),
+    );
+    return strtr($format, $replacements);
+  }
+
+  /**
+   * @deprecated Format a monetary string.
+   * Replaced by multiple different functions above
    *
    * Format a monetary string basing on the amount provided,
    * ISO currency code provided and a format string consisting of:
