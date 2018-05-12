@@ -150,6 +150,19 @@
       </div>
     </fieldset>
 
+    <div id="customData"></div>
+    {*include custom data js file*}
+    {include file="CRM/common/customData.tpl"}
+  {literal}
+    <script type="text/javascript">
+      CRM.$(function($) {
+        {/literal}
+        CRM.buildCustomData( '{$customDataType}' );
+        {literal}
+      });
+    </script>
+  {/literal}
+
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {/if}
     <div class="spacer"></div>
