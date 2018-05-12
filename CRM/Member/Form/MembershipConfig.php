@@ -63,6 +63,7 @@ class CRM_Member_Form_MembershipConfig extends CRM_Core_Form {
   public function preProcess() {
     $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
+    parent::preProcess();
   }
 
   /**

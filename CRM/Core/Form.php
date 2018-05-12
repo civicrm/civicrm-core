@@ -426,6 +426,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * This is a virtual function and should be redefined if needed.
    */
   public function preProcess() {
+    try {
+      $entity = $this->getDefaultEntity();
+      if (empty($this->_id)) {
+        return;
+      }
+      // when custom data is included in this page
+      if (!empty($_POST['hidden_custom'])) {
+        CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, $entity, $this->_id);
+        CRM_Custom_Form_CustomData::buildQuickForm($this);
+        CRM_Custom_Form_CustomData::setDefaultValues($this);
+      }
+    }
+    catch (Exception $e) {
+      // No default entity so probably not an entity type
+    }
   }
 
   /**
