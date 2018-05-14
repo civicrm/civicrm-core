@@ -164,11 +164,10 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       CRM_Core_SelectValues::date(NULL, 'M d'), FALSE
     );
 
-    // Auto-renew Option
-    $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
+    // Add Auto-renew options if we have a payment processor that supports recurring contributions
     $isAuthorize = FALSE;
     $options = array();
-    if (is_array($paymentProcessor) && !empty($paymentProcessor)) {
+    if (CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('Recurring'))) {
       $isAuthorize = TRUE;
       $options = CRM_Core_SelectValues::memberAutoRenew();
     }
