@@ -39,6 +39,21 @@
  */
 class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'MembershipType';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
   /**
    * Max number of contacts we will display for membership-organisation
    */
