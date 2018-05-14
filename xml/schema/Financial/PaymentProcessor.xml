@@ -48,6 +48,17 @@
     </html>
   </field>
   <field>
+    <name>key_name</name>
+    <title>Key</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Internal machine name used to unequivocally identify the payment processor.</comment>
+    <add>5.2</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
     <name>description</name>
     <title>Processor Description</title>
     <type>varchar</type>
@@ -109,6 +120,14 @@
     <fieldName>domain_id</fieldName>
     <unique>true</unique>
     <add>1.8</add>
+  </index>
+  <index>
+    <name>UI_key_name_is_test_domain_id</name>
+    <fieldName>key_name</fieldName>
+    <fieldName>is_test</fieldName>
+    <fieldName>domain_id</fieldName>
+    <unique>true</unique>
+    <add>4.7</add>
   </index>
   <field>
     <name>user_name</name>
