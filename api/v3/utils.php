@@ -1117,7 +1117,7 @@ function _civicrm_api3_format_params_for_create(&$params, $entity) {
   }
   $values = array();
   _civicrm_api3_custom_format_params($params, $values, $entity);
-  $params = array_merge($params, $values);
+  $params = CRM_Utils_Array::crmArrayMerge($params, $values);
 }
 
 /**
