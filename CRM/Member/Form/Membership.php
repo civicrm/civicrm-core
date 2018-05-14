@@ -112,6 +112,15 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   );
 
   /**
+   * Get the entity id being edited.
+   *
+   * @return int|null
+   */
+  public function getEntityId() {
+    return $this->_id;
+  }
+
+  /**
    * Get selected membership type from the form values.
    *
    * @param array $priceSet
