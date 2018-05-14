@@ -69,7 +69,6 @@ class CRM_Member_Form_MembershipConfig extends CRM_Core_Form {
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   *
    * @return array
    *   defaults
    */
