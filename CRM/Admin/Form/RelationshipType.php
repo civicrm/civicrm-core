@@ -36,6 +36,50 @@
  */
 class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
 
+  use CRM_Core_Form_EntityFormTrait;
+
+  /**
+   * Fields for the entity to be assigned to the template.
+   *
+   * Fields may have keys
+   *  - name (required to show in tpl from the array)
+   *  - description (optional, will appear below the field)
+   *  - not-auto-addable - this class will not attempt to add the field using addField.
+   *    (this will be automatically set if the field does not have html in it's metadata
+   *    or is not a core field on the form's entity).
+   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
+   *  - template - use a field specific template to render this field
+   * @var array
+   */
+  protected $entityFields = [];
+
+  /**
+   * Set entity fields to be assigned to the form.
+   */
+  protected function setEntityFields() {
+    $this->entityFields = [
+      'label_a_b' => [
+        'name' => 'label_a_b',
+        'description' => ts("Label for the relationship from Contact A to Contact B. EXAMPLE: Contact A is 'Parent of' Contact B.")
+      ],
+      'label_b_a' => [
+        'name' => 'label_b_a',
+        'description' => ts("Label for the relationship from Contact B to Contact A. EXAMPLE: Contact B is 'Child of' Contact A. You may leave this blank for relationships where the name is the same in both directions (e.g. Spouse).")
+      ],
+      'description' => ['name' => 'description'],
+      'contact_types_a' => ['name' => 'contact_types_a', 'not-auto-addable' => TRUE],
+      'contact_types_b' => ['name' => 'contact_types_b', 'not-auto-addable' => TRUE],
+      'is_active' => ['name' => 'is_active'],
+    ];
+  }
+
+  /**
+   * Deletion message to be assigned to the form.
+   *
+   * @var string
+   */
+  protected $deleteMessage;
+
   /**
    * Explicitly declare the entity api name.
    */
@@ -44,28 +88,30 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
   }
 
   /**
+   * Set the delete message.
+   *
+   * We do this from the constructor in order to do a translation.
+   */
+  public function setDeleteMessage() {
+    $this->deleteMessage = ts('WARNING: Deleting this option will result in the loss of all Relationship records of this type.') . ts('This may mean the loss of a substantial amount of data, and the action cannot be undone.') . ts('Do you want to continue?');
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
-    parent::buildQuickForm();
-    $this->setPageTitle(ts('Relationship Type'));
 
+    self::buildQuickEntityForm();
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
 
-    $this->applyFilter('__ALL__', 'trim');
-
-    $this->addField('label_a_b');
-    $this->addField('label_b_a');
     $this->addRule('label_a_b', ts('Label already exists in Database.'),
       'objectExists', array('CRM_Contact_DAO_RelationshipType', $this->_id, 'label_a_b')
     );
     $this->addRule('label_b_a', ts('Label already exists in Database.'),
       'objectExists', array('CRM_Contact_DAO_RelationshipType', $this->_id, 'label_b_a')
     );
-
-    $this->addField('description');
 
     $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '__');
 
@@ -81,8 +127,6 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       ) + $contactTypes
     );
 
-    $this->addField('is_active');
-
     //only selected field should be allow for edit, CRM-4888
     if ($this->_id &&
       CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $this->_id, 'is_reserved')
@@ -95,8 +139,6 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
     }
-
-    $this->assign('relationship_type_id', $this->_id);
 
   }
 

@@ -23,5 +23,17 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* this template is used for adding/editing relationship types  *}
-{include file="CRM/Core/Form/EntityForm.tpl"}
+{if $fieldSpec.template}
+  {include file=$fieldSpec.template}
+{else}
+  <td class="label">{$form.$fieldName.label}
+    {if $fieldSpec.help}{assign var=help value=$fieldSpec.help}{capture assign=helpFile}{if $fieldSpec.help}
+      {$fieldSpec.help}
+    {else}''{/if}
+    {/capture}{help id=$help.id file=$help.file}{/if}
+    {if $action == 2 && $fieldSpec.is_add_translate_dialog}{include file='CRM/Core/I18n/Dialog.tpl' table=$entityTable field=$fieldName id=$entityID}{/if}
+  </td>
+  <td>{if $form.$fieldName.html}{if $fieldSpec.formatter === 'crmMoney'}{$form.$fieldName.html|crmMoney}{else}{$form.$fieldName.html}{/if}{else}{$fieldSpec.place_holder}{/if}<br />
+    {if $fieldSpec.description}<span class="description">{$fieldSpec.description}</span>{/if}
+  </td>
+{/if}
