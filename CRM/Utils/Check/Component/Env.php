@@ -871,6 +871,28 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Display a warning for site admins if they cannot store international strings.
+   *
+   * @return array
+   */
+  public function checkDbCharacterSet() {
+    $messages = array();
+
+    if (!CRM_Utils_SQL::supportStorageOfAccents()) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('The default MySQL character-set for this database is not UTF-8. This could lead to irregularities in storing internationalized strings. Consider <a href="%1">changing the default MySQL character-set</a>.',
+          [1 => $this->createDocUrl('checkDbCharacterSet')]),
+        ts('International String Storage'),
+        \Psr\Log\LogLevel::NOTICE,
+        'fa-language'
+      );
+    }
+
+    return $messages;
+  }
+
+  /**
    * Check that the resource URL points to the correct location.
    * @return array
    */
@@ -900,6 +922,15 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       );
     }
     return $messages;
+  }
+
+  /**
+   * @param $topic
+   *
+   * @return string
+   */
+  public function createDocUrl($topic) {
+    return CRM_Utils_System::getWikiBaseURL() . $topic;
   }
 
 }
