@@ -121,6 +121,8 @@ class CRM_Utils_SQL {
 
   /**
    * Is the Database set up to handle acceents.
+   * @warning This function was introduced in attempt to determine the reason why the test getInternationalStrings was failing on ubu1604 but passing on ubu1204-5
+   * This function should not be used as the basis of further work as the reasoning is not perfact and is giving false failures.
    * @return bool
    */
   public static function supportStorageOfAccents() {
