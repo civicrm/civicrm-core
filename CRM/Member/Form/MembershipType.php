@@ -134,23 +134,19 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     }
 
     $this->applyFilter('__ALL__', 'trim');
-    $this->add('text', 'name', ts('Name'), CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'name'), TRUE);
+    $this->addField('name', [], TRUE);
+    $this->addField('description');
+    $this->addField('minimum_fee');
+    $this->addField('duration_unit', [], TRUE);
+    $this->addField('period_type', [], TRUE);
+    $this->addField('is_active');
+    $this->addField('weight');
+    $this->addField('max_related');
 
     $this->addRule('name', ts('A membership type with this name already exists. Please select another name.'),
       'objectExists', array('CRM_Member_DAO_MembershipType', $this->_id)
     );
-    $this->add('text', 'description', ts('Description'),
-      CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'description')
-    );
-    $this->add('text', 'minimum_fee', ts('Minimum Fee'),
-      CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'minimum_fee')
-    );
     $this->addRule('minimum_fee', ts('Please enter a monetary value for the Minimum Fee.'), 'money');
-
-    $this->addSelect('duration_unit', array(), TRUE);
-
-    // period type
-    $this->addSelect('period_type', array(), TRUE);
 
     $this->add('text', 'duration_interval', ts('Duration Interval'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'duration_interval')
@@ -193,12 +189,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     $memberRel = $this->add('select', 'relationship_type_id', ts('Relationship Type'),
       $relTypeInd, FALSE, array('class' => 'crm-select2 huge', 'multiple' => 1));
 
-    $this->addSelect('visibility', array('placeholder' => NULL, 'option_url' => NULL));
-
-    $this->add('text', 'weight', ts('Order'),
-      CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'weight')
-    );
-    $this->add('checkbox', 'is_active', ts('Enabled?'));
+    $this->addField('visibility', array('placeholder' => NULL, 'option_url' => NULL));
 
     $membershipRecords = FALSE;
     if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -210,10 +201,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     }
 
     $this->assign('membershipRecordsExists', $membershipRecords);
-
-    $this->add('text', 'max_related', ts('Max related'),
-      CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'max_related')
-    );
 
     $this->addFormRule(array('CRM_Member_Form_MembershipType', 'formRule'));
 
