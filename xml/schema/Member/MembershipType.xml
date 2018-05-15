@@ -49,6 +49,7 @@
     <comment>Name of Membership Type</comment>
     <html>
       <type>Text</type>
+      <label>Name</label>
     </html>
     <add>1.5</add>
   </field>
@@ -60,6 +61,7 @@
       <type>TextArea</type>
       <rows>6</rows>
       <cols>50</cols>
+      <label>Description</label>
     </html>
     <length>255</length>
     <localizable>true</localizable>
@@ -124,6 +126,7 @@
     <default>0</default>
     <html>
       <type>Text</type>
+      <label>Minimum Fee</label>
     </html>
     <add>1.5</add>
   </field>
@@ -213,6 +216,7 @@
     <add>4.3</add>
     <html>
       <type>Text</type>
+      <label>Max Related</label>
     </html>
   </field>
   <field>
@@ -282,6 +286,7 @@
     <add>1.5</add>
     <html>
       <type>CheckBox</type>
+      <label>Enabled?</label>
     </html>
   </field>
 </table>
