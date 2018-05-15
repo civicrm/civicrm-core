@@ -248,7 +248,7 @@ class CRM_Member_DAO_MembershipType extends CRM_Core_DAO {
           'localizable' => 1,
           'html' => [
             'type' => 'Text',
-            'label' => 'Name',
+            'label' => ts("Name"),
           ],
         ],
         'description' => [
@@ -264,7 +264,7 @@ class CRM_Member_DAO_MembershipType extends CRM_Core_DAO {
           'localizable' => 1,
           'html' => [
             'type' => 'TextArea',
-            'label' => 'Description',
+            'label' => ts("Description"),
           ],
         ],
         'member_of_contact_id' => [
@@ -311,7 +311,7 @@ class CRM_Member_DAO_MembershipType extends CRM_Core_DAO {
           'localizable' => 0,
           'html' => [
             'type' => 'Text',
-            'label' => 'Minimum Fee',
+            'label' => ts("Minimum Fee"),
           ],
         ],
         'duration_unit' => [
@@ -417,7 +417,7 @@ class CRM_Member_DAO_MembershipType extends CRM_Core_DAO {
           'localizable' => 0,
           'html' => [
             'type' => 'Text',
-            'label' => 'Max Related',
+            'label' => ts("Max Related"),
           ],
         ],
         'visibility' => [
@@ -504,7 +504,7 @@ class CRM_Member_DAO_MembershipType extends CRM_Core_DAO {
           'localizable' => 0,
           'html' => [
             'type' => 'CheckBox',
-            'label' => 'Enabled?',
+            'label' => ts("Enabled?"),
           ],
         ],
       ];
