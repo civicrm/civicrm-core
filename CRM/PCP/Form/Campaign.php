@@ -307,7 +307,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $managePCPUrl = CRM_Utils_System::url('civicrm/admin/pcp',
         "reset=1",
         TRUE, NULL, FALSE,
-        FALSE
+        FALSE, TRUE
       );
       $this->assign('managePCPUrl', $managePCPUrl);
 
