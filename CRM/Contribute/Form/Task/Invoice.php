@@ -458,12 +458,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'PDFFilename' => $pdfFileName,
       );
 
-      $fromEmail = CRM_Core_BAO_Email::getFromEmail();
-
       // from email address
-      if (isset($params['from_email_address'])) {
-        $fromEmailAddress = CRM_Utils_Array::value($params['from_email_address'], $fromEmail);
-      }
+      $fromEmailAddress = CRM_Utils_Array::value('from_email_address', $params);
+
       // condition to check for download PDF Invoice or email Invoice
       if ($invoiceElements['createPdf']) {
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
