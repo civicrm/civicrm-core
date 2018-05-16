@@ -165,6 +165,29 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * Disables usage of the ONLY_FULL_GROUP_BY Mode if necessary
+   */
+  public static function disableFullGroupByMode() {
+    $currentModes = CRM_Utils_SQL::getSqlModes();
+    if (CRM_Utils_SQL::supportsFullGroupBy() && in_array('ONLY_FULL_GROUP_BY', $currentModes) && CRM_Utils_SQL::isGroupByModeInDefault()) {
+      $key = array_search('ONLY_FULL_GROUP_BY', $currentModes);
+      unset($currentModes[$key]);
+      CRM_Core_DAO::executeQuery("SET SESSION sql_mode = %1", array(1 => array(implode(',', $currentModes), 'String')));
+    }
+  }
+
+  /**
+   * Re-enables ONLY_FULL_GROUP_BY sql_mode as necessary..
+   */
+  public static function reenableFullGroupByMode() {
+    $currentModes = CRM_Utils_SQL::getSqlModes();
+    if (CRM_Utils_SQL::supportsFullGroupBy() && !in_array('ONLY_FULL_GROUP_BY', $currentModes) && CRM_Utils_SQL::isGroupByModeInDefault()) {
+      $currentModes[] = 'ONLY_FULL_GROUP_BY';
+      CRM_Core_DAO::executeQuery("SET SESSION sql_mode = %1", array(1 => array(implode(',', $currentModes), 'String')));
+    }
+  }
+
+  /**
    * @param string $fieldName
    * @param $fieldDef
    * @param array $params

@@ -357,9 +357,9 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
       //Added "||$rowCount" to avoid displaying all records on first page
       $query .= ' LIMIT ' . CRM_Utils_Type::escape($offset, 'Integer') . ', ' . CRM_Utils_Type::escape($rowCount, 'Integer');
     }
-
+    CRM_Core_DAO::disableFullGroupByMode();
     $dao->query($query);
-
+    CRM_Core_DAO::reenableFullGroupByMode();
     $results = array();
 
     while ($dao->fetch()) {
