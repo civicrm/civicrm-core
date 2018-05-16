@@ -2750,6 +2750,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    */
   public function buildRows($sql, &$rows) {
     $dao = CRM_Core_DAO::executeQuery($sql);
+    if (stristr($this->_select, 'SQL_CALC_FOUND_ROWS')) {
+      $this->_rowsFound = CRM_Core_DAO::singleValueQuery('SELECT FOUND_ROWS()');
+    }
     CRM_Core_DAO::reenableFullGroupByMode();
     if (!is_array($rows)) {
       $rows = array();
