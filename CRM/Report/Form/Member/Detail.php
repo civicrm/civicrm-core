@@ -303,22 +303,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     }
   }
 
-  public function postProcess() {
-
-    $this->beginPostProcess();
-
-    // get the acl clauses built before we assemble the query
-    $this->buildACLClause($this->_aliases['civicrm_contact']);
-    $sql = $this->buildQuery(TRUE);
-
-    $rows = array();
-    $this->buildRows($sql, $rows);
-
-    $this->formatDisplay($rows);
-    $this->doTemplateAssignment($rows);
-    $this->endPostProcess($rows);
-  }
-
   /**
    * Alter display of rows.
    *
