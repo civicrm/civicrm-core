@@ -78,6 +78,26 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test get with alternative (optiongroup/optionvalue) parameters
+   */
+  public function testGetOptionValue() {
+    $params['groupName'] = 'msg_tpl_workflow_event';
+    $params['valueName'] = 'event_offline_receipt';
+    $result = $this->callAPISuccessGetSingle('MessageTemplate', $params);
+    $this->assertEquals('Events - Registration Confirmation and Receipt (off-line)', $result['msg_title'], 'Wrong message template returned');
+  }
+
+  /**
+   * Test get with alternative (optiongroup/optionvalue) parameters
+   */
+  public function testGetOptionValueParams() {
+    $params['option_group_name'] = 'msg_tpl_workflow_event';
+    $params['option_value_name'] = 'event_offline_receipt';
+    $result = $this->callAPISuccessGetSingle('MessageTemplate', $params);
+    $this->assertEquals('Events - Registration Confirmation and Receipt (off-line)', $result['msg_title'], 'Wrong message template returned');
+  }
+
+  /**
    * Check the delete function succeeds.
    */
   public function testDelete() {

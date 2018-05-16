@@ -1056,6 +1056,21 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Strip all tokens from a string
+   * @param $str
+   *
+   * @return mixed
+   */
+  public static function stripTokens($str) {
+    preg_match_all('/(\{\w+\.\w+\})/', $str, $match);
+    $unMatched = $match[1];
+    foreach ($unMatched as $token) {
+      $str = str_replace($token, '', $str);
+    }
+    return $str;
+  }
+
+  /**
    * Find and replace tokens for each component.
    *
    * @param string $str
