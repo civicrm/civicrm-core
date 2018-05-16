@@ -172,7 +172,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
       $domainID = CRM_Core_Config::domainID();
       $query = "
 SELECT id, label, parent_id, weight, is_active, name
-FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY parent_id, weight ASC";
+FROM civicrm_navigation WHERE domain_id = $domainID";
       $result = CRM_Core_DAO::executeQuery($query);
 
       $pidGroups = array();
@@ -262,6 +262,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
           'name' => $navigationMenu->name,
           'url' => $navigationMenu->url,
           'icon' => $navigationMenu->icon,
+          'weight' => $navigationMenu->weight,
           'permission' => $navigationMenu->permission,
           'operator' => $navigationMenu->permission_operator,
           'separator' => $navigationMenu->has_separator,
@@ -312,6 +313,13 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
     CRM_Utils_Hook::navigationMenu($navigations);
     self::fixNavigationMenu($navigations);
 
+    // Hooks have added menu items in an arbitrary order. We need to order by
+    // weight again. I would put this function directly after
+    // CRM_Utils_Hook::navigationMenu but for some reason, fixNavigationMenu is
+    // moving items added by hooks on the end of the menu. Hence I do it
+    // afterwards
+    self::orderByWeight($navigations);
+
     //skip children menu item if user don't have access to parent menu item
     $skipMenuItems = array();
     foreach ($navigations as $key => $value) {
@@ -335,6 +343,32 @@ FROM civicrm_navigation WHERE domain_id = $domainID {$whereClause} ORDER BY pare
     $navigationString = str_replace('<ul></ul></li>', '', $navigationString);
 
     return $navigationString;
+  }
+
+  /**
+   * buildNavigationTree retreives items in order. We call this function to
+   * ensure that any items added by the hook are also in the correct order.
+   */
+  private static function orderByWeight(&$navigations) {
+    // sort each item in navigations by weight
+    usort($navigations, function($a, $b) {
+
+      // If no weight have been defined for an item put it at the end of the list
+      if (!isset($a['attributes']['weight'])) {
+        $a['attributes']['weight'] = 1000;
+      }
+      if (!isset($b['attributes']['weight'])) {
+        $b['attributes']['weight'] = 1000;
+      }
+      return $a['attributes']['weight'] - $b['attributes']['weight'];
+    });
+
+    // If any of the $navigations have children, recurse
+    foreach ($navigations as $navigation) {
+      if (isset($navigation['child'])) {
+        self::orderByWeight($navigation['child']);
+      }
+    }
   }
 
   /**
