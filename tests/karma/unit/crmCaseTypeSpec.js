@@ -299,7 +299,7 @@ describe('crmCaseType', function() {
     beforeEach(function() {
       scope = $rootScope.$new();
       element = '<div crm-editable-tab-title title="Click to edit">' +
-        '<span ng-keydown="$event.stopImmediatePropagation()">{{ activitySet.label }}</span>' +
+        '<span>{{ activitySet.label }}</span>' +
         '</div>';
 
       scope.activitySet = { label: 'Title'};
