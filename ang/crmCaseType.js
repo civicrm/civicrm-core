@@ -40,6 +40,9 @@
         resolve: {
           caseTypes: function($route, crmApi) {
             return crmApi('CaseType', 'get', {options: {limit: 0}});
+          },
+          caseTypeCategories: function(crmApi) {
+            return crmApi('OptionValue', 'get', {options: {limit: 0}});
           }
         }
       });
@@ -56,6 +59,11 @@
             }];
             reqs.caseStatuses = ['OptionValue', 'get', {
               option_group_id: 'case_status',
+              sequential: 1,
+              options: {limit: 0}
+            }];
+            reqs.caseTypeCategories = ['OptionValue', 'get', {
+              option_group_id: 'case_type_category',
               sequential: 1,
               options: {limit: 0}
             }];
@@ -126,10 +134,13 @@
     // CRM_Case_XMLProcessor::REL_TYPE_CNAME
     var REL_TYPE_CNAME = CRM.crmCaseType.REL_TYPE_CNAME,
 
-    ts = $scope.ts = CRM.ts(null);
+    ts = $scope.ts = CRM.ts(null),
+    isNewCaseType = !apiCalls.caseType,
+    defaultCategory = _.find(apiCalls.caseTypeCategories.values, { is_default: '1' }) || {};
 
     $scope.activityStatuses = apiCalls.actStatuses.values;
     $scope.caseStatuses = _.indexBy(apiCalls.caseStatuses.values, 'name');
+    $scope.caseTypeCategories = apiCalls.caseTypeCategories.values;
     $scope.activityTypes = _.indexBy(apiCalls.actTypes.values, 'name');
     $scope.activityTypeOptions = _.map(apiCalls.actTypes.values, formatActivityTypeOption);
     $scope.relationshipTypeOptions = _.map(apiCalls.relTypes.values, function(type) {
@@ -142,7 +153,13 @@
       'sequence': 'Sequence'
     };
 
-    $scope.caseType = apiCalls.caseType ? apiCalls.caseType : _.cloneDeep(newCaseTypeTemplate);
+    if (isNewCaseType) {
+      $scope.caseType = _.cloneDeep(newCaseTypeTemplate);
+      $scope.caseType.category = defaultCategory.value;
+    } else {
+      $scope.caseType = apiCalls.caseType;
+    }
+
     $scope.caseType.definition = $scope.caseType.definition || [];
     $scope.caseType.definition.activityTypes = $scope.caseType.definition.activityTypes || [];
     $scope.caseType.definition.activitySets = $scope.caseType.definition.activitySets || [];
@@ -357,10 +374,11 @@
     }
   });
 
-  crmCaseType.controller('CaseTypeListCtrl', function($scope, crmApi, caseTypes) {
+  crmCaseType.controller('CaseTypeListCtrl', function($scope, crmApi, caseTypes, caseTypeCategories) {
     var ts = $scope.ts = CRM.ts(null);
 
     $scope.caseTypes = caseTypes.values;
+    $scope.caseTypeCategoriesIndexed = _.indexBy(caseTypeCategories.values, 'value');
     $scope.toggleCaseType = function (caseType) {
       caseType.is_active = (caseType.is_active == '1') ? '0' : '1';
       crmApi('CaseType', 'create', caseType, true)

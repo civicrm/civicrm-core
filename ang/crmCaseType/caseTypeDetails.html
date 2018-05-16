@@ -38,6 +38,12 @@ The original form used table layout; don't know if we have an alternative, CSS-b
     <div crm-ui-field="{name: 'caseTypeDetailForm.description', title: ts('Description')}">
       <textarea crm-ui-id="caseTypeDetailForm.description" name="description" ng-model="caseType.description" class="big crm-form-textarea"></textarea>
     </div>
+    <div crm-ui-field="{name: 'caseTypeDetailForm.category', title: ts('Category')}">
+      <label ng-repeat="category in caseTypeCategories | orderBy:'+weight'">
+        <input type="radio" name="category" value="{{category.value}}" ng-model="caseType.category" />
+        <span>{{category.label}}</span>
+      </label>
+    </div>
     <div crm-ui-field="{title: ts('Enabled?')}">
       <input name="is_active" type="checkbox" ng-model="caseType.is_active" ng-true-value="'1'" ng-false-value="'0'"/>
     </div>

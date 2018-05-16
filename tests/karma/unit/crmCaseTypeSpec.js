@@ -38,6 +38,7 @@ describe('crmCaseType', function() {
   describe('CaseTypeCtrl', function() {
     beforeEach(function () {
       apiCalls = {
+        caseTypeCategories: getCaseTypeCategoriesSampleData(),
         actStatuses: {
           values: [
             {
@@ -243,6 +244,10 @@ describe('crmCaseType', function() {
       expect(scope.activityTypes['ADC referral']).toEqualData(apiCalls.actTypes.values[0]);
     });
 
+    it('should load case type categories', function() {
+      expect(scope.caseTypeCategories).toEqual(apiCalls.caseTypeCategories.values);
+    });
+
     it('addActivitySet should add an activitySet to the case type', function() {
       scope.addActivitySet('timeline');
       var activitySets = scope.caseType.definition.activitySets;
@@ -260,6 +265,20 @@ describe('crmCaseType', function() {
       expect(newSet.name).toBe('timeline_2');
       expect(newSet.timeline).toBe('1');
       expect(newSet.label).toBe('Timeline #2');
+    });
+
+    describe('when creating a new case type', function() {
+      var expectedDefaultCategory;
+
+      beforeEach(inject(function ($controller) {
+        apiCalls.caseType = null;
+        expectedDefaultCategory = _.find(apiCalls.caseTypeCategories.values, { is_default: '1' }) || {};
+        ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
+      }));
+
+      it('sets the case type category equal to the default one', function() {
+        expect(scope.caseType.category).toEqual(expectedDefaultCategory.value);
+      });
     });
   });
 
@@ -292,9 +311,11 @@ describe('crmCaseType', function() {
   });
 
   describe('CaseTypeListCtrl', function() {
-    var caseTypes, crmApiSpy;
+    var caseTypes, crmApiSpy, expectedCaseTypeCategoriesIndexed;
 
     beforeEach(function() {
+      var caseTypeCategories = getCaseTypeCategoriesSampleData();
+
       caseTypes = {
         values: {
           1: { id: 1 },
@@ -302,17 +323,23 @@ describe('crmCaseType', function() {
           3: { id: 3 }
         }
       };
+      expectedCaseTypeCategoriesIndexed = _.indexBy(caseTypeCategories.values, 'value');
       crmApiSpy = jasmine.createSpy('crmApi').and.returnValue($q.resolve());
       scope = $rootScope.$new();
       ctrl = $controller('CaseTypeListCtrl', {
         $scope: scope,
         caseTypes: caseTypes,
+        caseTypeCategories: caseTypeCategories,
         crmApi: crmApiSpy
       });
     });
 
     it('should store an index of case types', function() {
       expect(scope.caseTypes).toEqual(caseTypes.values);
+    });
+
+    it('should store a list of case type categories indexed by value', function() {
+      expect(scope.caseTypeCategoriesIndexed).toEqual(expectedCaseTypeCategoriesIndexed);
     });
 
     describe('toggleCaseType', function() {
@@ -415,4 +442,40 @@ describe('crmCaseType', function() {
       });
     });
   });
+
+  /**
+   * Returns a sample API response for case type categories option values.
+   */
+  function getCaseTypeCategoriesSampleData() {
+    return {
+      values: [
+        {
+          "id": "1170",
+          "option_group_id": "153",
+          "label": "Workflow",
+          "value": "1",
+          "name": "WORKFLOW",
+          "filter": "0",
+          "is_default": "1",
+          "weight": "1",
+          "is_optgroup": "0",
+          "is_reserved": "1",
+          "is_active": "1"
+        },
+        {
+          "id": "1171",
+          "option_group_id": "153",
+          "label": "Vacancy",
+          "value": "2",
+          "name": "VACANCY",
+          "filter": "0",
+          "is_default": "0",
+          "weight": "2",
+          "is_optgroup": "0",
+          "is_reserved": "1",
+          "is_active": "1"
+        }
+      ]
+    };
+  }
 });
