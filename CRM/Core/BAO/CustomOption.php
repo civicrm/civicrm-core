@@ -143,6 +143,18 @@ class CRM_Core_BAO_CustomOption {
         $class .= ' disabled';
         $action -= CRM_Core_Action::DISABLE;
       }
+
+      $isGroupLocked = (bool) CRM_Core_DAO::getFieldValue(
+        CRM_Core_DAO_OptionGroup::class,
+        $field->option_group_id,
+        'is_locked'
+      );
+
+      // disable deletion of option values for locked option groups
+      if ($isGroupLocked) {
+        $action -= CRM_Core_Action::DELETE;
+      }
+
       if (in_array($field->html_type, array('CheckBox', 'AdvMulti-Select', 'Multi-Select'))) {
         if (isset($defVal) && in_array($dao->value, $defVal)) {
           $options[$dao->id]['is_default'] = '<img src="' . $config->resourceBase . 'i/check.gif" />';

@@ -72,14 +72,14 @@ class CRM_Core_OptionValue {
    */
   public static function getRows($groupParams, $links, $orderBy = 'weight', $skipEmptyComponents = TRUE) {
     $optionValue = array();
-
     $optionGroupID = NULL;
+    $isGroupLocked = FALSE;
+
     if (!isset($groupParams['id']) || !$groupParams['id']) {
       if ($groupParams['name']) {
-        $config = CRM_Core_Config::singleton();
-
         $optionGroup = CRM_Core_BAO_OptionGroup::retrieve($groupParams, $dnc);
         $optionGroupID = $optionGroup->id;
+        $isGroupLocked = (bool) $optionGroup->is_locked;
       }
     }
     else {
@@ -144,6 +144,11 @@ class CRM_Core_OptionValue {
         ) {
           $action -= CRM_Core_Action::DELETE;
         }
+      }
+
+      // disallow deletion of option values for locked groups
+      if ($isGroupLocked) {
+        $action -= CRM_Core_Action::DELETE;
       }
 
       $optionValue[$dao->id]['label'] = htmlspecialchars($optionValue[$dao->id]['label']);
