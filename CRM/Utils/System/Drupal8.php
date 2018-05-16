@@ -673,4 +673,26 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $e->list[] = 'js/crm.drupal8.js';
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function setUFLocale($civicrm_language) {
+    $langcode = substr(str_replace('_', '', $civicrm_language), 0, 2);
+    $languageManager = \Drupal::languageManager();
+    $languages = $languageManager->getLanguages();
+
+    if (isset($languages[$langcode])) {
+      $languageManager->setConfigOverrideLanguage($languages[$langcode]);
+
+      // Config must be re-initialized to reset the base URL
+      // otherwise links will have the wrong language prefix/domain.
+      $config = CRM_Core_Config::singleton();
+      $config->free();
+
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
 }
