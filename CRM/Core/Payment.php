@@ -1012,6 +1012,54 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Get the IP address of the remote user
+   *
+   * @param $params
+   *
+   * @return string
+   */
+  protected function getIpAddress(&$params) {
+    if (empty($params['ip_address'])) {
+      $params['ip_address'] = CRM_Utils_System::ipAddress();
+    }
+    return $params['ip_address'];
+  }
+
+  /**
+   * Get the state_province name from the state_province id.
+   *
+   * @param $params
+   * @param bool $abbreviation Whether to return the abbreviated version or not
+   *
+   * @return array
+   */
+  protected function getStateProvince(&$params, $abbreviation = TRUE) {
+    if (!empty($params['state_province_id'])) {
+      if ($abbreviation) {
+        $params['state_province'] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($params['state_province_id']);
+      }
+      else {
+        $params['state_province'] = CRM_Core_PseudoConstant::stateProvince($params['state_province_id']);
+      }
+    }
+    return CRM_Utils_Array::value('state_province', $params);
+  }
+
+  /**
+   * Get the country name from the country_id
+   *
+   * @param $params
+   *
+   * @return array|null
+   */
+  protected function getCountry(&$params) {
+    if (!empty($params['country_id'])) {
+      $params['country'] = CRM_Core_PseudoConstant::countryIsoCode($params['country_id']);
+    }
+    return CRM_Utils_Array::value('country', $params);
+  }
+
+  /**
    * Get url to return to after cancelled or failed transaction.
    *
    * @param string $qfKey
@@ -1180,6 +1228,11 @@ abstract class CRM_Core_Payment {
       $result['payment_status_id'] = array_search('Completed', $statuses);
       return $result;
     }
+
+    // Set some "Standard" parameters for payment
+    $this->getIpAddress($params);
+    $this->getCountry($params);
+    $this->getStateProvince($params);
 
     if ($this->_paymentProcessor['billing_mode'] == 4) {
       $result = $this->doTransferCheckout($params, $component);
