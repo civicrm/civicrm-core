@@ -64,8 +64,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
     $params["contact_id"] = $contact2Id;
     $contributionsOfSoftContact = CRM_Contribute_BAO_ContributionSoft::retrieve($params, $values);
-    $this->assertEquals(1, count($contributionsOfMainContact), 'Contribution not added for primary contact');
-    $this->assertEquals(1, count($contributionsOfSoftContact), 'Soft Contribution not added for secondary contact');
+    $this->assertEquals(1, $contributionsOfMainContact->N, 'Contribution not added for primary contact');
+    $this->assertEquals(1, $contributionsOfSoftContact->N, 'Soft Contribution not added for secondary contact');
+    $this->callAPISuccess('ContributionSoft', 'Delete', ['id' => $contributionsOfSoftContact->id]);
+    $this->callAPISuccess('Contribution', 'Delete', ['id' => $contributionsOfMainContact->id]);
   }
   /**
    * Run the import parser.
