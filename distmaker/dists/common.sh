@@ -220,6 +220,7 @@ function dm_generate_version() {
 
   # final touch
   echo "<?php
+/** @deprecated */
 function civicrmVersion( ) {
   return array( 'version'  => '$DM_VERSION',
                 'cms'      => '$ufname',

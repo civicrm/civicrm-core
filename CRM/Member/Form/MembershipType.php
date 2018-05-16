@@ -29,7 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2018
- * $Id$
  *
  */
 
@@ -38,6 +37,21 @@
  *
  */
 class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
+
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'MembershipType';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
 
   /**
    * Max number of contacts we will display for membership-organisation
@@ -61,8 +75,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   *
-   * @return void
+   * @return array
+   *   defaults
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
@@ -111,7 +125,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    * @return void
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
-   * @throws \HTML_QuickForm_Error
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -121,23 +134,19 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     }
 
     $this->applyFilter('__ALL__', 'trim');
-    $this->add('text', 'name', ts('Name'), CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'name'), TRUE);
+    $this->addField('name', [], TRUE);
+    $this->addField('description');
+    $this->addField('minimum_fee');
+    $this->addField('duration_unit', [], TRUE);
+    $this->addField('period_type', [], TRUE);
+    $this->addField('is_active');
+    $this->addField('weight');
+    $this->addField('max_related');
 
     $this->addRule('name', ts('A membership type with this name already exists. Please select another name.'),
       'objectExists', array('CRM_Member_DAO_MembershipType', $this->_id)
     );
-    $this->add('text', 'description', ts('Description'),
-      CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'description')
-    );
-    $this->add('text', 'minimum_fee', ts('Minimum Fee'),
-      CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'minimum_fee')
-    );
     $this->addRule('minimum_fee', ts('Please enter a monetary value for the Minimum Fee.'), 'money');
-
-    $this->addSelect('duration_unit', array(), TRUE);
-
-    // period type
-    $this->addSelect('period_type', array(), TRUE);
 
     $this->add('text', 'duration_interval', ts('Duration Interval'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'duration_interval')
@@ -151,11 +160,10 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       CRM_Core_SelectValues::date(NULL, 'M d'), FALSE
     );
 
-    // Auto-renew Option
-    $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'is_recur = 1');
+    // Add Auto-renew options if we have a payment processor that supports recurring contributions
     $isAuthorize = FALSE;
     $options = array();
-    if (is_array($paymentProcessor) && !empty($paymentProcessor)) {
+    if (CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('Recurring'))) {
       $isAuthorize = TRUE;
       $options = CRM_Core_SelectValues::memberAutoRenew();
     }
@@ -181,12 +189,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     $memberRel = $this->add('select', 'relationship_type_id', ts('Relationship Type'),
       $relTypeInd, FALSE, array('class' => 'crm-select2 huge', 'multiple' => 1));
 
-    $this->addSelect('visibility', array('placeholder' => NULL, 'option_url' => NULL));
-
-    $this->add('text', 'weight', ts('Order'),
-      CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'weight')
-    );
-    $this->add('checkbox', 'is_active', ts('Enabled?'));
+    $this->addField('visibility', array('placeholder' => NULL, 'option_url' => NULL));
 
     $membershipRecords = FALSE;
     if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -198,10 +201,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     }
 
     $this->assign('membershipRecordsExists', $membershipRecords);
-
-    $this->add('text', 'max_related', ts('Max related'),
-      CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'max_related')
-    );
 
     $this->addFormRule(array('CRM_Member_Form_MembershipType', 'formRule'));
 
@@ -330,9 +329,9 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
         'max_related',
       );
 
-      $params = $ids = array();
+      $params = array();
       foreach ($fields as $fld) {
-        $params[$fld] = CRM_Utils_Array::value($fld, $submitted, 'NULL');
+        $params[$fld] = CRM_Utils_Array::value($fld, $submitted, 'null');
       }
 
       if ($params['minimum_fee']) {
@@ -360,7 +359,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
         }
       }
       if (!$hasRelTypeVal) {
-        $params['relationship_type_id'] = $params['relationship_direction'] = $params['max_related'] = 'NULL';
+        $params['relationship_type_id'] = $params['relationship_direction'] = $params['max_related'] = 'null';
       }
 
       if ($params['duration_unit'] == 'lifetime' &&
@@ -370,20 +369,20 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       }
 
       $periods = array('fixed_period_start_day', 'fixed_period_rollover_day');
-      foreach ($periods as $per) {
-        if (!empty($params[$per]['M']) && !empty($params[$per]['d'])) {
-          $mon = $params[$per]['M'];
-          $dat = $params[$per]['d'];
+      foreach ($periods as $period) {
+        if (!empty($params[$period]['M']) && !empty($params[$period]['d'])) {
+          $mon = $params[$period]['M'];
+          $dat = $params[$period]['d'];
           $mon = ($mon < 10) ? '0' . $mon : $mon;
           $dat = ($dat < 10) ? '0' . $dat : $dat;
-          $params[$per] = $mon . $dat;
+          $params[$period] = $mon . $dat;
         }
-        elseif ($per == 'fixed_period_rollover_day' && !empty($params['month_fixed_period_rollover_day'])) {
+        elseif ($period == 'fixed_period_rollover_day' && !empty($params['month_fixed_period_rollover_day'])) {
           $params['fixed_period_rollover_day'] = $params['month_fixed_period_rollover_day']['d'];
           unset($params['month_fixed_period_rollover_day']);
         }
         else {
-          $params[$per] = 'NULL';
+          $params[$period] = 'null';
         }
       }
       $oldWeight = NULL;
@@ -398,10 +397,10 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       );
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
-        $ids['membershipType'] = $this->_id;
+        $params['id'] = $this->_id;
       }
 
-      $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
+      $membershipType = CRM_Member_BAO_MembershipType::add($params);
 
       CRM_Core_Session::setStatus(ts('The membership type \'%1\' has been saved.',
         array(1 => $membershipType->name)

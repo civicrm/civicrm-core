@@ -137,7 +137,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
   'table_name' => '{$table.name}',
   'entity' => '{$table.entity}',
   'bao' => '{$table.bao}',
-  'localizable' => {if ($field.localizable)}{1}{else}{0}{/if},
+  'localizable' => {if $field.localizable}1{else}0{/if},
 
 {if $field.FKClassName}
                       'FKClassName' => '{$field.FKClassName}',
@@ -146,8 +146,12 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
   'serialize' => self::SERIALIZE_{$field.serialize|strtoupper},
 {/if}
 {if $field.html}
-  'html' => {$field.html|@print_array},
-{/if} {* field.html *}
+  'html' => array(
+  {foreach from=$field.html item=val key=key}
+    '{$key}' => {if $key eq 'label'}ts("{$val}"){else}'{$val}'{/if},
+  {/foreach}
+  ),
+{/if}
 {if $field.pseudoconstant}
   'pseudoconstant' => {$field.pseudoconstant|@print_array}
 {/if} {* field.pseudoconstant *}                                                                    ),

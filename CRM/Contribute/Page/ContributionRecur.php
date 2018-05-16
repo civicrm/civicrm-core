@@ -39,6 +39,8 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
   static $_links = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
+  public $_id = NULL;
+  public $_action = NULL;
 
   /**
    * View details of a recurring contribution.
@@ -57,7 +59,9 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
       CRM_Core_Error::statusBounce('Recurring contribution not found (ID: ' . $this->_id);
     }
 
-    $contributionRecur['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName($contributionRecur['payment_processor_id']);
+    $contributionRecur['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName(
+      CRM_Utils_Array::value('payment_processor_id', $contributionRecur)
+    );
     $idFields = array('contribution_status_id', 'campaign_id', 'financial_type_id');
     foreach ($idFields as $idField) {
       if (!empty($contributionRecur[$idField])) {

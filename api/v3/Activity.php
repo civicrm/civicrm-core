@@ -635,7 +635,7 @@ function civicrm_api3_activity_delete($params) {
     return civicrm_api3_create_success(1, $params, 'Activity', 'delete');
   }
   else {
-    throw new API_Exception('Could not delete Activity');
+    throw new API_Exception('Could not delete Activity: ' . (int) $params['id']);
   }
 }
 

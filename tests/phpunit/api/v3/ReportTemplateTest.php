@@ -140,7 +140,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Tet api to get rows from reports.
+   * Test api to get rows from reports.
    *
    * @dataProvider getReportTemplates
    *
@@ -149,9 +149,68 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testReportTemplateGetRowsAllReports($reportID) {
+    //$reportID = 'logging/contact/summary';
     if (stristr($reportID, 'has existing issues')) {
       $this->markTestIncomplete($reportID);
     }
+    if (substr($reportID, 0, '7') === 'logging') {
+      Civi::settings()->set('logging', 1);
+    }
+
+    $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => $reportID,
+    ));
+    if (substr($reportID, 0, '7') === 'logging') {
+      Civi::settings()->set('logging', 0);
+    }
+  }
+
+  /**
+   * Test logging report when a custom data table has a table removed by hook.
+   *
+   * Here we are checking that no fatal is triggered.
+   */
+  public function testLoggingReportWithHookRemovalOfCustomDataTable() {
+    Civi::settings()->set('logging', 1);
+    $group1 = $this->customGroupCreate();
+    $group2 = $this->customGroupCreate(['name' => 'second_one', 'title' => 'second one', 'table_name' => 'civicrm_value_second_one']);
+    $this->customFieldCreate(array('custom_group_id' => $group1['id'], 'label' => 'field one'));
+    $this->customFieldCreate(array('custom_group_id' => $group2['id'], 'label' => 'field two'));
+    $this->hookClass->setHook('civicrm_alterLogTables', array($this, 'alterLogTablesRemoveCustom'));
+
+    $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => 'logging/contact/summary',
+    ));
+    Civi::settings()->set('logging', 0);
+    $this->customGroupDelete($group1['id']);
+    $this->customGroupDelete($group2['id']);
+  }
+
+  /**
+   * Remove one log table from the logging spec.
+   *
+   * @param array $logTableSpec
+   */
+  public function alterLogTablesRemoveCustom(&$logTableSpec) {
+    unset($logTableSpec['civicrm_value_second_one']);
+  }
+
+  /**
+   * Test api to get rows from reports with ACLs enabled.
+   *
+   * Checking for lack of fatal error at the moment.
+   *
+   * @dataProvider getReportTemplates
+   *
+   * @param $reportID
+   *
+   * @throws \PHPUnit_Framework_IncompleteTestError
+   */
+  public function testReportTemplateGetRowsAllReportsACL($reportID) {
+    if (stristr($reportID, 'has existing issues')) {
+      $this->markTestIncomplete($reportID);
+    }
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookNoResults'));
     $this->callAPISuccess('report_template', 'getrows', array(
       'report_id' => $reportID,
     ));
@@ -189,8 +248,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $reportsToSkip = array(
       'activity' => 'does not respect function signature on from clause',
       'event/income' => 'I do no understand why but error is Call to undefined method CRM_Report_Form_Event_Income::from() in CRM/Report/Form.php on line 2120',
-      'logging/contact/summary' => '(likely to be test related) probably logging off Undefined index: Form/Contact/LoggingSummary.php(231): PHP',
-      'logging/contribute/summary' => '(likely to be test related) probably logging off DB Error: no such table',
       'contribute/history' => 'Declaration of CRM_Report_Form_Contribute_History::buildRows() should be compatible with CRM_Report_Form::buildRows($sql, &$rows)',
       'activitySummary' => 'We use temp tables for the main query generation and name are dynamic. These names are not available in stats() when called directly.',
     );

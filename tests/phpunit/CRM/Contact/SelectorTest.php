@@ -83,6 +83,68 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the civicrm_prevnext_cache entry if it correctly stores the search query result
+   */
+  public function testPrevNextCache() {
+    $contactID = $this->individualCreate(['email' => 'mickey@mouseville.com']);
+    $dataSet = array(
+      'description' => 'Normal default behaviour',
+      'class' => 'CRM_Contact_Selector',
+      'settings' => array(),
+      'form_values' => array('email' => 'mickey@mouseville.com'),
+      'params' => array(),
+      'return_properties' => NULL,
+      'context' => 'advanced',
+      'action' => CRM_Core_Action::ADVANCED,
+      'includeContactIds' => NULL,
+      'searchDescendentGroups' => FALSE,
+      'expected_query' => array(
+        0 => 'default',
+        1 => 'default',
+        2 => "WHERE  ( civicrm_email.email LIKE '%mickey@mouseville.com%' )  AND (contact_a.is_deleted = 0)",
+      ),
+    );
+    $params = CRM_Contact_BAO_Query::convertFormValues($dataSet['form_values'], 0, FALSE, NULL, array());
+
+    // create CRM_Contact_Selector instance and set desired query params
+    $selector = new CRM_Contact_Selector(
+      $dataSet['class'],
+      $dataSet['form_values'],
+      $params,
+      $dataSet['return_properties'],
+      $dataSet['action'],
+      $dataSet['includeContactIds'],
+      $dataSet['searchDescendentGroups'],
+      $dataSet['context']
+    );
+    // set cache key
+    $key = substr(sha1(rand()), 0, 7);
+    $selector->setKey($key);
+
+    // fetch row and check the result
+    $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, TRUE, NULL);
+    $this->assertEquals(1, count($rows));
+    $this->assertEquals($contactID, key($rows));
+
+    // build cache key and use to it to fetch prev-next cache record
+    $cacheKey = 'civicrm search ' . $key;
+    $contacts = CRM_Utils_SQL_Select::from('civicrm_prevnext_cache')
+                  ->select(['entity_table', 'entity_id1', 'cacheKey'])
+                  ->where("cacheKey = '!key'")
+                  ->param('!key', $cacheKey)
+                  ->execute()
+                  ->fetchAll();
+    $this->assertEquals(1, count($contacts));
+    // check the prevNext record matches
+    $expectedEntry = [
+      'entity_table' => 'civicrm_contact',
+      'entity_id1' => $contactID,
+      'cacheKey' => $cacheKey,
+    ];
+    $this->checkArrayEquals($contacts[0], $expectedEntry);
+  }
+
+  /**
    * Data sets for testing.
    */
   public function querySets() {

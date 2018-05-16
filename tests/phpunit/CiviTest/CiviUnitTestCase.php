@@ -140,6 +140,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public $setupIDs = array();
 
   /**
+   * PHPUnit Mock Mecthod to use.
+   *
+   * @var string
+   */
+  public $mockMethod = 'getMock';
+
+  /**
    *  Constructor.
    *
    *  Because we are overriding the parent class constructor, we
@@ -167,6 +174,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     if (function_exists('_civix_phpunit_setUp')) {
       // FIXME: loosen coupling
       _civix_phpunit_setUp();
+    }
+    if (version_compare(PHPUnit_Runner_Version::id(), '5', '>=')) {
+      $this->mockMethod = 'createMock';
     }
   }
 

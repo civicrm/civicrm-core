@@ -206,25 +206,37 @@
             {$form.receipt_text.html|crmAddClass:huge}</td>
         </tr>
       </table>
-      <div id="customData"></div>
-      {*include custom data js file*}
-      {include file="CRM/common/customData.tpl"}
-      {literal}
-      <script type="text/javascript">
-      CRM.$(function($) {
-      {/literal}
-        CRM.buildCustomData( '{$customDataType}' );
-        {if $customDataSubType}
-          CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-        {/if}
-        {literal}
-      });
-      </script>
-      {/literal}
+      {include file="CRM/common/customDataBlock.tpl"}
       {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
         <div class="crm-accordion-wrapper">
           <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
-          <div class="crm-accordion-body">{include file="CRM/Contribute/Form/Selector.tpl" context="Search"}</div>
+          <div class="crm-accordion-body">
+            {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
+            <script type="text/javascript">
+              var membershipID = {$entityID};
+              var contactID = {$contactId};
+              {literal}
+              CRM.$(function($) {
+                CRM.loadPage(
+                  CRM.url(
+                    'civicrm/membership/recurring-contributions',
+                    {
+                      reset: 1,
+                      membershipID: membershipID,
+                      cid: contactID
+                    },
+                    'back'
+                  ),
+                  {
+                    target : '#membership-recurring-contributions',
+                    dialog : false
+                  }
+                );
+              });
+              {/literal}
+            </script>
+            <div id="membership-recurring-contributions"></div>
+          </div>
         </div>
       {/if}
       {if $softCredit}

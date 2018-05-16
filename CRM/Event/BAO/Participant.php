@@ -1586,10 +1586,7 @@ UPDATE  civicrm_participant
           'subject' => $subject,
           'source_contact_id' => $contactId,
           'source_record_id' => $participantId,
-          'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
-            $activityType,
-            'name'
-          ),
+          'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', $activityType),
           'activity_date_time' => CRM_Utils_Date::isoToMysql($now),
           'due_date_time' => CRM_Utils_Date::isoToMysql($participantValues['register_date']),
           'is_test' => $participantValues['is_test'],

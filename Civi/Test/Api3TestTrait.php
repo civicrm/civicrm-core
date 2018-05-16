@@ -160,7 +160,7 @@ trait Api3TestTrait {
    * @param string $entity
    * @param array $params
    * @param null $count
-   * @throws Exception
+   * @throws \Exception
    * @return array|int
    */
   public function callAPISuccessGetCount($entity, $params, $count = NULL) {
@@ -170,7 +170,7 @@ trait Api3TestTrait {
     );
     $result = $this->civicrm_api($entity, 'getcount', $params);
     if (!is_int($result) || !empty($result['is_error']) || isset($result['values'])) {
-      throw new Exception('Invalid getcount result : ' . print_r($result, TRUE) . " type :" . gettype($result));
+      throw new \Exception('Invalid getcount result : ' . print_r($result, TRUE) . " type :" . gettype($result));
     }
     if (is_int($count)) {
       $this->assertEquals($count, $result, "incorrect count returned from $entity getcount");
@@ -193,7 +193,7 @@ trait Api3TestTrait {
    *   - array
    *   - object
    *
-   * @throws Exception
+   * @throws \Exception
    * @return array|int
    */
   public function callAPISuccessGetSingle($entity, $params, $checkAgainst = NULL) {

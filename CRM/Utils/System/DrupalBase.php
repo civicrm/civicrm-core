@@ -450,25 +450,25 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
     // (for CRM-6281), Drupal’s xx_YY or is retrieved based on Drupal’s xx
     // sometimes for CLI based on order called, this might not be set and/or empty
-    global $language;
+    $language = $this->getCurrentLanguage();
 
     if (empty($language)) {
       return NULL;
     }
 
-    if ($language->language == 'zh-hans') {
+    if ($language == 'zh-hans') {
       return 'zh_CN';
     }
 
-    if ($language->language == 'zh-hant') {
+    if ($language == 'zh-hant') {
       return 'zh_TW';
     }
 
-    if (preg_match('/^.._..$/', $language->language)) {
-      return $language->language;
+    if (preg_match('/^.._..$/', $language)) {
+      return $language;
     }
 
-    return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
+    return CRM_Core_I18n_PseudoConstant::longForShort(substr($language, 0, 2));
   }
 
   /**
@@ -662,6 +662,16 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
         }
       }
     }
+  }
+
+  /**
+   * Function to return current language of Drupal
+   *
+   * @return string
+   */
+  public function getCurrentLanguage() {
+    global $language;
+    return (!empty($language->language)) ? $language->language : $language;
   }
 
 }

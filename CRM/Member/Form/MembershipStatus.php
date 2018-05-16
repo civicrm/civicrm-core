@@ -29,15 +29,27 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2018
- * $Id$
- *
  */
 
 /**
  * This class generates form components for Membership Type
- *
  */
 class CRM_Member_Form_MembershipStatus extends CRM_Member_Form_MembershipConfig {
+
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'MembershipStatus';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
 
   /**
    * Set default values for the form. MobileProvider that in edit/view mode

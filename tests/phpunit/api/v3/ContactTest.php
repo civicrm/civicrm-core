@@ -2036,7 +2036,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertTrue(is_numeric($ufMatch->id));
 
     // setup - mock the calls to CRM_Utils_System_*::getUfId
-    $userSystem = $this->getMock('CRM_Utils_System_UnitTests', array('getUfId'));
+    $mockFunction = $this->mockMethod;
+    $userSystem = $this->$mockFunction('CRM_Utils_System_UnitTests', array('getUfId'));
     $userSystem->expects($this->once())
       ->method('getUfId')
       ->with($this->equalTo('exampleUser'))
@@ -2111,7 +2112,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testContactGetByUnknownUsername() {
     // setup - mock the calls to CRM_Utils_System_*::getUfId
-    $userSystem = $this->getMock('CRM_Utils_System_UnitTests', array('getUfId'));
+    $mockFunction = $this->mockMethod;
+    $userSystem = $this->$mockFunction('CRM_Utils_System_UnitTests', array('getUfId'));
     $userSystem->expects($this->once())
       ->method('getUfId')
       ->with($this->equalTo('exampleUser'))
@@ -2732,12 +2734,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'first_contact' => $firstAlphabeticalContactBySortName,
         'second_contact' => $secondAlphabeticalContactBySortName,
       ),
-      'bob_search_no_orderby' => array(
-        'search_parameters' => array('name' => 'bob'),
-        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => FALSE),
-        'first_contact' => $firstContactByID,
-        'second_contact' => $secondContactByID,
-      ),
+      // This test has been disabled as is proving to be problematic to reproduce due to MySQL sorting issues between different versions
+      // 'bob_search_no_orderby' => array(
+      //  'search_parameters' => array('name' => 'bob'),
+      //  'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => FALSE),
+      //  'first_contact' => $firstContactByID,
+      //  'second_contact' => $secondContactByID,
+      //),
       'bob_search_no_wildcard' => array(
         'search_parameters' => array('name' => 'bob'),
         'settings' => array('includeWildCardInName' => FALSE, 'includeOrderByClause' => TRUE),
@@ -2764,12 +2767,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'first_contact' => $firstAlphabeticalContactFirstNameBob,
         'second_contact' => $secondAlphabeticalContactFirstNameBob,
       ),
-      'first_name_search_no_orderby' => array(
-        'search_parameters' => array('name' => 'bob', 'field_name' => 'first_name'),
-        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => FALSE),
-        'first_contact' => $firstByIDContactFirstNameBob,
-        'second_contact' => $secondByIDContactFirstNameBob,
-      ),
+      // This test has been disabled as is proving to be problematic to reproduce due to MySQL sorting issues between different versions
+      //'first_name_search_no_orderby' => array(
+      //  'search_parameters' => array('name' => 'bob', 'field_name' => 'first_name'),
+      //  'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => FALSE),
+      //  'first_contact' => $firstByIDContactFirstNameBob,
+      //  'second_contact' => $secondByIDContactFirstNameBob,
+      //),
       'email_search_basic' => array(
         'search_parameters' => array('name' => 'bob', 'field_name' => 'email', 'table_name' => 'eml'),
         'settings' => array('includeWildCardInName' => FALSE, 'includeOrderByClause' => TRUE),
@@ -2917,7 +2921,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
     $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
     $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
-    $this->assertEquals('E Bobby, Bobby', $result['values'][1]['sort_name']);
+    // This test has been disabled as is proving to be problematic to reproduce due to MySQL sorting issues between different versions
+    //$this->assertEquals('E Bobby, Bobby', $result['values'][1]['sort_name']);
   }
 
   /**
