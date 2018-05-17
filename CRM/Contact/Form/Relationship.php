@@ -260,6 +260,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     else {
       $defaults['is_active'] = $defaults['is_current_employer'] = 1;
       $defaults['relationship_type_id'] = $this->_rtypeId;
+      $defaults['is_permission_a_b'] = $defaults['is_permission_b_a'] = CRM_Contact_BAO_Relationship::NONE;
     }
 
     $this->_enabled = $defaults['is_active'];
@@ -339,8 +340,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     $this->addField('is_active', array('label' => ts('Enabled?'), 'type' => 'advcheckbox'));
 
-    $this->addField('is_permission_a_b');
-    $this->addField('is_permission_b_a');
+    $this->addField('is_permission_a_b', array(), TRUE);
+    $this->addField('is_permission_b_a', array(), TRUE);
 
     $this->addField('description', array('label' => ts('Description')));
 
