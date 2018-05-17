@@ -3643,7 +3643,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           if (($lineItemDetails['tax_amount'] && $lineItemDetails['tax_amount'] !== 'null') || ($context == 'changeFinancialType')) {
             $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
             $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-            $taxAmount = $lineItemDetails['tax_amount'];
+            $taxAmount = (float) $lineItemDetails['tax_amount'];
             if ($context == 'changeFinancialType' && $lineItemDetails['tax_amount'] === 'null') {
               // reverse the Sale Tax amount if there is no tax rate associated with new Financial Type
               $taxAmount = CRM_Utils_Array::value('tax_amount', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
