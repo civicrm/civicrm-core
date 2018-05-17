@@ -147,7 +147,7 @@ class CRM_Core_OptionValue {
       }
 
       // disallow deletion of option values for locked groups
-      if ($isGroupLocked) {
+      if (($action & CRM_Core_Action::DELETE) && $isGroupLocked) {
         $action -= CRM_Core_Action::DELETE;
       }
 
