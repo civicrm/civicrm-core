@@ -659,8 +659,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
       // Send the mailing.
 
-      $body = &$message->get();
-      $headers = &$message->headers();
+      $body = $message->get();
+      $headers = $message->headers();
 
       if ($mailing->sms_provider_id) {
         $provider = CRM_SMS_Provider::singleton(array('mailing_id' => $mailing->id));
