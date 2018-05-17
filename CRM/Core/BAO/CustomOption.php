@@ -151,7 +151,7 @@ class CRM_Core_BAO_CustomOption {
       );
 
       // disable deletion of option values for locked option groups
-      if ($isGroupLocked) {
+      if (($action & CRM_Core_Action::DELETE) && $isGroupLocked) {
         $action -= CRM_Core_Action::DELETE;
       }
 
