@@ -142,6 +142,18 @@ class api_v3_JobTest extends CiviUnitTestCase {
      $this->callAPIFailure('job', 'clone', $params);
    }
 
+   /**
+     *Check exception code for clone job when a wrong $id is passed.
+     */
+   public function testCloneWithWrongId() {
+       $params = array(
+         'id' => -2,
+         'last_run' => 'null',
+         'scheduled_run_date' => 'null',
+     );
+       $this->callAPIFailure('job', 'clone', $params);
+    }
+
   /**
    * Check if required fields are not passed.
    */
