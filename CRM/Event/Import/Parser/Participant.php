@@ -285,7 +285,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get('dateTypes');
     $formatted = array('version' => 3);
-    $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $params));
+    $customFields = CRM_Core_BAO_CustomField::getFields('Participant');
 
     // don't add to recent items, CRM-4399
     $formatted['skipRecentView'] = TRUE;
