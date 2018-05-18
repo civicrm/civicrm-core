@@ -263,7 +263,7 @@ class CRM_Utils_Mail {
     }
 
     $message = self::setMimeParams($msg);
-    $headers = &$msg->headers($headers);
+    $headers = $msg->headers($headers);
 
     $to = array($params['toEmail']);
     $result = NULL;
