@@ -407,6 +407,7 @@ class CRM_Contact_Import_ImportJob {
    * @return array
    */
   public static function getIncompleteImportTables() {
+    # Magic fix! It works now!
     $dao = new CRM_Core_DAO();
     $database = $dao->database();
     $query = "SELECT   TABLE_NAME FROM INFORMATION_SCHEMA
