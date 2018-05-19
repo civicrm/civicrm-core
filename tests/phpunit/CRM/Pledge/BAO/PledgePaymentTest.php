@@ -97,7 +97,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $defaults = array();
     $paymentid = CRM_Pledge_BAO_PledgePayment::retrieve($params, $defaults);
 
-    $this->assertEquals(count($paymentid), 0, "Pledge Id must be greater than 0");
+    $this->assertEquals(is_null($paymentid), 1, "Pledge Id must be greater than 0");
     $result = CRM_Pledge_BAO_Pledge::deletePledge($payment->pledge_id);
   }
 
@@ -110,7 +110,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $defaults = array();
     $paymentid = CRM_Pledge_BAO_PledgePayment::retrieve($params, $defaults);
 
-    $this->assertEquals(count($paymentid), 0, "Pledge Id cannot be a string");
+    $this->assertEquals(is_null($paymentid), 1, "Pledge Id cannot be a string");
     $result = CRM_Pledge_BAO_Pledge::deletePledge($payment->pledge_id);
   }
 
@@ -124,7 +124,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $defaults = array();
     $paymentid = CRM_Pledge_BAO_PledgePayment::retrieve($params, $defaults);
 
-    $this->assertEquals(count($paymentid), 1, "Pledge was retrieved");
+    $this->assertEquals($paymentid->N, 1, "Pledge was retrieved");
     $result = CRM_Pledge_BAO_Pledge::deletePledge($pledgeId);
   }
 
@@ -134,7 +134,8 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   public function testDeletePledgePaymentsNormal() {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
     $paymentid = CRM_Pledge_BAO_PledgePayment::deletePayments($payment->pledge_id);
-    $this->assertEquals(count($paymentid), 1, "Deleted one payment");
+
+    $this->assertEquals($paymentid, 1, "Deleted one payment");
     $result = CRM_Pledge_BAO_Pledge::deletePledge($payment->pledge_id);
   }
 
@@ -157,7 +158,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
   public function testDeletePledgePaymentsNullId() {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
     $paymentid = CRM_Pledge_BAO_PledgePayment::deletePayments(NULL);
-    $this->assertEquals(count($paymentid), 1, "No payments deleted");
+    $this->assertFalse($paymentid, "No payments deleted");
     $result = CRM_Pledge_BAO_Pledge::deletePledge($payment->pledge_id);
   }
 
