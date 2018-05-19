@@ -1404,8 +1404,8 @@ class CRM_Utils_Token {
         $greetingTokens = $remainingTokens;
         reset($greetingTokens);
         $greetingsReturnProperties = array();
-        while (list($key) = each($greetingTokens)) {
-          $props = array_flip(CRM_Utils_Array::value($key, $greetingTokens));
+        foreach ($greetingTokens as $value) {
+          $props = array_flip($value);
           $props = array_fill_keys(array_keys($props), 1);
           $greetingsReturnProperties = $greetingsReturnProperties + $props;
         }
