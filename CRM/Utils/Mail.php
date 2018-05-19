@@ -263,7 +263,7 @@ class CRM_Utils_Mail {
     }
 
     $message = self::setMimeParams($msg);
-    $headers = &$msg->headers($headers);
+    $headers = $msg->headers($headers);
 
     $to = array($params['toEmail']);
     $result = NULL;
@@ -421,7 +421,7 @@ class CRM_Utils_Mail {
    *
    * @return mixed
    */
-  public static function &setMimeParams(&$message, $params = NULL) {
+  public static function setMimeParams($message, $params = NULL) {
     static $mimeParams = NULL;
     if (!$params) {
       if (!$mimeParams) {
