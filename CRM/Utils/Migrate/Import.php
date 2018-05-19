@@ -352,10 +352,10 @@ AND        v.name = %1
         $fields_indexed_by_group_id[$id][] = $customFieldXML;
       }
     }
-    while (list($group_id, $fields) = each($fields_indexed_by_group_id)) {
+    foreach ($fields_indexed_by_group_id as $group_id => $fields) {
       $total = count($fields);
       $count = 0;
-      while (list(, $customFieldXML) = each($fields)) {
+      foreach ($fields as $customFieldXML) {
         $count++;
         $customField = new CRM_Core_DAO_CustomField();
         $customField->custom_group_id = $group_id;
