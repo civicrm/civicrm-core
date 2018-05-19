@@ -4121,3 +4121,6 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1080, "07", "Ogooué-Lolo"),
 (NULL, 1080, "08", "Ogooué-Maritime"),
 (NULL, 1080, "09", "Woleu-Ntem");
+
+--Missing UK State
+(NULL, 1226, "MON", "Monmouthshire")
