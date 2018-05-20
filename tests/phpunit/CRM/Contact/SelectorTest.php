@@ -269,6 +269,59 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test if custom table is added in from clause when
+   * search results are ordered by a custom field.
+   */
+  public function testSelectorQueryOrderByCustomField() {
+    //Search for any params.
+    $params = [[
+      0 => 'country-1',
+      1 => '=',
+      2 => '1228',
+      3 => 1,
+      4 => 0,
+    ]];
+
+    //Create a test custom group and field.
+    $customGroup = $this->callAPISuccess('CustomGroup', 'create', array(
+      'title' => "test custom group",
+      'extends' => "Individual",
+    ));
+    $cgTableName = $customGroup['values'][$customGroup['id']]['table_name'];
+    $customField = $this->callAPISuccess('CustomField', 'create', array(
+      'custom_group_id' => $customGroup['id'],
+      'label' => "test field",
+      'html_type' => "Text",
+    ));
+    $customFieldId = $customField['id'];
+
+    //Sort by the custom field created above.
+    $sortParams = array(
+      1 => array(
+        'name' => 'test field',
+        'sort' => "custom_{$customFieldId}",
+      ),
+    );
+    $sort = new CRM_Utils_Sort($sortParams, '1_d');
+
+    //Form a query to order by a custom field.
+    $query = new CRM_Contact_BAO_Query($params,
+      CRM_Contact_BAO_Query::NO_RETURN_PROPERTIES,
+      NULL, FALSE, FALSE, 1,
+      FALSE, TRUE, TRUE, NULL,
+      'AND'
+    );
+    $query->searchQuery(0, 0, $sort,
+      FALSE, FALSE, FALSE,
+      FALSE, FALSE
+    );
+    //Check if custom table is included in $query->_tables.
+    $this->assertTrue(in_array($cgTableName, array_keys($query->_tables)));
+    //Assert if from clause joins the custom table.
+    $this->assertTrue(strpos($query->_fromClause, $cgTableName) !== FALSE);
+  }
+
+  /**
    * Get the default select string since this is generally consistent.
    */
   public function getDefaultSelectString() {

@@ -6439,6 +6439,15 @@ AND   displayRelType.is_active = 1
           break;
 
         default:
+          $cfID = CRM_Core_BAO_CustomField::getKeyID($field);
+          // add to cfIDs array if not present
+          if (!empty($cfID) && !array_key_exists($cfID, $this->_cfIDs)) {
+            $this->_cfIDs[$cfID] = array();
+            $this->_customQuery = new CRM_Core_BAO_CustomQuery($this->_cfIDs, TRUE, $this->_locationSpecificCustomFields);
+            $this->_customQuery->query();
+            $this->_select = array_merge($this->_select, $this->_customQuery->_select);
+            $this->_tables = array_merge($this->_tables, $this->_customQuery->_tables);
+          }
           foreach ($this->_pseudoConstantsSelect as $key => $pseudoConstantMetadata) {
             // By replacing the join to the option value table with the mysql construct
             // ORDER BY field('contribution_status_id', 2,1,4)
