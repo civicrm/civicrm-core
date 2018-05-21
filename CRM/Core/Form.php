@@ -269,7 +269,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->addClass(CRM_Utils_System::getClassName($this));
 
     $this->assign('snippet', CRM_Utils_Array::value('snippet', $_GET));
+    $this->setTranslatedFields();
   }
+
+  /**
+   * Set translated fields.
+   *
+   * This function is called from the class constructor, allowing us to set
+   * fields on the class that can't be set as properties due to need for
+   * translation or other non-input specific handling.
+   */
+  protected function setTranslatedFields() {}
 
   /**
    * Add one or more css classes to the form.
