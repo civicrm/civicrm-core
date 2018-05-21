@@ -73,6 +73,12 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
     // Ensure that search builder return individual contact as per criteria
     if (!empty($dataSet['context'] == 'builder')) {
       $contactID = $this->individualCreate(['first_name' => 'James', 'last_name' => 'Bond']);
+      $this->callAPISuccess('Address', 'create', [
+        'contact_id' => $contactID,
+        'location_type_id' => "Home",
+        'is_primary' => 1,
+        'country_id' => "IN",
+      ]);
       $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
       $this->assertEquals(1, count($rows));
       $sortChar = $selector->alphabetQuery()->fetchAll();
@@ -231,7 +237,7 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
           'description' => 'Normal search builder behaviour',
           'class' => 'CRM_Contact_Selector',
           'settings' => array(),
-          'form_values' => array('contact_type' => 'Individual'),
+          'form_values' => array('contact_type' => 'Individual', 'country' => array('IS NOT NULL' => 1)),
           'params' => array(),
           'return_properties' => array(
             'contact_type' => 1,
@@ -243,9 +249,9 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => array(
-            0 => 'SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`',
-            1 => ' FROM civicrm_contact contact_a',
-            2 => 'WHERE  ( contact_a.contact_type IN ("Individual") )  AND (contact_a.is_deleted = 0)',
+            0 => 'SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, civicrm_address.id as address_id, civicrm_address.country_id as country_id',
+            1 => ' FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 )',
+            2 => 'WHERE ( contact_a.contact_type IN ("Individual") AND civicrm_address.country_id IS NOT NULL ) AND (contact_a.is_deleted = 0)',
           ),
         ),
       ),
