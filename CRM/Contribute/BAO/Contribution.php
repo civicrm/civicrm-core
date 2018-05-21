@@ -2895,6 +2895,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @return mixed
    */
   public function _assignMessageVariablesToTemplate(&$values, $input, $returnMessageText = TRUE) {
+    // @todo - this should have a better separation of concerns - ie.
+    // gatherMessageValues should build an array of values to be assigned to the template
+    // and this function should assign them (assigning null if not set).
+    // the way the pcpParams & honor Params section works is a baby-step towards this.
     $template = CRM_Core_Smarty::singleton();
     $template->assign('first_name', $this->_relatedObjects['contact']->first_name);
     $template->assign('last_name', $this->_relatedObjects['contact']->last_name);
@@ -2907,6 +2911,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     //assign honor information to receipt message
     $softRecord = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id);
 
+    $honorParams = ['soft_credit_type' => NULL, 'honor_block_is_active' => NULL];
     if (isset($softRecord['soft_credit'])) {
       //if id of contribution page is present
       if (!empty($values['id'])) {
@@ -2916,8 +2921,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           'honor_id' => $softRecord['soft_credit'][1]['contact_id'],
         );
 
-        $template->assign('soft_credit_type', $softRecord['soft_credit'][1]['soft_credit_type_label']);
-        $template->assign('honor_block_is_active', CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'is_active', 'entity_id'));
+        $honorParams['soft_credit_type'] = $softRecord['soft_credit'][1]['soft_credit_type_label'];
+        $honorParams['honor_block_is_active'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'is_active', 'entity_id');
       }
       else {
         //offline contribution
@@ -2954,24 +2959,28 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $values['amount'] = $this->total_amount;
     }
 
-    // add the new contribution values
+    $pcpParams = ['pcpBlock' => NULL, 'pcp_display_in_roll' => NULL, 'pcp_roll_nickname' => NULL, 'pcp_personal_note' => NULL, 'title' => NULL];
+
     if (strtolower($this->_component) == 'contribute') {
       //PCP Info
       $softDAO = new CRM_Contribute_DAO_ContributionSoft();
       $softDAO->contribution_id = $this->id;
       if ($softDAO->find(TRUE)) {
-        $template->assign('pcpBlock', TRUE);
-        $template->assign('pcp_display_in_roll', $softDAO->pcp_display_in_roll);
-        $template->assign('pcp_roll_nickname', $softDAO->pcp_roll_nickname);
-        $template->assign('pcp_personal_note', $softDAO->pcp_personal_note);
+        $pcpParams['pcpBlock'] = TRUE;
+        $pcpParams['pcp_display_in_roll'] = $softDAO->pcp_display_in_roll;
+        $pcpParams['pcp_roll_nickname'] = $softDAO->pcp_roll_nickname;
+        $pcpParams['pcp_personal_note'] = $softDAO->pcp_personal_note;
 
         //assign the pcp page title for email subject
         $pcpDAO = new CRM_PCP_DAO_PCP();
         $pcpDAO->id = $softDAO->pcp_id;
         if ($pcpDAO->find(TRUE)) {
-          $template->assign('title', $pcpDAO->title);
+          $pcpParams['title'] = $pcpDAO->title;
         }
       }
+    }
+    foreach (array_merge($honorParams, $pcpParams) as $templateKey => $templateValue) {
+      $template->assign($templateKey, $templateValue);
     }
 
     if ($this->financial_type_id) {
