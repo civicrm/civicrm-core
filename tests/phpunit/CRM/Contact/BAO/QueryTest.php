@@ -531,4 +531,42 @@ civicrm_relationship.is_active = 1 AND
     $this->disableFinancialACLs();
   }
 
+  /**
+   * When we have a relative date in search criteria, check that convertFormValues() sets _low & _high date fields and returns other criteria.
+   * CRM-21816 fix relative dates in search bug
+   */
+  public function testConvertFormValuesCRM21816() {
+    $fv = array(
+      "member_end_date_relative" => "starting_2.month", // next 60 days
+      "member_end_date_low" => "20180101000000",
+      "member_end_date_high" => "20180331235959",
+      "membership_is_current_member" => "1",
+      "member_is_primary" => "1",
+    );
+    $fv_orig = $fv;  // $fv is modified by convertFormValues()
+    $params = CRM_Contact_BAO_Query::convertFormValues($fv);
+
+    // restructure for easier testing
+    $modparams = array();
+    foreach ($params as $p) {
+      $modparams[$p[0]] = $p;
+    }
+
+    // Check member_end_date_low is in params
+    $this->assertTrue(is_array($modparams['member_end_date_low']));
+    // ... fv and params should match
+    $this->assertEquals($modparams['member_end_date_low'][2], $fv['member_end_date_low']);
+    // ... fv & fv_orig should be different
+    $this->assertNotEquals($fv['member_end_date_low'], $fv_orig['member_end_date_low']);
+
+    // same for member_end_date_high
+    $this->assertTrue(is_array($modparams['member_end_date_high']));
+    $this->assertEquals($modparams['member_end_date_high'][2], $fv['member_end_date_high']);
+    $this->assertNotEquals($fv['member_end_date_high'], $fv_orig['member_end_date_high']);
+
+    // Check other fv values are in params
+    $this->assertEquals($modparams['membership_is_current_member'][2], $fv_orig['membership_is_current_member']);
+    $this->assertEquals($modparams['member_is_primary'][2], $fv_orig['member_is_primary']);
+  }
+
 }
