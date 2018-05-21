@@ -179,7 +179,7 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
     }
 
     // check that locale supports address parsing
-    if(
+    if (
       CRM_Utils_Array::value($addressOptions['Street Address Parsing'], $this->_params['address_options']) &&
       !CRM_Core_BAO_Address::isSupportedParsingLocale()
     ) {
