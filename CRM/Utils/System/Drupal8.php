@@ -302,17 +302,23 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     $url = \Drupal\civicrm\CivicrmHelper::parseURL("{$path}?{$query}");
 
+    $config = CRM_Core_Config::singleton();
+    $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
+
     // Not all links that CiviCRM generates are Drupal routes, so we use the weaker ::fromUri method.
     try {
-      $url = \Drupal\Core\Url::fromUri("base:{$url['path']}", [
-        'query' => $url['query'],
-        'fragment' => $fragment,
-        'absolute' => $absolute,
-      ])->toString();
+      // @todo currently there is no way to pass formatted $baseUrl as a parameter or in url,
+      //  so for now to bypass URI validation we are passing dummy string here and later replacing it with D8 base URL w/o language prefix
+      $url = str_replace('//dummy-link',
+        "{$base}{$url['path']}",
+        \Drupal\Core\Url::fromUri('//dummy-link', [
+          'query' => $url['query'],
+          'fragment' => $fragment,
+        ])->toString()
+      );
     }
     catch (Exception $e) {
-      // @Todo: log to watchdog
-      $url = '';
+      \Drupal::logger('civicrm')->error($e->getMessage());
     }
 
     // Special case: CiviCRM passes us "*path*?*query*" as a skeleton, but asterisks
@@ -693,6 +699,63 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     }
 
     return FALSE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
+    if (empty($url)) {
+      return $url;
+    }
+
+    $language = $this->getCurrentLanguage();
+    if (\Drupal::service('module_handler')->moduleExists('language')) {
+      $config = \Drupal::config('language.negotiation')->get('url');
+
+      //does user configuration allow language
+      //support from the URL (Path prefix or domain)
+      $enabledLanguageMethods = \Drupal::config('language.types')->get('negotiation.language_interface.enabled') ?: [];
+      if (array_key_exists(\Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::METHOD_ID, $enabledLanguageMethods)) {
+        $urlType = $config['source'];
+
+        //url prefix
+        if ($urlType == \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::CONFIG_PATH_PREFIX) {
+          if (!empty($language)) {
+            if ($addLanguagePart) {
+              $url .= $config['prefixes'][$language] . '/';
+            }
+            if ($removeLanguagePart) {
+              $url = str_replace("/" . $config['prefixes'][$language] . "/", '/', $url);
+            }
+          }
+        }
+        //domain
+        if ($urlType == \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::CONFIG_DOMAIN) {
+          if (isset($language->domain) && $language->domain) {
+            if ($addLanguagePart) {
+              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' .  $config['domains'][$language] . base_path();
+            }
+            if ($removeLanguagePart && defined('CIVICRM_UF_BASEURL')) {
+              $url = str_replace('\\', '/', $url);
+              $parseUrl = parse_url($url);
+
+              //kinda hackish but not sure how to do it right
+              //hope http_build_url() will help at some point.
+              if (is_array($parseUrl) && !empty($parseUrl)) {
+                $urlParts = explode('/', $url);
+                $hostKey = array_search($parseUrl['host'], $urlParts);
+                $ufUrlParts = parse_url(CIVICRM_UF_BASEURL);
+                $urlParts[$hostKey] = $ufUrlParts['host'];
+                $url = implode('/', $urlParts);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return $url;
   }
 
 }
