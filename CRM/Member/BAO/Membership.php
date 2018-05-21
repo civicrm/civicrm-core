@@ -1438,7 +1438,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
       // max_related should be set in the parent membership
       unset($params['max_related']);
       // Number of inherited memberships available - NULL is interpreted as unlimited, '0' as none
-      $available = ($membership->max_related == NULL ? PHP_INT_MAX : $membership->max_related);
+      $numRelatedAvailable = ($membership->max_related == NULL ? PHP_INT_MAX : $membership->max_related);
       // will be used to queue potential memberships to be created.
       $queue = array();
 
@@ -1498,9 +1498,9 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         else {
           // related membership already exists, so this is just an update
           if (isset($params['id'])) {
-            if ($available > 0) {
+            if ($numRelatedAvailable > 0) {
               CRM_Member_BAO_Membership::create($params, $relMemIds);
-              $available--;
+              $numRelatedAvailable--;
             }
             else {
               // we have run out of inherited memberships, so delete extras
@@ -1514,10 +1514,12 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         }
       }
       // now go over the queue and create any available related memberships
-      reset($queue);
-      while (($available > 0) && ($params = each($queue))) {
-        CRM_Member_BAO_Membership::create($params['value'], $relMemIds);
-        $available--;
+      foreach ($queue as $params) {
+        if ($numRelatedAvailable <= 0) {
+          break;
+        }
+        CRM_Member_BAO_Membership::create($params, $relMemIds);
+        $numRelatedAvailable--;
       }
     }
   }
