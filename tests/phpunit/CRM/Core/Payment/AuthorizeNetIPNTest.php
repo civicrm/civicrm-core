@@ -224,6 +224,15 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this, TRUE);
     $this->setupMembershipRecurringPaymentProcessorTransaction(array('is_email_receipt' => TRUE));
     $this->addProfile('supporter_profile', $this->_contributionPageID);
+
+    $honoreeContactId = $this->getHonoreeContact();
+    $softParam['contact_id'] = $honoreeContactId;
+    $softParam['contribution_id'] = $this->_contributionID;
+    $softParam['amount'] = 200;
+
+    //Create Soft Contribution for honoree contact
+    CRM_Contribute_BAO_ContributionSoft::add($softParam);
+
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
     $IPN->main();
     $mut->checkAllMailLog(array(
@@ -235,6 +244,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'First Name: Anthony',
       'Last Name: Anderson',
       'Email Address: anthony_anderson@civicrm.org',
+      'Honor',
       'This membership will be automatically renewed every',
       'Dear Mr. Anthony Anderson II',
       'Thanks for your auto renew membership sign-up',
@@ -243,6 +253,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->_contactID = $this->individualCreate(array('first_name' => 'Antonia', 'prefix_id' => 'Mrs.', 'email' => 'antonia_anderson@civicrm.org'));
     $this->_invoiceID = uniqid();
 
+    // Note, the second contribution is not in honor of anyone and the
+    // receipt should not mention honor at all.
     $this->setupMembershipRecurringPaymentProcessorTransaction(array('is_email_receipt' => TRUE));
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction(array('x_trans_id' => 'hers')));
     $IPN->main();
@@ -263,6 +275,13 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'Thanks for your auto renew membership sign-up',
     ));
 
+    $shouldNotBeInMailing = array(
+      'Honor',
+    );
+    $mails = $mut->getAllMessages('raw');
+    foreach ($mails as $mail) {
+      $mut->checkMailForStrings(array(), $shouldNotBeInMailing, '', $mail);
+    }
     $mut->stop();
     $mut->clearMessages();
   }

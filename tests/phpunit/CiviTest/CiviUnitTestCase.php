@@ -3629,4 +3629,37 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $dbLocale = '_en_US';
   }
 
+
+  /**
+   *
+   * Create honoree contact
+   *
+   * Contact that can be used to test honor of contributions.
+   */
+  public function getHonoreeContact() {
+    $firstName = 'John_' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
+    $email = "{$firstName}.{$lastName}@example.com";
+
+    //Get profile id of name honoree_individual used to create profileContact
+    $honoreeProfileId = NULL;
+    $ufGroupDAO = new CRM_Core_DAO_UFGroup();
+    $ufGroupDAO->name = 'honoree_individual';
+    if ($ufGroupDAO->find(TRUE)) {
+      $honoreeProfileId = $ufGroupDAO->id;
+    }
+
+    $params = array(
+      'prefix_id' => 3,
+      'first_name' => $firstName,
+      'last_name' => $lastName,
+      'email-1' => $email,
+    );
+    $softParam = array('soft_credit_type_id' => 1);
+
+    return CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray,
+      NULL, NULL, $honoreeProfileId
+    );
+  }
+
 }

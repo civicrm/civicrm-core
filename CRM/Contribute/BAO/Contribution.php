@@ -2896,6 +2896,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    */
   public function _assignMessageVariablesToTemplate(&$values, $input, $returnMessageText = TRUE) {
     $template = CRM_Core_Smarty::singleton();
+    // Clear template variables to avoid leakage when processing multiple contributions.
+    // See https://lab.civicrm.org/dev/core/issues/35
+    $template->clearTemplateVars();
     $template->assign('first_name', $this->_relatedObjects['contact']->first_name);
     $template->assign('last_name', $this->_relatedObjects['contact']->last_name);
     $template->assign('displayName', $this->_relatedObjects['contact']->display_name);
@@ -2915,6 +2918,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           'honor_profile_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'uf_group_id', 'entity_id'),
           'honor_id' => $softRecord['soft_credit'][1]['contact_id'],
         );
+        $values['honoree_profile_id'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'uf_group_id', 'entity_id');
 
         $template->assign('soft_credit_type', $softRecord['soft_credit'][1]['soft_credit_type_label']);
         $template->assign('honor_block_is_active', CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'is_active', 'entity_id'));
