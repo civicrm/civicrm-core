@@ -5299,6 +5299,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_order_bys' => TRUE,
         'is_group_bys' => TRUE,
         'is_fields' => TRUE,
+        'is_filters' => TRUE,
       ),
       $options['prefix'] . 'external_identifier' => array(
         'name' => 'external_identifier',
