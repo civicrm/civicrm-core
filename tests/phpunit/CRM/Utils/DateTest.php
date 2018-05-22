@@ -87,4 +87,90 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $this->assertEquals($expectedTo, $calculatedTo);
   }
 
+  /**
+   * Test relativeToAbsolute function on a range of fiscal year options.
+   *
+   * Go backwards one year at a time through the sequence.
+   */
+  public function testRelativeToAbsoluteFiscalYear() {
+    $sequence = ['this', 'previous', 'previous_before'];
+    Civi::settings()->set('fiscalYearStart', ['M' => 7, 'd' => 1]);
+    $fiscalYearStartYear = (strtotime('now') > strtotime((date('Y-07-01')))) ? date('Y') : (date('Y') - 1);
+
+    foreach ($sequence as $relativeString) {
+      $date = CRM_Utils_Date::relativeToAbsolute($relativeString, 'fiscal_year');
+      $this->assertEquals([
+        'from' => $fiscalYearStartYear . '0701',
+        'to' => ($fiscalYearStartYear + 1) . '0630'
+      ], $date, 'relative term is ' . $relativeString);
+
+      $fiscalYearStartYear--;
+    }
+  }
+
+  /**
+   * Test relativeToAbsolute function on a range of year options.
+   *
+   * Go backwards one year at a time through the sequence.
+   */
+  public function testRelativeToAbsoluteYear() {
+    $sequence = ['this', 'previous', 'previous_before'];
+    $year = date('Y');
+
+    foreach ($sequence as $relativeString) {
+      $date = CRM_Utils_Date::relativeToAbsolute($relativeString, 'year');
+      $this->assertEquals([
+        'from' => $year . '0101',
+        'to' => $year . '1231',
+      ], $date, 'relative term is ' . $relativeString);
+
+      $year--;
+    }
+  }
+
+  /**
+   * Test relativeToAbsolute function on a range of year options.
+   *
+   * Go backwards one year at a time through the sequence.
+   */
+  public function testRelativeToAbsoluteYearRange() {
+    $sequence = ['previous_2'];
+    $lastYear = (date('Y') - 1);
+
+    foreach ($sequence as $relativeString) {
+      $date = CRM_Utils_Date::relativeToAbsolute($relativeString, 'year');
+      // For previous 2 years the range is e.g 2016-01-01 to 2017-12-31 so we have to subtract
+      // one from the range count to reflect the calendar year being one less apart due
+      // to it being from the beginning of one to the end of the next.
+      $offset = (substr($relativeString, -1, 1)) - 1;
+      $this->assertEquals([
+        'from' => $lastYear - $offset . '0101',
+        'to' => $lastYear  . '1231',
+      ], $date, 'relative term is ' . $relativeString);
+    }
+  }
+
+  /**
+   * Test relativeToAbsolute function on a range of year options.
+   *
+   * Go backwards one year at a time through the sequence.
+   */
+  public function testRelativeToAbsoluteFiscalYearRange() {
+    $sequence = ['previous_2', 'previous_3', 'previous_4'];
+    Civi::settings()->set('fiscalYearStart', ['M' => 7, 'd' => 1]);
+    $lastFiscalYearEnd = (strtotime('now') > strtotime((date('Y-07-01')))) ? (date('Y')) : (date('Y') - 1);
+
+    foreach ($sequence as $relativeString) {
+      $date = CRM_Utils_Date::relativeToAbsolute($relativeString, 'fiscal_year');
+      // For previous 2 years the range is e.g 2015-07-01 to 2017-06-30 so we have to subtract
+      // one from the range count to reflect the calendar year being one less apart due
+      // to it being from the beginning of one to the end of the next.
+      $offset = (substr($relativeString, -1, 1));
+      $this->assertEquals([
+        'from' => $lastFiscalYearEnd - $offset . '0701',
+        'to' => $lastFiscalYearEnd  . '0630',
+      ], $date, 'relative term is ' . $relativeString);
+    }
+  }
+
 }
