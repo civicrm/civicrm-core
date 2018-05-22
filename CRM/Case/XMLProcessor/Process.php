@@ -640,27 +640,63 @@ AND        a.is_deleted = 0
    * @return int|null the ID of the default assignee contact or null if none.
    */
   protected function getDefaultAssigneeByRelationship($activityParams, $activityTypeXML) {
-    if (!isset($activityTypeXML->default_assignee_relationship)) {
+    $isDefaultRelationshipDefined = isset($activityTypeXML->default_assignee_relationship)
+      && preg_match('/\d+_[ab]_[ab]/', $activityTypeXML->default_assignee_relationship);
+
+    if (!$isDefaultRelationshipDefined) {
       return NULL;
     }
 
     $targetContactId = is_array($activityParams['target_contact_id'])
       ? CRM_Utils_Array::first($activityParams['target_contact_id'])
       : $activityParams['target_contact_id'];
+    list($relTypeId, $a, $b) = explode('_', $activityTypeXML->default_assignee_relationship);
 
-    $relationships = civicrm_api3('Relationship', 'get', [
-      'contact_id_b' => $targetContactId,
-      'relationship_type_id.name_b_a' => (string) $activityTypeXML->default_assignee_relationship,
+    $params = [
+      'relationship_type_id' => $relTypeId,
+      "contact_id_$b" => $targetContactId,
       'is_active' => 1,
-      'sequential' => 1,
-    ]);
+    ];
+
+    if ($this->isBidirectionalRelationshipType($relTypeId)) {
+      $params["contact_id_$a"] = $targetContactId;
+      $params['options']['or'] = [['contact_id_a', 'contact_id_b']];
+    }
+
+    $relationships = civicrm_api3('Relationship', 'get', $params);
 
     if ($relationships['count']) {
-      return $relationships['values'][0]['contact_id_a'];
+      $relationship = CRM_Utils_Array::first($relationships['values']);
+
+      // returns the contact id on the other side of the relationship:
+      return (int) $relationship['contact_id_a'] === (int) $targetContactId
+        ? $relationship['contact_id_b']
+        : $relationship['contact_id_a'];
     }
     else {
       return NULL;
     }
+  }
+
+  /**
+   * Determines if the given relationship type is bidirectional or not by
+   * comparing their labels.
+   *
+   * @return bool
+   */
+  protected function isBidirectionalRelationshipType($relationshipTypeId) {
+    $relationshipTypeResult = civicrm_api3('RelationshipType', 'get', [
+      'id' => $relationshipTypeId,
+      'options' => ['limit' => 1]
+    ]);
+
+    if ($relationshipTypeResult['count'] === 0) {
+      return FALSE;
+    }
+
+    $relationshipType = CRM_Utils_Array::first($relationshipTypeResult['values']);
+
+    return $relationshipType['label_b_a'] === $relationshipType['label_a_b'];
   }
 
   /**

@@ -188,6 +188,18 @@ describe('crmCaseType', function() {
               "contact_type_b": "Individual",
               "is_reserved": "0",
               "is_active": "1"
+            },
+            {
+              "id": "2",
+              "name_a_b": "Spouse of",
+              "label_a_b": "Spouse of",
+              "name_b_a": "Spouse of",
+              "label_b_a": "Spouse of",
+              "description": "Spousal relationship.",
+              "contact_type_a": "Individual",
+              "contact_type_b": "Individual",
+              "is_reserved": "0",
+              "is_active": "1"
             }
           ]
         },
@@ -312,6 +324,26 @@ describe('crmCaseType', function() {
         .indexBy('name').mapValues('value').value();
 
       expect(scope.defaultAssigneeTypeValues).toEqual(defaultAssigneeTypeValues);
+    });
+
+    it('should store the default assignee relationship type options', function() {
+      var defaultRelationshipTypeOptions = _.transform(apiCalls.relTypes.values, function(result, relType) {
+        var isBidirectionalRelationship = relType.label_a_b === relType.label_b_a;
+
+        result.push({
+          label: relType.label_b_a,
+          value: relType.id + '_b_a'
+        });
+
+        if (!isBidirectionalRelationship) {
+          result.push({
+            label: relType.label_a_b,
+            value: relType.id + '_a_b'
+          });
+        }
+      }, []);
+
+      expect(scope.defaultRelationshipTypeOptions).toEqual(defaultRelationshipTypeOptions);
     });
 
     it('addActivitySet should add an activitySet to the case type', function() {

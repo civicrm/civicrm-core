@@ -264,9 +264,32 @@
       $scope.relationshipTypeOptions = _.map(apiCalls.relTypes.values, function(type) {
         return {id: type[REL_TYPE_CNAME], text: type.label_b_a};
       });
+      $scope.defaultRelationshipTypeOptions = getDefaultRelationshipTypeOptions();
       // stores the default assignee values indexed by their option name:
       $scope.defaultAssigneeTypeValues = _.chain($scope.defaultAssigneeTypes)
         .indexBy('name').mapValues('value').value();
+    }
+
+    /// Returns the default relationship type options. If the relationship is
+    /// bidirectional (Ex: Spouse of) it adds a single option otherwise it adds
+    /// two options representing the relationship type directions
+    /// (Ex: Employee of, Employer is)
+    function getDefaultRelationshipTypeOptions() {
+      return _.transform(apiCalls.relTypes.values, function(result, relType) {
+        var isBidirectionalRelationship = relType.label_a_b === relType.label_b_a;
+
+        result.push({
+          label: relType.label_b_a,
+          value: relType.id + '_b_a'
+        });
+
+        if (!isBidirectionalRelationship) {
+          result.push({
+            label: relType.label_a_b,
+            value: relType.id + '_a_b'
+          });
+        }
+      }, []);
     }
 
     /// initializes the case type object
