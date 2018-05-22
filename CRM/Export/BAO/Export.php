@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2018
- * $Id$
- *
  */
 
 /**
@@ -2105,9 +2103,10 @@ WHERE  {$whereClause}";
         $fieldValue = '';
       }
       $field = $field . '_';
+      $relPrefix = $field . $relationField;
 
       if (is_object($relDAO) && $relationField == 'id') {
-        $row[$field . $relationField] = $relDAO->contact_id;
+        $row[$relPrefix] = $relDAO->contact_id;
       }
       elseif (is_array($relationValue) && $relationField == 'location') {
         foreach ($relationValue as $ltype => $val) {
@@ -2147,7 +2146,7 @@ WHERE  {$whereClause}";
       elseif (isset($fieldValue) && $fieldValue != '') {
         //check for custom data
         if ($cfID = CRM_Core_BAO_CustomField::getKeyID($relationField)) {
-          $row[$field . $relationField] = CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
+          $row[$relPrefix] = CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
         }
         else {
           //normal relationship fields
@@ -2155,22 +2154,22 @@ WHERE  {$whereClause}";
           switch ($relationField) {
             case 'country':
             case 'world_region':
-              $row[$field . $relationField] = $i18n->crm_translate($fieldValue, array('context' => 'country'));
+              $row[$relPrefix] = $i18n->crm_translate($fieldValue, array('context' => 'country'));
               break;
 
             case 'state_province':
-              $row[$field . $relationField] = $i18n->crm_translate($fieldValue, array('context' => 'province'));
+              $row[$relPrefix] = $i18n->crm_translate($fieldValue, array('context' => 'province'));
               break;
 
             default:
-              $row[$field . $relationField] = $fieldValue;
+              $row[$relPrefix] = $fieldValue;
               break;
           }
         }
       }
       else {
         // if relation field is empty or null
-        $row[$field . $relationField] = '';
+        $row[$relPrefix] = '';
       }
     }
   }
