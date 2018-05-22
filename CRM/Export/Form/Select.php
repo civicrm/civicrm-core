@@ -70,6 +70,8 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
 
   public $_componentTable;
 
+  public $_customSearchID;
+
   /**
    * Must be set to entity table name (eg. civicrm_participant) by child class
    *
@@ -95,13 +97,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
     $this->preventAjaxSubmit();
 
     //special case for custom search, directly give option to download csv file
-    $customSearchID = $this->get('customSearchID');
-    if ($customSearchID) {
-      CRM_Export_BAO_Export::exportCustom($this->get('customSearchClass'),
-        $this->get('formValues'),
-        $this->get(CRM_Utils_Sort::SORT_ORDER)
-      );
-    }
+    $this->_customSearchID = $this->get('customSearchID');
 
     $this->_selectAll = FALSE;
     $this->_exportMode = self::CONTACT_EXPORT;
@@ -174,7 +170,11 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
     }
 
     // get the submitted values based on search
-    if ($this->_action == CRM_Core_Action::ADVANCED) {
+    if ($this->_customSearchID) {
+      $values = $this->get('formValues');
+      $this->assign('exportCustomSearchField', TRUE);
+    }
+    elseif ($this->_action == CRM_Core_Action::ADVANCED) {
       $values = $this->controller->exportValues('Advanced');
     }
     elseif ($this->_action == CRM_Core_Action::PROFILE) {
@@ -258,7 +258,7 @@ FROM   {$this->_componentTable}
     $exportOptions = $mergeOptions = $postalMailing = array();
     $exportOptions[] = $this->createElement('radio',
       NULL, NULL,
-      ts('Export PRIMARY fields'),
+      empty($this->_customSearchID) ? ts('Export PRIMARY fields') : ts('Export custom search fields'),
       self::EXPORT_ALL,
       array('onClick' => 'showMappingOption( );')
     );
@@ -423,6 +423,12 @@ FROM   {$this->_componentTable}
     }
 
     if ($exportOption == self::EXPORT_ALL) {
+      if ($this->_customSearchID) {
+        CRM_Export_BAO_Export::exportCustom($this->get('customSearchClass'),
+          $this->get('formValues'),
+          $this->get(CRM_Utils_Sort::SORT_ORDER)
+        );
+      }
       CRM_Export_BAO_Export::exportComponents($this->_selectAll,
         $this->_componentIds,
         (array) $this->get('queryParams'),
