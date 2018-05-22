@@ -128,7 +128,7 @@
       <tr class="crm-membership-type-form-block-visibility">
         <td class="label">{$form.visibility.label}</td>
         <td>{$form.visibility.html}<br />
-          <span class="description">{ts}Is this membership type available for self-service signups ('Public') or assigned by CiviCRM 'staff' users only ('Admin'){/ts}</span>
+          <span class="description">{ts}Can this membership type be used for self-service signups ('Public'), or is it only for CiviCRM users with 'Edit Contributions' permission ('Admin').{/ts}</span>
         </td>
       </tr>
       <tr class="crm-membership-type-form-block-weight">
