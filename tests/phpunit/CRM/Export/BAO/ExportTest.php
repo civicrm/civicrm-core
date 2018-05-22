@@ -172,8 +172,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'trxn_id' => 1,
       'contribution_id' => 1,
     );
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+
     $contactRelationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(
       NULL,
       NULL,
@@ -194,7 +193,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $queryFieldAliases = array();
     preg_match_all($pattern, $select, $queryFieldAliases, PREG_PATTERN_ORDER);
 
-    list($outputFields) = CRM_Export_BAO_Export::getExportStructureArrays($returnProperties, $query, $phoneTypes, $imProviders, $contactRelationshipTypes, '', array());
+    list($outputFields) = CRM_Export_BAO_Export::getExportStructureArrays($returnProperties, $query, $contactRelationshipTypes, '', array());
     foreach (array_keys($outputFields) as $fieldAlias) {
       if ($fieldAlias == 'Home-country') {
         $this->assertTrue(in_array($fieldAlias . '_id', $queryFieldAliases[1]), 'Country is subject to some funky translate so we make sure country id is present');

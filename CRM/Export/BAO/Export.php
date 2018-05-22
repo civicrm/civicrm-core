@@ -766,7 +766,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     // for CRM-3157 purposes
     $i18n = CRM_Core_I18n::singleton();
 
-    list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $query, $phoneTypes, $imProviders, $contactRelationshipTypes, $relationQuery, $selectedPaymentFields);
+    list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $query, $contactRelationshipTypes, $relationQuery, $selectedPaymentFields);
 
     $limitReached = FALSE;
     while (!$limitReached) {
@@ -1993,8 +1993,6 @@ WHERE  {$whereClause}";
    *
    * @param array $returnProperties
    * @param CRM_Contact_BAO_Contact $query
-   * @param array $phoneTypes
-   * @param array $imProviders
    * @param array $contactRelationshipTypes
    * @param string $relationQuery
    * @param array $selectedPaymentFields
@@ -2014,8 +2012,10 @@ WHERE  {$whereClause}";
    *    - b) this code is old & outdated. Submit your answers to circular bin or better
    *       yet find a way to comment them for posterity.
    */
-  public static function getExportStructureArrays($returnProperties, $query, $phoneTypes, $imProviders, $contactRelationshipTypes, $relationQuery, $selectedPaymentFields) {
+  public static function getExportStructureArrays($returnProperties, $query, $contactRelationshipTypes, $relationQuery, $selectedPaymentFields) {
     $metadata = $headerRows = $outputColumns = $sqlColumns = array();
+    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
 
     foreach ($returnProperties as $key => $value) {
       if ($key != 'location' || !is_array($value)) {
