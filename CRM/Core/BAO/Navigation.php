@@ -561,22 +561,24 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       }
     }
 
+    $menuMarkup = sprintf('<i class="menu-label">%s</i>', $name);
+
     if (!empty($value['attributes']['icon'])) {
-      $menuIcon = sprintf('<i class="%s"></i>', $value['attributes']['icon']);
-      $name = $menuIcon . $name;
+      $menuIconMarkup = sprintf('<i class="menu-icon %s" aria-hidden="true"></i>', $value['attributes']['icon']);
+      $menuMarkup = $menuIconMarkup . $menuMarkup;
     }
 
     if ($makeLink) {
       $url = CRM_Utils_System::evalUrl($url);
       if ($target) {
-        $name = "<a href=\"{$url}\" target=\"{$target}\">{$name}</a>";
+        $menuMarkup = "<a href=\"{$url}\" target=\"{$target}\">{$menuMarkup}</a>";
       }
       else {
-        $name = "<a href=\"{$url}\">{$name}</a>";
+        $menuMarkup = "<a href=\"{$url}\">{$menuMarkup}</a>";
       }
     }
 
-    return $name;
+    return $menuMarkup;
   }
 
   /**
