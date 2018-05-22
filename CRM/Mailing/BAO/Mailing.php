@@ -1342,10 +1342,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       }
       // add trailing quote since we've gobbled it up in a previous regex
       // function getPatterns, line 431
-      if (preg_match('/^href[ ]*=[ ]*\'/', $url)) {
+      if (preg_match("/^href[ ]*=[ ]*'.*[^']$/", $url)) {
         $url .= "'";
       }
-      elseif (preg_match('/^href[ ]*=[ ]*\"/', $url)) {
+      elseif (preg_match('/^href[ ]*=[ ]*".*[^"]$/', $url)) {
         $url .= '"';
       }
       $data = $url;
