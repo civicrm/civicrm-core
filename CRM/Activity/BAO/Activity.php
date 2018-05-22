@@ -2513,7 +2513,10 @@ AND cl.modified_id  = c.id
       // my case hence we have defined fields as case_*
       if ($name == 'Activity') {
         $exportableFields = CRM_Activity_DAO_Activity::export();
-        $exportableFields['source_contact_id']['title'] = ts('Source Contact ID');
+        $exportableFields['source_contact_id'] = [
+          'title' => ts('Source Contact ID'),
+          'type' => CRM_Utils_Type::T_INT,
+        ];
         $exportableFields['source_contact'] = array(
           'title' => ts('Source Contact'),
           'type' => CRM_Utils_Type::T_STRING,
