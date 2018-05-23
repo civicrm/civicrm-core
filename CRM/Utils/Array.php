@@ -1152,4 +1152,49 @@ class CRM_Utils_Array {
     return NULL;
   }
 
+  /**
+   * Check if a key isset which may be several layers deep.
+   *
+   * This is a helper for when the calling function does not know how many layers deep the
+   * path array is so cannot easily check.
+   *
+   * @param array $array
+   * @param array $path
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function recursiveIsset($array, $path) {
+    foreach ($path as $key) {
+      if (!is_array($array) || !isset($array[$key])) {
+        return FALSE;
+      }
+      $array = $array[$key];
+    }
+    return TRUE;
+  }
+
+  /**
+   * Check if a key isset which may be several layers deep.
+   *
+   * This is a helper for when the calling function does not know how many layers deep the
+   * path array is so cannot easily check.
+   *
+   * @param array $array
+   * @param array $path
+   *   An array of keys - e.g [0, 'bob', 8] where we want to check if $array[0]['bob'][8]
+   * @param mixed $default
+   *   Value to return if not found.
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function recursiveValue($array, $path, $default = NULL) {
+    foreach ($path as $key) {
+      if (!is_array($array) || !isset($array[$key])) {
+        return $default;
+      }
+      $array = $array[$key];
+    }
+    return $array;
+  }
+
 }

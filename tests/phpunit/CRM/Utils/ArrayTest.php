@@ -230,4 +230,72 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     }
   }
 
+  public function getRecursiveIssetExamples() {
+    return [
+      [
+        [[[], [0, 1, 2], []]], [0, 1, 2], TRUE,
+      ],
+      [
+        [[[], [0, 1, 2], []]], [0, 1, 3], FALSE,
+      ],
+      [
+        [], ['foo'], FALSE,
+      ],
+      [
+        [NULL, ['wrong' => NULL, 'right' => ['foo' => 1, 'bar' => 2]]], [1, 'wrong'], FALSE,
+      ],
+      [
+        [NULL, ['wrong' => NULL, 'right' => ['foo' => 1, 'bar' => 2]]], [1, 'right'], TRUE,
+      ],
+      [
+        [NULL, ['wrong' => NULL, 'right' => ['foo' => 1, 'bar' => 2]]], [1, 'right', 'foo'], TRUE,
+      ],
+    ];
+  }
+
+  /**
+   * @param $array
+   * @param $path
+   * @param $expected
+   * @dataProvider getRecursiveIssetExamples
+   */
+  public function testRecursiveIsset($array, $path, $expected) {
+    $result = CRM_Utils_Array::recursiveIsset($array, $path);
+    $this->assertEquals($expected, $result);
+  }
+
+  public function getRecursiveValueExamples() {
+    return [
+      [
+        [[[], [0, 1, 2], []]], [0, 1, 2], NULL, 2,
+      ],
+      [
+        [[[], [0, 1, 2], []]], [0, 1, 3], NULL, NULL,
+      ],
+      [
+        [], ['foo'], FALSE, FALSE,
+      ],
+      [
+        [NULL, ['wrong' => NULL, 'right' => ['foo' => 1, 'bar' => 2]]], [1, 'wrong'], 'nada', 'nada',
+      ],
+      [
+        [NULL, ['wrong' => NULL, 'right' => ['foo' => 1, 'bar' => 2]]], [1, 'right'], NULL, ['foo' => 1, 'bar' => 2]
+      ],
+      [
+        [NULL, ['wrong' => NULL, 'right' => ['foo' => 1, 'bar' => 2]]], [1, 'right', 'foo'], NULL, 1,
+      ],
+    ];
+  }
+
+  /**
+   * @param $array
+   * @param $path
+   * @param $expected
+   * @dataProvider getRecursiveValueExamples
+   */
+  public function testRecursiveValue($array, $path, $default, $expected) {
+    $result = CRM_Utils_Array::recursiveValue($array, $path, $default);
+    $this->assertEquals($expected, $result);
+  }
+
 }
