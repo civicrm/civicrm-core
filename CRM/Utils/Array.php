@@ -1152,4 +1152,99 @@ class CRM_Utils_Array {
     return NULL;
   }
 
+  /**
+   * Check if a key isset which may be several layers deep.
+   *
+   * This is a helper for when the calling function does not know how many layers deep the
+   * path array is so cannot easily check.
+   *
+   * @param array $array
+   * @param array $path
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function recursiveIsset($array, $path) {
+    $count = count($path);
+    switch ($count) {
+      case 0;
+        return FALSE;
+
+      case 1;
+        return isset($array[$path[0]]);
+
+      case 2;
+        return isset($array[$path[0]][$path[1]]);
+
+      case 3;
+        return isset($array[$path[0]][$path[1]][$path[2]]);
+
+      case 4;
+        return isset($array[$path[0]][$path[1]][$path[2]][$path[3]]);
+
+      case 5;
+        return isset($array[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]]);
+
+      case 6;
+        return isset($array[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]][$path[5]]);
+
+      case 7;
+        return isset($array[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]][$path[5]][$path[6]]);
+
+      case 8;
+        return isset($array[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]][$path[5]][$path[6]][$path[7]]);
+
+      default:
+        throw new CRM_Core_Exception('More levels in array than are supported');
+    }
+  }
+
+  /**
+   * Check if a key isset which may be several layers deep.
+   *
+   * This is a helper for when the calling function does not know how many layers deep the
+   * path array is so cannot easily check.
+   *
+   * @param array $array
+   * @param array $path
+   *   An array of keys - e.g [0, 'bob', 8] where we want to check if $array[0]['bob'][8]
+   * @param mixed $default
+   *   Value to return if not found.
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function recursiveGetValue($array, $path, $default = FALSE) {
+    $count = count($path);
+    switch ($count) {
+      case 0;
+        return $default;
+
+      case 1;
+        return isset($array[$path[0]]) ? $array[$path[0]] : $default;
+
+      case 2;
+        return isset($array[$path[0]][$path[1]]) ? $array[$path[0]][$path[1]] : $default;
+
+      case 3;
+        return isset($array[$path[0]][$path[1]][$path[2]]) ? $array[$path[0]][$path[1]][$path[2]] : $default;
+
+      case 4;
+        return isset($array[$path[0]][$path[1]][$path[2]][$path[3]]) ? $array[$path[0]][$path[1]][$path[2]][$path[3]] : $default;
+
+      case 5;
+        return isset($array[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]]) ? $array[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]] : $default;
+
+      case 6;
+        return isset($array[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]][$path[5]]) ? $array[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]][$path[5]] : $default;
+
+      case 7;
+        return isset($array[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]][$path[5]][$path[6]]) ? $array[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]][$path[5]][$path[6]] : $default;
+
+      case 8;
+        return isset($array[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]][$path[5]][$path[6]][$path[7]]) ? $array[$path[0]][$path[1]][$path[2]][$path[3]][$path[4]][$path[5]][$path[6]][$path[7]] : $default;
+
+      default:
+        throw new CRM_Core_Exception('More levels in array than are supported');
+    }
+  }
+
 }
