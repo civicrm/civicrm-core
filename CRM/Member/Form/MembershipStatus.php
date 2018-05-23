@@ -63,6 +63,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
    *    or is not a core field on the form's entity).
    *  - help (optional) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
    *  - template - use a field specific template to render this field
+   *  - required
    * @var array
    */
   protected $entityFields = [];
@@ -90,7 +91,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
    * We do this from the constructor in order to do a translation.
    */
   public function setDeleteMessage() {
-    $this->deleteMessage = ts('WARNING: Deleting this option will result in the loss of all membership records of this status.') . ' ' . ts('This may mean the loss of a substantial amount of data, and the action cannot be undone.') . ' ' . ts('Do you want to continue?');
+    $this->deleteMessage = ts('You will not be able to delete this membership status if there are existing memberships with this status. You will need to check all your membership status rules afterwards to ensure that a valid status will always be available.') . " "  . ts('Do you want to continue?');
   }
 
   public function preProcess() {

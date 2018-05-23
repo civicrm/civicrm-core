@@ -49,6 +49,7 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
    *    or is not a core field on the form's entity).
    *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
    *  - template - use a field specific template to render this field
+   *  - required
    * @var array
    */
   protected $entityFields = [];
@@ -60,7 +61,8 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
     $this->entityFields = [
       'label_a_b' => [
         'name' => 'label_a_b',
-        'description' => ts("Label for the relationship from Contact A to Contact B. EXAMPLE: Contact A is 'Parent of' Contact B.")
+        'description' => ts("Label for the relationship from Contact A to Contact B. EXAMPLE: Contact A is 'Parent of' Contact B."),
+        'required' => TRUE,
       ],
       'label_b_a' => [
         'name' => 'label_b_a',
