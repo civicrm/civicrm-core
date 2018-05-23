@@ -53,11 +53,6 @@ class CRM_Member_Form_MembershipConfig extends CRM_Core_Form {
    */
   protected $_BAOName;
 
-  public function preProcess() {
-    $this->_id = $this->get('id');
-    $this->_BAOName = $this->get('BAOName');
-  }
-
   /**
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database

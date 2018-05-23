@@ -161,7 +161,7 @@ trait CRM_Core_Form_EntityFormTrait {
   protected function addEntityFieldsToTemplate() {
     foreach ($this->getEntityFields() as $fieldSpec) {
       if (empty($fieldSpec['not-auto-addable'])) {
-        $this->addField($fieldSpec['name']);
+        $this->addField($fieldSpec['name'], [], CRM_Utils_Array::value('required', $fieldSpec));
       }
     }
   }
