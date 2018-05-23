@@ -37,7 +37,7 @@
          <tr class="crm-map-form-block-mapAPIKey">
              <td>{$form.mapAPIKey.label}</td>
              <td>{$form.mapAPIKey.html|crmAddClass:huge}<br />
-             <span class="description">{ts}Enter your API Key or Application ID. An API Key is required for the Google Maps API.{/ts}</span></td>
+             <span class="description">{ts}Enter your API Key or Application ID. An API Key is required for the Google Maps API. Refer to developers.google.com for the latest information.{/ts}</span></td>
          </tr>
          <tr class="crm-map-form-block-geoProvider">
              <td>{$form.geoProvider.label}</td>
