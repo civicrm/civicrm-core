@@ -293,7 +293,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
     // installments * intervals using the mysql date_add function, along
     // with the interval unit (e.g. DATE_ADD(start_date, INTERVAL 12 * 1 MONTH)
     $date_suffixes = array('relative', 'from', 'to');
-    while (list(, $suffix) = each($date_suffixes)) {
+    foreach ($date_suffixes as $suffix) {
       $isBreak = FALSE;
       // Check to see if the user wants to search by calculated date.
       if (!empty($this->_params['calculated_end_date_' . $suffix])) {
