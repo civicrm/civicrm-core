@@ -1197,4 +1197,20 @@ class CRM_Utils_Array {
     return $array;
   }
 
+  /**
+   * Append the value to the array using the key provided.
+   *
+   * e.g if value is 'llama' & path is [0, 'email', 'location'] result will be
+   * [0 => ['email' => ['location' => 'llama']]
+   *
+   * @param $path
+   * @param $value
+   *
+   * @return array
+   */
+  public static function recursiveBuild($path, $value) {
+    $arrayKey = array_shift($path);
+    return [$arrayKey => (empty($path) ? $value : self::recursiveBuild($path, $value))];
+  }
+
 }
