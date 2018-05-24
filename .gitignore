@@ -8,7 +8,7 @@ CRM/Core/DAO/.listAll.php
 CRM/Core/DAO/listAll.php
 bin/setup.conf
 civicrm-version.txt
-civicrm.config.php
+civicrm.config-generated.php
 node_modules
 settings_location.php
 sql/case_sample.mysql

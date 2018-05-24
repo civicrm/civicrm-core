@@ -22,11 +22,11 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
     elseif ($this->config->cms !== 'joomla') {
       $configTemplate = $this->findConfigTemplate($this->config->cms);
       if ($configTemplate) {
-        echo "Generating civicrm.config.php\n";
-        copy($configTemplate, '../civicrm.config.php');
+        echo "Generating civicrm.config-generated.php\n";
+        copy($configTemplate, '../civicrm.config-generated.php');
       }
       else {
-        throw new Exception("Failed to locate template for civicrm.config.php");
+        throw new Exception("Failed to locate template for civicrm.config-generated.php");
       }
     }
   }
