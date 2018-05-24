@@ -718,7 +718,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           }
         }
 
-        $params['actualBatchTotal'] += $value['total_amount'];
+        $params['actualBatchTotal'] += (float) $value['total_amount'];
 
         unset($value['financial_type']);
         unset($value['payment_instrument']);
