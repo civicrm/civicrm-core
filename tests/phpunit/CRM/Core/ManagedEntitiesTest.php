@@ -53,6 +53,30 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
         'is_reserved' => 1,
       ),
     );
+    $this->fixtures['com.example.one-CustomGroup'] = array(
+      'module' => 'com.example.one',
+      'name' => 'CustomGroup',
+      'entity' => 'CustomGroup',
+      'params' => array(
+        'version' => 3,
+        'name' => 'test_custom_group',
+        'title' => 'Test custom group',
+        'extends' => 'Individual',
+      ),
+    );
+    $this->fixtures['com.example.one-CustomField'] = array(
+      'module' => 'com.example.one',
+      'name' => 'CustomField',
+      'entity' => 'CustomField',
+      'params' => array(
+        'version' => 3,
+        'name' => 'test_custom_field',
+        'label' => 'Test custom field',
+        'custom_group_id' => 'test_custom_group',
+        'data_type' => 'String',
+        'html_type' => 'Text',
+      ),
+    );
 
     $this->apiKernel = \Civi::service('civi_api_kernel');
     $this->adhocProvider = new \Civi\API\Provider\AdhocProvider(3, 'CustomSearch');
@@ -383,6 +407,31 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $fooNew = $me->get('com.example.one', 'foo');
     $this->assertTrue(NULL === $fooNew);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+  }
+
+  public function testDependentEntitiesUninstallCleanly() {
+
+    // Install a module with two dependent managed entities
+    $decls = array();
+    $decls[] = $this->fixtures['com.example.one-CustomGroup'];
+    $decls[] = $this->fixtures['com.example.one-CustomField'];
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+
+    // Uninstall the module
+    unset($this->modules['one']);
+    $me = new CRM_Core_ManagedEntities($this->modules, []);
+    $me->reconcile();
+
+    // Ensure that no managed entities remain in the civicrm_managed
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_managed');
+
+    // Ensure that com.example.one-CustomGroup is deleted
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_custom_group WHERE name = "test_custom_group"');
+
+    // Ensure that com.example.one-CustomField is deleted
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_custom_field WHERE name = "test_custom_field"');
+
   }
 
 }
