@@ -36,6 +36,23 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   protected $_mainContacts;
   protected $_gid;
   protected $action;
+  /**
+   * Only display selected.
+   *
+   * @var bool
+   */
+  protected $selected;
+
+  /**
+   * Get isSelected value.
+   *
+   * This needs to be an integer of 0 or 1 or NULL for no filter.
+   *
+   * @return bool|NULL
+   */
+  public function isSelected() {
+    return ($this->selected === NULL) ? NULL : (int) $this->selected;
+  }
 
   /**
    * Get BAO Name.
@@ -54,9 +71,17 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   }
 
   /**
+   * Initialize properties from input.
+   */
+  protected function initialize() {
+    $this->selected = CRM_Utils_Request::retrieveValue('selected', 'Boolean');
+  }
+
+  /**
    * Browse all rule groups.
    */
   public function run() {
+    $this->initialize();
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0);
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 0);
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
@@ -84,6 +109,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       'criteria' => $criteria,
     );
     $this->assign('urlQuery', CRM_Utils_System::makeQueryString($urlQry));
+    $this->assign('isSelected', $this->isSelected());
     $criteria = json_decode($criteria, TRUE);
 
     if ($context == 'search') {
@@ -142,9 +168,6 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       $this->action = CRM_Core_Action::UPDATE;
 
       $urlQry['snippet'] = 4;
-      if ($isConflictMode) {
-        $urlQry['selected'] = 1;
-      }
 
       $this->assign('sourceUrl', CRM_Utils_System::url('civicrm/ajax/dedupefind', $urlQry, FALSE, NULL, FALSE));
 
@@ -160,7 +183,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
         CRM_Dedupe_Merger::resetMergeStats($cacheKeyString);
       }
 
-      $this->_mainContacts = CRM_Dedupe_Merger::getDuplicatePairs($rgid, $gid, !$isConflictMode, 0, $isConflictMode, '', $isConflictMode, $criteria, TRUE);
+      $this->_mainContacts = CRM_Dedupe_Merger::getDuplicatePairs($rgid, $gid, !$isConflictMode, 0, $this->isSelected(), '', $isConflictMode, $criteria, TRUE);
 
       if (empty($this->_mainContacts)) {
         if ($isConflictMode) {

@@ -651,18 +651,32 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   mode does a force merge.
    * @param int $batchLimit number of merges to carry out in one batch.
    * @param int $isSelected if records with is_selected column needs to be processed.
+   *   Note the option of '2' is only used in conjunction with $redirectForPerformance
+   *   to determine when
+   *   and the use of anything other than a boolean is being grandfathered out in favour of
+   *   explicitly
    *
    * @param array $criteria
    *   Criteria to use in the filter.
    *
    * @param bool $checkPermissions
    *   Respect logged in user permissions.
+   * @param bool|NULL $reloadCacheIfEmpty
+   *  If not set explicitly this is calculated but it is preferred that it be set
+   *  per comments on isSelected above.
    *
    * @return array|bool
    */
-  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $batchLimit = 1, $isSelected = 2, $criteria = array(), $checkPermissions = TRUE) {
+  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $batchLimit = 1, $isSelected = 2, $criteria = array(), $checkPermissions = TRUE, $reloadCacheIfEmpty = NULL) {
     $redirectForPerformance = ($batchLimit > 1) ? TRUE : FALSE;
-    $reloadCacheIfEmpty = (!$redirectForPerformance && $isSelected == 2);
+
+    if (!isset($reloadCacheIfEmpty)) {
+      $reloadCacheIfEmpty = (!$redirectForPerformance && $isSelected == 2);
+    }
+    if ($isSelected !== 0 && $isSelected !== 1) {
+      // explicitly set to NULL if not 1 or 0 as part of grandfathering out the mystical '2' value.
+      $isSelected = NULL;
+    }
     $dupePairs = self::getDuplicatePairs($rgid, $gid, $reloadCacheIfEmpty, $batchLimit, $isSelected, '', ($mode == 'aggressive'), $criteria, $checkPermissions);
 
     $cacheParams = array(

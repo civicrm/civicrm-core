@@ -651,7 +651,7 @@ LIMIT {$offset}, {$rowCount}
     $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive');
     $null = NULL;
     $criteria = CRM_Utils_Request::retrieve('criteria', 'Json', $null, FALSE, '{}');
-    $selected    = isset($_REQUEST['selected']) ? CRM_Utils_Type::escape($_REQUEST['selected'], 'Integer') : 0;
+    $selected = CRM_Utils_Request::retrieveValue('selected', 'Boolean');
     if ($rowCount < 0) {
       $rowCount = 0;
     }

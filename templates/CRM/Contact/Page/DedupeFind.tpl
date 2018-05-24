@@ -129,7 +129,7 @@
      <a href="{$backURL}" title="{ts}Safe Merge Selected Duplicates{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the selected duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span><i class="crm-i fa-compress"></i> {ts}Safe Merge Selected Duplicates{/ts}</span></a>
   {/if}
 
-  {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="`$urlQuery`&action=update" a=1}{/capture}
+  {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="`$urlQuery`&action=update&selected=0" a=1}{/capture}
    <a href="{$backURL}" title="{ts}List All Duplicates{/ts}" class="button"><span><i class="crm-i fa-refresh"></i> {ts}List All Duplicates{/ts}</span></a>
 {else}
    {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="`$urlQuery`&action=renew" a=1}{/capture}
@@ -162,7 +162,7 @@
   (function($) {
     CRM.$('table#dupePairs').data({
       "ajax": {
-        "url": {/literal}'{$sourceUrl}'{literal}
+        "url": {/literal}'{$sourceUrl}{if $isSelected}&selected=1{/if}'{literal}
       },
       "retrieve": true,
       "processing": true,
