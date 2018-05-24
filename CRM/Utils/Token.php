@@ -1762,6 +1762,7 @@ class CRM_Utils_Token {
               'id' => $membership['membership_type_id'],
               'return' => 'minimum_fee',
             ));
+          $value = CRM_Utils_Money::format($value, NULL, NULL, TRUE);
         }
         catch (CiviCRM_API3_Exception $e) {
           // we can anticipate we will get an error if the minimum fee is set to 'NULL' because of the way the
