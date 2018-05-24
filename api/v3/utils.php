@@ -819,7 +819,7 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
 
   $options = array(
     'offset' => CRM_Utils_Rule::integer($offset) ? $offset : NULL,
-    'limit' => CRM_Utils_Rule::integer($limit) ? $limit : NULL,
+    'limit' => (!$is_count && CRM_Utils_Rule::integer($limit)) ? $limit : NULL,
     'is_count' => $is_count,
     'return' => !empty($returnProperties) ? $returnProperties : array(),
   );

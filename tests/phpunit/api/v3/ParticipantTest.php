@@ -99,6 +99,23 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check that getCount can count past 25.
+   */
+  public function testGetCountLimit() {
+    $contactIDs = [];
+
+    for ($count = $this->callAPISuccessGetCount('Participant', []); $count < 27; $count++) {
+      $contactIDs[] = $contactID = $this->individualCreate();
+      $this->participantCreate(['contact_id' => $contactID, 'event_id' => $this->_eventID]);
+    }
+    $this->callAPISuccessGetCount('Participant', [], 27);
+
+    foreach ($contactIDs as $contactID) {
+      $this->callAPISuccess('Contact', 'delete', ['id' => $contactID]);
+    }
+  }
+
+  /**
    * Test get participants with role_id.
    */
   public function testGetParticipantWithRole() {
