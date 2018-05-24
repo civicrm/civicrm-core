@@ -717,8 +717,11 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             $value['soft_credit'][$key]['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'Gift');
           }
         }
+        if (!empty($value['total_amount'])) {
+          $value['total_amount'] = (float) $value['total_amount'];
+        }
 
-        $params['actualBatchTotal'] += (float) $value['total_amount'];
+        $params['actualBatchTotal'] += $value['total_amount'];
 
         unset($value['financial_type']);
         unset($value['payment_instrument']);
