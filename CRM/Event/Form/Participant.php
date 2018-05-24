@@ -910,7 +910,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
       if (!$this->_single && !empty($event_id)) {
         $duplicateContacts = 0;
-        while (list($k, $dupeCheckContactId) = each($this->_contactIds)) {
+        foreach ($this->_contactIds as $k => $dupeCheckContactId) {
           // Eliminate contacts that have already been assigned to this event.
           $dupeCheck = new CRM_Event_BAO_Participant();
           $dupeCheck->contact_id = $dupeCheckContactId;
