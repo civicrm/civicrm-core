@@ -298,4 +298,28 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $result);
   }
 
+  /**
+   * Get values for build test.
+   */
+  public function getBuildValueExamples() {
+    return [
+      [
+        [0, 'email', 2, 'location'], [0 => ['email' => [2 => ['location' => 'llama']]]]
+      ]
+    ];
+  }
+
+  /**
+   * Test the build recursive function.
+   *
+   * @param $path
+   * @param $expected
+   *
+   * @dataProvider getBuildValueExamples
+   */
+  public function testBuildRecursiveValue($path, $expected) {
+    $result = CRM_Utils_Array::recursiveBuild($path, 'llama');
+    $this->assertEquals($expected, $result);
+  }
+
 }
