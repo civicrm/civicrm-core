@@ -450,8 +450,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
   /**
    * Check the membership extended through relationship.
    *
-   * @param int $membershipId
-   *   Membership id.
+   * @param int $membershipTypeID
+   *   Membership type id.
    * @param int $contactId
    *   Contact id.
    *
@@ -460,10 +460,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @return array
    *   array of contact_id of all related contacts.
    */
-  public static function checkMembershipRelationship($membershipId, $contactId, $action = CRM_Core_Action::ADD) {
+  public static function checkMembershipRelationship($membershipTypeID, $contactId, $action = CRM_Core_Action::ADD) {
     $contacts = array();
-    $membershipTypeID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $membershipId, 'membership_type_id');
-
     $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
     $relationships = array();
     if (isset($membershipType['relationship_type_id'])) {
@@ -1820,7 +1818,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
     $allRelatedContacts = array();
     $relatedContacts = array();
     if (!is_a($membership, 'CRM_Core_Error')) {
-      $allRelatedContacts = CRM_Member_BAO_Membership::checkMembershipRelationship($membership->id,
+      $allRelatedContacts = CRM_Member_BAO_Membership::checkMembershipRelationship($membership->membership_type_id,
         $membership->contact_id,
         CRM_Utils_Array::value('action', $params)
       );
