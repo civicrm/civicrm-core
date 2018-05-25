@@ -79,6 +79,7 @@
     </fieldset>
   {/if}
 </div>
+
 {if $profileAddressFields}
   <script type="text/javascript">
     {literal}
@@ -207,15 +208,18 @@
   </script>
   {/literal}
 {/if}
-{if $suppressSubmitButton}
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {
-      $('.crm-submit-buttons', $('#billing-payment-block').closest('form')).hide();
+      {/literal}{if $suppressSubmitButton}{literal}
+        $('.crm-submit-buttons', $('#billing-payment-block').closest('form')).hide();
+      {/literal}{/if}{literal}
+
+      $('#credit_card_exp_date_M').attr('aria-label', ts('Expiration Month'));
+      $('#credit_card_exp_date_Y').attr('aria-label', ts('Expiration Year'));
     });
   </script>
 {/literal}
-{/if}
 {/crmRegion}
 {crmRegion name="billing-block-post"}
   {* Payment processors sometimes need to append something to the end of the billing block. We create a region for
