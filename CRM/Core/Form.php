@@ -376,6 +376,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($type == 'datepicker') {
       $attributes = ($attributes ? $attributes : array());
       $attributes['data-crm-datepicker'] = json_encode((array) $extra);
+      if (!empty($attributes['aria-label']) || $label) {
+        $attributes['aria-label'] = CRM_Utils_Array::value('aria-label', $attributes, $label);
+      }
       $type = "text";
     }
     if ($type == 'select' && is_array($extra)) {
