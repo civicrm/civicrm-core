@@ -255,8 +255,7 @@ END AS 'relType'
         $relTypeId = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_type_id']);
         $relDirection = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_direction']);
         foreach ($relTypeId as $rid) {
-          $dir = each($relDirection);
-          $relTypeDir[substr($dir['value'], 0, 1)][] = $rid;
+          $relTypeDir[substr($relDirection[0], 0, 1)][] = $rid;
         }
         // build query in 2 parts with a UNION if necessary
         // _x and _y are replaced with _a and _b first, then vice-versa
