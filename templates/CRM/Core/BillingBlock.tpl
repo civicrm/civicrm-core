@@ -39,7 +39,8 @@
             <div class="label">{$form.$paymentField.label}
               {if $requiredPaymentFields.$name}<span class="crm-marker" title="{ts}This field is required.{/ts}">*</span>{/if}
             </div>
-            <div class="content">{$form.$paymentField.html}
+            <div class="content">
+                {$form.$paymentField.html}
               {if $paymentField == 'cvv2'}{* @todo move to form assignment*}
                 <span class="cvv2-icon" title="{ts}Usually the last 3-4 digits in the signature area on the back of the card.{/ts}"> </span>
               {/if}

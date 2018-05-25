@@ -281,11 +281,11 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       $form->addRadio('is_pledge', ts('Pledge Frequency Interval'), $pledgeOptions,
         NULL, array('<br/>')
       );
-      $form->addElement('text', 'pledge_installments', ts('Installments'), array('size' => 3));
+      $form->addElement('text', 'pledge_installments', ts('Installments'), ['size' => 3, 'aria-label' => ts('Installments')]);
 
       if (!empty($pledgeBlock['is_pledge_interval'])) {
         $form->assign('is_pledge_interval', CRM_Utils_Array::value('is_pledge_interval', $pledgeBlock));
-        $form->addElement('text', 'pledge_frequency_interval', NULL, array('size' => 3));
+        $form->addElement('text', 'pledge_frequency_interval', NULL, ['size' => 3, 'aria-label' => ts('Frequency Intervals')]);
       }
       else {
         $form->add('hidden', 'pledge_frequency_interval', 1);
@@ -299,7 +299,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
           $freqUnits[$val] = !empty($pledgeBlock['is_pledge_interval']) ? "{$frequencyUnits[$val]}(s)" : $frequencyUnits[$val];
         }
       }
-      $form->addElement('select', 'pledge_frequency_unit', NULL, $freqUnits);
+      $form->addElement('select', 'pledge_frequency_unit', NULL, $freqUnits, ['aria-label' => ts('Frequency Units')]);
       // CRM-18854
       if (CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)) {
         if (CRM_Utils_Array::value('pledge_start_date', $pledgeBlock)) {
