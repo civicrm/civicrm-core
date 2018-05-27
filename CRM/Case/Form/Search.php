@@ -177,7 +177,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       $tasks = CRM_Case_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission());
 
       if (!empty($this->_formValues['case_deleted'])) {
-        unset($tasks[CRM_Case_Task::DELETE]);
+        unset($tasks[CRM_Case_Task::TASK_DELETE]);
       }
       else {
         unset($tasks[CRM_Case_Task::RESTORE_CASES]);
