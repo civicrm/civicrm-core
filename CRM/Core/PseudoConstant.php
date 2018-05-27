@@ -579,7 +579,6 @@ class CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db.
    * nex time it's requested.
    *
-   *
    * @param bool|string $name pseudoconstant to be flushed
    */
   public static function flush($name = 'cache') {

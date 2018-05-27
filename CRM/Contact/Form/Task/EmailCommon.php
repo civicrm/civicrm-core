@@ -48,7 +48,7 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @return array $domainEmails;
    */
   public static function domainEmails() {
-    Civi::log()->warning('Deprecated function, use CRM_Core_BAO_Email::domainEmails()', array('civi.tag' => 'deprecated'));
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Email::domainEmails()');
     return CRM_Core_BAO_Email::domainEmails();
   }
 
