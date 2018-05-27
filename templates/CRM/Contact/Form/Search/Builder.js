@@ -12,6 +12,7 @@
   function handleUserInputField() {
     var row = $(this).closest('tr');
     var field = $('select[id^=mapper][id$="_1"]', row).val();
+    field = (field === 'world_region') ? 'worldregion_id': field;
     var operator = $('select[id^=operator]', row);
     var op = operator.val();
 
