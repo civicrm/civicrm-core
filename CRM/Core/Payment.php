@@ -104,6 +104,17 @@ abstract class CRM_Core_Payment {
   protected $cancelUrl;
 
   /**
+   * Processor type label.
+   *
+   * (Deprecated parameter but used in some messages).
+   *
+   * @deprecated
+   *
+   * @var string
+   */
+  public $_processorName;
+
+  /**
    * The profile configured to show on the billing form.
    *
    * Currently only the pseudo-profile 'billing' is supported but hopefully in time we will take an id and
