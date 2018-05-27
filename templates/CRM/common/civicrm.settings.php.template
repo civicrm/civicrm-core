@@ -214,9 +214,16 @@ if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
  * Front-end site:
  *      define( 'CIVICRM_UF_BASEURL' , 'http://www.example.com/joomla/');
  *
- */
+ *
+ * if (!defined('CIVICRM_UF_BASEURL')) {
+ *  define( 'CIVICRM_UF_BASEURL'      , '%%baseURL%%');
+ *}
+*/
+
 if (!defined('CIVICRM_UF_BASEURL')) {
-  define( 'CIVICRM_UF_BASEURL'      , '%%baseURL%%');
+  $currenthost = "http://".$_SERVER['HTTP_HOST'];
+  $currentpath = preg_replace('@/+$@','',dirname($_SERVER['SCRIPT_NAME']));
+  define( 'CIVICRM_UF_BASEURL'      , $currenthost.$currentpath);
 }
 
 /**
