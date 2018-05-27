@@ -342,7 +342,7 @@ WHERE  v.option_group_id = g.id
    * @return null
    */
   public static function getLabel($groupName, $value, $onlyActiveValue = TRUE) {
-    Civi::log()->warning('Deprecated function CRM_Core_OptionGroup::getLabel, use CRM_Core_PseudoConstant::getLabel', array('civi.tag' => 'deprecated'));
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_PseudoConstant::getLabel');
     if (empty($groupName) ||
       empty($value)
     ) {
@@ -396,7 +396,7 @@ WHERE  v.option_group_id = g.id
       return NULL;
     }
 
-    Civi::log()->warning('Deprecated function CRM_Core_OptionGroup::getValue, use CRM_Core_PseudoConstant::getKey', array('civi.tag' => 'deprecated'));
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_PseudoConstant::getKey');
 
     $query = "
 SELECT  v.label as label ,v.{$valueField} as value

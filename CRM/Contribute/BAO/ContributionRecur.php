@@ -333,7 +333,7 @@ SELECT r.payment_processor_id
    *
    */
   public static function getRecurContributions($contactId) {
-    Civi::log()->warning('Deprecated function, use ContributionRecur.get API instead', array('civi.tag' => 'deprecated'));
+    CRM_Core_Error::deprecatedFunctionWarning('ContributionRecur.get API instead');
     $params = array();
     $recurDAO = new CRM_Contribute_DAO_ContributionRecur();
     $recurDAO->contact_id = $contactId;
