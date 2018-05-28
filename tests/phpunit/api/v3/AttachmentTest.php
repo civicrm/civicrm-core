@@ -408,6 +408,82 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertEquals('fa-file-text-o', $createResult['values'][$fileId]['icon']);
   }
 
+  public function testCreateShouldSetCreatedIdAsTheLoggedInUser() {
+    $loggedInUser = $this->createLoggedInUser();
+
+    $testEntityClass = 'CRM_Activity_DAO_Activity';
+    $entity = CRM_Core_DAO::createTestObject($testEntityClass);
+    $entity_table = CRM_Core_DAO_AllCoreTables::getTableForClass($testEntityClass);
+    $this->assertTrue(is_numeric($entity->id));
+
+    $createResult = $this->callAPISuccess('Attachment', 'create', array(
+      'name' => self::getFilePrefix() . 'exampleFromContent.txt',
+      'mime_type' => 'text/plain',
+      'content' => 'My test content',
+      'entity_table' => $entity_table,
+      'entity_id' => $entity->id,
+    ));
+
+    $fileId = $createResult['id'];
+    $this->assertEquals($loggedInUser, $createResult['values'][$fileId]['created_id']);
+  }
+
+  public function testCreateShouldKeepCreatedIdEmptyIfTheresNoLoggedInUser() {
+    $testEntityClass = 'CRM_Activity_DAO_Activity';
+    $entity = CRM_Core_DAO::createTestObject($testEntityClass);
+    $entity_table = CRM_Core_DAO_AllCoreTables::getTableForClass($testEntityClass);
+    $this->assertTrue(is_numeric($entity->id));
+
+    $createResult = $this->callAPISuccess('Attachment', 'create', array(
+      'name' => self::getFilePrefix() . 'exampleFromContent.txt',
+      'mime_type' => 'text/plain',
+      'content' => 'My test content',
+      'entity_table' => $entity_table,
+      'entity_id' => $entity->id,
+    ));
+
+    $fileId = $createResult['id'];
+    $this->assertEmpty($createResult['values'][$fileId]['created_id']);
+  }
+
+  public function testCreateShouldNotUpdateTheCreatedId() {
+    $testEntityClass = 'CRM_Activity_DAO_Activity';
+    $entity = CRM_Core_DAO::createTestObject($testEntityClass);
+    $entity_table = CRM_Core_DAO_AllCoreTables::getTableForClass($testEntityClass);
+    $this->assertTrue(is_numeric($entity->id));
+
+    $attachmentParams = array(
+      'name' => self::getFilePrefix() . 'exampleFromContent.txt',
+      'mime_type' => 'text/plain',
+      'description' => 'My test description',
+      'content' => 'My test content',
+      'entity_table' => $entity_table,
+      'entity_id' => $entity->id,
+    );
+
+    $createResult = $this->callAPISuccess('Attachment', 'create', $attachmentParams);
+
+    $fileId = $createResult['id'];
+    $this->assertEmpty($createResult['values'][$fileId]['created_id']);
+
+    $attachmentParams['id'] = $fileId;
+    $attachmentParams['description'] = 'My updated description';
+
+    $loggedInUser = $this->createLoggedInUser();
+
+    $this->callAPISuccess('Attachment', 'create', $attachmentParams);
+
+    $updatedAttachment = $this->callAPISuccess('Attachment', 'get', array(
+      'id' => $fileId,
+      'entity_id' => $attachmentParams['entity_id'],
+      'entity_table' => $attachmentParams['entity_table'],
+    ));
+
+    $this->assertNotEmpty($loggedInUser);
+    $this->assertEmpty($updatedAttachment['values'][$fileId]['created_id']);
+    $this->assertEquals($attachmentParams['description'], $updatedAttachment['values'][$fileId]['description']);
+  }
+
   /**
    * @param $getParams
    * @param $expectedNames

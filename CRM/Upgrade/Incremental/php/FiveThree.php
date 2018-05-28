@@ -61,6 +61,32 @@ class CRM_Upgrade_Incremental_php_FiveThree extends CRM_Upgrade_Incremental_Base
     // }
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_3_alpha1($rev) {
+    $this->addTask('CRM-19948 - Add created_id column to civicrm_file', 'addFileCreatedIdColumn');
+  }
+
+  public static function addFileCreatedIdColumn(CRM_Queue_TaskContext $ctx) {
+    self::addColumn($ctx, 'civicrm_file', 'created_id', "int unsigned COMMENT 'FK to civicrm_contact, who uploaded this file'");
+
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_file', 'FK_civicrm_file_created_id');
+
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE `civicrm_file`
+        ADD CONSTRAINT `FK_civicrm_file_created_id`
+        FOREIGN KEY (`created_id`)
+        REFERENCES `civicrm_contact`(`id`)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE;
+    ");
+
+    return TRUE;
+  }
+
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
