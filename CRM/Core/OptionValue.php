@@ -196,8 +196,7 @@ class CRM_Core_OptionValue {
    * @return CRM_Core_DAO_OptionValue
    *
    */
-  public static function addOptionValue(&$params, &$groupParams, &$action, &$optionValueID) {
-    $ids = array();
+  public static function addOptionValue(&$params, &$groupParams, $action, $optionValueID) {
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     // checking if the group name with the given id or name (in $groupParams) exists
     if (!empty($groupParams)) {
@@ -245,9 +244,9 @@ class CRM_Core_OptionValue {
       $params['name'] = $params['label'];
     }
     if ($action & CRM_Core_Action::UPDATE) {
-      $ids['optionValue'] = $optionValueID;
+      $params['id'] = $optionValueID;
     }
-    $optionValue = CRM_Core_BAO_OptionValue::add($params, $ids);
+    $optionValue = CRM_Core_BAO_OptionValue::add($params);
     return $optionValue;
   }
 

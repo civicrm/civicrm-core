@@ -190,7 +190,6 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
     else {
       // get the submitted form values.
       $params = $this->controller->exportValues($this->_name);
-      $ids = array();
 
       $groupParams = array('name' => ('report_template'));
       $optionValue = CRM_Core_OptionValue::addOptionValue($params, $groupParams, $this->_action, $this->_id);

@@ -450,7 +450,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
     else {
-      $ids = array();
       $params = $this->exportValues();
 
       // allow multiple defaults within group.
