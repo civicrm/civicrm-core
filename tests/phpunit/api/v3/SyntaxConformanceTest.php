@@ -384,7 +384,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailingEventResubscribe',
       'MailingEventSubscribe',
       'MailingEventUnsubscribe',
-      'MailingJob',
       'MembershipPayment',
       'SavedSearch',
       'UFJoin',
@@ -488,7 +487,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       // pseudo-entity; testUpdateSingleValueAlter doesn't introspect properly on it. Multiple magic fields
       'Mailing',
       'MailingGroup',
-      'MailingJob',
       'Address',
       'MailingEventUnsubscribe',
       'MailingEventSubscribe',

@@ -737,6 +737,7 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
     // END SAMPLE DATA
 
     $create = $this->callAPISuccess('Mailing', 'create', $params);
+    $created = $this->callAPISuccess('Mailing', 'get', []);
     $createId = $create['id'];
     $this->createLoggedInUser();
     $clone = $this->callAPIAndDocument('Mailing', 'clone', array('id' => $create['id']), __FUNCTION__, __FILE__);
