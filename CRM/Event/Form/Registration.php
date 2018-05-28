@@ -643,18 +643,21 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     //CRM-16456 get all price field including expired one.
-    $getAllPriceField = TRUE;
+    //CRM-20637 extend to backoffice registration form create mode
+    $validOnly = TRUE;
     $className = CRM_Utils_System::getClassName($form);
-    if ($className == 'CRM_Event_Form_ParticipantFeeSelection' && $form->_action == CRM_Core_Action::UPDATE) {
-      $getAllPriceField = FALSE;
+    if (($className == 'CRM_Event_Form_ParticipantFeeSelection' && $form->_action == CRM_Core_Action::UPDATE) ||
+      ($className == 'CRM_Event_Form_Participant')
+    ) {
+      $validOnly = FALSE;
     }
 
     if ($discountId) {
       $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $discountId, 'price_set_id');
-      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', $getAllPriceField, $priceSetId);
+      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', $validOnly, $priceSetId);
     }
     else {
-      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', $getAllPriceField);
+      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', $validOnly);
     }
 
     if (property_exists($form, '_context') && ($form->_context == 'standalone'
