@@ -2313,7 +2313,7 @@ function setting_getfields_expectedresult() {
         ),
         'default' => '',
         'title' => 'Geocoding Provider',
-        'description' => 'You may choose a different webservice for geocoding or select the same service.',
+        'description' => 'This can be the same or different from the mapping provider selected.',
       ),
       'mapAPIKey' => array(
         'add' => '4.7',
