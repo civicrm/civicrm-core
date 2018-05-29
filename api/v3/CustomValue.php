@@ -145,22 +145,27 @@ function civicrm_api3_custom_value_get($params) {
   unset($params['entity_id'], $params['entity_table']);
   foreach ($params as $id => $param) {
     if ($param && substr($id, 0, 6) == 'return') {
-      $id = substr($id, 7);
-      list($c, $i) = CRM_Utils_System::explode('_', $id, 2);
-      if ($c == 'custom' && is_numeric($i)) {
-        $names['custom_' . $i] = 'custom_' . $i;
-        $id = $i;
+      $returnVal = $param;
+      if (!empty(substr($id, 7))) {
+        $returnVal = substr($id, 7);
       }
-      else {
-        // Lookup names if ID was not supplied
-        list($group, $field) = CRM_Utils_System::explode(':', $id, 2);
-        $id = CRM_Core_BAO_CustomField::getCustomFieldID($field, $group);
-        if (!$id) {
-          continue;
+      foreach ((array) $returnVal as $value) {
+        list($c, $i) = CRM_Utils_System::explode('_', $value, 2);
+        if ($c == 'custom' && is_numeric($i)) {
+          $names['custom_' . $i] = 'custom_' . $i;
+          $fldId = $i;
         }
-        $names['custom_' . $id] = 'custom_' . $i;
+        else {
+          // Lookup names if ID was not supplied
+          list($group, $field) = CRM_Utils_System::explode(':', $value, 2);
+          $fldId = CRM_Core_BAO_CustomField::getCustomFieldID($field, $group);
+          if (!$fldId) {
+            continue;
+          }
+          $names['custom_' . $fldId] = 'custom_' . $i;
+        }
+        $getParams['custom_' . $fldId] = 1;
       }
-      $getParams['custom_' . $id] = 1;
     }
   }
 

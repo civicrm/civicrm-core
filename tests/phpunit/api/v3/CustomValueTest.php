@@ -230,6 +230,30 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $params = array('entity_id' => $contactId, 'custom_' . $customId => $selectedValue);
     $this->callAPISuccess('CustomValue', 'create', $params);
 
+    //Test for different return value syntax.
+    $returnValues = [
+      ['return' => "custom_{$customId}"],
+      ['return' => ["custom_{$customId}"]],
+      ["return.custom_{$customId}" => 1],
+    ];
+    foreach ($returnValues as $val) {
+      $params = array_merge($val, [
+        'sequential' => 1,
+        'entity_id' => $contactId,
+      ]);
+      $customValue = $this->callAPISuccess('CustomValue', 'get', $params);
+      if (is_array($selectedValue)) {
+        $expected = array_values($selectedValue);
+        $this->checkArrayEquals($expected, $customValue['values'][0]['latest']);
+      }
+      elseif ($type == 'date') {
+        $this->assertEquals($selectedValue, date('Ymd', strtotime(str_replace('.', '/', $customValue['values'][0]['latest']))));
+      }
+      else {
+        $this->assertEquals($selectedValue, $customValue['values'][0]['latest']);
+      }
+    }
+
     foreach ($sqlOps as $op) {
       $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
       switch ($op) {
