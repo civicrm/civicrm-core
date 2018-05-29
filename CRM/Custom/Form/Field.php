@@ -237,6 +237,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     else {
       $defaults['is_active'] = 1;
       $defaults['option_type'] = 1;
+      $defaults['is_search_range'] = 1;
     }
 
     // set defaults for weight.
@@ -284,6 +285,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $this->assign('gid', $this->_gid);
     }
 
+    $this->assign('dataTypeKeys', self::$_dataTypeKeys);
+
     // lets trim all the whitespace
     $this->applyFilter('__ALL__', 'trim');
 
@@ -305,7 +308,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $sel = &$this->addElement('hierselect',
       'data_type',
       ts('Data and Input Field Type'),
-      'onclick="clearSearchBoxes();custom_option_html_type(this.form)"; onBlur="custom_option_html_type(this.form)";',
       '&nbsp;&nbsp;&nbsp;'
     );
     $sel->setOptions(array($dt, $it));
@@ -515,8 +517,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     // is searchable ?
     $this->addElement('advcheckbox',
       'is_searchable',
-      ts('Is this Field Searchable?'),
-      NULL, array('onclick' => "showSearchRange(this)")
+      ts('Is this Field Searchable?')
     );
 
     // is searchable by range?
