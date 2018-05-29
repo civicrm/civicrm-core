@@ -224,7 +224,7 @@ class CRM_Core_OptionValue {
     }
     $params['option_group_id'] = $optionGroupID;
 
-    if (($action & CRM_Core_Action::ADD) && empty($params['value'])) {
+    if (($action & CRM_Core_Action::ADD) && !isset($params['value'])) {
       $fieldValues = array('option_group_id' => $optionGroupID);
       // use the next available value
       /* CONVERT(value, DECIMAL) is used to convert varchar
