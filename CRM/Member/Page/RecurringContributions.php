@@ -112,14 +112,18 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
    */
   private function setActionsForRecurringContribution($recurID, &$recurringContribution) {
     $action = array_sum(array_keys($this->recurLinks($recurID)));
+
     // no action allowed if it's not active
     $recurringContribution['is_active'] = ($recurringContribution['contribution_status_id'] != 3);
+
     if ($recurringContribution['is_active']) {
       $details = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurringContribution['id'], 'recur');
       $hideUpdate = $details->membership_id & $details->auto_renew;
-      if ($hideUpdate || empty($details->processor_id)) {
+
+      if ($hideUpdate) {
         $action -= CRM_Core_Action::UPDATE;
       }
+
       $recurringContribution['action'] = CRM_Core_Action::formLink(
         $this->recurLinks($recurID),
         $action,
