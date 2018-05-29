@@ -218,8 +218,9 @@
    * @param mapper: string
    * @param value: integer
    * @param location_type: integer
+   * @param section: section in which the country/state selection change occurred
    */
-  function chainSelect(mapper, value, location_type) {
+  function chainSelect(mapper, value, location_type, section) {
     var apiParams = {
       sequential: 1,
       field: (mapper == 'country_id') ?  'state_province' : 'county',
@@ -228,14 +229,16 @@
     var fieldName = apiParams.field;
     CRM.api3('address', 'getoptions', apiParams, {
       success: function(result) {
-        CRM.searchBuilder.fieldOptions[fieldName] = result.count ? result.values : [];
-        $('select[id^=mapper][id$="_1"]').each(function() {
-          var row = $(this).closest('tr');
-          var op = $('select[id^=operator]', row).val();
-          if ($(this).val() === fieldName && location_type === $('select[id^=mapper][id$="_2"]', row).val()) {
-            buildSelect(row, fieldName, op, true);
-          }
-        });
+        if (result.count) {
+          CRM.searchBuilder.fieldOptions[fieldName] = result.values;
+          $('select[id^=mapper_' + section + '][id$="_1"]').each(function() {
+            var row = $(this).closest('tr');
+            var op = $('select[id^=operator]', row).val();
+            if ($(this).val() === fieldName && location_type === $('select[id^=mapper][id$="_2"]', row).val()) {
+              buildSelect(row, fieldName, op, true);
+            }
+          });
+        }
       }
     });
   }
@@ -311,8 +314,9 @@
         if (value !== '') {
           var mapper = $('#' + $(this).siblings('input').attr('id').replace('value_', 'mapper_') + '_1').val();
           var location_type = $('#' + $(this).siblings('input').attr('id').replace('value_', 'mapper_') + '_2').val();
+          var section = $(this).siblings('input').attr('id').replace('value_', '').split('_')[0];
           if ($.inArray(mapper, ['state_province', 'country']) > -1) {
-            chainSelect(mapper + '_id', value, location_type);
+            chainSelect(mapper + '_id', value, location_type, section);
           }
         }
       })
