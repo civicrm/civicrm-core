@@ -2245,11 +2245,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * @param bool $pager
    */
   public function formatDisplay(&$rows, $pager = TRUE) {
-    // set pager based on if any limit was applied in the query.
-    if ($pager) {
-      $this->setPager();
-    }
-
     // allow building charts if any
     if (!empty($this->_params['charts']) && !empty($rows)) {
       $this->buildChart($rows);
@@ -2324,6 +2319,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
     // use this method for formatting custom rows for display purpose.
     $this->alterCustomDataDisplay($rows);
+
+    // set pager based on if any limit was applied in the query.
+    if ($pager) {
+      $this->setPager();
+    }
   }
 
   /**
