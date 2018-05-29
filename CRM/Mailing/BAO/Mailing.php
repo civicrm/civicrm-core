@@ -1639,21 +1639,25 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // Create parent job if not yet created.
     // Condition on the existence of a scheduled date.
     if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
+      $jobParams = [
+        'mailing_id' => $mailing->id,
+        // If we are creating a new Completed mailing (e.g. import from another system) set the job to completed.
+        // Keeping former behaviour when an id is present is precautionary and may warrant reconsideration later.
+        'status' => ((empty($params['is_completed']) || !empty($params['id'])) ? 'Scheduled' : 'Complete'),
+        'is_test' => 0,
+        '_skip_evil_bao_auto_recipients_' => TRUE,
+      ];
       $job = new CRM_Mailing_BAO_MailingJob();
-      $job->mailing_id = $mailing->id;
-      // If we are creating a new Completed mailing (e.g. import from another system) set the job to completed.
-      // Keeping former behaviour when an id is present is precautionary and may warrant reconsideration later.
-      $job->status = ((empty($params['is_completed']) || !empty($params['id'])) ? 'Scheduled' : 'Complete');
-      $job->is_test = 0;
+      $job->copyValues($jobParams);
 
       if (!$job->find(TRUE)) {
         // Don't schedule job until we populate the recipients.
-        $job->scheduled_date = NULL;
-        $job->save();
+        $jobParams['scheduled_date'] = NULL;
+        $jobParams['id'] = CRM_Mailing_BAO_MailingJob::create($jobParams)->id;
       }
       // Schedule the job now that it has recipients.
-      $job->scheduled_date = $params['scheduled_date'];
-      $job->save();
+      $jobParams['scheduled_date'] = $params['scheduled_date'];
+      CRM_Mailing_BAO_MailingJob::create($jobParams);
     }
 
     // Populate the recipients.

@@ -72,7 +72,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     $jobDAO = new CRM_Mailing_BAO_MailingJob();
     $jobDAO->copyValues($params, TRUE);
     $jobDAO->save();
-    if (!empty($params['mailing_id'])) {
+    if (!empty($params['mailing_id']) && empty($params['_skip_evil_bao_auto_recipients_'])) {
       CRM_Mailing_BAO_Mailing::getRecipients($params['mailing_id']);
     }
     CRM_Utils_Hook::post($op, 'MailingJob', $jobDAO->id, $jobDAO);
@@ -165,7 +165,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       }
 
       /* Queue up recipients for the child job being launched */
-
       if ($job->status != 'Running') {
         $transaction = new CRM_Core_Transaction();
 
@@ -283,11 +282,11 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
         $transaction = new CRM_Core_Transaction();
 
-        $saveJob = new CRM_Mailing_DAO_MailingJob();
-        $saveJob->id = $job->id;
-        $saveJob->end_date = date('YmdHis');
-        $saveJob->status = 'Complete';
-        $saveJob->save();
+        self::create([
+          'id' => $job->id,
+          'end_date' => date('YmdHis'),
+          'status' => 'Complete',
+        ]);
 
         $mailing->reset();
         $mailing->id = $job->mailing_id;
