@@ -360,7 +360,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       ts('Limit List to Group'),
       $contactGroups,
       FALSE,
-      array('multiple' => 'multiple')
+      array('multiple' => 'multiple', 'class' => 'crm-select2')
     );
 
     $this->add('text',
