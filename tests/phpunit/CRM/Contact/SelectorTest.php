@@ -275,6 +275,67 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the Search Builder using Non ASCII location type for email filter
+   */
+  public function testSelectorQueryOnNonASCIIlocationType() {
+    $contactID = $this->individualCreate();
+    $locationType = $this->locationTypeCreate([
+      'name' => 'Non ASCII Location Type',
+      'display_name' => 'Дом Location type',
+      'vcard_name' => 'Non ASCII Location Type',
+      'is_active' => 1,
+    ]);
+    $this->callAPISuccess('Email', 'create', [
+      'contact_id' => $contactID,
+      'location_type_id' => $locationType->id,
+      'email' => 'test@test.com',
+    ]);
+
+    $selector = new CRM_Contact_Selector(
+      'CRM_Contact_Selector',
+      ['email' => ['IS NOT NULL' => 1]],
+      [[
+        0 => 'email-' . $locationType->id,
+        1 => 'IS NOT NULL',
+        2 => NULL,
+        3 => 1,
+        4 => 0,
+      ]],
+      [
+        'contact_type' => 1,
+        'contact_sub_type' => 1,
+        'sort_name' => 1,
+        'location' => [
+          'Non ASCII Location Type' => [
+            'location_type' => $locationType->id,
+            'email' => 1,
+          ],
+        ],
+      ],
+      CRM_Core_Action::NONE,
+      NULL,
+      FALSE,
+      'builder'
+    );
+
+    $sql = $selector->getQueryObject()->query();
+
+    $expectedQuery = [
+      0 => "SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, `Non_ASCII_Location_Type-location_type`.id as `Non_ASCII_Location_Type-location_type_id`, `Non_ASCII_Location_Type-location_type`.name as `Non_ASCII_Location_Type-location_type`, `Non_ASCII_Location_Type-email`.id as `Non_ASCII_Location_Type-email_id`, `Non_ASCII_Location_Type-email`.email as `Non_ASCII_Location_Type-email`",
+      // @TODO these FROM clause doesn't matches due to extra spaces or special character
+      2 => "WHERE  (  ( LOWER(`Non_ASCII_Location_Type-email`.email) IS NOT NULL )  )  AND (contact_a.is_deleted = 0)",
+    ];
+    foreach ($expectedQuery as $index => $queryString) {
+      $this->assertEquals($this->strWrangle($queryString), $this->strWrangle($sql[$index]));
+    }
+
+    $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, TRUE, NULL);
+    $this->assertEquals(1, count($rows));
+    $this->assertEquals($contactID, key($rows));
+    $this->assertEquals('test@test.com', $rows[$contactID]['Non_ASCII_Location_Type-email']);
+  }
+
+  /**
    * Test if custom table is added in from clause when
    * search results are ordered by a custom field.
    */
