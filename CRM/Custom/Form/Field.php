@@ -318,21 +318,26 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $this->freeze('data_type');
     }
-    $includeFieldIds = NULL;
+
+    $optionGroupParams = [
+      'is_reserved' => 0,
+      'is_active' => 1,
+      'options' => ['limit' => 0, 'sort' => "title ASC"],
+      'return' => ['title'],
+    ];
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $includeFieldIds = $this->_values['id'];
+      $optionGroupParams['id'] = $this->_values['id'];
     }
-    $optionGroups = CRM_Core_BAO_CustomField::customOptionGroup($includeFieldIds);
-    $emptyOptGroup = FALSE;
-    if (empty($optionGroups)) {
-      $emptyOptGroup = TRUE;
-      $optionTypes = array('1' => ts('Create a new set of options'));
-    }
-    else {
-      $optionTypes = array(
-        '1' => ts('Create a new set of options'),
-        '2' => ts('Reuse an existing set'),
-      );
+    // Get all custom (is_reserved=0) option groups
+    $optionGroupMetadata = civicrm_api3('OptionGroup', 'get', $optionGroupParams);
+
+    // OptionGroup selection
+    $optionTypes = array('1' => ts('Create a new set of options'));
+
+    if (!empty($optionGroupMetadata['values'])) {
+      $emptyOptGroup = FALSE;
+      $optionGroups = CRM_Utils_Array::collect('title', $optionGroupMetadata['values']);
+      $optionTypes['2'] = ts('Reuse an existing set');
 
       $this->add('select',
         'option_group_id',
@@ -342,6 +347,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         ) + $optionGroups
       );
     }
+    else {
+      // No custom (non-reserved) option groups
+      $emptyOptGroup = TRUE;
+    }
 
     $element = &$this->addRadio('option_type',
       ts('Option Type'),
@@ -350,6 +359,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         'onclick' => "showOptionSelect();",
       ), '<br/>'
     );
+    // if empty option group freeze the option type.
+    if ($emptyOptGroup) {
+      $element->freeze();
+    }
 
     $contactGroups = CRM_Core_PseudoConstant::group();
     asort($contactGroups);
@@ -369,11 +382,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     );
 
     $this->add('hidden', 'filter_selected', 'Group', array('id' => 'filter_selected'));
-
-    //if empty option group freeze the option type.
-    if ($emptyOptGroup) {
-      $element->freeze();
-    }
 
     // form fields of Custom Option rows
     $defaultOption = array();

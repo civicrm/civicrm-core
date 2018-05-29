@@ -2030,6 +2030,8 @@ AND    cf.id = %1";
   /**
    * Get custom option groups.
    *
+   * @deprecated Use the API OptionGroup.get
+   *
    * @param array $includeFieldIds
    *   Ids of custom fields for which option groups must be included.
    *
