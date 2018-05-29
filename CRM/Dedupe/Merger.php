@@ -652,9 +652,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $batchLimit number of merges to carry out in one batch.
    * @param int $isSelected if records with is_selected column needs to be processed.
    *   Note the option of '2' is only used in conjunction with $redirectForPerformance
-   *   to determine when
-   *   and the use of anything other than a boolean is being grandfathered out in favour of
-   *   explicitly
+   *   to determine when to reload the cache (!). The use of anything other than a boolean is being grandfathered
+   *   out in favour of explicitly passing in $reloadCacheIfEmpty
    *
    * @param array $criteria
    *   Criteria to use in the filter.
