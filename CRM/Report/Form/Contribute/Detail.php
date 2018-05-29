@@ -478,26 +478,12 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
    * Soft credit functionality is not currently unit tested for this report.
    */
   public function postProcess() {
+    // @todo in order to make this report testable we need to remove this function override in favour of the
+    // functions called by the reportTemplate.getrows api - this requires a bit of tidy up!
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
 
     $this->beginPostProcess();
-    // CRM-18312 - display soft_credits and soft_credits_for column
-    // when 'Contribution or Soft Credit?' column is not selected
-    if (empty($this->_params['fields']['contribution_or_soft'])) {
-      $this->_params['fields']['contribution_or_soft'] = 1;
-      $this->noDisplayContributionOrSoftColumn = TRUE;
-    }
-
-    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
-      'contributions_only' &&
-      !empty($this->_params['fields']['soft_credit_type_id'])
-    ) {
-      unset($this->_params['fields']['soft_credit_type_id']);
-      if (!empty($this->_params['soft_credit_type_id_value'])) {
-        $this->_params['soft_credit_type_id_value'] = array();
-      }
-    }
 
     // 1. use main contribution query to build temp table 1
     $sql = $this->buildQuery();
@@ -575,6 +561,33 @@ UNION ALL
     $this->doTemplateAssignment($rows);
     // do print / pdf / instance stuff if needed
     $this->endPostProcess($rows);
+  }
+
+  /**
+   * Shared function for preliminary processing.
+   *
+   * This is called by the api / unit tests and the form layer and is
+   * the right place to do 'initial analysis of input'.
+   */
+  public function beginPostProcessCommon() {
+    // CRM-18312 - display soft_credits and soft_credits_for column
+    // when 'Contribution or Soft Credit?' column is not selected
+    if (empty($this->_params['fields']['contribution_or_soft'])) {
+      $this->_params['fields']['contribution_or_soft'] = 1;
+      $this->noDisplayContributionOrSoftColumn = TRUE;
+    }
+
+    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
+      'contributions_only' &&
+      (!empty($this->_params['fields']['soft_credit_type_id'])
+      || !empty($this->_params['soft_credit_type_id_value']))
+    ) {
+      unset($this->_params['fields']['soft_credit_type_id']);
+      if (!empty($this->_params['soft_credit_type_id_value'])) {
+        $this->_params['soft_credit_type_id_value'] = array();
+        CRM_Core_Session::setStatus(ts('Is it not possible to filter on soft contribution type when not including soft credits.'));
+      }
+    }
   }
 
   /**
