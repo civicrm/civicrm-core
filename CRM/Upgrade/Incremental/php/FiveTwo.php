@@ -40,7 +40,7 @@ class CRM_Upgrade_Incremental_php_FiveTwo extends CRM_Upgrade_Incremental_Base {
    * @param null $currentVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-    if ($rev == '5.2.alpha1') {
+    if ($rev == '5.3.0') {
       $params = array(
         1 => 'edit user-driven message templates',
         2 => 'edit system workflow message templates',
