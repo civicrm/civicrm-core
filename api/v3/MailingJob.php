@@ -41,7 +41,7 @@
  * @throws \API_Exception
  */
 function civicrm_api3_mailing_job_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'MailingJob');
 }
 
 /**
@@ -67,7 +67,7 @@ function _civicrm_api3_mailing_job_create_spec(&$params) {
  *   API return Array of matching mailing jobs.
  */
 function civicrm_api3_mailing_job_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'MailingJob');
 }
 
 /**

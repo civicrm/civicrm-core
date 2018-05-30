@@ -251,7 +251,7 @@ function civicrm_api3_mailing_delete($params) {
  * @return array
  */
 function civicrm_api3_mailing_get($params) {
-  $result = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $result = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Mailing');
   return _civicrm_api3_mailing_get_formatResult($result);
 }
 

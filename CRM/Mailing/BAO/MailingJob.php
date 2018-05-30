@@ -63,19 +63,20 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * @throws \CRM_Core_Exception
    */
   static public function create($params) {
-    $job = new CRM_Mailing_BAO_MailingJob();
-    $job->mailing_id = $params['mailing_id'];
-    $job->status = $params['status'];
-    $job->scheduled_date = $params['scheduled_date'];
-    $job->is_test = $params['is_test'];
-    $job->save();
-    if ($params['mailing_id']) {
-      CRM_Mailing_BAO_Mailing::getRecipients($params['mailing_id']);
-      return $job;
-    }
-    else {
+    if (empty($params['id']) && empty($params['mailing_id'])) {
       throw new CRM_Core_Exception("Failed to create job: Unknown mailing ID");
     }
+    $op = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($op, 'MailingJob', CRM_Utils_Array::value('id', $params), $params);
+
+    $jobDAO = new CRM_Mailing_BAO_MailingJob();
+    $jobDAO->copyValues($params, TRUE);
+    $jobDAO->save();
+    if (!empty($params['mailing_id'])) {
+      CRM_Mailing_BAO_Mailing::getRecipients($params['mailing_id']);
+    }
+    CRM_Utils_Hook::post($op, 'MailingJob', $jobDAO->id, $jobDAO);
+    return $jobDAO;
   }
 
   /**
@@ -89,7 +90,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
   public static function runJobs($testParams = NULL, $mode = NULL) {
     $job = new CRM_Mailing_BAO_MailingJob();
 
-    $config = CRM_Core_Config::singleton();
     $jobTable = CRM_Mailing_DAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
     $mailerBatchLimit = Civi::settings()->get('mailerBatchLimit');
@@ -173,12 +173,12 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         // get the parent ID, and limit and offset
         $job->queue($testParams);
 
-        // Mark up the starting time
-        $saveJob = new CRM_Mailing_DAO_MailingJob();
-        $saveJob->id = $job->id;
-        $saveJob->start_date = date('YmdHis');
-        $saveJob->status = 'Running';
-        $saveJob->save();
+        // Update to show job has started.
+        self::create([
+          'id' => $job->id,
+          'start_date' => date('YmdHis'),
+          'status' => 'Running',
+        ]);
 
         $transaction->commit();
       }
@@ -206,13 +206,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         // Finish the job.
 
         $transaction = new CRM_Core_Transaction();
-
-        $saveJob = new CRM_Mailing_DAO_MailingJob();
-        $saveJob->id = $job->id;
-        $saveJob->end_date = date('YmdHis');
-        $saveJob->status = 'Complete';
-        $saveJob->save();
-
+        self::create(['id' => $job->id, 'end_date' => date('YmdHis'), 'status' => 'Complete']);
         $transaction->commit();
 
         // don't mark the mailing as complete
@@ -379,13 +373,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
       $job->split_job($offset);
 
-      // update the status of the parent job
-      $saveJob = new CRM_Mailing_DAO_MailingJob();
-      $saveJob->id = $job->id;
-      $saveJob->start_date = date('YmdHis');
-      $saveJob->status = 'Running';
-      $saveJob->save();
-
+      // Update the status of the parent job
+      self::create(['id' => $job->id, 'start_date' => date('YmdHis'), 'status' => 'Running']);
       $transaction->commit();
 
       // Release the job lock
@@ -811,11 +800,7 @@ AND    ( ( job_type IS NULL ) OR
       in_array($job->status, array('Scheduled', 'Running', 'Paused'))
     ) {
 
-      $newJob = new CRM_Mailing_BAO_MailingJob();
-      $newJob->id = $job->id;
-      $newJob->end_date = date('YmdHis');
-      $newJob->status = 'Canceled';
-      $newJob->save();
+      self::create(['id' => $job->id, 'end_date' => date('YmdHis'), 'status' => 'Canceled']);
 
       // also cancel all child jobs
       $sql = "
