@@ -863,7 +863,6 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
           $htmlType = CRM_Utils_Array::value('html_type', $customFields[$customFieldID]);
           switch ($htmlType) {
             case 'CheckBox':
-            case 'AdvMulti-Select':
             case 'Multi-Select':
               if ($val) {
                 $mulValues = explode(',', $val);

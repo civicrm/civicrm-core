@@ -135,7 +135,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
           'Radio' => ts('Radio'),
           'CheckBox' => ts('CheckBox'),
           'Multi-Select' => ts('Multi-Select'),
-          'AdvMulti-Select' => ts('Adv Multi-Select (obsolete)'),
           'Autocomplete-Select' => ts('Autocomplete-Select'),
         ),
         array(
@@ -708,7 +707,7 @@ SELECT count(*)
     if (isset($fields['data_type'][1])) {
       $dataField = $fields['data_type'][1];
     }
-    $optionFields = array('Select', 'Multi-Select', 'CheckBox', 'Radio', 'AdvMulti-Select');
+    $optionFields = array('Select', 'Multi-Select', 'CheckBox', 'Radio');
 
     if (isset($fields['option_type']) && $fields['option_type'] == 1) {
       //capture duplicate Custom option values

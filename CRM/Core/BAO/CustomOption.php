@@ -155,7 +155,7 @@ class CRM_Core_BAO_CustomOption {
         $action -= CRM_Core_Action::DELETE;
       }
 
-      if (in_array($field->html_type, array('CheckBox', 'AdvMulti-Select', 'Multi-Select'))) {
+      if (in_array($field->html_type, ['CheckBox', 'Multi-Select'])) {
         if (isset($defVal) && in_array($dao->value, $defVal)) {
           $options[$dao->id]['is_default'] = '<img src="' . $config->resourceBase . 'i/check.gif" />';
         }
@@ -291,7 +291,6 @@ WHERE  id = %2";
           );
           break;
 
-        case 'AdvMulti-Select':
         case 'Multi-Select':
         case 'CheckBox':
           $oldString = CRM_Core_DAO::VALUE_SEPARATOR . $oldValue . CRM_Core_DAO::VALUE_SEPARATOR;

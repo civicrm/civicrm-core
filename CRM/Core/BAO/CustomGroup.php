@@ -1386,7 +1386,6 @@ ORDER BY civicrm_custom_group.weight,
 
         switch ($field['html_type']) {
           case 'Multi-Select':
-          case 'AdvMulti-Select':
           case 'CheckBox':
             $defaults[$elementName] = array();
             $customOption = CRM_Core_BAO_CustomOption::getCustomOption($field['id'], $inactiveNeeded);
@@ -1506,7 +1505,6 @@ ORDER BY civicrm_custom_group.weight,
         //added Multi-Select option in the below if-statement
         if ($field['html_type'] == 'CheckBox' ||
           $field['html_type'] == 'Radio' ||
-          $field['html_type'] == 'AdvMulti-Select' ||
           $field['html_type'] == 'Multi-Select'
         ) {
           $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = 'NULL';
@@ -1542,10 +1540,6 @@ ORDER BY civicrm_custom_group.weight,
             }
             break;
 
-          //added for Advanced Multi-Select
-
-          case 'AdvMulti-Select':
-            //added for Multi-Select
           case 'Multi-Select':
             if (!empty($v)) {
               $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = CRM_Core_DAO::VALUE_SEPARATOR
@@ -1663,7 +1657,6 @@ ORDER BY civicrm_custom_group.weight,
     $htmlType = array(
       'CheckBox',
       'Multi-Select',
-      'AdvMulti-Select',
       'Select',
       'Radio',
     );
@@ -1684,7 +1677,6 @@ ORDER BY civicrm_custom_group.weight,
             $valid = CRM_Core_BAO_CustomValue::typecheck($field['data_type'], $value);
           }
           if ($field['html_type'] == 'CheckBox' ||
-            $field['html_type'] == 'AdvMulti-Select' ||
             $field['html_type'] == 'Multi-Select'
           ) {
             $value = str_replace("|", ",", $value);

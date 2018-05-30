@@ -1246,7 +1246,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           $htmlType = array(
             'CheckBox',
             'Multi-Select',
-            'AdvMulti-Select',
             'Select',
             'Radio',
             'Multi-Select State/Province',
@@ -1260,7 +1259,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           }
 
           // check for values for custom fields for checkboxes and multiselect
-          if ($customFields[$customFieldID]['html_type'] == 'CheckBox' || $customFields[$customFieldID]['html_type'] == 'AdvMulti-Select' || $customFields[$customFieldID]['html_type'] == 'Multi-Select') {
+          if ($customFields[$customFieldID]['html_type'] == 'CheckBox' || $customFields[$customFieldID]['html_type'] == 'Multi-Select') {
             $value = trim($value);
             $value = str_replace('|', ',', $value);
             $mulValues = explode(',', $value);
