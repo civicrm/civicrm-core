@@ -348,20 +348,14 @@ class CRM_Export_BAO_Export {
       );
 
       foreach ($fields as $key => $value) {
-        $phoneTypeId = $imProviderId = $relationField = NULL;
+        $relationField = NULL;
         $relationshipTypes = $fieldName = CRM_Utils_Array::value(1, $value);
         if (!$fieldName) {
           continue;
         }
-        // get phoneType id and IM service provider id separately
-        if ($fieldName == 'phone') {
-          $phoneTypeId = CRM_Utils_Array::value(3, $value);
-        }
-        elseif ($fieldName == 'im') {
-          $imProviderId = CRM_Utils_Array::value(3, $value);
-        }
 
-        if (array_key_exists($relationshipTypes, $contactRelationshipTypes)) {
+        if (array_key_exists($relationshipTypes, $contactRelationshipTypes) && (!empty($value[2]) || empty($value[4]))) {
+          $relPhoneTypeId = $relIMProviderId = NULL;
           if (!empty($value[2])) {
             $relationField = CRM_Utils_Array::value(2, $value);
             if (trim(CRM_Utils_Array::value(3, $value))) {
@@ -388,11 +382,6 @@ class CRM_Export_BAO_Export {
               $relIMProviderId = CRM_Utils_Array::value(6, $value);
             }
           }
-        }
-
-        $locTypeId = CRM_Utils_Array::value(2, $value);
-
-        if ($relationField) {
           if (in_array($relationField, $locationTypeFields) && is_numeric($relLocTypeId)) {
             if ($relPhoneTypeId) {
               $returnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]]['phone-' . $relPhoneTypeId] = 1;
@@ -403,18 +392,22 @@ class CRM_Export_BAO_Export {
             else {
               $returnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]][$relationField] = 1;
             }
-            $relPhoneTypeId = $relIMProviderId = NULL;
           }
           else {
             $returnProperties[$relationshipTypes][$relationField] = 1;
           }
         }
-        elseif (is_numeric($locTypeId)) {
-          if ($phoneTypeId) {
-            $returnProperties['location'][$locationTypes[$locTypeId]]['phone-' . $phoneTypeId] = 1;
+
+        if ($relationField) {
+          // already handled.
+        }
+        elseif (is_numeric(CRM_Utils_Array::value(2, $value))) {
+          $locTypeId = $value[2];
+          if ($fieldName == 'phone') {
+            $returnProperties['location'][$locationTypes[$locTypeId]]['phone-' . CRM_Utils_Array::value(3, $value)] = 1;
           }
-          elseif ($imProviderId) {
-            $returnProperties['location'][$locationTypes[$locTypeId]]['im-' . $imProviderId] = 1;
+          elseif ($fieldName == 'im') {
+            $returnProperties['location'][$locationTypes[$locTypeId]]['im-' . CRM_Utils_Array::value(3, $value)] = 1;
           }
           else {
             $returnProperties['location'][$locationTypes[$locTypeId]][$fieldName] = 1;

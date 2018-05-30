@@ -369,6 +369,65 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test exporting relationships.
+   *
+   * This is to ensure that CRM-13995 remains fixed.
+   */
+  public function testExportRelationshipsMergeToHousehold() {
+    $this->setUpContactExportData();
+    $householdID = $this->householdCreate(['city' => 'Portland', 'state_province_id' => 'Oregan']);
+
+    $relationshipTypes = $this->callAPISuccess('RelationshipType', 'get', [])['values'];
+    $houseHoldTypeID = NULL;
+    foreach ($relationshipTypes as $id => $relationshipType) {
+      if ($relationshipType['name_a_b'] === 'Household Member of') {
+        $houseHoldTypeID = $relationshipType['id'];
+      }
+    }
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $this->contactIDs[0],
+      'contact_id_b' => $householdID,
+      'relationship_type_id' => $houseHoldTypeID,
+    ]);
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $this->contactIDs[1],
+      'contact_id_b' => $householdID,
+      'relationship_type_id' => $houseHoldTypeID,
+    ]);
+
+    $selectedFields = [
+      ['Individual', $houseHoldTypeID . '_a_b', 'state_province', ''],
+      ['Individual', $houseHoldTypeID . '_a_b', 'city', ''],
+      ['Individual', 'city', ''],
+      ['Individual', 'state_province', ''],
+    ];
+    list($tableName) = CRM_Export_BAO_Export::exportComponents(
+      FALSE,
+      $this->contactIDs,
+      [],
+      NULL,
+      $selectedFields,
+      NULL,
+      CRM_Export_Form_Select::CONTACT_EXPORT,
+      "contact_a.id IN (" . implode(",", $this->contactIDs) . ")",
+      NULL,
+      FALSE,
+      TRUE,
+      [
+        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
+        'suppress_csv_for_testing' => TRUE,
+      ]
+    );
+    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM {$tableName}");
+    while ($dao->fetch()) {
+      // Do some checks here
+      // $this->assertEquals('Portland', $dao->city);
+      // $this->assertEquals('Oregan', $dao0>state_province);
+    }
+
+  }
+
+  /**
    * Test master_address_id field.
    */
   public function testExportMasterAddress() {
