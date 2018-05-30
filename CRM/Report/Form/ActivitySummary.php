@@ -160,6 +160,14 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
           ),
+          'activity_role' => array(
+            'title' => ts('Activity Role'),
+            'default' => 3,
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_SELECT,
+            'options' => CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'search'),
+          ),
+
         ),
         'group_bys' => array(
           'activity_date_time' => array(
@@ -305,6 +313,12 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $activityContactTables = array(
+      $assigneeID => 'assignment_activity',
+      $targetID => 'target_activity',
+      $sourceID => 'source_activity',
+    );
+    $activityRole = $activityContactTables[$this->_params['activity_role_value']];
 
     if (!$durationMode) {
       $this->_from = "
@@ -320,7 +334,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
                       ON {$this->_aliases['civicrm_activity']}.id = source_activity.activity_id AND
                          source_activity.record_type_id = {$sourceID}
                LEFT JOIN civicrm_contact contact_civireport
-                      ON target_activity.contact_id = contact_civireport.id
+                      ON {$activityRole}.contact_id = contact_civireport.id
                LEFT JOIN civicrm_contact civicrm_contact_assignee
                       ON assignment_activity.contact_id = civicrm_contact_assignee.id
                LEFT JOIN civicrm_contact civicrm_contact_source
@@ -344,7 +358,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       FROM civicrm_activity {$this->_aliases['civicrm_activity']}
               LEFT JOIN civicrm_activity_contact target_activity
                      ON {$this->_aliases['civicrm_activity']}.id = target_activity.activity_id AND
-                        target_activity.record_type_id = {$targetID}
+                        target_activity.record_type_id = {$this->_params['activity_role_value']}
               LEFT JOIN civicrm_contact contact_civireport
                      ON target_activity.contact_id = contact_civireport.id
               {$this->_aclFrom}";
@@ -381,7 +395,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
             $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
           }
-          else {
+          elseif ($fieldName != 'activity_role') {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
             if ($op) {
               $clause = $this->whereClause($field,
