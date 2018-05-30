@@ -2341,7 +2341,7 @@ class CRM_Contact_BAO_Query {
         $this->_where[$grouping][] = CRM_Core_DAO::createSQLFilter($fieldName, $value, $type);
       }
       else {
-        if (!strpos($op, 'IN')) {
+        if (!strpos($op, 'IN') && $op !== 'RLIKE') {
           $value = $strtolower($value);
         }
         if ($wildcard) {
@@ -5713,7 +5713,12 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         $value = CRM_Utils_Type::escape($value, $dataType);
         // if we don't have a dataType we should assume
         if ($dataType == 'String' || $dataType == 'Text') {
-          $value = "'" . strtolower($value) . "'";
+          if ($op != 'RLIKE') {
+            $value = "'" . strtolower($value) . "'";
+          }
+          else {
+            $value = "BINARY '" . $value . "'";
+          }
         }
         return "$clause $value";
     }
