@@ -189,14 +189,15 @@ class CRM_Core_BAO_SchemaHandler {
 
     //create index only for searchable fields during ADD,
     //create index only if field is become searchable during MODIFY,
-    //drop index only if field is no more searchable and index was exist.
+    //drop index only if field is no longer searchable and it does not reference
+    //a forgein key (and indexExist is true)
     if (!empty($params['searchable']) && !$indexExist) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;
       $sql .= "INDEX_{$params['name']} ( {$params['name']} )";
     }
-    elseif (empty($params['searchable']) && $indexExist) {
+    elseif (empty($params['searchable']) && empty($params['fk_table_name']) && $indexExist) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= "DROP INDEX INDEX_{$params['name']}";
