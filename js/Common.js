@@ -1246,7 +1246,7 @@ if (!CRM.vars) CRM.vars = {};
         unique: true
       };
       options = $.extend(extra, options);
-      options.expires = options.expires === false ? 0 : parseInt(options.expires, 10);
+      options.expires = (options.expires === false || !CRM.config.allowAlertAutodismissal) ? 0 : parseInt(options.expires, 10);
       if (options.unique && options.unique !== '0') {
         $('#crm-notification-container .ui-notify-message').each(function () {
           if (title === $('h1', this).html() && text === $('.notify-content', this).html()) {
