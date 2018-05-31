@@ -266,7 +266,8 @@
     {literal}
       ruleFields = {},
       $ruleElements = $(),
-      matchMessage;
+      matchMessage,
+      runningCheck = 0;
     $.each(rules, function(i, field) {
       // Match regular fields
       var $el = $('#' + field + ', #' + field + '_1_' + field, $form).filter(':input');
@@ -283,12 +284,11 @@
     });
     $ruleElements.on('change', checkMatches);
     function checkMatches() {
-      // Close msg if it exists
-      matchMessage && matchMessage.close && matchMessage.close();
       if ($(this).is('input[type=text]') && $(this).val().length < 2) {
         return;
       }
-      var match = {contact_type: contactType};
+      var match = {contact_type: contactType},
+        checkNum = ++runningCheck;
       $.each(ruleFields, function(fieldName, ruleField) {
         if (ruleField.length > 1) {
           match[fieldName] = ruleField.filter(':checked').val();
@@ -302,6 +302,12 @@
         options: {sort: 'sort_name'},
         return: ['display_name', 'email']
       }).done(function(data) {
+        // If a new request has started running, cancel this one.
+        if (checkNum < runningCheck) {
+          return;
+        }
+        // Close msg if it exists
+        matchMessage && matchMessage.close && matchMessage.close();
         var title = data.count == 1 ? {/literal}"{ts escape='js'}Similar Contact Found{/ts}" : "{ts escape='js'}Similar Contacts Found{/ts}"{literal},
           msg = "<em>{/literal}{ts escape='js'}If the contact you were trying to add is listed below, click their name to view or edit their record{/ts}{literal}:</em>";
         if (data.is_error == 1 || data.count == 0) {
