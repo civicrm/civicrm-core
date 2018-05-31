@@ -111,8 +111,9 @@
 
   <script type="text/javascript" >
   CRM.$(function($) {
-    var $form = $("form.{/literal}{$form.formClass}{literal}");
-    var action = "{/literal}{$action}{literal}";
+    var $form = $("form.{/literal}{$form.formClass}{literal}"),
+      action = "{/literal}{$action}{literal}",
+      _ = CRM._;
 
     $('.crm-accordion-body').each( function() {
       //remove tab which doesn't have any element
@@ -262,8 +263,14 @@
     {/literal}{* Ajax check for matching contacts *}
     {if $checkSimilar == 1}
     var contactType = {$contactType|@json_encode},
-      rules = {$ruleFields|@json_encode},
-    {literal}
+      rules = {*$ruleFields|@json_encode*}{literal}[
+        'first_name',
+        'last_name',
+        'nick_name',
+        'household_name',
+        'organization_name',
+        'email'
+      ],
       ruleFields = {},
       $ruleElements = $(),
       matchMessage,
@@ -284,7 +291,7 @@
     });
     $ruleElements.on('change', checkMatches);
     function checkMatches() {
-      if ($(this).is('input[type=text]') && $(this).val().length < 2) {
+      if ($(this).is('input[type=text]') && $(this).val().length < 3) {
         return;
       }
       var match = {contact_type: contactType},
@@ -292,16 +299,25 @@
       $.each(ruleFields, function(fieldName, ruleField) {
         if (ruleField.length > 1) {
           match[fieldName] = ruleField.filter(':checked').val();
+        } else if (ruleField.is('input[type=text]')) {
+          if (ruleField.val().length > 2) {
+            match[fieldName] = ruleField.val() + '%'; // Todo: remove wildcard when switching to contact.match api
+          }
         } else {
           match[fieldName] = ruleField.val();
         }
       });
-      CRM.api3('contact', 'duplicatecheck', {
-        match: match,
-        rule_type: 'Supervised',
+      // CRM-20565 - Need a good default matching rule before using the dedupe engine for this. Using contact.get for now.
+      // CRM.api3('contact', 'duplicatecheck', {
+      //   match: match,
+      //   rule_type: 'Supervised',
+      //   options: {sort: 'sort_name'},
+      //   return: ['display_name', 'email']
+      // }).done(function(data) {
+      CRM.api3('contact', 'get', _.extend({
         options: {sort: 'sort_name'},
         return: ['display_name', 'email']
-      }).done(function(data) {
+      }, match)).done(function(data) {
         // If a new request has started running, cancel this one.
         if (checkNum < runningCheck) {
           return;
