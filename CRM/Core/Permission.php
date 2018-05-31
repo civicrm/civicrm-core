@@ -879,6 +879,12 @@ class CRM_Core_Permission {
       'edit message templates' => array(
         $prefix . ts('edit message templates'),
       ),
+      'edit system workflow message templates' => array(
+        $prefix . ts('edit system workflow message templates'),
+      ),
+      'edit user-driven message templates' => array(
+        $prefix . ts('edit user-driven message templates'),
+      ),
       'view my invoices' => array(
         $prefix . ts('view my invoices'),
         ts('Allow users to view/ download their own invoices'),
@@ -1461,8 +1467,8 @@ class CRM_Core_Permission {
 
     $permissions['message_template'] = array(
       'get' => array('access CiviCRM'),
-      'create' => array('edit message templates'),
-      'update' => array('edit message templates'),
+      'create' => array('edit message templates', 'edit user-driven message templates', 'edit system workflow message templates'),
+      'update' => array('edit message templates', 'edit user-driven message templates', 'edit system workflow message templates'),
     );
     return $permissions;
   }
