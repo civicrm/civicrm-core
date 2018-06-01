@@ -300,9 +300,17 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'help_post' => 'This is Post Help For Test Group 8',
     );
 
-    $customGroup = $this->callAPISuccess('custom_group', 'create', $params);
+    $customGroup = $this->callAPISuccess('CustomGroup', 'create', $params);
     $this->assertNotNull($customGroup['id']);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Group');
+  }
+
+  /**
+   * Test an empty update does not trigger e-notices when is_multiple has been set.
+   */
+  public function testCustomGroupEmptyUpdate() {
+    $customGroup = $this->callAPISuccess('CustomGroup', 'create', array_merge($this->_params, ['is_multiple' => 1]));
+    $this->callAPISuccess('CustomGroup', 'create', ['id' => $customGroup['id']]);
   }
 
   /**
