@@ -166,9 +166,10 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         if ($groupType == 'Include') {
           $includeSmartGroupIDs[] = $groupDAO->id;
         }
-        else {
+        else if ($groupType == 'Exclude') {
           $excludeSmartGroupIDs[] = $groupDAO->id;
         }
+        //NOTE: Do nothing for base
       }
     }
 
