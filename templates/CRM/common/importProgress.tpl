@@ -27,7 +27,6 @@
 <script type="text/javascript">
 CRM.$(function($) {
   var loop;
-  var isStatusRequestInProgress = false;
   $("form#Preview").on('submit', function (e) {
     if (!confirm("{/literal}{ts escape='js'}Backing up your database before importing is recommended, as there is no Undo for this. Are you sure you want to import now?{/ts}{literal}")) {
       e.preventDefault();
@@ -38,23 +37,19 @@ CRM.$(function($) {
   });
   function setIntermediate() {
     var dataUrl = "{/literal}{$statusUrl}{literal}";
-    if(!isStatusRequestInProgress) {
-      isStatusRequestInProgress = true;
-      $.getJSON(dataUrl, function(response) {
-        isStatusRequestInProgress = false;
-        var dataStr = response.toString();
-        var result  = dataStr.split(",");
-        $("#intermediate").html(result[1]);
-        $("#importProgressBar .ui-progressbar-value").show();
-        if (result[0] < 100) {
-          $("#importProgressBar .ui-progressbar-value").animate({width: result[0] + "%"}, 500);
-          $("#status").text(result[0] + "% Completed");
-        }
-        else {
-          window.clearInterval(loop);
-        }
-      });
-    }
+    $.getJSON(dataUrl, function(response) {
+      var dataStr = response.toString();
+      var result  = dataStr.split(",");
+      $("#intermediate").html(result[1]);
+      $("#importProgressBar .ui-progressbar-value").show();
+      if (result[0] < 100) {
+        $("#importProgressBar .ui-progressbar-value").animate({width: result[0] + "%"}, 500);
+        $("#status").text(result[0] + "% Completed");
+      }
+      else {
+        window.clearInterval(loop);
+      }
+    });
   }
 
   function showProgressBar() {
@@ -71,8 +66,7 @@ CRM.$(function($) {
     });
     $("#importProgressBar" ).progressbar({value:0});
     $("#importProgressBar").show( );
-    loop = window.setInterval(setIntermediate, 5000);
-    setIntermediate();
+    loop = window.setInterval(setIntermediate, 5000)
   }
 });
 </script>
