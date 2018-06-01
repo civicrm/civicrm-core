@@ -416,7 +416,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           ),
         );
 
-        $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+        $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id', 'validate');
 
         foreach ($this->_fields as $name => $field) {
           if (!empty($field['in_selector']) &&
@@ -492,7 +492,16 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           if (trim($phoneType) && !is_numeric($phoneType) && strtolower($phoneType) != $fld) {
             $title .= "-{$phoneType}";
           }
-          $title .= " ($loc)";
+          // fetch Location type label from name as $loc, which will be later used in column header
+          $title .= sprintf(" (%s)",
+            CRM_Core_PseudoConstant::getLabel(
+              'CRM_Core_DAO_Address',
+              'location_type_id',
+              CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_Address', 'location_type_id', $loc)
+            )
+          );
+          // use field name instead of table alias
+          $prop = $fld;
         }
         elseif (isset($this->_query->_fields[$prop]) && isset($this->_query->_fields[$prop]['title'])) {
           $title = $this->_query->_fields[$prop]['title'];
