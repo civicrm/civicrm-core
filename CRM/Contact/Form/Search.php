@@ -491,18 +491,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
     }
 
-    $selectedContactIds = array();
-    $qfKeyParam = CRM_Utils_Array::value('qfKey', $this->_formValues);
-    // We use ajax to handle selections only if the search results component_mode is set to "contacts"
-    if ($qfKeyParam && ($this->get('component_mode') <= CRM_Contact_BAO_Query::MODE_CONTACTS || $this->get('component_mode') == CRM_Contact_BAO_Query::MODE_CONTACTSRELATED)) {
-      $this->addClass('crm-ajax-selection-form');
-      $qfKeyParam = "civicrm search {$qfKeyParam}";
-      $selectedContactIdsArr = CRM_Core_BAO_PrevNextCache::getSelection($qfKeyParam);
-      $selectedContactIds = array_keys($selectedContactIdsArr[$qfKeyParam]);
-    }
-
-    $this->assign_by_ref('selectedContactIds', $selectedContactIds);
-
     $rows = $this->get('rows');
 
     if (is_array($rows)) {
