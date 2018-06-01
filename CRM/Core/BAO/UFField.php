@@ -207,7 +207,13 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     $ufField->field_type = $params['field_type'];
     $ufField->field_name = $params['field_name'];
     $ufField->website_type_id = CRM_Utils_Array::value('website_type_id', $params);
-    $ufField->location_type_id = CRM_Utils_Array::value('location_type_id', $params);
+    if (is_null(CRM_Utils_Array::value('location_type_id', $params, ''))) {
+      // primary location type have NULL value in DB
+      $ufField->whereAdd("location_type_id IS NULL");
+    }
+    else {
+      $ufField->location_type_id = CRM_Utils_Array::value('location_type_id', $params);
+    }
     $ufField->phone_type_id = CRM_Utils_Array::value('phone_type_id', $params);;
 
     if (!empty($params['id'])) {
