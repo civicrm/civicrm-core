@@ -36,7 +36,7 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Export_Form_Select extends CRM_Core_Form {
+class CRM_Export_Form_Select extends CRM_Core_Form_Task {
 
   /**
    * Various Contact types.
@@ -69,20 +69,6 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
   public $_exportMode;
 
   public $_componentTable;
-
-  /**
-   * Must be set to entity table name (eg. civicrm_participant) by child class
-   *
-   * @var string
-   */
-  static $tableName = NULL;
-
-  /**
-   * Must be set to entity shortname (eg. event)
-   *
-   * @var string
-   */
-  static $entityShortname = NULL;
 
   /**
    * Build all the data structures needed to build the form.
