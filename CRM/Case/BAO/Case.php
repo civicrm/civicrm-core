@@ -869,7 +869,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     );
 
     if ($relationshipID) {
-      $query .= ' AND civicrm_relationship.id = %3 ';
+      $query .= ' AND rel.id = %3 ';
       $params[3] = array($relationshipID, 'Integer');
     }
     $dao = CRM_Core_DAO::executeQuery($query, $params);
