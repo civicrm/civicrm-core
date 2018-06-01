@@ -34,7 +34,7 @@
 /**
  * This class generates form components for search-result tasks.
  */
-class CRM_Contact_Form_Task extends CRM_Core_Form {
+class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
 
   /**
    * The task being performed
