@@ -105,6 +105,8 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   public function testCreateCustomValue() {
     $this->_populateOptionAndCustomGroup();
+    $this->_customField = $this->customFieldCreate(array('custom_group_id' => $this->ids['string']['custom_group_id']));
+    $this->_customFieldID = $this->_customField['id'];
 
     $customFieldDataType = CRM_Core_BAO_CustomField::dataType();
     $dataToHtmlTypes = CRM_Core_BAO_CustomField::dataToHtml();
@@ -227,7 +229,11 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       }
     }
 
-    $params = array('entity_id' => $contactId, 'custom_' . $customId => $selectedValue);
+    $params = [
+      'entity_id' => $contactId,
+      'custom_' . $customId => $selectedValue,
+      "custom_{$this->_customFieldID}" => "Test String Value for {$this->_customFieldID}",
+    ];
     $this->callAPISuccess('CustomValue', 'create', $params);
 
     //Test for different return value syntax.
@@ -235,22 +241,26 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       ['return' => "custom_{$customId}"],
       ['return' => ["custom_{$customId}"]],
       ["return.custom_{$customId}" => 1],
+      ['return' => ["custom_{$customId}", "custom_{$this->_customFieldID}"]],
+      ["return.custom_{$customId}" => 1, "return.custom_{$this->_customFieldID}" => 1],
     ];
-    foreach ($returnValues as $val) {
+    foreach ($returnValues as $key => $val) {
       $params = array_merge($val, [
-        'sequential' => 1,
         'entity_id' => $contactId,
       ]);
       $customValue = $this->callAPISuccess('CustomValue', 'get', $params);
       if (is_array($selectedValue)) {
         $expected = array_values($selectedValue);
-        $this->checkArrayEquals($expected, $customValue['values'][0]['latest']);
+        $this->checkArrayEquals($expected, $customValue['values'][$customId]['latest']);
       }
       elseif ($type == 'date') {
-        $this->assertEquals($selectedValue, date('Ymd', strtotime(str_replace('.', '/', $customValue['values'][0]['latest']))));
+        $this->assertEquals($selectedValue, date('Ymd', strtotime(str_replace('.', '/', $customValue['values'][$customId]['latest']))));
       }
       else {
-        $this->assertEquals($selectedValue, $customValue['values'][0]['latest']);
+        $this->assertEquals($selectedValue, $customValue['values'][$customId]['latest']);
+      }
+      if ($key > 2) {
+        $this->assertEquals("Test String Value for {$this->_customFieldID}", $customValue['values'][$this->_customFieldID]['latest']);
       }
     }
 
