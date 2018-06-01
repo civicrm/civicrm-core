@@ -41,6 +41,13 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
   static $entityShortname = 'case';
 
   /**
+   * Must be set to queryMode
+   *
+   * @var int
+   */
+  static $queryMode = CRM_Contact_BAO_Query::MODE_CASE;
+
+  /**
    * @inheritDoc
    */
   public function setContactIDs() {
