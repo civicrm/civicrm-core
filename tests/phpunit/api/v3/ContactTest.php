@@ -3785,4 +3785,55 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(array('external_identifier'), $result['values']['UI_external_identifier']);
   }
 
+  public function testSmartGroupsForRelatedContacts() {
+    $rtype1 = $this->callAPISuccess('relationship_type', 'create', array(
+      "name_a_b" => uniqid() . " Child of",
+      "name_b_a" => uniqid() . " Parent of",
+    ));
+    $rtype2 = $this->callAPISuccess('relationship_type', 'create', array(
+      "name_a_b" => uniqid() . " Household Member of",
+      "name_b_a" => uniqid() . " Household Member is",
+    ));
+    $h1 = $this->householdCreate();
+    $c1 = $this->individualCreate(array('last_name' => 'Adams'));
+    $c2 = $this->individualCreate(array('last_name' => 'Adams'));
+    $this->callAPISuccess('relationship', 'create', array(
+      'contact_id_a' => $c1,
+      'contact_id_b' => $c2,
+      'is_active' => 1,
+      'relationship_type_id' => $rtype1['id'], // Child of
+    ));
+    $this->callAPISuccess('relationship', 'create', array(
+      'contact_id_a' => $c1,
+      'contact_id_b' => $h1,
+      'is_active' => 1,
+      'relationship_type_id' => $rtype2['id'], // Household Member of
+    ));
+    $this->callAPISuccess('relationship', 'create', array(
+      'contact_id_a' => $c2,
+      'contact_id_b' => $h1,
+      'is_active' => 1,
+      'relationship_type_id' => $rtype2['id'], // Household Member of
+    ));
+
+    $ssParams = array(
+      'formValues' => array(
+        'display_relationship_type' => $rtype1['id'] . '_a_b', // Child of
+        'sort_name' => 'Adams',
+      ),
+    );
+    $g1ID = $this->smartGroupCreate($ssParams, array('name' => uniqid(), 'title' => uniqid()));
+    $ssParams = array(
+      'formValues' => array(
+        'display_relationship_type' => $rtype2['id'] . '_a_b', // Household Member of
+      ),
+    );
+    $g2ID = $this->smartGroupCreate($ssParams, array('name' => uniqid(), 'title' => uniqid()));
+    CRM_Contact_BAO_GroupContactCache::loadAll();
+    $g1Contacts = $this->callAPISuccess('contact', 'get', array('group' => $g1ID));
+    $g2Contacts = $this->callAPISuccess('contact', 'get', array('group' => $g2ID));
+    $this->assertTrue($g1Contacts['count'] == 1);
+    $this->assertTrue($g2Contacts['count'] == 2);
+  }
+
 }

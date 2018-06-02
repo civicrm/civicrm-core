@@ -5779,13 +5779,26 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
    * @param $having
    */
   public function filterRelatedContacts(&$from, &$where, &$having) {
-    static $_rTypeProcessed = NULL;
-    static $_rTypeFrom = NULL;
-    static $_rTypeWhere = NULL;
-
-    if (!$_rTypeProcessed) {
-      $_rTypeProcessed = TRUE;
-
+    if (!isset(Civi::$statics[__CLASS__]['related_contacts_filter'])) {
+      Civi::$statics[__CLASS__]['related_contacts_filter'] = array();
+    }
+    $_rTempCache =& Civi::$statics[__CLASS__]['related_contacts_filter'];
+    // skip if filter has already applied
+    foreach ($_rTempCache as $acache) {
+      if (strpos($from, $acache['from']) !== FALSE) {
+        $having = NULL;
+        return;
+      }
+    }
+    $arg_sig = sha1("$from $where $having");
+    if (isset($_rTempCache[$arg_sig])) {
+      $cache = $_rTempCache[$arg_sig];
+    }
+    else {
+      $cache = array(
+        "from" => "",
+        "where" => "",
+      );
       // create temp table with contact ids
       $tableName = CRM_Core_DAO::createTempTableName('civicrm_transform', TRUE);
       $sql = "CREATE TEMPORARY TABLE $tableName ( contact_id int primary key) ENGINE=HEAP";
@@ -5805,11 +5818,11 @@ SELECT contact_a.id
 
       if (is_numeric($this->_displayRelationshipType)) {
         $relationshipTypeLabel = $rTypes[$this->_displayRelationshipType]['label_a_b'];
-        $_rTypeFrom = "
+        $cache['from'] = "
 INNER JOIN civicrm_relationship displayRelType ON ( displayRelType.contact_id_a = contact_a.id OR displayRelType.contact_id_b = contact_a.id )
 INNER JOIN $tableName transform_temp ON ( transform_temp.contact_id = displayRelType.contact_id_a OR transform_temp.contact_id = displayRelType.contact_id_b )
 ";
-        $_rTypeWhere = "
+        $cache['where'] = "
 WHERE displayRelType.relationship_type_id = {$this->_displayRelationshipType}
 AND   displayRelType.is_active = 1
 ";
@@ -5818,36 +5831,36 @@ AND   displayRelType.is_active = 1
         list($relType, $dirOne, $dirTwo) = explode('_', $this->_displayRelationshipType);
         if ($dirOne == 'a') {
           $relationshipTypeLabel = $rTypes[$relType]['label_a_b'];
-          $_rTypeFrom .= "
+          $cache['from'] .= "
 INNER JOIN civicrm_relationship displayRelType ON ( displayRelType.contact_id_a = contact_a.id )
 INNER JOIN $tableName transform_temp ON ( transform_temp.contact_id = displayRelType.contact_id_b )
 ";
         }
         else {
           $relationshipTypeLabel = $rTypes[$relType]['label_b_a'];
-          $_rTypeFrom .= "
+          $cache['from'] .= "
 INNER JOIN civicrm_relationship displayRelType ON ( displayRelType.contact_id_b = contact_a.id )
 INNER JOIN $tableName transform_temp ON ( transform_temp.contact_id = displayRelType.contact_id_a )
 ";
         }
-        $_rTypeWhere = "
+        $cache['where'] = "
 WHERE displayRelType.relationship_type_id = $relType
 AND   displayRelType.is_active = 1
 ";
       }
       $this->_qill[0][] = $qillMessage . "'" . $relationshipTypeLabel . "'";
+      $_rTempCache[$arg_sig] = $cache;
     }
 
-    if (!empty($this->_permissionWhereClause)) {
-      $_rTypeWhere .= "AND $this->_permissionWhereClause";
-    }
-
-    if (strpos($from, $_rTypeFrom) === FALSE) {
+    if (strpos($from, $cache['from']) === FALSE) {
       // lets replace all the INNER JOIN's in the $from so we dont exclude other data
       // this happens when we have an event_type in the quert (CRM-7969)
       $from = str_replace("INNER JOIN", "LEFT JOIN", $from);
-      $from .= $_rTypeFrom;
-      $where = $_rTypeWhere;
+      $from .= $cache['from'];
+      $where = $cache['where'];
+      if (!empty($this->_permissionWhereClause)) {
+        $where .= "AND $this->_permissionWhereClause";
+      }
     }
 
     $having = NULL;
