@@ -13,3 +13,9 @@ ALTER TABLE civicrm_custom_field ALTER column is_active SET DEFAULT 1;
 SET @UKCountryId = (SELECT id FROM civicrm_country cc WHERE cc.name = 'United Kingdom');
 INSERT INTO civicrm_state_province (country_id, abbreviation, name)
 VALUES (@UKCountryId, 'MON', 'Monmouthshire');
+
+{* Fix is_reserved flag on civicrm_option_group table *}
+UPDATE civicrm_option_group AS cog INNER JOIN civicrm_custom_field AS ccf
+ON cog.id = ccf.option_group_id
+SET cog.is_reserved = 0 WHERE cog.is_active = 1 AND ccf.is_active = 1;
+UPDATE civicrm_option_group SET is_reserved = 1 WHERE name='environment';
