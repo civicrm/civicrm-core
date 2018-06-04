@@ -965,40 +965,43 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   // TODO // function testActivityDateTime_NonMatch() { }
 
   /**
-   * For contacts/members which match schedule based on join date,
+   * For contacts/members which match schedule based on join/start date,
    * an email should be sent.
    */
-  public function testMembershipJoinDateMatch() {
-    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 1)));
-    $this->assertTrue(is_numeric($membership->id));
-    $result = $this->callAPISuccess('Email', 'create', array(
-      'contact_id' => $membership->contact_id,
-      'email' => 'test-member@example.com',
-      'location_type_id' => 1,
-    ));
-    $this->assertAPISuccess($result);
+  public function testMembershipDateMatch() {
+    foreach (['membership_join_date', 'membership_start_date'] as $date) {
+      $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 1)));
+      $this->assertTrue(is_numeric($membership->id));
+      $result = $this->callAPISuccess('Email', 'create', array(
+        'contact_id' => $membership->contact_id,
+        'email' => 'test-member@example.com',
+        'location_type_id' => 1,
+      ));
+      $this->assertAPISuccess($result);
 
-    $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
-    $actionSchedule = $this->fixtures['sched_membership_join_2week'];
-    $actionSchedule['entity_value'] = $membership->membership_type_id;
-    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
-    $this->assertTrue(is_numeric($actionScheduleDao->id));
+      $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
+      $actionSchedule = $this->fixtures['sched_membership_join_2week'];
+      $actionSchedule['start_action_date'] = $date;
+      $actionSchedule['entity_value'] = $membership->membership_type_id;
+      $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+      $this->assertTrue(is_numeric($actionScheduleDao->id));
 
-    // start_date=2012-03-15 ; schedule is 2 weeks after start_date
-    $this->assertCronRuns(array(
-      array(
-        // Before the 2-week mark, no email.
-        'time' => '2012-03-28 01:00:00',
-        'recipients' => array(),
-        'subjects' => array(),
-      ),
-      array(
-        // After the 2-week mark, send an email.
-        'time' => '2012-03-29 01:00:00',
-        'recipients' => array(array('test-member@example.com')),
-        'subjects' => array('subject sched_membership_join_2week (joined March 15th, 2012)'),
-      ),
-    ));
+      // start_date=2012-03-15 ; schedule is 2 weeks after start_date
+      $this->assertCronRuns(array(
+        array(
+          // Before the 2-week mark, no email.
+          'time' => '2012-03-28 01:00:00',
+          'recipients' => array(),
+          'subjects' => array(),
+        ),
+        array(
+          // After the 2-week mark, send an email.
+          'time' => '2012-03-29 01:00:00',
+          'recipients' => array(array('test-member@example.com')),
+          'subjects' => array('subject sched_membership_join_2week (joined March 15th, 2012)'),
+        ),
+      ));
+    }
   }
 
 
@@ -1667,6 +1670,82 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->callAPISuccess('custom_group', 'delete', array('id' => $createGroup['id']));
   }
 
+  /**
+   * Test sched reminder set via registration date.
+   */
+  public function testEventTypeRegistrationDate() {
+    //Create contact
+    $contactParams = array(
+      'email' => 'test-event@example.com',
+    );
+    $contact = $this->individualCreate($contactParams);
+    //Add it as a participant to an event ending registration - 7 days from now.
+    $params = array(
+      'start_date' => date('Ymd', strtotime('-5 day')),
+      'end_date' => date('Ymd', strtotime('+7 day')),
+      'registration_start_date' => date('Ymd', strtotime('-5 day')),
+      'registration_end_date' => date('Ymd', strtotime('+7 day')),
+    );
+    $event = $this->eventCreate($params);
+    $this->participantCreate(array('contact_id' => $contact, 'event_id' => $event['id']));
+
+    //Create a scheduled reminder to send email 7 days before registration date.
+    $actionSchedule = $this->fixtures['sched_eventtype_start_1week_before'];
+    $actionSchedule['start_action_offset'] = 7;
+    $actionSchedule['start_action_unit'] = 'day';
+    $actionSchedule['start_action_date'] = 'registration_end_date';
+    $actionSchedule['entity_value'] = $event['values'][$event['id']]['event_type_id'];
+    $actionSchedule['entity_status'] = $this->callAPISuccessGetValue('ParticipantStatusType', array(
+      'return' => "id",
+      'name' => "Attended",
+    ));
+    $actionSched = $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
+    //Run the cron and verify if an email was sent.
+    $this->assertCronRuns(array(
+      array(
+        'time' => date('Y-m-d'),
+        'recipients' => array(array('test-event@example.com')),
+      ),
+    ));
+
+    //Create contact 2
+    $contactParams = array(
+      'email' => 'test-event2@example.com',
+    );
+    $contact2 = $this->individualCreate($contactParams);
+    //Create an event with registration end date = 2 week from now.
+    $params['end_date'] = date('Ymd', strtotime('+2 week'));
+    $params['registration_end_date'] = date('Ymd', strtotime('+2 week'));
+    $event2 = $this->eventCreate($params);
+    $this->participantCreate(array('contact_id' => $contact2, 'event_id' => $event2['id']));
+
+    //Assert there is no reminder sent to the contact.
+    $this->assertCronRuns(array(
+      array(
+        'time' => date('Y-m-d'),
+        'recipients' => array(),
+      ),
+    ));
+
+    //Modify the sched reminder to be sent 2 week from registration end date.
+    $this->callAPISuccess('action_schedule', 'create', array(
+      'id' => $actionSched['id'],
+      'start_action_offset' => 2,
+      'start_action_unit' => 'week',
+    ));
+
+    //Contact should receive the reminder now.
+    $this->assertCronRuns(array(
+      array(
+        'time' => date('Y-m-d'),
+        'recipients' => array(array('test-event2@example.com')),
+      ),
+    ));
+  }
+
+  /**
+   * Test sched reminder set via start date.
+   */
   public function testEventTypeStartDate() {
     // Create event+participant with start_date = 20120315, end_date = 20120615.
     $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], array('status_id' => 2)));
