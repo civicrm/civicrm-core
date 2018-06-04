@@ -340,37 +340,37 @@ class CRM_Admin_Page_AJAX {
         }
       }
       else {
-        $style = '';
-        if ($dao->color) {
-          $style = "background-color: {$dao->color}; color: " . CRM_Utils_Color::getContrast($dao->color);
-        }
         $hasChildTags = empty($childTagIDs[$dao->id]) ? FALSE : TRUE;
         $usedFor = (array) explode(',', $dao->used_for);
-        $result[] = array(
+        $tag = [
           'id' => $dao->id,
           'text' => $dao->name,
-          'icon' => FALSE,
-          'li_attr' => array(
-            'title' => ((string) $dao->description) . ($dao->is_reserved ? ' (*' . ts('Reserved') . ')' : ''),
-            'class' => $dao->is_reserved ? 'is-reserved' : '',
-          ),
-          'a_attr' => array(
-            'style' => $style,
+          'a_attr' => [
             'class' => 'crm-tag-item',
-          ),
+          ],
           'children' => $hasChildTags,
-          'data' => array(
+          'data' => [
             'description' => (string) $dao->description,
             'is_selectable' => (bool) $dao->is_selectable,
             'is_reserved' => (bool) $dao->is_reserved,
             'used_for' => $usedFor,
             'color' => $dao->color ? $dao->color : '#ffffff',
-            'usages' => civicrm_api3('EntityTag', 'getcount', array(
-              'entity_table' => array('IN' => $usedFor),
+            'usages' => civicrm_api3('EntityTag', 'getcount', [
+              'entity_table' => ['IN' => $usedFor],
               'tag_id' => $dao->id,
-            )),
-          ),
-        );
+            ]),
+          ],
+        ];
+        if ($dao->description || $dao->is_reserved) {
+          $tag['li_attr']['title'] = ((string) $dao->description) . ($dao->is_reserved ? ' (*' . ts('Reserved') . ')' : '');
+        }
+        if ($dao->is_reserved) {
+          $tag['li_attr']['class'] = 'is-reserved';
+        }
+        if ($dao->color) {
+          $tag['a_attr']['style'] = "background-color: {$dao->color}; color: " . CRM_Utils_Color::getContrast($dao->color);
+        }
+        $result[] = $tag;
       }
     }
 
