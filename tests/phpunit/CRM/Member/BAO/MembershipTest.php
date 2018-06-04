@@ -75,6 +75,87 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->_contactID = $this->_membershipStatusID = $this->_membershipTypeID = NULL;
   }
 
+  /**
+   * Create membership type using given organization id.
+   * @param $organizationId
+   * @return array|int
+   */
+  private function createMembershipType($organizationId, $withRelationship = FALSE) {
+    $membershipType = $this->callAPISuccess('MembershipType', 'create', array(
+        'domain_id' => 1, //Default domain ID
+        'member_of_contact_id' => $organizationId,
+        'financial_type_id' => "Member Dues",
+        'duration_unit' => "year",
+        'duration_interval' => 1,
+        'period_type' => "rolling",
+        'is_active' => TRUE,
+        'name' => "Organiation Membership Type",
+        'relationship_type_id' => ($withRelationship) ? 5 : NULL,
+        'relationship_direction' => ($withRelationship) ? 'b_a' : NULL,
+    ));
+    return $membershipType["values"][$membershipType["id"]];
+  }
+
+  /**
+   * Get count of related memberships by parent membership id.
+   * @param $membershipId
+   * @return array|int
+   */
+  private function getRelatedMembershipsCount($membershipId) {
+    return $this->callAPISuccess("Membership", "getcount", array(
+        'owner_membership_id' => $membershipId,
+    ));
+  }
+
+  /**
+   * Test to delete related membership when type of parent memebrship is changed which does not have relation type associated.
+   * @throws CRM_Core_Exception
+   */
+  public function testDeleteRelatedMembershipsOnParentTypeChanged() {
+
+    $contactId = $this->individualCreate();
+    $membershipOrganizationId = $this->organizationCreate();
+    $organizationId = $this->organizationCreate();
+
+    // Create relationship between organization and individual contact
+    $this->callAPISuccess('Relationship', 'create', array(
+        'relationship_type_id' => 5, // Employer of relationship
+        'contact_id_a'         => $contactId,
+        'contact_id_b'         => $organizationId,
+        'is_active'            => 1,
+    ));
+
+    // Create two membership types one with relationship and one without.
+    $membershipTypeWithRelationship = $this->createMembershipType($membershipOrganizationId, TRUE);
+    $membershipTypeWithoutRelationship = $this->createMembershipType($membershipOrganizationId);
+
+    // Creating membership of organisation
+    $membership = $this->callAPISuccess("Membership", "create", array(
+        'membership_type_id' => $membershipTypeWithRelationship["id"],
+        'contact_id'         => $organizationId,
+        'skipRecentView'     => TRUE,
+        'status_id'          => $this->_membershipStatusID,
+    ));
+
+    $membership = $membership["values"][$membership["id"]];
+
+    // Check count of related memberships. It should be one for individual contact.
+    $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
+    $this->assertEquals(1, $relatedMembershipsCount, 'Related membership count should be 1.');
+
+    // Update membership by changing it's type. New membership type is without relationship.
+    $membership["membership_type_id"] = $membershipTypeWithoutRelationship["id"];
+    $membership["skipRecentView"] = TRUE;
+    $updatedMembership = $this->callAPISuccess("Membership", "create", $membership);
+
+    // Check count of related memberships again. It should be zero as we changed the membership type.
+    $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
+    $this->assertEquals(0, $relatedMembershipsCount, 'Related membership count should be 0.');
+
+    // Clean up: Delete membership
+    $this->membershipDelete($membership["id"]);
+  }
+
   public function testCreate() {
 
     $contactId = Contact::createIndividual();
