@@ -2375,16 +2375,16 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   public static function extractFormValues($form, $changeToday, $membershipTypeDetails, $pending = FALSE) {
     //@todo this is a BAO function & should not inspect the form - the form should do this
     // & pass required params to the BAO
-    if (CRM_Utils_Array::value('minimum_fee', $membershipTypeDetails) > 0.0) {
-      if (((isset($form->_contributeMode) && $form->_contributeMode == 'notify') || !empty($form->_params['is_pay_later'])
-        ) &&
-        (($form->_values['is_monetary'] && $form->_amount > 0.0) ||
+
+    if (((isset($form->_contributeMode) && $form->_contributeMode == 'notify') || !empty($form->_params['is_pay_later'])
+      ) &&
+        (($form->_values['is_monetary']) ||
           CRM_Utils_Array::value('record_contribution', $form->_params)
         )
       ) {
-        $pending = TRUE;
-      }
+      $pending = TRUE;
     }
+
     $contributionRecurID = isset($form->_params['contributionRecurID']) ? $form->_params['contributionRecurID'] : NULL;
 
     //we renew expired membership, CRM-6277
