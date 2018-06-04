@@ -569,11 +569,28 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     return $r;
   }
 
-  /**
-   * This test is designed to ensure that when a custom field is updated via the
-   * API, params that are not supplied do not revert to the defaults. This was
-   * happening with, for example, is_searchable
-   */
+  public function testMakeSearchableContactReferenceFieldUnsearchable() {
+    $customGroup = $this->customGroupCreate(array(
+      'name' => 'testCustomGroup',
+      'title' => 'testCustomGroup',
+      'extends' => 'Individual',
+    ));
+    $params = array(
+      'name' => 'testCustomField',
+      'label' => 'testCustomField',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'ContactReference',
+      'html_type' => 'Autocomplete-Select',
+      'is_searchable' => '1',
+    );
+    $result = $this->callAPISuccess('CustomField', 'create', $params);
+    $params = [
+      'id' => $result['id'],
+      'is_searchable' => 0,
+    ];
+    $result = $this->callAPISuccess('CustomField', 'create', $params);
+  }
+
   public function testDisableSearchableContactReferenceField() {
     $customGroup = $this->customGroupCreate(array(
       'name' => 'testCustomGroup',
