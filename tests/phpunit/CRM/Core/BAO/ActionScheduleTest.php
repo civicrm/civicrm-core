@@ -1699,12 +1699,46 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'return' => "id",
       'name' => "Attended",
     ));
-    $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
+    $actionSched = $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
     //Run the cron and verify if an email was sent.
     $this->assertCronRuns(array(
       array(
         'time' => date('Y-m-d'),
         'recipients' => array(array('test-event@example.com')),
+      ),
+    ));
+
+    //Create contact 2
+    $contactParams = array(
+      'email' => 'test-event2@example.com',
+    );
+    $contact2 = $this->individualCreate($contactParams);
+    //Create an event with registration end date = 2 week from now.
+    $params['end_date'] = date('Ymd', strtotime('+2 week'));
+    $params['registration_end_date'] = date('Ymd', strtotime('+2 week'));
+    $event2 = $this->eventCreate($params);
+    $this->participantCreate(array('contact_id' => $contact2, 'event_id' => $event2['id']));
+
+    //Assert there is no reminder sent to the contact.
+    $this->assertCronRuns(array(
+      array(
+        'time' => date('Y-m-d'),
+        'recipients' => array(),
+      ),
+    ));
+
+    //Modify the sched reminder to be sent 2 week from registration end date.
+    $this->callAPISuccess('action_schedule', 'create', array(
+      'id' => $actionSched['id'],
+      'start_action_offset' => 2,
+      'start_action_unit' => 'week',
+    ));
+
+    //Contact should receive the reminder now.
+    $this->assertCronRuns(array(
+      array(
+        'time' => date('Y-m-d'),
+        'recipients' => array(array('test-event2@example.com')),
       ),
     ));
   }
