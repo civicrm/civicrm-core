@@ -479,7 +479,6 @@ class CRM_Utils_Rule {
     return preg_match('/^[a-zA-Z0-9_-]*$/', $value) ? TRUE : FALSE;
   }
 
-
   /**
    * @param $value
    * @param $noOfDigit
