@@ -63,7 +63,7 @@ class CRM_Core_Payment_Form {
       $form->assign('paymentTypeName', $paymentTypeName);
       $form->assign('paymentTypeLabel', $paymentTypeLabel);
 
-      $form->billingFieldSets[$paymentTypeName]['fields'] = $form->_paymentFields = array_intersect_key(self::getPaymentFieldMetadata($processor), array_flip($paymentFields));
+      $form->billingFieldSets[$paymentTypeName]['fields'] = $form->_paymentFields = array_intersect_key(self::getPaymentFieldMetadata($processor, $isBackOffice), array_flip($paymentFields));
       if (in_array('cvv2', $paymentFields) && $isBackOffice) {
         if (!civicrm_api3('setting', 'getvalue', array('name' => 'cvv_backoffice_required', 'group' => 'Contribute Preferences'))) {
           $form->billingFieldSets[$paymentTypeName]['fields'][array_search('cvv2', $paymentFields)]['required'] = 0;
@@ -252,9 +252,9 @@ class CRM_Core_Payment_Form {
    *
    * @return array
    */
-  public static function getPaymentFieldMetadata($paymentProcessor) {
+  public static function getPaymentFieldMetadata($paymentProcessor, $isBackOffice = FALSE) {
     $paymentProcessorObject = CRM_Core_Payment::singleton(($paymentProcessor['is_test'] ? 'test' : 'live'), $paymentProcessor);
-    return $paymentProcessorObject->getPaymentFormFieldsMetadata();
+    return $paymentProcessorObject->getPaymentFormFieldsMetadata($isBackOffice);
   }
 
   /**
