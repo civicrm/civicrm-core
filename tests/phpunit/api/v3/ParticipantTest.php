@@ -25,15 +25,13 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  * Test class for Batch API - civicrm_participant_*
  *
  * @package CiviCRM_APIv3
  */
 require_once 'CRM/Utils/DeprecatedUtils.php';
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 
 /**
  * Class api_v3_ParticipantTest

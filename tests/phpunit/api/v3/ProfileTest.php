@@ -26,11 +26,6 @@
  */
 
 /**
- *  Include class definitions
- */
-require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
-
-/**
  *  Test APIv3 civicrm_profile_* functions
  *
  * @package   CiviCRM

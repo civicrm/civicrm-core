@@ -1,8 +1,6 @@
 <?php
 namespace Civi\API;
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  */
 class RequestTest extends \CiviUnitTestCase {

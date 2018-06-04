@@ -11,8 +11,17 @@
          bootstrap="tests/phpunit/CiviTest/bootstrap.php"
 >
   <testsuites>
-    <testsuite name="CiviCRM Test Suite">
-      <directory>./tests/phpunit/</directory>
+    <testsuite name="api_v3_AllTests">
+      <directory>./tests/phpunit/api</directory>
+    </testsuite>
+    <testsuite name="CRM_AllTests">
+      <directory>./tests/phpunit/CRM</directory>
+    </testsuite>
+    <testsuite name="Civi_AllTests">
+      <directory>./tests/phpunit/Civi</directory>
+    </testsuite>
+    <testsuite name="WebTest_AllTests">
+      <directory>./tests/phpunit/WebTest</directory>
     </testsuite>
   </testsuites>
 

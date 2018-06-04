@@ -1,5 +1,4 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  * Class CRM_Case_BAO_CaseTest

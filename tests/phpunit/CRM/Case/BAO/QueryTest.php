@@ -1,5 +1,5 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 /**
  *  Include dataProvider for tests
  */

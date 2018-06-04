@@ -4,8 +4,6 @@ namespace Civi\API\Subscriber;
 use \Civi\API\Kernel;
 use \Symfony\Component\EventDispatcher\EventDispatcher;
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
 /**
  */
 class DynamicFKAuthorizationTest extends \CiviUnitTestCase {

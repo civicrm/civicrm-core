@@ -25,8 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
-
 /**
  * Class contains api test cases for "civicrm_note"
  */
