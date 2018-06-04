@@ -95,7 +95,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
    */
   public function edit() {
     // set https for offline cc transaction
-    $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
+    $mode = CRM_Utils_Request::retrieve('mode', 'Alphanumeric', $this);
     if ($mode == 'test' || $mode == 'live') {
       CRM_Utils_System::redirectToSSL();
     }
