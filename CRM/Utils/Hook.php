@@ -1364,6 +1364,19 @@ abstract class CRM_Utils_Hook {
    *
    * @return mixed
    */
+  public static function preSave(&$dao) {
+    $hookName = 'civicrm_preSave_' . $dao->getTableName();
+    return self::singleton()->invoke(array('dao'), $dao,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      $hookName
+    );
+  }
+
+  /**
+   * @param CRM_Core_DAO $dao
+   *
+   * @return mixed
+   */
   public static function postSave(&$dao) {
     $hookName = 'civicrm_postSave_' . $dao->getTableName();
     return self::singleton()->invoke(array('dao'), $dao,
