@@ -129,7 +129,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     //set the payment mode - _mode property is defined in parent class
-    $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
+    $this->_mode = CRM_Utils_Request::retrieve('mode', 'Alphanumeric', $this);
 
     if (!empty($this->_mode) && $this->_paymentType == 'refund') {
       CRM_Core_Error::fatal(ts('Credit card payment is not for Refund payments use'));
