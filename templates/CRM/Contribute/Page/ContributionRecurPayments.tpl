@@ -11,6 +11,7 @@
           <th class='crm-contact-receive_date'>{ts}Recieved{/ts}</th>
           <th class='crm-contact-thankyou_date'>{ts}Thank-you Sent{/ts}</th>
           <th class='crm-contact-contribution_status'>{ts}Status{/ts}</th>
+          <th class='crm-contact-contribution_premium'>{ts}Premium{/ts}</th>
           <th>&nbsp;</th>
         </tr>
         </thead>
@@ -27,6 +28,7 @@
             { data: 'formatted_receive_date' },
             { data: 'formatted_thankyou_date' },
             { data: 'contribution_status_label' },
+            { data: 'product_name' },
             { data: 'action' }
           ]
         });
