@@ -136,23 +136,24 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       $params['max_multiple'] >= '0'
     ) ? $params['max_multiple'] : 'null' : 'null';
 
-    $tableName = $oldTableName = NULL;
+    $tableName = $tableNameNeedingIndexUpdate = NULL;
     if (isset($params['id'])) {
       $group->id = $params['id'];
-      //check whether custom group was changed from single-valued to multiple-valued
-      $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
-        $params['id'],
-        'is_multiple'
-      );
 
-      if ((!empty($params['is_multiple']) || $isMultiple) &&
-        ($params['is_multiple'] != $isMultiple)
-      ) {
-        $oldTableName = CRM_Core_DAO::getFieldValue(
-          'CRM_Core_DAO_CustomGroup',
+      if (isset($params['is_multiple'])) {
+        //check whether custom group was changed from single-valued to multiple-valued
+        $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
           $params['id'],
-          'table_name'
+          'is_multiple'
         );
+
+        if ($params['is_multiple'] != $isMultiple) {
+          $tableNameNeedingIndexUpdate = CRM_Core_DAO::getFieldValue(
+            'CRM_Core_DAO_CustomGroup',
+            $params['id'],
+            'table_name'
+          );
+        }
       }
     }
     else {
@@ -202,8 +203,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       // now create the table associated with this group
       self::createTable($group);
     }
-    elseif ($oldTableName) {
-      CRM_Core_BAO_SchemaHandler::changeUniqueToIndex($oldTableName, CRM_Utils_Array::value('is_multiple', $params));
+    elseif ($tableNameNeedingIndexUpdate) {
+      CRM_Core_BAO_SchemaHandler::changeUniqueToIndex($tableNameNeedingIndexUpdate, CRM_Utils_Array::value('is_multiple', $params));
     }
 
     if (CRM_Utils_Array::value('overrideFKConstraint', $params) == 1) {
