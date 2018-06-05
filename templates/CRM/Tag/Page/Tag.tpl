@@ -286,6 +286,7 @@
                   return {parent_id: node.id === '#' ? tagset : node.id};
                 }
               },
+              themes: {icons: false},
               check_callback: true
             },
             'search': {
