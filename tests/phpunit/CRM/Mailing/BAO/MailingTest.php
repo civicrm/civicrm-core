@@ -125,8 +125,46 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     $this->assertRecipientsCorrect($mailingID, $expectedContactIDs);
 
     $this->cleanUpAfterACLs();
+    $this->callAPISuccess('Group', 'Delete', ['id' => $groupID]);
     $this->contactDelete($contactID1);
     $this->contactDelete($this->allowedContactId);
+  }
+
+  /**
+   * Test verify that a disabled mailing group doesn't prvent access to the mailing generated with the group.
+   */
+  public function testGetMailingDisabledGroup() {
+    $this->prepareForACLs();
+    $this->createLoggedInUser();
+    // create hook to build ACL where clause which choses $this->allowedContactId as the only contact to be considered as mail recipient
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereAllowedOnlyOne'));
+    $this->hookClass->setHook('civicrm_aclGroup', array($this, 'hook_civicrm_aclGroup'));
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'edit groups');
+    // Create dummy group and assign 2 contacts
+    $name = 'Test static group ' . substr(sha1(rand()), 0, 7);
+    $groupID = $this->groupCreate([
+      'name' => $name,
+      'title' => $name,
+      'is_active' => 1,
+    ]);
+    $contactID = $this->individualCreate(array(), 0);
+    $this->callAPISuccess('GroupContact', 'Create', array(
+      'group_id' => $groupID,
+      'contact_id' => $contactID,
+    ));
+
+    // Create dummy mailing
+    $mailingID = $this->callAPISuccess('Mailing', 'create', array())['id'];
+    $this->createMailingGroup($mailingID, $groupID);
+    // Now disable the group.
+    $this->callAPISuccess('group', 'create', [
+      'id' => $groupID,
+      'is_active' => 0,
+    ]);
+    $groups = CRM_Mailing_BAO_Mailing::mailingACLIDs();
+    $this->assertTrue(in_array($groupID, $groups));
+    $this->cleanUpAfterACLs();
+    $this->contactDelete($contactID);
   }
 
   /**
@@ -143,6 +181,37 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   public function aclWhereAllowedOnlyOne($type, &$tables, &$whereTables, &$contactID, &$where) {
     $where = " contact_a.id = " . $this->allowedContactId;
   }
+
+  /**
+   * Implements ACLGroup hook.
+   *
+   * @implements CRM_Utils_Hook::aclGroup
+   *
+   * aclGroup function returns a list of permitted groups
+   * @param string $type
+   * @param int $contactID
+   * @param string $tableName
+   * @param array $allGroups
+   * @param array $currentGroups
+   */
+  public function hook_civicrm_aclGroup($type, $contactID, $tableName, &$allGroups, &$currentGroups) {
+    //don't use api - you will get a loop
+    $sql = " SELECT * FROM civicrm_group";
+    $groups = array();
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    while ($dao->fetch()) {
+      $groups[] = $dao->id;
+    }
+    if (!empty($allGroups)) {
+      //all groups is empty if we really mean all groups but if a filter like 'is_disabled' is already applied
+      // it is populated, ajax calls from Manage Groups will leave empty but calls from New Mailing pass in a filtered list
+      $currentGroups = array_intersect($groups, array_flip($allGroups));
+    }
+    else {
+      $currentGroups = $groups;
+    }
+  }
+
 
   /**
    * @todo Missing tests:
