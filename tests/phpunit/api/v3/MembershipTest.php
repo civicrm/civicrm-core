@@ -631,6 +631,28 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('membership', 'get', $params);
     $this->assertEquals(0, $result['count']);
 
+    //Create pay_later membership for organization.
+    $employerId[2] = $this->organizationCreate(array(), 1);
+    $params = array(
+      'contact_id' => $employerId[2],
+      'membership_type_id' => $membershipTypeId,
+      'source' => 'Test pay later suite',
+      'is_pay_later' => 1,
+      'status_id' => 5,
+    );
+    $organizationMembership = CRM_Member_BAO_Membership::add($params);
+    $organizationMembershipID = $organizationMembership->id;
+    $memberContactId[3] = $this->individualCreate(array('employer_id' => $employerId[2]), 0);
+    // Check that the employee inherited the membership
+    $params = array(
+      'contact_id' => $memberContactId[3],
+      'membership_type_id' => $membershipTypeId,
+    );
+    $result = $this->callAPISuccess('membership', 'get', $params);
+    $this->assertEquals(1, $result['count']);
+    $result = $result['values'][$result['id']];
+    $this->assertEquals($organizationMembershipID, $result['owner_membership_id']);
+
     // Set up params for enable/disable checks
     $relationship1 = $this->callAPISuccess('relationship', 'get', array('contact_id_a' => $memberContactId[1]));
     $params = array(
