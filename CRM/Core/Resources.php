@@ -690,7 +690,7 @@ class CRM_Core_Resources {
         'filters' => self::getEntityRefFilters(),
       ),
       'ajaxPopupsEnabled' => self::singleton()->ajaxPopupsEnabled,
-      'allowAlertAutodismissal' => Civi::settings()->get('allow_alert_autodismissal'),
+      'allowAlertAutodismissal' => (bool) Civi::settings()->get('allow_alert_autodismissal'),
     );
     print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $vars);
     CRM_Utils_System::civiExit();
