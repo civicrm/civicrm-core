@@ -66,7 +66,7 @@ CRM.$(function($) {
     });
     $("#importProgressBar" ).progressbar({value:0});
     $("#importProgressBar").show( );
-    loop = window.setInterval(setIntermediate, 5)
+    loop = window.setInterval(setIntermediate, 5000)
   }
 });
 </script>
