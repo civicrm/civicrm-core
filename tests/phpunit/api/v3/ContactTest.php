@@ -3829,11 +3829,20 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ),
     );
     $g2ID = $this->smartGroupCreate($ssParams, array('name' => uniqid(), 'title' => uniqid()));
+    $ssParams = array(
+      'formValues' => array(
+        'display_relationship_type' => $rtype2['id'] . '_b_a', // Household Member is
+      ),
+    );
+    // the reverse of g2 which adds another layer for overlap at related contact filter
+    $g3ID = $this->smartGroupCreate($ssParams, array('name' => uniqid(), 'title' => uniqid()));
     CRM_Contact_BAO_GroupContactCache::loadAll();
     $g1Contacts = $this->callAPISuccess('contact', 'get', array('group' => $g1ID));
     $g2Contacts = $this->callAPISuccess('contact', 'get', array('group' => $g2ID));
+    $g3Contacts = $this->callAPISuccess('contact', 'get', array('group' => $g3ID));
     $this->assertTrue($g1Contacts['count'] == 1);
     $this->assertTrue($g2Contacts['count'] == 2);
+    $this->assertTrue($g3Contacts['count'] == 1);
   }
 
 }

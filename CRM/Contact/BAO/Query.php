@@ -5783,11 +5783,14 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
       Civi::$statics[__CLASS__]['related_contacts_filter'] = array();
     }
     $_rTempCache =& Civi::$statics[__CLASS__]['related_contacts_filter'];
+    // since there only can be one instance of this filter in every query
     // skip if filter has already applied
     foreach ($_rTempCache as $acache) {
-      if (strpos($from, $acache['from']) !== FALSE) {
-        $having = NULL;
-        return;
+      foreach ($acache['queries'] as $aqcache) {
+        if (strpos($from, $aqcache['from']) !== FALSE) {
+          $having = NULL;
+          return;
+        }
       }
     }
     $arg_sig = sha1("$from $where $having");
@@ -5795,12 +5798,9 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
       $cache = $_rTempCache[$arg_sig];
     }
     else {
-      $cache = array(
-        "from" => "",
-        "where" => "",
-      );
       // create temp table with contact ids
       $tableName = CRM_Core_DAO::createTempTableName('civicrm_transform', TRUE);
+
       $sql = "CREATE TEMPORARY TABLE $tableName ( contact_id int primary key) ENGINE=HEAP";
       CRM_Core_DAO::executeQuery($sql);
 
@@ -5813,16 +5813,27 @@ SELECT contact_a.id
 ";
       CRM_Core_DAO::executeQuery($sql);
 
-      $qillMessage = ts('Contacts with a Relationship Type of: ');
+      $cache = array('tableName' => $tableName, 'queries' => array());
+      $_rTempCache[$arg_sig] = $cache;
+    }
+    // upsert the query depending on relationship type
+    if (isset($cache['queries'][$this->_displayRelationshipType])) {
+      $qcache = $cache['queries'][$this->_displayRelationshipType];
+    }
+    else {
+      $tableName = $cache['tableName'];
+      $qcache = array(
+        "from" => "",
+        "where" => "",
+      );
       $rTypes = CRM_Core_PseudoConstant::relationshipType();
-
       if (is_numeric($this->_displayRelationshipType)) {
         $relationshipTypeLabel = $rTypes[$this->_displayRelationshipType]['label_a_b'];
-        $cache['from'] = "
+        $qcache['from'] = "
 INNER JOIN civicrm_relationship displayRelType ON ( displayRelType.contact_id_a = contact_a.id OR displayRelType.contact_id_b = contact_a.id )
 INNER JOIN $tableName transform_temp ON ( transform_temp.contact_id = displayRelType.contact_id_a OR transform_temp.contact_id = displayRelType.contact_id_b )
 ";
-        $cache['where'] = "
+        $qcache['where'] = "
 WHERE displayRelType.relationship_type_id = {$this->_displayRelationshipType}
 AND   displayRelType.is_active = 1
 ";
@@ -5831,33 +5842,37 @@ AND   displayRelType.is_active = 1
         list($relType, $dirOne, $dirTwo) = explode('_', $this->_displayRelationshipType);
         if ($dirOne == 'a') {
           $relationshipTypeLabel = $rTypes[$relType]['label_a_b'];
-          $cache['from'] .= "
+          $qcache['from'] .= "
 INNER JOIN civicrm_relationship displayRelType ON ( displayRelType.contact_id_a = contact_a.id )
 INNER JOIN $tableName transform_temp ON ( transform_temp.contact_id = displayRelType.contact_id_b )
 ";
         }
         else {
           $relationshipTypeLabel = $rTypes[$relType]['label_b_a'];
-          $cache['from'] .= "
+          $qcache['from'] .= "
 INNER JOIN civicrm_relationship displayRelType ON ( displayRelType.contact_id_b = contact_a.id )
 INNER JOIN $tableName transform_temp ON ( transform_temp.contact_id = displayRelType.contact_id_a )
 ";
         }
-        $cache['where'] = "
+        $qcache['where'] = "
 WHERE displayRelType.relationship_type_id = $relType
 AND   displayRelType.is_active = 1
 ";
       }
-      $this->_qill[0][] = $qillMessage . "'" . $relationshipTypeLabel . "'";
-      $_rTempCache[$arg_sig] = $cache;
+      $qcache['relTypeLabel'] = $relationshipTypeLabel;
+      $_rTempCache[$arg_sig]['queries'][$this->_displayRelationshipType] = $qcache;
     }
-
-    if (strpos($from, $cache['from']) === FALSE) {
+    $qillMessage = ts('Contacts with a Relationship Type of: ');
+    $iqill = $qillMessage . "'" . $qcache['relTypeLabel'] . "'";
+    if (!is_array($this->_qill[0]) || !in_array($iqill, $this->_qill[0])) {
+      $this->_qill[0][] = $iqill;
+    }
+    if (strpos($from, $qcache['from']) === FALSE) {
       // lets replace all the INNER JOIN's in the $from so we dont exclude other data
       // this happens when we have an event_type in the quert (CRM-7969)
       $from = str_replace("INNER JOIN", "LEFT JOIN", $from);
-      $from .= $cache['from'];
-      $where = $cache['where'];
+      $from .= $qcache['from'];
+      $where = $qcache['where'];
       if (!empty($this->_permissionWhereClause)) {
         $where .= "AND $this->_permissionWhereClause";
       }
