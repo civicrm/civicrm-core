@@ -907,7 +907,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
             break;
 
           case 'CheckBox':
-          case 'AdvMulti-Select':
           case 'Multi-Select':
 
             if (!empty($formatted[$key]) && !empty($params[$key])) {
@@ -1217,7 +1216,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
             $htmlType = CRM_Utils_Array::value('html_type', $customFields[$customFieldID]);
             switch ($htmlType) {
               case 'CheckBox':
-              case 'AdvMulti-Select':
               case 'Multi-Select':
                 if ($val) {
                   $mulValues = explode(',', $val);
