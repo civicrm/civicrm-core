@@ -506,6 +506,27 @@ class CRM_Utils_Rule {
   }
 
   /**
+   * Test whether $value is alphanumeric.
+   *
+   * Underscores and dashes are also allowed!
+   *
+   * This is the type of string you could expect to see in URL parameters
+   * like `?mode=live` vs `?mode=test`. This function exists so that we can be
+   * strict about what we accept for such values, thus mitigating against
+   * potential security issues.
+   *
+   * @see \CRM_Utils_RuleTest::alphanumericData
+   *   for examples of vales that give TRUE/FALSE here
+   *
+   * @param $value
+   *
+   * @return bool
+   */
+  public static function alphanumeric($value) {
+    return preg_match('/^[a-zA-Z0-9_-]*$/', $value) ? TRUE : FALSE;
+  }
+
+  /**
    * @param $value
    * @param $noOfDigit
    *
