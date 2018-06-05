@@ -166,11 +166,15 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * contact 5 : smart 3 (inc)
    * contact 6 : smart 4 (inc)
    * contact 7 : smart 4 (inc)
+   * contact 8 : smart 5 (base)
+   *
+   * here 'contact 1 : static 0 (inc)' identified as static group $groupIDs[0]
+   *  that has 'contact 1' identified as $contactIDs[0] and Included in the mailing recipient list
    */
   public function testgetRecipientsEmailGroupIncludeExclude() {
-    // Set up groups; 3 standard, 3 smart
+    // Set up groups; 3 standard, 4 smart
     $groupIDs = array();
-    for ($i = 0; $i < 6; $i++) {
+    for ($i = 0; $i < 7; $i++) {
       $params = array(
         'name' => 'Test static group ' . $i,
         'title' => 'Test static group ' . $i,
@@ -181,21 +185,22 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       }
       else {
         $groupIDs[$i] = $this->smartGroupCreate(array(
-          'formValues' => array('last_name' => 'smart' . $i),
+          'formValues' => ['last_name' => (($i == 6) ? 'smart5' : 'smart' . $i)],
         ), $params);
       }
     }
 
     // Create contacts
     $contactIDs = array(
-      0 => $this->individualCreate(array('last_name' => 'smart5'), 0),
-      1 => $this->individualCreate(array(), 1),
-      2 => $this->individualCreate(array(), 2),
-      3 => $this->individualCreate(array(), 3),
-      4 => $this->individualCreate(array('last_name' => 'smart3'), 4),
-      5 => $this->individualCreate(array('last_name' => 'smart3'), 5),
-      6 => $this->individualCreate(array('last_name' => 'smart4'), 6),
-      7 => $this->individualCreate(array('last_name' => 'smart4'), 7),
+      $this->individualCreate(array('last_name' => 'smart5'), 0),
+      $this->individualCreate(array(), 1),
+      $this->individualCreate(array(), 2),
+      $this->individualCreate(array(), 3),
+      $this->individualCreate(array('last_name' => 'smart3'), 4),
+      $this->individualCreate(array('last_name' => 'smart3'), 5),
+      $this->individualCreate(array('last_name' => 'smart4'), 6),
+      $this->individualCreate(array('last_name' => 'smart4'), 7),
+      $this->individualCreate(array('last_name' => 'smart5'), 8),
     );
 
     // Add contacts to static groups
@@ -221,7 +226,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     ));
 
     // Force rebuild the smart groups
-    for ($i = 3; $i < 6; $i++) {
+    for ($i = 3; $i < 7; $i++) {
       $group = new CRM_Contact_DAO_Group();
       $group->id = $groupIDs[$i];
       $group->find(TRUE);
@@ -233,8 +238,9 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     $mailing = $this->callAPISuccess('Mailing', 'create', array());
     $this->createMailingGroup($mailing['id'], $groupIDs[0]);
     $this->createMailingGroup($mailing['id'], $groupIDs[1]);
+    $this->createMailingGroup($mailing['id'], $groupIDs[6], 'Base');
     $expected = $contactIDs;
-    unset($expected[4], $expected[5], $expected[6], $expected[7]);
+    unset($expected[4], $expected[5], $expected[6], $expected[7], $expected[8]);
     $this->assertRecipientsCorrect($mailing['id'], $expected);
 
     // Check that we can include smart groups in the mailing too.
@@ -243,6 +249,11 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     $this->enableMultilingual();
     $this->createMailingGroup($mailing['id'], $groupIDs[3]);
     $this->createMailingGroup($mailing['id'], $groupIDs[4]);
+    $this->createMailingGroup($mailing['id'], $groupIDs[5]);
+    // Check that all the contacts whould be present is recipient list as static group [0], [1] and [2] and
+    //  smart groups [3], [4] and [5] is included in the recipient listing.
+    //  NOTE: that contact[8] is present in both included smart group[5] and base smart group [6] so it will be
+    // present in recipient list as contact(s) from Base smart groups are not excluded the list as per (dev/mail/13)
     $this->assertRecipientsCorrect($mailing['id'], $contactIDs);
 
     // Check we can exclude static groups from the mailing.
@@ -250,13 +261,18 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     $this->createMailingGroup($mailing['id'], $groupIDs[2], 'Exclude');
     $expected = $contactIDs;
     unset($expected[4]);
+    // NOTE: as per (dev/mail/13) if a contact A is present in smartGroup [5] which is Included in the mailing AND
+    //  also present in another smartGroup [6] which is considered as Base group, then contact A should not be excluded from
+    //  the recipient list due to later
     $this->assertRecipientsCorrect($mailing['id'], $expected);
 
     // Check we can exclude smart groups from the mailing too.
-    // Expected: All contacts except [0] and [4]
+    // Expected: All contacts except [0], [4] and [8]
     $this->createMailingGroup($mailing['id'], $groupIDs[5], 'Exclude');
     $expected = $contactIDs;
-    unset($expected[0], $expected[4]);
+    // As contact [0] and [8] belongs to excluded smart group[5] and base smart group[6] respectively,
+    //  both these contacts should not be present in the mailing list
+    unset($expected[0], $expected[4], $expected[8]);
     $this->assertRecipientsCorrect($mailing['id'], $expected);
 
     // Tear down: delete mailing, groups, contacts
