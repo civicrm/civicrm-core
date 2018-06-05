@@ -1633,7 +1633,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             break;
 
           case 'CheckBox':
-          case 'AdvMulti-Select':
           case 'Multi-Select':
           case 'Multi-Select Country':
           case 'Multi-Select State/Province':
@@ -1667,7 +1666,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
                   if (in_array($htmlType, array(
                     'CheckBox',
                     'Multi-Select',
-                    'AdvMulti-Select',
                   ))) {
                     $submitted[$key] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
                         $mergeValue

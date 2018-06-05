@@ -171,7 +171,7 @@ class CRM_Core_Page_AJAX_Location {
               $elements["onbehalf_{$key}"]['value'][$k] = $v;
             }
           }
-          elseif (strstr($htmlType, 'Multi-Select') && $htmlType != 'AdvMulti-Select') {
+          elseif (strstr($htmlType, 'Multi-Select')) {
             $elements["onbehalf_{$key}"]['type'] = 'Multi-Select';
             $elements["onbehalf_{$key}"]['value'] = array_values($defaults[$key]);
           }

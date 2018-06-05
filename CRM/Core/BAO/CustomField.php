@@ -99,7 +99,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           'Radio' => 'Radio',
           'CheckBox' => 'CheckBox',
           'Multi-Select' => 'Multi-Select',
-          'AdvMulti-Select' => 'AdvMulti-Select',
           'Autocomplete-Select' => 'Autocomplete-Select',
         ),
         array('Text' => 'Text', 'Select' => 'Select', 'Radio' => 'Radio'),
@@ -167,7 +166,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'CheckBox':
-      case 'AdvMulti-Select':
       case 'Multi-Select':
         if (isset($params['default_checkbox_option'])) {
           $tempArray = array_keys($params['default_checkbox_option']);
@@ -821,7 +819,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       'Multi-Select State/Province',
       'Select Country',
       'Multi-Select Country',
-      'AdvMulti-Select',
       'CheckBox',
       'Radio',
     )));
@@ -830,7 +827,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $options = $field->getOptions($search ? 'search' : 'create');
 
       // Consolidate widget types to simplify the below switch statement
-      if ($search || ($widget !== 'AdvMulti-Select' && strpos($widget, 'Select') !== FALSE)) {
+      if ($search || (strpos($widget, 'Select') !== FALSE)) {
         $widget = 'Select';
       }
 
@@ -969,27 +966,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           );
           $qf->addGroup($operators, $elementName . '_operator');
           $qf->setDefaults(array($elementName . '_operator' => 'or'));
-        }
-        break;
-
-      case 'AdvMulti-Select':
-        $element = $qf->addElement(
-          'advmultiselect',
-          $elementName,
-          $label, $options,
-          array(
-            'size' => 5,
-            'style' => '',
-            'class' => 'advmultiselect',
-            'data-crm-custom' => $dataCrmCustomVal,
-          )
-        );
-
-        $element->setButtonAttributes('add', array('value' => ts('Add >>')));
-        $element->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-
-        if ($useRequired && !$search) {
-          $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
         }
         break;
 
@@ -1206,7 +1182,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'Select Country':
       case 'Select State/Province':
       case 'CheckBox':
-      case 'AdvMulti-Select':
       case 'Multi-Select':
       case 'Multi-Select State/Province':
       case 'Multi-Select Country':
@@ -1375,7 +1350,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
     switch ($customField->html_type) {
       case 'CheckBox':
-      case 'AdvMulti-Select':
       case 'Multi-Select':
         $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldId, FALSE);
         $defaults[$elementName] = array();
@@ -1387,9 +1361,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             if ($customField->html_type == 'CheckBox') {
               $defaults[$elementName][$val['value']] = 1;
             }
-            elseif ($customField->html_type == 'Multi-Select' ||
-              $customField->html_type == 'AdvMulti-Select'
-            ) {
+            elseif ($customField->html_type == 'Multi-Select') {
               $defaults[$elementName][$val['value']] = $val['value'];
             }
           }
@@ -1599,9 +1571,7 @@ SELECT id
       }
     }
 
-    if ($customFields[$customFieldId]['html_type'] == 'Multi-Select' ||
-      $customFields[$customFieldId]['html_type'] == 'AdvMulti-Select'
-    ) {
+    if ($customFields[$customFieldId]['html_type'] == 'Multi-Select') {
       if ($value) {
         $value = CRM_Utils_Array::implodePadded($value);
       }
@@ -1611,7 +1581,6 @@ SELECT id
     }
 
     if (($customFields[$customFieldId]['html_type'] == 'Multi-Select' ||
-        $customFields[$customFieldId]['html_type'] == 'AdvMulti-Select' ||
         $customFields[$customFieldId]['html_type'] == 'CheckBox'
       ) &&
       $customFields[$customFieldId]['data_type'] == 'String' &&

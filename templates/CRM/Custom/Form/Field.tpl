@@ -184,18 +184,7 @@
 <script type="text/javascript">
   CRM.$(function($) {
     var $form = $('form.{/literal}{$form.formClass}{literal}'),
-      deprecatedNotice,
       dataTypes = {/literal}{$dataTypeKeys|@json_encode}{literal};
-
-    function deprecatedWidgets() {
-      deprecatedNotice && deprecatedNotice.close && deprecatedNotice.close();
-      switch ($('#data_type_1', $form).val()) {
-        case 'AdvMulti-Select':
-          deprecatedNotice = CRM.alert({/literal}'{ts escape="js"}The old "Advance Multi-Select" widget is being phased out and will be removed in a future version of CiviCRM. "Multi-Select" is the recommended substitute.{/ts}', '{ts escape="js"}Obsolete widget{/ts}'{literal}, 'alert', {expires: 0});
-          break;
-      }
-    }
-    $('#data_type_1', $form).each(deprecatedWidgets).change(deprecatedWidgets);
 
     function showSearchRange() {
       var htmlType = $("[name='data_type[1]']", $form).val(),

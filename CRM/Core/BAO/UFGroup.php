@@ -1321,7 +1321,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           elseif (in_array($htmlType, array(
             'CheckBox',
             'Multi-Select',
-            'AdvMulti-Select',
             'Multi-Select State/Province',
             'Multi-Select Country',
           ))) {
@@ -2388,7 +2387,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             switch ($customFields[$customFieldId]['html_type']) {
               case 'Multi-Select State/Province':
               case 'Multi-Select Country':
-              case 'AdvMulti-Select':
               case 'Multi-Select':
                 $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $details[$name]);
                 foreach ($v as $item) {
