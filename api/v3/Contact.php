@@ -1359,12 +1359,24 @@ function civicrm_api3_contact_duplicatecheck($params) {
   $dupes = CRM_Contact_BAO_Contact::getDuplicateContacts(
     $params['match'],
     $params['match']['contact_type'],
-    'Unsupervised',
+    $params['rule_type'],
     array(),
     CRM_Utils_Array::value('check_permissions', $params),
     CRM_Utils_Array::value('dedupe_rule_id', $params)
   );
-  $values = empty($dupes) ? array() : array_fill_keys($dupes, array());
+  $values = array();
+  if ($dupes && !empty($params['return'])) {
+    return civicrm_api3('Contact', 'get', array(
+      'return' => $params['return'],
+      'id' => array('IN' => $dupes),
+      'options' => CRM_Utils_Array::value('options', $params),
+      'sequential' => CRM_Utils_Array::value('sequential', $params),
+      'check_permissions' => CRM_Utils_Array::value('check_permissions', $params),
+    ));
+  }
+  foreach ($dupes as $dupe) {
+    $values[$dupe] = array('id' => $dupe);
+  }
   return civicrm_api3_create_success($values, $params, 'Contact', 'duplicatecheck');
 }
 
@@ -1378,6 +1390,12 @@ function _civicrm_api3_contact_duplicatecheck_spec(&$params) {
     'title' => 'Dedupe Rule ID (optional)',
     'description' => 'This will default to the built in unsupervised rule',
     'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['rule_type'] = array(
+    'title' => 'Dedupe Rule Type',
+    'description' => 'If no rule id specified, pass "Unsupervised" or "Supervised"',
+    'type' => CRM_Utils_Type::T_STRING,
+    'api.default' => 'Unsupervised',
   );
   // @todo declare 'match' parameter. We don't have a standard for type = array yet.
 }

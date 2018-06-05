@@ -111,8 +111,9 @@
 
   <script type="text/javascript" >
   CRM.$(function($) {
-    var $form = $("form.{/literal}{$form.formClass}{literal}");
-    var action = "{/literal}{$action}{literal}";
+    var $form = $("form.{/literal}{$form.formClass}{literal}"),
+      action = "{/literal}{$action}{literal}",
+      _ = CRM._;
 
     $('.crm-accordion-body').each( function() {
       //remove tab which doesn't have any element
@@ -258,6 +259,90 @@
           $('div' + addClass).last().show();
         });
     });
+
+    {/literal}{* Ajax check for matching contacts *}
+    {if $checkSimilar == 1}
+    var contactType = {$contactType|@json_encode},
+      rules = {*$ruleFields|@json_encode*}{literal}[
+        'first_name',
+        'last_name',
+        'nick_name',
+        'household_name',
+        'organization_name',
+        'email'
+      ],
+      ruleFields = {},
+      $ruleElements = $(),
+      matchMessage,
+      runningCheck = 0;
+    $.each(rules, function(i, field) {
+      // Match regular fields
+      var $el = $('#' + field + ', #' + field + '_1_' + field, $form).filter(':input');
+      // Match custom fields
+      if (!$el.length && field.lastIndexOf('_') > 0) {
+        var pieces = field.split('_');
+        field = 'custom_' + pieces[pieces.length-1];
+        $el = $('#' + field + ', [name=' + field + '_-1]', $form).filter(':input');
+      }
+      if ($el.length) {
+        ruleFields[field] = $el;
+        $ruleElements = $ruleElements.add($el);
+      }
+    });
+    $ruleElements.on('change', checkMatches);
+    function checkMatches() {
+      if ($(this).is('input[type=text]') && $(this).val().length < 3) {
+        return;
+      }
+      var match = {contact_type: contactType},
+        checkNum = ++runningCheck;
+      $.each(ruleFields, function(fieldName, ruleField) {
+        if (ruleField.length > 1) {
+          match[fieldName] = ruleField.filter(':checked').val();
+        } else if (ruleField.is('input[type=text]')) {
+          if (ruleField.val().length > 2) {
+            match[fieldName] = ruleField.val() + '%'; // Todo: remove wildcard when switching to contact.match api
+          }
+        } else {
+          match[fieldName] = ruleField.val();
+        }
+      });
+      // CRM-20565 - Need a good default matching rule before using the dedupe engine for this. Using contact.get for now.
+      // CRM.api3('contact', 'duplicatecheck', {
+      //   match: match,
+      //   rule_type: 'Supervised',
+      //   options: {sort: 'sort_name'},
+      //   return: ['display_name', 'email']
+      // }).done(function(data) {
+      CRM.api3('contact', 'get', _.extend({
+        options: {sort: 'sort_name'},
+        return: ['display_name', 'email']
+      }, match)).done(function(data) {
+        // If a new request has started running, cancel this one.
+        if (checkNum < runningCheck) {
+          return;
+        }
+        // Close msg if it exists
+        matchMessage && matchMessage.close && matchMessage.close();
+        var title = data.count == 1 ? {/literal}"{ts escape='js'}Similar Contact Found{/ts}" : "{ts escape='js'}Similar Contacts Found{/ts}"{literal},
+          msg = "<em>{/literal}{ts escape='js'}If the contact you were trying to add is listed below, click their name to view or edit their record{/ts}{literal}:</em>";
+        if (data.is_error == 1 || data.count == 0) {
+          return;
+        }
+        msg += '<ul class="matching-contacts-actions">';
+        $.each(data.values, function(i, contact) {
+          contact.email = contact.email || '';
+          msg += '<li><a href="'+ CRM.url('civicrm/contact/view', {reset: 1, cid: contact.id}) + '">'+ contact.display_name +'</a> '+contact.email+'</li>';
+        });
+        msg += '</ul>';
+        matchMessage = CRM.alert(msg, title);
+        $('.matching-contacts-actions a').click(function() {
+          // No confirmation dialog on click
+          $('[data-warn-changes=true]').attr('data-warn-changes', 'false');
+        });
+      });
+    }
+    {/literal}{/if}{literal}
   });
 
 </script>
