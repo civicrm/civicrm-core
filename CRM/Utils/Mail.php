@@ -539,4 +539,42 @@ class CRM_Utils_Mail {
     );
   }
 
+  /**
+   * Format an email string from email fields.
+   *
+   * @param array $fields
+   *   The email fields.
+   * @return string
+   *   The formatted email string.
+   */
+  public static function format($fields) {
+    $formattedEmail = '';
+    if (!empty($fields['email'])) {
+      $formattedEmail = $fields['email'];
+    }
+
+    $formattedSuffix = array();
+    if (!empty($fields['is_bulkmail'])) {
+      $formattedSuffix[] = '(' . ts('Bulk') . ')';
+    }
+    if (!empty($fields['on_hold'])) {
+      if ($fields['on_hold'] == 2) {
+        $formattedSuffix[] = '(' . ts('On Hold - Opt Out') . ')';
+      }
+      else {
+        $formattedSuffix[] = '(' . ts('On Hold') . ')';
+      }
+    }
+    if (!empty($fields['signature_html']) || !empty($fields['signature_text'])) {
+      $formattedSuffix[] = '(' . ts('Signature') . ')';
+    }
+
+    // Add suffixes on a new line, if there is any.
+    if (!empty($formattedSuffix)) {
+      $formattedEmail .= "\n" . implode(' ', $formattedSuffix);
+    }
+
+    return $formattedEmail;
+  }
+
 }

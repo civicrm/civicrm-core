@@ -114,8 +114,20 @@
 
           <td>
             {* @TODO check if this is ever an array or a fileName? *}
-            {* This is on one long line for address formatting *}
-            {if $row.title|substr:0:7 == "Address"}<span style="white-space: pre">{else}<span>{/if}{if !is_array($row.other)}{$row.other}{elseif $row.other.fileName}{$row.other.fileName}{else}{', '|implode:$row.other}{/if}</span>
+            {if $row.title|substr:0:5 == "Email"   OR
+                $row.title|substr:0:7 == "Address"}
+              <span style="white-space: pre">
+            {else}
+              <span>
+            {/if}
+            {if !is_array($row.other)}
+              {$row.other}
+            {elseif $row.other.fileName}
+              {$row.other.fileName}
+            {else}
+              {', '|implode:$row.other}
+            {/if}
+            </span>
           </td>
 
           <td style='white-space: nowrap'>
@@ -131,7 +143,8 @@
 
             <td>
               {strip}
-                {if $row.title|substr:0:7 == "Address"}
+                {if $row.title|substr:0:5 == "Email"   OR
+                    $row.title|substr:0:7 == "Address"}
                   <span style="white-space: pre" id="main_{$blockName}_{$blockId}">
                 {else}
                   <span id="main_{$blockName}_{$blockId}">
