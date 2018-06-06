@@ -217,6 +217,11 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             default:
+              // using type of timestamp allows us to sneak in a null into db
+              // gross but effective hack
+              if ($value == NULL) {
+                $type = 'Timestamp';
+              }
               break;
           }
           if (strtolower($value) === "null") {

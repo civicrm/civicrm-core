@@ -1614,16 +1614,11 @@ SELECT id
       $value = $date;
     }
 
-    if ($customFields[$customFieldId]['data_type'] == 'Float' ||
-      $customFields[$customFieldId]['data_type'] == 'Money'
-    ) {
+    if ($customFields[$customFieldId]['data_type'] == 'Money') {
       if (!$value) {
         $value = 0;
       }
-
-      if ($customFields[$customFieldId]['data_type'] == 'Money') {
-        $value = CRM_Utils_Rule::cleanMoney($value);
-      }
+      $value = CRM_Utils_Rule::cleanMoney($value);
     }
 
     if (($customFields[$customFieldId]['data_type'] == 'StateProvince' ||
