@@ -2441,7 +2441,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    $this->loadRelatedMembershipObjects($ids);
+    $ids = $this->loadRelatedMembershipObjects($ids);
 
     if ($this->_component != 'contribute') {
       // we are in event mode
@@ -3846,8 +3846,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     // load related memberships on basis of $contributionDAO object
-    $membershipIDs = array();
-    $contributionDAO->loadRelatedMembershipObjects($membershipIDs);
+    $contributionDAO->loadRelatedMembershipObjects();
 
     // build params for recording financial trxn entry
     $params['contribution'] = $contributionDAO;
@@ -3929,15 +3928,11 @@ WHERE eft.entity_table = 'civicrm_contribution'
           }
         }
 
-        // update membership details
-        if (!empty($contributionDAO->_relatedObjects['membership'])) {
-          self::updateMembershipBasedOnCompletionOfContribution(
-            $contributionDAO,
-            $contributionDAO->_relatedObjects['membership'],
-            $contributionId,
-            $trxnsData['trxn_date']
-          );
-        }
+        self::updateMembershipBasedOnCompletionOfContribution(
+          $contributionDAO,
+          $contributionId,
+          $trxnsData['trxn_date']
+        );
 
         // update financial item statuses
         $baseTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId);
@@ -4550,7 +4545,6 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     }
 
     $participant = CRM_Utils_Array::value('participant', $objects);
-    $memberships = CRM_Utils_Array::value('membership', $objects);
     $recurContrib = CRM_Utils_Array::value('contributionRecur', $objects);
     $recurringContributionID = (empty($recurContrib->id)) ? NULL : $recurContrib->id;
     $event = CRM_Utils_Array::value('event', $objects);
@@ -4598,10 +4592,6 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     self::repeatTransaction($contribution, $input, $contributionParams, $paymentProcessorId);
     $contributionParams['financial_type_id'] = $contribution->financial_type_id;
 
-    if (is_numeric($memberships)) {
-      $memberships = array($objects['membership']);
-    }
-
     $values = array();
     if (isset($input['is_email_receipt'])) {
       $values['is_email_receipt'] = $input['is_email_receipt'];
@@ -4629,15 +4619,12 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         $values['is_email_receipt'] = $recurContrib->is_email_receipt;
       }
 
-      if (!empty($memberships)) {
-        self::updateMembershipBasedOnCompletionOfContribution(
-          $contribution,
-          $memberships,
-          $primaryContributionID,
-          $changeDate,
-          CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', CRM_Utils_Array::value('contribution_status_id', $input))
-        );
-      }
+      self::updateMembershipBasedOnCompletionOfContribution(
+        $contribution,
+        $primaryContributionID,
+        $changeDate,
+        CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', CRM_Utils_Array::value('contribution_status_id', $input))
+      );
     }
     else {
       if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
@@ -4820,9 +4807,11 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    *
    * @param array $ids
    *
+   * @return array $ids
+   *
    * @throws Exception
    */
-  public function loadRelatedMembershipObjects(&$ids) {
+  public function loadRelatedMembershipObjects($ids = []) {
     $query = "
       SELECT membership_id
       FROM   civicrm_membership_payment
@@ -4853,6 +4842,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         }
       }
     }
+    return $ids;
   }
 
   /**
@@ -5397,7 +5387,6 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * load them in this function. Code clean up would compensate for any minor performance implication.
    *
    * @param \CRM_Contribute_BAO_Contribution $contribution
-   * @param array $memberships
    * @param int $primaryContributionID
    * @param string $changeDate
    * @param string $contributionStatus
@@ -5405,7 +5394,12 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    *
    * @todo investigate completely bypassing this function if $contributionStatus != Completed.
    */
-  protected static function updateMembershipBasedOnCompletionOfContribution($contribution, $memberships, $primaryContributionID, $changeDate, $contributionStatus = 'Completed') {
+  protected static function updateMembershipBasedOnCompletionOfContribution($contribution, $primaryContributionID, $changeDate, $contributionStatus = 'Completed') {
+    $contribution->loadRelatedMembershipObjects();
+    if (empty($contribution->_relatedObjects['membership'])) {
+      return;
+    }
+    $memberships = $contribution->_relatedObjects['membership'];
     foreach ($memberships as $membershipTypeIdKey => $membership) {
       if ($membership) {
         $membershipParams = array(
