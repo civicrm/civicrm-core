@@ -6,6 +6,9 @@
   organization: Blackfly Solutions
   jira        : adixon
 
+- name        : Alexander Ferreras
+  jira        : aferreras
+
 - github      : agh1
   name        : Andrew Hunt
   organization: AGH Strategies
@@ -261,6 +264,10 @@
   organization: Glick Software
   jira        : davisagli
 
+- github      : deb1990
+  name        : Debarshi Bhaumik
+  organization: CompuCorp
+
 - github      : deepak-srivastava
   name        : Deepak Srivastava
   jira        : deepak
@@ -454,6 +461,10 @@
 - github      : ginkgomzd
   name        : Michael Z Daryabeygi
   organization: Ginkgo Street Labs
+
+- name        : Jon-Man Cheung
+  organization: GMCVO Databases
+  Jira        : gmcvo
 
 - name        : Graham Smith
   organization: Edinburgh College
@@ -1194,6 +1205,10 @@
   name        : Tamar Meir
   organization: Forest CRM Consulting
   jira        : tamar
+
+- github      : TBSliver
+  name        : Tom Bloor
+  jira        : TBSliver
 
 - name        : Bashar Makhay
   jira        : themak
