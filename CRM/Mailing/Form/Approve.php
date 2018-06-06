@@ -171,7 +171,9 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
       // also delete any jobs associated with this mailing
       $job = new CRM_Mailing_BAO_MailingJob();
       $job->mailing_id = $ids['mailing_id'];
-      $job->delete();
+      while ($job->fetch()) {
+        CRM_Mailing_BAO_MailingJob::del($job->id);
+      }
     }
     else {
       $mailing = new CRM_Mailing_BAO_Mailing();

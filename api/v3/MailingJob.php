@@ -79,5 +79,5 @@ function civicrm_api3_mailing_job_get($params) {
  * @throws \API_Exception
  */
 function civicrm_api3_mailing_job_delete($params) {
-  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'MailingJob');
 }
