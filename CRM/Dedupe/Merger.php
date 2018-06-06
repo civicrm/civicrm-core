@@ -651,18 +651,31 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   mode does a force merge.
    * @param int $batchLimit number of merges to carry out in one batch.
    * @param int $isSelected if records with is_selected column needs to be processed.
+   *   Note the option of '2' is only used in conjunction with $redirectForPerformance
+   *   to determine when to reload the cache (!). The use of anything other than a boolean is being grandfathered
+   *   out in favour of explicitly passing in $reloadCacheIfEmpty
    *
    * @param array $criteria
    *   Criteria to use in the filter.
    *
    * @param bool $checkPermissions
    *   Respect logged in user permissions.
+   * @param bool|NULL $reloadCacheIfEmpty
+   *  If not set explicitly this is calculated but it is preferred that it be set
+   *  per comments on isSelected above.
    *
    * @return array|bool
    */
-  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $batchLimit = 1, $isSelected = 2, $criteria = array(), $checkPermissions = TRUE) {
+  public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $batchLimit = 1, $isSelected = 2, $criteria = array(), $checkPermissions = TRUE, $reloadCacheIfEmpty = NULL) {
     $redirectForPerformance = ($batchLimit > 1) ? TRUE : FALSE;
-    $reloadCacheIfEmpty = (!$redirectForPerformance && $isSelected == 2);
+
+    if (!isset($reloadCacheIfEmpty)) {
+      $reloadCacheIfEmpty = (!$redirectForPerformance && $isSelected == 2);
+    }
+    if ($isSelected !== 0 && $isSelected !== 1) {
+      // explicitly set to NULL if not 1 or 0 as part of grandfathering out the mystical '2' value.
+      $isSelected = NULL;
+    }
     $dupePairs = self::getDuplicatePairs($rgid, $gid, $reloadCacheIfEmpty, $batchLimit, $isSelected, '', ($mode == 'aggressive'), $criteria, $checkPermissions);
 
     $cacheParams = array(
@@ -670,7 +683,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       // @todo stop passing these parameters in & instead calculate them in the merge function based
       // on the 'real' params like $isRespectExclusions $batchLimit and $isSelected.
       'join' => self::getJoinOnDedupeTable(),
-      'where' => self::getWhereString($batchLimit, $isSelected),
+      'where' => self::getWhereString($isSelected),
+      'limit' => (int) $batchLimit,
     );
     return CRM_Dedupe_Merger::merge($dupePairs, $cacheParams, $mode, $redirectForPerformance, $checkPermissions);
   }
@@ -693,20 +707,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Get where string for dedupe join.
    *
-   * @param int $batchLimit
    * @param bool $isSelected
    *
    * @return string
    */
-  protected static function getWhereString($batchLimit, $isSelected) {
+  protected static function getWhereString($isSelected) {
     $where = "de.id IS NULL";
     if ($isSelected === 0 || $isSelected === 1) {
       $where .= " AND pn.is_selected = {$isSelected}";
-    }
-    // else consider all dupe pairs
-    // @todo Adding limit to Where??!!
-    if ($batchLimit) {
-      $where .= " LIMIT {$batchLimit}";
     }
     return $where;
   }
@@ -858,7 +866,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $cacheParams['join'],
           $cacheParams['where'],
           0,
-          0,
+          $cacheParams['limit'],
           array(),
           '',
           FALSE
@@ -1996,16 +2004,16 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *    Array of matches meeting the criteria.
    */
   public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $orderByClause = '', $includeConflicts = TRUE, $criteria = array(), $checkPermissions = TRUE, $searchLimit = 0) {
-    $where = self::getWhereString($batchLimit, $isSelected);
+    $where = self::getWhereString($isSelected);
     $cacheKeyString = self::getMergeCacheKeyString($rule_group_id, $group_id, $criteria, $checkPermissions);
     $join = self::getJoinOnDedupeTable();
-    $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, 0, array(), $orderByClause, $includeConflicts);
+    $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, $batchLimit, array(), $orderByClause, $includeConflicts);
     if (empty($dupePairs) && $reloadCacheIfEmpty) {
       // If we haven't found any dupes, probably cache is empty.
       // Try filling cache and give another try. We don't need to specify include conflicts here are there will not be any
       // until we have done some processing.
       CRM_Core_BAO_PrevNextCache::refillCache($rule_group_id, $group_id, $cacheKeyString, $criteria, $checkPermissions, $searchLimit);
-      $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, 0, array(), $orderByClause, $includeConflicts);
+      $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, $batchLimit, array(), $orderByClause, $includeConflicts);
       return $dupePairs;
     }
     return $dupePairs;

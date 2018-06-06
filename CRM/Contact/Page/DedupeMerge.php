@@ -84,16 +84,9 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     ));
 
     $where = NULL;
-    if ($action == CRM_Core_Action::MAP) {
-      $where = "pn.is_selected = 1";
-      $isSelected = 1;
-    }
-    else {
-      // else merge all (2)
-      $isSelected = 2;
-    }
+    $onlyProcessSelected = ($action == CRM_Core_Action::MAP) ? 1 : 0;
 
-    $total  = CRM_Core_BAO_PrevNextCache::getCount($cacheKeyString, NULL, $where);
+    $total  = CRM_Core_BAO_PrevNextCache::getCount($cacheKeyString, NULL, ($onlyProcessSelected ? "pn.is_selected = 1" : NULL));
     if ($total <= 0) {
       // Nothing to do.
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry));
@@ -105,7 +98,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     for ($i = 1; $i <= ceil($total / self::BATCHLIMIT); $i++) {
       $task  = new CRM_Queue_Task(
         array('CRM_Contact_Page_DedupeMerge', 'callBatchMerge'),
-        array($rgid, $gid, $mode, self::BATCHLIMIT, $isSelected, $criteria),
+        array($rgid, $gid, $mode, self::BATCHLIMIT, $onlyProcessSelected, $criteria),
         "Processed " . $i * self::BATCHLIMIT . " pair of duplicates out of " . $total
       );
 
@@ -115,6 +108,9 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
 
     // Setup the Runner
     $urlQry['context'] = "conflicts";
+    if ($onlyProcessSelected) {
+      $urlQry['selected'] = 1;
+    }
     $runner = new CRM_Queue_Runner(array(
       'title'     => ts('Merging Duplicates..'),
       'queue'     => $queue,
@@ -140,7 +136,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
    * @return int
    */
   public static function callBatchMerge(CRM_Queue_TaskContext $ctx, $rgid, $gid, $mode = 'safe', $batchLimit, $isSelected, $criteria) {
-    CRM_Dedupe_Merger::batchMerge($rgid, $gid, $mode, $batchLimit, $isSelected, $criteria);
+    CRM_Dedupe_Merger::batchMerge($rgid, $gid, $mode, $batchLimit, $isSelected, $criteria, TRUE, FALSE);
     return CRM_Queue_Task::TASK_SUCCESS;
   }
 
