@@ -1736,6 +1736,10 @@ SELECT relationship_type_id, relationship_direction
               //contact before creating new membership record.
               CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipId, $relatedContactId);
             }
+            //skip status calculation for pay later memberships.
+            if (!empty($membershipValues['status_id']) && $membershipValues['status_id'] == $pendingStatusId) {
+              $membershipValues['skipStatusCal'] = TRUE;
+            }
 
             // check whether we have some related memberships still available
             $query = "
