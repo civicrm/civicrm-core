@@ -157,6 +157,10 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
         break;
     }
 
+    if (empty($entityDAOName)) {
+      $entityDAOName = $entityShortname;
+    }
+
     if (in_array($entityShortname, $components)) {
       $this->_exportMode = constant('CRM_Export_Form_Select::' . strtoupper($entityShortname) . '_EXPORT');
       $formTaskClassName = "CRM_{$entityShortname}_Form_Task";
@@ -184,7 +188,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
       $values = $this->controller->exportValues('Custom');
     }
     else {
-      if (in_array($entityShortname, $components)) {
+      if (in_array($entityShortname, $components) && $entityShortname !== 'Contact') {
         $values = $this->controller->exportValues('Search');
       }
       else {
