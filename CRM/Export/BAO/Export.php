@@ -41,6 +41,68 @@ class CRM_Export_BAO_Export {
   // CRM-7675
   const EXPORT_ROW_COUNT = 100000;
 
+  protected static $relationshipReturnProperties = [];
+
+  /**
+   * @param $value
+   * @param $locationTypeFields
+   * @param $relationshipTypes
+   *
+   * @return array
+   */
+  protected static function setRelationshipReturnProperties($value, $locationTypeFields, $relationshipTypes) {
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $relPhoneTypeId = $relIMProviderId = NULL;
+    if (!empty($value[2])) {
+      $relationField = CRM_Utils_Array::value(2, $value);
+      if (trim(CRM_Utils_Array::value(3, $value))) {
+        $relLocTypeId = CRM_Utils_Array::value(3, $value);
+      }
+      else {
+        $relLocTypeId = 'Primary';
+      }
+
+      if ($relationField == 'phone') {
+        $relPhoneTypeId = CRM_Utils_Array::value(4, $value);
+      }
+      elseif ($relationField == 'im') {
+        $relIMProviderId = CRM_Utils_Array::value(4, $value);
+      }
+    }
+    elseif (!empty($value[4])) {
+      $relationField = CRM_Utils_Array::value(4, $value);
+      $relLocTypeId = CRM_Utils_Array::value(5, $value);
+      if ($relationField == 'phone') {
+        $relPhoneTypeId = CRM_Utils_Array::value(6, $value);
+      }
+      elseif ($relationField == 'im') {
+        $relIMProviderId = CRM_Utils_Array::value(6, $value);
+      }
+    }
+    if (in_array($relationField, $locationTypeFields) && is_numeric($relLocTypeId)) {
+      if ($relPhoneTypeId) {
+        self::$relationshipReturnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]]['phone-' . $relPhoneTypeId] = 1;
+      }
+      elseif ($relIMProviderId) {
+        self::$relationshipReturnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]]['im-' . $relIMProviderId] = 1;
+      }
+      else {
+        self::$relationshipReturnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]][$relationField] = 1;
+      }
+    }
+    else {
+      self::$relationshipReturnProperties[$relationshipTypes][$relationField] = 1;
+    }
+    return array($relationField);
+  }
+
+  /**
+   * @return array
+   */
+  public static function getRelationshipReturnProperties() {
+    return self::relationshipReturnProperties;
+  }
+
   /**
    * Get Querymode based on ExportMode
    *
@@ -348,58 +410,15 @@ class CRM_Export_BAO_Export {
       );
 
       foreach ($fields as $key => $value) {
-        $relationField = NULL;
-        $relationshipTypes = $fieldName = CRM_Utils_Array::value(1, $value);
+        $fieldName = CRM_Utils_Array::value(1, $value);
         if (!$fieldName) {
           continue;
         }
 
-        if (array_key_exists($relationshipTypes, $contactRelationshipTypes) && (!empty($value[2]) || empty($value[4]))) {
-          $relPhoneTypeId = $relIMProviderId = NULL;
-          if (!empty($value[2])) {
-            $relationField = CRM_Utils_Array::value(2, $value);
-            if (trim(CRM_Utils_Array::value(3, $value))) {
-              $relLocTypeId = CRM_Utils_Array::value(3, $value);
-            }
-            else {
-              $relLocTypeId = 'Primary';
-            }
-
-            if ($relationField == 'phone') {
-              $relPhoneTypeId = CRM_Utils_Array::value(4, $value);
-            }
-            elseif ($relationField == 'im') {
-              $relIMProviderId = CRM_Utils_Array::value(4, $value);
-            }
-          }
-          elseif (!empty($value[4])) {
-            $relationField = CRM_Utils_Array::value(4, $value);
-            $relLocTypeId = CRM_Utils_Array::value(5, $value);
-            if ($relationField == 'phone') {
-              $relPhoneTypeId = CRM_Utils_Array::value(6, $value);
-            }
-            elseif ($relationField == 'im') {
-              $relIMProviderId = CRM_Utils_Array::value(6, $value);
-            }
-          }
-          if (in_array($relationField, $locationTypeFields) && is_numeric($relLocTypeId)) {
-            if ($relPhoneTypeId) {
-              $returnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]]['phone-' . $relPhoneTypeId] = 1;
-            }
-            elseif ($relIMProviderId) {
-              $returnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]]['im-' . $relIMProviderId] = 1;
-            }
-            else {
-              $returnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]][$relationField] = 1;
-            }
-          }
-          else {
-            $returnProperties[$relationshipTypes][$relationField] = 1;
-          }
-        }
-
-        if ($relationField) {
-          // already handled.
+        if (array_key_exists($fieldName, $contactRelationshipTypes) && (!empty($value[2]) || !empty($value[4]))) {
+          self::setRelationshipReturnProperties($value, $locationTypeFields, $fieldName);
+          // @todo we can later not add this to this array but maintain a separate array.
+          $returnProperties = array_merge($returnProperties, self::$relationshipReturnProperties);
         }
         elseif (is_numeric(CRM_Utils_Array::value(2, $value))) {
           $locTypeId = $value[2];

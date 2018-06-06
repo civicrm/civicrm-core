@@ -375,7 +375,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function testExportRelationshipsMergeToHousehold() {
     $this->setUpContactExportData();
-    $householdID = $this->householdCreate(['city' => 'Portland', 'state_province_id' => 'Oregan']);
+    $householdID = $this->householdCreate(['api.Address.create' => ['city' => 'Portland', 'state_province_id' => 'Maine', 'location_type_id' => 'Home']]);
 
     $relationshipTypes = $this->callAPISuccess('RelationshipType', 'get', [])['values'];
     $houseHoldTypeID = NULL;
@@ -420,9 +420,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     );
     $dao = CRM_Core_DAO::executeQuery("SELECT * FROM {$tableName}");
     while ($dao->fetch()) {
-      // Do some checks here
-      // $this->assertEquals('Portland', $dao->city);
-      // $this->assertEquals('Oregan', $dao0>state_province);
+      $this->assertEquals('Portland', $dao->city);
+      $this->assertEquals('ME', $dao->state_province);
+      $this->assertEquals($householdID, $dao->civicrm_primary_id);
+      $this->assertEquals($householdID, $dao->civicrm_primary_id);
     }
 
   }
