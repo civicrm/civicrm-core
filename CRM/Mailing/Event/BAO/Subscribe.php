@@ -211,6 +211,11 @@ SELECT     civicrm_email.id as email_id
         )
       ) . "@$emailDomain";
 
+    $bounce_address = CRM_Core_BAO_MailSettings::defaultReturnPath();
+    if (empty($bounce_address)) {
+      $bounce_address = $localpart . 'b' . "@$emailDomain";
+    }
+
     $group = new CRM_Contact_BAO_Group();
     $group->id = $this->group_id;
     $group->find(TRUE);
@@ -227,7 +232,7 @@ SELECT     civicrm_email.id as email_id
       'From' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
       'To' => $email,
       'Reply-To' => $confirm,
-      'Return-Path' => "do-not-reply@$emailDomain",
+      'Return-Path' => $bounce_address,
     );
 
     $url = CRM_Utils_System::url('civicrm/mailing/confirm',
