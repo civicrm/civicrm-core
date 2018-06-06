@@ -417,7 +417,8 @@ if (!CRM.vars) CRM.vars = {};
           placeholder: $el.attr('placeholder') || $el.data('placeholder') || $('option[value=""]', $el).text(),
           allowClear: !$el.hasClass('required'),
           templateResult: formatCrmSelect2,
-          templateSelection: formatCrmSelect2
+          templateSelection: formatCrmSelect2,
+          dropdownCssClass: 'crm-container'
         };
       // quickform doesn't support optgroups so here's a hack :(
       $('option[value^=crm_optgroup]', this).each(function () {
@@ -570,12 +571,12 @@ if (!CRM.vars) CRM.vars = {};
             return txt;
           }
         };
-        $el.on('select2:open.crmEntity', function() {
-          var $el = $(this);
+        $el.on('select2:open.crmEntity', function(e) {
+          var $el = $('#select2-' + $(this).attr('id') + '-results');
           renderEntityRefFilterValue($el);
-          $('span .select2-dropdown', this)
+          $('.crm-entityref-links a.crm-add-entity', $el)
             .off('.crmEntity')
-            .on('click.crmEntity', 'a.crm-add-entity', function(e) {
+            .on('click', function(e) {
               var extra = $el.data('api-params').extra,
                 formUrl = $(this).attr('href') + '&returnExtra=display_name,sort_name' + (extra ? (',' + extra) : '');
               $el.select2('close');
@@ -819,7 +820,7 @@ if (!CRM.vars) CRM.vars = {};
 
   function formatEntityRefSelection(row) {
     return (row.color ? '<span class="crm-select-item-color" style="background-color: ' + row.color + '"></span> ' : '') +
-      _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : ''));
+      _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.text + (row.suffix !== undefined ? ' ' + row.suffix : ''));
   }
 
   function renderEntityRefCreateLinks($el) {
@@ -934,17 +935,17 @@ if (!CRM.vars) CRM.vars = {};
     var
       filter = $el.data('user-filter') || {},
       filterSpec = filter.key ? _.find(getEntityRefFilters($el), {key: filter.key}) : null,
-      $keyField = $('.crm-entityref-filter-key', '#select2-drop'),
+      $keyField = $('.crm-entityref-filter-key', $el),
       $valField = null;
     if (filterSpec) {
-      $('.crm-entityref-filter-value', '#select2-drop').remove();
+      $('.crm-entityref-filter-value', '#select2-dropdown').remove();
       $valField = $(entityRefFilterValueMarkup(filter, filterSpec));
       $keyField.after($valField);
       if (filterSpec.type === 'select' && !filterSpec.options) {
         loadEntityRefFilterOptions(filter, filterSpec, $valField, $el);
       }
     } else {
-      $('.crm-entityref-filter-value', '#select2-drop').hide().val('').change();
+      $('.crm-entityref-filter-value', '#select2-dropdown').hide().val('').change();
     }
   }
 
