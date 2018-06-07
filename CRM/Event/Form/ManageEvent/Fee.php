@@ -521,6 +521,10 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
         if (empty($values['pay_later_receipt'])) {
           $errors['pay_later_receipt'] = ts('Please enter the Pay Later instructions to be displayed to your users.');
         }
+      } else {
+       if (empty($values['payment_processor'])) {
+         $errors['payment_processor'] = ts('You have listed fees or selected a price set, but no payment option has been selected. Please select at least one payment option or remove fees from the event configuration for an unpaid event.');
+        }
       }
     }
     return empty($errors) ? TRUE : $errors;
