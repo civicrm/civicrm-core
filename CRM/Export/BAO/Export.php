@@ -354,7 +354,7 @@ class CRM_Export_BAO_Export {
           continue;
         }
 
-        if (array_key_exists($relationshipTypes, $contactRelationshipTypes) && (!empty($value[2]) || empty($value[4]))) {
+        if (array_key_exists($relationshipTypes, $contactRelationshipTypes) && (!empty($value[2]) || !empty($value[4]))) {
           $relPhoneTypeId = $relIMProviderId = NULL;
           if (!empty($value[2])) {
             $relationField = CRM_Utils_Array::value(2, $value);
