@@ -2335,7 +2335,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // get all the groups that this user can access
     // if they dont have universal access
     $groupNames = civicrm_api3('Group', 'get', array(
-      'is_active' => 1,
       'check_permissions' => TRUE,
       'return' => array('title', 'id'),
       'options' => array('limit' => 0),
