@@ -2048,6 +2048,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         CRM_Core_Resources::singleton()->addVars('coreForm', array('checksum' => (int) $tempID));
         return $tempID;
       }
+      else {
+        throw new CRM_Core_Exception('The link used to access the website has expired. Please contact us to obtain a new link.');
+      }
     }
     // check if user has permission, CRM-12062
     elseif ($tempID && CRM_Contact_BAO_Contact_Permission::allow($tempID)) {
