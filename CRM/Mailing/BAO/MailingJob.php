@@ -598,6 +598,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $returnProperties = $mailing->getReturnProperties();
     $params = $targetParams = $deliveredParams = array();
     $count = 0;
+    $retryGroup = FALSE;
 
     // CRM-15702: Sending bulk sms to contacts without e-mail address fails.
     // Solution is to skip checking for on hold
@@ -684,9 +685,11 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
           CRM_Core_Error::debug_log_message("SMTP Socket Error or failed to set sender error. Message: $message, Code: $code");
 
           // these are socket write errors which most likely means smtp connection errors
-          // lets skip them
+          // lets skip them and reconnect.
           $smtpConnectionErrors++;
           if ($smtpConnectionErrors <= 5) {
+            $mailer->disconnect();
+            $retryGroup = TRUE;
             continue;
           }
 
@@ -775,6 +778,10 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $mailing,
       $job_date
     );
+
+    if ($retryGroup) {
+      return FALSE;
+    }
 
     return $result;
   }
