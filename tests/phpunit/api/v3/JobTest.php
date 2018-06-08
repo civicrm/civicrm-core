@@ -122,6 +122,39 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+    *Check exception message and exception code for clone job.
+    */
+  public function testCloneWithNoExistingId() {
+      $params = array(
+        'id' => null,
+        'last_run' => 'null',
+        'scheduled_run_date' => 'null',
+    );
+      $result = $this->callAPIFailure('job', 'clone', $params);
+      $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
+   }
+
+   /**
+    * Check with no params.
+    */
+   public function testCloneJobNoParams() {
+     $params = NULL;
+     $this->callAPIFailure('job', 'clone', $params);
+   }
+
+   /**
+     *Check exception code for clone job when a wrong $id is passed.
+     */
+   public function testCloneWithWrongId() {
+       $params = array(
+         'id' => -2,
+         'last_run' => 'null',
+         'scheduled_run_date' => 'null',
+     );
+       $this->callAPIFailure('job', 'clone', $params);
+    }
+
+  /**
    * Check if required fields are not passed.
    */
   public function testDeleteWithoutRequired() {
