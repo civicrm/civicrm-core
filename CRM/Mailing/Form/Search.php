@@ -92,7 +92,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
       $defaults['status_unscheduled'] = 1;
     }
     if ($parent->get('scheduled')) {
-      $statusVals = array('Scheduled', 'Complete', 'Running', 'Canceled');
+      $statusVals = array_keys(CRM_Core_SelectValues::getMailingJobStatus());
       $defaults['is_archived'] = 0;
     }
     if ($parent->get('archived')) {
