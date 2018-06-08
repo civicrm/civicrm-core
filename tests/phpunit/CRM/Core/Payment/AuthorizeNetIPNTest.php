@@ -246,7 +246,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'Email Address: anthony_anderson@civicrm.org',
       'Honor',
       'This membership will be automatically renewed every',
-      'Dear Mr. Anthony Anderson II',
+      'Dear Anthony',
       'Thanks for your auto renew membership sign-up',
       'In Memory of',
     ));
@@ -272,7 +272,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'Last Name: Anderson',
       'Email Address: antonia_anderson@civicrm.org',
       'This membership will be automatically renewed every',
-      'Dear Mrs. Antonia Anderson II',
+      'Dear Antonia',
       'Thanks for your auto renew membership sign-up',
     ));
 
@@ -307,7 +307,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'Last Name: Anderson',
       'Email Address: anthony_anderson@civicrm.org',
       'This membership will be automatically renewed every',
-      'Dear Mr. Anthony Anderson II',
+      'Dear Anthony',
       'Thanks for your auto renew membership sign-up',
     ));
 
@@ -328,7 +328,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'Membership Start Date:',
       'Transaction #: hers',
       'This membership will be automatically renewed every',
-      'Dear Mrs. Antonia Anderson II',
+      'Dear Antonia',
       'Thanks for your auto renew membership sign-up',
     ),
     array(
