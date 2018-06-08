@@ -113,6 +113,7 @@ function civicrm_api3_report_template_delete($params) {
 function civicrm_api3_report_template_getrows($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('report_id', 'instance_id'));
   list($rows, $instance, $metadata) = _civicrm_api3_report_template_getrows($params);
+  $instance->cleanUpTemporaryTables();
   return civicrm_api3_create_success($rows, $params, 'ReportTemplate', 'getrows', CRM_Core_DAO::$_nullObject, $metadata);
 }
 
@@ -187,6 +188,7 @@ function _civicrm_api3_report_template_getrows($params) {
 function civicrm_api3_report_template_getstatistics($params) {
   list($rows, $reportInstance, $metadata) = _civicrm_api3_report_template_getrows($params);
   $stats = $reportInstance->statistics($rows);
+  $reportInstance->cleanUpTemporaryTables();
   return civicrm_api3_create_success($stats, $params, 'ReportTemplate', 'getstatistics', CRM_Core_DAO::$_nullObject, $metadata);
 }
 /**

@@ -432,7 +432,26 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => array('metadata' => array('sql')),
     ));
     $this->assertEquals(2, $rows['values'][0]['civicrm_contribution_total_amount_count']);
+  }
 
+  /**
+   * Test the group filter works on the contribution summary.
+   */
+  public function testContributionDetailSoftCredits() {
+    $contactID = $this->individualCreate();
+    $contactID2 = $this->individualCreate();
+    $this->contributionCreate(['contact_id' => $contactID, 'api.ContributionSoft.create' => ['amount' => 5, 'contact_id' => $contactID2]]);
+    $template = 'contribute/detail';
+    $rows = $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => $template,
+      'contribution_or_soft_value' => 'contributions_only',
+      'fields' => ['soft_credits' => 1, 'contribution_or_soft' => 1, 'sort_name' => 1],
+      'options' => array('metadata' => array('sql')),
+    ));
+    $this->assertEquals(
+      "<a href='/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=" . $contactID2 . "'>Anderson, Anthony</a> $ 5.00",
+      $rows['values'][0]['civicrm_contribution_soft_credits']
+    );
   }
 
   /**

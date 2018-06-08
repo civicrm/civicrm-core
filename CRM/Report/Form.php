@@ -489,6 +489,14 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $sqlArray;
 
   /**
+   * Tables created for the report that need removal afterwards.
+   *
+   * ['civicrm_temp_report_x' => ['temporary' => TRUE, 'name' => 'civicrm_temp_report_x']
+   * @var array
+   */
+  protected $temporaryTables = [];
+
+  /**
    * Can this report use the sql mode ONLY_FULL_GROUP_BY.
    * @var bool
    */
@@ -1112,6 +1120,15 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   public function getDefaultValues() {
     return $this->_defaults;
+  }
+
+  /**
+   * Remove any temporary tables.
+   */
+  public function cleanUpTemporaryTables() {
+    foreach ($this->temporaryTables as $temporaryTable) {
+      CRM_Core_DAO::executeQuery('DROP ' . ($temporaryTable['temporary'] ? 'TEMPORARY' : '') . ' TABLE IF EXISTS ' . $temporaryTable['name']);
+    }
   }
 
   /**
