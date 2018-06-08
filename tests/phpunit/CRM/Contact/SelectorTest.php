@@ -73,18 +73,30 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
     // Ensure that search builder return individual contact as per criteria
     if (!empty($dataSet['context'] == 'builder')) {
       $contactID = $this->individualCreate(['first_name' => 'James', 'last_name' => 'Bond']);
-      $this->callAPISuccess('Address', 'create', [
-        'contact_id' => $contactID,
-        'location_type_id' => "Home",
-        'is_primary' => 1,
-        'country_id' => "IN",
-      ]);
-      $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
-      $this->assertEquals(1, count($rows));
-      $sortChar = $selector->alphabetQuery()->fetchAll();
-      // sort name is stored in '<last_name>, <first_name>' format, as per which the first character would be B of Bond
-      $this->assertEquals('B', $sortChar[0]['sort_name']);
-      $this->assertEquals($contactID, key($rows));
+      if ('Search builder behaviour for Activity' == $dataSet['description']) {
+        $this->callAPISuccess('Activity', 'create', [
+          'activity_type_id' => 'Meeting',
+          'subject' => "Test",
+          'source_contact_id' => $contactID,
+        ]);
+        $rows = CRM_Core_DAO::executeQuery(implode(' ', $sql))->fetchAll();
+        $this->assertEquals(1, count($rows));
+        $this->assertEquals($contactID, $rows[0]['source_contact_id']);
+      }
+      else {
+        $this->callAPISuccess('Address', 'create', [
+          'contact_id' => $contactID,
+          'location_type_id' => "Home",
+          'is_primary' => 1,
+          'country_id' => "IN",
+        ]);
+        $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
+        $this->assertEquals(1, count($rows));
+        $sortChar = $selector->alphabetQuery()->fetchAll();
+        // sort name is stored in '<last_name>, <first_name>' format, as per which the first character would be B of Bond
+        $this->assertEquals('B', $sortChar[0]['sort_name']);
+        $this->assertEquals($contactID, key($rows));
+      }
     }
   }
 
@@ -252,6 +264,26 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
             0 => 'SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, civicrm_address.id as address_id, civicrm_address.country_id as country_id',
             1 => ' FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 )',
             2 => 'WHERE ( contact_a.contact_type IN ("Individual") AND civicrm_address.country_id IS NOT NULL ) AND (contact_a.is_deleted = 0)',
+          ),
+        ),
+      ),
+      array(
+        array(
+          'description' => 'Search builder behaviour for Activity',
+          'class' => 'CRM_Contact_Selector',
+          'settings' => array(),
+          'form_values' => array('source_contact_id' => array('IS NOT NULL' => 1)),
+          'params' => array(),
+          'return_properties' => array(
+            'source_contact_id' => 1,
+          ),
+          'context' => 'builder',
+          'action' => CRM_Core_Action::NONE,
+          'includeContactIds' => NULL,
+          'searchDescendentGroups' => FALSE,
+          'expected_query' => array(
+            0 => 'SELECT contact_a.id as contact_id, source_contact.id as source_contact_id',
+            2 => 'WHERE ( source_contact.id IS NOT NULL ) AND (contact_a.is_deleted = 0)',
           ),
         ),
       ),
@@ -441,10 +473,10 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
    * @param array $expectedQuery
    */
   public function wrangleDefaultClauses(&$expectedQuery) {
-    if ($expectedQuery[0] == 'default') {
+    if (CRM_Utils_Array::value(0, $expectedQuery) == 'default') {
       $expectedQuery[0] = $this->getDefaultSelectString();
     }
-    if ($expectedQuery[1] == 'default') {
+    if (CRM_Utils_Array::value(1, $expectedQuery) == 'default') {
       $expectedQuery[1] = $this->getDefaultFromString();
     }
   }
