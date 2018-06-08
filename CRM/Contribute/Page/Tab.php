@@ -166,9 +166,51 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * Get all the recurring contribution information and assign to the template
    */
   private function addRecurringContributionsBlock() {
+    $activeContributions = $this->getActiveRecurringContributions();
+    $inactiveRecurringContributions = $this->getInactiveRecurringContributions();
+
+    if (!empty($activeContributions) || !empty($inactiveRecurringContributions)) {
+      // assign vars to templates
+      $this->assign('action', $this->_action);
+      $this->assign('activeRecurRows', $activeContributions);
+      $this->assign('inactiveRecurRows', $inactiveRecurringContributions);
+      $this->assign('recur', TRUE);
+    }
+  }
+
+  /**
+   * Loads active recurring contributions for the current contact and formats
+   * them to be used on the form.
+   *
+   * @return array;
+   */
+  private function getActiveRecurringContributions() {
     try {
       $contributionRecurResult = civicrm_api3('ContributionRecur', 'get', array(
         'contact_id' => $this->_contactId,
+        'contribution_status_id' => array('NOT IN' => CRM_Contribute_BAO_ContributionRecur::getInactiveStatuses()),
+        'options' => array('limit' => 0, 'sort' => 'start_date ASC'),
+      ));
+      $recurContributions = CRM_Utils_Array::value('values', $contributionRecurResult);
+    }
+    catch (Exception $e) {
+      $recurContributions = array();
+    }
+
+    return $this->buildRecurringContributionsArray($recurContributions);
+  }
+
+  /**
+   * Loads inactive recurring contributions for the current contact and formats
+   * them to be used on the form.
+   *
+   * @return array;
+   */
+  private function getInactiveRecurringContributions() {
+    try {
+      $contributionRecurResult = civicrm_api3('ContributionRecur', 'get', array(
+        'contact_id' => $this->_contactId,
+        'contribution_status_id' => array('IN' => CRM_Contribute_BAO_ContributionRecur::getInactiveStatuses()),
         'options' => array('limit' => 0, 'sort' => 'start_date ASC'),
       ));
       $recurContributions = CRM_Utils_Array::value('values', $contributionRecurResult);
@@ -177,48 +219,53 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $recurContributions = NULL;
     }
 
-    if (!empty($recurContributions)) {
-      foreach ($recurContributions as $recurId => $recurDetail) {
-        $action = array_sum(array_keys($this->recurLinks($recurId)));
-        // no action allowed if it's not active
-        $recurContributions[$recurId]['is_active'] = (!CRM_Contribute_BAO_Contribution::isContributionStatusNegative($recurDetail['contribution_status_id']));
+    return $this->buildRecurringContributionsArray($recurContributions);
+  }
 
-        // Get the name of the payment processor
-        if (!empty($recurDetail['payment_processor_id'])) {
-          $recurContributions[$recurId]['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName($recurDetail['payment_processor_id']);
-        }
-        // Get the label for the contribution status
-        if (!empty($recurDetail['contribution_status_id'])) {
-          $recurContributions[$recurId]['contribution_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $recurDetail['contribution_status_id']);
-        }
+  /**
+   * @param $recurContributions
+   *
+   * @return mixed
+   */
+  private function buildRecurringContributionsArray($recurContributions) {
+    foreach ($recurContributions as $recurId => $recurDetail) {
+      $action = array_sum(array_keys($this->recurLinks($recurId)));
+      // no action allowed if it's not active
+      $recurContributions[$recurId]['is_active'] = (!CRM_Contribute_BAO_Contribution::isContributionStatusNegative($recurDetail['contribution_status_id']));
 
-        if ($recurContributions[$recurId]['is_active']) {
-          $details = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurContributions[$recurId]['id'], 'recur');
-          $hideUpdate = $details->membership_id & $details->auto_renew;
-
-          if ($hideUpdate) {
-            $action -= CRM_Core_Action::UPDATE;
-          }
-
-          $recurContributions[$recurId]['action'] = CRM_Core_Action::formLink(self::recurLinks($recurId), $action,
-            array(
-              'cid' => $this->_contactId,
-              'crid' => $recurId,
-              'cxt' => 'contribution',
-            ),
-            ts('more'),
-            FALSE,
-            'contribution.selector.recurring',
-            'Contribution',
-            $recurId
-          );
-        }
+      // Get the name of the payment processor
+      if (!empty($recurDetail['payment_processor_id'])) {
+        $recurContributions[$recurId]['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName($recurDetail['payment_processor_id']);
       }
-      // assign vars to templates
-      $this->assign('action', $this->_action);
-      $this->assign('recurRows', $recurContributions);
-      $this->assign('recur', TRUE);
+      // Get the label for the contribution status
+      if (!empty($recurDetail['contribution_status_id'])) {
+        $recurContributions[$recurId]['contribution_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $recurDetail['contribution_status_id']);
+      }
+
+      if ($recurContributions[$recurId]['is_active']) {
+        $details = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurContributions[$recurId]['id'], 'recur');
+        $hideUpdate = $details->membership_id & $details->auto_renew;
+
+        if ($hideUpdate) {
+          $action -= CRM_Core_Action::UPDATE;
+        }
+
+        $recurContributions[$recurId]['action'] = CRM_Core_Action::formLink(self::recurLinks($recurId), $action,
+          array(
+            'cid' => $this->_contactId,
+            'crid' => $recurId,
+            'cxt' => 'contribution',
+          ),
+          ts('more'),
+          FALSE,
+          'contribution.selector.recurring',
+          'Contribution',
+          $recurId
+        );
+      }
     }
+
+    return $recurContributions;
   }
 
   /**
