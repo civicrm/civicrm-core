@@ -1,3 +1,4 @@
+{if $contact.email_greeting}{$contact.email_greeting},{/if}
 {if $receipt_text}
 {$receipt_text}
 {/if}

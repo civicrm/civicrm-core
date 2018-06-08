@@ -106,7 +106,9 @@ class CRM_Upgrade_Incremental_MessageTemplates {
     $messages = [];
     foreach ($updates as $key => $value) {
       $templateLabel = civicrm_api3('OptionValue', 'getvalue', [
-        'return' => 'label', 'name' => $value['name'], 'options' => ['limit' => 1]
+        'return' => 'label',
+        'name' => $value['name'],
+        'options' => ['limit' => 1],
       ]);
       $messages[$templateLabel] = $value['upgrade_descriptor'];
     }
