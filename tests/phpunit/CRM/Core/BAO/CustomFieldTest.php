@@ -6,19 +6,14 @@
  */
 class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
+  protected $customFieldID;
+
   public function setUp() {
     parent::setUp();
   }
 
   public function testCreateCustomField() {
-    $customGroup = $this->customGroupCreate(array('extends' => 'Individual'));
-    $fields = array(
-      'label' => 'testFld',
-      'data_type' => 'String',
-      'html_type' => 'Text',
-      'custom_group_id' => $customGroup['id'],
-    );
-    CRM_Core_BAO_CustomField::create($fields);
+    $customGroup = $this->createCustomField();
     $customFieldID = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customGroup['id'], 'id', 'custom_group_id',
       'Database check for created CustomField.'
     );
@@ -334,6 +329,34 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
     $this->customGroupDelete($groups['A']['id']);
     $this->customGroupDelete($groupB['id']);
+  }
+
+  /**
+   * Test get custom field id function.
+   */
+  public function testGetCustomFieldID() {
+    $this->createCustomField();
+    $fieldID = CRM_Core_BAO_CustomField::getCustomFieldID('testFld');
+    $this->assertEquals($this->customFieldID, $fieldID);
+
+    $fieldID = CRM_Core_BAO_CustomField::getCustomFieldID('testFld', 'new custom group');
+    $this->assertEquals($this->customFieldID, $fieldID);
+  }
+
+  /**
+   * @return array
+   */
+  protected function createCustomField() {
+    $customGroup = $this->customGroupCreate(array('extends' => 'Individual'));
+    $fields = array(
+      'label' => 'testFld',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+      'custom_group_id' => $customGroup['id'],
+    );
+    $field = CRM_Core_BAO_CustomField::create($fields);
+    $this->customFieldID = $field->id;
+    return $customGroup;
   }
 
 }
