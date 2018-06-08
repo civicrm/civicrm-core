@@ -198,7 +198,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
         CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
       }
       CRM_Mailing_BAO_MailingJob::pause($this->_mailingId);
-      CRM_Core_Session::setStatus(ts('The mailing has been paused.'), ts('Paused'), 'success');
+      CRM_Core_Session::setStatus(ts('The mailing has been paused. Active message deliveries may continue for a few minutes, but CiviMail will not begin delivery of any more batches.'), ts('Paused'), 'success');
       CRM_Utils_System::redirect($context);
     }
     elseif ($this->_action & CRM_Core_Action::REOPEN) {
