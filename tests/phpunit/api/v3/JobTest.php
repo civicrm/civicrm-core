@@ -122,6 +122,22 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Clone job
+   */
+  public function testClone() {
+    $createResult = $this->callAPISuccess('job', 'create', $this->_params);
+    $params = array('id' => $createResult['id']);
+    $cloneResult = $this->callAPIAndDocument('job', 'clone', $params, __FUNCTION__, __FILE__);
+    $clonedJob = $cloneResult['values'][$cloneResult['id']];
+    $this->assertEquals($this->_params['name'] . ' - Copy', $clonedJob['name']);
+    $this->assertEquals($this->_params['description'], $clonedJob['description']);
+    $this->assertEquals($this->_params['parameters'], $clonedJob['parameters']);
+    $this->assertEquals($this->_params['is_active'], $clonedJob['is_active']);
+    $this->assertArrayNotHasKey('last_run', $clonedJob);
+    $this->assertArrayNotHasKey('scheduled_run_date', $clonedJob);
+  }
+
+  /**
    * Check if required fields are not passed.
    */
   public function testDeleteWithoutRequired() {
