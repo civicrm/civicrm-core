@@ -555,6 +555,20 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->customGroupDelete($customGroup['id']);
   }
 
+  public function testCustomFieldCreateWithOptionGroupName() {
+    $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_custom_group'));
+    $params = array(
+      'custom_group_id' => $customGroup['id'],
+      'name' => 'Activity type',
+      'label' => 'Activity type',
+      'data_type' => 'String',
+      'html_type' => 'Select',
+      'option_group_id' => 'activity_type',
+    );
+    $result = $this->callAPISuccess('CustomField', 'create', $params);
+  }
+
+
   /**
    * @param $getFieldsResult
    *

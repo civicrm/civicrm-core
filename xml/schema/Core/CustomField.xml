@@ -262,6 +262,11 @@
     <title>Field Option Group</title>
     <comment>For elements with options, the option group id that is used</comment>
     <add>1.4</add>
+    <pseudoconstant>
+      <table>civicrm_option_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
   </field>
   <field>
     <name>filter</name>
