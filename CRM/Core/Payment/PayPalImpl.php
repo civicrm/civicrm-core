@@ -412,7 +412,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    */
   public function createRecurringPayments(&$params) {
     $args = array();
-    // @todo this function is riddled with enotices - perhaps use $this->mapPaypalParamsToCivicrmParams($fieldMap, $result)
     $this->initialize($args, 'CreateRecurringPaymentsProfile');
 
     $start_time = strtotime(date('m/d/Y'));
@@ -424,15 +423,12 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['currencyCode'] = $params['currencyID'];
     $args['payerID'] = $params['payer_id'];
     $args['invnum'] = $params['invoiceID'];
-    $args['returnURL'] = $params['returnURL'];
-    $args['cancelURL'] = $params['cancelURL'];
     $args['profilestartdate'] = $start_date;
     $args['method'] = 'CreateRecurringPaymentsProfile';
     $args['billingfrequency'] = $params['frequency_interval'];
     $args['billingperiod'] = ucwords($params['frequency_unit']);
     $args['desc'] = $params['amount'] . " Per " . $params['frequency_interval'] . " " . $params['frequency_unit'];
-    //$args['desc']           = 'Recurring Contribution';
-    $args['totalbillingcycles'] = $params['installments'];
+    $args['totalbillingcycles'] = CRM_Utils_Array::value('installments', $params);
     $args['version'] = '56.0';
     $args['profilereference'] = "i={$params['invoiceID']}" .
       "&m=" .
@@ -450,16 +446,18 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       return $result;
     }
 
-    /* Success */
-    $params['trxn_id'] = $result['transactionid'];
-    $params['gross_amount'] = $result['amt'];
-    $params['fee_amount'] = $result['feeamt'];
-    $params['net_amount'] = $result['settleamt'];
-    if ($params['net_amount'] == 0 && $params['fee_amount'] != 0) {
-      $params['net_amount'] = number_format(($params['gross_amount'] - $params['fee_amount']), 2);
-    }
-    $params['payment_status'] = $result['paymentstatus'];
-    $params['pending_reason'] = $result['pendingreason'];
+    /* Success - result looks like"
+     * array (
+     * 'profileid' => 'I-CP1U0PLG91R2',
+     * 'profilestatus' => 'ActiveProfile',
+     * 'timestamp' => '2018-05-07T03:55:52Z',
+     * 'correlationid' => 'e717999e9bf62',
+     * 'ack' => 'Success',
+     * 'version' => '56.0',
+     * 'build' => '39949200',)
+     */
+    $params['trxn_id'] = $result['profileid'];
+    $params['payment_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
 
     return $params;
   }
@@ -721,7 +719,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function cancelSubscription(&$message = '', $params = array()) {
-    if ($this->isPayPalType($this::PAYPAL_PRO)) {
+    if ($this->isPayPalType($this::PAYPAL_PRO) || $this->isPayPalType($this::PAYPAL_EXPRESS)) {
       $args = array();
       $this->initialize($args, 'ManageRecurringPaymentsProfileStatus');
 
