@@ -475,7 +475,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $punc = '.:?\-';
     $any = "{$letters}{$gunk}{$punc}";
     if ($onlyHrefs) {
-      $pattern = "\\bhref[ ]*=[ ]*([\"'])?(($protos:[$any]+?(?=[$punc]*[^$any]|$)))([\"'])?";
+      $pattern = "\\bhref[ ]*=[ ]*([\"'])?(($protos:[$any]+[$punc]*?(?=[$punc]*[^$any]|$)))([\"'])?";
     }
     else {
       $pattern = "\\b($protos:[$any]+?(?=[$punc]*[^$any]|$))";
