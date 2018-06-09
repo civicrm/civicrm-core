@@ -431,6 +431,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
       'civicrm_uf_group', 'cancel_button_text', "varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Custom Text to display on the cancel button when used in create or edit mode'", TRUE);
     $this->addTask('Add Submit button text column to civicrm_uf_group', 'addColumn',
       'civicrm_uf_group', 'submit_button_text', "varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Custom Text to display on the submit button on profile edit/create screens'", TRUE);
+    $this->addTask('Add For duplicate url column to civicrm_uf_group', 'addColumn',
+          'civicrm_uf_group', 'for_duplicate_URL',
+          "varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'In this field you can specify a URL to which the user will be redirected if the email address they entered already exists in CiviCRM'");
 
     $this->addTask('CRM-20958 - Add created_date to civicrm_activity', 'addColumn',
       'civicrm_activity', 'created_date', "timestamp NULL  DEFAULT NULL COMMENT 'When was the activity was created.'");

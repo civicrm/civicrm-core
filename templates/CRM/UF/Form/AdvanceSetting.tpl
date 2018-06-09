@@ -80,6 +80,11 @@
             <td>{$form.is_update_dupe.html} {help id='id-is_update_dupe' file="CRM/UF/Form/Group.hlp"}</td>
         </tr>
 
+        <tr class="crm-uf-advancesetting-form-block-for_duplicate_URL" id="for_duplicate_URL_block">
+            <td class="label">{$form.for_duplicate_URL.label}</td>
+            <td>{$form.for_duplicate_URL.html} {help id='id-for_duplicate_URL' file="CRM/UF/Form/Group.hlp"}</td>
+        </tr>
+
         <tr class="crm-uf-advancesetting-form-block-is_proximity_search">
             <td class="label">{$form.is_proximity_search.label}</td>
             <td>{$form.is_proximity_search.html} {help id='id-is_proximity_search' file="CRM/UF/Form/Group.hlp"}</td></tr>
@@ -102,3 +107,20 @@
     </div><!-- / .crm-block -->
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
+
+<script type="text/javascript">
+    {literal}
+    CRM.$(function ($) {
+        $("[name=is_update_dupe]").change(confirmCheck).filter(':checked').each(confirmCheck);
+
+        function confirmCheck() {
+            var duplicateURLInput = $("#for_duplicate_URL_block");
+            if ($(this).attr('checked') && $(this).val() == 1) {
+                duplicateURLInput.css('display', '');
+            } else if (duplicateURLInput.css('display') !== 'none') {
+                duplicateURLInput.css('display', 'none');
+            }
+        }
+    });
+    {/literal}
+</script>

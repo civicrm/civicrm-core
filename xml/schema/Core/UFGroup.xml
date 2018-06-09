@@ -281,4 +281,11 @@
     <localizable>true</localizable>
     <add>4.7</add>
   </field>
+  <field>
+    <name>for_duplicate_URL</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>In this field you can specify a URL to which the user will be redirected if the email address they entered already exists in CiviCRM</comment>
+    <add>4.7</add>
+  </field>
 </table>
