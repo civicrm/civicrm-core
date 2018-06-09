@@ -263,6 +263,11 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         'id' => $contributionId,
         'return' => $returnValues,
       ));
+      foreach ($contribution as $token => &$value) {
+        if (CRM_Core_BAO_CustomField::getKeyID($token)) {
+          $value = CRM_Core_BAO_CustomField::displayValue($value, $token);
+        }
+      }
       $contribution['campaign'] = CRM_Utils_Array::value('contribution_campaign_title', $contribution);
       $contributions[$contributionId] = $contribution;
 
