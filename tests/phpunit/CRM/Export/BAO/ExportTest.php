@@ -55,12 +55,57 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       NULL,
       NULL,
       FALSE,
-      FALSE,
+      TRUE,
       array(
         'exportOption' => 1,
         'suppress_csv_for_testing' => TRUE,
       )
     );
+
+    // delete the export temp table and component table
+    $sql = "DROP TABLE IF EXISTS {$tableName}";
+    CRM_Core_DAO::executeQuery($sql);
+  }
+
+  /**
+   * Test to ensure that 'Merge Household Members into their Households' works on export.
+   */
+  public function testMergeHouseholdMemberOnExport() {
+    // Here's how this test case works - 3 contacts are created A, B and C where A and B are individual contacts.
+    //  C is a household contact whose member is contact A. These 3 contacts are selected for export with 'Merge Household Members into their Households' = TRUE
+    //  And at the end export table contain only 2 contacts i.e. is B and C as B is not a member of C and A is a member of C reason why it is merged with it.
+    $this->setUpContactExportData();
+    $householdID = $this->householdCreate();
+    $this->callAPISuccess('relationship', 'create', [
+      'contact_id_a' => $this->contactIDs[0],
+      'contact_id_b' => $householdID,
+      'relationship_type_id' => CRM_Core_DAO::getFieldValue('CRM_Contact_BAO_RelationshipType', 'Household Member of', 'id', 'name_a_b'),
+    ]);
+
+    $contactIDs = array_merge($this->contactIDs, [$householdID]);
+    $params = ['contact_id' => $contactIDs];
+    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
+      FALSE,
+      $contactIDs,
+      CRM_Contact_BAO_Query::convertFormValues($params),
+      NULL,
+      NULL,
+      NULL,
+      CRM_Export_Form_Select::CONTACT_EXPORT,
+      NULL,
+      NULL,
+      FALSE,
+      TRUE,
+      array(
+        'exportOption' => 1,
+        'suppress_csv_for_testing' => TRUE,
+      )
+    );
+
+    $exportedRows = CRM_Utils_SQL_Select::from($tableName)->execute()->fetchAll();
+    $this->assertEquals(2, count($exportedRows));
+    // the result should contain contact B and C, as A being a household member merged with C.
+    $this->assertEquals([$this->contactIDs[1], $householdID], CRM_Utils_Array::collect('civicrm_primary_id', $exportedRows));
 
     // delete the export temp table and component table
     $sql = "DROP TABLE IF EXISTS {$tableName}";
