@@ -1521,8 +1521,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     //@todo it should no longer be possible for it to get to this point & membership to not be an array
     if (is_array($membershipTypeIDs) && !empty($membershipContributionID)) {
-      $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
-
       $membershipLines = $nonMembershipLines = array();
       foreach ($unprocessedLineItems as $priceSetID => $lines) {
         foreach ($lines as $line) {
@@ -1544,7 +1542,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $membershipLineItems = $unprocessedLineItems;
         }
         $i++;
-        $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
+
+        $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, array());
+        $termDetails = CRM_Utils_Array::value($memType, $typesTerms);
+        $numTerms = CRM_Utils_Array::value('qty', $termDetails, 1);
         if (!empty($membershipContribution)) {
           $pendingStatus = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
           $pending = ($membershipContribution->contribution_status_id == $pendingStatus) ? TRUE : FALSE;
@@ -1997,6 +1998,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
     $form->set('memberPriceFieldIDS', $membershipPriceFieldIDs);
+    $form->setRecurringMembershipParams();
     $form->processFormSubmission(CRM_Utils_Array::value('contact_id', $params));
   }
 
@@ -2395,27 +2397,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $priceFieldIds = $this->get('memberPriceFieldIDS');
 
     if (!empty($priceFieldIds)) {
-      $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
-      unset($priceFieldIds['id']);
-      $membershipTypeIds = array();
-      $membershipTypeTerms = array();
-      foreach ($priceFieldIds as $priceFieldId) {
-        if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
-          $membershipTypeIds[] = $id;
-          //@todo the value for $term is immediately overwritten. It is unclear from the code whether it was intentional to
-          // do this or a double = was intended (this ambiguity is the reason many IDEs complain about 'assignment in condition'
-          $term = 1;
-          if ($term = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_num_terms')) {
-            $membershipTypeTerms[$id] = ($term > 1) ? $term : 1;
-          }
-          else {
-            $membershipTypeTerms[$id] = 1;
-          }
-        }
-      }
-      $membershipParams['selectMembership'] = $membershipTypeIds;
-      $membershipParams['financial_type_id'] = $financialTypeID;
-      $membershipParams['types_terms'] = $membershipTypeTerms;
+      $membershipParams['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
+      $membershipParams['types_terms'] = $this->getMembershipTermDetails();
+      $membershipParams['selectMembership'] = array_keys($membershipParams['types_terms']);
     }
     if (!empty($membershipParams['selectMembership'])) {
       // CRM-12233
