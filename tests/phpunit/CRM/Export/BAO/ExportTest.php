@@ -40,6 +40,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
+
+
+  /** @var boolean */
+  private $hookConfirmation = false;
+
   /**
    * Basic test to ensure the exportComponents function completes without error.
    */
@@ -203,6 +208,36 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       }
     }
 
+  }
+
+  public function testExportCustomShouldCallHook() {
+    $customSearchClass = "CRM_Contact_Form_Search_Custom_Basic";
+    $formValues = array(
+      'csid' => '3',
+      'qfKey' => 'da118c92c7f2aea92f3610ab46bbc7b3_4234',
+      'entryURL' => 'http://localhost/index.php?q=civicrm/contact/search/custom&amp;csid=3&amp;reset=1',
+      'contact_type' => 'Organization',
+      'group' => '',
+      'tag' => '',
+      'sort_name' => '',
+      'task' => '5',
+      'radio_ts' => 'ts_all',
+      'customSearchID' => '3',
+      'customSearchClass' => 'CRM_Contact_Form_Search_Custom_Basic',
+      'component_mode' => 1,
+      'operator' => 1,
+    );
+    $order = "`sort_name` asc";
+
+    $this->hookClass->setHook('civicrm_export', array($this, 'confirmHookWasCalled'));
+
+    $this->hookConfirmation = false;
+    CRM_Export_BAO_Export::exportCustom($customSearchClass, $formValues, $order);
+    $this->assertTrue($this->hookConfirmation);
+  }
+
+  public function confirmHookWasCalled(&$exportTempTable, &$headerRows, &$sqlColumns, &$exportMode) {
+    $this->hookConfirmation = true;
   }
 
   /**
