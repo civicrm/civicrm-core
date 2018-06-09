@@ -242,6 +242,15 @@ WHERE      v.option_group_id = %1
             elseif (in_array($customGroup->extends, array('Individual', 'Organization', 'Household'))) {
               $valueIDs = $optionValues;
             }
+            elseif (in_array($customGroup->extends, array('Contribution', 'ContributionRecur'))) {
+              $sql = "SELECT id
+                      FROM civicrm_financial_type
+                      WHERE name IN ('{$optValues}')";
+              $dao = &CRM_Core_DAO::executeQuery($sql);
+              while ($dao->fetch()) {
+                $valueIDs[] = $dao->id;
+              }
+            }
             else {
               $sql = "
 SELECT     v.value
