@@ -35,7 +35,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   protected $masterAddressID;
 
   public function tearDown() {
-    $this->quickCleanup(['civicrm_contact', 'civicrm_email', 'civicrm_address']);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_email', 'civicrm_address', 'civicrm_relationship']);
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }

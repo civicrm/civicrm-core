@@ -620,31 +620,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           $contactA = 'contact_id_b';
           $contactB = 'contact_id_a';
         }
-        if ($exportMode == CRM_Export_Form_Select::CONTACT_EXPORT) {
-          $relIDs = $ids;
-        }
-        elseif ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
-          $sourceID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Source');
-          $dao = CRM_Core_DAO::executeQuery("
-            SELECT contact_id FROM civicrm_activity_contact
-            WHERE activity_id IN ( " . implode(',', $ids) . ") AND
-            record_type_id = {$sourceID}
-          ");
-
-          while ($dao->fetch()) {
-            $relIDs[] = $dao->contact_id;
-          }
-        }
-        else {
-          $component = self::exportComponent($exportMode);
-
-          if ($exportMode == CRM_Export_Form_Select::CASE_EXPORT) {
-            $relIDs = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($ids);
-          }
-          else {
-            $relIDs = CRM_Core_DAO::getContactIDsFromComponent($ids, $component);
-          }
-        }
+        $relIDs = self::getIDsForRelatedContact($ids, $exportMode);
 
         $relationshipJoin = $relationshipClause = '';
         if (!$selectAll && $componentTable) {
@@ -2183,6 +2159,42 @@ WHERE  {$whereClause}";
         // if relation field is empty or null
         $row[$relPrefix] = '';
       }
+    }
+  }
+
+  /**
+   * Get the ids that we want to get related contact details for.
+   *
+   * @param array $ids
+   * @param int $exportMode
+   *
+   * @return array
+   */
+  protected static function getIDsForRelatedContact($ids, $exportMode) {
+    if ($exportMode == CRM_Export_Form_Select::CONTACT_EXPORT) {
+      return $ids;
+    }
+    if ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
+      $relIDs = [];
+      $sourceID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Source');
+      $dao = CRM_Core_DAO::executeQuery("
+            SELECT contact_id FROM civicrm_activity_contact
+            WHERE activity_id IN ( " . implode(',', $ids) . ") AND
+            record_type_id = {$sourceID}
+          ");
+
+      while ($dao->fetch()) {
+        $relIDs[] = $dao->contact_id;
+      }
+      return $relIDs;
+    }
+    $component = self::exportComponent($exportMode);
+
+    if ($exportMode == CRM_Export_Form_Select::CASE_EXPORT) {
+      return CRM_Case_BAO_Case::retrieveContactIdsByCaseId($ids);
+    }
+    else {
+      return CRM_Core_DAO::getContactIDsFromComponent($ids, $component);
     }
   }
 
