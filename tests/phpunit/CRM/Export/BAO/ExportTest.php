@@ -374,26 +374,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * This is to ensure that CRM-13995 remains fixed.
    */
   public function testExportRelationshipsMergeToHousehold() {
-    $this->setUpContactExportData();
-    $householdID = $this->householdCreate(['api.Address.create' => ['city' => 'Portland', 'state_province_id' => 'Maine', 'location_type_id' => 'Home']]);
-
-    $relationshipTypes = $this->callAPISuccess('RelationshipType', 'get', [])['values'];
-    $houseHoldTypeID = NULL;
-    foreach ($relationshipTypes as $id => $relationshipType) {
-      if ($relationshipType['name_a_b'] === 'Household Member of') {
-        $houseHoldTypeID = $relationshipType['id'];
-      }
-    }
-    $this->callAPISuccess('Relationship', 'create', [
-      'contact_id_a' => $this->contactIDs[0],
-      'contact_id_b' => $householdID,
-      'relationship_type_id' => $houseHoldTypeID,
-    ]);
-    $this->callAPISuccess('Relationship', 'create', [
-      'contact_id_a' => $this->contactIDs[1],
-      'contact_id_b' => $householdID,
-      'relationship_type_id' => $houseHoldTypeID,
-    ]);
+    list($householdID, $houseHoldTypeID) = $this->setUpHousehold();
 
     $selectedFields = [
       ['Individual', $houseHoldTypeID . '_a_b', 'state_province', ''],
@@ -426,6 +407,40 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $this->assertEquals($householdID, $dao->civicrm_primary_id);
     }
 
+  }
+
+  /**
+   * Test exporting relationships.
+   */
+  public function testExportRelationshipsMergeToHouseholdAllFields() {
+    $this->markTestIncomplete('Does not yet work under CI due to mysql limitation (number of columns in table). Works on some boxes');
+    list($householdID) = $this->setUpHousehold();
+    list($tableName) = CRM_Export_BAO_Export::exportComponents(
+      FALSE,
+      $this->contactIDs,
+      [],
+      NULL,
+      NULL,
+      NULL,
+      CRM_Export_Form_Select::CONTACT_EXPORT,
+      "contact_a.id IN (" . implode(",", $this->contactIDs) . ")",
+      NULL,
+      FALSE,
+      TRUE,
+      [
+        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
+        'suppress_csv_for_testing' => TRUE,
+      ]
+    );
+    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM {$tableName}");
+    while ($dao->fetch()) {
+      $this->assertEquals('Portland', $dao->city);
+      $this->assertEquals('ME', $dao->state_province);
+      $this->assertEquals($householdID, $dao->civicrm_primary_id);
+      $this->assertEquals($householdID, $dao->civicrm_primary_id);
+      $this->assertEquals('Unit Test Household', $dao->addressee);
+      $this->assertEquals('Unit Test Household', $dao->display_name);
+    }
   }
 
   /**
@@ -537,6 +552,39 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     // delete the export temp table and component table
     $sql = "DROP TABLE IF EXISTS {$tableName}";
     CRM_Core_DAO::executeQuery($sql);
+  }
+
+  /**
+   * @return array
+   */
+  protected function setUpHousehold() {
+    $this->setUpContactExportData();
+    $householdID = $this->householdCreate([
+      'api.Address.create' => [
+        'city' => 'Portland',
+        'state_province_id' => 'Maine',
+        'location_type_id' => 'Home'
+      ]
+    ]);
+
+    $relationshipTypes = $this->callAPISuccess('RelationshipType', 'get', [])['values'];
+    $houseHoldTypeID = NULL;
+    foreach ($relationshipTypes as $id => $relationshipType) {
+      if ($relationshipType['name_a_b'] === 'Household Member of') {
+        $houseHoldTypeID = $relationshipType['id'];
+      }
+    }
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $this->contactIDs[0],
+      'contact_id_b' => $householdID,
+      'relationship_type_id' => $houseHoldTypeID,
+    ]);
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $this->contactIDs[1],
+      'contact_id_b' => $householdID,
+      'relationship_type_id' => $houseHoldTypeID,
+    ]);
+    return array($householdID, $houseHoldTypeID);
   }
 
 }
