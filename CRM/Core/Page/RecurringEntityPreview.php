@@ -60,7 +60,11 @@ class CRM_Core_Page_RecurringEntityPreview extends CRM_Core_Page {
       }
 
       // Get original entity
-      $original[$startDateColumnName] = CRM_Utils_Date::processDate($formValues['repetition_start_date']);
+      $entityStartDateTime = $formValues['repetition_start_date'];
+      if (isset($formValues['repetition_start_date_time'])) {
+        $entityStartDateTime .= " " . $formValues['repetition_start_date_time'];
+      }
+      $original[$startDateColumnName] = CRM_Utils_Date::processDate($entityStartDateTime);
       $daoName = CRM_Core_BAO_RecurringEntity::$_tableDAOMapper[$formValues['entity_table']];
       if ($parentEventId) {
         $startDate = $original[$startDateColumnName] = CRM_Core_DAO::getFieldValue($daoName, $parentEventId, $startDateColumnName);
