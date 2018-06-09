@@ -1470,6 +1470,9 @@ class CRM_Core_Permission {
       'create' => array('edit message templates', 'edit user-driven message templates', 'edit system workflow message templates'),
       'update' => array('edit message templates', 'edit user-driven message templates', 'edit system workflow message templates'),
     );
+
+    $permissions['report_template']['update'] = 'save Report Criteria';
+    $permissions['report_template']['create'] = 'save Report Criteria';
     return $permissions;
   }
 

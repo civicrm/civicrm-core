@@ -43,6 +43,7 @@ function civicrm_webtest_enable() {
    'access deleted contacts',
    // 'access my cases and activities',
    'access Report Criteria',
+   'save Report Criteria',
    'access uploaded files',
    // 'add cases',
    'add contacts',

@@ -55,6 +55,7 @@ class CRM_Upgrade_Incremental_php_FiveFour extends CRM_Upgrade_Incremental_Base 
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+    $postUpgradeMessage .= '<p>' . ts('A new %1 permission has been added. It is not granted by default. If your users create reports, you may wish to review your permissions.', array(1 => 'save Report Criteria')) . '</p>';
     // Example: Generate a post-upgrade message.
     // if ($rev == '5.12.34') {
     //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
