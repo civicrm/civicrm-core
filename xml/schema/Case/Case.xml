@@ -129,7 +129,7 @@
     <uniqueName>case_start_date</uniqueName>
     <title>Case Start Date</title>
     <import>true</import>
-    <type>date</type>
+    <type>datetime</type>
     <comment>Date on which given case starts.</comment>
     <html>
       <type>Select Date</type>
@@ -141,7 +141,7 @@
     <uniqueName>case_end_date</uniqueName>
     <title>Case End Date</title>
     <import>true</import>
-    <type>date</type>
+    <type>datetime</type>
     <comment>Date on which given case ends.</comment>
     <html>
       <type>Select Date</type>
