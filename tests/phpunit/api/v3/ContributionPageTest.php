@@ -1509,6 +1509,103 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->_ids['contribution_page'] = $contributionPageResult['id'];
   }
 
+  /**
+   * Helper function to set up contribution page which can be used to purchase a
+   * membership type for different intervals.
+   */
+  public function setUpMultiIntervalMembershipContributionPage() {
+    $this->setupPaymentProcessor();
+    $contributionPage = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $this->_ids['contribution_page'] = $contributionPage['id'];
+
+    $this->_ids['membership_type'] = $this->membershipTypeCreate(array(
+      'auto_renew' => 2, // force auto-renew
+      'duration_unit' => 'month',
+    ));
+
+    $priceSet = civicrm_api3('PriceSet', 'create', array(
+      'is_quick_config' => 0,
+      'extends' => 'CiviMember',
+      'financial_type_id' => 'Member Dues',
+      'title' => 'CRM-21177',
+    ));
+    $this->_ids['price_set'] = $priceSet['id'];
+
+    $priceField = $this->callAPISuccess('price_field', 'create', array(
+      'price_set_id' => $this->_ids['price_set'],
+      'name' => 'membership_type',
+      'label' => 'Membership Type',
+      'html_type' => 'Radio',
+    ));
+    $this->_ids['price_field'] = $priceField['id'];
+
+    $priceFieldValueMonthly = $this->callAPISuccess('price_field_value', 'create', array(
+      'name' => 'CRM-21177_Monthly',
+      'label' => 'CRM-21177 - Monthly',
+      'amount' => 20,
+      'membership_num_terms' => 1,
+      'membership_type_id' => $this->_ids['membership_type'],
+      'price_field_id' => $this->_ids['price_field'],
+      'financial_type_id' => 'Member Dues',
+    ));
+    $this->_ids['price_field_value_monthly'] = $priceFieldValueMonthly['id'];
+
+    $priceFieldValueYearly = $this->callAPISuccess('price_field_value', 'create', array(
+      'name' => 'CRM-21177_Yearly',
+      'label' => 'CRM-21177 - Yearly',
+      'amount' => 200,
+      'membership_num_terms' => 12,
+      'membership_type_id' => $this->_ids['membership_type'],
+      'price_field_id' => $this->_ids['price_field'],
+      'financial_type_id' => 'Member Dues',
+    ));
+    $this->_ids['price_field_value_yearly'] = $priceFieldValueYearly['id'];
+
+    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $this->_ids['contribution_page'], $this->_ids['price_set']);
+
+    $this->callAPISuccess('membership_block', 'create', array(
+      'entity_id' => $this->_ids['contribution_page'],
+      'entity_table' => 'civicrm_contribution_page',
+      'is_required' => TRUE,
+      'is_separate_payment' => FALSE,
+      'is_active' => TRUE,
+      'membership_type_default' => $this->_ids['membership_type'],
+    ));
+  }
+
+  /**
+   * Test submit with a membership block in place.
+   */
+  public function testSubmitMultiIntervalMembershipContributionPage() {
+    $this->setUpMultiIntervalMembershipContributionPage();
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'] => $this->_ids['price_field_value_monthly'],
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 20,
+      'first_name' => 'Billy',
+      'last_name' => 'Gruff',
+      'email' => 'billy@goat.gruff',
+      'payment_processor_id' => $this->_ids['payment_processor'],
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
+      'cvv2' => 123,
+      'auto_renew' => 1,
+    );
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+
+    $submitParams['price_' . $this->_ids['price_field']] = $this->_ids['price_field_value_yearly'];
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+
+    $contribution = $this->callAPISuccess('Contribution', 'get', array(
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'sequential' => 1,
+      'api.ContributionRecur.getsingle' => array(),
+    ));
+    $this->assertEquals(1, $contribution['values'][0]['api.ContributionRecur.getsingle']['frequency_interval']);
+    //$this->assertEquals(12, $contribution['values'][1]['api.ContributionRecur.getsingle']['frequency_interval']);
+  }
+
   public static function setUpBeforeClass() {
     // put stuff here that should happen before all tests in this unit
   }
