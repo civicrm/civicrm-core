@@ -304,8 +304,14 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
   public function getBuildValueExamples() {
     return [
       [
-        [0, 'email', 2, 'location'], [0 => ['email' => [2 => ['location' => 'llama']]]]
-      ]
+        [], [0, 'email', 2, 'location'], [0 => ['email' => [2 => ['location' => 'llama']]]],
+      ],
+      [
+        ['foo', 'bar', [['donkey']]], [2, 0, 1], ['foo', 'bar', [['donkey', 'llama']]],
+      ],
+      [
+        ['a' => [1, 2, 3], 'b' => ['x' => [], 'y' => ['a' => 'donkey', 'b' => 'bear'], 'z' => [4, 5, 6]]], ['b', 'y', 'b'], ['a' => [1, 2, 3], 'b' => ['x' => [], 'y' => ['a' => 'donkey', 'b' => 'llama'], 'z' => [4, 5, 6]]],
+      ],
     ];
   }
 
@@ -317,8 +323,8 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
    *
    * @dataProvider getBuildValueExamples
    */
-  public function testBuildRecursiveValue($path, $expected) {
-    $result = CRM_Utils_Array::recursiveBuild($path, 'llama');
+  public function testBuildRecursiveValue($source, $path, $expected) {
+    $result = CRM_Utils_Array::recursiveBuild($path, 'llama', $source);
     $this->assertEquals($expected, $result);
   }
 
