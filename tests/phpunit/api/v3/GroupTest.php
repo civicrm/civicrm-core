@@ -49,10 +49,10 @@ class api_v3_GroupTest extends CiviUnitTestCase {
    * Clean up after test.
    */
   public function tearDown() {
-    $this->groupDelete($this->_groupID);
     CRM_Utils_Hook::singleton()->reset();
     $config = CRM_Core_Config::singleton();
     unset($config->userPermissionClass->permissions);
+    $this->quickCleanup(['civicrm_group', 'civicrm_group_contact']);
   }
 
   /**
@@ -83,6 +83,17 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $this->assertEquals($group[$this->_groupID]['name'], "Test Group 1");
     $this->assertEquals($group[$this->_groupID]['is_active'], 1);
     $this->assertEquals($group[$this->_groupID]['visibility'], 'Public Pages');
+  }
+
+  /**
+   * Test ability to get active, inactive and both.
+   *
+   * Default is active only.
+   */
+  public function testGetGroupActiveAndInactive() {
+    $this->groupCreate(['is_active' => 0, 'name' => 'group_2', 'title' => 2]);
+    $group1 = $this->callAPISuccessGetSingle('Group', ['is_active' => 1]);
+    $this->callAPISuccessGetCount('Group', [], 2);
   }
 
   public function testGetGroupParamsWithGroupId() {
