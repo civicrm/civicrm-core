@@ -75,6 +75,10 @@ class CRM_Upgrade_Incremental_MessageTemplates {
         'templates' => [
           ['name' => 'membership_online_receipt', 'type' => 'text'],
           ['name' => 'membership_online_receipt', 'type' => 'html'],
+          ['name' => 'contribution_online_receipt', 'type' => 'text'],
+          ['name' => 'contribution_online_receipt', 'type' => 'html'],
+          ['name' => 'event_online_receipt', 'type' => 'text'],
+          ['name' => 'event_online_receipt', 'type' => 'html'],
         ]
       ],
     ];
