@@ -133,9 +133,20 @@ class CRM_Core_DAO extends DB_DataObject {
    *   The database connection string.
    */
   public static function init($dsn) {
+    $runtime = \Civi\Core\Container::getBootService('runtime');
+
     Civi::$statics[__CLASS__]['init'] = 1;
+
+    if (!isset(Civi::$statics[__CLASS__]['activeDb'])) {
+      Civi::$statics[__CLASS__]['activeDb'] = [$runtime->defaultDsnType];
+    }
+
     $options = &PEAR::getStaticProperty('DB_DataObject', 'options');
-    $options['database'] = $dsn;
+    $options['database'] = $runtime->dsn;
+    $options['database_rw'] = $runtime->dsn;
+    $options['database_ro'] = $runtime->roDsn;
+    $options['database_cms'] = $runtime->userFrameworkDSN;
+
     if (defined('CIVICRM_DAO_DEBUG')) {
       self::DebugLevel(CIVICRM_DAO_DEBUG);
     }
@@ -447,6 +458,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * we need to set the links manually.
    */
   public function initialize() {
+    $this->_database = isset(Civi::$statics[__CLASS__]['activeDb'][0]) ? Civi::$statics[__CLASS__]['activeDb'][0] : \Civi\Core\Container::getBootService('runtime')->defaultDsnType;
     $this->_connect();
     if (empty(Civi::$statics[__CLASS__]['init'])) {
       // CRM_Core_DAO::init() must be called before CRM_Core_DAO->initialize().
@@ -856,7 +868,7 @@ LIKE %1
     $dao = CRM_Core_DAO::executeQuery(
       "SELECT TABLE_NAME
        FROM information_schema.TABLES
-       WHERE TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
+       WHERE TABLE_SCHEMA = database()
          AND TABLE_NAME LIKE 'civicrm_%'
          AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
          AND TABLE_NAME NOT LIKE '%_temp%'
@@ -879,7 +891,7 @@ LIKE %1
       "SELECT count(*)
        FROM information_schema.TABLES
        WHERE ENGINE = 'MyISAM'
-         AND TABLE_SCHEMA = '" . CRM_Core_DAO::getDatabaseName() . "'
+         AND TABLE_SCHEMA = database()
          AND TABLE_NAME LIKE 'civicrm_%'
          AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
          AND TABLE_NAME NOT LIKE '%_temp%'
@@ -892,8 +904,7 @@ LIKE %1
    * @return string
    */
   public static function getDatabaseName() {
-    $daoObj = new CRM_Core_DAO();
-    return $daoObj->database();
+    return CRM_Core_DAO::singleValueQuery('SELECT database()');
   }
 
   /**
@@ -1440,11 +1451,12 @@ FROM   civicrm_domain
   ) {
     $queryStr = self::composeQuery($query, $params, $abort);
 
-    static $_dao = NULL;
+    $db = isset(Civi::$statics[__CLASS__]['activeDb'][0]) ? Civi::$statics[__CLASS__]['activeDb'][0] : \Civi\Core\Container::getBootService('runtime')->defaultDsnType;
 
-    if (!$_dao) {
-      $_dao = new CRM_Core_DAO();
+    if (!isset(Civi::$statics[__CLASS__]['svq'][$db])) {
+      Civi::$statics[__CLASS__]['svq'][$db] = new CRM_Core_DAO();
     }
+    $_dao = Civi::$statics[__CLASS__]['svq'][$db];
 
     $_dao->query($queryStr, $i18nRewrite);
 

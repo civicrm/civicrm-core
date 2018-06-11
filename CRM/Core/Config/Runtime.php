@@ -34,7 +34,27 @@
  */
 class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
 
+  /**
+   * @var string
+   *   Credentials for the normal/master/read-write database.
+   *
+   *   Ex: 'mysql://USER:PASS@HOST:PORT/DB?new_link=true'
+   */
   public $dsn;
+
+  /**
+   * @var string|NULL
+   *   Credentials for the replica/read-only database (if applicable).
+   *
+   *   Ex: 'mysql://USER:PASS@HOST:PORT/DB?new_link=true'
+   */
+  public $roDsn;
+
+  /**
+   * @var string
+   *   Ex: 'rw' or 'ro'.
+   */
+  public $defaultDsnType;
 
   /**
    * The name of user framework
@@ -94,6 +114,8 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
       $this->fatal('You need to define CIVICRM_DSN in civicrm.settings.php');
     }
     $this->dsn = defined('CIVICRM_DSN') ? CIVICRM_DSN : NULL;
+    $this->roDsn = defined('CIVICRM_RO_DSN') ? CIVICRM_RO_DSN : $this->dsn;
+    $this->defaultDsnType = defined('CIVICRM_RO_DSN') ? 'ro' : 'rw';
 
     if (!defined('CIVICRM_TEMPLATE_COMPILEDIR') && $loadFromDB) {
       $this->fatal('You need to define CIVICRM_TEMPLATE_COMPILEDIR in civicrm.settings.php');

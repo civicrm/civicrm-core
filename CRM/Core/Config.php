@@ -386,7 +386,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     $query = "
       SELECT TABLE_NAME as tableName
       FROM   INFORMATION_SCHEMA.TABLES
-      WHERE  TABLE_SCHEMA = %1
+      WHERE  TABLE_SCHEMA = database()
       AND (
         TABLE_NAME LIKE 'civicrm_import_job_%'
         OR TABLE_NAME LIKE 'civicrm_export_temp%'
@@ -398,7 +398,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       $query .= " AND CREATE_TIME < DATE_SUB(NOW(), INTERVAL {$timeInterval})";
     }
 
-    $tableDAO = CRM_Core_DAO::executeQuery($query, array(1 => array($dao->database(), 'String')));
+    $tableDAO = CRM_Core_DAO::executeQuery($query);
     $tables = array();
     while ($tableDAO->fetch()) {
       $tables[] = $tableDAO->tableName;

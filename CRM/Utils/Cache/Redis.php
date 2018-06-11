@@ -105,7 +105,9 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
       echo 'Could not connect to redisd server';
       CRM_Utils_System::civiExit();
     }
-    $this->_cache->auth(CIVICRM_DB_CACHE_PASSWORD);
+    if (CRM_Utils_Constant::value('CIVICRM_DB_CACHE_PASSWORD')) {
+      $this->_cache->auth(CIVICRM_DB_CACHE_PASSWORD);
+    }
   }
 
   /**
@@ -117,7 +119,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    */
   public function set($key, &$value) {
     if (!$this->_cache->set($this->_prefix . $key, serialize($value), $this->_timeout)) {
-      CRM_Core_Error::fatal("Redis set failed, wondering why?, $key", $value);
+      CRM_Core_Error::fatal("Redis set ($key) failed: " . $this->_cache->getLastError(), $value);
       return FALSE;
     }
     return TRUE;
@@ -130,7 +132,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    */
   public function get($key) {
     $result = $this->_cache->get($this->_prefix . $key);
-    return unserialize($result);
+    return ($result === FALSE) ? NULL : unserialize($result);
   }
 
   /**
@@ -146,7 +148,12 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    * @return mixed
    */
   public function flush() {
-    return $this->_cache->flushDB();
+    // FIXME: Ideally, we'd map each prefix to a different 'hash' object in Redis,
+    // and this would be simpler. However, that needs to go in tandem with a
+    // more general rethink of cache expiration/TTL.
+
+    $keys = $this->_cache->keys($this->_prefix . '*');
+    return $this->_cache->del($keys);
   }
 
 }

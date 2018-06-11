@@ -1422,21 +1422,28 @@ class CRM_Utils_System {
     // also reset the various static memory caches
 
     // reset the memory or array cache
-    CRM_Core_BAO_Cache::deleteGroup('contact fields', NULL, FALSE);
+    CRM_Utils_System::flushFields();
 
     // reset ACL cache
     CRM_ACL_BAO_Cache::resetCache();
 
     // reset various static arrays used here
-    CRM_Contact_BAO_Contact::$_importableFields = CRM_Contact_BAO_Contact::$_exportableFields
-      = CRM_Contribute_BAO_Contribution::$_importableFields
-        = CRM_Contribute_BAO_Contribution::$_exportableFields
-          = CRM_Pledge_BAO_Pledge::$_exportableFields
-            = CRM_Core_BAO_CustomField::$_importFields
-              = CRM_Core_BAO_Cache::$_cache = CRM_Core_DAO::$_dbColumnValueCache = NULL;
+    CRM_Core_BAO_Cache::$_cache = CRM_Core_DAO::$_dbColumnValueCache = NULL;
 
     CRM_Core_OptionGroup::flushAll();
     CRM_Utils_PseudoConstant::flushAll();
+  }
+
+  public static function flushFields() {
+    // reset the memory or array cache
+    \Civi::cache('fields')->flush();
+
+    CRM_Contact_BAO_Contact::$_importableFields = NULL;
+    CRM_Contact_BAO_Contact::$_exportableFields = NULL;
+    CRM_Contribute_BAO_Contribution::$_importableFields = NULL;
+    CRM_Contribute_BAO_Contribution::$_exportableFields = NULL;
+    CRM_Pledge_BAO_Pledge::$_exportableFields = NULL;
+    CRM_Core_BAO_CustomField::$_importFields = NULL;
   }
 
   /**

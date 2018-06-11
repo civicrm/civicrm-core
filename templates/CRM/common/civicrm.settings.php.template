@@ -129,6 +129,17 @@ if (!defined('CIVICRM_LOGGING_DSN')) {
 }
 
 /**
+ * CiviCRM Read-only Database (EXPERIMENTAL)
+ *
+ * To distribute load across multiple database replicas, you may set an alternative read-only DSN
+ * which will be used for read operations.
+ */
+// if (!defined('CIVICRM_RO_DSN')) {
+//   define('CIVICRM_RO_DSN', 'mysql://%%roDbUser%%:%%roDbPass%%@%%roDbHost%%/%%roDbName%%?new_link=true');
+// }
+
+
+/**
  * File System Paths:
  *
  * $civicrm_root is the file system path on your server where the civicrm
