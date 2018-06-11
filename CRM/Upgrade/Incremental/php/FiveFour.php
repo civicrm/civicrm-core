@@ -62,6 +62,17 @@ class CRM_Upgrade_Incremental_php_FiveFour extends CRM_Upgrade_Incremental_Base 
     // }
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_4_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Add Cancel Button Setting to the Profile', 'addColumn',
+      'civicrm_uf_group', 'add_cancel_button', "tinyint DEFAULT '1' COMMENT 'Should a Cancel button be included in this Profile form.'");
+  }
+
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
