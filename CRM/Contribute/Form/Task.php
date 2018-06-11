@@ -217,7 +217,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
    */
   public function setContactIDs() {
     if (!$this->_includesSoftCredits) {
-      $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent(
+      $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent(
         $this->_contributionIds,
         'civicrm_contribution'
       );
