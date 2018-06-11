@@ -840,12 +840,13 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param int $caseID
    *   Case id.
    * @param int $relationshipID
+   * @param bool $activeOnly
    *
    * @return array
    *   case role / relationships
    *
    */
-  public static function getCaseRoles($contactID, $caseID, $relationshipID = NULL) {
+  public static function getCaseRoles($contactID, $caseID, $relationshipID = NULL, $activeOnly = TRUE) {
     $query = '
     SELECT  rel.id as civicrm_relationship_id,
             con.sort_name as sort_name,
@@ -861,7 +862,11 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
  LEFT JOIN  civicrm_phone ON (civicrm_phone.contact_id = con.id AND civicrm_phone.is_primary = 1)
  LEFT JOIN  civicrm_email ON (civicrm_email.contact_id = con.id AND civicrm_email.is_primary = 1)
      WHERE  (rel.contact_id_a = %1 OR rel.contact_id_b = %1) AND rel.case_id = %2
-       AND  rel.is_active = 1 AND con.is_deleted = 0 AND (rel.end_date IS NULL OR rel.end_date > NOW())';
+       AND con.is_deleted = 0';
+
+    if ($activeOnly) {
+      $query .= ' AND rel.is_active = 1 AND (rel.end_date IS NULL OR rel.end_date > NOW())';
+    }
 
     $params = array(
       1 => array($contactID, 'Positive'),
