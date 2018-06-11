@@ -240,15 +240,12 @@ SELECT r.payment_processor_id
    *
    * @param int $recurId
    *   Recur contribution id.
-   * @param array $objects
-   *   An array of objects that is to be cancelled like.
-   *                          contribution, membership, event. At least contribution object is a must.
    *
    * @param array $activityParams
    *
    * @return bool
    */
-  public static function cancelRecurContribution($recurId, $objects, $activityParams = array()) {
+  public static function cancelRecurContribution($recurId, $activityParams = array()) {
     if (!$recurId) {
       return FALSE;
     }
@@ -306,16 +303,8 @@ SELECT r.payment_processor_id
         CRM_Activity_BAO_Activity::create($activityParams);
       }
 
-      // if there are associated objects, cancel them as well
-      if (!$objects) {
-        $transaction->commit();
-        return TRUE;
-      }
-      else {
-        // @todo - this is bad! Get the function out of the ipn.
-        $baseIPN = new CRM_Core_Payment_BaseIPN();
-        return $baseIPN->cancelled($objects, $transaction);
-      }
+      $transaction->commit();
+      return TRUE;
     }
     else {
       // if already cancelled, return true

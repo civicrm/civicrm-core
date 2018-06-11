@@ -224,7 +224,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
         );
       $cancelStatus = CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution(
         $this->_subscriptionDetails->recur_id,
-        NULL,
         $activityParams
       );
 
