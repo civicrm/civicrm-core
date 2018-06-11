@@ -497,6 +497,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    */
   public function testRelationshipClause() {
     $today = date('Ymd');
+    $from1 = " FROM civicrm_contact contact_a LEFT JOIN civicrm_relationship ON (civicrm_relationship.contact_id_a = contact_a.id ) LEFT JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_b = contact_b.id )";
+    $from2 = " FROM civicrm_contact contact_a LEFT JOIN civicrm_relationship ON (civicrm_relationship.contact_id_b = contact_a.id ) LEFT JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_a = contact_b.id )";
     $where1 = "WHERE  ( (
 civicrm_relationship.is_active = 1 AND
 ( civicrm_relationship.end_date IS NULL OR civicrm_relationship.end_date >= {$today} ) AND
@@ -516,6 +518,7 @@ civicrm_relationship.is_active = 1 AND
       TRUE, FALSE
     );
     $sql1 = $query1->query(FALSE);
+    $this->assertEquals($from1, $sql1[1]);
     $this->assertEquals($where1, $sql1[2]);
     // Test single relationship type selected in multiple select.
     $params2 = array(array('relation_type_id', 'IN', array('8_a_b'), 0, 0));
@@ -526,6 +529,7 @@ civicrm_relationship.is_active = 1 AND
       TRUE, FALSE
     );
     $sql2 = $query2->query(FALSE);
+    $this->assertEquals($from1, $sql2[1]);
     $this->assertEquals($where1, $sql2[2]);
     // Test multiple relationship types selected.
     $params3 = array(array('relation_type_id', 'IN', array('8_a_b', '10_a_b'), 0, 0));
@@ -536,6 +540,7 @@ civicrm_relationship.is_active = 1 AND
       TRUE, FALSE
     );
     $sql3 = $query3->query(FALSE);
+    $this->assertEquals($from1, $sql3[1]);
     $this->assertEquals($where2, $sql3[2]);
     // Test Multiple Relationship type selected where one doesn't actually exist.
     $params4 = array(array('relation_type_id', 'IN', array('8_a_b', '10_a_b', '14_a_b'), 0, 0));
@@ -546,7 +551,20 @@ civicrm_relationship.is_active = 1 AND
       TRUE, FALSE
     );
     $sql4 = $query4->query(FALSE);
+    $this->assertEquals($from1, $sql4[1]);
     $this->assertEquals($where2, $sql4[2]);
+
+    // Test Multiple b to a Relationship type  .
+    $params5 = array(array('relation_type_id', 'IN', array('8_b_a', '10_b_a', '14_b_a'), 0, 0));
+    $query5 = new CRM_Contact_BAO_Query(
+      $params5, array('contact_id'),
+      NULL, TRUE, FALSE, 1,
+      TRUE,
+      TRUE, FALSE
+    );
+    $sql5 = $query5->query(FALSE);
+    $this->assertEquals($from2, $sql5[1]);
+    $this->assertEquals($where2, $sql5[2]);
   }
 
   /**
