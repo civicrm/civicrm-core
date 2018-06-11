@@ -4066,7 +4066,7 @@ WHERE  $smartGroupClause
       $relationType[2] = (array) $relationType[2];
       foreach ($relationType[2] as $relType) {
         $rel = explode('_', $relType);
-        self::$_relType .= $rel[1];
+        self::$_relType = $rel[1];
         $params = array('id' => $rel[0]);
         $typeValues = array();
         $rTypeValue = CRM_Contact_BAO_RelationshipType::retrieve($params, $typeValues);
