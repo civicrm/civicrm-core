@@ -36,7 +36,9 @@
 
   <div class="crm-submit-buttons">
     <span class="crm-button">{$form._qf_Edit_upload_delete.html}</span>
-    <a class="button cancel" href="{$cancelURL}">{$cancelButtonText}</a>
+    {if $includeCancelButton}
+      <a class="button cancel" href="{$cancelURL}">{$cancelButtonText}</a>
+    {/if}
   </div>
 {else}
 {if ! empty( $fields )}
@@ -218,12 +220,14 @@
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
         {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
-        <a class="button cancel" href="{$cancelURL}">
-          <span>
-            <i class="crm-i fa-times"></i>
-            {$cancelButtonText}
-          </span>
-        </a>
+        {if $includeCancelButton}
+          <a class="button cancel" href="{$cancelURL}">
+            <span>
+              <i class="crm-i fa-times"></i>
+              {$cancelButtonText}
+            </span>
+          </a>
+        {/if}
       </div>
     {/if}
     {if $help_post && $action neq 4}<br /><div class="messages help">{$help_post}</div>{/if}
