@@ -1986,6 +1986,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $rule_group_id
    * @param int $group_id
    * @param bool $reloadCacheIfEmpty
+   *   Should the cache be reloaded if empty - this must be false when in a dedupe action!
    * @param int $batchLimit
    * @param bool $isSelected
    *   Limit to selected pairs.
