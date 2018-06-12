@@ -604,7 +604,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * @param array $errors
    *   List of errors to be posted back to the form.
    */
-  public static function formRuleSubType($fieldType, $groupType, &$errors) {
+  public static function formRuleSubType($fieldType, $groupType, &$errors, $self) {
     if (in_array($fieldType, array(
       'Participant',
       'Contribution',
@@ -624,7 +624,16 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
             'Formatting',
           ))
         ) {
-          $errors['field_name'] = ts('Cannot add or update profile field "%1" with combination of Household or Organization or any subtypes of Household or Organization.', array(1 => $fieldType));
+          $flag = TRUE;
+          $onbehalf = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $self->_gid, 'module', 'uf_group_id');
+          //special case where in we allow membership/contribution + organization fields, for on behalf feature
+          if ($onbehalf == 'on_behalf' && $value == 'Organization' && in_array($fieldType, array('Membership', 'Contribution'))) {
+            $flag = FALSE;
+          }
+
+          if ($flag) {
+            $errors['field_name'] = ts('Cannot add or update profile field "%1" with combination of Household or Organization or any subtypes of Household or Organization.', array(1 => $fieldType));
+          }
           break;
         }
       }
@@ -848,7 +857,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     switch ($fieldType) {
       case 'Contact':
-        self::formRuleSubType($fieldType, $groupType, $errors);
+        self::formRuleSubType($fieldType, $groupType, $errors, $self);
         break;
 
       case 'Individual':
@@ -867,7 +876,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           }
         }
         else {
-          self::formRuleSubType($fieldType, $groupType, $errors);
+          self::formRuleSubType($fieldType, $groupType, $errors, $self);
         }
         break;
 
@@ -876,7 +885,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           $errors['field_name'] = ts('Cannot add or update profile field type Household with combination of Individual or Organization or Activity');
         }
         else {
-          self::formRuleSubType($fieldType, $groupType, $errors);
+          self::formRuleSubType($fieldType, $groupType, $errors, $self);
         }
         break;
 
@@ -885,7 +894,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           $errors['field_name'] = ts('Cannot add or update profile field type Organization with combination of Household or Individual or Activity');
         }
         else {
-          self::formRuleSubType($fieldType, $groupType, $errors);
+          self::formRuleSubType($fieldType, $groupType, $errors, $self);
         }
         break;
 
@@ -909,7 +918,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           }
         }
         else {
-          self::formRuleSubType($fieldType, $groupType, $errors);
+          self::formRuleSubType($fieldType, $groupType, $errors, $self);
         }
 
         if ($isCustomField && !isset($errors['field_name'])) {
@@ -924,39 +933,34 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           $errors['field_name'] = ts('Cannot add or update profile field type Participant with combination of Activity or Membership or Contribution or Household or Organization.');
         }
         else {
-          self::formRuleSubType($fieldType, $groupType, $errors);
+          self::formRuleSubType($fieldType, $groupType, $errors, $self);
         }
         break;
 
       case 'Contribution':
-        //special case where in we allow contribution + oganization fields, for on behalf feature
-        $profileId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup',
-          'on_behalf_organization', 'id', 'name'
-        );
+        //special case where in we allow contribution + organization fields, for on behalf feature
+        $onbehalf = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $self->_gid, 'module', 'uf_group_id');
 
         if (in_array('Participant', $groupType) || in_array('Membership', $groupType)
-          || ($profileId != $self->_gid && in_array('Organization', $groupType)) || in_array('Household', $groupType) || in_array('Activity', $groupType)
+          || ($onbehalf != 'on_behalf' && in_array('Organization', $groupType)) || in_array('Household', $groupType) || in_array('Activity', $groupType)
         ) {
           $errors['field_name'] = ts('Cannot add or update profile field type Contribution with combination of Activity or Membership or Participant or Household or Organization');
         }
         else {
-          self::formRuleSubType($fieldType, $groupType, $errors);
+          self::formRuleSubType($fieldType, $groupType, $errors, $self);
         }
         break;
 
       case 'Membership':
-        //special case where in we allow contribution + oganization fields, for on behalf feature
-        $profileId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup',
-          'on_behalf_organization', 'id', 'name'
-        );
-
+        //special case where in we allow membership + organization fields, for on behalf feature
+        $onbehalf = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $self->_gid, 'module', 'uf_group_id');
         if (in_array('Participant', $groupType) || in_array('Contribution', $groupType)
-          || ($profileId != $self->_gid && in_array('Organization', $groupType)) || in_array('Household', $groupType) || in_array('Activity', $groupType)
+          || ($onbehalf != 'on_behalf' && in_array('Organization', $groupType)) || in_array('Household', $groupType) || in_array('Activity', $groupType)
         ) {
           $errors['field_name'] = ts('Cannot add or update profile field type Membership with combination of Activity or Participant or Contribution or Household or Organization');
         }
         else {
-          self::formRuleSubType($fieldType, $groupType, $errors);
+          self::formRuleSubType($fieldType, $groupType, $errors, $self);
         }
         break;
 
