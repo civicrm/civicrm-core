@@ -139,6 +139,14 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
     elseif ($field == 'fee_amount') {
       $row->tokens($entity, $field, \CRM_Utils_Money::format($actionSearchResult->$field));
     }
+    elseif ($field == 'description') {
+      $description_html = $actionSearchResult->description;
+      $description_text = CRM_Utils_String::htmlToText($description_html);
+      $original_format = $row->format;
+      $row->format('text/html')->tokens($entity, $field, $description_html);
+      $row->format('text/plain')->tokens($entity, $field, $description_text);
+      $row->format($original_format);
+    }
     elseif (isset($actionSearchResult->$field)) {
       $row->tokens($entity, $field, $actionSearchResult->$field);
     }
