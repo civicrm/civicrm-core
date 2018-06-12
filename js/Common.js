@@ -1522,44 +1522,35 @@ if (!CRM.vars) CRM.vars = {};
           $(this).siblings('.crm-clear-link').css({visibility: 'hidden'});
         }
       })
-
-      // Allow normal clicking of links within accordions
-      .on('click.crmAccordions', 'div.crm-accordion-header a, .collapsible-title a', function (e) {
-        e.stopPropagation();
-      })
-      // Handle accordions
       .on('click.crmAccordions', '.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
         var action = 'open';
-        if ($(this).parent().hasClass('collapsed')) {
-          $(this).next().css('display', 'none').slideDown(200);
-        }
-        else {
-          $(this).next().css('display', 'block').slideUp(200);
-          action = 'close';
-        }
-        $(this).parent().toggleClass('collapsed').trigger('crmAccordion:' + action);
+
         e.preventDefault();
       });
 
     $().crmtooltip();
+
+    $('.crm-accessible-accordion').crmAccordionToggle();
   });
 
   /**
-   * Collapse or expand an accordion
-   * @param speed
+   * Collapse or expand an accessible accordion
+   * @param options
    */
-  $.fn.crmAccordionToggle = function (speed) {
-    $(this).each(function () {
-      var action = 'open';
-      if ($(this).hasClass('collapsed')) {
-        $('.crm-accordion-body', this).first().css('display', 'none').slideDown(speed);
-      }
-      else {
-        $('.crm-accordion-body', this).first().css('display', 'block').slideUp(speed);
-        action = 'close';
-      }
-      $(this).toggleClass('collapsed').trigger('crmAccordion:' + action);
-    });
+  $.fn.crmAccordionToggle = function (settings) {
+    $('.crm-accordion-header .expanded', this).attr('data-accordion-opened', 'true');
+    $(this).accordion($.extend({
+      headersSelector: '.crm-accordion-header',
+      panelsSelector: '.crm-accordion-wrapper',
+      buttonsSelector: 'button.crm-accordion-header',
+      button: $('<button></button>', {
+        class: 'crm-accordion-header',
+        type: 'button'
+      }),
+      headerSuffixClass: '-title',
+      buttonSuffixClass: '-header',
+      panelSuffixClass: '-wrapper',
+    }, settings));
   };
 
   /**

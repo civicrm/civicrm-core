@@ -30,7 +30,7 @@
   {if $contactId}
     {include file="CRM/Contact/Form/Edit/Lock.tpl"}
   {/if}
-  <div class="crm-form-block crm-search-form-block">
+  <div class="crm-accessible-accordion crm-form-block crm-search-form-block">
     {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
       <a href='{crmURL p="civicrm/admin/setting/preferences/display" q="reset=1"}' title="{ts}Click here to configure the panes.{/ts}"><i class="crm-i fa-wrench"></i></a>
     {/if}
@@ -39,11 +39,10 @@
     {include file="CRM/common/formButtons.tpl" location="top"}
     </div>
 
-    <div class="crm-accordion-wrapper crm-contactDetails-accordion">
+    <div class="crm-accordion-wrapper" data-accordion-opened='true'>
       <div class="crm-accordion-header">
         {ts}Contact Details{/ts}
       </div><!-- /.crm-accordion-header -->
-      <div class="crm-accordion-body" id="contactDetails">
         <div id="contactDetails">
           <div class="crm-section contact_basic_information-section">
           {include file="CRM/Contact/Form/Edit/$contactType.tpl"}
@@ -93,7 +92,6 @@
           {/if}
           <div class="spacer"></div>
         </div>
-      </div><!-- /.crm-accordion-body -->
     </div><!-- /.crm-accordion-wrapper -->
 
     {foreach from = $editOptions item = "title" key="name"}
@@ -115,19 +113,6 @@
       action = "{/literal}{$action}{literal}",
       _ = CRM._;
 
-    $('.crm-accordion-body').each( function() {
-      //remove tab which doesn't have any element
-      if ( ! $.trim( $(this).text() ) ) {
-        ele     = $(this);
-        prevEle = $(this).prev();
-        $(ele).remove();
-        $(prevEle).remove();
-      }
-      //open tab if form rule throws error
-      if ( $(this).children().find('span.crm-error').text().length > 0 ) {
-        $(this).parents('.collapsed').crmAccordionToggle();
-      }
-    });
     if (action == '2') {
       $('.crm-accordion-wrapper').not('.crm-accordion-wrapper .crm-accordion-wrapper').each(function() {
         highlightTabs(this);
@@ -136,55 +121,20 @@
         highlightTabs($(this).parents('.crm-accordion-wrapper'));
       });
     }
-    function highlightTabs(tab) {
-      //highlight the tab having data inside.
-      $('.crm-accordion-body :input', tab).each( function() {
-        var active = false;
-          switch($(this).prop('type')) {
-            case 'checkbox':
-            case 'radio':
-              if($(this).is(':checked') && !$(this).is('[id$=IsPrimary],[id$=IsBilling]')) {
-                $('.crm-accordion-header:first', tab).addClass('active');
-                return false;
-              }
-              break;
-
-            case 'text':
-            case 'textarea':
-              if($(this).val()) {
-                $('.crm-accordion-header:first', tab).addClass('active');
-                return false;
-              }
-              break;
-
-            case 'select-one':
-            case 'select-multiple':
-              if($(this).val() && $('option[value=""]', this).length > 0) {
-                $('.crm-accordion-header:first', tab).addClass('active');
-                return false;
-              }
-              break;
-
-            case 'file':
-              if($(this).next().html()) {
-                $('.crm-accordion-header:first', tab).addClass('active');
-                return false;
-              }
-              break;
-          }
-          $('.crm-accordion-header:first', tab).removeClass('active');
-      });
-    }
 
     $('a#expand').click( function() {
       if( $(this).attr('href') == '#expand') {
         var message = {/literal}"{ts escape='js'}Collapse all tabs{/ts}"{literal};
         $(this).attr('href', '#collapse');
-        $('.crm-accordion-wrapper.collapsed').crmAccordionToggle();
+        $('.crm-accordion-wrapper').each(function() {
+          $(this).attr('aria-hidden', 'false');
+        });
       }
       else {
         var message = {/literal}"{ts escape='js'}Expand all tabs{/ts}"{literal};
-        $('.crm-accordion-wrapper:not(.collapsed)').crmAccordionToggle();
+        $('.crm-accordion-wrapper').each(function() {
+          $(this).attr('aria-hidden', 'true');
+        });
         $(this).attr('href', '#expand');
       }
       $(this).html(message);

@@ -30,7 +30,8 @@
     "font-awesome": "~4",
     "angular-bootstrap": "^2.5.0",
     "angular-sanitize": "~1.5.0",
-    "phantomjs-polyfill": "^0.0.2"
+    "phantomjs-polyfill": "^0.0.2",
+    "jquery-accessible-accordion-aria": "^2.5"
   },
   "resolutions": {
     "angular": "~1.5.11"

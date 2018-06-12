@@ -728,6 +728,7 @@ class CRM_Core_Resources {
       "js/Common.js",
       "js/crm.ajax.js",
       "js/wysiwyg/crm.wysiwyg.js",
+      "bower_components/jquery-accessible-accordion-aria/index.js",
     );
     // add wysiwyg editor
     $editor = Civi::settings()->get('editor_id');
