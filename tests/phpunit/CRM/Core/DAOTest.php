@@ -433,4 +433,18 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test the DAO cloning method does not hit issues with freeing the result.
+   */
+  public function testCloneDAO() {
+    $dao = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_domain');
+    $i = 0;
+    while ($dao->fetch()) {
+      $i++;
+      $cloned = clone($dao);
+      unset($cloned);
+    }
+    $this->assertEquals(2, $i);
+  }
+
 }

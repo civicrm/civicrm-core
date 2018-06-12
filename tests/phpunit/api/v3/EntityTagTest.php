@@ -140,6 +140,19 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test memory usage does not escalate crazily.
+   */
+  public function testMemoryLeak() {
+    $start = memory_get_usage();
+    for ($i = 0; $i < 100; $i++) {
+      $this->callAPISuccess('EntityTag', 'get', []);
+      $memUsage = memory_get_usage();
+    }
+    $max = $start + 2000000;
+    $this->assertTrue($memUsage < $max, "mem usage ( $memUsage ) should be less than $max (start was $start) ");
+  }
+
+  /**
    * Test tag can be added to a household.
    */
   public function testHouseholdEntityCreate() {
