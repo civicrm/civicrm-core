@@ -206,6 +206,7 @@ Now, in `afform/foobar/layout.html`, you can use the `phaseOfMoon`:
 Hello, {{routeParams.name}}. The moon is currently {{options.phaseOfMoon}}.
 ```
 
+Or if you're not sure data will actually be provided:
 
 ```html
 Hello, {{routeParams.name ? routeParams.name : 'anonymous'}}. The moon is currently {{options.phaseOfMoon ? options.phaseOfMoon : 'on hiatus'}}.
@@ -216,7 +217,6 @@ Hello, {{routeParams.name ? routeParams.name : 'anonymous'}}. The moon is curren
 * The code is currently written as a proof-of-concept. There are several `FIXME`/`TODO` declarations in the code
   for checking pre-conditions, reporting errors, handling edge-cases, etc.
 * Although afforms are can be used in AngularJS, they don't fully support tooling like `cv ang:html:list`
-  and `hook_civicrm_alterAngular`. We'll need a core patch to allow that.
+  and `hook_civicrm_alterAngular` changesets. We'll need a core patch to allow that.
 * We generally need to provide more services for managing/accessing data (e.g. `crm-api3`).
 * Need to implement the `Afform.revert` API to undo local cusotmizations.
-* To allow full support for change-sets, we'll need to patch `civicrm-core`.
