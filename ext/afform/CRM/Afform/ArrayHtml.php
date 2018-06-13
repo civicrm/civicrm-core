@@ -35,6 +35,11 @@ class CRM_Afform_ArrayHtml {
       elseif (is_array($attrValue) && $this->allowStructuredAttribute($tag, $attrName)) {
         $buf .= sprintf(' %s="%s"', $attrName, htmlentities(json_encode($attrValue))); // FIXME attribute encoding
       }
+      else {
+        Civi::log()->warning('Afform: Cannot serialize attribute {attrName}', [
+          'attrName' => $attrName,
+        ]);
+      }
     }
     $buf .= '>';
 
@@ -61,7 +66,7 @@ class CRM_Afform_ArrayHtml {
     $doc = new DOMDocument();
     $doc->loadHTML("<html><body>$html</body></html>");
 
-    // FIXME: Valid expected number of child nodes
+    // FIXME: Validate expected number of child nodes
 
     foreach ($doc->childNodes as $htmlNode) {
       if ($htmlNode instanceof DOMElement && $htmlNode->tagName === 'html') {
