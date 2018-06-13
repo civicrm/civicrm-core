@@ -58,32 +58,44 @@ $ cv flush
 A few things to note:
 
 * We defined a route `civicrm/pretty-page`. This is defined in the same routing system used by CiviCRM forms.
-* The file `layout.html` is an AngularJS HTML document. It has access to all the general templating features, such as variable substition
-  (`{{routeParams.name}}`) and the standard library of directives (`ng-if`, `ng-style`, `ng-repeat`, etc).
+* The file `layout.html` is an AngularJS HTML document. It has access to all the general features of Angular HTML (discussed more later).
 * After creating a new form or file, we should flush the cache.
 * If you're going to actively edit/revise the content of the file, then you should navigate
   to **Administer > System Settings > Debugging** and disable asset caching.
 
-Now that we've created a form, we'll want to determine its URL:
+Now that we've created a form, we'll want to determine its URL. As with most
+CiviCRM forms, the URL depends on the CMS configuration. Here is an example
+from a local Drupal 7 site:
 
 ```
-$ cv url civicrm/pretty-page
+$ cv url "civicrm/pretty-page"
 "http://dmaster.localhost/civicrm/pretty-page"
-$ cv url civicrm/pretty-page/#/?name=world
+$ cv url "civicrm/pretty-page/#/?name=world"
 "http://dmaster.localhost/civicrm/pretty-page/#/?name=world"
 ```
 
-You can open the given URL in a web-browser.
+Open the URLs and see what you get.
 
-## Development: Scope variables and functions
+## Development: Scopes, variables, and directives - oh my!
 
-In AngularJS, every component has its own *scope* -- which defines a list of variables you can access.
+In AngularJS, the primary language for orchestrating a screen is HTML. You can embed code in here.
 
-By default, `afform` provides a few variables in the scope of every form:
+One key concept *scope* -- the *scope* defines the list of variables which you can access.  By default, `afform`
+provides a few variables within the scope of every form:
 
 * `routeParams`: This is a reference to the [$routeParams](https://docs.angularjs.org/api/ngRoute/service/$routeParams)
   service. In the example, we used `routeParams` to get a reference to a `name` from the URL.
+* `meta`: The stored meta data (`meta.json`) for this form.
 * `ts`: This is a utility function which translates strings, as in `{{ts('Hello world')}}`.
+
+Additionally, AngularJS allows *directives* -- these are extra HTML attributes and HTML tags. For example:
+
+* `ng-if` will conditionally create or destroy elements in the page.
+* `ng-repeat` will loop through data.
+* `ng-style` and `ng-class` will conditionally apply styling.
+
+A full explanation of these features is out-of-scope for this document, but the key point is that you can use standard
+AngularJS features.
 
 ## Development: Display a contact record
 
@@ -94,11 +106,15 @@ would request a URL like:
 http://dmaster.localhost/civicrm/pretty-page/#/?cid=123
 ```
 
-How do we use the `cid` to get information about the contact? Update `layout.html` to call APIv3:
+How do we use the `cid` to get information about the contact? Update `layout.html` to include data from APIv33:
 
 ```html
-<div ng-if="routeParams.cid" afform-api3="['Contact', 'get', {id: routeParams.cid}]" afform-api3-ctrl="apiData">
+<div ng-if="routeParams.cid"
+  afform-api3="['Contact', 'get', {id: routeParams.cid}]"
+  afform-api3-ctrl="apiData">
+
   <div ng-repeat="contact in apiData.result.values">
+    <h1 crm-page-title="">{{contact.display_name}}</h1>
 
     <h3>Key Contact Fields</h3>
 
