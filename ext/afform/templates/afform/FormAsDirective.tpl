@@ -7,20 +7,10 @@
 {literal}
 (function(angular, $, _) {
   angular.module('{/literal}{$afform.camel}{literal}', CRM.angRequires('{/literal}{$afform.camel}{literal}'));
-  angular.module('{/literal}{$afform.camel}{literal}').directive('{/literal}{$afform.camel}{literal}', function() {
-    return {
-      restrict: 'AE',
-      template: {/literal}{$afform.layout|json}{literal},
-      scope: {
-        {/literal}{$afform.camel}{literal}: '='
-      },
-      link: function($scope, $el, $attr) {
-        var ts = $scope.ts = CRM.ts('{/literal}{$afform.camel}{literal}');
-        $scope.$watch('{/literal}{$afform.camel}{literal}', function(newValue){
-          $scope.myOptions = newValue;
-        });
-      }
-    };
+  angular.module('{/literal}{$afform.camel}{literal}').directive('{/literal}{$afform.camel}{literal}', function(afformCoreDirective) {
+    return afformCoreDirective({/literal}{$afform.camel|json}{literal}, {
+      template: {/literal}{$afform.layout|json}{literal}
+    });
   });
 })(angular, CRM.$, CRM._);
 {/literal}
