@@ -214,7 +214,6 @@ function afform_civicrm_alterMenu(&$items) {
       ];
     }
   }
-  print_r($items);
 }
 
 /**
