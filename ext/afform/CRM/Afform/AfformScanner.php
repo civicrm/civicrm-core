@@ -31,6 +31,8 @@ class CRM_Afform_AfformScanner {
   }
 
   /**
+   * Get a list of all forms and their file paths.
+   *
    * @return array
    *   Ex: ['view-individual' => ['/var/www/foo/afform/view-individual']]
    */
@@ -108,7 +110,8 @@ class CRM_Afform_AfformScanner {
    * @param string $name
    *   Ex: 'view-individual'
    * @return array
-   *   An array with some mix of the following keys: name, title, description, client_route, server_route, requires
+   *   An array with some mix of the following keys: name, title, description, client_route, server_route, requires.
+   *   NOTE: This is only data available in meta.json. It does *NOT* include layout.
    *   Ex: [
    *     'name' => 'view-individual',
    *     'title' => 'View an individual contact',
@@ -131,6 +134,22 @@ class CRM_Afform_AfformScanner {
     ];
 
     return array_merge($defaults, json_decode(file_get_contents($metaFile), 1));
+  }
+
+  /**
+   * Get the effective metadata for all forms.
+   *
+   * @return array
+   *   A list of all forms, keyed by form name.
+   *   NOTE: This is only data available in meta.json. It does *NOT* include layout.
+   *   Ex: ['view-individual' => ['title' => 'View an individual contact', ...]]
+   */
+  public function getMetas() {
+    $result = array();
+    foreach (array_keys($this->findFilePaths()) as $name) {
+      $result[$name] = $this->getMeta($name);
+    }
+    return $result;
   }
 
   /**
