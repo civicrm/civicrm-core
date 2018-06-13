@@ -3,6 +3,26 @@
 require_once 'afform.civix.php';
 use CRM_Afform_ExtensionUtil as E;
 
+function _afform_fields() {
+  return ['name', 'title', 'description', 'requires', 'layout'];
+}
+
+/**
+ * Filter the content of $params to only have supported afform fields.
+ *
+ * @param array $params
+ * @return array
+ */
+function _afform_fields_filter($params) {
+  $result = array();
+  foreach (_afform_fields() as $field) {
+    if (isset($params[$field])) {
+      $result[$field] = $params[$field];
+    }
+  }
+  return $result;
+}
+
 /**
  * Implements hook_civicrm_config().
  *
