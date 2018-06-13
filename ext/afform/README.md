@@ -7,7 +7,7 @@ in CiviCRM which:
 
 1. Allows developers to declaratively define a canonical, baseline form.
 2. Allows administrators (or administrative tools) to use the CRUD API to customize the forms.
-3. Allows developers to embed these forms in other AngularJS apps.
+3. Allows developers to embed these forms in other CiviCRM-AngularJS apps.
 4. (WIP; pending upstream support) Allow developers to apply [change sets](https://docs.civicrm.org/dev/en/latest/framework/angular/changeset/).
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
