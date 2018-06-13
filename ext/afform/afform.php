@@ -186,13 +186,15 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   }
 
   $name = $params['name'];
-  $meta = civicrm_api3('Afform', 'getsingle', ['name' => $name]);
+  $scanner = new CRM_Afform_AfformScanner();
+  $meta = $scanner->getMeta($name);
   $scanner = new CRM_Afform_AfformScanner();
 
   $smarty = CRM_Core_Smarty::singleton();
   $smarty->assign('afform', [
     'camel' => _afform_angular_module_name($name),
     'meta' => $meta,
+    'metaJson' => json_encode($meta),
     'layout' => file_get_contents($scanner->findFilePath($name, 'layout.html'))
   ]);
   $mimeType = 'text/javascript';
