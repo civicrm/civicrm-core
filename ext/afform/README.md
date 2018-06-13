@@ -35,9 +35,61 @@ git clone https://github.com/FIXME/org.civicrm.afform.git
 cv en afform
 ```
 
-## Usage
+## Usage (Developers): Create a form
 
-(* FIXME: Where would a new user navigate to get started? What changes would they see? *)
+As an upstream publisher of a form, you can define the default, canonical
+substance of the form by creating a folder named `afform/<MY-FORM>`. In
+this example, we create a form named `foobar`:
+
+```
+$ cd /path/to/my/own/extension
+$ mkdir -p afform/foobar
+$ echo '{"route": "civicrm/foobar"}' > afform/foobar/meta.json
+$ echo '<div>Hello {{param.name}}</div>' > afform/foobar/layout.html
+$ cv flush
+$ cv url civicrm/foobar?name=world
+```
+
+You can open the given URL in a web-browser.
+
+## Usage (Developers): Programmatically read and write forms
+
+Downstream, administrators may customize the form.
+
+```
+$ cv api afform.getsingle name=foobar
+{
+    "name": "foobar",
+    "requires": [
+        "afform",
+        "crmUi",
+        "crmUtil"
+    ],
+    "title": "",
+    "description": "",
+    "layout": {
+        "#tag": "div",
+        "#children": [
+            "Hello {{param.name}}"
+        ]
+    },
+    "id": "foobar"
+}
+$ cv api afform.create name=foobar title="The Foo Bar Screen"
+{
+    "is_error": 0,
+    "version": 3,
+    "count": 2,
+    "values": {
+        "name": "foobar",
+        "title": "The Foo Bar Screen"
+    }
+}
+```
+
+## Usage (Developers): Render a form
+
+(* FIXME *)
 
 ## Known Issues
 
