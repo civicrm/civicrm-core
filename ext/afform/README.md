@@ -44,7 +44,7 @@ this example, we create a form named `foobar`:
 ```
 $ cd /path/to/my/own/extension
 $ mkdir -p afform/foobar
-$ echo '{"route": "civicrm/foobar"}' > afform/foobar/meta.json
+$ echo '{"server_route": "civicrm/foobar"}' > afform/foobar/meta.json
 $ echo '<div>Hello {{param.name}}</div>' > afform/foobar/layout.html
 $ cv flush
 $ cv url civicrm/foobar?name=world

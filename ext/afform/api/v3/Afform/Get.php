@@ -26,7 +26,7 @@ function _civicrm_api3_afform_get_spec(&$spec) {
     'description' => 'Description',
   );
 
-  // FIXME: title, requires, layout
+  // FIXME: title, requires, layout, server_route, client_route
 }
 
 /**

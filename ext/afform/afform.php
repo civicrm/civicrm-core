@@ -4,7 +4,7 @@ require_once 'afform.civix.php';
 use CRM_Afform_ExtensionUtil as E;
 
 function _afform_fields() {
-  return ['name', 'title', 'description', 'requires', 'layout'];
+  return ['name', 'title', 'description', 'requires', 'layout', 'server_route', 'client_route'];
 }
 
 /**

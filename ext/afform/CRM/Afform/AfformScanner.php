@@ -108,11 +108,11 @@ class CRM_Afform_AfformScanner {
    * @param string $name
    *   Ex: 'view-individual'
    * @return array
-   *   An array with some mix of the following keys: name, title, description, route, requires
+   *   An array with some mix of the following keys: name, title, description, client_route, server_route, requires
    *   Ex: [
    *     'name' => 'view-individual',
    *     'title' => 'View an individual contact',
-   *     'route' => 'civicrm/view-individual',
+   *     'server_route' => 'civicrm/view-individual',
    *     'requires' => ['afform'],
    *   ]
    */
