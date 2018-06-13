@@ -200,6 +200,24 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
 }
 
 /**
+ * Implements hook_civicrm_alterMenu().
+ */
+function afform_civicrm_alterMenu(&$items) {
+  $scanner = new CRM_Afform_AfformScanner();
+  foreach ($scanner->getMetas() as $name => $meta) {
+    if (!empty($meta['server_route'])) {
+      $items[$meta['server_route']] = [
+        'page_callback' => 'CRM_Afform_Page_AfformBase',
+        'page_arguments' => 'afform=' . urlencode($name),
+        'title' => CRM_Utils_Array::value('title', $meta, ''),
+        'access_arguments' => [['access CiviCRM'], 'and'] // FIXME
+      ];
+    }
+  }
+  print_r($items);
+}
+
+/**
  * @param $name
  * @return string
  */
