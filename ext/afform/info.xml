@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <extension key="org.civicrm.afform" type="module">
   <file>afform</file>
-  <name>FIXME</name>
-  <description>FIXME</description>
+  <name>Afform</name>
+  <description>Afform is the Affable Administrative AngularJS Form Framework</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>CiviCRM LLC</author>
@@ -18,7 +18,7 @@
   <version>1.0</version>
   <develStage>alpha</develStage>
   <compatibility>
-    <ver>4.7</ver>
+    <ver>5.3</ver>
   </compatibility>
   <comments>This is a new, undeveloped module</comments>
   <civix>
