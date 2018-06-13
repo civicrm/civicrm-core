@@ -216,6 +216,15 @@ Or if you're not sure data will actually be provided:
 Hello, {{routeParams.name ? routeParams.name : 'anonymous'}}. The moon is currently {{options.phaseOfMoon ? options.phaseOfMoon : 'on hiatus'}}.
 ```
 
+This design has some other neat consequences:
+
+* One `afform` may embed another `afform`.
+* The parent `afform` can pass extra `options` to the child.
+* If you decide that the framework provided by `org.civicrm.afform` is too stifling, you can fork off --
+  remove the `afform/foobar` folder and create your own static module (`civix generate:angular-module --am=afform-foobar`, etc).
+  As long as your module supports the same interfaces (e.g. `<div afform-foobar="...">`), downstream users can still be supported.
+    *(FIXME: Could one fork off the JS while still allowing CRUD API to manipulate HTML?)
+
 ## Known Issues
 
 * The code is currently written as a proof-of-concept. There are several `FIXME`/`TODO` declarations in the code
