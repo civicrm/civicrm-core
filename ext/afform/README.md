@@ -6,7 +6,9 @@ The Affable Administrative Angular Form Framework (`afform`) is a system for adm
 in CiviCRM which:
 
 1. Allows developers to declaratively define a canonical, baseline form.
-2. Allows administrators (or administrative tools) to use the API to revise the forms.
+2. Allows administrators (or administrative tools) to use the CRUD API to customize the forms.
+3. Allows developers to embed these forms in other AngularJS apps.
+4. (WIP; pending upstream support) Allow developers to apply [change sets](https://docs.civicrm.org/dev/en/latest/framework/angular/changeset/).
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
@@ -41,8 +43,8 @@ cv en afform
 
 ## Development: Quick Start
 
-As an upstream publisher of a form, you can define the default, canonical
-substance of the form by creating a folder named `afform/<MY-FORM>`. In
+As an extension author, you can define a form along with its default,
+canonical content. Simply create a folder named  `afform/<MY-FORM>`. In
 this example, we create a form named `foobar`:
 
 ```
@@ -55,6 +57,7 @@ $ cv flush
 
 A few things to note:
 
+* We defined a route `civicrm/pretty-page`. This is defined in the same routing system used by CiviCRM forms.
 * The file `layout.html` is an AngularJS HTML document. It has access to all the general templating features, such as variable substition
   (`{{routeParams.name}}`) and the standard library of directives (`ng-if`, `ng-style`, `ng-repeat`, etc).
 * After creating a new form or file, we should flush the cache.
@@ -75,16 +78,14 @@ You can open the given URL in a web-browser.
 ## Development: Form CRUD API
 
 Now that we've defined a baseline form, it's possible for administrators and
-GUI applications to inspect and revise this form using the API.
+GUI applications to inspect the form using the API:
 
 ```
 $ cv api afform.getsingle name=foobar
 {
     "name": "foobar",
     "requires": [
-        "afform",
-        "crmUi",
-        "crmUtil"
+        "afformCore"
     ],
     "title": "",
     "description": "",
@@ -96,6 +97,11 @@ $ cv api afform.getsingle name=foobar
     },
     "id": "foobar"
 }
+```
+
+Additionally, you can also update the forms:
+
+```
 $ cv api afform.create name=foobar title="The Foo Bar Screen"
 {
     "is_error": 0,
@@ -107,6 +113,15 @@ $ cv api afform.create name=foobar title="The Foo Bar Screen"
     }
 }
 ```
+
+A few important things to note about this:
+
+* The changes are only applied on this site.
+* Once you make a change with the CRUD API, there will be two copies of the form:
+    * `[myextension]/afform/foobar/` is the default, canonical version.
+    * `[civicrm.files]/afform/foobar/` is the locally customized version.
+* The `layout` field is stored as an Angular-style HTML document (`layout.html`), so you can edit it on disk like
+  normal Angular code. However, when CRUD'ing the `layout` through the API, it is presented in JSON-style.
 
 ## Development: Scope variables and functions
 
@@ -121,11 +136,11 @@ By default, `afform` provides a few variables in the scope of every form:
 ## Development: Every form is an AngularJS directive
 
 In the quick-start example, we registered a new route (`"server_route": "civicrm/pretty-page"`) -- this created a
-standalone page with the sole purpose of displaying the `foobar` form.
+simple, standalone page with the sole purpose of displaying the `foobar` form. But that had very limited information.
+What if we want control the environment a bit more?
 
-However, there's no obligation to use the `foobar` form in a standalone fashion.  Think of `foobar` as a *re-usable
-sub-form* or as a *directive*.  If you've created an AngluarJS application, then you can embed `foobar` with
-two small steps:
+There's no obligation to use the simple, standalone version of `foobar`.  Think of `foobar` as a *re-usable sub-form*
+or as a *directive*.  If you've created an AngluarJS application, then you can embed `foobar` with two small steps:
 
 1. In your application, declare a dependency on module `afformFoobar`. This is usually done in `ang/MYMODULE.ang.php`
    and/or `ang/MYMODULE.js`.
@@ -156,3 +171,5 @@ Hello, {{routeParams.name ? routeParams.name : 'anonymous'}}. The moon is curren
 * Although afforms are can be used in AngularJS, they don't fully support tooling like `cv ang:html:list`
   and `hook_civicrm_alterAngular`. We'll need a core patch to allow that.
 * We generally need to provide more services for managing/accessing data (e.g. `crm-api3`).
+* Need to implement the `Afform.revert` API to undo local cusotmizations.
+* To allow full support for change-sets, we'll need to patch `civicrm-core`.
