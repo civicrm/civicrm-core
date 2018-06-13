@@ -218,11 +218,25 @@ function afform_civicrm_alterMenu(&$items) {
 }
 
 /**
- * @param $name
+ * @param string $name
+ *   Ex: fooBar
+ * @param string $format
+ *   'camel' or 'dash'.
  * @return string
+ *   Ex: 'FooBar' or 'foo-bar'.
  */
-function _afform_angular_module_name($name) {
-  return 'afform' . strtoupper($name{0}) . substr($name, 1);
+function _afform_angular_module_name($name, $format = 'camel') {
+  switch ($format) {
+    case 'camel':
+      return 'afform' . strtoupper($name{0}) . substr($name, 1);
+
+    case 'dash':
+      $camel = _afform_angular_module_name($name, 'camel');
+      return strtolower(implode('-', array_filter(preg_split('/(?=[A-Z])/', $camel))));
+
+    default:
+      throw new \Exception("Unrecognized format");
+  }
 }
 
 /**
