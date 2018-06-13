@@ -198,7 +198,7 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     'layout' => file_get_contents($scanner->findFilePath($name, 'layout.html'))
   ]);
   $mimeType = 'text/javascript';
-  $content = $smarty->fetch('afform/FormAsDirective.tpl');
+  $content = $smarty->fetch('afform/AfformAngularModule.tpl');
 }
 
 /**
