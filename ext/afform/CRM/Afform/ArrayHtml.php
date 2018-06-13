@@ -4,6 +4,7 @@
  * Class CRM_Afform_ArrayHtml
  *
  * FIXME This a quick-and-dirty array<=>html mapping.
+ * FIXME: Comment mapping.
  */
 class CRM_Afform_ArrayHtml {
 
@@ -86,7 +87,7 @@ class CRM_Afform_ArrayHtml {
       $arr = ['#tag' => $node->tagName];
       foreach ($node->attributes as $attribute) {
         $txt = $attribute->textContent;
-        if ($txt{0} === '{' && $txt{1} !== '{' && $this->allowStructuredAttribute($node->tagName, $attribute->name)) {
+        if ($txt && $txt{0} === '{' && $txt{1} !== '{' && $this->allowStructuredAttribute($node->tagName, $attribute->name)) {
           $arr[$attribute->name] = sprintf('PARSE-ME(%s)', $txt);
         }
         else {
