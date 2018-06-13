@@ -75,6 +75,46 @@ $ cv url civicrm/pretty-page/#/?name=world
 
 You can open the given URL in a web-browser.
 
+## Development: Scope variables and functions
+
+In AngularJS, every component has its own *scope* -- which defines a list of variables you can access.
+
+By default, `afform` provides a few variables in the scope of every form:
+
+* `routeParams`: This is a reference to the [$routeParams](https://docs.angularjs.org/api/ngRoute/service/$routeParams)
+  service. In the example, we used `routeParams` to get a reference to a `name` from the URL.
+* `ts`: This is a utility function which translates strings, as in `{{ts('Hello world')}}`.
+
+## Development: Display a contact record
+
+Let's say we want `foobar` to become a basic "View Contact" page. A user
+would request a URL like:
+
+```
+http://dmaster.localhost/civicrm/pretty-page/#/?cid=123
+```
+
+How do we use the `cid` to get information about the contact? Update `layout.html` to call APIv3:
+
+```html
+<div ng-if="routeParams.cid" afform-api3="['Contact', 'get', {id: routeParams.cid}]" afform-api3-ctrl="apiData">
+  <div ng-repeat="contact in apiData.result.values">
+
+    <h3>Key Contact Fields</h3>
+
+    <div><strong>Contact ID</strong>: {{contact.contact_id}}</div>
+    <div><strong>Contact Type</strong>: {{contact.contact_type}}</div>
+    <div><strong>Display Name</strong>: {{contact.display_name}}</div>
+    <div><strong>First Name</strong>: {{contact.first_name}}</div>
+    <div><strong>Last Name</strong>: {{contact.last_name}}</div>
+
+    <h3>Full Contact record</h3>
+
+    <pre>{{contact|json}}</pre>
+  </div>
+</div>
+```
+
 ## Development: Form CRUD API
 
 Now that we've defined a baseline form, it's possible for administrators and
@@ -123,15 +163,6 @@ A few important things to note about this:
 * The `layout` field is stored as an Angular-style HTML document (`layout.html`), so you can edit it on disk like
   normal Angular code. However, when CRUD'ing the `layout` through the API, it is presented in JSON-style.
 
-## Development: Scope variables and functions
-
-In AngularJS, every component has its own *scope* -- which defines a list of variables you can access.
-
-By default, `afform` provides a few variables in the scope of every form:
-
-* `routeParams`: This is a reference to the [$routeParams](https://docs.angularjs.org/api/ngRoute/service/$routeParams)
-  service. In the example, we used `routeParams` to get a reference to a `name` from the URL.
-* `ts`: This is a utility function which translates strings, as in `{{ts('Hello world')}}`.
 
 ## Development: Every form is an AngularJS directive
 
