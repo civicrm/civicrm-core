@@ -132,6 +132,23 @@ function afform_civicrm_caseTypes(&$caseTypes) {
  */
 function afform_civicrm_angularModules(&$angularModules) {
   _afform_civix_civicrm_angularModules($angularModules);
+
+  $scanner = new CRM_Afform_AfformScanner();
+  $names = array_keys($scanner->findFilePaths());
+  foreach ($names as $name) {
+    $meta = $scanner->getMeta($name);
+    $angularModules[_afform_angular_module_name($name)] = [
+      'ext' => E::LONG_NAME,
+      'js' => ['assetBuilder://afform.js?name=' . urlencode($name)],
+      'requires' => $meta['requires'],
+      'basePages' => [],
+    ];
+
+    // FIXME: The HTML layout template is embedded in the JS asset.
+    // This works at runtime for basic usage, but it bypasses
+    // the hook_alterAngular infrastructure, and I'm not sure translation works.
+    // We should update core so that 'partials' can be specified more dynamically.
+  }
 }
 
 /**
@@ -155,6 +172,40 @@ function afform_civicrm_entityTypes(&$entityTypes) {
 }
 
 // --- Functions below this ship commented out. Uncomment as required. ---
+
+/**
+ * Implements hook_civicrm_buildAsset().
+ */
+function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
+  if ($asset !== 'afform.js') {
+    return;
+  }
+
+  if (empty($params['name'])) {
+    throw new RuntimeException("Missing required parameter: afform.js?name=NAME");
+  }
+
+  $name = $params['name'];
+  $meta = civicrm_api3('Afform', 'getsingle', ['name' => $name]);
+  $scanner = new CRM_Afform_AfformScanner();
+
+  $smarty = CRM_Core_Smarty::singleton();
+  $smarty->assign('afform', [
+    'camel' => _afform_angular_module_name($name),
+    'meta' => $meta,
+    'layout' => file_get_contents($scanner->findFilePath($name, 'layout.html'))
+  ]);
+  $mimeType = 'text/javascript';
+  $content = $smarty->fetch('afform/FormAsDirective.tpl');
+}
+
+/**
+ * @param $name
+ * @return string
+ */
+function _afform_angular_module_name($name) {
+  return 'afform' . strtoupper($name{0}) . substr($name, 1);
+}
 
 /**
  * Implements hook_civicrm_preProcess().

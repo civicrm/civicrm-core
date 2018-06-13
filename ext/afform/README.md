@@ -91,6 +91,16 @@ $ cv api afform.create name=foobar title="The Foo Bar Screen"
 
 (* FIXME *)
 
+## Usage (Developers): Include a customizable subform in your own page
+
+Suppose you've created an AngularJS UI based on [the developer
+documentation](https://docs.civicrm.org/dev/en/latest/framework/angular/quickstart/).  You'd like to use the
+customizable `foobar` form as part of your UI.  Fortunately, `foobar` is available as an AngularJS module named
+`afformFoobar`.  You can use it with two steps:
+
+1. In your module metadata (`ang/MYMODULE.ang.php`), update the `requires` to include `afformFoobar`.
+2. In your HTML template, use the directive `<div afform-foobar="..."></div>`.
+
 ## Known Issues
 
 (* FIXME *)
