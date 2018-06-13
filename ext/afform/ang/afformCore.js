@@ -13,10 +13,6 @@
       d.link = function($scope, $el, $attr) {
         $scope.ts = CRM.ts(camelName);
         $scope.routeParams = $routeParams;
-        console.log('$routeParams', $routeParams);
-        // $scope.$watch(camelName, function(newValue){
-        //   $scope.options = newValue;
-        // });
       };
       return d;
     };
