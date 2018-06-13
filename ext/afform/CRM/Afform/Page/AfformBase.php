@@ -7,13 +7,18 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
     //    echo '<pre>';print_r(func_get_args());exit();
     list ($pagePath, $pageArgs) = func_get_args();
 
-    // Example: Set the page-title dynamically; alternatively, declare a static title in xml/Menu/*.xml
-    CRM_Utils_System::setTitle(E::ts('AfformBase'));
+    $module = _afform_angular_module_name($pageArgs['afform']);
 
-    // Example: Assign a variable for use in a template
-    $this->assign('currentTime', date('Y-m-d H:i:s'));
-
-    $this->assign('afform', $pageArgs['afform']);
+    $loader = new \Civi\Angular\AngularLoader();
+    $loader->setModules([$module, 'afformStandalone']);
+    $loader->setPageName(implode('/', $pagePath));
+    $loader->useApp();
+    $loader->getRes()->addSetting([
+      'afform' => [
+        'open' => _afform_angular_module_name($pageArgs['afform'], 'dash'),
+      ],
+    ]);
+    $loader->load();
 
     parent::run();
   }
