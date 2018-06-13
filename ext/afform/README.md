@@ -2,14 +2,18 @@
 
 ![Screenshot](/images/screenshot.png)
 
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+The Affable Administrative Angular Form Framework (`afform`) is a system for administering AngularJS-based forms
+in CiviCRM which:
+
+1. Allows developers to declaratively define a canonical, baseline form.
+2. Allows administrators (or administrative tools) to use the API to revise the forms.
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Requirements
 
 * PHP v5.4+
-* CiviCRM (*FIXME: Version number*)
+* CiviCRM v5.3+
 
 ## Installation (Web UI)
 
@@ -103,4 +107,7 @@ customizable `foobar` form as part of your UI.  Fortunately, `foobar` is availab
 
 ## Known Issues
 
-(* FIXME *)
+* The code is currently written as a proof-of-concept. There are several `FIXME`/`TODO` declarations in the code
+  for checking pre-conditions, reporting errors, handling edge-cases, etc.
+* Although afforms are can be used in AngularJS, they don't fully support tooling like `cv ang:html:list`
+  and `hook_civicrm_alterAngular`. We'll need a core patch to allow that.
