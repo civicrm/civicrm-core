@@ -17,7 +17,6 @@ function _civicrm_api3_afform_get_spec(&$spec) {
     'description' => 'Form name',
     'maxlength' => 128,
     'size' => CRM_Utils_Type::HUGE,
-    'api.required' => 1,
   );
   $spec['description'] = array(
     'name' => 'description',
