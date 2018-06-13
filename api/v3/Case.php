@@ -39,12 +39,12 @@
  * @param array $params
  *
  * @code
- * //REQUIRED for create:
+ * // REQUIRED for create:
  * 'case_type_id' => int OR
  * 'case_type' => str (provide one or the other)
  * 'contact_id' => int // case client
  * 'subject' => str
- * //REQUIRED for update:
+ * // REQUIRED for update:
  * 'id' => case Id
  *
  * //OPTIONAL
@@ -77,42 +77,44 @@ function civicrm_api3_case_create($params) {
     // Update an existing case
     // FIXME: Some of this logic should move to the BAO object?
     // FIXME: Should we check if case with ID actually exists?
-    if (!isset($params['case_id']) && isset($params['id'])) {
-      $params['case_id'] = $params['id'];
-    }
 
     if (array_key_exists('creator_id', $params)) {
       throw new API_Exception('You cannot update creator id');
     }
 
-    $mergedCaseId = $origContactIds = array();
+    $mergedCaseIds = $origContactIds = array();
 
-    // get original contact id and creator id of case
+    // If a contact ID is specified we need to make sure this is the main contact ID for the case (and update if necessary)
     if (!empty($params['contact_id'])) {
       $origContactIds = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($params['id']);
-      $origContactId = CRM_Utils_Array::first($origContactIds);
-    }
 
-    // FIXME: Refactor as separate method to get contactId
-    if (count($origContactIds) > 1) {
-      // check valid orig contact id
-      if (empty($params['orig_contact_id'])) {
-        throw new API_Exception('Case is linked with more than one contact id. Provide the required params orig_contact_id to be replaced');
+      // Get the original contact ID for the case
+      // FIXME: Refactor as separate method to get contactId
+      if (count($origContactIds) > 1) {
+        // Multiple original contact IDs. Need to specify which one to use as a parameter
+        if (empty($params['orig_contact_id'])) {
+          throw new API_Exception('Case is linked with more than one contact id. Provide the required params orig_contact_id to be replaced');
+        }
+        if (!empty($params['orig_contact_id']) && !in_array($params['orig_contact_id'], $origContactIds)) {
+          throw new API_Exception('Invalid case contact id (orig_contact_id)');
+        }
+        $origContactId = $params['orig_contact_id'];
       }
-      if (!empty($params['orig_contact_id']) && !in_array($params['orig_contact_id'], $origContactIds)) {
-        throw new API_Exception('Invalid case contact id (orig_contact_id)');
+      else {
+        // Only one original contact ID
+        $origContactId = CRM_Utils_Array::first($origContactIds);
       }
-      $origContactId = $params['orig_contact_id'];
-    }
 
-    // check for same contact id for edit Client
-    if (!empty($params['contact_id']) && !in_array($params['contact_id'], $origContactIds)) {
-      $mergedCaseId = CRM_Case_BAO_Case::mergeCases($params['contact_id'], $params['case_id'], $origContactId, NULL, TRUE);
-    }
+      // Get the specified main contact ID for the case
+      $mainContactId = CRM_Utils_Array::first($params['contact_id']);
 
-    // If we merged cases then update the merged case
-    if (!empty($mergedCaseId[0])) {
-      $params['id'] = $mergedCaseId[0];
+      // If the main contact ID is not in the list of original contact IDs for the case we need to change the main contact ID for the case
+      // This means we'll end up with a new case ID
+      if (!in_array($mainContactId, $origContactIds)) {
+        $mergedCaseIds = CRM_Case_BAO_Case::mergeCases($mainContactId, $params['id'], $origContactId, NULL, TRUE);
+        // If we merged cases then the first element will contain the case ID of the merged case - update that one
+        $params['id'] = CRM_Utils_Array::first($mergedCaseIds);
+      }
     }
   }
 
@@ -146,8 +148,11 @@ function civicrm_api3_case_create($params) {
 /**
  * When creating a new case, run the xmlProcessor to get all necessary params/configuration
  *  for the new case, as cases use an xml file to store their configuration.
+ *
  * @param $params
  * @param $caseBAO
+ *
+ * @throws \Exception
  */
 function _civicrm_api3_case_create_xmlProcessor($params, $caseBAO) {
   // Format params for xmlProcessor
@@ -629,7 +634,9 @@ function _civicrm_api3_case_read(&$cases, $options) {
   foreach ($cases as &$case) {
     if (empty($options['return']) || !empty($options['return']['contact_id'])) {
       // Legacy support for client_id - TODO: in apiv4 remove 'client_id'
-      $case['client_id'] = $case['contact_id'] = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($case['id']);
+      // FIXME: Historically we return a 1-based array. Changing that risks breaking API clients that
+      //   have been hardcoded to index "1", instead of the first array index (eg. using reset(), foreach etc)
+      $case['client_id'] = $case['contact_id'] = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($case['id'], NULL, 1);
     }
     if (!empty($options['return']['contacts'])) {
       //get case contacts
@@ -700,10 +707,26 @@ function _civicrm_api3_case_format_params(&$params) {
   _civicrm_api3_custom_format_params($params, $values, 'Case');
   $params = array_merge($params, $values);
 
+  // A single or multiple contact_id (client_id) can be passed as a value or array.
+  // Convert single value to array here to simplify processing in later functions which expect an array.
+  if (isset($params['contact_id'])) {
+    if (!is_array($params['contact_id'])) {
+      $params['contact_id'] = array($params['contact_id']);
+    }
+  }
+
+  // DEPRECATED: case_id - use id parameter instead.
+  if (!isset($params['id']) && isset($params['case_id'])) {
+    $params['id'] = $params['case_id'];
+  }
+
+  // When creating a new case, either case_type_id or case_type must be specified.
   if (empty($params['case_type_id']) && empty($params['case_type'])) {
+    // If both case_type_id and case_type are empty we are updating a case so return here.
     return;
   }
 
+  // We are creating a new case
   // figure out case_type_id from case_type and vice-versa
   $caseTypes = CRM_Case_PseudoConstant::caseType('name', FALSE);
   if (empty($params['case_type_id'])) {
