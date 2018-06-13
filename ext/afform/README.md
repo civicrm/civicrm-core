@@ -1,4 +1,4 @@
-# org.civicrm.afform
+# org.civicrm.afform (Early Proof of Concept)
 
 ![Screenshot](/images/screenshot.png)
 
