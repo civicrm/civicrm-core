@@ -106,7 +106,7 @@ would request a URL like:
 http://dmaster.localhost/civicrm/pretty-page/#/?cid=123
 ```
 
-How do we use the `cid` to get information about the contact? Update `layout.html` to include data from APIv33:
+How do we use the `cid` to get information about the contact? Update `layout.html` to include data from APIv3:
 
 ```html
 <div ng-if="routeParams.cid"
@@ -130,6 +130,10 @@ How do we use the `cid` to get information about the contact? Update `layout.htm
   </div>
 </div>
 ```
+
+This example is useful pedagogically and may be useful in a crunch -- but in the longer term,
+we should have a richer library of directives so that typical user-managed forms don't drill-down
+at this level of detail.
 
 ## Development: Form CRUD API
 
@@ -219,4 +223,7 @@ Hello, {{routeParams.name ? routeParams.name : 'anonymous'}}. The moon is curren
 * Although afforms are can be used in AngularJS, they don't fully support tooling like `cv ang:html:list`
   and `hook_civicrm_alterAngular` changesets. We'll need a core patch to allow that.
 * We generally need to provide more services for managing/accessing data (e.g. `crm-api3`).
-* Need to implement the `Afform.revert` API to undo local cusotmizations.
+* Need to implement the `Afform.revert` API to undo local customizations.
+* Haven't decided if we should support a `client_route` property (i.e. defining a skeletal controller and route for any form).
+  On the plus side, make it easier to add items to the `civicrm/a` base-page. On the flipside, we don't currently have
+  a strong use-case, and developers can get the same effect with `civix generate:angular-page` and embedding `<div afform-foobar/>`.
