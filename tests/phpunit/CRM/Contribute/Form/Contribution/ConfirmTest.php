@@ -120,16 +120,20 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'skipLineItem' => 0,
     );
 
-    $result = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form,
+    $processConfirmResult = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form,
       $form->_params,
       $contactID,
       $form->_values['financial_type_id'],
       0, FALSE
     );
+
+    // Make sure that certain parameters are set on return from processConfirm
+    $this->assertEquals($form->_values['financial_type_id'], $processConfirmResult['financial_type_id']);
+
     // Based on the processed contribution, complete transaction which update the contribution status based on payment result.
-    if (!empty($result['contribution'])) {
+    if (!empty($processConfirmResult['contribution'])) {
       $this->callAPISuccess('contribution', 'completetransaction', array(
-        'id' => $result['contribution']->id,
+        'id' => $processConfirmResult['contribution']->id,
         'trxn_date' => date('Y-m-d'),
         'payment_processor_id' => $paymentProcessorID,
       ));
