@@ -78,24 +78,25 @@ Open the URLs and see what you get.
 
 ## Development: Writing HTML templates
 
-In AngularJS, the primary language for orchestrating a screen is HTML. You can embed code in here.
+In AngularJS, the primary language for orchestrating a screen is HTML. You can do interesting things in Angular
+HTML, such as displaying variables and applying directives.
 
-One key concept *scope* -- the *scope* defines the list of variables which you can access.  By default, `afform`
-provides a few variables within the scope of every form:
+One key concept is *scope* -- the *scope* determines the list of variables which you can access.  By default, `afform`
+creates a scope with these variables:
 
 * `routeParams`: This is a reference to the [$routeParams](https://docs.angularjs.org/api/ngRoute/service/$routeParams)
   service. In the example, we used `routeParams` to get a reference to a `name` from the URL.
 * `meta`: The stored meta data (`meta.json`) for this form.
 * `ts`: This is a utility function which translates strings, as in `{{ts('Hello world')}}`.
 
-Additionally, AngularJS allows *directives* -- these are extra HTML attributes and HTML tags. For example:
+Additionally, AngularJS allows *directives* -- these are extra HTML attributes which create behavior. For example:
 
 * `ng-if` will conditionally create or destroy elements in the page.
 * `ng-repeat` will loop through data.
 * `ng-style` and `ng-class` will conditionally apply styling.
 
 A full explanation of these features is out-of-scope for this document, but the key point is that you can use standard
-AngularJS features.
+AngularJS markup.
 
 ## Development: Writing HTML templates: Contact record example
 
@@ -193,7 +194,7 @@ sub-forms*.
 How does this work?  Every `afform` is an *AngularJS directive*.  For example, `helloworld` can be embedded with:
 
 ```html
-<div afform-hellworld=""></div>
+<div afform-helloworld=""></div>
 ```
 
 Moreover, you can pass options to `helloworld`:
@@ -212,13 +213,13 @@ Hello, {{routeParams.name}}. The moon is currently {{options.phaseOfMoon}}.
 
 Is this useful? Let's suppose you're building a contact record page.
 
-First, let's make a few building-blocks:
+First, we should make a few building-blocks:
 
 1. `afform/contactName/layout.html` displays a sub-form for editing first name, lastname, prefix, suffix, etc.
 2. `afform/contactAddressess/layout.html` displays a sub-form for editing street addresses.
 3. `afform/contactEmails/layout.html` displays a sub-form for editing email addresses.
 
-Now you can create an overall `afform/contact/layout.html` which uses these building-blocks:
+Next, we should create an overall `afform/contact/layout.html` which uses these building-blocks:
 
 ```html
 <div ng-form="contactForm">
@@ -242,14 +243,15 @@ of manging upgrades and changes.
 
 ## Development: Full AngularJS
 
-Afform is really only a subset of AngularJS -- it emphasizes the use of *directives* as a way to *pick and arrange* the
-parts of your form.  There is more to AngularJS -- such as client-side routing, controllers, services, etc.  What to do
-if you need these? Here are few tricks:
+Afform is a subset of AngularJS -- it emphasizes the use of *directives* as a way to *choose and arrange* the parts of
+your form.  There is more to AngularJS -- such as client-side routing, controllers, services, etc.  What to do if you
+need these?  Here are few tricks:
 
 * You can create your own applications and pages with full AngularJS. (See also: [CiviCRM Developer Guide: AngularJS: Quick Start](https://docs.civicrm.org/dev/en/latest/framework/angular/quickstart/)).
   Then embed the afform (like `helloworld`) in your page with these steps:
     * Declare a dependency on module (`afformHelloworld`). This is usually done in `ang/MYMODULE.ang.php` and/or `ang/MYMODULE.js`.
-    * In your HTML template, use the directive `<div afform-helloworld=""></div>`. If you want to provide extra data or services for the form author, pass them along.
+    * In your HTML template, use the directive `<div afform-helloworld=""></div>`. I
+    * f you want to provide extra data, services, or actions for the form author -- then pass them along.
 * You can write your own directives with full AngularJS (e.g. `civix generate:angular-directive`). These directives become available for use in other afforms.
 * If you start out distributing an `afform` and later find it too limiting, then you can change your mind and convert it to static code in full AngularJS.
   As long as you name it consistently (e.g. `afform-helloworld`), downstream consumers can use the static version as a drop-in replacement.
