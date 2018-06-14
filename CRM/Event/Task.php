@@ -117,7 +117,7 @@ class CRM_Event_Task extends CRM_Core_Task {
           'class' => 'CRM_Event_Form_Task_Badge',
           'result' => FALSE,
         ),
-        self::TASK_PRINT => array(
+        self::PDF_LETTER => array(
           'title' => ts('PDF letter - print for participants'),
           'class' => 'CRM_Event_Form_Task_PDF',
           'result' => TRUE,
