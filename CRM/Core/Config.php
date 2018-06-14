@@ -389,7 +389,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       WHERE  TABLE_SCHEMA = %1
       AND (
         TABLE_NAME LIKE 'civicrm_import_job_%'
-        OR TABLE_NAME LIKE 'civicrm_export_temp%'
         OR TABLE_NAME LIKE 'civicrm_report_temp%'
         OR TABLE_NAME LIKE 'civicrm_tmp_d%'
         )

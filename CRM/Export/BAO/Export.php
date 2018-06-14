@@ -1259,7 +1259,7 @@ VALUES $sqlValueString
    */
   public static function createTempTable(&$sqlColumns) {
     //creating a temporary table for the search result that need be exported
-    $exportTempTable = CRM_Core_DAO::createTempTableName('civicrm_export', TRUE);
+    $exportTempTable = CRM_Utils_SQL_TempTable::build()->setDurable()->setCategory('export')->getName();
 
     // also create the sql table
     $sql = "DROP TABLE IF EXISTS {$exportTempTable}";
