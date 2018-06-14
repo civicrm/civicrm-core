@@ -45,19 +45,19 @@ cv en afform
 
 As an extension author, you can define a form along with its default,
 canonical content. Simply create a folder named  `afform/<MY-FORM>`. In
-this example, we create a form named `foobar`:
+this example, we create a form named `helloworld`:
 
 ```
 $ cd /path/to/my/own/extension
-$ mkdir -p afform/foobar
-$ echo '{"server_route": "civicrm/pretty-page"}' > afform/foobar/meta.json
-$ echo '<div>Hello {{routeParams.name}}</div>' > afform/foobar/layout.html
+$ mkdir -p afform/helloworld
+$ echo '{"server_route": "civicrm/hello-world"}' > afform/helloworld/meta.json
+$ echo '<div>Hello {{routeParams.name}}</div>' > afform/helloworld/layout.html
 $ cv flush
 ```
 
 A few things to note:
 
-* We defined a route `civicrm/pretty-page`. This is defined in the same routing system used by CiviCRM forms.
+* We defined a route `civicrm/hello-world`. This is defined in the same routing system used by CiviCRM forms.
 * The file `layout.html` is an AngularJS HTML document. It has access to all the general features of Angular HTML (discussed more later).
 * After creating a new form or file, we should flush the cache.
 * If you're going to actively edit/revise the content of the file, then you should navigate
@@ -68,10 +68,10 @@ CiviCRM forms, the URL depends on the CMS configuration. Here is an example
 from a local Drupal 7 site:
 
 ```
-$ cv url "civicrm/pretty-page"
-"http://dmaster.localhost/civicrm/pretty-page"
-$ cv url "civicrm/pretty-page/#/?name=world"
-"http://dmaster.localhost/civicrm/pretty-page/#/?name=world"
+$ cv url "civicrm/hello-world"
+"http://dmaster.localhost/civicrm/hello-world"
+$ cv url "civicrm/hello-world/#/?name=world"
+"http://dmaster.localhost/civicrm/hello-world/#/?name=world"
 ```
 
 Open the URLs and see what you get.
@@ -99,11 +99,11 @@ AngularJS features.
 
 ## Development: Display a contact record
 
-Let's say we want `foobar` to become a basic "View Contact" page. A user
+Let's say we want `helloworld` to become a basic "View Contact" page. A user
 would request a URL like:
 
 ```
-http://dmaster.localhost/civicrm/pretty-page/#/?cid=123
+http://dmaster.localhost/civicrm/hello-world/#/?cid=123
 ```
 
 How do we use the `cid` to get information about the contact? Update `layout.html` to include data from APIv3:
@@ -141,9 +141,9 @@ Now that we've defined a baseline form, it's possible for administrators and
 GUI applications to inspect the form using the API:
 
 ```
-$ cv api afform.getsingle name=foobar
+$ cv api afform.getsingle name=helloworld
 {
-    "name": "foobar",
+    "name": "helloworld",
     "requires": [
         "afformCore"
     ],
@@ -155,20 +155,20 @@ $ cv api afform.getsingle name=foobar
             "Hello {{routeParams.name}}"
         ]
     },
-    "id": "foobar"
+    "id": "helloworld"
 }
 ```
 
 Additionally, you can also update the forms:
 
 ```
-$ cv api afform.create name=foobar title="The Foo Bar Screen"
+$ cv api afform.create name=helloworld title="The Foo Bar Screen"
 {
     "is_error": 0,
     "version": 3,
     "count": 2,
     "values": {
-        "name": "foobar",
+        "name": "helloworld",
         "title": "The Foo Bar Screen"
     }
 }
@@ -178,33 +178,33 @@ A few important things to note about this:
 
 * The changes are only applied on this site.
 * Once you make a change with the CRUD API, there will be two copies of the form:
-    * `[myextension]/afform/foobar/` is the default, canonical version.
-    * `[civicrm.files]/afform/foobar/` is the locally customized version.
+    * `[myextension]/afform/helloworld/` is the default, canonical version.
+    * `[civicrm.files]/afform/helloworld/` is the locally customized version.
 * The `layout` field is stored as an Angular-style HTML document (`layout.html`), so you can edit it on disk like
   normal Angular code. However, when CRUD'ing the `layout` through the API, it is presented in JSON-style.
 
 
 ## Development: Every form is an AngularJS directive
 
-In the quick-start example, we registered a new route (`"server_route": "civicrm/pretty-page"`) -- this created a
-simple, standalone page with the sole purpose of displaying the `foobar` form. But that had very limited information.
+In the quick-start example, we registered a new route (`"server_route": "civicrm/hello-world"`) -- this created a
+simple, standalone page with the sole purpose of displaying the `helloworld` form. But that had very limited information.
 What if we want control the environment a bit more?
 
-There's no obligation to use the simple, standalone version of `foobar`.  Think of `foobar` as a *re-usable sub-form*
-or as a *directive*.  If you've created an AngluarJS application, then you can embed `foobar` with two small steps:
+There's no obligation to use the simple, standalone version of `helloworld`.  Think of `helloworld` as a *re-usable sub-form*
+or as a *directive*.  If you've created an AngluarJS application, then you can embed `helloworld` with two small steps:
 
 1. In your application, declare a dependency on module `afformFoobar`. This is usually done in `ang/MYMODULE.ang.php`
    and/or `ang/MYMODULE.js`.
-2. In your HTML template, use the directive `<div afform-foobar=""></div>`.
+2. In your HTML template, use the directive `<div afform-helloworld=""></div>`.
 
 This technique is particularly useful if you want to provide extra data for the form author to use.  For example, your
 application might pass in the current phase of the moon:
 
 ```html
-<div afform-foobar="{phaseOfMoon: 'waxing'}"></div>
+<div afform-helloworld="{phaseOfMoon: 'waxing'}"></div>
 ```
 
-Now, in `afform/foobar/layout.html`, you can use the `phaseOfMoon`:
+Now, in `afform/helloworld/layout.html`, you can use the `phaseOfMoon`:
 
 ```html
 Hello, {{routeParams.name}}. The moon is currently {{options.phaseOfMoon}}.
@@ -221,8 +221,8 @@ This design has some other neat consequences:
 * One `afform` may embed another `afform`.
 * The parent `afform` can pass extra `options` to the child.
 * If you decide that the framework provided by `org.civicrm.afform` is too stifling, you can fork off --
-  remove the `afform/foobar` folder and create your own static module (`civix generate:angular-module --am=afform-foobar`, etc).
-  As long as your module supports the same interfaces (e.g. `<div afform-foobar="...">`), downstream users can still be supported.
+  remove the `afform/helloworld` folder and create your own static module (`civix generate:angular-module --am=afform-helloworld`, etc).
+  As long as your module supports the same interfaces (e.g. `<div afform-helloworld="...">`), downstream users can still be supported.
     *(FIXME: Could one fork off the JS while still allowing CRUD API to manipulate HTML?)
 
 ## Known Issues
@@ -235,4 +235,4 @@ This design has some other neat consequences:
 * Need to implement the `Afform.revert` API to undo local customizations.
 * Haven't decided if we should support a `client_route` property (i.e. defining a skeletal controller and route for any form).
   On the plus side, make it easier to add items to the `civicrm/a` base-page. On the flipside, we don't currently have
-  a strong use-case, and developers can get the same effect with `civix generate:angular-page` and embedding `<div afform-foobar/>`.
+  a strong use-case, and developers can get the same effect with `civix generate:angular-page` and embedding `<div afform-helloworld/>`.
