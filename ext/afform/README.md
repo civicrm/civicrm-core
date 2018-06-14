@@ -76,7 +76,7 @@ $ cv url "civicrm/hello-world/#/?name=world"
 
 Open the URLs and see what you get.
 
-## Development: Scopes, variables, and directives - oh my!
+## Development: Writing HTML templates
 
 In AngularJS, the primary language for orchestrating a screen is HTML. You can embed code in here.
 
@@ -97,7 +97,7 @@ Additionally, AngularJS allows *directives* -- these are extra HTML attributes a
 A full explanation of these features is out-of-scope for this document, but the key point is that you can use standard
 AngularJS features.
 
-## Development: Display a contact record
+## Development: Writing HTML templates: Contact record example
 
 Let's say we want `helloworld` to become a basic "View Contact" page. A user
 would request a URL like:
@@ -179,51 +179,81 @@ A few important things to note about this:
 * The changes are only applied on this site.
 * Once you make a change with the CRUD API, there will be two copies of the form:
     * `[myextension]/afform/helloworld/` is the default, canonical version.
-    * `[civicrm.files]/afform/helloworld/` is the locally customized version.
+    * `[civicrm.files]/afform/helloworld/` is the local, custom version.
 * The `layout` field is stored as an Angular-style HTML document (`layout.html`), so you can edit it on disk like
   normal Angular code. However, when CRUD'ing the `layout` through the API, it is presented in JSON-style.
 
-
-## Development: Every form is an AngularJS directive
+## Development: Embedding forms
 
 In the quick-start example, we registered a new route (`"server_route": "civicrm/hello-world"`) -- this created a
-simple, standalone page with the sole purpose of displaying the `helloworld` form. But that had very limited information.
-What if we want control the environment a bit more?
+simple, standalone page with the sole purpose of displaying the `helloworld` form.  What if we want to embed the form
+somewhere else -- e.g. as a dialog inside an event-listing or membership directory?  Afforms are actualy *re-usable
+sub-forms*.
 
-There's no obligation to use the simple, standalone version of `helloworld`.  Think of `helloworld` as a *re-usable sub-form*
-or as a *directive*.  If you've created an AngluarJS application, then you can embed `helloworld` with two small steps:
+How does this work?  Every `afform` is an *AngularJS directive*.  For example, `helloworld` can be embedded with:
 
-1. In your application, declare a dependency on module `afformFoobar`. This is usually done in `ang/MYMODULE.ang.php`
-   and/or `ang/MYMODULE.js`.
-2. In your HTML template, use the directive `<div afform-helloworld=""></div>`.
+```html
+<div afform-hellworld=""></div>
+```
 
-This technique is particularly useful if you want to provide extra data for the form author to use.  For example, your
-application might pass in the current phase of the moon:
+Moreover, you can pass options to `helloworld`:
 
 ```html
 <div afform-helloworld="{phaseOfMoon: 'waxing'}"></div>
 ```
 
-Now, in `afform/helloworld/layout.html`, you can use the `phaseOfMoon`:
+Now, in `afform/helloworld/layout.html`, you can use `options.phaseOfMoon`:
 
 ```html
 Hello, {{routeParams.name}}. The moon is currently {{options.phaseOfMoon}}.
 ```
 
-Or if you're not sure data will actually be provided:
+## Development: Embedding forms: Contact record example
+
+Is this useful? Let's suppose you're building a contact record page.
+
+First, let's make a few building-blocks:
+
+1. `afform/contactName/layout.html` displays a sub-form for editing first name, lastname, prefix, suffix, etc.
+2. `afform/contactAddressess/layout.html` displays a sub-form for editing street addresses.
+3. `afform/contactEmails/layout.html` displays a sub-form for editing email addresses.
+
+Now you can create an overall `afform/contact/layout.html` which uses these building-blocks:
 
 ```html
-Hello, {{routeParams.name ? routeParams.name : 'anonymous'}}. The moon is currently {{options.phaseOfMoon ? options.phaseOfMoon : 'on hiatus'}}.
+<div ng-form="contactForm">
+  <div crm-ui-accordion="{title: ts('Name')}">
+    <div afform-contact-name="{cid: routeParams.cid}"></div>
+  </div>
+  <div crm-ui-accordion="{title: ts('Street Addresses')}">
+    <div afform-contact-addresses="{cid: routeParams.cid}"></div>
+  </div>
+  <div crm-ui-accordion="{title: ts('Emails')}">
+    <div afform-contact-emails="{cid: routeParams.cid}"></div>
+  </div>
+</div>
 ```
 
-This design has some other neat consequences:
+> *(FIXME: In the parent form's `meta.json`, we need to manually add `afformContactName`, `afformContactAddresses`, `afformContactEmails` to the `requires` list. We should autodetect these instead.)*
 
-* One `afform` may embed another `afform`.
-* The parent `afform` can pass extra `options` to the child.
-* If you decide that the framework provided by `org.civicrm.afform` is too stifling, you can fork off --
-  remove the `afform/helloworld` folder and create your own static module (`civix generate:angular-module --am=afform-helloworld`, etc).
-  As long as your module supports the same interfaces (e.g. `<div afform-helloworld="...">`), downstream users can still be supported.
-    *(FIXME: Could one fork off the JS while still allowing CRUD API to manipulate HTML?)
+What does this buy us?  It means that a downstream admin (using APIs/GUIs) can fork `afform/contactName/layout.html` --
+but all the other components can cleanly track the canonical release. This significantly reduces the costs and risks
+of manging upgrades and changes.
+
+## Development: Full AngularJS
+
+Afform is really only a subset of AngularJS -- it emphasizes the use of *directives* as a way to *pick and arrange* the
+parts of your form.  There is more to AngularJS -- such as client-side routing, controllers, services, etc.  What to do
+if you need these? Here are few tricks:
+
+* You can create your own applications and pages with full AngularJS. (See also: [CiviCRM Developer Guide: AngularJS: Quick Start](https://docs.civicrm.org/dev/en/latest/framework/angular/quickstart/)).
+  Then embed the afform (like `helloworld`) in your page with these steps:
+    * Declare a dependency on module (`afformHelloworld`). This is usually done in `ang/MYMODULE.ang.php` and/or `ang/MYMODULE.js`.
+    * In your HTML template, use the directive `<div afform-helloworld=""></div>`. If you want to provide extra data or services for the form author, pass them along.
+* You can write your own directives with full AngularJS (e.g. `civix generate:angular-directive`). These directives become available for use in other afforms.
+* If you start out distributing an `afform` and later find it too limiting, then you can change your mind and convert it to static code in full AngularJS.
+  As long as you name it consistently (e.g. `afform-helloworld`), downstream consumers can use the static version as a drop-in replacement.
+    *(FIXME: But if you do this, could you still permit downstream folks customize the HTML?)
 
 ## Known Issues
 
