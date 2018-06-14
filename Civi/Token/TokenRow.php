@@ -217,12 +217,17 @@ class TokenRow {
       case 'text/html':
         // Plain => HTML.
         foreach ($textTokens as $entity => $values) {
+          $entityFields = civicrm_api3($entity, "getFields", array('api_action' => 'get'));
           foreach ($values as $field => $value) {
             if (!isset($htmlTokens[$entity][$field])) {
               // CRM-18420 - Activity Details Field are enclosed within <p>,
               // hence if $body_text is empty, htmlentities will lead to
               // conversion of these tags resulting in raw HTML.
               if ($entity == 'activity' && $field == 'details') {
+                $htmlTokens[$entity][$field] = $value;
+              }
+              elseif (\CRM_Utils_Array::value('data_type', \CRM_Utils_Array::value($field, $entityFields['values'])) == 'Memo') {
+                // Memo fields aka custom fields of type Note are html.
                 $htmlTokens[$entity][$field] = $value;
               }
               else {
