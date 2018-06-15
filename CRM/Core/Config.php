@@ -393,6 +393,8 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
         OR TABLE_NAME LIKE 'civicrm_tmp_d%'
         )
     ";
+    // NOTE: Cannot find use-cases where "civicrm_report_temp" would be durable. Could probably remove.
+
     if ($timeInterval) {
       $query .= " AND CREATE_TIME < DATE_SUB(NOW(), INTERVAL {$timeInterval})";
     }
