@@ -3837,7 +3837,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @return null|object
    */
   public static function recordAdditionalPayment($contributionId, $trxnsData, $paymentType = 'owed', $participantId = NULL, $updateStatus = TRUE) {
-    $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     $getInfoOf['id'] = $contributionId;
     $defaults = array();
     $contributionDAO = CRM_Contribute_BAO_Contribution::retrieve($getInfoOf, $defaults, CRM_Core_DAO::$_nullArray);
@@ -3855,7 +3854,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $trxnsData['trxn_date'] = !empty($trxnsData['trxn_date']) ? $trxnsData['trxn_date'] : date('YmdHis');
     $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionDAO->financial_type_id, 'Accounts Receivable Account is');
 
-    // get the paid status id
+    $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     $paidStatus = CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialItem', 'status_id', 'Paid');
 
     if ($paymentType == 'owed') {
@@ -3890,7 +3889,7 @@ LEFT JOIN civicrm_entity_financial_trxn eft
 WHERE eft.entity_table = 'civicrm_contribution'
   AND eft.entity_id = {$contributionId}
   AND ft.to_financial_account_id != {$toFinancialAccount}
-  AND ft.status_id = {$statusId}
+  AND ft.status_id = {$completedStatusId}
 ";
       $query = CRM_Core_DAO::executeQuery($sql);
       $query->fetch();
@@ -3900,7 +3899,7 @@ WHERE eft.entity_table = 'civicrm_contribution'
       if ($contributionDAO->total_amount == $sumOfPayments) {
         // update contribution status and
         // clean cancel info (if any) if prev. contribution was updated in case of 'Refunded' => 'Completed'
-        $contributionDAO->contribution_status_id = $statusId;
+        $contributionDAO->contribution_status_id = $completedStatusId;
         $contributionDAO->cancel_date = 'null';
         $contributionDAO->cancel_reason = NULL;
         $netAmount = !empty($trxnsData['net_amount']) ? NULL : $trxnsData['total_amount'];
@@ -3909,7 +3908,7 @@ WHERE eft.entity_table = 'civicrm_contribution'
         $contributionDAO->save();
 
         //Change status of financial record too
-        $financialTrxn->status_id = $statusId;
+        $financialTrxn->status_id = $completedStatusId;
         $financialTrxn->save();
 
         // note : not using the self::add method,
@@ -3958,7 +3957,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
       // which in 'Pending Refund' => 'Completed' is not useful, instead specific financial record updates
       // are coded below i.e. just updating financial_item status to 'Paid'
       if ($updateStatus) {
-        $contributionDetails = CRM_Core_DAO::setFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'contribution_status_id', $statusId);
+        CRM_Core_DAO::setFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'contribution_status_id', $completedStatusId);
       }
       // add financial item entry
       $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionDAO->id);
