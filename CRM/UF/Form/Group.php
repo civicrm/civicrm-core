@@ -141,7 +141,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
 
     //add checkboxes
     $uf_group_type = array();
-    $UFGroupType = CRM_Core_SelectValues::ufGroupTypes();
+    $UFGroupType = CRM_Core_BAO_UFJoin::buildOptions('module', 'create');
     foreach ($UFGroupType as $key => $value) {
       $uf_group_type[] = $this->createElement('checkbox', $key, NULL, $value);
     }

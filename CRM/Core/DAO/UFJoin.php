@@ -43,7 +43,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
   public $is_active;
 
   /**
-   * Module which owns this uf_join instance, e.g. User Registration, CiviDonate, etc.
+   * Type of uf_join instance, e.g. User Registration or Search Profile.
    *
    * @var string
    */
@@ -142,7 +142,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'name' => 'module',
           'type' => CRM_Utils_Type::T_STRING,
           'title' => ts('Profile Module'),
-          'description' => 'Module which owns this uf_join instance, e.g. User Registration, CiviDonate, etc.',
+          'description' => 'Type of uf_join instance, e.g. User Registration or Search Profile.',
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
@@ -150,6 +150,9 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',
           'localizable' => 0,
+          'pseudoconstant' => [
+            'callback' => 'CRM_Core_SelectValues::ufGroupTypes',
+          ]
         ],
         'entity_table' => [
           'name' => 'entity_table',
