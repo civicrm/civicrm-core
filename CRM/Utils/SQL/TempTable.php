@@ -36,10 +36,16 @@
  *   - Durable temp tables: "civicrm_tmp_d_{12}_{32}"
  *   - Ephemeral temp tables: "civicrm_tmp_e_{12}_{32}"
  *
- * Example 1: Just create table name. You'll be responsible for CREATE/DROP actions.
+ * To use `TempTable`:
+ *   - Begin by calling `CRM_Utils_SQL_TempTable::build()`.
+ *   - Optionally, describe the table with `setDurable()`, `setCategory()`, `setId()`.
+ *   - Finally, call `getName()` or `createWithQuery()` or `createWithColumns()`.
+ *
+ * Example 1: Just create a table name. You'll be responsible for CREATE/DROP actions.
  *
  * $name = CRM_Utils_SQL_TempTable::build()->getName();
  * $name = CRM_Utils_SQL_TempTable::build()->setDurable()->getName();
+ * $name = CRM_Utils_SQL_TempTable::build()->setCategory('contactstats')->setId($contact['id'])->getName();
  *
  * Example 2: Create a temp table using the results of a SELECT query.
  *
