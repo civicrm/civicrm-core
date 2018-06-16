@@ -351,9 +351,6 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function testGetExtensionSetting() {
     $this->hookClass->setHook('civicrm_alterSettingsFolders', array($this, 'setExtensionMetadata'));
     $data = NULL;
-    // the caching of data to all duplicates the caching of data to the empty string
-    CRM_Core_BAO_Cache::setItem($data, 'CiviCRM setting Spec', 'All');
-    CRM_Core_BAO_Cache::setItem($data, 'CiviCRM setting Specs', 'settingsMetadata__');
     Civi::cache('settings')->flush();
     $fields = $this->callAPISuccess('setting', 'getfields', array('filters' => array('group_name' => 'Test Settings')));
     $this->assertArrayHasKey('test_key', $fields['values']);
