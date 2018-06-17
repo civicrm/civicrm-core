@@ -177,7 +177,7 @@
        </td>
      </tr>
     {/if}
-    {if $event.is_monetary}
+    {if $event.is_monetary and not $isRequireApproval}
 
       <tr>
        <th {$headerStyle}>

@@ -101,7 +101,7 @@
 {if $payer.name}
 You were registered by: {$payer.name}
 {/if}
-{if $event.is_monetary} {* This section for Paid events only.*}
+{if $event.is_monetary and not $isRequireApproval} {* This section for Paid events only.*}
 
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 

@@ -208,7 +208,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->assignToTemplate();
 
     if ($this->_values['event']['is_monetary'] &&
-      ($this->_params[0]['amount'] || $this->_params[0]['amount'] == 0)
+      ($this->_params[0]['amount'] || $this->_params[0]['amount'] == 0) &&
+      !$this->_requireApproval
     ) {
       $this->_amount = array();
 
