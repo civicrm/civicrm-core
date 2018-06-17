@@ -2018,6 +2018,8 @@ SELECT contact_id
    * @param null $string
    *
    * @return string
+   * @deprecated
+   * @see CRM_Utils_SQL_TempTable
    */
   public static function createTempTableName($prefix = 'civicrm', $addRandomString = TRUE, $string = NULL) {
     $tableName = $prefix . "_temp";

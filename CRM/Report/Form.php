@@ -3689,7 +3689,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         WHERE smartgroup_contact.group_id IN ({$smartGroups}) ";
     }
 
-    $this->groupTempTable = 'civicrm_report_temp_group_' . date('Ymd_') . uniqid();
+    $this->groupTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('rptgrp')->setId(date('Ymd_') . uniqid())->getName();
     $this->executeReportQuery("
       CREATE TEMPORARY TABLE $this->groupTempTable $this->_databaseAttributes
       $query
