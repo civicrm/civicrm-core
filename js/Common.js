@@ -414,9 +414,11 @@ if (!CRM.vars) CRM.vars = {};
         $el = $(this),
         iconClass,
         settings = {
+          placeholder: $el.attr('placeholder') || $el.data('placeholder') || $('option[value=""]', $el).text(),
           allowClear: !$el.hasClass('required'),
-          formatResult: formatCrmSelect2,
-          formatSelection: formatCrmSelect2
+          templateResult: formatCrmSelect2,
+          templateSelection: formatCrmSelect2,
+          dropdownCssClass: 'crm-container'
         };
       // quickform doesn't support optgroups so here's a hack :(
       $('option[value^=crm_optgroup]', this).each(function () {
@@ -440,12 +442,11 @@ if (!CRM.vars) CRM.vars = {};
           return out;
         };
       }
-
       // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
         settings.minimumResultsForSearch = 10;
         if ($('option:first', this).val() === '') {
-          settings.placeholderOption = 'first';
+          settings.placeholder = $('option:first', this).text();
         }
       }
       $.extend(settings, $el.data('select-params') || {}, options || {});
@@ -497,15 +498,15 @@ if (!CRM.vars) CRM.vars = {};
               json: JSON.stringify(params)
             };
           },
-          results: function(data) {
+          processResults: function (data, page) {
             return {more: data.more_results, results: data.values || []};
           }
         },
         minimumInputLength: 1,
-        formatResult: CRM.utils.formatSelect2Result,
-        formatSelection: formatEntityRefSelection,
+        templateResult: CRM.utils.formatSelect2Result,
+        templateSelection: formatEntityRefSelection,
         escapeMarkup: _.identity,
-        initSelection: function($el, callback) {
+        current: function(callback) {
           var
             multiple = !!$el.data('select-params').multiple,
             val = $el.val(),
@@ -535,14 +536,14 @@ if (!CRM.vars) CRM.vars = {};
         };
         selectParams.tokenSeparators = [','];
         selectParams.createSearchChoicePosition = 'bottom';
-        $el.on('select2-selecting.crmEntity', function(e) {
+        $el.on('select2:selecting.crmEntity', function(e) {
           if (e.val === "0") {
             // Create a new term
             e.object.label = e.object.term;
             CRM.api3(entity, 'create', $.extend({name: e.object.term}, $el.data('api-params').params || {}))
               .done(function(created) {
                 var
-                  val = $el.select2('val'),
+                  val = $el.val(),
                   data = $el.select2('data'),
                   item = {id: created.id, label: e.object.term};
                 if (val === "0") {
@@ -558,22 +559,24 @@ if (!CRM.vars) CRM.vars = {};
         });
       }
       else {
-        selectParams.formatInputTooShort = function() {
-          var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
-          txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
-          return txt;
+        selectParams.language = {
+          noResults: function() {
+            var txt = $el.data('select-params').noMatches || $.fn.select2.defaults.noMatches;
+            txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
+            return txt;
+          },
+          inputTooShort: function() {
+            var txt = $el.data('select-params').inputTooShort || $.fn.select2.defaults.inputTooShort.call($el);
+            txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
+            return txt;
+          }
         };
-        selectParams.formatNoMatches = function() {
-          var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
-          txt += entityRefFiltersMarkup($el) + renderEntityRefCreateLinks($el);
-          return txt;
-        };
-        $el.on('select2-open.crmEntity', function() {
-          var $el = $(this);
+        $el.on('select2:open.crmEntity', function(e) {
+          var $el = $('#select2-' + $(this).attr('id') + '-results');
           renderEntityRefFilterValue($el);
-          $('#select2-drop')
+          $('.crm-entityref-links a.crm-add-entity', $el)
             .off('.crmEntity')
-            .on('click.crmEntity', 'a.crm-add-entity', function(e) {
+            .on('click', function(e) {
               var extra = $el.data('api-params').extra,
                 formUrl = $(this).attr('href') + '&returnExtra=display_name,sort_name' + (extra ? (',' + extra) : '');
               $el.select2('close');
@@ -817,7 +820,7 @@ if (!CRM.vars) CRM.vars = {};
 
   function formatEntityRefSelection(row) {
     return (row.color ? '<span class="crm-select-item-color" style="background-color: ' + row.color + '"></span> ' : '') +
-      _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.label + (row.suffix !== undefined ? ' ' + row.suffix : ''));
+      _.escape((row.prefix !== undefined ? row.prefix + ' ' : '') + row.text + (row.suffix !== undefined ? ' ' + row.suffix : ''));
   }
 
   function renderEntityRefCreateLinks($el) {
@@ -932,17 +935,17 @@ if (!CRM.vars) CRM.vars = {};
     var
       filter = $el.data('user-filter') || {},
       filterSpec = filter.key ? _.find(getEntityRefFilters($el), {key: filter.key}) : null,
-      $keyField = $('.crm-entityref-filter-key', '#select2-drop'),
+      $keyField = $('.crm-entityref-filter-key', $el),
       $valField = null;
     if (filterSpec) {
-      $('.crm-entityref-filter-value', '#select2-drop').remove();
+      $('.crm-entityref-filter-value', '#select2-dropdown').remove();
       $valField = $(entityRefFilterValueMarkup(filter, filterSpec));
       $keyField.after($valField);
       if (filterSpec.type === 'select' && !filterSpec.options) {
         loadEntityRefFilterOptions(filter, filterSpec, $valField, $el);
       }
     } else {
-      $('.crm-entityref-filter-value', '#select2-drop').hide().val('').change();
+      $('.crm-entityref-filter-value', '#select2-dropdown').hide().val('').change();
     }
   }
 

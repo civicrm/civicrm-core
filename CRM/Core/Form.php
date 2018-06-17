@@ -1934,7 +1934,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $props['select'] = CRM_Utils_Array::value('select', $props, array()) + $defaults;
 
     $this->formatReferenceFieldAttributes($props, get_class($this));
-    return $this->add('text', $name, $label, $props, $required);
+    return $this->add('select', $name, $label, NULL, $required, $props);
   }
 
   /**
