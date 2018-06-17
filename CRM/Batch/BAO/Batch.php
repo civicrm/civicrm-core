@@ -745,6 +745,24 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
           $values['contribution_date_low'] = $date['from'];
           $values['contribution_date_high'] = $date['to'];
         }
+        $specialParams = array(
+          'financial_type_id',
+          'contribution_soft_credit_type_id',
+          'contribution_status_id',
+          'contribution_trxn_id',
+          'contribution_page_id',
+          'contribution_product_id',
+          'invoice_id',
+          'payment_instrument_id',
+          'contribution_batch_id',
+        );
+
+        foreach ($specialParams as $key) {
+          if (($val = CRM_Utils_Array::value($key, $values)) && !is_array($val)) {
+            $values[$key] = explode(',', $val);
+          }
+        }
+        CRM_Contact_BAO_Query::processSpecialFormValue($values, $specialParams);
         $searchParams = CRM_Contact_BAO_Query::convertFormValues($values);
         // @todo the use of defaultReturnProperties means the search will be inefficient
         // as slow-unneeded properties are included.

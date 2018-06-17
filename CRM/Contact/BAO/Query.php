@@ -6353,7 +6353,9 @@ AND   displayRelType.is_active = 1
             unset($formValues[$element]);
             $element = $changeNames[$element];
           }
-          $formValues[$element] = array('IN' => $value);
+          if (!array_key_exists('IN', $value)) {
+            $formValues[$element] = array('IN' => $value);
+          }
         }
         elseif (in_array($value, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
           $formValues[$element] = array($value => 1);
