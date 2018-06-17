@@ -1967,7 +1967,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             $membershipLog['modified_date'] = date('Ymd');
             $membershipLog['membership_type_id'] = $membership->membership_type_id;
 
-            CRM_Member_BAO_MembershipLog::add($membershipLog, CRM_Core_DAO::$_nullArray);
+            CRM_Member_BAO_MembershipLog::add($membershipLog);
 
             //update related Memberships.
             CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $formattedParams);

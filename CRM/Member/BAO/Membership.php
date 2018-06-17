@@ -134,7 +134,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       $membershipLog['modified_id'] = $membership->contact_id;
     }
 
-    CRM_Member_BAO_MembershipLog::add($membershipLog, CRM_Core_DAO::$_nullArray);
+    CRM_Member_BAO_MembershipLog::add($membershipLog);
 
     // reset the group contact cache since smart groups might be affected due to this
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
@@ -1233,7 +1233,7 @@ AND civicrm_membership.is_test = %2";
         )
       );
 
-      CRM_Member_BAO_MembershipLog::add($logParams, CRM_Core_DAO::$_nullArray);
+      CRM_Member_BAO_MembershipLog::add($logParams);
     }
   }
 
