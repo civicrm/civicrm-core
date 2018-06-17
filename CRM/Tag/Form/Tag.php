@@ -113,7 +113,7 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
    * @return void
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache('CRM_Core_DAO_Tag');
+    CRM_Utils_System::flushCache();
 
     // array contains the posted values
     // exportvalues is not used because its give value 1 of the checkbox which were checked by default,

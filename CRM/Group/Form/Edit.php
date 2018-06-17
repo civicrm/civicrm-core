@@ -364,7 +364,7 @@ WHERE  title = %1
    * Process the form when submitted.
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache('CRM_Core_DAO_Group');
+    CRM_Utils_System::flushCache();
 
     $updateNestingCache = FALSE;
     if ($this->_action & CRM_Core_Action::DELETE) {
