@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {assign var=isRecordPayment value=1 }
-{assign var=isShowBillingBlock value=($action neq 2)}
+{capture assign="isShowBillingBlock"}{if $action neq 2}1{else}0{/if}{/capture}
 {if $paid} {* We retrieve this tpl when event is selected - keep it empty if event is not paid *}
     <table class="form-layout">
     {if $priceSet}
