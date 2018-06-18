@@ -1453,7 +1453,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
     $mailing->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
 
-    if (!isset($params['replyto_email']) &&
+    if (((!$id && empty($params['replyto_email'])) || !isset($params['replyto_email'])) &&
       isset($params['from_email'])
     ) {
       $params['replyto_email'] = $params['from_email'];
