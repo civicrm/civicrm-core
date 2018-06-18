@@ -793,16 +793,82 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
         ),
       ),
     );
+
     try {
       CRM_Contribute_BAO_Contribution::checkLineItems($params);
       $this->fail("Missed expected exception");
     }
-    catch (Exception $e) {
-      $this->assertEquals("Line item total doesn't match with total amount.", $e->getMessage());
+    catch (CRM_Contribute_Exception_CheckLineItemsException $e) {
+      $this->assertEquals(
+        CRM_Contribute_Exception_CheckLineItemsException::LINE_ITEM_DIFFERRING_TOTAL_EXCEPTON_MSG,
+        $e->getMessage()
+      );
     }
+
     $this->assertEquals(3, $params['line_items'][0]['line_item'][0]['financial_type_id']);
     $params['total_amount'] = 300;
+
     CRM_Contribute_BAO_Contribution::checkLineItems($params);
+  }
+
+  /**
+   * Tests CRM_Contribute_BAO_Contribution::checkLineItems() method works with
+   * floating point values.
+   */
+  public function testCheckLineItemsWithFloatingPointValues() {
+    $params = array(
+      'contact_id' => 202,
+      'receive_date' => date('Y-m-d'),
+      'total_amount' => 16.67,
+      'financial_type_id' => 3,
+      'line_items' => array(
+        array(
+          'line_item' => array(
+            array(
+              'entity_table' => 'civicrm_contribution',
+              'price_field_id' => 8,
+              'price_field_value_id' => 16,
+              'label' => 'test 1',
+              'qty' => 1,
+              'unit_price' => 14.85,
+              'line_total' => 14.85,
+            ),
+            array(
+              'entity_table' => 'civicrm_contribution',
+              'price_field_id' => 8,
+              'price_field_value_id' => 17,
+              'label' => 'Test 2',
+              'qty' => 1,
+              'unit_price' => 1.66,
+              'line_total' => 1.66,
+              'financial_type_id' => 1,
+            ),
+            array(
+              'entity_table' => 'civicrm_contribution',
+              'price_field_id' => 8,
+              'price_field_value_id' => 17,
+              'label' => 'Test 2',
+              'qty' => 1,
+              'unit_price' => 0.16,
+              'line_total' => 0.16,
+              'financial_type_id' => 1,
+            ),
+          ),
+          'params' => array(),
+        ),
+      ),
+    );
+
+    $foundException = FALSE;
+
+    try {
+      CRM_Contribute_BAO_Contribution::checkLineItems($params);
+    }
+    catch (CRM_Contribute_Exception_CheckLineItemsException $e) {
+      $foundException = TRUE;
+    }
+
+    $this->assertFalse($foundException);
   }
 
   /**
