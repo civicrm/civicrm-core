@@ -1461,7 +1461,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           'max_related' => $dao->max_related,
         );
 
-        CRM_Member_BAO_MembershipLog::add($membershipLog, CRM_Core_DAO::$_nullArray);
+        CRM_Member_BAO_MembershipLog::add($membershipLog);
 
         //create activity when membership status is changed
         $activityParam = array(
