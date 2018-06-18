@@ -682,7 +682,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'text',
         'name' => 'credit_card_number',
         'title' => ts('Card Number'),
-        'cc_field' => TRUE,
         'attributes' => array(
           'size' => 20,
           'maxlength' => 20,
@@ -695,7 +694,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'text',
         'name' => 'cvv2',
         'title' => ts('Security Code'),
-        'cc_field' => TRUE,
         'attributes' => array(
           'size' => 5,
           'maxlength' => 10,
@@ -714,7 +712,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'date',
         'name' => 'credit_card_exp_date',
         'title' => ts('Expiration Date'),
-        'cc_field' => TRUE,
         'attributes' => CRM_Core_SelectValues::date('creditCard'),
         'is_required' => TRUE,
         'rules' => array(
@@ -729,7 +726,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'select',
         'name' => 'credit_card_type',
         'title' => ts('Card Type'),
-        'cc_field' => TRUE,
         'attributes' => $creditCardType,
         'is_required' => FALSE,
       ),
@@ -737,7 +733,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'text',
         'name' => 'account_holder',
         'title' => ts('Account Holder'),
-        'cc_field' => TRUE,
         'attributes' => array(
           'size' => 20,
           'maxlength' => 34,
@@ -750,7 +745,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'text',
         'name' => 'bank_account_number',
         'title' => ts('Bank Account Number'),
-        'cc_field' => TRUE,
         'attributes' => array(
           'size' => 20,
           'maxlength' => 34,
@@ -770,7 +764,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'text',
         'name' => 'bank_identification_number',
         'title' => ts('Bank Identification Number'),
-        'cc_field' => TRUE,
         'attributes' => array(
           'size' => 20,
           'maxlength' => 11,
@@ -789,7 +782,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'text',
         'name' => 'bank_name',
         'title' => ts('Bank Name'),
-        'cc_field' => TRUE,
         'attributes' => array(
           'size' => 20,
           'maxlength' => 64,
@@ -803,7 +795,6 @@ abstract class CRM_Core_Payment {
         'name' => 'check_number',
         'title' => ts('Check Number'),
         'is_required' => FALSE,
-        'cc_field' => TRUE,
         'attributes' => NULL,
       ),
       'pan_truncation' => array(
@@ -811,7 +802,6 @@ abstract class CRM_Core_Payment {
         'name' => 'pan_truncation',
         'title' => ts('Last 4 digits of the card'),
         'is_required' => FALSE,
-        'cc_field' => TRUE,
         'attributes' => array(
           'size' => 4,
           'maxlength' => 4,
@@ -825,6 +815,13 @@ abstract class CRM_Core_Payment {
             'rule_parameters' => NULL,
           ),
         ),
+      ),
+      'payment_token' => array(
+        'htmlType' => 'hidden',
+        'name' => 'payment_token',
+        'title' => ts('Authorization token'),
+        'is_required' => FALSE,
+        'attributes' => ['size' => 10, 'autocomplete' => 'off'],
       ),
     );
   }

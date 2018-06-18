@@ -614,11 +614,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           $this->assign($paymentField, $this->_params[$paymentField]);
         }
       }
-      $paymentFieldsetLabel = ts('%1 Information', array($paymentProcessorObject->getPaymentTypeLabel()));
-      if (empty($paymentFields)) {
-        $paymentFieldsetLabel = '';
-      }
-      $this->assign('paymentFieldsetLabel', $paymentFieldsetLabel);
+      $this->assign('paymentFieldsetLabel', CRM_Core_Payment_Form::getPaymentLabel($paymentProcessorObject));
       $this->assign('paymentFields', $paymentFields);
 
     }
