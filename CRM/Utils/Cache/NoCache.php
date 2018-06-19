@@ -54,10 +54,11 @@ class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
   /**
    * @param string $key
    * @param mixed $value
+   * @param null|int|\DateInterval $ttl
    *
    * @return bool
    */
-  public function set($key, &$value) {
+  public function set($key, $value, $ttl = NULL) {
     return FALSE;
   }
 

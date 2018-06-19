@@ -56,9 +56,15 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
   /**
    * @param string $key
    * @param mixed $value
+   * @param null|int|\DateInterval $ttl
+   * @return bool
    */
-  public function set($key, &$value) {
+  public function set($key, $value, $ttl = NULL) {
+    if ($ttl !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::set() should support non-NULL TTL");
+    }
     $this->_cache[$key] = $value;
+    return TRUE;
   }
 
   /**

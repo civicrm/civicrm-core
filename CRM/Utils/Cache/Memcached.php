@@ -110,11 +110,15 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
   /**
    * @param $key
    * @param $value
+   * @param null|int|\DateInterval $ttl
    *
    * @return bool
    * @throws Exception
    */
-  public function set($key, &$value) {
+  public function set($key, $value, $ttl = NULL) {
+    if ($ttl !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::set() should support non-NULL TTL");
+    }
     $key = $this->cleanKey($key);
     if (!$this->_cache->set($key, $value, $this->_timeout)) {
       CRM_Core_Error::debug('Result Code: ', $this->_cache->getResultMessage());

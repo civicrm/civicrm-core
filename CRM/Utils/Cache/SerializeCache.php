@@ -90,13 +90,19 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
   /**
    * @param string $key
    * @param mixed $value
+   * @param null|int|\DateInterval $ttl
+   * @return bool
    */
-  public function set($key, &$value) {
+  public function set($key, $value, $ttl = NULL) {
+    if ($ttl !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::set() should support non-NULL TTL");
+    }
     if (file_exists($this->fileName($key))) {
-      return;
+      return FALSE; // WTF, write-once cache?!
     }
     $this->_cache[$key] = $value;
-    file_put_contents($this->fileName($key), "<?php //" . serialize($value));
+    $bytes = file_put_contents($this->fileName($key), "<?php //" . serialize($value));
+    return ($bytes !== FALSE);
   }
 
   /**
