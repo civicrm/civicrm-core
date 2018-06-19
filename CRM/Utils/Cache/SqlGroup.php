@@ -144,6 +144,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     CRM_Core_BAO_Cache::$_cache = NULL; // FIXME: remove multitier cache
     CRM_Utils_Cache::singleton()->flush(); // FIXME: remove multitier cache
     $this->frontCache = array();
+    return TRUE;
   }
 
   public function prefetch() {

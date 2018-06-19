@@ -159,7 +159,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
   }
 
   /**
-   * @return mixed
+   * @return bool
    */
   public function flush() {
     // FIXME: Ideally, we'd map each prefix to a different 'hash' object in Redis,
@@ -167,7 +167,8 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
     // more general rethink of cache expiration/TTL.
 
     $keys = $this->_cache->keys($this->_prefix . '*');
-    return $this->_cache->del($keys);
+    $this->_cache->del($keys);
+    return TRUE;
   }
 
 }

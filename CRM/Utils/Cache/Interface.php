@@ -86,6 +86,8 @@ interface CRM_Utils_Cache_Interface {
 
   /**
    * Delete all values from the cache.
+   *
+   * @return bool
    */
   public function flush();
 

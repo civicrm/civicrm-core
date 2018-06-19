@@ -124,6 +124,7 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
         apc_delete($this->_prefix . $name);
       }
     }
+    return TRUE;
   }
 
 }

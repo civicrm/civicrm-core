@@ -119,11 +119,12 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
 
   /**
    * @param null $key
+   * @return bool
    */
   public function flush($key = NULL) {
     $prefix = "CRM_";
     if (!$handle = opendir(CIVICRM_TEMPLATE_COMPILEDIR)) {
-      return; // die? Error?
+      return FALSE; // die? Error?
     }
     while (FALSE !== ($entry = readdir($handle))) {
       if (substr($entry, 0, 4) == $prefix) {
@@ -133,6 +134,7 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
     closedir($handle);
     unset($this->_cache);
     $this->_cache = array();
+    return TRUE;
   }
 
 }

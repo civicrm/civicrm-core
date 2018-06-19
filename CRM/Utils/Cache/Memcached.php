@@ -172,7 +172,7 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
   }
 
   /**
-   * @return mixed
+   * @return bool
    */
   public function flush() {
     // FIXME: Only delete items matching `$this->_prefix`.
