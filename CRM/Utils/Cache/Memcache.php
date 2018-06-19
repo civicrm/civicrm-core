@@ -143,7 +143,7 @@ class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
   /**
    * @param $key
    *
-   * @return mixed
+   * @return bool
    */
   public function delete($key) {
     return $this->_cache->delete($this->_prefix . $key);

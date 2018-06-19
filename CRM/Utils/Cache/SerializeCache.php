@@ -109,12 +109,14 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
 
   /**
    * @param string $key
+   * @return bool
    */
   public function delete($key) {
     if (file_exists($this->fileName($key))) {
       unlink($this->fileName($key));
     }
     unset($this->_cache[$key]);
+    return TRUE;
   }
 
   /**

@@ -81,6 +81,7 @@ interface CRM_Utils_Cache_Interface {
    * Delete a value from the cache.
    *
    * @param string $key
+   * @return bool
    */
   public function delete($key);
 

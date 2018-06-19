@@ -131,12 +131,14 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
 
   /**
    * @param string $key
+   * @return bool
    */
   public function delete($key) {
     CRM_Core_BAO_Cache::deleteGroup($this->group, $key, FALSE);
     CRM_Core_BAO_Cache::$_cache = NULL; // FIXME: remove multitier cache
     CRM_Utils_Cache::singleton()->flush(); // FIXME: remove multitier cache
     unset($this->frontCache[$key]);
+    return TRUE;
   }
 
   public function flush() {

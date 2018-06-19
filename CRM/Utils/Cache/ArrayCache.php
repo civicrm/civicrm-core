@@ -81,9 +81,11 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
 
   /**
    * @param string $key
+   * @return bool
    */
   public function delete($key) {
     unset($this->_cache[$key]);
+    return TRUE;
   }
 
   public function flush() {

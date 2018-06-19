@@ -152,10 +152,11 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
   /**
    * @param $key
    *
-   * @return mixed
+   * @return bool
    */
   public function delete($key) {
-    return $this->_cache->delete($this->_prefix . $key);
+    $this->_cache->delete($this->_prefix . $key);
+    return TRUE;
   }
 
   /**
