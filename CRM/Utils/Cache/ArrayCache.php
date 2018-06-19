@@ -94,4 +94,8 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
     return TRUE;
   }
 
+  public function clear() {
+    return $this->flush();
+  }
+
 }

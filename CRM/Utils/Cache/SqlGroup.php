@@ -149,6 +149,10 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     return TRUE;
   }
 
+  public function clear() {
+    return $this->flush();
+  }
+
   public function prefetch() {
     $this->frontCache = CRM_Core_BAO_Cache::getItems($this->group, $this->componentID);
   }

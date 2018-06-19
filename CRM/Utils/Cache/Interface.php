@@ -88,8 +88,24 @@ interface CRM_Utils_Cache_Interface {
   /**
    * Delete all values from the cache.
    *
+   * NOTE: flush() and clear() should be aliases. flush() is specified by
+   * Civi's traditional interface, and clear() is specified by PSR-16.
+   *
    * @return bool
+   * @see clear
+   * @deprecated
    */
   public function flush();
+
+  /**
+   * Delete all values from the cache.
+   *
+   * NOTE: flush() and clear() should be aliases. flush() is specified by
+   * Civi's traditional interface, and clear() is specified by PSR-16.
+   *
+   * @return bool
+   * @see flush
+   */
+  public function clear();
 
 }

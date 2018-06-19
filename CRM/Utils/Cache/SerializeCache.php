@@ -139,4 +139,8 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
     return TRUE;
   }
 
+  public function clear() {
+    return $this->flush();
+  }
+
 }

@@ -157,4 +157,8 @@ class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
     return $this->_cache->flush();
   }
 
+  public function clear() {
+    return $this->flush();
+  }
+
 }
