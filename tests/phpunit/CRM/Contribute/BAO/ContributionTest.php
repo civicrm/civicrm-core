@@ -806,6 +806,61 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
+   */
+  public function testcheckLineItemsWithCorrectTaxAmountAndCorrectTotalAmountDoesNotThrowAnError() {
+    $params = array(
+      'contact_id' => 1,
+      'receive_date' => '2010-01-20',
+      'total_amount' => 23,
+      'financial_type_id' => 1,
+      'line_items' => array(
+        array(
+          'line_item' => array(
+            array(
+              'entity_table' => 'civicrm_contribution',
+              'label' => 'Test 1',
+              'qty' => 1,
+              'unit_price' => 20,
+              'line_total' => 20,
+              'tax_amount' => 3,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    $this->assertTrue(CRM_Contribute_BAO_Contribution::checkLineItems($params));
+  }
+
+  /**
+   * @expectedException API_Exception
+   */
+  public function testcheckLineItemsWithTaxAmountAndInCorrectTotalAmountDoesThrowAnError() {
+    $params = array(
+      'contact_id' => 1,
+      'receive_date' => '2010-01-20',
+      'total_amount' => 27,
+      'financial_type_id' => 1,
+      'line_items' => array(
+        array(
+          'line_item' => array(
+            array(
+              'entity_table' => 'civicrm_contribution',
+              'label' => 'Test 1',
+              'qty' => 1,
+              'unit_price' => 20,
+              'line_total' => 20,
+              'tax_amount' => 3,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    $this->assertTrue(CRM_Contribute_BAO_Contribution::checkLineItems($params));
+  }
+
+  /**
    * Test activity amount updation.
    */
   public function testActivityCreate() {

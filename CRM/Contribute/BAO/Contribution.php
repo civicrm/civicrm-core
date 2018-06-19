@@ -4992,6 +4992,8 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    * @param array $params
    *  array of order params.
    *
+   * @return TRUE
+   *
    * @throws \API_Exception
    */
   public static function checkLineItems(&$params) {
@@ -5003,6 +5005,10 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
           $item['financial_type_id'] = $params['financial_type_id'];
         }
         $lineItemAmount += $item['line_total'];
+
+        if (!empty($item['tax_amount'])) {
+          $lineItemAmount += $item['tax_amount'];
+        }
       }
     }
     if (!isset($totalAmount)) {
@@ -5011,6 +5017,8 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     elseif ($totalAmount != $lineItemAmount) {
       throw new API_Exception("Line item total doesn't match with total amount.");
     }
+
+    return TRUE;
   }
 
   /**
