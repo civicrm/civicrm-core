@@ -173,8 +173,6 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
       }
     }
     else {
-      $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
-
       if (empty($eq->display_name)) {
         $from = $eq->email;
       }
@@ -189,7 +187,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
         'To' => $mailing->replyto_email,
         'From' => $from,
         'Reply-To' => empty($replyto) ? $eq->email : $replyto,
-        'Return-Path' => "do-not-reply@{$emailDomain}",
+        'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
         // CRM-17754 Include re-sent headers to indicate that we have forwarded on the email
         'Resent-From' => $domainValues['values'][0]['from_email'],
         'Resent-Date' => date('r'),
@@ -253,14 +251,12 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $domain = CRM_Core_BAO_Domain::getDomain();
     list($domainEmailName, $_) = CRM_Core_BAO_Domain::getNameAndEmail();
 
-    $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
-
     $headers = array(
       'Subject' => $component->subject,
       'To' => $to,
-      'From' => "\"$domainEmailName\" <do-not-reply@$emailDomain>",
-      'Reply-To' => "do-not-reply@$emailDomain",
-      'Return-Path' => "do-not-reply@$emailDomain",
+      'From' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
+      'Reply-To' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
     );
 
     // TODO: do we need reply tokens?

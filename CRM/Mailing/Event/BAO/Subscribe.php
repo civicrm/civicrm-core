@@ -227,7 +227,7 @@ SELECT     civicrm_email.id as email_id
       'From' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
       'To' => $email,
       'Reply-To' => $confirm,
-      'Return-Path' => "do-not-reply@$emailDomain",
+      'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
     );
 
     $url = CRM_Utils_System::url('civicrm/mailing/confirm',
