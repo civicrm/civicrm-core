@@ -36,6 +36,8 @@
  */
 class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
 
+  use CRM_Utils_Cache_NaiveMultipleTrait;
+
   /**
    * The cache storage container, an array by default, stored in a file under templates
    */

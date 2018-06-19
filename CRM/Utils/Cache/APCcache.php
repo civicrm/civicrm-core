@@ -31,6 +31,9 @@
  * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
+
+  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+
   const DEFAULT_TIMEOUT = 3600;
   const DEFAULT_PREFIX = '';
 

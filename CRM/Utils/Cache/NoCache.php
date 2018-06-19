@@ -32,6 +32,8 @@
  */
 class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
 
+  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+
   /**
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable

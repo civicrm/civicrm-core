@@ -36,6 +36,8 @@
  */
 class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
 
+  use CRM_Utils_Cache_NaiveMultipleTrait;
+
   /**
    * The cache storage container, an in memory array by default
    */
