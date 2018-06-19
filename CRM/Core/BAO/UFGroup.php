@@ -993,7 +993,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
     $details = $query->searchQuery(0, 0, NULL, FALSE, FALSE,
       FALSE, FALSE, FALSE, $additionalWhereClause);
-    while($details->fetch()) {
+    while ($details->fetch()) {
       if (!$details) {
         return;
       }
