@@ -135,5 +135,5 @@
 </script>
 {/literal}
 {/crmRegion}
-{crmRegion name="contribute-form-contributionpage-widget-post}
+{crmRegion name="contribute-form-contributionpage-widget-post"}
 {/crmRegion}
