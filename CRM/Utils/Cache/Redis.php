@@ -35,6 +35,7 @@
 class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
 
   use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
 
   const DEFAULT_HOST    = 'localhost';
   const DEFAULT_PORT    = 6379;

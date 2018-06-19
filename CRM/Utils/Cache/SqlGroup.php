@@ -39,6 +39,7 @@
 class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
 
   use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
 
   /**
    * The host name of the memcached server.
