@@ -63,11 +63,12 @@ class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
 
   /**
    * @param string $key
+   * @param mixed $default
    *
    * @return null
    */
-  public function get($key) {
-    return NULL;
+  public function get($key, $default = NULL) {
+    return $default;
   }
 
   /**

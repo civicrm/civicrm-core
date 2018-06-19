@@ -63,11 +63,12 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
 
   /**
    * @param string $key
+   * @param mixed $default
    *
    * @return mixed
    */
-  public function get($key) {
-    return CRM_Utils_Array::value($key, $this->_cache);
+  public function get($key, $default = NULL) {
+    return CRM_Utils_Array::value($key, $this->_cache, $default);
   }
 
   /**

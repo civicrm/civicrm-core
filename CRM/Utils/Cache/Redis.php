@@ -133,12 +133,13 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
 
   /**
    * @param $key
+   * @param mixed $default
    *
    * @return mixed
    */
-  public function get($key) {
+  public function get($key, $default = NULL) {
     $result = $this->_cache->get($this->_prefix . $key);
-    return ($result === FALSE) ? NULL : unserialize($result);
+    return ($result === FALSE) ? $default : unserialize($result);
   }
 
   /**

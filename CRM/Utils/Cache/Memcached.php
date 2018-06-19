@@ -126,10 +126,14 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
 
   /**
    * @param $key
+   * @param mixed $default
    *
    * @return mixed
    */
-  public function &get($key) {
+  public function get($key, $default = NULL) {
+    if ($default !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::get() only supports NULL default");
+    }
     $key = $this->cleanKey($key);
     $result = $this->_cache->get($key);
     return $result;

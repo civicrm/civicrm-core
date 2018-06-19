@@ -97,10 +97,14 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
 
   /**
    * @param string $key
+   * @param mixed $default
    *
    * @return mixed
    */
-  public function get($key) {
+  public function get($key, $default = NULL) {
+    if ($default !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::get() only supports NULL default");
+    }
     if (!array_key_exists($key, $this->frontCache)) {
       $this->frontCache[$key] = CRM_Core_BAO_Cache::getItem($this->group, $key, $this->componentID);
     }

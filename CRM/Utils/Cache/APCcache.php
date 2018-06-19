@@ -84,10 +84,14 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
 
   /**
    * @param $key
+   * @param mixed $default
    *
    * @return mixed
    */
-  public function get($key) {
+  public function get($key, $default = NULL) {
+    if ($default !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::get() only supports NULL default");
+    }
     return apc_fetch($this->_prefix . $key);
   }
 

@@ -67,10 +67,15 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
 
   /**
    * @param string $key
+   * @param mixed $default
    *
    * @return mixed
    */
-  public function get($key) {
+  public function get($key, $default = NULL) {
+    if ($default !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::get() only supports NULL default");
+    }
+
     if (array_key_exists($key, $this->_cache)) {
       return $this->_cache[$key];
     }
