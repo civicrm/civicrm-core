@@ -5,7 +5,7 @@
   // the available "From:" addrs. Records are like the underlying OptionValues -- but add "email"
   // and "author".
   angular.module('crmMailing').factory('crmFromAddresses', function ($q, crmApi) {
-    var emailRegex = /^"(.*)" <([^@>]*@[^@>]*)>$/;
+    var emailRegex = /^"(.*)" *<([^@>]*@[^@>]*)>$/;
     var addrs = _.map(CRM.crmMailing.fromAddress, function (addr) {
       var match = emailRegex.exec(addr.label);
       return angular.extend({}, addr, {
