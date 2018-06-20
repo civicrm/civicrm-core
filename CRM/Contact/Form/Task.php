@@ -94,11 +94,13 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
    * Common pre-processing function.
    *
    * @param CRM_Core_Form $form
-   * @param bool $useTable
    */
-  public static function preProcessCommon(&$form, $useTable = FALSE) {
+  public static function preProcessCommon(&$form) {
     $form->_contactIds = array();
     $form->_contactTypes = array();
+
+    $formName = CRM_Utils_System::getClassName($form->controller->getStateMachine());
+    $useTable = ($formName !== 'CRM_Export_StateMachine_Standalone') ? TRUE : FALSE;
 
     $isStandAlone = in_array('task', $form->urlPath) || in_array('standalone', $form->urlPath);
     if ($isStandAlone) {

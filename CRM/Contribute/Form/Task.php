@@ -67,9 +67,8 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
 
   /**
    * @param CRM_Core_Form $form
-   * @param bool $useTable
    */
-  public static function preProcessCommon(&$form, $useTable = FALSE) {
+  public static function preProcessCommon(&$form) {
     $form->_contributionIds = array();
 
     $values = $form->controller->exportValues($form->get('searchFormName'));

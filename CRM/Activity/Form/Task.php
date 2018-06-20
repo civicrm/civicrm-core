@@ -55,9 +55,8 @@ class CRM_Activity_Form_Task extends CRM_Core_Form_Task {
    * Common pre-process function.
    *
    * @param CRM_Core_Form $form
-   * @param bool $useTable
    */
-  public static function preProcessCommon(&$form, $useTable = FALSE) {
+  public static function preProcessCommon(&$form) {
     $form->_activityHolderIds = array();
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
