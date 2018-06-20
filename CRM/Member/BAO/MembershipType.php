@@ -807,41 +807,39 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param array $params
    */
   public static function updateAllPriceFieldValue($membershipTypeId, $params) {
-    $updateFields = array();
-    if (!empty($params['minimum_fee'])) {
-      $amount = $params['minimum_fee'];
-    }
-    else {
-      $amount = 0;
-    }
-
-    $updateValues = array(
-      2 => array('financial_type_id', 'financial_type_id', 'Integer'),
-      3 => array('label', 'name', 'String'),
-      4 => array('amount', 'minimum_fee', 'Float'),
-      5 => array('description', 'description', 'String'),
+    $defaults = array();
+    $fieldsToUpdate = array(
+      'financial_type_id' => 'financial_type_id',
+      'name' => 'label',
+      'minimum_fee' => 'amount',
+      'description' => 'description',
+      'visibility' => 'visibility_id',
     );
-
-    $queryParams = array(1 => array($membershipTypeId, 'Integer'));
-    foreach ($updateValues as $key => $value) {
-      if (array_key_exists($value[1], $params)) {
-        $updateFields[] = "cpfv." . $value[0] . " = %$key";
-        if ($value[1] == 'minimum_fee') {
-          $fieldValue = $amount;
+    $priceFieldValueBAO = new CRM_Price_BAO_PriceFieldValue();
+    $priceFieldValueBAO->membership_type_id = $membershipTypeId;
+    $priceFieldValueBAO->find();
+    while ($priceFieldValueBAO->fetch()) {
+      $updateParams = array(
+        'id' => $priceFieldValueBAO->id,
+        'price_field_id' => $priceFieldValueBAO->price_field_id,
+      );
+      //Get priceset details.
+      $fieldParams = array('fid' => $priceFieldValueBAO->price_field_id);
+      $setID = CRM_Price_BAO_PriceSet::getSetId($fieldParams);
+      $setParams = array('id' => $setID);
+      $setValues = CRM_Price_BAO_PriceSet::retrieve($setParams, $defaults);
+      if (!empty($setValues->is_quick_config) && $setValues->name != 'default_membership_type_amount') {
+        foreach ($fieldsToUpdate as $key => $value) {
+          if ($value == 'visibility_id' && !empty($params['visibility'])) {
+            $updateParams['visibility_id'] = CRM_Price_BAO_PriceField::getVisibilityOptionID(strtolower($params['visibility']));
+          }
+          else {
+            $updateParams[$value] = CRM_Utils_Array::value($key, $params);
+          }
         }
-        else {
-          $fieldValue = $params[$value[1]];
-        }
-        $queryParams[$key] = array($fieldValue, $value[2]);
+        CRM_Price_BAO_PriceFieldValue::add($updateParams);
       }
     }
-
-    $query = "UPDATE `civicrm_price_field_value` cpfv
-INNER JOIN civicrm_price_field cpf on cpf.id = cpfv.price_field_id
-INNER JOIN civicrm_price_set cps on cps.id = cpf.price_set_id
-SET " . implode(' , ', $updateFields) . " WHERE cpfv.membership_type_id = %1
-AND cps.is_quick_config = 1 AND cps.name != 'default_membership_type_amount'";
-    CRM_Core_DAO::executeQuery($query, $queryParams);
   }
 
 }
