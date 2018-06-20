@@ -48,6 +48,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    */
   protected function tearDown() {
     $this->quickCleanup(array('civicrm_email', 'civicrm_address'));
+    $this->quickCleanUpFinancialEntities();
     parent::tearDown();
     $this->callAPISuccess('Setting', 'create', array('logging' => FALSE));
     $schema = new CRM_Logging_Schema();
@@ -383,20 +384,62 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    */
   public function testGet() {
     $contactId = $this->individualCreate();
+    $this->entityCustomGroupWithSingleFieldCreate('ContactTest', 'ContactTest.php');
     $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'wooty woot'");
     $timeStamp = date('Y-m-d H:i:s');
-    $this->callAPISuccess('Contact', 'create', array(
+    $contact = $this->callAPISuccess('Contact', 'create', array(
         'id' => $contactId,
         'first_name' => 'Dopey',
         'last_name' => 'Dwarf',
         'api.email.create' => array('email' => 'dopey@mail.com'))
     );
+
+    // Update the contact under a different connection id.
+    CRM_Core_DAO::executeQuery("SET @uniqueID = 'wooty wootless'");
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $contact['id'],
+      'middle_name' => 'Einstein',
+      'api.note.create' => ['subject' => 'actually very clever', 'note' => 'we thought he was dopey but he just was not listening because we were too dull'],
+      'api.phone.create' => ['location_type_id' => 'Home', 'phone' => '90210'],
+      'api.contribution.create' => ['financial_type_id' => 'Donation', 'total_amount' => '90210', 'receive_date' => '2018-02-09'],
+    ]);
+
     $this->callAPISuccessGetSingle('email', array('email' => 'dopey@mail.com'));
-    $diffs = $this->callAPISuccess('Logging', 'get', array('log_conn_id' => 'wooty woot', 'log_date' => $timeStamp), __FUNCTION__, __FILE__);
+    $diffs = $this->callAPISuccess('Logging', 'get', array('log_conn_id' => 'wooty woot', 'log_date' => $timeStamp));
     $this->assertLoggingIncludes($diffs['values'], array('to' => 'Dwarf, Dopey'));
     $this->assertLoggingIncludes($diffs['values'], array('to' => 'Mr. Dopey Dwarf II', 'table' => 'civicrm_contact', 'action' => 'Update', 'field' => 'display_name'));
     $this->assertLoggingIncludes($diffs['values'], array('to' => 'dopey@mail.com', 'table' => 'civicrm_email', 'action' => 'Insert', 'field' => 'email'));
+    // The diffs in the 'wooty woot' connection changed the contact name & email.
+    $this->assertChangesExpected($diffs, ['civicrm_contact' => 1, 'civicrm_email' => 1]);
+
+    $diffs = $this->callAPISuccess('Logging', 'get', array('contact_id' => $contact['id']));
+    // All changes for the contact also includes all 3 connections - the initialization - where the contact was created with a different email.
+    // the 'wooty woot' connection, where we added an email & all the changes were in the 'wooty wootless' connection...
+    $expectedChanges = [
+      'civicrm_contribution' => 1,
+      'civicrm_contact' => 1,
+      'civicrm_phone' => 1,
+      'civicrm_email' => 2,
+      'civicrm_financial_item' => 1,
+      'civicrm_activity_contact' => 1,
+      'civicrm_note' => 1,
+    ];
+    $this->assertChangesExpected($diffs, $expectedChanges);
+
+    $diffsToCheck = [
+      ['to' => '90210', 'table' => 'civicrm_phone', 'action' => 'Insert', 'field' => 'phone'],
+      ['to' => '90210', 'table' => 'civicrm_contribution', 'action' => 'Insert', 'field' => 'total_amount'],
+      ['to' => 'actually very clever', 'table' => 'civicrm_note', 'action' => 'Insert', 'field' => 'subject'],
+      ['to' => 'Einstein', 'table' => 'civicrm_contact', 'action' => 'Update', 'field' => 'middle_name'],
+      // This one was in the 'wooty woot' log_conn_id not the 'wooty wooless' one - making sure both are checked.
+      ['to' => 'dopey@mail.com', 'table' => 'civicrm_email', 'action' => 'Insert', 'field' => 'email'],
+    ];
+    foreach ($diffsToCheck as $diffToCheck) {
+      $this->assertLoggingIncludes($diffs['values'], $diffToCheck);
+    }
+
   }
 
   /**
@@ -462,6 +505,29 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_acl DROP Column temp_col");
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_website DROP Column temp_col");
     }
+  }
+
+  /**
+   * Assert changes are as expected.
+   *
+   * We are looking at the number of rows changed for each entity.
+   *
+   * @param array $diffs Logging.get result
+   * @param array $expectedChanges
+   *   In format ['civicrm_contribution' => 1, 'civicrm_email' => 2] where we expect 2 emails to be changed
+   *   (ie. 2 rows in civicrm_email) and one contribution changed. Changed includes insert/delete.
+   */
+  protected function assertChangesExpected($diffs, $expectedChanges) {
+    $changes = [];
+    foreach ($diffs['values'] as $diff) {
+      $changes[$diff['table']][$diff['id']] = TRUE;
+    }
+    foreach ($expectedChanges as $expectedChangeEntity => $expectedChangeCount) {
+      $this->assertEquals($expectedChangeCount, count($changes[$expectedChangeEntity]), $expectedChangeEntity);
+      unset($changes[$expectedChangeEntity]);
+    }
+    // There should be none left.
+    $this->assertEquals([], $changes);
   }
 
 }
