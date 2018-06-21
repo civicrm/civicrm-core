@@ -47,7 +47,9 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
     ));
     $fooValue = array('whiz' => 'bang', 'bar' => 3);
     $a->set('foo', $fooValue);
-    $this->assertEquals($a->get('foo'), array('whiz' => 'bang', 'bar' => 3));
+    $getValue = $a->get('foo');
+    $expectValue = array('whiz' => 'bang', 'bar' => 3);
+    $this->assertEquals($getValue, $expectValue);
 
     $b = new CRM_Utils_Cache_SqlGroup(array(
       'group' => 'testTwoInstance',
