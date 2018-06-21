@@ -106,4 +106,11 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
     return $result;
   }
 
+  /**
+   * @return \CRM_Utils_Cache_Interface|null
+   */
+  public function getCache() {
+    return $this->cache;
+  }
+
 }
