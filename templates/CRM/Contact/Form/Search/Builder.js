@@ -19,15 +19,16 @@
     var patt = /_1$/; // pattern to check if the change event came from field name
     if (field !== null && patt.test(this.id)) {
       // based on data type remove invalid operators e.g. IS EMPTY doesn't work with Boolean type column
+      var operators = CRM.searchBuilder.generalOperators;
       if ((field in CRM.searchBuilder.fieldTypes) === true) {
-        if (CRM.searchBuilder.fieldTypes[field] == 'Boolean') {
-          CRM.searchBuilder.generalOperators = _.omit(CRM.searchBuilder.generalOperators, ['IS NOT EMPTY', 'IS EMPTY']);
+        if ($.inArray(CRM.searchBuilder.fieldTypes[field], ['Boolean', 'Int']) > -1) {
+          operators = _.omit(operators, ['IS NOT EMPTY', 'IS EMPTY']);
         }
         else if (CRM.searchBuilder.fieldTypes[field] == 'String') {
-          CRM.searchBuilder.generalOperators = _.omit(CRM.searchBuilder.generalOperators, ['>', '<', '>=', '<=']);
+          operators = _.omit(operators, ['>', '<', '>=', '<=']);
         }
       }
-      buildOperator(operator, CRM.searchBuilder.generalOperators);
+      buildOperator(operator, operators);
     }
 
     // These Ops don't get any input field.

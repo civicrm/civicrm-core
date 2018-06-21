@@ -5662,11 +5662,11 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         return $clause;
 
       case 'IS EMPTY':
-        $clause = " (NULLIF($field, '') IS NULL) ";
+        $clause = ($dataType == 'Date') ? " $field IS NULL " : " (NULLIF($field, '') IS NULL) ";
         return $clause;
 
       case 'IS NOT EMPTY':
-        $clause = " (NULLIF($field, '') IS NOT NULL) ";
+        $clause = ($dataType == 'Date') ? " $field IS NOT NULL " : " (NULLIF($field, '') IS NOT NULL) ";
         return $clause;
 
       case 'IN':
@@ -5677,7 +5677,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         }
 
       default:
-        if (empty($dataType)) {
+        if (empty($dataType) || $dataType == 'Date') {
           $dataType = 'String';
         }
         if (is_array($value)) {

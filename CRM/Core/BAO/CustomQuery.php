@@ -433,7 +433,7 @@ SELECT f.id, f.label, f.data_type,
             break;
 
           case 'Date':
-            $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
+            $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Date');
             list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, array(), CRM_Utils_Type::T_DATE);
             $this->_qill[$grouping][] = "{$field['label']} $qillOp '$qillVal'";
             break;

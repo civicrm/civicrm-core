@@ -84,6 +84,28 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
+   * Build the map of custom field's data types and there respective Util type
+   *
+   * @return array
+   *   Data data-type => CRM_Utils_Type
+   */
+  public static function dataToType() {
+    return [
+      'String' => CRM_Utils_Type::T_STRING,
+      'Int' => CRM_Utils_Type::T_INT,
+      'Float' => CRM_Utils_Type::T_FLOAT,
+      'Money' => CRM_Utils_Type::T_FLOAT,
+      'Memo' => CRM_Utils_Type::T_TEXT,
+      'Date' => CRM_Utils_Type::T_DATE,
+      'Boolean' => CRM_Utils_Type::T_BOOLEAN,
+      'StateProvince' => CRM_Utils_Type::T_INT,
+      'Country' => CRM_Utils_Type::T_INT,
+      'Link' => CRM_Utils_Type::T_STRING,
+      'ContactReference' => CRM_Utils_Type::T_INT,
+    ];
+  }
+
+  /**
    * Get data to html array.
    *
    * (Does this caching achieve anything?)
@@ -691,6 +713,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $regexp = preg_replace('/[.,;:!?]/', '', CRM_Utils_Array::value(0, $values));
       $importableFields[$key] = array(
         'name' => $key,
+        'type' => CRM_Utils_Array::value(CRM_Utils_Array::value('data_type', $values), self::dataToType()),
         'title' => CRM_Utils_Array::value('label', $values),
         'headerPattern' => '/' . preg_quote($regexp, '/') . '/',
         'import' => 1,
