@@ -405,7 +405,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   protected function tearDown() {
     error_reporting(E_ALL & ~E_NOTICE);
     CRM_Utils_Hook::singleton()->reset();
-    $this->hookClass->reset();
+    if ($this->hookClass) {
+      $this->hookClass->reset();
+    }
     $session = CRM_Core_Session::singleton();
     $session->set('userID', NULL);
 
