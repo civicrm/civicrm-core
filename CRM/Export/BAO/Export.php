@@ -1137,6 +1137,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         case CRM_Utils_Type::T_LONGTEXT:
         case CRM_Utils_Type::T_BLOB:
         case CRM_Utils_Type::T_MEDIUMBLOB:
+        case CRM_Utils_Type::T_LONGBLOB:
           $sqlColumns[$fieldName] = "$fieldName longtext";
           break;
 

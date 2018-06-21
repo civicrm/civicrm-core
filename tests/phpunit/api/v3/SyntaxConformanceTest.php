@@ -1333,6 +1333,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         case CRM_Utils_Type::T_STRING:
         case CRM_Utils_Type::T_BLOB:
         case CRM_Utils_Type::T_MEDIUMBLOB:
+        case CRM_Utils_Type::T_LONGBLOB:
         case CRM_Utils_Type::T_TEXT:
         case CRM_Utils_Type::T_LONGTEXT:
         case CRM_Utils_Type::T_EMAIL:
