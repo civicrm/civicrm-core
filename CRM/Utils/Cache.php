@@ -214,4 +214,30 @@ class CRM_Utils_Cache {
     throw new CRM_Core_Exception("Failed to instantiate cache. No supported cache type found. " . print_r($params, 1));
   }
 
+  /**
+   * Assert that a key is well-formed.
+   *
+   * @param string $key
+   * @return string
+   *   Same $key, if it's valid.
+   * @throws \CRM_Utils_Cache_InvalidArgumentException
+   */
+  public static function assertValidKey($key) {
+    $strict = CRM_Utils_Constant::value('CIVICRM_PSR16_STRICT', FALSE) || defined('CIVICRM_TEST');
+
+    if (!is_string($key)) {
+      throw new CRM_Utils_Cache_InvalidArgumentException("Invalid cache key: Not a string");
+    }
+
+    if ($strict && !preg_match(';^[A-Za-z0-9_\-\. ]+$;', $key)) {
+      throw new CRM_Utils_Cache_InvalidArgumentException("Invalid cache key: Illegal characters");
+    }
+
+    if ($strict && strlen($key) > 255) {
+      throw new CRM_Utils_Cache_InvalidArgumentException("Invalid cache key: Too long");
+    }
+
+    return $key;
+  }
+
 }
