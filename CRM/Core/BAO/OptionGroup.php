@@ -93,16 +93,10 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
     }
 
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
 
     // action is taken depending upon the mode
     $optionGroup = new CRM_Core_DAO_OptionGroup();
     $optionGroup->copyValues($params);;
-
-    if ($params['is_default']) {
-      $query = "UPDATE civicrm_option_group SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query);
-    }
 
     $optionGroup->save();
     return $optionGroup;
