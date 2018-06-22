@@ -150,13 +150,147 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public static function entities($skip = array()) {
+  public static function entities($skip = array(), $mode = 'static') {
     // The order of operations in here is screwy. In the case where SYNTAX_CONFORMANCE_ENTITIES is
     // defined, we should be able to parse+return it immediately. However, some weird dependency
     // crept into the system where civicrm_api('Entity','get') must be called as part of entities()
     // (even if its return value is ignored).
 
-    $tmp = civicrm_api('Entity', 'Get', array('version' => 3));
+    if ($mode === 'dynamic') {
+      $tmp = civicrm_api('Entity', 'Get', array('version' => 3));
+    }
+    elseif ($mode === 'static') {
+      $tmp = [
+        'values' => [
+          'Acl',
+          'AclRole',
+          'ActionSchedule',
+          'Activity',
+          'ActivityContact',
+          'ActivityType',
+          'Address',
+          'Attachment',
+          'Batch',
+          'Campaign',
+          'Case',
+          'CaseContact',
+          'CaseType',
+          'Constant',
+          'Contact',
+          'ContactType',
+          'Contribution',
+          'ContributionPage',
+          'ContributionProduct',
+          'ContributionRecur',
+          'ContributionSoft',
+          'Country',
+          'CustomField',
+          'CustomGroup',
+          'CustomSearch',
+          'CustomValue',
+          'Cxn',
+          'CxnApp',
+          'Dashboard',
+          'DashboardContact',
+          'Domain',
+          'Email',
+          'Entity',
+          'EntityBatch',
+          'EntityFinancialAccount',
+          'EntityFinancialTrxn',
+          'EntityTag',
+          'Event',
+          'Extension',
+          'File',
+          'FinancialAccount',
+          'FinancialItem',
+          'FinancialTrxn',
+          'FinancialType',
+          'Grant',
+          'Group',
+          'GroupContact',
+          'GroupNesting',
+          'GroupOrganization',
+          'Im',
+          'Job',
+          'JobLog',
+          'LineItem',
+          'LocBlock',
+          'LocationType',
+          'Logging',
+          'MailSettings',
+          'Mailing',
+          'MailingAB',
+          'MailingComponent',
+          'MailingContact',
+          'MailingEventConfirm',
+          'MailingEventQueue',
+          'MailingEventResubscribe',
+          'MailingEventSubscribe',
+          'MailingEventUnsubscribe',
+          'MailingGroup',
+          'MailingJob',
+          'MailingRecipients',
+          'Mapping',
+          'MappingField',
+          'Membership',
+          'MembershipBlock',
+          'MembershipLog',
+          'MembershipPayment',
+          'MembershipStatus',
+          'MembershipType',
+          'MessageTemplate',
+          'Navigation',
+          'Note',
+          'OpenID',
+          'OptionGroup',
+          'OptionValue',
+          'Order',
+          'Participant',
+          'ParticipantPayment',
+          'ParticipantStatusType',
+          'Payment',
+          'PaymentProcessor',
+          'PaymentProcessorType',
+          'PaymentToken',
+          'Pcp',
+          'Phone',
+          'Pledge',
+          'PledgePayment',
+          'Premium',
+          'PriceField',
+          'PriceFieldValue',
+          'PriceSet',
+          'PrintLabel',
+          'Product',
+          'Profile',
+          'RecurringEntity',
+          'Relationship',
+          'RelationshipType',
+          'ReportInstance',
+          'ReportTemplate',
+          'RuleGroup',
+          'SavedSearch',
+          'Setting',
+          'SmsProvider',
+          'StateProvince',
+          'StatusPreference',
+          'Survey',
+          'SurveyRespondant',
+          'System',
+          'SystemLog',
+          'Tag',
+          'UFField',
+          'UFGroup',
+          'UFJoin',
+          'UFMatch',
+          'User',
+          'Website',
+          'WordReplacement',
+        ]
+      ];
+    }
+
     if (getenv('SYNTAX_CONFORMANCE_ENTITIES')) {
       $tmp = array(
         'values' => explode(' ', getenv('SYNTAX_CONFORMANCE_ENTITIES')),
@@ -172,6 +306,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $entities[] = array($e);
     }
     return $entities;
+  }
+
+  /**
+   * Ensure that we have an accurate list of entities for testing.
+   */
+  public function testEntityList() {
+    $staticList = $this->entities([], 'static');
+    $dynamicList = $this->entities([], 'dynamic');
+    $this->assertEquals($dynamicList, $staticList,
+      'The static list of entities used by SyntaxConformanceTest should be kept up-to-date with the actual list of entities.');
   }
 
   /**
