@@ -31,6 +31,18 @@
  */
 class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
 
+  public function testMultiVersionDecode() {
+    $encoders = ['serialize', ['CRM_Core_BAO_Cache', 'encode']];
+    $values = [NULL, 0, 1, TRUE, FALSE, [], ['abcd'], 'ab;cd', new stdClass()];
+    foreach ($encoders as $encoder) {
+      foreach ($values as $value) {
+        $encoded = $encoder($value);
+        $decoded = CRM_Core_BAO_Cache::decode($encoded);
+        $this->assertEquals($value, $decoded, "Failure encoding/decoding value " . var_export($value, 1) . ' with ' . var_export($encoder, 1));
+      }
+    }
+  }
+
   public function exampleValues() {
     $binary = '';
     for ($i = 0; $i < 256; $i++) {
