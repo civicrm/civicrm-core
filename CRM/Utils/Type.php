@@ -47,7 +47,8 @@ class CRM_Utils_Type {
     T_EMAIL = 2048,
     T_URL = 4096,
     T_CCNUM = 8192,
-    T_MEDIUMBLOB = 16384;
+    T_MEDIUMBLOB = 16384,
+    T_LONGBLOB = 32768;
 
   // @TODO What's the point of these constants? Backwards compatibility?
   //
@@ -138,6 +139,10 @@ class CRM_Utils_Type {
       case 16384:
         $string = 'Mediumblob';
         break;
+
+      case 32768:
+        $string = 'Longblob';
+        break;
     }
 
     return (isset($string)) ? $string : "";
@@ -162,6 +167,7 @@ class CRM_Utils_Type {
       'Money' => self::T_MONEY,
       'Email' => self::T_EMAIL,
       'Mediumblob' => self::T_MEDIUMBLOB,
+      'Longblob' => self::T_LONGBLOB,
     );
   }
 
