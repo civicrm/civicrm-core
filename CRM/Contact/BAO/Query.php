@@ -3041,9 +3041,25 @@ class CRM_Contact_BAO_Query {
     }
 
     //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
-    if (count($smartGroupIDs)) {
-      $groupContactCacheClause = $this->addGroupContactCache($smartGroupIDs, NULL, "contact_a", $op);
+    $groupContactCacheClause = '';
+    if (count($smartGroupIDs) || empty($value)) {
+      $isNullOp = (strpos($op, 'NULL') !== FALSE);
+      $gccTableAlias = "`civicrm_group_contact_cache_";
+      $gccTableAlias .= ($isNullOp) ? "a`" : implode(',', $smartGroupIDs) . "`";
+      $groupContactCacheClause = $this->addGroupContactCache($smartGroupIDs, $gccTableAlias, "contact_a", $op);
       if (!empty($groupContactCacheClause)) {
+        if ($isNotOp) {
+          $groupIds = implode(',', (array) $smartGroupIDs);
+          $gcTable = "`civicrm_group_contact-{$groupIds}`";
+          $joinClause = array("contact_a.id = {$gcTable}.contact_id");
+          $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
+          if (strpos($op, 'IN') !== FALSE) {
+            $groupClause[] = "{$gcTable}.group_id $op ( $groupIds ) AND {$gccTableAlias}.group_id IS NULL";
+          }
+          else {
+            $groupClause[] = "{$gcTable}.group_id $op $groupIds AND {$gccTableAlias}.group_id IS NULL";
+          }
+        }
         $groupClause[] = " ( {$groupContactCacheClause} ) ";
       }
     }
@@ -3124,7 +3140,7 @@ WHERE  $smartGroupClause
         CRM_Contact_BAO_GroupContactCache::load($group);
       }
     }
-    if ($group->N == 0) {
+    if ($group->N == 0 && $op != 'NOT IN') {
       return NULL;
     }
 
@@ -3132,8 +3148,11 @@ WHERE  $smartGroupClause
       $tableAlias = "`civicrm_group_contact_cache_";
       $tableAlias .= ($isNullOp) ? "a`" : implode(',', (array) $groupsIds) . "`";
     }
-
     $this->_tables[$tableAlias] = $this->_whereTables[$tableAlias] = " LEFT JOIN civicrm_group_contact_cache {$tableAlias} ON {$joinTable}.{$joinColumn} = {$tableAlias}.contact_id ";
+
+    if ($op == 'NOT IN') {
+      return "{$tableAlias}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact_cache cgcc WHERE cgcc.group_id IN ( " . implode(',', (array) $groupsIds) . " ) )";
+    }
     return self::buildClause("{$tableAlias}.group_id", $op, $groups, 'Int');
   }
 

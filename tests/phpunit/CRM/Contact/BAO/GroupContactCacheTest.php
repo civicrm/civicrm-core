@@ -437,8 +437,13 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
       FALSE,
       FALSE, FALSE
     );
+    $ids = $query->searchQuery(0, 0, NULL,
+      FALSE, FALSE, FALSE,
+      TRUE, FALSE
+    );
     $expectedWhere = "`civicrm_group_contact_cache_{$group2->id}`.group_id IN (\"{$group2->id}\")";
     $this->assertContains($expectedWhere, $query->_whereClause);
+    $this->_assertContactIds($query, "group_id = {$group2->id}");
 
     $params = array(array('group', '!=', $group->id, 1, 0));
     $query = new CRM_Contact_BAO_Query(
@@ -448,8 +453,9 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
       FALSE, FALSE
     );
     //Assert if proper where clause is present.
-    $expectedWhere = "`civicrm_group_contact_cache_{$group->id}`.group_id NOT IN (\"{$group->id}\")";
+    $expectedWhere = "`civicrm_group_contact-{$group->id}`.group_id != {$group->id} AND `civicrm_group_contact_cache_{$group->id}`.group_id IS NULL OR  ( `civicrm_group_contact_cache_{$group->id}`.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact_cache cgcc WHERE cgcc.group_id IN ( {$group->id} ) ) )";
     $this->assertContains($expectedWhere, $query->_whereClause);
+    $this->_assertContactIds($query, "group_id != {$group->id}");
 
     $params = array(array('group', 'IN', array($group->id, $group2->id), 1, 0));
     $query = new CRM_Contact_BAO_Query(
@@ -460,6 +466,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     );
     $expectedWhere = "`civicrm_group_contact_cache_{$group->id},{$group2->id}`.group_id IN (\"{$group->id}\", \"{$group2->id}\")";
     $this->assertContains($expectedWhere, $query->_whereClause);
+    $this->_assertContactIds($query, "group_id IN ({$group->id}, {$group2->id})");
 
     $params = array(array('group', 'NOT IN', array($group->id), 1, 0));
     $query = new CRM_Contact_BAO_Query(
@@ -468,8 +475,28 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
       FALSE,
       FALSE, FALSE
     );
-    $expectedWhere = "`civicrm_group_contact_cache_{$group->id}`.group_id NOT IN (\"{$group->id}\")";
+    $expectedWhere = "`civicrm_group_contact-{$group->id}`.group_id NOT IN ( {$group->id} ) AND `civicrm_group_contact_cache_{$group->id}`.group_id IS NULL OR  ( `civicrm_group_contact_cache_{$group->id}`.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact_cache cgcc WHERE cgcc.group_id IN ( {$group->id} ) ) )";
     $this->assertContains($expectedWhere, $query->_whereClause);
+    $this->_assertContactIds($query, "group_id NOT IN ({$group->id})");
+  }
+
+  /**
+   * Check if contact ids are fetched correctly.
+   *
+   * @param object $query
+   * @param string $groupWhereClause
+   */
+  public function _assertContactIds($query, $groupWhereClause) {
+    $contactIds = explode(',', $query->searchQuery(0, 0, NULL,
+      FALSE, FALSE, FALSE,
+      TRUE, FALSE
+    ));
+    $expectedContactIds = array();
+    $groupDAO = CRM_Core_DAO::executeQuery("SELECT contact_id FROM civicrm_group_contact_cache WHERE {$groupWhereClause}");
+    while ($groupDAO->fetch()) {
+      $expectedContactIds[] = $groupDAO->contact_id;
+    }
+    $this->assertEquals(sort($expectedContactIds), sort($contactIds));
   }
 
 }
