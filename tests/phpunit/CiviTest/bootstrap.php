@@ -16,11 +16,7 @@ if (file_exists('/etc/timezone')) {
 # Crank up the memory
 ini_set('memory_limit', '2G');
 define('CIVICRM_TEST', 1);
-eval(cv('php:boot --level=settings', 'phpcode'));
-
-if (CIVICRM_UF === 'UnitTests') {
-  Civi\Test::headless()->apply();
-}
+eval(cv('php:boot --level=classloader', 'phpcode'));
 
 // ------------------------------------------------------------------------------
 

@@ -51,7 +51,7 @@ define('API_LATEST_VERSION', 3);
  *  Common functions for unit tests
  * @package CiviCRM
  */
-class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
+class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase implements \Civi\Test\HeadlessInterface {
 
   use \Civi\Test\Api3DocTrait;
 
@@ -281,6 +281,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = array();
   }
 
+  public function setUpHeadless() {
+    //    Civi\Test::headless()->apply();
+  }
+
   /**
    *  Common setup functions for all unit tests.
    */
@@ -311,12 +315,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // disable any left-over test extensions
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_extension WHERE full_name LIKE "test.%"');
 
-    // reset all the caches
-    CRM_Utils_System::flushCache();
-
-    // initialize the object once db is loaded
-    \Civi::reset();
-    $config = CRM_Core_Config::singleton(TRUE, TRUE); // ugh, performance
+    $config = CRM_Core_Config::singleton();
 
     // when running unit tests, use mockup user framework
     $this->hookClass = CRM_Utils_Hook::singleton();
