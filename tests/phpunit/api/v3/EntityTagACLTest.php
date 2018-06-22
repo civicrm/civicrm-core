@@ -88,11 +88,31 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
   /**
    * Get the options for the used_for fields.
    *
+   * @param string $mode
+   *   Whether to get options using 'static' source (amenable to use in dataProvider)
+   *   or using a 'dynamic' source (based on latest metadata in a running system).
    * @return array
    */
-  public function getTagOptions() {
-    $options = $this->callAPISuccess('Tag', 'getoptions', array('field' => 'used_for'));
-    return $options['values'];
+  public function getTagOptions($mode = 'static') {
+    if ($mode === 'dynamic') {
+      $options = $this->callAPISuccess('Tag', 'getoptions', array('field' => 'used_for')); // FIXME
+      return $options['values'];
+    }
+    else {
+      return [
+        "civicrm_contact" => "Contacts",
+        "civicrm_activity" => "Activities",
+        "civicrm_case" => "Cases",
+        "civicrm_file" => "Attachments",
+      ];
+    }
+  }
+
+  public function testTagOptionList() {
+    $staticList = $this->getTagOptions('static');
+    $dynamicList = $this->getTagOptions('dynamic');
+    $this->assertEquals($dynamicList, $staticList,
+      'The static list of taggable entitiyes used by EntityTagACLTest should be kept up-to-date with the actual list of entities.');
   }
 
   /**
