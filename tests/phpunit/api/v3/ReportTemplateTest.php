@@ -244,7 +244,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Note that the function needs to
    * be static so cannot use $this->callAPISuccess
    */
-  public static function getReportTemplates() {
+  public static function getReportTemplates($mode = 'static') {
     $reportsToSkip = array(
       'activity' => 'does not respect function signature on from clause',
       'event/income' => 'I do no understand why but error is Call to undefined method CRM_Report_Form_Event_Income::from() in CRM/Report/Form.php on line 2120',
@@ -252,7 +252,218 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'activitySummary' => 'We use temp tables for the main query generation and name are dynamic. These names are not available in stats() when called directly.',
     );
 
-    $reports = civicrm_api3('report_template', 'get', array('return' => 'value', 'options' => array('limit' => 500)));
+    if ($mode === 'dynamic') {
+      $reports = civicrm_api3('report_template', 'get', array('return' => 'value', 'options' => array('limit' => 500)));
+    }
+    else {
+      $reports = [
+        "is_error" => 0,
+        "version" => 3,
+        "count" => 50,
+        "values" => [
+          232 => [
+            "id" => "232",
+            "value" => "contact/summary",
+          ],
+          233 => [
+            "id" => "233",
+            "value" => "contact/detail",
+          ],
+          234 => [
+            "id" => "234",
+            "value" => "activity",
+          ],
+          235 => [
+            "id" => "235",
+            "value" => "walklist",
+          ],
+          236 => [
+            "id" => "236",
+            "value" => "contact/currentEmployer",
+          ],
+          237 => [
+            "id" => "237",
+            "value" => "contribute/summary",
+          ],
+          238 => [
+            "id" => "238",
+            "value" => "contribute/detail",
+          ],
+          239 => [
+            "id" => "239",
+            "value" => "contribute/repeat",
+          ],
+          240 => [
+            "id" => "240",
+            "value" => "contribute/organizationSummary",
+          ],
+          241 => [
+            "id" => "241",
+            "value" => "contribute/householdSummary",
+          ],
+          242 => [
+            "id" => "242",
+            "value" => "contribute/topDonor",
+          ],
+          243 => [
+            "id" => "243",
+            "value" => "contribute/sybunt",
+          ],
+          244 => [
+            "id" => "244",
+            "value" => "contribute/lybunt",
+          ],
+          245 => [
+            "id" => "245",
+            "value" => "contribute/softcredit",
+          ],
+          246 => [
+            "id" => "246",
+            "value" => "member/summary",
+          ],
+          247 => [
+            "id" => "247",
+            "value" => "member/detail",
+          ],
+          248 => [
+            "id" => "248",
+            "value" => "member/lapse",
+          ],
+          249 => [
+            "id" => "249",
+            "value" => "event/participantListing",
+          ],
+          250 => [
+            "id" => "250",
+            "value" => "event/summary",
+          ],
+          251 => [
+            "id" => "251",
+            "value" => "event/income",
+          ],
+          252 => [
+            "id" => "252",
+            "value" => "pledge/detail",
+          ],
+          253 => [
+            "id" => "253",
+            "value" => "pledge/pbnp",
+          ],
+          254 => [
+            "id" => "254",
+            "value" => "contact/relationship",
+          ],
+          255 => [
+            "id" => "255",
+            "value" => "case/summary",
+          ],
+          256 => [
+            "id" => "256",
+            "value" => "case/timespent",
+          ],
+          257 => [
+            "id" => "257",
+            "value" => "case/demographics",
+          ],
+          258 => [
+            "id" => "258",
+            "value" => "contact/log",
+          ],
+          259 => [
+            "id" => "259",
+            "value" => "activitySummary",
+          ],
+          260 => [
+            "id" => "260",
+            "value" => "contribute/bookkeeping",
+          ],
+          261 => [
+            "id" => "261",
+            "value" => "grant/detail",
+          ],
+          262 => [
+            "id" => "262",
+            "value" => "event/participantlist",
+          ],
+          263 => [
+            "id" => "263",
+            "value" => "event/incomesummary",
+          ],
+          264 => [
+            "id" => "264",
+            "value" => "case/detail",
+          ],
+          265 => [
+            "id" => "265",
+            "value" => "Mailing/bounce",
+          ],
+          266 => [
+            "id" => "266",
+            "value" => "Mailing/summary",
+          ],
+          267 => [
+            "id" => "267",
+            "value" => "Mailing/opened",
+          ],
+          268 => [
+            "id" => "268",
+            "value" => "Mailing/clicks",
+          ],
+          269 => [
+            "id" => "269",
+            "value" => "logging/contact/summary",
+          ],
+          270 => [
+            "id" => "270",
+            "value" => "logging/contact/detail",
+          ],
+          271 => [
+            "id" => "271",
+            "value" => "grant/statistics",
+          ],
+          272 => [
+            "id" => "272",
+            "value" => "survey/detail",
+          ],
+          273 => [
+            "id" => "273",
+            "value" => "contribute/pcp",
+          ],
+          274 => [
+            "id" => "274",
+            "value" => "pledge/summary",
+          ],
+          275 => [
+            "id" => "275",
+            "value" => "contribute/history",
+          ],
+          276 => [
+            "id" => "276",
+            "value" => "mailing/detail",
+          ],
+          277 => [
+            "id" => "277",
+            "value" => "member/contributionDetail",
+          ],
+          278 => [
+            "id" => "278",
+            "value" => "contribute/recur",
+          ],
+          279 => [
+            "id" => "279",
+            "value" => "contribute/recursummary",
+          ],
+          280 => [
+            "id" => "280",
+            "value" => "contribute/deferredrevenue",
+          ],
+          886 => [
+            "id" => "886",
+            "value" => "volunteer",
+          ],
+        ],
+      ];
+    }
     foreach ($reports['values'] as $report) {
       if (empty($reportsToSkip[$report['value']])) {
         $reportTemplates[] = array($report['value']);
@@ -263,6 +474,16 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     }
 
     return $reportTemplates;
+  }
+
+  /**
+   * Ensure that we have an accurate list of entities for testing.
+   */
+  public function testReportList() {
+    $staticList = $this->getReportTemplates('static');
+    $dynamicList = $this->getReportTemplates('dynamic');
+    $this->assertEquals($dynamicList, $staticList,
+      'The static list of entities used by SyntaxConformanceTest should be kept up-to-date with the actual list of entities.');
   }
 
   /**
