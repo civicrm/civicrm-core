@@ -299,8 +299,13 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if (!empty($fields['net_amount']) && $netAmt != $fields['net_amount']) {
       $errors['net_amount'] = ts('Net amount should be equal to the difference between payment amount and fee amount.');
     }
-    if ($self->_paymentProcessor['id'] === 0 && empty($fields['payment_instrument_id'])) {
-      $errors['payment_instrument_id'] = ts('Payment method is a required field');
+    if (empty($fields['payment_instrument_id'])) {
+      if ($self->_paymentProcessor['id'] === 0) {
+        $errors['payment_instrument_id'] = ts('Payment method is a required field');
+      }
+    }
+    elseif ('Accounts Receivable' == CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccountName($fields['payment_instrument_id'])) {
+      $errors['payment_instrument_id'] = ts("Please choose payment instrument which is not linked to 'Account Recievable' financial account.");
     }
 
     return $errors;

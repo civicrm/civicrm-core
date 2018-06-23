@@ -3340,6 +3340,37 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
+   * Create Payment Instrument.
+   *
+   * @param array $params
+   * @param string $financialAccountName
+   *
+   * @return int
+   */
+  protected function createPaymentInstrument($params = array(), $financialAccountName = 'Donation') {
+    $params = array_merge(array(
+      'label' => 'Payment Instrument -' . substr(sha1(rand()), 0, 7),
+      'option_group_id' => 'payment_instrument',
+      'is_active' => 1,
+      ),
+      $params
+    );
+    $newPaymentInstrument = $this->callAPISuccess('OptionValue', 'create', $params);
+
+    $relationTypeID = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
+
+    $financialAccountParams = [
+      'entity_table' => 'civicrm_option_value',
+      'entity_id' => key($newPaymentInstrument),
+      'account_relationship' => $relationTypeID,
+      'financial_account_id' => $this->callAPISuccess('FinancialAccount', 'getValue', ['name' => $financialAccountName, 'return' => 'id']),
+    ];
+    CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
+
+    return CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $params['label']);
+  }
+
+  /**
    * Enable Tax and Invoicing
    */
   protected function enableTaxAndInvoicing($params = array()) {

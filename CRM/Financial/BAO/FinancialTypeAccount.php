@@ -146,7 +146,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   }
 
   /**
-   * Financial Account for payment instrument.
+   * Financial Account ID for payment instrument.
    *
    * @param int $paymentInstrumentValue
    *   Payment instrument value.
@@ -164,7 +164,27 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
       NULL,
       'civicrm_option_value'
     );
+
     return $financialAccountId;
+  }
+
+  /**
+   * Financial Account name of a payment instrument.
+   *
+   * @param int $paymentInstrumentValue
+   *   Payment instrument value.
+   *
+   * @return null|int
+   */
+  public static function getInstrumentFinancialAccountName($paymentInstrumentValue) {
+    return civicrm_api3(
+      'FinancialAccount',
+      'getValue',
+      [
+        'id' => self::getInstrumentFinancialAccount($paymentInstrumentValue),
+        'return' => 'name',
+      ]
+    );
   }
 
   /**
