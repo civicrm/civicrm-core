@@ -3802,6 +3802,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $params = array_merge($defaults, $params);
     $params['skipLineItem'] = TRUE;
     $trxnsData['trxn_date'] = !empty($trxnsData['trxn_date']) ? $trxnsData['trxn_date'] : date('YmdHis');
+    $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $trxnsData, CRM_Utils_Array::value('payment_instrument_id', $params));
     $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionDAO->financial_type_id, 'Accounts Receivable Account is');
 
     $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
@@ -3813,6 +3814,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $trxnsData['net_amount'] = !empty($trxnsData['net_amount']) ? $trxnsData['net_amount'] : $trxnsData['total_amount'];
       $params['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $trxnsData);
       $params['card_type_id'] = CRM_Utils_Array::value('card_type_id', $trxnsData);
+      $params['check_number'] = CRM_Utils_Array::value('check_number', $trxnsData);
 
       // record the entry
       $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnsData);
