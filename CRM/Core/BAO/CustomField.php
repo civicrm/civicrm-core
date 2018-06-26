@@ -93,15 +93,17 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     return [
       'String' => CRM_Utils_Type::T_STRING,
       'Int' => CRM_Utils_Type::T_INT,
+      'Money' => CRM_Utils_Type::T_MONEY,
+      'Memo' => CRM_Utils_Type::T_LONGTEXT,
       'Float' => CRM_Utils_Type::T_FLOAT,
-      'Money' => CRM_Utils_Type::T_FLOAT,
-      'Memo' => CRM_Utils_Type::T_TEXT,
       'Date' => CRM_Utils_Type::T_DATE,
+      'DateTime' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
       'Boolean' => CRM_Utils_Type::T_BOOLEAN,
       'StateProvince' => CRM_Utils_Type::T_INT,
-      'Country' => CRM_Utils_Type::T_INT,
+      'File' => CRM_Utils_Type::T_STRING,
       'Link' => CRM_Utils_Type::T_STRING,
       'ContactReference' => CRM_Utils_Type::T_INT,
+      'Country' => CRM_Utils_Type::T_INT,
     ];
   }
 
