@@ -31,8 +31,43 @@
  */
 class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
 
-  public function testSetGetItem() {
-    $originalValue = array('abc' => 'def');
+  public function testMultiVersionDecode() {
+    $encoders = ['serialize', ['CRM_Core_BAO_Cache', 'encode']];
+    $values = [NULL, 0, 1, TRUE, FALSE, [], ['abcd'], 'ab;cd', new stdClass()];
+    foreach ($encoders as $encoder) {
+      foreach ($values as $value) {
+        $encoded = $encoder($value);
+        $decoded = CRM_Core_BAO_Cache::decode($encoded);
+        $this->assertEquals($value, $decoded, "Failure encoding/decoding value " . var_export($value, 1) . ' with ' . var_export($encoder, 1));
+      }
+    }
+  }
+
+  public function exampleValues() {
+    $binary = '';
+    for ($i = 0; $i < 256; $i++) {
+      $binary .= chr($i);
+    }
+
+    $ex = [];
+
+    $ex[] = [array('abc' => 'def')];
+    $ex[] = [0];
+    $ex[] = ['hello world'];
+    $ex[] = ['Scarabée'];
+    $ex[] = ['Iñtërnâtiônàlizætiøn'];
+    $ex[] = ['これは日本語のテキストです。読めますか'];
+    $ex[] = ['देखें हिन्दी कैसी नजर आती है। अरे वाह ये तो नजर आती है।'];
+    $ex[] = [$binary];
+
+    return $ex;
+  }
+
+  /**
+   * @param $originalValue
+   * @dataProvider exampleValues
+   */
+  public function testSetGetItem($originalValue) {
     CRM_Core_BAO_Cache::setItem($originalValue, __CLASS__, 'testSetGetItem');
 
     $return_1 = CRM_Core_BAO_Cache::getItem(__CLASS__, 'testSetGetItem');

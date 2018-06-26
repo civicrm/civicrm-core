@@ -71,7 +71,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         $table = self::getTableName();
         $where = self::whereCache($group, $path, $componentID);
         $rawData = CRM_Core_DAO::singleValueQuery("SELECT data FROM $table WHERE $where");
-        $data = $rawData ? unserialize($rawData) : NULL;
+        $data = $rawData ? self::decode($rawData) : NULL;
 
         self::$_cache[$argString] = $data;
         $cache->set($argString, self::$_cache[$argString]);
@@ -107,7 +107,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
 
         $result = array();
         while ($dao->fetch()) {
-          $result[$dao->path] = unserialize($dao->data);
+          $result[$dao->path] = self::decode($dao->data);
         }
         $dao->free();
 
@@ -148,7 +148,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     $where = self::whereCache($group, $path, $componentID);
     $dataExists = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM $table WHERE {$where}");
     $now = date('Y-m-d H:i:s'); // FIXME - Use SQL NOW() or CRM_Utils_Time?
-    $dataSerialized = serialize($data);
+    $dataSerialized = self::encode($data);
 
     // This table has a wonky index, so we cannot use REPLACE or
     // "INSERT ... ON DUPE". Instead, use SELECT+(INSERT|UPDATE).
@@ -180,7 +180,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
 
     $argString = "CRM_CT_{$group}_{$path}_{$componentID}";
     $cache = CRM_Utils_Cache::singleton();
-    $data = unserialize($dataSerialized);
+    $data = self::decode($dataSerialized);
     self::$_cache[$argString] = $data;
     $cache->set($argString, $data);
 
@@ -362,6 +362,33 @@ WHERE       group_name = 'CiviCRM Session'
 AND         created_date < date_sub( NOW( ), INTERVAL $timeIntervalDays DAY )
 ";
       CRM_Core_DAO::executeQuery($sql);
+    }
+  }
+
+  /**
+   * (Quasi-private) Encode an object/array/string/int as a string.
+   *
+   * @param $mixed
+   * @return string
+   */
+  public static function encode($mixed) {
+    return base64_encode(serialize($mixed));
+  }
+
+  /**
+   * (Quasi-private) Decode an object/array/string/int from a string.
+   *
+   * @param $string
+   * @return mixed
+   */
+  public static function decode($string) {
+    // Upgrade support -- old records (serialize) always have this punctuation,
+    // and new records (base64) never do.
+    if (strpos($string, ':') !== FALSE || strpos($string, ';') !== FALSE) {
+      return unserialize($string);
+    }
+    else {
+      return unserialize(base64_decode($string));
     }
   }
 
