@@ -427,6 +427,9 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * Test to create and update payment method with financial account.
+   */
   public function testCreateUpdateOptionValueForPaymentInstrument() {
     $assetFinancialAccountId = $this->callAPISuccessGetValue('FinancialAccount', [
       'return' => "id",
@@ -439,48 +442,37 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'option_group_id' => "payment_instrument",
       'label' => "Dummy Payment Method",
     ]);
+
     //check if relationship is created between Payment method and Financial Account
-    $assetAccountRelValue = $this->callAPISuccessGetValue('EntityFinancialAccount', [
-      'return' => "account_relationship",
-      'entity_table' => "civicrm_option_value",
-      'entity_id' => $ov['id'],
-      'financial_account_id' => $assetFinancialAccountId,
-    ]);
-    $checkAssetAccountIs = $this->callAPISuccessGetValue('OptionValue', [
-      'return' => "id",
-      'option_group_id' => "account_relationship",
-      'name' => "Asset Account is",
-      'value' => $assetAccountRelValue,
-    ]);
+    $this->checkPaymentMethodFinancialAccountRelationship($ov['id'], $assetFinancialAccountId);
+
     // update payment method to have different non-asset financial Account
     $nonAssetFinancialAccountId = $this->callAPISuccessGetValue('FinancialAccount', [
       'return' => "id",
       'financial_account_type_id' => ['NOT IN' => ["Asset"]],
       'options' => ['limit' => 1],
     ]);
-    $result = $this->callAPISuccess('OptionValue', 'create', [
-      'financial_account_id' => $nonAssetFinancialAccountId,
-      'id' => $ov['id'],
-    ]);
-    // TODO: check for error
-    $assetAccountRelValue = $this->callAPISuccessGetValue('EntityFinancialAccount', [
-      'return' => "account_relationship",
-      'entity_table' => "civicrm_option_value",
-      'entity_id' => $ov['id'],
-      'financial_account_id' => $nonAssetFinancialAccountId,
-    ]);
-    $assetAccountRelValue = $this->callAPISuccessGetValue('EntityFinancialAccount', [
-      'return' => "account_relationship",
-      'entity_table' => "civicrm_option_value",
-      'entity_id' => $ov['id'],
-      'financial_account_id' => $assetFinancialAccountId,
-    ]);
-    $checkAssetAccountIs = $this->callAPISuccessGetValue('OptionValue', [
-      'return' => "id",
-      'option_group_id' => "account_relationship",
-      'name' => "Asset Account is",
-      'value' => $assetAccountRelValue,
-    ]);
+    try {
+      $result = $this->callAPISuccess('OptionValue', 'create', [
+        'financial_account_id' => $nonAssetFinancialAccountId,
+        'id' => $ov['id'],
+      ]);
+      throw new API_Exception(ts('Should throw error.'));
+    }
+    catch (Exception $e) {
+      try {
+        $assetAccountRelValue = $this->callAPISuccessGetValue('EntityFinancialAccount', [
+          'return' => "account_relationship",
+          'entity_table' => "civicrm_option_value",
+          'entity_id' => $ov['id'],
+          'financial_account_id' => $nonAssetFinancialAccountId,
+        ]);
+        throw new API_Exception(ts('Should throw error.'));
+      }
+      catch (Exception $e) {
+        $this->checkPaymentMethodFinancialAccountRelationship($ov['id'], $assetFinancialAccountId);
+      }
+    }
     // update payment method to have different asset financial Account
     $assetFinancialAccountId = $this->callAPISuccessGetValue('FinancialAccount', [
       'return' => "id",
@@ -493,11 +485,21 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'id' => $ov['id'],
     ]);
     //check if relationship is updated between Payment method and Financial Account
+    $this->checkPaymentMethodFinancialAccountRelationship($ov['id'], $assetFinancialAccountId);
+  }
+
+  /**
+   * Function to check relationship between FA and Payment method.
+   *
+   * @param int $paymentMethodId
+   * @param int $financialAccountId
+   */
+  protected function checkPaymentMethodFinancialAccountRelationship($paymentMethodId, $financialAccountId) {
     $assetAccountRelValue = $this->callAPISuccessGetValue('EntityFinancialAccount', [
       'return' => "account_relationship",
       'entity_table' => "civicrm_option_value",
-      'entity_id' => $ov['id'],
-      'financial_account_id' => $assetFinancialAccountId,
+      'entity_id' => $paymentMethodId,
+      'financial_account_id' => $financialAccountId,
     ]);
     $checkAssetAccountIs = $this->callAPISuccessGetValue('OptionValue', [
       'return' => "id",
