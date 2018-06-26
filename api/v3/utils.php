@@ -1977,41 +1977,13 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
     // Regular fields have a 'name' property
     $value['name'] = 'custom_' . $key;
     $value['title'] = $value['label'];
-    $value['type'] = _getStandardTypeFromCustomDataType($value);
+    if ($value['data_type'] == 'Date' && CRM_Utils_Array::value('time_format', $value, 0) > 0) {
+      $value['data_type'] = 'DateTime';
+    }
+    $value['type'] = CRM_Utils_Array::value($value['data_type'], CRM_Core_BAO_CustomField::dataToType());
     $ret['custom_' . $key] = $value;
   }
   return $ret;
-}
-
-/**
- * Translate the custom field data_type attribute into a std 'type'.
- *
- * @param array $value
- *
- * @return int
- */
-function _getStandardTypeFromCustomDataType($value) {
-  $dataType = $value['data_type'];
-  //CRM-15792 - If date custom field contains timeformat change type to DateTime
-  if ($value['data_type'] == 'Date' && isset($value['time_format']) && $value['time_format'] > 0) {
-    $dataType = 'DateTime';
-  }
-  $mapping = array(
-    'String' => CRM_Utils_Type::T_STRING,
-    'Int' => CRM_Utils_Type::T_INT,
-    'Money' => CRM_Utils_Type::T_MONEY,
-    'Memo' => CRM_Utils_Type::T_LONGTEXT,
-    'Float' => CRM_Utils_Type::T_FLOAT,
-    'Date' => CRM_Utils_Type::T_DATE,
-    'DateTime' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-    'Boolean' => CRM_Utils_Type::T_BOOLEAN,
-    'StateProvince' => CRM_Utils_Type::T_INT,
-    'File' => CRM_Utils_Type::T_STRING,
-    'Link' => CRM_Utils_Type::T_STRING,
-    'ContactReference' => CRM_Utils_Type::T_INT,
-    'Country' => CRM_Utils_Type::T_INT,
-  );
-  return $mapping[$dataType];
 }
 
 

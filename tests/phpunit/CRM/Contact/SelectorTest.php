@@ -421,6 +421,60 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check where clause of a date custom field when 'IS NOT EMPTY' operator is used
+   */
+  public function testCustomDateField() {
+    $contactID = $this->individualCreate();
+    //Create a test custom group and field.
+    $customGroup = $this->callAPISuccess('CustomGroup', 'create', array(
+      'title' => "test custom group",
+      'extends' => "Individual",
+    ));
+    $customTableName = $this->callAPISuccess('CustomGroup', 'getValue', ['id' => $customGroup, 'return' => 'table_name']);
+    $customGroupTableName = $customGroup['values'][$customGroup['id']]['table_name'];
+
+    $createdField = $this->callAPISuccess('customField', 'create', [
+      'data_type' => 'Date',
+      'html_type' => 'Select Date',
+      'date_format' => 'd M yy',
+      'time_format' => 1,
+      'label' => 'test field',
+      'custom_group_id' => $customGroup['id'],
+    ]);
+    $customFieldColumnName = $createdField['values'][$createdField['id']]['column_name'];
+
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $contactID,
+      'custom_' . $createdField['id'] => date('YmdHis'),
+    ]);
+
+    $selector = new CRM_Contact_Selector(
+      'CRM_Contact_Selector',
+      ['custom_' . $createdField['id'] => ['IS NOT EMPTY' => 1]],
+      [[
+        0 => 'custom_' . $createdField['id'],
+        1 => 'IS NOT NULL',
+        2 => 1,
+        3 => 1,
+        4 => 0,
+      ]],
+      [],
+      CRM_Core_Action::NONE,
+      NULL,
+      FALSE,
+      'builder'
+    );
+
+    $whereClause = $selector->getQueryObject()->query()[2];
+    $expectedClause = sprintf("( %s.%s IS NOT NULL )", $customGroupTableName, $customFieldColumnName);
+    // test the presence of expected date clause
+    $this->assertEquals(TRUE, strpos($whereClause, $expectedClause));
+
+    $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, TRUE, NULL);
+    $this->assertEquals(1, count($rows));
+  }
+
+  /**
    * Get the default select string since this is generally consistent.
    */
   public function getDefaultSelectString() {
