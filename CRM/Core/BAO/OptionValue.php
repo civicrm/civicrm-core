@@ -243,6 +243,29 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $optionValue->id = $id;
     $optionValue->save();
     CRM_Core_PseudoConstant::flush();
+
+    // Create relationship for payment intrument options
+    if (!empty($params['financial_account_id'])) {
+      $optionName = civicrm_api3('OptionGroup', 'getvalue', [
+        'return' => 'name',
+        'id' => $params['option_group_id'],
+      ]);
+      // Only create relationship for payment intrument options
+      if ($optionName == 'payment_instrument') {
+        $relationTypeId = civicrm_api3('OptionValue', 'getvalue', [
+          'return' => 'value',
+          'option_group_id' => 'account_relationship',
+          'name' => 'Asset Account is',
+        ]);
+        $params = [
+          'entity_table' => 'civicrm_option_value',
+          'entity_id' => $optionValue->id,
+          'account_relationship' => $relationTypeId,
+          'financial_account_id' => $params['financial_account_id'],
+        ];
+        CRM_Financial_BAO_FinancialTypeAccount::add($params);
+      }
+    }
     return $optionValue;
   }
 
