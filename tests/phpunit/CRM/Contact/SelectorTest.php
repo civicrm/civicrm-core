@@ -368,6 +368,53 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the value use in where clause if it's case sensitive or not against each MySQL operators
+   */
+  public function testWhereClauseByOperator() {
+    $contactID = $this->individualCreate(['first_name' => 'Adam']);
+
+    $filters = [
+      'IS NOT NULL' => 1,
+      '=' => 'Adam',
+      'LIKE' => '%Ad%',
+      'RLIKE' => '^A[a-z]{3}$',
+      'IN' => ['IN' => ['Adam']],
+    ];
+    $filtersByWhereClause = [
+      'IS NOT NULL' => '( contact_a.first_name IS NOT NULL )', // doesn't matter
+      '=' => "( contact_a.first_name = 'Adam' )", // case sensitive check
+      'LIKE' => "( contact_a.first_name LIKE '%ad%' )", // case insensitive check
+      'RLIKE' => "(  contact_a.first_name RLIKE BINARY '^A[a-z]{3}$'  )", // case sensitive check
+      'IN' => '( contact_a.first_name IN ("Adam") )', // case sensitive check
+    ];
+    foreach ($filters as $op => $filter) {
+      $selector = new CRM_Contact_Selector(
+        'CRM_Contact_Selector',
+        ['first_name' => [$op => $filter]],
+        [[
+          0 => 'first_name',
+          1 => $op,
+          2 => $filter,
+          3 => 1,
+          4 => 0,
+        ]],
+        [],
+        CRM_Core_Action::NONE,
+        NULL,
+        FALSE,
+        'builder'
+      );
+
+      $sql = $selector->getQueryObject()->query();
+      $this->assertEquals(TRUE, strpos($sql[2], $filtersByWhereClause[$op]));
+
+      $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, TRUE, NULL);
+      $this->assertEquals(1, count($rows));
+      $this->assertEquals($contactID, key($rows));
+    }
+  }
+
+  /**
    * Test if custom table is added in from clause when
    * search results are ordered by a custom field.
    */
