@@ -486,18 +486,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
       $optionValue = CRM_Core_OptionValue::addOptionValue($params, $this->_gName, $this->_action, $this->_id);
 
-      // CRM-11516
-      if (!empty($params['financial_account_id'])) {
-        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
-        $params = array(
-          'entity_table' => 'civicrm_option_value',
-          'entity_id' => $optionValue->id,
-          'account_relationship' => $relationTypeId,
-          'financial_account_id' => $params['financial_account_id'],
-        );
-        CRM_Financial_BAO_FinancialTypeAccount::add($params);
-      }
-
       CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', array(
             1 => $this->_gLabel,
             2 => $optionValue->label,
