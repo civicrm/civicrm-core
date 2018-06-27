@@ -66,7 +66,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     $argString = "CRM_CT_{$group}_{$path}_{$componentID}";
     if (!array_key_exists($argString, self::$_cache)) {
       $cache = CRM_Utils_Cache::singleton();
-      self::$_cache[$argString] = $cache->get($argString);
+      self::$_cache[$argString] = $cache->get(self::cleanKey($argString));
       if (!self::$_cache[$argString]) {
         $table = self::getTableName();
         $where = self::whereCache($group, $path, $componentID);
@@ -74,7 +74,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         $data = $rawData ? self::decode($rawData) : NULL;
 
         self::$_cache[$argString] = $data;
-        $cache->set($argString, self::$_cache[$argString]);
+        $cache->set(self::cleanKey($argString), self::$_cache[$argString]);
       }
     }
     return self::$_cache[$argString];
@@ -99,7 +99,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     $argString = "CRM_CT_CI_{$group}_{$componentID}";
     if (!array_key_exists($argString, self::$_cache)) {
       $cache = CRM_Utils_Cache::singleton();
-      self::$_cache[$argString] = $cache->get($argString);
+      self::$_cache[$argString] = $cache->get(self::cleanKey($argString));
       if (!self::$_cache[$argString]) {
         $table = self::getTableName();
         $where = self::whereCache($group, NULL, $componentID);
@@ -112,7 +112,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         $dao->free();
 
         self::$_cache[$argString] = $result;
-        $cache->set($argString, self::$_cache[$argString]);
+        $cache->set(self::cleanKey($argString), self::$_cache[$argString]);
       }
     }
 
@@ -182,11 +182,11 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     $cache = CRM_Utils_Cache::singleton();
     $data = self::decode($dataSerialized);
     self::$_cache[$argString] = $data;
-    $cache->set($argString, $data);
+    $cache->set(self::cleanKey($argString), $data);
 
     $argString = "CRM_CT_CI_{$group}_{$componentID}";
     unset(self::$_cache[$argString]);
-    $cache->delete($argString);
+    $cache->delete(self::cleanKey($argString));
   }
 
   /**
@@ -415,6 +415,37 @@ AND         created_date < date_sub( NOW( ), INTERVAL $timeIntervalDays DAY )
       $clauses[] = ('component_id = ' . (int) $componentID);
     }
     return $clauses ? implode(' AND ', $clauses) : '(1)';
+  }
+
+  /**
+   * Normalize a cache key.
+   *
+   * This bridges an impedance mismatch between our traditional caching
+   * and PSR-16 -- PSR-16 accepts a narrower range of cache keys.
+   *
+   * @param string $key
+   *   Ex: 'ab/cd:ef'
+   * @return string
+   *   Ex: '_abcd1234abcd1234' or 'ab_xx/cd_xxef'.
+   *   A similar key, but suitable for use with PSR-16-compliant cache providers.
+   */
+  public static function cleanKey($key) {
+    if (!is_string($key) && !is_int($key)) {
+      throw new \RuntimeException("Malformed cache key");
+    }
+
+    $maxLen = 64;
+    $escape = '-';
+
+    if (strlen($key) >= $maxLen) {
+      return $escape . md5($key);
+    }
+
+    $r = preg_replace_callback(';[^A-Za-z0-9_\. ];', function($m) use ($escape) {
+      return $escape . dechex(ord($m[0]));
+    }, $key);
+
+    return strlen($r) >= $maxLen ? $escape . md5($key) : $r;
   }
 
 }

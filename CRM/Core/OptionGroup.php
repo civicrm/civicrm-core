@@ -200,8 +200,8 @@ WHERE  v.option_group_id = g.id
   /**
    * @return string
    */
-  protected static function createCacheKey() {
-    $cacheKey = "CRM_OG_" . serialize(func_get_args());
+  protected static function createCacheKey($id) {
+    $cacheKey = "CRM_OG_" . preg_replace('/[^a-zA-Z0-9]/', '', $id) . '_' . md5(serialize(func_get_args()));
     return $cacheKey;
   }
 
