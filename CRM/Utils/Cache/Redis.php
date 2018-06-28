@@ -33,6 +33,10 @@
  *
  */
 class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
+
+  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+
   const DEFAULT_HOST    = 'localhost';
   const DEFAULT_PORT    = 6379;
   const DEFAULT_TIMEOUT = 3600;
@@ -113,11 +117,15 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
   /**
    * @param $key
    * @param $value
+   * @param null|int|\DateInterval $ttl
    *
    * @return bool
    * @throws Exception
    */
-  public function set($key, &$value) {
+  public function set($key, $value, $ttl = NULL) {
+    if ($ttl !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::set() should support non-NULL TTL");
+    }
     if (!$this->_cache->set($this->_prefix . $key, serialize($value), $this->_timeout)) {
       if (PHP_SAPI === 'cli' || (Civi\Core\Container::isContainerBooted() && CRM_Core_Permission::check('view debug output'))) {
         CRM_Core_Error::fatal("Redis set ($key) failed: " . $this->_cache->getLastError());
@@ -133,25 +141,27 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
 
   /**
    * @param $key
+   * @param mixed $default
    *
    * @return mixed
    */
-  public function get($key) {
+  public function get($key, $default = NULL) {
     $result = $this->_cache->get($this->_prefix . $key);
-    return ($result === FALSE) ? NULL : unserialize($result);
+    return ($result === FALSE) ? $default : unserialize($result);
   }
 
   /**
    * @param $key
    *
-   * @return mixed
+   * @return bool
    */
   public function delete($key) {
-    return $this->_cache->delete($this->_prefix . $key);
+    $this->_cache->delete($this->_prefix . $key);
+    return TRUE;
   }
 
   /**
-   * @return mixed
+   * @return bool
    */
   public function flush() {
     // FIXME: Ideally, we'd map each prefix to a different 'hash' object in Redis,
@@ -159,7 +169,12 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
     // more general rethink of cache expiration/TTL.
 
     $keys = $this->_cache->keys($this->_prefix . '*');
-    return $this->_cache->del($keys);
+    $this->_cache->del($keys);
+    return TRUE;
+  }
+
+  public function clear() {
+    return $this->flush();
   }
 
 }

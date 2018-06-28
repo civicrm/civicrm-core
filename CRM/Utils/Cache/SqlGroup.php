@@ -38,6 +38,9 @@
  */
 class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
 
+  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+
   /**
    * The host name of the memcached server.
    *
@@ -89,18 +92,28 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   /**
    * @param string $key
    * @param mixed $value
+   * @param null|int|\DateInterval $ttl
+   * @return bool
    */
-  public function set($key, &$value) {
+  public function set($key, $value, $ttl = NULL) {
+    if ($ttl !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::set() should support non-NULL TTL");
+    }
     CRM_Core_BAO_Cache::setItem($value, $this->group, $key, $this->componentID);
     $this->frontCache[$key] = $value;
+    return TRUE;
   }
 
   /**
    * @param string $key
+   * @param mixed $default
    *
    * @return mixed
    */
-  public function get($key) {
+  public function get($key, $default = NULL) {
+    if ($default !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::get() only supports NULL default");
+    }
     if (!array_key_exists($key, $this->frontCache)) {
       $this->frontCache[$key] = CRM_Core_BAO_Cache::getItem($this->group, $key, $this->componentID);
     }
@@ -119,12 +132,14 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
 
   /**
    * @param string $key
+   * @return bool
    */
   public function delete($key) {
     CRM_Core_BAO_Cache::deleteGroup($this->group, $key, FALSE);
     CRM_Core_BAO_Cache::$_cache = NULL; // FIXME: remove multitier cache
     CRM_Utils_Cache::singleton()->flush(); // FIXME: remove multitier cache
     unset($this->frontCache[$key]);
+    return TRUE;
   }
 
   public function flush() {
@@ -132,6 +147,11 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     CRM_Core_BAO_Cache::$_cache = NULL; // FIXME: remove multitier cache
     CRM_Utils_Cache::singleton()->flush(); // FIXME: remove multitier cache
     $this->frontCache = array();
+    return TRUE;
+  }
+
+  public function clear() {
+    return $this->flush();
   }
 
   public function prefetch() {

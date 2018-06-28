@@ -36,6 +36,9 @@
  */
 class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
 
+  use CRM_Utils_Cache_NaiveMultipleTrait;
+  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+
   /**
    * The cache storage container, an in memory array by default
    */
@@ -56,30 +59,44 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
   /**
    * @param string $key
    * @param mixed $value
+   * @param null|int|\DateInterval $ttl
+   * @return bool
    */
-  public function set($key, &$value) {
+  public function set($key, $value, $ttl = NULL) {
+    if ($ttl !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::set() should support non-NULL TTL");
+    }
     $this->_cache[$key] = $value;
+    return TRUE;
   }
 
   /**
    * @param string $key
+   * @param mixed $default
    *
    * @return mixed
    */
-  public function get($key) {
-    return CRM_Utils_Array::value($key, $this->_cache);
+  public function get($key, $default = NULL) {
+    return CRM_Utils_Array::value($key, $this->_cache, $default);
   }
 
   /**
    * @param string $key
+   * @return bool
    */
   public function delete($key) {
     unset($this->_cache[$key]);
+    return TRUE;
   }
 
   public function flush() {
     unset($this->_cache);
     $this->_cache = array();
+    return TRUE;
+  }
+
+  public function clear() {
+    return $this->flush();
   }
 
 }

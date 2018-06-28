@@ -31,6 +31,10 @@
  * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
+
+  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+
   const DEFAULT_HOST = 'localhost';
   const DEFAULT_PORT = 11211;
   const DEFAULT_TIMEOUT = 3600;
@@ -109,10 +113,14 @@ class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
   /**
    * @param $key
    * @param $value
+   * @param null|int|\DateInterval $ttl
    *
    * @return bool
    */
-  public function set($key, &$value) {
+  public function set($key, $value, $ttl = NULL) {
+    if ($ttl !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::set() should support non-NULL TTL");
+    }
     if (!$this->_cache->set($this->_prefix . $key, $value, FALSE, $this->_timeout)) {
       return FALSE;
     }
@@ -121,10 +129,14 @@ class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
 
   /**
    * @param $key
+   * @param mixed $default
    *
    * @return mixed
    */
-  public function &get($key) {
+  public function get($key, $default = NULL) {
+    if ($default !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::get() only supports NULL default");
+    }
     $result = $this->_cache->get($this->_prefix . $key);
     return $result;
   }
@@ -132,18 +144,22 @@ class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
   /**
    * @param $key
    *
-   * @return mixed
+   * @return bool
    */
   public function delete($key) {
     return $this->_cache->delete($this->_prefix . $key);
   }
 
   /**
-   * @return mixed
+   * @return bool
    */
   public function flush() {
     // FIXME: Only delete items matching `$this->_prefix`.
     return $this->_cache->flush();
+  }
+
+  public function clear() {
+    return $this->flush();
   }
 
 }

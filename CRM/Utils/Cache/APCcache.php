@@ -31,6 +31,10 @@
  * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
+
+  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+
   const DEFAULT_TIMEOUT = 3600;
   const DEFAULT_PREFIX = '';
 
@@ -72,10 +76,14 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
   /**
    * @param $key
    * @param $value
+   * @param null|int|\DateInterval $ttl
    *
    * @return bool
    */
-  public function set($key, &$value) {
+  public function set($key, $value, $ttl = NULL) {
+    if ($ttl !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::set() should support non-NULL TTL");
+    }
     if (!apc_store($this->_prefix . $key, $value, $this->_timeout)) {
       return FALSE;
     }
@@ -84,10 +92,14 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
 
   /**
    * @param $key
+   * @param mixed $default
    *
    * @return mixed
    */
-  public function get($key) {
+  public function get($key, $default = NULL) {
+    if ($default !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::get() only supports NULL default");
+    }
     return apc_fetch($this->_prefix . $key);
   }
 
@@ -113,6 +125,11 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
         apc_delete($this->_prefix . $name);
       }
     }
+    return TRUE;
+  }
+
+  public function clear() {
+    return $this->flush();
   }
 
 }
