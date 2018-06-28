@@ -260,6 +260,7 @@ class CRM_Core_BAO_ConfigSetting {
 
     // clear all caches
     CRM_Core_Config::clearDBCache();
+    Civi::cache('session')->clear();
     $moveStatus .= ts('Database cache tables cleared.') . '<br />';
 
     $resetSessionTable = CRM_Utils_Request::retrieve('resetSessionTable',
