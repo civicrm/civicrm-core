@@ -992,6 +992,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $params),
     );
 
+    // dev-core-25
+    if (!empty($params['partial_amount_to_pay']) && $params['partial_amount_to_pay'] > 0 && $params['amount'] > $params['partial_amount_to_pay']) {
+      $contribParams['partial_payment_total'] = CRM_Utils_Array::value('partial_payment_total', $params, CRM_Utils_Array::value('amount', $params));
+      $contribParams['partial_amount_to_pay'] = $params['partial_amount_to_pay'];
+    }
+
     if ($paymentProcessor) {
       $contribParams['payment_instrument_id'] = $paymentProcessor['payment_instrument_id'];
       $contribParams['payment_processor'] = $paymentProcessor['id'];
