@@ -34,11 +34,18 @@
  */
 class E2E_Cache_ConfiguredMemoryTest extends E2E_Cache_CacheTestCase {
 
-  public function createSimpleCache() {
+  /**
+   * @return bool
+   */
+  public static function isMemorySupported() {
     $cache = Civi::cache('default');
+    return ($cache instanceof CRM_Utils_Cache_Redis || $cache instanceof CRM_Utils_Cache_Memcache || $cache instanceof CRM_Utils_Cache_Memcached);
+  }
 
-    if ($cache instanceof CRM_Utils_Cache_Redis || $cache instanceof CRM_Utils_Cache_Memcache || $cache instanceof  CRM_Utils_Cache_Memcached) {
-      return $cache;
+  public function createSimpleCache() {
+    $isMemorySupported = self::isMemorySupported();
+    if ($isMemorySupported) {
+      return Civi::cache('default');
     }
     else {
       $this->markTestSkipped('This environment is not configured to use a memory-backed cache service.');
