@@ -34,6 +34,16 @@
 interface CRM_Core_PrevNextCache_Interface {
 
   /**
+   * Store the results of a SQL query in the cache.
+   *
+   * @param string $sql
+   *   A SQL query. The query *MUST* be a SELECT statement which yields
+   *   the following columns (in order): entity_table, entity_id1, entity_id2, cacheKey, data
+   * @return bool
+   */
+  public function fillWithSql($cacheKey, $sql);
+
+  /**
    * Fetch a list of contacts from the prev/next cache for displaying a search results page
    *
    * @param string $cacheKey
