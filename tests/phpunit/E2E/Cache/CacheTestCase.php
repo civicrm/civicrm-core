@@ -46,15 +46,6 @@ abstract class E2E_Cache_CacheTestCase extends \Cache\IntegrationTests\LegacySim
     parent::setUpBeforeClass();
   }
 
-  protected function setUp() {
-    parent::setUp();
-    // Testing on PHP 5.5 and having trouble finding a test that correctly
-    // detects generators.
-    $this->skippedTests['testGetMultipleWithGenerator'] = 1;
-    $this->skippedTests['testSetMultipleWithGenerator'] = 1;
-    $this->skippedTests['testDeleteMultipleGenerator'] = 1;
-  }
-
   public function testBasicUsageWithLongKey() {
     if (isset($this->skippedTests[__FUNCTION__])) {
       $this->markTestSkipped($this->skippedTests[__FUNCTION__]);

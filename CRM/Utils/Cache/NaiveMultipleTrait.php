@@ -113,7 +113,7 @@ trait CRM_Utils_Cache_NaiveMultipleTrait {
    * @throws \CRM_Utils_Cache_InvalidArgumentException
    */
   private function assertIterable($func, $keys) {
-    if (!is_array($keys) || $keys instanceof Traversable) {
+    if (!is_array($keys) && !($keys instanceof Traversable)) {
       throw new CRM_Utils_Cache_InvalidArgumentException("$func expects iterable input");
     }
   }
