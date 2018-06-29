@@ -4965,30 +4965,6 @@ civicrm_relationship.start_date > {$today}
   }
 
   /**
-   * Fetch a list of contacts from the prev/next cache for displaying a search results page
-   *
-   * @param string $cacheKey
-   * @param int $offset
-   * @param int $rowCount
-   * @param bool $includeContactIds
-   * @return CRM_Core_DAO
-   */
-  public function getCachedContacts($cacheKey, $offset, $rowCount, $includeContactIds) {
-    $this->_includeContactIds = $includeContactIds;
-    $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $this->_params);
-    list($select, $from, $where) = $this->query(FALSE, FALSE, FALSE, $onlyDeleted);
-    $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
-    $order = " ORDER BY pnc.id";
-    $groupByCol = array('contact_a.id', 'pnc.id');
-    $select = self::appendAnyValueToSelect($this->_select, $groupByCol, 'GROUP_CONCAT');
-    $groupBy = " GROUP BY " . implode(', ', $groupByCol);
-    $limit = " LIMIT $offset, $rowCount";
-    $query = "$select $from $where $groupBy $order $limit";
-
-    return CRM_Core_DAO::executeQuery($query);
-  }
-
-  /**
    * Populate $this->_permissionWhereClause with permission related clause and update other
    * query related properties.
    *
