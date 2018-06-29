@@ -908,7 +908,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     // Does arrow.png exist where we expect it?
     $arrowUrl = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'packages/jquery/css/images/arrow.png';
-    $headers = get_headers($arrowUrl);
+    $headers = CRM_Utils_Curl::getHeaders($arrowUrl);
     $fileExists = stripos($headers[0], "200 OK") ? 1 : 0;
     if (!$fileExists) {
       $messages[] = new CRM_Utils_Check_Message(
