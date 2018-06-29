@@ -477,4 +477,17 @@ LIMIT 1";
     return $organizationNames;
   }
 
+  function getAssetFinancialAccounts() {
+    $results = civicrm_api3('FinancialAccount', 'get', [
+      'return' => ["id", "name"],
+      'financial_account_type_id' => "Asset",
+      'name' => ['!=' => "Accounts Receivable"],
+    ]);
+    $financialAccounts = [];
+    foreach ($results['values'] as $financialAccount) {
+      $financialAccounts[$financialAccount['id']] = $financialAccount['name'];
+    }
+    return $financialAccounts;
+  }
+
 }
