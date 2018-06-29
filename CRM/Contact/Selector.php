@@ -579,10 +579,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // note that the default action is basic
     if ($rowCount) {
       $cacheKey = $this->buildPrevNextCache($sort);
-      $result = $this->_query->getCachedContacts($cacheKey, $offset, $rowCount, $includeContactIds);
+      $resultSet = $this->_query->getCachedContacts($cacheKey, $offset, $rowCount, $includeContactIds)->fetchGenerator();
     }
     else {
-      $result = $this->_query->searchQuery($offset, $rowCount, $sort, FALSE, $includeContactIds);
+      $resultSet = $this->_query->searchQuery($offset, $rowCount, $sort, FALSE, $includeContactIds)->fetchGenerator();
     }
 
     // process the result of the query
@@ -671,7 +671,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       );
     }
 
-    while ($result->fetch()) {
+    foreach ($resultSet as $result) {
       $row = array();
       $this->_query->convertToPseudoNames($result);
       // the columns we are interested in
