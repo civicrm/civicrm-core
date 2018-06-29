@@ -31,4 +31,25 @@
  * Store the previous/next cache in a special-purpose SQL table.
  */
 class CRM_Core_PrevNextCache_Sql implements CRM_Core_PrevNextCache_Interface {
+
+  /**
+   * Store the results of a SQL query in the cache.
+   *
+   * @param string $sql
+   *   A SQL query. The query *MUST* be a SELECT statement which yields
+   *   the following columns (in order): entity_table, entity_id1, entity_id2, cacheKey, data
+   * @return bool
+   * @throws CRM_Core_Exception
+   */
+  public function fillWithSql($cacheKey, $sql) {
+    $insertSQL = "
+INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cacheKey, data )
+";
+    $result = CRM_Core_DAO::executeQuery($insertSQL . $sql, [], FALSE, NULL, FALSE, TRUE, TRUE);
+    if (is_a($result, 'DB_Error')) {
+      throw new CRM_Core_Exception($result->message);
+    }
+    return TRUE;
+  }
+
 }
