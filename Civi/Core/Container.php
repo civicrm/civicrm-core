@@ -214,6 +214,11 @@ class Container {
         ->setFactory(array($class, 'singleton'));
     }
 
+    $container->setDefinition('prevnext', new Definition(
+      'CRM_Core_PrevNextCache_Sql',
+      []
+    ));
+
     $container->setDefinition('civi.mailing.triggers', new Definition(
       'Civi\Core\SqlTrigger\TimestampTriggers',
       array('civicrm_mailing', 'Mailing')
