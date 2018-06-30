@@ -33,13 +33,17 @@
 class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
 
   use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
-  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
 
   const DEFAULT_HOST = 'localhost';
   const DEFAULT_PORT = 11211;
   const DEFAULT_TIMEOUT = 3600;
   const DEFAULT_PREFIX = '';
-  const MAX_KEY_LEN = 62;
+  const MAX_KEY_LEN = 200;
+
+  /**
+   * If another process clears namespace, we'll find out in ~5 sec.
+   */
+  const NS_LOCAL_TTL = 5;
 
   /**
    * The host name of the memcached server
@@ -81,6 +85,15 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
   protected $_cache;
 
   /**
+   * @var NULL|array
+   *
+   * This is the effective prefix. It may be bumped up whenever the dataset is flushed.
+   *
+   * @see https://github.com/memcached/memcached/wiki/ProgrammingTricks#deleting-by-namespace
+   */
+  protected $_truePrefix = NULL;
+
+  /**
    * Constructor.
    *
    * @param array $config
@@ -120,14 +133,23 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
    * @throws Exception
    */
   public function set($key, $value, $ttl = NULL) {
-    if ($ttl !== NULL) {
-      throw new \RuntimeException("FIXME: " . __CLASS__ . "::set() should support non-NULL TTL");
+    CRM_Utils_Cache::assertValidKey($key);
+    if (is_int($ttl) && $ttl <= 0) {
+      return $this->delete($key);
     }
+    $expires = CRM_Utils_Date::convertCacheTtlToExpires($ttl, $this->_timeout);
+
     $key = $this->cleanKey($key);
-    if (!$this->_cache->set($key, $value, $this->_timeout)) {
-      CRM_Core_Error::debug('Result Code: ', $this->_cache->getResultMessage());
-      CRM_Core_Error::fatal("memcached set failed, wondering why?, $key", $value);
+    if (!$this->_cache->set($key, serialize($value), $expires)) {
+      if (PHP_SAPI === 'cli' || (Civi\Core\Container::isContainerBooted() && CRM_Core_Permission::check('view debug output'))) {
+        throw new CRM_Utils_Cache_CacheException("Memcached::set($key) failed: " . $this->_cache->getResultMessage());
+      }
+      else {
+        Civi::log()->error("Memcached::set($key) failed: " . $this->_cache->getResultMessage());
+        throw new CRM_Utils_Cache_CacheException("Memcached::set($key) failed");
+      }
       return FALSE;
+
     }
     return TRUE;
   }
@@ -139,12 +161,45 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
    * @return mixed
    */
   public function get($key, $default = NULL) {
-    if ($default !== NULL) {
-      throw new \RuntimeException("FIXME: " . __CLASS__ . "::get() only supports NULL default");
-    }
+    CRM_Utils_Cache::assertValidKey($key);
     $key = $this->cleanKey($key);
     $result = $this->_cache->get($key);
-    return $result;
+    switch ($this->_cache->getResultCode()) {
+      case Memcached::RES_SUCCESS:
+        return unserialize($result);
+
+      case Memcached::RES_NOTFOUND:
+        return $default;
+
+      default:
+        Civi::log()->error("Memcached::get($key) failed: " . $this->_cache->getResultMessage());
+        throw new CRM_Utils_Cache_CacheException("Memcached set ($key) failed");
+    }
+  }
+
+  /**
+   * @param string $key
+   *
+   * @return bool
+   * @throws \Psr\SimpleCache\CacheException
+   */
+  public function has($key) {
+    CRM_Utils_Cache::assertValidKey($key);
+    $key = $this->cleanKey($key);
+    if ($this->_cache->get($key) !== FALSE) {
+      return TRUE;
+    }
+    switch ($this->_cache->getResultCode()) {
+      case Memcached::RES_NOTFOUND:
+        return FALSE;
+
+      case Memcached::RES_SUCCESS:
+        return TRUE;
+
+      default:
+        Civi::log()->error("Memcached::has($key) failed: " . $this->_cache->getResultMessage());
+        throw new CRM_Utils_Cache_CacheException("Memcached set ($key) failed");
+    }
   }
 
   /**
@@ -153,8 +208,13 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
    * @return mixed
    */
   public function delete($key) {
+    CRM_Utils_Cache::assertValidKey($key);
     $key = $this->cleanKey($key);
-    return $this->_cache->delete($key);
+    if ($this->_cache->delete($key)) {
+      return TRUE;
+    }
+    $code = $this->_cache->getResultCode();
+    return ($code == Memcached::RES_DELETED || $code == Memcached::RES_NOTFOUND);
   }
 
   /**
@@ -163,25 +223,47 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
    * @return mixed|string
    */
   public function cleanKey($key) {
-    $key = preg_replace('/\s+|\W+/', '_', $this->_prefix . $key);
-    if (strlen($key) > self::MAX_KEY_LEN) {
+    $truePrefix = $this->getTruePrefix();
+    $maxLen = self::MAX_KEY_LEN - strlen($truePrefix);
+    $key = preg_replace('/\s+|\W+/', '_', $key);
+    if (strlen($key) > $maxLen) {
       $md5Key = md5($key);  // this should be 32 characters in length
-      $subKeyLen = self::MAX_KEY_LEN - 1 - strlen($md5Key);
+      $subKeyLen = $maxLen - 1 - strlen($md5Key);
       $key = substr($key, 0, $subKeyLen) . "_" . $md5Key;
     }
-    return $key;
+    return $truePrefix . $key;
   }
 
   /**
    * @return bool
    */
   public function flush() {
-    // FIXME: Only delete items matching `$this->_prefix`.
-    return $this->_cache->flush();
+    $this->_truePrefix = NULL;
+    if ($this->_cache->delete($this->_prefix)) {
+      return TRUE;
+    }
+    $code = $this->_cache->getResultCode();
+    return ($code == Memcached::RES_DELETED || $code == Memcached::RES_NOTFOUND);
   }
 
   public function clear() {
     return $this->flush();
+  }
+
+  protected function getTruePrefix() {
+    if ($this->_truePrefix === NULL || $this->_truePrefix['expires'] < time()) {
+      $key = $this->_prefix;
+      $value = $this->_cache->get($key);
+      if ($this->_cache->getResultCode() === Memcached::RES_NOTFOUND) {
+        $value = uniqid();
+        $this->_cache->add($key, $value, 0); // Indefinite.
+      }
+      $this->_truePrefix = [
+        'value' => $value,
+        'expires' => time() + self::NS_LOCAL_TTL,
+      ];
+    }
+    return $this->_prefix . $this->_truePrefix['value'] . '/';
   }
 
 }
