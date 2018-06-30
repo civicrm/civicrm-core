@@ -1083,18 +1083,17 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     // build insert query, note that currently we build cache for 500 (self::CACHE_SIZE) contact records at a time, hence below approach
-    $insertValues = array();
+    $rows = [];
     while ($dao->fetch()) {
-      $insertValues[] = "('civicrm_contact', {$dao->contact_id}, {$dao->contact_id}, '{$cacheKey}', '" . CRM_Core_DAO::escapeString($dao->sort_name) . "')";
+      $rows[] = [
+        'entity_table' => 'civicrm_contact',
+        'entity_id1' => $dao->contact_id,
+        'entity_id2' => $dao->contact_id,
+        'data' => $dao->sort_name,
+      ];
     }
 
-    //update pre/next cache using single insert query
-    if (!empty($insertValues)) {
-      $sql = 'INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cacheKey, data ) VALUES
-' . implode(',', $insertValues);
-
-      $result = CRM_Core_DAO::executeQuery($sql);
-    }
+    Civi::service('prevnext')->fillWithArray($cacheKey, $rows);
   }
 
   /**
