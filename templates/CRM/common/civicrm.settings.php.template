@@ -400,6 +400,14 @@ if (!defined('CIVICRM_DB_CACHE_PREFIX')) {
 }
 
 /**
+ * The cache system traditionally allowed a wide range of cache-keys, but some
+ * cache-keys are prohibited by PSR-16.
+ */
+if (!defined('CIVICRM_PSR16_STRICT')) {
+  define('CIVICRM_PSR16_STRICT', FALSE);
+}
+
+/**
  * If you have multilingual site and you are using the "inherit CMS language"
  * configuration option, but wish to, for example, use fr_CA instead of the
  * default fr_FR (for French), set one or more of the constants below to an

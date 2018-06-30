@@ -51,6 +51,8 @@ trait CRM_Utils_Cache_NaiveMultipleTrait {
    *   or if any of the $keys are not a legal value.
    */
   public function getMultiple($keys, $default = NULL) {
+    $this->assertIterable('getMultiple', $keys);
+
     $result = [];
     foreach ($keys as $key) {
       $result[$key] = $this->get($key, $default);
@@ -73,8 +75,13 @@ trait CRM_Utils_Cache_NaiveMultipleTrait {
    *   or if any of the $values are not a legal value.
    */
   public function setMultiple($values, $ttl = NULL) {
+    $this->assertIterable('setMultiple', $values);
+
     $result = TRUE;
     foreach ($values as $key => $value) {
+      if (is_int($key)) {
+        $key = (string) $key;
+      }
       $result = $this->set($key, $value, $ttl) || $result;
     }
     return $result;
@@ -92,11 +99,23 @@ trait CRM_Utils_Cache_NaiveMultipleTrait {
    *   or if any of the $keys are not a legal value.
    */
   public function deleteMultiple($keys) {
+    $this->assertIterable('deleteMultiple', $keys);
+
     $result = TRUE;
     foreach ($keys as $key) {
       $result = $this->delete($key) || $result;
     }
     return $result;
+  }
+
+  /**
+   * @param $keys
+   * @throws \CRM_Utils_Cache_InvalidArgumentException
+   */
+  private function assertIterable($func, $keys) {
+    if (!is_array($keys) && !($keys instanceof Traversable)) {
+      throw new CRM_Utils_Cache_InvalidArgumentException("$func expects iterable input");
+    }
   }
 
 }
