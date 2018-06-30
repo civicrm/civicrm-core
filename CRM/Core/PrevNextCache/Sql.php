@@ -52,6 +52,28 @@ INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cache
     return TRUE;
   }
 
+  public function fillWithArray($cacheKey, $rows) {
+    if (empty($rows)) {
+      return;
+    }
+
+    $insert = CRM_Utils_SQL_Insert::into('civicrm_prevnext_cache')
+      ->columns([
+        'entity_table',
+        'entity_id1',
+        'entity_id2',
+        'cacheKey',
+        'data'
+      ]);
+
+    foreach ($rows as &$row) {
+      $insert->row($row + ['cacheKey' => $cacheKey]);
+    }
+
+    CRM_Core_DAO::executeQuery($insert->toSQL());
+    return TRUE;
+  }
+
   /**
    * Fetch a list of contacts from the prev/next cache for displaying a search results page
    *
