@@ -54,6 +54,9 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
             ),
           ),
         ),
+        'timelineActivityTypes' => array(
+          array('name' => 'Open Case', 'status' => 'Completed'),
+        ),
         'caseRoles' => array(
           array('name' => 'First role', 'creator' => 1, 'manager' => 1),
         ),

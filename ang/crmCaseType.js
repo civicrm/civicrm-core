@@ -261,6 +261,8 @@
     $scope.caseType.definition.caseRoles = $scope.caseType.definition.caseRoles || [];
     $scope.caseType.definition.statuses = $scope.caseType.definition.statuses || [];
 
+    $scope.caseType.definition.timelineActivityTypes = $scope.caseType.definition.timelineActivityTypes || [];
+
     $scope.selectedStatuses = {};
     _.each(apiCalls.caseStatuses.values, function (status) {
       $scope.selectedStatuses[status.name] = !$scope.caseType.definition.statuses.length || $scope.caseType.definition.statuses.indexOf(status.name) > -1;
@@ -288,14 +290,27 @@
     }
 
     function addActivityToSet(activitySet, activityTypeName) {
-      activitySet.activityTypes.push({
-        name: activityTypeName,
-        label: $scope.activityTypes[activityTypeName].label,
-        status: 'Scheduled',
-        reference_activity: 'Open Case',
-        reference_offset: '1',
-        reference_select: 'newest'
-      });
+      var activity = {
+          name: activityTypeName,
+          label: $scope.activityTypes[activityTypeName].label,
+          status: 'Scheduled',
+          reference_activity: 'Open Case',
+          reference_offset: '1',
+          reference_select: 'newest'
+      };
+      activitySet.activityTypes.push(activity);
+      if(typeof activitySet.timeline !== "undefined" && activitySet.timeline == "1") {
+        $scope.caseType.definition.timelineActivityTypes.push(activity);
+      }
+    }
+
+    function resetTimelineActivityTypes() {
+        $scope.caseType.definition.timelineActivityTypes = [];
+        angular.forEach($scope.caseType.definition.activitySets, function(activitySet) {
+            angular.forEach(activitySet.activityTypes, function(activityType) {
+                $scope.caseType.definition.timelineActivityTypes.push(activityType);
+            });
+        });
     }
 
     function createActivity(name, callback) {
@@ -363,6 +378,7 @@
       var idx = _.indexOf(array, item);
       if (idx != -1) {
         array.splice(idx, 1);
+        resetTimelineActivityTypes();
       }
     };
 
@@ -462,6 +478,7 @@
     if (!$scope.isForkable()) {
       CRM.alert(ts('The CiviCase XML file for this case-type prohibits editing the definition.'));
     }
+
   });
 
   crmCaseType.controller('CaseTypeListCtrl', function($scope, crmApi, caseTypes) {

@@ -23,6 +23,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
         'activitySets' => array(),
         'activityTypes' => array(),
         'caseRoles' => array(),
+        'timelineActivityTypes' => array(),
       )),
       'xml' => file_get_contents(__DIR__ . '/xml/empty-lists.xml'),
     );
@@ -41,6 +42,9 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
               array('name' => 'Open Case', 'status' => 'Completed'),
             ),
           ),
+        ),
+        'timelineActivityTypes' => array(
+          array('name' => 'Open Case', 'status' => 'Completed'),
         ),
         'caseRoles' => array(
           array('name' => 'First role', 'creator' => 1, 'manager' => 1),
@@ -78,6 +82,15 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
               array('name' => 'First act'),
               array('name' => 'Second act'),
             ),
+          ),
+        ),
+        'timelineActivityTypes' => array(
+          array('name' => 'Open Case', 'status' => 'Completed'),
+          array(
+            'name' => 'Meeting',
+            'reference_activity' => 'Open Case',
+            'reference_offset' => 1,
+            'reference_select' => 'newest',
           ),
         ),
         'caseRoles' => array(

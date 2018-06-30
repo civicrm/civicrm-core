@@ -39,7 +39,7 @@ Required vars: activitySet
         ui-jq="select2"
         ui-options="{dropdownAutoWidth : true}"
         ng-model="activity.reference_activity"
-        ng-options="activityType.name as activityType.label for activityType in activitySet.activityTypes"
+        ng-options="activityType.name as activityType.label for activityType in caseType.definition.timelineActivityTypes"
         >
         <option value="">-- Case Start --</option>
       </select>
