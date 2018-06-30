@@ -123,16 +123,18 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    * @throws Exception
    */
   public function set($key, $value, $ttl = NULL) {
-    if ($ttl !== NULL) {
-      throw new \RuntimeException("FIXME: " . __CLASS__ . "::set() should support non-NULL TTL");
+    CRM_Utils_Cache::assertValidKey($key);
+    if (is_int($ttl) && $ttl <= 0) {
+      return $this->delete($key);
     }
-    if (!$this->_cache->set($this->_prefix . $key, serialize($value), $this->_timeout)) {
+    $ttl = CRM_Utils_Date::convertCacheTtl($ttl, self::DEFAULT_TIMEOUT);
+    if (!$this->_cache->setex($this->_prefix . $key, $ttl, serialize($value))) {
       if (PHP_SAPI === 'cli' || (Civi\Core\Container::isContainerBooted() && CRM_Core_Permission::check('view debug output'))) {
-        CRM_Core_Error::fatal("Redis set ($key) failed: " . $this->_cache->getLastError());
+        throw new CRM_Utils_Cache_CacheException("Redis set ($key) failed: " . $this->_cache->getLastError());
       }
       else {
         Civi::log()->error("Redis set ($key) failed: " . $this->_cache->getLastError());
-        CRM_Core_Error::fatal("Redis set ($key) failed");
+        throw new CRM_Utils_Cache_CacheException("Redis set ($key) failed");
       }
       return FALSE;
     }
@@ -146,6 +148,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    * @return mixed
    */
   public function get($key, $default = NULL) {
+    CRM_Utils_Cache::assertValidKey($key);
     $result = $this->_cache->get($this->_prefix . $key);
     return ($result === FALSE) ? $default : unserialize($result);
   }
@@ -156,6 +159,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    * @return bool
    */
   public function delete($key) {
+    CRM_Utils_Cache::assertValidKey($key);
     $this->_cache->delete($this->_prefix . $key);
     return TRUE;
   }
