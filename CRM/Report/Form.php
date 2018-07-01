@@ -2433,7 +2433,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * @return mixed
    */
   protected function alterBoolean($value) {
-    $options = array(0 => ts('No'), 1 => ts('Yes'));
+    $options = array(0 => '', 1 => ts('Yes'));
     if (isset($options[$value])) {
       return $options[$value];
     }
