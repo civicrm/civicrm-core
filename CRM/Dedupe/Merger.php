@@ -1986,6 +1986,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $rule_group_id
    * @param int $group_id
    * @param bool $reloadCacheIfEmpty
+   *   Should the cache be reloaded if empty - this must be false when in a dedupe action!
    * @param int $batchLimit
    * @param bool $isSelected
    *   Limit to selected pairs.
@@ -2035,7 +2036,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   public static function getMergeCacheKeyString($rule_group_id, $group_id, $criteria = array(), $checkPermissions = TRUE) {
     $contactType = CRM_Dedupe_BAO_RuleGroup::getContactTypeForRuleGroup($rule_group_id);
-    $cacheKeyString = "merge {$contactType}";
+    $cacheKeyString = "merge_{$contactType}";
     $cacheKeyString .= $rule_group_id ? "_{$rule_group_id}" : '_0';
     $cacheKeyString .= $group_id ? "_{$group_id}" : '_0';
     $cacheKeyString .= !empty($criteria) ? md5(serialize($criteria)) : '_0';

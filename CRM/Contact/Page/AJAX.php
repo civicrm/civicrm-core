@@ -1017,13 +1017,9 @@ LIMIT {$offset}, {$rowCount}
    * Mark dupe pairs as selected from un-selected state or vice-versa, in dupe cache table.
    */
   public static function toggleDedupeSelect() {
-    $rgid = CRM_Utils_Type::escape($_REQUEST['rgid'], 'Integer');
-    $gid  = CRM_Utils_Type::escape($_REQUEST['gid'], 'Integer');
     $pnid = $_REQUEST['pnid'];
     $isSelected = CRM_Utils_Type::escape($_REQUEST['is_selected'], 'Boolean');
-    $criteria = CRM_Utils_Request::retrieve('criteria', 'Json', $null, FALSE, '{}');
-
-    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, json_decode($criteria, TRUE));
+    $cacheKeyString = CRM_Utils_Request::retrieve('cacheKey', 'Alphanumeric', $null, FALSE);
 
     $params = array(
       1 => array($isSelected, 'Boolean'),
