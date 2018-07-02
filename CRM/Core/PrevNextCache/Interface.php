@@ -81,13 +81,11 @@ interface CRM_Core_PrevNextCache_Interface {
    * @param string $cacheKey
    * @param string $action
    *   Ex: 'select', 'unselect'.
-   * @param array|int|NULL $cIds
+   * @param array|int|NULL $ids
    *   A list of contact IDs to (un)select.
    *   To unselect all contact IDs, use NULL.
-   * @param string $entity_table
-   *   Ex: 'civicrm_contact'.
    */
-  public function markSelection($cacheKey, $action = 'unselect', $cIds = NULL, $entity_table = 'civicrm_contact');
+  public function markSelection($cacheKey, $action, $ids = NULL);
 
   /**
    * Get the selections.
