@@ -917,6 +917,9 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
       return;
     }
     if ($isEmptyPrevNextTable) {
+      // These two calls are redundant in default deployments, but they're
+      // meaningful if "prevnext" is memory-backed.
+      Civi::service('prevnext')->deleteItem();
       CRM_Core_BAO_PrevNextCache::deleteItem();
     }
     // clear acl cache if any.

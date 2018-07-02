@@ -116,4 +116,13 @@ interface CRM_Core_PrevNextCache_Interface {
    */
   public function getPositions($cacheKey, $id1, $id2);
 
+  /**
+   * Delete an item from the prevnext cache table based on the entity.
+   *
+   * @param int $id
+   * @param string $cacheKey
+   * @param string $entityTable
+   */
+  public function deleteItem($id = NULL, $cacheKey = NULL, $entityTable = 'civicrm_contact');
+
 }
