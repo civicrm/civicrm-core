@@ -821,7 +821,7 @@ abstract class CRM_Core_Payment {
         'name' => 'payment_token',
         'title' => ts('Authorization token'),
         'is_required' => FALSE,
-        'attributes' => ['size' => 10, 'autocomplete' => 'off'],
+        'attributes' => ['size' => 10, 'autocomplete' => 'off', 'id' => 'payment_token'],
       ),
     );
   }
