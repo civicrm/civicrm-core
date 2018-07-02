@@ -3,7 +3,7 @@
 
 /**
  * An abstract base class for QuickForm renderers
- * 
+ *
  * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.01 of the PHP license
@@ -23,7 +23,7 @@
 
 /**
  * An abstract base class for QuickForm renderers
- * 
+ *
  * The class implements a Visitor design pattern
  *
  * @category    HTML
@@ -49,7 +49,7 @@ class HTML_QuickForm_Renderer
     *
     * @param    HTML_QuickForm  a form being visited
     * @access   public
-    * @return   void 
+    * @return   void
     * @abstract
     */
     function startForm(&$form)
@@ -59,10 +59,10 @@ class HTML_QuickForm_Renderer
 
    /**
     * Called when visiting a form, after processing all form elements
-    * 
+    *
     * @param    HTML_QuickForm  a form being visited
     * @access   public
-    * @return   void 
+    * @return   void
     * @abstract
     */
     function finishForm(&$form)
@@ -75,7 +75,7 @@ class HTML_QuickForm_Renderer
     *
     * @param    HTML_QuickForm_header   a header element being visited
     * @access   public
-    * @return   void 
+    * @return   void
     * @abstract
     */
     function renderHeader(&$header)
@@ -90,7 +90,7 @@ class HTML_QuickForm_Renderer
     * @param    bool                    Whether an element is required
     * @param    string                  An error message associated with an element
     * @access   public
-    * @return   void 
+    * @return   void
     * @abstract
     */
     function renderElement(&$element, $required, $error)
@@ -100,11 +100,11 @@ class HTML_QuickForm_Renderer
 
    /**
     * Called when visiting a hidden element
-    * 
+    *
     * @param    HTML_QuickForm_element  a hidden element being visited
     * @access   public
     * @return   void
-    * @abstract 
+    * @abstract
     */
     function renderHidden(&$element)
     {
@@ -113,13 +113,13 @@ class HTML_QuickForm_Renderer
 
    /**
     * Called when visiting a raw HTML/text pseudo-element
-    * 
-    * Only implemented in Default renderer. Usage of 'html' elements is 
+    *
+    * Only implemented in Default renderer. Usage of 'html' elements is
     * discouraged, templates should be used instead.
     *
     * @param    HTML_QuickForm_html     a 'raw html' element being visited
     * @access   public
-    * @return   void 
+    * @return   void
     * @abstract
     */
     function renderHtml(&$data)
@@ -134,7 +134,7 @@ class HTML_QuickForm_Renderer
     * @param    bool                    Whether a group is required
     * @param    string                  An error message associated with a group
     * @access   public
-    * @return   void 
+    * @return   void
     * @abstract
     */
     function startGroup(&$group, $required, $error)
@@ -147,7 +147,7 @@ class HTML_QuickForm_Renderer
     *
     * @param    HTML_QuickForm_group    A group being visited
     * @access   public
-    * @return   void 
+    * @return   void
     * @abstract
     */
     function finishGroup(&$group)

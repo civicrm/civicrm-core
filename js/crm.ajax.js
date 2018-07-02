@@ -498,7 +498,7 @@
       settings = $el.data('popup-settings') || {},
       formData = false;
     settings.dialog = settings.dialog || {};
-    if (e.isDefaultPrevented() || !CRM.config.ajaxPopupsEnabled || !url || $el.is(exclude)) {
+    if (e.isDefaultPrevented() || !CRM.config.ajaxPopupsEnabled || !url || $el.is(exclude + ', .open-inline, .open-inline-noreturn')) {
       return;
     }
     // Sized based on css class

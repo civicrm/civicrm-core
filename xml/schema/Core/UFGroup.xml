@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>UFGroup</class>
+  <name>civicrm_uf_group</name>
+  <comment>User framework groups. Each group represents a form which encompasses a set of fields defined in civicrm_uf_fields table. Initially will be used for CiviCRM Profile form(s). Subsequently we anticipate using this to define other public facing forms (e.g. online donation solicitation forms, mailing list preferences, etc.).</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Profile ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique table ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>is_active</name>
+    <title>Profile Is Active</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this form currently active? If false, hide all related fields for all sharing contexts.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>group_type</name>
+    <title>Profile Group Type</title>
+    <type>varchar</type>
+    <length>255</length>
+    <import>true</import>
+    <comment>Comma separated list of the type(s) of profile fields.</comment>
+    <serialize>COMMA</serialize>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>form_type</name>
+    <type>enum</type>
+    <values>CiviCRM Profile</values>
+    <comment>Type of form.</comment>
+    <drop>2.1</drop>
+  </field>
+  <field>
+    <name>title</name>
+    <type>varchar</type>
+    <length>64</length>
+    <localizable>true</localizable>
+    <required>true</required>
+    <comment>Form title.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>frontend_title</name>
+    <type>varchar</type>
+    <length>64</length>
+    <localizable>true</localizable>
+    <comment>Profile Form Public title</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>description</name>
+    <type>text</type>
+    <title>Profile Description</title>
+    <html>
+      <type>TextArea</type>
+      <rows>2</rows>
+      <cols>60</cols>
+    </html>
+    <comment>Optional verbose description of the profile.</comment>
+    <add>4.4</add>
+  </field>
+  <field>
+    <name>collapse_display</name>
+    <type>int unsigned</type>
+    <default>0</default>
+    <comment>Will this group be in collapsed or expanded mode on initial display ?</comment>
+    <add>1.1</add>
+    <drop>2.2</drop>
+  </field>
+  <field>
+    <name>help_pre</name>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>Description and/or help text to display before fields in form.</comment>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>80</cols>
+    </html>
+    <add>1.2</add>
+  </field>
+  <field>
+    <name>help_post</name>
+    <title>Profile Post Text</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>Description and/or help text to display after fields in form.</comment>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>80</cols>
+    </html>
+    <add>1.2</add>
+  </field>
+  <field>
+    <name>weight</name>
+    <title>Profile Weight</title>
+    <type>int</type>
+    <required>true</required>
+    <default>1</default>
+    <comment>Controls display order when multiple user framework groups are setup for concurrent display.</comment>
+    <add>1.2</add>
+    <drop>1.3</drop>
+  </field>
+  <field>
+    <name>limit_listings_group_id</name>
+    <title>Profile Search Limit Group</title>
+    <type>int unsigned</type>
+    <comment>Group id, foreign key from civicrm_group</comment>
+    <add>1.4</add>
+  </field>
+  <foreignKey>
+    <name>limit_listings_group_id</name>
+    <table>civicrm_group</table>
+    <key>id</key>
+    <add>1.4</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>post_URL</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Redirect to URL.</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>add_to_group_id</name>
+    <title>Add Contact To Group</title>
+    <type>int unsigned</type>
+    <comment>foreign key to civicrm_group_id</comment>
+  </field>
+  <foreignKey>
+    <name>add_to_group_id</name>
+    <table>civicrm_group</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>add_captcha</name>
+    <title>Show Captcha On Profile</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Should a CAPTCHA widget be included this Profile form.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>is_map</name>
+    <title>Map Profile</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Do we want to map results from this profile.</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>is_edit_link</name>
+    <title>Show Edit Link?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Should edit link display in profile selector</comment>
+    <add>1.6</add>
+  </field>
+  <field>
+    <name>is_uf_link</name>
+    <title>Show Link to CMS User</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Should we display a link to the website profile in profile selector</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>is_update_dupe</name>
+    <title>Update on Duplicate</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Should we update the contact record if we find a duplicate</comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>cancel_URL</name>
+    <title>Profile Cancel URL</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Redirect to URL when Cancle button clik .</comment>
+    <add>1.4</add>
+  </field>
+  <field>
+    <name>is_cms_user</name>
+    <title>Create CMS User?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Should we create a cms user for this profile </comment>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>notify</name>
+    <title>Notify on Profile Submit</title>
+    <type>text</type>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>is_reserved</name>
+    <title>Profile Is Reserved</title>
+    <type>boolean</type>
+    <comment>Is this group reserved for use by some other CiviCRM functionality?</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>name</name>
+    <title>Profile Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Name of the UF group for directly addressing it in the codebase</comment>
+    <add>3.0</add>
+  </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>4.7</add>
+  </index>
+  <field>
+    <name>created_id</name>
+    <title>Profile Created By</title>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_contact, who created this UF group</comment>
+    <add>3.0</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.0</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>created_date</name>
+    <type>datetime</type>
+    <title>UF Group Created Date</title>
+    <comment>Date and time this UF group was created.</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>is_proximity_search</name>
+    <title>Include Proximity Search?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Should we include proximity search feature in this profile search form?</comment>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>cancel_button_text</name>
+    <title>Cancel Button Text</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Custom Text to display on the Cancel button when used in create or edit mode</comment>
+    <default>NULL</default>
+    <localizable>true</localizable>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>submit_button_text</name>
+    <title>Submit Button Text</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Custom Text to display on the submit button on profile edit/create screens</comment>
+    <default>NULL</default>
+    <localizable>true</localizable>
+    <add>4.7</add>
+  </field>
+</table>

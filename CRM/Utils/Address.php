@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Address Utilities
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Utils_Address {
 
@@ -39,6 +39,9 @@ class CRM_Utils_Address {
    * Format an address basing on the address fields provided.
    * Use Setting's address_format if there's no format specified.
    *
+   * This function is also used to generate a contact's display_name and
+   * sort_name.
+   *
    * @param array $fields
    *   The address fields.
    * @param string $format
@@ -47,9 +50,6 @@ class CRM_Utils_Address {
    *   If true indicates, the address to be built in hcard-microformat standard.
    * @param bool $mailing
    *   If true indicates, the call has been made from mailing label.
-   * @param bool $individualFormat
-   *   If true indicates, the call has been made for the contact of type 'individual'.
-   *
    * @param null $tokenFields
    *
    * @return string
@@ -61,7 +61,6 @@ class CRM_Utils_Address {
     $format = NULL,
     $microformat = FALSE,
     $mailing = FALSE,
-    $individualFormat = FALSE,
     $tokenFields = NULL
   ) {
     static $config = NULL;
@@ -112,20 +111,6 @@ class CRM_Utils_Address {
       }
       else {
         $fields['country'] = mb_convert_case($fields['country'], MB_CASE_UPPER, "UTF-8");
-      }
-    }
-
-    $contactName = CRM_Utils_Array::value('display_name', $fields);
-    if (!$individualFormat) {
-      if (isset($fields['id'])) {
-        $type = CRM_Contact_BAO_Contact::getContactType($fields['id']);
-      }
-      else {
-        $type = 'Individual';
-      }
-
-      if ($type == 'Individual') {
-        $contactName = CRM_Utils_Array::value('addressee_display', $fields);
       }
     }
 
@@ -366,6 +351,7 @@ class CRM_Utils_Address {
       if (is_numeric($value) && ($name == 'state_province' || $name == 'country')) {
         if ($name == 'state_province') {
           $addressFields[$name] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($value);
+          $addressFields[$name . '_name'] = CRM_Core_PseudoConstant::stateProvince($value);
         }
         if ($name == 'country') {
           $addressFields[$name] = CRM_Core_PseudoConstant::countryIsoCode($value);

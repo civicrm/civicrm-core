@@ -1,5 +1,5 @@
 // http://civicrm.org/licensing
-(function($, CRM) {
+(function($, CRM, _) {
   'use strict';
 
   /* jshint validthis: true */
@@ -12,18 +12,22 @@
   function handleUserInputField() {
     var row = $(this).closest('tr');
     var field = $('select[id^=mapper][id$="_1"]', row).val();
+    field = (field === 'world_region') ? 'worldregion_id': field;
     var operator = $('select[id^=operator]', row);
     var op = operator.val();
-    
+
     var patt = /_1$/; // pattern to check if the change event came from field name
     if (field !== null && patt.test(this.id)) {
-      if ($.inArray(field, CRM.searchBuilder.stringFields) >= 0) {
-        // string operators
-        buildOperator(operator, CRM.searchBuilder.stringOperators);
-      } else {
-        // general operators
-        buildOperator(operator, CRM.searchBuilder.generalOperators);
+      // based on data type remove invalid operators e.g. IS EMPTY doesn't work with Boolean type column
+      if ((field in CRM.searchBuilder.fieldTypes) === true) {
+        if (CRM.searchBuilder.fieldTypes[field] == 'Boolean') {
+          CRM.searchBuilder.generalOperators = _.omit(CRM.searchBuilder.generalOperators, ['IS NOT EMPTY', 'IS EMPTY']);
+        }
+        else if (CRM.searchBuilder.fieldTypes[field] == 'String') {
+          CRM.searchBuilder.generalOperators = _.omit(CRM.searchBuilder.generalOperators, ['>', '<', '>=', '<=']);
+        }
       }
+      buildOperator(operator, CRM.searchBuilder.generalOperators);
     }
 
     // These Ops don't get any input field.
@@ -40,14 +44,16 @@
       removeSelect(row);
     }
     else {
-      buildSelect(row, field, op);
+      buildSelect(row, field, op, false);
     }
 
-    if ($.inArray(field, CRM.searchBuilder.dateFields) < 0) {
-      removeDate(row);
+    if ((field in CRM.searchBuilder.fieldTypes) === true &&
+      CRM.searchBuilder.fieldTypes[field] == 'Date'
+    ) {
+      buildDate(row, op);
     }
     else {
-      buildDate(row, op);
+      removeDate(row);
     }
   }
 
@@ -69,8 +75,9 @@
    * Add select list if appropriate for this operation
    * @param row: jQuery object
    * @param field: string
+   * @param skip_fetch: boolean
    */
-  function buildSelect(row, field, op) {
+  function buildSelect(row, field, op, skip_fetch) {
     var multiSelect = '';
     // Operators that will get a single drop down list of choices.
     var dropDownSingleOps = ['=', '!='];
@@ -91,7 +98,13 @@
       .hide()
       .after('<select class="crm-form-' + multiSelect.substr(0, 5) + 'select required" ' + multiSelect + '><option value="">' + ts('Loading') + '...</option></select>');
 
-    fetchOptions(row, field);
+    // Avoid reloading state/county options IF already built, identified by skip_fetch
+    if (skip_fetch) {
+      buildOptions(row, field);
+    }
+    else {
+      fetchOptions(row, field);
+    }
   }
 
   /**
@@ -200,6 +213,33 @@
     }
   }
 
+  /**
+   * Load and build select options for state IF country is chosen OR county options if state is chosen
+   * @param mapper: string
+   * @param value: integer
+   * @param location_type: integer
+   */
+  function chainSelect(mapper, value, location_type) {
+    var apiParams = {
+      sequential: 1,
+      field: (mapper == 'country_id') ?  'state_province' : 'county',
+    };
+    apiParams[mapper] = value;
+    var fieldName = apiParams.field;
+    CRM.api3('address', 'getoptions', apiParams, {
+      success: function(result) {
+        CRM.searchBuilder.fieldOptions[fieldName] = result.count ? result.values : [];
+        $('select[id^=mapper][id$="_1"]').each(function() {
+          var row = $(this).closest('tr');
+          var op = $('select[id^=operator]', row).val();
+          if ($(this).val() === fieldName && location_type === $('select[id^=mapper][id$="_2"]', row).val()) {
+            buildSelect(row, fieldName, op, true);
+          }
+        });
+      }
+    });
+  }
+
   // Initialize display: Hide empty blocks & fields
   var newBlock = CRM.searchBuilder && CRM.searchBuilder.newBlock || 0;
   function initialize() {
@@ -268,6 +308,13 @@
           value = value.join(',');
         }
         $(this).siblings('input').val(value);
+        if (value !== '') {
+          var mapper = $('#' + $(this).siblings('input').attr('id').replace('value_', 'mapper_') + '_1').val();
+          var location_type = $('#' + $(this).siblings('input').attr('id').replace('value_', 'mapper_') + '_2').val();
+          if ($.inArray(mapper, ['state_province', 'country']) > -1) {
+            chainSelect(mapper + '_id', value, location_type);
+          }
+        }
       })
       .on('crmLoad', function() {
         initialize();
@@ -280,7 +327,7 @@
     var initialFields = {}, fetchFields = false;
     $('select[id^=mapper][id$="_1"] option:selected', '#Builder').each(function() {
       var field = $(this).attr('value');
-      if (typeof(CRM.searchBuilder.fieldOptions[field]) == 'string') {
+      if (typeof(CRM.searchBuilder.fieldOptions[field]) == 'string' && CRM.searchBuilder.fieldOptions[field] !== 'yesno') {
         initialFields[field] = [CRM.searchBuilder.fieldOptions[field], 'getoptions', {field: field, sequential: 1}];
         fetchFields = true;
       }
@@ -296,4 +343,4 @@
       $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
     }
   });
-})(cj, CRM);
+})(cj, CRM, CRM._);

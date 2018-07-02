@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Contact_Form_Search_Criteria {
   /**
@@ -158,32 +158,7 @@ class CRM_Contact_Form_Search_Criteria {
     );
 
     $componentModes = CRM_Contact_Form_Search::getModeSelect();
-    $enabledComponents = CRM_Core_Component::getEnabledComponents();
-
-    // unset disabled components that must should have been enabled
-    // to the option be viable
-    if (!array_key_exists('CiviMail', $enabledComponents)) {
-      unset($componentModes['8']);
-    }
-
-    // unset contributions or participants if user does not have
-    // permission on them
-    if (!CRM_Core_Permission::access('CiviContribute')) {
-      unset($componentModes['2']);
-    }
-
-    if (!CRM_Core_Permission::access('CiviEvent')) {
-      unset($componentModes['3']);
-    }
-
-    if (!CRM_Core_Permission::access('CiviMember')) {
-      unset($componentModes['5']);
-    }
-
-    if (!CRM_Core_Permission::check('view all activities')) {
-      unset($componentModes['4']);
-    }
-
+    $form->assign('component_mappings', json_encode(CRM_Contact_Form_Search::getModeToComponentMapping()));
     if (count($componentModes) > 1) {
       $form->add('select',
         'component_mode',
@@ -198,8 +173,8 @@ class CRM_Contact_Form_Search_Criteria {
       'operator',
       ts('Search Operator'),
       array(
-        'AND' => ts('AND'),
-        'OR' => ts('OR'),
+        CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND => ts('AND'),
+        CRM_Contact_BAO_Query::SEARCH_OPERATOR_OR => ts('OR'),
       ),
       array('allowClear' => FALSE)
     );
@@ -355,7 +330,7 @@ class CRM_Contact_Form_Search_Criteria {
     }
 
     // extend addresses with proximity search
-    if (!empty($config->geocodeMethod)) {
+    if (CRM_Utils_GeocodeProvider::getUsableClassName()) {
       $form->addElement('text', 'prox_distance', ts('Find contacts within'), array('class' => 'six'));
       $form->addElement('select', 'prox_distance_unit', NULL, array(
         'miles' => ts('Miles'),
@@ -396,9 +371,9 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('text', 'changed_by', ts('Modified By'), NULL);
 
     $dates = array(1 => ts('Added'), 2 => ts('Modified'));
-    $form->addRadio('log_date', NULL, $dates, array('allowClear' => TRUE), '<br />');
+    $form->addRadio('log_date', NULL, $dates, array('allowClear' => TRUE));
 
-    CRM_Core_Form_Date::buildDateRange($form, 'log_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
+    CRM_Core_Form_Date::buildDateRange($form, 'log_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
   }
 
   /**
@@ -416,7 +391,7 @@ class CRM_Contact_Form_Search_Criteria {
 
     $allRelationshipType = array();
     $allRelationshipType = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, NULL, TRUE);
-    $form->add('select', 'relation_type_id', ts('Relationship Type'), array('' => ts('- select -')) + $allRelationshipType, FALSE, array('class' => 'crm-select2'));
+    $form->add('select', 'relation_type_id', ts('Relationship Type'), array('' => ts('- select -')) + $allRelationshipType, FALSE, array('multiple' => TRUE, 'class' => 'crm-select2'));
     $form->addElement('text', 'relation_target_name', ts('Target Contact'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
     // relation status
     $relStatusOption = array(ts('Active'), ts('Inactive'), ts('All'));

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
 
@@ -526,9 +526,9 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
       if ($isMembershipType) {
         $graphRows['value'] = $display;
         $chartInfo = array(
-          'legend' => 'Membership Summary',
-          'xname' => 'Member Since / Member Type',
-          'yname' => 'Fees',
+          'legend' => ts('Membership Summary'),
+          'xname' => ts('Member Since / Member Type'),
+          'yname' => ts('Fees'),
         );
         CRM_Utils_OpenFlashChart::reportChart($graphRows, $this->_params['charts'], $interval, $chartInfo);
       }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -60,37 +60,37 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       $group->title = $params['title'];
     }
 
-    if (in_array($params['extends'][0],
-      array(
-        'ParticipantRole',
-        'ParticipantEventName',
-        'ParticipantEventType',
-      )
-    )) {
+    $extends = CRM_Utils_Array::value('extends', $params, []);
+    $extendsEntity = CRM_Utils_Array::value(0, $extends);
+
+    $participantEntities = array(
+      'ParticipantRole',
+      'ParticipantEventName',
+      'ParticipantEventType',
+    );
+
+    if (in_array($extendsEntity, $participantEntities)) {
       $group->extends = 'Participant';
     }
     else {
-      $group->extends = $params['extends'][0];
+      $group->extends = $extendsEntity;
     }
 
     $group->extends_entity_column_id = 'null';
-    if (
-      $params['extends'][0] == 'ParticipantRole' ||
-      $params['extends'][0] == 'ParticipantEventName' ||
-      $params['extends'][0] == 'ParticipantEventType'
+    if (in_array($extendsEntity, $participantEntities)
     ) {
-      $group->extends_entity_column_id = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $params['extends'][0], 'value', 'name');
+      $group->extends_entity_column_id = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $extendsEntity, 'value', 'name');
     }
 
     //this is format when form get submit.
-    $extendsChildType = CRM_Utils_Array::value(1, $params['extends']);
+    $extendsChildType = CRM_Utils_Array::value(1, $extends);
     //lets allow user to pass direct child type value, CRM-6893
     if (!empty($params['extends_entity_column_value'])) {
       $extendsChildType = $params['extends_entity_column_value'];
     }
     if (!CRM_Utils_System::isNull($extendsChildType)) {
       $extendsChildType = implode(CRM_Core_DAO::VALUE_SEPARATOR, $extendsChildType);
-      if (CRM_Utils_Array::value(0, $params['extends']) == 'Relationship') {
+      if (CRM_Utils_Array::value(0, $extends) == 'Relationship') {
         $extendsChildType = str_replace(array('_a_b', '_b_a'), array(
           '',
           '',
@@ -128,31 +128,32 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       $fields[] = 'is_public';
     }
     foreach ($fields as $field) {
-      if (isset($params[$field]) || $field == 'is_multiple') {
-        $group->$field = CRM_Utils_Array::value($field, $params, FALSE);
+      if (isset($params[$field])) {
+        $group->$field = $params[$field];
       }
     }
     $group->max_multiple = isset($params['is_multiple']) ? (isset($params['max_multiple']) &&
       $params['max_multiple'] >= '0'
     ) ? $params['max_multiple'] : 'null' : 'null';
 
-    $tableName = $oldTableName = NULL;
+    $tableName = $tableNameNeedingIndexUpdate = NULL;
     if (isset($params['id'])) {
       $group->id = $params['id'];
-      //check whether custom group was changed from single-valued to multiple-valued
-      $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
-        $params['id'],
-        'is_multiple'
-      );
 
-      if ((!empty($params['is_multiple']) || $isMultiple) &&
-        ($params['is_multiple'] != $isMultiple)
-      ) {
-        $oldTableName = CRM_Core_DAO::getFieldValue(
-          'CRM_Core_DAO_CustomGroup',
+      if (isset($params['is_multiple'])) {
+        //check whether custom group was changed from single-valued to multiple-valued
+        $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
           $params['id'],
-          'table_name'
+          'is_multiple'
         );
+
+        if ($params['is_multiple'] != $isMultiple) {
+          $tableNameNeedingIndexUpdate = CRM_Core_DAO::getFieldValue(
+            'CRM_Core_DAO_CustomGroup',
+            $params['id'],
+            'table_name'
+          );
+        }
       }
     }
     else {
@@ -189,7 +190,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $group->save();
     if (!isset($params['id'])) {
       if (!isset($params['table_name'])) {
-        $munged_title = strtolower(CRM_Utils_String::munge($group->title, '_', 42));
+        $munged_title = strtolower(CRM_Utils_String::munge($group->title, '_', 13));
         $tableName = "civicrm_value_{$munged_title}_{$group->id}";
       }
       $group->table_name = $tableName;
@@ -202,8 +203,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       // now create the table associated with this group
       self::createTable($group);
     }
-    elseif ($oldTableName) {
-      CRM_Core_BAO_SchemaHandler::changeUniqueToIndex($oldTableName, CRM_Utils_Array::value('is_multiple', $params));
+    elseif ($tableNameNeedingIndexUpdate) {
+      CRM_Core_BAO_SchemaHandler::changeUniqueToIndex($tableNameNeedingIndexUpdate, CRM_Utils_Array::value('is_multiple', $params));
     }
 
     if (CRM_Utils_Array::value('overrideFKConstraint', $params) == 1) {
@@ -211,7 +212,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         $params['id'],
         'table_name'
       );
-      CRM_Core_BAO_SchemaHandler::changeFKConstraint($table, self::mapTableName($params['extends'][0]));
+      CRM_Core_BAO_SchemaHandler::changeFKConstraint($table, self::mapTableName($extendsEntity));
     }
     $transaction->commit();
 
@@ -1259,6 +1260,10 @@ ORDER BY civicrm_custom_group.weight,
    */
   private static function _addWhereAdd(&$customGroupDAO, $entityType, $entityID = NULL, $allSubtypes = FALSE) {
     $addSubtypeClause = FALSE;
+    // This function isn't really accessible with user data but since the string
+    // is not passed as a param to the query CRM_Core_DAO::escapeString seems like a harmless
+    // precaution.
+    $entityType = CRM_Core_DAO::escapeString($entityType);
 
     switch ($entityType) {
       case 'Contact':
@@ -1281,13 +1286,7 @@ ORDER BY civicrm_custom_group.weight,
         }
         break;
 
-      case 'Case':
-      case 'Location':
-      case 'Address':
-      case 'Activity':
-      case 'Contribution':
-      case 'Membership':
-      case 'Participant':
+      default:
         $customGroupDAO->whereAdd("extends IN ('$entityType')");
         break;
     }
@@ -1388,7 +1387,6 @@ ORDER BY civicrm_custom_group.weight,
 
         switch ($field['html_type']) {
           case 'Multi-Select':
-          case 'AdvMulti-Select':
           case 'CheckBox':
             $defaults[$elementName] = array();
             $customOption = CRM_Core_BAO_CustomOption::getCustomOption($field['id'], $inactiveNeeded);
@@ -1508,7 +1506,6 @@ ORDER BY civicrm_custom_group.weight,
         //added Multi-Select option in the below if-statement
         if ($field['html_type'] == 'CheckBox' ||
           $field['html_type'] == 'Radio' ||
-          $field['html_type'] == 'AdvMulti-Select' ||
           $field['html_type'] == 'Multi-Select'
         ) {
           $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = 'NULL';
@@ -1544,10 +1541,6 @@ ORDER BY civicrm_custom_group.weight,
             }
             break;
 
-          //added for Advanced Multi-Select
-
-          case 'AdvMulti-Select':
-            //added for Multi-Select
           case 'Multi-Select':
             if (!empty($v)) {
               $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = CRM_Core_DAO::VALUE_SEPARATOR
@@ -1665,7 +1658,6 @@ ORDER BY civicrm_custom_group.weight,
     $htmlType = array(
       'CheckBox',
       'Multi-Select',
-      'AdvMulti-Select',
       'Select',
       'Radio',
     );
@@ -1686,7 +1678,6 @@ ORDER BY civicrm_custom_group.weight,
             $valid = CRM_Core_BAO_CustomValue::typecheck($field['data_type'], $value);
           }
           if ($field['html_type'] == 'CheckBox' ||
-            $field['html_type'] == 'AdvMulti-Select' ||
             $field['html_type'] == 'Multi-Select'
           ) {
             $value = str_replace("|", ",", $value);
@@ -1726,19 +1717,7 @@ ORDER BY civicrm_custom_group.weight,
             }
           }
           elseif ($field['data_type'] == 'Date') {
-            if (!empty($value)) {
-              $time = NULL;
-              if (!empty($field['time_format'])) {
-                $time = CRM_Utils_Request::retrieve($fieldName .
-                  '_time', 'String', $form, FALSE, NULL, 'GET');
-              }
-              list($value, $time) = CRM_Utils_Date::setDateDefaults($value .
-                ' ' . $time);
-              if (!empty($field['time_format'])) {
-                $customValue[$fieldName . '_time'] = $time;
-              }
-            }
-            $valid = TRUE;
+            $valid = CRM_Utils_Rule::date($value);
           }
 
           if ($valid) {
@@ -1961,7 +1940,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
   /**
    * Build custom data view.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Core_Form|CRM_Core_Page $form
    *   Page object.
    * @param array $groupTree
    * @param bool $returnCount
@@ -1972,6 +1951,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @param int $entityId
    *
    * @return array|int
+   * @throws \Exception
    */
   public static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL, $entityId = NULL) {
     $details = array();

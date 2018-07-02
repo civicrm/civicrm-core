@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -115,7 +115,6 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
 
       if ($fieldDefaults['html_type'] == 'CheckBox'
         || $fieldDefaults['html_type'] == 'Multi-Select'
-        || $fieldDefaults['html_type'] == 'AdvMulti-Select'
       ) {
         if (!empty($fieldDefaults['default_value'])) {
           $defaultCheckValues = explode(CRM_Core_DAO::VALUE_SEPARATOR,
@@ -181,6 +180,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
 
       $this->add('text', 'value', ts('Option Value'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'), TRUE);
 
+      $this->add('textarea', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'description'));
       // weight
       $this->add('text', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'weight'), TRUE);
       $this->addRule('weight', ts('is a numeric field'), 'numeric');
@@ -406,6 +406,7 @@ SELECT count(*)
     $customOption->label = $params['label'];
     $customOption->name = CRM_Utils_String::titleToVar($params['label']);
     $customOption->weight = $params['weight'];
+    $customOption->description = $params['description'];
     $customOption->value = $params['value'];
     $customOption->is_active = CRM_Utils_Array::value('is_active', $params, FALSE);
 
@@ -432,7 +433,6 @@ SELECT count(*)
       $customField->find(TRUE) &&
       (
         $customField->html_type == 'CheckBox' ||
-        $customField->html_type == 'AdvMulti-Select' ||
         $customField->html_type == 'Multi-Select'
       )
     ) {

@@ -2436,16 +2436,29 @@ class DB_DataObject extends DB_DataObject_Overload
         $t= explode(' ',microtime());
         $_DB_DATAOBJECT['QUERYENDTIME'] = $time = $t[0]+$t[1];
 
+      $maxTries = defined('CIVICRM_DEADLOCK_RETRIES') ? CIVICRM_DEADLOCK_RETRIES : 3;
+      for ($tries = 0;$tries < $maxTries;$tries++) {
+        if ($_DB_driver == 'DB') {
+          try {
+            $result = $DB->query($string);
+          }
+          catch (PEAR_Exception $e) {
+            // CRM-21489 If we have caught a DB lock - let it go around the loop until our tries limit is hit.
+            // else rethrow the exception. The 2 locks we are looking at are mysql code 1205 (lock) and
+            // 1213 (deadlock).
+            $dbErrorMessage = $e->getCause()->getUserInfo();
+            if (!stristr($dbErrorMessage, 'nativecode=1205') && !stristr($dbErrorMessage, 'nativecode=1213')) {
+              throw $e;
+            }
+            $message = (stristr($dbErrorMessage, 'nativecode=1213') ? 'Database deadlock encountered' : 'Database lock encountered');
+            if (($tries + 1) === $maxTries) {
+              throw new CRM_Core_Exception($message, 0, array('sql' => $string, 'trace' => $e->getTrace()));
+            }
+            CRM_Core_Error::debug_log_message("Retrying after $message hit on attempt " . ($tries + 1) . ' at query : ' . $string);
+            continue;
+          }
 
-        for ($tries = 0;$tries < 3;$tries++) {
-
-            if ($_DB_driver == 'DB') {
-                if ($tries) {
-                  CRM_Core_Error::debug_log_message('Attempt: ' . $tries + 1 . ' at query : ' . $string);
-                }
-                $result = $DB->query($string);
-
-            } else {
+        } else {
                 switch (strtolower(substr(trim($string),0,6))) {
 
                     case 'insert':
@@ -2460,7 +2473,7 @@ class DB_DataObject extends DB_DataObject_Overload
                 }
             }
 
-            // see if we got a failure.. - try again a few times..
+            // See CRM-21489 for why I believe this is never hit.
             if (!is_a($result,'PEAR_Error')) {
                 break;
             }
@@ -2470,7 +2483,6 @@ class DB_DataObject extends DB_DataObject_Overload
             sleep(1); // wait before retyring..
             $DB->connect($DB->dsn);
         }
-
 
         if (is_a($result,'PEAR_Error')) {
             if (!empty($_DB_DATAOBJECT['CONFIG']['debug'])) {

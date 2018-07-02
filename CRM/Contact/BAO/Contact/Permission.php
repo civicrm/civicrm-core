@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Contact_BAO_Contact_Permission {
 
@@ -199,9 +199,12 @@ WHERE contact_a.id = %1 AND $permission
     //   that somebody might flush the cache away from under our feet,
     //   but the alternative would be a SQL call every time this is called,
     //   and a complete rebuild if the result was an empty set...
-    static $_processed = array(
-      CRM_Core_Permission::VIEW => array(),
-      CRM_Core_Permission::EDIT => array());
+    if (!isset(Civi::$statics[__CLASS__]['processed'])) {
+      Civi::$statics[__CLASS__]['processed'] = [
+        CRM_Core_Permission::VIEW => [],
+        CRM_Core_Permission::EDIT => [],
+      ];
+    }
 
     if ($type == CRM_Core_Permission::VIEW) {
       $operationClause = " operation IN ( 'Edit', 'View' ) ";
@@ -215,7 +218,7 @@ WHERE contact_a.id = %1 AND $permission
 
     if (!$force) {
       // skip if already calculated
-      if (!empty($_processed[$type][$userID])) {
+      if (!empty(Civi::$statics[__CLASS__]['processed'][$type][$userID])) {
         return;
       }
 
@@ -228,7 +231,7 @@ AND    $operationClause
 ";
       $count = CRM_Core_DAO::singleValueQuery($sql, $queryParams);
       if ($count > 0) {
-        $_processed[$type][$userID] = 1;
+        Civi::$statics[__CLASS__]['processed'][$type][$userID] = 1;
         return;
       }
     }
@@ -257,7 +260,7 @@ AND ac.user_id IS NULL
         CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation ) VALUES(%1, %1, '{$operation}')", $queryParams);
       }
     }
-    $_processed[$type][$userID] = 1;
+    Civi::$statics[__CLASS__]['processed'][$type][$userID] = 1;
   }
 
   /**

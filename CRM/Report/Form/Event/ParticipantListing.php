@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2018                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
 
@@ -115,27 +115,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'title' => ts('Contact Subtype'),
           ),
         ),
-        'filters' => array(
-          'sort_name' => array(
-            'title' => ts('Participant Name'),
-            'operator' => 'like',
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-        ),
+        'filters' => CRM_Report_Form::getBasicContactFilters(),
       ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
@@ -533,16 +513,12 @@ ORDER BY  cv.label
              LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                     ON ({$this->_aliases['civicrm_participant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  )
              {$this->_aclFrom}
-             LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                    ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
-                       {$this->_aliases['civicrm_address']}.is_primary = 1
-             LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']}
-                    ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                       {$this->_aliases['civicrm_email']}.is_primary = 1)
-             LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
-                     ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                         {$this->_aliases['civicrm_phone']}.is_primary = 1
       ";
+
+    $this->joinAddressFromContact();
+    $this->joinPhoneFromContact();
+    $this->joinEmailFromContact();
+
     if ($this->_contribField) {
       $this->_from .= "
              LEFT JOIN civicrm_participant_payment pp

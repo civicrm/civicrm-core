@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -91,18 +91,22 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    */
   public function buildQuickForm() {
     $fields = self::fields();
-    // Get fields of type date
-    // FIXME: This is a hack until our fields contain this meta-data
-    $dateFields = array();
-    $stringFields = array();
     $searchByLabelFields = array();
+    // This array contain list of available fields and their corresponding data type,
+    //  later assigned as json string, to be used to filter list of mysql operators
+    $fieldNameTypes = [];
+    $dataType = [
+      CRM_Utils_Type::T_STRING => 'String',
+      CRM_Utils_Type::T_TEXT => 'String',
+      CRM_Utils_Type::T_LONGTEXT => 'String',
+      CRM_Utils_Type::T_BOOLEAN => 'Boolean',
+      CRM_Utils_Type::T_DATE => 'Date',
+      CRM_Utils_Type::T_TIMESTAMP => 'Date',
+    ];
     foreach ($fields as $name => $field) {
-      if (strpos($name, '_date') || CRM_Utils_Array::value('data_type', $field) == 'Date') {
-        $dateFields[] = $name;
-      }
-      // it's necessary to know which of the fields are from string data type
-      if (isset($field['type']) && $field['type'] === CRM_Utils_Type::T_STRING) {
-        $stringFields[] = $name;
+      // Assign date type to respective field name, which will be later used to modify operator list
+      if (isset($field['type']) && array_key_exists($field['type'], $dataType)) {
+        $fieldNameTypes[$name] = $dataType[$field['type']];
       }
       // it's necessary to know which of the fields are searchable by label
       if (isset($field['searchByLabel']) && $field['searchByLabel']) {
@@ -116,12 +120,10 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         'searchBuilder' => array(
           // Index of newly added/expanded block (1-based index)
           'newBlock' => $this->get('newBlock'),
-          'dateFields' => $dateFields,
           'fieldOptions' => self::fieldOptions(),
-          'stringFields' => $stringFields,
           'searchByLabelFields' => $searchByLabelFields,
+          'fieldTypes' => $fieldNameTypes,
           'generalOperators' => array('' => ts('-operator-')) + CRM_Core_SelectValues::getSearchBuilderOperators(),
-          'stringOperators' => array('' => ts('-operator-')) + CRM_Core_SelectValues::getSearchBuilderOperators(CRM_Utils_Type::T_STRING),
         ),
       ));
     //get the saved search mapping id

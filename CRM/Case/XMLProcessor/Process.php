@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   /**
@@ -237,6 +237,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
         'is_active' => 1,
         'case_id' => $params['caseID'],
         'start_date' => date("Ymd"),
+        'end_date' => CRM_Utils_Array::value('relationship_end_date', $params),
       );
 
       if (!$this->createRelationship($relationshipParams)) {

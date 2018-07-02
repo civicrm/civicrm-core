@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Core_OptionGroup {
   static $_values = array();
@@ -342,7 +342,7 @@ WHERE  v.option_group_id = g.id
    * @return null
    */
   public static function getLabel($groupName, $value, $onlyActiveValue = TRUE) {
-    Civi::log()->warning('Deprecated function, use CRM_Core_PseudoConstant::getLabel', array('civi.tag' => 'deprecated'));
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_PseudoConstant::getLabel');
     if (empty($groupName) ||
       empty($value)
     ) {
@@ -396,7 +396,7 @@ WHERE  v.option_group_id = g.id
       return NULL;
     }
 
-    Civi::log()->warning('Deprecated function, use CRM_Core_PseudoConstant::getKey', array('civi.tag' => 'deprecated'));
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_PseudoConstant::getKey');
 
     $query = "
 SELECT  v.label as label ,v.{$valueField} as value
@@ -676,6 +676,12 @@ WHERE  v.option_group_id = g.id
     );
   }
 
+  /**
+   * Flush all the places where option values are cached.
+   *
+   * Note that this is called from CRM_Core_PseudoConstant::flush() so we should resist
+   * the intuitive urge to flush that class.
+   */
   public static function flushAll() {
     self::$_values = array();
     self::$_cache = array();

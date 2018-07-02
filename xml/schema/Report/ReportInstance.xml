@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Report</base>
+  <class>ReportInstance</class>
+  <name>civicrm_report_instance</name>
+  <comment>Users can save their report instance and put in a cron tab etc.</comment>
+  <add>2.2</add>
+  <field>
+    <name>id</name>
+    <title>Report Instance ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Report Instance ID</comment>
+    <add>2.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>false</autoincrement>
+  </primaryKey>
+  <field>
+    <name>domain_id</name>
+    <title>Report Instance Domain ID</title>
+    <type>int unsigned</type>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <required>true</required>
+    <comment>Which Domain is this instance for</comment>
+    <add>3.1</add>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <add>3.1</add>
+  </foreignKey>
+  <field>
+    <name>title</name>
+    <title>Report Instance Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Report Instance Title.</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>report_id</name>
+    <title>Report template ID</title>
+    <type>varchar</type>
+    <length>512</length>
+    <required>true</required>
+    <comment>FK to civicrm_option_value for the report template</comment>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>name</name>
+    <title>Report instance Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>when combined with report_id/template uniquely identifies the instance</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>args</name>
+    <title>Report Instance Arguments</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>arguments that are passed in the url when invoking the instance</comment>
+    <add>3.2</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>description</name>
+    <title>Report Instance description</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Report Instance description.</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>permission</name>
+    <title>Report Instance Permissions</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>permission required to be able to run this instance</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>grouprole</name>
+    <title>Report Instance Assigned to Roles</title>
+    <type>varchar</type>
+    <length>1024</length>
+    <comment>role required to be able to run this instance</comment>
+    <add>4.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>form_values</name>
+    <title>Submitted Form Values</title>
+    <type>text</type>
+    <import>true</import>
+    <comment>Submitted form values for this report</comment>
+    <serialize>PHP</serialize>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Report Instance is Active</title>
+    <type>boolean</type>
+    <comment>Is this entry active?</comment>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>created_id</name>
+    <type>int unsigned</type>
+    <title>Report Instance Created By</title>
+    <comment>FK to contact table.</comment>
+    <add>4.6</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.6</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>owner_id</name>
+    <type>int unsigned</type>
+    <title>Report Instance Owned By</title>
+    <comment>FK to contact table.</comment>
+    <add>4.6</add>
+  </field>
+  <foreignKey>
+    <name>owner_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.6</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>email_subject</name>
+    <title>Report Instance email Subject</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Subject of email</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>email_to</name>
+    <title>Email Report Instance To</title>
+    <type>text</type>
+    <comment>comma-separated list of email addresses to send the report to</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>email_cc</name>
+    <title>cc Email Report Instance To</title>
+    <type>text</type>
+    <comment>comma-separated list of email addresses to send the report to</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>header</name>
+    <title>Report Instance Header</title>
+    <type>text</type>
+    <comment>comma-separated list of email addresses to send the report to</comment>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
+    </html>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>footer</name>
+    <title>Report Instance Footer</title>
+    <type>text</type>
+    <comment>comma-separated list of email addresses to send the report to</comment>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
+    </html>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>navigation_id</name>
+    <title>Navigation ID</title>
+    <type>int unsigned</type>
+    <import>true</import>
+    <comment>FK to navigation ID</comment>
+    <add>3.0</add>
+  </field>
+  <foreignKey>
+    <name>navigation_id</name>
+    <table>civicrm_navigation</table>
+    <key>id</key>
+    <add>3.0</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>drilldown_id</name>
+    <title>Drilldown Report ID</title>
+    <type>int unsigned</type>
+    <import>true</import>
+    <comment>FK to instance ID drilldown to</comment>
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>drilldown_id</name>
+    <table>civicrm_report_instance</table>
+    <key>id</key>
+    <add>4.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>is_reserved</name>
+    <title>Instance is Reserved</title>
+    <type>boolean</type>
+    <default>0</default>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <add>4.2</add>
+  </field>
+</table>

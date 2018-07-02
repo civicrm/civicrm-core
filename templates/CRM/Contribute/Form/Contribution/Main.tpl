@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -91,14 +91,14 @@
   {elseif !empty($ccid)}
     {if $lineItem && $priceSetID && !$is_quick_config}
       <div class="header-dark">
-        {ts}Contribution Information{/ts}
+        {ts}Contribution Information{/ts}{if $display_name} &ndash; {$display_name}{/if}
       </div>
       {assign var="totalAmount" value=$pendingAmount}
       {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
     {else}
       <div class="display-block">
         <td class="label">{$form.total_amount.label}</td>
-        <td><span>{$form.total_amount.html|crmMoney}&nbsp;&nbsp;{if $taxAmount}(includes {$taxTerm} of {$taxAmount|crmMoney}){/if}</span></td>
+        <td><span>{$form.total_amount.html|crmMoney}&nbsp;&nbsp;{if $taxAmount}{ts 1=$taxTerm 2=$taxAmount|crmMoney}(includes %1 of %2){/ts}{/if}</span></td>
       </div>
     {/if}
   {else}
@@ -355,7 +355,7 @@
     }
     else {
       cj('#recurHelp').hide();
-      cj('#amount_sum_label').text('{/literal}{ts escape='js'}Total amount{/ts}{literal}');
+      cj('#amount_sum_label').text('{/literal}{ts escape='js'}Total Amount{/ts}{literal}');
     }
   }
 

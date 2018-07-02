@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
@@ -474,6 +474,13 @@ function _civicrm_api3_generic_getoptions_spec(&$params, $apiRequest) {
         $params['field']['options'][$name] = CRM_Utils_Array::value('title', $field, $name);
       }
     }
+  }
+
+  $entityName = _civicrm_api_get_entity_name_from_camel($apiRequest['entity']);
+  $getOptionsSpecFunction = '_civicrm_api3_' . $entityName . '_getoptions_spec';
+
+  if (function_exists($getOptionsSpecFunction)) {
+    $getOptionsSpecFunction($params);
   }
 }
 

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright U.S. PIRG Education Fund (c) 2007                        |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -32,6 +32,28 @@
  * @copyright U.S. PIRG 2007
  */
 class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting {
+
+  /**
+   * Add Dashboard.
+   *
+   * @param array $params
+   *   Values.
+   *
+   *
+   * @return object
+   */
+  public static function create($params) {
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'GroupNesting', CRM_Utils_Array::value('id', $params), $params);
+    $dao = new CRM_Contact_BAO_GroupNesting();
+    $dao->copyValues($params);
+    if (empty($params['id'])) {
+      $dao->find(TRUE);
+    }
+    $dao->save();
+    CRM_Utils_Hook::post($hook, 'GroupNesting', $dao->id, $dao);
+    return $dao;
+  }
 
   /**
    * Adds a new group nesting record.

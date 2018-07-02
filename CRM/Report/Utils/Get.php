@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -113,6 +113,7 @@ class CRM_Report_Utils_Get {
       case 'ew':
       case 'nhas':
       case 'like':
+      case 'eq':
       case 'neq':
         $value = self::getTypedValue("{$fieldName}_value", CRM_Utils_Array::value('type', $field));
         if ($value !== NULL) {

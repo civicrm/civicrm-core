@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -106,7 +106,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
 
     // remove file type field and then limit fields
     $suppressFields = FALSE;
-    $removehtmlTypes = array('File', 'Autocomplete-Select');
+    $removehtmlTypes = array('File');
     foreach ($this->_fields as $name => $field) {
       if (CRM_Core_BAO_CustomField::getKeyID($name) &&
         in_array($this->_fields[$name]['html_type'], $removehtmlTypes)
@@ -187,7 +187,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     // $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields) {
-      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Update multiple activities."), ts('Some Fields Excluded'), 'info');
+      CRM_Core_Session::setStatus(ts("File type field(s) in the selected profile are not supported for Update multiple activities."), ts('Some Fields Excluded'), 'info');
     }
 
     $this->addDefaultButtons(ts('Update Activities'));
@@ -242,6 +242,9 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
         $activityId = civicrm_api3('activity', 'create', $value);
 
         // @todo this would be done by the api call above if the parames were passed through.
+        // @todo extract submit functions &
+        // extend CRM_Event_Form_Task_BatchTest::testSubmit with a data provider to test
+        // handling of custom data, specifically checkbox fields.
         if (!empty($value['custom']) &&
           is_array($value['custom'])
         ) {

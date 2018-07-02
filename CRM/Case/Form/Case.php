@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -124,10 +124,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
-      $this->_activityTypeId = CRM_Core_OptionGroup::getValue('activity_type',
-        'Open Case',
-        'name'
-      );
+      $this->_activityTypeId = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
       if (!$this->_activityTypeId) {
         CRM_Core_Error::fatal(ts('The Open Case activity type is missing or disabled. Please have your site administrator check Administer > Option Lists > Activity Types for the CiviCase component.'));
       }
@@ -207,9 +204,9 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     $this->assign('multiClient', $isMultiClient);
 
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
-      $title = 'Delete';
+      $title = ts('Delete');
       if ($this->_action & CRM_Core_Action::RENEW) {
-        $title = 'Restore';
+        $title = ts('Restore');
       }
       $this->addButtons(array(
           array(
@@ -357,7 +354,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       $params['subject'] = $params['activity_subject'];
     }
     $caseObj = CRM_Case_BAO_Case::create($params);
-    $params['case_id'] = $caseObj->id;
+    $this->_caseId = $params['case_id'] = $caseObj->id;
     // unset any ids, custom data
     unset($params['id'], $params['custom']);
 

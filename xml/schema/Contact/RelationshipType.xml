@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contact</base>
+  <class>RelationshipType</class>
+  <name>civicrm_relationship_type</name>
+  <comment>Relationship types s/b structured with contact_a as the 'subject/child' contact and contact_b as the 'object/parent' contact (e.g. Individual A is Employee of Org B).</comment>
+  <add>1.1</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Relationship Type ID</title>
+    <required>true</required>
+    <comment>Primary key</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name_a_b</name>
+    <type>varchar</type>
+    <title>Relationship Type Name A to B</title>
+    <length>64</length>
+    <comment>name for relationship of contact_a to contact_b.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>label_a_b</name>
+    <type>varchar</type>
+    <title>Relationship Type Label A to B</title>
+    <length>64</length>
+    <comment>label for relationship of contact_a to contact_b.</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>3.0</add>
+    <localizable>true</localizable>
+  </field>
+  <field>
+    <name>name_b_a</name>
+    <type>varchar</type>
+    <title>Relationship Type Name B to A</title>
+    <length>64</length>
+    <comment>Optional name for relationship of contact_b to contact_a.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>label_b_a</name>
+    <type>varchar</type>
+    <title>Relationship Type Label B to A</title>
+    <length>64</length>
+    <comment>Optional label for relationship of contact_b to contact_a.</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>3.0</add>
+    <localizable>true</localizable>
+  </field>
+  <field>
+    <name>description</name>
+    <type>varchar</type>
+    <title>Relationship Description</title>
+    <length>255</length>
+    <comment>Optional verbose description of the relationship type.</comment>
+    <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+    <localizable>true</localizable>
+  </field>
+  <field>
+    <name>contact_type_a</name>
+    <title>Contact Type for Contact A</title>
+    <type>varchar</type>
+    <length>12</length>
+    <comment>If defined, contact_a in a relationship of this type must be a specific contact_type.</comment>
+    <pseudoconstant>
+      <table>civicrm_contact_type</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>label</labelColumn>
+      <condition>parent_id IS NULL</condition>
+    </pseudoconstant>
+    <add>1.1</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>contact_type_b</name>
+    <title>Contact Type for Contact B</title>
+    <type>varchar</type>
+    <length>12</length>
+    <comment>If defined, contact_b in a relationship of this type must be a specific contact_type.</comment>
+    <pseudoconstant>
+      <table>civicrm_contact_type</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>label</labelColumn>
+      <condition>parent_id IS NULL</condition>
+    </pseudoconstant>
+    <add>1.1</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>contact_sub_type_a</name>
+    <title>Contact Subtype A</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>If defined, contact_sub_type_a in a relationship of this type must be a specific contact_sub_type.
+    </comment>
+    <add>3.1</add>
+    <html>
+      <type>Select</type>
+    </html>
+    <pseudoconstant>
+      <table>civicrm_contact_type</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>label</labelColumn>
+      <condition>parent_id IS NOT NULL</condition>
+    </pseudoconstant>
+  </field>
+  <field>
+    <name>contact_sub_type_b</name>
+    <title>Contact Subtype B</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>If defined, contact_sub_type_b in a relationship of this type must be a specific contact_sub_type.
+    </comment>
+    <add>3.1</add>
+    <html>
+      <type>Select</type>
+    </html>
+    <pseudoconstant>
+      <table>civicrm_contact_type</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>label</labelColumn>
+      <condition>parent_id IS NOT NULL</condition>
+    </pseudoconstant>
+  </field>
+  <field>
+    <name>is_reserved</name>
+    <type>boolean</type>
+    <title>Relationship Type is Reserved</title>
+    <comment>Is this relationship type a predefined system type (can not be changed or de-activated)?</comment>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Relationship Type is Active</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this relationship type currently active (i.e. can be used when creating or editing relationships)?
+    </comment>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>UI_name_a_b</name>
+    <fieldName>name_a_b</fieldName>
+    <unique>true</unique>
+    <add>2.1</add>
+  </index>
+  <index>
+    <name>UI_name_b_a</name>
+    <fieldName>name_b_a</fieldName>
+    <unique>true</unique>
+    <add>2.1</add>
+  </index>
+</table>

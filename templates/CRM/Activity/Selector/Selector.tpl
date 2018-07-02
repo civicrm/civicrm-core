@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,9 +37,9 @@
           <td class="crm-contact-form-block-activity_type_exclude_filter_id crm-inline-edit-field">
             {$form.activity_type_exclude_filter_id.label}<br /> {$form.activity_type_exclude_filter_id.html|crmAddClass:medium}
           </td>
-          {include file="CRM/Core/DateRange.tpl" fieldName="activity_date" from='_low' to='_high' label='Date'}
+          {include file="CRM/Core/DateRange.tpl" fieldName="activity_date" from='_low' to='_high' label='<label>Date</label>'}
           <td class="crm-contact-form-block-activity_status_filter_id crm-inline-edit-field">
-            {ts}Status{/ts}<br /> {$form.status_id.html|crmAddClass:medium}
+            <label>{ts}Status{/ts}</label><br /> {$form.status_id.html|crmAddClass:medium}
           </td>
         </tr>
       </table>

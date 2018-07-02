@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>ActionSchedule</class>
+  <name>civicrm_action_schedule</name>
+  <comment>Table to store the reminders.</comment>
+  <add>3.4</add>
+  <field>
+    <name>id</name>
+    <title>Action Schedule ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>3.4</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>name</name>
+    <title>Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Name of the action(reminder)</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>title</name>
+    <title>Title</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Title of the action(reminder)</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>recipient</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Recipient</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>limit_to</name>
+    <type>boolean</type>
+    <comment>Is this the recipient criteria limited to OR in addition to?</comment>
+    <add>4.4</add>
+  </field>
+  <field>
+    <name>entity_value</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Entity value</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>entity_status</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Entity status</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>start_action_offset</name>
+    <type>int unsigned</type>
+    <comment>Reminder Interval.</comment>
+    <default>0</default>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>start_action_unit</name>
+    <type>varchar</type>
+    <length>8</length>
+    <comment>Time units for reminder.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getRecurringFrequencyUnits</callback>
+    </pseudoconstant>
+    <add>3.4</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>start_action_condition</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Reminder Action</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>start_action_date</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Entity date</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>is_repeat</name>
+    <title>Repeat?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>repetition_frequency_unit</name>
+    <type>varchar</type>
+    <length>8</length>
+    <comment>Time units for repetition of reminder.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getRecurringFrequencyUnits</callback>
+    </pseudoconstant>
+    <add>3.4</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>repetition_frequency_interval</name>
+    <type>int unsigned</type>
+    <default>0</default>
+    <comment>Time interval for repeating the reminder.</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>end_frequency_unit</name>
+    <type>varchar</type>
+    <length>8</length>
+    <comment>Time units till repetition of reminder.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getRecurringFrequencyUnits</callback>
+    </pseudoconstant>
+    <add>3.4</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>end_frequency_interval</name>
+    <type>int unsigned</type>
+    <comment>Time interval till repeating the reminder.</comment>
+    <add>3.4</add>
+    <default>0</default>
+  </field>
+  <field>
+    <name>end_action</name>
+    <type>varchar</type>
+    <length>32</length>
+    <comment>Reminder Action till repeating the reminder.</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>end_date</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Entity end date</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Schedule is Active?</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this option active?</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>recipient_manual</name>
+    <title>Recipient Manual</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Contact IDs to which reminder should be sent.</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>recipient_listing</name>
+    <title>Recipient Listing</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>listing based on recipient field.</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>body_text</name>
+    <title>Reminder Text</title>
+    <type>longtext</type>
+    <comment>Body of the mailing in text format.</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>body_html</name>
+    <title>Reminder HTML</title>
+    <type>longtext</type>
+    <comment>Body of the mailing in html format.</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>sms_body_text</name>
+    <title>SMS Reminder Text</title>
+    <type>longtext</type>
+    <comment>Content of the SMS text.</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>subject</name>
+    <title>Reminder Subject</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Subject of mailing</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>record_activity</name>
+    <title>Record Activity for Reminder?</title>
+    <type>boolean</type>
+    <default>NULL</default>
+    <comment>Record Activity for this reminder?</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>mapping_id</name>
+    <title>Reminder Mapping</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Name/ID of the mapping to use on this table</comment>
+    <add>3.4</add>
+  </field>
+  <field>
+    <name>group_id</name>
+    <title>Reminder Group</title>
+    <type>int unsigned</type>
+    <comment>FK to Group</comment>
+    <pseudoconstant>
+      <table>civicrm_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>3.4</add>
+  </field>
+  <foreignKey>
+    <name>group_id</name>
+    <table>civicrm_group</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>msg_template_id</name>
+    <title>Reminder Template</title>
+    <type>int unsigned</type>
+    <comment>FK to the message template.</comment>
+  </field>
+  <foreignKey>
+    <name>msg_template_id</name>
+    <table>civicrm_msg_template</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>sms_template_id</name>
+    <title>SMS Reminder Template</title>
+    <type>int unsigned</type>
+    <comment>FK to the message template.</comment>
+  </field>
+  <foreignKey>
+    <name>sms_template_id</name>
+    <table>civicrm_msg_template</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>absolute_date</name>
+    <title>Fixed Date for Reminder</title>
+    <type>date</type>
+    <comment>Date on which the reminder be sent.</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>from_name</name>
+    <title>Reminder from Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Name in "from" field</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>from_email</name>
+    <title>Reminder From Email</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Email address in "from" field</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>mode</name>
+    <title>Message Mode</title>
+    <default>"Email"</default>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Send the message as email or sms or both.</comment>
+    <pseudoconstant>
+      <optionGroupName>msg_mode</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>sms_provider_id</name>
+    <title>SMS Provider</title>
+    <type>int unsigned</type>
+    <add>4.5</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>sms_provider_id</name>
+    <table>civicrm_sms_provider</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+    <add>4.5</add>
+  </foreignKey>
+  <field>
+    <name>used_for</name>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Used for repeating entity</comment>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>filter_contact_language</name>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Used for multilingual installation</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>communication_language</name>
+    <type>varchar</type>
+    <length>8</length>
+    <comment>Used for multilingual installation</comment>
+    <add>4.7</add>
+  </field>
+</table>

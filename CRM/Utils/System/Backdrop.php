@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -410,6 +410,26 @@ AND    u.status = 1
    */
   public function userLoginFinalize($params = array()) {
     user_login_finalize($params);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function isUserRegistrationPermitted() {
+    if (config_get('system.core', 'user_register') == 'admin_only') {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function isPasswordUserGenerated() {
+    if (config_get('system.core', 'user_email_verification') == TRUE) {
+      return FALSE;
+    }
+    return TRUE;
   }
 
   /**

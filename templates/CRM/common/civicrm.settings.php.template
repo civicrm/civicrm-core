@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -304,6 +304,13 @@ if (!defined('CIVICRM_MAIL_SMARTY')) {
 // define( 'CIVICRM_MAIL_LOG', '%%templateCompileDir%%/mail.log');
 // }
 
+/**
+ * This setting will only work if CIVICRM_MAIL_LOG is defined.  Mail will be logged and then sent.
+ */
+//if (!defined('CIVICRM_MAIL_LOG_AND_SEND')) {
+//  define( 'CIVICRM_MAIL_LOG_AND_SEND', 1);
+//}
+
 
 if (!defined('CIVICRM_DOMAIN_ID')) {
   define( 'CIVICRM_DOMAIN_ID', 1);
@@ -421,6 +428,13 @@ if (!defined('CIVICRM_DB_CACHE_PREFIX')) {
 // }
 
 /**
+ * Define how many times to retry a transaction when the DB hits a deadlock
+ * (ie. the database is locked by another transaction). This is an
+ * advanced setting intended for high-traffic databases & experienced developers/ admins.
+ */
+define('CIVICRM_DEADLOCK_RETRIES', 3);
+
+/**
  * Configure MySQL to throw more errors when encountering unusual SQL expressions.
  *
  * If undefined, the value is determined automatically. For CiviCRM tarballs, it defaults
@@ -452,6 +466,9 @@ if ( set_include_path( $include_path ) === false ) {
 
 if (!defined('CIVICRM_CLEANURL')) {
   if ( function_exists('variable_get') && variable_get('clean_url', '0') != '0') {
+    define('CIVICRM_CLEANURL', 1 );
+  }
+  elseif ( function_exists('config_get') && config_get('system.core', 'clean_url') != 0) {
     define('CIVICRM_CLEANURL', 1 );
   }
   else {

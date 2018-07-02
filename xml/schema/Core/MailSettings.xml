@@ -1,0 +1,153 @@
+<table>
+  <base>CRM/Core</base>
+  <class>MailSettings</class>
+  <name>civicrm_mail_settings</name>
+  <comment>Various email accounts for use by CiviMail (and its processor)</comment>
+  <add>2.2</add>
+  <field>
+    <name>id</name>
+    <title>Mail Settings ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>primary key</comment>
+    <add>2.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>domain_id</name>
+    <title>Mail Settings Domain</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>Which Domain is this match entry for</comment>
+    <add>3.1</add>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <add>4.5</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>name</name>
+    <title>Mail Settings Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>name of this group of settings</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>is_default</name>
+    <title>Is Default Mail Settings?</title>
+    <type>boolean</type>
+    <comment>whether this is the default set of settings for this domain</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>domain</name>
+    <title>email Domain</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>email address domain (the part after @)</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>localpart</name>
+    <title>email Local Part</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>optional local part (like civimail+ for addresses like civimail+s.1.2@example.com)</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>return_path</name>
+    <title>Return Path</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>contents of the Return-Path header</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>protocol</name>
+    <title>Protocol</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>name of the protocol to use for polling (like IMAP, POP3 or Maildir)</comment>
+    <add>2.2</add>
+    <pseudoconstant>
+      <optionGroupName>mail_protocol</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>server</name>
+    <title>Mail Server</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>server to use when polling</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>port</name>
+    <title>Mail Port</title>
+    <type>int unsigned</type>
+    <comment>port to use when polling</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>username</name>
+    <title>Mail Account Username</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>username to use when polling</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>password</name>
+    <title>Mail Account Password</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>password to use when polling</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>is_ssl</name>
+    <title>Mail Account Uses SSL</title>
+    <type>boolean</type>
+    <comment>whether to use SSL or not</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>source</name>
+    <title>Mail Folder</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>folder to poll from when using IMAP, path to poll from when using Maildir, etc.</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>activity_status</name>
+    <title>Activity Status</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Name of status to use when creating email to activity.</comment>
+    <add>4.7</add>
+    <pseudoconstant>
+      <optionGroupName>activity_status</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+</table>

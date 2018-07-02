@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Member</base>
+  <class>MembershipBlock</class>
+  <name>civicrm_membership_block</name>
+  <comment>A Membership Block stores admin configurable status options and rules</comment>
+  <add>1.5</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Membership Block ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Membership Id</comment>
+    <add>1.5</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>entity_table</name>
+    <title>Membership Block Entity Table</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Name for Membership Status</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>Membership Block Entity ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm_contribution_page.id</comment>
+    <add>1.5</add>
+  </field>
+  <foreignKey>
+    <name>entity_id</name>
+    <table>civicrm_contribution_page</table>
+    <key>id</key>
+    <add>1.5</add>
+  </foreignKey>
+  <field>
+    <name>membership_types</name>
+    <title>Membership Block Membership Types</title>
+    <type>varchar</type>
+    <length>1024</length>
+    <comment>Membership types to be exposed by this block</comment>
+    <serialize>PHP</serialize>
+    <add>1.5</add>
+     <!-- changed from varchar 255 to 1024 in 4.6 beta 2 -->
+    <change>4.6</change>
+  </field>
+  <field>
+    <name>membership_type_default</name>
+    <title>Membership Block Default Type</title>
+    <type>int unsigned</type>
+    <comment>Optional foreign key to membership_type</comment>
+    <add>1.5</add>
+  </field>
+  <foreignKey>
+    <name>membership_type_default</name>
+    <table>civicrm_membership_type</table>
+    <key>id</key>
+    <add>1.5</add>
+  </foreignKey>
+  <field>
+    <name>display_min_fee</name>
+    <title>Membership Block Display Minimum Fee</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Display minimum membership fee</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>is_separate_payment</name>
+    <title>Membership Block Is Separate Payment</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Should membership transactions be processed separately</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>new_title</name>
+    <title>Membership Block New Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Title to display at top of block</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>new_text</name>
+    <title>Membership Block New Text</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>Text to display below title</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>renewal_title</name>
+    <title>Membership Block Renewal Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Title for renewal</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>renewal_text</name>
+    <title>Membership Block Renewal Text</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>Text to display for member renewal</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>is_required</name>
+    <title>Is Required</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is membership sign up optional</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Is Active</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this membership_block enabled</comment>
+    <add>1.5</add>
+  </field>
+</table>

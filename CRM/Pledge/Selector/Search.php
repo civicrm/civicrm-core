@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -319,9 +319,11 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
       $row['campaign_id'] = $result->pledge_campaign_id;
 
       // add pledge status name
-      $row['pledge_status_name'] = CRM_Utils_Array::value($row['pledge_status_id'],
-        $pledgeStatuses
-      );
+      if (!empty($row['pledge_status_id'])) {
+        $row['pledge_status_name'] = CRM_Utils_Array::value($row['pledge_status_id'],
+          $pledgeStatuses
+        );
+      }
       // append (test) to status label
       if (!empty($row['pledge_is_test'])) {
         $row['pledge_status'] .= ' (test)';

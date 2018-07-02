@@ -1,9 +1,9 @@
 
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,6 @@
  +--------------------------------------------------------------------+
 *}
 {crmRegion name="contribute-form-contributionpage-settings-main"}
-<div class="crm-block crm-form-block crm-contribution-contributionpage-settings-form-block">
 <div class="help">
     {if $action eq 0}
         <p>{ts}This is the first step in creating a new online Contribution Page. You can create one or more different Contribution Pages for different purposes, audiences, campaigns, etc. Each page can have it's own introductory message, pre-configured contribution amounts, custom data collection fields, etc.{/ts}</p>
@@ -34,6 +33,8 @@
         {ts}Use this form to edit the page title, financial type (e.g. donation, campaign contribution, etc.), goal amount, introduction, and status (active/inactive) for this online contribution page.{/ts}
     {/if}
 </div>
+<div class="crm-block crm-form-block crm-contribution-contributionpage-settings-form-block">
+
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout-compressed">
   <tr class="crm-contribution-contributionpage-settings-form-block-title"><td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='title' id=$contributionPageID}{/if}</td><td>{$form.title.html}<br/>

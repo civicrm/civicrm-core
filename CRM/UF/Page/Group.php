@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -326,6 +326,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $ufGroup[$id] = array();
       $ufGroup[$id]['id'] = $id;
       $ufGroup[$id]['title'] = $value['title'];
+      $ufGroup[$id]['frontend_title'] = $value['frontend_title'];
       $ufGroup[$id]['created_id'] = $value['created_id'];
       $ufGroup[$id]['created_by'] = CRM_Contact_BAO_Contact::displayName($value['created_id']);
       $ufGroup[$id]['description'] = $value['description'];

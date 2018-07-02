@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing</base>
+  <class>TrackableURL</class>
+  <name>civicrm_mailing_trackable_url</name>
+  <comment>Stores URLs for which we should track click-throughs from mailings</comment>
+  <archive>true</archive>
+  <field>
+    <name>id</name>
+    <title>Trackable URL ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>url</name>
+    <title>Url</title>
+    <type>text</type>
+    <required>true</required>
+    <comment>The URL to be tracked.</comment>
+  </field>
+  <field>
+    <name>mailing_id</name>
+    <title>Mailing</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to the mailing</comment>
+  </field>
+  <foreignKey>
+    <name>mailing_id</name>
+    <table>civicrm_mailing</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+</table>

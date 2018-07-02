@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
@@ -537,6 +537,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     $input['net_amount'] = self::retrieve('settle_amount', 'Money', 'POST', FALSE);
     $input['trxn_id'] = self::retrieve('txn_id', 'String', 'POST', FALSE);
     $input['payment_date'] = $input['receive_date'] = self::retrieve('payment_date', 'String', 'POST', FALSE);
+    $input['total_amount'] = $input['amount'];
   }
 
   /**

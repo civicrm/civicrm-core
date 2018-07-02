@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -218,34 +218,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   public static function getPayment($paymentProcessorID, $mode = 'based_on_id') {
     $capabilities = ($mode == 'test') ? array('TestMode') : array();
     $processors = self::getPaymentProcessors($capabilities, array($paymentProcessorID));
-    $processor = $processors[$paymentProcessorID];
-    $fields = array(
-      'id',
-      'name',
-      'payment_processor_type_id',
-      'user_name',
-      'password',
-      'signature',
-      'url_site',
-      'url_api',
-      'url_recur',
-      'url_button',
-      'subject',
-      'class_name',
-      'is_recur',
-      'billing_mode',
-      'is_test',
-      'payment_type',
-      'is_default',
-    );
-    // Just to prevent e-Notices elsewhere we set all fields.
-    foreach ($fields as $name) {
-      if (!isset($processor)) {
-        $processor[$name] = NULL;
-      }
-    }
-    $processor['payment_processor_type'] = CRM_Core_PseudoConstant::paymentProcessorType(FALSE,
-      $processor['payment_processor_type_id'], 'name');
     return $processors[$paymentProcessorID];
   }
 
@@ -326,7 +298,25 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
 
     $processors = civicrm_api3('payment_processor', 'get', $retrievalParameters);
     foreach ($processors['values'] as $processor) {
-      $fieldsToProvide = array('user_name', 'password', 'signature', 'subject', 'is_recur');
+      $fieldsToProvide = array(
+        'id',
+        'name',
+        'payment_processor_type_id',
+        'user_name',
+        'password',
+        'signature',
+        'url_site',
+        'url_api',
+        'url_recur',
+        'url_button',
+        'subject',
+        'class_name',
+        'is_recur',
+        'billing_mode',
+        'is_test',
+        'payment_type',
+        'is_default',
+      );
       foreach ($fieldsToProvide as $field) {
         // Prevent e-notices in processor classes when not configured.
         if (!isset($processor[$field])) {
@@ -432,6 +422,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *  - supportsBackOffice
    *  - supportsLiveMode
    *  - supportsFutureRecurDate
+   *  - supportsRecurring
    *  - supportsCancelRecurring
    *  - supportsRecurContributionsForPledges
    *
@@ -444,8 +435,12 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * @return bool
    */
   public static function hasPaymentProcessorSupporting($capabilities = array()) {
-    $result = self::getPaymentProcessors($capabilities);
-    return (!empty($result)) ? TRUE : FALSE;
+    $capabilitiesString = implode('', $capabilities);
+    if (!isset(\Civi::$statics[__CLASS__]['supported_capabilities'][$capabilitiesString])) {
+      $result = self::getPaymentProcessors($capabilities);
+      \Civi::$statics[__CLASS__]['supported_capabilities'][$capabilitiesString] = (!empty($result) && array_keys($result) !== array(0)) ? TRUE : FALSE;
+    }
+    return \Civi::$statics[__CLASS__]['supported_capabilities'][$capabilitiesString];
   }
 
   /**
@@ -508,6 +503,7 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
      WHERE con.id = %1";
     }
     elseif ($component == 'recur') {
+      // @deprecated - use getPaymentProcessorForRecurringContribution.
       $sql = "
     SELECT cr.payment_processor_id as ppID1, NULL as ppID2, cr.is_test
       FROM civicrm_contribution_recur cr
@@ -543,10 +539,63 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
         // The function looks to load the payment processor ID from the contribution page, which
         // can support multiple processors.
       }
-      $paymentProcessor['payment_processor_type'] = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, $paymentProcessor['payment_processor_type_id'], 'name');
+
+      $paymentProcessor['payment_processor_type'] = CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_PaymentProcessor', 'payment_processor_type_id', $paymentProcessor['payment_processor_type_id']);
       $result = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
     }
     return $result;
+  }
+
+  /**
+   * Get the payment processor associated with a recurring contribution series.
+   *
+   * @param int $contributionRecurID
+   *
+   * @return \CRM_Core_Payment
+   */
+  public static function getPaymentProcessorForRecurringContribution($contributionRecurID) {
+    $paymentProcessorId = civicrm_api3('ContributionRecur', 'getvalue', array(
+      'id' => $contributionRecurID,
+      'return' => 'payment_processor_id',
+    ));
+    return Civi\Payment\System::singleton()->getById($paymentProcessorId);
+  }
+
+  /**
+   * Get the name of the payment processor
+   *
+   * @param $paymentProcessorId
+   *
+   * @return null|string
+   */
+  public static function getPaymentProcessorName($paymentProcessorId) {
+    try {
+      $paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle', array(
+        'return' => array('name'),
+        'id' => $paymentProcessorId,
+      ));
+      return $paymentProcessor['name'];
+    }
+    catch (Exception $e) {
+      return ts('Unknown') . ' (' . $paymentProcessorId . ')';
+    }
+  }
+
+  /**
+   * Generate and assign an arbitrary value to a field of a test object.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   *   The globally-unique ID of the test object.
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName === 'class_name') {
+      $this->class_name = 'Payment_Dummy';
+    }
+    else {
+      parent::assignTestValue($fieldName, $fieldDef, $counter);
+    }
   }
 
 }

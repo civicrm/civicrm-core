@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2018                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -26,10 +26,12 @@
  */
 
 /**
- * Our base DAO class. All DAO classes should inherit from this class.
+ * Base Database Access Object class.
+ *
+ * All DAO classes should inherit from this class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 if (!defined('DB_DSN_MODE')) {
@@ -64,7 +66,28 @@ class CRM_Core_DAO extends DB_DataObject {
     BULK_INSERT_COUNT = 200,
     BULK_INSERT_HIGH_COUNT = 200,
     QUERY_FORMAT_WILDCARD = 1,
-    QUERY_FORMAT_NO_QUOTES = 2;
+    QUERY_FORMAT_NO_QUOTES = 2,
+
+    /**
+     * Serialized string separated by and bookended with VALUE_SEPARATOR
+     */
+    SERIALIZE_SEPARATOR_BOOKEND = 1,
+    /**
+     * @deprecated format separated by VALUE_SEPARATOR
+     */
+    SERIALIZE_SEPARATOR_TRIMMED = 2,
+    /**
+     * Recommended serialization format
+     */
+    SERIALIZE_JSON = 3,
+    /**
+     * @deprecated format using php serialize()
+     */
+    SERIALIZE_PHP = 4,
+    /**
+     * Comma separated string, no quotes, no spaces
+     */
+    SERIALIZE_COMMA = 5;
 
   /**
    * Define entities that shouldn't be created or deleted when creating/ deleting
@@ -118,8 +141,15 @@ class CRM_Core_DAO extends DB_DataObject {
     }
     $factory = new CRM_Contact_DAO_Factory();
     CRM_Core_DAO::setFactory($factory);
+    $currentModes = CRM_Utils_SQL::getSqlModes();
     if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
-      CRM_Core_DAO::executeQuery('SET SESSION sql_mode = STRICT_TRANS_TABLES');
+      if (CRM_Utils_SQL::supportsFullGroupBy() && !in_array('ONLY_FULL_GROUP_BY', $currentModes) && CRM_Utils_SQL::isGroupByModeInDefault()) {
+        $currentModes[] = 'ONLY_FULL_GROUP_BY';
+      }
+      if (!in_array('STRICT_TRANS_TABLES', $currentModes)) {
+        $currentModes = array_merge(array('STRICT_TRANS_TABLES'), $currentModes);
+      }
+      CRM_Core_DAO::executeQuery("SET SESSION sql_mode = %1", array(1 => array(implode(',', $currentModes), 'String')));
     }
     CRM_Core_DAO::executeQuery('SET NAMES utf8');
     CRM_Core_DAO::executeQuery('SET @uniqueID = %1', array(1 => array(CRM_Utils_Request::id(), 'String')));
@@ -132,6 +162,29 @@ class CRM_Core_DAO extends DB_DataObject {
     global $_DB_DATAOBJECT;
     $dao = new CRM_Core_DAO();
     return $_DB_DATAOBJECT['CONNECTIONS'][$dao->_database_dsn_md5];
+  }
+
+  /**
+   * Disables usage of the ONLY_FULL_GROUP_BY Mode if necessary
+   */
+  public static function disableFullGroupByMode() {
+    $currentModes = CRM_Utils_SQL::getSqlModes();
+    if (in_array('ONLY_FULL_GROUP_BY', $currentModes) && CRM_Utils_SQL::isGroupByModeInDefault()) {
+      $key = array_search('ONLY_FULL_GROUP_BY', $currentModes);
+      unset($currentModes[$key]);
+      CRM_Core_DAO::executeQuery("SET SESSION sql_mode = %1", array(1 => array(implode(',', $currentModes), 'String')));
+    }
+  }
+
+  /**
+   * Re-enables ONLY_FULL_GROUP_BY sql_mode as necessary..
+   */
+  public static function reenableFullGroupByMode() {
+    $currentModes = CRM_Utils_SQL::getSqlModes();
+    if (!in_array('ONLY_FULL_GROUP_BY', $currentModes) && CRM_Utils_SQL::isGroupByModeInDefault()) {
+      $currentModes[] = 'ONLY_FULL_GROUP_BY';
+      CRM_Core_DAO::executeQuery("SET SESSION sql_mode = %1", array(1 => array(implode(',', $currentModes), 'String')));
+    }
   }
 
   /**
@@ -379,6 +432,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * Factory method to instantiate a new object from a table name.
    *
    * @param string $table
+   * @return \DataObject|\PEAR_Error
    */
   public function factory($table = '') {
     if (!isset(self::$_factory)) {
@@ -404,7 +458,6 @@ class CRM_Core_DAO extends DB_DataObject {
 
   /**
    * Defines the default key as 'id'.
-   *
    *
    * @return array
    */
@@ -460,7 +513,7 @@ class CRM_Core_DAO extends DB_DataObject {
    *   (associative)
    */
   public function table() {
-    $fields = &$this->fields();
+    $fields = $this->fields();
 
     $table = array();
     if ($fields) {
@@ -580,12 +633,18 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param array $params
    *   (reference ) associative array of name/value pairs.
+   * @param bool $serializeArrays
+   *   Should arrays that are passed in be serialised according to the metadata.
+   *   Eventually this should be always true / gone, but in the interests of caution
+   *   it is being grandfathered in. In general an array is not valid on the DAO
+   *   but there may be instances where this function is called & then some handling
+   *   takes place on the would-be array.
    *
    * @return bool
    *   Did we copy all null values into the object
    */
-  public function copyValues(&$params) {
-    $fields = &$this->fields();
+  public function copyValues(&$params, $serializeArrays = FALSE) {
+    $fields = $this->fields();
     $allNull = TRUE;
     foreach ($fields as $name => $value) {
       $dbName = $value['name'];
@@ -606,7 +665,14 @@ class CRM_Core_DAO extends DB_DataObject {
         if ($pValue === '') {
           $this->$dbName = 'null';
         }
+        elseif ($serializeArrays && is_array($pValue) && !empty($value['serialize'])) {
+          $this->$dbName = CRM_Core_DAO::serializeField($pValue, $value['serialize']);
+          $allNull = FALSE;
+        }
         else {
+          if (!$serializeArrays && is_array($pValue) && !empty($value['serialize'])) {
+            Civi::log()->warning(ts('use copyParams to serialize arrays (' . __CLASS__ . '.' . $name . ')'), ['civi.tag' => 'deprecated']);
+          }
           $this->$dbName = $pValue;
           $allNull = FALSE;
         }
@@ -626,7 +692,7 @@ class CRM_Core_DAO extends DB_DataObject {
    *   (reference ) associative array of name/value pairs.
    */
   public static function storeValues(&$object, &$values) {
-    $fields = &$object->fields();
+    $fields = $object->fields();
     foreach ($fields as $name => $value) {
       $dbName = $value['name'];
       if (isset($object->$dbName) && $object->$dbName !== 'null') {
@@ -702,7 +768,7 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public static function getAttribute($class, $fieldName = NULL) {
     $object = new $class();
-    $fields = &$object->fields();
+    $fields = $object->fields();
     if ($fieldName != NULL) {
       $field = CRM_Utils_Array::value($fieldName, $fields);
       return self::makeAttribute($field);
@@ -721,15 +787,6 @@ class CRM_Core_DAO extends DB_DataObject {
       }
     }
     return NULL;
-  }
-
-  /**
-   * @param $type
-   *
-   * @throws Exception
-   */
-  public static function transaction($type) {
-    CRM_Core_Error::fatal('This function is obsolete, please use CRM_Core_Transaction');
   }
 
   /**
@@ -1007,8 +1064,10 @@ FROM   civicrm_domain
    * @param int $id
    *   Id of the DAO object being searched for.
    *
-   * @return object
+   * @return CRM_Core_DAO
    *   Object of the type of the class that called this function.
+   *
+   * @throws Exception
    */
   public static function findById($id) {
     $object = new static();
@@ -1157,13 +1216,14 @@ FROM   civicrm_domain
    *   Default sort value.
    *
    * @return string
-   *   sortString
    */
   public static function getSortString($sort, $default = NULL) {
     // check if sort is of type CRM_Utils_Sort
     if (is_a($sort, 'CRM_Utils_Sort')) {
       return $sort->orderBy();
     }
+
+    $sortString = '';
 
     // is it an array specified as $field => $sortDirection ?
     if ($sort) {
@@ -1482,23 +1542,21 @@ FROM   civicrm_domain
   }
 
   /**
-   * make a shallow copy of an object.
-   * and all the fields in the object
+   * Make a shallow copy of an object and all the fields in the object.
    *
    * @param string $daoName
    *   Name of the dao.
    * @param array $criteria
    *   Array of all the fields & values.
-   *                                        on which basis to copy
+   *   on which basis to copy
    * @param array $newData
    *   Array of all the fields & values.
-   *                                        to be copied besides the other fields
+   *   to be copied besides the other fields
    * @param string $fieldsFix
    *   Array of fields that you want to prefix/suffix/replace.
    * @param string $blockCopyOfDependencies
    *   Fields that you want to block from.
-   *                                        getting copied
-   *
+   *   getting copied
    *
    * @return CRM_Core_DAO
    *   the newly created copy of the object
@@ -1526,7 +1584,7 @@ FROM   civicrm_domain
 
       $newObject = new $daoName();
 
-      $fields = &$object->fields();
+      $fields = $object->fields();
       if (!is_array($fieldsFix)) {
         $fieldsToPrefix = array();
         $fieldsToSuffix = array();
@@ -1595,7 +1653,7 @@ FROM   civicrm_domain
       $newObject->id = $toId;
 
       if ($newObject->find(TRUE)) {
-        $fields = &$object->fields();
+        $fields = $object->fields();
         foreach ($fields as $name => $value) {
           if ($name == 'id' || $value['name'] == 'id') {
             // copy everything but the id!
@@ -1627,10 +1685,11 @@ FROM   civicrm_domain
    *
    * @param $componentIDs
    * @param string $tableName
+   * @param string $idField
    *
    * @return array
    */
-  public static function &getContactIDsFromComponent(&$componentIDs, $tableName) {
+  public static function getContactIDsFromComponent($componentIDs, $tableName, $idField = 'id') {
     $contactIDs = array();
 
     if (empty($componentIDs)) {
@@ -1641,7 +1700,7 @@ FROM   civicrm_domain
     $query = "
 SELECT contact_id
   FROM $tableName
- WHERE id IN ( $IDs )
+ WHERE $idField IN ( $IDs )
 ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
@@ -1687,6 +1746,11 @@ SELECT contact_id
     return $details;
   }
 
+  /**
+   * Drop all CiviCRM tables.
+   *
+   * @throws \CRM_Exception
+   */
   public static function dropAllTables() {
 
     // first drop all the custom tables we've created
@@ -1819,7 +1883,7 @@ SELECT contact_id
       /** @var CRM_Core_DAO $object */
       $object = new $daoName();
 
-      $fields = &$object->fields();
+      $fields = $object->fields();
       foreach ($fields as $fieldName => $fieldDef) {
         $dbName = $fieldDef['name'];
         $FKClassName = CRM_Utils_Array::value('FKClassName', $fieldDef);
@@ -1880,7 +1944,7 @@ SELECT contact_id
     $deletions = array(); // array(array(0 => $daoName, 1 => $daoParams))
     if ($object->find(TRUE)) {
 
-      $fields = &$object->fields();
+      $fields = $object->fields();
       foreach ($fields as $name => $value) {
 
         $dbName = $value['name'];
@@ -2584,6 +2648,75 @@ SELECT contact_id
       return FALSE;
     }
     return TRUE;
+  }
+
+  /**
+   * Transform an array to a serialized string for database storage.
+   *
+   * @param array|NULL $value
+   * @param $serializationType
+   * @return string|NULL
+   * @throws \Exception
+   */
+  public static function serializeField($value, $serializationType) {
+    if ($value === NULL) {
+      return NULL;
+    }
+    switch ($serializationType) {
+      case self::SERIALIZE_SEPARATOR_BOOKEND:
+        return $value === array() ? '' : CRM_Utils_Array::implodePadded($value);
+
+      case self::SERIALIZE_SEPARATOR_TRIMMED:
+        return is_array($value) ? implode(self::VALUE_SEPARATOR, $value) : $value;
+
+      case self::SERIALIZE_JSON:
+        return is_array($value) ? json_encode($value) : $value;
+
+      case self::SERIALIZE_PHP:
+        return is_array($value) ? serialize($value) : $value;
+
+      case self::SERIALIZE_COMMA:
+        return is_array($value) ? implode(',', $value) : $value;
+
+      default:
+        throw new Exception('Unknown serialization method for field.');
+    }
+  }
+
+  /**
+   * Transform a serialized string from the database into an array.
+   *
+   * @param string|null $value
+   * @param $serializationType
+   * @return array|null
+   * @throws \Exception
+   */
+  public static function unSerializeField($value, $serializationType) {
+    if ($value === NULL) {
+      return NULL;
+    }
+    if ($value === '') {
+      return array();
+    }
+    switch ($serializationType) {
+      case self::SERIALIZE_SEPARATOR_BOOKEND:
+        return (array) CRM_Utils_Array::explodePadded($value);
+
+      case self::SERIALIZE_SEPARATOR_TRIMMED:
+        return explode(self::VALUE_SEPARATOR, trim($value));
+
+      case self::SERIALIZE_JSON:
+        return strlen($value) ? json_decode($value, TRUE) : array();
+
+      case self::SERIALIZE_PHP:
+        return strlen($value) ? unserialize($value) : array();
+
+      case self::SERIALIZE_COMMA:
+        return explode(',', trim(str_replace(', ', '', $value)));
+
+      default:
+        throw new Exception('Unknown serialization method for field.');
+    }
   }
 
 }

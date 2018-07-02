@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -84,6 +84,12 @@
           <td>{$form.remote_profile_submissions.html}<br />
             <p class="description">{ts}If enabled, CiviCRM will allow users to submit profiles from external sites. This is disabled by default to limit abuse.{/ts}</p>
           </td>
+        </tr>
+        <tr class="crm-miscellaneous-form-block-allow_alert_autodismissal">
+            <td class="label">{$form.allow_alert_autodismissal.label}</td>
+            <td>{$form.allow_alert_autodismissal.html}<br />
+                <p class="description">{ts}If disabled, CiviCRM will not automatically dismiss any alerts after 10 seconds.{/ts}</p>
+            </td>
         </tr>
     </table>
 

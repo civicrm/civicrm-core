@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -207,7 +207,13 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     $ufField->field_type = $params['field_type'];
     $ufField->field_name = $params['field_name'];
     $ufField->website_type_id = CRM_Utils_Array::value('website_type_id', $params);
-    $ufField->location_type_id = CRM_Utils_Array::value('location_type_id', $params);
+    if (is_null(CRM_Utils_Array::value('location_type_id', $params, ''))) {
+      // primary location type have NULL value in DB
+      $ufField->whereAdd("location_type_id IS NULL");
+    }
+    else {
+      $ufField->location_type_id = CRM_Utils_Array::value('location_type_id', $params);
+    }
     $ufField->phone_type_id = CRM_Utils_Array::value('phone_type_id', $params);;
 
     if (!empty($params['id'])) {
@@ -975,6 +981,7 @@ SELECT  id
         'membership_type_id',
         'member_is_test',
         'is_override',
+        'status_override_end_date',
         'status_id',
         'member_is_pay_later'
       );
@@ -994,10 +1001,7 @@ SELECT  id
         CRM_Utils_Array::remove($caseFields,
           'case_id',
           'case_type',
-          'case_start_date',
-          'case_end_date',
           'case_role',
-          'case_status',
           'case_deleted'
         );
       }

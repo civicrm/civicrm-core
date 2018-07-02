@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CiviCRM_Hook
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 abstract class CRM_Utils_Hook {
 
@@ -1636,6 +1636,28 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Alter redirect.
+   *
+   * This hook is called when the browser is being re-directed and allows the url
+   * to be altered.
+   *
+   * @param \Psr\Http\Message\UriInterface $url
+   * @param array $context
+   *   Additional information about context
+   *   - output - if this is 'json' then it will return json.
+   *
+   * @return null
+   *   the return value is ignored
+   */
+  public static function alterRedirect(&$url, &$context) {
+    return self::singleton()->invoke(array('url', 'context'), $url,
+      $context, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_alterRedirect'
+    );
+  }
+
+  /**
    * @param $varType
    * @param $var
    * @param $object
@@ -1987,7 +2009,7 @@ abstract class CRM_Utils_Hook {
     // are expected to be called externally.
     // It's really really unlikely anyone uses this - but let's add deprecations for a couple
     // of releases first.
-    Civi::log()->warning('Deprecated function CRM_Utils_Hook::alterMail, use CRM_Utils_Hook::alterMailer', array('civi.tag' => 'deprecated'));
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Utils_Hook::alterMailer');
     return CRM_Utils_Hook::alterMailer($mailer, $driver, $params);
   }
 
@@ -2110,8 +2132,8 @@ abstract class CRM_Utils_Hook {
    *   );
    *   $angularModules['myBigAngularModule'] = array(
    *     'ext' => 'org.example.mymod',
-   *     'js' => array('js/part1.js', 'js/part2.js'),
-   *     'css' => array('css/myAngularModule.css'),
+   *     'js' => array('js/part1.js', 'js/part2.js', 'ext://other.ext.name/file.js', 'assetBuilder://dynamicAsset.js'),
+   *     'css' => array('css/myAngularModule.css', 'ext://other.ext.name/file.css', 'assetBuilder://dynamicAsset.css'),
    *     'partials' => array('partials/myBigAngularModule'),
    *     'requires' => array('otherModuleA', 'otherModuleB'),
    *     'basePages' => array('civicrm/a'),
@@ -2380,6 +2402,20 @@ abstract class CRM_Utils_Hook {
    */
   public static function inboundSMS(&$message) {
     return self::singleton()->invoke(array('message'), $message, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_inboundSMS');
+  }
+
+  /**
+   * This hook is called to modify api params of EntityRef form field
+   *
+   * @param array $params
+   *
+   * @return mixed
+   */
+  public static function alterEntityRefParams(&$params, $formName) {
+    return self::singleton()->invoke(array('params', 'formName'), $params, $formName,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_alterEntityRefParams'
+    );
   }
 
 }

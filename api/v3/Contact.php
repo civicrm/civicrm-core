@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
@@ -152,6 +152,12 @@ function _civicrm_api3_contact_create_spec(&$params) {
     'title' => 'Check for Duplicates',
     'description' => 'Throw error if contact create matches dedupe rule',
     'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
+  $params['skip_greeting_processing'] = array(
+    'title' => 'Skip Greeting processing',
+    'description' => 'Do not process greetings, (these can be done by scheduled job and there may be a preference to do so for performance reasons)',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => 0,
   );
   $params['prefix_id']['api.aliases'] = array('individual_prefix', 'individual_prefix_id');
   $params['suffix_id']['api.aliases'] = array('individual_suffix', 'individual_suffix_id');
@@ -618,7 +624,6 @@ function _civicrm_api3_greeting_format_params($params) {
 
     $nullValue = FALSE;
     $filter = array(
-      'contact_type' => $params['contact_type'],
       'greeting_type' => "{$key}{$greeting}",
     );
 
@@ -648,11 +653,6 @@ function _civicrm_api3_greeting_format_params($params) {
     }
 
     if ($greetingId) {
-
-      if (!array_key_exists($greetingId, $greetings)) {
-        throw new API_Exception(ts('Invalid %1 greeting Id', array(1 => $key)));
-      }
-
       if (!$customGreeting && ($greetingId == array_search('Customized', $greetings))) {
         throw new API_Exception(ts('Please provide a custom value for %1 greeting',
             array(1 => $key)
@@ -1359,12 +1359,24 @@ function civicrm_api3_contact_duplicatecheck($params) {
   $dupes = CRM_Contact_BAO_Contact::getDuplicateContacts(
     $params['match'],
     $params['match']['contact_type'],
-    'Unsupervised',
+    $params['rule_type'],
     array(),
     CRM_Utils_Array::value('check_permissions', $params),
     CRM_Utils_Array::value('dedupe_rule_id', $params)
   );
-  $values = empty($dupes) ? array() : array_fill_keys($dupes, array());
+  $values = array();
+  if ($dupes && !empty($params['return'])) {
+    return civicrm_api3('Contact', 'get', array(
+      'return' => $params['return'],
+      'id' => array('IN' => $dupes),
+      'options' => CRM_Utils_Array::value('options', $params),
+      'sequential' => CRM_Utils_Array::value('sequential', $params),
+      'check_permissions' => CRM_Utils_Array::value('check_permissions', $params),
+    ));
+  }
+  foreach ($dupes as $dupe) {
+    $values[$dupe] = array('id' => $dupe);
+  }
   return civicrm_api3_create_success($values, $params, 'Contact', 'duplicatecheck');
 }
 
@@ -1378,6 +1390,12 @@ function _civicrm_api3_contact_duplicatecheck_spec(&$params) {
     'title' => 'Dedupe Rule ID (optional)',
     'description' => 'This will default to the built in unsupervised rule',
     'type' => CRM_Utils_Type::T_INT,
+  );
+  $params['rule_type'] = array(
+    'title' => 'Dedupe Rule Type',
+    'description' => 'If no rule id specified, pass "Unsupervised" or "Supervised"',
+    'type' => CRM_Utils_Type::T_STRING,
+    'api.default' => 'Unsupervised',
   );
   // @todo declare 'match' parameter. We don't have a standard for type = array yet.
 }

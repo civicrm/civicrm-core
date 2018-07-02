@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -302,51 +302,80 @@ class CRM_Admin_Page_AJAX {
    */
   public static function getTagTree() {
     $parent = CRM_Utils_Type::escape(CRM_Utils_Array::value('parent_id', $_GET, 0), 'Integer');
+    $substring = CRM_Utils_Type::escape(CRM_Utils_Array::value('str', $_GET), 'String');
     $result = array();
 
-    $parentClause = $parent ? "AND parent_id = $parent" : 'AND parent_id IS NULL';
-    $sql = "SELECT *
-      FROM civicrm_tag
-      WHERE is_tagset <> 1 $parentClause
-      GROUP BY id
-      ORDER BY name";
+    $whereClauses = array('is_tagset <> 1');
+    $orderColumn = 'name';
 
     // fetch all child tags in Array('parent_tag' => array('child_tag_1', 'child_tag_2', ...)) format
-    $childTagIDs = CRM_Core_BAO_Tag::getChildTags();
+    $childTagIDs = CRM_Core_BAO_Tag::getChildTags($substring);
+    $parentIDs = array_keys($childTagIDs);
 
-    $dao = CRM_Core_DAO::executeQuery($sql);
-    while ($dao->fetch()) {
-      $style = '';
-      if ($dao->color) {
-        $style = "background-color: {$dao->color}; color: " . CRM_Utils_Color::getContrast($dao->color);
+    if ($parent) {
+      $whereClauses[] = "parent_id = $parent";
+    }
+    elseif ($substring) {
+      $whereClauses['substring'] = " name LIKE '%$substring%' ";
+      if (!empty($parentIDs)) {
+        $whereClauses['substring'] = sprintf(" %s OR id IN (%s) ", $whereClauses['substring'], implode(',', $parentIDs));
       }
-      $hasChildTags = empty($childTagIDs[$dao->id]) ? FALSE : TRUE;
-      $usedFor = (array) explode(',', $dao->used_for);
-      $result[] = array(
-        'id' => $dao->id,
-        'text' => $dao->name,
-        'icon' => FALSE,
-        'li_attr' => array(
-          'title' => ((string) $dao->description) . ($dao->is_reserved ? ' (*' . ts('Reserved') . ')' : ''),
-          'class' => $dao->is_reserved ? 'is-reserved' : '',
-        ),
-        'a_attr' => array(
-          'style' => $style,
-          'class' => 'crm-tag-item',
-        ),
-        'children' => $hasChildTags,
-        'data' => array(
-          'description' => (string) $dao->description,
-          'is_selectable' => (bool) $dao->is_selectable,
-          'is_reserved' => (bool) $dao->is_reserved,
-          'used_for' => $usedFor,
-          'color' => $dao->color ? $dao->color : '#ffffff',
-          'usages' => civicrm_api3('EntityTag', 'getcount', array(
-            'entity_table' => array('IN' => $usedFor),
-            'tag_id' => $dao->id,
-          )),
-        ),
-      );
+      $orderColumn = 'id';
+    }
+    else {
+      $whereClauses[] = "parent_id IS NULL";
+    }
+
+    $dao = CRM_Utils_SQL_Select::from('civicrm_tag')
+            ->where($whereClauses)
+            ->groupBy('id')
+            ->orderBy($orderColumn)
+            ->execute();
+
+    while ($dao->fetch()) {
+      if (!empty($substring)) {
+        $result[] = $dao->id;
+        if (!empty($childTagIDs[$dao->id])) {
+          $result = array_merge($result, $childTagIDs[$dao->id]);
+        }
+      }
+      else {
+        $hasChildTags = empty($childTagIDs[$dao->id]) ? FALSE : TRUE;
+        $usedFor = (array) explode(',', $dao->used_for);
+        $tag = [
+          'id' => $dao->id,
+          'text' => $dao->name,
+          'a_attr' => [
+            'class' => 'crm-tag-item',
+          ],
+          'children' => $hasChildTags,
+          'data' => [
+            'description' => (string) $dao->description,
+            'is_selectable' => (bool) $dao->is_selectable,
+            'is_reserved' => (bool) $dao->is_reserved,
+            'used_for' => $usedFor,
+            'color' => $dao->color ? $dao->color : '#ffffff',
+            'usages' => civicrm_api3('EntityTag', 'getcount', [
+              'entity_table' => ['IN' => $usedFor],
+              'tag_id' => $dao->id,
+            ]),
+          ],
+        ];
+        if ($dao->description || $dao->is_reserved) {
+          $tag['li_attr']['title'] = ((string) $dao->description) . ($dao->is_reserved ? ' (*' . ts('Reserved') . ')' : '');
+        }
+        if ($dao->is_reserved) {
+          $tag['li_attr']['class'] = 'is-reserved';
+        }
+        if ($dao->color) {
+          $tag['a_attr']['style'] = "background-color: {$dao->color}; color: " . CRM_Utils_Color::getContrast($dao->color);
+        }
+        $result[] = $tag;
+      }
+    }
+
+    if ($substring) {
+      $result = array_values(array_unique($result));
     }
 
     if (!empty($_REQUEST['is_unit_test'])) {

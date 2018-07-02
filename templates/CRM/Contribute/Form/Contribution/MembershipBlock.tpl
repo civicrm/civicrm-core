@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -231,7 +231,7 @@ CRM.$(function($) {
     {/strip}
 {/if}
 {* Include JS for auto renew membership if priceset is Quick Config*}
-{if $membershipBlock AND $quickConfig}
+{if $membershipBlock}
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {

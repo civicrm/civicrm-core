@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<tables xmlns:xi="http://www.w3.org/2001/XInclude">
+<xi:include href="PriceField.xml"           parse="xml" />
+<xi:include href="PriceFieldValue.xml"      parse="xml" />
+<xi:include href="LineItem.xml"        parse="xml" />
+<xi:include href="PriceSet.xml"             parse="xml" />
+<xi:include href="PriceSetEntity.xml"       parse="xml" />
+</tables>

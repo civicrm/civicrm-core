@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>File</class>
+  <name>civicrm_file</name>
+  <comment>Data store for uploaded (attached) files (pointer to file on disk OR blob). Maybe be joined to entities via custom_value.file_id or entity_file table.</comment>
+  <add>1.5</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>File ID</title>
+    <required>true</required>
+    <comment>Unique ID</comment>
+    <add>1.5</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>file_type_id</name>
+    <type>int unsigned</type>
+    <title>File Type</title>
+    <comment>Type of file (e.g. Transcript, Income Tax Return, etc). FK to civicrm_option_value.</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>mime_type</name>
+    <type>varchar</type>
+    <title>Mime Type</title>
+    <length>255</length>
+    <comment>mime type of the document</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>uri</name>
+    <type>varchar</type>
+    <title>Path</title>
+    <length>255</length>
+    <comment>uri of the file on disk</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>document</name>
+    <type>mediumblob</type>
+    <title>File Contents</title>
+    <comment>contents of the document</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>description</name>
+    <type>varchar</type>
+    <title>File Description</title>
+    <length>255</length>
+    <comment>Additional descriptive text regarding this attachment (optional).</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>upload_date</name>
+    <type>datetime</type>
+    <title>File Upload Date</title>
+    <comment>Date and time that this attachment was uploaded or written to server.</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>created_id</name>
+    <type>int unsigned</type>
+    <title>Created By Contact ID</title>
+    <comment>FK to civicrm_contact, who uploaded this file</comment>
+    <add>5.3</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>5.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+</table>

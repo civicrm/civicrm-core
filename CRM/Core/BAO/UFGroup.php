@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -484,6 +484,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       'name' => $name,
       'groupTitle' => $group->title,
       'groupName' => $group->name,
+      'groupDisplayTitle' => (!empty($group->frontend_title)) ? $group->frontend_title : $group->title,
       'groupHelpPre' => empty($group->help_pre) ? '' : $group->help_pre,
       'groupHelpPost' => empty($group->help_post) ? '' : $group->help_post,
       'title' => $title,
@@ -1320,7 +1321,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           elseif (in_array($htmlType, array(
             'CheckBox',
             'Multi-Select',
-            'AdvMulti-Select',
             'Multi-Select State/Province',
             'Multi-Select Country',
           ))) {
@@ -1542,13 +1542,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     );
     CRM_Core_DAO::executeQuery($query, $p);
 
-    // do a menu rebuild if we are on drupal, so it gets all the new menu entries
-    // for user account
-    $config = CRM_Core_Config::singleton();
-    if ($menuRebuild &&
-      $config->userSystem->is_drupal
-    ) {
-      menu_rebuild();
+    // Do a menu rebuild, so it gets all the new menu entries for user account
+    if ($menuRebuild) {
+      $config = CRM_Core_Config::singleton();
+      $config->userSystem->updateCategories();
     }
   }
 
@@ -1676,9 +1673,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   public static function getModuleUFGroup($moduleName = NULL, $count = 0, $skipPermission = TRUE, $op = CRM_Core_Permission::VIEW, $returnFields = NULL) {
     $selectFields = array('id', 'title', 'created_id', 'is_active', 'is_reserved', 'group_type');
 
-    if (!CRM_Core_Config::isUpgradeMode()) {
+    if (CRM_Core_DAO::checkFieldExists('civicrm_uf_group', 'description')) {
       // CRM-13555, since description field was added later (4.4), and to avoid any problems with upgrade
       $selectFields[] = 'description';
+    }
+
+    if (CRM_Core_DAO::checkFieldExists('civicrm_uf_group', 'frontend_title')) {
+      $selectFields[] = 'frontend_title';
     }
 
     if (!empty($returnFields)) {
@@ -1756,6 +1757,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
       if (CRM_Contact_BAO_ContactType::isaSubType($profileType)) {
         $profileType = CRM_Contact_BAO_ContactType::getBasicType($profileType);
+
+        //in some cases getBasicType() returns a cached array instead of string. Example: array ('sponsor' => 'organization')
+        if (is_array($profileType)) {
+          $profileType = array_shift($profileType);
+        }
       }
 
       //allow special mix profiles for Contribution and Participant
@@ -2154,7 +2160,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       //else (for contribution), use configured SCT default value
       $SCTDefaultValue = CRM_Core_OptionGroup::getDefaultValue("soft_credit_type");
       if ($field['field_type'] == 'Membership') {
-        $SCTDefaultValue = CRM_Core_OptionGroup::getValue('soft_credit_type', 'Gift', 'name');
+        $SCTDefaultValue = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'gift');
       }
       $form->addElement('hidden', 'sct_default_id', $SCTDefaultValue, array('id' => 'sct_default_id'));
     }
@@ -2235,6 +2241,14 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif ($fieldName == 'activity_duration') {
       $form->add('text', $name, $title, $attributes, $required);
       $form->addRule($name, ts('Please enter the duration as number of minutes (integers only).'), 'positiveInteger');
+    }
+    elseif ($fieldName == 'case_status') {
+      $form->add('select', $name, $title,
+        array(
+          '' => ts('- select -'),
+        ) + CRM_Case_BAO_Case::buildOptions('case_status_id', 'create'),
+        $required
+      );
     }
     else {
       if (substr($fieldName, 0, 3) === 'is_' or substr($fieldName, 0, 7) === 'do_not_') {
@@ -2342,7 +2356,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             $defaults[$name . '_custom'] = $details[$name . '_custom'];
           }
           elseif ($name == 'preferred_communication_method') {
-            $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $details[$name]);
+            $v = $details[$name];
+            if (!is_array($details[$name])) {
+              $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $v);
+            }
             foreach ($v as $item) {
               if ($item) {
                 $defaults[$fldName . "[$item]"] = 1;
@@ -2370,7 +2387,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             switch ($customFields[$customFieldId]['html_type']) {
               case 'Multi-Select State/Province':
               case 'Multi-Select Country':
-              case 'AdvMulti-Select':
               case 'Multi-Select':
                 $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $details[$name]);
                 foreach ($v as $item) {
@@ -2498,23 +2514,28 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
     }
 
-    //Handling Contribution Part of the batch profile
+    // Handling Contribution Part of the batch profile
     if (CRM_Core_Permission::access('CiviContribute') && $component == 'Contribute') {
       self::setComponentDefaults($fields, $componentId, $component, $defaults);
     }
 
-    //Handling Event Participation Part of the batch profile
+    // Handling Event Participation Part of the batch profile
     if (CRM_Core_Permission::access('CiviEvent') && $component == 'Event') {
       self::setComponentDefaults($fields, $componentId, $component, $defaults);
     }
 
-    //Handling membership Part of the batch profile
+    // Handling membership Part of the batch profile
     if (CRM_Core_Permission::access('CiviMember') && $component == 'Membership') {
       self::setComponentDefaults($fields, $componentId, $component, $defaults);
     }
 
-    //Handling Activity Part of the batch profile
+    // Handling Activity Part of the batch profile
     if ($component == 'Activity') {
+      self::setComponentDefaults($fields, $componentId, $component, $defaults);
+    }
+
+    // Handling Case Part of the batch profile
+    if (CRM_Core_Permission::access('CiviCase') && $component == 'Case') {
       self::setComponentDefaults($fields, $componentId, $component, $defaults);
     }
   }
@@ -3018,7 +3039,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
         $groupTypeName = "{$customGroups->extends}Type";
         if ($customGroups->extends == 'Participant' && $customGroups->extends_entity_column_id) {
-          $groupTypeName = CRM_Core_OptionGroup::getValue('custom_data_type', $customGroups->extends_entity_column_id, 'value', 'String', 'name');
+          $groupTypeName = CRM_Core_PseudoConstant::getName('CRM_Core_DAO_CustomGroup', 'extends_entity_column_id', $customGroups->extends_entity_column_id);
         }
 
         foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, $customGroups->extends_entity_column_value) as $val) {
@@ -3163,7 +3184,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    */
   public static function setComponentDefaults(&$fields, $componentId, $component, &$defaults, $isStandalone = FALSE) {
     if (!$componentId ||
-      !in_array($component, array('Contribute', 'Membership', 'Event', 'Activity'))
+      !in_array($component, array('Contribute', 'Membership', 'Event', 'Activity', 'Case'))
     ) {
       return;
     }
@@ -3192,6 +3213,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $componentBAO = 'CRM_Activity_BAO_Activity';
         $componentBAOName = 'Activity';
         $componentSubType = array('activity_type_id');
+        break;
+
+      case 'Case':
+        $componentBAO = 'CRM_Case_BAO_Case';
+        $componentBAOName = 'Case';
+        $componentSubType = array('case_type_id');
         break;
     }
 
@@ -3231,6 +3258,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
       elseif ($name == 'membership_status') {
         $defaults[$fldName] = $values['status_id'];
+      }
+      elseif ($name == 'case_status') {
+        $defaults[$fldName] = $values['case_status_id'];
       }
       elseif (CRM_Core_BAO_CustomField::getKeyID($name, TRUE) !== array(NULL, NULL)) {
         if (empty($formattedGroupTree)) {

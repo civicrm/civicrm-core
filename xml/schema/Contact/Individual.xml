@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contact</base>
+  <class>Individual</class>
+  <name>civicrm_individual</name>
+  <comment>Define contact-individual specific properties. Extends civicrm_contact.</comment>
+  <log>true</log>
+  <add>1.1</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique Individual ID</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Contact ID</comment>
+    <add>1.1</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.1</add>
+  </foreignKey>
+  <field>
+    <name>first_name</name>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <headerPattern>/^first|(f(irst\s)?name)$/i</headerPattern>
+    <dataPattern>/^\w+$/</dataPattern>
+    <fulltext/>
+    <comment>First Name.</comment>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>index_first_name</name>
+    <fieldName>first_name</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>middle_name</name>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <headerPattern>/^middle|(m(iddle\s)?name)$/i</headerPattern>
+    <dataPattern>/^\w+$/</dataPattern>
+    <fulltext/>
+    <comment>Middle Name.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>last_name</name>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <headerPattern>/^(l(ast\s)?name)$/i</headerPattern>
+    <dataPattern>/^\w+(\s\w+)?+$/</dataPattern>
+    <comment>Last Name.</comment>
+    <fulltext/>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>index_last_name</name>
+    <fieldName>last_name</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>gender</name>
+    <type>enum</type>
+    <import>true</import>
+    <values>Female, Male, Other</values>
+    <add>1.1</add>
+    <drop>1.2</drop>
+  </field>
+  <field>
+    <name>prefix_id</name>
+    <type>int unsigned</type>
+    <comment>Prefix or Title for name (Ms, Mr...). FK to prefix ID</comment>
+    <headerPattern>/^(prefix|title)/i</headerPattern>
+    <dataPattern>/^(mr|ms|mrs|sir|dr)\.?$/i</dataPattern>
+    <add>1.2</add>
+  </field>
+  <index>
+    <name>UI_prefix</name>
+    <fieldName>prefix_id</fieldName>
+    <add>1.6</add>
+  </index>
+  <field>
+    <name>suffix_id</name>
+    <type>int unsigned</type>
+    <comment>Suffix for name (Jr, Sr...). FK to suffix ID</comment>
+    <headerPattern>/^suffix$/i</headerPattern>
+    <dataPattern>/^(sr|jr)\.?|i{2,}$/</dataPattern>
+    <add>1.2</add>
+  </field>
+  <index>
+    <name>UI_suffix</name>
+    <fieldName>suffix_id</fieldName>
+    <add>1.6</add>
+  </index>
+  <field>
+    <name>prefix</name>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <comment>Prefix to Name.</comment>
+    <add>1.1</add>
+    <drop>1.2</drop>
+  </field>
+  <field>
+    <name>suffix</name>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <comment>Suffix to Name.</comment>
+    <add>1.1</add>
+    <drop>1.2</drop>
+  </field>
+  <field>
+    <name>greeting_type</name>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Preferred greeting format.</comment>
+    <add>1.1</add>
+    <drop>2.2</drop>
+  </field>
+  <field>
+    <name>greeting_type_id</name>
+    <title>Greeting Type</title>
+    <type>int unsigned</type>
+    <comment>FK to civicrm_option_value.id, that has to be valid, registered Greeting type.</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>custom_greeting</name>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Custom greeting message.</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>job_title</name>
+    <type>varchar</type>
+    <length>64</length>
+    <import>true</import>
+    <headerPattern>/^job|(j(ob\s)?title)$/i</headerPattern>
+    <dataPattern>//</dataPattern>
+    <comment>Job Title</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>gender_id</name>
+    <type>int unsigned</type>
+    <headerPattern>/^gender$/i</headerPattern>
+    <comment>FK to gender ID</comment>
+    <add>1.2</add>
+  </field>
+  <index>
+    <name>UI_gender</name>
+    <fieldName>gender_id</fieldName>
+    <add>1.6</add>
+  </index>
+  <field>
+    <name>birth_date</name>
+    <type>date</type>
+    <import>true</import>
+    <headerPattern>/^birth|(b(irth\s)?date)|D(\W*)O(\W*)B(\W*)$/i</headerPattern>
+    <dataPattern>/\d{4}-?\d{2}-?\d{2}/</dataPattern>
+    <comment>Date of birth</comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>is_deceased</name>
+    <title>Deceased</title>
+    <import>true</import>
+    <export>true</export>
+    <headerPattern>/i(s\s)?d(eceased)$/i</headerPattern>
+    <type>boolean</type>
+    <default>0</default>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>deceased_date</name>
+    <type>date</type>
+    <import>true</import>
+    <export>true</export>
+    <headerPattern>/^deceased|(d(eceased\s)?date)$/i</headerPattern>
+    <comment>Date of deceased</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>phone_to_household_id</name>
+    <type>int unsigned</type>
+    <comment>OPTIONAL FK to civicrm_contact_household record. If NOT NULL, direct phone communications to household
+      rather than individual location.
+    </comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>email_to_household_id</name>
+    <type>int unsigned</type>
+    <comment>OPTIONAL FK to civicrm_contact_household record. If NOT NULL, direct phone communications to household
+      rather than individual location.
+    </comment>
+    <add>1.1</add>
+  </field>
+  <field>
+    <name>mail_to_household_id</name>
+    <type>int unsigned</type>
+    <comment>OPTIONAL FK to civicrm_contact_household record. If NOT NULL, direct mail communications to household
+      rather than individual location.
+    </comment>
+    <add>1.1</add>
+  </field>
+  <index>
+    <name>UI_contact</name>
+    <fieldName>contact_id</fieldName>
+    <unique>true</unique>
+    <add>1.6</add>
+  </index>
+</table>

@@ -3,7 +3,7 @@
 
 /**
  * Required elements validation
- * 
+ *
  * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.01 of the PHP license
@@ -22,7 +22,7 @@
  */
 
 /**
- * Abstract base class for QuickForm validation rules 
+ * Abstract base class for QuickForm validation rules
  */
 require_once 'HTML/QuickForm/Rule.php';
 
@@ -53,8 +53,8 @@ class HTML_QuickForm_Rule_Required extends HTML_QuickForm_Rule
                 array_key_exists( 'name', $value ) &&
                 array_key_exists( 'tmp_name', $value );
             // hack to fix required issue with advcheckbox, but in general if any value is present then
-            // it should pass required check 
-            $return = false;    
+            // it should pass required check
+            $return = false;
             foreach ( $value as $k => $v ) {
                 // dont check type field. Safari3 Beta does not set this
                 if ( $fileType && $k == 'type' ) {

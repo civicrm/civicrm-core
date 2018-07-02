@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Core_I18n_Schema {
 
@@ -107,6 +107,9 @@ class CRM_Core_I18n_Schema {
     // update civicrm_domain.locales
     $domain->locales = $locale;
     $domain->save();
+
+    // CRM-21627 Updates the $dbLocale
+    CRM_Core_BAO_ConfigSetting::applyLocale(Civi::settings($domain->id), $domain->locales);
   }
 
   /**

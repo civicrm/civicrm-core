@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Navigation</class>
+  <name>civicrm_navigation</name>
+  <comment>Table to store navigation.</comment>
+  <add>3.0</add>
+  <field>
+    <name>id</name>
+    <title>Navigation ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>3.0</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>domain_id</name>
+    <title>Navigation Domain</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>Which Domain is this navigation item for</comment>
+    <add>3.0</add>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <add>3.0</add>
+  </foreignKey>
+  <field>
+    <name>label</name>
+    <title>Navigation Item Label</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Navigation Title</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>name</name>
+    <title>Navigation Item Machine Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Internal Name</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>url</name>
+    <title>Url</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>url in case of custom navigation link</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>icon</name>
+    <title>Icon</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>CSS class name for an icon</comment>
+    <default>NULL</default>
+    <required>false</required>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>permission</name>
+    <title>Required Permission</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Permission for menu item</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>permission_operator</name>
+    <title>Permission Operator</title>
+    <type>varchar</type>
+    <length>3</length>
+    <comment>Permission Operator</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>parent_id</name>
+    <title>Navigation parent ID</title>
+    <type>int unsigned</type>
+    <comment>Parent navigation item, used for grouping</comment>
+    <pseudoconstant>
+      <table>civicrm_navigation</table>
+      <keyColumn>id</keyColumn>
+      <nameColumn>name</nameColumn>
+      <labelColumn>label</labelColumn>
+    </pseudoconstant>
+    <add>3.0</add>
+  </field>
+  <foreignKey>
+    <name>parent_id</name>
+    <table>civicrm_navigation</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+    <add>3.0</add>
+  </foreignKey>
+  <field>
+    <name>is_active</name>
+    <title>Is Active</title>
+    <type>boolean</type>
+    <comment>Is this navigation item active?</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>has_separator</name>
+    <title>Use separator</title>
+    <type>boolean</type>
+    <comment>If separator needs to be added after this menu item</comment>
+    <add>3.0</add>
+  </field>
+  <field>
+    <name>weight</name>
+    <title>Order</title>
+    <type>int</type>
+    <comment>Ordering of the navigation items in various blocks.</comment>
+    <add>3.0</add>
+  </field>
+</table>

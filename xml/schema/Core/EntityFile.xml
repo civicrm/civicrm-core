@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>EntityFile</class>
+  <name>civicrm_entity_file</name>
+  <comment>Attaches (joins) uploaded files (images, documents, etc.) to entities (Contacts, Groups, Actions).</comment>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Entity File ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>primary key</comment>
+    <add>1.5</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>entity_table</name>
+    <title>Entity Table</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>physical tablename for entity being joined to file, e.g. civicrm_contact</comment>
+    <add>1.5</add>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>Entity ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to entity table specified in entity_table column.</comment>
+    <add>1.5</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>1.5</add>
+  </dynamicForeignKey>
+  <index>
+    <name>index_entity</name>
+    <fieldName>entity_table</fieldName>
+    <fieldName>entity_id</fieldName>
+    <add>1.5</add>
+  </index>
+  <field>
+    <name>file_id</name>
+    <title>File</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm_file</comment>
+    <add>1.5</add>
+  </field>
+  <foreignKey>
+    <name>file_id</name>
+    <table>civicrm_file</table>
+    <key>id</key>
+    <add>1.5</add>
+  </foreignKey>
+  <index>
+    <name>index_entity_file_id</name>
+    <fieldName>entity_table</fieldName>
+    <fieldName>entity_id</fieldName>
+    <fieldName>file_id</fieldName>
+    <add>1.1</add>
+  </index>
+</table>

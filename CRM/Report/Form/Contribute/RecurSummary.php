@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -94,14 +94,12 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
   }
 
   public function select() {
+    // @todo remove & only adjust parent with selectWhere fn (if needed)
     $select = array();
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('group_bys', $table)) {
         foreach ($table['group_bys'] as $fieldName => $field) {
-          if ($tableName == 'civicrm_address') {
-            $this->_addressField = TRUE;
-          }
           if (!empty($this->_params['group_bys'][$fieldName])) {
             switch (CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])) {
               case 'YEARWEEK':
@@ -150,9 +148,6 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
 
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if ($tableName == 'civicrm_address') {
-            $this->_addressField = TRUE;
-          }
           if (!empty($field['required']) ||
             !empty($this->_params['fields'][$fieldName])
           ) {

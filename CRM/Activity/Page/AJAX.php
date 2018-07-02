@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  *
  */
 
@@ -208,7 +208,7 @@ class CRM_Activity_Page_AJAX {
     foreach ($caseRelationships as $key => &$row) {
       $typeLabel = $row['relation'];
       // Add "<br />(Case Manager)" to label
-      if ($row['relation_type'] == $managerRoleId) {
+      if (!empty($row['relation_type']) && $row['relation_type'] == $managerRoleId) {
         $row['relation'] .= '<br />' . '(' . ts('Case Manager') . ')';
       }
       // view user links
@@ -381,10 +381,11 @@ class CRM_Activity_Page_AJAX {
     $caseActivity->activity_id = $mainActivityId;
     $caseActivity->save();
     $error_msg = $caseActivity->_lastError;
-    $caseActivity->free();
 
     $params['mainActivityId'] = $mainActivityId;
     CRM_Activity_BAO_Activity::copyExtendedActivityData($params);
+    CRM_Utils_Hook::post('create', 'CaseActivity', $caseActivity->id, $caseActivity);
+    $caseActivity->free();
 
     return (array('error_msg' => $error_msg, 'newId' => $mainActivity->id));
   }

@@ -3,7 +3,7 @@
 
 /**
  * Checks that the length of value is within range
- * 
+ *
  * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.01 of the PHP license
@@ -22,7 +22,7 @@
  */
 
 /**
- * Abstract base class for QuickForm validation rules 
+ * Abstract base class for QuickForm validation rules
  */
 require_once 'HTML/QuickForm/Rule.php';
 
@@ -59,13 +59,13 @@ class HTML_QuickForm_Rule_Range extends HTML_QuickForm_Rule
     function getValidationScript($options = null)
     {
         switch ($this->name) {
-            case 'minlength': 
+            case 'minlength':
                 $test = '{jsVar}.length < '.$options;
                 break;
-            case 'maxlength': 
+            case 'maxlength':
                 $test = '{jsVar}.length > '.$options;
                 break;
-            default: 
+            default:
                 $test = '({jsVar}.length < '.$options[0].' || {jsVar}.length > '.$options[1].')';
         }
         return array('', "{jsVar} != '' && {$test}");

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
@@ -77,6 +77,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
+    $this->optimisedForOnlyFullGroupBy = FALSE;
     $this->_rollup = 'WITH ROLLUP';
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
     $yearsInPast = 10;
@@ -345,19 +346,10 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
           AND {$this->_aliases['civicrm_contribution']}.is_test = 0
         INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
           ON restricted_contacts.cid = {$this->_aliases['civicrm_contact']}.id";
-      if ($this->isTableSelected('civicrm_email')) {
-        $this->_from .= "
-          LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
-            ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
-            AND {$this->_aliases['civicrm_email']}.is_primary = 1";
-      }
-      if ($this->isTableSelected('civicrm_phone')) {
-        $this->_from .= "
-          LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
-            ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id
-            AND {$this->_aliases['civicrm_phone']}.is_primary = 1";
-      }
-      $this->addAddressFromClause();
+
+      $this->joinAddressFromContact();
+      $this->joinPhoneFromContact();
+      $this->joinEmailFromContact();
     }
     else {
       $this->setFromBase('civicrm_contact');
@@ -612,7 +604,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
     $this->groupBy();
     $this->orderBy();
-    $this->getPermissionedFTQuery($this);
     $limitFilter = '';
 
     // order_by columns not selected for display need to be included in SELECT

@@ -40,9 +40,8 @@ Required vars: activitySet
         ui-options="{dropdownAutoWidth : true}"
         ng-model="activity.reference_activity"
         ng-options="activityType.name as activityType.label for activityType in activitySet.activityTypes"
-        ng-hide="activity.name == 'Open Case'"
-        ng-required="activity.name != 'Open Case'"
         >
+        <option value="">-- Case Start --</option>
       </select>
     </td>
     <td>
@@ -51,8 +50,6 @@ Required vars: activitySet
         type="text"
         ng-pattern="/^-?[0-9]*$/"
         ng-model="activity.reference_offset"
-        ng-hide="activity.name == 'Open Case'"
-        ng-required="activity.name != 'Open Case'"
         >
     </td>
     <td>
@@ -61,8 +58,6 @@ Required vars: activitySet
         ui-options="{dropdownAutoWidth : true}"
         ng-model="activity.reference_select"
         ng-options="key as value for (key,value) in {newest: ts('Newest'), oldest: ts('Oldest')}"
-        ng-hide="activity.name == 'Open Case'"
-        ng-required="activity.name != 'Open Case'"
         >
       </select>
     </td>

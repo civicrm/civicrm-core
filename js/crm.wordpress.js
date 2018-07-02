@@ -10,5 +10,12 @@ CRM.$(function($) {
         // Restore admin bar position
         $('#adminmenuwrap').css('z-index', '');
       }
+    })
+    .on('crmWysiwygCreate', function(e, type, editor) {
+      if (type === 'ckeditor') {
+        editor.on('maximize', function(e) {
+          $('#wpadminbar').toggle(e.data === 2);
+        });
+      }
     });
 });

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -249,6 +249,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $this->assign('componentId', $id);
       $this->assign('component', 'contribution');
     }
+    $this->assignPaymentInfoBlock($id);
   }
 
   /**
@@ -264,6 +265,29 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
         'isDefault' => TRUE,
       ),
     ));
+  }
+
+  /**
+   * Assign the values to build the payment info block.
+   *
+   * @todo - this is a bit too much copy & paste from AbstractEditPayment
+   * (justifying on the basis it's 'pretty short' and in a different inheritance
+   * tree. I feel like traits are probably the longer term answer).
+   *
+   * @param int $id
+   *
+   * @return string $title
+   *   Block title.
+   */
+  protected function assignPaymentInfoBlock($id) {
+    // component is used in getPaymentInfo primarily to retrieve the contribution id, we
+    // already have that.
+    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($id, 'contribution', TRUE);
+    $title = ts('View Payment');
+    $this->assign('transaction', TRUE);
+    $this->assign('payments', $paymentInfo['transaction']);
+    $this->assign('paymentLinks', $paymentInfo['payment_links']);
+    return $title;
   }
 
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -37,6 +37,7 @@
 class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('Settings - Display Preferences'));
+    $optionValues = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
 
     $this->_varNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
@@ -76,9 +77,9 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'weight' => 7,
         ),
         'contact_ajax_check_similar' => array(
-          'html_type' => 'checkbox',
           'title' => ts('Check for Similar Contacts'),
           'weight' => 8,
+          'html_type' => NULL,
         ),
         'user_dashboard_options' => array(
           'html_type' => 'checkboxes',
@@ -103,6 +104,13 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'html_type' => 'checkbox',
           'title' => ts('Enable Popup Forms'),
           'weight' => 13,
+        ),
+        'do_not_notify_assignees_for' => array(
+          'html_type' => 'select',
+          'option_values' => $optionValues,
+          'attributes' => array('multiple' => 1, "class" => "huge crm-select2"),
+          'title' => ts('Do not notify assignees for'),
+          'weight' => 14,
         ),
       ),
     );
@@ -141,6 +149,12 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
     $this->addElement('select', 'editor_id', ts('WYSIWYG Editor'), $wysiwyg_options, $extra);
     $this->addElement('submit', 'ckeditor_config', ts('Configure CKEditor'));
+
+    $this->addRadio('contact_ajax_check_similar', ts('Check for Similar Contacts'), array(
+      '1' => ts('While Typing'),
+      '0' => ts('When Saving'),
+      '2' => ts('Never'),
+    ));
 
     $editOptions = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 0');
     $this->assign('editOptions', $editOptions);
@@ -183,6 +197,9 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     $this->_config->editor_id = $this->_params['editor_id'];
 
     $this->postProcessCommon();
+
+    // Fixme - shouldn't be needed
+    Civi::settings()->set('contact_ajax_check_similar', $this->_params['contact_ajax_check_similar']);
 
     // If "Configure CKEditor" button was clicked
     if (!empty($this->_params['ckeditor_config'])) {

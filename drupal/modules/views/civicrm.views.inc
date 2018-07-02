@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -329,7 +329,8 @@ function civicrm_views_custom_data_cache(&$data, $entity_type, $group_id, $sub_t
     return;
   }
   // From http://forum.civicrm.org/index.php/topic,17658.msg73901.html#msg73901, CRM-7860.
-  $tree = CRM_Core_BAO_CustomGroup::getTree($entity_type, NULL, NULL, $group_id, $sub_type, NULL);
+  // Checking permissions results in bug CRM-20292.
+  $tree = CRM_Core_BAO_CustomGroup::getTree($entity_type, NULL, NULL, $group_id, $sub_type, NULL, TRUE, NULL, FALSE, FALSE);
 
   $join_table = civicrm_views_get_join_table($entity_type);
   foreach ($tree as $groupkey => $current_group) {
@@ -609,6 +610,9 @@ function civicrm_views_get_filter($data_type, $html_type = NULL, $option_group_i
 
     case "County":
       return array('handler' => 'civicrm_handler_filter_pseudo_constant', 'pseudo class' => 'CRM_Core_PseudoConstant', 'pseudo method' => 'county', 'allow empty' => TRUE);
+
+    case "ContactReference":
+      return array('handler' => 'civicrm_handler_filter_contact_ref');
 
     default:
       return array('handler' => 'views_handler_filter_string', 'allow empty' => TRUE);

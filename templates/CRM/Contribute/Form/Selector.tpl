@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,11 +26,15 @@
 {include file="CRM/common/pager.tpl" location="top"}
 
 {strip}
+  <div class="crm-contact-contribute-contributions">
   <table class="selector row-highlight">
     <thead class="sticky">
     <tr>
       {if !$single and $context eq 'Search' }
         <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
+      {/if}
+      {if !$single}
+      <th scope="col"></th>
       {/if}
       {foreach from=$columnHeaders item=header}
         <th scope="col">
@@ -45,9 +49,6 @@
     </tr>
     </thead>
 
-    <p class="description">
-      {ts}Click arrow to view payment details.{/ts}
-    </p>
     {counter start=0 skip=1 print=false}
     {foreach from=$rows item=row}
       <tr id="rowid{$row.contribution_id}" class="{cycle values="odd-row,even-row"} {if $row.cancel_date} cancelled{/if} crm-contribution_{$row.contribution_id}">
@@ -56,7 +57,8 @@
             {assign var=cbName value=$row.checkbox}
             <td>{$form.$cbName.html}</td>
           {/if}
-          <td>{$row.contact_type} &nbsp; <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
+          <td>{$row.contact_type}</td>
+          <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
         {/if}
         <td class="crm-contribution-amount">
           {if !$row.contribution_soft_credit_amount}
@@ -107,6 +109,7 @@
     {/foreach}
 
   </table>
+  </div>
 {/strip}
 
 {include file="CRM/common/pager.tpl" location="bottom"}

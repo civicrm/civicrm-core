@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>EntityTag</class>
+  <name>civicrm_entity_tag</name>
+  <comment>Tag entities (Contacts, Groups, Actions) to categories.</comment>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Entity Tag ID</title>
+    <required>true</required>
+    <comment>primary key</comment>
+    <add>1.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to contact table.</comment>
+    <add>2.0</add>
+    <drop>3.2</drop>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>2.0</add>
+    <drop>3.2</drop>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>entity_table</name>
+    <type>varchar</type>
+    <title>Entity Table</title>
+    <length>64</length>
+    <comment>physical tablename for entity being joined to file, e.g. civicrm_contact</comment>
+    <pseudoconstant>
+      <optionGroupName>tag_used_for</optionGroupName>
+    </pseudoconstant>
+    <add>3.2</add>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <type>int unsigned</type>
+    <title>Entity ID</title>
+    <required>true</required>
+    <comment>FK to entity table specified in entity_table column.</comment>
+    <add>3.2</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>3.2</add>
+  </dynamicForeignKey>
+  <index>
+    <name>index_entity</name>
+    <fieldName>entity_table</fieldName>
+    <fieldName>entity_id</fieldName>
+    <add>3.2</add>
+    <drop>3.4</drop>
+  </index>
+  <field>
+    <name>tag_id</name>
+    <type>int unsigned</type>
+    <title>Tag</title>
+    <required>true</required>
+    <comment>FK to civicrm_tag</comment>
+    <add>1.1</add>
+    <pseudoconstant>
+      <table>civicrm_tag</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>tag_id</name>
+    <table>civicrm_tag</table>
+    <key>id</key>
+    <add>1.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <index>
+    <name>UI_entity_id_entity_table_tag_id</name>
+    <fieldName>entity_id</fieldName>
+    <fieldName>entity_table</fieldName>
+    <fieldName>tag_id</fieldName>
+    <unique>true</unique>
+    <add>3.4</add>
+  </index>
+</table>

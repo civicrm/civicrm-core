@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
@@ -243,7 +243,7 @@ SELECT count(*)
   }
 
   if (in_array($htmlType, array(
-    'Select', 'Multi-Select', 'CheckBox', 'Radio', 'AdvMulti-Select')) &&
+    'Select', 'Multi-Select', 'CheckBox', 'Radio')) &&
     !isset($errors[$fieldName])
   ) {
     $options = CRM_Core_OptionGroup::valuesByID($fieldDetails['option_group_id']);

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Batch</base>
+  <class>EntityBatch</class>
+  <name>civicrm_entity_batch</name>
+  <comment>Batch entities (Contributions, Participants, Contacts) to a batch.</comment>
+  <field>
+    <name>id</name>
+    <title>EntityBatch ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>primary key</comment>
+    <add>3.3</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>entity_table</name>
+    <title>EntityBatch Table</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>physical tablename for entity being joined to file, e.g. civicrm_contact</comment>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>Entity ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to entity table specified in entity_table column.</comment>
+    <add>3.3</add>
+  </field>
+  <dynamicForeignKey>
+    <idColumn>entity_id</idColumn>
+    <typeColumn>entity_table</typeColumn>
+    <add>3.3</add>
+  </dynamicForeignKey>
+  <index>
+    <name>index_entity</name>
+    <fieldName>entity_table</fieldName>
+    <fieldName>entity_id</fieldName>
+    <add>3.3</add>
+  </index>
+  <field>
+    <name>batch_id</name>
+    <title>Batch ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm_batch</comment>
+    <pseudoconstant>
+      <table>civicrm_batch</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <add>3.3</add>
+  </field>
+  <foreignKey>
+    <name>batch_id</name>
+    <table>civicrm_batch</table>
+    <key>id</key>
+    <add>3.3</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <index>
+    <name>UI_batch_entity</name>
+    <fieldName>batch_id</fieldName>
+    <fieldName>entity_id</fieldName>
+    <fieldName>entity_table</fieldName>
+    <unique>true</unique>
+    <add>3.3</add>
+  </index>
+</table>

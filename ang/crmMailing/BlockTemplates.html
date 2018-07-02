@@ -1,0 +1,9 @@
+<div ng-controller="MsgTemplateCtrl" class="crm-mailing-templates-row">
+    <input 
+      type="hidden"
+      crm-mailing-templates
+      ng-model="mailing.msg_template_id"
+      crm-ui-id="{{crmMailingBlockTemplates.id}}"
+      name="{{crmMailingBlockTemplates.name}}" />
+  <a crm-icon="fa-floppy-o" ng-if="checkPerm('edit message templates')" ng-click="saveTemplate(mailing)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
+</div>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,23 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
-
-  protected $_addressField = FALSE;
-
-  protected $_emailField = FALSE;
 
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
   protected $_summary = NULL;
 
   /**
-   */
-  /**
+   * Class constructor.
    */
   public function __construct() {
     self::validRelationships();
@@ -77,7 +70,13 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
           ),
         ),
         'filters' => array(
-          'household_name' => array('title' => ts('Household Name')),
+          'household_name' => array(
+            'title' => ts('Household Name'),
+          ),
+          'is_deleted' => array(
+            'default' => 0,
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+          ),
         ),
         'grouping' => 'household-fields',
       ),
@@ -138,6 +137,9 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             'required' => TRUE,
             'no_display' => TRUE,
           ),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
+          ),
           'trxn_id' => NULL,
           'receive_date' => array('default' => TRUE),
           'receipt_date' => NULL,
@@ -157,6 +159,11 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),
+          ),
+          'financial_type_id' => array(
+            'title' => ts('Financial Type'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
         ),
         'grouping' => 'contri-fields',
@@ -219,11 +226,8 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
     parent::__construct();
   }
 
-  public function preProcess() {
-    parent::preProcess();
-  }
-
   public function select() {
+    // @todo remove this & use parent select.
     $this->_columnHeaders = $select = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
@@ -231,12 +235,6 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
           if (!empty($field['required']) ||
             !empty($this->_params['fields'][$fieldName])
           ) {
-            if ($tableName == 'civicrm_address') {
-              $this->_addressField = TRUE;
-            }
-            elseif ($tableName == 'civicrm_email') {
-              $this->_emailField = TRUE;
-            }
 
             if (!empty($field['statistics'])) {
               foreach ($field['statistics'] as $stat => $label) {
@@ -261,8 +259,6 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
   }
 
   public function from() {
-
-    $this->_from = NULL;
     $this->_from = "
         FROM  civicrm_relationship {$this->_aliases['civicrm_relationship']}
             LEFT  JOIN civicrm_contact {$this->_aliases['civicrm_contact_household']} ON
@@ -273,18 +269,8 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
             INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']} ON
                       ({$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_relationship']}.$this->otherContact ) AND {$this->_aliases['civicrm_contribution']}.is_test = 0 ";
 
-    if ($this->_addressField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_address  {$this->_aliases['civicrm_address']} ON
-                      {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
-                      {$this->_aliases['civicrm_address']}.is_primary = 1\n ";
-    }
-    if ($this->_emailField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} ON
-                      {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                      {$this->_aliases['civicrm_email']}.is_primary = 1\n ";
-    }
+    $this->joinAddressFromContact();
+    $this->joinEmailFromContact();
 
     // for credit card type
     $this->addFinancialTrxnFromClause();
@@ -523,6 +509,12 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
       if (array_key_exists('civicrm_contribution_contribution_status_id', $row)) {
         if ($value = $row['civicrm_contribution_contribution_status_id']) {
           $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = CRM_Contribute_PseudoConstant::contributionStatus($value);
+        }
+      }
+
+      if (array_key_exists('civicrm_contribution_financial_type_id', $row)) {
+        if ($value = $row['civicrm_contribution_financial_type_id']) {
+          $rows[$rowNum]['civicrm_contribution_financial_type_id'] = CRM_Contribute_PseudoConstant::financialType($value);
         }
       }
 

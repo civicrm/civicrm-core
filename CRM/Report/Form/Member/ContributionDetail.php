@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2018                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,12 +28,9 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
-  protected $_addressField = FALSE;
-
-  protected $_emailField = FALSE;
 
   protected $_summary = NULL;
 
@@ -411,12 +408,6 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           if (!empty($field['required']) ||
             !empty($this->_params['fields'][$fieldName])
           ) {
-            if ($tableName == 'civicrm_address') {
-              $this->_addressField = TRUE;
-            }
-            if ($tableName == 'civicrm_email') {
-              $this->_emailField = TRUE;
-            }
 
             // only include statistics columns if set
             if (!empty($field['statistics'])) {
@@ -509,12 +500,6 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
     }
 
-    if (!empty($this->_params['fields']['phone'])) {
-      $this->_from .= "
-               LEFT JOIN  civicrm_phone {$this->_aliases['civicrm_phone']}
-                      ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                         {$this->_aliases['civicrm_phone']}.is_primary = 1)";
-    }
     //for contribution batches
     if (!empty($this->_params['fields']['batch_id']) ||
         !empty($this->_params['bid_value'])
@@ -528,22 +513,9 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           AND {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn')";
     }
 
-    if ($this->_addressField OR
-      (!empty($this->_params['state_province_id_value']) OR
-        !empty($this->_params['country_id_value']))
-    ) {
-      $this->_from .= "
-            LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
-                      {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
-
-    if ($this->_emailField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                      {$this->_aliases['civicrm_email']}.is_primary = 1\n";
-    }
+    $this->joinAddressFromContact();
+    $this->joinPhoneFromContact();
+    $this->joinEmailFromContact();
   }
 
   /**

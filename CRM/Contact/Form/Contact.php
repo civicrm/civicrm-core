@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -590,7 +590,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @return bool
    *   email/openId
    */
-  public static function formRule($fields, &$errors, $contactId = NULL) {
+  public static function formRule($fields, &$errors, $contactId, $contactType) {
     $config = CRM_Core_Config::singleton();
 
     // validations.
@@ -713,6 +713,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       }
     }
 
+    // Check for duplicate contact if it wasn't already handled by ajax or disabled
+    if (!Civi::settings()->get('contact_ajax_check_similar')) {
+      self::checkDuplicateContacts($fields, $errors, $contactId, $contactType);
+    }
+
     return $primaryID;
   }
 
@@ -753,6 +758,14 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     //build contact type specific fields
     $className = 'CRM_Contact_Form_Edit_' . $this->_contactType;
     $className::buildQuickForm($this);
+
+    // Ajax duplicate checking
+    $checkSimilar = $this->_action == CRM_Core_Action::ADD && Civi::settings()->get('contact_ajax_check_similar');
+    $this->assign('checkSimilar', $checkSimilar);
+    if ($checkSimilar == 1) {
+      $ruleParams = array('used' => 'Supervised', 'contact_type' => $this->_contactType);
+      $this->assign('ruleFields', CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams));
+    }
 
     // build Custom data if Custom data present in edit option
     $buildCustomData = 'noCustomDataPresent';
@@ -866,8 +879,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       }
     }
 
-    CRM_Contact_BAO_Contact_Optimizer::edit($params, $this->_preEditValues);
-
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
@@ -916,8 +927,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       CRM_Utils_Hook::pre('create', $params['contact_type'], NULL, $params);
     }
 
-    $customFields = CRM_Core_BAO_CustomField::getFields($params['contact_type'], FALSE, TRUE);
-
     //CRM-5143
     //if subtype is set, send subtype as extend to validate subtype customfield
     $customFieldExtends = (CRM_Utils_Array::value('contact_sub_type', $params)) ? $params['contact_sub_type'] : $params['contact_type'];
@@ -943,11 +952,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // process shared contact address.
     CRM_Contact_BAO_Contact_Utils::processSharedAddress($params['address']);
 
-    if (!array_key_exists('TagsAndGroups', $this->_editOptions) && !empty($params['group'])) {
+    if (!array_key_exists('TagsAndGroups', $this->_editOptions)) {
       unset($params['group']);
     }
-
-    if (!empty($params['contact_id']) && ($this->_action & CRM_Core_Action::UPDATE) && !empty($params['group'])) {
+    elseif (!empty($params['contact_id']) && ($this->_action & CRM_Core_Action::UPDATE)) {
       // figure out which all groups are intended to be removed
       $contactGroupList = CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], 'Added');
       if (is_array($contactGroupList)) {

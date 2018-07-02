@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Event</base>
+  <class>Participant</class>
+  <name>civicrm_participant</name>
+  <add>1.7</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <uniqueName>participant_id</uniqueName>
+    <title>Participant ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Participant Id</comment>
+    <import>true</import>
+    <headerPattern>/(^(participant(.)?)?id$)/i</headerPattern>
+    <add>1.7</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <uniqueName>participant_contact_id</uniqueName>
+    <type>int unsigned</type>
+    <title>Contact ID</title>
+    <headerPattern>/contact(.?id)?/i</headerPattern>
+    <import>true</import>
+    <required>true</required>
+    <comment>FK to Contact ID</comment>
+    <add>1.7</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>event_id</name>
+    <type>int unsigned</type>
+    <title>Event</title>
+    <import>true</import>
+    <headerPattern>/event id$/i</headerPattern>
+    <required>true</required>
+    <comment>FK to Event ID</comment>
+    <add>1.7</add>
+  </field>
+  <foreignKey>
+    <name>event_id</name>
+    <table>civicrm_event</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>status_id</name>
+    <uniqueName>participant_status_id</uniqueName>
+    <title>Participant Status</title>
+    <headerPattern>/(participant.)?(status)$/i</headerPattern>
+    <import>true</import>
+    <type>int unsigned</type>
+    <export>true</export>
+    <required>true</required>
+    <default>1</default>
+    <comment>Participant status ID. FK to civicrm_participant_status_type. Default of 1 should map to status = Registered.</comment>
+    <add>1.7</add>
+    <pseudoconstant>
+      <table>civicrm_participant_status_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>label</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>status_id</name>
+    <table>civicrm_participant_status_type</table>
+    <key>id</key>
+    <add>3.0</add>
+  </foreignKey>
+  <index>
+    <name>index_status_id</name>
+    <fieldName>status_id</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>role_id</name>
+    <uniqueName>participant_role_id</uniqueName>
+    <title>Participant Role</title>
+    <pseudoconstant>
+      <optionGroupName>participant_role</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+      <multiple>1</multiple>
+    </html>
+    <serialize>SEPARATOR_TRIMMED</serialize>
+    <headerPattern>/(participant.)?(role)$/i</headerPattern>
+    <import>true</import>
+    <type>varchar</type>
+    <length>128</length>
+    <export>true</export>
+    <default>NULL</default>
+    <comment>Participant role ID. Implicit FK to civicrm_option_value where option_group = participant_role.</comment>
+    <add>1.7</add>
+  </field>
+  <index>
+    <name>index_role_id</name>
+    <fieldName>role_id</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>register_date</name>
+    <uniqueName>participant_register_date</uniqueName>
+    <title>Register date</title>
+    <headerPattern>/^(r(egister\s)?date)$/i</headerPattern>
+    <import>true</import>
+    <type>datetime</type>
+    <comment>When did contact register for event?</comment>
+    <add>1.7</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
+    </html>
+  </field>
+  <field>
+    <name>source</name>
+    <uniqueName>participant_source</uniqueName>
+    <title>Participant Source</title>
+    <headerPattern>/(participant.)?(source)$/i</headerPattern>
+    <import>true</import>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Source of this event registration.</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>fee_level</name>
+    <uniqueName>participant_fee_level</uniqueName>
+    <title>Fee level</title>
+    <headerPattern>/^(f(ee\s)?level)$/i</headerPattern>
+    <type>text</type>
+    <import>true</import>
+    <serialize>SEPARATOR_BOOKEND</serialize>
+    <comment>Populate with the label (text) associated with a fee level for paid events with multiple levels. Note that
+      we store the label value and not the key
+    </comment>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>is_test</name>
+    <uniqueName>participant_is_test</uniqueName>
+    <title>Test</title>
+    <type>boolean</type>
+    <default>0</default>
+    <import>true</import>
+    <add>1.7</add>
+  </field>
+  <field>
+    <name>is_pay_later</name>
+    <uniqueName>participant_is_pay_later</uniqueName>
+    <title>Is Pay Later</title>
+    <type>boolean</type>
+    <default>0</default>
+    <import>true</import>
+    <headerPattern>/(is.)?(pay(.)?later)$/i</headerPattern>
+    <add>2.1</add>
+  </field>
+
+  <field>
+    <name>fee_amount</name>
+    <uniqueName>participant_fee_amount</uniqueName>
+    <title>Fee Amount</title>
+    <type>decimal</type>
+    <import>true</import>
+    <headerPattern>/fee(.?am(ou)?nt)?/i</headerPattern>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
+    <comment>actual processor fee if known - may be 0.</comment>
+    <add>2.1</add>
+  </field>
+  <field>
+    <name>registered_by_id</name>
+    <uniqueName>participant_registered_by_id</uniqueName>
+    <type>int unsigned</type>
+    <title>Registered By ID</title>
+    <import>true</import>
+    <default>NULL</default>
+    <comment>FK to Participant ID</comment>
+    <add>2.1</add>
+    <export>true</export>
+  </field>
+  <foreignKey>
+    <name>registered_by_id</name>
+    <table>civicrm_participant</table>
+    <key>id</key>
+    <add>2.1</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>discount_id</name>
+    <uniqueName>participant_discount_id</uniqueName>
+    <type>int unsigned</type>
+    <title>Discount ID</title>
+    <default>NULL</default>
+    <comment>FK to Discount ID</comment>
+    <add>2.1</add>
+  </field>
+  <foreignKey>
+    <name>discount_id</name>
+    <table>civicrm_discount</table>
+    <key>id</key>
+    <add>2.1</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>fee_currency</name>
+    <uniqueName>participant_fee_currency</uniqueName>
+    <title>Fee Currency</title>
+    <type>varchar</type>
+    <length>3</length>
+    <default>NULL</default>
+    <import>true</import>
+    <headerPattern>/(fee)?.?cur(rency)?/i</headerPattern>
+    <dataPattern>/^[A-Z]{3}$/i</dataPattern>
+    <comment>3 character string, value derived from config setting.</comment>
+    <add>3.0</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>campaign_id</name>
+    <uniqueName>participant_campaign_id</uniqueName>
+    <type>int unsigned</type>
+    <title>Campaign</title>
+    <import>true</import>
+    <comment>The campaign for which this participant has been registered.</comment>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <add>3.4</add>
+  </field>
+  <foreignKey>
+    <name>campaign_id</name>
+    <table>civicrm_campaign</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>discount_amount</name>
+    <type>int unsigned</type>
+    <title>Discount Amount</title>
+    <comment>Discount Amount</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>cart_id</name>
+    <type>int unsigned</type>
+    <title>Event Cart ID</title>
+    <comment>FK to civicrm_event_carts</comment>
+    <add>4.1</add>
+  </field>
+  <foreignKey>
+    <name>cart_id</name>
+    <table>civicrm_event_carts</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>must_wait</name>
+    <type>int</type>
+    <title>Must Wait on List</title>
+    <comment>On Waiting List</comment>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>transferred_to_contact_id</name>
+    <uniqueName>transferred_to_contact_id</uniqueName>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <title>Transferred to Contact ID</title>
+    <headerPattern>/transfer(.?id)?/i</headerPattern>
+    <import>true</import>
+    <comment>FK to Contact ID</comment>
+    <add>4.7</add>
+  </field>
+  <foreignKey>
+    <name>transferred_to_contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+</table>

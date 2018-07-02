@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -49,6 +49,12 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * @var array
    */
   protected $_gLabel;
+
+  /**
+   * Is this Option Group Domain Specific
+   * @var bool
+   */
+  protected $_domainSpecific = FALSE;
 
   /**
    * Pre-process
@@ -74,6 +80,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'name'
     );
     $this->_gLabel = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $this->_gid, 'title');
+    $this->_domainSpecific = in_array($this->_gName, CRM_Core_OptionGroup::$_domainIDGroups);
     $url = "civicrm/admin/options/{$this->_gName}";
     $params = "reset=1";
 
@@ -122,7 +129,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
 
-    //setDefault of contact types for email greeting, postal greeting, addressee, CRM-4575
+    // setDefault of contact types for email greeting, postal greeting, addressee, CRM-4575
     if (in_array($this->_gName, array(
       'email_greeting',
       'postal_greeting',
@@ -172,6 +179,11 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'),
         TRUE
       );
+      $this->addRule('value',
+        ts('This Value already exists in the database for this option group. Please select a different Value.'),
+        'optionExists',
+        array('CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'value', $this->_domainSpecific)
+      );
     }
     else {
       $this->add('text', 'icon', ts('Icon'), array('class' => 'crm-icon-picker', 'title' => ts('Choose Icon'), 'allowClear' => TRUE));
@@ -187,12 +199,10 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         'addressee',
       )) && !$isReserved
     ) {
-      $domainSpecificOptionGroups = array('from_email_address');
-      $domainSpecific = in_array($this->_gName, $domainSpecificOptionGroups) ? TRUE : FALSE;
       $this->addRule('label',
-        ts('This Label already exists in the database for this option group. Please select a different Value.'),
+        ts('This Label already exists in the database for this option group. Please select a different Label.'),
         'optionExists',
-        array('CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'label', $domainSpecific)
+        array('CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'label', $this->_domainSpecific)
       );
     }
 
@@ -292,7 +302,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $enabled->freeze();
     }
 
-    //fix for CRM-3552, CRM-4575
+    // fix for CRM-3552, CRM-4575
     $showIsDefaultGroups = array(
       'email_greeting',
       'postal_greeting',
@@ -312,7 +322,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $this->add('checkbox', 'is_default', ts('Default Option?'));
     }
 
-    //get contact type for which user want to create a new greeting/addressee type, CRM-4575
+    // get contact type for which user want to create a new greeting/addressee type, CRM-4575
     if (in_array($this->_gName, array(
         'email_greeting',
         'postal_greeting',
@@ -331,7 +341,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
     if ($this->_gName == 'participant_status') {
       // For Participant Status options, expose the 'filter' field to track which statuses are "Counted", and the Visibility field
-      $element = $this->add('checkbox', 'filter', ts('Counted?'));
+      $this->add('checkbox', 'filter', ts('Counted?'));
       $this->add('select', 'visibility_id', ts('Visibility'), CRM_Core_PseudoConstant::visibility());
     }
     if ($this->_gName == 'participant_role') {
@@ -354,6 +364,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    *
    * @return array
    *   array of errors / empty array.
+   * @throws \CRM_Core_Exception
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();
@@ -396,7 +407,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     $dataType = self::getOptionGroupDataType($self->_gName);
     if ($dataType && $self->_gName !== 'activity_type') {
       $validate = CRM_Utils_Type::validate($fields['value'], $dataType, FALSE);
-      if (!$validate) {
+      if ($validate === FALSE) {
         CRM_Core_Session::setStatus(
           ts('Data Type of the value field for this option value does not match ' . $dataType),
           ts('Value field Data Type mismatch'));
@@ -425,7 +436,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $fieldValues = array('option_group_id' => $this->_gid);
-      $wt = CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $this->_id, $fieldValues);
+      CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $this->_id, $fieldValues);
 
       if (CRM_Core_BAO_OptionValue::del($this->_id)) {
         if ($this->_gName == 'phone_type') {
@@ -440,7 +451,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
     else {
-      $ids = array();
       $params = $this->exportValues();
 
       // allow multiple defaults within group.

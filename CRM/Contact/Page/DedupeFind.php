@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   protected $_cid = NULL;
@@ -36,6 +36,23 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   protected $_mainContacts;
   protected $_gid;
   protected $action;
+  /**
+   * Only display selected.
+   *
+   * @var bool
+   */
+  protected $selected;
+
+  /**
+   * Get isSelected value.
+   *
+   * This needs to be an integer of 0 or 1 or NULL for no filter.
+   *
+   * @return bool|NULL
+   */
+  public function isSelected() {
+    return ($this->selected === NULL) ? NULL : (int) $this->selected;
+  }
 
   /**
    * Get BAO Name.
@@ -54,17 +71,27 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
   }
 
   /**
+   * Initialize properties from input.
+   */
+  protected function initialize() {
+    $this->selected = CRM_Utils_Request::retrieveValue('selected', 'Boolean');
+  }
+
+  /**
    * Browse all rule groups.
    */
   public function run() {
+    $this->initialize();
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0);
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 0);
     $context = CRM_Utils_Request::retrieve('context', 'String', $this);
     $limit = CRM_Utils_Request::retrieve('limit', 'Integer', $this);
     $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive', $this);
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, 0);
-    // Using a placeholder for criteria as it is intended to be able to pass this later.
-    $criteria = array();
+
+    $criteria = CRM_Utils_Request::retrieve('criteria', 'Json', $this, FALSE, '{}');
+    $this->assign('criteria', $criteria);
+
     $isConflictMode = ($context == 'conflicts');
     if ($cid) {
       $this->_cid = $cid;
@@ -79,8 +106,13 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       'rgid' => $rgid,
       'gid' => $gid,
       'limit' => $limit,
+      'criteria' => $criteria,
     );
     $this->assign('urlQuery', CRM_Utils_System::makeQueryString($urlQry));
+    $this->assign('isSelected', $this->isSelected());
+    $criteria = json_decode($criteria, TRUE);
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria);
+    $this->assign('cacheKey', $cacheKeyString);
 
     if ($context == 'search') {
       $context = 'search';
@@ -90,7 +122,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
     if ($action & CRM_Core_Action::RENEW) {
       // empty cache
       if ($rgid) {
-        CRM_Core_BAO_PrevNextCache::deleteItem(NULL, CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria));
+        CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKeyString);
       }
       $urlQry['action'] = 'update';
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry));
@@ -138,23 +170,19 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       $this->action = CRM_Core_Action::UPDATE;
 
       $urlQry['snippet'] = 4;
-      if ($isConflictMode) {
-        $urlQry['selected'] = 1;
-      }
 
       $this->assign('sourceUrl', CRM_Utils_System::url('civicrm/ajax/dedupefind', $urlQry, FALSE, NULL, FALSE));
 
-      //reload from cache table
-      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria);
-
-      $stats = CRM_Dedupe_Merger::getMergeStatsMsg($cacheKeyString);
+      $stats = CRM_Dedupe_Merger::getMergeStats($cacheKeyString);
       if ($stats) {
-        CRM_Core_Session::setStatus($stats);
+        $message = CRM_Dedupe_Merger::getMergeStatsMsg($stats);
+        $status = empty($stats['skipped']) ? 'success' : 'alert';
+        CRM_Core_Session::setStatus($message, ts('Batch Complete'), $status, array('expires' => 0));
         // reset so we not displaying same message again
         CRM_Dedupe_Merger::resetMergeStats($cacheKeyString);
       }
 
-      $this->_mainContacts = CRM_Dedupe_Merger::getDuplicatePairs($rgid, $gid, !$isConflictMode, 0, $isConflictMode, '', $isConflictMode, $criteria, TRUE);
+      $this->_mainContacts = CRM_Dedupe_Merger::getDuplicatePairs($rgid, $gid, !$isConflictMode, 0, $this->isSelected(), '', $isConflictMode, $criteria, TRUE, $limit);
 
       if (empty($this->_mainContacts)) {
         if ($isConflictMode) {

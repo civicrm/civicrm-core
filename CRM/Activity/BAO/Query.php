@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Activity_BAO_Query {
 
@@ -318,8 +318,8 @@ class CRM_Activity_BAO_Query {
 
       case 'activity_result':
         if (is_array($value)) {
-          $safe = NULL;
-          while (list(, $k) = each($value)) {
+          $safe = [];
+          foreach ($values as $id => $k) {
             $safe[] = "'" . CRM_Utils_Type::escape($k, 'String') . "'";
           }
           $query->_where[$grouping][] = "civicrm_activity.result IN (" . implode(',', $safe) . ")";
@@ -505,7 +505,7 @@ class CRM_Activity_BAO_Query {
         if ($name) {
           $value = CRM_Core_OptionGroup::values($name);
           if (!empty($value)) {
-            while (list($k, $v) = each($value)) {
+            foreach ($value as $k => $v) {
               $resultOptions[$v] = $v;
             }
           }

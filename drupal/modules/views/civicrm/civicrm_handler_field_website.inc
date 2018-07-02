@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                               |
+ | CiviCRM version 5                                                 |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
  *
  * @ingroup civicrm_field_handlers
  */
-class civicrm_handler_field_website extends civicrm_handler_field_location {
+class civicrm_handler_field_website extends civicrm_handler_field {
   static $_websiteType;
 
   public function construct() {

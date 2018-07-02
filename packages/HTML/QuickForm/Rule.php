@@ -2,8 +2,8 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
- * Abstract base class for QuickForm validation rules 
- * 
+ * Abstract base class for QuickForm validation rules
+ *
  * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.01 of the PHP license
@@ -22,7 +22,7 @@
  */
 
 /**
- * Abstract base class for QuickForm validation rules 
+ * Abstract base class for QuickForm validation rules
  *
  * @category    HTML
  * @package     HTML_QuickForm
@@ -46,7 +46,7 @@ class HTML_QuickForm_Rule
 
    /**
     * Validates a value
-    * 
+    *
     * @access public
     * @abstract
     */

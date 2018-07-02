@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Contact_Form_Location {
 
@@ -81,7 +81,6 @@ class CRM_Contact_Form_Location {
 
     //build 1 instance of all blocks, without using ajax ...
     foreach ($form->_blocks as $blockName => $label) {
-      require_once str_replace('_', DIRECTORY_SEPARATOR, 'CRM_Contact_Form_Edit_' . $blockName) . '.php';
       $name = strtolower($blockName);
 
       $instances = array(1);

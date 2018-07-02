@@ -3,7 +3,7 @@
 
 /**
  * HTML class for an <input type="button" /> elements
- * 
+ *
  * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.01 of the PHP license
@@ -29,7 +29,7 @@ require_once 'HTML/QuickForm/input.php';
 
 /**
  * HTML class for an <input type="button" /> elements
- * 
+ *
  * @category    HTML
  * @package     HTML_QuickForm
  * @author      Adam Daniel <adaniel1@eesus.jnj.com>
@@ -43,10 +43,10 @@ class HTML_QuickForm_button extends HTML_QuickForm_input
 
     /**
      * Class constructor
-     * 
+     *
      * @param     string    $elementName    (optional)Input field name attribute
      * @param     string    $value          (optional)Input field value
-     * @param     mixed     $attributes     (optional)Either a typical HTML attribute string 
+     * @param     mixed     $attributes     (optional)Either a typical HTML attribute string
      *                                      or an associative array
      * @since     1.0
      * @access    public
@@ -59,13 +59,13 @@ class HTML_QuickForm_button extends HTML_QuickForm_input
         $this->setValue($value);
         $this->setType('button');
     } //end constructor
-    
+
     // }}}
     // {{{ freeze()
 
     /**
      * Freeze the element so that only its value is returned
-     * 
+     *
      * @access    public
      * @return    void
      */
@@ -75,6 +75,6 @@ class HTML_QuickForm_button extends HTML_QuickForm_input
     } //end func freeze
 
     // }}}
- 
+
 } //end class HTML_QuickForm_button
 ?>

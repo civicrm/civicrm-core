@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contribute</base>
+  <class>ContributionSoft</class>
+  <name>civicrm_contribution_soft</name>
+  <add>2.2</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <uniqueName>contribution_soft_id</uniqueName>
+    <title>Soft Contribution ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <import>true</import>
+    <title>Soft Contribution ID</title>
+    <comment>Soft Contribution ID</comment>
+    <add>2.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contribution_id</name>
+    <title>Soft Contribution - Contribution</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to contribution table.</comment>
+    <add>2.2</add>
+  </field>
+  <foreignKey>
+    <name>contribution_id</name>
+    <table>civicrm_contribution</table>
+    <key>id</key>
+    <add>2.2</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>contact_id</name>
+    <uniqueName>contribution_soft_contact_id</uniqueName>
+    <title>Contact ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <import>true</import>
+    <headerPattern>/contact(.?id)?/i</headerPattern>
+    <dataPattern>/^\d+$/</dataPattern>
+    <comment>FK to Contact ID</comment>
+    <add>2.2</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>2.2</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>amount</name>
+    <title>Soft Contribution Amount</title>
+    <type>decimal</type>
+    <required>true</required>
+    <import>true</import>
+    <headerPattern>/total(.?am(ou)?nt)?/i</headerPattern>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
+    <comment>Amount of this soft contribution.</comment>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>currency</name>
+    <type>varchar</type>
+    <title>Soft Contribution Currency</title>
+    <length>3</length>
+    <default>NULL</default>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <add>3.2</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <name>pcp_id</name>
+    <type>int unsigned</type>
+    <title>Soft Contribution PCP</title>
+    <default>NULL</default>
+    <comment>FK to civicrm_pcp.id</comment>
+    <add>2.2</add>
+    <pseudoconstant>
+      <table>civicrm_pcp</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+  </field>
+  <foreignKey>
+    <name>pcp_id</name>
+    <table>civicrm_pcp</table>
+    <key>id</key>
+    <add>3.1</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <index>
+    <name>index_id</name>
+    <fieldName>pcp_id</fieldName>
+    <add>2.2</add>
+  </index>
+  <field>
+    <name>pcp_display_in_roll</name>
+    <type>boolean</type>
+    <title>Soft Contribution Display on PCP</title>
+    <default>0</default>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>pcp_roll_nickname</name>
+    <type>varchar</type>
+    <title>Soft Contribution PCP Nickname</title>
+    <length>255</length>
+    <default>NULL</default>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>pcp_personal_note</name>
+    <type>varchar</type>
+    <title>Soft Contribution PCP Note</title>
+    <length>255</length>
+    <html>
+      <type>TextArea</type>
+    </html>
+    <default>NULL</default>
+    <add>2.2</add>
+  </field>
+  <field>
+    <name>soft_credit_type_id</name>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <title>Soft Credit Type</title>
+    <pseudoconstant>
+      <optionGroupName>soft_credit_type</optionGroupName>
+    </pseudoconstant>
+    <comment>Soft Credit Type ID.Implicit FK to civicrm_option_value where option_group = soft_credit_type.</comment>
+    <add>2.2</add>
+  </field>
+</table>

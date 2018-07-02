@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Extension</class>
+  <name>civicrm_extension</name>
+  <add>4.2</add>
+  <log>false</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <title>Extension ID</title>
+    <required>true</required>
+    <comment>Local Extension ID</comment>
+    <add>4.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>type</name>
+    <title>Type</title>
+    <type>varchar</type>
+    <length>8</length>
+    <required>true</required>
+    <comment></comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getExtensionTypes</callback>
+    </pseudoconstant>
+    <add>4.2</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
+    <!-- "key" is a reserved word in MySQL -->
+    <name>full_name</name>
+    <title>Key</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>true</required>
+    <comment>Fully qualified extension name</comment>
+    <add>4.2</add>
+  </field>
+  <index>
+    <name>UI_extension_full_name</name>
+    <fieldName>full_name</fieldName>
+    <unique>true</unique>
+    <add>4.2</add>
+  </index>
+  <field>
+    <name>name</name>
+    <title>Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <import>true</import>
+    <comment>Short name</comment>
+    <add>4.2</add>
+  </field>
+  <index>
+    <name>UI_extension_name</name>
+    <fieldName>name</fieldName>
+    <add>4.2</add>
+  </index>
+  <field>
+    <name>label</name>
+    <title>Label</title>
+    <type>varchar</type>
+    <length>255</length>
+    <import>true</import>
+    <comment>Short, printable name</comment>
+    <add>4.2</add>
+  </field>
+  <field>
+    <name>file</name>
+    <title>File</title>
+    <type>varchar</type>
+    <length>255</length>
+    <import>true</import>
+    <comment>Primary PHP file</comment>
+    <add>4.2</add>
+  </field>
+  <field>
+    <name>schema_version</name>
+    <title>Schema Version</title>
+    <type>varchar</type>
+    <length>63</length>
+    <import>true</import>
+    <comment>Revision code of the database schema; the format is module-defined</comment>
+    <add>4.2</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <type>boolean</type>
+    <title>Extension is Active?</title>
+    <default>1</default>
+    <comment>Is this extension active?</comment>
+    <add>4.2</add>
+  </field>
+</table>

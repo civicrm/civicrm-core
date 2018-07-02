@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<table>
+  <base>CRM/Grant</base>
+  <class>Grant</class>
+  <name>civicrm_grant</name>
+  <comment>This table stores information about grants given to a contact.</comment>
+  <add>1.8</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <uniqueName>grant_id</uniqueName>
+    <title>Grant ID</title>
+    <required>true</required>
+    <comment>Unique Grant id</comment>
+    <import>true</import>
+    <add>1.8</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <uniqueName>grant_contact_id</uniqueName>
+    <title>Contact ID</title>
+    <export>true</export>
+    <required>true</required>
+    <comment>Contact ID of contact record given grant belongs to.</comment>
+    <add>1.8</add>
+    <html>
+       <type>EntityRef</type>
+     </html>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.8</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>application_received_date</name>
+    <title>Application received date</title>
+    <type>date</type>
+    <export>true</export>
+    <import>true</import>
+    <comment>Date on which grant application was received by donor.</comment>
+    <add>1.8</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDate</formatType>
+    </html>
+  </field>
+  <field>
+    <name>decision_date</name>
+    <title>Decision date</title>
+    <type>date</type>
+    <comment>Date on which grant decision was made.</comment>
+    <import>true</import>
+    <add>1.8</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDate</formatType>
+    </html>
+  </field>
+  <field>
+    <name>money_transfer_date</name>
+    <uniqueName>grant_money_transfer_date</uniqueName>
+    <title>Grant Money transfer date</title>
+    <type>date</type>
+    <comment>Date on which grant money transfer was made.</comment>
+    <import>true</import>
+    <add>1.8</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDate</formatType>
+    </html>
+  </field>
+  <field>
+    <name>grant_due_date</name>
+    <type>date</type>
+    <title>Grant Due Date</title>
+    <comment>Date on which grant report is due.</comment>
+    <add>1.8</add>
+    <import>true</import>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDate</formatType>
+    </html>
+  </field>
+  <field>
+    <name>grant_report_received</name>
+    <title>Grant report received</title>
+    <type>boolean</type>
+    <comment>Yes/No field stating whether grant report was received by donor.</comment>
+    <import>true</import>
+    <add>1.8</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>grant_type_id</name>
+    <type>int unsigned</type>
+    <title>Grant Type</title>
+    <pseudoconstant>
+      <optionGroupName>grant_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <export>true</export>
+    <required>true</required>
+    <comment>Type of grant. Implicit FK to civicrm_option_value in grant_type option_group.</comment>
+    <add>1.8</add>
+  </field>
+  <index>
+    <name>index_grant_type_id</name>
+    <fieldName>grant_type_id</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>amount_total</name>
+    <title>Total Amount</title>
+    <type>decimal</type>
+    <required>true</required>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
+    <import>true</import>
+    <comment>Requested grant amount, in default currency.</comment>
+    <add>1.8</add>
+   <html>
+     <type>Text</type>
+   </html>
+  </field>
+  <field>
+    <name>amount_requested</name>
+    <title>Amount Requested</title>
+    <type>decimal</type>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
+    <comment>Requested grant amount, in original currency (optional).</comment>
+    <add>1.8</add>
+    <html>
+     <type>Text</type>
+   </html>
+  </field>
+  <field>
+    <name>amount_granted</name>
+    <title>Amount granted</title>
+    <type>decimal</type>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
+    <import>true</import>
+    <comment>Granted amount, in default currency.</comment>
+    <add>1.8</add>
+    <html>
+          <type>Text</type>
+        </html>
+  </field>
+  <field>
+    <name>currency</name>
+    <title>Grant Currency</title>
+    <type>varchar</type>
+    <length>3</length>
+    <required>true</required>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <add>3.2</add>
+      <pseudoconstant>
+        <table>civicrm_currency</table>
+        <keyColumn>name</keyColumn>
+        <labelColumn>full_name</labelColumn>
+        <nameColumn>name</nameColumn>
+      </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
+  </field>
+  <field>
+    <name>currency</name>
+    <type>varchar</type>
+    <length>8</length>
+    <default>NULL</default>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <add>3.2</add>
+    <drop>4.3</drop>
+  </field>
+  <field>
+    <name>rationale</name>
+    <type>text</type>
+    <title>Grant Rationale</title>
+    <comment>Grant rationale.</comment>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
+    </html>
+    <import>true</import>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>status_id</name>
+    <type>int unsigned</type>
+    <title>Grant Status</title>
+    <uniqueName>grant_status_id</uniqueName>
+    <required>true</required>
+    <import>true</import>
+    <export>false</export>
+    <comment>Id of Grant status.</comment>
+    <pseudoconstant>
+      <optionGroupName>grant_status</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>1.8</add>
+  </field>
+  <index>
+    <name>index_status_id</name>
+    <fieldName>status_id</fieldName>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>financial_type_id</name>
+    <title>Financial Type</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>FK to Financial Type.</comment>
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+    <add>4.3</add>
+  </foreignKey>
+</table>

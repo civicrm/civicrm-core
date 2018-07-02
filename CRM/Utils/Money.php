@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -139,6 +139,19 @@ class CRM_Utils_Money {
    */
   public static function getCurrencyPrecision($currency = NULL) {
     return 2;
+  }
+
+  /**
+   * Subtract currencies using integers instead of floats, to preserve precision
+   *
+   * @return float
+   *   Result of subtracting $rightOp from $leftOp to the precision of $currency
+   */
+  public static function subtractCurrencies($leftOp, $rightOp, $currency) {
+    if (is_numeric($leftOp) && is_numeric($rightOp)) {
+      $precision = pow(10, self::getCurrencyPrecision($currency));
+      return (($leftOp * $precision) - ($rightOp * $precision)) / $precision;
+    }
   }
 
 }

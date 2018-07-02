@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<table>
+  <base>CRM/Core</base>
+  <class>OpenID</class>
+  <name>civicrm_openid</name>
+  <comment>OpenID information for a specific location.</comment>
+  <add>2.0</add>
+  <field>
+    <name>id</name>
+    <title>Open ID identifier</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique OpenID ID</comment>
+    <add>2.0</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>contact_id</name>
+    <title>OpenID Contact</title>
+    <type>int unsigned</type>
+    <comment>FK to Contact ID</comment>
+    <add>2.0</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>2.0</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>location_type_id</name>
+    <title>OpenID Location Type</title>
+    <type>int unsigned</type>
+    <comment>Which Location does this email belong to.</comment>
+    <add>2.0</add>
+  </field>
+  <index>
+    <name>index_location_type</name>
+    <fieldName>location_type_id</fieldName>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>openid</name>
+    <title>OpenID</title>
+    <type>varchar</type>
+    <length>255</length>
+    <import>true</import>
+    <headerPattern>/^Open.?ID|u(niq\w*)?.?ID/i</headerPattern>
+    <dataPattern>/^[\w\/\:\.]+$/</dataPattern>
+    <comment>the OpenID (or OpenID-style http://username.domain/) unique identifier for this contact mainly used for logging in to CiviCRM</comment>
+    <rule>url</rule>
+    <comment>OpenID</comment>
+    <add>2.0</add>
+  </field>
+  <index>
+    <name>UI_openid</name>
+    <fieldName>openid</fieldName>
+    <unique>true</unique>
+    <add>2.0</add>
+  </index>
+  <field>
+    <name>allowed_to_login</name>
+    <title>Allowed to login?</title>
+    <type>boolean</type>
+    <required>true</required>
+    <default>0</default>
+    <comment>Whether or not this user is allowed to login</comment>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>is_primary</name>
+    <title>Is OpenID Primary?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this the primary email for this contact and location.</comment>
+    <add>2.0</add>
+  </field>
+</table>

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -189,14 +189,15 @@ class CRM_Core_BAO_SchemaHandler {
 
     //create index only for searchable fields during ADD,
     //create index only if field is become searchable during MODIFY,
-    //drop index only if field is no more searchable and index was exist.
+    //drop index only if field is no longer searchable and it does not reference
+    //a forgein key (and indexExist is true)
     if (!empty($params['searchable']) && !$indexExist) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;
       $sql .= "INDEX_{$params['name']} ( {$params['name']} )";
     }
-    elseif (empty($params['searchable']) && $indexExist) {
+    elseif (empty($params['searchable']) && empty($params['fk_table_name']) && $indexExist) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= "DROP INDEX INDEX_{$params['name']}";
@@ -713,6 +714,7 @@ MODIFY      {$columnName} varchar( $length )
     $requiredSigs = $existingSigs = array();
     // Get the indices defined (originally) in the xml files
     $requiredIndices = CRM_Core_DAO_AllCoreTables::indices();
+    $reqSigs = array();
     foreach ($requiredIndices as $table => $indices) {
       $reqSigs[] = CRM_Utils_Array::collect('sig', $indices);
     }
@@ -720,6 +722,7 @@ MODIFY      {$columnName} varchar( $length )
 
     // Get the indices in the database
     $existingIndices = CRM_Core_BAO_SchemaHandler::getIndexes(array_keys($requiredIndices));
+    $extSigs = array();
     foreach ($existingIndices as $table => $indices) {
       CRM_Core_BAO_SchemaHandler::addIndexSignature($table, $indices);
       $extSigs[] = CRM_Utils_Array::collect('sig', $indices);
@@ -747,10 +750,12 @@ MODIFY      {$columnName} varchar( $length )
     $missingIndices = array();
     foreach ($missingSigs as $sig) {
       $sigParts = explode('::', $sig);
-      foreach ($requiredIndices[$sigParts[0]] as $index) {
-        if ($index['sig'] == $sig) {
-          $missingIndices[$sigParts[0]][] = $index;
-          continue;
+      if (array_key_exists($sigParts[0], $requiredIndices)) {
+        foreach ($requiredIndices[$sigParts[0]] as $index) {
+          if ($index['sig'] == $sig) {
+            $missingIndices[$sigParts[0]][] = $index;
+            continue;
+          }
         }
       }
     }

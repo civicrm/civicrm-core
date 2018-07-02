@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -31,7 +31,7 @@
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
   {include file="CRM/Admin/Form/LabelFormats.tpl"}
 {else}
-
+<div class="crm-content-block crm-block">
   {if $rows}
     <div id="ltype">
       {strip}
@@ -74,4 +74,5 @@
       {ts 1=$crmURL}There are no Label Formats configured. You can<a href='%1'>add one</a>.{/ts}
     </div>
   {/if}
+</div>
 {/if}

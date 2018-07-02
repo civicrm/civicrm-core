@@ -1,10 +1,24 @@
 (function(angular, $, _) {
+  // "YYYY-MM-DD hh:mm:ss" => Date()
+  function parseYmdHms(d) {
+    var parts = d.split(/[\-: ]/);
+    return new Date(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5]);
+  }
+
+  function isDateBefore(tgt, cutoff, tolerance) {
+    var ad = parseYmdHms(tgt), bd = parseYmdHms(cutoff);
+    // We'll allow a little leeway, where tgt is considered before cutoff
+    // even if technically misses the cutoff by a little.
+    return  ad < bd-tolerance;
+  }
+
   // Represent a datetime field as if it were a radio ('schedule.mode') and a datetime ('schedule.datetime').
   // example: <div crm-mailing-radio-date="mySchedule" ng-model="mailing.scheduled_date">...</div>
   angular.module('crmMailing').directive('crmMailingRadioDate', function(crmUiAlert) {
     return {
       require: 'ngModel',
       link: function($scope, element, attrs, ngModel) {
+        var lastAlert = null;
 
         var schedule = $scope[attrs.crmMailingRadioDate] = {
           mode: 'now',
@@ -63,9 +77,13 @@
               date = [year, month, day].join('-');
               time = [hours, minutes, "00"].join(':');
               currentDate = date + ' ' + time;
-              ngModel.$setValidity('dateTimeInThePast', !($(this).val().length && submittedDate < currentDate));
-              if ($(this).val().length && submittedDate < currentDate) {
-                crmUiAlert({
+              var isInPast = (submittedDate.length && submittedDate.match(/^[0-9\-]+ [0-9\:]+$/) && isDateBefore(submittedDate, currentDate, 4*60*60*1000));
+              ngModel.$setValidity('dateTimeInThePast', !isInPast);
+              if (lastAlert && lastAlert.isOpen) {
+                lastAlert.close();
+              }
+              if (isInPast) {
+                lastAlert = crmUiAlert({
                   text: ts('The scheduled date and time is in the past'),
                   title: ts('Error')
                 });

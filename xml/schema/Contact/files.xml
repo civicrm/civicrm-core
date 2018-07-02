@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<tables xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<xi:include href="Contact.xml"              parse="xml" />
+<xi:include href="DashboardContact.xml"     parse="xml" />
+<xi:include href="Group.xml"                parse="xml" />
+<xi:include href="SubscriptionHistory.xml"  parse="xml" />
+<xi:include href="GroupContact.xml"         parse="xml" />
+<xi:include href="GroupContactCache.xml"    parse="xml" />
+<xi:include href="ACLContactCache.xml"      parse="xml" />
+<xi:include href="GroupNesting.xml"         parse="xml" />
+<xi:include href="GroupOrganization.xml"    parse="xml" />
+<xi:include href="Relationship.xml"         parse="xml" />
+<xi:include href="RelationshipType.xml"     parse="xml" />
+<xi:include href="SavedSearch.xml"          parse="xml" />
+<xi:include href="ContactType.xml"          parse="xml" />
+
+</tables>

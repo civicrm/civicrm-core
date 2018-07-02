@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
@@ -79,7 +79,9 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       $result = civicrm_api3('ReportInstance', 'get', array(
         'sequential' => 1,
         'report_id' => 'mailing/' . $report));
-      $reportIds[$report] = $result['values'][0]['id'];
+      if (!empty($result['values'])) {
+        $reportIds[$report] = $result['values'][0]['id'];
+      }
     }
     $result = array();
     $result['crmMailing'] = include "$civicrm_root/ang/crmMailing.ang.php";
@@ -127,6 +129,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ));
     $enabledLanguages = CRM_Core_I18n::languages(TRUE);
     $isMultiLingual = (count($enabledLanguages) > 1);
+    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
+    $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS, array()) : CRM_Utils_Token::getRequiredTokens();
     CRM_Core_Resources::singleton()
       ->addSetting(array(
         'crmMailing' => array(
@@ -134,14 +138,14 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
           'civiMails' => array(),
           'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
           'groupNames' => array(),
-          // @todo see if we can remove this by dynamically generating the test group list
+          // @todo this is not used in core. Remove once Mosaico no longer depends on it.
           'testGroupNames' => $groupNames['values'],
           'headerfooterList' => $headerfooterList['values'],
           'mesTemplate' => $mesTemplate['values'],
           'emailAdd' => $emailAdd['values'],
           'mailTokens' => $mailTokens['values'],
           'contactid' => $contactID,
-          'requiredTokens' => CRM_Utils_Token::getRequiredTokens(),
+          'requiredTokens' => $requiredTokens,
           'enableReplyTo' => (int) Civi::settings()->get('replyTo'),
           'disableMandatoryTokensCheck' => (int) Civi::settings()->get('disable_mandatory_tokens_check'),
           'fromAddress' => $fromAddress['values'],

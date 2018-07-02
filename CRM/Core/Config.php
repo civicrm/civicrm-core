@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * The default values in general, should reflect production values (minimizes chances of screwing up)
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 require_once 'Log.php';
@@ -64,6 +64,7 @@ require_once 'api/api.php';
  * @property string $defaultContactStateProvince
  * @property string $monetaryDecimalPoint
  * @property string $monetaryThousandSeparator
+ * @property array fiscalYearStart
  */
 class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 

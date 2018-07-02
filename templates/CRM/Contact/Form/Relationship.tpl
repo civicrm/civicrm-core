@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -144,10 +144,88 @@
       CRM.$(function($) {
         var
           $form = $("form.{/literal}{$form.formClass}{literal}"),
-          relationshipData = {/literal}{$relationshipData|@json_encode}{literal};
-        $('[name=relationship_type_id]', $form).change(function() {
+          $relationshipTypeSelect = $('[name=relationship_type_id]', $form),
+          relationshipData = {},
+          contactTypes = {/literal}{$contactTypes|@json_encode}{literal};
+
+        (function init () {
+          // Refresh options if relationship types were edited
+          $('body').on('crmOptionsEdited', 'a.crm-option-edit-link', refreshRelationshipData);
+          // Initial load and trigger change on select
+          refreshRelationshipData().done(function() {
+            $relationshipTypeSelect.change();
+          });
+          $relationshipTypeSelect.change(function() {
+            var $select = $(this);
+
+            // ensure we have relationship data before changing anything
+            getRelationshipData().then(function() {
+              updateSelect($select);
+            })
+          });
+        })();
+
+        /**
+         * Fetch contact types and reset relationship data
+         */
+        function refreshRelationshipData() {
+          // reset
+          relationshipData = {};
+
+          return getRelationshipData();
+        }
+
+        /**
+         * Fetches the relationship data using latest relationship types
+         */
+        function getRelationshipData() {
+          var defer = $.Deferred();
+
+          if (!$.isEmptyObject(relationshipData)) {
+            defer.resolve(relationshipData);
+          }
+
+          CRM.api3("RelationshipType", "get", {"options": {"limit":0}})
+            .done(function (data) {
+              $.each(data.values, function (key, relType) {
+                // Loop over the suffixes for a relationship type
+                $.each(["a", "b"], function (index, suffix) {
+                  var subtype = relType["contact_subtype_" + suffix];
+                  var type = subtype || relType["contact_type_" + suffix];
+                  var label = getContactTypeLabel(type) || "Contact";
+                  label = label.toLowerCase();
+                  relType["placeholder_" + suffix] = "- select " + label + " -";
+                });
+
+                relationshipData[relType["id"]] = relType;
+              });
+
+              defer.resolve(relationshipData);
+            });
+
+          return defer.promise();
+        }
+
+        /**
+         * Gets a contact type label based on a provided name
+         * @param {String} name - the name of the contact type
+         */
+        function getContactTypeLabel(name) {
+          var label = "";
+
+          $.each(contactTypes, function(index, contactType) {
+            if (contactType.name === name) {
+              label = contactType.label;
+              return false;
+            }
+          });
+
+          return label;
+        }
+
+        function updateSelect($select) {
           var
-            val = $(this).val(),
+            val = $select.val(),
             $contactField = $('#related_contact_id[type=text]', $form);
           if (!val && $contactField.length) {
             $contactField
@@ -190,7 +268,7 @@
 
             CRM.buildCustomData('Relationship', rType);
           }
-        }).change();
+        }
       });
       {/literal}
     </script>

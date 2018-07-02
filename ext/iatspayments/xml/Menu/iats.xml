@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/iATSAdmin</path>
+    <page_callback>CRM_iATS_Page_iATSAdmin</page_callback>
+    <title>iATS Payments Administration</title>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/iatsjson</path>
+    <page_callback>CRM_iATS_Page_json</page_callback>
+    <access_arguments>make online contributions</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/admin/contribute/iatssettings</path>
+    <page_callback>CRM_iATS_Form_IatsSettings</page_callback>
+    <title>iATS Payments Settings</title>
+    <access_arguments>access CiviContribute,administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contact/view/iatscustomerlink</path>
+    <page_callback>CRM_iATS_Page_IATSCustomerLink</page_callback>
+    <title>CustomerLink Information at iATS</title>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contact/edit/iatscustomerlink</path>
+    <page_callback>CRM_iATS_Form_IATSCustomerLink</page_callback>
+    <title>Edit CustomerLink Information at iATS</title>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contact/iatsprocesslink</path>
+    <page_callback>CRM_iATS_Form_IATSOneTimeCharge</page_callback>
+    <title>IATSOneTimeCharge</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

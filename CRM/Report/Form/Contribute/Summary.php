@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,17 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
-  protected $_addressField = FALSE;
 
   protected $_charts = array(
     '' => 'Tabular',
     'barChart' => 'Bar Chart',
     'pieChart' => 'Pie Chart',
   );
-  protected $_customGroupExtends = array('Contribution');
+  protected $_customGroupExtends = array('Contribution', 'Contact', 'Individual');
   protected $_customGroupGroupBy = TRUE;
 
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
@@ -344,9 +343,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('group_bys', $table)) {
         foreach ($table['group_bys'] as $fieldName => $field) {
-          if ($tableName == 'civicrm_address') {
-            $this->_addressField = TRUE;
-          }
           if (!empty($this->_params['group_bys'][$fieldName])) {
             switch (CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])) {
               case 'YEARWEEK':
@@ -411,9 +407,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
 
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if ($tableName == 'civicrm_address') {
-            $this->_addressField = TRUE;
-          }
           if (!empty($field['required']) ||
             !empty($this->_params['fields'][$fieldName])
           ) {
@@ -515,15 +508,12 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
              {$softCreditJoin}
              LEFT  JOIN civicrm_financial_type  {$this->_aliases['civicrm_financial_type']}
                      ON {$this->_aliases['civicrm_contribution']}.financial_type_id ={$this->_aliases['civicrm_financial_type']}.id
-             LEFT  JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                        {$this->_aliases['civicrm_email']}.is_primary = 1)
+             ";
 
-             LEFT  JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                        {$this->_aliases['civicrm_phone']}.is_primary = 1)";
+    $this->joinAddressFromContact();
+    $this->joinPhoneFromContact();
+    $this->joinEmailFromContact();
 
-    $this->addAddressFromClause();
     //for contribution batches
     if ($this->isTableSelected('civicrm_batch')) {
       $this->_from .= "
@@ -866,7 +856,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
         // build the chart.
         $config = CRM_Core_Config::Singleton();
         $graphRows['xname'] = $this->_interval;
-        $graphRows['yname'] = "Amount ({$config->defaultCurrency})";
+        $graphRows['yname'] = ts('Amount (%1)', array(1 => $config->defaultCurrency));
         CRM_Utils_OpenFlashChart::chart($graphRows, $this->_params['charts'], $this->_interval);
         $this->assign('chartType', $this->_params['charts']);
       }

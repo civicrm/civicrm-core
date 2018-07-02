@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -69,10 +69,16 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     $session = CRM_Core_Session::singleton();
     $userID = $session->get('userID');
 
+    $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
+    $validUser = FALSE;
+    if (empty($userID) && $this->_contactId && $userChecksum) {
+      $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($this->_contactId, $userChecksum);
+    }
+
     if (!$this->_contactId) {
       $this->_contactId = $userID;
     }
-    elseif ($this->_contactId != $userID) {
+    elseif ($this->_contactId != $userID && !$validUser) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::VIEW)) {
         CRM_Core_Error::fatal(ts('You do not have permission to access this contact.'));
       }

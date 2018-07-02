@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_ContributionSoft {
 
@@ -85,7 +85,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $softParams['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $pcp);
       $softParams['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $pcp);
       $softParams['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $pcp);
-      $softParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
+      $softParams['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'pcp');
       $contributionSoft = self::add($softParams);
       //Send notification to owner for PCP
       if ($contributionSoft->pcp_id && empty($pcpId)) {
@@ -149,7 +149,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $honorId = NULL;
 
       // @todo fix use of deprecated function.
-      $contributionSoftParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
+      $contributionSoftParams['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'pcp');
       //check if there is any duplicate contact
       // honoree should never be the donor
       $exceptKeys = array(

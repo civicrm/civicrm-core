@@ -11,7 +11,7 @@
  * http://www.php.net/license/3_01.txt If you did not receive a copy of
  * the PHP License and are unable to obtain it through the web, please
  * send a note to license@php.net so we can mail you a copy immediately.
- * 
+ *
  * @category    HTML
  * @package     HTML_Common
  * @author      Adam Daniel <adaniel1@eesus.jnj.com>
@@ -19,7 +19,7 @@
  * @license     http://www.php.net/license/3_01.txt PHP License 3.01
  * @version     CVS: $Id: Common.php,v 1.15 2009/04/03 15:26:22 avb Exp $
  * @link        http://pear.php.net/package/HTML_Common/
- */ 
+ */
 
 /**
  * Base class for all HTML classes
@@ -445,8 +445,8 @@ class HTML_Common
      * $charset = HTML_Common::charset();
      * </code>
      *
-     * @param   string  New charset to use. Omit if just getting the 
-     *                  current value. Consult the htmlspecialchars() docs 
+     * @param   string  New charset to use. Omit if just getting the
+     *                  current value. Consult the htmlspecialchars() docs
      *                  for a list of supported character sets.
      * @return  string  Current charset
      * @access  public

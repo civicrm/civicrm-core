@@ -7,6 +7,20 @@
 class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLetterCommon {
 
   /**
+   * Build the form object.
+   *
+   * @var CRM_Core_Form $form
+   */
+  public static function buildQuickForm(&$form) {
+    // use contact form as a base
+    CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($form);
+
+    // Contribute PDF tasks allow you to email as well, so we need to add email address to those forms
+    $form->add('select', 'from_email_address', ts('From Email Address'), $form->_fromEmails, TRUE);
+    parent::buildQuickForm($form);
+  }
+
+  /**
    * Process the form after the input has been submitted and validated.
    *
    * @param CRM_Contribute_Form_Task $form
@@ -22,7 +36,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     if (!empty($formValues['email_options'])) {
       $returnProperties['email'] = $returnProperties['on_hold'] = $returnProperties['is_deceased'] = $returnProperties['do_not_email'] = 1;
       $emailParams = array(
-        'subject' => $formValues['subject'],
+        'subject' => CRM_Utils_Array::value('subject', $formValues),
+        'from' => CRM_Utils_Array::value('from_email_address', $formValues),
       );
       // We need display_name for emailLetter() so add to returnProperties here
       $returnProperties['display_name'] = 1;
@@ -89,26 +104,22 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         }
         $contact['is_sent'][$groupBy][$groupByID] = TRUE;
       }
-      // update dates (do it for each contribution including grouped recurring contribution)
-      //@todo - the 2 calls below bypass all hooks. Using the api would possibly be slower than one call but not than 2
+      // Update receipt/thankyou dates
+      $contributionParams = array('id' => $contributionId);
       if ($receipt_update) {
-        $result = CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'receipt_date', $nowDate);
-        if ($result) {
-          $receipts++;
-        }
+        $contributionParams['receipt_date'] = $nowDate;
       }
       if ($thankyou_update) {
-        $result = CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'thankyou_date', $nowDate);
-        if ($result) {
-          $thanks++;
-        }
+        $contributionParams['thankyou_date'] = $nowDate;
+      }
+      if ($receipt_update || $thankyou_update) {
+        civicrm_api3('Contribution', 'create', $contributionParams);
+        $receipts = ($receipt_update ? $receipts + 1 : $receipts);
+        $thanks = ($thankyou_update ? $thanks + 1 : $thanks);
       }
     }
 
-    // This seems silly, but the old behavior was to first check `_cid`
-    // and then use the provided `$contactIds`. Probably not even necessary,
-    // but difficult to audit.
-    $contactIds = $form->_cid ? array($form->_cid) : array_keys($contacts);
+    $contactIds = array_keys($contacts);
     self::createActivities($form, $html_message, $contactIds, CRM_Utils_Array::value('subject', $formValues, ts('Thank you letter')), CRM_Utils_Array::value('campaign_id', $formValues), $contactHtml);
     $html = array_diff_key($html, $emailedHtml);
 
@@ -177,17 +188,17 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * Check that the token only appears in a table cell. The '</td><td>' separator cannot otherwise work
    * Calculate the number of times it appears IN the cell & the number of times it appears - should be the same!
    *
-   * @param $token
-   * @param $entity
-   * @param $textToSearch
+   * @param string $token
+   * @param string $entity
+   * @param string $textToSearch
    *
    * @return bool
    */
   public static function isHtmlTokenInTableCell($token, $entity, $textToSearch) {
-    $tokenToMatch = $entity . '.' . $token;
-    $dontCare = array();
-    $within = preg_match_all("|<td.+?{" . $tokenToMatch . "}.+?</td|si", $textToSearch, $dontCare);
-    $total = preg_match_all("|{" . $tokenToMatch . "}|", $textToSearch, $dontCare);
+    $tokenToMatch = $entity . '\.' . $token;
+    $pattern = '|<td(?![\w-])((?!</td>).)*\{' . $tokenToMatch . '\}.*?</td>|si';
+    $within = preg_match_all($pattern, $textToSearch);
+    $total = preg_match_all("|{" . $tokenToMatch . "}|", $textToSearch);
     return ($within == $total);
   }
 
@@ -371,6 +382,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         $emails = CRM_Core_BAO_Email::getFromEmail();
         $emails = array_keys($emails);
         $defaults['from'] = array_pop($emails);
+      }
+      else {
+        $defaults['from'] = $params['from'];
       }
       if (!empty($params['subject'])) {
         $defaults['subject'] = $params['subject'];

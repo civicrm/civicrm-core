@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
@@ -72,7 +72,7 @@ return array(
     ),
     'default' => NULL,
     'title' => 'Geocoding Provider',
-    'description' => 'You may choose a different webservice for geocoding. This is required if there is no geo-coding plugin for your selected mapping provider. You can leave the Geocoding fields blank if you are using Google as your mapping provider.',
+    'description' => 'This can be the same or different from the mapping provider selected.',
   ),
   'mapAPIKey' => array(
     'add' => '4.7',
@@ -91,7 +91,7 @@ return array(
     ),
     'default' => NULL,
     'title' => 'Map Provider Key',
-    'description' => 'Enter your API Key or Application ID. An API Key is currently optional for Google Maps API, but may be helpful diagnosing any problems and required for higher volumes of requests. Refer to developers.google.com for the latest information.',
+    'description' => 'Enter your API Key or Application ID. An API Key is required for the Google Maps API. Refer to developers.google.com for the latest information.',
   ),
   'mapProvider' => array(
     'add' => '4.7',

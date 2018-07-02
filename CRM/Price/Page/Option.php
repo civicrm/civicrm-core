@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -158,7 +158,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         if ($invoicing && isset($customOption[$id]['tax_rate'])) {
           $getTaxDetails = TRUE;
         }
-        $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($customOption[$id]['amount'], $customOption[$id]['tax_rate']);
+        $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($customOption[$id]['amount'], $customOption[$id]['tax_rate'], TRUE);
         $customOption[$id]['tax_amount'] = $taxAmount['tax_amount'];
       }
       if (!empty($values['financial_type_id'])) {

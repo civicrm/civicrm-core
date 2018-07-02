@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -304,6 +304,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'title' => ts('End Date'),
             'type' => CRM_Utils_Type::T_DATE,
           ),
+          'active_period_date' => array(
+            'title' => ts('Active Period'),
+            'type' => CRM_Utils_Type::T_DATE,
+          ),
           'is_permission_a_b' => array(
             'title' => ts('Does contact A have permission over contact B?'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
@@ -330,10 +334,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           'start_date' => array(
             'title' => ts('Start Date'),
             'name' => 'start_date',
-          ),
-          'active_period_date' => array(
-            'title' => ts('Active Period'),
-            'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
         'grouping' => 'relation-fields',
@@ -590,10 +590,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $isStatusFilter = FALSE;
     $relStatus = NULL;
     if (CRM_Utils_Array::value('is_active_value', $this->_params) == '1') {
-      $relStatus = 'Is equal to Active';
+      $relStatus = ts('Is equal to Active');
     }
     elseif (CRM_Utils_Array::value('is_active_value', $this->_params) == '0') {
-      $relStatus = 'Is equal to Inactive';
+      $relStatus = ts('Is equal to Inactive');
     }
     if (!empty($statistics['filters'])) {
       foreach ($statistics['filters'] as $id => $value) {
@@ -646,9 +646,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
   }
 
-  public function postProcess() {
-    $this->beginPostProcess();
-
+  public function beginPostProcessCommon() {
     $originalRelationshipTypeIdValue = CRM_Utils_Array::value('relationship_type_id_value', $this->_params);
     if ($originalRelationshipTypeIdValue) {
       $relationshipTypes = array();
@@ -663,11 +661,16 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       $this->relationType = $direction[0];
       $this->_params['relationship_type_id_value'] = $relationshipTypes;
     }
+  }
+
+  public function postProcess() {
+    $this->beginPostProcess();
 
     $this->buildACLClause(array(
       $this->_aliases['civicrm_contact'],
       $this->_aliases['civicrm_contact_b'],
     ));
+
     $sql = $this->buildQuery();
     $this->buildRows($sql, $rows);
 

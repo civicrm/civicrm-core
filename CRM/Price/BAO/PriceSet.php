@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2018                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -703,8 +703,8 @@ WHERE  id = %1";
     }
     if ($priceSetID) {
       $priceFields = self::filterPriceFieldsFromParams($priceSetID, $params);
-      if (count($priceFields) == 1 && !empty($params['total_amount'])) {
-        $amount_override = $params['total_amount'];
+      if (count($priceFields) == 1) {
+        $amount_override = CRM_Utils_Array::value('partial_payment_total', $params, CRM_Utils_Array::value('total_amount', $params));
       }
     }
     foreach ($fields as $id => $field) {
@@ -719,7 +719,7 @@ WHERE  id = %1";
         case 'Text':
           $firstOption = reset($field['options']);
           $params["price_{$id}"] = array($firstOption['id'] => $params["price_{$id}"]);
-          CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
+          CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, CRM_Utils_Array::value('partial_payment_total', $params));
           $optionValueId = key($field['options']);
 
           if (CRM_Utils_Array::value('name', $field['options'][$optionValueId]) == 'contribution_amount') {
@@ -747,7 +747,7 @@ WHERE  id = %1";
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, $amount_override);
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
-            if (CRM_Utils_Array::value('field_title', $lineItem[$optionValueId]) == 'Membership Amount') {
+            if ($amount_override) {
               $lineItem[$optionValueId]['line_total'] = $lineItem[$optionValueId]['unit_price'] = CRM_Utils_Rule::cleanMoney($lineItem[$optionValueId]['line_total'] - $lineItem[$optionValueId]['tax_amount']);
             }
           }
@@ -767,7 +767,7 @@ WHERE  id = %1";
           $params["price_{$id}"] = array($params["price_{$id}"] => 1);
           $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
 
-          CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
+          CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, CRM_Utils_Array::value('partial_payment_total', $params));
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
           }
@@ -783,7 +783,7 @@ WHERE  id = %1";
 
         case 'CheckBox':
 
-          CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
+          CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, CRM_Utils_Array::value('partial_payment_total', $params));
           foreach ($params["price_{$id}"] as $optionId => $option) {
             if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionId])) {
               $lineItem = self::setLineItem($field, $lineItem, $optionId, $totalTax);
@@ -838,9 +838,8 @@ WHERE  id = %1";
         $params['amount_level'] = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
       }
     }
-    // @todo this was a fix for CRM-16460 but is too deep in the system for formatting
-    // and probably causes negative amounts to save as $0 depending on server config.
-    $params['amount'] = CRM_Utils_Money::format($totalPrice, NULL, NULL, TRUE);
+
+    $params['amount'] = $totalPrice;
     $params['tax_amount'] = $totalTax;
     if ($component) {
       foreach ($autoRenew as $dontCare => $eachAmount) {

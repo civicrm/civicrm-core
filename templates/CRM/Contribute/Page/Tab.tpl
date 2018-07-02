@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 {elseif $action eq 4}
     {include file="CRM/Contribute/Form/ContributionView.tpl"}
 {else}
-    <div class="view-content">
+    <div class="contact-summary-contribute-tab view-content">
         <div class="help">
             {if $permission EQ 'edit'}
               {capture assign=newContribURL}{crmURL p="civicrm/contact/view/contribution" q="reset=1&action=add&cid=`$contactId`&context=contribution"}{/capture}
@@ -52,13 +52,12 @@
                 {/if}
                 <br /><br />
             </div>
-      <div class='clear'> </div>
+          <div class='clear'></div>
         {/if}
-
 
         {if $rows}
             {include file="CRM/Contribute/Page/ContributionTotals.tpl" mode="view"}
-            <p> </p>
+          <div class='clear'></div>
             {include file="CRM/Contribute/Form/Selector.tpl"}
         {else}
             <div class="messages status no-popup">
@@ -68,19 +67,17 @@
         {/if}
 
         {if $recur}
-            <div class="solid-border-top">
-                <br /><label>{ts 1=$displayName}Recurring Contributions{/ts}</label>
-            </div>
+          <div class="crm-block crm-contact-contribute-recur">
+            <h3>{ts}Recurring Contributions{/ts}</h3>
             {include file="CRM/Contribute/Page/ContributionRecur.tpl"}
+          </div>
         {/if}
 
         {if $softCredit}
-            <div class="solid-border-top">
-                <br />
-                <div class="label">{ts}Soft credits{/ts} {help id="id-soft_credit"}</div>
-                <div class="spacer"></div>
-            </div>
+          <div class="crm-block crm-contact-contribute-softcredit">
+            <h3>{ts}Soft credits{/ts} {help id="id-soft_credit"}</h3>
             {include file="CRM/Contribute/Page/ContributionSoft.tpl"}
+          </div>
         {/if}
     </div>
 {/if}

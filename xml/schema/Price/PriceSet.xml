@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Price</base>
+  <class>PriceSet</class>
+  <name>civicrm_price_set</name>
+  <add>1.8</add>
+  <log>true</log>
+  <field>
+    <name>id</name>
+    <title>Price Set ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Price Set</comment>
+    <add>1.8</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>domain_id</name>
+    <title>Price Set Domain</title>
+    <type>int unsigned</type>
+    <pseudoconstant>
+      <table>civicrm_domain</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <comment>Which Domain is this price-set for</comment>
+    <add>3.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>domain_id</name>
+    <table>civicrm_domain</table>
+    <key>id</key>
+    <add>3.1</add>
+  </foreignKey>
+  <field>
+    <name>name</name>
+    <type>varchar</type>
+    <length>255</length>
+    <required>true</required>
+    <comment>Variable name/programmatic handle for this set of price fields.</comment>
+    <add>1.8</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>1.8</add>
+  </index>
+  <field>
+    <name>title</name>
+    <title>Price Set Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>true</required>
+    <localizable>true</localizable>
+    <comment>Displayed title for the Price Set.</comment>
+    <add>1.8</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Price Set Is Active?</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is this price set active</comment>
+    <add>1.8</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>help_pre</name>
+    <title>Price Set Pre Help</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>Description and/or help text to display before fields in form.</comment>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>80</cols>
+    </html>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>help_post</name>
+    <title>Price Set Post Help</title>
+    <type>text</type>
+    <localizable>true</localizable>
+    <comment>Description and/or help text to display after fields in form.</comment>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>80</cols>
+    </html>
+    <add>1.8</add>
+  </field>
+  <field>
+    <name>javascript</name>
+    <title>Price Set Javascript</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Optional Javascript script function(s) included on the form with this price_set. Can be used for conditional</comment>
+    <add>1.8</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>extends</name>
+    <title>Price Set Extends</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>true</required>
+    <comment>What components are using this price set?</comment>
+    <pseudoconstant>
+      <table>civicrm_component</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <add>3.1</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>contribution_type_id</name>
+    <title>Price Set Contribution Type</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>FK to Contribution Type(for membership price sets only).</comment>
+    <add>3.4</add>
+    <drop>4.3</drop>
+  </field>
+  <foreignKey>
+    <name>contribution_type_id</name>
+    <table>civicrm_contribution_type</table>
+    <key>id</key>
+    <add>3.4</add>
+    <drop>4.3</drop>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>financial_type_id</name>
+    <title>Financial Type</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>FK to Financial Type(for membership price sets only).</comment>
+    <add>4.3</add>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
+    <add>4.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>is_quick_config</name>
+    <title>Is Price Set Quick Config?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is set if edited on Contribution or Event Page rather than through Manage Price Sets</comment>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <add>4.1</add>
+  </field>
+  <field>
+    <name>is_reserved</name>
+    <title>Price Set Is Reserved</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this a predefined system price set  (i.e. it can not be deleted, edited)?</comment>
+    <add>4.2</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
+  </field>
+  <field>
+    <name>min_amount</name>
+    <title>Minimum Amount</title>
+    <type>int unsigned</type>
+    <default>0</default>
+    <comment>Minimum Amount required for this set.</comment>
+    <add>4.7</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+</table>

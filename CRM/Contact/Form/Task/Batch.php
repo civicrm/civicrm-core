@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -88,7 +88,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
     // remove file type field and then limit fields
     $suppressFields = FALSE;
-    $removehtmlTypes = array('File', 'Autocomplete-Select');
+    $removehtmlTypes = array('File');
     foreach ($this->_fields as $name => $field) {
       if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) &&
         in_array($this->_fields[$name]['html_type'], $removehtmlTypes)
@@ -147,7 +147,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields && $buttonName != '_qf_BatchUpdateProfile_next') {
-      CRM_Core_Session::setStatus(ts("File or Autocomplete-Select type field(s) in the selected profile are not supported for Update multiple contacts."), ts('Some Fields Excluded'), 'info');
+      CRM_Core_Session::setStatus(ts("File type field(s) in the selected profile are not supported for Update multiple contacts."), ts('Some Fields Excluded'), 'info');
     }
 
     $this->addDefaultButtons(ts('Update Contacts'));
@@ -217,6 +217,9 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   public function postProcess() {
     $params = $this->exportValues();
 
+    // @todo extract submit functions &
+    // extend CRM_Event_Form_Task_BatchTest::testSubmit with a data provider to test
+    // handling of custom data, specifically checkbox fields.
     $ufGroupId = $this->get('ufGroupId');
     $notify = NULL;
     $inValidSubtypeCnt = 0;

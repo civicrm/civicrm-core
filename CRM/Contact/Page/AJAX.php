@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  *
  */
 
@@ -261,8 +261,11 @@ class CRM_Contact_Page_AJAX {
       }
       // Save activity only for the primary (first) client
       if ($i == 0 && empty($result['is_error'])) {
-        CRM_Case_BAO_Case::createCaseRoleActivity($caseID, $result['id'], $relContactID);
+        CRM_Case_BAO_Case::createCaseRoleActivity($caseID, $result['id'], $relContactID, $sourceContactID);
       }
+    }
+    if (!empty($_REQUEST['is_unit_test'])) {
+      return $ret;
     }
 
     CRM_Utils_JSON::output($ret);
@@ -388,6 +391,7 @@ class CRM_Contact_Page_AJAX {
       }
 
       if ($queryString) {
+        $result = array();
         $offset = CRM_Utils_Array::value('offset', $_GET, 0);
         $rowCount = Civi::settings()->get('search_autocomplete_count');
 
@@ -450,9 +454,7 @@ LIMIT {$offset}, {$rowCount}
             );
           }
         }
-        if ($result) {
-          CRM_Utils_JSON::output($result);
-        }
+        CRM_Utils_JSON::output($result);
       }
     }
     CRM_Utils_System::civiExit();
@@ -483,6 +485,7 @@ LIMIT {$offset}, {$rowCount}
     }
 
     if ($queryString) {
+      $result = array();
       $offset = CRM_Utils_Array::value('offset', $_GET, 0);
       $rowCount = CRM_Utils_Array::value('rowcount', $_GET, 20);
 
@@ -519,9 +522,6 @@ LIMIT {$offset}, {$rowCount}
           'id' => (CRM_Utils_Array::value('id', $_GET)) ? "{$dao->id}::{$dao->phone}" : '"' . $dao->name . '" <' . $dao->phone . '>',
         );
       }
-    }
-
-    if ($result) {
       CRM_Utils_JSON::output($result);
     }
     CRM_Utils_System::civiExit();
@@ -649,13 +649,16 @@ LIMIT {$offset}, {$rowCount}
 
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive');
     $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive');
-    $selected    = isset($_REQUEST['selected']) ? CRM_Utils_Type::escape($_REQUEST['selected'], 'Integer') : 0;
+    $null = NULL;
+    $criteria = CRM_Utils_Request::retrieve('criteria', 'Json', $null, FALSE, '{}');
+    $selected = CRM_Utils_Request::retrieveValue('selected', 'Boolean');
     if ($rowCount < 0) {
       $rowCount = 0;
     }
 
     $whereClause = $orderByClause = '';
-    $cacheKeyString   = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
+    $cacheKeyString   = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, json_decode($criteria, TRUE));
+
     $searchRows       = array();
 
     $searchParams = self::getSearchOptionsFromRequest();
@@ -811,9 +814,17 @@ LIMIT {$offset}, {$rowCount}
       $searchRows[$count]['weight'] = CRM_Utils_Array::value('weight', $pair);
 
       if (!empty($pairInfo['data']['canMerge'])) {
-        $mergeParams = "reset=1&cid={$pairInfo['entity_id1']}&oid={$pairInfo['entity_id2']}&action=update&rgid={$rgid}&limit=" . CRM_Utils_Request::retrieve('limit', 'Integer');
+        $mergeParams = [
+          'reset' => 1,
+            'cid' => $pairInfo['entity_id1'],
+            'oid' => $pairInfo['entity_id2'],
+            'action' => 'update',
+            'rgid' => $rgid,
+            'criteria' => $criteria,
+            'limit' => CRM_Utils_Request::retrieve('limit', 'Integer'),
+          ];
         if ($gid) {
-          $mergeParams .= "&gid={$gid}";
+          $mergeParams['gid'] = $gid;
         }
 
         $searchRows[$count]['actions']  = "<a class='crm-dedupe-flip' href='#' data-pnid={$pairInfo['prevnext_id']}>" . ts('flip') . "</a>&nbsp;|&nbsp;";
@@ -1006,12 +1017,9 @@ LIMIT {$offset}, {$rowCount}
    * Mark dupe pairs as selected from un-selected state or vice-versa, in dupe cache table.
    */
   public static function toggleDedupeSelect() {
-    $rgid = CRM_Utils_Type::escape($_REQUEST['rgid'], 'Integer');
-    $gid  = CRM_Utils_Type::escape($_REQUEST['gid'], 'Integer');
     $pnid = $_REQUEST['pnid'];
     $isSelected = CRM_Utils_Type::escape($_REQUEST['is_selected'], 'Boolean');
-
-    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
+    $cacheKeyString = CRM_Utils_Request::retrieve('cacheKey', 'Alphanumeric', $null, FALSE);
 
     $params = array(
       1 => array($isSelected, 'Boolean'),

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -105,6 +105,11 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
         else {
           $options = NULL;
         }
+        //Load input as readonly whose values are overridden in civicrm.settings.php.
+        if (Civi::settings()->getMandatory($setting)) {
+          $props['html_attributes']['readonly'] = TRUE;
+          $setStatus = TRUE;
+        }
 
         $add = 'add' . $props['quick_form_type'];
         if ($add == 'addElement') {
@@ -146,6 +151,9 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
         }
 
       }
+    }
+    if (!empty($setStatus)) {
+      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', array('expires' => 0));
     }
     // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
     $this->assign('setting_descriptions', $descriptions);

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -106,7 +106,12 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     if ($this->_action == CRM_Core_Action::DELETE) {
       if (isset($this->_id)) {
         $this->assign('title', $this->_title);
-        $this->assign('count', CRM_Contact_BAO_Group::memberCount($this->_id));
+        try {
+          $this->assign('count', CRM_Contact_BAO_Group::memberCount($this->_id));
+        }
+        catch (CRM_Core_Exception $e) {
+          // If the group is borked the query might fail but delete should be possible.
+        }
         CRM_Utils_System::setTitle(ts('Confirm Group Delete'));
       }
       if ($this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
@@ -160,7 +165,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     $defaults = array();
-
     if (isset($this->_id)) {
       $defaults = $this->_groupValues;
       if (!empty($defaults['group_type'])) {
@@ -176,6 +180,9 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       if (CRM_Core_Permission::check('administer Multiple Organizations') && CRM_Core_Permission::isMultisiteEnabled()) {
         CRM_Contact_BAO_GroupOrganization::retrieve($this->_id, $defaults);
       }
+    }
+    else {
+      $defaults['is_active'] = 1;
     }
 
     if (!((CRM_Core_Permission::check('access CiviMail')) ||
@@ -261,6 +268,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     if (!CRM_Core_Permission::check('administer reserved groups')) {
       $this->freeze('is_reserved');
     }
+    $this->addElement('checkbox', 'is_active', ts('Is active?'));
 
     //build custom data
     CRM_Custom_Form_CustomData::buildQuickForm($this);
@@ -367,9 +375,6 @@ WHERE  title = %1
     else {
       // store the submitted values in an array
       $params = $this->controller->exportValues($this->_name);
-
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $this->_groupValues, 1);
-
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $params['id'] = $this->_id;
       }
@@ -378,8 +383,13 @@ WHERE  title = %1
         $params['group_organization'] = $this->_groupOrganizationID;
       }
 
-      $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
+      // CRM-21431 If all group_type are unchecked, the change will not be saved otherwise.
+      if (!isset($params['group_type'])) {
+        $params['group_type'] = array();
+      }
 
+      $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
+      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
         $this->_id,
         'Group'

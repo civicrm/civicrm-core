@@ -54,35 +54,25 @@ else {
   define('CIVICRM_WINDOWS', 0);
 }
 
-// set installation type - drupal
-if (!session_id()) {
-  if (defined('PANTHEON_ENVIRONMENT')) {
-    ini_set('session.save_handler', 'files');
-  }
-  session_start();
-}
-
-// unset civicrm session if any
-if (array_key_exists('CiviCRM', $_SESSION)) {
-  unset($_SESSION['CiviCRM']);
-}
-
-if (isset($_GET['civicrm_install_type'])) {
-  $_SESSION['civicrm_install_type'] = $_GET['civicrm_install_type'];
-}
-else {
-  if (!isset($_SESSION['civicrm_install_type'])) {
-    $_SESSION['civicrm_install_type'] = "drupal";
-  }
-}
-
 global $installType;
 global $crmPath;
 global $pkgPath;
 global $installDirPath;
 global $installURLPath;
 
-$installType = strtolower($_SESSION['civicrm_install_type']);
+// Set the install type
+// this is sent as a query string when the page is first loaded
+// and subsequently posted to the page as a hidden field
+if (isset($_POST['civicrm_install_type'])) {
+  $installType = $_POST['civicrm_install_type'];
+}
+elseif (isset($_GET['civicrm_install_type'])) {
+  $installType = strtolower($_GET['civicrm_install_type']);
+}
+else {
+  // default value if not set
+  $installType = "drupal";
+}
 
 if ($installType == 'drupal' || $installType == 'backdrop') {
   $crmPath = dirname(dirname($_SERVER['SCRIPT_FILENAME']));
@@ -103,64 +93,6 @@ $pkgPath = $crmPath . DIRECTORY_SEPARATOR . 'packages';
 
 require_once $crmPath . '/CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
-
-// Load civicrm database config
-if (isset($_POST['mysql'])) {
-  $databaseConfig = $_POST['mysql'];
-}
-else {
-  $databaseConfig = array(
-    "server"   => "localhost",
-    "username" => "civicrm",
-    "password" => "",
-    "database" => "civicrm",
-  );
-}
-
-if ($installType == 'wordpress') {
-  // Load WP database config
-  if (isset($_POST['mysql'])) {
-    $databaseConfig = $_POST['mysql'];
-  }
-  else {
-    $databaseConfig = array(
-      "server"   => DB_HOST,
-      "username" => DB_USER,
-      "password" => DB_PASSWORD,
-      "database" => DB_NAME,
-    );
-  }
-}
-
-if ($installType == 'drupal') {
-  // Load drupal database config
-  if (isset($_POST['drupal'])) {
-    $drupalConfig = $_POST['drupal'];
-  }
-  else {
-    $drupalConfig = array(
-      "server" => "localhost",
-      "username" => "drupal",
-      "password" => "",
-      "database" => "drupal",
-    );
-  }
-}
-
-if ($installType == 'backdrop') {
-  // Load backdrop database config
-  if (isset($_POST['backdrop'])) {
-    $backdropConfig = $_POST['backdrop'];
-  }
-  else {
-    $backdropConfig = array(
-      "server" => "localhost",
-      "username" => "backdrop",
-      "password" => "",
-      "database" => "backdrop",
-    );
-  }
-}
 
 $loadGenerated = 0;
 if (isset($_POST['loadGenerated'])) {
@@ -291,7 +223,7 @@ if ($alreadyInstalled) {
   }
 
   $docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, ts('Installation Guide'), NULL, NULL, "wiki");
-  $errorMsg = ts("CiviCRM has already been installed. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>%1</strong>.</li><li>To <strong>upgrade an existing installation</strong>, <a href='%2'>refer to the online documentation</a>.</li></ul>", array(1 => $settings_directory, 2 => $docLink));
+  $errorMsg = ts("CiviCRM has already been installed. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>%1</strong>.</li><li>To <strong>upgrade an existing installation</strong>, refer to the online documentation: %2.</li></ul>", array(1 => $settings_directory, 2 => $docLink));
   errorDisplayPage($errorTitle, $errorMsg, FALSE);
 }
 
@@ -323,6 +255,21 @@ if ($installType == 'drupal') {
     if (file_exists($drupalVersionFile)) {
       require_once $drupalVersionFile;
     }
+  }
+
+  // Bootstrap Drupal to get settings and user
+  $base_root = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
+  $base_root .= '://' . $_SERVER['HTTP_HOST'];
+  $base_url = $base_root;
+  drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+
+  // Check that user is logged in and has administrative permissions
+  // This is necessary because the script exposes the database settings in the form and these could be viewed by unauthorised users
+  if ((!function_exists('user_access')) || (!user_access('administer site configuration'))) {
+    $errorTitle = ts("You don't have permission to access this page");
+    $errorMsg = ts("The installer can only be run by a user with the permission to administer site configuration.");
+    errorDisplayPage($errorTitle, $errorMsg);
+    exit();
   }
 
   if (!defined('VERSION') or version_compare(VERSION, '6.0') < 0) {
@@ -365,6 +312,70 @@ elseif ($installType == 'wordpress') {
     $errorTitle = ts("Oops! Incorrect CiviCRM version");
     $errorMsg = ts("This installer can only be used for the WordPress version of CiviCRM.");
     errorDisplayPage($errorTitle, $errorMsg);
+  }
+}
+
+// Load CiviCRM database config
+if (isset($_POST['mysql'])) {
+  $databaseConfig = $_POST['mysql'];
+}
+
+if ($installType == 'wordpress') {
+  // Load WP database config
+  if (isset($_POST['mysql'])) {
+    $databaseConfig = $_POST['mysql'];
+  }
+  else {
+    $databaseConfig = array(
+      "server" => DB_HOST,
+      "username" => DB_USER,
+      "password" => DB_PASSWORD,
+      "database" => DB_NAME,
+    );
+  }
+}
+
+if ($installType == 'drupal') {
+  // Load drupal database config
+  if (isset($_POST['drupal'])) {
+    $drupalConfig = $_POST['drupal'];
+  }
+  else {
+    $dbServer = $databases['default']['default']['host'];
+    if (!empty($databases['default']['default']['port'])) {
+      $dbServer .= ':' . $databases['default']['default']['port'];
+    }
+    $drupalConfig = array(
+      "server" => $dbServer,
+      "username" => $databases['default']['default']['username'],
+      "password" => $databases['default']['default']['password'],
+      "database" => $databases['default']['default']['database'],
+    );
+  }
+}
+
+if ($installType == 'backdrop') {
+  // Load backdrop database config
+  if (isset($_POST['backdrop'])) {
+    $backdropConfig = $_POST['backdrop'];
+  }
+  else {
+    $backdropConfig = array(
+      "server" => "localhost",
+      "username" => "backdrop",
+      "password" => "",
+      "database" => "backdrop",
+    );
+  }
+}
+
+// By default set CiviCRM database to be same as CMS database
+if (!isset($databaseConfig)) {
+  if (($installType == 'drupal') && (isset($drupalConfig))) {
+    $databaseConfig = $drupalConfig;
+  }
+  if (($installType == 'backdrop') && (isset($backdropConfig))) {
+    $databaseConfig = $backdropConfig;
   }
 }
 
@@ -584,12 +595,9 @@ class InstallRequirements {
 
     $this->errors = NULL;
 
-    // See also: CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER
-    $this->requirePHPVersion('5.3.4', array(
+    $this->requirePHPVersion(array(
       ts("PHP Configuration"),
       ts("PHP5 installed"),
-      NULL,
-      ts("PHP version %1", array(1 => phpversion())),
     ));
 
     // Check that we can identify the root folder successfully
@@ -717,6 +725,13 @@ class InstallRequirements {
       ts("PHP Configuration"),
       ts("JSON support"),
       ts("JSON support not included in PHP."),
+    ));
+
+    // check for Multibyte support such as mb_substr. Required for proper handling of Multilingual setups.
+    $this->requireFunction('mb_substr', array(
+      ts("PHP Configuration"),
+      ts("Multibyte support"),
+      ts("Multibyte support not enabled in PHP."),
     ));
 
     // Check for xcache_isset and emit warning if exists
@@ -849,36 +864,30 @@ class InstallRequirements {
   }
 
   /**
-   * @param $minVersion
-   * @param $testDetails
-   * @param null $maxVersion
+   * @param array $testDetails
+   * @return bool
    */
-  public function requirePHPVersion($minVersion, $testDetails, $maxVersion = NULL) {
+  public function requirePHPVersion($testDetails) {
 
     $this->testing($testDetails);
 
     $phpVersion = phpversion();
-    $aboveMinVersion = version_compare($phpVersion, $minVersion) >= 0;
-    $belowMaxVersion = $maxVersion ? version_compare($phpVersion, $maxVersion) < 0 : TRUE;
+    $aboveMinVersion = version_compare($phpVersion, CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER) >= 0;
 
-    if ($aboveMinVersion && $belowMaxVersion) {
-      if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) < 0) {
-        $testDetails[2] = ts('This webserver is running an outdated version of PHP (%1). It is strongly recommended to upgrade to PHP %2 or later, as older versions can present a security risk.', array(
-          1 => phpversion(),
+    if ($aboveMinVersion) {
+      if (version_compare($phpVersion, CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) < 0) {
+        $testDetails[2] = ts('This webserver is running an outdated version of PHP (%1). It is strongly recommended to upgrade to PHP %2 or later, as older versions can present a security risk. The preferred version is %3.', array(
+          1 => $phpVersion,
           2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+          3 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
         ));
         $this->warning($testDetails);
       }
       return TRUE;
     }
 
-    if (!$testDetails[2]) {
-      if (!$aboveMinVersion) {
-        $testDetails[2] = ts("You need PHP version %1 or later, only %2 is installed. Please upgrade your server, or ask your web-host to do so.", array(1 => $minVersion, 2 => $phpVersion));
-      }
-      else {
-        $testDetails[2] = ts("PHP version %1 is not supported. PHP version earlier than %2 is required. You might want to downgrade your server, or ask your web-host to do so.", array(1 => $maxVersion, 2 => $phpVersion));
-      }
+    if (empty($testDetails[2])) {
+      $testDetails[2] = ts("You need PHP version %1 or later, only %2 is installed. Please upgrade your server, or ask your web-host to do so.", array(1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER, 2 => $phpVersion));
     }
 
     $this->error($testDetails);
@@ -1697,12 +1706,13 @@ class Installer extends InstallRequirements {
         $output .= "<li>" . ts("Use the <a %1>Configuration Checklist</a> to review and configure settings for your new site", array(1 => "target='_blank' href='$cmsURL'")) . "</li>";
         $output .= $commonOutputMessage;
 
-        echo '</ul>';
-        echo '</div>';
+        $output .= '</ul>';
+        $output .= '</div>';
+        echo $output;
 
         $c = CRM_Core_Config::singleton(FALSE);
         $c->free();
-        $wpInstallRedirect = admin_url("?page=CiviCRM&q=civicrm&reset=1");
+        $wpInstallRedirect = admin_url('admin.php?page=CiviCRM&q=civicrm&reset=1');
         echo "<script>
          window.location = '$wpInstallRedirect';
         </script>";
@@ -1828,14 +1838,21 @@ function getSiteDir($cmsPath, $str) {
  * @param $showRefer
  */
 function errorDisplayPage($errorTitle, $errorMsg, $showRefer = TRUE) {
-  if ($showRefer) {
-    $docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, 'Installation Guide', NULL, NULL, "wiki");
 
-    if (function_exists('ts')) {
-      $errorMsg .= '<p>' . ts("<a %1>Refer to the online documentation for more information</a>", array(1 => "href='$docLink'")) . '</p>';
+  // Add a link to the documentation
+  if ($showRefer) {
+    if (is_callable(array('CRM_Utils_System', 'docURL2'))) {
+      $docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, 'Installation Guide', NULL, NULL, "wiki");
     }
     else {
-      $errorMsg .= '<p>' . sprintf("<a %s>Refer to the online documentation for more information</a>", "href='$docLink'") . '</p>';
+      $docLink = '';
+    }
+
+    if (function_exists('ts')) {
+      $errorMsg .= '<p>' . ts("Refer to the online documentation for more information: ") . $docLink . '</p>';
+    }
+    else {
+      $errorMsg .= '<p>' . 'Refer to the online documentation for more information: ' . $docLink . '</p>';
     }
   }
 

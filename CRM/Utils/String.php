@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 require_once 'HTML/QuickForm/Rule/Email.php';
@@ -657,13 +657,13 @@ class CRM_Utils_String {
    * @return string
    */
   public static function ellipsify($string, $maxLen) {
-    $len = strlen($string);
+    $len = mb_strlen($string, 'UTF-8');
     if ($len <= $maxLen) {
       return $string;
     }
     else {
       $end = $maxLen - 3;
-      while (strlen($string) > $maxLen - 3) {
+      while (mb_strlen($string, 'UTF-8') > $maxLen - 3) {
         $string = mb_substr($string, 0, $end, 'UTF-8');
         $end = $end - 1;
       }

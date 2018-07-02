@@ -7,20 +7,7 @@ It could perhaps be thinned by 30-60% by making more directives.
 <div class="crm-block" ng-form="subform" crm-ui-id-scope>
   <div class="crm-group">
     <div crm-ui-field="{name: 'subform.msg_template_id', title: ts('Template')}">
-      <div ng-controller="MsgTemplateCtrl">
-        <select
-          crm-ui-id="subform.msg_template_id"
-          name="msg_template_id"
-          class="fa-clipboard"
-          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Message Template')}"
-          ng-model="mailing.msg_template_id"
-          ng-change="loadTemplate(mailing, mailing.msg_template_id)"
-          >
-          <option value=""></option>
-          <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
-        </select>
-        <a crm-icon="fa-floppy-o" ng-if="checkPerm('edit message templates')" ng-click="saveTemplate(mailing)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
-      </div>
+      <div crm-mailing-block-templates="{name: 'templates', id: 'subform.msg_template_id'}" crm-mailing="mailing"></div>
     </div>
     <div crm-ui-field="{name: 'subform.fromAddress', title: ts('From'), help: hs('from_email')}">
       <div ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="mailing">
@@ -49,20 +36,18 @@ It could perhaps be thinned by 30-60% by making more directives.
         </select>
       </div>
     </div>
-    <div crm-ui-field="{name: 'subform.recipients', title: ts('Recipients')}">
-      <div crm-mailing-block-recipients="{name: 'recipients', id: 'subform.recipients'}" crm-mailing="mailing"></div>
+    <div crm-ui-field="{name: 'subform.recipients', title: ts('Recipients'), required: true}">
+      <div crm-mailing-block-recipients="{name: 'recipients', id: 'subform.recipients'}" crm-mailing="mailing" cm-ui-id="subform.recipients"></div>
     </div>
     <span ng-controller="EditUnsubGroupCtrl">
       <div crm-ui-field="{name: 'subform.baseGroup', title: ts('Unsubscribe Group')}" ng-if="isUnsubGroupRequired(mailing)">
-        <select
+        <input
+          crm-entityref="{entity: 'Group', api: {params: {is_hidden: 0, is_active: 1}}, select: {allowClear:true, minimumInputLength: 0}}"
           crm-ui-id="subform.baseGroup"
-          crm-ui-select
           name="baseGroup"
           ng-model="mailing.recipients.groups.base[0]"
           ng-required="true"
-          >
-          <option ng-repeat="grp in crmMailingConst.groupNames | filter:{is_hidden:0} | orderBy:'title'" value="{{grp.id}}">{{grp.title}}</option>
-        </select>
+        />
       </div>
     </span>
     <div crm-ui-field="{name: 'subform.subject', title: ts('Subject')}">

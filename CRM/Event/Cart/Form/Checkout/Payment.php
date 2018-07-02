@@ -86,8 +86,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         'participant_id' => $participant->id,
         'contribution_id' => $params['contributionID'],
       );
-      $ids = array();
-      CRM_Event_BAO_ParticipantPayment::create($payment_params, $ids);
+      CRM_Event_BAO_ParticipantPayment::create($payment_params);
     }
 
     $transaction->commit();
@@ -329,16 +328,6 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   }
 
   /**
-   * Get default from address.
-   *
-   * @return mixed
-   */
-  public function getDefaultFrom() {
-    $values = CRM_Core_OptionGroup::values('from_email_address');
-    return $values[1];
-  }
-
-  /**
    * Send email receipt.
    *
    * @param array $events_in_cart
@@ -362,7 +351,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $send_template_params = array(
       'table' => 'civicrm_msg_template',
       'contactId' => $this->payer_contact_id,
-      'from' => $this->getDefaultFrom(),
+      'from' => CRM_Core_BAO_Domain::getNameAndEmail(TRUE, TRUE),
       'groupName' => 'msg_tpl_workflow_event',
       'isTest' => FALSE,
       'toEmail' => $contact_details[1],
@@ -532,11 +521,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $contribution_statuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $params['payment_instrument_id'] = NULL;
     if (!empty($params['is_pay_later'])) {
-      $params['payment_instrument_id'] = CRM_Core_OptionGroup::getValue('payment_instrument', 'Check', 'name');
+      $params['payment_instrument_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
       $trxn_prefix = 'CK';
     }
     else {
-      $params['payment_instrument_id'] = CRM_Core_OptionGroup::getValue('payment_instrument', 'Credit Card', 'name');
+      $params['payment_instrument_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit Card');
     }
     if ($this->is_pay_later && empty($params['payment_completed'])) {
       $params['contribution_status_id'] = array_search('Pending', $contribution_statuses);
@@ -680,10 +669,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $contribParams['payment_processor'] = $this->_paymentProcessor['id'];
     }
 
-    $contribution = &CRM_Contribute_BAO_Contribution::add($contribParams);
-    if (is_a($contribution, 'CRM_Core_Error')) {
-      CRM_Core_Error::fatal(ts("There was an error creating a contribution record for your event. Please report this error to the webmaster. Details: %1", array(1 => $contribution->getMessages($contribution))));
-    }
+    $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
     $mer_participant->contribution_id = $contribution->id;
     $params['contributionID'] = $contribution->id;
 

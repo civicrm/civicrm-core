@@ -1,6 +1,6 @@
 name = CiviCRM
 description = Constituent relationship management system. Allows sites to manage contacts, relationships and groups, and track contact activities, contributions, memberships and events. See the <a href="https://civicrm.org/">CiviCRM website</a> for more information.
-version = 7.x-4.7.27
+version = 7.x-5.3.beta1
 package = CiviCRM
 core = 7.x
 project = civicrm
@@ -66,6 +66,7 @@ files[] = modules/views/civicrm/civicrm_handler_filter_relationship_type.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_country_multi.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_state_multi.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_domain.inc
+files[] = modules/views/civicrm/civicrm_handler_filter_contact_ref.inc
 
 ; activity handlers
 files[] = modules/views/civicrm/civicrm_handler_field_activity.inc

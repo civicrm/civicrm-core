@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -90,6 +90,8 @@ class CRM_Utils_Token {
 
 
   /**
+   * @deprecated
+   *   This is used by CiviMail but will be made redundant by FlexMailer.
    * @return array
    */
   public static function getRequiredTokens() {
@@ -118,7 +120,8 @@ class CRM_Utils_Token {
    *    else an array of the missing tokens
    */
   public static function requiredTokens(&$str) {
-    $requiredTokens = self::getRequiredTokens();
+    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
+    $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS, array()) : CRM_Utils_Token::getRequiredTokens();
 
     $missing = array();
     foreach ($requiredTokens as $token => $value) {
@@ -657,17 +660,14 @@ class CRM_Utils_Token {
     $returnBlankToken = FALSE,
     $escapeSmarty = FALSE
   ) {
+    // Refresh contact tokens in case they have changed. There is heavy caching
+    // in exportable fields so there is no benefit in doing this conditionally.
+    self::$_tokens['contact'] = array_merge(
+      array_keys(CRM_Contact_BAO_Contact::exportableFields('All')),
+      array('checksum', 'contact_id')
+    );
+
     $key = 'contact';
-    if (self::$_tokens[$key] == NULL) {
-      // This should come from UF
-
-      self::$_tokens[$key]
-        = array_merge(
-          array_keys(CRM_Contact_BAO_Contact::exportableFields('All')),
-          array('checksum', 'contact_id')
-        );
-    }
-
     // here we intersect with the list of pre-configured valid tokens
     // so that we remove anything we do not recognize
     // I hope to move this step out of here soon and
@@ -1157,7 +1157,7 @@ class CRM_Utils_Token {
    * Gives required details of contacts in an indexed array format so we
    * can iterate in a nice loop and do token evaluation
    *
-   * @param $contactIDs
+   * @param array $contactIDs
    * @param array $returnProperties
    *   Of required properties.
    * @param bool $skipOnHold Don't return on_hold contact info also.
@@ -1186,7 +1186,7 @@ class CRM_Utils_Token {
   ) {
 
     $params = array();
-    foreach ($contactIDs as $key => $contactID) {
+    foreach ($contactIDs as $contactID) {
       $params[] = array(
         CRM_Core_Form::CB_PREFIX . $contactID,
         '=',
@@ -1215,7 +1215,7 @@ class CRM_Utils_Token {
       $fields = array_merge(array_keys(CRM_Contact_BAO_Contact::exportableFields()),
         array('display_name', 'checksum', 'contact_id')
       );
-      foreach ($fields as $key => $val) {
+      foreach ($fields as $val) {
         // The unavailable fields are not available as tokens, do not have a one-2-one relationship
         // with contacts and are expensive to resolve.
         // @todo see CRM-17253 - there are some other fields (e.g note) that should be excluded
@@ -1239,12 +1239,12 @@ class CRM_Utils_Token {
 
     $contactDetails = &$details[0];
 
-    foreach ($contactIDs as $key => $contactID) {
+    foreach ($contactIDs as $contactID) {
       if (array_key_exists($contactID, $contactDetails)) {
         if (!empty($contactDetails[$contactID]['preferred_communication_method'])
         ) {
           $communicationPreferences = array();
-          foreach ($contactDetails[$contactID]['preferred_communication_method'] as $key => $val) {
+          foreach ($contactDetails[$contactID]['preferred_communication_method'] as $val) {
             if ($val) {
               $communicationPreferences[$val] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_communication_method', $val);
             }
@@ -1404,8 +1404,8 @@ class CRM_Utils_Token {
         $greetingTokens = $remainingTokens;
         reset($greetingTokens);
         $greetingsReturnProperties = array();
-        while (list($key) = each($greetingTokens)) {
-          $props = array_flip(CRM_Utils_Array::value($key, $greetingTokens));
+        foreach ($greetingTokens as $value) {
+          $props = array_flip($value);
           $props = array_fill_keys(array_keys($props), 1);
           $greetingsReturnProperties = $greetingsReturnProperties + $props;
         }
@@ -1762,6 +1762,7 @@ class CRM_Utils_Token {
               'id' => $membership['membership_type_id'],
               'return' => 'minimum_fee',
             ));
+          $value = CRM_Utils_Money::format($value, NULL, NULL, TRUE);
         }
         catch (CiviCRM_API3_Exception $e) {
           // we can anticipate we will get an error if the minimum fee is set to 'NULL' because of the way the

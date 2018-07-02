@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>MessageTemplate</class>
+  <name>civicrm_msg_template</name>
+  <comment>Users will need a way to save and retrieve templates with tokens for use in recurring email communication tasks</comment>
+  <add>1.6</add>
+  <field>
+    <name>id</name>
+    <title>Message Template ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Message Template ID</comment>
+    <add>1.6</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>msg_title</name>
+    <title>Message Template Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Descriptive title of message</comment>
+    <add>1.6</add>
+  </field>
+  <field>
+    <name>msg_subject</name>
+    <title>Message Template Subject</title>
+    <type>text</type>
+    <comment>Subject for email message.</comment>
+    <add>1.6</add>
+    <!-- type changed from VARCHAR(255) to TEXT in 3.1 -->
+  </field>
+  <field>
+    <name>msg_text</name>
+    <title>Message Template Text</title>
+    <type>longtext</type>
+    <html>
+      <type>TextArea</type>
+      <rows>10</rows>
+      <cols>75</cols>
+    </html>
+    <comment>Text formatted message</comment>
+    <add>1.6</add>
+    <!-- type changed from TEXT to LONGTEXT in 4.3 -->
+  </field>
+  <field>
+    <name>msg_html</name>
+    <title>Message Template HTML</title>
+    <type>longtext</type>
+    <html>
+      <type>RichTextEditor</type>
+      <rows>10</rows>
+      <cols>75</cols>
+    </html>
+    <comment>HTML formatted message</comment>
+    <add>1.6</add>
+    <!-- type changed from TEXT to LONGTEXT in 4.3 -->
+  </field>
+  <field>
+    <name>is_active</name>
+    <title>Is Active</title>
+    <type>boolean</type>
+    <default>1</default>
+    <add>1.6</add>
+  </field>
+  <field>
+    <name>workflow_id</name>
+    <title>Message Template Workflow</title>
+    <type>int unsigned</type>
+    <comment>a pseudo-FK to civicrm_option_value</comment>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>is_default</name>
+    <title>Message Template Is Default?</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>is this the default message template for the workflow referenced by workflow_id?</comment>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>is_reserved</name>
+    <title>Message Template Is Reserved?</title>
+    <type>boolean</type>
+    <comment>is this the reserved message template which we ship for the workflow referenced by workflow_id?</comment>
+    <add>3.1</add>
+  </field>
+  <field>
+    <name>is_sms</name>
+    <title>Message Template is used for SMS?</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Is this message template used for sms?</comment>
+    <add>4.5</add>
+  </field>
+  <field>
+    <name>pdf_format_id</name>
+    <title>Message Template Format</title>
+    <type>int unsigned</type>
+    <comment>a pseudo-FK to civicrm_option_value containing PDF Page Format.</comment>
+    <pseudoconstant>
+      <optionGroupName>pdf_format</optionGroupName>
+      <keyColumn>id</keyColumn>
+    </pseudoconstant>
+    <add>3.4</add>
+  </field>
+</table>

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-contact-userdashboard-groupcontact-pre"}
+{/crmRegion}
 <div id="groupContact">
     <div class="view-content">
         {if $groupCount eq 0 }
@@ -131,3 +133,5 @@
         {/if}
     </div>
 </div>
+{crmRegion name="crm-contact-userdashboard-groupcontact-post"}
+{/crmRegion}

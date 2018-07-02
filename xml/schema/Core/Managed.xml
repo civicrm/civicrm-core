@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>Managed</class>
+  <name>civicrm_managed</name>
+  <comment>List of declaratively managed objects</comment>
+  <add>4.2</add>
+  <log>false</log>
+  <field>
+    <name>id</name>
+    <title>Managed ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Surrogate Key</comment>
+    <add>4.2</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>module</name>
+    <title>Module</title>
+    <type>varchar</type>
+    <length>127</length>
+    <required>true</required>
+    <comment>Name of the module which declared this object</comment>
+    <add>4.2</add>
+  </field>
+  <field>
+    <name>name</name>
+    <title>Name</title>
+    <type>varchar</type>
+    <length>127</length>
+    <comment>Symbolic name used by the module to identify the object</comment>
+    <add>4.2</add>
+  </field>
+  <index>
+    <name>UI_managed_module_name</name>
+    <fieldName>module</fieldName>
+    <fieldName>name</fieldName>
+    <add>4.2</add>
+  </index>
+  <field>
+    <name>entity_type</name>
+    <title>Entity Type</title>
+    <type>varchar</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>API entity type</comment>
+    <add>4.2</add>
+  </field>
+  <field>
+    <name>entity_id</name>
+    <title>Entity ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Foreign key to the referenced item.</comment>
+    <add>4.2</add>
+  </field>
+  <field>
+    <name>cleanup</name>
+    <title>Cleanup Setting</title>
+    <type>varchar</type>
+    <length>32</length>
+    <comment>Policy on when to cleanup entity (always, never, unused)</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_ManagedEntities::getCleanupOptions</callback>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>4.5</add>
+  </field>
+  <index>
+    <name>UI_managed_entity</name>
+    <fieldName>entity_type</fieldName>
+    <fieldName>entity_id</fieldName>
+    <add>4.2</add>
+  </index>
+</table>

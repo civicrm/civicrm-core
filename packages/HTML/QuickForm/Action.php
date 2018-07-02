@@ -3,7 +3,7 @@
 
 /**
  * Class representing an action to perform on HTTP request.
- * 
+ *
  * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.01 of the PHP license
@@ -22,10 +22,10 @@
  */
 
 /**
- * Class representing an action to perform on HTTP request. 
- * 
+ * Class representing an action to perform on HTTP request.
+ *
  * The Controller will select the appropriate Action to call on the request and
- * call its perform() method. The subclasses of this class should implement all 
+ * call its perform() method. The subclasses of this class should implement all
  * the necessary business logic.
  *
  * @category    HTML

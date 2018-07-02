@@ -3,7 +3,7 @@
 
 /**
  * A concrete renderer for HTML_QuickForm, makes an array of form contents
- * 
+ *
  * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.01 of the PHP license
@@ -229,10 +229,10 @@ class HTML_QuickForm_Renderer_Array extends HTML_QuickForm_Renderer
     function renderHidden(&$element, $required = FALSE, $error = FALSE)
     {
         if ($this->_collectHidden) {
-            // add to error array 
-            if (!empty($error)) { 
-                $this->_ary['errors']['hidden'] = $error; 
-            } 
+            // add to error array
+            if (!empty($error)) {
+                $this->_ary['errors']['hidden'] = $error;
+            }
             $this->_ary['hidden'] .= $element->toHtml() . "\n";
         } else {
             $this->renderElement($element, $required, $error);

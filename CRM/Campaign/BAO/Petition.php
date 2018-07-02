@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   /**
@@ -94,7 +94,7 @@ INNER JOIN civicrm_option_group grp ON ( activity_type.option_group_id = grp.id 
 
     //we only have activity type as a
     //difference between survey and petition.
-    $petitionTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'petition', 'name');
+    $petitionTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Petition');
     if ($petitionTypeID) {
       $where[] = "( petition.activity_type_id = %1 )";
       $queryParams[1] = array($petitionTypeID, 'Positive');
@@ -160,7 +160,7 @@ SELECT  petition.id                         as id,
   public static function getPetitionCount() {
     $whereClause = 'WHERE ( 1 )';
     $queryParams = array();
-    $petitionTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'petition', 'name');
+    $petitionTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Petition');
     if ($petitionTypeID) {
       $whereClause = "WHERE ( petition.activity_type_id = %1 )";
       $queryParams[1] = array($petitionTypeID, 'Positive');

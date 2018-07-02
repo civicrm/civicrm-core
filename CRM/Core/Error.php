@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * PEAR_ErrorStack and use that framework
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 require_once 'PEAR/ErrorStack.php';
@@ -106,7 +106,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param bool $throwPEAR_Error
    * @param string $stackClass
    *
-   * @return object
+   * @return CRM_Core_Error
    */
   public static function &singleton($package = NULL, $msgCallback = FALSE, $contextCallback = FALSE, $throwPEAR_Error = FALSE, $stackClass = 'PEAR_ErrorStack') {
     if (self::$_singleton === NULL) {
@@ -148,6 +148,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       }
       $message = implode($separator, $message);
       return $message;
+    }
+    elseif (is_a($error, 'Civi\Payment\Exception\PaymentProcessorException')) {
+      return $error->getMessage();
     }
     return NULL;
   }
@@ -343,7 +346,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
 
     if (!$message) {
-      $message = ts('We experienced an unexpected error. Please post a detailed description and the backtrace on the CiviCRM forums: %1', array(1 => 'http://forum.civicrm.org/'));
+      $message = ts('We experienced an unexpected error. You may have found a bug. For more information on how to provide a bug report, please read: %1', array(1 => 'https://civicrm.org/bug-reporting'));
     }
 
     if (php_sapi_name() == "cli") {
@@ -423,7 +426,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       'exception' => $exception,
     );
     if (!$vars['message']) {
-      $vars['message'] = ts('We experienced an unexpected error. Please post a detailed description and the backtrace on the CiviCRM forums: %1', array(1 => 'http://forum.civicrm.org/'));
+      $vars['message'] = ts('We experienced an unexpected error. You may have found a bug. For more information on how to provide a bug report, please read: %1', array(1 => 'https://civicrm.org/bug-reporting'));
     }
 
     // Case A: CLI
@@ -1025,6 +1028,19 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Output a deprecated function warning to log file.  Deprecated class:function is automatically generated from calling function.
+   *
+   * @param $newMethod
+   *   description of new method (eg. "buildOptions() method in the appropriate BAO object").
+   */
+  public static function deprecatedFunctionWarning($newMethod) {
+    $dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+    $callerFunction = isset($dbt[1]['function']) ? $dbt[1]['function'] : NULL;
+    $callerClass = isset($dbt[1]['class']) ? $dbt[1]['class'] : NULL;
+    Civi::log()->warning("Deprecated function $callerClass::$callerFunction, use $newMethod.", array('civi.tag' => 'deprecated'));
   }
 
 }

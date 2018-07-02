@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailing</base>
+  <class>Spool</class>
+  <name>civicrm_mailing_spool</name>
+  <comment>Stores the outbond mails</comment>
+  <field>
+    <name>id</name>
+    <title>Spool ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>job_id</name>
+    <title>Mailing Job</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>The ID of the Job .</comment>
+  </field>
+  <foreignKey>
+    <name>job_id</name>
+    <table>civicrm_mailing_job</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>recipient_email</name>
+    <title>Recipient Email</title>
+    <type>text</type>
+    <comment>The email of the receipients this mail is to be sent.</comment>
+  </field>
+  <field>
+    <name>headers</name>
+    <title>Headers</title>
+    <type>text</type>
+    <comment>The header information of this mailing .</comment>
+  </field>
+  <field>
+    <name>body</name>
+    <title>Body</title>
+    <type>text</type>
+    <comment>The body of this mailing.</comment>
+  </field>
+  <field>
+    <name>added_at</name>
+    <title>Added</title>
+    <type>timestamp</type>
+    <required>false</required>
+    <default>NULL</default>
+    <comment>date on which this job was added.</comment>
+  </field>
+  <field>
+    <name>removed_at</name>
+    <title>Removed</title>
+    <type>timestamp</type>
+    <required>false</required>
+    <default>NULL</default>
+    <comment>date on which this job was removed.</comment>
+  </field>
+</table>

@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2018                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -484,7 +484,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $this->addGroup($elements, 'pcp_is_anonymous', NULL, '&nbsp;&nbsp;&nbsp;');
 
         $this->add('text', 'pcp_roll_nickname', ts('Name'), array('maxlength' => 30));
-        $this->add('textarea', 'pcp_personal_note', ts('Personal Note'), array('style' => 'height: 3em; width: 40em;'));
+        $this->addField('pcp_personal_note', array('entity' => 'ContributionSoft', 'context' => 'create', 'style' => 'height: 3em; width: 40em;'));
       }
     }
     if (empty($this->_values['fee']) && empty($this->_ccid)) {
@@ -956,7 +956,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
       if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {
-        $customizedValue = CRM_Core_OptionGroup::getValue($greeting, 'Customized', 'name');
+        $customizedValue = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $greeting . '_id', 'Customized');
         if ($customizedValue == $greetingType && empty($fielse[$greeting . '_custom'])) {
           $errors[$greeting . '_custom'] = ts('Custom %1 is a required field if %1 is of type Customized.',
             array(1 => ucwords(str_replace('_', " ", $greeting)))
@@ -1165,7 +1165,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $component = 'membership';
       }
 
-      CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem[$priceSetId], $component);
+      CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem[$priceSetId], $component, $priceSetId);
       if ($params['tax_amount']) {
         $this->set('tax_amount', $params['tax_amount']);
       }

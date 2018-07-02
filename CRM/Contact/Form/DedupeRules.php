@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -58,10 +58,12 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     }
     $this->_options = CRM_Core_SelectValues::getDedupeRuleTypes();
     $this->_rgid = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
-    $contactTypes = civicrm_api3('Contact', 'getOptions', array('field' => "contact_type"));
+
+    // check if $contactType is valid
+    $contactTypes = civicrm_api3('Contact', 'getOptions', array('field' => "contact_type", 'context' => "validate"));
     $contactType = CRM_Utils_Request::retrieve('contact_type', 'String', $this, FALSE, 0);
     if (CRM_Utils_Array::value($contactType, $contactTypes['values'])) {
-      $this->_contactType = CRM_Utils_Array::value($contactType, $contactTypes['values']);
+      $this->_contactType = $contactType;
     }
     elseif (!empty($contactType)) {
       throw new CRM_Core_Exception('Contact Type is Not valid');

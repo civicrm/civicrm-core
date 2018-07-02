@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -135,7 +135,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
           'Radio' => ts('Radio'),
           'CheckBox' => ts('CheckBox'),
           'Multi-Select' => ts('Multi-Select'),
-          'AdvMulti-Select' => ts('Adv Multi-Select (obsolete)'),
           'Autocomplete-Select' => ts('Autocomplete-Select'),
         ),
         array(
@@ -237,6 +236,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     else {
       $defaults['is_active'] = 1;
       $defaults['option_type'] = 1;
+      $defaults['is_search_range'] = 1;
     }
 
     // set defaults for weight.
@@ -284,6 +284,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $this->assign('gid', $this->_gid);
     }
 
+    $this->assign('dataTypeKeys', self::$_dataTypeKeys);
+
     // lets trim all the whitespace
     $this->applyFilter('__ALL__', 'trim');
 
@@ -305,7 +307,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $sel = &$this->addElement('hierselect',
       'data_type',
       ts('Data and Input Field Type'),
-      'onclick="clearSearchBoxes();custom_option_html_type(this.form)"; onBlur="custom_option_html_type(this.form)";',
       '&nbsp;&nbsp;&nbsp;'
     );
     $sel->setOptions(array($dt, $it));
@@ -358,7 +359,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       ts('Limit List to Group'),
       $contactGroups,
       FALSE,
-      array('multiple' => 'multiple')
+      array('multiple' => 'multiple', 'class' => 'crm-select2')
     );
 
     $this->add('text',
@@ -515,8 +516,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     // is searchable ?
     $this->addElement('advcheckbox',
       'is_searchable',
-      ts('Is this Field Searchable?'),
-      NULL, array('onclick' => "showSearchRange(this)")
+      ts('Is this Field Searchable?')
     );
 
     // is searchable by range?
@@ -707,7 +707,7 @@ SELECT count(*)
     if (isset($fields['data_type'][1])) {
       $dataField = $fields['data_type'][1];
     }
-    $optionFields = array('Select', 'Multi-Select', 'CheckBox', 'Radio', 'AdvMulti-Select');
+    $optionFields = array('Select', 'Multi-Select', 'CheckBox', 'Radio');
 
     if (isset($fields['option_type']) && $fields['option_type'] == 1) {
       //capture duplicate Custom option values

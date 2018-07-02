@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,16 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   // Primary Contacts count limitCONSTROW_COUNT_LIMIT = 10;
 
-  protected $_addressField = FALSE;
-  protected $_emailField = FALSE;
-  protected $_phoneField = FALSE;
   protected $_relationshipColumns = array();
 
   protected $_customGroupExtends = array(
@@ -327,6 +322,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
 
   public function select() {
     $select = array();
+    // @todo remove this & use parent (with maybe some override in this or better yet selectWhere fn)
     $this->_columnHeaders = array();
 
     foreach ($this->_columns as $tableName => $table) {
@@ -336,15 +332,6 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
           if (!empty($field['required']) ||
             !empty($this->_params['fields'][$fieldName])
           ) {
-            if ($tableName == 'civicrm_address') {
-              $this->_addressField = TRUE;
-            }
-            if ($tableName == 'civicrm_email') {
-              $this->_emailField = TRUE;
-            }
-            if ($tableName == 'civicrm_phone') {
-              $this->_phoneField = TRUE;
-            }
             if ($tableName == 'civicrm_relationship') {
               $this->_relationshipColumns["{$tableName}_{$fieldName}"] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
@@ -398,23 +385,13 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND
                         {$this->_aliases['civicrm_contribution']}.is_test = 0 ";
 
-    if ($this->_emailField) {
-      $this->_from .= " LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                        {$this->_aliases['civicrm_email']}.is_primary = 1) ";
-    }
-
-    if ($this->_phoneField) {
-      $this->_from .= " LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-                     ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                        {$this->_aliases['civicrm_phone']}.is_primary = 1) ";
-    }
-
     $relContacAlias = 'contact_relationship';
     $this->_relationshipFrom = " INNER JOIN civicrm_relationship {$this->_aliases['civicrm_relationship']}
                      ON (({$this->_aliases['civicrm_relationship']}.contact_id_a = {$relContacAlias}.id OR {$this->_aliases['civicrm_relationship']}.contact_id_b = {$relContacAlias}.id ) AND {$this->_aliases['civicrm_relationship']}.is_active = 1) ";
 
-    $this->addAddressFromClause();
+    $this->joinAddressFromContact();
+    $this->joinPhoneFromContact();
+    $this->joinEmailFromContact();
 
     // for credit card type
     $this->addFinancialTrxnFromClause();

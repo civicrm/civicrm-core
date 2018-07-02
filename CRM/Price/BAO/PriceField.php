@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2018                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -456,7 +456,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           if (!empty($qf->_quickConfig) && $field->name == 'contribution_amount') {
             $extra += array('onclick' => 'clearAmountOther();');
           }
-          elseif (!empty($qf->_quickConfig) && $field->name == 'membership_amount') {
+          if ($field->name == 'membership_amount') {
             $extra += array(
               'onclick' => "return showHideAutoRenew({$opt['membership_type_id']});",
               'membership-type' => $opt['membership_type_id'],
@@ -645,17 +645,16 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *   array of options
    */
   public static function getOptions($fieldId, $inactiveNeeded = FALSE, $reset = FALSE, $isDefaultContributionPriceSet = FALSE) {
-    static $options = array();
-    if ($reset) {
-      $options = array();
+    if ($reset || !isset(Civi::$statics[__CLASS__]['priceOptions'])) {
+      Civi::$statics[__CLASS__]['priceOptions'] = array();
       // This would happen if the function was only called to clear the cache.
       if (empty($fieldId)) {
         return array();
       }
     }
 
-    if (empty($options[$fieldId])) {
-      $values = array();
+    if (empty(Civi::$statics[__CLASS__]['priceOptions'][$fieldId])) {
+      $values = $options = array();
       CRM_Price_BAO_PriceFieldValue::getValues($fieldId, $values, 'weight', !$inactiveNeeded);
       $options[$fieldId] = $values;
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();
@@ -669,9 +668,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $options[$fieldId][$priceFieldId]['tax_amount'] = $taxAmount['tax_amount'];
         }
       }
+      Civi::$statics[__CLASS__]['priceOptions'][$fieldId] = $options[$fieldId];
     }
 
-    return $options[$fieldId];
+    return Civi::$statics[__CLASS__]['priceOptions'][$fieldId];
   }
 
   /**
@@ -836,8 +836,16 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
       list($componentName) = explode(':', $fields['_qf_default']);
       // now we have all selected amount in hand.
       $totalAmount = array_sum($selectedAmounts);
+      // The form offers a field to enter the amount paid. This may differ from the amount that is due to complete the purchase
+      $totalPaymentAmountEnteredOnForm = CRM_Utils_Array::value('partial_payment_total', $fields, CRM_Utils_Array::value('total_amount', $fields));
       if ($totalAmount < 0) {
         $error['_qf_default'] = ts('%1 amount can not be less than zero. Please select the options accordingly.', array(1 => $componentName));
+      }
+      elseif ($totalAmount > 0 &&
+        $totalPaymentAmountEnteredOnForm >= $totalAmount && // if total amount is equal to all selected amount in hand
+        (CRM_Utils_Array::value('contribution_status_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Partially paid'))
+      ) {
+        $error['total_amount'] = ts('You have specified the status Partially Paid but have entered an amount that equals or exceeds the amount due. Please adjust the status of the payment or the amount');
       }
     }
     else {

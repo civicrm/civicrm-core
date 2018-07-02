@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Standalone/OpenID</base>
+  <class>Associations</class>
+  <name>civicrm_openid_associations</name>
+  <comment>The OpenID associations store for standalone login.</comment>
+  <add>2.0</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>2.0</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>server_url</name>
+    <type>blob</type>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>handle</name>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>secret</name>
+    <type>blob</type>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>issued</name>
+    <type>int</type>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>lifetime</name>
+    <type>int</type>
+    <add>2.0</add>
+  </field>
+  <field>
+    <name>assoc_type</name>
+    <type>varchar</type>
+    <length>64</length>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>2.0</add>
+  </field>
+  <index>
+    <name>server_url_handle_index</name>
+    <fieldName length="166">server_url</fieldName>
+    <fieldName length="166">handle</fieldName>
+    <unique>true</unique>
+    <add>2.0</add>
+  </index>
+</table>

@@ -1,0 +1,5 @@
+{
+  "name": "civicrm/civicrm-packages",
+  "description": "Legacy third party dependencies for CiviCRM",
+  "type": "library"
+}

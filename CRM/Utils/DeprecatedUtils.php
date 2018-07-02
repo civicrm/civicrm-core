@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2018                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /*
@@ -242,16 +242,16 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
         break;
 
       case 'payment_instrument':
-        require_once 'CRM/Core/OptionGroup.php';
-        $values['payment_instrument_id'] = CRM_Core_OptionGroup::getValue('payment_instrument', $value);
+        require_once 'CRM/Core/PseudoConstant.php';
+        $values['payment_instrument_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $value);
         if (empty($values['payment_instrument_id'])) {
           return civicrm_api3_create_error("Payment Instrument is not valid: $value");
         }
         break;
 
       case 'contribution_status_id':
-        require_once 'CRM/Core/OptionGroup.php';
-        if (!$values['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', $value)) {
+        require_once 'CRM/Core/PseudoConstant.php';
+        if (!$values['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $value)) {
           return civicrm_api3_create_error("Contribution Status is not valid: $value");
         }
         break;
@@ -863,7 +863,6 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
           $htmlType = CRM_Utils_Array::value('html_type', $customFields[$customFieldID]);
           switch ($htmlType) {
             case 'CheckBox':
-            case 'AdvMulti-Select':
             case 'Multi-Select':
               if ($val) {
                 $mulValues = explode(',', $val);

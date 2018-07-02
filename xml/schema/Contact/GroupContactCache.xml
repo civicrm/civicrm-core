@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Contact</base>
+  <class>GroupContactCache</class>
+  <name>civicrm_group_contact_cache</name>
+  <comment>Join table cache for 'static' groups.</comment>
+  <add>2.1</add>
+  <field>
+    <name>id</name>
+    <title>Group Contact Cache ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>primary key</comment>
+    <add>2.1</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>group_id</name>
+    <title>Group</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm_group</comment>
+    <add>2.1</add>
+    <pseudoconstant>
+      <table>civicrm_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>group_id</name>
+    <table>civicrm_group</table>
+    <key>id</key>
+    <add>2.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <field>
+    <name>contact_id</name>
+    <title>Contact ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm_contact</comment>
+    <add>2.1</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>2.1</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+  <index>
+    <name>UI_contact_group</name>
+    <fieldName>contact_id</fieldName>
+    <fieldName>group_id</fieldName>
+    <unique>true</unique>
+    <add>2.1</add>
+  </index>
+</table>

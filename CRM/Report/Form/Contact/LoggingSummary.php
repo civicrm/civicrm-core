@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
+
+  public $optimisedForOnlyFullGroupBy = FALSE;
   /**
    * Class constructor.
    */
@@ -142,6 +144,19 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
             'type' => CRM_Utils_Type::T_INT,
           ),
         ),
+        'order_bys' => array(
+          'log_date' => array(
+            'title' => ts('Log Date (When)'),
+            'default' => TRUE,
+            'default_weight' => '0',
+            'default_order' => 'DESC',
+          ),
+          'altered_contact' => array(
+            'name' => 'display_name',
+            'title' => ts('Altered Contact'),
+            'alias' => 'modified_contact_civireport',
+          ),
+        ),
       ),
       'altered_by_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -158,6 +173,12 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
             'name' => 'display_name',
             'title' => ts('Altered By'),
             'type' => CRM_Utils_Type::T_STRING,
+          ),
+        ),
+        'order_bys' => array(
+          'altered_by_contact' => array(
+            'name' => 'display_name',
+            'title' => ts('Altered by'),
           ),
         ),
       ),
@@ -280,6 +301,10 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
    * Generate From Clause.
    */
   public function from() {
+    if (!$this->currentLogTable) {
+      // From has already been built in this case.
+      return;
+    }
     $entity = $this->currentLogTable;
 
     $detail = $this->_logTables[$entity];
@@ -332,5 +357,12 @@ LEFT  JOIN civicrm_contact altered_by_contact_civireport
     $row['log_civicrm_entity_log_action'] = "<a href='{$url1}' class='crm-summary-link'><i class=\"crm-i fa-list-alt\"></i></a>&nbsp;<a title='{$hoverTitle}' href='{$url2}'>" . $row['log_civicrm_entity_log_action'] . '</a>';
     return $row;
   }
+
+  /**
+   * Calculate section totals.
+   *
+   * Override to do nothing as this does not work / make sense on this report.
+   */
+  public function sectionTotals() {}
 
 }

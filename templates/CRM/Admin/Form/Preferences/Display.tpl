@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -114,12 +114,13 @@
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-contact_ajax_check_similar">
-      <td class="label"></td>
-      <td>{$form.contact_ajax_check_similar.html} {$form.contact_ajax_check_similar.label}</td>
+      <td class="label">{$form.contact_ajax_check_similar.label}</td>
+      <td>{$form.contact_ajax_check_similar.html}</td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
-      <td class="description">{ts}When enabled, checks for contacts with similar names as the user types values into the contact form name fields.{/ts}
+      {capture assign=dedupeRules}href="{crmURL p='civicrm/contact/deduperules' q='reset=1'}"{/capture}
+      <td class="description">{ts 1=$dedupeRules}When enabled, checks for possible matches on the "New Contact" form using the Supervised <a %1>matching rule specified in your system</a>.{/ts}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-activity_assignee_notification">
@@ -132,7 +133,16 @@
         {ts}When enabled, contacts who are assigned activities will automatically receive an email notification with a copy of the activity.{/ts}
       </td>
     </tr>
-
+    <tr class="crm-preferences-display-form-activity_types">
+      <td class="label">{$form.do_not_notify_assignees_for.label}</td>
+      <td>{$form.do_not_notify_assignees_for.html}</td>
+    </tr>
+    <tr class="crm-preferences-display-form-activity_types">
+      <td>&nbsp;</td>
+      <td class="description">
+        {ts}These activity types will be excluded from automated email notifications to assignees.{/ts}
+      </td>
+    </tr>
     <tr class="crm-preferences-display-form-block-activity_assignee_notification_ics">
       <td class="label"></td>
       <td>{$form.activity_assignee_notification_ics.html} {$form.activity_assignee_notification_ics.label}</td>
@@ -227,6 +237,12 @@
           }
           $('#contact_edit_preferences').val(params.toString());
         }
+
+        // show/hide activity types based on checkbox value
+        $('.crm-preferences-display-form-activity_types').toggle($('#activity_assignee_notification').is(":checked"));
+        $('#activity_assignee_notification').click(function() {
+          $('.crm-preferences-display-form-activity_types').toggle($(this).is(":checked"));
+        });
 
         var invoicesKey = '{/literal}{$invoicesKey}{literal}';
         var invoicing = '{/literal}{$invoicing}{literal}';

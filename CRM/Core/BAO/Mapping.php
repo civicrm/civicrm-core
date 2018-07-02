@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
@@ -1130,7 +1130,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       return $fields;
     }
 
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id', 'validate');
     foreach ($params['mapper'] as $key => $value) {
       foreach ($value as $k => $v) {
         if (isset($v[1])) {

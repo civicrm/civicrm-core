@@ -1,0 +1,113 @@
+<table>
+  <base>CRM/Cxn</base>
+  <class>Cxn</class>
+  <name>civicrm_cxn</name>
+  <add>4.6</add>
+  <field>
+    <name>id</name>
+    <title>Connection ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Connection ID</comment>
+    <add>4.6</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>false</autoincrement>
+  </primaryKey>
+
+  <!-- Application identification -->
+
+  <field>
+    <name>app_guid</name>
+    <title>Application GUID</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Application GUID</comment>
+    <add>4.6</add>
+  </field>
+  <index>
+    <name>UI_appid</name>
+    <fieldName>app_guid</fieldName>
+    <unique>true</unique>
+    <add>4.6</add>
+  </index>
+  <field>
+    <name>app_meta</name>
+    <title>Application Metadata (JSON)</title>
+    <type>text</type>
+    <comment>Application Metadata (JSON)</comment>
+    <add>4.6</add>
+  </field>
+
+  <!-- Connection details -->
+  
+  <field>
+    <name>cxn_guid</name>
+    <title>Connection GUID</title>
+    <type>varchar</type>
+    <length>128</length>
+    <comment>Connection GUID</comment>
+    <add>4.6</add>
+  </field>
+  <index>
+    <name>UI_keypair_cxnid</name>
+    <fieldName>cxn_guid</fieldName>
+    <unique>true</unique>
+    <add>4.6</add>
+  </index>
+  <field>
+    <name>secret</name>
+    <type>text</type>
+    <comment>Shared secret</comment>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>perm</name>
+    <type>text</type>
+    <comment>Permissions approved for the service (JSON)</comment>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>options</name>
+    <type>text</type>
+    <comment>Options for the service (JSON)</comment>
+    <serialize>JSON</serialize>
+    <add>4.6</add>
+  </field>
+  
+  <!-- Connection lifecycle -->
+  
+  <field>
+    <name>is_active</name>
+    <title>Is Active</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Is connection currently enabled?</comment>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>created_date</name>
+    <type>timestamp</type>
+    <comment>When was the connection was created.</comment>
+    <required>false</required>
+    <default>NULL</default>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <type>timestamp</type>
+    <comment>When the connection was created or modified.</comment>
+    <required>false</required>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <add>4.6</add>
+  </field>
+  <field>
+    <name>fetched_date</name>
+    <type>timestamp</type>
+    <comment>The last time the application metadata was fetched.</comment>
+    <required>false</required>
+    <default>NULL</default>
+    <add>4.6</add>
+  </field>
+</table>

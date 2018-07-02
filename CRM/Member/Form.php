@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -85,6 +85,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   public $_priceSet;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Membership';
+  }
+
+  /**
    * Values submitted to the form, processed along the way.
    *
    * @var array
@@ -139,6 +146,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
       if (isset($defaults['status'])) {
         $this->assign('membershipStatus', $defaults['status']);
+      }
+
+      if (!empty($defaults['is_override'])) {
+        $defaults['is_override'] = CRM_Member_StatusOverrideTypes::PERMANENT;
+      }
+      if (!empty($defaults['status_override_end_date'])) {
+        $defaults['is_override'] = CRM_Member_StatusOverrideTypes::UNTIL_DATE;
       }
     }
 

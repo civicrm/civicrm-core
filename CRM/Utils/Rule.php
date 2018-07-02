@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 require_once 'HTML/QuickForm/Rule/Email.php';
@@ -482,6 +482,20 @@ class CRM_Utils_Rule {
    *
    * @return bool
    */
+  public static function commaSeparatedIntegers($value) {
+    foreach (explode(',', $value) as $val) {
+      if (!self::positiveInteger($val)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * @param $value
+   *
+   * @return bool
+   */
   public static function numeric($value) {
     // lets use a php gatekeeper to ensure this is numeric
     if (!is_numeric($value)) {
@@ -489,6 +503,27 @@ class CRM_Utils_Rule {
     }
 
     return preg_match('/(^-?\d\d*\.\d*$)|(^-?\d\d*$)|(^-?\.\d\d*$)/', $value) ? TRUE : FALSE;
+  }
+
+  /**
+   * Test whether $value is alphanumeric.
+   *
+   * Underscores and dashes are also allowed!
+   *
+   * This is the type of string you could expect to see in URL parameters
+   * like `?mode=live` vs `?mode=test`. This function exists so that we can be
+   * strict about what we accept for such values, thus mitigating against
+   * potential security issues.
+   *
+   * @see \CRM_Utils_RuleTest::alphanumericData
+   *   for examples of vales that give TRUE/FALSE here
+   *
+   * @param $value
+   *
+   * @return bool
+   */
+  public static function alphanumeric($value) {
+    return preg_match('/^[a-zA-Z0-9_-]*$/', $value) ? TRUE : FALSE;
   }
 
   /**
@@ -502,9 +537,15 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
+   * Strip thousand separator from a money string.
    *
-   * @return mixed
+   * Note that this should be done at the form layer. Once we are processing
+   * money at the BAO or processor layer we should be working with something that
+   * is already in a normalised format.
+   *
+   * @param string $value
+   *
+   * @return string
    */
   public static function cleanMoney($value) {
     // first remove all white space
@@ -794,6 +835,25 @@ class CRM_Utils_Rule {
   }
 
   /**
+   * Validate json string for xss
+   *
+   * @param string $value
+   *
+   * @return bool
+   *   False if invalid, true if valid / safe.
+   */
+  public static function json($value) {
+    if (!self::xssString($value)) {
+      return FALSE;
+    }
+    $array = json_decode($value, TRUE);
+    if (!$array || !is_array($array)) {
+      return FALSE;
+    }
+    return self::arrayValue($array);
+  }
+
+  /**
    * @param $path
    *
    * @return bool
@@ -915,9 +975,29 @@ class CRM_Utils_Rule {
    * @param string $key Extension Key to check
    * @return bool
    */
-  public static function checkExtesnionKeyIsValid($key = NULL) {
+  public static function checkExtensionKeyIsValid($key = NULL) {
     if (!empty($key) && !preg_match('/^[0-9a-zA-Z._-]+$/', $key)) {
       return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
+   * Validate array recursively checking keys and  values.
+   *
+   * @param array $array
+   * @return bool
+   */
+  protected static function arrayValue($array) {
+    foreach ($array as $key => $item) {
+      if (is_array($item)) {
+        if (!self::xssString($key) || !self::arrayValue($item)) {
+          return FALSE;
+        }
+      }
+      if (!self::xssString($key) || !self::xssString($item)) {
+        return FALSE;
+      }
     }
     return TRUE;
   }

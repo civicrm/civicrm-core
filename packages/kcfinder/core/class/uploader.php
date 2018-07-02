@@ -87,6 +87,10 @@ class uploader {
   * @var string */
     protected $cms = "";
 
+/** Ouput format.
+  * @var string */
+    protected $outputFormat = 'js';
+
 /** Magic method which allows read-only access to protected or private class properties
   * @param string $property
   * @return mixed */
@@ -247,6 +251,11 @@ class uploader {
                 : path::url2fullPath($this->config['uploadURL']);
             $this->typeDir = "{$this->config['uploadDir']}/{$this->type}";
             $this->typeURL = "{$this->config['uploadURL']}/{$this->type}";
+        }
+
+        // Output Format
+        if (isset($_GET['format'])) {
+          $this->outputFormat = $_GET['format'];
         }
 
         // HOST APPLICATIONS INIT
@@ -759,11 +768,18 @@ class uploader {
                 $js = $this->$method($url, $message);
         }
 
-        if (!isset($js))
+        if ($this->outputFormat == 'json') {
+          header('Content-Type: application/json');
+          $json = $this->callBack_json($url, $message);
+          echo json_encode($json);
+        }
+        else {
+          if (!isset($js)) {
             $js = $this->callBack_default($url, $message);
-
-        header("Content-Type: text/html; charset={$this->charset}");
-        echo "<html><body>$js</body></html>";
+          }
+          header("Content-Type: text/html; charset={$this->charset}");
+          echo "<html><body>$js</body></html>";
+        }
     }
 
     protected function callBack_ckeditor($url, $message) {
@@ -817,6 +833,27 @@ if (window.opener) window.close();
     protected function get_htaccess() {
         return file_get_contents("conf/upload.htaccess");
     }
+
+    protected function callBack_json($url, $message) {
+      $uploaded = !empty($url) ? 1 : 0;
+      $result = [
+       'uploaded' => $uploaded
+      ];
+      if ($uploaded) {
+        $result['url'] = $url;
+        $urlPieces = explode('/', $url);
+        end($urlPieces);
+        $fileNamekey = key($urlPieces);
+        $result['fileName'] = $urlPieces[$fileNamekey];
+      }
+      else {
+        $result['error'] = [
+          'message' => $message,
+        ];
+      }
+    return $result;
+  }
+
 }
 
 ?>

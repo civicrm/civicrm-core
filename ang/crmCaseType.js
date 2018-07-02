@@ -103,7 +103,9 @@
         };
 
         $(input).crmSelect2({
-          data: scope[attrs.crmOptions],
+          data: function () {
+            return { results: scope[attrs.crmOptions] };
+          },
           createSearchChoice: function(term) {
             return {id: term, text: term + ' (' + ts('new') + ')'};
           },
@@ -116,11 +118,113 @@
           scope.$evalAsync('_resetSelection()');
           e.preventDefault();
         });
+      }
+    };
+  });
 
-        scope.$watch(attrs.crmOptions, function(value) {
-          $(input).select2('data', scope[attrs.crmOptions]);
-          $(input).select2('val', '');
-        });
+  crmCaseType.directive('crmEditableTabTitle', function($timeout) {
+    return {
+      restrict: 'AE',
+      link: function(scope, element, attrs) {
+        element.addClass('crm-editable crm-editable-enabled');
+        var titleLabel = $(element).find('span');
+        var penIcon = $('<i class="crm-i fa-pencil crm-editable-placeholder"></i>').prependTo(element);
+        var saveButton = $('<button type="button"><i class="crm-i fa-check"></i></button>').appendTo(element);
+        var cancelButton = $('<button type="cancel"><i class="crm-i fa-times"></i></button>').appendTo(element);
+        $('button', element).wrapAll('<div class="crm-editable-form" style="display:none" />');
+        var buttons = $('.crm-editable-form', element);
+        titleLabel.on('click', startEditMode);
+        penIcon.on('click', startEditMode);
+
+        function detectEscapeKeyPress (event) {
+          var isEscape = false;
+
+          if ("key" in event) {
+              isEscape = (event.key == "Escape" || event.key == "Esc");
+          } else {
+              isEscape = (event.keyCode == 27);
+          }
+
+          return isEscape;
+        }
+
+        function detectEnterKeyPress (event) {
+          var isEnter = false;
+
+          if ("key" in event) {
+            isEnter = (event.key == "Enter");
+          } else {
+            isEnter = (event.keyCode == 13);
+          }
+
+          return isEnter;
+        }
+
+        function startEditMode () {
+          if (titleLabel.is(":focus")) {
+            return;
+          }
+
+          penIcon.hide();
+          buttons.show();
+
+          saveButton.click(function () {
+            updateTextValue();
+            stopEditMode();
+          });
+
+          cancelButton.click(function () {
+            revertTextValue();
+            stopEditMode();
+          });
+
+          $(element).addClass('crm-editable-editing');
+
+          titleLabel
+            .attr("contenteditable", "true")
+            .focus()
+            .focusout(function (event) {
+              $timeout(function () {
+                revertTextValue();
+                stopEditMode();
+              }, 500);
+            })
+            .keydown(function(event) {
+              event.stopImmediatePropagation();
+
+              if(detectEscapeKeyPress(event)) {
+                revertTextValue();
+                stopEditMode();
+              } else if(detectEnterKeyPress(event)) {
+                event.preventDefault();
+                updateTextValue();
+                stopEditMode();
+              }
+            });
+        }
+
+        function stopEditMode () {
+          titleLabel.removeAttr("contenteditable").off("focusout");
+          titleLabel.off("keydown");
+          saveButton.off("click");
+          cancelButton.off("click");
+          $(element).removeClass('crm-editable-editing');
+
+          penIcon.show();
+          buttons.hide();
+        }
+
+        function revertTextValue () {
+          titleLabel.text(scope.activitySet.label);
+        }
+
+        function updateTextValue () {
+          var updatedTitle = titleLabel.text();
+
+          scope.$evalAsync(function () {
+            scope.activitySet.label = updatedTitle;
+          });
+        }
       }
     };
   });
@@ -288,11 +392,7 @@
     };
 
     $scope.isActivityRemovable = function(activitySet, activity) {
-      if (activitySet.name == 'standard_timeline' && activity.name == 'Open Case') {
-        return false;
-      } else {
-        return true;
-      }
+      return true;
     };
 
     $scope.isValidName = function(name) {
@@ -384,7 +484,6 @@
       })
         .then(function (data) {
           delete caseTypes.values[caseType.id];
-          $scope.$digest();
         });
     };
     $scope.revertCaseType = function (caseType) {

@@ -22,6 +22,8 @@ if ($text_direction == 'rtl') {
 
 <form name="civicrm_form" method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
 
+  <input type="hidden" name="civicrm_install_type" value="<?php echo $installType; ?>" />
+
 <?php if (isset($hasErrorOtherThanDatabase)) { ?>
   <p class="error"><?php echo ts('We are not able to install the software. Please <a href="#requirements">see below</a> for details.'); ?></p>
 <?php } else { ?>

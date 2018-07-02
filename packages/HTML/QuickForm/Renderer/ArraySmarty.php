@@ -4,7 +4,7 @@
 /**
  * A static renderer for HTML_QuickForm, makes an array of form content
  * useful for a Smarty template
- * 
+ *
  * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.01 of the PHP license
@@ -26,7 +26,7 @@
 
 /**
  * A concrete renderer for HTML_QuickForm, makes an array of form contents
- */ 
+ */
 require_once 'HTML/QuickForm/Renderer/Array.php';
 
 /**
@@ -202,11 +202,11 @@ class HTML_QuickForm_Renderer_ArraySmarty extends HTML_QuickForm_Renderer_Array
         }
         // create keys for elements grouped by native group or name
         if (strstr($ret['name'], '[') or $this->_currentGroup) {
-            // Fix for bug #8123: escape backslashes and quotes to prevent errors 
+            // Fix for bug #8123: escape backslashes and quotes to prevent errors
             // in eval(). The code below seems to handle the case where element
             // name has unbalanced square brackets. Dunno whether we really
             // need this after the fix for #8123, but I'm wary of making big
-            // changes to this code.  
+            // changes to this code.
             preg_match('/([^]]*)\\[([^]]*)\\]/', $ret['name'], $matches);
             if (isset($matches[1])) {
                 $sKeysSub = substr_replace($ret['name'], '', 0, strlen($matches[1]));

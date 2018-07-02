@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -206,6 +206,7 @@ class CRM_Core_Config_MagicMerge {
       'userFrameworkResourceURL' => array('setting-url'),
 
       // "callback" properties are generated on-demand by calling a function.
+      // @todo remove geocodeMethod. As of Feb 2018, $config->geocodeMethod works but gives a deprecation warning.
       'geocodeMethod' => array('callback', 'CRM_Utils_Geocode', 'getProviderClass'),
       'defaultCurrencySymbol' => array('callback', 'CRM_Core_BAO_Country', 'getDefaultCurrencySymbol'),
     );

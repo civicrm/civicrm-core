@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Provides a collection of static methods for array manipulation.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Utils_Array {
 
@@ -392,9 +392,7 @@ class CRM_Utils_Array {
   /**
    * Convert associative array names to values and vice-versa.
    *
-   * This function is used by both the web form layer and the api. Note that
-   * the api needs the name => value conversion, also the view layer typically
-   * requires value => name conversion
+   * This function is used by by import functions and some webforms.
    *
    * @param array $defaults
    * @param string $property
@@ -1152,6 +1150,79 @@ class CRM_Utils_Array {
       }
     }
     return NULL;
+  }
+
+  /**
+   * Check if a key isset which may be several layers deep.
+   *
+   * This is a helper for when the calling function does not know how many layers deep the
+   * path array is so cannot easily check.
+   *
+   * @param array $array
+   * @param array $path
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function recursiveIsset($array, $path) {
+    foreach ($path as $key) {
+      if (!is_array($array) || !isset($array[$key])) {
+        return FALSE;
+      }
+      $array = $array[$key];
+    }
+    return TRUE;
+  }
+
+  /**
+   * Check if a key isset which may be several layers deep.
+   *
+   * This is a helper for when the calling function does not know how many layers deep the
+   * path array is so cannot easily check.
+   *
+   * @param array $array
+   * @param array $path
+   *   An array of keys - e.g [0, 'bob', 8] where we want to check if $array[0]['bob'][8]
+   * @param mixed $default
+   *   Value to return if not found.
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function recursiveValue($array, $path, $default = NULL) {
+    foreach ($path as $key) {
+      if (!is_array($array) || !isset($array[$key])) {
+        return $default;
+      }
+      $array = $array[$key];
+    }
+    return $array;
+  }
+
+  /**
+   * Append the value to the array using the key provided.
+   *
+   * e.g if value is 'llama' & path is [0, 'email', 'location'] result will be
+   * [0 => ['email' => ['location' => 'llama']]
+   *
+   * @param $path
+   * @param $value
+   * @param array $source
+   *
+   * @return array
+   */
+  public static function recursiveBuild($path, $value, $source = []) {
+    $arrayKey = array_shift($path);
+    // Recurse through array keys
+    if ($path) {
+      if (!isset($source[$arrayKey])) {
+        $source[$arrayKey] = [];
+      }
+      $source[$arrayKey] = self::recursiveBuild($path, $value, $source[$arrayKey]);
+    }
+    // Final iteration
+    else {
+      $source[$arrayKey] = $value;
+    }
+    return $source;
   }
 
 }

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <!--
+    NOTE: To facilitate upgrades, manually copy the CREATE TABLE statement
+    from sql/civicrm.mysql to sql/civicrm_queue_item.mysql
+  -->
+  <base>CRM/Queue</base>
+  <class>QueueItem</class>
+  <name>civicrm_queue_item</name>
+  <comment>Stores a list of queue items</comment>
+  <add>4.2</add>
+  <field>
+    <name>id</name>
+    <title>Queue ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>queue_name</name>
+    <title>Queue Name</title>
+    <type>varchar</type>
+    <length>64</length>
+    <comment>Name of the queue which includes this item</comment>
+    <required>true</required>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>weight</name>
+    <title>Order</title>
+    <type>int</type>
+    <required>true</required>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>submit_time</name>
+    <title>Submit Time</title>
+    <type>datetime</type>
+    <comment>date on which this item was submitted to the queue</comment>
+    <required>true</required>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
+    <name>release_time</name>
+    <title>Release Time</title>
+    <type>datetime</type>
+    <comment>date on which this job becomes available; null if ASAP</comment>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+
+  <field>
+    <name>data</name>
+    <title>Queue item data</title>
+    <type>text</type>
+    <comment>Serialized queue data</comment>
+    <serialize>PHP</serialize>
+  </field>
+  <index>
+    <name>index_queueids</name>
+    <fieldName>queue_name</fieldName>
+    <fieldName>weight</fieldName>
+    <fieldName>id</fieldName>
+  </index>
+</table>

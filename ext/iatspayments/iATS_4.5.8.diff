@@ -1,0 +1,37 @@
+--- CRM/Core/Payment/Form.php
++++ CRM/Core/Payment/Form.php
+@@ -364,9 +364,9 @@ class CRM_Core_Payment_Form {
+         $errors['cvv2'] = ts('Please enter a valid Card Verification Number');
+       }
+     }
+-    elseif (!empty($values['credit_card_number'])) {
+-      $errors['credit_card_number'] = ts('Please enter a valid Card Number');
+-    }
++    /* elseif (!empty($values['credit_card_number'])) {
++      $errors['credit_card_number'] = ts('Please enter a Card Number');
++    } */
+   }
+ 
+   /**
+--- CRM/Event/Form/Participant.php
++++ CRM/Event/Form/Participant.php
+@@ -274,7 +274,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
+       $this->_paymentProcessor = array('billing_mode' => 1);
+ 
+       $validProcessors = array();
+-      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, "billing_mode IN ( 1, 3 )");
++      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, "billing_mode IN ( 1, 3 ) AND payment_type = 1");
+ 
+       foreach ($processors as $ppID => $label) {
+         $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $this->_mode);
+--- CRM/Member/Form/Membership.php
++++ CRM/Member/Form/Membership.php
+@@ -150,7 +150,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
+     if ($this->_mode) {
+       $this->_paymentProcessor = array('billing_mode' => 1);
+       $validProcessors = array();
+-      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'billing_mode IN ( 1, 3 )');
++      $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, 'billing_mode IN ( 1, 3 ) AND payment_type = 1');
+ 
+       foreach ($processors as $ppID => $label) {
+         $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $this->_mode);
