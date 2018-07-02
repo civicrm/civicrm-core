@@ -175,4 +175,20 @@ ORDER BY id
     }
   }
 
+  /**
+   * Get the previous and next keys.
+   *
+   * @param string $cacheKey
+   * @param int $id1
+   * @param int $id2
+   *
+   * NOTE: I don't really get why there are two ID columns, but we'll
+   * keep passing them through as a matter of safe-refactoring.
+   *
+   * @return array
+   */
+  public function getPositions($cacheKey, $id1, $id2) {
+    return CRM_Core_BAO_PrevNextCache::getPositions($cacheKey, $id1, $id2);
+  }
+
 }
