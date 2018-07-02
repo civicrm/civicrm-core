@@ -945,7 +945,7 @@ COLS;
    * but this is the only entity currently available...
    */
   public function getLogTablesForContact() {
-    $tables = array_keys(CRM_Dedupe_Merger::cidRefs());
+    $tables = array_keys(CRM_Core_DAO::getReferencesToContactTable());
     return array_intersect($tables, $this->tables);
   }
 
