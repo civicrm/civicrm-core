@@ -202,4 +202,14 @@ ORDER BY id
     CRM_Core_BAO_PrevNextCache::deleteItem($id, $cacheKey, $entityTable);
   }
 
+  /**
+   * Get count of matching rows.
+   *
+   * @param string $cacheKey
+   * @return int
+   */
+  public function getCount($cacheKey) {
+    return CRM_Core_BAO_PrevNextCache::getCount($cacheKey, NULL, "entity_table = 'civicrm_contact'");
+  }
+
 }
