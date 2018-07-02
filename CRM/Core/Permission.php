@@ -1368,8 +1368,7 @@ class CRM_Core_Permission {
       ),
     );
     
-    // Payment Processor Permissions
-    
+    // Payment Processor Permissions    
     $permissions['payment_processor'] = array(
       'get' => array(
         array('access CiviEvent', 'edit all events'),
