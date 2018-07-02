@@ -105,4 +105,15 @@ interface CRM_Core_PrevNextCache_Interface {
    */
   public function getSelection($cacheKey, $action = 'get', $entity_table = 'civicrm_contact');
 
+  /**
+   * Get the previous and next keys.
+   *
+   * @param string $cacheKey
+   * @param int $id1
+   * @param int $id2
+   *
+   * @return array
+   */
+  public function getPositions($cacheKey, $id1, $id2);
+
 }
