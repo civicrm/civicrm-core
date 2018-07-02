@@ -168,15 +168,15 @@ WHERE  cacheKey LIKE %1 AND is_selected = 1
    * @param string $cacheKey
    *   Cache key.
    * @param string $action
-   *   Action.
-   *  $action : get - get only selection records
-   *            getall - get all the records of the specified cache key
-   * @param string $entity_table
-   *   Entity table.
+   *   One of the following:
+   *   - 'get' - get only selection records
+   *   - 'getall' - get all the records of the specified cache key
    *
    * @return array|NULL
    */
-  public function getSelection($cacheKey, $action = 'get', $entity_table = 'civicrm_contact') {
+  public function getSelection($cacheKey, $action = 'get') {
+    $entity_table = 'civicrm_contact';
+
     if (!$cacheKey) {
       return NULL;
     }
