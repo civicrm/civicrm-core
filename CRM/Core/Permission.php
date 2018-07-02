@@ -1367,6 +1367,15 @@ class CRM_Core_Permission {
         'edit contributions',
       ),
     );
+    
+    // Payment Processor Permissions
+    
+    $permissions['payment_processor'] = array(
+      'get' => array(
+        array('access CiviEvent', 'edit all events'),
+        array('administer CiviCRM')
+      ),
+    );
 
     // Pledge permissions
     $permissions['pledge'] = array(
