@@ -523,7 +523,7 @@ LIMIT 1
    */
   public static function formatAmount($amount, $decimals = 2) {
     $config = CRM_Core_Config::singleton();
-    number_format((float) round($amount, (int) $decimals), (int) $decimals, $config->monetaryDecimalPoint, '');
+    return number_format((float) round($amount, (int) $decimals), (int) $decimals, $config->monetaryDecimalPoint, '');
   }
 
   /**
