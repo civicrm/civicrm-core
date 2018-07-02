@@ -125,4 +125,12 @@ interface CRM_Core_PrevNextCache_Interface {
    */
   public function deleteItem($id = NULL, $cacheKey = NULL, $entityTable = 'civicrm_contact');
 
+  /**
+   * Get count of matching rows.
+   *
+   * @param string $cacheKey
+   * @return int
+   */
+  public function getCount($cacheKey);
+
 }
