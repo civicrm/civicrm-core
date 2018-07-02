@@ -453,30 +453,6 @@ AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
   }
 
   /**
-   * @return array
-   */
-  public static function getSelectedContacts() {
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String');
-    $cacheKey = "civicrm search {$qfKey}";
-    $query = "
-SELECT *
-FROM   civicrm_prevnext_cache
-WHERE  cacheKey LIKE %1
-  AND  is_selected=1
-  AND  cacheKey NOT LIKE %2
-";
-    $params1[1] = array("{$cacheKey}%", 'String');
-    $params1[2] = array("{$cacheKey}_alphabet%", 'String');
-    $dao = CRM_Core_DAO::executeQuery($query, $params1);
-
-    $val = array();
-    while ($dao->fetch()) {
-      $val[] = $dao->data;
-    }
-    return $val;
-  }
-
-  /**
    * Flip 2 contacts in the prevNext cache.
    *
    * @param array $prevNextId
