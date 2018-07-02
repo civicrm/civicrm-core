@@ -304,7 +304,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @param bool $table
    * @param bool $prevNext
    */
-  public static function cleanup($session = FALSE, $table = FALSE, $prevNext = FALSE) {
+  public static function cleanup($session = FALSE, $table = FALSE, $prevNext = FALSE, $expired = FALSE) {
     // first delete all sessions more than 20 minutes old which are related to any potential transaction
     $timeIntervalMins = (int) Civi::settings()->get('secure_cache_timeout_minutes');
     if ($timeIntervalMins && $session) {
@@ -338,10 +338,10 @@ AND         (" . implode(' OR ', $where) . ")";
     $timeIntervalDays = 2;
 
     if (mt_rand(1, 100000) % $cleanUpNumber == 0) {
-      $session = $table = $prevNext = TRUE;
+      $expired = $session = $table = $prevNext = TRUE;
     }
 
-    if (!$session && !$table && !$prevNext) {
+    if (!$session && !$table && !$prevNext && !$expired) {
       return;
     }
 
@@ -362,6 +362,14 @@ WHERE       group_name = 'CiviCRM Session'
 AND         created_date < date_sub( NOW( ), INTERVAL $timeIntervalDays DAY )
 ";
       CRM_Core_DAO::executeQuery($sql);
+    }
+
+    if ($expired) {
+      $sql = "DELETE FROM civicrm_cache WHERE expired_date < %1";
+      $params = [
+        1 => [date(CRM_Utils_Cache_SqlGroup::TS_FMT, CRM_Utils_Time::getTimeRaw()), 'String'],
+      ];
+      CRM_Core_DAO::executeQuery($sql, $params);
     }
   }
 
