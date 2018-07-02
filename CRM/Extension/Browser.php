@@ -55,22 +55,48 @@ class CRM_Extension_Browser {
 
   // timeout for when the connection or the server is slow
   const CHECK_TIMEOUT = 5;
+  /**
+   * @var CRM_Utils_HttpClient
+   */
+  protected $client;
+  /**
+   * @var CRM_Utils_Cache_Interface
+   */
+  protected $cache;
 
   /**
-   * @param string $repoUrl
-   *   URL of the remote repository.
-   * @param string $indexPath
-   *   Relative path of the 'index' file within the repository.
-   * @param string $cacheDir
-   *   Local path in which to cache files.
+   * Create default instance.
+   *
+   * @return CRM_Extension_Browser
    */
-  public function __construct($repoUrl, $indexPath, $cacheDir) {
+
+   public static function create() {
+     return new CRM_Extension_Browser(
+       Civi::cache('extension_browser'),
+       CRM_Utils_HttpClient::singleton()
+     );
+   }
+
+   /**
+    * @param string $repoUrl
+    *   URL of the remote repository.
+    * @param string $indexPath
+    *   Relative path of the 'index' file within the repository.
+    * @param string $cacheDir
+    *   Local path in which to cache files.
+    * @param CRM_Utils_Cache_Interface $cache
+    * @param CRM_Utils_HttpClient $client
+    */
+
+  public function __construct($cache, $client, $repoUrl, $indexPath) {
     $this->repoUrl = $repoUrl;
-    $this->cacheDir = $cacheDir;
+    // $this->cacheDir = $cacheDir;
+    $this->cache = $cache;
+    $this->client = $client;
     $this->indexPath = empty($indexPath) ? self::SINGLE_FILE_PATH : $indexPath;
-    if ($cacheDir && !file_exists($cacheDir) && is_dir(dirname($cacheDir)) && is_writable(dirname($cacheDir))) {
-      CRM_Utils_File::createDir($cacheDir, FALSE);
-    }
+    // if ($cacheDir && !file_exists($cacheDir) && is_dir(dirname($cacheDir)) && is_writable(dirname($cacheDir))) {
+    //   CRM_Utils_File::createDir($cacheDir, FALSE);
+    // }
   }
 
   /**
@@ -108,29 +134,29 @@ class CRM_Extension_Browser {
    * @return array
    *   List of error messages; empty if OK.
    */
-  public function checkRequirements() {
-    if (!$this->isEnabled()) {
-      return array();
-    }
-
-    $errors = array();
-
-    if (!$this->cacheDir || !is_dir($this->cacheDir) || !is_writable($this->cacheDir)) {
-      $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
-      $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination=${civicrmDestination}");
-      $errors[] = array(
-        'title' => ts('Directory Unwritable'),
-        'message' => ts('Your extensions cache directory (%1) is not web server writable. Please go to the <a href="%2">path setting page</a> and correct it.<br/>',
-          array(
-            1 => $this->cacheDir,
-            2 => $url,
-          )
-        ),
-      );
-    }
-
-    return $errors;
-  }
+  // public function checkRequirements() {
+  //   if (!$this->isEnabled()) {
+  //     return array();
+  //   }
+  //
+  //   $errors = array();
+  //
+  //   if (!$this->cacheDir || !is_dir($this->cacheDir) || !is_writable($this->cacheDir)) {
+  //     $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
+  //     $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination=${civicrmDestination}");
+  //     $errors[] = array(
+  //       'title' => ts('Directory Unwritable'),
+  //       'message' => ts('Your extensions cache directory (%1) is not web server writable. Please go to the <a href="%2">path setting page</a> and correct it.<br/>',
+  //         array(
+  //           1 => $this->cacheDir,
+  //           2 => $url,
+  //         )
+  //       ),
+  //     );
+  //   }
+  //
+  //   return $errors;
+  // }
 
   /**
    * Get a list of all available extensions.
@@ -215,16 +241,44 @@ class CRM_Extension_Browser {
    *
    * @return string
    */
-  private function grabCachedJson() {
-    $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this->getRepositoryUrl());
-    $json = NULL;
-    if (file_exists($filename)) {
-      $json = file_get_contents($filename);
+  // private function grabCachedJson() {
+  //   $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this->getRepositoryUrl());
+  //   $json = NULL;
+  //   if (file_exists($filename)) {
+  //     $json = file_get_contents($filename);
+  //   }
+  //   if (empty($json)) {
+  //     $json = $this->grabRemoteJson();
+  //   }
+  //   return $json;
+  // }
+
+  public function grabExtCache() {
+    $isChanged = FALSE;
+    $extension = $this->cache->get('Extension_Browser');
+    if (empty($extension) || !is_array($extension)) {
+      $extension = array(
+        'expires' => 0, // ASAP
+        'ttl' => self::DEFAULT_RETRY,
+        'retry' => self::DEFAULT_RETRY,
+      );
+      $isChanged = TRUE;
     }
-    if (empty($json)) {
-      $json = $this->grabRemoteJson();
+    if ($extension['expires'] <= CRM_Utils_Time::getTimeRaw()) {
+      $newExtension = $this->grabRemoteJson();
+        $extension = $newExtension;
+        $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['ttl'];
+
+      else {
+        // keep the old extensions for now, try again later
+        $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['retry'];
+      }
+      $isChanged = TRUE;
     }
-    return $json;
+    if ($isChanged) {
+      $this->cache->set('Extension_Browser', $extension);
+    }
+    return $extension;
   }
 
   /**
