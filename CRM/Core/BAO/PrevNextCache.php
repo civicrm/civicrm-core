@@ -448,8 +448,8 @@ AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
    * @deprecated
    * @see CRM_Core_PrevNextCache_Sql::getSelection()
    */
-  public static function getSelection($cacheKey, $action = 'get', $entity_table = 'civicrm_contact') {
-    return Civi::service('prevnext')->getSelection($cacheKey, $action, $entity_table);
+  public static function getSelection($cacheKey, $action = 'get') {
+    return Civi::service('prevnext')->getSelection($cacheKey, $action);
   }
 
   /**
