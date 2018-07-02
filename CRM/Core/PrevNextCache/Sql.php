@@ -132,4 +132,47 @@ WHERE  cacheKey LIKE %1 AND is_selected = 1
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 
+  /**
+   * Get the selections.
+   *
+   * @param string $cacheKey
+   *   Cache key.
+   * @param string $action
+   *   Action.
+   *  $action : get - get only selection records
+   *            getall - get all the records of the specified cache key
+   * @param string $entity_table
+   *   Entity table.
+   *
+   * @return array|NULL
+   */
+  public function getSelection($cacheKey, $action = 'get', $entity_table = 'civicrm_contact') {
+    if (!$cacheKey) {
+      return NULL;
+    }
+    $params = array();
+
+    $entity_whereClause = " AND entity_table = '{$entity_table}'";
+    if ($cacheKey && ($action == 'get' || $action == 'getall')) {
+      $actionGet = ($action == "get") ? " AND is_selected = 1 " : "";
+      $sql = "
+SELECT entity_id1, entity_id2 FROM civicrm_prevnext_cache
+WHERE cacheKey LIKE %1
+      $actionGet
+      $entity_whereClause
+ORDER BY id
+";
+      $params[1] = array("{$cacheKey}%", 'String');
+
+      $contactIds = array($cacheKey => array());
+      $cIdDao = CRM_Core_DAO::executeQuery($sql, $params);
+      while ($cIdDao->fetch()) {
+        if ($cIdDao->entity_id1 == $cIdDao->entity_id2) {
+          $contactIds[$cacheKey][$cIdDao->entity_id1] = 1;
+        }
+      }
+      return $contactIds;
+    }
+  }
+
 }

@@ -65,7 +65,7 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form_Task {
     else {
       $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
       $cacheKey = "civicrm search {$qfKey}";
-      $allCids = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey, "getall");
+      $allCids = Civi::service('prevnext')->getSelection($cacheKey, "getall");
       $ids = array_keys($allCids[$cacheKey]);
       $this->assign('totalSelectedVoters', count($ids));
     }
