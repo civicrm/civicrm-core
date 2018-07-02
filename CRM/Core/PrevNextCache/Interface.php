@@ -89,4 +89,20 @@ interface CRM_Core_PrevNextCache_Interface {
    */
   public function markSelection($cacheKey, $action = 'unselect', $cIds = NULL, $entity_table = 'civicrm_contact');
 
+  /**
+   * Get the selections.
+   *
+   * @param string $cacheKey
+   *   Cache key.
+   * @param string $action
+   *   Action.
+   *  $action : get - get only selection records
+   *            getall - get all the records of the specified cache key
+   * @param string $entity_table
+   *   Entity table.
+   *
+   * @return array|NULL
+   */
+  public function getSelection($cacheKey, $action = 'get', $entity_table = 'civicrm_contact');
+
 }

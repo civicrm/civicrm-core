@@ -172,7 +172,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
       // rather than prevnext cache table for most of the task actions except export where we rebuild query to fetch
       // final result set
       if ($useTable) {
-        $allCids = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey, "getall");
+        $allCids = Civi::service('prevnext')->getSelection($cacheKey, "getall");
       }
       else {
         $allCids[$cacheKey] = self::getContactIds($form);
@@ -233,7 +233,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
       }
       else {
         // fetching selected contact ids of passed cache key
-        $selectedCids = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey);
+        $selectedCids = Civi::service('prevnext')->getSelection($cacheKey);
         foreach ($selectedCids[$cacheKey] as $selectedCid => $ignore) {
           if ($useTable) {
             $insertString[] = " ( {$selectedCid} ) ";

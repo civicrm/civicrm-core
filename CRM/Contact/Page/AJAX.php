@@ -978,7 +978,7 @@ LIMIT {$offset}, {$rowCount}
       $action = ($state == 'checked') ? 'select' : 'unselect';
       Civi::service('prevnext')->markSelection($cacheKey, $action, $cId);
     }
-    $contactIds = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey);
+    $contactIds = Civi::service('prevnext')->getSelection($cacheKey);
     $countSelectionCids = count($contactIds[$cacheKey]);
 
     $arrRet = array('getCount' => $countSelectionCids);
