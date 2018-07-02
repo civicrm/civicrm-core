@@ -91,4 +91,22 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
     }
   }
 
+
+  public function emailAddressTests() {
+    $tests[] = array('"Name"<email@example.com>', '"Name" <email@example.com>');
+    $tests[] = array('"Name" <email@example.com>', '"Name" <email@example.com>');
+    $tests[] = array('"Name"  <email@example.com>', '"Name" <email@example.com>');
+    return $tests;
+  }
+
+
+  /**
+   * @dataProvider emailAddressTests
+   */
+  public function testSanitizeFromEmailAddress($dirty, $clean) {
+    $form = new CRM_Admin_Form_Options();
+    $actual = $form->sanitizeFromEmailAddress($dirty);
+    $this->assertEquals($actual, $clean);
+  }
+
 }
