@@ -782,7 +782,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     ) {
       //reset the cache table for new search
       $cacheKey = "civicrm search {$this->controller->_key}";
-      CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKey);
+      Civi::service('prevnext')->deleteItem(NULL, $cacheKey);
     }
 
     //get the button name
