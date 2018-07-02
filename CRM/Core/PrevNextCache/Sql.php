@@ -83,10 +83,10 @@ INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cache
    * @param array|int|NULL $cIds
    *   A list of contact IDs to (un)select.
    *   To unselect all contact IDs, use NULL.
-   * @param string $entity_table
-   *   Ex: 'civicrm_contact'.
    */
-  public function markSelection($cacheKey, $action = 'unselect', $cIds = NULL, $entity_table = 'civicrm_contact') {
+  public function markSelection($cacheKey, $action, $cIds = NULL) {
+    $entity_table = 'civicrm_contact';
+
     if (!$cacheKey) {
       return;
     }
