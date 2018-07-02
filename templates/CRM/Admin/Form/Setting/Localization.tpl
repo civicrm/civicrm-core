@@ -35,16 +35,20 @@
                 <td class="label">{$form.lcMessages.label}</td>
                 <td>{$form.lcMessages.html}</td>
             </tr>
-           {if $form.languageLimit}
-             <tr class="crm-localization-form-block-languageLimit">
-                 <td class="label">{$form.languageLimit.label}</td>
-                 <td>{$form.languageLimit.html}<br />
-                 <span class="description">{ts}Languages available to users of this installation.{/ts}</span></td>
+            <tr class="crm-localization-form-block-languageLimit">
+                <td class="label">{$form.languageLimit.label}</td>
+                <td>{$form.languageLimit.html}<br />
+                <span class="description">{ts}Languages available to users of this installation.{/ts}</span></td>
+            </tr>
+           {if $multilingual}
+             <tr class="crm-localization-form-block-dbLanguages">
+                <td class="label"><label>{ts}Current database languages{/ts}</label></td>
+                <td>{foreach from=$dbLanguages item=language}{$language}<br />{/foreach}</td>
              </tr>
              <tr class="crm-localization-form-block-addLanguage">
                  <td class="label">{$form.addLanguage.label}</td>
                  <td>{$form.addLanguage.html}<br />
-                 <span class="description">{ts}Add a new language to this installation.{/ts}</span></td>
+                 <span class="description">{ts}Add a new language to the database.{/ts}</span></td>
              </tr>
           {/if}
             <tr class="crm-localization-form-block-inheritLocale">
@@ -114,7 +118,7 @@
         </table>
     <h3>{ts}Multiple Languages Support{/ts}</h3>
       <table class="form-layout-compressed">
-        {if $form.languageLimit}
+        {if $multilingual}
           <tr class="crm-localization-form-block-makeSinglelingual_description">
               <td></td>
               <td><span class="description">{ts 1="http://documentation.civicrm.org"}This is a multilingual installation. It contains certain schema differences compared to regular installations of CiviCRM. Please <a href="%1">refer to the documentation</a> for details.{/ts}</span></td>

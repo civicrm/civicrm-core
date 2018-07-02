@@ -142,14 +142,14 @@ class CRM_Core_BAO_ConfigSetting {
     $session = CRM_Core_Session::singleton();
 
     // on multi-lang sites based on request and civicrm_uf_match
-    if ($multiLang) {
+//    if ($multiLang) {
       $languageLimit = array();
       if (is_array($settings->get('languageLimit'))) {
         $languageLimit = $settings->get('languageLimit');
       }
 
       $requestLocale = CRM_Utils_Request::retrieve('lcMessages', 'String');
-      if (in_array($requestLocale, array_keys($languageLimit))) {
+      if (in_array($requestLocale, $languageLimit)) {
         $chosenLocale = $requestLocale;
 
         //CRM-8559, cache navigation do not respect locale if it is changed, so reseting cache.
@@ -162,7 +162,7 @@ class CRM_Core_BAO_ConfigSetting {
 
       if (!$requestLocale) {
         $sessionLocale = $session->get('lcMessages');
-        if (in_array($sessionLocale, array_keys($languageLimit))) {
+        if (in_array($sessionLocale, $languageLimit)) {
           $chosenLocale = $sessionLocale;
         }
         else {
@@ -184,13 +184,13 @@ class CRM_Core_BAO_ConfigSetting {
         $ufm = new CRM_Core_DAO_UFMatch();
         $ufm->contact_id = $session->get('userID');
         if ($ufm->find(TRUE) &&
-          in_array($ufm->language, array_keys($languageLimit))
+          in_array($ufm->language, $languageLimit)
         ) {
           $chosenLocale = $ufm->language;
         }
         $session->set('lcMessages', $chosenLocale);
       }
-    }
+//    }
     global $dbLocale;
 
     // try to inherit the language from the hosting CMS
@@ -210,7 +210,22 @@ class CRM_Core_BAO_ConfigSetting {
     }
 
     // set suffix for table names - use views if more than one language
-    $dbLocale = $multiLang && $chosenLocale ? "_{$chosenLocale}" : '';
+    if ($multiLang) {
+      $activatedLocalesList = explode(CRM_Core_DAO::VALUE_SEPARATOR, $activatedLocales);
+      $requestLocaleDb = CRM_Utils_Request::retrieve('lcMessagesDb', 'String');
+      if ($requestLocaleDb && in_array($requestLocaleDb, $activatedLocalesList)) {
+        $dbLocale = "_" . $requestLocaleDb;
+      }
+      elseif (in_array($chosenLocale, $activatedLocalesList)) {
+        $dbLocale = "_" . $chosenLocale;
+      }
+      else {
+        $dbLocale = "_" . $settings->get('lcMessages');
+      }
+    }
+    else {
+      $dbLocale = '';
+    }
 
     // FIXME: an ugly hack to fix CRM-4041
     global $tsLocale;

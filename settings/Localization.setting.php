@@ -432,7 +432,7 @@ return array(
     ),
     'default' => NULL,
     'add' => '4.3',
-    'title' => 'Available Languages (Multi-lingual)',
+    'title' => 'Available Languages',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',

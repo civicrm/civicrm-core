@@ -63,15 +63,25 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     CRM_Utils_System::setTitle(ts('Settings - Localization'));
 
     $warningTitle = json_encode(ts("Warning"));
-    $defaultLocaleOptions = CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions();
 
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
+    $languageLimit = &$this->addElement('advmultiselect', 'languageLimit',
+      ts('Available Interface Languages') . ' ', CRM_Core_I18n::languages(),
+      array(
+        'size' => 5,
+        'style' => 'width:150px',
+        'class' => 'advmultiselect',
+      )
+    );
+    $languageLimit->setButtonAttributes('add', array('value' => ts('>>')));
+    $languageLimit->setButtonAttributes('remove', array('value' => ts('<<')));
 
-    if ($domain->locales) {
-      // add language limiter and language adder
-      $this->addCheckBox('languageLimit', ts('Available Languages'), array_flip($defaultLocaleOptions), NULL, NULL, NULL, NULL, ' &nbsp; ');
-      $this->addElement('select', 'addLanguage', ts('Add Language'), array_merge(array('' => ts('- select -')), array_diff(CRM_Core_I18n::languages(), $defaultLocaleOptions)));
+    $isMultilingual = CRM_Core_I18n::isMultilingual();
+    $this->assign('multilingual', $isMultilingual);
+
+    if ($isMultilingual) {
+      // add current languages and language adder
+      $this->assign('dbLanguages', CRM_Core_I18n::getLocales(TRUE));
+      $this->addElement('select', 'addLanguage', ts('Add Language'), array_merge(array('' => ts('- select -')), array_diff(CRM_Core_I18n::languages(), CRM_Core_I18n::getLocales(TRUE))));
 
       // add the ability to return to single language
       $warning = ts('This will make your CiviCRM installation a single-language one again. THIS WILL DELETE ALL DATA RELATED TO LANGUAGES OTHER THAN THE DEFAULT ONE SELECTED ABOVE (and only that language will be preserved).');
@@ -170,7 +180,13 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     // retrieve default values for currencyLimit
     $this->_defaults['currencyLimit'] = array_keys(CRM_Core_OptionGroup::values('currencies_enabled'));
 
-    $this->_defaults['languageLimit'] = Civi::settings()->get('languageLimit');
+//    $this->_defaults['languageLimit'] = Civi::settings()->get('languageLimit');
+    // ? move to upgrade
+    $ll = Civi::settings()->get('languageLimit');
+    if (strpos(array_keys($ll)[0], "_") !== FALSE) {
+      $ll = array_keys($ll);
+    }
+    $this->_defaults['languageLimit'] = $ll;
 
     // CRM-5111: unset these two unconditionally, we don’t want them to stick – ever
     unset($this->_defaults['makeMultilingual']);
@@ -208,22 +224,18 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     // make the site multi-lang if requested
     if (!empty($values['makeMultilingual'])) {
       CRM_Core_I18n_Schema::makeMultilingual($values['lcMessages']);
-      $values['languageLimit'][$values['lcMessages']] = 1;
       // make the site single-lang if requested
     }
     elseif (!empty($values['makeSinglelingual'])) {
       CRM_Core_I18n_Schema::makeSinglelingual($values['lcMessages']);
-      $values['languageLimit'] = '';
     }
 
     // add a new db locale if the requested language is not yet supported by the db
     if (!CRM_Utils_Array::value('makeSinglelingual', $values) and CRM_Utils_Array::value('addLanguage', $values)) {
-      $domain = new CRM_Core_DAO_Domain();
-      $domain->find(TRUE);
-      if (!substr_count($domain->locales, $values['addLanguage'])) {
+      if (!in_array($values['addLanguage'], CRM_Core_I18n::getLocales())) {
         CRM_Core_I18n_Schema::addLocale($values['addLanguage'], $values['lcMessages']);
       }
-      $values['languageLimit'][$values['addLanguage']] = 1;
+      $values['languageLimit'] = array_merge($values['languageLimit'], array($values['addLanguage']));
     }
 
     // if we manipulated the language list, return to the localization admin screen
@@ -290,6 +302,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   }
 
   /**
+   * **Can be removed?
    * Get the default locale options.
    *
    * @return array

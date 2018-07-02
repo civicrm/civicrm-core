@@ -36,7 +36,7 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
     $tsLocale = CRM_Core_I18n::getLocale();
-    $this->_locales = array_keys($config->languageLimit);
+    $this->_locales = CRM_Core_I18n::getLocales();
 
     // get the part of the database we want to edit and validate it
     $table = CRM_Utils_Request::retrieve('table', 'String', $this);

@@ -223,17 +223,15 @@ class CRM_Core_I18n {
         }
       }
 
-      ksort($all);
+      asort($all);
     }
 
     if ($enabled === NULL) {
-      $config = CRM_Core_Config::singleton();
       $enabled = array();
-      if (isset($config->languageLimit) and $config->languageLimit) {
-        foreach ($all as $code => $name) {
-          if (in_array($code, array_keys($config->languageLimit))) {
-            $enabled[$code] = $name;
-          }
+      $languageLimit = Civi::settings()->get("languageLimit");
+      foreach ($all as $code => $name) {
+        if (in_array($code, $languageLimit)) {
+          $enabled[$code] = $name;
         }
       }
     }
@@ -606,6 +604,34 @@ class CRM_Core_I18n {
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     return (bool) $domain->locales;
+  }
+
+  /**
+   * Get the list of locales supported in the db
+   *
+   * @return array
+   *   Array of locales
+   */
+  public static function getLocales($labels = FALSE) {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    $return = [];
+    if ($domain->locales) {
+      $localesList = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      $languages = CRM_Core_I18n::languages();
+      if ($labels) {
+        foreach ($localesList as $locale) {
+          $name = CRM_Utils_Array::value($locale, $languages);
+          if ($name) {
+            $return[$locale] = $name;
+          }
+        }
+      }
+      else {
+        $return = $localesList;
+      }
+    }
+    return $return;
   }
 
   /**
