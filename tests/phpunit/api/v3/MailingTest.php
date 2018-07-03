@@ -398,7 +398,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   /**
-   *
+   * Test sending a test mailing.
    */
   public function testMailerSendTest_email() {
     $contactIDs['alice'] = $this->individualCreate(array(
@@ -410,8 +410,10 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
 
     $params = array('mailing_id' => $mail['id'], 'test_email' => 'alice@example.org', 'test_group' => NULL);
+    // Per https://lab.civicrm.org/dev/core/issues/229 ensure this is not passed through!
+    $params['id'] = $mail['id'];
     $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', $params);
-    $this->assertEquals(1, $deliveredInfo['count'], "in line " . __LINE__); // verify mail has been sent to user by count
+    $this->assertEquals(1, $deliveredInfo['count']); // verify mail has been sent to user by count
 
     $deliveredContacts = array_values(CRM_Utils_Array::collect('contact_id', $deliveredInfo['values']));
     $this->assertEquals(array($contactIDs['alice']), $deliveredContacts);
