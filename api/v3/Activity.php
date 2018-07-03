@@ -368,14 +368,7 @@ function civicrm_api3_activity_get($params) {
  */
 function _civicrm_api3_activity_get_extraFilters(&$params, &$sql) {
   // Filter by activity contacts
-  $recordTypes = civicrm_api3('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
-  $recordTypes = $recordTypes['values'];
-  $activityContactOptions = array(
-    'contact_id' => NULL,
-    'target_contact_id' => array_search('Activity Targets', $recordTypes),
-    'source_contact_id' => array_search('Activity Source', $recordTypes),
-    'assignee_contact_id' => array_search('Activity Assignees', $recordTypes),
-  );
+  $activityContactOptions = _civicrm_api3_activity_get_activityContactOptions();
   foreach ($activityContactOptions as $activityContactName => $activityContactValue) {
     if (!empty($params[$activityContactName])) {
       if (!is_array($params[$activityContactName])) {
@@ -446,6 +439,50 @@ function _civicrm_api3_activity_get_extraFilters(&$params, &$sql) {
       }
     }
   }
+}
+
+/**
+ * Given a list of activity contact options
+ *
+ * @return array
+ *   activity contact options
+ */
+function _civicrm_api3_activity_get_activityContactOptions() {
+  $activityContactOptions = array(
+    'contact_id' => NULL,
+    'target_contact_id' => NULL,
+    'source_contact_id' => NULL,
+    'assignee_contact_id' => NULL,
+  );
+
+  $recordTypes = civicrm_api3('OptionValue', 'get', array(
+    'sequential' => 1,
+    'return' => array("name", "value"),
+    'option_group_id' => "activity_contacts",
+  ));
+
+  if ($recordTypes['values']) {
+    foreach ($recordTypes['values'] as $recordId => $type) {
+      switch ($type['name']) {
+        case 'Activity Targets':
+          $activityContactOptions['target_contact_id'] = $type['value'];
+          break;
+
+        case 'Activity Source':
+          $activityContactOptions['source_contact_id'] = $type['value'];
+          break;
+        
+        case 'Activity Assignees':
+          $activityContactOptions['assignee_contact_id'] = $type['value'];
+          break;
+        
+        default:
+          break;
+      }
+    } 
+  }
+
+  return $activityContactOptions;
 }
 
 /**
