@@ -598,6 +598,7 @@ function civicrm_api3_mailing_preview($params) {
 function _civicrm_api3_mailing_send_test_spec(&$spec) {
   $spec['test_group']['title'] = 'Test Group ID';
   $spec['test_email']['title'] = 'Test Email Address';
+  $spec['mailing_id']['api.required'] = TRUE;
 }
 
 /**
@@ -613,19 +614,16 @@ function civicrm_api3_mailing_send_test($params) {
   if (!array_key_exists('test_group', $params) && !array_key_exists('test_email', $params)) {
     throw new API_Exception("Mandatory key(s) missing from params array: test_group and/or test_email field are required");
   }
-  civicrm_api3_verify_mandatory($params,
-    'CRM_Mailing_DAO_MailingJob',
-    array('mailing_id'),
-    FALSE
-  );
+  $testEmailParams = [
+    'mailing_id' => $params['mailing_id'],
+    'is_test' => 1,
+    'status' => 'Scheduled',
+    'scheduled_date' => CRM_Utils_Date::processDate(date('Y-m-d'), date('H:i:s')),
+  ];
 
-  $testEmailParams = _civicrm_api3_generic_replace_base_params($params);
-  $testEmailParams['is_test'] = 1;
-  $testEmailParams['status'] = 'Scheduled';
-  $testEmailParams['scheduled_date'] = CRM_Utils_Date::processDate(date('Y-m-d'), date('H:i:s'));
   $job = civicrm_api3('MailingJob', 'create', $testEmailParams);
   $testEmailParams['job_id'] = $job['id'];
-  $testEmailParams['emails'] = array_key_exists('test_email', $testEmailParams) ? explode(',', $testEmailParams['test_email']) : NULL;
+  $testEmailParams['emails'] = array_key_exists('test_email', $params) ? explode(',', $params['test_email']) : NULL;
   if (!empty($params['test_email'])) {
     $query = CRM_Utils_SQL_Select::from('civicrm_email e')
         ->select(array('e.id', 'e.contact_id', 'e.email'))
@@ -679,8 +677,7 @@ function civicrm_api3_mailing_send_test($params) {
   }
 
   $isComplete = FALSE;
-  $config = CRM_Core_Config::singleton();
-  $mailerJobSize = Civi::settings()->get('mailerJobSize');
+
   while (!$isComplete) {
     // Q: In CRM_Mailing_BAO_Mailing::processQueue(), the three runJobs*()
     // functions are all called. Why does Mailing.send_test only call one?
