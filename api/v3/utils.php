@@ -1863,14 +1863,22 @@ function _civicrm_api3_generic_replace($entity, $params) {
  * Replace base parameters.
  *
  * @param array $params
+ * @param array $unsetParams
  *
  * @return array
  */
-function _civicrm_api3_generic_replace_base_params($params) {
+function _civicrm_api3_generic_replace_base_params($params, $unsetParams = array()) {
   $baseParams = $params;
   unset($baseParams['values']);
   unset($baseParams['sequential']);
   unset($baseParams['options']);
+  if (!empty($unsetParams)) {
+    foreach ($unsetParams as $uParam) {
+      if (array_key_exists($uParam, $baseParams)) {
+        unset($baseParams[$uParam]);
+      }
+    }
+  }
   return $baseParams;
 }
 

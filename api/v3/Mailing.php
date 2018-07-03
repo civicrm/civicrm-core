@@ -619,13 +619,13 @@ function civicrm_api3_mailing_send_test($params) {
     FALSE
   );
 
-  $testEmailParams = _civicrm_api3_generic_replace_base_params($params);
+  $testEmailParams = _civicrm_api3_generic_replace_base_params($params, ['id']);
   $testEmailParams['is_test'] = 1;
   $testEmailParams['status'] = 'Scheduled';
   $testEmailParams['scheduled_date'] = CRM_Utils_Date::processDate(date('Y-m-d'), date('H:i:s'));
   $job = civicrm_api3('MailingJob', 'create', $testEmailParams);
   $testEmailParams['job_id'] = $job['id'];
-  $testEmailParams['emails'] = array_key_exists('test_email', $testEmailParams) ? explode(',', $testEmailParams['test_email']) : NULL;
+  $testEmailParams['emails'] = array_key_exists('test_email', $params) ? explode(',', $params['test_email']) : NULL;
   if (!empty($params['test_email'])) {
     $query = CRM_Utils_SQL_Select::from('civicrm_email e')
         ->select(array('e.id', 'e.contact_id', 'e.email'))
@@ -679,8 +679,6 @@ function civicrm_api3_mailing_send_test($params) {
   }
 
   $isComplete = FALSE;
-  $config = CRM_Core_Config::singleton();
-  $mailerJobSize = Civi::settings()->get('mailerJobSize');
   while (!$isComplete) {
     // Q: In CRM_Mailing_BAO_Mailing::processQueue(), the three runJobs*()
     // functions are all called. Why does Mailing.send_test only call one?
