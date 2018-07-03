@@ -41,6 +41,13 @@
 class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
 
   /**
+   * When store session/form state, how long should the data be retained?
+   *
+   * @var int, number of second
+   */
+  const DEFAULT_SESSION_TTL = 172800; // Two days: 2*24*60*60
+
+  /**
    * @var array ($cacheKey => $cacheValue)
    */
   static $_cache = NULL;
@@ -237,7 +244,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         if (!empty($_SESSION[$sessionName[0]][$sessionName[1]])) {
           $value = $_SESSION[$sessionName[0]][$sessionName[1]];
         }
-        self::setItem($value, 'CiviCRM Session', "{$sessionName[0]}_{$sessionName[1]}");
+        $key = "{$sessionName[0]}_{$sessionName[1]}";
+        Civi::cache('session')->set($key, $value, self::pickSessionTtl($key));
         if ($resetSession) {
           $_SESSION[$sessionName[0]][$sessionName[1]] = NULL;
           unset($_SESSION[$sessionName[0]][$sessionName[1]]);
@@ -248,7 +256,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         if (!empty($_SESSION[$sessionName])) {
           $value = $_SESSION[$sessionName];
         }
-        self::setItem($value, 'CiviCRM Session', $sessionName);
+        Civi::cache('session')->set($sessionName, $value, self::pickSessionTtl($sessionName));
         if ($resetSession) {
           $_SESSION[$sessionName] = NULL;
           unset($_SESSION[$sessionName]);
@@ -275,22 +283,44 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   public static function restoreSessionFromCache($names) {
     foreach ($names as $key => $sessionName) {
       if (is_array($sessionName)) {
-        $value = self::getItem('CiviCRM Session',
-          "{$sessionName[0]}_{$sessionName[1]}"
-        );
+        $value = Civi::cache('session')->get("{$sessionName[0]}_{$sessionName[1]}");
         if ($value) {
           $_SESSION[$sessionName[0]][$sessionName[1]] = $value;
         }
       }
       else {
-        $value = self::getItem('CiviCRM Session',
-          $sessionName
-        );
+        $value = Civi::cache('session')->get($sessionName);
         if ($value) {
           $_SESSION[$sessionName] = $value;
         }
       }
     }
+  }
+
+  /**
+   * Determine how long session-state should be retained.
+   *
+   * @param string $sessionKey
+   *   Ex: '_CRM_Admin_Form_Preferences_Display_f1a5f232e3d850a29a7a4d4079d7c37b_4654_container'
+   *   Ex: 'CiviCRM_CRM_Admin_Form_Preferences_Display_f1a5f232e3d850a29a7a4d4079d7c37b_4654'
+   * @return int
+   *   Number of seconds.
+   */
+  protected static function pickSessionTtl($sessionKey) {
+    $secureSessionTimeoutMinutes = (int) Civi::settings()->get('secure_cache_timeout_minutes');
+    if ($secureSessionTimeoutMinutes) {
+      $transactionPages = array(
+        'CRM_Contribute_Controller_Contribution',
+        'CRM_Event_Controller_Registration',
+      );
+      foreach ($transactionPages as $transactionPage) {
+        if (strpos($sessionKey, $transactionPage) !== FALSE) {
+          return $secureSessionTimeoutMinutes * 60;
+        }
+      }
+    }
+
+    return self::DEFAULT_SESSION_TTL;
   }
 
   /**
@@ -305,32 +335,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @param bool $prevNext
    */
   public static function cleanup($session = FALSE, $table = FALSE, $prevNext = FALSE, $expired = FALSE) {
-    // first delete all sessions more than 20 minutes old which are related to any potential transaction
-    $timeIntervalMins = (int) Civi::settings()->get('secure_cache_timeout_minutes');
-    if ($timeIntervalMins && $session) {
-      $transactionPages = array(
-        'CRM_Contribute_Controller_Contribution',
-        'CRM_Event_Controller_Registration',
-      );
-
-      $params = array(
-        1 => array(
-          date('Y-m-d H:i:s', time() - $timeIntervalMins * 60),
-          'String',
-        ),
-      );
-      foreach ($transactionPages as $trPage) {
-        $params[] = array("%${trPage}%", 'String');
-        $where[] = 'path LIKE %' . count($params);
-      }
-
-      $sql = "
-DELETE FROM civicrm_cache
-WHERE       group_name = 'CiviCRM Session'
-AND         created_date <= %1
-AND         (" . implode(' OR ', $where) . ")";
-      CRM_Core_DAO::executeQuery($sql, $params);
-    }
     // clean up the session cache every $cacheCleanUpNumber probabilistically
     $cleanUpNumber = 757;
 
@@ -355,13 +359,8 @@ AND         (" . implode(' OR ', $where) . ")";
     }
 
     if ($session) {
-
-      $sql = "
-DELETE FROM civicrm_cache
-WHERE       group_name = 'CiviCRM Session'
-AND         created_date < date_sub( NOW( ), INTERVAL $timeIntervalDays DAY )
-";
-      CRM_Core_DAO::executeQuery($sql);
+      // Session caches are just regular caches, so they expire naturally per TTL.
+      $expired = TRUE;
     }
 
     if ($expired) {
