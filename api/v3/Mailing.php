@@ -623,8 +623,25 @@ function civicrm_api3_mailing_send_test($params) {
 
   $job = civicrm_api3('MailingJob', 'create', $testEmailParams);
   $testEmailParams['job_id'] = $job['id'];
-  $testEmailParams['emails'] = array_key_exists('test_email', $params) ? explode(',', $params['test_email']) : NULL;
+  $testEmailParams['emails'] = array();
+
+  $emailDetail = array();
+  if (!empty($params['test_group'])) {
+    $contacts = CRM_Contact_BAO_Group::getGroupContacts($params['test_group']);
+    foreach ($contacts as $contact_id => $unused) {
+      $results = civicrm_api3('Email', 'get', array('contact_id' => $contact_id, 'is_primary' => 1));
+      foreach ($results['values'] as $email_id => $value) {
+        $email = $value['email'];
+        $testEmailParams['emails'][] = $email;
+        $emailDetail[$email] = array(
+          'contact_id' => $contact_id,
+          'email_id' => $email_id,
+        );
+      }
+    }
+  }
   if (!empty($params['test_email'])) {
+    $testEmailParams['emails'] = explode(',', $params['test_email']);
     $query = CRM_Utils_SQL_Select::from('civicrm_email e')
         ->select(array('e.id', 'e.contact_id', 'e.email'))
         ->join('c', 'INNER JOIN civicrm_contact c ON e.contact_id = c.id')
@@ -638,7 +655,6 @@ function civicrm_api3_mailing_send_test($params) {
         ->orderBy(array('e.is_bulkmail DESC', 'e.is_primary DESC'))
         ->toSQL();
     $dao = CRM_Core_DAO::executeQuery($query);
-    $emailDetail = array();
     // fetch contact_id and email id for all existing emails
     while ($dao->fetch()) {
       $emailDetail[$dao->email] = array(
@@ -647,33 +663,33 @@ function civicrm_api3_mailing_send_test($params) {
       );
     }
     $dao->free();
-    foreach ($testEmailParams['emails'] as $key => $email) {
-      $email = trim($email);
-      $contactId = $emailId = NULL;
-      if (array_key_exists($email, $emailDetail)) {
-        $emailId = $emailDetail[$email]['email_id'];
-        $contactId = $emailDetail[$email]['contact_id'];
-      }
-      if (!$contactId) {
-        //create new contact.
-        $contact   = civicrm_api3('Contact', 'create',
-          array(
-            'contact_type' => 'Individual',
-            'email' => $email,
-            'api.Email.get' => array('return' => 'id'),
-          )
-        );
-        $contactId = $contact['id'];
-        $emailId   = $contact['values'][$contactId]['api.Email.get']['id'];
-      }
-      civicrm_api3('MailingEventQueue', 'create',
+  }
+  foreach ($testEmailParams['emails'] as $key => $email) {
+    $email = trim($email);
+    $contactId = $emailId = NULL;
+    if (array_key_exists($email, $emailDetail)) {
+      $emailId = $emailDetail[$email]['email_id'];
+      $contactId = $emailDetail[$email]['contact_id'];
+    }
+    if (!$contactId) {
+      //create new contact.
+      $contact   = civicrm_api3('Contact', 'create',
         array(
-          'job_id' => $job['id'],
-          'email_id' => $emailId,
-          'contact_id' => $contactId,
+          'contact_type' => 'Individual',
+          'email' => $email,
+          'api.Email.get' => array('return' => 'id'),
         )
       );
+      $contactId = $contact['id'];
+      $emailId   = $contact['values'][$contactId]['api.Email.get']['id'];
     }
+    civicrm_api3('MailingEventQueue', 'create',
+      array(
+        'job_id' => $job['id'],
+        'email_id' => $emailId,
+        'contact_id' => $contactId,
+      )
+    );
   }
 
   $isComplete = FALSE;
