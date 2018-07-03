@@ -25,6 +25,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+
 /**
  *
  * Given an argument list, invoke the appropriate CRM function
@@ -349,8 +351,15 @@ class CRM_Core_Invoke {
     if (CRM_Core_Config::isUpgradeMode() || !CRM_Core_Permission::check('administer CiviCRM')) {
       return;
     }
-    // always use cached results - they will be refreshed by the session timer
-    $status = Civi::cache('checks')->get('systemStatusCheckResult');
+    try {
+      // always use cached results - they will be refreshed by the session timer
+      $status = Civi::cache('checks')->get('systemStatusCheckResult');
+    }
+    catch (ServiceNotFoundException $e) {
+      // As of 5.4 this could happen in dev environments as switching between codebase versions
+      // affects the cache mechanism. This is not the place to hard fail.
+      $status = 3;
+    }
     $template->assign('footer_status_severity', $status);
     $template->assign('footer_status_message', CRM_Utils_Check::toStatusLabel($status));
   }
