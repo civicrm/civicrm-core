@@ -58,15 +58,15 @@
                   <div>
                   {if $row.rtype EQ 'a_b' AND $is_contact_id_a}
                     {if $row.is_permission_a_b == 1}
-                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view and update information about %2.{/ts}
+                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view and update information about <strong>%2</strong>{/ts} <i class="crm-i fa-asterisk"></i>
                     {else}
-                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view information about %2.{/ts}
+                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view information about <strong>%2</strong>{/ts} <i class="crm-i fa-eye"></i>
                     {/if}
                   {else}
                     {if $row.is_permission_a_b == 1}
-                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view and update information about %2.{/ts}
+                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view and update information about <strong>%2</strong>{/ts} <i class="crm-i fa-asterisk"></i>
                     {else}
-                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view information about %2.{/ts}
+                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view information about <strong>%2</strong>{/ts} <i class="crm-i fa-eye"></i>
                     {/if}
                   {/if}
                   </div>
@@ -75,15 +75,15 @@
                   <div>
                   {if $row.rtype EQ 'a_b' AND $is_contact_id_a}
                     {if $row.is_permission_b_a == 1}
-                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view and update information about %2.{/ts}
+                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view and update information about <strong>%2</strong>{/ts} <i class="crm-i fa-asterisk"></i>
                     {else}
-                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view information about %2.{/ts}
+                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view information about <strong>%2</strong>{/ts} <i class="crm-i fa-eye"></i>
                     {/if}
                   {else}
                     {if $row.is_permission_b_a == 1}
-                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view and update information about %2.{/ts}
+                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view and update information about <strong>%2</strong>{/ts} <i class="crm-i fa-asterisk"></i>
                     {else}
-                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view and update information about %2.{/ts}
+                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view information about <strong>%2</strong>{/ts} <i class="crm-i fa-eye"></i>
                     {/if}
                   {/if}
                   </div>
@@ -132,14 +132,14 @@
           {capture assign="contact_b"}{if $action eq 1}{ts}selected contact(s){/ts}{else}{$display_name_b}{/if}{/capture}
           <td class="label"><label>{ts}Permissions{/ts}</label></td>
           <td>
-            {ts 1=$display_name_a 2=$contact_b}Permission for <strong>%1</strong> to access information about %2.{/ts}<br />
+            {ts 1=$display_name_a 2=$contact_b}Permission for <strong>%1</strong> to access information about <strong>%2</strong>{/ts}<br />
             {$form.is_permission_a_b.html}
           </td>
         </tr>
         <tr class="crm-relationship-form-block-is_permission_b_a">
           <td class="label"></td>
           <td>
-            {ts 1=$contact_b|ucfirst 2=$display_name_a}Permission for <strong>%1</strong> to access information about %2.{/ts}<br />
+            {ts 1=$contact_b|ucfirst 2=$display_name_a}Permission for <strong>%1</strong> to access information about <strong>%2</strong>{/ts}<br />
             {$form.is_permission_b_a.html}
           </td>
         </tr>

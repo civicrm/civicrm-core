@@ -39,9 +39,9 @@
     {include file="CRM/Contact/Page/View/RelationshipSelector.tpl" context="current"}
     <div id="permission-legend" class="crm-content-block">
       <span class="label">Permissioned Relationships: </span>&nbsp;
-      <span class="crm-marker"> +</span>
+      <i class="crm-i fa-eye"></i>
       {ts}This contact can be viewed by the other.{/ts}&nbsp;
-      <span class="crm-marker"> *</span>
+      <i class="crm-i fa-asterisk"></i>
       {ts}This contact can be viewed and updated by the other.{/ts}
     </div>
 

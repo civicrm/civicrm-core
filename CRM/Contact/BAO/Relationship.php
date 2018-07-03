@@ -2123,34 +2123,34 @@ AND cc.sort_name LIKE '%$name%'";
           'civicrm/contact/view/rel',
           "action=view&reset=1&cid={$values['cid']}&id={$values['id']}&rtype={$values['rtype']}");
 
+        if (!empty($values['description'])) {
+          $relationship['relation'] .= "<p class='description'>{$values['description']}</p>";
+        }
+
         if ($params['context'] == 'current') {
           if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::EDIT) OR
             ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::EDIT)
           ) {
-            $relationship['sort_name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> *</span>';
+            $relationship['sort_name'] .= ' <i class="crm-i fa-asterisk"></i>';
           }
 
           if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::VIEW) OR
             ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::VIEW)
           ) {
-            $relationship['sort_name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> +</span>';
+            $relationship['sort_name'] .= ' <i class="crm-i fa-eye"></i>';
           }
 
           if (($values['cid'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::EDIT) OR
             ($values['cid'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::EDIT)
           ) {
-            $relationship['relation'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> *</span>';
+            $relationship['relation'] .= ' <i class="crm-i fa-asterisk"></i>';
           }
 
           if (($values['cid'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::VIEW) OR
             ($values['cid'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::VIEW)
           ) {
-            $relationship['relation'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> +</span>';
+            $relationship['relation'] .= ' <i class="crm-i fa-eye"></i>';
           }
-        }
-
-        if (!empty($values['description'])) {
-          $relationship['relation'] .= "<p class='description'>{$values['description']}</p>";
         }
 
         $relationship['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
