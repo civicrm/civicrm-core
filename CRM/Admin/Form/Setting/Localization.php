@@ -180,7 +180,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     // retrieve default values for currencyLimit
     $this->_defaults['currencyLimit'] = array_keys(CRM_Core_OptionGroup::values('currencies_enabled'));
 
-//    $this->_defaults['languageLimit'] = Civi::settings()->get('languageLimit');
+    // $this->_defaults['languageLimit'] = Civi::settings()->get('languageLimit');
     // ? move to upgrade
     $ll = Civi::settings()->get('languageLimit');
     if (strpos(array_keys($ll)[0], "_") !== FALSE) {
