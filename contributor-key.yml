@@ -85,6 +85,10 @@
   organization: Circle Interactive
   jira        : andyw
 
+- github      : aniesshsethh
+  name        : Aniessh Sethh
+  jira        : aniesshsethh
+
 - name        : Anna Kovalova
   organization: CompuCorp
   jira        : anna
@@ -96,6 +100,8 @@
   name        : Anthony Lindsay
   organization: Annertech
   jira        : anthonylindsay
+
+- github      : applicado
 
 - github      : arborrow
   name        : Anthony Borrow
@@ -498,6 +504,10 @@
   organization: CiviHosting
   jira        : hershel
 
+- name        : Paul Butler
+  organization: Hudson-Essex-Terraplane Club
+  jira        : hetclub
+
 - github      : sunnycs121
   name        : Hassan Farooq
   organization: BackOffice Thinking
@@ -567,6 +577,10 @@
 - name        : Jane Hanley
   organization: AGH Strategies
   jira        : jehanley
+
+- github      : jensschuppe
+  name        : Jens Schuppe
+  jira        : jensschuppe
 
 - github      : jernic
   name        : jernic
@@ -718,7 +732,8 @@
   organization: Web Access
   jira        : kurund
 
-- name        : Lars Sanders-Green
+- github      : larssg-wildsight
+  name        : Lars Sanders-Green
   organization: Wildsight
   jira        : larssg
 
