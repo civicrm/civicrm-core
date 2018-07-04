@@ -354,7 +354,7 @@ AND ac.user_id IS NULL
     $queries = array();
     $contact_id_list = implode(',', $contact_ids);
 
-    // add a select statement for each direection
+    // add a select statement for each direction
     $directions = array(array('from' => 'a', 'to' => 'b'), array('from' => 'b', 'to' => 'a'));
 
     // CRM_Core_Permission::VIEW is satisfied by either CRM_Contact_BAO_Relationship::VIEW or CRM_Contact_BAO_Relationship::EDIT
@@ -402,7 +402,7 @@ SELECT civicrm_relationship.{$contact_id_column} AS contact_id
           $queries[] = "
 SELECT second_degree_relationship.contact_id_{$second_direction['to']} AS contact_id
   FROM civicrm_relationship first_degree_relationship
-  LEFT JOIN civicrm_relationship second_degree_relationship ON first_degree_relationship.contact_id_{$first_direction['to']} = second_degree_relationship.contact_id_{$first_direction['from']}
+  LEFT JOIN civicrm_relationship second_degree_relationship ON first_degree_relationship.contact_id_{$first_direction['to']} = second_degree_relationship.contact_id_{$second_direction['from']}
   {$LEFT_JOIN_DELETED}
  WHERE first_degree_relationship.contact_id_{$first_direction['from']} = {$contactID}
    AND second_degree_relationship.contact_id_{$second_direction['to']} IN ({$contact_id_list})
