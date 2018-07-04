@@ -314,6 +314,15 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test an update when is_multiple is an emtpy string this can occur in form submissions for custom groups that extend activites.
+   * dev/core#227.
+   */
+  public function testCustomGroupEmptyisMultipleUpdate() {
+    $customGroup = $this->callAPISuccess('CustomGroup', 'create', array_merge($this->_params, ['is_multiple' => 0]));
+    $this->callAPISuccess('CustomGroup', 'create', ['id' => $customGroup['id'], 'is_multiple' => '']);
+  }
+
+  /**
    * Check with Activity - Meeting Type
    */
   public function testCustomGroupCreateActivityMeeting() {

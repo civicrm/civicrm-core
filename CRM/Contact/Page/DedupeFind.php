@@ -111,6 +111,8 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
     $this->assign('urlQuery', CRM_Utils_System::makeQueryString($urlQry));
     $this->assign('isSelected', $this->isSelected());
     $criteria = json_decode($criteria, TRUE);
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria);
+    $this->assign('cacheKey', $cacheKeyString);
 
     if ($context == 'search') {
       $context = 'search';
@@ -120,7 +122,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
     if ($action & CRM_Core_Action::RENEW) {
       // empty cache
       if ($rgid) {
-        CRM_Core_BAO_PrevNextCache::deleteItem(NULL, CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria));
+        CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKeyString);
       }
       $urlQry['action'] = 'update';
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry));
@@ -171,9 +173,6 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
 
       $this->assign('sourceUrl', CRM_Utils_System::url('civicrm/ajax/dedupefind', $urlQry, FALSE, NULL, FALSE));
 
-      //reload from cache table
-      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria);
-
       $stats = CRM_Dedupe_Merger::getMergeStats($cacheKeyString);
       if ($stats) {
         $message = CRM_Dedupe_Merger::getMergeStatsMsg($stats);
@@ -183,7 +182,7 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
         CRM_Dedupe_Merger::resetMergeStats($cacheKeyString);
       }
 
-      $this->_mainContacts = CRM_Dedupe_Merger::getDuplicatePairs($rgid, $gid, !$isConflictMode, 0, $this->isSelected(), '', $isConflictMode, $criteria, TRUE);
+      $this->_mainContacts = CRM_Dedupe_Merger::getDuplicatePairs($rgid, $gid, !$isConflictMode, 0, $this->isSelected(), '', $isConflictMode, $criteria, TRUE, $limit);
 
       if (empty($this->_mainContacts)) {
         if ($isConflictMode) {

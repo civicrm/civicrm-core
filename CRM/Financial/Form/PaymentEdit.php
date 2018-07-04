@@ -204,13 +204,13 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
       }
 
       foreach (array($previousFinanciaTrxn, $newFinancialTrxn) as $financialTrxnParams) {
-        civicrm_api3('FinancialTrxn', 'create', $financialTrxnParams);
+        $financialTrxn = civicrm_api3('FinancialTrxn', 'create', $financialTrxnParams);
         $trxnParams = array(
           'total_amount' => $financialTrxnParams['total_amount'],
           'contribution_id' => $this->_contributionID,
         );
         $contributionTotalAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $this->_contributionID, 'total_amount');
-        CRM_Contribute_BAO_Contribution::assignProportionalLineItems($trxnParams, $submittedValues['id'], $contributionTotalAmount);
+        CRM_Contribute_BAO_Contribution::assignProportionalLineItems($trxnParams, $financialTrxn['id'], $contributionTotalAmount);
       }
     }
     else {

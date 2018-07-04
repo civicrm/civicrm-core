@@ -181,7 +181,7 @@ class CRM_Dedupe_Finder {
    *   array of (cid1, cid2, weight) dupe triples
    */
   public static function dupesInGroup($rgid, $gid, $searchLimit = 0) {
-    $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid, $searchLimit));
+    $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid, TRUE, $searchLimit));
     if (!empty($cids)) {
       return self::dupes($rgid, $cids);
     }
