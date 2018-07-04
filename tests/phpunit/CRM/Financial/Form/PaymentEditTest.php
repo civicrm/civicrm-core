@@ -87,7 +87,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
     $expectedPaymentParams = array(
       array(
         'total_amount' => 50.00,
-        'financial_type' => 'Donation,Donation,Donation',
+        'financial_type' => 'Donation',
         'payment_instrument' => 'Check',
         'status' => 'Completed',
         'receive_date' => '2015-04-21 23:27:00',
@@ -95,7 +95,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
       ),
       array(
         'total_amount' => -50.00,
-        'financial_type' => NULL,
+        'financial_type' => 'Donation',
         'payment_instrument' => 'Check',
         'status' => 'Completed',
         'receive_date' => $params['trxn_date'],
@@ -103,7 +103,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
       ),
       array(
         'total_amount' => 50.00,
-        'financial_type' => NULL,
+        'financial_type' => 'Donation',
         'payment_instrument' => sprintf('Credit Card (Visa: %s)', $params['pan_truncation']),
         'status' => 'Completed',
         'receive_date' => $params['trxn_date'],
