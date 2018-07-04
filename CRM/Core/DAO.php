@@ -2655,18 +2655,23 @@ SELECT contact_id
         $clauses[$fieldName] = CRM_Utils_SQL::mergeSubquery('Contact');
       }
       // Clause for an entity_table/entity_id combo
-      if ($fieldName == 'entity_id' && isset($fields['entity_table'])) {
-        $relatedClauses = array();
-        $relatedEntities = $this->buildOptions('entity_table', 'get');
-        foreach ((array) $relatedEntities as $table => $ent) {
-          if (!empty($ent)) {
-            $ent = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($table));
-            $subquery = CRM_Utils_SQL::mergeSubquery($ent);
-            if ($subquery) {
-              $relatedClauses[] = "(entity_table = '$table' AND entity_id " . implode(' AND entity_id ', $subquery) . ")";
+      $relatedClauses = array();
+      if ($fieldName == 'entity_id' && (isset($fields['entity_table']) || isset($fields['entity']))) {
+        if (isset($fields['entity_table'])) {
+          $relatedEntities = $this->buildOptions('entity_table', 'get');
+          foreach ((array) $relatedEntities as $table => $ent) {
+            if (!empty($ent)) {
+              $ent = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($table));
+              $relatedClauses[] = self::entityWhereClauses($ent, 'entity_table', $table);
             }
-            else {
-              $relatedClauses[] = "(entity_table = '$table')";
+          }
+        }
+        if (isset($fields['entity'])) {
+          $relatedEntities = $this->buildOptions('entity', 'get');
+          foreach ((array) $relatedEntities as $entity => $ent) {
+            if (!empty($ent)) {
+              $ent = _civicrm_api3_get_BAO($entity);
+              $relatedClauses[] = self::entityWhereClauses($ent, 'entity', $entity);
             }
           }
         }
@@ -2678,6 +2683,26 @@ SELECT contact_id
     CRM_Utils_Hook::selectWhereClause($this, $clauses);
     return $clauses;
   }
+
+  /**
+   * Add in entity WHERE clauses
+   *
+   * @param $enttiyClass
+   * @param $entityField
+   * @return string
+   *   - SQL string.
+   */
+  protected static function entityWhereClauses($enttiyClass, $entityField, $entityValue) {
+    $subquery = CRM_Utils_SQL::mergeSubquery($enttiyClass);
+    if ($subquery) {
+      $relatedClauses = "({$entityField} = '{$entityValue}' AND entity_id " . implode(' AND entity_id ', $subquery) . ")";
+    }
+    else {
+      $relatedClauses = "({$entityField} = '{$entityValue}')";
+    }
+    return $relatedClauses;
+  }
+
 
   /**
    * This returns the final permissioned query string for this entity
