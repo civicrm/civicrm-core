@@ -73,6 +73,42 @@ class CRM_Upgrade_Incremental_php_FiveFour extends CRM_Upgrade_Incremental_Base 
       'civicrm_uf_group', 'add_cancel_button', "tinyint DEFAULT '1' COMMENT 'Should a Cancel button be included in this Profile form.'");
     $this->addTask('Add location_id if missing to group_contact table (affects some older installs CRM-20711)', 'addColumn',
       'civicrm_group_contact', 'location_id', "int(10) unsigned DEFAULT NULL COMMENT 'Optional location to associate with this membership'");
+    $this->addTask('dev/core#107 - Add Activity\'s default assignee options', 'addActivityDefaultAssigneeOptions');
+  }
+
+  /**
+   * This task adds the default assignee option values that can be selected when
+   * creating or editing a new workflow's activity.
+   *
+   * @return bool
+   */
+  public static function addActivityDefaultAssigneeOptions() {
+    // Add option group for activity default assignees:
+    CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(array(
+      'name' => 'activity_default_assignee',
+      'title' => ts('Activity default assignee'),
+      'is_reserved' => 1,
+    ));
+
+    // Add option values for activity default assignees:
+    $options = array(
+      array('name' => 'NONE', 'label' => ts('None'), 'is_default' => 1),
+      array('name' => 'BY_RELATIONSHIP', 'label' => ts('By relationship to case client')),
+      array('name' => 'SPECIFIC_CONTACT', 'label' => ts('Specific contact')),
+      array('name' => 'USER_CREATING_THE_CASE', 'label' => ts('User creating the case')),
+    );
+
+    foreach ($options as $option) {
+      CRM_Core_BAO_OptionValue::ensureOptionValueExists(array(
+        'option_group_id' => 'activity_default_assignee',
+        'name' => $option['name'],
+        'label' => $option['label'],
+        'is_default' => CRM_Utils_Array::value('is_default', $option, 0),
+        'is_active' => TRUE,
+      ));
+    }
+
+    return TRUE;
   }
 
   /*
