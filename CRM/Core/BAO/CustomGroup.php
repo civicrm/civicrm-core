@@ -147,7 +147,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
           'is_multiple'
         );
 
-        if ($params['is_multiple'] != $isMultiple) {
+        // dev/core#227 Fix issue where is_multiple in params maybe an empty string if checkbox is not rendered on the form.
+        $paramsIsMultiple = empty($params['is_multiple']) ? 0 : 1;
+        if ($paramsIsMultiple != $isMultiple) {
           $tableNameNeedingIndexUpdate = CRM_Core_DAO::getFieldValue(
             'CRM_Core_DAO_CustomGroup',
             $params['id'],
