@@ -182,9 +182,15 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
   }
 
   public function setContext() {
-    $context = CRM_Utils_Request::retrieve('context',
-      'String', $this, FALSE, 'search'
-    );
+    $urlPath = implode('/', isset($this->urlPath) ? $this->urlPath : NULL);
+    if ($urlPath == 'civicrm/contact/view/participant') {
+      $context = 'participant';
+    }
+    else {
+      $context = CRM_Utils_Request::retrieve('context',
+        'String', $this, FALSE, 'search'
+      );
+    }
     $compContext = CRM_Utils_Request::retrieve('compContext',
       'String', $this
     );

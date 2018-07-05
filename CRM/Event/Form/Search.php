@@ -332,7 +332,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     }
 
     // We don't show test records in summaries or dashboards
-    if (empty($this->_formValues['participant_test']) && $this->_force) {
+    if (empty($this->_formValues['participant_test']) && $this->_force && ($this->_context !== 'participant')) {
       $this->_formValues["participant_test"] = 0;
     }
 
