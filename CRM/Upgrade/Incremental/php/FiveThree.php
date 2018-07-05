@@ -75,6 +75,7 @@ class CRM_Upgrade_Incremental_php_FiveThree extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_5_3_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('CRM-19948 - Add created_id column to civicrm_file', 'addFileCreatedIdColumn');
   }
 
