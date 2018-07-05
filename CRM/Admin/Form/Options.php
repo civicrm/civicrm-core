@@ -484,8 +484,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         $params['color'] = 'null';
       }
 
-      $groupParams = array('name' => ($this->_gName));
-      $optionValue = CRM_Core_OptionValue::addOptionValue($params, $groupParams, $this->_action, $this->_id);
+      $optionValue = CRM_Core_OptionValue::addOptionValue($params, $this->_gName, $this->_action, $this->_id);
 
       // CRM-11516
       if (!empty($params['financial_account_id'])) {

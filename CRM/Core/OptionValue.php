@@ -187,7 +187,7 @@ class CRM_Core_OptionValue {
    *
    * @param array $params
    *   Array containing exported values from the invoking form.
-   * @param array $groupParams
+   * @param string $optionGroupName
    *   Array containing group fields whose option-values is to retrieved/saved.
    * @param $action
    * @param int $optionValueID Has the id of the optionValue being edited, disabled ..etc.
@@ -196,22 +196,17 @@ class CRM_Core_OptionValue {
    * @return CRM_Core_DAO_OptionValue
    *
    */
-  public static function addOptionValue(&$params, &$groupParams, $action, $optionValueID) {
+  public static function addOptionValue(&$params, $optionGroupName, $action, $optionValueID) {
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     // checking if the group name with the given id or name (in $groupParams) exists
-    if (!empty($groupParams)) {
-      $config = CRM_Core_Config::singleton();
-      $groupParams['is_active'] = 1;
-      $optionGroup = CRM_Core_BAO_OptionGroup::retrieve($groupParams, $defaults);
-    }
+    $groupParams = ['name' => $optionGroupName, 'is_active' => 1];
+    $optionGroup = CRM_Core_BAO_OptionGroup::retrieve($groupParams, $defaults);
 
-    // if the corresponding group doesn't exist, create one, provided $groupParams has 'name' in it.
+    // if the corresponding group doesn't exist, create one.
     if (!$optionGroup->id) {
-      if ($groupParams['name']) {
-        $newOptionGroup = CRM_Core_BAO_OptionGroup::add($groupParams, $defaults);
-        $params['weight'] = 1;
-        $optionGroupID = $newOptionGroup->id;
-      }
+      $newOptionGroup = CRM_Core_BAO_OptionGroup::add($groupParams);
+      $params['weight'] = 1;
+      $optionGroupID = $newOptionGroup->id;
     }
     else {
       $optionGroupID = $optionGroup->id;
