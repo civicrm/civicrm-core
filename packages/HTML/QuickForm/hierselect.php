@@ -227,19 +227,21 @@ class HTML_QuickForm_hierselect extends HTML_QuickForm_group
      */
     function _setOptions()
     {
-        $toLoad = '';
+        $arrayKeys = [];
         foreach (array_keys($this->_elements) AS $key) {
-            if (eval("return isset(\$this->_options[{$key}]{$toLoad});") ) {
-                $array = eval("return \$this->_options[{$key}]{$toLoad};");
+          if (isset($this->_options[$key])) {
+            if ((empty($arrayKeys)) || CRM_Utils_Array::recursiveIsset($this->_options[$key], $arrayKeys)) {
+              $array = empty($arrayKeys) ? $this->_options[$key] : CRM_Utils_Array::recursiveValue($this->_options[$key], $arrayKeys);
                 if (is_array($array)) {
                     $select =& $this->_elements[$key];
                     $select->_options = array();
                     $select->loadArray($array);
 
-                    $value  = is_array($v = $select->getValue()) ? $v[0] : key($array);
-                    $toLoad .= '[\''.$value.'\']';
-                }
+                    $value = is_array($v = $select->getValue()) ? $v[0] : key($array);
+                    $arrayKeys[] = $value;
+              }
             }
+          }
         }
     } // end func _setOptions
 

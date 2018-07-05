@@ -112,7 +112,7 @@
   <script type="text/javascript" >
   CRM.$(function($) {
     var $form = $("form.{/literal}{$form.formClass}{literal}"),
-      action = "{/literal}{$action}{literal}",
+      action = {/literal}{$action|@json_encode}{literal},
       _ = CRM._;
 
     $('.crm-accordion-body').each( function() {

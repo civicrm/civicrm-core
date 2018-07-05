@@ -385,7 +385,7 @@
       }
     }
 
-  var url = "{/literal}{$dataUrl}{literal}";
+  var url = {/literal}{$dataUrl|@json_encode}{literal};
 
   {/literal}
     {if $context eq 'standalone' and $outBound_option != 2 }
@@ -520,7 +520,7 @@ function buildAmount( priceSetId, financialtypeIds ) {
     // show/hide price set amount and total amount.
     cj("#totalAmountORPriceSet").show( );
     cj("#totalAmount").show( );
-    var choose = "{/literal}{ts}Choose price set{/ts}{literal}";
+    var choose = "{/literal}{ts escape='js'}Choose price set{/ts}{literal}";
     cj("#price_set_id option[value='']").html( choose );
 
     cj('label[for="total_amount"]').text('{/literal}{ts}Total Amount{/ts}{literal}');
@@ -554,7 +554,7 @@ function buildAmount( priceSetId, financialtypeIds ) {
 
   cj( "#totalAmountORPriceSet" ).hide( );
   cj( "#totalAmount").hide( );
-  var manual = "{/literal}{ts}Manual contribution amount{/ts}{literal}";
+  var manual = "{/literal}{ts escape='js'}Manual contribution amount{/ts}{literal}";
   cj("#price_set_id option[value='']").html( manual );
 
   cj('label[for="total_amount"]').text('{/literal}{ts}Price Sets{/ts}{literal}');

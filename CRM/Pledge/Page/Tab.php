@@ -94,7 +94,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   }
 
   public function preProcess() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
@@ -156,7 +156,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
    * @param $form
    */
   public static function setContext(&$form) {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $form, FALSE, 'search');
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $form, FALSE, 'search');
 
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
     // validate the qfKey

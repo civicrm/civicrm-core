@@ -50,7 +50,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     parent::buildQuickForm();
     $this->_mappingID = $mappingID = NULL;
     $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     //CRM-16777: Don't provide access to administer schedule reminder page, with user that does not have 'administer CiviCRM' permission
     if (empty($this->_context) && !CRM_Core_Permission::check('administer CiviCRM')) {

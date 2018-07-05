@@ -471,6 +471,10 @@ class CRM_Core_Session {
     $session = self::singleton();
     $session->initialize();
 
+    // Sanitize any HTML we're displaying. This helps prevent reflected XSS in error messages.
+    $text = CRM_Utils_String::purifyHTML($text);
+    $title = CRM_Utils_String::purifyHTML($title);
+
     // default options
     $options += array('unique' => TRUE);
 

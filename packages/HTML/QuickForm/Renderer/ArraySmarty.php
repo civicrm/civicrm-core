@@ -257,15 +257,14 @@ class HTML_QuickForm_Renderer_ArraySmarty extends HTML_QuickForm_Renderer_Array
     function _storeArray($elAry)
     {
         if ($elAry) {
-            $sKeys = $elAry['keys'];
+            $keys = explode('][', substr(str_replace(["['", "']", '["', '"]'], ['[', ']', '[', ']'], $elAry['keys']), 1, -1));
             unset($elAry['keys']);
             // where should we put this element...
             if (is_array($this->_currentGroup) && ('group' != $elAry['type'])) {
-                $toEval = '$this->_currentGroup' . $sKeys . ' = $elAry;';
+                $this->_currentGroup = CRM_Utils_Array::recursiveBuild($keys, $elAry, $this->_currentGroup);
             } else {
-                $toEval = '$this->_ary' . $sKeys . ' = $elAry;';
+                $this->_ary = CRM_Utils_Array::recursiveBuild($keys, $elAry, $this->_ary);
             }
-            eval($toEval);
         }
         return;
     }

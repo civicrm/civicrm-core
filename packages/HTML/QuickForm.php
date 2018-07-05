@@ -851,28 +851,26 @@ class HTML_QuickForm extends HTML_Common
             return $this->getElementValue($elementName);
 
         } elseif (false !== ($pos = strpos($elementName, '['))) {
-            $base = str_replace(
-                        array('\\', '\''), array('\\\\', '\\\''),
-                        substr($elementName, 0, $pos)
-                    );
-            $idx  = "['" . str_replace(
-                        array('\\', '\'', ']', '['), array('\\\\', '\\\'', '', "']['"),
-                        substr($elementName, $pos + 1, -1)
-                    ) . "']";
+            $base = substr($elementName, 0, $pos);
+            $idx = explode('][', str_replace(["['", "']", '["', '"]'], ['[', ']', '[', ']'], substr($elementName, $pos + 1, -1)));
             if (isset($this->_submitValues[$base])) {
-                $value = eval("return (isset(\$this->_submitValues['{$base}']{$idx})) ? \$this->_submitValues['{$base}']{$idx} : null;");
+                $value = CRM_Utils_Array::recursiveValue($this->_submitValues[$base], $idx);
             }
 
             if ((is_array($value) || null === $value) && isset($this->_submitFiles[$base])) {
-                $props = array('name', 'type', 'size', 'tmp_name', 'error');
-                $code  = "if (!isset(\$this->_submitFiles['{$base}']['name']{$idx})) {\n" .
-                         "    return null;\n" .
-                         "} else {\n" .
-                         "    \$v = array();\n";
-                foreach ($props as $prop) {
-                    $code .= "    \$v = HTML_QuickForm::arrayMerge(\$v, \$this->_reindexFiles(\$this->_submitFiles['{$base}']['{$prop}']{$idx}, '{$prop}'));\n";
+                if (!CRM_Utils_Array::recursiveIsset($this->_submitFiles[$base], array_merge(['name'], $idx))) {
+                    $fileValue = NULL;
                 }
-                $fileValue = eval($code . "    return \$v;\n}\n");
+                else {
+                    $props = ['name', 'type', 'size', 'tmp_name', 'error'];
+                    $fileValue = [];
+                    foreach ($props as $prop) {
+                        $fileValue = HTML_QuickForm::arrayMerge(
+                          $fileValue,
+                          $this->_reindexFiles(CRM_Utils_Array::recursiveValue($this->_submitFiles[$base], array_merge([$prop], $idx)), $prop)
+                        );
+                    }
+                }
                 if (null !== $fileValue) {
                     $value = null === $value? $fileValue: HTML_QuickForm::arrayMerge($value, $fileValue);
                 }
@@ -1265,11 +1263,8 @@ class HTML_QuickForm extends HTML_Common
                     if (false === strpos($elName, '[')) {
                         $this->_submitValues[$elName] = $this->_recursiveFilter($filter, $value);
                     } else {
-                        $idx  = "['" . str_replace(
-                                    array('\\', '\'', ']', '['), array('\\\\', '\\\'', '', "']['"),
-                                    $elName
-                                ) . "']";
-                        eval("\$this->_submitValues{$idx} = \$this->_recursiveFilter(\$filter, \$value);");
+                        $keys = explode('[', trim(str_replace(["['", "']", '["', '"]'], ['[', '', '[', ''], $elName), ']['));
+                        $this->_submitValues = CRM_Utils_Array::recursiveBuild($keys, $this->_recursiveFilter($filter, $value), $this->_submitValues);
                     }
                 }
             }
@@ -1551,15 +1546,10 @@ class HTML_QuickForm extends HTML_Common
                         if (false === ($pos = strpos($target, '['))) {
                             $isUpload = !empty($this->_submitFiles[$target]);
                         } else {
-                            $base = str_replace(
-                                        array('\\', '\''), array('\\\\', '\\\''),
-                                        substr($target, 0, $pos)
-                                    );
-                            $idx  = "['" . str_replace(
-                                        array('\\', '\'', ']', '['), array('\\\\', '\\\'', '', "']['"),
-                                        substr($target, $pos + 1, -1)
-                                    ) . "']";
-                            eval("\$isUpload = isset(\$this->_submitFiles['{$base}']['name']{$idx});");
+                            $base = substr($target, 0, $pos);
+                            $idx = explode('][', str_replace(["['", "']", '["', '"]'], ['[', ']', '[', ']'], substr($target, $pos + 1, -1)));
+                            $idx = array_merge([$base, 'name'], $idx);
+                            $isUpload = CRM_Utils_Array::recursiveIsset($this->_submitFiles, $idx);
                         }
                         if ($isUpload && (!isset($submitValue['error']) || UPLOAD_ERR_NO_FILE == $submitValue['error'])) {
                             continue 2;

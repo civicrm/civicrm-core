@@ -344,11 +344,8 @@ class HTML_QuickForm_element extends HTML_Common
         if (isset($values[$elementName])) {
             return $values[$elementName];
         } elseif (strpos($elementName, '[')) {
-            $myVar = "['" . str_replace(
-                         array('\\', '\'', ']', '['), array('\\\\', '\\\'', '', "']['"),
-                         $elementName
-                     ) . "']";
-            return eval("return (isset(\$values$myVar)) ? \$values$myVar : null;");
+            $keys = explode('[', str_replace(']', '', $elementName));
+            return CRM_Utils_Array::recursiveValue($values, $keys);
         } else {
             return null;
         }
@@ -477,13 +474,8 @@ class HTML_QuickForm_element extends HTML_Common
             if (!strpos($name, '[')) {
                 return array($name => $value);
             } else {
-                $valueAry = array();
-                $myIndex  = "['" . str_replace(
-                                array('\\', '\'', ']', '['), array('\\\\', '\\\'', '', "']['"),
-                                $name
-                            ) . "']";
-                eval("\$valueAry$myIndex = \$value;");
-                return $valueAry;
+                $keys = explode('[', str_replace(']', '', $name));
+                return CRM_Utils_Array::recursiveBuild($keys, $value);
             }
         }
     }

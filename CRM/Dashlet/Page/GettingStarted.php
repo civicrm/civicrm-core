@@ -70,7 +70,7 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
    * List gettingStarted page as dashlet.
    */
   public function run() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'dashlet');
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'dashlet');
 
     // Assign smarty variables.
     $this->assign('context', $context);

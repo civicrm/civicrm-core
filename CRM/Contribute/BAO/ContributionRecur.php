@@ -475,7 +475,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       $cid = CRM_Utils_Request::retrieve('cid', 'Integer');
       $mid = CRM_Utils_Request::retrieve('mid', 'Integer');
       $qfkey = CRM_Utils_Request::retrieve('key', 'String');
-      $context = CRM_Utils_Request::retrieve('context', 'String');
+      $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric');
       if ($cid) {
         switch ($context) {
           case 'contribution':

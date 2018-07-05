@@ -235,7 +235,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
         // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
         CRM_Utils_System::setTitle($displayName);
-        $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+        $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
         $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
 
         $urlParams = 'reset=1&cid=' . $this->_contactId;
@@ -1055,7 +1055,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/add', $resetStr));
     }
     else {
-      $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+      $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
       $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
       //validate the qfKey
       $urlParams = 'reset=1&cid=' . $contact->id;
