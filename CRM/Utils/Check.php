@@ -25,6 +25,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+
 /**
  *
  * @package CRM
@@ -222,8 +224,13 @@ class CRM_Utils_Check {
       $maxSeverity = max(1, $message->getLevel());
       break;
     }
-
-    Civi::cache('checks')->set('systemStatusCheckResult', $maxSeverity);
+    try {
+      Civi::cache('checks')->set('systemStatusCheckResult', $maxSeverity);
+    }
+    catch (ServiceNotFoundException $e) {
+      // As of 5.4 this could happen in dev environments as switching between codebase versions
+      // affects the cache mechanism. This is not the place to hard fail.
+    }
 
     return ($max) ? $maxSeverity : $messages;
   }
