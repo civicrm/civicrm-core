@@ -486,8 +486,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Attachment',
       // pseudo-entity; testUpdateSingleValueAlter doesn't introspect properly on it. Multiple magic fields
       'Mailing',
-      'MailingGroup',
-      'Address',
       'MailingEventUnsubscribe',
       'MailingEventSubscribe',
       'Constant',
@@ -495,15 +493,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Location',
       'Profile',
       'CustomValue',
-      'SurveyRespondant',
-      'UFMatch',
       'UFJoin',
       'UFField',
-      'OptionValue',
       'Relationship',
       'RelationshipType',
       'Note',
-      'OptionGroup',
       'Membership',
       'Group',
       'File',
@@ -525,7 +519,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MembershipPayment',
       'Participant',
       'LineItem',
-      'PledgePayment',
       'ContributionPage',
       'Phone',
       'PaymentProcessor',
@@ -607,9 +600,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Address' => array(
         'cant_update' => array(
           'state_province_id', //issues with country id - need to ensure same country
+          'world_region',
           'master_id', //creates relationship
         ),
-        'cant_return' => array(),
+        'cant_return' => ['street_parsing', 'skip_geocode', 'fix_address'],
       ),
       'Batch' => array(
         'cant_update' => array(
@@ -632,6 +626,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'entity_id',
         ),
       ),
+      'MailingJob' => ['cant_update' => ['parent_id']],
       'ContributionSoft' => array(
         'cant_update' => array(
           // can't be changed through api
@@ -1310,10 +1305,13 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $entity2 = $getEntities['values'][1];
     $this->deletableTestObjects[$baoString][] = $entity['id'];
     $this->deletableTestObjects[$baoString][] = $entity2['id'];
+    // Skip these fields that we never really expect to update well.
+    $genericFieldsToSkip = ['currency', 'id', strtolower($entityName) . '_id', 'is_primary'];
     foreach ($fields as $field => $specs) {
       $resetFKTo = NULL;
       $fieldName = $field;
-      if ($field == 'currency' || $field == 'id' || $field == strtolower($entityName) . '_id'
+
+      if (in_array($field, $genericFieldsToSkip)
         || in_array($field, $entityValuesThatDoNotWork)
       ) {
         //@todo id & entity_id are correct but we should fix currency & frequency_day
