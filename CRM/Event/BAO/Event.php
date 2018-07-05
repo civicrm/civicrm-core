@@ -2085,7 +2085,7 @@ WHERE  ce.loc_block_id = $locBlockId";
       // Search again, but only events created by the user.
       $params['created_id'] = 'user_contact_id';
       $result = civicrm_api3('Event', 'get', $params);
-      $createdEvents = CRM_Utils_Array::collect('title', $result['values']);
+      $createdEvents = array_keys($result['values']);
 
       // Note: for a multisite setup, a user with edit all events, can edit all events
       // including those from other sites
