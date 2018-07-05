@@ -560,45 +560,6 @@ WHERE  cacheKey LIKE %1
   }
 
   /**
-   * @param CRM_Core_Form $form
-   * @param array $params
-   *
-   * @return mixed
-   */
-  public static function buildSelectedContactPager(&$form, &$params) {
-    $params['status'] = ts('Contacts %%StatusMessage%%');
-    $params['csvString'] = NULL;
-    $params['buttonTop'] = 'PagerTopButton';
-    $params['buttonBottom'] = 'PagerBottomButton';
-    $params['rowCount'] = $form->get(CRM_Utils_Pager::PAGE_ROWCOUNT);
-
-    if (!$params['rowCount']) {
-      $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
-    }
-
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
-    $cacheKey = "civicrm search {$qfKey}";
-
-    $query = "
-SELECT count(*)
-FROM   civicrm_prevnext_cache
-WHERE  cacheKey LIKE %1
-  AND  is_selected = 1
-  AND  cacheKey NOT LIKE %2
-";
-    $params1[1] = array("{$cacheKey}%", 'String');
-    $params1[2] = array("{$cacheKey}_alphabet%", 'String');
-    $paramsTotal = CRM_Core_DAO::singleValueQuery($query, $params1);
-    $params['total'] = $paramsTotal;
-    $form->_pager = new CRM_Utils_Pager($params);
-    $form->assign_by_ref('pager', $form->_pager);
-    list($offset, $rowCount) = $form->_pager->getOffsetAndRowCount();
-    $params['offset'] = $offset;
-    $params['rowCount1'] = $rowCount;
-    return $params;
-  }
-
-  /**
    * Flip 2 contacts in the prevNext cache.
    *
    * @param array $prevNextId
