@@ -926,6 +926,10 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       {$this->_aclFrom}
     ";
 
+    //Join temp table if report is filtered by group. This is specific to 'notin' operator and covered in unit test(ref dev/core#212)
+    if (!empty($this->_params['gid_op']) && $this->_params['gid_op'] == 'notin') {
+      $this->joinGroupTempTable('civicrm_contact', 'id', $this->_aliases['civicrm_contact']);
+    }
     $this->appendAdditionalFromJoins();
   }
 
