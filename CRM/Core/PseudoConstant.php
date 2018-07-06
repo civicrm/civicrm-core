@@ -170,7 +170,7 @@ class CRM_Core_PseudoConstant {
   /**
    * Low-level option getter, rarely accessed directly.
    * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
-   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Pseudoconstant+%28option+list%29+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/framework/pseudoconstant/
    *
    * NOTE: If someone undertakes a refactoring of this, please consider the use-case of
    * the Setting.getoptions API. There is no DAO/field, but it would be nice to use the
