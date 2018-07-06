@@ -350,7 +350,6 @@ WHERE ceft.entity_id = %1";
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       $toFinancialAccountType = !empty($params['isDeleted']) ? 'Premiums Inventory Account is' : 'Cost of Sales Account is';
       $fromFinancialAccountType = !empty($params['isDeleted']) ? 'Cost of Sales Account is' : 'Premiums Inventory Account is';
-      $accountRelationship = array_flip($accountRelationship);
       $financialtrxn = array(
         'to_financial_account_id' => CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['financial_type_id'], $toFinancialAccountType),
         'from_financial_account_id' => CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['financial_type_id'], $fromFinancialAccountType),
@@ -387,7 +386,7 @@ WHERE ceft.entity_id = %1";
    * @param array $params
    *   To create trxn entries.
    *
-   * @return bool
+   * @return bool|void
    */
   public static function recordFees($params) {
     $domainId = CRM_Core_Config::domainID();
@@ -482,7 +481,6 @@ WHERE ft.is_payment = 1
 ";
 
       $ftTotalAmt = CRM_Core_DAO::singleValueQuery($sqlFtTotalAmt);
-      $value = 0;
       if (!$ftTotalAmt) {
         $ftTotalAmt = 0;
       }

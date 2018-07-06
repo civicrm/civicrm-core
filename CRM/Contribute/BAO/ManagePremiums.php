@@ -33,11 +33,6 @@
 class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
 
   /**
-   * Static holder for the default LT.
-   */
-  static $_defaultContributionType = NULL;
-
-  /**
    * Class constructor.
    */
   public function __construct() {
@@ -52,7 +47,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_BAO_ManagePremium
+   * @return CRM_Contribute_DAO_Product
    */
   public static function retrieve(&$params, &$defaults) {
     $premium = new CRM_Contribute_DAO_Product();
@@ -110,7 +105,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
     $params['image'] = CRM_Utils_String::simplifyURL($params['image'], TRUE);
     $params['thumbnail'] = CRM_Utils_String::simplifyURL($params['thumbnail'], TRUE);
 
-    // Save and return
+    // Save the new/updated premium product
     $premium = new CRM_Contribute_DAO_Product();
     $premium->copyValues($params);
     $premium->save();
@@ -129,16 +124,14 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
     $premiumsProduct = new CRM_Contribute_DAO_PremiumsProduct();
     $premiumsProduct->product_id = $productID;
     if ($premiumsProduct->find(TRUE)) {
-      $session = CRM_Core_Session::singleton();
-      $message .= ts('This Premium is being linked to <a href=\'%1\'>Online Contribution page</a>. Please remove it in order to delete this Premium.', array(1 => CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1')), ts('Deletion Error'), 'error');
-      CRM_Core_Session::setStatus($message);
-      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/contribute/managePremiums', 'reset=1&action=browse'));
+      throw new CRM_Core_Exception('Cannot delete a Premium that is linked to a Contribution page');
     }
-
-    //delete from financial Type table
-    $premium = new CRM_Contribute_DAO_Product();
-    $premium->id = $productID;
-    $premium->delete();
+    else {
+      //delete from financial Type table
+      $premium = new CRM_Contribute_DAO_Product();
+      $premium->id = $productID;
+      $premium->delete();
+    }
   }
 
 }

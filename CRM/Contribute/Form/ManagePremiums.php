@@ -272,30 +272,38 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     // If deleting, then only delete and skip the rest of the post-processing
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Contribute_BAO_ManagePremiums::del($this->_id);
+      try {
+        CRM_Contribute_BAO_ManagePremiums::del($this->_id);
+      }
+      catch (CRM_Core_Exception $e) {
+        $message = ts("This Premium is linked to an <a href='%1'>Online Contribution page</a>. Please remove it before deleting this Premium.", array(1 => CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1')));
+        CRM_Core_Session::setStatus($message, ts('Cannot delete Premium'), 'error');
+        CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/contribute/managePremiums', 'reset=1&action=browse'));
+        return;
+      }
       CRM_Core_Session::setStatus(
         ts('Selected Premium Product type has been deleted.'),
         ts('Deleted'), 'info');
       return;
     }
 
-    $params = $this->controller->exportValues($this->_name);
+    $productParams = $this->controller->exportValues($this->_name);
 
     // Clean the the money fields
     $moneyFields = array('cost', 'price', 'min_contribution');
     foreach ($moneyFields as $field) {
-      $params[$field] = CRM_Utils_Rule::cleanMoney($params[$field]);
+      $productParams[$field] = CRM_Utils_Rule::cleanMoney($productParams[$field]);
     }
 
-    $ids = array();
+    // If we're updating, we need to pass in the premium product Id
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $ids['premium'] = $this->_id;
+      $productParams['id'] = $this->_id;
     }
 
-    $this->_processImages($params);
+    $this->_processImages($productParams);
 
-    // Save to database
-    $premium = CRM_Contribute_BAO_ManagePremiums::add($params, $ids);
+    // Save the premium product to database
+    $premium = CRM_Contribute_BAO_ManagePremiums::add($productParams);
 
     CRM_Core_Session::setStatus(
       ts("The Premium '%1' has been saved.", array(1 => $premium->name)),

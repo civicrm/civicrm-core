@@ -4851,7 +4851,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    *
    * @param array $params
    *
-   * @return object
+   * @return CRM_Financial_DAO_FinancialTrxn
    */
   public static function recordPartialPayment($contribution, $params) {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');

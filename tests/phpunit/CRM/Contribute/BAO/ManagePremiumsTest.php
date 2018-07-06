@@ -39,8 +39,7 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
    * Check method add()
    */
   public function testAdd() {
-    $ids = array();
-    $params = array(
+    $productParams = array(
       'name' => 'Test Product',
       'sku' => 'TP-10',
       'imageOption' => 'noImage',
@@ -50,7 +49,7 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $product = CRM_Contribute_BAO_ManagePremiums::add($params, $ids);
+    $product = CRM_Contribute_BAO_ManagePremiums::add($productParams);
 
     $result = $this->assertDBNotNull('CRM_Contribute_BAO_ManagePremiums', $product->id,
       'sku', 'id',
@@ -64,8 +63,7 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
    * Check method retrieve( )
    */
   public function testRetrieve() {
-    $ids = array();
-    $params = array(
+    $productParams = array(
       'name' => 'Test Product',
       'sku' => 'TP-10',
       'imageOption' => 'noImage',
@@ -75,19 +73,17 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $product = CRM_Contribute_BAO_ManagePremiums::add($params, $ids);
+    $product = CRM_Contribute_BAO_ManagePremiums::add($productParams);
     $params = array('id' => $product->id);
-    $default = array();
-    $result = CRM_Contribute_BAO_ManagePremiums::retrieve($params, $default);
-    $this->assertEquals(empty($result), FALSE, 'Verify products record.');
+    $retrievedProduct = CRM_Contribute_BAO_ManagePremiums::retrieve($params, $defaults);
+    $this->assertEquals(empty($retrievedProduct), FALSE, 'Verify products record.');
   }
 
   /**
    * Check method setIsActive( )
    */
   public function testSetIsActive() {
-    $ids = array();
-    $params = array(
+    $productParams = array(
       'name' => 'Test Product',
       'sku' => 'TP-10',
       'imageOption' => 'noImage',
@@ -97,7 +93,7 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $product = CRM_Contribute_BAO_ManagePremiums::add($params, $ids);
+    $product = CRM_Contribute_BAO_ManagePremiums::add($productParams);
     CRM_Contribute_BAO_ManagePremiums::setIsActive($product->id, 0);
 
     $isActive = $this->assertDBNotNull('CRM_Contribute_BAO_ManagePremiums', $product->id,
@@ -112,8 +108,7 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
    * Check method del( )
    */
   public function testDel() {
-    $ids = array();
-    $params = array(
+    $productParams = array(
       'name' => 'Test Product',
       'sku' => 'TP-10',
       'imageOption' => 'noImage',
@@ -123,15 +118,14 @@ class CRM_Contribute_BAO_ManagePremiumsTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $product = CRM_Contribute_BAO_ManagePremiums::add($params, $ids);
+    $product = CRM_Contribute_BAO_ManagePremiums::add($productParams);
 
     CRM_Contribute_BAO_ManagePremiums::del($product->id);
 
     $params = array('id' => $product->id);
-    $default = array();
-    $result = CRM_Contribute_BAO_ManagePremiums::retrieve($params, $defaults);
+    $retrievedProduct = CRM_Contribute_BAO_ManagePremiums::retrieve($params, $defaults);
 
-    $this->assertEquals(empty($result), TRUE, 'Verify product record deletion.');
+    $this->assertEquals(empty($retrievedProduct), TRUE, 'Verify product record deletion.');
   }
 
 }
