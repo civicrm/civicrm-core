@@ -358,9 +358,12 @@ AND ac.user_id IS NULL
     $directions = array(array('from' => 'a', 'to' => 'b'), array('from' => 'b', 'to' => 'a'));
 
     // CRM_Core_Permission::VIEW is satisfied by either CRM_Contact_BAO_Relationship::VIEW or CRM_Contact_BAO_Relationship::EDIT
-    $is_perm_condition = $type == CRM_Core_Permission::VIEW ?
-      ' != ' .  CRM_Contact_BAO_Relationship::NONE :
-      ' = ' . CRM_Contact_BAO_Relationship::EDIT;
+    if ($type == CRM_Core_Permission::VIEW) {
+      $is_perm_condition = ' IN ( ' . CRM_Contact_BAO_Relationship::EDIT . ' , ' . CRM_Contact_BAO_Relationship::VIEW . ' ) ';
+    }
+    else {
+      $is_perm_condition = ' = ' . CRM_Contact_BAO_Relationship::EDIT;
+    }
 
     // NORMAL/SINGLE DEGREE RELATIONSHIPS
     foreach ($directions as $direction) {
