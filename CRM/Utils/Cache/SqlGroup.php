@@ -118,8 +118,12 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
       throw new \CRM_Utils_Cache_CacheException("SqlGroup: Failed to acquire lock on cache key.");
     }
 
+    if (is_int($ttl) && $ttl <= 0) {
+      return $this->delete($key);
+    }
+
     $dataExists = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM {$this->table} WHERE {$this->where($key)}");
-    $expires = CRM_Utils_Date::convertCacheTtlToExpires($ttl, self::DEFAULT_TTL);
+    $expires = round(microtime(1)) + CRM_Utils_Date::convertCacheTtl($ttl, self::DEFAULT_TTL);
 
     $dataSerialized = CRM_Core_BAO_Cache::encode($value);
 
