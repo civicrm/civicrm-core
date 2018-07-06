@@ -83,7 +83,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $params = array(
       'name' => $this->_membershipTypeName,
       'description' => NULL,
-      'minimum_fee' => 10,
+      'minimum_fee' => 1500,
       'duration_unit' => 'year',
       'member_of_contact_id' => $this->_orgContactID,
       'period_type' => 'fixed',
@@ -156,9 +156,18 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
   /**
    *  Test Import.
+   *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testProcessMembership() {
+  public function testProcessMembership($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
+
     $form = new CRM_Batch_Form_Entry();
+    $profileID = $this->callAPISuccessGetValue('UFGroup', ['return' => 'id', 'name' => 'membership_batch_entry']);
+    $form->_fields = CRM_Core_BAO_UFGroup::getFields($profileID, FALSE, CRM_Core_Action::VIEW);
+
     $params = $this->getMembershipData();
     $this->assertTrue($form->testProcessMembership($params));
     $result = $this->callAPISuccess('membership', 'get', array());
@@ -184,14 +193,20 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
         'return' => 'line_total',
 
       )), $contribution['total_amount']);
+      $this->assertEquals(1500, $contribution['total_amount']);
       $this->assertEquals($params['field'][$key]['trxn_id'], $contribution['trxn_id']);
     }
   }
 
   /**
    *  Test Contribution Import.
+   *
+   * @param $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testProcessContribution() {
+  public function testProcessContribution($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $this->offsetDefaultPriceSet();
     $form = new CRM_Batch_Form_Entry();
     $params = $this->getContributionData();
@@ -273,7 +288,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'membership_end_date' => NULL,
           'membership_source' => NULL,
           'financial_type' => 2,
-          'total_amount' => 1,
+          'total_amount' => $this->formatMoneyInput(1500),
           'receive_date' => '2013-07-24',
           'receive_date_time' => NULL,
           'payment_instrument' => 1,
@@ -288,7 +303,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'membership_end_date' => NULL,
           'membership_source' => NULL,
           'financial_type' => 2,
-          'total_amount' => 1,
+          'total_amount' => $this->formatMoneyInput(1500),
           'receive_date' => '2013-07-17',
           'receive_date_time' => NULL,
           'payment_instrument' => NULL,
@@ -304,7 +319,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'membership_end_date' => '2013-12-01',
           'membership_source' => NULL,
           'financial_type' => 2,
-          'total_amount' => 1,
+          'total_amount' => $this->formatMoneyInput(1500),
           'receive_date' => '2013-07-17',
           'receive_date_time' => NULL,
           'payment_instrument' => NULL,
@@ -320,9 +335,11 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   }
 
   /**
+   * @param $thousandSeparator
+   *
    * @return array
    */
-  public function getContributionData() {
+  public function getContributionData($thousandSeparator = '.') {
     return array(
       //'batch_id' => 4,
       'primary_profiles' => array(1 => NULL, 2 => NULL, 3 => NULL),
@@ -334,7 +351,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       'field' => array(
         1 => array(
           'financial_type' => 1,
-          'total_amount' => 15,
+          'total_amount' => $this->formatMoneyInput(1500.15),
           'receive_date' => '2013-07-24',
           'receive_date_time' => NULL,
           'payment_instrument' => 1,
@@ -343,7 +360,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
         ),
         2 => array(
           'financial_type' => 1,
-          'total_amount' => 15,
+          'total_amount' => $this->formatMoneyInput(1500.15),
           'receive_date' => '2013-07-24',
           'receive_date_time' => NULL,
           'payment_instrument' => 1,
@@ -351,7 +368,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'contribution_status_id' => 1,
         ),
       ),
-      'actualBatchTotal' => 30,
+      'actualBatchTotal' => $this->formatMoneyInput(3000.30),
 
     );
   }

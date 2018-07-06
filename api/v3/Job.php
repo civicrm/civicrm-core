@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
@@ -58,7 +58,42 @@ function _civicrm_api3_job_create_spec(&$params) {
  * @return array
  */
 function civicrm_api3_job_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Job');
+}
+
+/**
+ * Adjust metadata for clone spec action.
+ *
+ * @param array $spec
+ */
+function _civicrm_api3_job_clone_spec(&$spec) {
+  $spec['id']['title'] = 'Job ID to clone';
+  $spec['id']['type'] = CRM_Utils_Type::T_INT;
+  $spec['id']['api.required'] = 1;
+  $spec['is_active']['title'] = 'Job is Active?';
+  $spec['is_active']['type'] = CRM_Utils_Type::T_BOOLEAN;
+  $spec['is_active']['api.required'] = 0;
+}
+
+/**
+ * Clone Job.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
+ */
+function civicrm_api3_job_clone($params) {
+  if (empty($params['id'])) {
+    throw new API_Exception("Mandatory key(s) missing from params array: id field is required");
+  }
+  $id = $params['id'];
+  unset($params['id']);
+  $params['last_run'] = 'null';
+  $params['scheduled_run_date'] = 'null';
+  $newJobDAO = CRM_Core_BAO_Job::copy($id, $params);
+  return civicrm_api3('Job', 'get', array('id' => $newJobDAO->id));
 }
 
 /**
@@ -584,14 +619,15 @@ function civicrm_api3_job_cleanup($params) {
   $session   = CRM_Utils_Array::value('session', $params, TRUE);
   $tempTable = CRM_Utils_Array::value('tempTables', $params, TRUE);
   $jobLog    = CRM_Utils_Array::value('jobLog', $params, TRUE);
+  $expired   = CRM_Utils_Array::value('expiredDbCache', $params, TRUE);
   $prevNext  = CRM_Utils_Array::value('prevNext', $params, TRUE);
   $dbCache   = CRM_Utils_Array::value('dbCache', $params, FALSE);
   $memCache  = CRM_Utils_Array::value('memCache', $params, FALSE);
   $tplCache  = CRM_Utils_Array::value('tplCache', $params, FALSE);
   $wordRplc  = CRM_Utils_Array::value('wordRplc', $params, FALSE);
 
-  if ($session || $tempTable || $prevNext) {
-    CRM_Core_BAO_Cache::cleanup($session, $tempTable, $prevNext);
+  if ($session || $tempTable || $prevNext || $expired) {
+    CRM_Core_BAO_Cache::cleanup($session, $tempTable, $prevNext, $expired);
   }
 
   if ($jobLog) {

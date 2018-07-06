@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,15 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
 class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
+
+  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+
   const DEFAULT_HOST    = 'localhost';
   const DEFAULT_PORT    = 6379;
   const DEFAULT_TIMEOUT = 3600;
@@ -105,19 +109,33 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
       echo 'Could not connect to redisd server';
       CRM_Utils_System::civiExit();
     }
-    $this->_cache->auth(CIVICRM_DB_CACHE_PASSWORD);
+    if (CRM_Utils_Constant::value('CIVICRM_DB_CACHE_PASSWORD')) {
+      $this->_cache->auth(CIVICRM_DB_CACHE_PASSWORD);
+    }
   }
 
   /**
    * @param $key
    * @param $value
+   * @param null|int|\DateInterval $ttl
    *
    * @return bool
    * @throws Exception
    */
-  public function set($key, &$value) {
-    if (!$this->_cache->set($this->_prefix . $key, serialize($value), $this->_timeout)) {
-      CRM_Core_Error::fatal("Redis set failed, wondering why?, $key", $value);
+  public function set($key, $value, $ttl = NULL) {
+    CRM_Utils_Cache::assertValidKey($key);
+    if (is_int($ttl) && $ttl <= 0) {
+      return $this->delete($key);
+    }
+    $ttl = CRM_Utils_Date::convertCacheTtl($ttl, self::DEFAULT_TIMEOUT);
+    if (!$this->_cache->setex($this->_prefix . $key, $ttl, serialize($value))) {
+      if (PHP_SAPI === 'cli' || (Civi\Core\Container::isContainerBooted() && CRM_Core_Permission::check('view debug output'))) {
+        throw new CRM_Utils_Cache_CacheException("Redis set ($key) failed: " . $this->_cache->getLastError());
+      }
+      else {
+        Civi::log()->error("Redis set ($key) failed: " . $this->_cache->getLastError());
+        throw new CRM_Utils_Cache_CacheException("Redis set ($key) failed");
+      }
       return FALSE;
     }
     return TRUE;
@@ -125,28 +143,42 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
 
   /**
    * @param $key
+   * @param mixed $default
    *
    * @return mixed
    */
-  public function get($key) {
+  public function get($key, $default = NULL) {
+    CRM_Utils_Cache::assertValidKey($key);
     $result = $this->_cache->get($this->_prefix . $key);
-    return unserialize($result);
+    return ($result === FALSE) ? $default : unserialize($result);
   }
 
   /**
    * @param $key
    *
-   * @return mixed
+   * @return bool
    */
   public function delete($key) {
-    return $this->_cache->delete($this->_prefix . $key);
+    CRM_Utils_Cache::assertValidKey($key);
+    $this->_cache->delete($this->_prefix . $key);
+    return TRUE;
   }
 
   /**
-   * @return mixed
+   * @return bool
    */
   public function flush() {
-    return $this->_cache->flushDB();
+    // FIXME: Ideally, we'd map each prefix to a different 'hash' object in Redis,
+    // and this would be simpler. However, that needs to go in tandem with a
+    // more general rethink of cache expiration/TTL.
+
+    $keys = $this->_cache->keys($this->_prefix . '*');
+    $this->_cache->del($keys);
+    return TRUE;
+  }
+
+  public function clear() {
+    return $this->flush();
   }
 
 }

@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2017                                |
   +--------------------------------------------------------------------+
@@ -819,7 +819,7 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
 
   $options = array(
     'offset' => CRM_Utils_Rule::integer($offset) ? $offset : NULL,
-    'limit' => CRM_Utils_Rule::integer($limit) ? $limit : NULL,
+    'limit' => (!$is_count && CRM_Utils_Rule::integer($limit)) ? $limit : NULL,
     'is_count' => $is_count,
     'return' => !empty($returnProperties) ? $returnProperties : array(),
   );
@@ -1111,7 +1111,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
 function _civicrm_api3_format_params_for_create(&$params, $entity) {
   $nonGenericEntities = array('Contact', 'Individual', 'Household', 'Organization');
 
-  $customFieldEntities = array_diff_key(CRM_Core_BAO_CustomQuery::$extendsMap, array_fill_keys($nonGenericEntities, 1));
+  $customFieldEntities = array_diff_key(CRM_Core_SelectValues::customGroupExtends(), array_fill_keys($nonGenericEntities, 1));
   if (!array_key_exists($entity, $customFieldEntities)) {
     return;
   }
@@ -1235,7 +1235,7 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
  * @return array
  */
 function _civicrm_api3_basic_get($bao_name, $params, $returnAsSuccess = TRUE, $entity = "", $sql = NULL, $uniqueFields = FALSE) {
-  $entity = CRM_Core_DAO_AllCoreTables::getBriefName(str_replace('_BAO_', '_DAO_', $bao_name));
+  $entity = $entity ?: CRM_Core_DAO_AllCoreTables::getBriefName(str_replace('_BAO_', '_DAO_', $bao_name));
   $options = _civicrm_api3_get_options_from_params($params);
 
   $query = new \Civi\API\Api3SelectQuery($entity, CRM_Utils_Array::value('check_permissions', $params, FALSE));
@@ -1311,6 +1311,11 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
     throw new API_Exception($msg);
   }
   else {
+    // If we have custom fields the BAO may have taken care of it or we may have to.
+    // $extendsMap provides a pretty good hard-coded list of BAOs that take care of the custom data.
+    if (isset($params['custom']) && empty(CRM_Core_BAO_CustomQuery::$extendsMap[$entity])) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($entity)), $bao->id);
+    }
     $values = array();
     _civicrm_api3_object_to_array($bao, $values[$bao->id]);
     return civicrm_api3_create_success($values, $params, $entity, 'create', $bao);
@@ -1346,7 +1351,7 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
 
   CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
   $instance = new $dao_name();
-  $instance->copyValues($params);
+  $instance->copyValues($params, TRUE);
   $instance->save();
   CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
 
@@ -1530,9 +1535,6 @@ function _civicrm_api3_validate_switch_cases($fieldName, $fieldInfo, $entity, $p
       break;
 
     case CRM_Utils_Type::T_TEXT:
-      _civicrm_api3_validate_html($params, $fieldName, $fieldInfo);
-      break;
-
     case CRM_Utils_Type::T_STRING:
       _civicrm_api3_validate_string($params, $fieldName, $fieldInfo, $entity);
       break;
@@ -1602,10 +1604,6 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields) {
         break;
 
       case CRM_Utils_Type::T_TEXT:
-        //blob
-        _civicrm_api3_validate_html($params, $fieldName, $fieldInfo);
-        break;
-
       case CRM_Utils_Type::T_STRING:
         _civicrm_api3_validate_string($params, $fieldName, $fieldInfo, $entity);
         break;
@@ -1979,41 +1977,13 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
     // Regular fields have a 'name' property
     $value['name'] = 'custom_' . $key;
     $value['title'] = $value['label'];
-    $value['type'] = _getStandardTypeFromCustomDataType($value);
+    if ($value['data_type'] == 'Date' && CRM_Utils_Array::value('time_format', $value, 0) > 0) {
+      $value['data_type'] = 'DateTime';
+    }
+    $value['type'] = CRM_Utils_Array::value($value['data_type'], CRM_Core_BAO_CustomField::dataToType());
     $ret['custom_' . $key] = $value;
   }
   return $ret;
-}
-
-/**
- * Translate the custom field data_type attribute into a std 'type'.
- *
- * @param array $value
- *
- * @return int
- */
-function _getStandardTypeFromCustomDataType($value) {
-  $dataType = $value['data_type'];
-  //CRM-15792 - If date custom field contains timeformat change type to DateTime
-  if ($value['data_type'] == 'Date' && isset($value['time_format']) && $value['time_format'] > 0) {
-    $dataType = 'DateTime';
-  }
-  $mapping = array(
-    'String' => CRM_Utils_Type::T_STRING,
-    'Int' => CRM_Utils_Type::T_INT,
-    'Money' => CRM_Utils_Type::T_MONEY,
-    'Memo' => CRM_Utils_Type::T_LONGTEXT,
-    'Float' => CRM_Utils_Type::T_FLOAT,
-    'Date' => CRM_Utils_Type::T_DATE,
-    'DateTime' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-    'Boolean' => CRM_Utils_Type::T_BOOLEAN,
-    'StateProvince' => CRM_Utils_Type::T_INT,
-    'File' => CRM_Utils_Type::T_STRING,
-    'Link' => CRM_Utils_Type::T_STRING,
-    'ContactReference' => CRM_Utils_Type::T_INT,
-    'Country' => CRM_Utils_Type::T_INT,
-  );
-  return $mapping[$dataType];
 }
 
 
@@ -2203,15 +2173,13 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
   if (!is_array($fieldValue)) {
     $fieldValue = (string) $fieldValue;
   }
-  else {
-    //@todo what do we do about passed in arrays. For many of these fields
-    // the missing piece of functionality is separating them to a separated string
-    // & many save incorrectly. But can we change them wholesale?
-  }
+
   if ($fieldValue) {
-    foreach ((array) $fieldValue as $value) {
-      if (!CRM_Utils_Rule::xssString($fieldValue)) {
-        throw new Exception('Input contains illegal SCRIPT tag.');
+    foreach ((array) $fieldValue as $key => $value) {
+      foreach ([$fieldValue, $key, $value] as $input) {
+        if (!CRM_Utils_Rule::xssString($input)) {
+          throw new Exception('Input contains illegal SCRIPT tag.');
+        }
       }
       if ($fieldName == 'currency') {
         //When using IN operator $fieldValue is a array of currency codes
@@ -2445,13 +2413,13 @@ function _civicrm_api3_field_value_check(&$params, $fieldName, $type = NULL) {
  *   List of all records.
  * @param string $idCol
  *   The property which defines the ID of a record
- * @param array $fields
+ * @param array $filterableFields
  *   List of filterable fields.
  *
  * @return array
  * @throws \API_Exception
  */
-function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $fields) {
+function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $filterableFields) {
   $options = _civicrm_api3_get_options_from_params($params, TRUE, $entity, 'get');
   // TODO // $sort = CRM_Utils_Array::value('sort', $options, NULL);
   $offset = CRM_Utils_Array::value('offset', $options);
@@ -2469,7 +2437,7 @@ function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $fiel
       if ($k == 'id') {
         $k = $idCol;
       }
-      if (in_array($k, $fields) && $record[$k] != $v) {
+      if (in_array($k, $filterableFields) && $record[$k] != $v) {
         $match = FALSE;
         break;
       }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
  * This class generates form components for search-result tasks.
  */
-class CRM_Contact_Form_Task extends CRM_Core_Form {
+class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
 
   /**
    * The task being performed
@@ -94,17 +94,19 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
    * Common pre-processing function.
    *
    * @param CRM_Core_Form $form
-   * @param bool $useTable
    */
-  public static function preProcessCommon(&$form, $useTable = FALSE) {
+  public static function preProcessCommon(&$form) {
     $form->_contactIds = array();
     $form->_contactTypes = array();
+
+    $formName = CRM_Utils_System::getClassName($form->controller->getStateMachine());
+    $useTable = $formName == 'CRM_Export_StateMachine_Standalone';
 
     $isStandAlone = in_array('task', $form->urlPath) || in_array('standalone', $form->urlPath);
     if ($isStandAlone) {
       list($form->_task, $title) = CRM_Contact_Task::getTaskAndTitleByClass(get_class($form));
       if (!array_key_exists($form->_task, CRM_Contact_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission()))) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
       $form->_contactIds = explode(',', CRM_Utils_Request::retrieve('cids', 'CommaSeparatedIntegers', $form, TRUE));
       if (empty($form->_contactIds)) {
@@ -150,7 +152,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     $form->assign('taskName', CRM_Utils_Array::value($form->_task, $crmContactTaskTasks));
 
     if ($useTable) {
-      $form->_componentTable = CRM_Core_DAO::createTempTableName('civicrm_task_action', TRUE, $qfKey);
+      $form->_componentTable = CRM_Utils_SQL_TempTable::build()->setCategory('tskact')->setDurable()->setId($qfKey)->getName();
       $sql = " DROP TABLE IF EXISTS {$form->_componentTable}";
       CRM_Core_DAO::executeQuery($sql);
 
@@ -298,11 +300,9 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     }
 
     $selectorName = $this->controller->selectorName();
-    require_once str_replace('_', DIRECTORY_SEPARATOR, $selectorName) . '.php';
 
     $fv = $this->get('formValues');
     $customClass = $this->get('customSearchClass');
-    require_once 'CRM/Core/BAO/Mapping.php';
     $returnProperties = CRM_Core_BAO_Mapping::returnProperties(self::$_searchFormValues);
 
     $selector = new $selectorName($customClass, $fv, NULL, $returnProperties);
@@ -318,7 +318,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
     if (!$queryOperator) {
       $queryOperator = 'AND';
     }
-    $dao = $selector->contactIDQuery($params, $this->_action, $sortID,
+    $dao = $selector->contactIDQuery($params, $sortID,
       CRM_Utils_Array::value('display_relationship_type', $fv),
       $queryOperator
     );

@@ -690,6 +690,7 @@ if (!CRM.vars) CRM.vars = {};
         $timeField
           .addClass('crm-form-text crm-form-time')
           .attr('placeholder', $dataField.attr('time-placeholder') === undefined ? ts('Time') : $dataField.attr('time-placeholder'))
+          .attr('aria-label', $dataField.attr('time-placeholder') === undefined ? ts('Time') : $dataField.attr('time-placeholder'))
           .change(updateDataField)
           .timeEntry({
             spinnerImage: '',
@@ -699,7 +700,7 @@ if (!CRM.vars) CRM.vars = {};
       if (settings.date !== false) {
         // Render "number" field for year-only format, calendar popup for all other formats
         $dateField = $('<input type="' + type + '">').insertAfter($dataField);
-        copyAttributes($dataField, $dateField, ['placeholder', 'style', 'class', 'disabled']);
+        copyAttributes($dataField, $dateField, ['placeholder', 'style', 'class', 'disabled', 'aria-label']);
         $dateField.addClass('crm-form-' + type);
         if (hasDatepicker) {
           settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
@@ -1246,7 +1247,7 @@ if (!CRM.vars) CRM.vars = {};
         unique: true
       };
       options = $.extend(extra, options);
-      options.expires = options.expires === false ? 0 : parseInt(options.expires, 10);
+      options.expires = (options.expires === false || !CRM.config.allowAlertAutodismissal) ? 0 : parseInt(options.expires, 10);
       if (options.unique && options.unique !== '0') {
         $('#crm-notification-container .ui-notify-message').each(function () {
           if (title === $('h1', this).html() && text === $('.notify-content', this).html()) {
@@ -1260,7 +1261,8 @@ if (!CRM.vars) CRM.vars = {};
       if (title.length) {
         text = title + "\n" + text;
       }
-      alert(text);
+      // strip html tags as they are not parsed in standard alerts
+      alert($("<div/>").html(text).text());
       return null;
     }
   };

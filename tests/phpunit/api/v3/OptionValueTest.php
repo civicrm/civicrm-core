@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.7                                                |
+| CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2017                                |
+| Copyright CiviCRM LLC (c) 2004-2018                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -378,7 +378,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-19346 Ensur that Option Values cannot share same value in the same option value group
+   * CRM-19346 Ensure that Option Values cannot share same value in the same option value group
    */
   public function testCreateOptionValueWithSameValue() {
     $og = $this->callAPISuccess('option_group', 'create', array(
@@ -390,9 +390,22 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       array('option_group_id' => $og['id'], 'label' => 'test option value')
     );
     // update option value without 'option_group_id'
-    $ov2 = $this->callAPIFailure('option_value', 'create',
+    $this->callAPIFailure('option_value', 'create',
       array('option_group_id' => $og['id'], 'label' => 'Test 2nd option value', 'value' => $ov['values'][$ov['id']]['value'])
     );
+  }
+
+  /**
+   * CRM-21737 Ensure that language Option Values CAN share same value.
+   */
+  public function testCreateOptionValueWithSameValueLanguagesException() {
+    $this->callAPISuccess('option_value', 'create',
+      ['option_group_id' => 'languages', 'label' => 'Quasi English', 'name' => 'en_Qu', 'value' => 'en']
+    );
+    $this->callAPISuccess('option_value', 'create',
+      ['option_group_id' => 'languages', 'label' => 'Semi English', 'name' => 'en_Se', 'value' => 'en']
+    );
+
   }
 
   public function testCreateOptionValueWithSameValueDiffOptionGroup() {
@@ -412,6 +425,88 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $ov2 = $this->callAPISuccess('option_value', 'create',
       array('option_group_id' => $og2['id'], 'label' => 'Test 2nd option value', 'value' => $ov['values'][$ov['id']]['value'])
     );
+  }
+
+  /**
+   * Test to create and update payment method with financial account.
+   */
+  public function testCreateUpdateOptionValueForPaymentInstrument() {
+    $assetFinancialAccountId = $this->callAPISuccessGetValue('FinancialAccount', [
+      'return' => "id",
+      'financial_account_type_id' => "Asset",
+      'options' => ['limit' => 1],
+    ]);
+    // create new payment method with financial account
+    $ov = $this->callAPISuccess('OptionValue', 'create', [
+      'financial_account_id' => $assetFinancialAccountId,
+      'option_group_id' => "payment_instrument",
+      'label' => "Dummy Payment Method",
+    ]);
+
+    //check if relationship is created between Payment method and Financial Account
+    $this->checkPaymentMethodFinancialAccountRelationship($ov['id'], $assetFinancialAccountId);
+
+    // update payment method to have different non-asset financial Account
+    $nonAssetFinancialAccountId = $this->callAPISuccessGetValue('FinancialAccount', [
+      'return' => "id",
+      'financial_account_type_id' => ['NOT IN' => ["Asset"]],
+      'options' => ['limit' => 1],
+    ]);
+    try {
+      $result = $this->callAPISuccess('OptionValue', 'create', [
+        'financial_account_id' => $nonAssetFinancialAccountId,
+        'id' => $ov['id'],
+      ]);
+      throw new API_Exception(ts('Should throw error.'));
+    }
+    catch (Exception $e) {
+      try {
+        $assetAccountRelValue = $this->callAPISuccessGetValue('EntityFinancialAccount', [
+          'return' => "account_relationship",
+          'entity_table' => "civicrm_option_value",
+          'entity_id' => $ov['id'],
+          'financial_account_id' => $nonAssetFinancialAccountId,
+        ]);
+        throw new API_Exception(ts('Should throw error.'));
+      }
+      catch (Exception $e) {
+        $this->checkPaymentMethodFinancialAccountRelationship($ov['id'], $assetFinancialAccountId);
+      }
+    }
+    // update payment method to have different asset financial Account
+    $assetFinancialAccountId = $this->callAPISuccessGetValue('FinancialAccount', [
+      'return' => "id",
+      'financial_account_type_id' => "Asset",
+      'options' => ['limit' => 1],
+      'id' => ['NOT IN' => [$assetFinancialAccountId]],
+    ]);
+    $result = $this->callAPISuccess('OptionValue', 'create', [
+      'financial_account_id' => $assetFinancialAccountId,
+      'id' => $ov['id'],
+    ]);
+    //check if relationship is updated between Payment method and Financial Account
+    $this->checkPaymentMethodFinancialAccountRelationship($ov['id'], $assetFinancialAccountId);
+  }
+
+  /**
+   * Function to check relationship between FA and Payment method.
+   *
+   * @param int $paymentMethodId
+   * @param int $financialAccountId
+   */
+  protected function checkPaymentMethodFinancialAccountRelationship($paymentMethodId, $financialAccountId) {
+    $assetAccountRelValue = $this->callAPISuccessGetValue('EntityFinancialAccount', [
+      'return' => "account_relationship",
+      'entity_table' => "civicrm_option_value",
+      'entity_id' => $paymentMethodId,
+      'financial_account_id' => $financialAccountId,
+    ]);
+    $checkAssetAccountIs = $this->callAPISuccessGetValue('OptionValue', [
+      'return' => "id",
+      'option_group_id' => "account_relationship",
+      'name' => "Asset Account is",
+      'value' => $assetAccountRelValue,
+    ]);
   }
 
 }

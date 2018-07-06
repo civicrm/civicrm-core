@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2018                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
 
@@ -304,18 +304,17 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       CRM_Core_Action::ADD => 'add',
       CRM_Core_Action::DELETE => 'delete',
     );
-    // check cached value
-    if (CRM_Utils_Array::value($action, self::$_availableFinancialTypes) && !$resetCache) {
-      $financialTypes = self::$_availableFinancialTypes[$action];
-      return self::$_availableFinancialTypes[$action];
-    }
-    foreach ($financialTypes as $finTypeId => $type) {
-      if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type)) {
-        unset($financialTypes[$finTypeId]);
+
+    if (!isset(\Civi::$statics[__CLASS__]['available_types_' . $action])) {
+      foreach ($financialTypes as $finTypeId => $type) {
+        if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type)) {
+          unset($financialTypes[$finTypeId]);
+        }
       }
+      \Civi::$statics[__CLASS__]['available_types_' . $action] = $financialTypes;
     }
-    self::$_availableFinancialTypes[$action] = $financialTypes;
-    return $financialTypes;
+    $financialTypes = \Civi::$statics[__CLASS__]['available_types_' . $action];
+    return \Civi::$statics[__CLASS__]['available_types_' . $action];
   }
 
   /**
@@ -459,15 +458,14 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return bool
    */
   public static function isACLFinancialTypeStatus() {
-    if (array_key_exists('acl_financial_type', self::$_statusACLFt)) {
-      return self::$_statusACLFt['acl_financial_type'];
+    if (!isset(\Civi::$statics[__CLASS__]['is_acl_enabled'])) {
+      \Civi::$statics[__CLASS__]['is_acl_enabled'] = FALSE;
+      $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
+      if (CRM_Utils_Array::value('acl_financial_type', $contributeSettings)) {
+        \Civi::$statics[__CLASS__]['is_acl_enabled'] = TRUE;
+      }
     }
-    $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
-    self::$_statusACLFt['acl_financial_type'] = FALSE;
-    if (CRM_Utils_Array::value('acl_financial_type', $contributeSettings)) {
-      self::$_statusACLFt['acl_financial_type'] = TRUE;
-    }
-    return self::$_statusACLFt['acl_financial_type'];
+    return \Civi::$statics[__CLASS__]['is_acl_enabled'];
   }
 
 }

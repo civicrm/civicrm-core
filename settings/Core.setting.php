@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
@@ -192,6 +192,21 @@ return array(
     'description' => 'If enabled, CiviCRM will permit submissions from external sites to profiles. This is disabled by default to limit abuse.',
     'help_text' => NULL,
   ),
+  'allow_alert_autodismissal' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'allow_alert_autodismissal',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => TRUE,
+    'html_type' => 'radio',
+    'add' => '4.7',
+    'title' => 'Allow alerts to auto-dismiss?',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'If disabled, CiviCRM will not automatically dismiss any alerts after 10 seconds.',
+    'help_text' => NULL,
+  ),
   'editor_id' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
@@ -211,10 +226,10 @@ return array(
     'group' => 'core',
     'name' => 'contact_ajax_check_similar',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'radio',
     'default' => '1',
     'add' => '4.1',
-    'title' => 'Ajax Check Similar',
+    'title' => 'Check for Similar Contacts',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => NULL,
@@ -868,21 +883,6 @@ return array(
     'description' => NULL,
     'help_text' => NULL,
   ),
-  'systemStatusCheckResult' => array(
-    'group_name' => 'CiviCRM Preferences',
-    'group' => 'core',
-    'name' => 'systemStatusCheckResult',
-    'type' => 'Integer',
-    'quick_form_type' => 'Element',
-    'html_type' => 'text',
-    'default' => 0,
-    'add' => '4.7',
-    'title' => 'systemStatusCheckResult',
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => NULL,
-    'help_text' => NULL,
-  ),
   'recentItemsMaxCount' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
@@ -974,6 +974,7 @@ return array(
     'type' => 'Array',
     'add' => '4.7',
     'is_domain' => 1,
+    'is_contact' => 0,
     'default' => array(),
     'title' => 'Do not notify assignees for',
     'help_text' => 'These activity types will be excluded from automated email notifications to assignees.',

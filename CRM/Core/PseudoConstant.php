@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,7 +43,7 @@
  * This provides greater consistency/predictability after flushing.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Core_PseudoConstant {
 
@@ -192,6 +192,7 @@ class CRM_Core_PseudoConstant {
    * - onlyActive boolean return only the action option values
    * - fresh      boolean ignore cache entries and go back to DB
    * @param string $context : Context string
+   * @see CRM_Core_DAO::buildOptionsContext
    *
    * @return array|bool
    *   array on success, FALSE on error.
@@ -535,7 +536,7 @@ class CRM_Core_PseudoConstant {
     $key = 'id',
     $force = NULL
   ) {
-    $cacheKey = "CRM_PC_{$name}_{$all}_{$key}_{$retrieve}_{$filter}_{$condition}_{$orderby}";
+    $cacheKey = CRM_Core_BAO_Cache::cleanKey("CRM_PC_{$name}_{$all}_{$key}_{$retrieve}_{$filter}_{$condition}_{$orderby}");
     $cache = CRM_Utils_Cache::singleton();
     $var = $cache->get($cacheKey);
     if ($var && empty($force)) {
@@ -578,7 +579,6 @@ class CRM_Core_PseudoConstant {
   /**
    * Flush given pseudoconstant so it can be reread from db.
    * nex time it's requested.
-   *
    *
    * @param bool|string $name pseudoconstant to be flushed
    */
@@ -931,6 +931,11 @@ WHERE  id = %1";
    *   array reference of all groups.
    */
   public static function allGroup($groupType = NULL, $excludeHidden = TRUE) {
+    if ($groupType === 'validate') {
+      // validate gets passed through from getoptions. Handle in the deprecated
+      // fn rather than change the new pattern.
+      $groupType = NULL;
+    }
     $condition = CRM_Contact_BAO_Group::groupTypeCondition($groupType, $excludeHidden);
     $groupKey = ($groupType ? $groupType : 'null') . !empty($excludeHidden);
 
@@ -1075,275 +1080,13 @@ WHERE  id = %1";
    */
   public static function &currencyCode() {
     if (!self::$currencyCode) {
-      self::$currencyCode = array(
-        'AFN',
-        'ALL',
-        'DZD',
-        'USD',
-        'EUR',
-        'AOA',
-        'XCD',
-        'XCD',
-        'ARS',
-        'AMD',
-        'AWG',
-        'AUD',
-        'EUR',
-        'AZM',
-        'BSD',
-        'BHD',
-        'BDT',
-        'BBD',
-        'BYR',
-        'EUR',
-        'BZD',
-        'XOF',
-        'BMD',
-        'INR',
-        'BTN',
-        'BOB',
-        'BOV',
-        'BAM',
-        'BWP',
-        'NOK',
-        'BRL',
-        'USD',
-        'BND',
-        'BGN',
-        'XOF',
-        'BIF',
-        'KHR',
-        'XAF',
-        'CAD',
-        'CVE',
-        'KYD',
-        'XAF',
-        'XAF',
-        'CLP',
-        'CLF',
-        'CNY',
-        'AUD',
-        'AUD',
-        'COP',
-        'COU',
-        'KMF',
-        'XAF',
-        'CDF',
-        'NZD',
-        'CRC',
-        'XOF',
-        'HRK',
-        'CUP',
-        'CYP',
-        'CZK',
-        'DKK',
-        'DJF',
-        'XCD',
-        'DOP',
-        'USD',
-        'EGP',
-        'SVC',
-        'USD',
-        'XAF',
-        'ERN',
-        'EEK',
-        'ETB',
-        'FKP',
-        'DKK',
-        'FJD',
-        'EUR',
-        'EUR',
-        'EUR',
-        'XPF',
-        'EUR',
-        'XAF',
-        'GMD',
-        'GEL',
-        'EUR',
-        'GHC',
-        'GIP',
-        'EUR',
-        'DKK',
-        'XCD',
-        'EUR',
-        'USD',
-        'GTQ',
-        'GNF',
-        'GWP',
-        'XOF',
-        'GYD',
-        'HTG',
-        'USD',
-        'AUD',
-        'EUR',
-        'HNL',
-        'HKD',
-        'HUF',
-        'ISK',
-        'INR',
-        'IDR',
-        'XDR',
-        'IRR',
-        'IQD',
-        'EUR',
-        'ILS',
-        'EUR',
-        'JMD',
-        'JPY',
-        'JOD',
-        'KZT',
-        'KES',
-        'AUD',
-        'KPW',
-        'KRW',
-        'KWD',
-        'KGS',
-        'LAK',
-        'LVL',
-        'LBP',
-        'ZAR',
-        'LSL',
-        'LRD',
-        'LYD',
-        'CHF',
-        'LTL',
-        'EUR',
-        'MOP',
-        'MKD',
-        'MGA',
-        'MWK',
-        'MYR',
-        'MVR',
-        'XOF',
-        'MTL',
-        'USD',
-        'EUR',
-        'MRO',
-        'MUR',
-        'EUR',
-        'MXN',
-        'MXV',
-        'USD',
-        'MDL',
-        'EUR',
-        'MNT',
-        'XCD',
-        'MAD',
-        'MZM',
-        'MMK',
-        'ZAR',
-        'NAD',
-        'AUD',
-        'NPR',
-        'EUR',
-        'ANG',
-        'XPF',
-        'NZD',
-        'NIO',
-        'XOF',
-        'NGN',
-        'NZD',
-        'AUD',
-        'USD',
-        'NOK',
-        'OMR',
-        'PKR',
-        'USD',
-        'PAB',
-        'USD',
-        'PGK',
-        'PYG',
-        'PEN',
-        'PHP',
-        'NZD',
-        'PLN',
-        'EUR',
-        'USD',
-        'QAR',
-        'EUR',
-        'ROL',
-        'RON',
-        'RUB',
-        'RWF',
-        'SHP',
-        'XCD',
-        'XCD',
-        'EUR',
-        'XCD',
-        'WST',
-        'EUR',
-        'STD',
-        'SAR',
-        'XOF',
-        'CSD',
-        'EUR',
-        'SCR',
-        'SLL',
-        'SGD',
-        'SKK',
-        'SIT',
-        'SBD',
-        'SOS',
-        'ZAR',
-        'EUR',
-        'LKR',
-        'SDD',
-        'SRD',
-        'NOK',
-        'SZL',
-        'SEK',
-        'CHF',
-        'CHW',
-        'CHE',
-        'SYP',
-        'TWD',
-        'TJS',
-        'TZS',
-        'THB',
-        'USD',
-        'XOF',
-        'NZD',
-        'TOP',
-        'TTD',
-        'TND',
-        'TRY',
-        'TRL',
-        'TMM',
-        'USD',
-        'AUD',
-        'UGX',
-        'UAH',
-        'AED',
-        'GBP',
-        'USD',
-        'USS',
-        'USN',
-        'USD',
-        'UYU',
-        'UZS',
-        'VUV',
-        'VEB',
-        'VND',
-        'USD',
-        'USD',
-        'XPF',
-        'MAD',
-        'YER',
-        'ZMK',
-        'ZWD',
-        'XAU',
-        'XBA',
-        'XBB',
-        'XBC',
-        'XBD',
-        'XPD',
-        'XPT',
-        'XAG',
-        'XFU',
-        'XFO',
-        'XTS',
-        'XXX',
-      );
+
+      $query = "SELECT name FROM civicrm_currency";
+      $dao = CRM_Core_DAO::executeQuery($query);
+      $currencyCode = array();
+      while ($dao->fetch()) {
+        self::$currencyCode[] = $dao->name;
+      }
     }
     return self::$currencyCode;
   }

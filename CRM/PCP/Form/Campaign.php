@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -135,12 +135,12 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     if ($this->_pageId) {
       $params = array('id' => $this->_pageId);
       CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $params, $pcpInfo);
-      $owner_notification_option = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCPBlock', $pcpInfo['pcp_block_id'], 'owner_notify_id');
+      $owner_notification_option = CRM_Core_DAO::getFieldValue('CRM_PCP_BAO_PCPBlock', $pcpInfo['pcp_block_id'], 'owner_notify_id');
     }
     else {
       $owner_notification_option = CRM_PCP_BAO_PCP::getOwnerNotificationId($this->controller->get('component_page_id'), $this->_component ? $this->_component : 'contribute');
     }
-    if ($owner_notification_option == CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'owner_chooses', 'name')) {
+    if ($owner_notification_option == CRM_Core_PseudoConstant::getKey('CRM_PCP_BAO_PCPBlock', 'owner_notify_id', 'owner_chooses')) {
       $this->assign('owner_notification_option', TRUE);
       $this->addElement('checkbox', 'is_notify', ts('Notify me via email when someone donates to my page'), NULL);
     }
@@ -307,7 +307,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $managePCPUrl = CRM_Utils_System::url('civicrm/admin/pcp',
         "reset=1",
         TRUE, NULL, FALSE,
-        FALSE
+        FALSE, TRUE
       );
       $this->assign('managePCPUrl', $managePCPUrl);
 

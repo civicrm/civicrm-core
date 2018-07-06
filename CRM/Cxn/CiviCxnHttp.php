@@ -54,7 +54,7 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
     $lowVerb = strtolower($verb);
 
     if ($lowVerb === 'get' && $this->cache) {
-      $cachePath = 'get/' . md5($url);
+      $cachePath = 'get_' . md5($url);
       $cacheLine = $this->cache->get($cachePath);
       if ($cacheLine && $cacheLine['expires'] > CRM_Utils_Time::getTimeRaw()) {
         return $cacheLine['data'];
@@ -66,7 +66,7 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
     if ($lowVerb === 'get' && $this->cache) {
       $expires = CRM_Utils_Http::parseExpiration($result[0]);
       if ($expires !== NULL) {
-        $cachePath = 'get/' . md5($url);
+        $cachePath = 'get_' . md5($url);
         $cacheLine = array(
           'url' => $url,
           'expires' => $expires,
@@ -104,6 +104,13 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
     }
 
     return $result;
+  }
+
+  /**
+   * @return \CRM_Utils_Cache_Interface|null
+   */
+  public function getCache() {
+    return $this->cache;
   }
 
 }

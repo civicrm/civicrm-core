@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -138,7 +138,10 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     }
     // Active form elements
     else {
-      if ($element->getType() == 'select' && $element->getAttribute('data-option-edit-path')) {
+      $typesToShowEditLink = array('select', 'group');
+      $hasEditPath = NULL !== $element->getAttribute('data-option-edit-path');
+
+      if (in_array($element->getType(), $typesToShowEditLink) && $hasEditPath) {
         $this->addOptionsEditLink($el, $element);
       }
 

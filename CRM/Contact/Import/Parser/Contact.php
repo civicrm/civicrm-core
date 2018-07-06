@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@ require_once 'api/v3/utils.php';
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -457,6 +457,16 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   }
 
   /**
+   * Get Array of all the fields that could potentially be part
+   * import process
+   *
+   * @return array
+   */
+  public function getAllFields() {
+    return $this->_fields;
+  }
+
+  /**
    * Handle the values in import mode.
    *
    * @param int $onDuplicate
@@ -474,7 +484,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     $this->_unparsedStreetAddressContacts = array();
     if (!$doGeocodeAddress) {
       // CRM-5854, reset the geocode method to null to prevent geocoding
-      $config->geocodeMethod = '';
+      CRM_Utils_GeocodeProvider::disableForSession();
     }
 
     // first make sure this is a valid line
@@ -1236,7 +1246,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           $htmlType = array(
             'CheckBox',
             'Multi-Select',
-            'AdvMulti-Select',
             'Select',
             'Radio',
             'Multi-Select State/Province',
@@ -1250,7 +1259,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           }
 
           // check for values for custom fields for checkboxes and multiselect
-          if ($customFields[$customFieldID]['html_type'] == 'CheckBox' || $customFields[$customFieldID]['html_type'] == 'AdvMulti-Select' || $customFields[$customFieldID]['html_type'] == 'Multi-Select') {
+          if ($customFields[$customFieldID]['html_type'] == 'CheckBox' || $customFields[$customFieldID]['html_type'] == 'Multi-Select') {
             $value = trim($value);
             $value = str_replace('|', ',', $value);
             $mulValues = explode(',', $value);

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -106,7 +106,12 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     if ($this->_action == CRM_Core_Action::DELETE) {
       if (isset($this->_id)) {
         $this->assign('title', $this->_title);
-        $this->assign('count', CRM_Contact_BAO_Group::memberCount($this->_id));
+        try {
+          $this->assign('count', CRM_Contact_BAO_Group::memberCount($this->_id));
+        }
+        catch (CRM_Core_Exception $e) {
+          // If the group is borked the query might fail but delete should be possible.
+        }
         CRM_Utils_System::setTitle(ts('Confirm Group Delete'));
       }
       if ($this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
@@ -359,7 +364,7 @@ WHERE  title = %1
    * Process the form when submitted.
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache('CRM_Core_DAO_Group');
+    CRM_Utils_System::flushCache();
 
     $updateNestingCache = FALSE;
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -376,6 +381,11 @@ WHERE  title = %1
 
       if ($this->_action & CRM_Core_Action::UPDATE && isset($this->_groupOrganizationID)) {
         $params['group_organization'] = $this->_groupOrganizationID;
+      }
+
+      // CRM-21431 If all group_type are unchecked, the change will not be saved otherwise.
+      if (!isset($params['group_type'])) {
+        $params['group_type'] = array();
       }
 
       $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
@@ -448,7 +458,7 @@ WHERE  title = %1
       $potentialParentGroupIds = array_keys($groupNames);
     }
 
-    $parentGroupSelectValues = array('' => '- ' . ts('select group') . ' -');
+    $parentGroupSelectValues = array();
     foreach ($potentialParentGroupIds as $potentialParentGroupId) {
       if (array_key_exists($potentialParentGroupId, $groupNames)) {
         $parentGroupSelectValues[$potentialParentGroupId] = $groupNames[$potentialParentGroupId];
@@ -462,7 +472,7 @@ WHERE  title = %1
       else {
         $required = FALSE;
       }
-      $form->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required, array('class' => 'crm-select2'));
+      $form->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required, array('class' => 'crm-select2', 'multiple' => TRUE));
     }
 
     return $parentGroups;

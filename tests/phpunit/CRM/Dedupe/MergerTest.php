@@ -549,6 +549,14 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $createGroup  = $this->setupCustomGroupForIndividual();
     $customField1 = $this->setupCustomField('TestField', $createGroup);
 
+    // Create multi-value custom field
+    $multiGroup = $this->CustomGroupMultipleCreateByParams();
+    $multiField = $this->customFieldCreate(array(
+      'custom_group_id' => $multiGroup['id'],
+      'label' => 'field_1' . $multiGroup['id'],
+      'in_selector' => 1,
+    ));
+
     // Contacts setup
     $this->setupMatchData();
     $originalContactID = $this->contacts[0]['id'];
@@ -558,17 +566,24 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'create', array(
       'id' => $duplicateContactID,
       "custom_{$customField1['id']}" => 'abc',
+      "custom_{$multiField['id']}" => 'def',
     ));
     $this->assertCustomFieldValue($duplicateContactID, 'abc', "custom_{$customField1['id']}");
+    $this->assertCustomFieldValue($duplicateContactID, 'def', "custom_{$multiField['id']}");
 
+    // Merge, and ensure that no value was migrated
     $this->mergeContacts($originalContactID, $duplicateContactID, array(
       "move_custom_{$customField1['id']}" => NULL,
+      "move_rel_table_custom_{$multiGroup['id']}" => NULL,
     ));
     $this->assertCustomFieldValue($originalContactID, '', "custom_{$customField1['id']}");
+    $this->assertCustomFieldValue($originalContactID, '', "custom_{$multiField['id']}");
 
     // cleanup created custom set
     $this->callAPISuccess('CustomField', 'delete', array('id' => $customField1['id']));
     $this->callAPISuccess('CustomGroup', 'delete', array('id' => $createGroup['id']));
+    $this->callAPISuccess('CustomField', 'delete', array('id' => $multiField['id']));
+    $this->callAPISuccess('CustomGroup', 'delete', array('id' => $multiGroup['id']));
   }
 
   /**
@@ -583,6 +598,14 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $customField1 = $this->setupCustomField('Test1', $createGroup);
     $customField2 = $this->setupCustomField('Test2', $createGroup);
 
+    // Create multi-value custom field
+    $multiGroup = $this->CustomGroupMultipleCreateByParams();
+    $multiField = $this->customFieldCreate(array(
+      'custom_group_id' => $multiGroup['id'],
+      'label' => 'field_1' . $multiGroup['id'],
+      'in_selector' => 1,
+    ));
+
     // Contacts setup
     $this->setupMatchData();
     $originalContactID = $this->contacts[0]['id'];
@@ -593,22 +616,28 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'id' => $duplicateContactID,
       "custom_{$customField1['id']}" => 'abc',
       "custom_{$customField2['id']}" => 'def',
+      "custom_{$multiField['id']}" => 'ghi',
     ));
     $this->assertCustomFieldValue($duplicateContactID, 'abc', "custom_{$customField1['id']}");
     $this->assertCustomFieldValue($duplicateContactID, 'def', "custom_{$customField2['id']}");
+    $this->assertCustomFieldValue($duplicateContactID, 'ghi', "custom_{$multiField['id']}");
 
     // Perform merge
     $this->mergeContacts($originalContactID, $duplicateContactID, array(
       "move_custom_{$customField1['id']}" => NULL,
       "move_custom_{$customField2['id']}" => 'def',
+      "move_rel_table_custom_{$multiGroup['id']}" => '1',
     ));
     $this->assertCustomFieldValue($originalContactID, '', "custom_{$customField1['id']}");
     $this->assertCustomFieldValue($originalContactID, 'def', "custom_{$customField2['id']}");
+    $this->assertCustomFieldValue($originalContactID, 'ghi', "custom_{$multiField['id']}");
 
     // cleanup created custom set
     $this->callAPISuccess('CustomField', 'delete', array('id' => $customField1['id']));
     $this->callAPISuccess('CustomField', 'delete', array('id' => $customField2['id']));
     $this->callAPISuccess('CustomGroup', 'delete', array('id' => $createGroup['id']));
+    $this->callAPISuccess('CustomField', 'delete', array('id' => $multiField['id']));
+    $this->callAPISuccess('CustomGroup', 'delete', array('id' => $multiGroup['id']));
   }
 
   /**
@@ -859,6 +888,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         0 => 'created_id',
         1 => 'scheduled_id',
         2 => 'approver_id',
+      ),
+      'civicrm_file' => array(
+        'created_id',
       ),
       'civicrm_mailing_abtest' => array(
         0 => 'created_id',

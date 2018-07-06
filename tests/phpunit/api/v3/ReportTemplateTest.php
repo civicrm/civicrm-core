@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -140,7 +140,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Tet api to get rows from reports.
+   * Test api to get rows from reports.
    *
    * @dataProvider getReportTemplates
    *
@@ -149,9 +149,68 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @throws \PHPUnit_Framework_IncompleteTestError
    */
   public function testReportTemplateGetRowsAllReports($reportID) {
+    //$reportID = 'logging/contact/summary';
     if (stristr($reportID, 'has existing issues')) {
       $this->markTestIncomplete($reportID);
     }
+    if (substr($reportID, 0, '7') === 'logging') {
+      Civi::settings()->set('logging', 1);
+    }
+
+    $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => $reportID,
+    ));
+    if (substr($reportID, 0, '7') === 'logging') {
+      Civi::settings()->set('logging', 0);
+    }
+  }
+
+  /**
+   * Test logging report when a custom data table has a table removed by hook.
+   *
+   * Here we are checking that no fatal is triggered.
+   */
+  public function testLoggingReportWithHookRemovalOfCustomDataTable() {
+    Civi::settings()->set('logging', 1);
+    $group1 = $this->customGroupCreate();
+    $group2 = $this->customGroupCreate(['name' => 'second_one', 'title' => 'second one', 'table_name' => 'civicrm_value_second_one']);
+    $this->customFieldCreate(array('custom_group_id' => $group1['id'], 'label' => 'field one'));
+    $this->customFieldCreate(array('custom_group_id' => $group2['id'], 'label' => 'field two'));
+    $this->hookClass->setHook('civicrm_alterLogTables', array($this, 'alterLogTablesRemoveCustom'));
+
+    $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => 'logging/contact/summary',
+    ));
+    Civi::settings()->set('logging', 0);
+    $this->customGroupDelete($group1['id']);
+    $this->customGroupDelete($group2['id']);
+  }
+
+  /**
+   * Remove one log table from the logging spec.
+   *
+   * @param array $logTableSpec
+   */
+  public function alterLogTablesRemoveCustom(&$logTableSpec) {
+    unset($logTableSpec['civicrm_value_second_one']);
+  }
+
+  /**
+   * Test api to get rows from reports with ACLs enabled.
+   *
+   * Checking for lack of fatal error at the moment.
+   *
+   * @dataProvider getReportTemplates
+   *
+   * @param $reportID
+   *
+   * @throws \PHPUnit_Framework_IncompleteTestError
+   */
+  public function testReportTemplateGetRowsAllReportsACL($reportID) {
+    if (stristr($reportID, 'has existing issues')) {
+      $this->markTestIncomplete($reportID);
+    }
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookNoResults'));
     $this->callAPISuccess('report_template', 'getrows', array(
       'report_id' => $reportID,
     ));
@@ -188,10 +247,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   public static function getReportTemplates() {
     $reportsToSkip = array(
       'activity' => 'does not respect function signature on from clause',
-      'contribute/topDonor' => 'construction of query in postProcess makes inaccessible ',
       'event/income' => 'I do no understand why but error is Call to undefined method CRM_Report_Form_Event_Income::from() in CRM/Report/Form.php on line 2120',
-      'logging/contact/summary' => '(likely to be test related) probably logging off Undefined index: Form/Contact/LoggingSummary.php(231): PHP',
-      'logging/contribute/summary' => '(likely to be test related) probably logging off DB Error: no such table',
       'contribute/history' => 'Declaration of CRM_Report_Form_Contribute_History::buildRows() should be compatible with CRM_Report_Form::buildRows($sql, &$rows)',
       'activitySummary' => 'We use temp tables for the main query generation and name are dynamic. These names are not available in stats() when called directly.',
     );
@@ -303,6 +359,15 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ));
 
     $this->assertEquals(2, $rows['count'], "Report failed - the sql used to generate the results was " . print_r($rows['metadata']['sql'], TRUE));
+
+    $this->assertContains('DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
+      SELECT SQL_CALC_FOUND_ROWS contact_civireport.id as cid  FROM civicrm_contact contact_civireport    INNER JOIN civicrm_contribution contribution_civireport USE index (received_date) ON contribution_civireport.contact_id = contact_civireport.id
+         AND contribution_civireport.is_test = 0
+         AND contribution_civireport.receive_date BETWEEN \'20140701000000\' AND \'20150630235959\'
+       
+       LEFT JOIN civicrm_contribution cont_exclude ON cont_exclude.contact_id = contact_civireport.id
+         AND cont_exclude.receive_date BETWEEN \'2015-7-1\' AND \'20160630235959\' WHERE cont_exclude.id IS NULL AND 1 AND ( contribution_civireport.contribution_status_id IN (1) )
+      GROUP BY contact_civireport.id', $rows['metadata']['sql'][0]);
   }
 
   /**
@@ -367,7 +432,26 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => array('metadata' => array('sql')),
     ));
     $this->assertEquals(2, $rows['values'][0]['civicrm_contribution_total_amount_count']);
+  }
 
+  /**
+   * Test the group filter works on the contribution summary.
+   */
+  public function testContributionDetailSoftCredits() {
+    $contactID = $this->individualCreate();
+    $contactID2 = $this->individualCreate();
+    $this->contributionCreate(['contact_id' => $contactID, 'api.ContributionSoft.create' => ['amount' => 5, 'contact_id' => $contactID2]]);
+    $template = 'contribute/detail';
+    $rows = $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => $template,
+      'contribution_or_soft_value' => 'contributions_only',
+      'fields' => ['soft_credits' => 1, 'contribution_or_soft' => 1, 'sort_name' => 1],
+      'options' => array('metadata' => array('sql')),
+    ));
+    $this->assertEquals(
+      "<a href='/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=" . $contactID2 . "'>Anderson, Anthony</a> $ 5.00",
+      $rows['values'][0]['civicrm_contribution_soft_credits']
+    );
   }
 
   /**

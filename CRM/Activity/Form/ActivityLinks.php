@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -73,13 +73,26 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
         }
       }
       elseif ($act['name'] == 'SMS') {
-        if (!$contactId || !CRM_SMS_BAO_Provider::activeProviderCount()) {
+        if (!$contactId || !CRM_SMS_BAO_Provider::activeProviderCount() || !CRM_Core_Permission::check('send SMS')) {
           continue;
         }
         // Check for existence of a mobile phone and ! do not SMS privacy setting
-        $mobileTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile');
-        list($name, $phone, $doNotSMS) = CRM_Contact_BAO_Contact_Location::getPhoneDetails($contactId, $mobileTypeID);
-        if (!$doNotSMS && $phone) {
+        try {
+          $phone = civicrm_api3('Phone', 'getsingle', array(
+            'contact_id' => $contactId,
+            'phone_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile'),
+            'return' => array('phone', 'contact_id'),
+            'options' => array('limit' => 1, 'sort' => "is_primary DESC"),
+            'api.Contact.getsingle' => array(
+              'id' => '$value.contact_id',
+              'return' => 'do_not_sms',
+            ),
+          ));
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          continue;
+        }
+        if (!$phone['api.Contact.getsingle']['do_not_sms'] && $phone['phone']) {
           $url = 'civicrm/activity/sms/add';
         }
         else {

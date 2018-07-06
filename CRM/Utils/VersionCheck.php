@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Utils_VersionCheck {
   const
-    CACHEFILE_NAME = 'version-info-cache.json',
-    // After which length of time we expire the cached version info (7+ days).
-    CACHEFILE_EXPIRE = 605000;
+    CACHEFILE_NAME = 'version-msgs-cache.json',
+    // After which length of time we expire the cached version info (3 days).
+    CACHEFILE_EXPIRE = 259200;
 
   /**
    * The version of the current (local) installation
@@ -42,13 +42,6 @@ class CRM_Utils_VersionCheck {
    * @var string
    */
   public $localVersion = NULL;
-
-  /**
-   * The major version (branch name) of the local version
-   *
-   * @var string
-   */
-  public $localMajorVersion;
 
   /**
    * Info about available versions
@@ -70,7 +63,7 @@ class CRM_Utils_VersionCheck {
   /**
    * @var string
    */
-  public $pingbackUrl = 'https://latest.civicrm.org/stable.php?format=json';
+  public $pingbackUrl = 'https://latest.civicrm.org/stable.php?format=summary';
 
   /**
    * Pingback params
@@ -91,7 +84,6 @@ class CRM_Utils_VersionCheck {
    */
   public function __construct() {
     $this->localVersion = CRM_Utils_System::version();
-    $this->localMajorVersion = $this->getMajorVersion($this->localVersion);
     $this->cacheFile = CRM_Core_Config::singleton()->uploadDir . self::CACHEFILE_NAME;
   }
 
@@ -126,113 +118,19 @@ class CRM_Utils_VersionCheck {
    *
    * @param $info
    */
-  public function setVersionInfo($info) {
-    $this->versionInfo = (array) $info;
-    // Sort version info in ascending order for easier comparisons
-    ksort($this->versionInfo, SORT_NUMERIC);
+  protected function setVersionInfo($info) {
+    $this->versionInfo = $info;
   }
 
   /**
-   * Finds the release info for a minor version.
-   * @param string $version
-   * @return array|null
+   * @return array|NULL
+   *   message: string
+   *   title: string
+   *   severity: string
+   *     Ex: 'info', 'notice', 'warning', 'critical'.
    */
-  public function getReleaseInfo($version) {
-    $majorVersion = $this->getMajorVersion($version);
-    if (isset($this->versionInfo[$majorVersion])) {
-      foreach ($this->versionInfo[$majorVersion]['releases'] as $info) {
-        if ($info['version'] == $version) {
-          return $info;
-        }
-      }
-    }
-    return NULL;
-  }
-
-  /**
-   * @param $minorVersion
-   * @return string
-   */
-  public function getMajorVersion($minorVersion) {
-    if (!$minorVersion) {
-      return NULL;
-    }
-    list($a, $b) = explode('.', $minorVersion);
-    return "$a.$b";
-  }
-
-
-  /**
-   * Get the latest version number if it's newer than the local one
-   *
-   * @return array
-   *   Returns version number of the latest release if it is greater than the local version,
-   *   along with the type of upgrade (regular/security) needed and the status of the major
-   *   version
-   */
-  public function isNewerVersionAvailable() {
-    $return = array(
-      'version' => NULL,
-      'upgrade' => NULL,
-      'status' => NULL,
-    );
-
-    if ($this->versionInfo && $this->localVersion) {
-      if (isset($this->versionInfo[$this->localMajorVersion])) {
-        switch (CRM_Utils_Array::value('status', $this->versionInfo[$this->localMajorVersion])) {
-          case 'stable':
-          case 'lts':
-          case 'testing':
-            // look for latest version in this major version
-            $releases = $this->checkBranchForNewVersion($this->versionInfo[$this->localMajorVersion]);
-            if ($releases['newest']) {
-              $return['version'] = $releases['newest'];
-
-              // check for intervening security releases
-              $return['upgrade'] = ($releases['security']) ? 'security' : 'regular';
-            }
-            break;
-
-          case 'eol':
-          default:
-            // look for latest version ever
-            foreach ($this->versionInfo as $majorVersionNumber => $majorVersion) {
-              if ($majorVersionNumber < $this->localMajorVersion || $majorVersion['status'] == 'testing') {
-                continue;
-              }
-              $releases = $this->checkBranchForNewVersion($this->versionInfo[$majorVersionNumber]);
-
-              if ($releases['newest']) {
-                $return['version'] = $releases['newest'];
-
-                // check for intervening security releases
-                $return['upgrade'] = ($releases['security'] || $return['upgrade'] == 'security') ? 'security' : 'regular';
-              }
-            }
-        }
-        $return['status'] = $this->versionInfo[$this->localMajorVersion]['status'];
-      }
-      else {
-        // Figure if the version is really old or really new
-        $wayOld = TRUE;
-
-        foreach ($this->versionInfo as $majorVersionNumber => $majorVersion) {
-          $wayOld = ($this->localMajorVersion < $majorVersionNumber);
-        }
-
-        if ($wayOld) {
-          $releases = $this->checkBranchForNewVersion($majorVersion);
-
-          $return = array(
-            'version' => $releases['newest'],
-            'upgrade' => 'security',
-            'status' => 'eol',
-          );
-        }
-      }
-    }
-
-    return $return;
+  public function getVersionMessages() {
+    return $this->isInfoAvailable ? $this->versionInfo : NULL;
   }
 
   /**
@@ -241,28 +139,6 @@ class CRM_Utils_VersionCheck {
   public function fetch() {
     $this->getSiteStats();
     $this->pingBack();
-  }
-
-  /**
-   * @param $majorVersion
-   * @return null|string
-   */
-  private function checkBranchForNewVersion($majorVersion) {
-    $newerVersion = array(
-      'newest' => NULL,
-      'security' => NULL,
-    );
-    if (!empty($majorVersion['releases'])) {
-      foreach ($majorVersion['releases'] as $release) {
-        if (version_compare($this->localVersion, $release['version']) < 0) {
-          $newerVersion['newest'] = $release['version'];
-          if (CRM_Utils_Array::value('security', $release)) {
-            $newerVersion['security'] = $release['version'];
-          }
-        }
-      }
-    }
-    return $newerVersion;
   }
 
   /**
@@ -303,11 +179,10 @@ class CRM_Utils_VersionCheck {
     $dao->find();
     $ppTypes = array();
 
-    // Get title and id for all processor types
-    $ppTypeNames = CRM_Core_PseudoConstant::paymentProcessorType();
-
+    // Get title for all processor types
+    // FIXME: This should probably be getName, but it has always returned translated label so we stick with that for now as it would affect stats
     while ($dao->fetch()) {
-      $ppTypes[] = $ppTypeNames[$dao->payment_processor_type_id];
+      $ppTypes[] = CRM_Core_PseudoConstant::getLabel('CRM_Financial_BAO_PaymentProcessor', 'payment_processor_type_id', $dao->payment_processor_type_id);
     }
     // add the .-separated list of the processor types
     $this->stats['PPTypes'] = implode(',', array_unique($ppTypes));
@@ -457,6 +332,15 @@ class CRM_Utils_VersionCheck {
   private function writeCacheFile($contents) {
     if (file_put_contents($this->cacheFile, $contents) === FALSE) {
       throw new Exception('File not writable');
+    }
+  }
+
+  /**
+   * Removes cached version info.
+   */
+  public function flushCache() {
+    if (file_exists($this->cacheFile)) {
+      unlink($this->cacheFile);
     }
   }
 

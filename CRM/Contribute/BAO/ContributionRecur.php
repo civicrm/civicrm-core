@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
+
+  /**
+   * Array with statuses that mark a recurring contribution as inactive.
+   *
+   * @var array
+   */
+  private static $inactiveStatuses = array('Cancelled', 'Chargeback', 'Refunded', 'Completed');
 
   /**
    * Create recurring contribution.
@@ -233,15 +240,12 @@ SELECT r.payment_processor_id
    *
    * @param int $recurId
    *   Recur contribution id.
-   * @param array $objects
-   *   An array of objects that is to be cancelled like.
-   *                          contribution, membership, event. At least contribution object is a must.
    *
    * @param array $activityParams
    *
    * @return bool
    */
-  public static function cancelRecurContribution($recurId, $objects, $activityParams = array()) {
+  public static function cancelRecurContribution($recurId, $activityParams = array()) {
     if (!$recurId) {
       return FALSE;
     }
@@ -282,7 +286,7 @@ SELECT r.payment_processor_id
         }
         $activityParams = array(
           'source_contact_id' => $dao->contact_id,
-          'source_record_id' => CRM_Utils_Array::value('source_record_id', $activityParams),
+          'source_record_id' => $dao->recur_id,
           'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Cancel Recurring Contribution'),
           'subject' => CRM_Utils_Array::value('subject', $activityParams, ts('Recurring contribution cancelled')),
           'details' => $details,
@@ -299,16 +303,8 @@ SELECT r.payment_processor_id
         CRM_Activity_BAO_Activity::create($activityParams);
       }
 
-      // if there are associated objects, cancel them as well
-      if (!$objects) {
-        $transaction->commit();
-        return TRUE;
-      }
-      else {
-        // @todo - this is bad! Get the function out of the ipn.
-        $baseIPN = new CRM_Core_Payment_BaseIPN();
-        return $baseIPN->cancelled($objects, $transaction);
-      }
+      $transaction->commit();
+      return TRUE;
     }
     else {
       // if already cancelled, return true
@@ -323,7 +319,7 @@ SELECT r.payment_processor_id
   }
 
   /**
-   * Get list of recurring contribution of contact Ids.
+   * @deprecated Get list of recurring contribution of contact Ids.
    *
    * @param int $contactId
    *   Contact ID.
@@ -333,6 +329,7 @@ SELECT r.payment_processor_id
    *
    */
   public static function getRecurContributions($contactId) {
+    CRM_Core_Error::deprecatedFunctionWarning('ContributionRecur.get API instead');
     $params = array();
     $recurDAO = new CRM_Contribute_DAO_ContributionRecur();
     $recurDAO->contact_id = $contactId;
@@ -897,11 +894,20 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @return array
    */
   public static function calculateRecurLineItems($recurId, $total_amount, $financial_type_id) {
-    $originalContributionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContributionID);
+    $originalContribution = civicrm_api3('Contribution', 'getsingle', array(
+    'contribution_recur_id' => $recurId,
+    'contribution_test' => '',
+    'options' => ['limit' => 1],
+    'return' => ['id', 'financial_type_id'],
+    ));
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContribution['id']);
     $lineSets = array();
     if (count($lineItems) == 1) {
       foreach ($lineItems as $index => $lineItem) {
+        if ($lineItem['financial_type_id'] != $originalContribution['financial_type_id']) {
+          // CRM-20685, Repeattransaction produces incorrect Financial Type ID (in specific circumstance) - if number of lineItems = 1, So this conditional will set the financial_type_id as the original if line_item and contribution comes with different data.
+          $financial_type_id = $lineItem['financial_type_id'];
+        }
         if ($financial_type_id) {
           // CRM-17718 allow for possibility of changed financial type ID having been set prior to calling this.
           $lineItem['financial_type_id'] = $financial_type_id;
@@ -926,6 +932,16 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     }
 
     return $lineSets;
+  }
+
+  /**
+   * Returns array with statuses that are considered to make a recurring
+   * contribution inacteve.
+   *
+   * @return array
+   */
+  public static function getInactiveStatuses() {
+    return self::$inactiveStatuses;
   }
 
 }

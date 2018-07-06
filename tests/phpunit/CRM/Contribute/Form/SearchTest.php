@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -57,7 +57,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $batchTitle = CRM_Batch_BAO_Batch::generateBatchName();
 
     // create batch
-    $batch = civicrm_api3('Batch', 'create', array(
+    $batch = $this->callAPISuccess('Batch', 'create', array(
       'created_id' => $this->_individual,
       'created_date' => CRM_Utils_Date::processDate(date("Y-m-d"), date("H:i:s")),
       'status_id' => CRM_Core_Pseudoconstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Data Entry'),
@@ -98,7 +98,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     );
 
     // create random contribution to check IS NULL filter more precisely
-    $nonBatchContri = civicrm_api3('Contribution', 'create', array(
+    $nonBatchContri = $this->callAPISuccess('Contribution', 'create', array(
       'financial_type_id' => 1,
       'total_amount' => 123,
       'receive_date' => '2014-07-24',
@@ -116,7 +116,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $form->testProcessContribution($batchEntry);
 
     // fetch created contributions
-    $entities = civicrm_api3('EntityBatch', 'get', array('batch_id' => $batchID));
+    $entities = $this->callAPISuccess('EntityBatch', 'get', array('batch_id' => $batchID));
     $ids = array();
     foreach ($entities['values'] as $value) {
       $ids[] = $value['entity_id'];
@@ -201,7 +201,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'contact_id' => $contactID1,
     ));
-    $Contribution3 = civicrm_api3('Contribution', 'create', array(
+    $Contribution3 = $this->callAPISuccess('Contribution', 'create', array(
       'financial_type_id' => 1,
       'total_amount' => 200,
       'receive_date' => date('Ymd'),
@@ -307,7 +307,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'contact_id' => $contactID1,
     ));
-    $Contribution3 = civicrm_api3('Contribution', 'create', array(
+    $Contribution3 = $this->callAPISuccess('Contribution', 'create', array(
       'financial_type_id' => 1,
       'total_amount' => 200,
       'receive_date' => date('Ymd'),
@@ -482,6 +482,92 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $this->assertEquals($case['expected_count'], count($contacts));
       // assert the contribution IDs
       $this->checkArrayEquals($case['expected_contact'], $contacts);
+      // get and assert qill string
+      $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
+      $this->assertEquals($case['expected_qill'], $qill);
+    }
+  }
+
+  /**
+   *  CRM-21343: Test CRM_Contribute_Form_Search Cancelled filters
+   */
+  public function testCancelledFilter() {
+    $this->quickCleanup($this->_tablesToTruncate);
+    $contactID1 = $this->individualCreate(array(), 1);
+    $contactID2 = $this->individualCreate(array(), 2);
+    $Contribution1 = $this->callAPISuccess('Contribution', 'create', array(
+      'financial_type_id' => 1,
+      'total_amount' => 100,
+      'receive_date' => date('Ymd'),
+      'receive_date_time' => NULL,
+      'payment_instrument' => 1,
+      'contribution_status_id' => 3,
+      'cancel_date' => date('Ymd'),
+      'cancel_reason' => 'Insufficient funds',
+      'contact_id' => $contactID1,
+    ));
+    $Contribution2 = $this->callAPISuccess('Contribution', 'create', array(
+      'financial_type_id' => 1,
+      'total_amount' => 150,
+      'receive_date' => date('Ymd', strtotime(date('Y-m-d') . ' - 1 days')),
+      'receive_date_time' => NULL,
+      'payment_instrument' => 1,
+      'contribution_status_id' => 3,
+      'cancel_date' => date('Ymd', strtotime(date('Y-m-d') . ' - 1 days')),
+      'cancel_reason' => 'Insufficient funds',
+      'contact_id' => $contactID2,
+    ));
+    $Contribution3 = $this->callAPISuccess('Contribution', 'create', array(
+      'financial_type_id' => 1,
+      'total_amount' => 200,
+      'receive_date' => date('Ymd'),
+      'receive_date_time' => NULL,
+      'payment_instrument' => 1,
+      'contribution_status_id' => 3,
+      'cancel_date' => date('Ymd'),
+      'cancel_reason' => 'Invalid Credit Card Number',
+      'contact_id' => $contactID1,
+    ));
+
+    $useCases = array(
+      // Case 1: Search for Cancelled Date
+      array(
+        'form_value' => array('cancel_date' => date('Y-m-d')),
+        'expected_count' => 2,
+        'expected_contribution' => array($Contribution1['id'], $Contribution3['id']),
+        'expected_qill' => "Cancel Date Like '%" . date('Y-m-d') . "%'",
+      ),
+      // Case 2: Search for Cancelled Reason
+      array(
+        'form_value' => array('cancel_reason' => 'Invalid Credit Card Number'),
+        'expected_count' => 1,
+        'expected_contribution' => array($Contribution3['id']),
+        'expected_qill' => "Cancel Reason Like '%Invalid Credit Card Number%'",
+      ),
+      // Case 3: Search for Cancelled Date and Cancelled Reason
+      array(
+        'form_value' => array('cancel_date' => date('Y-m-d'), 'cancel_reason' => 'Insufficient funds'),
+        'expected_count' => 1,
+        'expected_contribution' => array($Contribution1['id']),
+        'expected_qill' => "Cancel Date Like '%" . date('Y-m-d') . "%'ANDCancel Reason Like '%Insufficient funds%'",
+      ),
+    );
+
+    foreach ($useCases as $case) {
+      $fv = $case['form_value'];
+      CRM_Contact_BAO_Query::processSpecialFormValue($fv, array('cancel_date', 'cancel_reason'));
+      $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
+      list($select, $from, $where, $having) = $query->query();
+
+      // get and assert contribution count
+      $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL AND civicrm_contribution.contribution_status_id = 3', $from, $where))->fetchAll();
+      foreach ($contributions as $key => $value) {
+        $contributions[$key] = $value['id'];
+      }
+      // assert the contribution count
+      $this->assertEquals($case['expected_count'], count($contributions));
+      // assert the contribution IDs
+      $this->checkArrayEquals($case['expected_contribution'], $contributions);
       // get and assert qill string
       $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
       $this->assertEquals($case['expected_qill'], $qill);

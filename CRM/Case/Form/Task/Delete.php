@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -73,7 +73,7 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
    */
   public function postProcess() {
     $deleted = $failed = 0;
-    foreach ($this->_caseIds as $caseId) {
+    foreach ($this->_entityIds as $caseId) {
       if (CRM_Case_BAO_Case::deleteCase($caseId, $this->_moveToTrash)) {
         $deleted++;
       }

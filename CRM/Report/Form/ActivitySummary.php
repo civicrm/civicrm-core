@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
@@ -337,12 +337,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
                LEFT JOIN civicrm_case_contact
                       ON civicrm_case_contact.case_id = civicrm_case.id ";
 
-      if ($this->_phoneField) {
-        $this->_from .= "
-              LEFT JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
-                     ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                       {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
-      }
+      $this->joinPhoneFromContact();
     }
     else {
       $this->_from = "
@@ -355,12 +350,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
               {$this->_aclFrom}";
     }
 
-    if ($this->_emailField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_email  {$this->_aliases['civicrm_email']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                     {$this->_aliases['civicrm_email']}.is_primary = 1 ";
-    }
+    $this->joinEmailFromContact();
   }
 
   /**
@@ -694,7 +684,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           }
         }
         $date_suffixes = array('relative', 'from', 'to');
-        while (list(, $suffix) = each($date_suffixes)) {
+        foreach ($date_suffixes as $suffix) {
           if (!empty($this->_params['activity_date_time_' . $suffix])) {
             list($from, $to)
               = $this->getFromTo(

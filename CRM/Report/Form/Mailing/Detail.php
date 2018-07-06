@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
 
@@ -443,12 +443,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
           ON civicrm_mailing_job.mailing_id = {$this->_aliases['civicrm_mailing']}.id
           AND civicrm_mailing_job.is_test = 0";
 
-    if ($this->_phoneField) {
-      $this->_from .= "
-            LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                      {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
-    }
+    $this->joinPhoneFromContact();
   }
 
   public function where() {
@@ -489,7 +484,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
       // If the email address has been deleted
       if (array_key_exists('civicrm_email_email', $row)) {
         if (empty($rows[$rowNum]['civicrm_email_email'])) {
-          $rows[$rowNum]['civicrm_email_email'] = '<del>Email address deleted</del>';
+          $rows[$rowNum]['civicrm_email_email'] = '<del>' . ts('Email address deleted.') . '</del>';
         }
         $entryFound = TRUE;
       }

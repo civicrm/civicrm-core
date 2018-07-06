@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -146,12 +146,14 @@ ORDER BY c.id, l.price_field_value_id;
 
     foreach (array_keys($rows) as $participantID) {
       $values = implode(',', $rows[$participantID]);
-      $sql = "
+      if ($values) {
+        $sql = "
 UPDATE {$this->_tableName}
 SET $values
 WHERE participant_id = $participantID;
 ";
-      CRM_Core_DAO::executeQuery($sql);
+        CRM_Core_DAO::executeQuery($sql);
+      }
     }
   }
 

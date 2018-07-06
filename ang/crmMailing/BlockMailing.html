@@ -41,15 +41,13 @@ It could perhaps be thinned by 30-60% by making more directives.
     </div>
     <span ng-controller="EditUnsubGroupCtrl">
       <div crm-ui-field="{name: 'subform.baseGroup', title: ts('Unsubscribe Group')}" ng-if="isUnsubGroupRequired(mailing)">
-        <select
+        <input
+          crm-entityref="{entity: 'Group', api: {params: {is_hidden: 0, is_active: 1}}, select: {allowClear:true, minimumInputLength: 0}}"
           crm-ui-id="subform.baseGroup"
-          crm-ui-select
           name="baseGroup"
           ng-model="mailing.recipients.groups.base[0]"
           ng-required="true"
-          >
-          <option ng-repeat="grp in crmMailingConst.testGroupNames | filter:{is_hidden:0} | orderBy:'title'" value="{{grp.id}}">{{grp.title}}</option>
-        </select>
+        />
       </div>
     </span>
     <div crm-ui-field="{name: 'subform.subject', title: ts('Subject')}">

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -289,6 +289,9 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
     );
 
     $this->assign('rows', $rows);
+    $this->assign('canEditSystemTemplates', CRM_Core_Permission::check('edit system workflow message templates'));
+    $this->assign('canEditMessageTemplates', CRM_Core_Permission::check('edit message templates'));
+    $this->assign('canEditUserDrivenMessageTemplates', CRM_Core_Permission::check('edit user-driven message templates'));
   }
 
 }

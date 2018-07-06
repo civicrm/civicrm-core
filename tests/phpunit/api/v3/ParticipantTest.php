@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,8 +30,6 @@
  *
  * @package CiviCRM_APIv3
  */
-require_once 'CRM/Utils/DeprecatedUtils.php';
-
 
 /**
  * Class api_v3_ParticipantTest
@@ -99,6 +97,23 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check that getCount can count past 25.
+   */
+  public function testGetCountLimit() {
+    $contactIDs = [];
+
+    for ($count = $this->callAPISuccessGetCount('Participant', []); $count < 27; $count++) {
+      $contactIDs[] = $contactID = $this->individualCreate();
+      $this->participantCreate(['contact_id' => $contactID, 'event_id' => $this->_eventID]);
+    }
+    $this->callAPISuccessGetCount('Participant', [], 27);
+
+    foreach ($contactIDs as $contactID) {
+      $this->callAPISuccess('Contact', 'delete', ['id' => $contactID]);
+    }
+  }
+
+  /**
    * Test get participants with role_id.
    */
   public function testGetParticipantWithRole() {
@@ -159,24 +174,6 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->customGroupDelete($ids['custom_group_id']);
   }
 
-
-  ///////////////// civicrm_participant_get methods
-
-  /**
-   * Check with wrong params type.
-   */
-  public function testGetWrongParamsType() {
-    $params = 'a string';
-    $result = $this->callAPIFailure('participant', 'get', $params);
-  }
-
-  /**
-   * Test civicrm_participant_get with empty params.
-   */
-  public function testGetEmptyParams() {
-    $this->callAPISuccess('participant', 'get', array());
-  }
-
   /**
    * Check with participant_id.
    */
@@ -192,9 +189,9 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     );
     $result = $this->callAPISuccess('participant', 'get', $params);
     $this->assertAPISuccess($result, " in line " . __LINE__);
-    $this->assertEquals($result['values'][$this->_participantID]['event_id'], $this->_eventID, "in line " . __LINE__);
-    $this->assertEquals($result['values'][$this->_participantID]['participant_register_date'], '2007-02-19 00:00:00', "in line " . __LINE__);
-    $this->assertEquals($result['values'][$this->_participantID]['participant_source'], 'Wimbeldon', "in line " . __LINE__);
+    $this->assertEquals($result['values'][$this->_participantID]['event_id'], $this->_eventID);
+    $this->assertEquals($result['values'][$this->_participantID]['participant_register_date'], '2007-02-19 00:00:00');
+    $this->assertEquals($result['values'][$this->_participantID]['participant_source'], 'Wimbeldon');
     $params = array(
       'id' => $this->_participantID,
       'return' => 'id,participant_register_date,event_id',
@@ -291,21 +288,11 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     );
     $participant = $this->callAPISuccess('participant', 'get', $params);
 
-    $this->assertEquals($this->_participantID, $participant['id'],
-      "In line " . __LINE__
-    );
-    $this->assertEquals($this->_eventID, $participant['values'][$participant['id']]['event_id'],
-      "In line " . __LINE__
-    );
-    $this->assertEquals('2007-02-19 00:00:00', $participant['values'][$participant['id']]['participant_register_date'],
-      "In line " . __LINE__
-    );
-    $this->assertEquals('Wimbeldon', $participant['values'][$participant['id']]['participant_source'],
-      "In line " . __LINE__
-    );
-    $this->assertEquals($participant['id'], $participant['values'][$participant['id']]['id'],
-      "In line " . __LINE__
-    );
+    $this->assertEquals($this->_participantID, $participant['id']);
+    $this->assertEquals($this->_eventID, $participant['values'][$participant['id']]['event_id']);
+    $this->assertEquals('2007-02-19 00:00:00', $participant['values'][$participant['id']]['participant_register_date']);
+    $this->assertEquals('Wimbeldon', $participant['values'][$participant['id']]['participant_source']);
+    $this->assertEquals($participant['id'], $participant['values'][$participant['id']]['id']);
   }
 
   /**
@@ -433,10 +420,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
    * Check with event_id.
    */
   public function testCreateMissingContactID() {
-    $params = array(
-      'event_id' => $this->_eventID,
-    );
-    $participant = $this->callAPIFailure('participant', 'create', $params);
+    $this->callAPIFailure('participant', 'create', ['event_id' => $this->_eventID]);
   }
 
   /**
@@ -444,10 +428,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
    * without event_id
    */
   public function testCreateMissingEventID() {
-    $params = array(
-      'contact_id' => $this->_contactID,
-    );
-    $participant = $this->callAPIFailure('participant', 'create', $params);
+    $this->callAPIFailure('participant', 'create', ['contact_id' => $this->_contactID]);
   }
 
   /**
@@ -768,9 +749,9 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $participants = $this->callAPISuccess('Participant', 'Get', array());
     $this->assertEquals($participants['count'], 3);
     $params = array('contact_id' => $this->_contactID2, 'api.participant.delete' => 1);
-    $participants = $this->callAPIAndDocument('Participant', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $this->callAPIAndDocument('Participant', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $check = $this->callAPISuccess('participant', 'getcount', array());
-    $this->assertEquals(1, $check, "only one participant should be left. line " . __LINE__);
+    $this->assertEquals(1, $check, "only one participant should be left");
   }
 
   /**

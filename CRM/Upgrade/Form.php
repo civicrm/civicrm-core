@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -45,12 +45,12 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * Minimum previous CiviCRM version we can directly upgrade from
    */
-  const MINIMUM_UPGRADABLE_VERSION = '4.0.8';
+  const MINIMUM_UPGRADABLE_VERSION = '4.1.3';
 
   /**
    * Minimum php version required to run (equal to or lower than the minimum install version)
    */
-  const MINIMUM_PHP_VERSION = '5.4';
+  const MINIMUM_PHP_VERSION = '5.5';
 
   protected $_config;
 
@@ -67,24 +67,6 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    * @var array
    */
   public $locales;
-
-  /**
-   * Number to string mapper.
-   *
-   * @var array
-   */
-  static $_numberMap = array(
-    0 => 'Zero',
-    1 => 'One',
-    2 => 'Two',
-    3 => 'Three',
-    4 => 'Four',
-    5 => 'Five',
-    6 => 'Six',
-    7 => 'Seven',
-    8 => 'Eight',
-    9 => 'Nine',
-  );
 
   /**
    * Constructor for the basic form page.
@@ -137,7 +119,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
     static $incrementalPhpObject = array();
 
     $versionParts = explode('.', $version);
-    $versionName = self::$_numberMap[$versionParts[0]] . self::$_numberMap[$versionParts[1]];
+    $versionName = CRM_Utils_EnglishNumber::toCamelCase($versionParts[0]) . CRM_Utils_EnglishNumber::toCamelCase($versionParts[1]);
 
     if (!array_key_exists($versionName, $incrementalPhpObject)) {
       $className = "CRM_Upgrade_Incremental_php_{$versionName}";
@@ -354,9 +336,6 @@ SET    version = '$version'
     $sqlFilePattern = '/^((\d{1,2}\.\d{1,2})\.(\d{1,2}\.)?(\d{1,2}|\w{4,7}))\.(my)?sql(\.tpl)?$/i';
     foreach ($sqlFiles as $file) {
       if (preg_match($sqlFilePattern, $file, $matches)) {
-        if ($matches[2] == '4.0') {
-          CRM_Core_Error::fatal("4.0.x upgrade files shouldn't exist. Contact Lobo to discuss this. This is related to the issue CRM-7731.");
-        }
         if (!in_array($matches[1], $revList)) {
           $revList[] = $matches[1];
         }
@@ -550,12 +529,6 @@ SET    version = '$version'
    */
   public static function buildQueue($currentVer, $latestVer, $postUpgradeMessageFile) {
     $upgrade = new CRM_Upgrade_Form();
-
-    // hack to make 4.0.x (D7,J1.6) codebase go through 3.4.x (d6, J1.5) upgrade files,
-    // since schema wise they are same
-    if (CRM_Upgrade_Form::getRevisionPart($currentVer) == '4.0') {
-      $currentVer = str_replace('4.0.', '3.4.', $currentVer);
-    }
 
     // Ensure that queue can be created
     if (!CRM_Queue_BAO_QueueItem::findCreateTable()) {
@@ -765,6 +738,9 @@ SET    version = '$version'
     $config = CRM_Core_Config::singleton();
     $config->cleanupCaches(1);
 
+    $versionCheck = new CRM_Utils_VersionCheck();
+    $versionCheck->flushCache();
+
     // Rebuild all triggers and re-enable logging if needed
     $logging = new CRM_Logging_Schema();
     $logging->fixSchemaDifferences();
@@ -793,6 +769,7 @@ SET    version = '$version'
     foreach ($revisions as $rev) {
       if (version_compare($currentVer, $rev) < 0) {
         $versionObject = $this->incrementalPhpObject($rev);
+        CRM_Upgrade_Incremental_General::updateMessageTemplate($preUpgradeMessage, $rev);
         if (is_callable(array($versionObject, 'setPreUpgradeMessage'))) {
           $versionObject->setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
         }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Core_OptionValue {
 
@@ -72,14 +72,14 @@ class CRM_Core_OptionValue {
    */
   public static function getRows($groupParams, $links, $orderBy = 'weight', $skipEmptyComponents = TRUE) {
     $optionValue = array();
-
     $optionGroupID = NULL;
+    $isGroupLocked = FALSE;
+
     if (!isset($groupParams['id']) || !$groupParams['id']) {
       if ($groupParams['name']) {
-        $config = CRM_Core_Config::singleton();
-
         $optionGroup = CRM_Core_BAO_OptionGroup::retrieve($groupParams, $dnc);
         $optionGroupID = $optionGroup->id;
+        $isGroupLocked = (bool) $optionGroup->is_locked;
       }
     }
     else {
@@ -146,6 +146,11 @@ class CRM_Core_OptionValue {
         }
       }
 
+      // disallow deletion of option values for locked groups
+      if (($action & CRM_Core_Action::DELETE) && $isGroupLocked) {
+        $action -= CRM_Core_Action::DELETE;
+      }
+
       $optionValue[$dao->id]['label'] = htmlspecialchars($optionValue[$dao->id]['label']);
       $optionValue[$dao->id]['order'] = $optionValue[$dao->id]['weight'];
       $optionValue[$dao->id]['icon'] = CRM_Utils_Array::value('icon', $optionValue[$dao->id], '');
@@ -191,8 +196,7 @@ class CRM_Core_OptionValue {
    * @return CRM_Core_DAO_OptionValue
    *
    */
-  public static function addOptionValue(&$params, &$groupParams, &$action, &$optionValueID) {
-    $ids = array();
+  public static function addOptionValue(&$params, &$groupParams, $action, $optionValueID) {
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     // checking if the group name with the given id or name (in $groupParams) exists
     if (!empty($groupParams)) {
@@ -220,7 +224,7 @@ class CRM_Core_OptionValue {
     }
     $params['option_group_id'] = $optionGroupID;
 
-    if (($action & CRM_Core_Action::ADD) && empty($params['value'])) {
+    if (($action & CRM_Core_Action::ADD) && !isset($params['value'])) {
       $fieldValues = array('option_group_id' => $optionGroupID);
       // use the next available value
       /* CONVERT(value, DECIMAL) is used to convert varchar
@@ -240,9 +244,9 @@ class CRM_Core_OptionValue {
       $params['name'] = $params['label'];
     }
     if ($action & CRM_Core_Action::UPDATE) {
-      $ids['optionValue'] = $optionValueID;
+      $params['id'] = $optionValueID;
     }
-    $optionValue = CRM_Core_BAO_OptionValue::add($params, $ids);
+    $optionValue = CRM_Core_BAO_OptionValue::add($params);
     return $optionValue;
   }
 

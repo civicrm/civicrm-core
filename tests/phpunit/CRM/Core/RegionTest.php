@@ -73,11 +73,15 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
     ));
     CRM_Core_Region::instance('testAllTypes')->add(array(
       // note: returns a value which gets appended to the region
-      'callback' => create_function('&$spec, &$html', 'return "callback-return<br/>";'),
+      'callback' => function(&$spec, &$html) {
+         return "callback-return<br/>";
+      },
     ));
     CRM_Core_Region::instance('testAllTypes')->add(array(
       // note: returns void; directly modifies region's $html
-      'callback' => create_function('&$spec, &$html', '$html = "callback-ref<br/>" . $html;'),
+      'callback' => function(&$spec, &$html) {
+        $html = "callback-ref<br/>" . $html;
+      },
     ));
     CRM_Core_Region::instance('testAllTypes')->add(array(
       'scriptUrl' => '/foo%20bar.js',

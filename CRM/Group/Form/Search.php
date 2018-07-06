@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -81,6 +81,17 @@ class CRM_Group_Form_Search extends CRM_Core_Form {
       NULL, NULL, NULL, NULL, '&nbsp;&nbsp;&nbsp;'
     );
 
+    $componentModes = CRM_Contact_Form_Search::getModeSelect();
+    if (count($componentModes) > 1) {
+      $this->add('select',
+        'component_mode',
+        ts('View Results As'),
+        $componentModes,
+        FALSE,
+        array('class' => 'crm-select2')
+      );
+    }
+
     $this->addButtons(array(
       array(
         'type' => 'refresh',
@@ -97,7 +108,7 @@ class CRM_Group_Form_Search extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
     $parent = $this->controller->getParent();
     if (!empty($params)) {
-      $fields = array('title', 'created_by', 'group_type', 'visibility', 'active_status', 'inactive_status');
+      $fields = array('title', 'created_by', 'group_type', 'visibility', 'active_status', 'inactive_status', 'component_mode');
       foreach ($fields as $field) {
         if (isset($params[$field]) &&
           !CRM_Utils_System::isNull($params[$field])

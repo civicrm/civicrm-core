@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -90,23 +90,18 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'thankyou_date' => '20080522',
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
+    $contribution = $contribution['values'][$contribution['id']];
 
-    $this->assertEquals($params['trxn_id'], $contribution->trxn_id);
-    $this->assertEquals($contactId, $contribution->contact_id);
-
-    $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution->id);
+    $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
     $this->assertEquals(0, $totalPaymentAmount, 'Amount not matching.');
-    //update contribution amount
-    $params['id'] = $contribution->id;
+
+    $params['id'] = $contribution['id'];
     $params['contribution_status_id'] = 1;
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
 
-    $this->assertEquals($params['trxn_id'], $contribution->trxn_id);
-    $this->assertEquals($params['contribution_status_id'], $contribution->contribution_status_id);
-
-    $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution->id);
+    $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
     $this->assertEquals('200.00', $totalPaymentAmount, 'Amount not matching.');
   }
 
@@ -158,15 +153,16 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
         ),
       ),
     );
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
-    $lineItems[1] = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution->id);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
+    $lineItems[1] = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
     $lineItemId = key($lineItems[1]);
     $lineItems[1][$lineItemId]['financial_item_id'] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_item WHERE entity_table = 'civicrm_line_item' AND entity_id = {$lineItemId}");
     // Get financial trxns for contribution
     $trxn = $this->callAPISuccess("FinancialTrxn", "get", array('total_amount' => 622));
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime('2016-01-20')));
-    $contribution->revenue_recognition_date = date('Ymd', strtotime("+1 month"));
-    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contribution);
+    $contributionObj = $this->getContributionObject($contribution['id']);
+    $contributionObj->revenue_recognition_date = date('Ymd', strtotime("+1 month"));
+    CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($lineItems, $contributionObj);
     $trxn = $this->callAPISuccess("FinancialTrxn", "get", array('total_amount' => 622, 'id' => array("NOT IN" => array($trxn['id']))));
     $this->assertEquals(date('Ymd', strtotime($trxn['values'][$trxn['id']]['trxn_date'])), date('Ymd', strtotime("+1 month")));
   }
@@ -182,8 +178,8 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'financial_type_id' => 1,
     );
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
-    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'DESC');
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
       array(
@@ -196,7 +192,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $params = array(
       'card_type_id' => 2,
       'pan_truncation' => 4567,
-      'id' => $contribution->id,
+      'id' => $contribution['id'],
     );
     $this->callAPISuccess("Contribution", "create", $params);
     $financialTrxn = $this->callAPISuccessGetSingle(
@@ -221,8 +217,8 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'financial_type_id' => 1,
     );
-    $contribution = CRM_Contribute_BAO_Contribution::create($params);
-    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'DESC');
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
+    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
       array(
@@ -232,7 +228,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     );
     $this->assertEquals(CRM_Utils_Array::value('card_type_id', $financialTrxn), NULL);
     $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), NULL);
-    CRM_Core_BAO_FinancialTrxn::updateCreditCardDetails($contribution->id, 4567, 2);
+    CRM_Core_BAO_FinancialTrxn::updateCreditCardDetails($contribution['id'], 4567, 2);
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
       array(
@@ -242,6 +238,34 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     );
     $this->assertEquals($financialTrxn['card_type_id'], 2);
     $this->assertEquals($financialTrxn['pan_truncation'], 4567);
+  }
+
+  /**
+   * Test getPartialPaymentWithType function.
+   */
+  public function testGetPartialPaymentWithType() {
+    //create the contribution that isn't paid yet
+    $contactId = $this->individualCreate();
+    $params = array(
+      'contact_id' => $contactId,
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'contribution_status_id' => 8,
+      'payment_instrument_id' => 4,
+      'total_amount' => 300.00,
+      'fee_amount' => 0.00,
+      'net_amount' => 300.00,
+    );
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][7];
+    //make a payment one cent short
+    $params = array(
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 299.99,
+    );
+    $this->callAPISuccess('Payment', 'create', $params);
+    //amount owed should be one cent
+    $amountOwed = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($contribution['id'], 'contribution')['amount_owed'];
+    $this->assertTrue(0.01 == $amountOwed, 'Amount does not match');
   }
 
 }

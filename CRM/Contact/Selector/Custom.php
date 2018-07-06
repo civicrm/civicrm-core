@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id: Selector.php 11510 2007-09-18 09:21:34Z lobo $
  */
 
@@ -227,11 +227,14 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     $columns = $this->_search->columns();
-    if ($output == CRM_Core_Selector_Controller::EXPORT) {
-      return array_keys($columns);
+    $headers = array();
+    if ($output == CRM_Core_Selector_Controller::EXPORT || $output == CRM_Core_Selector_Controller::SCREEN) {
+      foreach ($columns as $name => $key) {
+        $headers[$key] = $name;
+      }
+      return $headers;
     }
     else {
-      $headers = array();
       foreach ($columns as $name => $key) {
         if (!empty($name)) {
           $headers[] = array(
@@ -424,7 +427,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    * @return Object
    */
-  public function contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
+  public function contactIDQuery($params, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
     // $action, $displayRelationshipType and $queryOperator are unused. I have
     // no idea why they are there.
 

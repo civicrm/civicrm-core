@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Job
  *
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
@@ -109,6 +109,42 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test pause and resume on Mailing.
+   */
+  public function testPauseAndResumeMailing() {
+    $this->createContactsInGroup(10, $this->_groupID);
+    Civi::settings()->add(array(
+      'mailerBatchLimit' => 2,
+    ));
+    $this->_mut->clearMessages();
+    //Create a test mailing and check if the status is set to Scheduled.
+    $result = $this->callAPISuccess('mailing', 'create', $this->_params);
+    $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
+    $this->assertEquals('Scheduled', $jobs['values'][$jobs['id']]['status']);
+
+    //Pause the mailing.
+    CRM_Mailing_BAO_MailingJob::pause($result['id']);
+    $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
+    $this->assertEquals('Paused', $jobs['values'][$jobs['id']]['status']);
+
+    //Verify if Paused mailing isn't considered in process_mailing job.
+    $this->callAPISuccess('job', 'process_mailing', array());
+    //Check if mail log is empty.
+    $this->_mut->assertMailLogEmpty();
+    $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
+    $this->assertEquals('Paused', $jobs['values'][$jobs['id']]['status']);
+
+    //Resume should set the status back to Scheduled.
+    CRM_Mailing_BAO_MailingJob::resume($result['id']);
+    $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
+    $this->assertEquals('Scheduled', $jobs['values'][$jobs['id']]['status']);
+
+    //Execute the job and it should send the mailing to the recipients now.
+    $this->callAPISuccess('job', 'process_mailing', array());
+    $this->_mut->assertRecipients($this->getRecipients(1, 2));
+  }
+
+  /**
    * Test mail when in non-production environment.
    *
    */
@@ -118,6 +154,10 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'environment' => 'Staging',
     );
     $this->callAPISuccess('Setting', 'create', $params);
+    //Assert if outbound mail is disabled.
+    $mailingBackend = Civi::settings()->get('mailing_backend');
+    $this->assertEquals($mailingBackend['outBound_option'], CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED);
+
     $this->createContactsInGroup(10, $this->_groupID);
     Civi::settings()->add(array(
       'mailerBatchLimit' => 2,
@@ -129,6 +169,21 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     // Test with runInNonProductionEnvironment param.
     $this->callAPISuccess('job', 'process_mailing', array('runInNonProductionEnvironment' => TRUE));
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
+
+    $jobId = $this->callAPISuccessGetValue('Job', array(
+      'return' => "id",
+      'api_action' => "group_rebuild",
+    ));
+    $this->callAPISuccess('Job', 'create', array(
+      'id' => $jobId,
+      'parameters' => "runInNonProductionEnvironment=TRUE",
+    ));
+    $jobManager = new CRM_Core_JobManager();
+    $jobManager->executeJobById($jobId);
+
+    //Assert if outbound mail is still disabled.
+    $mailingBackend = Civi::settings()->get('mailing_backend');
+    $this->assertEquals($mailingBackend['outBound_option'], CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED);
 
     // Test in production mode.
     $params = array(

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
  * Cache is an empty base object, we'll modify the scheme when we have different caching schemes
  */
 class CRM_Utils_Cache {
+
+  const DELIMITER = '/';
+
   /**
    * (Quasi-Private) Treat this as private. It is marked public to facilitate testing.
    *
@@ -83,6 +86,7 @@ class CRM_Utils_Cache {
       // a generic method for utilizing any of the available db caches.
       $dbCacheClass = 'CRM_Utils_Cache_' . $className;
       $settings = self::getCacheSettings($className);
+      $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . 'default' . self::DELIMITER;
       self::$_singleton = new $dbCacheClass($settings);
     }
     return self::$_singleton;
@@ -186,7 +190,7 @@ class CRM_Utils_Cache {
           if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, array('Memcache', 'Memcached', 'Redis'))) {
             $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
             $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
-            $settings['prefix'] = $settings['prefix'] . '_' . $params['name'];
+            $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . $params['name'] . self::DELIMITER;
             return new $dbCacheClass($settings);
           }
           break;
@@ -208,6 +212,32 @@ class CRM_Utils_Cache {
     }
 
     throw new CRM_Core_Exception("Failed to instantiate cache. No supported cache type found. " . print_r($params, 1));
+  }
+
+  /**
+   * Assert that a key is well-formed.
+   *
+   * @param string $key
+   * @return string
+   *   Same $key, if it's valid.
+   * @throws \CRM_Utils_Cache_InvalidArgumentException
+   */
+  public static function assertValidKey($key) {
+    $strict = CRM_Utils_Constant::value('CIVICRM_PSR16_STRICT', FALSE) || defined('CIVICRM_TEST');
+
+    if (!is_string($key)) {
+      throw new CRM_Utils_Cache_InvalidArgumentException("Invalid cache key: Not a string");
+    }
+
+    if ($strict && !preg_match(';^[A-Za-z0-9_\-\. ]+$;', $key)) {
+      throw new CRM_Utils_Cache_InvalidArgumentException("Invalid cache key: Illegal characters");
+    }
+
+    if ($strict && strlen($key) > 255) {
+      throw new CRM_Utils_Cache_InvalidArgumentException("Invalid cache key: Too long");
+    }
+
+    return $key;
   }
 
 }

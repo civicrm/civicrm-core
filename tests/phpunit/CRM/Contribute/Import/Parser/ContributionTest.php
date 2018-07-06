@@ -22,9 +22,14 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * In this case primary contact and secondary contact both are identified by external identifier.
    *
+   * @dataProvider getThousandSeparators
+   *
+   * @param string $thousandSeparator
+   *
    * @throws \Exception
    */
-  public function testImportParserWithSoftCreditsByExternalIdentifier() {
+  public function testImportParserWithSoftCreditsByExternalIdentifier($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $contact1Params = array(
       'first_name' => 'Contact',
       'last_name' => 'One',
@@ -40,7 +45,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contact1Id = $this->individualCreate($contact1Params);
     $contact2Id = $this->individualCreate($contact2Params);
     $values = array(
-      "total_amount" => 10,
+      "total_amount" => $this->formatMoneyInput(1230.99),
       "financial_type" => "Donation",
       "external_identifier" => "ext-1",
       "soft_credit" => "ext-2",
@@ -53,10 +58,16 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     );
     $values = array();
     $contributionsOfMainContact = CRM_Contribute_BAO_Contribution::retrieve($params, $values, $values);
+    $this->assertEquals(1230.99, $contributionsOfMainContact->total_amount);
+    $this->assertEquals(1230.99, $contributionsOfMainContact->net_amount);
+    $this->assertEquals(0, $contributionsOfMainContact->fee_amount);
+
     $params["contact_id"] = $contact2Id;
     $contributionsOfSoftContact = CRM_Contribute_BAO_ContributionSoft::retrieve($params, $values);
-    $this->assertEquals(1, count($contributionsOfMainContact), 'Contribution not added for primary contact');
-    $this->assertEquals(1, count($contributionsOfSoftContact), 'Soft Contribution not added for secondary contact');
+    $this->assertEquals(1, $contributionsOfMainContact->N, 'Contribution not added for primary contact');
+    $this->assertEquals(1, $contributionsOfSoftContact->N, 'Soft Contribution not added for secondary contact');
+    $this->callAPISuccess('ContributionSoft', 'Delete', ['id' => $contributionsOfSoftContact->id]);
+    $this->callAPISuccess('Contribution', 'Delete', ['id' => $contributionsOfMainContact->id]);
   }
   /**
    * Run the import parser.

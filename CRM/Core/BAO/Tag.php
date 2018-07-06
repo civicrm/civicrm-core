@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
@@ -573,6 +573,17 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
               ->execute();
     while ($dao->fetch()) {
       $childTagIDs[$dao->parent_id] = (array) explode(',', $dao->child_id);
+      $parentID = $dao->parent_id;
+      if ($searchString) {
+        // recursively search for parent tag ID and it's child if any
+        while ($parentID) {
+          $newParentID = CRM_Core_DAO::singleValueQuery(" SELECT parent_id FROM civicrm_tag WHERE id = $parentID ");
+          if ($newParentID) {
+            $childTagIDs[$newParentID] = array($parentID);
+          }
+          $parentID = $newParentID;
+        }
+      }
     }
 
     // check if child tag has any childs, if found then include those child tags inside parent tag

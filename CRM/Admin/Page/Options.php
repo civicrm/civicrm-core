@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -81,6 +81,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
   public function preProcess() {
     if (!self::$_gName && !empty($this->urlPath[3])) {
       self::$_gName = $this->urlPath[3];
+      self::$_isLocked = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gName, 'is_locked', 'name');
     }
     // If an id arg is passed instead of a group name in the path
     elseif (!self::$_gName && !empty($_GET['gid'])) {
@@ -151,6 +152,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
       $this->assign('showCounted', TRUE);
     }
     $this->assign('isLocked', self::$_isLocked);
+    $this->assign('allowLoggedIn', Civi::settings()->get('allow_mail_from_logged_in_contact'));
     $config = CRM_Core_Config::singleton();
     if (self::$_gName == 'activity_type') {
       $this->assign('showComponent', TRUE);

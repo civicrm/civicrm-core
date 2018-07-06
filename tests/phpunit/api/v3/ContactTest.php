@@ -144,19 +144,27 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test for international string acceptance (CRM-10210).
+   * Requires the databsase to be in utf8.
    *
    * @dataProvider getInternationalStrings
    *
    * @param string $string
    *   String to be tested.
+   * @param bool $checkCharSet
+   *   Bool to see if we should check charset.
    *
    * @throws \Exception
    */
-  public function testInternationalStrings($string) {
+  public function testInternationalStrings($string, $checkCharSet = FALSE) {
     $this->callAPISuccess('Contact', 'create', array_merge(
       $this->_params,
       array('first_name' => $string)
     ));
+    if ($checkCharSet) {
+      if (!CRM_Utils_SQL::supportStorageOfAccents()) {
+        $this->markTestIncomplete('Database is not Charset UTF8 therefore can not store accented strings properly');
+      }
+    }
     $result = $this->callAPISuccessGetSingle('Contact', array('first_name' => $string));
     $this->assertEquals($string, $result['first_name']);
 
@@ -175,8 +183,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function getInternationalStrings() {
     $invocations = array();
-    $invocations[] = array('Scarabée');
-    $invocations[] = array('Iñtërnâtiônàlizætiøn');
+    $invocations[] = array('Scarabée', TRUE);
+    $invocations[] = array('Iñtërnâtiônàlizætiøn', TRUE);
     $invocations[] = array('これは日本語のテキストです。読めますか');
     $invocations[] = array('देखें हिन्दी कैसी नजर आती है। अरे वाह ये तो नजर आती है।');
     return $invocations;
@@ -1001,6 +1009,33 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test retrieval by addressee id.
+   */
+  public function testGetByAddresseeID() {
+    $individual1ID = $this->individualCreate([
+      'skip_greeting_processing' => 1,
+      'addressee_id' => 'null',
+      'email_greeting_id' => 'null',
+      'postal_greeting_id' => 'null'
+    ]);
+    $individual2ID = $this->individualCreate();
+
+    $this->assertEquals($individual1ID,
+      $this->callAPISuccessGetValue('Contact', ['contact_type' => 'Individual', 'addressee_id' => ['IS NULL' => 1], 'return' => 'id'])
+    );
+    $this->assertEquals($individual1ID,
+      $this->callAPISuccessGetValue('Contact', ['contact_type' => 'Individual', 'email_greeting_id' => ['IS NULL' => 1], 'return' => 'id'])
+    );
+    $this->assertEquals($individual1ID,
+      $this->callAPISuccessGetValue('Contact', ['contact_type' => 'Individual', 'postal_greeting_id' => ['IS NULL' => 1], 'return' => 'id'])
+    );
+
+    $this->assertEquals($individual2ID,
+      $this->callAPISuccessGetValue('Contact', ['contact_type' => 'Individual', 'addressee_id' => ['NOT NULL' => 1], 'return' => 'id'])
+    );
+  }
+
+  /**
    * Check with complete array + custom field.
    *
    * Note that the test is written on purpose without any
@@ -1158,6 +1193,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'invoice_id' => 67990,
         'source' => 'SSF',
         'contribution_status_id' => 1,
+        'skipCleanMoney' => 1,
       ),
       'api.website.create' => array(
         'url' => "http://civicrm.org",
@@ -1199,6 +1235,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'invoice_id' => 67890,
         'source' => 'SSF',
         'contribution_status_id' => 1,
+        'skipCleanMoney' => 1,
       ),
       'api.website.create' => array(
         array(
@@ -1490,6 +1527,76 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     );
     $actual->addTable('civicrm_contact');
     $expected->matches($actual);
+  }
+
+  /**
+   * Test merging 2 organizations.
+   *
+   * CRM-20421: This test make sure that inherited memberships are deleted upon merging organization.
+   */
+  public function testMergeOrganizations() {
+    $organizationID1 = $this->organizationCreate(array(), 0);
+    $organizationID2 = $this->organizationCreate(array(), 1);
+    $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
+        'employer_id' => $organizationID1,
+      )
+    ));
+    $contact = $contact["values"][$contact["id"]];
+
+    $membershipType = $this->createEmployerOfMembership();
+    $membershipParams = array(
+      'membership_type_id' => $membershipType["id"],
+      'contact_id' => $organizationID1,
+      'start_date' => "01/01/2015",
+      'join_date' => "01/01/2010",
+      'end_date' => "12/31/2015",
+    );
+    $ownermembershipid = $this->contactMembershipCreate($membershipParams);
+
+    $contactmembership = $this->callAPISuccess("membership", "getsingle", array(
+      "contact_id" => $contact["id"],
+    ));
+
+    $this->assertEquals($ownermembershipid, $contactmembership["owner_membership_id"], "Contact membership must be inherited from Organization");
+
+    CRM_Dedupe_Merger::moveAllBelongings($organizationID2, $organizationID1, array(
+      "move_rel_table_memberships"   => "0",
+      "move_rel_table_relationships" => "1",
+      "main_details" => array(
+        "contact_id"   => $organizationID2,
+        "contact_type" => "Organization",
+      ),
+      "other_details" => array(
+        "contact_id"   => $organizationID1,
+        "contact_type" => "Organization",
+      ),
+    ));
+
+    $contactmembership = $this->callAPISuccess("membership", "get", array(
+      "contact_id" => $contact["id"],
+    ));
+
+    $this->assertEquals(0, $contactmembership["count"], "Contact membership must be deleted after merging organization without memberships.");
+  }
+
+  private function createEmployerOfMembership() {
+    $params = array(
+      'domain_id' => CRM_Core_Config::domainID(),
+      'name' => 'Organization Membership',
+      'description' => NULL,
+      'member_of_contact_id' => 1,
+      'financial_type_id' => 1,
+      'minimum_fee' => 10,
+      'duration_unit' => 'year',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'relationship_type_id' => 5,
+      'relationship_direction' => 'b_a',
+      'visibility' => 'Public',
+      'is_active' => 1,
+    );
+    $membershipType = $this->callAPISuccess('membership_type', 'create', $params);
+    return $membershipType["values"][$membershipType["id"]];
   }
 
   /**
@@ -1929,7 +2036,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertTrue(is_numeric($ufMatch->id));
 
     // setup - mock the calls to CRM_Utils_System_*::getUfId
-    $userSystem = $this->getMock('CRM_Utils_System_UnitTests', array('getUfId'));
+    $mockFunction = $this->mockMethod;
+    $userSystem = $this->$mockFunction('CRM_Utils_System_UnitTests', array('getUfId'));
     $userSystem->expects($this->once())
       ->method('getUfId')
       ->with($this->equalTo('exampleUser'))
@@ -2004,7 +2112,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testContactGetByUnknownUsername() {
     // setup - mock the calls to CRM_Utils_System_*::getUfId
-    $userSystem = $this->getMock('CRM_Utils_System_UnitTests', array('getUfId'));
+    $mockFunction = $this->mockMethod;
+    $userSystem = $this->$mockFunction('CRM_Utils_System_UnitTests', array('getUfId'));
     $userSystem->expects($this->once())
       ->method('getUfId')
       ->with($this->equalTo('exampleUser'))
@@ -2186,6 +2295,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'net_amount' => 90.00,
         'source' => 'SSF',
         'contribution_status_id' => 1,
+        'skipCleanMoney' => 1,
       ),
       'api.contribution.create.1' => array(
         'receive_date' => '2011-01-01',
@@ -2197,6 +2307,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'net_amount' => 90.00,
         'source' => 'SSF',
         'contribution_status_id' => 1,
+        'skipCleanMoney' => 1,
       ),
       'api.website.create' => array(
         array(
@@ -2254,6 +2365,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'invoice_id' => 67890,
         'source' => 'SSF',
         'contribution_status_id' => 1,
+        'skipCleanMoney' => 1,
       ),
       'api.contribution.create.1' => array(
         'receive_date' => '2011-01-01',
@@ -2267,6 +2379,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'invoice_id' => 67830,
         'source' => 'SSF',
         'contribution_status_id' => 1,
+        'skipCleanMoney' => 1,
       ),
       'api.website.create' => array(
         array(
@@ -2621,12 +2734,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'first_contact' => $firstAlphabeticalContactBySortName,
         'second_contact' => $secondAlphabeticalContactBySortName,
       ),
-      'bob_search_no_orderby' => array(
-        'search_parameters' => array('name' => 'bob'),
-        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => FALSE),
-        'first_contact' => $firstContactByID,
-        'second_contact' => $secondContactByID,
-      ),
+      // This test has been disabled as is proving to be problematic to reproduce due to MySQL sorting issues between different versions
+      // 'bob_search_no_orderby' => array(
+      //  'search_parameters' => array('name' => 'bob'),
+      //  'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => FALSE),
+      //  'first_contact' => $firstContactByID,
+      //  'second_contact' => $secondContactByID,
+      //),
       'bob_search_no_wildcard' => array(
         'search_parameters' => array('name' => 'bob'),
         'settings' => array('includeWildCardInName' => FALSE, 'includeOrderByClause' => TRUE),
@@ -2653,12 +2767,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'first_contact' => $firstAlphabeticalContactFirstNameBob,
         'second_contact' => $secondAlphabeticalContactFirstNameBob,
       ),
-      'first_name_search_no_orderby' => array(
-        'search_parameters' => array('name' => 'bob', 'field_name' => 'first_name'),
-        'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => FALSE),
-        'first_contact' => $firstByIDContactFirstNameBob,
-        'second_contact' => $secondByIDContactFirstNameBob,
-      ),
+      // This test has been disabled as is proving to be problematic to reproduce due to MySQL sorting issues between different versions
+      //'first_name_search_no_orderby' => array(
+      //  'search_parameters' => array('name' => 'bob', 'field_name' => 'first_name'),
+      //  'settings' => array('includeWildCardInName' => TRUE, 'includeOrderByClause' => FALSE),
+      //  'first_contact' => $firstByIDContactFirstNameBob,
+      //  'second_contact' => $secondByIDContactFirstNameBob,
+      //),
       'email_search_basic' => array(
         'search_parameters' => array('name' => 'bob', 'field_name' => 'email', 'table_name' => 'eml'),
         'settings' => array('includeWildCardInName' => FALSE, 'includeOrderByClause' => TRUE),
@@ -2806,7 +2921,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => FALSE));
     $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'bob'));
     $this->assertEquals('Bob, Bob', $result['values'][0]['sort_name']);
-    $this->assertEquals('E Bobby, Bobby', $result['values'][1]['sort_name']);
+    // This test has been disabled as is proving to be problematic to reproduce due to MySQL sorting issues between different versions
+    //$this->assertEquals('E Bobby, Bobby', $result['values'][1]['sort_name']);
   }
 
   /**
@@ -3524,6 +3640,34 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'delete', array('id' => $created_contact_id, 'skip_undelete' => TRUE));
   }
 
+  /**
+   * Test the prox_distance functionality works.
+   *
+   * This is primarily testing functionality in the BAO_Query object that 'happens to be'
+   * accessible via the api.
+   */
+  public function testContactGetProximity() {
+    CRM_Core_Config::singleton()->geocodeMethod = 'CRM_Utils_MockGeocoder';
+    $this->individualCreate();
+    $contactID = $this->individualCreate();
+    $this->callAPISuccess('Address', 'create', [
+      'contact_id' => $contactID,
+      'is_primary' => 1,
+      'city' => 'Whangarei',
+      'street_address' => 'Dent St',
+      'geo_code_1' => '-35.8743325',
+      'geo_code_2' => '174.4567136',
+      'location_type_id' => 'Home',
+    ]);
+    $contact = $this->callAPISuccess('Contact', 'get', [
+      'prox_distance' => 100,
+      'prox_geo_code_1' => '-35.72192',
+      'prox_geo_code_2' => '174.32034',
+    ]);
+    $this->assertEquals(1, $contact['count']);
+    $this->assertEquals($contactID, $contact['id']);
+  }
+
   public function testLoggedInUserAPISupportToken() {
     $description = "Get contact id of the current logged in user";
     $subFile = "ContactIDOfLoggedInUserContactAPI";
@@ -3630,6 +3774,75 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('OptionValue', 'create', array('id' => $postalOption['id'], 'name' => 'Dear {contact.first_name}'));
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
+  }
+
+  /**
+   * Test getunique api call for Contact entity
+   */
+  public function testContactGetUnique() {
+    $result = $this->callAPIAndDocument($this->_entity, 'getunique', array(), __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(array('external_identifier'), $result['values']['UI_external_identifier']);
+  }
+
+  public function testSmartGroupsForRelatedContacts() {
+    $rtype1 = $this->callAPISuccess('relationship_type', 'create', array(
+      "name_a_b" => uniqid() . " Child of",
+      "name_b_a" => uniqid() . " Parent of",
+    ));
+    $rtype2 = $this->callAPISuccess('relationship_type', 'create', array(
+      "name_a_b" => uniqid() . " Household Member of",
+      "name_b_a" => uniqid() . " Household Member is",
+    ));
+    $h1 = $this->householdCreate();
+    $c1 = $this->individualCreate(array('last_name' => 'Adams'));
+    $c2 = $this->individualCreate(array('last_name' => 'Adams'));
+    $this->callAPISuccess('relationship', 'create', array(
+      'contact_id_a' => $c1,
+      'contact_id_b' => $c2,
+      'is_active' => 1,
+      'relationship_type_id' => $rtype1['id'], // Child of
+    ));
+    $this->callAPISuccess('relationship', 'create', array(
+      'contact_id_a' => $c1,
+      'contact_id_b' => $h1,
+      'is_active' => 1,
+      'relationship_type_id' => $rtype2['id'], // Household Member of
+    ));
+    $this->callAPISuccess('relationship', 'create', array(
+      'contact_id_a' => $c2,
+      'contact_id_b' => $h1,
+      'is_active' => 1,
+      'relationship_type_id' => $rtype2['id'], // Household Member of
+    ));
+
+    $ssParams = array(
+      'formValues' => array(
+        'display_relationship_type' => $rtype1['id'] . '_a_b', // Child of
+        'sort_name' => 'Adams',
+      ),
+    );
+    $g1ID = $this->smartGroupCreate($ssParams, array('name' => uniqid(), 'title' => uniqid()));
+    $ssParams = array(
+      'formValues' => array(
+        'display_relationship_type' => $rtype2['id'] . '_a_b', // Household Member of
+      ),
+    );
+    $g2ID = $this->smartGroupCreate($ssParams, array('name' => uniqid(), 'title' => uniqid()));
+    $ssParams = array(
+      'formValues' => array(
+        'display_relationship_type' => $rtype2['id'] . '_b_a', // Household Member is
+      ),
+    );
+    // the reverse of g2 which adds another layer for overlap at related contact filter
+    $g3ID = $this->smartGroupCreate($ssParams, array('name' => uniqid(), 'title' => uniqid()));
+    CRM_Contact_BAO_GroupContactCache::loadAll();
+    $g1Contacts = $this->callAPISuccess('contact', 'get', array('group' => $g1ID));
+    $g2Contacts = $this->callAPISuccess('contact', 'get', array('group' => $g2ID));
+    $g3Contacts = $this->callAPISuccess('contact', 'get', array('group' => $g3ID));
+    $this->assertTrue($g1Contacts['count'] == 1);
+    $this->assertTrue($g2Contacts['count'] == 2);
+    $this->assertTrue($g3Contacts['count'] == 1);
   }
 
 }

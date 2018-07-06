@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -91,7 +91,6 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       'total_amount' => $actualPaidAmt,
       'source' => 'Fall Fundraiser Dinner: Offline registration',
       'currency' => 'USD',
-      'non_deductible_amount' => 'null',
       'receipt_date' => date('Y-m-d') . " 00:00:00",
       'contact_id' => $this->_contactId,
       'financial_type_id' => 4,
@@ -103,8 +102,8 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       'partial_amount_to_pay' => $actualPaidAmt,
     );
 
-    $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
-    $contributionId = $contribution->id;
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $contributionId = $contribution['id'];
     $participant = $this->callAPISuccessGetSingle('participant', array('id' => $participant['id']));
 
     // add participant payment entry
@@ -125,11 +124,11 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       $params, $lineItem
     );
     $lineItemVal[$priceSetId] = $lineItem;
-    CRM_Price_BAO_LineItem::processPriceSet($participant['id'], $lineItemVal, $contribution, 'civicrm_participant');
+    CRM_Price_BAO_LineItem::processPriceSet($participant['id'], $lineItemVal, $this->getContributionObject($contributionId), 'civicrm_participant');
 
     return array(
       'participant' => $participant,
-      'contribution' => $contribution,
+      'contribution' => $contribution['values'][$contribution['id']],
       'lineItem' => $templineItems,
       'params' => $tempParams,
       'feeBlock' => $feeBlock,
@@ -155,7 +154,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
     // status checking
     $this->assertEquals($participant['participant_status_id'], 14, 'Status record is not proper for participant');
-    $this->assertEquals($contribution->contribution_status_id, 8, 'Status record is not proper for contribution');
+    $this->assertEquals($result['contribution']['contribution_status_id'], 8, 'Status record is not proper for contribution');
   }
 
   /**
@@ -165,6 +164,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $feeAmt = 100;
     $amtPaid = 80;
     $result = $this->addParticipantWithPayment($feeAmt, $amtPaid);
+    $contributionID = $result['contribution']['id'];
     extract($result);
 
     //Complete the partial payment.
@@ -172,15 +172,15 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       'total_amount' => 20,
       'payment_instrument_id' => 3,
     );
-    CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contribution->id, $submittedValues, 'owed', $participant['id']);
+    CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionID, $submittedValues, 'owed', $participant['id']);
 
     //Change selection to a lower amount.
     $params['price_2'] = 50;
-    CRM_Price_BAO_LineItem::changeFeeSelections($params, $participant['id'], 'participant', $contribution->id, $feeBlock, $lineItem, $feeAmt);
+    CRM_Price_BAO_LineItem::changeFeeSelections($params, $participant['id'], 'participant', $contributionID, $feeBlock, $lineItem, $feeAmt);
 
     //Record a refund of the remaining amount.
     $submittedValues['total_amount'] = 50;
-    CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contribution->id, $submittedValues, 'refund', $participant['id']);
+    CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionID, $submittedValues, 'refund', $participant['id']);
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participant['id'], 'event', TRUE);
     $transaction = $paymentInfo['transaction'];
 

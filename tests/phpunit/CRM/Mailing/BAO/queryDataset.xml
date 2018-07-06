@@ -12,7 +12,7 @@
   test05  109       n       y       n       n
   test06  110       n       y2      n       y
   test07  111       n       y       y[dc]   n
-  test08  112       n       y       y[c]    y
+  test08  112       n       y       y[c2]   y
 
   Mailing 15: Second Test Mailing Events, 2011-05-26
 
@@ -131,6 +131,7 @@
   <civicrm_mailing_event_trackable_url_open id="8" event_queue_id="51" trackable_url_id="12" time_stamp="2011-05-26 13:21:09"/>
   <civicrm_mailing_event_trackable_url_open id="9" event_queue_id="51" trackable_url_id="13" time_stamp="2011-05-26 13:21:13"/>
   <civicrm_mailing_event_trackable_url_open id="7" event_queue_id="52" trackable_url_id="13" time_stamp="2011-05-26 13:20:03"/>
+  <civicrm_mailing_event_trackable_url_open id="12" event_queue_id="52" trackable_url_id="13" time_stamp="2011-05-27 13:20:03"/>
   <civicrm_mailing_event_trackable_url_open id="10" event_queue_id="55" trackable_url_id="14" time_stamp="2011-05-26 13:23:54"/>
   <civicrm_mailing_event_trackable_url_open id="11" event_queue_id="55" trackable_url_id="15" time_stamp="2011-05-26 13:23:58"/>
 </dataset>

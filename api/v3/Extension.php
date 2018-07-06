@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
@@ -368,12 +368,14 @@ function civicrm_api3_extension_get($params) {
       $result[] = $info;
     }
   }
-  $options = _civicrm_api3_get_options_from_params($params);
-  $returnFields = !empty($options['return']) ? $options['return'] : array();
-  if (!in_array('id', $returnFields)) {
-    $returnFields = array_merge($returnFields, array('id'));
-  }
-  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', $returnFields);
+
+  // These fields have been filtered already, and they have special semantics.
+  unset($params['key']);
+  unset($params['keys']);
+  unset($params['full_name']);
+
+  $filterableFields = array('id', 'type', 'status', 'path');
+  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', $filterableFields);
 }
 
 /**

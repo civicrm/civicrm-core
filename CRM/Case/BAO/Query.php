@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
 
@@ -698,6 +698,9 @@ case_relation_type.id = case_relationship.relationship_type_id )";
       $accessAllCases = TRUE;
       $caseOwner = array(1 => ts('Search All Cases'), 2 => ts('Only My Cases'));
       $form->addRadio('case_owner', ts('Cases'), $caseOwner);
+      if ($form->get('context') != 'dashboard') {
+        $form->add('checkbox', 'upcoming', ts('Search Cases with Upcoming Activities'));
+      }
     }
     $form->assign('accessAllCases', $accessAllCases);
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,9 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
-  protected $_addressField = FALSE;
-
-  protected $_emailField = FALSE;
-
-  protected $_phoneField = FALSE;
 
   protected $_summary = NULL;
 
@@ -99,6 +94,13 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
           'country_id' => array(
             'title' => ts('Country'),
           ),
+          'odd_street_number' => array(
+            'title' => ts('Odd/Even Street Number'),
+            'type' => CRM_Utils_Type::T_INT,
+            'no_display' => TRUE,
+            'required' => TRUE,
+            'dbAlias' => '(address_civireport.street_number % 2)',
+          ),
         ),
         'filters' => array(
           'street_number' => array(
@@ -108,6 +110,18 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
           ),
           'street_address' => NULL,
           'city' => NULL,
+        ),
+        'order_bys' => array(
+          'street_name' => array(
+            'title' => ts('Street Name'),
+          ),
+          'street_number' => array(
+            'title' => ts('Street Number'),
+          ),
+          'odd_street_number' => array(
+            'title' => ts('Odd/Even Street Number'),
+            'dbAlias' => 'civicrm_address_odd_street_number',
+          ),
         ),
         'grouping' => 'location-fields',
       ),
@@ -130,6 +144,7 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
   }
 
   public function select() {
+    // @todo remove this function & use parent.
     $select = array();
 
     $this->_columnHeaders = array();
@@ -138,15 +153,6 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
         if (!empty($field['required']) ||
           !empty($this->_params['fields'][$fieldName])
         ) {
-          if ($tableName == 'civicrm_address') {
-            $this->_addressField = TRUE;
-          }
-          elseif ($tableName == 'civicrm_email') {
-            $this->_emailField = TRUE;
-          }
-          elseif ($tableName == 'civicrm_phone') {
-            $this->_phoneField = TRUE;
-          }
 
           $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
           $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
@@ -164,17 +170,10 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
     $this->_from = "
 FROM       civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
 ";
-    if ($this->_addressField) {
-      $this->_from .= "LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
 
-    if ($this->_emailField) {
-      $this->_from .= "LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']} ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND {$this->_aliases['civicrm_email']}.is_primary = 1\n";
-    }
-
-    if ($this->_phoneField) {
-      $this->_from .= "LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']} ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND {$this->_aliases['civicrm_phone']}.is_primary = 1\n";
-    }
+    $this->joinAddressFromContact();
+    $this->joinPhoneFromContact();
+    $this->joinEmailFromContact();
   }
 
   public function where() {

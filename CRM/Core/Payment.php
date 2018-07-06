@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -102,6 +102,17 @@ abstract class CRM_Core_Payment {
    * @var string
    */
   protected $cancelUrl;
+
+  /**
+   * Processor type label.
+   *
+   * (Deprecated parameter but used in some messages).
+   *
+   * @deprecated
+   *
+   * @var string
+   */
+  public $_processorName;
 
   /**
    * The profile configured to show on the billing form.
@@ -489,10 +500,10 @@ abstract class CRM_Core_Payment {
         if (array_keys($params) == array('is_recur_installments', 'is_email_receipt')) {
           $gotText = ts('Your recurring contribution will be processed automatically.');
           if ($params['is_recur_installments']) {
-            $gotText .= ts(' You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.');
+            $gotText .= ' ' . ts('You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.');
           }
           if ($params['is_email_receipt']) {
-            $gotText .= ts(' You will receive an email receipt for each recurring contribution.');
+            $gotText .= ' ' . ts('You will receive an email receipt for each recurring contribution.');
           }
         }
         break;
@@ -671,7 +682,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'text',
         'name' => 'credit_card_number',
         'title' => ts('Card Number'),
-        'cc_field' => TRUE,
         'attributes' => array(
           'size' => 20,
           'maxlength' => 20,
@@ -684,7 +694,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'text',
         'name' => 'cvv2',
         'title' => ts('Security Code'),
-        'cc_field' => TRUE,
         'attributes' => array(
           'size' => 5,
           'maxlength' => 10,
@@ -703,7 +712,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'date',
         'name' => 'credit_card_exp_date',
         'title' => ts('Expiration Date'),
-        'cc_field' => TRUE,
         'attributes' => CRM_Core_SelectValues::date('creditCard'),
         'is_required' => TRUE,
         'rules' => array(
@@ -718,7 +726,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'select',
         'name' => 'credit_card_type',
         'title' => ts('Card Type'),
-        'cc_field' => TRUE,
         'attributes' => $creditCardType,
         'is_required' => FALSE,
       ),
@@ -726,7 +733,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'text',
         'name' => 'account_holder',
         'title' => ts('Account Holder'),
-        'cc_field' => TRUE,
         'attributes' => array(
           'size' => 20,
           'maxlength' => 34,
@@ -739,7 +745,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'text',
         'name' => 'bank_account_number',
         'title' => ts('Bank Account Number'),
-        'cc_field' => TRUE,
         'attributes' => array(
           'size' => 20,
           'maxlength' => 34,
@@ -759,7 +764,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'text',
         'name' => 'bank_identification_number',
         'title' => ts('Bank Identification Number'),
-        'cc_field' => TRUE,
         'attributes' => array(
           'size' => 20,
           'maxlength' => 11,
@@ -778,7 +782,6 @@ abstract class CRM_Core_Payment {
         'htmlType' => 'text',
         'name' => 'bank_name',
         'title' => ts('Bank Name'),
-        'cc_field' => TRUE,
         'attributes' => array(
           'size' => 20,
           'maxlength' => 64,
@@ -792,7 +795,6 @@ abstract class CRM_Core_Payment {
         'name' => 'check_number',
         'title' => ts('Check Number'),
         'is_required' => FALSE,
-        'cc_field' => TRUE,
         'attributes' => NULL,
       ),
       'pan_truncation' => array(
@@ -800,7 +802,6 @@ abstract class CRM_Core_Payment {
         'name' => 'pan_truncation',
         'title' => ts('Last 4 digits of the card'),
         'is_required' => FALSE,
-        'cc_field' => TRUE,
         'attributes' => array(
           'size' => 4,
           'maxlength' => 4,
@@ -814,6 +815,13 @@ abstract class CRM_Core_Payment {
             'rule_parameters' => NULL,
           ),
         ),
+      ),
+      'payment_token' => array(
+        'htmlType' => 'hidden',
+        'name' => 'payment_token',
+        'title' => ts('Authorization token'),
+        'is_required' => FALSE,
+        'attributes' => ['size' => 10, 'autocomplete' => 'off', 'id' => 'payment_token'],
       ),
     );
   }
@@ -999,6 +1007,19 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Get the currency for the transaction.
+   *
+   * Handle any inconsistency about how it is passed in here.
+   *
+   * @param $params
+   *
+   * @return string
+   */
+  protected function getAmount($params) {
+    return CRM_Utils_Money::format($params['amount'], NULL, NULL, TRUE);
+  }
+
+  /**
    * Get url to return to after cancelled or failed transaction.
    *
    * @param string $qfKey
@@ -1158,7 +1179,7 @@ abstract class CRM_Core_Payment {
    */
   public function doPayment(&$params, $component = 'contribute') {
     $this->_component = $component;
-    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
 
     // If we have a $0 amount, skip call to processor and set payment_status to Completed.
     // Conceivably a processor might override this - perhaps for setting up a token - but we don't
@@ -1526,6 +1547,18 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
    * @return bool
    */
   public function supportsEditRecurringContribution() {
+    return FALSE;
+  }
+
+  /**
+   * Checks if payment processor supports recurring contributions
+   *
+   * @return bool
+   */
+  public function supportsRecurring() {
+    if (!empty($this->_paymentProcessor['is_recur'])) {
+      return TRUE;
+    }
     return FALSE;
   }
 

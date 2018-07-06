@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -91,12 +91,24 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param array $ids
    *   Array contains the id (deprecated).
    *
-   *
-   * @return object
+   * @return \CRM_Member_DAO_MembershipType
+   * @throws \CiviCRM_API3_Exception
    */
   public static function add(&$params, $ids = array()) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membershipType', $ids));
-    if (!$id) {
+    // DEPRECATED Check if membershipType ID was passed in via $ids
+    if (empty($params['id'])) {
+      if (isset($ids['membershipType'])) {
+        Civi::log()->warning('Deprecated: Passing membershipType by $ids array in CRM_Member_BAO_MembershipType::add');
+      }
+      $params['id'] = CRM_Utils_Array::value('membershipType', $ids);
+    }
+
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'MembershipType', CRM_Utils_Array::value('id', $params), $params);
+
+    $membershipTypeId = CRM_Utils_Array::value('id', $params);
+
+    if (!$membershipTypeId) {
       if (!isset($params['is_active'])) {
         // do we need this?
         $params['is_active'] = FALSE;
@@ -106,28 +118,30 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       }
     }
 
+    // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an organization is changed.
+    $previousID = NULL;
+    if ($membershipTypeId) {
+      $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipTypeId, 'member_of_contact_id');
+    }
+
     // action is taken depending upon the mode
     $membershipType = new CRM_Member_DAO_MembershipType();
     $membershipType->copyValues($params);
-    $membershipType->id = $id;
-
-    // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an organization is changed.
-    $previousID = NULL;
-    if ($id) {
-      $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $id, 'member_of_contact_id');
-    }
-
     $membershipType->save();
-    if ($id) {
+
+    if ($membershipTypeId) {
       // on update we may need to retrieve some details for the price field function - otherwise we get e-notices on attempts to retrieve
       // name etc - the presence of previous id tells us this is an update
       $params = array_merge(civicrm_api3('membership_type', 'getsingle', array('id' => $membershipType->id)), $params);
     }
     self::createMembershipPriceField($params, $previousID, $membershipType->id);
     // update all price field value for quick config when membership type is set CRM-11718
-    if ($id) {
-      self::updateAllPriceFieldValue($id, $params);
+    if ($membershipTypeId) {
+      self::updateAllPriceFieldValue($membershipTypeId, $params);
     }
+
+    CRM_Utils_Hook::post($hook, 'MembershipType', $membershipType->id, $membershipType);
+
     self::flush();
     return $membershipType;
   }
@@ -536,6 +550,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         $date = $membershipDetails->end_date;
       }
       $date = explode('-', $date);
+      // We have to add 1 day first in case it's the end of the month, then subtract afterwards
+      // eg. 2018-02-28 should renew to 2018-03-31, if we just added 1 month we'd get 2018-03-28
       $logStartDate = date('Y-m-d', mktime(0, 0, 0,
         (double) $date[1],
         (double) ($date[2] + 1),
@@ -620,7 +636,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *   array of the details of membership types
    */
   public static function getMembershipTypesByOrg($orgID) {
-    Civi::log()->warning('Deprecated function getMembershipTypesByOrg, please user membership_type api', array('civi.tag' => 'deprecated'));
+    CRM_Core_Error::deprecatedFunctionWarning('membership_type api');
     $memberTypesSameParentOrg = civicrm_api3('MembershipType', 'get', array(
       'member_of_contact_id' => $orgID,
       'options' => array(
@@ -791,41 +807,39 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * @param array $params
    */
   public static function updateAllPriceFieldValue($membershipTypeId, $params) {
-    $updateFields = array();
-    if (!empty($params['minimum_fee'])) {
-      $amount = $params['minimum_fee'];
-    }
-    else {
-      $amount = 0;
-    }
-
-    $updateValues = array(
-      2 => array('financial_type_id', 'financial_type_id', 'Integer'),
-      3 => array('label', 'name', 'String'),
-      4 => array('amount', 'minimum_fee', 'Float'),
-      5 => array('description', 'description', 'String'),
+    $defaults = array();
+    $fieldsToUpdate = array(
+      'financial_type_id' => 'financial_type_id',
+      'name' => 'label',
+      'minimum_fee' => 'amount',
+      'description' => 'description',
+      'visibility' => 'visibility_id',
     );
-
-    $queryParams = array(1 => array($membershipTypeId, 'Integer'));
-    foreach ($updateValues as $key => $value) {
-      if (array_key_exists($value[1], $params)) {
-        $updateFields[] = "cpfv." . $value[0] . " = %$key";
-        if ($value[1] == 'minimum_fee') {
-          $fieldValue = $amount;
+    $priceFieldValueBAO = new CRM_Price_BAO_PriceFieldValue();
+    $priceFieldValueBAO->membership_type_id = $membershipTypeId;
+    $priceFieldValueBAO->find();
+    while ($priceFieldValueBAO->fetch()) {
+      $updateParams = array(
+        'id' => $priceFieldValueBAO->id,
+        'price_field_id' => $priceFieldValueBAO->price_field_id,
+      );
+      //Get priceset details.
+      $fieldParams = array('fid' => $priceFieldValueBAO->price_field_id);
+      $setID = CRM_Price_BAO_PriceSet::getSetId($fieldParams);
+      $setParams = array('id' => $setID);
+      $setValues = CRM_Price_BAO_PriceSet::retrieve($setParams, $defaults);
+      if (!empty($setValues->is_quick_config) && $setValues->name != 'default_membership_type_amount') {
+        foreach ($fieldsToUpdate as $key => $value) {
+          if ($value == 'visibility_id' && !empty($params['visibility'])) {
+            $updateParams['visibility_id'] = CRM_Price_BAO_PriceField::getVisibilityOptionID(strtolower($params['visibility']));
+          }
+          else {
+            $updateParams[$value] = CRM_Utils_Array::value($key, $params);
+          }
         }
-        else {
-          $fieldValue = $params[$value[1]];
-        }
-        $queryParams[$key] = array($fieldValue, $value[2]);
+        CRM_Price_BAO_PriceFieldValue::add($updateParams);
       }
     }
-
-    $query = "UPDATE `civicrm_price_field_value` cpfv
-INNER JOIN civicrm_price_field cpf on cpf.id = cpfv.price_field_id
-INNER JOIN civicrm_price_set cps on cps.id = cpf.price_set_id
-SET " . implode(' , ', $updateFields) . " WHERE cpfv.membership_type_id = %1
-AND cps.is_quick_config = 1 AND cps.name != 'default_membership_type_amount'";
-    CRM_Core_DAO::executeQuery($query, $queryParams);
   }
 
 }

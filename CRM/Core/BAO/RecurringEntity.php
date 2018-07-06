@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 require_once 'packages/When/When.php';
@@ -660,7 +660,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         }
 
         $updateDAO = CRM_Core_DAO::cascadeUpdate($daoName, $obj->id, $entityID, $skipData);
-        CRM_Core_DAO::freeResult();
       }
       else {
         CRM_Core_Error::fatal("DAO Mapper missing for $entityTable.");
@@ -1214,21 +1213,37 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       $dao->mode = $mode;
       $dao->save();
 
-      //CRM-20787 Fix
-      //I am not sure about other fields, if mode = 3 apply for an event then other fields
-      //should be save for all other series events or not so applying for price set only for now here.
-      if (CRM_Core_BAO_RecurringEntity::MODE_ALL_ENTITY_IN_SERIES === $mode) {
-
-        //Step-1: Get all events of series
-        $seriesEventRecords = CRM_Core_BAO_RecurringEntity::getEntitiesFor($entityId, $entityTable);
-        foreach ($seriesEventRecords as $event) {
-          //Step-3: Save price set in other series events
-          if (CRM_Price_BAO_PriceSet::removeFrom($event['table'], $event['id'])) {//Remove existing priceset
-            CRM_Core_BAO_Discount::del($event['id'], $event['table']);
+      if ($priceSet) {
+        //CRM-20787 Fix
+        //I am not sure about other fields, if mode = 3 apply for an event then other fields
+        //should be save for all other series events or not so applying for price set only for now here.
+        if (CRM_Core_BAO_RecurringEntity::MODE_ALL_ENTITY_IN_SERIES === $mode) {
+          //Step-1: Get all events of series
+          $seriesEventRecords = CRM_Core_BAO_RecurringEntity::getEntitiesFor($entityId, $entityTable);
+          foreach ($seriesEventRecords as $event) {
+            //Step-2: Save price set in other series events
+            if (CRM_Price_BAO_PriceSet::removeFrom($event['table'], $event['id'])) {//Remove existing priceset
+              CRM_Core_BAO_Discount::del($event['id'], $event['table']);
+            }
             CRM_Price_BAO_PriceSet::addTo($event['table'], $event['id'], $priceSet); //Add new price set
           }
         }
+
+        if (CRM_Core_BAO_RecurringEntity::MODE_NEXT_ALL_ENTITY === $mode) {
+          //Step-1: Get all events of series
+          $seriesEventRecords = CRM_Core_BAO_RecurringEntity::getEntitiesFor($entityId, $entityTable);
+          foreach ($seriesEventRecords as $event) {
+            //Step-2: Save price set in other series events
+            if ($entityId < $event["id"]) {
+              if (CRM_Price_BAO_PriceSet::removeFrom($event['table'], $event['id'])) {//Remove existing priceset
+                CRM_Core_BAO_Discount::del($event['id'], $event['table']);
+              }
+              CRM_Price_BAO_PriceSet::addTo($event['table'], $event['id'], $priceSet); //Add new price set
+            }
+          }
+        }
       }
+
       //CRM-20787 - Fix end
       $finalResult['status'] = 'Done';
     }

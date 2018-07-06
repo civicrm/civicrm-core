@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -205,7 +205,7 @@ class SettingsManager {
       return self::getSystemDefaults($entity);
     }
 
-    $cacheKey = 'defaults:' . $entity;
+    $cacheKey = 'defaults_' . $entity;
     $defaults = $this->cache->get($cacheKey);
     if (!is_array($defaults)) {
       $specs = SettingsMetadata::getMetadata(array(

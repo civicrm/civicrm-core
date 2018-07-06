@@ -270,12 +270,14 @@
         else {
           // Protect against races in saving and previewing by chaining create+preview.
           var params = angular.extend({}, mailing, mailing.recipients, {
-            options: {force_rollback: 1},
+            id: mailing.id,
             'api.Mailing.preview': {
               id: '$value.id'
             }
           });
+          delete params.scheduled_date;
           delete params.recipients; // the content was merged in
+          params._skip_evil_bao_auto_recipients_ = 1; // skip recipient rebuild on mail preview
           return qApi('Mailing', 'create', params).then(function(result) {
             mailing.modified_date = result.values[result.id].modified_date;
             // changes rolled back, so we don't care about updating mailing
@@ -290,11 +292,8 @@
       previewRecipients: function previewRecipients(mailing, previewLimit) {
         // To get list of recipients, we tentatively save the mailing and
         // get the resulting recipients -- then rollback any changes.
-        var params = angular.extend({}, mailing, mailing.recipients, {
-          name: 'placeholder', // for previewing recipients on new, incomplete mailing
-          subject: 'placeholder', // for previewing recipients on new, incomplete mailing
-          options: {force_rollback: 1},
-          'api.mailing_job.create': 1, // note: exact match to API default
+        var params = angular.extend({}, mailing.recipients, {
+          id: mailing.id,
           'api.MailingRecipients.get': {
             mailing_id: '$value.id',
             options: {limit: previewLimit},
@@ -302,6 +301,7 @@
             'api.email.getvalue': {'return': 'email'}
           }
         });
+        delete params.scheduled_date;
         delete params.recipients; // the content was merged in
         return qApi('Mailing', 'create', params).then(function (recipResult) {
           // changes rolled back, so we don't care about updating mailing
@@ -317,10 +317,7 @@
           // To get list of recipients, we tentatively save the mailing and
           // get the resulting recipients -- then rollback any changes.
           var params = angular.extend({}, mailing, mailing.recipients, {
-            name: 'placeholder', // for previewing recipients on new, incomplete mailing
-            subject: 'placeholder', // for previewing recipients on new, incomplete mailing
-            options: {force_rollback: 1},
-            'api.mailing_job.create': 1, // note: exact match to API default
+            id: mailing.id,
             'api.MailingRecipients.getcount': {
               mailing_id: '$value.id'
             }
@@ -337,6 +334,7 @@
             });
             crmMailingCache.put('mailing-' + mailing.id + '-recipient-params', params.recipients);
           }
+          delete params.scheduled_date;
           delete params.recipients; // the content was merged in
           recipientCount = qApi('Mailing', 'create', params).then(function (recipResult) {
             // changes rolled back, so we don't care about updating mailing
@@ -373,7 +371,7 @@
         delete params.jobs;
 
         delete params.recipients; // the content was merged in
-
+        params._skip_evil_bao_auto_recipients_ = 1; // skip recipient rebuild on simple save
         return qApi('Mailing', 'create', params).then(function(result) {
           if (result.id && !mailing.id) {
             mailing.id = result.id;
@@ -426,6 +424,8 @@
         delete params.jobs;
 
         delete params.recipients; // the content was merged in
+
+        params._skip_evil_bao_auto_recipients_ = 1; // skip recipient rebuild while sending test mail
 
         return qApi('Mailing', 'create', params).then(function (result) {
           if (result.id && !mailing.id) {

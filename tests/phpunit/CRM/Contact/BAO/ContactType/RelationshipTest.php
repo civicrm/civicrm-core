@@ -101,8 +101,7 @@ DELETE FROM civicrm_contact_type
       'contact_type_b' => 'Individual',
       'contact_sub_type_b' => $this->parent,
     );
-    $ids = array();
-    $result = CRM_Contact_BAO_RelationshipType::add($params, $ids);
+    $result = CRM_Contact_BAO_RelationshipType::add($params);
     $this->assertEquals($result->name_a_b, 'indivToparent');
     $this->assertEquals($result->contact_type_a, 'Individual');
     $this->assertEquals($result->contact_type_b, 'Individual');
@@ -119,8 +118,7 @@ DELETE FROM civicrm_contact_type
       'contact_sub_type_a' => $this->sponsor,
       'contact_type_b' => 'Individual',
     );
-    $ids = array();
-    $result = CRM_Contact_BAO_RelationshipType::add($params, $ids);
+    $result = CRM_Contact_BAO_RelationshipType::add($params);
     $this->assertEquals($result->name_a_b, 'SponsorToIndiv');
     $this->assertEquals($result->contact_type_a, 'Organization');
     $this->assertEquals($result->contact_sub_type_a, $this->sponsor);
@@ -138,8 +136,7 @@ DELETE FROM civicrm_contact_type
       'contact_type_b' => 'Organization',
       'contact_sub_type_b' => $this->sponsor,
     );
-    $ids = array();
-    $result = CRM_Contact_BAO_RelationshipType::add($params, $ids);
+    $result = CRM_Contact_BAO_RelationshipType::add($params);
     $this->assertEquals($result->name_a_b, 'StudentToSponser');
     $this->assertEquals($result->contact_type_a, 'Individual');
     $this->assertEquals($result->contact_sub_type_a, $this->student);
@@ -160,8 +157,7 @@ DELETE FROM civicrm_contact_type
       'contact_type_b' => 'Individual',
       'contact_sub_type_b' => $this->parent,
     );
-    $relTypeIds = array();
-    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
+    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams);
     $params = array(
       'relationship_type_id' => $relType->id . '_a_b',
       'contact_check' => array($this->indivi_student => 1),
@@ -187,8 +183,7 @@ DELETE FROM civicrm_contact_type
       'contact_sub_type_a' => $this->sponsor,
       'contact_type_b' => 'Individual',
     );
-    $relTypeIds = array();
-    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
+    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams);
     $params = array(
       'relationship_type_id' => $relType->id . '_a_b',
       'contact_check' => array($this->individual => 1),
@@ -212,8 +207,7 @@ DELETE FROM civicrm_contact_type
       'contact_type_b' => 'Organization',
       'contact_sub_type_b' => 'Sponser',
     );
-    $relTypeIds = array();
-    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
+    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams);
     $params = array(
       'relationship_type_id' => $relType->id . '_a_b',
       'contact_check' => array($this->individual => 1),
@@ -240,8 +234,7 @@ DELETE FROM civicrm_contact_type
       'contact_type_b' => 'Individual',
       'contact_sub_type_b' => $this->parent,
     );
-    $relTypeIds = array();
-    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
+    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams);
     $params = array(
       'relationship_type_id' => $relType->id . '_a_b',
       'is_active' => 1,
@@ -268,8 +261,7 @@ DELETE FROM civicrm_contact_type
       'contact_sub_type_a' => $this->sponsor,
       'contact_type_b' => 'Individual',
     );
-    $relTypeIds = array();
-    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
+    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams);
     $params = array(
       'relationship_type_id' => $relType->id . '_a_b',
       'is_active' => 1,
@@ -293,8 +285,7 @@ DELETE FROM civicrm_contact_type
       'contact_type_b' => 'Organization',
       'contact_sub_type_b' => $this->sponsor,
     );
-    $relTypeIds = array();
-    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams, $relTypeIds);
+    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams);
     $params = array(
       'relationship_type_id' => $relType->id . '_a_b',
       'is_active' => 1,

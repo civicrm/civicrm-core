@@ -33,6 +33,10 @@ class SequenceListener implements CaseChangeListener {
   }
 
   /**
+   * Triggers next case activity in sequence if current activity status is updated
+   * to type=COMPLETED(See CRM-21598). The adjoining activity is created according
+   * to the sequence configured in case type.
+   *
    * @param \Civi\CCase\Event\CaseChangeEvent $event
    *
    * @throws \CiviCRM_API3_Exception
@@ -48,7 +52,7 @@ class SequenceListener implements CaseChangeListener {
     }
 
     $actTypes = array_flip(\CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name'));
-    $actStatuses = array_flip(\CRM_Core_PseudoConstant::activityStatus('name'));
+    $actStatuses = array_flip(\CRM_Activity_BAO_Activity::getStatusesByType(\CRM_Activity_BAO_Activity::COMPLETED));
 
     $actIndex = $analyzer->getActivityIndex(array('activity_type_id', 'status_id'));
 
@@ -59,7 +63,7 @@ class SequenceListener implements CaseChangeListener {
         $this->createActivity($analyzer, $actTypeXML);
         return;
       }
-      elseif (empty($actIndex[$actTypeId][$actStatuses['Completed']])) {
+      elseif (!in_array(key($actIndex[$actTypeId]), $actStatuses)) {
         // Haven't gotten past this step yet!
         return;
       }
@@ -68,7 +72,7 @@ class SequenceListener implements CaseChangeListener {
     //CRM-17452 - Close the case only if all the activities are complete
     $activities = $analyzer->getActivities();
     foreach ($activities as $activity) {
-      if ($activity['status_id'] != $actStatuses['Completed']) {
+      if (!in_array($activity['status_id'], $actStatuses)) {
         return;
       }
     }

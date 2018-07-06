@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2017                                |
  +--------------------------------------------------------------------+
@@ -635,7 +635,7 @@ function civicrm_api3_activity_delete($params) {
     return civicrm_api3_create_success(1, $params, 'Activity', 'delete');
   }
   else {
-    throw new API_Exception('Could not delete Activity');
+    throw new API_Exception('Could not delete Activity: ' . (int) $params['id']);
   }
 }
 

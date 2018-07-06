@@ -33,6 +33,9 @@
     <title>Relationship Type Label A to B</title>
     <length>64</length>
     <comment>label for relationship of contact_a to contact_b.</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>3.0</add>
     <localizable>true</localizable>
   </field>
@@ -50,6 +53,9 @@
     <title>Relationship Type Label B to A</title>
     <length>64</length>
     <comment>Optional label for relationship of contact_b to contact_a.</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>3.0</add>
     <localizable>true</localizable>
   </field>
@@ -60,6 +66,9 @@
     <length>255</length>
     <comment>Optional verbose description of the relationship type.</comment>
     <add>1.1</add>
+    <html>
+      <type>Text</type>
+    </html>
     <localizable>true</localizable>
   </field>
   <field>
@@ -137,6 +146,9 @@
     <type>boolean</type>
     <title>Relationship Type is Reserved</title>
     <comment>Is this relationship type a predefined system type (can not be changed or de-activated)?</comment>
+    <html>
+      <type>CheckBox</type>
+    </html>
     <add>1.1</add>
   </field>
   <field>
@@ -146,6 +158,9 @@
     <default>1</default>
     <comment>Is this relationship type currently active (i.e. can be used when creating or editing relationships)?
     </comment>
+    <html>
+      <type>CheckBox</type>
+    </html>
     <add>1.1</add>
   </field>
   <index>

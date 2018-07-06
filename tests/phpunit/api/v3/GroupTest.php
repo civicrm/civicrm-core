@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,10 +49,10 @@ class api_v3_GroupTest extends CiviUnitTestCase {
    * Clean up after test.
    */
   public function tearDown() {
-    $this->groupDelete($this->_groupID);
     CRM_Utils_Hook::singleton()->reset();
     $config = CRM_Core_Config::singleton();
     unset($config->userPermissionClass->permissions);
+    $this->quickCleanup(['civicrm_group', 'civicrm_group_contact']);
   }
 
   /**
@@ -83,6 +83,17 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $this->assertEquals($group[$this->_groupID]['name'], "Test Group 1");
     $this->assertEquals($group[$this->_groupID]['is_active'], 1);
     $this->assertEquals($group[$this->_groupID]['visibility'], 'Public Pages');
+  }
+
+  /**
+   * Test ability to get active, inactive and both.
+   *
+   * Default is active only.
+   */
+  public function testGetGroupActiveAndInactive() {
+    $this->groupCreate(['is_active' => 0, 'name' => 'group_2', 'title' => 2]);
+    $group1 = $this->callAPISuccessGetSingle('Group', ['is_active' => 1]);
+    $this->callAPISuccessGetCount('Group', [], 2);
   }
 
   public function testGetGroupParamsWithGroupId() {
@@ -150,7 +161,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       //check for empty parent
       'parents' => "",
       'visibility' => 'Public Pages',
-      'group_type' => array(1, 2),
+      'group_type' => [1, 2],
     );
 
     $result = $this->callAPISuccess('Group', 'create', $params);
@@ -178,12 +189,47 @@ class api_v3_GroupTest extends CiviUnitTestCase {
         'title' => 'Test Group 2',
         'group_type' => 2,
         'parents' => $result['id'],
+        'sequential' => 1,
       )
     );
-    $result = $this->callAPISuccess('Group', 'create', $params);
-    $group = $result["values"][$result['id']];
-    $this->assertEquals($group['group_type'], array($params['group_type']));
-    $this->assertEquals($group['parents'], $params['parents']);
+    $group2 = $this->callAPISuccess('Group', 'create', $params)['values'][0];
+
+    $this->assertEquals($group2['group_type'], array($params['group_type']));
+    $this->assertEquals($params['parents'], $group2['parents']);
+
+    // Test array format for parents.
+    $params = array_merge($params, array(
+        'name' => 'Test Group 3',
+        'title' => 'Test Group 3',
+        'parents' => [$result['id'], $group2['id']],
+      )
+    );
+    $group3 = $this->callAPISuccess('Group', 'create', $params)['values'][0];
+    $parents = $this->callAPISuccess('Group', 'getvalue', ['return' => 'parents', 'id' => $group3['id']]);
+
+    $this->assertAPIArrayComparison("{$result['id']},{$group2['id']}", $parents);
+
+    $groupNesting = $this->callAPISuccess('GroupNesting', 'get', ['child_group_id' => $group3['id']]);
+    // 2 Group nesting entries - one for direct parent & one for grandparent.
+    $this->assertEquals(2, $groupNesting['count']);
+    $this->groupDelete($group2['id']);
+    $this->groupDelete($group3['id']);
+  }
+
+  /**
+   * Test that an array of valid values works for group_type field.
+   */
+  public function testGroupTypeWithPseudoconstantArray() {
+    $params = [
+      'name' => 'Test Group 2',
+      'title' => 'Test Group 2',
+      'group_type' => ['Mailing List', 'Access Control'],
+      'sequential' => 1,
+    ];
+    $group = $this->callAPISuccess('Group', 'create', $params);
+    $groupType = $this->callAPISuccess('Group', 'getvalue', ['return' => 'group_type', 'id' => $group['id']]);
+
+    $this->assertAPIArrayComparison([2, 1], $groupType);
   }
 
   public function testGetNonExistingGroup() {
@@ -226,8 +272,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $params['parents']["(SELECT api_key FROM civicrm_contact where id = 1)"] = "Test";
     $this->callAPIFailure('group', 'create', $params);
     unset($params['parents']["(SELECT api_key FROM civicrm_contact where id = 1)"]);
-    $group2 = $this->callAPISuccess('group', 'create', $params);
-    $this->assertEquals(count($group2['values'][$group2['id']]['parents']), 1);
+    $this->callAPIFailure('group', 'create', $params, '\'test Group\' is not a valid option for field parents');
   }
 
   /**

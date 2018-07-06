@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
 
@@ -387,6 +387,7 @@ WHERE  type.name IS NOT NULL
     $argString = $all ? 'CRM_CT_GSE_1' : 'CRM_CT_GSE_0';
     $argString .= $isSeparator ? '_1' : '_0';
     $argString .= $separator;
+    $argString = CRM_Core_BAO_Cache::cleanKey($argString);
     if (!array_key_exists($argString, $_cache)) {
       $cache = CRM_Utils_Cache::singleton();
       $_cache[$argString] = $cache->get($argString);
@@ -654,12 +655,11 @@ WHERE name = %1";
     }
 
     if (!empty($params['id'])) {
-      $params = array('name' => "New $contactName");
       $newParams = array(
         'label' => "New $contact",
         'is_active' => $active,
       );
-      CRM_Core_BAO_Navigation::processUpdate($params, $newParams);
+      CRM_Core_BAO_Navigation::processUpdate(['name' => "New $contactName"], $newParams);
     }
     else {
       $name = self::getBasicType($contactName);

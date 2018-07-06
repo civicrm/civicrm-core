@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -724,7 +724,7 @@ class CRM_Core_Permission {
       ),
       'skip IDS check' => array(
         $prefix . ts('skip IDS check'),
-        ts('IDS system is bypassed for users with this permission. Prevents false errors for admin users.'),
+        ts('Warning: Give to trusted roles only; this permission has security implications. IDS system is bypassed for users with this permission. Prevents false errors for admin users.'),
       ),
       'access uploaded files' => array(
         $prefix . ts('access uploaded files'),
@@ -732,21 +732,23 @@ class CRM_Core_Permission {
       ),
       'profile listings and forms' => array(
         $prefix . ts('profile listings and forms'),
-        ts('Access the profile Search form and listings'),
+        ts('Warning: Give to trusted roles only; this permission has privacy implications. Add/edit data in online forms and access public searchable directories.'),
       ),
       'profile listings' => array(
         $prefix . ts('profile listings'),
+        ts('Warning: Give to trusted roles only; this permission has privacy implications. Access public searchable directories.'),
       ),
       'profile create' => array(
         $prefix . ts('profile create'),
-        ts('Use profiles in Create mode'),
+        ts('Add data in a profile form.'),
       ),
       'profile edit' => array(
         $prefix . ts('profile edit'),
-        ts('Use profiles in Edit mode'),
+        ts('Edit data in a profile form.'),
       ),
       'profile view' => array(
         $prefix . ts('profile view'),
+        ts('View data in a profile.'),
       ),
       'access all custom data' => array(
         $prefix . ts('access all custom data'),
@@ -768,8 +770,8 @@ class CRM_Core_Permission {
         ts('Edit all inbound email activities (for visible contacts) basic information and content.'),
       ),
       'access CiviCRM' => array(
-        $prefix . ts('access CiviCRM'),
-        ts('Master control for access to the main CiviCRM backend and API'),
+        $prefix . ts('access CiviCRM backend and API'),
+        ts('Master control for access to the main CiviCRM backend and API. Give to trusted roles only.'),
       ),
       'access Contact Dashboard' => array(
         $prefix . ts('access Contact Dashboard'),
@@ -885,6 +887,12 @@ class CRM_Core_Permission {
       'edit message templates' => array(
         $prefix . ts('edit message templates'),
       ),
+      'edit system workflow message templates' => array(
+        $prefix . ts('edit system workflow message templates'),
+      ),
+      'edit user-driven message templates' => array(
+        $prefix . ts('edit user-driven message templates'),
+      ),
       'view my invoices' => array(
         $prefix . ts('view my invoices'),
         ts('Allow users to view/ download their own invoices'),
@@ -896,6 +904,10 @@ class CRM_Core_Permission {
       'edit own api keys' => array(
         $prefix . ts('edit own api keys'),
         ts('Edit user\'s own API keys'),
+      ),
+      'send SMS' => array(
+        $prefix . ts('send SMS'),
+        ts('Send an SMS'),
       ),
     );
 
@@ -1463,9 +1475,12 @@ class CRM_Core_Permission {
 
     $permissions['message_template'] = array(
       'get' => array('access CiviCRM'),
-      'create' => array('edit message templates'),
-      'update' => array('edit message templates'),
+      'create' => array('edit message templates', 'edit user-driven message templates', 'edit system workflow message templates'),
+      'update' => array('edit message templates', 'edit user-driven message templates', 'edit system workflow message templates'),
     );
+
+    $permissions['report_template']['update'] = 'save Report Criteria';
+    $permissions['report_template']['create'] = 'save Report Criteria';
     return $permissions;
   }
 

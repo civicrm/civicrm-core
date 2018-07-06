@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,9 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
-
-  protected $_addressField = FALSE;
 
   protected $_customGroupExtends = array(
     'Grant',
@@ -212,13 +210,11 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
   }
 
   public function select() {
+    // @todo remove this override - seems to do nothing parent doesn't.
     $select = array();
 
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
-      if ($tableName == 'civicrm_address') {
-        $this->_addressField = TRUE;
-      }
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
           if (!empty($field['required']) ||
@@ -242,16 +238,11 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
         FROM civicrm_grant {$this->_aliases['civicrm_grant']}
                         LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                     ON ({$this->_aliases['civicrm_grant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  ) ";
-    if ($this->_addressField) {
-      $this->_from .= "
-                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                         ON {$this->_aliases['civicrm_contact']}.id =
-                            {$this->_aliases['civicrm_address']}.contact_id AND
-                            {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
+    $this->joinAddressFromContact();
   }
 
   public function where() {
+    // @todo this function appears to do nothing more than parent, test & remove
     $clauses = array();
     $this->_where = '';
     foreach ($this->_columns as $tableName => $table) {
@@ -291,6 +282,7 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
   }
 
   public function groupBy() {
+    // @todo this function appears to do nothing more than parent, test & remove
     $this->_groupBy = "";
     if (!empty($this->_params['group_bys']) &&
       is_array($this->_params['group_bys']) &&

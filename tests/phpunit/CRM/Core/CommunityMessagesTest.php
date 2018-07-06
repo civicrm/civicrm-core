@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -377,7 +377,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * @return CRM_Utils_HttpClient|PHPUnit_Framework_MockObject_MockObject
    */
   protected function expectNoHttpRequest() {
-    $client = $this->getMock('CRM_Utils_HttpClient');
+    $mockFunction = $this->mockMethod;
+    $client = $this->$mockFunction('CRM_Utils_HttpClient');
     $client->expects($this->never())
       ->method('get');
     return $client;
@@ -391,7 +392,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * @return CRM_Utils_HttpClient|PHPUnit_Framework_MockObject_MockObject
    */
   protected function expectOneHttpRequest($response) {
-    $client = $this->getMock('CRM_Utils_HttpClient');
+    $mockFunction = $this->mockMethod;
+    $client = $this->$mockFunction('CRM_Utils_HttpClient');
     $client->expects($this->once())
       ->method('get')
       ->will($this->returnValue($response));

@@ -1,9 +1,9 @@
 <?php
 /**
  * +--------------------------------------------------------------------+
- * | CiviCRM version 4.7                                                |
+ * | CiviCRM version 5                                                  |
  * +--------------------------------------------------------------------+
- * | Copyright CiviCRM LLC (c) 2004-2017                                |
+ * | Copyright CiviCRM LLC (c) 2004-2018                                |
  * +--------------------------------------------------------------------+
  * | This file is a part of CiviCRM.                                    |
  * |                                                                    |
@@ -105,11 +105,13 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   public function testCreateCustomValue() {
     $this->_populateOptionAndCustomGroup();
+    $this->_customField = $this->customFieldCreate(array('custom_group_id' => $this->ids['string']['custom_group_id']));
+    $this->_customFieldID = $this->_customField['id'];
 
     $customFieldDataType = CRM_Core_BAO_CustomField::dataType();
     $dataToHtmlTypes = CRM_Core_BAO_CustomField::dataToHtml();
     $count = 0;
-    $optionSupportingHTMLTypes = array('Select', 'Radio', 'CheckBox', 'AdvMulti-Select', 'Autocomplete-Select', 'Multi-Select');
+    $optionSupportingHTMLTypes = array('Select', 'Radio', 'CheckBox', 'Autocomplete-Select', 'Multi-Select');
 
     foreach ($customFieldDataType as $dataType => $label) {
       switch ($dataType) {
@@ -227,8 +229,40 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       }
     }
 
-    $params = array('entity_id' => $contactId, 'custom_' . $customId => $selectedValue);
+    $params = [
+      'entity_id' => $contactId,
+      'custom_' . $customId => $selectedValue,
+      "custom_{$this->_customFieldID}" => "Test String Value for {$this->_customFieldID}",
+    ];
     $this->callAPISuccess('CustomValue', 'create', $params);
+
+    //Test for different return value syntax.
+    $returnValues = [
+      ['return' => "custom_{$customId}"],
+      ['return' => ["custom_{$customId}"]],
+      ["return.custom_{$customId}" => 1],
+      ['return' => ["custom_{$customId}", "custom_{$this->_customFieldID}"]],
+      ["return.custom_{$customId}" => 1, "return.custom_{$this->_customFieldID}" => 1],
+    ];
+    foreach ($returnValues as $key => $val) {
+      $params = array_merge($val, [
+        'entity_id' => $contactId,
+      ]);
+      $customValue = $this->callAPISuccess('CustomValue', 'get', $params);
+      if (is_array($selectedValue)) {
+        $expected = array_values($selectedValue);
+        $this->checkArrayEquals($expected, $customValue['values'][$customId]['latest']);
+      }
+      elseif ($type == 'date') {
+        $this->assertEquals($selectedValue, date('Ymd', strtotime(str_replace('.', '/', $customValue['values'][$customId]['latest']))));
+      }
+      else {
+        $this->assertEquals($selectedValue, $customValue['values'][$customId]['latest']);
+      }
+      if ($key > 2) {
+        $this->assertEquals("Test String Value for {$this->_customFieldID}", $customValue['values'][$this->_customFieldID]['latest']);
+      }
+    }
 
     foreach ($sqlOps as $op) {
       $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);

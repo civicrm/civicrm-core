@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -234,6 +234,16 @@
             });
         }
 
+        function isDraggable(nodes, event) {
+          var draggable = true;
+          _.each(nodes, function(node) {
+            if (node.data.is_reserved && !CRM.checkPerm('administer reserved tags')) {
+              draggable = false;
+            }
+          });
+          return draggable;
+        }
+
         $panel
           .append('<div class="tag-tree-wrapper"><div class="tag-tree"></div><div class="tag-info"></div></div>')
           .on('change', 'input[type=color]', changeColor)
@@ -265,6 +275,9 @@
         $('.tag-tree', $panel)
           .on('changed.jstree loaded.jstree', changeSelection)
           .on('move_node.jstree', moveTag)
+          .on('search.jstree', function() {
+            $(this).unblock();
+          })
           .jstree({
             core: {
               data: {
@@ -273,6 +286,7 @@
                   return {parent_id: node.id === '#' ? tagset : node.id};
                 }
               },
+              themes: {icons: false},
               check_callback: true
             },
             'search': {
@@ -283,16 +297,35 @@
             },
             plugins: plugins,
             dnd: {
+              is_draggable: isDraggable,
               copy: false
             }
           });
 
-        $('input[name=filter_tag_tree]', $panel).on('keyup change', function() {
-          if ($(this).val() == null) {
-            $('.tag-tree', $panel).jstree(true).refresh();
+        $('input[name=filter_tag_tree]', $panel).on('keyup change', function(e) {
+          var element = $(this);
+          var searchString = element.val();
+          if (e.type == 'change') {
+            if (window.searchedString === searchString) {
+              if (searchString === '') {
+                $('.tag-tree', $panel).jstree("clear_search");
+                $('.tag-tree', $panel).jstree("refresh", true, true);
+              }
+              else {
+                $('.tag-tree', $panel).block();
+                $(".tag-tree", $panel).jstree("search", searchString);
+                delete window.searchedString;
+              }
+            }
           }
           else {
-            $(".tag-tree", $panel).jstree("search", $(this).val());
+            if (this.timer) clearTimeout(this.timer);
+            this.timer = setTimeout(function() {
+              if (_.isEmpty(window.searchedString) || window.searchedString !== searchString) {
+                window.searchedString = searchString;
+                element.trigger('change');
+              }
+            }, 1000);
           }
         });
       }
@@ -393,6 +426,14 @@
   li.is-reserved > a:after {
     content: ' *';
   }
+  {/literal}{if !call_user_func(array('CRM_Core_Permission', 'check'), 'administer reserved tags')}{literal}
+    #tree li.is-reserved > a.crm-tag-item {
+      cursor: not-allowed;
+    }
+    li.is-reserved > a:after {
+      color: #8A1F11;
+    }
+  {/literal}{/if}{literal}
   .tag-tree-wrapper ul {
     margin: 0;
     padding: 0;

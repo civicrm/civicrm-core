@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -207,13 +207,18 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
     // first we need to find custom value table, from custom group ID
     $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupID, 'table_name');
 
+    // Retrieve the $entityId so we can pass that to the hook.
+    $entityID = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM {$tableName} WHERE id = %1", array(
+      1 => array($customValueID, 'Integer'),
+    ));
+
     // delete custom value from corresponding custom value table
     $sql = "DELETE FROM {$tableName} WHERE id = {$customValueID}";
     CRM_Core_DAO::executeQuery($sql);
 
     CRM_Utils_Hook::custom('delete',
       $customGroupID,
-      NULL,
+      $entityID,
       $customValueID
     );
   }

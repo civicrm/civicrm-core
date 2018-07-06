@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -110,6 +110,15 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected $_dateFields = array(
     'receive_date' => array('default' => 'now'),
   );
+
+  /**
+   * Get the entity id being edited.
+   *
+   * @return int|null
+   */
+  public function getEntityId() {
+    return $this->_id;
+  }
 
   /**
    * Get selected membership type from the form values.
@@ -243,12 +252,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $this->_memType = $params['membership_type_id'][1];
       }
     }
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_memType, 1, 'Membership', $this->_id);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
+
+    // Add custom data to form
+    CRM_Custom_Form_CustomData::addToForm($this, $this->_memType);
 
     // CRM-4395, get the online pending contribution id.
     $this->_onlinePendingContributionId = NULL;
@@ -455,11 +461,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->assign('hasPriceSets', $buildPriceSet);
     }
 
-    //need to assign custom data type and subtype to the template
-    $this->assign('customDataType', 'Membership');
-    $this->assign('customDataSubType', $this->_memType);
-    $this->assign('entityID', $this->_id);
-
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(array(
         array(
@@ -596,13 +597,15 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->add('select', 'status_id', ts('Membership Status'),
         array('' => ts('- select -')) + CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label')
       );
-      $statusOverride = $this->addElement('checkbox', 'is_override',
-        ts('Status Override?'), NULL,
-        array('onClick' => 'showHideMemberStatus()')
+
+      $statusOverride = $this->addElement('select', 'is_override', ts('Status Override?'),
+        CRM_Member_StatusOverrideTypes::getSelectOptions()
       );
       if ($statusOverride) {
         $elements[] = $statusOverride;
       }
+
+      $this->add('datepicker', 'status_override_end_date', ts('Status Override End Date'), '', FALSE, array('minDate' => time(), 'time' => FALSE));
 
       $this->addElement('checkbox', 'record_contribution', ts('Record Membership Payment?'));
 
@@ -821,9 +824,13 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             foreach ($tmp_statuses as $cur_stat) {
               $status_ids[] = $cur_stat['id'];
             }
+
             if (empty($params['status_id']) || in_array($params['status_id'], $status_ids) == FALSE) {
               $errors['status_id'] = ts('Please enter a status that does NOT represent a current membership status.');
-              $errors['is_override'] = ts('This must be checked because you set an End Date for a lifetime membership');
+            }
+
+            if (!empty($params['is_override']) && !CRM_Member_StatusOverrideTypes::isPermanent($params['is_override'])) {
+              $errors['is_override'] = ts('Because you set an End Date for a lifetime membership, This must be set to "Override Permanently"');
             }
           }
           else {
@@ -855,7 +862,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
 
         //CRM-3724, check for availability of valid membership status.
-        if (empty($params['is_override']) && !isset($errors['_qf_default'])) {
+        if ((empty($params['is_override']) || CRM_Member_StatusOverrideTypes::isNo($params['is_override'])) && !isset($errors['_qf_default'])) {
           $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
             $endDate,
             $joinDate,
@@ -869,7 +876,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             $errors['_qf_default'] = ts('There is no valid Membership Status available for selected membership dates.');
             $status = ts('Oops, it looks like there is no valid membership status available for the given membership dates. You can <a href="%1">Configure Membership Status Rules</a>.', array(1 => $url));
             if (!$self->_mode) {
-              $status .= ' ' . ts('OR You can sign up by setting Status Override? to true.');
+              $status .= ' ' . ts('OR You can sign up by setting Status Override? to something other than "NO".');
             }
             CRM_Core_Session::setStatus($status, ts('Membership Status Error'), 'error');
           }
@@ -880,10 +887,14 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $errors['join_date'] = ts('Please enter the Member Since.');
     }
 
-    if (isset($params['is_override']) &&
-      $params['is_override'] && empty($params['status_id'])
-    ) {
-      $errors['status_id'] = ts('Please enter the status.');
+    if (!empty($params['is_override']) && CRM_Member_StatusOverrideTypes::isOverridden($params['is_override']) && empty($params['status_id'])) {
+      $errors['status_id'] = ts('Please enter the Membership status.');
+    }
+
+    if (!empty($params['is_override']) && CRM_Member_StatusOverrideTypes::isUntilDate($params['is_override'])) {
+      if (empty($params['status_override_end_date'])) {
+        $errors['status_override_end_date'] = ts('Please enter the Membership override end date.');
+      }
     }
 
     //total amount condition arise when membership type having no
@@ -916,10 +927,38 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
     // get the submitted form values.
     $this->_params = $this->controller->exportValues($this->_name);
+    $this->prepareStatusOverrideValues();
 
     $this->submit();
 
     $this->setUserContext();
+  }
+
+  /**
+   * Prepares the values related to status override.
+   */
+  private function prepareStatusOverrideValues() {
+    $this->setOverrideDateValue();
+    $this->convertIsOverrideValue();
+  }
+
+  /**
+   * Sets status override end date to empty value if
+   * the selected override option is not 'until date'.
+   */
+  private function setOverrideDateValue() {
+    if (!CRM_Member_StatusOverrideTypes::isUntilDate($this->_params['is_override'])) {
+      $this->_params['status_override_end_date'] = '';
+    }
+  }
+
+  /**
+   * Convert the value of selected (status override?)
+   * option to TRUE if it indicate an overridden status
+   * or FALSE otherwise.
+   */
+  private function convertIsOverrideValue() {
+    $this->_params['is_override'] = CRM_Member_StatusOverrideTypes::isOverridden($this->_params['is_override']);
   }
 
   /**
@@ -936,7 +975,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   public static function emailReceipt(&$form, &$formValues, &$membership) {
     // retrieve 'from email id' for acknowledgement
-    $receiptFrom = $formValues['from_email_address'];
+    $receiptFrom = CRM_Utils_Array::value('from_email_address', $formValues);
 
     if (!empty($formValues['payment_instrument_id'])) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
@@ -1181,6 +1220,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       'status_id',
       'source',
       'is_override',
+      'status_override_end_date',
       'campaign_id',
     );
 
@@ -1417,7 +1457,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           // Assign amount to template if payment was successful.
           $this->assign('amount', $params['total_amount']);
         }
-        catch (PaymentProcessorException $e) {
+        catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
           if (!empty($paymentParams['contributionID'])) {
             CRM_Contribute_BAO_Contribution::failPayment($paymentParams['contributionID'], $this->_contactID,
               $e->getMessage());
@@ -1426,9 +1466,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
           }
 
-          CRM_Core_Error::displaySessionError($result);
+          CRM_Core_Session::singleton()->setStatus($e->getMessage());
           CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/membership',
-            "reset=1&action=add&cid={$this->_contactID}&context=&mode={$this->_mode}"
+            "reset=1&action=add&cid={$this->_contactID}&context=membership&mode={$this->_mode}"
           ));
 
         }

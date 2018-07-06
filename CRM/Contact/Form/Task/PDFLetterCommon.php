@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -58,6 +58,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @param CRM_Core_Form $form
    */
   public static function preProcess(&$form) {
+    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($form);
     $messageText = array();
     $messageSubject = array();
     $dao = new CRM_Core_BAO_MessageTemplate();

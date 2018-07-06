@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -297,7 +297,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // lineItem isn't set until Register postProcess
     $this->_lineItem = $this->get('lineItem');
     $this->_ccid = $this->get('ccid');
-    $this->_paymentProcessor = $this->get('paymentProcessor');
+
     $this->_params = $this->controller->exportValues('Main');
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->get('amount');
@@ -334,7 +334,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     // if onbehalf-of-organization
     if (!empty($this->_values['onbehalf_profile_id']) && !empty($this->_params['onbehalf']['organization_name'])) {
-      $this->_params['organization_id'] = CRM_Utils_Array::value('onbehalfof_id', $this->_params);
+      if (empty($this->_params['org_option']) && empty($this->_params['organization_id'])) {
+        $this->_params['organization_id'] = CRM_Utils_Array::value('onbehalfof_id', $this->_params);
+      }
       $this->_params['organization_name'] = $this->_params['onbehalf']['organization_name'];
       $addressBlocks = array(
         'street_address',
@@ -716,14 +718,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public function postProcess() {
     $contactID = $this->getContactID();
-    $result = $this->processFormSubmission($contactID);
+    try {
+      $result = $this->processFormSubmission($contactID);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->bounceOnError($e->getMessage());
+    }
+
     if (is_array($result) && !empty($result['is_payment_failure'])) {
-      // We will probably have the function that gets this error throw an exception on the next round of refactoring.
-      CRM_Core_Session::singleton()->setStatus(ts("Payment Processor Error message :") .
-          $result['error']->getMessage());
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact',
-        "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"
-      ));
+      $this->bounceOnError($result['error']->getMessage());
     }
     // Presumably this is for hooks to access? Not quite clear & perhaps not required.
     $this->set('params', $this->_params);
@@ -737,21 +740,18 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * Comments from previous refactor indicate doubt as to what was going on.
    *
-   * @param int $contributionTypeId
+   * @param int $financialTypeID
    *
    * @return null|string
    */
-  public function wrangleFinancialTypeID($contributionTypeId) {
-    if (isset($paymentParams['financial_type'])) {
-      $contributionTypeId = $paymentParams['financial_type'];
-    }
-    elseif (!empty($this->_values['pledge_id'])) {
-      $contributionTypeId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
+  public function wrangleFinancialTypeID($financialTypeID) {
+    if (empty($financialTypeID) && !empty($this->_values['pledge_id'])) {
+      $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
         $this->_values['pledge_id'],
         'financial_type_id'
       );
     }
-    return $contributionTypeId;
+    return $financialTypeID;
   }
 
   /**
@@ -966,6 +966,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // @todo this is the wrong place for this - it should be done as close to form submission
       // as possible
       $contributionParams['total_amount'] = $params['amount'];
+
       $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
 
       $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
@@ -989,10 +990,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $smarty = CRM_Core_Smarty::singleton();
         $smarty->assign('dataArray', $dataArray);
         $smarty->assign('totalTaxAmount', $params['tax_amount']);
-      }
-      if (is_a($contribution, 'CRM_Core_Error')) {
-        $message = CRM_Core_Error::getMessages($contribution);
-        CRM_Core_Error::fatal($message);
       }
 
       // lets store it in the form variable so postProcess hook can get to this and use it
@@ -1020,8 +1017,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       //handle custom data.
       $params['contribution_id'] = $contribution->id;
       if (!empty($params['custom']) &&
-        is_array($params['custom']) &&
-        !is_a($contribution, 'CRM_Core_Error')
+        is_array($params['custom'])
       ) {
         CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution', $contribution->id);
       }
@@ -1280,11 +1276,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $params = array('id' => $contributionSoft->pcp_id);
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $params, $pcpInfo);
     $ownerNotifyID = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCPBlock', $pcpInfo['pcp_block_id'], 'owner_notify_id');
+    $ownerNotifyOption = CRM_Core_PseudoConstant::getName('CRM_PCP_DAO_PCPBlock', 'owner_notify_id', $ownerNotifyID);
 
-    if ($ownerNotifyID != CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'no_notifications', 'name') &&
-        (($ownerNotifyID == CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'owner_chooses', 'name') &&
+    if ($ownerNotifyOption != 'no_notifications' &&
+        (($ownerNotifyOption == 'owner_chooses' &&
         CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $contributionSoft->pcp_id, 'is_notify')) ||
-        $ownerNotifyID == CRM_Core_OptionGroup::getValue('pcp_owner_notify', 'all_owners', 'name'))) {
+        $ownerNotifyOption == 'all_owners')) {
       $pcpInfoURL = CRM_Utils_System::url('civicrm/pcp/info',
         "reset=1&id={$contributionSoft->pcp_id}",
         TRUE, NULL, FALSE, TRUE
@@ -1533,6 +1530,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
 
       $i = 1;
+      $form->_params['createdMembershipIDs'] = array();
       foreach ($membershipTypeIDs as $memType) {
         $membershipLineItems = array();
         if ($i < count($membershipTypeIDs)) {
@@ -1593,6 +1591,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           // Next line is probably redundant. Checksprevent it happening twice.
           CRM_Member_BAO_Membership::linkMembershipPayment($membership, $membershipContribution);
         }
+        if ($membership) {
+          CRM_Core_BAO_CustomValueTable::postProcess($form->_params, 'civicrm_membership', $membership->id, 'Membership');
+          $form->_params['createdMembershipIDs'][] = $membership->id;
+          $form->_params['membershipID'] = $membership->id;
+
+          //CRM-15232: Check if membership is created and on the basis of it use
+          //membership receipt template to send payment receipt
+          $form->_values['isMembership'] = TRUE;
+        }
       }
       if ($form->_priceSetId && !empty($form->_useForMember) && !empty($form->_lineItem)) {
         foreach ($form->_lineItem[$form->_priceSetId] as & $priceFieldOp) {
@@ -1614,23 +1621,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $message = $this->compileErrorMessage($errors);
       throw new CRM_Core_Exception($message);
     }
-    $form->_params['createdMembershipIDs'] = array();
 
-    // CRM-7851 - Moved after processing Payment Errors
-    //@todo - the reasoning for this being here seems a little outdated
-    CRM_Core_BAO_CustomValueTable::postProcess($form->_params, 'civicrm_membership', $membership->id, 'Membership');
-    $form->_params['createdMembershipIDs'][] = $membership->id;
-
-    if ($membership) {
-      //presumably this is only relevant for exactly 1 membership
-      $form->_params['membershipID'] = $membership->id;
-    }
-
-    //CRM-15232: Check if membership is created and on the basis of it use
-    //membership receipt template to send payment receipt
-    if ($membership) {
-      $form->_values['isMembership'] = TRUE;
-    }
     if (isset($membershipContributionID)) {
       $form->_values['contribution_id'] = $membershipContributionID;
     }
@@ -1991,7 +1982,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $priceFields = $priceFields[$priceSetID]['fields'];
     $lineItems = array();
-    CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution');
+    CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution', $priceSetID);
     $form->_lineItem = array($priceSetID => $lineItems);
     $membershipPriceFieldIDs = array();
     foreach ((array) $lineItems as $lineItem) {
@@ -2003,6 +1994,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
     $form->set('memberPriceFieldIDS', $membershipPriceFieldIDs);
+    $form->setRecurringMembershipParams();
     $form->processFormSubmission(CRM_Utils_Array::value('contact_id', $params));
   }
 
@@ -2401,26 +2393,19 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $priceFieldIds = $this->get('memberPriceFieldIDS');
 
     if (!empty($priceFieldIds)) {
-      $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
+      $membershipParams['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
       unset($priceFieldIds['id']);
       $membershipTypeIds = array();
       $membershipTypeTerms = array();
       foreach ($priceFieldIds as $priceFieldId) {
-        if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
-          $membershipTypeIds[] = $id;
-          //@todo the value for $term is immediately overwritten. It is unclear from the code whether it was intentional to
-          // do this or a double = was intended (this ambiguity is the reason many IDEs complain about 'assignment in condition'
-          $term = 1;
-          if ($term = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_num_terms')) {
-            $membershipTypeTerms[$id] = ($term > 1) ? $term : 1;
-          }
-          else {
-            $membershipTypeTerms[$id] = 1;
-          }
+        $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id');
+        if ($membershipTypeId) {
+          $membershipTypeIds[] = $membershipTypeId;
+          $term = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_num_terms') ?: 1;
+          $membershipTypeTerms[$membershipTypeId] = ($term > 1) ? $term : 1;
         }
       }
       $membershipParams['selectMembership'] = $membershipTypeIds;
-      $membershipParams['financial_type_id'] = $financialTypeID;
       $membershipParams['types_terms'] = $membershipTypeTerms;
     }
     if (!empty($membershipParams['selectMembership'])) {
@@ -2496,6 +2481,20 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
     }
+  }
+
+  /**
+   * Bounce the user back to retry when an error occurs.
+   *
+   * @param string $message
+   */
+  protected function bounceOnError($message) {
+    CRM_Core_Session::singleton()
+      ->setStatus(ts("Payment Processor Error message :") .
+        $message);
+    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact',
+      "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"
+    ));
   }
 
 }

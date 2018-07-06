@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2018                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -696,6 +696,58 @@ class CRM_Utils_Date {
   }
 
   /**
+   * Translate a TTL to a concrete expiration time.
+   *
+   * @param NULL|int|DateInterval $ttl
+   * @param int $default
+   *   The value to use if $ttl is not specified (NULL).
+   * @return int
+   *   Timestamp (seconds since epoch).
+   * @throws \CRM_Utils_Cache_InvalidArgumentException
+   */
+  public static function convertCacheTtlToExpires($ttl, $default) {
+    if ($ttl === NULL) {
+      $ttl = $default;
+    }
+
+    if (is_int($ttl)) {
+      return time() + $ttl;
+    }
+    elseif ($ttl instanceof DateInterval) {
+      return date_add(new DateTime(), $ttl)->getTimestamp();
+    }
+    else {
+      throw new CRM_Utils_Cache_InvalidArgumentException("Invalid cache TTL");
+    }
+  }
+
+  /**
+   * Normalize a TTL.
+   *
+   * @param NULL|int|DateInterval $ttl
+   * @param int $default
+   *   The value to use if $ttl is not specified (NULL).
+   * @return int
+   *   Seconds until expiration.
+   * @throws \CRM_Utils_Cache_InvalidArgumentException
+   */
+  public static function convertCacheTtl($ttl, $default) {
+    if ($ttl === NULL) {
+      return $default;
+    }
+    elseif (is_int($ttl)) {
+      return $ttl;
+    }
+    elseif ($ttl instanceof DateInterval) {
+      return date_add(new DateTime(), $ttl)->getTimestamp() - time();
+    }
+    else {
+      throw new CRM_Utils_Cache_InvalidArgumentException("Invalid cache TTL");
+    }
+  }
+
+
+  /**
    * @param null $timeStamp
    *
    * @return bool|string
@@ -791,26 +843,34 @@ class CRM_Utils_Date {
    * Get start date and end from
    * the given relative term and unit
    *
-   * @param date $relative
-   *   Eg: term.unit.
+   * @param string $relative Relative format in the format term.unit.
+   *   Eg: previous.day
    *
-   * @param $from
-   * @param $to
+   * @param string $from
+   * @param string $to
+   * @param string $fromTime
+   * @param string $toTime
    *
    * @return array
    *   start date, end date
    */
-  public static function getFromTo($relative, $from, $to) {
+  public static function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = '235959') {
     if ($relative) {
-      list($term, $unit) = explode('.', $relative);
+      list($term, $unit) = explode('.', $relative, 2);
       $dateRange = self::relativeToAbsolute($term, $unit);
-      $from = $dateRange['from'];
-      //Take only Date Part, Sometime Time part is also present in 'to'
+      $from = substr($dateRange['from'], 0, 8);
       $to = substr($dateRange['to'], 0, 8);
+      // @todo fix relativeToAbsolute & add tests
+      // relativeToAbsolute returns 8 char date strings
+      // or 14 char date + time strings.
+      // We should use those. However, it turns out to be unreliable.
+      // e.g. this.week does NOT return 235959 for 'from'
+      // so our defaults are more reliable.
+      // Currently relativeToAbsolute only supports 'whole' days so that is ok
     }
 
-    $from = self::processDate($from);
-    $to = self::processDate($to, '235959');
+    $from = self::processDate($from, $fromTime);
+    $to = self::processDate($to, $toTime);
 
     return array($from, $to);
   }
@@ -1019,8 +1079,8 @@ class CRM_Utils_Date {
   /**
    * Resolves the given relative time interval into finite time limits.
    *
-   * @param array $relativeTerm
-   *   Relative time frame like this, previous, etc.
+   * @param string $relativeTerm
+   *   Relative time frame: this, previous, previous_1.
    * @param int $unit
    *   Frequency unit like year, month, week etc.
    *
@@ -1031,6 +1091,9 @@ class CRM_Utils_Date {
     $now = getdate();
     $from = $to = $dateRange = array();
     $from['H'] = $from['i'] = $from['s'] = 0;
+    $relativeTermParts = explode('_', $relativeTerm);
+    $relativeTermPrefix = $relativeTermParts[0];
+    $relativeTermSuffix = isset($relativeTermParts[1]) ? $relativeTermParts[1] : '';
 
     switch ($unit) {
       case 'year':
@@ -1154,7 +1217,7 @@ class CRM_Utils_Date {
         $from['d'] = $config->fiscalYearStart['d'];
         $from['M'] = $config->fiscalYearStart['M'];
         $fYear = self::calculateFiscalYear($from['d'], $from['M']);
-        switch ($relativeTerm) {
+        switch ($relativeTermPrefix) {
           case 'this':
             $from['Y'] = $fYear;
             $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
@@ -1166,12 +1229,22 @@ class CRM_Utils_Date {
             break;
 
           case 'previous':
-            $from['Y'] = $fYear - 1;
-            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
-            $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
-            $to['d'] = $fiscalEnd['2'];
-            $to['M'] = $fiscalEnd['1'];
-            $to['Y'] = $fiscalEnd['0'];
+            if (!is_numeric($relativeTermSuffix)) {
+              $from['Y'] = ($relativeTermSuffix === 'before') ? $fYear - 2 : $fYear - 1;
+              $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
+              $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
+              $to['d'] = $fiscalEnd['2'];
+              $to['M'] = $fiscalEnd['1'];
+              $to['Y'] = $fiscalEnd['0'];
+            }
+            else {
+              $from['Y'] = $fYear - $relativeTermSuffix;
+              $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
+              $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
+              $to['d'] = $fiscalEnd['2'];
+              $to['M'] = $fiscalEnd['1'];
+              $to['Y'] = $fYear;
+            }
             break;
 
           case 'next':
@@ -1737,7 +1810,7 @@ class CRM_Utils_Date {
    *   Fiscal Start Month.
    *
    * @return int
-   *   $fy       Current Fiscl Year
+   *   $fy       Current Fiscal Year
    */
   public static function calculateFiscalYear($fyDate, $fyMonth) {
     $date = date("Y-m-d");

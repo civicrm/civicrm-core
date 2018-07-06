@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -682,15 +682,27 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Create test with unique field name on source.
+   *
+   * @param string $thousandSeparator
+   *   punctuation used to refer to thousands.
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testCreateDefaultNow() {
-
+  public function testCreateDefaultNow($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
     $params = $this->_params;
-    unset($params['receive_date']);
+    unset($params['receive_date'], $params['net_amount']);
+
+    $params['total_amount'] = $this->formatMoneyInput(5000.77);
+    $params['fee_amount'] = $this->formatMoneyInput(.77);
+    $params['skipCleanMoney'] = FALSE;
 
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $contribution = $this->callAPISuccessGetSingle('contribution', array('id' => $contribution['id']));
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['receive_date'])));
+    $this->assertEquals(5000.77, $contribution['total_amount'], 'failed to handle ' . $this->formatMoneyInput(5000.77));
+    $this->assertEquals(.77, $contribution['fee_amount']);
+    $this->assertEquals(5000, $contribution['net_amount']);
   }
 
   /**
@@ -2486,6 +2498,61 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-20685 Repeattransaction produces incorrect Financial Type ID (in specific circumstance) - if number of lineItems = 1.
+   *
+   * This case happens when the line item & contribution do not have the same type in his initiating transaction.
+   */
+  public function testRepeatTransactionUpdatedFinancialTypeAndNotEquals() {
+    $originalContribution = $this->setUpRecurringContribution(array(), array('financial_type_id' => 2));
+    // This will made the trick to get the not equals behaviour.
+    $this->callAPISuccess('line_item', 'create', array('id' => 1, 'financial_type_id' => 4));
+    $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'contribution_recur_id' => $originalContribution['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
+    ));
+    $lineItemParams = array(
+      'entity_id' => $originalContribution['id'],
+      'sequential' => 1,
+      'return' => array(
+        'entity_table',
+        'qty',
+        'unit_price',
+        'line_total',
+        'label',
+        'financial_type_id',
+        'deductible_amount',
+        'price_field_value_id',
+        'price_field_id',
+      ),
+    );
+    $this->callAPISuccessGetSingle('contribution', array(
+      'total_amount' => 100,
+      'financial_type_id' => 2,
+    ));
+    $lineItem1 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, array(
+      'entity_id' => $originalContribution['id'],
+    )));
+    $expectedLineItem = array_merge(
+      $lineItem1['values'][0], array(
+        'line_total' => '100.00',
+        'unit_price' => '100.00',
+        'financial_type_id' => 4,
+        'contribution_type_id' => 4,
+      )
+    );
+
+    $lineItem2 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, array(
+      'entity_id' => $originalContribution['id'] + 1,
+    )));
+    $this->callAPISuccess('line_item', 'create', array('id' => 1, 'financial_type_id' => 1));
+    unset($expectedLineItem['id'], $expectedLineItem['entity_id']);
+    unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
+    $this->assertEquals($expectedLineItem, $lineItem2['values'][0]);
+  }
+
+
+  /**
    * Test completing a transaction does not 'mess' with net amount (CRM-15960).
    */
   public function testCompleteTransactionNetAmountOK() {
@@ -2878,11 +2945,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test if renewal activity is create after changing Pending contribution to Completed via offline
    */
   public function testPendingToCompleteContribution() {
-    $contributionPage = $this->createPriceSetWithPage('membership');
-    $stateOfGrace = $this->callAPISuccess('MembershipStatus', 'getvalue', array(
-      'name' => 'Grace',
-      'return' => 'id')
-    );
+    $this->createPriceSetWithPage('membership');
     $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
     $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
     // Case 1: Assert that Membership Signup Activity is created on Pending to Completed Contribution via backoffice
@@ -2895,15 +2958,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     // change pending contribution to completed
     $form = new CRM_Contribute_Form_Contribution();
-    $error = FALSE;
+
     $form->_params = array(
       'id' => $this->_ids['contribution'],
       'total_amount' => 20,
       'net_amount' => 20,
       'fee_amount' => 0,
       'financial_type_id' => 1,
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 1,
       'billing_middle_name' => '',
@@ -2927,12 +2988,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_mode' => 'membership',
       'source' => 'Membership Signup and Renewal',
     );
-    try {
-      $form->testSubmit($form->_params, CRM_Core_Action::UPDATE);
-    }
-    catch (Civi\Payment\Exception\PaymentProcessorException $e) {
-      $error = TRUE;
-    }
+
+    $form->testSubmit($form->_params, CRM_Core_Action::UPDATE);
+
     // Case 2: After successful payment for Pending backoffice there are three activities created
     //  2.a Update status of existing Scheduled Membership Signup (created in step 1) to Completed
     $activity = $this->callAPISuccess('Activity', 'get', array(
@@ -2972,6 +3030,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'source' => 'SSF',
       'contribution_status_id' => 2,
       'contribution_page_id' => $this->_ids['contribution_page'],
+      // We can't rely on contribution api to link line items correctly to membership
+      'skipLineItem' => TRUE,
       'api.membership_payment.create' => array('membership_id' => $this->_ids['membership']),
     ));
 
@@ -2984,18 +3044,26 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'unit_price' => 20,
       'line_total' => 20,
       'financial_type_id' => 1,
+      'price_field_value_id' => $this->_ids['price_field_value']['cont'],
+    ));
+    $this->callAPISuccess('line_item', 'create', array(
+      'entity_id' => $this->_ids['membership'],
+      'entity_table' => 'civicrm_membership',
+      'contribution_id' => $contribution['id'],
+      'price_field_id' => $this->_ids['price_field'][0],
+      'qty' => 1,
+      'unit_price' => 20,
+      'line_total' => 20,
+      'financial_type_id' => 1,
       'price_field_value_id' => $this->_ids['price_field_value'][0],
+      'membership_type_id' => $this->_ids['membership_type'],
     ));
 
     //Update it to Failed.
     $form->_params['id'] = $contribution['id'];
     $form->_params['contribution_status_id'] = 4;
-    try {
-      $form->testSubmit($form->_params, CRM_Core_Action::UPDATE);
-    }
-    catch (Civi\Payment\Exception\PaymentProcessorException $e) {
-      $error = TRUE;
-    }
+
+    $form->testSubmit($form->_params, CRM_Core_Action::UPDATE);
     //Existing membership should not get updated to expired.
     $membership = $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
     $this->assertNotEquals($membership['status_id'], 4);
@@ -4060,6 +4128,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // only be called from test classes. Move into test suite & maybe just use api
     // from this function.
     return array_merge(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($trxnParams, FALSE, array()));
+  }
+
+  /**
+   * Test getunique api call for Contribution entity
+   */
+  public function testContributionGetUnique() {
+    $result = $this->callAPIAndDocument($this->_entity, 'getunique', array(), __FUNCTION__, __FILE__);
+    $this->assertEquals(2, $result['count']);
+    $this->assertEquals(array('trxn_id'), $result['values']['UI_contrib_trxn_id']);
+    $this->assertEquals(array('invoice_id'), $result['values']['UI_contrib_invoice_id']);
   }
 
 }

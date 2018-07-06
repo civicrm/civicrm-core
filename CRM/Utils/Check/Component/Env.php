@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
@@ -121,6 +121,27 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
+   * @return array
+   */
+  public function checkPhpEcrypt() {
+    $messages = array();
+    $test_pass = 'iAmARandomString';
+    $encrypted_test_pass = CRM_Utils_Crypt::encrypt($test_pass);
+    if ($encrypted_test_pass == base64_encode($test_pass)) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('Your PHP does not include the recommended encryption functions. Some passwords will not be stored encrypted, and if you have recently upgraded from a PHP that does include these functions, your encrypted passwords will not be decrypted correctly. If you are using PHP 7.0 or earlier, you probably want to include the "%1" extension.',
+          array('1' => 'mcrypt')
+        ),
+        ts('PHP Missing Extension "mcrypt"'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+    }
+    return $messages;
+  }
+
+  /**
    * Check that the MySQL time settings match the PHP time settings.
    *
    * @return array<CRM_Utils_Check_Message> an empty array, or a list of warnings
@@ -208,14 +229,19 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $messages = array();
 
     list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
-    $domain = CRM_Core_BAO_Domain::getDomain();
-    $domainName = $domain->name;
-    $fixEmailUrl = CRM_Utils_System::url("civicrm/admin/domain", "action=update&reset=1");
+    $domain        = CRM_Core_BAO_Domain::getDomain();
+    $domainName    = $domain->name;
+    $fixEmailUrl   = CRM_Utils_System::url("civicrm/admin/options/from_email_address", "&reset=1");
+    $fixDomainName = CRM_Utils_System::url("civicrm/admin/domain", "action=update&reset=1");
 
     if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
       if (!$domainName || $domainName == 'Default Domain Name') {
-        $msg = ts("Please enter your organization's <a href=\"%1\">name, primary address, and default FROM Email Address</a> (for system-generated emails).",
-          array(1 => $fixEmailUrl));
+        $msg = ts("Please enter your organization's <a href=\"%1\">name, primary address </a> and <a href=\"%2\">default FROM Email Address </a> (for system-generated emails).",
+          array(
+            1 => $fixDomainName,
+            2 => $fixEmailUrl,
+          )
+        );
       }
       else {
         $msg = ts('Please enter a <a href="%1">default FROM Email Address</a> (for system-generated emails).',
@@ -224,7 +250,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
     elseif (!$domainName || $domainName == 'Default Domain Name') {
       $msg = ts("Please enter your organization's <a href=\"%1\">name and primary address</a>.",
-        array(1 => $fixEmailUrl));
+        array(1 => $fixDomainName));
     }
 
     if (!empty($msg)) {
@@ -408,7 +434,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       'uploadDir' => ts('Temporary Files Directory'),
       'imageUploadDir' => ts('Images Directory'),
       'customFileUploadDir' => ts('Custom Files Directory'),
-      'extensionsDir' => ts('CiviCRM Extensions Directory'),
     );
 
     foreach ($directories as $directory => $label) {
@@ -480,56 +505,15 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
 
     if ($vc->isInfoAvailable) {
-      $newerVersion = $vc->isNewerVersionAvailable();
-      if ($newerVersion['version']) {
-        $vInfo = array(
-          1 => $newerVersion['version'],
-          2 => $vc->localVersion,
-        );
-        // LTS = long-term support version
-        if ($newerVersion['status'] == 'lts') {
-          $vInfo[1] .= ' ' . ts('(long-term support)');
-        }
-
-        if ($newerVersion['upgrade'] == 'security') {
-          // Security
-          $severity = \Psr\Log\LogLevel::CRITICAL;
-          $title = ts('CiviCRM Security Update Required');
-          $message = ts('New security release %1 is available. The site is currently running %2.', $vInfo);
-        }
-        elseif ($newerVersion['status'] == 'eol') {
-          // Warn about EOL
-          $severity = \Psr\Log\LogLevel::WARNING;
-          $title = ts('CiviCRM Update Needed');
-          $message = ts('New version %1 is available. The site is currently running %2, which has reached its end of life.', $vInfo);
-        }
-        else {
-          // For most new versions, just make them notice
-          $severity = \Psr\Log\LogLevel::NOTICE;
-          $title = ts('CiviCRM Update Available');
-          $message = ts('New version %1 is available. The site is currently running %2.', $vInfo);
-        }
-      }
-      elseif (!empty($vc->cronJob['is_active'])) {
-        $vNum = $vc->localVersion;
-        // LTS = long-term support version
-        if ($newerVersion['status'] == 'lts') {
-          $vNum .= ' ' . ts('(long-term support)');
-        }
-
-        $severity = \Psr\Log\LogLevel::INFO;
-        $title = ts('CiviCRM Up-to-Date');
-        $message = ts('CiviCRM version %1 is up-to-date.', array(1 => $vNum));
-      }
-
-      if (!empty($message)) {
-        $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__,
-          $message,
-          $title,
-          $severity,
-          'fa-cloud-upload'
-        );
+      $severities = array(
+        'info' => CRM_Utils_Check::severityMap(\Psr\Log\LogLevel::INFO),
+        'notice' => CRM_Utils_Check::severityMap(\Psr\Log\LogLevel::NOTICE) ,
+        'warning' => CRM_Utils_Check::severityMap(\Psr\Log\LogLevel::WARNING) ,
+        'critical' => CRM_Utils_Check::severityMap(\Psr\Log\LogLevel::CRITICAL),
+      );
+      foreach ($vc->getVersionMessages() as $msg) {
+        $messages[] = new CRM_Utils_Check_Message(__FUNCTION__ . '_' . $msg['name'],
+          $msg['message'], $msg['title'], $severities[$msg['severity']], 'fa-cloud-upload');
       }
     }
 
@@ -577,10 +561,10 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     elseif (!is_writable($basedir)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('Directory %1 is not writable.  Please change your file permissions.',
+        ts('Your extensions directory (%1) is read-only. If you would like to perform downloads or upgrades, then change the file permissions.',
           array(1 => $basedir)),
-        ts('Directory not writable'),
-        \Psr\Log\LogLevel::ERROR,
+        ts('Read-Only Extensions'),
+        \Psr\Log\LogLevel::WARNING,
         'fa-plug'
       );
       return $messages;
@@ -850,6 +834,25 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
+   * ensure reply id is set to any default value
+   * @return array
+   */
+  public function checkReplyIdForMailing() {
+    $messages = array();
+
+    if (!CRM_Mailing_PseudoConstant::defaultComponent('Reply', '')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('Reply Auto Responder is not set to any default value in <a %1>Headers, Footers, and Automated Messages</a>. This will disable the submit operation on any mailing created from CiviMail.', array(1 => 'href="' . CRM_Utils_System::url('civicrm/admin/component', 'reset=1') . '"')),
+        ts('No Default value for Auto Responder.'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-reply'
+      );
+    }
+    return $messages;
+  }
+
+  /**
    * Check for required mbstring extension
    * @return array
    */
@@ -898,6 +901,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     if (CRM_Core_Config::singleton()->userFramework == 'UnitTests') {
       return $messages;
     }
+    // CRM-21629 Set User Agent to avoid being blocked by filters
+    stream_context_set_default(array(
+      'http' => array('user_agent' => 'CiviCRM'),
+    ));
+
     // Does arrow.png exist where we expect it?
     $arrowUrl = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'packages/jquery/css/images/arrow.png';
     $headers = get_headers($arrowUrl);

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -533,6 +533,17 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
       CRM_Core_Form_RecurringEntity::preProcess('civicrm_activity');
     }
+
+    if ($this->_action & CRM_Core_Action::VIEW) {
+      $url = CRM_Utils_System::url(implode("/", $this->urlPath), "reset=1&id={$this->_activityId}&action=view&cid={$this->_values['source_contact_id']}");
+      CRM_Utils_Recent::add($this->_values['subject'],
+        $url,
+        $this->_values['id'],
+        'Activity',
+        $this->_values['source_contact_id'],
+        $this->_values['source_contact']
+      );
+    }
   }
 
   /**
@@ -821,7 +832,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     $this->addFormRule(array('CRM_Activity_Form_Activity', 'formRule'), $this);
 
-    $doNotNotifyAssigneeFor = Civi::settings()->get('do_not_notify_assignees_for');
+    $doNotNotifyAssigneeFor = (array) Civi::settings()->get('do_not_notify_assignees_for');
     if (($this->_activityTypeId && in_array($this->_activityTypeId, $doNotNotifyAssigneeFor)) || !Civi::settings()->get('activity_assignee_notification')) {
       $this->assign('activityAssigneeNotification', FALSE);
     }

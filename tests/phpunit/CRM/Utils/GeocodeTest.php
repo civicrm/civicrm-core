@@ -30,9 +30,7 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
       'geoProvider' => "Google",
     ));
 
-    // Set geocodeMethod to empty.
-    $config = CRM_Core_Config::singleton();
-    $config->geocodeMethod = '';
+    CRM_Utils_GeocodeProvider::disableForSession();
 
     // Save a contact with geo coding disabled.
     $params = array(
@@ -53,8 +51,7 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
     $this->assertArrayNotHasKey('geo_code_1', $address_values, 'No geocoding when geocodeMethod is empty');
 
     // Run the geocode job on that specific contact
-    $config->geocodeMethod = 'CRM_Utils_Geocode_Google';
-
+    CRM_Utils_GeocodeProvider::reset();
     try {
       $params_geocode = array(
         'start' => $contact_values['id'],
@@ -65,7 +62,7 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
       $result_geocode = civicrm_api3('Job', 'geocode', $params_geocode);
     }
     catch (CiviCRM_API3_Exception $e) {
-      if ($e->getMessage() == 'A fatal error was triggered: Aborting batch geocoding. Hit the over query limit on geocoder.') {
+      if ($e->getMessage() == 'Aborting batch geocoding. Hit the over query limit on geocoder.') {
         $this->markTestIncomplete('Job.geocode error_message: A fatal error was triggered: Aborting batch geocoding. Hit the over query limit on geocoder.');
       }
       else {

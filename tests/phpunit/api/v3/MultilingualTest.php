@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -139,20 +139,6 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
       }
       $this->callAPISuccess($entity, 'get', $params);
     }
-  }
-
-  public function enableMultilingual() {
-    $this->callAPISuccess('Setting', 'create', array(
-      'lcMessages' => 'en_US',
-      'languageLimit' => array(
-        'en_US' => 1,
-      ),
-    ));
-
-    CRM_Core_I18n_Schema::makeMultilingual('en_US');
-
-    global $dbLocale;
-    $dbLocale = '_en_US';
   }
 
 }

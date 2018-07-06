@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -100,10 +100,11 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
 
     $orderClause = FALSE;
     $buttonName = $this->controller->getButtonName();
+    $walkListActivityId = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'WalkList');
     if ($buttonName == '_qf_Interview_submit_orderBy' && !empty($_POST['order_bys'])) {
       $orderByParams = CRM_Utils_Array::value('order_bys', $_POST);
     }
-    elseif (CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') == $this->_surveyDetails['activity_type_id']) {
+    elseif ($walkListActivityId == $this->_surveyDetails['activity_type_id']) {
       $orderByParams
         = array(
           1 => array(
@@ -170,8 +171,7 @@ WHERE {$clause}
       $this->_contactIds,
       $this->_interviewerId
     );
-    $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
-    $scheduledStatusId = array_search('Scheduled', $activityStatus);
+    $scheduledStatusId = CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_status_id', 'Scheduled');
 
     $activityIds = array();
     foreach ($this->_contactIds as $key => $voterId) {
@@ -248,9 +248,9 @@ WHERE {$clause}
     }
 
     //set the title.
-    $activityTypes = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
     $this->_surveyTypeId = CRM_Utils_Array::value('activity_type_id', $this->_surveyValues);
-    CRM_Utils_System::setTitle(ts('Record %1 Responses', array(1 => $activityTypes[$this->_surveyTypeId])));
+    $surveyTypeLabel = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $this->_surveyTypeId);
+    CRM_Utils_System::setTitle(ts('Record %1 Responses', array(1 => $surveyTypeLabel)));
   }
 
   public function validateIds() {
@@ -387,7 +387,7 @@ WHERE {$clause}
     foreach ($this->_surveyFields as $name => $field) {
       $acceptable_types = CRM_Contact_BAO_ContactType::basicTypes();
       $acceptable_types[] = 'Contact';
-      if (in_array($field['field_type'], $acceptable_types)) {
+      if (isset($field['field_type']) && (in_array($field['field_type'], $acceptable_types))) {
         $contactFields[$name] = $field;
       }
     }
@@ -397,7 +397,8 @@ WHERE {$clause}
       }
     }
 
-    if (CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') == $this->_surveyDetails['activity_type_id']) {
+    $walkListActivityId = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'WalkList');
+    if ($walkListActivityId == $this->_surveyDetails['activity_type_id']) {
       $defaults['order_bys']
         = array(
           1 => array(
@@ -480,7 +481,7 @@ WHERE {$clause}
 
     static $statusId;
     if (!$statusId) {
-      $statusId = array_search('Completed', CRM_Core_PseudoConstant::activityStatus('name'));
+      $statusId = CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_status_id', 'Completed');
     }
 
     //format custom fields.
@@ -580,11 +581,7 @@ WHERE {$clause}
     $this->_contactIds = $this->get('contactIds');
     if (!is_array($this->_contactIds)) {
       //get the survey activities.
-      $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
-      $statusIds = array();
-      if ($statusId = array_search('Scheduled', $activityStatus)) {
-        $statusIds[] = $statusId;
-      }
+      $statusIds[] = CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_status_id', 'Scheduled');
       $surveyActivities = CRM_Campaign_BAO_Survey::getSurveyVoterInfo($this->_surveyId,
         $this->_interviewerId,
         $statusIds

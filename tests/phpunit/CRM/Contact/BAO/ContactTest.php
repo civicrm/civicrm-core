@@ -1565,4 +1565,61 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
+  /**
+   * Test case for UpdateProfileLocationLeak (CRM-20598).
+   */
+  public function testUpdateProfileLocationLeak() {
+    // create a simple contact with address and phone that share the same location type
+    $defaults = $this->contactParams();
+    $params = array(
+      'first_name' => $defaults['first_name'],
+      'last_name' => $defaults['last_name'],
+      'contact_type' => 'Individual',
+      'address' => array(1 => $defaults['address'][1]),
+      'phone' => array(1 => $defaults['phone'][1]),
+    );
+    $contact = CRM_Contact_BAO_Contact::create($params);
+    $contactId = $contact->id;
+
+    // now, update using a profile with phone, email, address... that share the same location type
+    $updatePfParams = array(
+      'first_name' => $params['first_name'],
+      'last_name' => $params['first_name'],
+      'street_address-Primary' => $params['address'][1]['street_address'],
+      'state_province-Primary' => $params['address'][1]['state_province_id'],
+      'country-Primary' => $params['address'][1]['country_id'],
+      'phone-Primary-1' => $params['phone'][1]['phone'],
+      'phone_ext-Primary-1' => '345',
+    );
+
+    //create the contact using create profile contact.
+    $fields = CRM_Contact_BAO_Contact::exportableFields('Individual');
+
+    $this->createLoggedInUser();
+    // now, emulate the contact update using a profile
+    $contactID = CRM_Contact_BAO_Contact::createProfileContact($updatePfParams, $fields, $contactId,
+      NULL, NULL, NULL, TRUE
+    );
+
+    //check the contact ids
+    $this->assertEquals($contactId, $contactID, 'check for Contact ids');
+    $phone = $this->callAPISuccess('Phone', 'getsingle', ['contact_id' => $contactID]);
+    $this->assertEquals('345', $phone['phone_ext']);
+    $this->assertEquals($params['phone'][1]['phone'], $phone['phone']);
+
+    //check the values in DB.
+    $searchParams = array(
+      'contact_id' => $contactId,
+      'location_type_id' => 1,
+      'is_primary' => 1,
+    );
+    $compareParams = array(
+      'street_address' => CRM_Utils_Array::value('street_address-Primary', $updatePfParams),
+    );
+    $this->assertDBCompareValues('CRM_Core_DAO_Address', $searchParams, $compareParams);
+
+    //cleanup DB by deleting the contact
+    $this->contactDelete($contactId);
+  }
+
 }

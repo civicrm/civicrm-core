@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -55,7 +55,7 @@ CRM.$(function($) {
     {if $component eq "event"}
       <th>{ts}Total Fee(s){/ts}</th>
     {else}
-      <th>{ts}Contribution Amount(s){/ts}</th>
+      <th>{ts}Contribution Total{/ts}</th>
     {/if}
     <th class="right">{ts}Total Paid{/ts}</th>
     <th class="right">{ts}Balance{/ts}</th>

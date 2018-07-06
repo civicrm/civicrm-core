@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  *
  */
 
@@ -184,6 +184,32 @@ class CRM_Case_Page_AJAX {
 
     CRM_Case_BAO_Case::endCaseRole($caseId, $b, $cid, $relTypeId);
     CRM_Utils_System::civiExit();
+  }
+
+  public static function getCases() {
+    $requiredParameters = array(
+      'type' => 'String',
+    );
+    $optionalParameters = array(
+      'case_type_id' => 'CommaSeparatedIntegers',
+      'status_id' => 'CommaSeparatedIntegers',
+      'all' => 'Positive',
+    );
+    $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
+    $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);
+
+    $allCases = (bool) $params['all'];
+
+    $cases = CRM_Case_BAO_Case::getCases($allCases, $params);
+
+    $casesDT = array(
+      'recordsFiltered' => $cases['total'],
+      'recordsTotal' => $cases['total'],
+    );
+    unset($cases['total']);
+    $casesDT['data'] = $cases;
+
+    CRM_Utils_JSON::output($casesDT);
   }
 
 }

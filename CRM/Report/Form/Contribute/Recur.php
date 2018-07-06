@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -273,14 +273,9 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
     $this->_from .= "
       LEFT JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
         ON {$this->_aliases['civicrm_contribution_recur']}.id = {$this->_aliases['civicrm_contribution']}.contribution_recur_id";
-    $this->_from .= "
-      LEFT JOIN civicrm_email  {$this->_aliases['civicrm_email']}
-        ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-        {$this->_aliases['civicrm_email']}.is_primary = 1)";
-    $this->_from .= "
-      LEFT  JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-        ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-        {$this->_aliases['civicrm_phone']}.is_primary = 1)";
+
+    $this->joinPhoneFromContact();
+    $this->joinEmailFromContact();
 
     // for credit card type
     $this->addFinancialTrxnFromClause();
@@ -298,7 +293,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
     // installments * intervals using the mysql date_add function, along
     // with the interval unit (e.g. DATE_ADD(start_date, INTERVAL 12 * 1 MONTH)
     $date_suffixes = array('relative', 'from', 'to');
-    while (list(, $suffix) = each($date_suffixes)) {
+    foreach ($date_suffixes as $suffix) {
       $isBreak = FALSE;
       // Check to see if the user wants to search by calculated date.
       if (!empty($this->_params['calculated_end_date_' . $suffix])) {

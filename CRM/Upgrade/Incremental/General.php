@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -53,7 +53,7 @@ class CRM_Upgrade_Incremental_General {
    *
    * @see install/index.php
    */
-  const MIN_INSTALL_PHP_VER = '5.4';
+  const MIN_INSTALL_PHP_VER = '5.5';
 
   /**
    * Compute any messages which should be displayed before upgrade.
@@ -118,12 +118,36 @@ class CRM_Upgrade_Incremental_General {
   }
 
   /**
+   * Perform any message template updates. 5.0+.
+   * @param $message
+   * @param $version
+   */
+  public static function updateMessageTemplate(&$message, $version) {
+    if (version_compare($version, 5.0, '<')) {
+      return;
+    }
+    $messageObj = new CRM_Upgrade_Incremental_MessageTemplates($version);
+    $messages = $messageObj->getUpgradeMessages();
+    if (empty($messages)) {
+      return;
+    }
+    $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", array(
+        1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Message+Templates#MessageTemplates-UpgradesandCustomizedSystemWorkflowTemplates',
+        2 => '<ul><l>' . implode('</li><li>', $messages) . '</li></ul>',
+      ));
+
+    $messageObj->updateTemplates();
+  }
+
+  /**
    * @param $message
    * @param $latestVer
    * @param $currentVer
    */
   public static function checkMessageTemplate(&$message, $latestVer, $currentVer) {
-
+    if (version_compare($currentVer, 5.0, '>')) {
+      return;
+    }
     $sql = "SELECT orig.workflow_id as workflow_id,
              orig.msg_title as title
             FROM civicrm_msg_template diverted JOIN civicrm_msg_template orig ON (

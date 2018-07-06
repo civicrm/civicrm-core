@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -557,7 +557,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       define('DS', DIRECTORY_SEPARATOR);
       define('JPATH_BASE', $joomlaBase . '/administrator');
       require $joomlaBase . '/administrator/includes/defines.php';
-      require $joomlaBase . '/administrator/includes/framework.php';
     }
 
     // Get the framework.
@@ -565,20 +564,26 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       require $joomlaBase . '/libraries/import.legacy.php';
     }
     require $joomlaBase . '/libraries/cms.php';
-    require $joomlaBase . '/libraries/import.php';
-    require $joomlaBase . '/libraries/joomla/event/dispatcher.php';
-    require_once $joomlaBase . '/configuration.php';
     self::getJVersion($joomlaBase);
+
+    if (version_compare(JVERSION, '3.8', 'lt')) {
+      require $joomlaBase . '/libraries/import.php';
+      require $joomlaBase . '/libraries/joomla/event/dispatcher.php';
+    }
+
+    require_once $joomlaBase . '/configuration.php';
 
     if (version_compare(JVERSION, '3.0', 'lt')) {
       require $joomlaBase . '/libraries/joomla/environment/uri.php';
       require $joomlaBase . '/libraries/joomla/application/component/helper.php';
     }
-    else {
+    elseif (version_compare(JVERSION, '3.8', 'lt')) {
       jimport('joomla.environment.uri');
     }
 
-    jimport('joomla.application.cli');
+    if (version_compare(JVERSION, '3.8', 'lt')) {
+      jimport('joomla.application.cli');
+    }
 
     if (!defined('JDEBUG')) {
       define('JDEBUG', FALSE);
@@ -631,6 +636,16 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function getLoggedInUniqueIdentifier() {
     $user = JFactory::getUser();
     return $this->getUniqueIdentifierFromUserObject($user);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getUser($contactID) {
+    $user_details = parent::getUser($contactID);
+    $user = JFactory::getUser($user_details['id']);
+    $user_details['name'] = $user->name;
+    return $user_details;
   }
 
   /**

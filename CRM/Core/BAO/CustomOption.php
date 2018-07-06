@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -143,7 +143,19 @@ class CRM_Core_BAO_CustomOption {
         $class .= ' disabled';
         $action -= CRM_Core_Action::DISABLE;
       }
-      if (in_array($field->html_type, array('CheckBox', 'AdvMulti-Select', 'Multi-Select'))) {
+
+      $isGroupLocked = (bool) CRM_Core_DAO::getFieldValue(
+        CRM_Core_DAO_OptionGroup::class,
+        $field->option_group_id,
+        'is_locked'
+      );
+
+      // disable deletion of option values for locked option groups
+      if (($action & CRM_Core_Action::DELETE) && $isGroupLocked) {
+        $action -= CRM_Core_Action::DELETE;
+      }
+
+      if (in_array($field->html_type, ['CheckBox', 'Multi-Select'])) {
         if (isset($defVal) && in_array($dao->value, $defVal)) {
           $options[$dao->id]['is_default'] = '<img src="' . $config->resourceBase . 'i/check.gif" />';
         }
@@ -159,7 +171,7 @@ class CRM_Core_BAO_CustomOption {
           $options[$dao->id]['is_default'] = '';
         }
       }
-
+      $options[$dao->id]['description'] = $dao->description;
       $options[$dao->id]['class'] = $dao->id . ',' . $class;
       $options[$dao->id]['is_active'] = empty($dao->is_active) ? ts('No') : ts('Yes');
       $options[$dao->id]['links'] = CRM_Core_Action::formLink($links,
@@ -279,7 +291,6 @@ WHERE  id = %2";
           );
           break;
 
-        case 'AdvMulti-Select':
         case 'Multi-Select':
         case 'CheckBox':
           $oldString = CRM_Core_DAO::VALUE_SEPARATOR . $oldValue . CRM_Core_DAO::VALUE_SEPARATOR;

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * smart caching scheme on a per domain basis
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
  *
  */
@@ -203,7 +203,6 @@ class CRM_Core_SelectValues {
       'RichTextEditor' => ts('Rich Text Editor'),
       'Autocomplete-Select' => ts('Autocomplete-Select'),
       'Multi-Select' => ts('Multi-Select'),
-      'AdvMulti-Select' => ts('AdvMulti-Select'),
       'Link' => ts('Link'),
       'ContactReference' => ts('Autocomplete-Select'),
     );
@@ -896,7 +895,7 @@ class CRM_Core_SelectValues {
    * @return array
    */
   public static function getSearchBuilderOperators($fieldType = NULL) {
-    $builderOperators = array(
+    return [
       '=' => '=',
       '!=' => '≠',
       '>' => '>',
@@ -912,18 +911,7 @@ class CRM_Core_SelectValues {
       'IS NOT EMPTY' => ts('Not Empty'),
       'IS NULL' => ts('Is Null'),
       'IS NOT NULL' => ts('Not Null'),
-    );
-    if ($fieldType) {
-      switch ($fieldType) {
-        case CRM_Utils_Type::T_STRING:
-          unset($builderOperators['>']);
-          unset($builderOperators['<']);
-          unset($builderOperators['>=']);
-          unset($builderOperators['<=']);
-          break;
-      }
-    }
-    return $builderOperators;
+    ];
   }
 
   /**

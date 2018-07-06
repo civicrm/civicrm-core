@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
@@ -138,7 +138,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
           'civiMails' => array(),
           'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
           'groupNames' => array(),
-          // @todo see if we can remove this by dynamically generating the test group list
+          // @todo this is not used in core. Remove once Mosaico no longer depends on it.
           'testGroupNames' => $groupNames['values'],
           'headerfooterList' => $headerfooterList['values'],
           'mesTemplate' => $mesTemplate['values'],

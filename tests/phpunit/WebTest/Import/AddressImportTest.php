@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -201,12 +201,6 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
     $customField6 = 'Customfield_alp_multiselect' . substr(sha1(rand()), 0, 4);
     $customFieldId6 = $this->_createMultipleValueCustomField($customField6, 'Multi-Select');
 
-    // create custom field - "alphanumeric advmultiselect"
-    $this->click("newCustomField");
-    $this->waitForElementPresent('_qf_Field_done-bottom');
-    $customField7 = 'Customfield_alp_advmultiselect' . substr(sha1(rand()), 0, 4);
-    $customFieldId7 = $this->_createMultipleValueCustomField($customField7, 'AdvMulti-Select');
-
     // create custom field - "alphanumeric autocompleteselect"
     $this->click("newCustomField");
     $this->waitForElementPresent('_qf_Field_done-bottom');
@@ -253,7 +247,6 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
         "custom_{$customFieldId4}" => "$customField4 :: $customGroupTitle",
         "custom_{$customFieldId5}" => "$customField5 :: $customGroupTitle",
         "custom_{$customFieldId6}" => "$customField6 :: $customGroupTitle",
-        "custom_{$customFieldId7}" => "$customField7 :: $customGroupTitle",
         "custom_{$customFieldId8}" => "$customField8 :: $customGroupTitle",
         "custom_{$customFieldId1}" => "$customField1 :: $customGroupTitle",
         "custom_{$customFieldId2}" => "$customField2 :: $customGroupTitle",
@@ -267,7 +260,6 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
           "custom_{$customFieldId4}" => "label1",
           "custom_{$customFieldId5}" => "label1",
           "custom_{$customFieldId6}" => "label1",
-          "custom_{$customFieldId7}" => "label1",
           "custom_{$customFieldId8}" => "label1",
           "custom_{$customFieldId1}" => 1,
           "custom_{$customFieldId2}" => 12345,
@@ -281,7 +273,6 @@ class WebTest_Import_AddressImportTest extends ImportCiviSeleniumTestCase {
         $customField4 => 'label1',
         $customField5 => 'label1',
         $customField6 => 'label1',
-        $customField7 => 'label1',
         $customField8 => 'label1',
         $customField1 => '1',
         $customField2 => '12345',

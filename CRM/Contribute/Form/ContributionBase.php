@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -294,6 +294,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->_fields = $this->get('fields');
     $this->_bltID = $this->get('bltID');
     $this->_paymentProcessor = $this->get('paymentProcessor');
+
     $this->_priceSetId = $this->get('priceSetId');
     $this->_priceSet = $this->get('priceSet');
 
@@ -310,6 +311,17 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
       if (empty($this->_values['is_active'])) {
         throw new CRM_Contribute_Exception_InactiveContributionPageException(ts('The page you requested is currently unavailable.'), $this->_id);
+      }
+
+      $endDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('end_date', $this->_values));
+      $now = date('YmdHis');
+      if ($endDate && $endDate < $now) {
+        throw new CRM_Contribute_Exception_PastContributionPageException(ts('The page you requested has past its end date on ' . CRM_Utils_Date::customFormat($endDate)), $this->_id);
+      }
+
+      $startDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('start_date', $this->_values));
+      if ($startDate && $startDate > $now) {
+        throw new CRM_Contribute_Exception_FutureContributionPageException(ts('The page you requested will be active from ' . CRM_Utils_Date::customFormat($startDate)), $this->_id);
       }
 
       $this->assignBillingType();
@@ -578,9 +590,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // The concept of contributeMode is deprecated.
     // The payment processor object can provide info about the fields it shows.
-    if ($isMonetary) {
+    if ($isMonetary && is_a($this->_paymentProcessor['object'], 'CRM_Core_Payment')) {
       /** @var  $paymentProcessorObject \CRM_Core_Payment */
       $paymentProcessorObject = $this->_paymentProcessor['object'];
+
       $paymentFields = $paymentProcessorObject->getPaymentFormFields();
       foreach ($paymentFields as $index => $paymentField) {
         if (!isset($this->_params[$paymentField])) {
@@ -601,11 +614,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           $this->assign($paymentField, $this->_params[$paymentField]);
         }
       }
-      $paymentFieldsetLabel = ts('%1 Information', array($paymentProcessorObject->getPaymentTypeLabel()));
-      if (empty($paymentFields)) {
-        $paymentFieldsetLabel = '';
-      }
-      $this->assign('paymentFieldsetLabel', $paymentFieldsetLabel);
+      $this->assign('paymentFieldsetLabel', CRM_Core_Payment_Form::getPaymentLabel($paymentProcessorObject));
       $this->assign('paymentFields', $paymentFields);
 
     }

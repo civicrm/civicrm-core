@@ -47,22 +47,21 @@
     "totten/ca-config": "~17.05",
     "zetacomponents/base": "1.7.*",
     "zetacomponents/mail": "dev-1.7-civi",
-    "marcj/topsort": "dev-1.0-php53",
-    "phpoffice/phpword": "^0.13.0",
+    "marcj/topsort": "~1.1",
+    "phpoffice/phpword": "^0.14.0",
     "pear/Validate_Finance_CreditCard": "dev-master",
     "civicrm/civicrm-cxn-rpc": "~0.17.07.01",
     "pear/Auth_SASL": "1.1.0",
     "pear/Net_SMTP": "1.6.*",
-    "pear/Net_socket": "1.0.*"
+    "pear/Net_socket": "1.0.*",
+    "civicrm/civicrm-setup": "~0.2.0",
+    "guzzlehttp/guzzle": "^6.3",
+    "psr/simple-cache": "~1.0.1"
   },
   "repositories": [
     {
       "type": "git",
       "url": "https://github.com/civicrm/zetacomponents-mail.git"
-    },
-    {
-      "type": "git",
-      "url": "https://github.com/totten/topsort.php.git"
     }
   ],
   "scripts": {

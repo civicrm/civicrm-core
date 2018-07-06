@@ -185,6 +185,14 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     foreach ($relationships['values'] as $key => $values) {
       $this->assertEquals($values['end_date'], date('Y-m-d'));
     }
+
+    //Verify there are no active relationships.
+    $activeCaseRelationships = CRM_Case_BAO_Case::getCaseRoles($result['values'][$id]['client_id'][1], $id);
+    $this->assertEquals(count($activeCaseRelationships), 0, "Checking for empty array");
+
+    //Check if getCaseRoles() is able to return inactive relationships.
+    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($result['values'][$id]['client_id'][1], $id, NULL, FALSE);
+    $this->assertEquals(count($caseRelationships), 1);
   }
 
   /**
@@ -225,9 +233,8 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     // Verify that updated case is equal to the original with new subject.
     $result = $this->callAPISuccessGetSingle('Case', array('case_id' => $id));
     // Modification dates are likely to differ by 0-2 sec. Check manually.
-    $this->assertGreaterThanOrEqual($result['modified_date'], $case['modified_date']);
-    unset($result['modified_date']);
-    unset($case['modified_date']);
+    $this->assertGreaterThanOrEqual($case['modified_date'], $result['modified_date']);
+    unset($result['modified_date'], $case['modified_date']);
     // Everything else should be identical.
     $this->assertAPIArrayComparison($result, $case);
   }
@@ -252,9 +259,8 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     // Verify that updated case is equal to the original with new subject.
     $result = $this->callAPISuccessGetSingle('Case', array('case_id' => $id));
     // Modification dates are likely to differ by 0-2 sec. Check manually.
-    $this->assertGreaterThanOrEqual($result['modified_date'], $case['modified_date']);
-    unset($result['modified_date']);
-    unset($case['modified_date']);
+    $this->assertGreaterThanOrEqual($case['modified_date'], $result['modified_date']);
+    unset($result['modified_date'], $case['modified_date']);
     // Everything else should be identical.
     $this->assertAPIArrayComparison($result, $case);
   }
@@ -324,6 +330,43 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     // Check result - case should no longer exist
     $result = $this->callAPISuccess('case', 'get', array('id' => $id));
     $this->assertEquals(0, $result['count']);
+  }
+
+  /**
+   * Test Case role relationship is correctly created
+   * for contacts.
+   */
+  public function testCaseRoleRelationships() {
+    // Create Case
+    $case = $this->callAPISuccess('case', 'create', $this->_params);
+    $relType = $this->relationshipTypeCreate(array('name_a_b' => 'Test AB', 'name_b_a' => 'Test BA', 'contact_type_b' => 'Individual'));
+    $relContact = $this->individualCreate(array('first_name' => 'First', 'last_name' => 'Last'));
+
+    $_REQUEST = array(
+      'rel_type' => "{$relType}_b_a",
+      'rel_contact' => $relContact,
+      'case_id' => $case['id'],
+      'is_unit_test' => TRUE,
+    );
+    $ret = CRM_Contact_Page_AJAX::relationship();
+    $this->assertEquals(0, $ret['is_error']);
+    //Check if relationship exist for the case.
+    $relationship = $this->callAPISuccess('Relationship', 'get', array(
+      'sequential' => 1,
+      'relationship_type_id' => $relType,
+      'case_id' => $case['id'],
+    ));
+    $this->assertEquals($relContact, $relationship['values'][0]['contact_id_a']);
+    $this->assertEquals($this->_params['contact_id'], $relationship['values'][0]['contact_id_b']);
+
+    //Check if activity is assigned to correct contact.
+    $activity = $this->callAPISuccess('Activity', 'get', array(
+      'subject' => 'Test BA : Mr. First Last II',
+    ));
+    $activityContact = $this->callAPISuccess('ActivityContact', 'get', array(
+      'contact_id' => $relContact,
+      'activity_id' => $activity['id'],
+    ));
   }
 
   /**

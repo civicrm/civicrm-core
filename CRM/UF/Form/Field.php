@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
@@ -550,6 +550,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       else {
         $apiFormattedParams['location_type_id'] = $params['field_name'][2];
       }
+    }
+    elseif ($params['field_name'][2] == 0) {
+      // 0 is Primary location type
+      $apiFormattedParams['location_type_id'] = NULL;
     }
     if (!empty($params['field_name'][3])) {
       $apiFormattedParams['phone_type_id'] = $params['field_name'][3];
