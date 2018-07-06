@@ -2834,6 +2834,22 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
   }
 
   /**
+   * Checks if user has permissions to edit inbound e-mails, either bsic info
+   * or both basic information and content.
+   *
+   * @return bool
+   */
+  public function checkEditInboundEmailsPermissions() {
+    if (CRM_Core_Permission::check('edit inbound email basic information')
+      || CRM_Core_Permission::check('edit inbound email basic information and content')
+    ) {
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
    * Wrapper for ajax activity selector.
    *
    * @param array $params
