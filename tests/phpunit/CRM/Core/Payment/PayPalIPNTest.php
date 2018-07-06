@@ -121,24 +121,37 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    * The second will create a new contribution.
    */
   public function testIPNPaymentRecurSuccess() {
-    $this->setupRecurringPaymentProcessorTransaction();
+    $this->setupRecurringPaymentProcessorTransaction([], ['total_amount' => '15.00']);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurTransaction());
     $paypalIPN->main();
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
-    $this->assertEquals(1, $contribution['contribution_status_id']);
-    $this->assertEquals('8XA571746W2698126', $contribution['trxn_id']);
+    $contribution1 = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
+    $this->assertEquals(1, $contribution1['contribution_status_id']);
+    $this->assertEquals('8XA571746W2698126', $contribution1['trxn_id']);
     // source gets set by processor
-    $this->assertTrue(substr($contribution['contribution_source'], 0, 20) == "Online Contribution:");
+    $this->assertTrue(substr($contribution1['contribution_source'], 0, 20) == "Online Contribution:");
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $this->_contributionRecurID));
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurSubsequentTransaction());
     $paypalIPN->main();
-    $contribution = $this->callAPISuccess('contribution', 'get', array(
+    $contributions = $this->callAPISuccess('contribution', 'get', array(
         'contribution_recur_id' => $this->_contributionRecurID,
         'sequential' => 1,
       ));
-    $this->assertEquals(2, $contribution['count']);
-    $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
+    $this->assertEquals(2, $contributions['count']);
+    $contribution2 = $contributions['values'][1];
+    $this->assertEquals('secondone', $contribution2['trxn_id']);
+    $paramsThatShouldMatch = [
+      'total_amount',
+      'net_amount',
+      'fee_amount',
+      'payment_instrument',
+      'payment_instrument_id',
+      'financial_type',
+      'financial_type_id',
+    ];
+    foreach ($paramsThatShouldMatch as $match) {
+      $this->assertEquals($contribution1[$match], $contribution2[$match]);
+    }
   }
 
   /**

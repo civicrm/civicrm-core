@@ -226,7 +226,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       // In future moving to create pending & then complete, but this OK for now.
       // Also consider accepting 'Failed' like other processors.
       $input['contribution_status_id'] = $contributionStatuses['Completed'];
-      $input['invoice_id'] = md5(uniqid(rand(), TRUE));
       $input['original_contribution_id'] = $ids['contribution'];
       $input['contribution_recur_id'] = $ids['contributionRecur'];
 
