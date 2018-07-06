@@ -126,7 +126,6 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
       $dao->find();
 
       $products = array();
-      $radio = array();
       while ($dao->fetch()) {
         $productDAO = new CRM_Contribute_DAO_Product();
         $productDAO->id = $dao->product_id;
