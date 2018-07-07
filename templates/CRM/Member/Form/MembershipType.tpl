@@ -24,15 +24,12 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting membership type  *}
+{if $action eq 8}
+  {include file="CRM/Core/Form/EntityForm.tpl"}
+{else}
 <div class="crm-block crm-form-block crm-membership-type-form-block">
 
   <div class="form-item" id="membership_type_form">
-  {if $action eq 8}
-    <div class="messages status no-popup">
-      {ts}WARNING: Deleting this option will result in the loss of all membership records of this type.{/ts} {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
-    </div>
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
-  {else}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
       <tr class="crm-membership-type-form-block-name">
