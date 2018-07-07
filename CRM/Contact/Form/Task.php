@@ -165,9 +165,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     if ((CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_all') ||
       ($form->_task == CRM_Contact_Task::SAVE_SEARCH)
     ) {
-      $sortByCharacter = $form->get('sortByCharacter');
-      $cacheKey = ($sortByCharacter && $sortByCharacter != 'all') ? "{$cacheKey}_alphabet" : $cacheKey;
-
       // since we don't store all contacts in prevnextcache, when user selects "all" use query to retrieve contacts
       // rather than prevnext cache table for most of the task actions except export where we rebuild query to fetch
       // final result set

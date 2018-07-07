@@ -127,13 +127,13 @@ INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cache
       if (is_array($cIds)) {
         $cIdFilter = "(" . implode(',', $cIds) . ")";
         $whereClause = "
-WHERE cacheKey LIKE %1
+WHERE cacheKey = %1
 AND (entity_id1 IN {$cIdFilter} OR entity_id2 IN {$cIdFilter})
 ";
       }
       else {
         $whereClause = "
-WHERE cacheKey LIKE %1
+WHERE cacheKey = %1
 AND (entity_id1 = %2 OR entity_id2 = %2)
 ";
         $params[2] = array("{$cIds}", 'Integer');
@@ -141,12 +141,12 @@ AND (entity_id1 = %2 OR entity_id2 = %2)
       if ($action == 'select') {
         $whereClause .= "AND is_selected = 0";
         $sql = "UPDATE civicrm_prevnext_cache SET is_selected = 1 {$whereClause} {$entity_whereClause}";
-        $params[1] = array("{$cacheKey}%", 'String');
+        $params[1] = array($cacheKey, 'String');
       }
       elseif ($action == 'unselect') {
         $whereClause .= "AND is_selected = 1";
         $sql = "UPDATE civicrm_prevnext_cache SET is_selected = 0 {$whereClause} {$entity_whereClause}";
-        $params[1] = array("%{$cacheKey}%", 'String');
+        $params[1] = array($cacheKey, 'String');
       }
       // default action is reseting
     }
@@ -154,10 +154,10 @@ AND (entity_id1 = %2 OR entity_id2 = %2)
       $sql = "
 UPDATE civicrm_prevnext_cache
 SET    is_selected = 0
-WHERE  cacheKey LIKE %1 AND is_selected = 1
+WHERE  cacheKey = %1 AND is_selected = 1
        {$entity_whereClause}
 ";
-      $params[1] = array("{$cacheKey}%", 'String');
+      $params[1] = array($cacheKey, 'String');
     }
     CRM_Core_DAO::executeQuery($sql, $params);
   }
@@ -187,12 +187,12 @@ WHERE  cacheKey LIKE %1 AND is_selected = 1
       $actionGet = ($action == "get") ? " AND is_selected = 1 " : "";
       $sql = "
 SELECT entity_id1, entity_id2 FROM civicrm_prevnext_cache
-WHERE cacheKey LIKE %1
+WHERE cacheKey = %1
       $actionGet
       $entity_whereClause
 ORDER BY id
 ";
-      $params[1] = array("{$cacheKey}%", 'String');
+      $params[1] = array($cacheKey, 'String');
 
       $contactIds = array($cacheKey => array());
       $cIdDao = CRM_Core_DAO::executeQuery($sql, $params);
@@ -229,7 +229,19 @@ ORDER BY id
    * @param string $entityTable
    */
   public function deleteItem($id = NULL, $cacheKey = NULL, $entityTable = 'civicrm_contact') {
-    CRM_Core_BAO_PrevNextCache::deleteItem($id, $cacheKey, $entityTable);
+    $sql = "DELETE FROM civicrm_prevnext_cache WHERE  entity_table = %1";
+    $params = array(1 => array($entityTable, 'String'));
+
+    if (is_numeric($id)) {
+      $sql .= " AND ( entity_id1 = %2 OR entity_id2 = %2 )";
+      $params[2] = array($id, 'Integer');
+    }
+
+    if (isset($cacheKey)) {
+      $sql .= " AND cacheKey = %3";
+      $params[3] = array($cacheKey, 'String');
+    }
+    CRM_Core_DAO::executeQuery($sql, $params);
   }
 
   /**
