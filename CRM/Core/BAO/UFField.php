@@ -896,7 +896,7 @@ SELECT  id
       'address_options', TRUE, NULL, TRUE
     );
 
-    if (!$addressOptions['county']) {
+    if (empty($addressOptions['county'])) {
       unset($fields['Individual']['county'], $fields['Household']['county'], $fields['Organization']['county']);
     }
 
