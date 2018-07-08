@@ -1,4 +1,8 @@
 {* file to handle db changes in 5.5.alpha1 during upgrade *}
+
+ALTER TABLE civicrm_prevnext_cache
+  CHANGE `entity_id2` `entity_id2` int unsigned NULL   COMMENT 'FK to entity table specified in entity_table column.';
+
 #https://lab.civicrm.org/dev/core/issues/228
 UPDATE civicrm_option_group SET is_active = 0 WHERE is_active IS NULL;
 ALTER TABLE civicrm_option_group MODIFY COLUMN is_active TINYINT(4) NOT NULL DEFAULT 1 COMMENT 'Is this option group active?';
