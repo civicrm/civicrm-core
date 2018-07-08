@@ -282,7 +282,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
       );
       list($select, $from) = explode(' FROM ', $sql);
       $selectSQL = "
-      SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.display_name
+      SELECT '$cacheKey', contact_a.id, contact_a.display_name
 FROM {$from}
 ";
 
