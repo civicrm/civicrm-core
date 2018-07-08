@@ -30,8 +30,7 @@
  *
  * Usage:
  * @code
- * $select = CRM_Utils_SQL_Select::from('civicrm_activity act')
- *     ->join('absence', 'inner join civicrm_activity absence on absence.id = act.source_record_id')
+ * $del = CRM_Utils_SQL_Delete::from('civicrm_activity act')
  *     ->where('activity_type_id = #type', array('type' => 234))
  *     ->where('status_id IN (#statuses)', array('statuses' => array(1,2,3))
  *     ->where('subject like @subj', array('subj' => '%hello%'))
@@ -40,7 +39,7 @@
  *        'column' => $customField->column_name,
  *        'value' => $form['foo']
  *      ))
- * echo $select->toSQL();
+ * echo $del->toSQL();
  * @endcode
  *
  * Design principles:
@@ -80,46 +79,25 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2018
  */
-class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
+class CRM_Utils_SQL_Delete extends CRM_Utils_SQL_BaseParamQuery {
 
-  private $insertInto = NULL;
-  private $insertVerb = 'INSERT INTO ';
-  private $insertIntoFields = array();
-  private $selects = array();
   private $from;
-  private $joins = array();
   private $wheres = array();
-  private $groupBys = array();
-  private $havings = array();
-  private $orderBys = array();
-  private $limit = NULL;
-  private $offset = NULL;
-  private $distinct = NULL;
 
   /**
-   * Create a new SELECT query.
+   * Create a new DELETE query.
    *
    * @param string $from
    *   Table-name and optional alias.
    * @param array $options
-   * @return CRM_Utils_SQL_Select
+   * @return CRM_Utils_SQL_Delete
    */
   public static function from($from, $options = array()) {
     return new self($from, $options);
   }
 
   /**
-   * Create a partial SELECT query.
-   *
-   * @param array $options
-   * @return CRM_Utils_SQL_Select
-   */
-  public static function fragment($options = array()) {
-    return new self(NULL, $options);
-  }
-
-  /**
-   * Create a new SELECT query.
+   * Create a new DELETE query.
    *
    * @param string $from
    *   Table-name and optional alias.
@@ -133,7 +111,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   /**
    * Make a new copy of this query.
    *
-   * @return CRM_Utils_SQL_Select
+   * @return CRM_Utils_SQL_Delete
    */
   public function copy() {
     return clone $this;
@@ -142,10 +120,10 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   /**
    * Merge something or other.
    *
-   * @param CRM_Utils_SQL_Select $other
+   * @param CRM_Utils_SQL_Delete $other
    * @param array|NULL $parts
-   *   ex: 'joins', 'wheres'
-   * @return CRM_Utils_SQL_Select
+   *   ex: 'wheres'
+   * @return CRM_Utils_SQL_Delete
    */
   public function merge($other, $parts = NULL) {
     if ($other === NULL) {
@@ -163,14 +141,14 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
       throw new RuntimeException("Cannot merge queries that use different interpolation modes ({$this->mode} vs {$other->mode}).");
     }
 
-    $arrayFields = array('insertIntoFields', 'selects', 'joins', 'wheres', 'groupBys', 'havings', 'orderBys', 'params');
+    $arrayFields = array('wheres', 'params');
     foreach ($arrayFields as $f) {
       if ($parts === NULL || in_array($f, $parts)) {
         $this->{$f} = array_merge($this->{$f}, $other->{$f});
       }
     }
 
-    $flatFields = array('insertInto', 'from', 'limit', 'offset');
+    $flatFields = array('from');
     foreach ($flatFields as $f) {
       if ($parts === NULL || in_array($f, $parts)) {
         if ($other->{$f} !== NULL) {
@@ -183,121 +161,17 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
-   * Add a new JOIN clause.
-   *
-   * Note: To add multiple JOINs at once, use $name===NULL and
-   * pass an array of $exprs.
-   *
-   * @param string|NULL $name
-   *   The effective alias of the joined table.
-   * @param string|array $exprs
-   *   The complete join expression (eg "INNER JOIN mytable myalias ON mytable.id = maintable.foo_id").
-   * @param array|null $args
-   * @return CRM_Utils_SQL_Select
-   */
-  public function join($name, $exprs, $args = NULL) {
-    if ($name !== NULL) {
-      $this->joins[$name] = $this->interpolate($exprs, $args);
-    }
-    else {
-      foreach ($exprs as $name => $expr) {
-        $this->joins[$name] = $this->interpolate($expr, $args);
-      }
-      return $this;
-    }
-    return $this;
-  }
-
-  /**
-   * Specify the column(s)/value(s) to return by adding to the SELECT clause
-   *
-   * @param string|array $exprs list of SQL expressions
-   * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
-   * @return CRM_Utils_SQL_Select
-   */
-  public function select($exprs, $args = NULL) {
-    $exprs = (array) $exprs;
-    foreach ($exprs as $expr) {
-      $this->selects[] = $this->interpolate($expr, $args);
-    }
-    return $this;
-  }
-
-  /**
-   * Return only distinct values
-   *
-   * @param bool $isDistinct allow DISTINCT select or not
-   * @return CRM_Utils_SQL_Select
-   */
-  public function distinct($isDistinct = TRUE) {
-    if ($isDistinct) {
-      $this->distinct = 'DISTINCT ';
-    }
-    return $this;
-  }
-
-  /**
    * Limit results by adding extra condition(s) to the WHERE clause
    *
    * @param string|array $exprs list of SQL expressions
    * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
-   * @return CRM_Utils_SQL_Select
+   * @return CRM_Utils_SQL_Delete
    */
   public function where($exprs, $args = NULL) {
     $exprs = (array) $exprs;
     foreach ($exprs as $expr) {
       $evaluatedExpr = $this->interpolate($expr, $args);
       $this->wheres[$evaluatedExpr] = $evaluatedExpr;
-    }
-    return $this;
-  }
-
-  /**
-   * Group results by adding extra items to the GROUP BY clause.
-   *
-   * @param string|array $exprs list of SQL expressions
-   * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
-   * @return CRM_Utils_SQL_Select
-   */
-  public function groupBy($exprs, $args = NULL) {
-    $exprs = (array) $exprs;
-    foreach ($exprs as $expr) {
-      $evaluatedExpr = $this->interpolate($expr, $args);
-      $this->groupBys[$evaluatedExpr] = $evaluatedExpr;
-    }
-    return $this;
-  }
-
-  /**
-   * Limit results by adding extra condition(s) to the HAVING clause
-   *
-   * @param string|array $exprs list of SQL expressions
-   * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
-   * @return CRM_Utils_SQL_Select
-   */
-  public function having($exprs, $args = NULL) {
-    $exprs = (array) $exprs;
-    foreach ($exprs as $expr) {
-      $evaluatedExpr = $this->interpolate($expr, $args);
-      $this->havings[$evaluatedExpr] = $evaluatedExpr;
-    }
-    return $this;
-  }
-
-  /**
-   * Sort results by adding extra items to the ORDER BY clause.
-   *
-   * @param string|array $exprs list of SQL expressions
-   * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
-   * @param int $weight
-   * @return \CRM_Utils_SQL_Select
-   */
-  public function orderBy($exprs, $args = NULL, $weight = 0) {
-    static $guid = 0;
-    $exprs = (array) $exprs;
-    foreach ($exprs as $expr) {
-      $evaluatedExpr = $this->interpolate($expr, $args);
-      $this->orderBys[$evaluatedExpr] = array('value' => $evaluatedExpr, 'weight' => $weight, 'guid' => $guid++);
     }
     return $this;
   }
@@ -311,111 +185,24 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    *   The new value of the parameter.
    *   Values may be strings, ints, or arrays thereof -- provided that the
    *   SQL query uses appropriate prefix (e.g. "@", "!", "#").
-   * @return \CRM_Utils_SQL_Select
+   * @return \CRM_Utils_SQL_Delete
    */
   public function param($keys, $value = NULL) {
-    // Why bother with an override? To provide bett er type-hinting in `@return`.
+    // Why bother with an override? To provide better type-hinting in `@return`.
     return parent::param($keys, $value);
   }
 
   /**
-   * Set a limit on the number of records to return.
-   *
-   * @param int $limit
-   * @param int $offset
-   * @return CRM_Utils_SQL_Select
-   * @throws CRM_Core_Exception
-   */
-  public function limit($limit, $offset = 0) {
-    if ($limit !== NULL && !is_numeric($limit)) {
-      throw new CRM_Core_Exception("Illegal limit");
-    }
-    if ($offset !== NULL && !is_numeric($offset)) {
-      throw new CRM_Core_Exception("Illegal offset");
-    }
-    $this->limit = $limit;
-    $this->offset = $offset;
-    return $this;
-  }
-
-  /**
-   * Insert the results of the SELECT query into another
-   * table.
-   *
-   * @param string $table
-   *   The name of the other table (which receives new data).
-   * @param array $fields
-   *   The fields to fill in the other table (in order).
-   * @return CRM_Utils_SQL_Select
-   * @see insertIntoField
-   */
-  public function insertInto($table, $fields = array()) {
-    $this->insertInto = $table;
-    $this->insertIntoField($fields);
-    return $this;
-  }
-
-  /**
-   * Wrapper function of insertInto fn but sets insertVerb = "INSERT IGNORE INTO "
-   *
-   * @param string $table
-   *   The name of the other table (which receives new data).
-   * @param array $fields
-   *   The fields to fill in the other table (in order).
-   * @return CRM_Utils_SQL_Select
-   */
-  public function insertIgnoreInto($table, $fields = array()) {
-    $this->insertVerb = "INSERT IGNORE INTO ";
-    return $this->insertInto($table, $fields);
-  }
-
-  /**
-   * Wrapper function of insertInto fn but sets insertVerb = "REPLACE INTO "
-   *
-   * @param string $table
-   *   The name of the other table (which receives new data).
-   * @param array $fields
-   *   The fields to fill in the other table (in order).
-   */
-  public function replaceInto($table, $fields = array()) {
-    $this->insertVerb = "REPLACE INTO ";
-    return $this->insertInto($table, $fields);
-  }
-
-
-  /**
-   * @param array $fields
-   *   The fields to fill in the other table (in order).
-   * @return CRM_Utils_SQL_Select
-   */
-  public function insertIntoField($fields) {
-    $fields = (array) $fields;
-    foreach ($fields as $field) {
-      $this->insertIntoFields[] = $field;
-    }
-    return $this;
-  }
-
-  /**
    * @param array|NULL $parts
-   *   List of fields to check (e.g. 'selects', 'joins').
+   *   List of fields to check (e.g. 'wheres').
    *   Defaults to all.
    * @return bool
    */
   public function isEmpty($parts = NULL) {
     $empty = TRUE;
     $fields = array(
-      'insertInto',
-      'insertIntoFields',
-      'selects',
       'from',
-      'joins',
       'wheres',
-      'groupBys',
-      'havings',
-      'orderBys',
-      'limit',
-      'offset',
     );
     if ($parts !== NULL) {
       $fields = array_intersect($fields, $parts);
@@ -433,45 +220,13 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    *   SQL statement
    */
   public function toSQL() {
-    $sql = '';
-    if ($this->insertInto) {
-      $sql .= $this->insertVerb . $this->insertInto . ' (';
-      $sql .= implode(', ', $this->insertIntoFields);
-      $sql .= ")\n";
-    }
+    $sql = 'DELETE ';
 
-    if ($this->selects) {
-      $sql .= 'SELECT ' . $this->distinct . implode(', ', $this->selects) . "\n";
-    }
-    else {
-      $sql .= 'SELECT *' . "\n";
-    }
     if ($this->from !== NULL) {
       $sql .= 'FROM ' . $this->from . "\n";
     }
-    foreach ($this->joins as $join) {
-      $sql .= $join . "\n";
-    }
     if ($this->wheres) {
       $sql .= 'WHERE (' . implode(') AND (', $this->wheres) . ")\n";
-    }
-    if ($this->groupBys) {
-      $sql .= 'GROUP BY ' . implode(', ', $this->groupBys) . "\n";
-    }
-    if ($this->havings) {
-      $sql .= 'HAVING (' . implode(') AND (', $this->havings) . ")\n";
-    }
-    if ($this->orderBys) {
-      $orderBys = CRM_Utils_Array::crmArraySortByField($this->orderBys,
-        array('weight', 'guid'));
-      $orderBys = CRM_Utils_Array::collect('value', $orderBys);
-      $sql .= 'ORDER BY ' . implode(', ', $orderBys) . "\n";
-    }
-    if ($this->limit !== NULL) {
-      $sql .= 'LIMIT ' . $this->limit . "\n";
-      if ($this->offset !== NULL) {
-        $sql .= 'OFFSET ' . $this->offset . "\n";
-      }
     }
     if ($this->mode === self::INTERPOLATE_OUTPUT) {
       $sql = $this->interpolate($sql, $this->params, self::INTERPOLATE_OUTPUT);
