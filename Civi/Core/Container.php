@@ -224,6 +224,14 @@ class Container {
       []
     ));
 
+    $container->setDefinition('prevnext.driver.redis', new Definition(
+      'CRM_Core_PrevNextCache_Redis',
+      [new Reference('cache_config')]
+    ));
+
+    $container->setDefinition('cache_config', new Definition('ArrayObject'))
+      ->setFactory(array(new Reference(self::SELF), 'createCacheConfig'));
+
     $container->setDefinition('civi.mailing.triggers', new Definition(
       'Civi\Core\SqlTrigger\TimestampTriggers',
       array('civicrm_mailing', 'Mailing')
@@ -419,6 +427,13 @@ class Container {
     return $container->has($service)
       ? $container->get($service)
       : $container->get('prevnext.driver.sql');
+  }
+
+  public static function createCacheConfig() {
+    $driver = \CRM_Utils_Cache::getCacheDriver();
+    $settings = \CRM_Utils_Cache::getCacheSettings($driver);
+    $settings['driver'] = $driver;
+    return new \ArrayObject($settings);
   }
 
   /**
