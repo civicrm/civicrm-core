@@ -1115,6 +1115,29 @@ FROM   civicrm_domain
   }
 
   /**
+   * Return the results as PHP generator.
+   *
+   * @param string $type
+   *   Whether the generator yields 'dao' objects or 'array's.
+   */
+  public function fetchGenerator($type = 'dao') {
+    while ($this->fetch()) {
+      switch ($type) {
+        case 'dao':
+          yield $this;
+          break;
+
+        case 'array':
+          yield $this->toArray();
+          break;
+
+        default:
+          throw new \RuntimeException("Invalid record type ($type)");
+      }
+    }
+  }
+
+  /**
    * Returns a singular value.
    *
    * @return mixed|NULL
