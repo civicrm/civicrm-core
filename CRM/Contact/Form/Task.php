@@ -99,8 +99,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     $form->_contactIds = array();
     $form->_contactTypes = array();
 
-    $formName = CRM_Utils_System::getClassName($form->controller->getStateMachine());
-    $useTable = $formName == 'CRM_Export_StateMachine_Standalone';
+    $useTable = (CRM_Utils_System::getClassName($form->controller->getStateMachine()) == 'CRM_Export_StateMachine_Standalone');
 
     $isStandAlone = in_array('task', $form->urlPath) || in_array('standalone', $form->urlPath);
     if ($isStandAlone) {
@@ -174,7 +173,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
         $allCids = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey, "getall");
       }
       else {
-        $allCids[$cacheKey] = $form->getContactIds();
+        $allCids[$cacheKey] = self::getContactIds($form);
       }
 
       $form->_contactIds = array();
@@ -285,36 +284,41 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
   }
 
   /**
-   * Get the contact id for custom search.
+   * Get the contact ids for:
+   *   - "Select Records: All xx records"
+   *   - custom search (FIXME: does this still apply to custom search?).
+   * When we call this function we are not using the prev/next cache
    *
-   * we are not using prev/next table in case of custom search
+   * @param $form CRM_Core_Form
+   *
+   * @return array $contactIds
    */
-  public function getContactIds() {
+  public static function getContactIds($form) {
     // need to perform action on all contacts
     // fire the query again and get the contact id's + display name
     $sortID = NULL;
-    if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-      $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-        $this->get(CRM_Utils_Sort::SORT_DIRECTION)
+    if ($form->get(CRM_Utils_Sort::SORT_ID)) {
+      $sortID = CRM_Utils_Sort::sortIDValue($form->get(CRM_Utils_Sort::SORT_ID),
+        $form->get(CRM_Utils_Sort::SORT_DIRECTION)
       );
     }
 
-    $selectorName = $this->controller->selectorName();
+    $selectorName = $form->controller->selectorName();
 
-    $fv = $this->get('formValues');
-    $customClass = $this->get('customSearchClass');
+    $fv = $form->get('formValues');
+    $customClass = $form->get('customSearchClass');
     $returnProperties = CRM_Core_BAO_Mapping::returnProperties(self::$_searchFormValues);
 
     $selector = new $selectorName($customClass, $fv, NULL, $returnProperties);
 
-    $params = $this->get('queryParams');
+    $params = $form->get('queryParams');
 
     // fix for CRM-5165
-    $sortByCharacter = $this->get('sortByCharacter');
+    $sortByCharacter = $form->get('sortByCharacter');
     if ($sortByCharacter && $sortByCharacter != 1) {
       $params[] = array('sortByCharacter', '=', $sortByCharacter, 0, 0);
     }
-    $queryOperator = $this->get('queryOperator');
+    $queryOperator = $form->get('queryOperator');
     if (!$queryOperator) {
       $queryOperator = 'AND';
     }
