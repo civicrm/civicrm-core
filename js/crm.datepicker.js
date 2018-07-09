@@ -72,6 +72,8 @@
           if (!settings.yearRange && settings.minDate !== null && settings.maxDate !== null) {
             settings.yearRange = '' + CRM.utils.formatDate(settings.minDate, 'yy') + ':' + CRM.utils.formatDate(settings.maxDate, 'yy');
           }
+          settings.showButtonPanel = true;
+          settings.closeText = 'Close';
           $dateField.addClass('crm-form-date').datepicker(settings);
         } else {
           $dateField.attr('min', settings.minDate ? CRM.utils.formatDate(settings.minDate, 'yy') : '1000');
@@ -86,7 +88,122 @@
         else {
           $dateField.attr('aria-label', placeholder);
         }
+        $dateField.change(updateDataField);
+        $dateField.on('focus', function(event) {
+          var calender = $('#ui-datepicker-div');
+          if (calender.css('display') != 'none') {
+            var today = $('.ui-datepicker-today a')[0];
+            if (!today) {
+              today = $('.ui-state-active')[0] || $('.ui-state-default')[0];
+            }
+            today.focus();
+            event.preventDefault();
+          }
+        });
+        $('#ui-datepicker-div').keydown(function(event) {
+          var key = event.key,
+          target = event.target,
+          calender = $('#ui-datepicker-div'),
+          today =  $('.ui-datepicker-today a')[0] || $('.ui-state-active')[0] || $('.ui-state-default')[0],
+          el = $(target).closest('td');
+          if (key === "Tab") {
+            event.preventDefault();
+            if (el.hasClass('ui-datepicker-days-cell-over')) {
+              $('.ui-datepicker-current').focus();
+            }
+            else if ($(target).hasClass('ui-datepicker-current')) {
+              $('.ui-datepicker-close').focus();
+            }
+            if ($(target).hasClass('ui-datepicker-close')) {
+              $('.ui-datepicker-month').focus();
+            }
+            else if ($(target).hasClass('ui-datepicker-month')) {
+              $('.ui-datepicker-year').focus();
+            }
+            else if ($(target).hasClass('ui-datepicker-year')) {
+              today.focus();
+            }
+            else {
+              $('.ui-datepicker-close').focus();
+            }
+          }
+          else if (key === "ArrowLeft" || key === "ArrowRight") {
+            if (!$(target).hasClass('ui-datepicker-close') && $(target).hasClass('ui-state-default')) {
+              event.preventDefault();
+              el = (key === 'ArrowLeft') ? $('a.ui-state-default', el.prev())[0] : $('a.ui-state-default', el.next())[0];
+              if (el) {
+                el.focus();
+              }
+              else {
+                el = $(target).closest('tr');
+                el = (key === 'ArrowLeft') ? $('a.ui-state-default', el.prev())[6] : $('a.ui-state-default', el.next())[0];
+                if (el) {
+                  el.focus();
+                }
+                else {
+                  $('.ui-datepicker-month').focus();
+                }
+              }
+            }
+            else if ($(target).hasClass('ui-datepicker-month')) {
+              if (key === "ArrowRight") {
+                $('.ui-datepicker-year').focus();
+              }
+              else {
+                $('td a.ui-state-default')[0].focus();
+              }
+            }
+            else if ($(target).hasClass('ui-datepicker-year')) {
+              if (key === "ArrowLeft") {
+                $('.ui-datepicker-month').focus();
+              }
+              else {
+                $('td a.ui-state-default')[0].focus();
+              }
+            }
+          }
+          // TODO : for now we are relying on up/down arrow change month and year, but need to replace with ENTER + Up/Down
+          else if (key === "ArrowUp" || key === "ArrowDown") {
+            event.preventDefault();
+            if (!$(target).hasClass('ui-datepicker-close') && $(target).hasClass('ui-state-default')) {
+              var index = el.index();
+              el = (key === "ArrowUp") ? $('a.ui-state-default', $(target).closest('tr').prev()) : $('a.ui-state-default', $(target).closest('tr').next());
+              if (el.length) {
+                if (el[index]) {
+                  el[index].focus();
+                }
+                else if (key === "ArrowUp") {
+                  el[0].focus();
+                }
+                else if (key === "ArrowDown") {
+                  el.last().focus();
+                }
+              }
+              else {
+                $('.ui-datepicker-month').focus();
+              }
+            }
+            else if ($(target).hasClass('ui-datepicker-month')) {
+              var nextMonth = (key === "ArrowUp") ? parseInt($(target).val()) - 1 : parseInt($(target).val()) + 1;
+              nextMonth = (nextMonth === 12) ? 0 : ((nextMonth === -1) ? 11 : nextMonth);
+              $(target).val(nextMonth).trigger('change');
+              $('.ui-datepicker-month').focus();
+            }
+            else if ($(target).hasClass('ui-datepicker-year')) {
+              var nextYear = (key === "ArrowUp") ? parseInt($(target).val()) - 1 : parseInt($(target).val()) + 1;
+              // prevent value to change when the next selected year doesn't fall in the range
+              if ((nextYear <= $('.ui-datepicker-year option:last-child').val()) && (nextYear >= $('.ui-datepicker-year option:first-child').val())) {
+                $(target).val(nextYear).trigger('change');
+                $('.ui-datepicker-year').focus();
+              }
+            }
+            else if ($(target).hasClass('ui-datepicker-close')) {
+              $('.ui-datepicker-month').focus();
+            }
+          }
+        });
       }
+
       // Rudimentary validation. TODO: Roll into use of jQUery validate and ui.datepicker.validation
       function isValidDate() {
         // FIXME: parseDate doesn't work with incomplete date formats; skip validation if no month, day or year in format
