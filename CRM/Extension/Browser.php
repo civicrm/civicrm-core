@@ -58,7 +58,7 @@ class CRM_Extension_Browser {
   /**
    * @var CRM_Utils_HttpClient
    */
-  protected $client;
+  // protected $client;
   /**
    * @var CRM_Utils_Cache_Interface
    */
@@ -92,7 +92,7 @@ class CRM_Extension_Browser {
     $this->repoUrl = $repoUrl;
     // $this->cacheDir = $cacheDir;
     $this->cache = $cache;
-    $this->client = $client;
+    // $this->client = $client;
     $this->indexPath = empty($indexPath) ? self::SINGLE_FILE_PATH : $indexPath;
     // if ($cacheDir && !file_exists($cacheDir) && is_dir(dirname($cacheDir)) && is_writable(dirname($cacheDir))) {
     //   CRM_Utils_File::createDir($cacheDir, FALSE);
@@ -134,29 +134,29 @@ class CRM_Extension_Browser {
    * @return array
    *   List of error messages; empty if OK.
    */
-  // public function checkRequirements() {
-  //   if (!$this->isEnabled()) {
-  //     return array();
-  //   }
-  //
-  //   $errors = array();
-  //
-  //   if (!$this->cacheDir || !is_dir($this->cacheDir) || !is_writable($this->cacheDir)) {
-  //     $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
-  //     $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination=${civicrmDestination}");
-  //     $errors[] = array(
-  //       'title' => ts('Directory Unwritable'),
-  //       'message' => ts('Your extensions cache directory (%1) is not web server writable. Please go to the <a href="%2">path setting page</a> and correct it.<br/>',
-  //         array(
-  //           1 => $this->cacheDir,
-  //           2 => $url,
-  //         )
-  //       ),
-  //     );
-  //   }
-  //
-  //   return $errors;
-  // }
+  public function checkRequirements() {
+    if (!$this->isEnabled()) {
+      return array();
+    }
+
+    $errors = array();
+
+    // if (!$this->cacheDir || !is_dir($this->cacheDir) || !is_writable($this->cacheDir)) {
+    //   $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
+    //   $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination=${civicrmDestination}");
+    //   $errors[] = array(
+    //     'title' => ts('Directory Unwritable'),
+    //     'message' => ts('Your extensions cache directory (%1) is not web server writable. Please go to the <a href="%2">path setting page</a> and correct it.<br/>',
+    //       array(
+    //         1 => $this->cacheDir,
+    //         2 => $url,
+    //       )
+    //     ),
+    //   );
+    // }
+
+    return $errors;
+  }
 
   /**
    * Get a list of all available extensions.
@@ -253,7 +253,7 @@ class CRM_Extension_Browser {
   //   return $json;
   // }
 
-  public function grabExtCache() {
+  public function grabCachedJson() {
     $isChanged = FALSE;
     $extension = $this->cache->get('Extension_Browser');
     if (empty($extension) || !is_array($extension)) {
@@ -269,10 +269,10 @@ class CRM_Extension_Browser {
         $extension = $newExtension;
         $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['ttl'];
 
-      else {
-        // keep the old extensions for now, try again later
-        $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['retry'];
-      }
+      // else {
+      //   // keep the old extensions for now, try again later
+      //   $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['retry'];
+      // }
       $isChanged = TRUE;
     }
     if ($isChanged) {
