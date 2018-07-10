@@ -1473,6 +1473,10 @@ class CRM_Core_Permission {
     $permissions['option_value'] = $permissions['uf_group'];
     $permissions['option_group'] = $permissions['option_value'];
 
+    $permissions['custom_value'] = array(
+      'gettree' => array('access CiviCRM'),
+    );
+
     $permissions['message_template'] = array(
       'get' => array('access CiviCRM'),
       'create' => array('edit message templates', 'edit user-driven message templates', 'edit system workflow message templates'),
