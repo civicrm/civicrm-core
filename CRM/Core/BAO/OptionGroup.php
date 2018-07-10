@@ -88,16 +88,12 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    * @return object
    */
   public static function add(&$params, $ids = array()) {
-    if (empty($params['id'])) {
-      $params['id'] = CRM_Utils_Array::value('optionGroup', $ids);
+    if (empty($params['id']) && !empty($ids['optionGroup'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('no $ids array');
+      $params['id'] = $ids['optionGroup'];
     }
-
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-
-    // action is taken depending upon the mode
     $optionGroup = new CRM_Core_DAO_OptionGroup();
     $optionGroup->copyValues($params);;
-
     $optionGroup->save();
     return $optionGroup;
   }
