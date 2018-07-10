@@ -368,7 +368,7 @@ WHERE ceft.entity_id = %1";
         'id' => $params['oldPremium']['product_id'],
       );
       $productDetails = array();
-      CRM_Contribute_BAO_ManagePremiums::retrieve($premiumParams, $productDetails);
+      CRM_Contribute_BAO_Product::retrieve($premiumParams, $productDetails);
       $params = array(
         'cost' => CRM_Utils_Array::value('cost', $productDetails),
         'currency' => CRM_Utils_Array::value('currency', $productDetails),

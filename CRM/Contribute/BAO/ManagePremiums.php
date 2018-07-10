@@ -30,7 +30,7 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2018
  */
-class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
+class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
 
   /**
    * Class constructor.
@@ -124,9 +124,10 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
     $premiumsProduct = new CRM_Contribute_DAO_PremiumsProduct();
     $premiumsProduct->product_id = $productID;
     if ($premiumsProduct->find(TRUE)) {
-      throw new CRM_Core_Exception('Cannot delete a Premium that is linked to a Contribution page');
+      throw new CRM_Core_Exception('Cannot delete a premium product that is linked to a Contribution page');
     }
     else {
+
       //delete from financial Type table
       $premium = new CRM_Contribute_DAO_Product();
       $premium->id = $productID;
