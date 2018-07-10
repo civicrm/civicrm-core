@@ -32,7 +32,7 @@
    * Add a help link to a form label
    */
   function addHelp(title, options) {
-    return title + ' <a href="#" onclick=\'CRM.help("' + title + '", ' + JSON.stringify(options) + '); return false;\' title="' + ts('%1 Help', {1: title}) + '" class="helpicon"></a>';
+    return title + ' <a href="#" onclick=\'CRM.help("' + title + '", ' + JSON.stringify(options) + '); return false;\' title="' + ts('%1 Help', {1: title}) + '" aria-label="' + ts('%1 Help', {1: title}) + '" class="helpicon"></a>';
   }
 
   function watchChanges() {
