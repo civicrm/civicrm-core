@@ -802,7 +802,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
     $viewLinks = FALSE;
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'report');
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'report');
     $actUrl = '';
 
     if (CRM_Core_Permission::check('access CiviCRM')) {

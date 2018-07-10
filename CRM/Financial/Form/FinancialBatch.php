@@ -52,7 +52,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    * @return void
    */
   public function preProcess() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->set("context", $context);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     parent::preProcess();

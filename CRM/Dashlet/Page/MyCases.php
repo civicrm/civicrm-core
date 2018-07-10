@@ -45,7 +45,7 @@ class CRM_Dashlet_Page_MyCases extends CRM_Core_Page {
    * @return void
    */
   public function run() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'dashlet');
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'dashlet');
     $this->assign('context', $context);
 
     //check for civicase access.

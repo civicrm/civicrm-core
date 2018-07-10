@@ -80,7 +80,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       return CRM_Custom_Form_CustomData::preProcess($this);
     }
 
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $this->assign('context', $this->_context);
 
