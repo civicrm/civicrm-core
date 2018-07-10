@@ -152,15 +152,9 @@
   </tr>
   <tr class="crm-activity-form-block-details">
     <td class="label">{$form.details.label}</td>
-    {if $activityTypeName eq "Print PDF Letter"}
-      <td class="view-value">
-      {$form.details.html}
-      </td>
-      {else}
-      <td class="view-value">
-       {$form.details.html|crmStripAlternatives|nl2br}
-      </td>
-    {/if}
+    <td class="view-value">
+     {$form.details.html}
+    </td>
   </tr>
   <tr class="crm-activity-form-block-priority_id">
     <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
