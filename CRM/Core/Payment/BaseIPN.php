@@ -273,12 +273,9 @@ class CRM_Core_Payment_BaseIPN {
       }
 
       if ($participant) {
-        $participantStatuses = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'status_id', array(
-            'labelColumn' => 'name',
-            'flip' => 1,
-          ));
-        $participant->status_id = $participantStatuses['Cancelled'];
-        $participant->save();
+        $participantParams['id'] = $participant->id;
+        $participantParams['status_id'] = 'Cancelled';
+        civicrm_api3('Participant', 'create', $participantParams);
       }
     }
 
@@ -370,12 +367,9 @@ class CRM_Core_Payment_BaseIPN {
       }
 
       if ($participant) {
-        $participantStatuses = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'status_id', array(
-            'labelColumn' => 'name',
-            'flip' => 1,
-          ));
-        $participant->status_id = $participantStatuses['Cancelled'];
-        $participant->save();
+        $participantParams['id'] = $participant->id;
+        $participantParams['status_id'] = 'Cancelled';
+        civicrm_api3('Participant', 'create', $participantParams);
       }
     }
     $transaction->commit();
