@@ -73,8 +73,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
+   * @return bool
    */
   public static function setIsActive($id, $is_active) {
     if (!$is_active) {
@@ -121,6 +120,8 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    * Delete premium Types.
    *
    * @param int $productID
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function del($productID) {
     //check dependencies
