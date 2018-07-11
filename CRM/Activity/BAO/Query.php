@@ -209,10 +209,9 @@ class CRM_Activity_BAO_Query {
         // We no longer expect "subject" as a specific criteria (as of CRM-19447),
         // but we still use activity_subject in Activity.Get API
       case 'activity_subject':
-
         $qillName = $name;
         if (in_array($name, array('activity_engagement_level', 'activity_id'))) {
-          $name = $qillName = str_replace('activity_', '', $name);
+          $name = str_replace('activity_', '', $name);
         }
         if (in_array($name, array('activity_status_id', 'activity_subject', 'activity_priority_id'))) {
           $name = str_replace('activity_', '', $name);
@@ -335,11 +334,11 @@ class CRM_Activity_BAO_Query {
 
       case 'parent_id':
         if ($value == 1) {
-          $query->_where[$grouping][] = "parent_id.parent_id IS NOT NULL";
+          $query->_where[$grouping][] = "civicrm_activity.parent_id IS NOT NULL";
           $query->_qill[$grouping][] = ts('Activities which have Followup Activities');
         }
         elseif ($value == 2) {
-          $query->_where[$grouping][] = "parent_id.parent_id IS NULL";
+          $query->_where[$grouping][] = "civicrm_activity.parent_id IS NULL";
           $query->_qill[$grouping][] = ts('Activities without Followup Activities');
         }
         break;

@@ -285,22 +285,29 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       return;
     }
 
-    $status = CRM_Utils_Request::retrieve('status', 'String', $this);
-    if ($status) {
-      $this->_formValues['activity_status_id'] = $status;
-      $this->_defaults['activity_status_id'] = $status;
+    $forceParams = [
+      'activity_status_id' => ['name' => 'status', 'type' => 'String'],
+      'followup_parent_id' => ['name' => 'isFollowUp', 'type' => 'Positive'],
+      'parent_id' => ['name' => 'hasFollowUp', 'type' => 'Positive'],
+    ];
+    foreach ($forceParams as $key => $params) {
+      $value = CRM_Utils_Request::retrieve($params['name'], $params['type'], $this);
+      if ($value) {
+        $this->_formValues[$key] = $this->_defaults[$key] = $value;
+      }
     }
 
     $survey = CRM_Utils_Request::retrieve('survey', 'Positive');
-
+    $activity_type_id = CRM_Utils_Request::retrieve('type', 'Integer', $this);
     if ($survey) {
       $this->_formValues['activity_survey_id'] = $this->_defaults['activity_survey_id'] = $survey;
       $sid = CRM_Utils_Array::value('activity_survey_id', $this->_formValues);
       $activity_type_id = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $sid, 'activity_type_id');
+    }
 
+    if ($activity_type_id) {
       // since checkbox are replaced by multiple select option
-      $this->_formValues['activity_type_id'] = $activity_type_id;
-      $this->_defaults['activity_type_id'] = $activity_type_id;
+      $this->_formValues['activity_type_id'] = $this->_defaults['activity_type_id'] = $activity_type_id;
     }
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
@@ -310,7 +317,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
         $this->_formValues['contact_id'] = $cid;
 
         $activity_role = CRM_Utils_Request::retrieve('activity_role', 'Positive', $this);
-
         if ($activity_role) {
           $this->_formValues['activity_role'] = $activity_role;
         }

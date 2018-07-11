@@ -392,11 +392,16 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     if (!$this->_force) {
       return;
     }
-
-    $status = CRM_Utils_Request::retrieve('status', 'String');
-    if ($status) {
-      $this->_formValues['contribution_status_id'] = array($status => 1);
-      $this->_defaults['contribution_status_id'] = array($status => 1);
+    $forceParams = [
+      'contribution_status_id' => ['name' => 'status', 'type' => 'String'],
+      'financial_type_id' => ['name' => 'fid', 'type' => 'Positive'],
+      'contribution_pay_later' => ['name' => 'pay_later', 'type' => 'Boolean'],
+    ];
+    foreach ($forceParams as $key => $params) {
+      $value = CRM_Utils_Request::retrieve($params['name'], $params['type'], $this);
+      if ($value || ($params['type'] == 'Boolean') && isset($value)) {
+        $this->_formValues[$key] = $this->_defaults[$key] = $value;
+      }
     }
 
     $pcpid = (array) CRM_Utils_Request::retrieve('pcpid', 'String', $this);
@@ -410,7 +415,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     }
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-
     if ($cid) {
       $cid = CRM_Utils_Type::escape($cid, 'Integer');
       if ($cid > 0) {
@@ -465,7 +469,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     if ($contribPageId) {
       $this->_formValues['contribution_page_id'] = $contribPageId;
     }
-
     //give values to default.
     $this->_defaults = $this->_formValues;
   }

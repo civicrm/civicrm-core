@@ -331,14 +331,12 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     }
 
     $membershipType = CRM_Utils_Request::retrieve('type', 'String');
-
     if ($membershipType) {
       $this->_formValues['membership_type_id'] = array($membershipType);
       $this->_defaults['membership_type_id'] = array($membershipType);
     }
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
-
     if ($cid) {
       $cid = CRM_Utils_Type::escape($cid, 'Integer');
       if ($cid > 0) {
@@ -351,28 +349,20 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
         $this->_single = TRUE;
       }
     }
-
-    $fromDate = CRM_Utils_Request::retrieve('start', 'Date');
-    if ($fromDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($fromDate);
-      $this->_formValues['member_start_date_low'] = $this->_defaults['member_start_date_low'] = $date;
-    }
-
-    $toDate = CRM_Utils_Request::retrieve('end', 'Date');
-    if ($toDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($toDate);
-      $this->_formValues['member_start_date_high'] = $this->_defaults['member_start_date_high'] = $date;
-    }
-    $joinDate = CRM_Utils_Request::retrieve('join', 'Date');
-    if ($joinDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($joinDate);
-      $this->_formValues['member_join_date_low'] = $this->_defaults['member_join_date_low'] = $date;
-    }
-
-    $joinEndDate = CRM_Utils_Request::retrieve('joinEnd', 'Date');
-    if ($joinEndDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($joinEndDate);
-      $this->_formValues['member_join_date_high'] = $this->_defaults['member_join_date_high'] = $date;
+    foreach (array('start', 'end', 'join') as $field) {
+      $dateLow = CRM_Utils_Request::retrieve($field, 'Date');
+      if ($dateLow) {
+        list($date) = CRM_Utils_Date::setDateDefaults($dateLow);
+        $this->_formValues["member_{$field}_date_low"] = $this->_defaults["member_{$field}_date_low"] = $date;
+      }
+      $dateHigh = CRM_Utils_Request::retrieve("{$field}_high", 'Date');
+      if ($dateHigh) {
+        list($date) = CRM_Utils_Date::setDateDefaults($dateHigh);
+        $this->_formValues["member_{$field}_date_high"] = $this->_defaults["member_{$field}_date_high"] = $date;
+      }
+      if ($dateLow || $dateHigh) {
+        $this->_formValues["member_{$field}_date_relative"] = $this->_defaults["member_{$field}_date_relative"] = 0;
+      }
     }
 
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive',

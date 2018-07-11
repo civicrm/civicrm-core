@@ -431,8 +431,21 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues['event_name'] = CRM_Event_PseudoConstant::event($event, TRUE);
     }
 
-    $status = CRM_Utils_Request::retrieve('status', 'String');
+    $registerDate = CRM_Utils_Request::retrieve('register_start', 'Date');
+    if ($registerDate) {
+      list($date) = CRM_Utils_Date::setDateDefaults($registerDate);
+      $this->_formValues['participant_register_date_low'] = $this->_defaults['participant_register_date_low'] = $date;
+    }
+    $registerEndDate = CRM_Utils_Request::retrieve('register_end', 'Date');
+    if ($registerEndDate) {
+      list($date) = CRM_Utils_Date::setDateDefaults($registerEndDate);
+      $this->_formValues['participant_register_date_high'] = $this->_defaults['participant_register_date_high'] = $date;
+    }
+    if ($registerDate || $registerEndDate) {
+      $this->_formValues['participant_relative'] = $this->_defaults['participant_relative'] = 0;
+    }
 
+    $status = CRM_Utils_Request::retrieve('status', 'String');
     if (isset($status)) {
       if ($status === 'true') {
         $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1");
@@ -450,7 +463,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     }
 
     $role = CRM_Utils_Request::retrieve('role', 'String');
-
     if (isset($role)) {
       if ($role === 'true') {
         $roleTypes = CRM_Event_PseudoConstant::participantRole(NULL, "filter = 1");
@@ -479,6 +491,10 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
         // also assign individual mode to the template
         $this->_single = TRUE;
       }
+    }
+    $payLater = CRM_Utils_Request::retrieve('pay_later', 'Boolean', $this);
+    if (isset($payLater)) {
+      $this->_formValues['participant_is_pay_later'] = $payLater;
     }
   }
 
