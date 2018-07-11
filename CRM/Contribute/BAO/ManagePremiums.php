@@ -89,14 +89,15 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
-   * @param array $ids
+   * @param array $ids (deprecated)
    *   Reference array contains the id.
    *
    * @return CRM_Contribute_DAO_Product
    */
-  public static function add(&$params, &$ids) {
+  public static function add(&$params, $ids) {
+    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('premium', $ids));
     $params = array_merge(array(
-      'id' => CRM_Utils_Array::value('premium', $ids),
+      'id' => $id,
       'image' => '',
       'thumbnail' => '',
       'is_active' => 0,
