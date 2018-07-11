@@ -212,6 +212,19 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test getrows on Mailing Opened report.
+   */
+  public function testReportTemplateGetRowsMailingUniqueOpened() {
+    $description = "Retrieve rows from a mailing opened report template.";
+    $result = $this->callAPIAndDocument('report_template', 'getrows', array(
+      'report_id' => 'Mailing/opened',
+      'options' => array('metadata' => array('labels', 'title')),
+    ), __FUNCTION__, __FILE__, $description, 'Getrows');
+
+    $this->assertEquals(4, $result['count']);
+  }
+
+  /**
    * Test api to get rows from reports.
    *
    * @dataProvider getReportTemplates
