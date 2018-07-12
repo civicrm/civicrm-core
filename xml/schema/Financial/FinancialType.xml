@@ -32,6 +32,11 @@
     <dataPattern>/donation|member|campaign/i</dataPattern>
     <comment>Financial Type Name.</comment>
     <add>1.3</add>
+    <pseudoconstant>
+      <table>civicrm_financial_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
   </field>
   <field>
     <name>accounting_code</name>
