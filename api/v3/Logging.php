@@ -93,11 +93,25 @@ function _civicrm_api3_logging_revert_spec(&$params) {
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_logging_get($params) {
+  civicrm_api3_verify_one_mandatory($params, ['contact_id', 'log_conn_id']);
+  if (!empty($params['contact_id']) && !empty($params['log_conn_id'])) {
+    // Block passing both as it's unclear how both would work in a merge change.
+    // That migh be resolvable but will need more thought.
+    throw new API_Exception(ts('It is not currently possible to pass both log_conn_id AND contact_id to logging.get'));
+  }
   $schema = new CRM_Logging_Schema();
   $interval = (empty($params['log_date'])) ? NULL : $params['interval'];
-  $differ = new CRM_Logging_Differ($params['log_conn_id'], CRM_Utils_Array::value('log_date', $params), $interval);
   $tables = !empty($params['tables']) ? (array) $params['tables'] : $schema->getLogTablesForContact();
-  return civicrm_api3_create_success($differ->getAllChangesForConnection($tables));
+
+  $differ = new CRM_Logging_Differ(CRM_Utils_Array::value('log_conn_id', $params), CRM_Utils_Array::value('log_date', $params), $interval);
+  if (!empty($params['log_conn_id'])) {
+    $result = $differ->getAllChangesForConnection($tables);
+  }
+  else {
+    $result = $differ->getAllChangesForContact($params['contact_id']);
+  }
+
+  return civicrm_api3_create_success($result, $params);
 }
 
 /**
@@ -110,12 +124,15 @@ function civicrm_api3_logging_get($params) {
  */
 function _civicrm_api3_logging_get_spec(&$params) {
   $params['log_conn_id'] = array(
-    'title' => 'Logging Connection ID',
+    'title' => ts('Logging Connection ID'),
     'type' => CRM_Utils_Type::T_STRING,
-    'api.required' => TRUE,
+  );
+  $params['contact_id'] = array(
+    'title' => ts('Contact ID'),
+    'type' => CRM_Utils_Type::T_STRING,
   );
   $params['log_date'] = array(
-    'title' => 'Logging Timestamp',
+    'title' => ts('Logging Timestamp'),
     'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
   );
   $params['interval'] = array(

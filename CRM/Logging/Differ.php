@@ -211,6 +211,7 @@ WHERE lt.log_conn_id = %1
           break;
 
         case 'Insert':
+        case 'Initialization':
           // the previous state does not exist
           $original = array();
           break;
@@ -439,6 +440,42 @@ ORDER BY log_date
       if (empty($this->log_date)) {
         $this->log_date = CRM_Core_DAO::singleValueQuery("SELECT log_date FROM {$this->db}.log_{$table} WHERE log_conn_id = %1 LIMIT 1", $params);
       }
+      $diffs = array_merge($diffs, $this->diffsInTableForId($dao->table_name, $dao->id));
+    }
+    return $diffs;
+  }
+
+  /**
+   * @param int $contact_id
+   *
+   * @return array
+   */
+  public function getAllChangesForContact($contact_id) {
+    $params = [1 => [$contact_id, 'Integer']];
+    $clauses = $diffs = [];
+    $schema = new CRM_Logging_Schema();
+    $loggedTables = $schema->getLogTablesForContact();
+    $tables = array_intersect_key(CRM_Core_DAO::getReferencesToContactTable(), array_flip($loggedTables));
+    $customValueTables = CRM_Utils_Array::collect('table_name', civicrm_api3('CustomGroup', 'get', [
+      'return' => 'table_name',
+      'options' => ['limit' => 0]]
+    )['values']);
+    $tables['civicrm_contact'][] = 'id';
+    foreach ($tables as $tableName => $keys) {
+      $where = [];
+      foreach ($keys as $key) {
+        if ($key === 'entity_id' && !in_array($tableName, $customValueTables)) {
+          $where[] = "( $key  = %1 AND entity_table = 'civicrm_contact' ) ";
+        }
+        else {
+          $where[] = $key . ' = %1';
+        }
+      }
+      $clauses[] = " SELECT '{$tableName}' as table_name, id, log_conn_id FROM {$this->db}.log_{$tableName} WHERE " . implode(' OR ', $where);
+    }
+    $dao = CRM_Core_DAO::executeQuery(implode(' UNION ', $clauses), $params);
+    while ($dao->fetch()) {
+      $this->log_conn_id = $dao->log_conn_id;
       $diffs = array_merge($diffs, $this->diffsInTableForId($dao->table_name, $dao->id));
     }
     return $diffs;
