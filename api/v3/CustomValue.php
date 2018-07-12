@@ -341,6 +341,7 @@ function civicrm_api3_custom_value_gettree($params) {
   if ($ret || !empty($params['check_permissions'])) {
     $entityData = civicrm_api3($params['entity_type'], 'getsingle', array(
       'id' => $params['entity_id'],
+      'check_permissions' => !empty($params['check_permissions']),
       'return' => array_merge(array('id'), array_values($ret)),
     ));
     foreach ($ret as $param => $key) {
