@@ -153,8 +153,11 @@
                   el.last().focus();
                 }
               }
-              else {
+              else if (key === "ArrowDown") {
                 $('.ui-datepicker-close').focus();
+              }
+              else {
+                $('.ui-datepicker-month').focus();
               }
             }
             else if ($(target).hasClass('ui-datepicker-month')) {
@@ -172,9 +175,9 @@
           }
           else if (key === 'Enter') {
             if ($(target).hasClass('ui-datepicker-close')) {
-              $('input', calender).focus();
-              calender.hide();
-              event.preventDefault();
+              //$('input', calender).focus();
+              //calender.hide();
+              //event.preventDefault();
             }
           }
         });
