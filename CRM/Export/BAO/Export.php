@@ -615,19 +615,18 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
 
       foreach ($returnProperties as $key => $value) {
-        if (!array_key_exists($key, self::$relationshipTypes)) {
-          $returnProperties[self::$memberOfHouseholdRelationshipKey][$key] = $value;
-          $returnProperties[self::$headOfHouseholdRelationshipKey][$key] = $value;
+        foreach ([self::$memberOfHouseholdRelationshipKey, self::$headOfHouseholdRelationshipKey] as $relationshipType) {
+          if (!array_key_exists($key, self::$relationshipTypes) && !in_array($key, ['location_type', 'im_provider'])) {
+            self::$relationshipReturnProperties[$relationshipType][$key] = $value;
+            // For now we also still add to return properties but this unholy merging of unrelated data structures
+            // and subsequent endless wrangling is a pattern to get rid of
+            $returnProperties[$relationshipType][$key] = $value;
+          }
         }
       }
-
-      unset($returnProperties[self::$memberOfHouseholdRelationshipKey]['location_type']);
-      unset($returnProperties[self::$memberOfHouseholdRelationshipKey]['im_provider']);
-      unset($returnProperties[self::$headOfHouseholdRelationshipKey]['location_type']);
-      unset($returnProperties[self::$headOfHouseholdRelationshipKey]['im_provider']);
     }
 
-    list($relationQuery, $allRelContactArray) = self::buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $queryMode);
+    list($relationQuery, $allRelContactArray) = self::buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $queryMode);
 
     // make sure the groups stuff is included only if specifically specified
     // by the fields param (CRM-1969), else we limit the contacts outputted to only
@@ -2176,15 +2175,14 @@ WHERE  {$whereClause}";
    * @param $ids
    * @param $exportMode
    * @param $componentTable
-   * @param $returnProperties
    * @param $queryMode
    * @return array
    */
-  protected static function buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $queryMode) {
+  protected static function buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $queryMode) {
     $allRelContactArray = $relationQuery = array();
 
-    foreach (self::$relationshipTypes as $rel => $dnt) {
-      if ($relationReturnProperties = CRM_Utils_Array::value($rel, $returnProperties)) {
+    foreach (array_keys(self::$relationshipTypes) as $rel) {
+      if ($relationReturnProperties = CRM_Utils_Array::value($rel, self::$relationshipReturnProperties)) {
         $allRelContactArray[$rel] = array();
         // build Query for each relationship
         $relationQuery[$rel] = new CRM_Contact_BAO_Query(NULL, $relationReturnProperties,
