@@ -11,12 +11,7 @@ CRM.$(function($) {
         $('#toolbar').css('z-index', '');
       }
     })
-   // d8 Hack to hide title when it should be (CRM-19960)
    .ready(function() {
-     var pageTitle = $('.page-title');
-     var title = $('.page-title').text();
-     if ('<span id="crm-remove-title" style="display:none">CiviCRM</span>' == title) {
-       pageTitle.hide();
-     }
+     $('#civicrm-menu').css({position: "fixed", top: "0px", 'width': '97%'});
    });
 });

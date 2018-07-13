@@ -17,5 +17,8 @@ CRM.$(function($) {
           $('#wpadminbar').toggle(e.data === 2);
         });
       }
-    });
+    })
+    .ready(function() {
+      $('#civicrm-menu').css({position: "fixed", top: "0px"});
+  });
 });

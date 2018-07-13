@@ -861,4 +861,13 @@ AND    u.status = 1
     }
   }
 
+  /**
+   * Append Drupal7 js to coreResourcesList.
+   *
+   * @param array $list
+   */
+  public function appendCoreResources(&$list) {
+    $list[] = 'js/crm.drupal7.js';
+  }
+
 }
