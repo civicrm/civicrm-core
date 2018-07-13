@@ -42,7 +42,7 @@
   </div>
 
   <div class="action-link">
-    <a href="#" class="action-item crm-hover-button crm-notDuplicate" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid}, {$other_cid}, 'dupe-nondupe', 'merge-contact', '{if $rgid}{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=$rgid"}{/if}' );return false;">
+    <a href="#" class="action-item crm-hover-button crm-notDuplicate" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid|escape}, {$other_cid|escape}, 'dupe-nondupe', 'merge-contact', '{if $rgid}{crmURL p="civicrm/contact/dedupefind" q="reset=1&action=update&rgid=$rgid"}{/if}' );return false;">
       <span class="icon ui-icon-circle-close"></span>
       {ts}Mark this pair as not a duplicate.{/ts}
     </a>
@@ -51,18 +51,18 @@
   <table class="row-highlight">
     <tr class="columnheader">
       <th>&nbsp;</th>
-      <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$other_cid"}">{$other_name}</a> ({ts}duplicate{/ts})</th>
+      <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$other_cid"}">{$other_name|escape}</a> ({ts}duplicate{/ts})</th>
       <th>{ts}Mark All{/ts}<br />=={$form.toggleSelect.html} ==&gt;</th>
-      <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$main_cid"}">{$main_name}</a></th>
+      <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$main_cid"}">{$main_name|escape}</a></th>
     </tr>
     {foreach from=$rows item=row key=field}
        <tr class="{cycle values="odd-row,even-row"}">
-          <td>{$row.title}</td>
+          <td>{$row.title|escape}</td>
           <td>
             {if !is_array($row.other)}
-              {$row.other}
+              {$row.other|escape}
             {elseif $row.other.fileName}
-              {$row.other.fileName}
+              {$row.other.fileName|escape}
             {else}
               {', '|implode:$row.other}
             {/if}
@@ -81,18 +81,18 @@
 
                   {$form.location.$blockName.$blockId.locTypeId.html}&nbsp;
                   {if $blockName eq 'email' || $blockName eq 'phone' }
-       <span id="main_{$blockName}_{$blockId}_overwrite">{if $row.main}(overwrite){$form.location.$blockName.$blockId.operation.html}&nbsp;<br />{else}(add){/if}</span>
+       <span id="main_{$blockName|escape}_{$blockId|escape}_overwrite">{if $row.main}(overwrite){$form.location.$blockName.$blockId.operation.html}&nbsp;<br />{else}(add){/if}</span>
       {else}
-      <span id="main_{$blockName}_{$blockId}_overwrite">{if $row.main}(overwrite)<br />{else}(add){/if}</span>
+      <span id="main_{$blockName|escape}_{$blockId|escape}_overwrite">{if $row.main}(overwrite)<br />{else}(add){/if}</span>
                   {/if}
 
               {/if}
               {*NYSS 5546*}
-              <span id="main_{$blockName}_{$blockId}">
+              <span id="main_{$blockName|escape}_{$blockId|escape}">
                 {if !is_array($row.main)}
-                  {$row.main}
+                  {$row.main|escape}
                 {elseif $row.main.fileName}
-                  {$row.main.fileName}
+                  {$row.main.fileName|escape}
                 {else}
                   {', '|implode:$row.main}
                 {/if}
