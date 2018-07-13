@@ -690,7 +690,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $new_having = ' addtogroup_contact_id';
     $having = str_ireplace(' civicrm_contact_contact_target_id', $new_having, $this->_having);
     $query = "$select
-FROM civireport_activity_temp_target tar
+FROM {$this->temporaryTables['activity_temp_table']} tar
 GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $select = 'AS addtogroup_contact_id';
     $query = str_ireplace('AS civicrm_contact_contact_target_id', $select, $query);
@@ -773,15 +773,12 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $this->from();
     $this->customDataFrom();
     $this->where('target');
-    $insertCols = implode(',', $this->_selectAliases);
-    $tempQuery = "CREATE TEMPORARY TABLE civireport_activity_temp_target {$this->_databaseAttributes} AS
-{$this->_select} {$this->_from} {$this->_where} ";
-    $this->executeReportQuery($tempQuery);
+    $tempTableName = $this->createTemporaryTable('activity_temp_table', "{$this->_select} {$this->_from} {$this->_where}");
 
     // 2. add new columns to hold assignee and source results
     // fixme: add when required
     $tempQuery = "
-  ALTER TABLE  civireport_activity_temp_target
+  ALTER TABLE  $tempTableName
   MODIFY COLUMN civicrm_contact_contact_target_id VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_assignee VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_source VARCHAR(128),
@@ -801,7 +798,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $this->customDataFrom();
     $this->where('assignee');
     $insertCols = implode(',', $this->_selectAliases);
-    $tempQuery = "INSERT INTO civireport_activity_temp_target ({$insertCols})
+    $tempQuery = "INSERT INTO $tempTableName ({$insertCols})
 {$this->_select}
 {$this->_from} {$this->_where}";
     $this->executeReportQuery($tempQuery);
@@ -813,7 +810,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $this->customDataFrom();
     $this->where('source');
     $insertCols = implode(',', $this->_selectAliases);
-    $tempQuery = "INSERT INTO civireport_activity_temp_target ({$insertCols})
+    $tempQuery = "INSERT INTO $tempTableName ({$insertCols})
 {$this->_select}
 {$this->_from} {$this->_where}";
     $this->executeReportQuery($tempQuery);
@@ -828,7 +825,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $this->orderBy();
     foreach ($this->_sections as $alias => $section) {
       if (!empty($section) && $section['name'] == 'activity_date_time') {
-        $this->alterSectionHeaderForDateTime('civireport_activity_temp_target', $section['tplField']);
+        $this->alterSectionHeaderForDateTime($tempTableName, $section['tplField']);
       }
     }
 
@@ -845,7 +842,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     }
 
     $sql = "{$this->_select}
-      FROM civireport_activity_temp_target tar
+      FROM $tempTableName tar
       INNER JOIN civicrm_activity {$this->_aliases['civicrm_activity']} ON {$this->_aliases['civicrm_activity']}.id = tar.civicrm_activity_id
       INNER JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_contact']} ON {$this->_aliases['civicrm_activity_contact']}.activity_id = {$this->_aliases['civicrm_activity']}.id
       AND {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$sourceID}
@@ -1079,7 +1076,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($ifnulls, $sectionAliases);
 
       $query = $this->_select .
-        ", count(DISTINCT civicrm_activity_id) as ct from civireport_activity_temp_target group by " .
+        ", count(DISTINCT civicrm_activity_id) as ct from {$this->temporaryTables['activity_temp_table']} group by " .
         implode(", ", $sectionAliases);
 
       // initialize array of total counts
