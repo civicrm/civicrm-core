@@ -4987,12 +4987,15 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
   }
 
   /**
-   * Function to check line items.
+   * Checks if line items total amounts
+   * match the contribution total amount.
    *
    * @param array $params
    *  array of order params.
    *
-   * @throws \API_Exception
+   * @return bool
+   *   TRUE if total amount match line item amounts
+   *   or FALSE otherwise
    */
   public static function checkLineItems(&$params) {
     $totalAmount = CRM_Utils_Array::value('total_amount', $params);
@@ -5003,14 +5006,20 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
           $item['financial_type_id'] = $params['financial_type_id'];
         }
         $lineItemAmount += $item['line_total'];
+
+        if (!empty($item['tax_amount'])) {
+          $lineItemAmount += $item['tax_amount'];
+        }
       }
     }
     if (!isset($totalAmount)) {
       $params['total_amount'] = $lineItemAmount;
     }
     elseif ($totalAmount != $lineItemAmount) {
-      throw new API_Exception("Line item total doesn't match with total amount.");
+      return FALSE;
     }
+
+    return TRUE;
   }
 
   /**
