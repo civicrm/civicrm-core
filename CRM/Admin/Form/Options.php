@@ -464,9 +464,9 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
           $params['reset_default_for'] = array('filter' => "0, " . $params['filter']);
         }
 
-        //make sure we should has to have space, CRM-6977
+        //make sure we only have a single space, CRM-6977 and dev/mail/15
         if ($this->_gName == 'from_email_address') {
-          $params['label'] = str_replace('"<', '" <', $params['label']);
+          $params['label'] = $this->sanitizeFromEmailAddress($params['label']);
         }
       }
 
@@ -505,6 +505,11 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
       $this->ajaxResponse['optionValue'] = $optionValue->toArray();
     }
+  }
+
+  public function sanitizeFromEmailAddress($email) {
+    preg_match("/^\"(.*)\" *<([^@>]*@[^@>]*)>$/", $email, $parts);
+    return "\"{$parts[1]}\" <$parts[2]>";
   }
 
 }
