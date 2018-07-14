@@ -78,7 +78,7 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    * @return void
    */
   public function run() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->set("context", $context);
     // assign vars to templates
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
