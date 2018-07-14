@@ -444,7 +444,18 @@ class CRM_Export_BAO_Export {
       }
     }
     else {
-      $primary = TRUE;
+      $extraProperties = self::defineExtraProperties($queryMode);
+      $paymentFields = $extraProperties['paymentFields'];
+      $extraReturnProperties = $extraProperties['extraReturnProperties'];
+      $paymentTableId = $extraProperties['paymentTableId'];
+
+      $returnProperties = [
+        'location_type' => 1,
+        'im_provider' => 1,
+        'phone_type_id' => 1,
+        'current_employer' => 1,
+       ];
+
       $fields = CRM_Contact_BAO_Contact::exportableFields('All', TRUE, TRUE);
       foreach ($fields as $key => $var) {
         if ($key && (substr($key, 0, 6) != 'custom')) {
@@ -452,19 +463,6 @@ class CRM_Export_BAO_Export {
           $returnProperties[$key] = 1;
         }
       }
-
-      if ($primary) {
-        $returnProperties['location_type'] = 1;
-        $returnProperties['im_provider'] = 1;
-        $returnProperties['phone_type_id'] = 1;
-        $returnProperties['provider_id'] = 1;
-        $returnProperties['current_employer'] = 1;
-      }
-
-      $extraProperties = self::defineExtraProperties($queryMode);
-      $paymentFields = $extraProperties['paymentFields'];
-      $extraReturnProperties = $extraProperties['extraReturnProperties'];
-      $paymentTableId = $extraProperties['paymentTableId'];
 
       if ($queryMode != CRM_Contact_BAO_Query::MODE_CONTACTS) {
         $componentReturnProperties = CRM_Contact_BAO_Query::defaultReturnProperties($queryMode);
