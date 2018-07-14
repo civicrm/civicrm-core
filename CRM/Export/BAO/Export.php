@@ -2032,8 +2032,11 @@ WHERE  {$whereClause}";
   private static function fetchRelationshipDetails($relDAO, $value, $field, &$row) {
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    $field = $field . '_';
+
     $i18n = CRM_Core_I18n::singleton();
     foreach ($value as $relationField => $relationValue) {
+      $relPrefix = $field . $relationField;
       if (is_object($relDAO) && property_exists($relDAO, $relationField)) {
         $fieldValue = $relDAO->$relationField;
         if ($relationField == 'phone_type_id') {
@@ -2063,8 +2066,6 @@ WHERE  {$whereClause}";
       else {
         $fieldValue = '';
       }
-      $field = $field . '_';
-      $relPrefix = $field . $relationField;
 
       if (is_object($relDAO) && $relationField == 'id') {
         $row[$relPrefix] = $relDAO->contact_id;
@@ -2077,28 +2078,29 @@ WHERE  {$whereClause}";
             if (!empty($type[1])) {
               $fldValue .= "-" . $type[1];
             }
+            $relPrefix .=  $fldValue;
             // CRM-3157: localise country, region (both have ‘country’ context)
             // and state_province (‘province’ context)
             switch (TRUE) {
               case (!is_object($relDAO)):
-                $row[$field . '_' . $fldValue] = '';
+                $row[$relPrefix] = '';
                 break;
 
               case in_array('country', $type):
               case in_array('world_region', $type):
-                $row[$field . '_' . $fldValue] = $i18n->crm_translate($relDAO->$fldValue,
+                $row[$relPrefix] = $i18n->crm_translate($relDAO->$fldValue,
                   array('context' => 'country')
                 );
                 break;
 
               case in_array('state_province', $type):
-                $row[$field . '_' . $fldValue] = $i18n->crm_translate($relDAO->$fldValue,
+                $row[$relPrefix] = $i18n->crm_translate($relDAO->$fldValue,
                   array('context' => 'province')
                 );
                 break;
 
               default:
-                $row[$field . '_' . $fldValue] = $relDAO->$fldValue;
+                $row[$relPrefix] = $relDAO->$fldValue;
                 break;
             }
           }
