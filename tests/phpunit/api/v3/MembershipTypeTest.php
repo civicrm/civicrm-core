@@ -126,9 +126,9 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test update fails with no ID.
+   * Domain ID can be intuited..
    */
-  public function testUpdateWithoutId() {
+  public function testCreateWithoutDomainId() {
     $params = array(
       'name' => '60+ Membership',
       'description' => 'people above 60 are given health instructions',
@@ -141,8 +141,18 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'visibility' => 'public',
     );
 
-    $membershipType = $this->callAPIFailure('membership_type', 'create', $params);
-    $this->assertEquals($membershipType['error_message'], 'Mandatory key(s) missing from params array: domain_id');
+    $membershipType = $this->callAPISuccess('membership_type', 'create', $params);
+    $domainID = $this->callAPISuccessGetValue('MembershipType', ['return' => 'domain_id', 'id' => $membershipType['id']]);
+    $this->assertEquals(CRM_Core_Config::domainID(), $domainID);
+
+    $this->callAPISuccess('membership_type', 'create', ['domain_id' => 2, 'id' => $membershipType['id']]);
+    $domainID = $this->callAPISuccessGetValue('MembershipType', ['return' => 'domain_id', 'id' => $membershipType['id']]);
+    $this->assertEquals(2, $domainID);
+
+    $this->callAPISuccess('membership_type', 'create', ['id' => $membershipType['id'], 'description' => 'Cool member']);
+    $domainID = $this->callAPISuccessGetValue('MembershipType', ['return' => 'domain_id', 'id' => $membershipType['id']]);
+    $this->assertEquals(2, $domainID);
+
   }
 
   /**
