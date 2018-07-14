@@ -48,7 +48,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Core_BAO_FinancialTrxn
+   * @return CRM_Financial_DAO_FinancialTrxn
    */
   public static function create($params) {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
@@ -116,7 +116,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_BAO_ContributionType
+   * @return \CRM_Financial_DAO_FinancialTrxn
    */
   public static function retrieve(&$params, &$defaults) {
     $financialItem = new CRM_Financial_DAO_FinancialTrxn();
@@ -507,7 +507,7 @@ WHERE ft.is_payment = 1
   /**
    * @param int $contributionId
    *
-   * @return array
+   * @return string
    */
   public static function getTotalPayments($contributionId) {
     $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
@@ -531,7 +531,7 @@ WHERE ft.is_payment = 1
    * @param array $contribution
    * @param array $params
    *
-   * @return CRM_Core_BAO_FinancialTrxn
+   * @return \CRM_Financial_DAO_FinancialTrxn
    */
   public static function getPartialPaymentTrxn($contribution, $params) {
     $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
