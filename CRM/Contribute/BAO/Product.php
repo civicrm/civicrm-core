@@ -29,38 +29,45 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2018
- * @deprecated
  */
-class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_BAO_Product {
+class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
+
+  /**
+   * Static holder for the default LT.
+   */
+  static $_defaultContributionType = NULL;
 
   /**
    * Class constructor.
    */
   public function __construct() {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Product::construct');
     parent::__construct();
   }
 
   /**
    * Fetch object based on array of properties.
    *
-   * @deprecated
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_BAO_ManagePremiums
+   * @return CRM_Contribute_BAO_Product
    */
   public static function retrieve(&$params, &$defaults) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Product::retrieve');
-    return parent::retrieve($params, $defaults);
+    $premium = new CRM_Contribute_DAO_Product();
+    $premium->copyValues($params);
+    if ($premium->find(TRUE)) {
+      $premium->product_name = $premium->name;
+      CRM_Core_DAO::storeValues($premium, $defaults);
+      return $premium;
+    }
+    return NULL;
   }
 
   /**
    * Update the is_active flag in the db.
    *
-   * @deprecated
    * @param int $id
    *   Id of the database record.
    * @param bool $is_active
@@ -69,14 +76,17 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_BAO_Product {
    * @return bool
    */
   public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Product::setIsActive');
-    return parent::setIsActive($id, $is_active);
+    if (!$is_active) {
+      $dao = new CRM_Contribute_DAO_PremiumsProduct();
+      $dao->product_id = $id;
+      $dao->delete();
+    }
+    return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Product', $id, 'is_active', $is_active);
   }
 
   /**
    * Add a premium product to the database, and return it.
    *
-   * @deprecated
    * @param array $params
    *   Reference array contains the values submitted by the form.
    * @param array $ids (deprecated)
@@ -85,21 +95,50 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_BAO_Product {
    * @return CRM_Contribute_DAO_Product
    */
   public static function add(&$params, $ids) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Product::add');
-    return parent::add($params, $ids);
+    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('premium', $ids));
+    $params = array_merge(array(
+      'id' => $id,
+      'image' => '',
+      'thumbnail' => '',
+      'is_active' => 0,
+      'is_deductible' => FALSE,
+      'currency' => CRM_Core_Config::singleton()->defaultCurrency,
+    ), $params);
+
+    // Modify the submitted values for 'image' and 'thumbnail' so that we use
+    // local URLs for these images when possible.
+    $params['image'] = CRM_Utils_String::simplifyURL($params['image'], TRUE);
+    $params['thumbnail'] = CRM_Utils_String::simplifyURL($params['thumbnail'], TRUE);
+
+    // Save and return
+    $premium = new CRM_Contribute_DAO_Product();
+    $premium->copyValues($params);
+    $premium->save();
+    return $premium;
   }
 
   /**
    * Delete premium Types.
    *
-   * @deprecated
    * @param int $productID
    *
    * @throws \CRM_Core_Exception
    */
   public static function del($productID) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Product::del');
-    return parent::del($productID);
+    //check dependencies
+    $premiumsProduct = new CRM_Contribute_DAO_PremiumsProduct();
+    $premiumsProduct->product_id = $productID;
+    if ($premiumsProduct->find(TRUE)) {
+      $session = CRM_Core_Session::singleton();
+      $message .= ts('This Premium is being linked to <a href=\'%1\'>Online Contribution page</a>. Please remove it in order to delete this Premium.', array(1 => CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1')), ts('Deletion Error'), 'error');
+      CRM_Core_Session::setStatus($message);
+      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/contribute/managePremiums', 'reset=1&action=browse'));
+    }
+
+    //delete from financial Type table
+    $premium = new CRM_Contribute_DAO_Product();
+    $premium->id = $productID;
+    $premium->delete();
   }
 
 }

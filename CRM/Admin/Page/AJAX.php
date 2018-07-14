@@ -123,7 +123,7 @@ class CRM_Admin_Page_AJAX {
           $ret['content'] = ts('Are you sure you want to disable this CiviCRM Profile field?');
           break;
 
-        case 'CRM_Contribute_BAO_ManagePremiums':
+        case 'CRM_Contribute_BAO_Product':
           $ret['content'] = ts('Are you sure you want to disable this premium? This action will remove the premium from any contribution pages that currently offer it. However it will not delete the premium record - so you can re-enable it and add it back to your contribution page(s) at a later time.');
           break;
 
