@@ -1873,64 +1873,7 @@ WHERE  {$whereClause}";
       $headerRows[] = $query->_fields['case'][$field]['title'];
     }
     elseif (array_key_exists($field, self::$relationshipTypes)) {
-      foreach ($value as $relationField => $relationValue) {
-        // below block is same as primary block (duplicate)
-        if (isset($relationQuery[$field]->_fields[$relationField]['title'])) {
-          if ($relationQuery[$field]->_fields[$relationField]['name'] == 'name') {
-            $headerName = $field . '-' . $relationField;
-          }
-          else {
-            if ($relationField == 'current_employer') {
-              $headerName = $field . '-' . 'current_employer';
-            }
-            else {
-              $headerName = $field . '-' . $relationQuery[$field]->_fields[$relationField]['name'];
-            }
-          }
-
-          $headerRows[] = $headerName;
-
-          self::sqlColumnDefn($query, $sqlColumns, $headerName);
-        }
-        elseif ($relationField == 'phone_type_id') {
-          $headerName = $field . '-' . 'Phone Type';
-          $headerRows[] = $headerName;
-          self::sqlColumnDefn($query, $sqlColumns, $headerName);
-        }
-        elseif ($relationField == 'provider_id') {
-          $headerName = $field . '-' . 'Im Service Provider';
-          $headerRows[] = $headerName;
-          self::sqlColumnDefn($query, $sqlColumns, $headerName);
-        }
-        elseif ($relationField == 'state_province_id') {
-          $headerName = $field . '-' . 'state_province_id';
-          $headerRows[] = $headerName;
-          self::sqlColumnDefn($query, $sqlColumns, $headerName);
-        }
-        elseif (is_array($relationValue) && $relationField == 'location') {
-          // fix header for location type case
-          foreach ($relationValue as $ltype => $val) {
-            foreach (array_keys($val) as $fld) {
-              $type = explode('-', $fld);
-
-              $hdr = "{$ltype}-" . $relationQuery[$field]->_fields[$type[0]]['title'];
-
-              if (!empty($type[1])) {
-                if (CRM_Utils_Array::value(0, $type) == 'phone') {
-                  $hdr .= "-" . CRM_Utils_Array::value($type[1], $phoneTypes);
-                }
-                elseif (CRM_Utils_Array::value(0, $type) == 'im') {
-                  $hdr .= "-" . CRM_Utils_Array::value($type[1], $imProviders);
-                }
-              }
-              $headerName = $field . '-' . $hdr;
-              $headerRows[] = $headerName;
-              self::sqlColumnDefn($query, $sqlColumns, $headerName);
-            }
-          }
-        }
-      }
-      self::manipulateHeaderRows($headerRows);
+      list($headerRows, $sqlColumns) = self::setHeaderRowsForRelationship($field, $headerRows, $query, $value, $relationQuery);
     }
     elseif ($selectedPaymentFields && array_key_exists($field, self::componentPaymentFields())) {
       $headerRows[] = CRM_Utils_Array::value($field, self::componentPaymentFields());
@@ -2233,6 +2176,78 @@ WHERE  {$whereClause}";
       }
     }
     return array($relationQuery, $allRelContactArray);
+  }
+
+  /**
+   * @param $field
+   * @param $headerRows
+   * @param $query
+   * @param $value
+   * @param $relationQuery
+   * @return array
+   */
+  protected static function setHeaderRowsForRelationship($field, $headerRows, $query, $value, $relationQuery) {
+    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    foreach ($value as $relationField => $relationValue) {
+      // below block is same as primary block (duplicate)
+      if (isset($relationQuery[$field]->_fields[$relationField]['title'])) {
+        if ($relationQuery[$field]->_fields[$relationField]['name'] == 'name') {
+          $headerName = $field . '-' . $relationField;
+        }
+        else {
+          if ($relationField == 'current_employer') {
+            $headerName = $field . '-' . 'current_employer';
+          }
+          else {
+            $headerName = $field . '-' . $relationQuery[$field]->_fields[$relationField]['name'];
+          }
+        }
+
+        $headerRows[] = $headerName;
+
+        self::sqlColumnDefn($query, $sqlColumns, $headerName);
+      }
+      elseif ($relationField == 'phone_type_id') {
+        $headerName = $field . '-' . 'Phone Type';
+        $headerRows[] = $headerName;
+        self::sqlColumnDefn($query, $sqlColumns, $headerName);
+      }
+      elseif ($relationField == 'provider_id') {
+        $headerName = $field . '-' . 'Im Service Provider';
+        $headerRows[] = $headerName;
+        self::sqlColumnDefn($query, $sqlColumns, $headerName);
+      }
+      elseif ($relationField == 'state_province_id') {
+        $headerName = $field . '-' . 'state_province_id';
+        $headerRows[] = $headerName;
+        self::sqlColumnDefn($query, $sqlColumns, $headerName);
+      }
+      elseif (is_array($relationValue) && $relationField == 'location') {
+        // fix header for location type case
+        foreach ($relationValue as $ltype => $val) {
+          foreach (array_keys($val) as $fld) {
+            $type = explode('-', $fld);
+
+            $hdr = "{$ltype}-" . $relationQuery[$field]->_fields[$type[0]]['title'];
+
+            if (!empty($type[1])) {
+              if (CRM_Utils_Array::value(0, $type) == 'phone') {
+                $hdr .= "-" . CRM_Utils_Array::value($type[1], $phoneTypes);
+              }
+              elseif (CRM_Utils_Array::value(0, $type) == 'im') {
+                $hdr .= "-" . CRM_Utils_Array::value($type[1], $imProviders);
+              }
+            }
+            $headerName = $field . '-' . $hdr;
+            $headerRows[] = $headerName;
+            self::sqlColumnDefn($query, $sqlColumns, $headerName);
+          }
+        }
+      }
+    }
+    self::manipulateHeaderRows($headerRows);
+    return array($headerRows, $sqlColumns);
   }
 
 }
