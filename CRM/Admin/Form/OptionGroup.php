@@ -78,7 +78,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionGroup', 'description')
     );
 
-    $this->addSelect('data_type', array('options' => CRM_Utils_Type::dataTypes()), TRUE);
+    $this->addSelect('data_type', array('options' => CRM_Utils_Type::dataTypes()), empty($this->_values['is_reserved']));
 
     $element = $this->add('checkbox', 'is_active', ts('Enabled?'));
     if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -96,8 +96,12 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
           $element->freeze();
         }
       }
+
+      $this->add('checkbox', 'is_reserved', ts('Reserved?'));
+      $this->freeze('is_reserved');
+
       if (!empty($this->_values['is_reserved'])) {
-        $this->freeze(array('name', 'is_active'));
+        $this->freeze(array('name', 'is_active', 'data_type'));
       }
     }
 
@@ -118,12 +122,13 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
       // store the submitted values in an array
       $params = $this->exportValues();
 
-      // If we are adding option group via UI it should not be marked reserved.
-      if (!isset($params['is_reserved'])) {
-        $params['is_reserved'] = 0;
+      if ($this->_action & CRM_Core_Action::ADD) {
+        // If we are adding option group via UI it should not be marked reserved.
+        if (!isset($params['is_reserved'])) {
+          $params['is_reserved'] = 0;
+        }
       }
-
-      if ($this->_action & CRM_Core_Action::UPDATE) {
+      elseif ($this->_action & CRM_Core_Action::UPDATE) {
         $params['id'] = $this->_id;
       }
 
