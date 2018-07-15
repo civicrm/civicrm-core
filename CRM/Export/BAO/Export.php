@@ -131,50 +131,6 @@ class CRM_Export_BAO_Export {
   }
 
   /**
-   * Get Querymode based on ExportMode
-   *
-   * @param int $exportMode
-   *   Export mode.
-   *
-   * @return string $Querymode
-   *   Query Mode
-   */
-  public static function getQueryMode($exportMode) {
-    $queryMode = CRM_Contact_BAO_Query::MODE_CONTACTS;
-
-    switch ($exportMode) {
-      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_CONTRIBUTE;
-        break;
-
-      case CRM_Export_Form_Select::EVENT_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_EVENT;
-        break;
-
-      case CRM_Export_Form_Select::MEMBER_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_MEMBER;
-        break;
-
-      case CRM_Export_Form_Select::PLEDGE_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_PLEDGE;
-        break;
-
-      case CRM_Export_Form_Select::CASE_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_CASE;
-        break;
-
-      case CRM_Export_Form_Select::GRANT_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_GRANT;
-        break;
-
-      case CRM_Export_Form_Select::ACTIVITY_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_ACTIVITY;
-        break;
-    }
-    return $queryMode;
-  }
-
-  /**
    * Get default return property for export based on mode
    *
    * @param int $exportMode
@@ -397,6 +353,7 @@ class CRM_Export_BAO_Export {
     $queryOperator = 'AND'
   ) {
 
+    $processor = new CRM_Export_BAO_ExportProcessor($exportMode);
     $returnProperties = array();
     $paymentFields = $selectedPaymentFields = FALSE;
 
@@ -417,7 +374,7 @@ class CRM_Export_BAO_Export {
     self::$memberOfHouseholdRelationshipKey = CRM_Utils_Array::key('Household Member of', self::$relationshipTypes);
     self::$headOfHouseholdRelationshipKey = CRM_Utils_Array::key('Head of Household for', self::$relationshipTypes);
 
-    $queryMode = self::getQueryMode($exportMode);
+    $queryMode = $processor->getQueryMode();
 
     if ($fields) {
       //construct return properties
