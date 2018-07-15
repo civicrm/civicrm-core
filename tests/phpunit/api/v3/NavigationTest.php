@@ -69,6 +69,17 @@ class api_v3_NavigationTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test create function.
+   */
+  public function testDefaultDomain() {
+    $params = array('label' => 'Herd the Cats');
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+    // Check domain_id has been set per default
+    $params['domain_id'] = CRM_Core_Config::domainID();
+    $this->getAndCheck($params, $result['id'], $this->_entity, TRUE);
+  }
+
+  /**
    * Test delete function.
    */
   public function testDelete() {
