@@ -4998,6 +4998,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
   public static function checkLineItems(&$params) {
     $totalAmount = CRM_Utils_Array::value('total_amount', $params);
     $lineItemAmount = 0;
+
     foreach ($params['line_items'] as &$lineItems) {
       foreach ($lineItems['line_item'] as &$item) {
         if (empty($item['financial_type_id'])) {
@@ -5006,11 +5007,20 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         $lineItemAmount += $item['line_total'];
       }
     }
+
     if (!isset($totalAmount)) {
       $params['total_amount'] = $lineItemAmount;
     }
-    elseif ($totalAmount != $lineItemAmount) {
-      throw new API_Exception("Line item total doesn't match with total amount.");
+    else {
+      $currency = CRM_Utils_Array::value('currency', $params, '');
+
+      if (empty($currency)) {
+        $currency = CRM_Core_Config::singleton()->defaultCurrency;
+      }
+
+      if (!CRM_Utils_Money::equals($totalAmount, $lineItemAmount, $currency)) {
+        throw new CRM_Contribute_Exception_CheckLineItemsException();
+      }
     }
   }
 
@@ -5027,11 +5037,13 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     if (!empty($params['financial_account_id'])) {
       return $params['financial_account_id'];
     }
+
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['contribution_status_id'], 'name');
     $preferredAccountsRelationships = array(
       'Refunded' => 'Credit/Contra Revenue Account is',
       'Chargeback' => 'Chargeback Account is',
     );
+
     if (in_array($contributionStatus, array_keys($preferredAccountsRelationships))) {
       $financialTypeID = !empty($params['financial_type_id']) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
       return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
@@ -5039,6 +5051,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         $preferredAccountsRelationships[$contributionStatus]
       );
     }
+
     return $default;
   }
 

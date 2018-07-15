@@ -19,6 +19,17 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
     $this->assertEquals($expectedResult, CRM_Utils_Money::subtractCurrencies($leftOp, $rightOp, $currency));
   }
 
+  public function testEquals() {
+    $testValue = 0.01;
+
+    for ($i = 0; $i <= 10; $i++) {
+      $equalValues = CRM_Utils_Money::equals($testValue, $testValue + ($i * 0.0001), 'USD');
+      $this->assertTrue($equalValues);
+    }
+
+    $this->assertFalse(CRM_Utils_Money::equals($testValue, $testValue + 0.001000000001, 'USD'));
+  }
+
   /**
    * @return array
    */
