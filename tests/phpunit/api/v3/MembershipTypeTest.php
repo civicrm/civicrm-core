@@ -127,6 +127,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   /**
    * Domain ID can be intuited..
+   * DomainID is now optional on API, check that it gets set correctly and that the domain_id is not overwritten when not specified in create.
    */
   public function testCreateWithoutDomainId() {
     $params = array(
