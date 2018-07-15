@@ -70,6 +70,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
     if (empty($params['id'])) {
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
       $params['has_separator'] = CRM_Utils_Array::value('has_separator', $params, FALSE);
+      $params['domain_id'] = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
     }
 
     if (!isset($params['id']) ||
@@ -92,8 +93,6 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
     }
 
     $navigation->copyValues($params);
-
-    $navigation->domain_id = CRM_Core_Config::domainID();
 
     $navigation->save();
     return $navigation;
