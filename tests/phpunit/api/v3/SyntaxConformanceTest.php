@@ -1436,6 +1436,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         //api has special handling on these 2 fields for backward compatibility reasons
         $entity['next_sched_contribution'] = $updateParams['next_sched_contribution_date'];
       }
+      if (isset($updateParams['image'])) {
+        // Image field is passed through simplifyURL function so may be different, do the same here for comparison
+        $entity['image'] = CRM_Utils_String::simplifyURL($updateParams['image'], TRUE);
+      }
+      if (isset($updateParams['thumbnail'])) {
+        // Thumbnail field is passed through simplifyURL function so may be different, do the same here for comparison
+        $entity['thumbnail'] = CRM_Utils_String::simplifyURL($updateParams['thumbnail'], TRUE);
+      }
 
       $update = $this->callAPISuccess($entityName, 'create', $updateParams);
       $checkParams = array(

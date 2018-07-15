@@ -96,19 +96,26 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
    */
   public static function add(&$params, $ids) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('premium', $ids));
-    $params = array_merge(array(
-      'id' => $id,
-      'image' => '',
-      'thumbnail' => '',
-      'is_active' => 0,
-      'is_deductible' => FALSE,
-      'currency' => CRM_Core_Config::singleton()->defaultCurrency,
-    ), $params);
+    if (empty($id)) {
+      $defaultParams = [
+        'id' => $id,
+        'image' => '',
+        'thumbnail' => '',
+        'is_active' => 0,
+        'is_deductible' => FALSE,
+        'currency' => CRM_Core_Config::singleton()->defaultCurrency,
+      ];
+      $params = array_merge($defaultParams, $params);
+    }
 
     // Modify the submitted values for 'image' and 'thumbnail' so that we use
     // local URLs for these images when possible.
-    $params['image'] = CRM_Utils_String::simplifyURL($params['image'], TRUE);
-    $params['thumbnail'] = CRM_Utils_String::simplifyURL($params['thumbnail'], TRUE);
+    if (isset($params['image'])) {
+      $params['image'] = CRM_Utils_String::simplifyURL($params['image'], TRUE);
+    }
+    if (isset($params['thumbnail'])) {
+      $params['thumbnail'] = CRM_Utils_String::simplifyURL($params['thumbnail'], TRUE);
+    }
 
     // Save and return
     $premium = new CRM_Contribute_DAO_Product();
