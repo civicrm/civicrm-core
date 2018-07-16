@@ -247,7 +247,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param array $error
    *   Error to display.
    *
-   * @return array
+   * @return array|bool
    */
   public static function checkContactPresent($contactIds, &$error) {
     if (empty($contactIds)) {
