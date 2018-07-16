@@ -192,8 +192,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $pattern = '/as `?([^`,]*)/';
     $queryFieldAliases = array();
     preg_match_all($pattern, $select, $queryFieldAliases, PREG_PATTERN_ORDER);
+    $processor = new CRM_Export_BAO_ExportProcessor(CRM_Contact_BAO_Query::MODE_CONTRIBUTE);
+    $processor->setQueryFields($query->_fields);
 
-    list($outputFields) = CRM_Export_BAO_Export::getExportStructureArrays($returnProperties, $query, $contactRelationshipTypes, '', array());
+    list($outputFields) = CRM_Export_BAO_Export::getExportStructureArrays($returnProperties, $processor, $contactRelationshipTypes, '', array());
     foreach (array_keys($outputFields) as $fieldAlias) {
       if ($fieldAlias == 'Home-country') {
         $this->assertTrue(in_array($fieldAlias . '_id', $queryFieldAliases[1]), 'Country is subject to some funky translate so we make sure country id is present');
