@@ -63,6 +63,15 @@ class CRM_Export_BAO_ExportProcessor {
   protected $queryOperator;
 
   /**
+   * Key representing the head of household in the relationship array.
+   *
+   * e.g. ['8_b_a' => 'Household Member Is', '8_a_b = 'Household Member Of'.....]
+   *
+   * @var
+   */
+  protected $relationshipTypes = [];
+
+  /**
    * CRM_Export_BAO_ExportProcessor constructor.
    *
    * @param int $exportMode
@@ -72,6 +81,37 @@ class CRM_Export_BAO_ExportProcessor {
     $this->setExportMode($exportMode);
     $this->setQueryMode();
     $this->setQueryOperator($queryOperator);
+    $this->setRelationshipTypes();
+  }
+
+  /**
+   * @return array
+   */
+  public function getRelationshipTypes() {
+    return $this->relationshipTypes;
+  }
+
+  /**
+   */
+  public function setRelationshipTypes() {
+    $this->relationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      TRUE,
+      'name',
+      FALSE
+    );
+  }
+
+
+  /**
+   * @param $fieldName
+   * @return bool
+   */
+  public function isRelationshipTypeKey($fieldName) {
+    return array_key_exists($fieldName, $this->relationshipTypes);
   }
 
   /**
