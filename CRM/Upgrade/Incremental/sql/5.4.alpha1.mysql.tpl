@@ -11,3 +11,11 @@ we want to ensure that these values are handled precisely and consistently.
 ALTER TABLE civicrm_cache
   CHANGE created_date created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'When was the cache item created',
   CHANGE expired_date expired_date  TIMESTAMP NULL DEFAULT NULL COMMENT 'When should the cache item expire';
+
+
+-- core/issues/230
+ALTER TABLE `civicrm_saved_search`
+  DROP FOREIGN KEY FK_civicrm_saved_search_mapping_id;
+
+ALTER TABLE `civicrm_saved_search`
+  ADD CONSTRAINT `FK_civicrm_saved_search_mapping_id` FOREIGN KEY (`mapping_id`) REFERENCES `civicrm_mapping` (`id`) ON DELETE SET NULL;
