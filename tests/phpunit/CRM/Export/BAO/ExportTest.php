@@ -192,7 +192,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $pattern = '/as `?([^`,]*)/';
     $queryFieldAliases = array();
     preg_match_all($pattern, $select, $queryFieldAliases, PREG_PATTERN_ORDER);
-    $processor = new CRM_Export_BAO_ExportProcessor(CRM_Contact_BAO_Query::MODE_CONTRIBUTE);
+    $processor = new CRM_Export_BAO_ExportProcessor(CRM_Contact_BAO_Query::MODE_CONTRIBUTE, 'AND');
     $processor->setQueryFields($query->_fields);
 
     list($outputFields) = CRM_Export_BAO_Export::getExportStructureArrays($returnProperties, $processor, $contactRelationshipTypes, '', array());
@@ -518,7 +518,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $relationships[$contactID]['relationship_type_id'] = $relationshipTypeID;
     }
 
-    $fields = [['Individual', 'contact_id']];
+    $fields = [
+      ['Individual', 'contact_id'],
+      ['Individual', 'preferred_communication_method'],
+      ['Individual', $relationships[$this->contactIDs[1]]['relationship_type_id'] . '_preferred_communication_method'],
+    ];
     // ' ' denotes primary location type.
     foreach (array_merge($locationTypes, [' ']) as $locationType) {
       $fields[] = [
