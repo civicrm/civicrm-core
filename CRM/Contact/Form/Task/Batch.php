@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -217,6 +217,9 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   public function postProcess() {
     $params = $this->exportValues();
 
+    // @todo extract submit functions &
+    // extend CRM_Event_Form_Task_BatchTest::testSubmit with a data provider to test
+    // handling of custom data, specifically checkbox fields.
     $ufGroupId = $this->get('ufGroupId');
     $notify = NULL;
     $inValidSubtypeCnt = 0;

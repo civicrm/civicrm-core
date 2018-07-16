@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -329,7 +329,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function fatal($message = NULL, $code = NULL, $email = NULL) {
     $vars = array(
-      'message' => htmlspecialchars($message),
+      'message' => $message,
       'code' => $code,
     );
 
@@ -1028,6 +1028,19 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Output a deprecated function warning to log file.  Deprecated class:function is automatically generated from calling function.
+   *
+   * @param $newMethod
+   *   description of new method (eg. "buildOptions() method in the appropriate BAO object").
+   */
+  public static function deprecatedFunctionWarning($newMethod) {
+    $dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+    $callerFunction = isset($dbt[1]['function']) ? $dbt[1]['function'] : NULL;
+    $callerClass = isset($dbt[1]['class']) ? $dbt[1]['class'] : NULL;
+    Civi::log()->warning("Deprecated function $callerClass::$callerFunction, use $newMethod.", array('civi.tag' => 'deprecated'));
   }
 
 }

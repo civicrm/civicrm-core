@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -24,8 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 {* add/update/view custom data group *}
+<div class="help">{ts}Use Custom Field Sets to add logically related fields for a specific type of CiviCRM record (e.g. contact records, contribution records, etc.).{/ts} {help id="id-group_intro"}</div>
 <div class="crm-block crm-form-block">
-    <div class="help">{ts}Use Custom Field Sets to add logically related fields for a specific type of CiviCRM record (e.g. contact records, contribution records, etc.).{/ts} {help id="id-group_intro"}</div>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout">
     <tr>
@@ -93,7 +93,7 @@ CRM.$(function($) {
 
   $('#extends_0').each(showHideStyle).change(showHideStyle);
 
-  var isGroupEmpty = "{/literal}{$isGroupEmpty}{literal}";
+  var isGroupEmpty = {/literal}{$isGroupEmpty|@json_encode}{literal};
   if (isGroupEmpty) {
     showRange(true);
   }

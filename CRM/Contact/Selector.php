@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -240,6 +240,15 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   }
 
   /**
+   * This method set cache key, later used in test environment
+   *
+   * @param string $key
+   */
+  public function setKey($key) {
+    $this->_key = $key;
+  }
+
+  /**
    * This method returns the links that are given for each search row.
    * currently the links added for each row are
    *
@@ -407,7 +416,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           ),
         );
 
-        $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+        $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id', 'validate');
 
         foreach ($this->_fields as $name => $field) {
           if (!empty($field['in_selector']) &&
@@ -483,7 +492,16 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           if (trim($phoneType) && !is_numeric($phoneType) && strtolower($phoneType) != $fld) {
             $title .= "-{$phoneType}";
           }
-          $title .= " ($loc)";
+          // fetch Location type label from name as $loc, which will be later used in column header
+          $title .= sprintf(" (%s)",
+            CRM_Core_PseudoConstant::getLabel(
+              'CRM_Core_DAO_Address',
+              'location_type_id',
+              CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_Address', 'location_type_id', $loc)
+            )
+          );
+          // use field name instead of table alias
+          $prop = $fld;
         }
         elseif (isset($this->_query->_fields[$prop]) && isset($this->_query->_fields[$prop]['title'])) {
           $title = $this->_query->_fields[$prop]['title'];
@@ -545,7 +563,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    *   the total number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
-
     if (($output == CRM_Core_Selector_Controller::EXPORT ||
         $output == CRM_Core_Selector_Controller::SCREEN
       ) &&

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -80,6 +80,11 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           'sort_name' => array(
             'title' => ts('Contact Name'),
             'operator' => 'like',
+          ),
+          'is_deleted' => array(
+            'title' => ts('Is Deleted'),
+            'default' => 0,
+            'type' => CRM_Utils_Type::T_BOOLEAN,
           ),
           'id' => array('no_display' => TRUE),
         ),
@@ -284,29 +289,10 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
                           ON {$this->_aliases['civicrm_membership_status']}.id =
                              {$this->_aliases['civicrm_membership']}.status_id ";
 
-    if ($this->isTableSelected('civicrm_address')) {
-      $this->_from .= "
-             LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                       ON {$this->_aliases['civicrm_contact']}.id =
-                          {$this->_aliases['civicrm_address']}.contact_id AND
-                          {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
+    $this->joinAddressFromContact();
+    $this->joinPhoneFromContact();
+    $this->joinEmailFromContact();
 
-    if ($this->isTableSelected('civicrm_email')) {
-      $this->_from .= "
-              LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                        ON {$this->_aliases['civicrm_contact']}.id =
-                           {$this->_aliases['civicrm_email']}.contact_id AND
-                           {$this->_aliases['civicrm_email']}.is_primary = 1\n";
-    }
-    //used when phone field is selected
-    if ($this->isTableSelected('civicrm_phone')) {
-      $this->_from .= "
-              LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-                        ON {$this->_aliases['civicrm_contact']}.id =
-                           {$this->_aliases['civicrm_phone']}.contact_id AND
-                           {$this->_aliases['civicrm_phone']}.is_primary = 1\n";
-    }
     //used when contribution field is selected.
     if ($this->isTableSelected('civicrm_contribution')) {
       $this->_from .= "
@@ -315,22 +301,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
              LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                  ON cmp.contribution_id={$this->_aliases['civicrm_contribution']}.id\n";
     }
-  }
-
-  public function postProcess() {
-
-    $this->beginPostProcess();
-
-    // get the acl clauses built before we assemble the query
-    $this->buildACLClause($this->_aliases['civicrm_contact']);
-    $sql = $this->buildQuery(TRUE);
-
-    $rows = array();
-    $this->buildRows($sql, $rows);
-
-    $this->formatDisplay($rows);
-    $this->doTemplateAssignment($rows);
-    $this->endPostProcess($rows);
   }
 
   /**

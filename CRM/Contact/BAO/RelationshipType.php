@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -79,26 +79,20 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    * Add the relationship type in the db.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param array $ids
-   *   The array that holds all the db ids.
    *
    * @return CRM_Contact_DAO_RelationshipType
    */
-  public static function add(&$params, $ids = []) {
-    $params['id'] = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('relationshipType', $ids));
-    //to change name, CRM-3336
-    if (empty($params['label_a_b']) && !empty($params['name_a_b'])) {
-      $params['label_a_b'] = $params['name_a_b'];
-    }
+  public static function add($params) {
+    if (empty($params['id'])) {
+      // Set name to label if not set
+      if (empty($params['label_a_b']) && !empty($params['name_a_b'])) {
+        $params['label_a_b'] = $params['name_a_b'];
+      }
+      if (empty($params['label_b_a']) && !empty($params['name_b_a'])) {
+        $params['label_b_a'] = $params['name_b_a'];
+      }
 
-    if (empty($params['label_b_a']) && !empty($params['name_b_a'])) {
-      $params['label_b_a'] = $params['name_b_a'];
-    }
-
-    // set label to name if it's not set - but *only* for
-    // ADD action. CRM-3336 as part from (CRM-3522)
-    if (!$params['id']) {
+      // set label to name if it's not set
       if (empty($params['name_a_b']) && !empty($params['label_a_b'])) {
         $params['name_a_b'] = $params['label_a_b'];
       }
@@ -110,22 +104,18 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
     // action is taken depending upon the mode
     $relationshipType = new CRM_Contact_DAO_RelationshipType();
 
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'RelationshipType', CRM_Utils_Array::value('id', $params), $params);
+
     $relationshipType->copyValues($params);
+    $relationshipType->save();
 
-    // if label B to A is blank, insert the value label A to B for it
-    if (!strlen(trim($strName = CRM_Utils_Array::value('name_b_a', $params)))) {
-      $relationshipType->name_b_a = CRM_Utils_Array::value('name_a_b', $params);
-    }
-    if (!strlen(trim($strName = CRM_Utils_Array::value('label_b_a', $params)))) {
-      $relationshipType->label_b_a = CRM_Utils_Array::value('label_a_b', $params);
-    }
-
-    $result = $relationshipType->save();
+    CRM_Utils_Hook::post($hook, 'RelationshipType', $relationshipType->id, $relationshipType);
 
     CRM_Core_PseudoConstant::relationshipType('label', TRUE);
     CRM_Core_PseudoConstant::relationshipType('name', TRUE);
     CRM_Case_XMLProcessor::flushStaticCaches();
-    return $result;
+    return $relationshipType;
   }
 
   /**

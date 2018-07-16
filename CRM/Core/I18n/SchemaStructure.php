@@ -1,7 +1,7 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.7                                                |
+| CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2018                                |
 +--------------------------------------------------------------------+
@@ -489,11 +489,13 @@ class CRM_Core_I18n_SchemaStructure {
         'civicrm_membership_type' => [
           'name' => [
             'type' => "Text",
+            'label' => "Name",
           ],
           'description' => [
             'type' => "TextArea",
             'rows' => "6",
             'cols' => "50",
+            'label' => "Description",
           ],
         ],
         'civicrm_membership_block' => [

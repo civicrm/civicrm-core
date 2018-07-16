@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -975,8 +975,8 @@ LIMIT  1
     $extends = array('case');
     $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
     $caseCustomFields = array();
-    while (list($gid, $group_values) = each($groupTree)) {
-      while (list($id, $field_values) = each($group_values['fields'])) {
+    foreach ($groupTree as $gid => $group_values) {
+      foreach ($group_values['fields'] as $id => $field_values) {
         if (array_key_exists($id, $customValues)) {
           $caseCustomFields[$gid]['title'] = $group_values['title'];
           $caseCustomFields[$gid]['values'][$id] = array(

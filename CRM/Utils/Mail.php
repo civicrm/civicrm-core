@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -203,8 +203,15 @@ class CRM_Utils_Mail {
       CRM_Utils_Array::value('toEmail', $params),
       FALSE
     );
-    $headers['Cc'] = CRM_Utils_Array::value('cc', $params);
-    $headers['Bcc'] = CRM_Utils_Array::value('bcc', $params);
+
+    // On some servers mail() fails when 'Cc' or 'Bcc' headers are defined but empty.
+    foreach (['Cc', 'Bcc'] as $optionalHeader) {
+      $headers[$optionalHeader] = CRM_Utils_Array::value(strtolower($optionalHeader), $params);
+      if (empty($headers[$optionalHeader])) {
+        unset($headers[$optionalHeader]);
+      }
+    }
+
     $headers['Subject'] = CRM_Utils_Array::value('subject', $params);
     $headers['Content-Type'] = $htmlMessage ? 'multipart/mixed; charset=utf-8' : 'text/plain; charset=utf-8';
     $headers['Content-Disposition'] = 'inline';
@@ -263,7 +270,7 @@ class CRM_Utils_Mail {
     }
 
     $message = self::setMimeParams($msg);
-    $headers = &$msg->headers($headers);
+    $headers = $msg->headers($headers);
 
     $to = array($params['toEmail']);
     $result = NULL;
@@ -421,7 +428,7 @@ class CRM_Utils_Mail {
    *
    * @return mixed
    */
-  public static function &setMimeParams(&$message, $params = NULL) {
+  public static function setMimeParams($message, $params = NULL) {
     static $mimeParams = NULL;
     if (!$params) {
       if (!$mimeParams) {
@@ -530,6 +537,44 @@ class CRM_Utils_Mail {
       'mime_type' => 'application/pdf',
       'cleanName' => $fileName,
     );
+  }
+
+  /**
+   * Format an email string from email fields.
+   *
+   * @param array $fields
+   *   The email fields.
+   * @return string
+   *   The formatted email string.
+   */
+  public static function format($fields) {
+    $formattedEmail = '';
+    if (!empty($fields['email'])) {
+      $formattedEmail = $fields['email'];
+    }
+
+    $formattedSuffix = array();
+    if (!empty($fields['is_bulkmail'])) {
+      $formattedSuffix[] = '(' . ts('Bulk') . ')';
+    }
+    if (!empty($fields['on_hold'])) {
+      if ($fields['on_hold'] == 2) {
+        $formattedSuffix[] = '(' . ts('On Hold - Opt Out') . ')';
+      }
+      else {
+        $formattedSuffix[] = '(' . ts('On Hold') . ')';
+      }
+    }
+    if (!empty($fields['signature_html']) || !empty($fields['signature_text'])) {
+      $formattedSuffix[] = '(' . ts('Signature') . ')';
+    }
+
+    // Add suffixes on a new line, if there is any.
+    if (!empty($formattedSuffix)) {
+      $formattedEmail .= "\n" . implode(' ', $formattedSuffix);
+    }
+
+    return $formattedEmail;
   }
 
 }

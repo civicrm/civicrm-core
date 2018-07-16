@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2018                                |
   +--------------------------------------------------------------------+
@@ -29,14 +29,44 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2018
- * $Id$
- *
  */
 
 /**
  * this class builds custom data
  */
 class CRM_Custom_Form_CustomData {
+
+  /**
+   * Generic wrapper to add custom data to a form via a single line in preProcess.
+   *
+   * $this->getDefaultEntity() must be defined for the form class for this to work.
+   *
+   * If the postProcess form cannot use the api & instead uses a BAO function it will need.
+   *   $params['custom'] = CRM_Core_BAO_CustomField::postProcess($submitted, $this->_id, $this->getDefaultEntity());
+   *
+   * @param CRM_Core_Form $form
+   * @param null|string $subType values stored in civicrm_custom_group.extends_entity_column_value
+   *   e.g Student for contact type
+   * @param null|string $subName value in civicrm_custom_group.extends_entity_column_id
+   * @param null|int $groupCount number of entities that could have custom data
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function addToForm(&$form, $subType = NULL, $subName = NULL, $groupCount = 1) {
+    $entityName = $form->getDefaultEntity();
+    $entityID = $form->getEntityId();
+
+    // when custom data is included in this page
+    if (!empty($_POST['hidden_custom'])) {
+      self::preProcess($form, $subName, $subType, $groupCount, $entityName, $entityID);
+      self::buildQuickForm($form);
+      self::setDefaultValues($form);
+    }
+    // need to assign custom data type and subtype to the template
+    $form->assign('customDataType', $entityName);
+    $form->assign('customDataSubType', $subType);
+    $form->assign('entityID', $entityID);
+  }
 
   /**
    * @param CRM_Core_Form $form
@@ -46,6 +76,8 @@ class CRM_Custom_Form_CustomData {
    * @param string $type
    * @param null|int $entityID
    * @param null $onlySubType
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function preProcess(
     &$form, $subName = NULL, $subType = NULL,

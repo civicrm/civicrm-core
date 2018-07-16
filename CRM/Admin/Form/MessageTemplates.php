@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -106,6 +106,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     }
     else {
       $this->_workflow_id = CRM_Utils_Array::value('workflow_id', $this->_values);
+      $this->checkUserPermission($this->_workflow_id);
       $this->assign('workflow_id', $this->_workflow_id);
 
       if ($this->_workflow_id) {
@@ -211,6 +212,26 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
       CRM_Utils_System::setTitle(ts('View System Default Message Template'));
+    }
+  }
+
+  /**
+   * Restrict users access based on permission
+   *
+   * @param int $workflowId
+   */
+  private function checkUserPermission($workflowId) {
+    if (isset($workflowId)) {
+      $canView = CRM_Core_Permission::check('edit system workflow message templates');
+    }
+    else {
+      $canView = CRM_Core_Permission::check('edit user-driven message templates');
+    }
+
+    if (!$canView && !CRM_Core_Permission::check('edit message templates')) {
+      CRM_Core_Session::setStatus(ts('You do not have permission to view requested page.'), ts('Access Denied'));
+      $url = CRM_Utils_System::url('civicrm/admin/messageTemplates', "reset=1");
+      CRM_Utils_System::redirect($url);
     }
   }
 

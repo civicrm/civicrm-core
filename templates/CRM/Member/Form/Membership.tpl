@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -206,25 +206,37 @@
             {$form.receipt_text.html|crmAddClass:huge}</td>
         </tr>
       </table>
-      <div id="customData"></div>
-      {*include custom data js file*}
-      {include file="CRM/common/customData.tpl"}
-      {literal}
-      <script type="text/javascript">
-      CRM.$(function($) {
-      {/literal}
-        CRM.buildCustomData( '{$customDataType}' );
-        {if $customDataSubType}
-          CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-        {/if}
-        {literal}
-      });
-      </script>
-      {/literal}
+      {include file="CRM/common/customDataBlock.tpl"}
       {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
         <div class="crm-accordion-wrapper">
           <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
-          <div class="crm-accordion-body">{include file="CRM/Contribute/Form/Selector.tpl" context="Search"}</div>
+          <div class="crm-accordion-body">
+            {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
+            <script type="text/javascript">
+              var membershipID = {$entityID};
+              var contactID = {$contactId};
+              {literal}
+              CRM.$(function($) {
+                CRM.loadPage(
+                  CRM.url(
+                    'civicrm/membership/recurring-contributions',
+                    {
+                      reset: 1,
+                      membershipID: membershipID,
+                      cid: contactID
+                    },
+                    'back'
+                  ),
+                  {
+                    target : '#membership-recurring-contributions',
+                    dialog : false
+                  }
+                );
+              });
+              {/literal}
+            </script>
+            <div id="membership-recurring-contributions"></div>
+          </div>
         </div>
       {/if}
       {if $softCredit}
@@ -287,11 +299,10 @@
         // skip this for test and live modes because financial type is set automatically
         cj("#financial_type_id").val(allMemberships[memType]['financial_type_id']);
         var term = cj('#num_terms').val();
-        var taxRates = '{/literal}{$taxRates}{literal}';
-        var taxTerm = '{/literal}{$taxTerm}{literal}';
-        var taxRates = JSON.parse(taxRates);
+        var taxRates = {/literal}{$taxRates}{literal};
+        var taxTerm = {/literal}{$taxTerm|@json_encode}{literal};
         var taxRate = taxRates[allMemberships[memType]['financial_type_id']];
-        var currency = '{/literal}{$currency}{literal}';
+        var currency = {/literal}{$currency|@json_encode}{literal};
         var taxAmount = (taxRate/100)*allMemberships[memType]['total_amount_numeric'];
         taxAmount = isNaN (taxAmount) ? 0:taxAmount;
         if (term) {
@@ -386,8 +397,8 @@
       // elsewhere some script determines if there is a paying contact the
       // email should go to instead (e.g gift membership). This should be checked for here
       // and that merged into that code as currently behaviour is inconsistent.
-      var emailExists = '{$emailExists}';
-      var isStandalone = ('{$context}' == 'standalone');
+      var emailExists = {$emailExists|json_encode};
+      var isStandalone = {if $context == 'standalone'}true{else}false{/if};
       var isEmailEnabledForSite = {if $isEmailEnabledForSite}true{else}false{/if};
 
       {literal}
@@ -529,10 +540,10 @@
       var action = {/literal}'{$action}'{literal};
 
       //for update lets hide it when not already recurring.
-      if ( action == 2 ) {
+      if (action == 2) {
         //user can't cancel auto renew by unchecking.
-        if ( cj("#auto_renew").prop('checked' ) ) {
-          cj("#auto_renew").attr( 'readonly', true );
+        if (cj("#auto_renew").prop('checked')) {
+          cj("#auto_renew").attr('readonly', true);
         }
         else {
           cj("#autoRenew").hide( );
@@ -540,16 +551,22 @@
       }
 
       //we should do all auto renew for cc memberships.
-      if ( !mode ) return;
+      if (!mode) {
+        return;
+      }
 
       //get the required values in case missing.
-      if ( !processorId )  processorId = cj( '#payment_processor_id' ).val( );
-      if ( !membershipType ) membershipType = parseInt( cj('#membership_type_id_1').val( ) );
+      if (!processorId) {
+        processorId = cj( '#payment_processor_id' ).val( );
+      }
+      if (!membershipType) {
+        membershipType = parseInt( cj('#membership_type_id_1').val( ) );
+      }
 
       //we don't have both required values.
-      if ( !processorId || !membershipType ) {
-        cj("#auto_renew").prop('checked', false );
-        cj("#autoRenew").hide( );
+      if (!processorId || !membershipType) {
+        cj("#auto_renew").prop('checked', false);
+        cj("#autoRenew").hide();
         showEmailOptions();
         return;
       }
@@ -558,26 +575,24 @@
       var autoRenewOptions = {/literal}{$autoRenewOptions}{literal};
       var currentOption    = autoRenewOptions[membershipType];
 
-      if ( !currentOption || !recurProcessors[processorId] ) {
+      if (!currentOption || !recurProcessors[processorId]) {
         cj("#auto_renew").prop('checked', false );
         cj("#autoRenew").hide();
         return;
       }
 
-      if ( currentOption == 1 ) {
-        cj("#autoRenew").show( );
-        if ( cj("#auto_renew").attr( 'readonly' ) ) {
-          cj("#auto_renew").prop('checked', false );
-          cj("#auto_renew").removeAttr( 'readonly' );
+      if (currentOption == 1) {
+        cj("#autoRenew").show();
+        if (cj("#auto_renew").attr('readonly')) {
+          cj("#auto_renew").prop('checked', false).removeAttr('readonly');
         }
       }
       else if ( currentOption == 2 ) {
-        cj("#autoRenew").show( );
-        cj("#auto_renew").prop('checked', true );
-        cj("#auto_renew").attr( 'readonly', true );
+        cj("#autoRenew").show();
+        cj("#auto_renew").prop('checked', true).attr('readonly', true);
       }
       else {
-        cj("#auto_renew").prop('checked', false );
+        cj("#auto_renew").prop('checked', false);
         cj("#autoRenew").hide( );
       }
       showEmailOptions();
@@ -587,21 +602,18 @@
 
     {literal}
 
-    var customDataType = '{/literal}{$customDataType}{literal}';
+    var customDataType = {/literal}{$customDataType|@json_encode}{literal};
 
     // load form during form rule.
     {/literal}{if $buildPriceSet}{literal}
-    cj( "#totalAmountORPriceSet" ).hide( );
-    cj( "#mem_type_id" ).hide( );
-    cj('#total_amount').attr("readonly", true);
-    cj( "#num_terms_row" ).hide( );
-    cj(".crm-membership-form-block-financial_type_id-mode").hide();
+      cj("#totalAmountORPriceSet, #mem_type_id, #num_terms_row, .crm-membership-form-block-financial_type_id-mode").hide();
+      cj('#total_amount').attr("readonly", true);
     {/literal}{/if}{literal}
 
     function buildAmount( priceSetId ) {
-  if ( !priceSetId ) {
-    priceSetId = cj("#price_set_id").val( );
-  }
+      if (!priceSetId) {
+        priceSetId = cj("#price_set_id").val();
+      }
         var fname = '#priceset';
         if ( !priceSetId ) {
         cj('#membership_type_id_1').val(0);
@@ -612,7 +624,7 @@
 
         // show/hide price set amount and total amount.
         cj( "#mem_type_id").show( );
-        var choose = "{/literal}{ts}Choose price set{/ts}{literal}";
+        var choose = "{/literal}{ts escape='js'}Choose price set{/ts}{literal}";
         cj("#price_set_id option[value='']").html( choose );
         cj( "#totalAmountORPriceSet" ).show( );
         cj('#total_amount').removeAttr("readonly");
@@ -620,16 +632,13 @@
         cj(".crm-membership-form-block-financial_type_id-mode").show();
 
         {/literal}{if $allowAutoRenew}{literal}
-        cj('#autoRenew').hide();
-        var autoRenew = cj("#auto_renew");
-        autoRenew.removeAttr( 'readOnly' );
-        autoRenew.prop('checked', false );
+          cj('#autoRenew').hide();
+          cj("#auto_renew").removeAttr('readOnly').prop('checked', false );
         {/literal}{/if}{literal}
         return;
       }
 
-      cj( "#total_amount" ).val( '' );
-      cj('#total_amount').attr("readonly", true);
+      cj( "#total_amount" ).val('').attr("readonly", true);
 
       var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&priceSetId=' + priceSetId;
 
@@ -643,7 +652,7 @@
 
       cj( "#totalAmountORPriceSet" ).hide( );
       cj( "#mem_type_id" ).hide( );
-      var manual = "{/literal}{ts}Manual membership and price{/ts}{literal}";
+      var manual = "{/literal}{ts escape='js'}Manual membership and price{/ts}{literal}";
       cj("#price_set_id option[value='']").html( manual );
       cj( "#num_terms_row" ).hide( );
       cj(".crm-membership-form-block-financial_type_id-mode").hide();
@@ -699,14 +708,12 @@
         {/literal}{if $allowAutoRenew}{literal}
         cj('#autoRenew').hide();
         var autoRenew = cj("#auto_renew");
-        autoRenew.removeAttr( 'readOnly' );
-        autoRenew.prop('checked', false );
-        if ( autoRenewOption == 1 ) {
+        autoRenew.removeAttr('readOnly').prop('checked', false );
+        if (autoRenewOption == 1) {
           cj('#autoRenew').show();
         }
-        else if ( autoRenewOption == 2 ) {
-          autoRenew.attr( 'readOnly', true );
-          autoRenew.prop('checked',  true );
+        else if (autoRenewOption == 2) {
+          autoRenew.attr('readOnly', true).prop('checked',  true );
           cj('#autoRenew').show();
         }
         {/literal}{/if}{literal}

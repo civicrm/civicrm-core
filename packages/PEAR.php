@@ -923,7 +923,7 @@ class PEAR_Error
 
         if ($this->mode & PEAR_ERROR_EXCEPTION) {
             trigger_error("PEAR_ERROR_EXCEPTION is obsolete, use class PEAR_Exception for exceptions", E_USER_WARNING);
-            eval('$e = new Exception($this->message, $this->code);throw($e);');
+            throw new Exception($this->message, $this->code);
         }
     }
 

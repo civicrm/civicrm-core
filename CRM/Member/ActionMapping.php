@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -58,9 +58,21 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
       'entity_value_label' => ts('Membership Type'),
       'entity_status' => 'auto_renew_options',
       'entity_status_label' => ts('Auto Renew Options'),
-      'entity_date_start' => 'membership_join_date',
-      'entity_date_end' => 'membership_end_date',
     )));
+  }
+
+  /**
+   * Get a list of available date fields.
+   *
+   * @return array
+   *   Array(string $fieldName => string $fieldLabel).
+   */
+  public function getDateFields() {
+    return array(
+      'join_date' => ts('Membership Join Date'),
+      'start_date' => ts('Membership Start Date'),
+      'end_date' => ts('Membership End Date'),
+    );
   }
 
   /**

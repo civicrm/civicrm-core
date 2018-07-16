@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -54,21 +54,8 @@ class CRM_Member_Form_MembershipConfig extends CRM_Core_Form {
   protected $_BAOName;
 
   /**
-   * Explicitly declare the entity api name.
-   */
-  public function getDefaultEntity() {
-    return 'MembershipType';
-  }
-
-  public function preProcess() {
-    $this->_id = $this->get('id');
-    $this->_BAOName = $this->get('BAOName');
-  }
-
-  /**
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
-   *
    *
    * @return array
    *   defaults

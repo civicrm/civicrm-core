@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -86,15 +86,12 @@ class CRM_Contact_Form_Edit_Organization {
    */
   public static function formRule($fields, $files, $contactID = NULL) {
     $errors = array();
-    $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID);
+    $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID, 'Organization');
 
     // make sure that organization name is set
     if (empty($fields['organization_name'])) {
       $errors['organization_name'] = 'Organization Name should be set.';
     }
-
-    //check for duplicate - dedupe rules
-    CRM_Contact_Form_Contact::checkDuplicateContacts($fields, $errors, $contactID, 'Organization');
 
     // add code to make sure that the uniqueness criteria is satisfied
     return empty($errors) ? TRUE : $errors;

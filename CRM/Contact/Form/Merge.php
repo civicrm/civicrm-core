@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -45,6 +45,11 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
   var $_contactType = NULL;
 
   /**
+   * @var array
+   */
+  public $criteria = array();
+
+  /**
    * Query limit to be retained in the urls.
    *
    * @var int
@@ -74,8 +79,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $this->_gid = $gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE);
       $this->_mergeId = CRM_Utils_Request::retrieve('mergeId', 'Positive', $this, FALSE);
       $this->limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this, FALSE);
+      $this->criteria = CRM_Utils_Request::retrieve('criteria', 'Json', $this, FALSE, '{}');
 
-      $urlParams = ['reset' => 1, 'rgid' => $this->_rgid, 'gid' => $this->_gid, 'limit' => $this->limit];
+      $urlParams = ['reset' => 1, 'rgid' => $this->_rgid, 'gid' => $this->_gid, 'limit' => $this->limit, 'criteria' => $this->criteria];
 
       $this->bounceIfInvalid($this->_cid, $this->_oid);
 
@@ -100,7 +106,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         CRM_Core_Session::singleton()->pushUserContext($browseUrl);
       }
 
-      $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $gid);
+      $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $gid, json_decode($this->criteria, TRUE));
 
       $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
       $where = "de.id IS NULL";
@@ -114,16 +120,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $mainUfId = CRM_Core_BAO_UFMatch::getUFId($this->_cid);
       $mainUser = NULL;
       if ($mainUfId) {
-        // d6 compatible
-        if ($config->userSystem->is_drupal == '1') {
-          $mainUser = user_load($mainUfId);
-        }
-        elseif ($config->userFramework == 'Joomla') {
-          $mainUser = JFactory::getUser($mainUfId);
-        }
-
+        $mainUser = $config->userSystem->getUser($this->_cid);
         $this->assign('mainUfId', $mainUfId);
-        $this->assign('mainUfName', $mainUser ? $mainUser->name : NULL);
+        $this->assign('mainUfName', $mainUser ? $mainUser['name'] : NULL);
       }
       $flipParams = array_merge($urlParams, ['action' => 'update', 'cid' => $this->_oid, 'oid' => $this->_cid]);
       if (!$flip) {
@@ -158,16 +157,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $otherUser = NULL;
 
       if ($otherUfId) {
-        // d6 compatible
-        if ($config->userSystem->is_drupal == '1') {
-          $otherUser = user_load($otherUfId);
-        }
-        elseif ($config->userFramework == 'Joomla') {
-          $otherUser = JFactory::getUser($otherUfId);
-        }
-
+        $otherUser = $config->userSystem->getUser($this->_oid);
         $this->assign('otherUfId', $otherUfId);
-        $this->assign('otherUfName', $otherUser ? $otherUser->name : NULL);
+        $this->assign('otherUfName', $otherUser ? $otherUser['name'] : NULL);
       }
 
       $cmsUser = ($mainUfId && $otherUfId) ? TRUE : FALSE;
@@ -244,7 +236,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       'type' => 'next',
       'name' => $this->next ? ts('Merge and go to Next Pair') : ts('Merge'),
       'isDefault' => TRUE,
-      'icon' => $this->next ? 'circle-triangle-e' : 'check',
+      'icon' => $this->next ? 'fa-play-circle' : 'check',
     );
 
     if ($this->next || $this->prev) {
@@ -300,7 +292,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $message = '<ul><li>' . ts('%1 has been updated.', array(1 => $name)) . '</li><li>' . ts('Contact ID %1 has been deleted.', array(1 => $this->_oid)) . '</li></ul>';
     CRM_Core_Session::setStatus($message, ts('Contacts Merged'), 'success');
 
-    $urlParams = ['reset' => 1, 'cid' => $this->_cid, 'rgid' => $this->_rgid, 'gid' => $this->_gid, 'limit' => $this->limit];
+    $urlParams = ['reset' => 1, 'cid' => $this->_cid, 'rgid' => $this->_rgid, 'gid' => $this->_gid, 'limit' => $this->limit, 'criteria' => $this->criteria];
     $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $this->_cid]);
 
     if (!empty($formValues['_qf_Merge_submit'])) {
@@ -314,7 +306,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     if ($this->next && $this->_mergeId) {
-      $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $this->_gid);
+      $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $this->_gid, json_decode($this->criteria, TRUE));
 
       $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
       $where = "de.id IS NULL";

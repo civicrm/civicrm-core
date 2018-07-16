@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -41,10 +41,10 @@
     <script type="text/javascript">
       CRM.$(function() {
         {/literal}
-        var customValueCount = "{$customValueCount}",
-          groupID = "{$groupID}",
-          contact_type = "{$contact_type}",
-          contact_subtype = "{$contact_subtype}",
+        var customValueCount = {$customValueCount|@json_encode},
+          groupID = {$groupID|@json_encode},
+          contact_type = {$contact_type|@json_encode},
+          contact_subtype = {$contact_subtype|@json_encode},
           i = 1;
         {literal}
         // FIXME: This is pretty terrible. Loading each item at a time via ajax.

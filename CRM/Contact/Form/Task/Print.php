@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -82,8 +82,9 @@ class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
     $selectorName = $this->controller->selectorName();
     require_once str_replace('_', DIRECTORY_SEPARATOR, $selectorName) . '.php';
 
-    $returnP = isset($returnPropeties) ? $returnPropeties : "";
+    $returnP = isset($returnProperties) ? $returnProperties : "";
     $customSearchClass = $this->get('customSearchClass');
+    $this->assign('customSearchID', $this->get('customSearchID'));
     $selector = new $selectorName($customSearchClass,
       $fv,
       $params,

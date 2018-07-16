@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -217,7 +217,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
   }
 
   public function setContext() {
-    $context = CRM_Utils_Request::retrieve('context', 'String',
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric',
       $this, FALSE, 'search'
     );
 

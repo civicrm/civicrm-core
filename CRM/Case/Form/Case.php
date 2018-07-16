@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -204,9 +204,9 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     $this->assign('multiClient', $isMultiClient);
 
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
-      $title = 'Delete';
+      $title = ts('Delete');
       if ($this->_action & CRM_Core_Action::RENEW) {
-        $title = 'Restore';
+        $title = ts('Restore');
       }
       $this->addButtons(array(
           array(

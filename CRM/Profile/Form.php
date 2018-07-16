@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -195,7 +195,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $this->_id = $this->get('id');
     $this->_profileIds = $this->get('profileIds');
     $this->_grid = CRM_Utils_Request::retrieve('grid', 'Integer', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     //unset from session when $_GET doesn't have it
     //except when the form is submitted
@@ -849,7 +849,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   public static function validateContactActivityProfile($activityId, $contactId, $gid) {
     $errors = array();
     if (!$activityId) {
-      $errors[] = 'Profile is using one or more activity fields, and is missing the activity Id (aid) in the URL.';
+      $errors[] = ts('Profile is using one or more activity fields, and is missing the activity Id (aid) in the URL.');
       return $errors;
     }
 
@@ -858,7 +858,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     CRM_Activity_BAO_Activity::retrieve($activityParams, $activityDetails);
 
     if (empty($activityDetails)) {
-      $errors[] = 'Invalid Activity Id (aid).';
+      $errors[] = ts('Invalid Activity Id (aid).');
       return $errors;
     }
 
@@ -871,7 +871,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         !in_array($contactId, $activityDetails['target_contact'])
       )
     ) {
-      $errors[] = 'This activity cannot be edited or viewed via this profile.';
+      $errors[] = ts('This activity cannot be edited or viewed via this profile.');
     }
 
     return $errors;
@@ -1051,7 +1051,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
       if ($greetingType = CRM_Utils_Array::value($greeting, $fields)) {
-        $customizedValue = CRM_Core_OptionGroup::getValue($greeting, 'Customized', 'name');
+        $customizedValue = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $greeting . '_id', 'Customized');
         if ($customizedValue == $greetingType && empty($fields[$greeting . '_custom'])) {
           $errors[$greeting . '_custom'] = ts('Custom  %1 is a required field if %1 is of type Customized.',
             array(1 => ucwords(str_replace('_', ' ', $greeting)))

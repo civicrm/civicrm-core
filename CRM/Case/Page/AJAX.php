@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -191,8 +191,8 @@ class CRM_Case_Page_AJAX {
       'type' => 'String',
     );
     $optionalParameters = array(
-      'case_type_id' => 'String',
-      'status_id' => 'String',
+      'case_type_id' => 'CommaSeparatedIntegers',
+      'status_id' => 'CommaSeparatedIntegers',
       'all' => 'Positive',
     );
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();

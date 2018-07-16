@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -421,17 +421,6 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
     if (!empty($fields['payment_processor']) && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($self->_defaultValues['financial_type_id'])) {
       $errors['payment_processor'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;
-    }
-
-    if (!empty($fields['is_recur_interval'])) {
-      foreach (array_keys($fields['payment_processor']) as $paymentProcessorID) {
-        $paymentProcessorTypeId = CRM_Core_DAO::getFieldValue(
-          'CRM_Financial_DAO_PaymentProcessor',
-          $paymentProcessorID,
-          'payment_processor_type_id'
-        );
-        $paymentProcessorType = CRM_Core_PseudoConstant::paymentProcessorType(FALSE, $paymentProcessorTypeId, 'name');
-      }
     }
 
     return $errors;

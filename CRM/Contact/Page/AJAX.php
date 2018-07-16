@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -261,8 +261,11 @@ class CRM_Contact_Page_AJAX {
       }
       // Save activity only for the primary (first) client
       if ($i == 0 && empty($result['is_error'])) {
-        CRM_Case_BAO_Case::createCaseRoleActivity($caseID, $result['id'], $relContactID);
+        CRM_Case_BAO_Case::createCaseRoleActivity($caseID, $result['id'], $relContactID, $sourceContactID);
       }
+    }
+    if (!empty($_REQUEST['is_unit_test'])) {
+      return $ret;
     }
 
     CRM_Utils_JSON::output($ret);
@@ -412,7 +415,7 @@ LIMIT {$offset}, {$rowCount}
           // send query to hook to be modified if needed
           CRM_Utils_Hook::contactListQuery($query,
             $name,
-            CRM_Utils_Request::retrieve('context', 'String'),
+            CRM_Utils_Request::retrieve('context', 'Alphanumeric'),
             CRM_Utils_Request::retrieve('cid', 'Positive')
           );
 
@@ -437,7 +440,7 @@ LIMIT {$offset}, {$rowCount}
           // send query to hook to be modified if needed
           CRM_Utils_Hook::contactListQuery($query,
             $name,
-            CRM_Utils_Request::retrieve('context', 'String'),
+            CRM_Utils_Request::retrieve('context', 'Alphanumeric'),
             CRM_Utils_Request::retrieve('cid', 'Positive')
           );
 
@@ -507,7 +510,7 @@ LIMIT {$offset}, {$rowCount}
       // send query to hook to be modified if needed
       CRM_Utils_Hook::contactListQuery($query,
         $name,
-        CRM_Utils_Request::retrieve('context', 'String'),
+        CRM_Utils_Request::retrieve('context', 'Alphanumeric'),
         CRM_Utils_Request::retrieve('cid', 'Positive')
       );
 
@@ -646,13 +649,16 @@ LIMIT {$offset}, {$rowCount}
 
     $gid = CRM_Utils_Request::retrieve('gid', 'Positive');
     $rgid = CRM_Utils_Request::retrieve('rgid', 'Positive');
-    $selected    = isset($_REQUEST['selected']) ? CRM_Utils_Type::escape($_REQUEST['selected'], 'Integer') : 0;
+    $null = NULL;
+    $criteria = CRM_Utils_Request::retrieve('criteria', 'Json', $null, FALSE, '{}');
+    $selected = CRM_Utils_Request::retrieveValue('selected', 'Boolean');
     if ($rowCount < 0) {
       $rowCount = 0;
     }
 
     $whereClause = $orderByClause = '';
-    $cacheKeyString   = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
+    $cacheKeyString   = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, json_decode($criteria, TRUE));
+
     $searchRows       = array();
 
     $searchParams = self::getSearchOptionsFromRequest();
@@ -814,6 +820,7 @@ LIMIT {$offset}, {$rowCount}
             'oid' => $pairInfo['entity_id2'],
             'action' => 'update',
             'rgid' => $rgid,
+            'criteria' => $criteria,
             'limit' => CRM_Utils_Request::retrieve('limit', 'Integer'),
           ];
         if ($gid) {
@@ -1010,12 +1017,9 @@ LIMIT {$offset}, {$rowCount}
    * Mark dupe pairs as selected from un-selected state or vice-versa, in dupe cache table.
    */
   public static function toggleDedupeSelect() {
-    $rgid = CRM_Utils_Type::escape($_REQUEST['rgid'], 'Integer');
-    $gid  = CRM_Utils_Type::escape($_REQUEST['gid'], 'Integer');
     $pnid = $_REQUEST['pnid'];
     $isSelected = CRM_Utils_Type::escape($_REQUEST['is_selected'], 'Boolean');
-
-    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid);
+    $cacheKeyString = CRM_Utils_Request::retrieve('cacheKey', 'Alphanumeric', $null, FALSE);
 
     $params = array(
       1 => array($isSelected, 'Boolean'),
@@ -1046,7 +1050,7 @@ LIMIT {$offset}, {$rowCount}
    */
   public static function getContactRelationships() {
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
-    $context = CRM_Utils_Type::escape($_GET['context'], 'String');
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric');
     $relationship_type_id = CRM_Utils_Type::escape(CRM_Utils_Array::value('relationship_type_id', $_GET), 'Integer', FALSE);
 
     if (!CRM_Contact_BAO_Contact_Permission::allow($contactID)) {

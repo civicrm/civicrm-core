@@ -374,7 +374,7 @@ class DB_DataObject_Generator extends DB_DataObject
      * Currenly only works with mysql / mysqli
      * to use, you must set option: generate_links=true
      * 
-     * @author Pascal Schöni 
+     * @author Pascal Schï¿½ni 
      */
     function generateForeignKeys() 
     {
@@ -1149,8 +1149,7 @@ class DB_DataObject_Generator extends DB_DataObject
         $classname = $this->classname = $this->getClassNameFromTableName($this->table);
         
         $out = $this->_generateClassTable();
-        //echo $out;
-        eval('?>'.$out);
+        echo $out;
         return new $classname;
         
     }

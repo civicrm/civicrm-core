@@ -24,9 +24,9 @@
  */
 function smarty_function_math($params, &$smarty)
 {
-    static $_allowed_funcs = array('int' => true, 'abs' => true, 'ceil' => true, 'cos' => true, 'exp' => true, 'floor' => true,
-      'log' => true, 'log10' => true, 'max' => true, 'min' => true, 'pi' => true, 'pow' => true, 'rand' => true,
-      'round' => true, 'sin' => true, 'sqrt' => true, 'srand' => true, 'tan' => true);
+    static $_allowed_funcs = array('int' => TRUE, 'abs' => TRUE, 'ceil' => TRUE, 'cos' => TRUE, 'exp' => TRUE, 'floor' => TRUE,
+      'log' => TRUE, 'log10' => TRUE, 'max' => TRUE, 'min' => TRUE, 'pi' => TRUE, 'pow' => TRUE, 'rand' => TRUE,
+      'round' => TRUE, 'sin' => TRUE, 'sqrt' => TRUE, 'srand' => TRUE, 'tan' => TRUE);
     // be sure equation parameter is present
     if (empty($params['equation'])) {
         trigger_error("math: missing equation parameter", E_USER_WARNING);
@@ -72,6 +72,7 @@ function smarty_function_math($params, &$smarty)
             }
         }
     }
+
     // match all vars in equation, make sure all are passed
     preg_match_all('!(?:0x[a-fA-F0-9]+)|([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)!', $equation, $match);
 

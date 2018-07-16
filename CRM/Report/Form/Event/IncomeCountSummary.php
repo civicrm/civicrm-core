@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -386,16 +386,16 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form_Event {
 
       if ((!empty($rows)) && $countEvent != 1) {
         $chartInfo = array(
-          'legend' => 'Participants Summary',
-          'xname' => 'Event',
-          'yname' => 'Total Participants',
+          'legend' => ts('Participants Summary'),
+          'xname' => ts('Event'),
+          'yname' => ts('Total Participants'),
         );
         if (!empty($graphRows)) {
           foreach ($graphRows[$this->_interval] as $key => $val) {
             $graph[$val] = $graphRows['value'][$key];
           }
           $chartInfo['values'] = $graph;
-          $chartInfo['tip'] = 'Participants : #val#';
+          $chartInfo['tip'] = ts('Participants : %1', array(1 => '#val#'));
           $chartInfo['xLabelAngle'] = 20;
 
           // build the chart.

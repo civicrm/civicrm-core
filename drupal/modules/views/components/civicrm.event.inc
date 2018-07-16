@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -343,25 +343,6 @@ function _civicrm_event_data(&$data, $enabled) {
       'handler' => 'views_handler_sort',
     ),
   );
-
-  // Domain information
-  $data['civicrm_event']['domain_id'] = array(
-    'title' => t('Domain Id'),
-    'help' => t('The Numeric ID of the domain this event was created in'),
-    'field' => array(
-      'handler' => 'views_handler_field_numeric',
-    ),
-  );
-
-  $data['civicrm_event']['domain_url'] = array(
-    'title' => t('Domain URL'),
-    'help' => t('Domain URL for registration'),
-    'field' => array(
-      'handler' => 'views_handler_field',
-      'click sortable' => TRUE,
-    ),
-  );
-
   // Event created_id
   $data['civicrm_event']['created_id'] = array(
     'title' => t('Created ID'),
@@ -385,6 +366,24 @@ function _civicrm_event_data(&$data, $enabled) {
       'field' => 'created_id',
       'handler' => 'views_handler_relationship',
       'label' => t('CiviCRM Contact of the event creator'),
+    ),
+  );
+
+  // Domain information
+  $data['civicrm_event']['domain_id'] = array(
+    'title' => t('Domain Id'),
+    'help' => t('The Numeric ID of the domain this event was created in'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+    ),
+  );
+
+  $data['civicrm_event']['domain_url'] = array(
+    'title' => t('Domain URL'),
+    'help' => t('Domain URL for registration'),
+    'field' => array(
+      'handler' => 'views_handler_field',
+      'click sortable' => TRUE,
     ),
   );
 

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -114,12 +114,13 @@
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-contact_ajax_check_similar">
-      <td class="label"></td>
-      <td>{$form.contact_ajax_check_similar.html} {$form.contact_ajax_check_similar.label}</td>
+      <td class="label">{$form.contact_ajax_check_similar.label}</td>
+      <td>{$form.contact_ajax_check_similar.html}</td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
-      <td class="description">{ts}When enabled, checks for contacts with similar names as the user types values into the contact form name fields.{/ts}
+      {capture assign=dedupeRules}href="{crmURL p='civicrm/contact/deduperules' q='reset=1'}"{/capture}
+      <td class="description">{ts 1=$dedupeRules}When enabled, checks for possible matches on the "New Contact" form using the Supervised <a %1>matching rule specified in your system</a>.{/ts}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-activity_assignee_notification">

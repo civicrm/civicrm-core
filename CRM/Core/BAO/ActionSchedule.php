@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2018                                |
    +--------------------------------------------------------------------+
@@ -563,7 +563,7 @@ FROM civicrm_action_schedule cas
       'activity_date_time' => date('YmdHis'),
       'subject' => $messageSubject,
       'details' => $sms_body_text,
-      'status_id' => CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name'),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
     );
 
     $activity = CRM_Activity_BAO_Activity::create($activityParams);

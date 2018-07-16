@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -61,8 +61,6 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
       'entity_value_label' => ts('Event Type'),
       'entity_status' => 'civicrm_participant_status_type',
       'entity_status_label' => ts('Participant Status'),
-      'entity_date_start' => 'event_start_date',
-      'entity_date_end' => 'event_end_date',
     )));
     $registrations->register(CRM_Event_ActionMapping::create(array(
       'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
@@ -72,8 +70,6 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
       'entity_value_label' => ts('Event Name'),
       'entity_status' => 'civicrm_participant_status_type',
       'entity_status_label' => ts('Participant Status'),
-      'entity_date_start' => 'event_start_date',
-      'entity_date_end' => 'event_end_date',
     )));
     $registrations->register(CRM_Event_ActionMapping::create(array(
       'id' => CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID,
@@ -83,9 +79,22 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
       'entity_value_label' => ts('Event Template'),
       'entity_status' => 'civicrm_participant_status_type',
       'entity_status_label' => ts('Participant Status'),
-      'entity_date_start' => 'event_start_date',
-      'entity_date_end' => 'event_end_date',
     )));
+  }
+
+  /**
+   * Get a list of available date fields.
+   *
+   * @return array
+   *   Array(string $fieldName => string $fieldLabel).
+   */
+  public function getDateFields() {
+    return array(
+      'start_date' => ts('Event Start Date'),
+      'end_date' => ts('Event End Date'),
+      'registration_start_date' => ts('Registration Start Date'),
+      'registration_end_date' => ts('Registration End Date'),
+    );
   }
 
   /**

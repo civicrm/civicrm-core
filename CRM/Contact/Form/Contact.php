@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -235,7 +235,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
         // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
         CRM_Utils_System::setTitle($displayName);
-        $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+        $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
         $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
 
         $urlParams = 'reset=1&cid=' . $this->_contactId;
@@ -590,7 +590,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @return bool
    *   email/openId
    */
-  public static function formRule($fields, &$errors, $contactId = NULL) {
+  public static function formRule($fields, &$errors, $contactId, $contactType) {
     $config = CRM_Core_Config::singleton();
 
     // validations.
@@ -713,6 +713,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       }
     }
 
+    // Check for duplicate contact if it wasn't already handled by ajax or disabled
+    if (!Civi::settings()->get('contact_ajax_check_similar')) {
+      self::checkDuplicateContacts($fields, $errors, $contactId, $contactType);
+    }
+
     return $primaryID;
   }
 
@@ -753,6 +758,14 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     //build contact type specific fields
     $className = 'CRM_Contact_Form_Edit_' . $this->_contactType;
     $className::buildQuickForm($this);
+
+    // Ajax duplicate checking
+    $checkSimilar = $this->_action == CRM_Core_Action::ADD && Civi::settings()->get('contact_ajax_check_similar');
+    $this->assign('checkSimilar', $checkSimilar);
+    if ($checkSimilar == 1) {
+      $ruleParams = array('used' => 'Supervised', 'contact_type' => $this->_contactType);
+      $this->assign('ruleFields', CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams));
+    }
 
     // build Custom data if Custom data present in edit option
     $buildCustomData = 'noCustomDataPresent';
@@ -1042,7 +1055,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/add', $resetStr));
     }
     else {
-      $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+      $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
       $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
       //validate the qfKey
       $urlParams = 'reset=1&cid=' . $contact->id;

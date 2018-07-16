@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -665,15 +665,19 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
       // CRM-16506
-      if (array_key_exists('civicrm_mailing_name', $row) &&
-        array_key_exists('civicrm_mailing_id', $row)
-      ) {
-        $rows[$rowNum]['civicrm_mailing_name_link'] = CRM_Report_Utils_Report::getNextUrl('mailing/detail',
-          'reset=1&force=1&mailing_id_op=eq&mailing_id_value=' . $row['civicrm_mailing_id'],
-          $this->_absoluteUrl, $this->_id, $this->_drilldownReport
-        );
-        $rows[$rowNum]['civicrm_mailing_name_hover'] = ts('View Mailing details for this mailing');
-        $entryFound = TRUE;
+      if (array_key_exists('civicrm_mailing_id', $row)) {
+        if (array_key_exists('civicrm_mailing_name', $row)) {
+          $rows[$rowNum]['civicrm_mailing_name_link'] = CRM_Report_Utils_Report::getNextUrl('mailing/detail',
+            'reset=1&force=1&mailing_id_op=eq&mailing_id_value=' . $row['civicrm_mailing_id'],
+            $this->_absoluteUrl, $this->_id, $this->_drilldownReport
+          );
+          $rows[$rowNum]['civicrm_mailing_name_hover'] = ts('View Mailing details for this mailing');
+          $entryFound = TRUE;
+        }
+        if (array_key_exists('civicrm_mailing_event_opened_open_count', $row)) {
+          $rows[$rowNum]['civicrm_mailing_event_opened_open_count'] = CRM_Mailing_Event_BAO_Opened::getTotalCount($row['civicrm_mailing_id']);
+          $entryFound = TRUE;
+        }
       }
       // skip looking further in rows, if first row itself doesn't
       // have the column we need

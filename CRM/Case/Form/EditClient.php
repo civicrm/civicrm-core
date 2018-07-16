@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -42,7 +42,7 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
   public function preProcess() {
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     //get current client name.
     $this->assign('currentClientName', CRM_Contact_BAO_Contact::displayName($cid));

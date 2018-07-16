@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -96,13 +96,6 @@ class CRM_Contact_Form_Edit_Individual {
     }
 
     if (!$inlineEditMode) {
-      $checkSimilar = Civi::settings()->get('contact_ajax_check_similar');
-
-      if ($checkSimilar == NULL) {
-        $checkSimilar = 0;
-      }
-      $form->assign('checkSimilar', $checkSimilar);
-
       //External Identifier Element
       $form->addField('external_identifier', array('label' => 'External ID'));
 
@@ -129,15 +122,12 @@ class CRM_Contact_Form_Edit_Individual {
    */
   public static function formRule($fields, $files, $contactID = NULL) {
     $errors = array();
-    $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID);
+    $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID, 'Individual');
 
     // make sure that firstName and lastName or a primary OpenID is set
     if (!$primaryID && (empty($fields['first_name']) || empty($fields['last_name']))) {
       $errors['_qf_default'] = ts('First Name and Last Name OR an email OR an OpenID in the Primary Location should be set.');
     }
-
-    //check for duplicate - dedupe rules
-    CRM_Contact_Form_Contact::checkDuplicateContacts($fields, $errors, $contactID, 'Individual');
 
     return empty($errors) ? TRUE : $errors;
   }

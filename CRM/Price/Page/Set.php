@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -224,7 +224,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   public function preview($sid) {
     $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_Preview', ts('Preview Price Set'), NULL);
     $session = CRM_Core_Session::singleton();
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     if ($context == 'field') {
       $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/price/field', "action=browse&sid={$sid}"));
     }
@@ -294,7 +294,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
       $actionLinks = self::actionLinks();
       //CRM-10117
       if ($dao->is_reserved) {
-        $actionLinks[CRM_Core_Action::BROWSE]['name'] = 'View Price Fields';
+        $actionLinks[CRM_Core_Action::BROWSE]['name'] = ts('View Price Fields');
       }
       $priceSet[$dao->id]['action'] = CRM_Core_Action::formLink($actionLinks, $action,
         array('sid' => $dao->id),

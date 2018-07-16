@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2018                                |
   +--------------------------------------------------------------------+
@@ -1334,7 +1334,7 @@ WHERE {$whereClause}";
   public static function getChildGroupIds($regularGroupIDs) {
     $childGroupIDs = array();
 
-    foreach ($regularGroupIDs as $regularGroupID) {
+    foreach ((array) $regularGroupIDs as $regularGroupID) {
       // temporary store the child group ID(s) of regular group identified by $id,
       //   later merge with main child group array
       $tempChildGroupIDs = array();

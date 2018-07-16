@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -35,7 +35,7 @@ class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this, TRUE);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, TRUE);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, TRUE);
     $this->_cid = CRM_Utils_Request::retrieve('cid', 'String', $this, TRUE);
 
     $this->assign('cid', $this->_cid);

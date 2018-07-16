@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -714,25 +714,11 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    *   parsed fields values.
    */
   public static function parseStreetAddress($streetAddress, $locale = NULL) {
-    $config = CRM_Core_Config::singleton();
-
-    /* locales supported include:
-     *  en_US - http://pe.usps.com/cpim/ftp/pubs/pub28/pub28.pdf
-     *  en_CA - http://www.canadapost.ca/tools/pg/manual/PGaddress-e.asp
-     *  fr_CA - http://www.canadapost.ca/tools/pg/manual/PGaddress-f.asp
-     *          NB: common use of comma after street number also supported
-     *  default is en_US
-     */
-
-    $supportedLocalesForParsing = array('en_US', 'en_CA', 'fr_CA');
-    if (!$locale) {
-      $locale = $config->lcMessages;
-    }
-    // as different locale explicitly requested but is not available, display warning message and set $locale = 'en_US'
-    if (!in_array($locale, $supportedLocalesForParsing)) {
-      CRM_Core_Session::setStatus(ts('Unsupported locale specified to parseStreetAddress: %1. Proceeding with en_US locale.', array(1 => $locale)), ts('Unsupported Locale'), 'alert');
+    // use 'en_US' for address parsing if the requested locale is not supported.
+    if (!self::isSupportedParsingLocale($locale)) {
       $locale = 'en_US';
     }
+
     $emptyParseFields = $parseFields = array(
       'street_name' => '',
       'street_unit' => '',
@@ -874,6 +860,38 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     }
 
     return $parseFields;
+  }
+
+  /**
+   * Determines if the specified locale is
+   * supported by address parsing.
+   * If no locale is specified then it
+   * will check the default configured locale.
+   *
+   * locales supported include:
+   *  en_US - http://pe.usps.com/cpim/ftp/pubs/pub28/pub28.pdf
+   *  en_CA - http://www.canadapost.ca/tools/pg/manual/PGaddress-e.asp
+   *  fr_CA - http://www.canadapost.ca/tools/pg/manual/PGaddress-f.asp
+   *          NB: common use of comma after street number also supported
+   *
+   * @param string $locale
+   *   The locale to be checked
+   *
+   * @return bool
+   */
+  public static function isSupportedParsingLocale($locale = NULL) {
+    if (!$locale) {
+      $config = CRM_Core_Config::singleton();
+      $locale = $config->lcMessages;
+    }
+
+    $parsingSupportedLocales = array('en_US', 'en_CA', 'fr_CA');
+
+    if (in_array($locale, $parsingSupportedLocales)) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**

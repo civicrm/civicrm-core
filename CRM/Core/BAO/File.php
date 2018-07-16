@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -39,6 +39,34 @@
 class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
   static $_signableFields = array('entityTable', 'entityID', 'fileID');
+
+  /**
+   * Takes an associative array and creates a File object.
+   *
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   *
+   * @return CRM_Core_BAO_File
+   */
+  public static function create($params) {
+    $fileDAO = new CRM_Core_DAO_File();
+
+    $op = empty($params['id']) ? 'create' : 'edit';
+
+    CRM_Utils_Hook::pre($op, 'File', CRM_Utils_Array::value('id', $params), $params);
+
+    $fileDAO->copyValues($params);
+
+    if (empty($params['id']) && empty($params['created_id'])) {
+      $fileDAO->created_id = CRM_Core_Session::getLoggedInContactID();
+    }
+
+    $fileDAO->save();
+
+    CRM_Utils_Hook::post($op, 'File', $fileDAO->id, $fileDAO);
+
+    return $fileDAO;
+  }
 
   /**
    * @param int $fileID

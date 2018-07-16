@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -56,10 +56,37 @@
               <td><a class="crm-hover-button" href='{crmURL p="civicrm/contact/view/membership" q="action=view&reset=1&cid=`$contactId`&id=`$recur.membership_id`&context=membership&selectedChild=member"}'>{$recur.membership_name}</a></td>
               </tr>
             {/if}
+            {include file="CRM/Custom/Page/CustomDataView.tpl"}
+
           </table>
           <div class="crm-submit-buttons"><a class="button cancel crm-form-submit" href="{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=contribute'}">{ts}Done{/ts}</a></div>
         </div>
     {/if}
+
+  <script type="text/javascript">
+    var recurContribID = {$recur.id};
+    var contactID = {$contactId};
+    {literal}
+    CRM.$(function($) {
+      CRM.loadPage(
+        CRM.url(
+          'civicrm/contribute/contributionrecur-payments',
+          {
+            reset: 1,
+            id: recurContribID,
+            cid: contactID
+          },
+          'back'
+        ),
+        {
+          target : '#recurring-contribution-payments',
+          dialog : false
+        }
+      );
+    });
+    {/literal}
+  </script>
+  <div id="recurring-contribution-payments"></div>
 {/if}
 {if $recurRows}
     {strip}
@@ -70,7 +97,7 @@
             <th scope="col">{ts}Start Date{/ts}</th>
             <th scope="col">{ts}Installments{/ts}</th>
             <th scope="col">{ts}Status{/ts}</th>
-            <th scope="col">&nbsp;</th>
+            <th scope="col"></th>
         </tr>
 
         {foreach from=$recurRows item=row}
@@ -81,9 +108,7 @@
                 <td>{$row.start_date|crmDate}</td>
                 <td>{$row.installments}</td>
                 <td>{$row.contribution_status}</td>
-                <td>
-                    {$row.action|replace:'xx':$row.recurId}
-                </td>
+                <td>{$row.action|replace:'xx':$row.recurId}</td>
             </tr>
         {/foreach}
     </table>

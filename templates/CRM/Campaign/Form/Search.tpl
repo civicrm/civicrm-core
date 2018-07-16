@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -51,7 +51,6 @@
       </div>
       <div class="crm-search-results">
        {* This section displays the rows along and includes the paging controls *}
-       <p></p>
        {include file="CRM/Campaign/Form/Selector.tpl" context="Search"}
       </div>
     </fieldset>

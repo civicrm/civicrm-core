@@ -3,7 +3,7 @@
 
 /**
  * The class representing a Controller of MVC design pattern.
- * 
+ *
  * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.01 of the PHP license
@@ -218,7 +218,6 @@ class HTML_QuickForm_Controller
         } // switch
     }
 
-
    /**
     * Checks whether the form is modal.
     *
@@ -253,7 +252,7 @@ class HTML_QuickForm_Controller
                     // Fix for bug #8687: the unseen page was considered
                     // submitted, so defaults for checkboxes and multiselects
                     // were not used. Shouldn't break anything since this flag
-                    // will be reset right below in loadValues(). 
+                    // will be reset right below in loadValues().
                     $page->_flagSubmitted = false;
                     // Use controller's defaults and constants, if present
                     $this->applyDefaults($key);

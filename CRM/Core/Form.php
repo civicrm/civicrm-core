@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -269,7 +269,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->addClass(CRM_Utils_System::getClassName($this));
 
     $this->assign('snippet', CRM_Utils_Array::value('snippet', $_GET));
+    $this->setTranslatedFields();
   }
+
+  /**
+   * Set translated fields.
+   *
+   * This function is called from the class constructor, allowing us to set
+   * fields on the class that can't be set as properties due to need for
+   * translation or other non-input specific handling.
+   */
+  protected function setTranslatedFields() {}
 
   /**
    * Add one or more css classes to the form.
@@ -366,6 +376,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($type == 'datepicker') {
       $attributes = ($attributes ? $attributes : array());
       $attributes['data-crm-datepicker'] = json_encode((array) $extra);
+      if (!empty($attributes['aria-label']) || $label) {
+        $attributes['aria-label'] = CRM_Utils_Array::value('aria-label', $attributes, $label);
+      }
       $type = "text";
     }
     if ($type == 'select' && is_array($extra)) {
@@ -406,6 +419,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       if (HTML_QuickForm::isError($error)) {
         CRM_Core_Error::fatal(HTML_QuickForm::errorMessage($element));
       }
+    }
+
+    // Add context for the editing of option groups
+    if (isset($extra['option_context'])) {
+      $context = json_encode($extra['option_context']);
+      $element->setAttribute('data-option-edit-context', $context);
     }
 
     return $element;
@@ -1091,6 +1110,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $options[] = $this->createElement('radio', NULL, NULL, $var, $key, $attributes);
     }
     $group = $this->addGroup($options, $name, $title, $separator);
+
+    $optionEditKey = 'data-option-edit-path';
+    if (!empty($attributes[$optionEditKey])) {
+      $group->setAttribute($optionEditKey, $attributes[$optionEditKey]);
+    }
+
     if ($required) {
       $this->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
     }
@@ -1144,25 +1169,29 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($javascriptMethod) {
       foreach ($values as $key => $var) {
         if (!$flipValues) {
-          $options[] = $this->createElement('checkbox', $var, NULL, $key, $javascriptMethod);
+          $options[] = $this->createElement('checkbox', $var, NULL, $key, $javascriptMethod, $attributes);
         }
         else {
-          $options[] = $this->createElement('checkbox', $key, NULL, $var, $javascriptMethod);
+          $options[] = $this->createElement('checkbox', $key, NULL, $var, $javascriptMethod, $attributes);
         }
       }
     }
     else {
       foreach ($values as $key => $var) {
         if (!$flipValues) {
-          $options[] = $this->createElement('checkbox', $var, NULL, $key);
+          $options[] = $this->createElement('checkbox', $var, NULL, $key, $attributes);
         }
         else {
-          $options[] = $this->createElement('checkbox', $key, NULL, $var);
+          $options[] = $this->createElement('checkbox', $key, NULL, $var, $attributes);
         }
       }
     }
 
-    $this->addGroup($options, $id, $title, $separator);
+    $group = $this->addGroup($options, $id, $title, $separator);
+    $optionEditKey = 'data-option-edit-path';
+    if (!empty($attributes[$optionEditKey])) {
+      $group->setAttribute($optionEditKey, $attributes[$optionEditKey]);
+    }
 
     if ($other) {
       $this->addElement('text', $id . '_other', ts('Other'), $attributes[$id . '_other']);
@@ -1397,7 +1426,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Core field - get metadata.
     $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
     $fieldSpec = $fieldSpec['values'];
-    $label = CRM_Utils_Array::value('label', $props, isset($fieldSpec['title']) ? $fieldSpec['title'] : NULL);
+    $fieldSpecLabel = isset($fieldSpec['html']['label']) ? $fieldSpec['html']['label'] : CRM_Utils_Array::value('title', $fieldSpec);
+    $label = CRM_Utils_Array::value('label', $props, $fieldSpecLabel);
 
     $widget = isset($props['type']) ? $props['type'] : $fieldSpec['html']['type'];
     if ($widget == 'TextArea' && $context == 'search') {
@@ -1425,8 +1455,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
 
       // Add data for popup link.
-      if ((!empty($props['option_url']) || !array_key_exists('option_url', $props)) && ($context != 'search' && $widget == 'Select' && CRM_Core_Permission::check('administer CiviCRM'))) {
-        $props['data-option-edit-path'] = !empty($props['option_url']) ? $props['option_url'] : CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
+      $canEditOptions = CRM_Core_Permission::check('administer CiviCRM');
+      $hasOptionUrl = !empty($props['option_url']);
+      $optionUrlKeyIsSet = array_key_exists('option_url', $props);
+      $shouldAdd = $context !== 'search' && $isSelect && $canEditOptions;
+
+      // Only add if key is not set, or if non-empty option url is provided
+      if (($hasOptionUrl || !$optionUrlKeyIsSet) && $shouldAdd) {
+        $optionUrl = $hasOptionUrl ? $props['option_url'] :
+          CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
+        $props['data-option-edit-path'] = $optionUrl;
         $props['data-api-entity'] = $props['entity'];
         $props['data-api-field'] = $props['name'];
       }
@@ -1451,6 +1489,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         //Set default columns and rows for textarea.
         $props['rows'] = isset($props['rows']) ? $props['rows'] : 4;
         $props['cols'] = isset($props['cols']) ? $props['cols'] : 60;
+        if (empty($props['maxlength']) && isset($fieldSpec['length'])) {
+          $props['maxlength'] = $fieldSpec['length'];
+        }
         return $this->add('textarea', $name, $label, $props, $required);
 
       case 'Select Date':

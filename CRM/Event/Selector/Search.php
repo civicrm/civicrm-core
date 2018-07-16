@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -392,6 +392,20 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
           'url' => 'civicrm/payment',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event',
           'title' => ts('Record Refund'),
+        );
+      }
+
+      // CRM-20879: Show 'Transfer or Cancel' action only if logged in user
+      //  have 'edit event participants' permission and participant status
+      //  is not Cancelled or Transferred
+      if (in_array(CRM_Core_Permission::EDIT, $permissions) &&
+        !in_array($statusTypes[$row['participant_status_id']], array('Cancelled', 'Transferred'))
+      ) {
+        $links[] = array(
+          'name' => ts('Transfer or Cancel'),
+          'url' => 'civicrm/event/selfsvcupdate',
+          'qs' => 'reset=1&pid=%%id%%&is_backoffice=1&cs=' . CRM_Contact_BAO_Contact_Utils::generateChecksum($result->contact_id, NULL, 'inf'),
+          'title' => ts('Transfer or Cancel'),
         );
       }
 

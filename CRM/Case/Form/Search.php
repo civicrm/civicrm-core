@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -97,7 +97,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'search');
 
     $this->assign('context', $this->_context);
 
@@ -177,7 +177,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       $tasks = CRM_Case_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission());
 
       if (!empty($this->_formValues['case_deleted'])) {
-        unset($tasks[CRM_Case_Task::DELETE]);
+        unset($tasks[CRM_Case_Task::TASK_DELETE]);
       }
       else {
         unset($tasks[CRM_Case_Task::RESTORE_CASES]);

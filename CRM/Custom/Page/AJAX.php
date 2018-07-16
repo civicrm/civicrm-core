@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -57,6 +57,7 @@ class CRM_Custom_Page_AJAX {
     $selectorElements = array(
       'label',
       'value',
+      'description',
       'is_default',
       'is_active',
       'links',

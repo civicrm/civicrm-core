@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -31,6 +31,8 @@
  * @copyright CiviCRM LLC (c) 2004-2018
  */
 class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
+
+  public $optimisedForOnlyFullGroupBy = FALSE;
   /**
    * Class constructor.
    */
@@ -299,6 +301,10 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
    * Generate From Clause.
    */
   public function from() {
+    if (!$this->currentLogTable) {
+      // From has already been built in this case.
+      return;
+    }
     $entity = $this->currentLogTable;
 
     $detail = $this->_logTables[$entity];
@@ -351,5 +357,12 @@ LEFT  JOIN civicrm_contact altered_by_contact_civireport
     $row['log_civicrm_entity_log_action'] = "<a href='{$url1}' class='crm-summary-link'><i class=\"crm-i fa-list-alt\"></i></a>&nbsp;<a title='{$hoverTitle}' href='{$url2}'>" . $row['log_civicrm_entity_log_action'] . '</a>';
     return $row;
   }
+
+  /**
+   * Calculate section totals.
+   *
+   * Override to do nothing as this does not work / make sense on this report.
+   */
+  public function sectionTotals() {}
 
 }

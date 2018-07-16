@@ -3,7 +3,7 @@
 
 /**
  * Class for a group of elements used to input dates (and times).
- * 
+ *
  * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.01 of the PHP license
@@ -32,10 +32,10 @@ require_once 'HTML/QuickForm/select.php';
 
 /**
  * Class for a group of elements used to input dates (and times).
- * 
+ *
  * Inspired by original 'date' element but reimplemented as a subclass
  * of HTML_QuickForm_group
- * 
+ *
  * @category    HTML
  * @package     HTML_QuickForm
  * @author      Alexey Borzov <avb@php.net>
@@ -48,7 +48,7 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
 
    /**
     * Various options to control the element's display.
-    * 
+    *
     * @access   private
     * @var      array
     */
@@ -71,7 +71,7 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
 
    /**
     * Locale array build from CRM_Utils_Date-provided names
-    * 
+    *
     * @access   private
     * @var      array
     */
@@ -82,12 +82,12 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
 
    /**
     * Class constructor
-    * 
+    *
     * The following keys may appear in $options array:
     * - 'language': date language
     * - 'format': Format of the date, based on PHP's date() function.
     *   The following characters are currently recognised in format string:
-    *   <pre>  
+    *   <pre>
     *       D => Short names of days
     *       l => Long names of days
     *       d => Day numbers
@@ -119,11 +119,11 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
     */
     function __construct($elementName = null, $elementLabel = null, $options = array(), $attributes = null)
     {
-        $this->_locale = array( 
-                               'weekdays_short'=> CRM_Utils_Date::getAbbrWeekdayNames(), 
-                               'weekdays_long' => CRM_Utils_Date::getFullWeekdayNames(), 
-                               'months_short'  => CRM_Utils_Date::getAbbrMonthNames(), 
-                               'months_long'   => CRM_Utils_Date::getFullMonthNames() 
+        $this->_locale = array(
+                               'weekdays_short'=> CRM_Utils_Date::getAbbrWeekdayNames(),
+                               'weekdays_long' => CRM_Utils_Date::getFullWeekdayNames(),
+                               'months_short'  => CRM_Utils_Date::getAbbrMonthNames(),
+                               'months_long'   => CRM_Utils_Date::getFullMonthNames()
                                );
         parent::__construct($elementName, $elementLabel, null, null, null, $attributes);
         $this->_persistantFreeze = true;
@@ -197,7 +197,7 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
                     case 'Y':
                         $options = $this->_createOptionList(
                             $this->_options['minYear'],
-                            $this->_options['maxYear'], 
+                            $this->_options['maxYear'],
                             $this->_options['minYear'] > $this->_options['maxYear']? -1: 1
                         );
                         $emptyText = ts('-year-');
@@ -208,7 +208,7 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
                             $this->_options['maxYear'],
                             $this->_options['minYear'] > $this->_options['maxYear']? -1: 1
                         );
-                        array_walk($options, create_function('&$v,$k','$v = substr($v,-2);')); 
+                        array_walk($options, create_function('&$v,$k','$v = substr($v,-2);'));
                         $emptyText = ts('-year-');
                         break;
                     case 'h':
@@ -250,7 +250,7 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
                         $separator .= (' ' == $sign? '&nbsp;': $sign);
                         $loadSelect = false;
                 }
-    
+
                 if ($loadSelect) {
                     if (0 < count($this->_elements)) {
                         $this->_separator[] = $separator;
@@ -259,7 +259,7 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
                     }
                     $separator = '';
                     // Should we add an empty option to the top of the select?
-                    if (!is_array($this->_options['addEmptyOption']) && $this->_options['addEmptyOption'] || 
+                    if (!is_array($this->_options['addEmptyOption']) && $this->_options['addEmptyOption'] ||
                         is_array($this->_options['addEmptyOption']) && !empty($this->_options['addEmptyOption'][$sign])) {
 
                         // Using '+' array operator to preserve the keys
@@ -271,12 +271,12 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
                             $options = array($this->_options['emptyOptionValue'] => $text) + $options;
                         }
                     }
-                  
+
                     //modified autogenerated id for date select boxes.
                     $attribs = $this->getAttributes();
                     $elementName = $this->getName();
                     $attribs['id'] = $elementName.'['.$sign.']';
-                    
+
                     $this->_elements[] = new HTML_QuickForm_select($sign, null, $options, $attribs);
                 }
             }

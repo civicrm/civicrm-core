@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -419,18 +419,31 @@ class RecipientBuilder {
     $actionSchedule = $this->actionSchedule;
 
     if ($actionSchedule->group_id) {
-      if ($this->isSmartGroup($actionSchedule->group_id)) {
-        // Check that the group is in place in the cache and up to date
-        \CRM_Contact_BAO_GroupContactCache::check($actionSchedule->group_id);
-        return \CRM_Utils_SQL_Select::fragment()
-          ->join('grp', "INNER JOIN civicrm_group_contact_cache grp ON {$contactIdField} = grp.contact_id")
-          ->where(" grp.group_id IN ({$actionSchedule->group_id})");
+      $regularGroupIDs = $smartGroupIDs = $groupWhereCLause = array();
+      $query = \CRM_Utils_SQL_Select::fragment();
+
+      // get child group IDs if any
+      $childGroupIDs = \CRM_Contact_BAO_Group::getChildGroupIds($actionSchedule->group_id);
+      foreach (array_merge(array($actionSchedule->group_id), $childGroupIDs) as $groupID) {
+        if ($this->isSmartGroup($groupID)) {
+          // Check that the group is in place in the cache and up to date
+          \CRM_Contact_BAO_GroupContactCache::check($groupID);
+          $smartGroupIDs[] = $groupID;
+        }
+        else {
+          $regularGroupIDs[] = $groupID;
+        }
       }
-      else {
-        return \CRM_Utils_SQL_Select::fragment()
-          ->join('grp', " INNER JOIN civicrm_group_contact grp ON {$contactIdField} = grp.contact_id AND grp.status = 'Added'")
-          ->where(" grp.group_id IN ({$actionSchedule->group_id})");
+
+      if (!empty($smartGroupIDs)) {
+        $query->join('sg', "LEFT JOIN civicrm_group_contact_cache sg ON {$contactIdField} = sg.contact_id");
+        $groupWhereCLause[] = " sg.group_id IN ( " . implode(', ', $smartGroupIDs) . " ) ";
       }
+      if (!empty($regularGroupIDs)) {
+        $query->join('rg', " LEFT JOIN civicrm_group_contact rg ON {$contactIdField} = rg.contact_id AND rg.status = 'Added'");
+        $groupWhereCLause[] = " rg.group_id IN ( " . implode(', ', $regularGroupIDs) . " ) ";
+      }
+      return $query->where(implode(" OR ", $groupWhereCLause));
     }
     elseif (!empty($actionSchedule->recipient_manual)) {
       $rList = \CRM_Utils_Type::escape($actionSchedule->recipient_manual, 'String');

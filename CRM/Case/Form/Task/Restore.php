@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -63,7 +63,7 @@ class CRM_Case_Form_Task_Restore extends CRM_Case_Form_Task {
    */
   public function postProcess() {
     $restoredCases = $failed = 0;
-    foreach ($this->_caseIds as $caseId) {
+    foreach ($this->_entityIds as $caseId) {
       if (CRM_Case_BAO_Case::restoreCase($caseId)) {
         $restoredCases++;
       }

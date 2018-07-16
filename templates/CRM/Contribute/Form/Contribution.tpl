@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -31,13 +31,6 @@
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
   {include file="CRM/Contribute/Form/AdditionalInfo/Payment.tpl"}
-  <div class="crm-block crm-form-block crm-contribution-form-block">
-
-  {if !$email and $action neq 8 and $context neq 'standalone'}
-  <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this contribution because there is no email address recorded for this contact. If you want a receipt to be sent when this contribution is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the contribution.{/ts}
-  </div>
-  {/if}
   {if $contributionMode}
   <div class="help">
     {if $contactId && $payNow}
@@ -51,6 +44,15 @@
     {/if}
   </div>
   {/if}
+  
+  <div class="crm-block crm-form-block crm-contribution-form-block">
+
+  {if !$email and $action neq 8 and $context neq 'standalone'}
+  <div class="messages status no-popup">
+    <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this contribution because there is no email address recorded for this contact. If you want a receipt to be sent when this contribution is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the contribution.{/ts}
+  </div>
+  {/if}
+  
   {if $action eq 8}
   <div class="messages status no-popup">
     <div class="icon inform-icon"></div>
@@ -343,25 +345,17 @@
     <div id="customData" class="crm-contribution-form-block-customData"></div>
   {/if}
 
-  {*include custom data js file*}
-  {include file="CRM/common/customData.tpl"}
+  {include file="CRM/Custom/Form/Edit.tpl"}
 
-    {literal}
-    <script type="text/javascript">
-      CRM.$(function($) {
+  {literal}
+  <script type="text/javascript">
+    CRM.$(function($) {
     {/literal}
-    CRM.buildCustomData( '{$customDataType}' );
-    {if $customDataSubType}
-      CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-    {/if}
-
-    {if $buildPriceSet}{literal}buildAmount( );{/literal}{/if}
+      {if $buildPriceSet}{literal}buildAmount();{/literal}{/if}
     {literal}
-    });
 
     // bind first click of accordion header to load crm-accordion-body with snippet
     // everything else taken care of by cj().crm-accordions()
-    CRM.$(function($) {
       cj('#adjust-option-type').hide();
       cj('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
         loadPanes(cj(this).attr('id'));
@@ -391,7 +385,7 @@
       }
     }
 
-  var url = "{/literal}{$dataUrl}{literal}";
+  var url = {/literal}{$dataUrl|@json_encode}{literal};
 
   {/literal}
     {if $context eq 'standalone' and $outBound_option != 2 }
@@ -526,7 +520,7 @@ function buildAmount( priceSetId, financialtypeIds ) {
     // show/hide price set amount and total amount.
     cj("#totalAmountORPriceSet").show( );
     cj("#totalAmount").show( );
-    var choose = "{/literal}{ts}Choose price set{/ts}{literal}";
+    var choose = "{/literal}{ts escape='js'}Choose price set{/ts}{literal}";
     cj("#price_set_id option[value='']").html( choose );
 
     cj('label[for="total_amount"]').text('{/literal}{ts}Total Amount{/ts}{literal}');
@@ -560,7 +554,7 @@ function buildAmount( priceSetId, financialtypeIds ) {
 
   cj( "#totalAmountORPriceSet" ).hide( );
   cj( "#totalAmount").hide( );
-  var manual = "{/literal}{ts}Manual contribution amount{/ts}{literal}";
+  var manual = "{/literal}{ts escape='js'}Manual contribution amount{/ts}{literal}";
   cj("#price_set_id option[value='']").html( manual );
 
   cj('label[for="total_amount"]').text('{/literal}{ts}Price Sets{/ts}{literal}');

@@ -332,23 +332,21 @@ class HTML_QuickForm_file extends HTML_QuickForm_input
         if (isset($_FILES[$elementName])) {
             return $_FILES[$elementName];
         } elseif (false !== ($pos = strpos($elementName, '['))) {
-            $base  = str_replace(
-                        array('\\', '\''), array('\\\\', '\\\''),
-                        substr($elementName, 0, $pos)
-                    );
-            $idx   = "['" . str_replace(
-                        array('\\', '\'', ']', '['), array('\\\\', '\\\'', '', "']['"),
-                        substr($elementName, $pos + 1, -1)
-                     ) . "']";
-            $props = array('name', 'type', 'size', 'tmp_name', 'error');
-            $code  = "if (!isset(\$_FILES['{$base}']['name']{$idx})) {\n" .
-                     "    return null;\n" .
-                     "} else {\n" .
-                     "    \$value = array();\n";
-            foreach ($props as $prop) {
-                $code .= "    \$value['{$prop}'] = \$_FILES['{$base}']['{$prop}']{$idx};\n";
+            $base = substr($elementName, 0, $pos);
+            $idx = explode('][', str_replace(["['", "']", '["', '"]'], ['[', ']', '[', ']'], substr($elementName, $pos + 1, -1)));
+            $idx = array_merge([$base, 'name'], $idx);
+            if (!CRM_Utils_Array::recursiveIsset($_FILES, $idx)) {
+                return NULL;
             }
-            return eval($code . "    return \$value;\n}\n");
+            else {
+                $props = ['name', 'type', 'size', 'tmp_name', 'error'];
+                $value = [];
+                foreach ($props as $prop) {
+                    $idx[1] = $prop;
+                    $value[$prop] = CRM_Utils_Array::recursiveValue($_FILES, $idx);
+                }
+                return $value;
+            }
         } else {
             return null;
         }

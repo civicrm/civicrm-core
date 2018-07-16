@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -1200,32 +1200,33 @@ SELECT  pledge.contact_id              as contact_id,
    */
   public static function getPledgeStartDate($date, $pledgeBlock) {
     $startDate = (array) json_decode($pledgeBlock['pledge_start_date']);
-    list($field, $value) = each($startDate);
-    if (!empty($date) && !CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
-      return $date;
-    }
-    if (empty($date)) {
-      $date = $value;
-    }
-    switch ($field) {
-      case 'contribution_date':
-        if (empty($date)) {
-          $date = date('Ymd');
-        }
-        break;
+    foreach ($startDate as $field => $value) {
+      if (!empty($date) && !CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
+        return $date;
+      }
+      if (empty($date)) {
+        $date = $value;
+      }
+      switch ($field) {
+        case 'contribution_date':
+          if (empty($date)) {
+            $date = date('Ymd');
+          }
+          break;
 
-      case 'calendar_date':
-        $date = date('Ymd', strtotime($date));
-        break;
+        case 'calendar_date':
+          $date = date('Ymd', strtotime($date));
+          break;
 
-      case 'calendar_month':
-        $date = self::getPaymentDate($date);
-        $date = date('Ymd', strtotime($date));
-        break;
+        case 'calendar_month':
+          $date = self::getPaymentDate($date);
+          $date = date('Ymd', strtotime($date));
+          break;
 
-      default:
-        break;
+        default:
+          break;
 
+      }
     }
     return $date;
   }

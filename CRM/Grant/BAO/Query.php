@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -159,7 +159,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
       case 'grant_due_date_high':
         $query->dateQueryBuilder($values, 'civicrm_grant',
           'grant_due_date',
-          'grant_due_date', 'Grant Due Date'
+          'grant_due_date', ts('Grant Due Date')
         );
         return;
 
@@ -173,7 +173,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
       case 'grant_decision_date_high':
         $query->dateQueryBuilder($values, 'civicrm_grant',
           'grant_decision_date',
-          'decision_date', 'Grant Decision Date'
+          'decision_date', ts('Grant Decision Date')
         );
         return;
 
@@ -190,11 +190,11 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
 
         if (strstr($name, 'type')) {
           $name = 'grant_type_id';
-          $label = 'Grant Type(s)';
+          $label = ts('Grant Type(s)');
         }
         else {
           $name = 'status_id';
-          $label = 'Grant Status(s)';
+          $label = ts('Grant Status(s)');
         }
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_grant.$name", $op, $value, "Integer");
@@ -208,15 +208,15 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
       case 'grant_report_received':
 
         if ($value == 1) {
-          $yesNo = 'Yes';
+          $yesNo = ts('Yes');
           $query->_where[$grouping][] = "civicrm_grant.grant_report_received $op $value";
         }
         elseif ($value == 0) {
-          $yesNo = 'No';
+          $yesNo = ts('No');
           $query->_where[$grouping][] = "civicrm_grant.grant_report_received IS NULL";
         }
 
-        $query->_qill[$grouping][] = "Grant Report Received = $yesNo ";
+        $query->_qill[$grouping][] = ts('Grant Report Received = %1', array(1 => $yesNo));
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
 
         return;

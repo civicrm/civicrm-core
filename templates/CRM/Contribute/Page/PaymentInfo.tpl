@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -36,7 +36,7 @@ CRM.$(function($) {
         $("#payment-info").html(html).trigger('crmLoad');
       }
     });
-
+    // Fixme: Possible bug - the following line won't be processed by smarty because it's in a literal block
     var taxAmount = "{$totalTaxAmount}";
     if (taxAmount) {
       $('.total_amount-section').show();
@@ -55,7 +55,7 @@ CRM.$(function($) {
     {if $component eq "event"}
       <th>{ts}Total Fee(s){/ts}</th>
     {else}
-      <th>{ts}Contribution Amount(s){/ts}</th>
+      <th>{ts}Contribution Total{/ts}</th>
     {/if}
     <th class="right">{ts}Total Paid{/ts}</th>
     <th class="right">{ts}Balance{/ts}</th>

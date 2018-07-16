@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -434,7 +434,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         'street_unit',
         'survey_response',
       );
-      if (CRM_Core_OptionGroup::getValue('activity_type', 'WalkList') ==
+      if (CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'WalkList') ==
         $this->_values['activity_type_id']
       ) {
         $this->_params['order_bys'] = array(
@@ -456,14 +456,14 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
           ),
         );
       }
-      elseif (CRM_Core_OptionGroup::getValue('activity_type', 'PhoneBank') ==
+      elseif (CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'PhoneBank') ==
         $this->_values['activity_type_id']
       ) {
         array_push($displayFields, 'phone');
       }
-      elseif ((CRM_Core_OptionGroup::getValue('activity_type', 'Survey') ==
+      elseif ((CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Survey') ==
           $this->_values['activity_type_id']) ||
-        (CRM_Core_OptionGroup::getValue('activity_type', 'Canvass') ==
+        (CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Canvass') ==
           $this->_values['activity_type_id'])
       ) {
         array_push($displayFields, 'phone', 'city', 'state_province_id', 'postal_code', 'email');

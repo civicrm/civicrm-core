@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -242,6 +242,9 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
         $activityId = civicrm_api3('activity', 'create', $value);
 
         // @todo this would be done by the api call above if the parames were passed through.
+        // @todo extract submit functions &
+        // extend CRM_Event_Form_Task_BatchTest::testSubmit with a data provider to test
+        // handling of custom data, specifically checkbox fields.
         if (!empty($value['custom']) &&
           is_array($value['custom'])
         ) {

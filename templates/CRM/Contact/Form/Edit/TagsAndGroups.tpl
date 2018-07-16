@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -45,7 +45,7 @@
           <td>
             {if $groupElementType eq 'select'}
               <div class="crm-section group-section">
-              {if $title}{$form.group.label}{/if}
+              {if $title}{$form.group.label}<br>{/if}
               {$form.group.html}
             </div>
             {else}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -2045,6 +2045,27 @@ function _civicrm_core_data(&$data, $enabled) {
     ),
   );
 
+  // Original ID
+  $data['civicrm_activity']['original_id'] = array(
+    'title' => t('Original Activity ID'),
+    'help' => t('The numeric ID of the Original Activity in a versioned chain.'),
+    'field' => array(
+      'handler' => 'views_handler_field_numeric',
+      'click sortable' => TRUE,
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+      'numeric' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+      'allow empty' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
   //Activity Subject
   $data['civicrm_activity']['subject'] = array(
     'title' => t('Subject'),
@@ -2084,6 +2105,48 @@ function _civicrm_core_data(&$data, $enabled) {
   civicrm_views_add_date_arguments($data['civicrm_activity'], array(
     'title' => 'Scheduled Activity Date',
     'name' => 'activity_date_time',
+  ));
+
+  //Created Activity Date
+  $data['civicrm_activity']['created_date'] = array(
+    'title' => t('Created Date'),
+    'help' => t('The Date and Time the activity was created.'),
+    'field' => array(
+      'handler' => 'civicrm_handler_field_datetime',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'civicrm_handler_filter_datetime',
+      'is date' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'civicrm_handler_sort_date',
+    ),
+  );
+  civicrm_views_add_date_arguments($data['civicrm_activity'], array(
+    'title' => 'Created Date',
+    'name' => 'created_date',
+  ));
+
+  //Modified Activity Date
+  $data['civicrm_activity']['modified_date'] = array(
+    'title' => t('Modified Date'),
+    'help' => t('The Date and Time the activity was modified.'),
+    'field' => array(
+      'handler' => 'civicrm_handler_field_datetime',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'handler' => 'civicrm_handler_filter_datetime',
+      'is date' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'civicrm_handler_sort_date',
+    ),
+  );
+  civicrm_views_add_date_arguments($data['civicrm_activity'], array(
+    'title' => 'Modified Date',
+    'name' => 'modified_date',
   ));
 
   //Activity Duration
@@ -2973,7 +3036,7 @@ function _civicrm_core_data(&$data, $enabled) {
     ),
   );
 
-   $data['civicrm_tag']['parent_name'] = array(
+  $data['civicrm_tag']['parent_name'] = array(
     'title' => t('Parent Name'),
     'help' => t('Name of Parent Tag'),
     'real field' => 'parent_id',

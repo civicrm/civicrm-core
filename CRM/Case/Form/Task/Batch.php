@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -98,6 +98,9 @@ class CRM_Case_Form_Task_Batch extends CRM_Core_Form_Task_Batch {
         );
       }
       //check for custom data
+      // @todo extract submit functions &
+      // extend CRM_Event_Form_Task_BatchTest::testSubmit with a data provider to test
+      // handling of custom data, specifically checkbox fields.
       $value['custom'] = CRM_Core_BAO_CustomField::postProcess($params['field'][$key],
         $key,
         'Case',

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -216,11 +216,11 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
     // CRM-13698 - add 'Available' and 'No-show' activity statuses
     $insertStatus = array();
     $nsinc = $avinc = $inc = 0;
-    if (!CRM_Core_OptionGroup::getValue('activity_status', 'Available', 'name')) {
+    if (!CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Available')) {
       $insertStatus[] = "(%1, 'Available', %2, 'Available',  NULL, 0, NULL, %3, 0, 0, 1, NULL, NULL)";
       $avinc = $inc = 1;
     }
-    if (!CRM_Core_OptionGroup::getValue('activity_status', 'No_show', 'name')) {
+    if (!CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'No_show')) {
       $insertStatus[] = "(%1, 'No-show', %4, 'No_show',  NULL, 0, NULL, %5, 0, 0, 1, NULL, NULL)";
       $nsinc = $inc + 1;
     }

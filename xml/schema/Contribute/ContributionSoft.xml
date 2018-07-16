@@ -129,6 +129,9 @@
     <type>varchar</type>
     <title>Soft Contribution PCP Note</title>
     <length>255</length>
+    <html>
+      <type>TextArea</type>
+    </html>
     <default>NULL</default>
     <add>2.2</add>
   </field>

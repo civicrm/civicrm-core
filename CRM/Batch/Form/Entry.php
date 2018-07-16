@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -716,6 +716,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           else {
             $value['soft_credit'][$key]['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'Gift');
           }
+        }
+        if (!empty($value['total_amount'])) {
+          $value['total_amount'] = (float) $value['total_amount'];
         }
 
         $params['actualBatchTotal'] += $value['total_amount'];

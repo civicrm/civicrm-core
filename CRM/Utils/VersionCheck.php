@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -179,11 +179,10 @@ class CRM_Utils_VersionCheck {
     $dao->find();
     $ppTypes = array();
 
-    // Get title and id for all processor types
-    $ppTypeNames = CRM_Core_PseudoConstant::paymentProcessorType();
-
+    // Get title for all processor types
+    // FIXME: This should probably be getName, but it has always returned translated label so we stick with that for now as it would affect stats
     while ($dao->fetch()) {
-      $ppTypes[] = $ppTypeNames[$dao->payment_processor_type_id];
+      $ppTypes[] = CRM_Core_PseudoConstant::getLabel('CRM_Financial_BAO_PaymentProcessor', 'payment_processor_type_id', $dao->payment_processor_type_id);
     }
     // add the .-separated list of the processor types
     $this->stats['PPTypes'] = implode(',', array_unique($ppTypes));
@@ -333,6 +332,15 @@ class CRM_Utils_VersionCheck {
   private function writeCacheFile($contents) {
     if (file_put_contents($this->cacheFile, $contents) === FALSE) {
       throw new Exception('File not writable');
+    }
+  }
+
+  /**
+   * Removes cached version info.
+   */
+  public function flushCache() {
+    if (file_exists($this->cacheFile)) {
+      unlink($this->cacheFile);
     }
   }
 

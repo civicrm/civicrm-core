@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -155,7 +155,6 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     $mutliValueOps = array(
       'CheckBox',
       'Multi-Select',
-      'AdvMulti-Select',
     );
 
     $srcHtmlType = $this->_values['html_type'];
@@ -220,7 +219,6 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     $mutliValueOps = array(
       'CheckBox' => 'CheckBox',
       'Multi-Select' => 'Multi-Select',
-      'AdvMulti-Select' => 'AdvMulti-Select',
     );
 
     switch ($dataType) {

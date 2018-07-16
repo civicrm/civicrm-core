@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -90,18 +90,18 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
-          'title' => ts('Disable Mutliple Choice Option'),
+          'title' => ts('Disable Multiple Choice Option'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
-          'title' => ts('Enable Mutliple Choice Option'),
+          'title' => ts('Enable Multiple Choice Option'),
         ),
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/custom/group/field/option',
           'qs' => 'action=delete&id=%%id%%&fid=%%fid%%',
-          'title' => ts('Disable Multiple Choice Option'),
+          'title' => ts('Delete Multiple Choice Option'),
         ),
       );
     }
@@ -229,8 +229,13 @@ WHERE  option_group_id = %1";
     );
 
     if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
-      CRM_Core_Error::fatal("You cannot add or edit muliple choice options in a reserved custom field-set.");
+      CRM_Core_Error::fatal("You cannot add or edit multiple choice options in a reserved custom field-set.");
     }
+
+    $optionGroupId = $this->getOptionGroupId($this->_fid);
+    $isOptionGroupLocked = $optionGroupId ? $this->isOptionGroupLocked($optionGroupId) : FALSE;
+    $this->assign('optionGroupId', $optionGroupId);
+    $this->assign('isOptionGroupLocked', $isOptionGroupLocked);
 
     //as url contain $gid so append breadcrumb dynamically.
     $breadcrumb = array(
@@ -279,6 +284,36 @@ WHERE  option_group_id = %1";
 
     // Call the parents run method
     return parent::run();
+  }
+
+  /**
+   * Gets the "is_locked" status for the provided option group
+   *
+   * @param int $optionGroupId
+   *
+   * @return bool
+   */
+  private function isOptionGroupLocked($optionGroupId) {
+    return (bool) CRM_Core_DAO::getFieldValue(
+      CRM_Core_DAO_OptionGroup::class,
+      $optionGroupId,
+      'is_locked'
+    );
+  }
+
+  /**
+   * Gets the associated "option_group_id" for a custom field
+   *
+   * @param int $customFieldId
+   *
+   * @return int
+   */
+  private function getOptionGroupId($customFieldId) {
+    return (int) CRM_Core_DAO::getFieldValue(
+      CRM_Core_DAO_CustomField::class,
+      $customFieldId,
+      'option_group_id'
+    );
   }
 
 }

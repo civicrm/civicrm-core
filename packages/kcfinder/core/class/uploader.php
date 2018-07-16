@@ -257,6 +257,7 @@ class uploader {
         if (isset($_GET['format'])) {
           $this->outputFormat = $_GET['format'];
         }
+
         // HOST APPLICATIONS INIT
         if (isset($_GET['CKEditorFuncNum'])) {
             $this->opener['name'] = "ckeditor";
@@ -765,18 +766,18 @@ class uploader {
             if (method_exists($this, $method))
                 $js = $this->$method($url, $message);
         }
+
         if ($this->outputFormat == 'json') {
           header('Content-Type: application/json');
           $json = $this->callBack_json($url, $message);
           echo json_encode($json);
         }
         else {
-          $js = $this->callBack_ckeditor($url, $message);
           if (!isset($js)) {
             $js = $this->callBack_default($url, $message);
-            header("Content-Type: text/html; charset={$this->charset}");
-            echo "<html><body>$js</body></html>";
           }
+          header("Content-Type: text/html; charset={$this->charset}");
+          echo "<html><body>$js</body></html>";
         }
     }
 
@@ -851,6 +852,7 @@ if (window.opener) window.close();
       }
     return $result;
   }
+
 }
 
 ?>

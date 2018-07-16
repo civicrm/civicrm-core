@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                          |
+ | CiviCRM version 5                                            |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -136,6 +136,13 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   protected $contact_id;
 
   /**
+   * Is backoffice form?
+   *
+   * @array bool
+   */
+  protected $isBackoffice = FALSE;
+
+  /**
    * Get source values for transfer based on participant id in URL. Line items will
    * be transferred to this participant - at this point no transaction changes processed
    *
@@ -147,6 +154,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $this->_userContext = $session->readUserContext();
     $this->_from_participant_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this, FALSE, NULL, 'REQUEST');
     $this->_userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE, NULL, 'REQUEST');
+    $this->isBackoffice = CRM_Utils_Request::retrieve('is_backoffice', 'String', $this, FALSE, NULL, 'REQUEST');
     $params = array('id' => $this->_from_participant_id);
     $participant = $values = array();
     $this->_participant = CRM_Event_BAO_Participant::getValues($params, $values, $participant);
@@ -204,9 +212,17 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * return @void
    */
   public function buildQuickForm() {
-    $this->add('text', 'email', ts('To Email'), ts($this->_contact_email), TRUE);
-    $this->add('text', 'last_name', ts('To Last Name'), ts($this->_to_contact_last_name), TRUE);
-    $this->add('text', 'first_name', ts('To First Name'), ts($this->_to_contact_first_name), TRUE);
+    // use entityRef select field for contact when this form is used by staff/admin user
+    if ($this->isBackoffice) {
+      $this->addEntityRef("contact_id", ts('Select Contact'), array('create' => TRUE), TRUE);
+    }
+    // for front-end user show and use the basic three fields used to create a contact
+    else {
+      $this->add('text', 'email', ts('To Email'), ts($this->_contact_email), TRUE);
+      $this->add('text', 'last_name', ts('To Last Name'), ts($this->_to_contact_last_name), TRUE);
+      $this->add('text', 'first_name', ts('To First Name'), ts($this->_to_contact_first_name), TRUE);
+    }
+
     $this->addButtons(array(
       array(
         'type' => 'submit',
@@ -234,10 +250,15 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();
-    //check that either an email or firstname+lastname is included in the form(CRM-9587)
-    $to_contact_id = self::checkProfileComplete($fields, $errors, $self);
+    if (!empty($fields['contact_id'])) {
+      $to_contact_id = $fields['contact_id'];
+    }
+    else {
+      //check that either an email or firstname+lastname is included in the form(CRM-9587)
+      $to_contact_id = self::checkProfileComplete($fields, $errors, $self);
+    }
     //To check if the user is already registered for the event(CRM-2426)
-    if ($to_contact_id) {
+    if (!empty($to_contact_id)) {
       self::checkRegistration($fields, $self, $to_contact_id, $errors);
     }
     //return parent::formrule($fields, $files, $self);
@@ -311,11 +332,16 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   public function postProcess() {
     //For transfer, process form to allow selection of transferree
     $params = $this->controller->exportValues($this->_name);
-    //cancel 'from' participant row
-    $query = "select contact_id from civicrm_email where email = '" . $params['email'] . "'";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $contact_id  = $dao->contact_id;
+    if (!empty($params['contact_id'])) {
+      $contact_id = $params['contact_id'];
+    }
+    else {
+      //cancel 'from' participant row
+      $query = "select contact_id from civicrm_email where email = '" . $params['email'] . "'";
+      $dao = CRM_Core_DAO::executeQuery($query);
+      while ($dao->fetch()) {
+        $contact_id  = $dao->contact_id;
+      }
     }
     $from_participant = $params = array();
     $query = "select role_id, source, fee_level, is_test, is_pay_later, fee_amount, discount_id, fee_currency,campaign_id, discount_amount from civicrm_participant where id = " . $this->_from_participant_id;
@@ -364,6 +390,9 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $statusMsg = ts('Event registration information for %1 has been updated.', array(1 => $displayName));
     $statusMsg .= ' ' . ts('A confirmation email has been sent to %1.', array(1 => $email));
     CRM_Core_Session::setStatus($statusMsg, ts('Registration Transferred'), 'success');
+    if ($this->isBackoffice) {
+      return;
+    }
     $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}");
     CRM_Utils_System::redirect($url);
   }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -112,14 +112,26 @@ class CRM_Utils_SQL {
    * @return bool
    */
   public static function isGroupByModeInDefault() {
-    if (!self::supportsFullGroupBy()) {
-      return FALSE;
-    }
     $sqlModes = explode(',', CRM_Core_DAO::singleValueQuery('SELECT @@global.sql_mode'));
     if (!in_array('ONLY_FULL_GROUP_BY', $sqlModes)) {
       return FALSE;
     }
     return TRUE;
+  }
+
+  /**
+   * Is the Database set up to handle acceents.
+   * @warning This function was introduced in attempt to determine the reason why the test getInternationalStrings was failing on ubu1604 but passing on ubu1204-5
+   * This function should not be used as the basis of further work as the reasoning is not perfact and is giving false failures.
+   * @return bool
+   */
+  public static function supportStorageOfAccents() {
+    $charSetDB = CRM_Core_DAO::executeQuery("SHOW VARIABLES LIKE 'character_set_database'")->fetchAll();
+    $charSet = $charSetDB[0]['Value'];
+    if ($charSet == 'utf8') {
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -63,7 +63,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
       $this, FALSE
     );
     $this->assign('profileGID', $profileGID);
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $type = 'Contact';
     if ($cid) {

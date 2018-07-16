@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -36,7 +36,7 @@ CRM.$(function($) {
     }
   });
   function setIntermediate() {
-    var dataUrl = "{/literal}{$statusUrl}{literal}";
+    var dataUrl = {/literal}{$statusUrl|@json_encode}{literal};
     $.getJSON(dataUrl, function(response) {
       var dataStr = response.toString();
       var result  = dataStr.split(",");

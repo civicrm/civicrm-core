@@ -3,7 +3,7 @@
 
 /**
  * This action handles output of the form.
- * 
+ *
  * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.01 of the PHP license

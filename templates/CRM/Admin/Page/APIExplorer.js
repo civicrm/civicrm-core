@@ -585,13 +585,13 @@
       $.each(val, function(k, v) {
         ret += (ret ? ', ' : '') + "'" + k + "' => " + phpFormat(v);
       });
-      return 'array(' + ret + ')';
+      return '[' + ret + ']';
     }
     if ($.isArray(val)) {
       $.each(val, function(k, v) {
         ret += (ret ? ', ' : '') + phpFormat(v);
       });
-      return 'array(' + ret + ')';
+      return '[' + ret + ']';
     }
     return JSON.stringify(val).replace(/\$/g, '\\$');
   }
@@ -716,7 +716,7 @@
         js = key === 'return' && action !== 'getvalue' ? JSON.stringify(evaluate(value, true)) : json,
         php = key === 'return' && action !== 'getvalue' ? phpFormat(evaluate(value, true)) : phpFormat(value);
       if (!(i++)) {
-        q.php += ", array(\n";
+        q.php += ", [\n";
         q.json += ", {\n";
       } else {
         q.json += ",\n";
@@ -733,10 +733,10 @@
       q.wpcli += key + '=' + json + ' ';
     });
     if (i) {
-      q.php += ")";
+      q.php += "]";
       q.json += "\n}";
     }
-    q.php += ");";
+    q.php += "];";
     q.json += ").done(function(result) {\n  // do something\n});";
     q.smarty += "}\n{foreach from=$result.values item=" + entity.toLowerCase() + "}\n  {$" + entity.toLowerCase() + ".some_field}\n{/foreach}";
     if (!_.includes(action, 'get')) {
@@ -760,7 +760,7 @@
       alert(ts('Select an entity.'));
       return;
     }
-    if (!_.includes(action, 'get') && action != 'check') {
+    if (!_.includes(action, 'get') && !_.includes(action, 'check')) {
       var msg = action === 'delete' ? ts('This will delete data from CiviCRM. Are you sure?') : ts('This will write to the database. Continue?');
       CRM.confirm({title: ts('Confirm %1', {1: action}), message: msg}).on('crmConfirm:yes', execute);
     } else {

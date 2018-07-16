@@ -1,5 +1,5 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.7                                                |
+-- | CiviCRM version 5                                                  |
 -- +--------------------------------------------------------------------+
 -- | Copyright CiviCRM LLC (c) 2004-2018                                |
 -- +--------------------------------------------------------------------+
@@ -79,6 +79,7 @@ DROP TABLE IF EXISTS `civicrm_uf_join`;
 DROP TABLE IF EXISTS `civicrm_uf_field`;
 DROP TABLE IF EXISTS `civicrm_uf_group`;
 DROP TABLE IF EXISTS `civicrm_entity_tag`;
+DROP TABLE IF EXISTS `civicrm_entity_file`;
 DROP TABLE IF EXISTS `civicrm_discount`;
 DROP TABLE IF EXISTS `civicrm_dashboard`;
 DROP TABLE IF EXISTS `civicrm_county`;
@@ -126,7 +127,7 @@ DROP TABLE IF EXISTS `civicrm_log`;
 DROP TABLE IF EXISTS `civicrm_job_log`;
 DROP TABLE IF EXISTS `civicrm_job`;
 DROP TABLE IF EXISTS `civicrm_im`;
-DROP TABLE IF EXISTS `civicrm_entity_file`;
+DROP TABLE IF EXISTS `civicrm_file`;
 DROP TABLE IF EXISTS `civicrm_email`;
 DROP TABLE IF EXISTS `civicrm_domain`;
 DROP TABLE IF EXISTS `civicrm_custom_field`;
@@ -182,7 +183,6 @@ DROP TABLE IF EXISTS `civicrm_msg_template`;
 DROP TABLE IF EXISTS `civicrm_mapping`;
 DROP TABLE IF EXISTS `civicrm_managed`;
 DROP TABLE IF EXISTS `civicrm_location_type`;
-DROP TABLE IF EXISTS `civicrm_file`;
 DROP TABLE IF EXISTS `civicrm_extension`;
 DROP TABLE IF EXISTS `civicrm_address_format`;
 

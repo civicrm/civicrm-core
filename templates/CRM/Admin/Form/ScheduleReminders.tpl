@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -60,11 +60,11 @@
     <tr id="repeatFields" class="crm-scheduleReminder-form-block-repeatFields"><td></td><td>
         <table class="form-layout-compressed">
           <tr class="crm-scheduleReminder-form-block-repetition_frequency_interval">
-            <td class="label">{$form.repetition_frequency_interval.label}&nbsp;&nbsp;&nbsp;{$form.repetition_frequency_interval.html}</td>
+            <td class="label">{$form.repetition_frequency_interval.label} <span class="crm-marker">*</span>&nbsp;&nbsp;{$form.repetition_frequency_interval.html}</td>
           <td>{$form.repetition_frequency_unit.html}</td>
           </tr>
           <tr class="crm-scheduleReminder-form-block-repetition_frequency_interval">
-             <td class="label">{$form.end_frequency_interval.label}&nbsp;&nbsp;&nbsp;{$form.end_frequency_interval.html}
+             <td class="label">{$form.end_frequency_interval.label} <span class="crm-marker">*</span>&nbsp;&nbsp;{$form.end_frequency_interval.html}
            <td>{$form.end_frequency_unit.html}&nbsp;&nbsp;&nbsp;{$form.end_action.html}&nbsp;&nbsp;&nbsp;{$form.end_date.html}</td>
           </tr>
         </table>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
@@ -44,7 +44,7 @@ class CRM_Case_Form_Task_SearchTaskHookSample extends CRM_Case_Form_Task {
     parent::preProcess();
     $rows = array();
     // display name and email of all contact ids
-    $caseIDs = implode(',', $this->_caseIds);
+    $caseIDs = implode(',', $this->_entityIds);
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'case_status', 'id', 'name');
     $query = "
 SELECT ct.display_name as display_name,
