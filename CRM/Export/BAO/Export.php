@@ -353,7 +353,7 @@ class CRM_Export_BAO_Export {
     $queryOperator = 'AND'
   ) {
 
-    $processor = new CRM_Export_BAO_ExportProcessor($exportMode);
+    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $queryOperator);
     $returnProperties = array();
     $paymentFields = $selectedPaymentFields = FALSE;
 
@@ -556,7 +556,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       CRM_Contact_BAO_ProximityQuery::fixInputParams($params);
     }
 
-    list($query, $select, $from, $where, $having) = $processor->runQuery($params, $order, $queryOperator, $returnProperties);
+    list($query, $select, $from, $where, $having) = $processor->runQuery($params, $order, $returnProperties);
 
     if ($mergeSameHousehold == 1) {
       if (empty($returnProperties['id'])) {
