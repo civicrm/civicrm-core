@@ -49,13 +49,97 @@ class CRM_Export_BAO_ExportProcessor {
   protected $exportMode;
 
   /**
+   * Array of fields in the main query.
+   *
+   * @var array
+   */
+  protected $queryFields = [];
+
+  /**
+   * Either AND or OR.
+   *
+   * @var string
+   */
+  protected $queryOperator;
+
+  /**
+   * Key representing the head of household in the relationship array.
+   *
+   * e.g. ['8_b_a' => 'Household Member Is', '8_a_b = 'Household Member Of'.....]
+   *
+   * @var
+   */
+  protected $relationshipTypes = [];
+
+  /**
    * CRM_Export_BAO_ExportProcessor constructor.
    *
    * @param int $exportMode
+   * @param string $queryOperator
    */
-  public function __construct($exportMode) {
+  public function __construct($exportMode, $queryOperator) {
     $this->setExportMode($exportMode);
     $this->setQueryMode();
+    $this->setQueryOperator($queryOperator);
+    $this->setRelationshipTypes();
+  }
+
+  /**
+   * @return array
+   */
+  public function getRelationshipTypes() {
+    return $this->relationshipTypes;
+  }
+
+  /**
+   */
+  public function setRelationshipTypes() {
+    $this->relationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      TRUE,
+      'name',
+      FALSE
+    );
+  }
+
+
+  /**
+   * @param $fieldName
+   * @return bool
+   */
+  public function isRelationshipTypeKey($fieldName) {
+    return array_key_exists($fieldName, $this->relationshipTypes);
+  }
+
+  /**
+   * @return string
+   */
+  public function getQueryOperator() {
+    return $this->queryOperator;
+  }
+
+  /**
+   * @param string $queryOperator
+   */
+  public function setQueryOperator($queryOperator) {
+    $this->queryOperator = $queryOperator;
+  }
+
+  /**
+   * @return array
+   */
+  public function getQueryFields() {
+    return $this->queryFields;
+  }
+
+  /**
+   * @param array $queryFields
+   */
+  public function setQueryFields($queryFields) {
+    $this->queryFields = $queryFields;
   }
 
   /**
@@ -116,6 +200,69 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function setExportMode($exportMode) {
     $this->exportMode = $exportMode;
+  }
+
+  /**
+   * @param $params
+   * @param $order
+   * @param $returnProperties
+   * @return array
+   */
+  public function runQuery($params, $order, $returnProperties) {
+    $query = new CRM_Contact_BAO_Query($params, $returnProperties, NULL,
+      FALSE, FALSE, $this->getQueryMode(),
+      FALSE, TRUE, TRUE, NULL, $this->getQueryOperator()
+    );
+
+    //sort by state
+    //CRM-15301
+    $query->_sort = $order;
+    list($select, $from, $where, $having) = $query->query();
+    $this->setQueryFields($query->_fields);
+    return array($query, $select, $from, $where, $having);
+  }
+
+  /**
+   * Get the fields sql definition based on the field type.
+   *
+   * @param string $fieldName
+   * @param array $fieldSpec
+   *
+   * @return string
+   *   SQL definition statement for field - e.g display_name varchar(255)
+   */
+  public function getSqlDefinitionForType($fieldName, $fieldSpec) {
+    switch ($fieldSpec['type']) {
+      case CRM_Utils_Type::T_INT:
+      case CRM_Utils_Type::T_BOOLEAN:
+        return "$fieldName varchar(16)";
+
+      case CRM_Utils_Type::T_STRING:
+        if (isset($fieldSpec['maxlength'])) {
+          return "$fieldName varchar({$fieldSpec['maxlength']})";
+        }
+        else {
+          return "$fieldName varchar(255)";
+        }
+
+      case CRM_Utils_Type::T_TEXT:
+      case CRM_Utils_Type::T_LONGTEXT:
+      case CRM_Utils_Type::T_BLOB:
+      case CRM_Utils_Type::T_MEDIUMBLOB:
+        return "$fieldName longtext";
+
+      case CRM_Utils_Type::T_FLOAT:
+      case CRM_Utils_Type::T_ENUM:
+      case CRM_Utils_Type::T_DATE:
+      case CRM_Utils_Type::T_TIME:
+      case CRM_Utils_Type::T_TIMESTAMP:
+      case CRM_Utils_Type::T_MONEY:
+      case CRM_Utils_Type::T_EMAIL:
+      case CRM_Utils_Type::T_URL:
+      case CRM_Utils_Type::T_CCNUM:
+      default:
+        return "$fieldName varchar(32)";
+    }
   }
 
 }
