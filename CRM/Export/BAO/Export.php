@@ -995,49 +995,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       return;
     }
 
-    $lookUp = array('prefix_id', 'suffix_id');
-    // set the sql columns
-    if (isset($queryFields[$field]['type'])) {
-      switch ($queryFields[$field]['type']) {
-        case CRM_Utils_Type::T_INT:
-        case CRM_Utils_Type::T_BOOLEAN:
-          if (in_array($field, $lookUp)) {
-            $sqlColumns[$fieldName] = "$fieldName varchar(255)";
-          }
-          else {
-            $sqlColumns[$fieldName] = "$fieldName varchar(16)";
-          }
-          break;
-
-        case CRM_Utils_Type::T_STRING:
-          if (isset($queryFields[$field]['maxlength'])) {
-            $sqlColumns[$fieldName] = "$fieldName varchar({$queryFields[$field]['maxlength']})";
-          }
-          else {
-            $sqlColumns[$fieldName] = "$fieldName varchar(255)";
-          }
-          break;
-
-        case CRM_Utils_Type::T_TEXT:
-        case CRM_Utils_Type::T_LONGTEXT:
-        case CRM_Utils_Type::T_BLOB:
-        case CRM_Utils_Type::T_MEDIUMBLOB:
-          $sqlColumns[$fieldName] = "$fieldName longtext";
-          break;
-
-        case CRM_Utils_Type::T_FLOAT:
-        case CRM_Utils_Type::T_ENUM:
-        case CRM_Utils_Type::T_DATE:
-        case CRM_Utils_Type::T_TIME:
-        case CRM_Utils_Type::T_TIMESTAMP:
-        case CRM_Utils_Type::T_MONEY:
-        case CRM_Utils_Type::T_EMAIL:
-        case CRM_Utils_Type::T_URL:
-        case CRM_Utils_Type::T_CCNUM:
-        default:
-          $sqlColumns[$fieldName] = "$fieldName varchar(32)";
-          break;
-      }
+    //CRM-15877
+    if (in_array($field, ['prefix_id', 'suffix_id'])) {
+      $sqlColumns[$fieldName] = "$fieldName varchar(255)";
+    }
+    elseif (isset($queryFields[$field]['type'])) {
+      $sqlColumns[$fieldName] = $processor->getSqlDefinitionForType($fieldName, $queryFields[$field]);
     }
     else {
       if (substr($fieldName, -3, 3) == '_id') {

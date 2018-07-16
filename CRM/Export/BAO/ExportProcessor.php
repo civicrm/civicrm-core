@@ -182,4 +182,47 @@ class CRM_Export_BAO_ExportProcessor {
     return array($query, $select, $from, $where, $having);
   }
 
+  /**
+   * Get the fields sql definition based on the field type.
+   *
+   * @param string $fieldName
+   * @param array $fieldSpec
+   *
+   * @return string
+   *   SQL definition statement for field - e.g display_name varchar(255)
+   */
+  public function getSqlDefinitionForType($fieldName, $fieldSpec) {
+    switch ($fieldSpec['type']) {
+      case CRM_Utils_Type::T_INT:
+      case CRM_Utils_Type::T_BOOLEAN:
+        return "$fieldName varchar(16)";
+
+      case CRM_Utils_Type::T_STRING:
+        if (isset($fieldSpec['maxlength'])) {
+          return "$fieldName varchar({$fieldSpec['maxlength']})";
+        }
+        else {
+          return "$fieldName varchar(255)";
+        }
+
+      case CRM_Utils_Type::T_TEXT:
+      case CRM_Utils_Type::T_LONGTEXT:
+      case CRM_Utils_Type::T_BLOB:
+      case CRM_Utils_Type::T_MEDIUMBLOB:
+        return "$fieldName longtext";
+
+      case CRM_Utils_Type::T_FLOAT:
+      case CRM_Utils_Type::T_ENUM:
+      case CRM_Utils_Type::T_DATE:
+      case CRM_Utils_Type::T_TIME:
+      case CRM_Utils_Type::T_TIMESTAMP:
+      case CRM_Utils_Type::T_MONEY:
+      case CRM_Utils_Type::T_EMAIL:
+      case CRM_Utils_Type::T_URL:
+      case CRM_Utils_Type::T_CCNUM:
+      default:
+        return "$fieldName varchar(32)";
+    }
+  }
+
 }
