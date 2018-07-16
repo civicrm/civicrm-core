@@ -1073,6 +1073,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     if (substr($field, -4) == '_a_b' || substr($field, -4) == '_b_a') {
       return;
     }
+    $queryFields = $query->_fields;
 
     $fieldName = CRM_Utils_String::munge(strtolower($field), '_', 64);
     if ($fieldName == 'id') {
@@ -1095,8 +1096,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $lookUp = array('prefix_id', 'suffix_id');
     // set the sql columns
-    if (isset($query->_fields[$field]['type'])) {
-      switch ($query->_fields[$field]['type']) {
+    if (isset($queryFields[$field]['type'])) {
+      switch ($queryFields[$field]['type']) {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
           if (in_array($field, $lookUp)) {
@@ -1108,8 +1109,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           break;
 
         case CRM_Utils_Type::T_STRING:
-          if (isset($query->_fields[$field]['maxlength'])) {
-            $sqlColumns[$fieldName] = "$fieldName varchar({$query->_fields[$field]['maxlength']})";
+          if (isset($queryFields[$field]['maxlength'])) {
+            $sqlColumns[$fieldName] = "$fieldName varchar({$queryFields[$field]['maxlength']})";
           }
           else {
             $sqlColumns[$fieldName] = "$fieldName varchar(255)";
@@ -1156,12 +1157,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         }
         else {
           // set the sql columns for custom data
-          if (isset($query->_fields[$field]['data_type'])) {
+          if (isset($queryFields[$field]['data_type'])) {
 
-            switch ($query->_fields[$field]['data_type']) {
+            switch ($queryFields[$field]['data_type']) {
               case 'String':
                 // May be option labels, which could be up to 512 characters
-                $length = max(512, CRM_Utils_Array::value('text_length', $query->_fields[$field]));
+                $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$field]));
                 $sqlColumns[$fieldName] = "$fieldName varchar($length)";
                 break;
 
@@ -1810,6 +1811,7 @@ WHERE  {$whereClause}";
    */
   public static function setHeaderRows($field, $headerRows, $sqlColumns, $query, $value, $phoneTypes, $imProviders, $relationQuery, $selectedPaymentFields) {
 
+    $queryFields = $query->_fields;
     // Split campaign into 2 fields for id and title
     if (substr($field, -14) == 'campaign_title') {
       $headerRows[] = ts('Campaign Title');
@@ -1817,8 +1819,8 @@ WHERE  {$whereClause}";
     elseif (substr($field, -11) == 'campaign_id') {
       $headerRows[] = ts('Campaign ID');
     }
-    elseif (isset($query->_fields[$field]['title'])) {
-      $headerRows[] = $query->_fields[$field]['title'];
+    elseif (isset($queryFields[$field]['title'])) {
+      $headerRows[] = $queryFields[$field]['title'];
     }
     elseif ($field == 'phone_type_id') {
       $headerRows[] = ts('Phone Type');
@@ -1826,8 +1828,8 @@ WHERE  {$whereClause}";
     elseif ($field == 'provider_id') {
       $headerRows[] = ts('IM Service Provider');
     }
-    elseif (substr($field, 0, 5) == 'case_' && $query->_fields['case'][$field]['title']) {
-      $headerRows[] = $query->_fields['case'][$field]['title'];
+    elseif (substr($field, 0, 5) == 'case_' && $queryFields['case'][$field]['title']) {
+      $headerRows[] = $queryFields['case'][$field]['title'];
     }
     elseif (array_key_exists($field, self::$relationshipTypes)) {
       foreach ($value as $relationField => $relationValue) {
@@ -1935,6 +1937,7 @@ WHERE  {$whereClause}";
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
 
+    $queryFields = $query->_fields;
     foreach ($returnProperties as $key => $value) {
       if ($key != 'location' || !is_array($value)) {
         $outputColumns[$key] = $value;
@@ -1946,7 +1949,7 @@ WHERE  {$whereClause}";
             $type = explode('-', $locationFieldName);
 
             $actualDBFieldName = $type[0];
-            $outputFieldName = $locationType . '-' . $query->_fields[$actualDBFieldName]['title'];
+            $outputFieldName = $locationType . '-' . $queryFields[$actualDBFieldName]['title'];
             $daoFieldName = CRM_Utils_String::munge($locationType) . '-' . $actualDBFieldName;
 
             if (!empty($type[1])) {
