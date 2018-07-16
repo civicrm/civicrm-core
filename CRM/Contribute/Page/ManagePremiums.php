@@ -52,7 +52,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    *   Classname of BAO.
    */
   public function getBAOName() {
-    return 'CRM_Contribute_BAO_ManagePremiums';
+    return 'CRM_Contribute_BAO_Product';
   }
 
   /**
