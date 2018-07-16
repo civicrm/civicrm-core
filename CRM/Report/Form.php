@@ -1141,6 +1141,27 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * Create a temporary table.
+   *
+   * This function creates a table AND adds the details to the developer tab & $this->>temporary tables.
+   *
+   * @todo improve presentation on the developer tab since CREATE TEMPORARY is removed.
+   *
+   * @param string $identifier
+   * @param $sql
+   * @param bool $isTrueTemporary
+   *   Is this a mysql temporary table or temporary in a less technical sense.
+   *
+   * @return string
+   */
+  public function createTemporaryTable($identifier, $sql, $isTrueTemporary = TRUE) {
+    $this->addToDeveloperTab($sql);
+    $name = CRM_Utils_SQL_TempTable::build()->setUtf8(TRUE)->setDurable($isTrueTemporary)->createWithQuery($sql)->getName();
+    $this->temporaryTables[$identifier] = ['temporary' => $isTrueTemporary, 'name' => $name];
+    return $name;
+  }
+
+  /**
    * Add columns to report.
    */
   public function addColumns() {

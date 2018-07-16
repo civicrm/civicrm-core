@@ -35,6 +35,8 @@
 class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
+  protected $contactIDs = [];
+
   /**
    * Our group reports use an alter so transaction cleanup won't work.
    *
@@ -246,7 +248,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public static function getReportTemplates() {
     $reportsToSkip = array(
-      'activity' => 'does not respect function signature on from clause',
       'event/income' => 'I do no understand why but error is Call to undefined method CRM_Report_Form_Event_Income::from() in CRM/Report/Form.php on line 2120',
       'contribute/history' => 'Declaration of CRM_Report_Form_Contribute_History::buildRows() should be compatible with CRM_Report_Form::buildRows($sql, &$rows)',
       'activitySummary' => 'We use temp tables for the main query generation and name are dynamic. These names are not available in stats() when called directly.',
@@ -774,6 +775,129 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => array('metadata' => array('sql')),
     ));
     $this->assertNumberOfContactsInResult(2, $rows, $template);
+  }
+
+  /**
+   * Test activity summary report - requiring all current fields to be output.
+   */
+  public function testActivitySummary() {
+    $this->createContactsWithActivities();
+    $fields = [
+      'contact_source' => '1',
+      'contact_assignee' => '1',
+      'contact_target' => '1',
+      'contact_source_email' => '1',
+      'contact_assignee_email' => '1',
+      'contact_target_email' => '1',
+      'contact_source_phone' => '1',
+      'contact_assignee_phone' => '1',
+      'contact_target_phone' => '1',
+      'activity_type_id' => '1',
+      'activity_subject' => '1',
+      'activity_date_time' => '1',
+      'status_id' => '1',
+      'duration' => '1',
+      'location' => '1',
+      'details' => '1',
+      'priority_id' => '1',
+      'result' => '1',
+      'engagement_level' => '1',
+      'address_name' => '1',
+      'street_address' => '1',
+      'supplemental_address_1' => '1',
+      'supplemental_address_2' => '1',
+      'supplemental_address_3' => '1',
+      'street_number' => '1',
+      'street_name' => '1',
+      'street_unit' => '1',
+      'city' => '1',
+      'postal_code' => '1',
+      'postal_code_suffix' => '1',
+      'country_id' => '1',
+      'state_province_id' => '1',
+      'county_id' => '1',
+    ];
+    $params = [
+      'fields' => $fields,
+      'current_user_op' => 'eq',
+      'current_user_value' => '0',
+      'include_case_activities_op' => 'eq',
+      'include_case_activities_value' => 0,
+      'order_bys' => [1 => ['column' => 'activity_date_time', 'order' => 'ASC'], 2 => ['column' => 'activity_type_id', 'order' => 'ASC']],
+    ];
+
+    $params['report_id'] = 'Activity';
+
+    $rows = $this->callAPISuccess('report_template', 'getrows', $params)['values'];
+    $expected = [
+      'civicrm_contact_contact_source' => 'Łąchowski-Roberts, Anthony',
+      'civicrm_contact_contact_assignee' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=4\'>Łąchowski-Roberts, Anthony</a>',
+      'civicrm_contact_contact_target' => '<a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3\'>Brzęczysław, Anthony</a>; <a title=\'View Contact Summary for this Contact\' href=\'/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=4\'>Łąchowski-Roberts, Anthony</a>',
+      'civicrm_contact_contact_source_id' => $this->contactIDs[2],
+      'civicrm_contact_contact_assignee_id' => $this->contactIDs[1],
+      'civicrm_contact_contact_target_id' => $this->contactIDs[0] . ';' . $this->contactIDs[1],
+      'civicrm_email_contact_source_email' => 'anthony_anderson@civicrm.org',
+      'civicrm_email_contact_assignee_email' => 'anthony_anderson@civicrm.org',
+      'civicrm_email_contact_target_email' => 'anthony_anderson@civicrm.org;anthony_anderson@civicrm.org',
+      'civicrm_phone_contact_source_phone' => NULL,
+      'civicrm_phone_contact_assignee_phone' => NULL,
+      'civicrm_phone_contact_target_phone' => NULL,
+      'civicrm_activity_id' => '1',
+      'civicrm_activity_source_record_id' => NULL,
+      'civicrm_activity_activity_type_id' => 'Meeting',
+      'civicrm_activity_activity_subject' => 'Very secret meeting',
+      'civicrm_activity_activity_date_time' => '2018-07-16 03:42:32',
+      'civicrm_activity_status_id' => 'Scheduled',
+      'civicrm_activity_duration' => '120',
+      'civicrm_activity_location' => 'Pennsylvania',
+      'civicrm_activity_details' => 'a test activity',
+      'civicrm_activity_priority_id' => 'Normal',
+      'civicrm_address_address_name' => NULL,
+      'civicrm_address_street_address' => NULL,
+      'civicrm_address_supplemental_address_1' => NULL,
+      'civicrm_address_supplemental_address_2' => NULL,
+      'civicrm_address_supplemental_address_3' => NULL,
+      'civicrm_address_street_number' => NULL,
+      'civicrm_address_street_name' => NULL,
+      'civicrm_address_street_unit' => NULL,
+      'civicrm_address_city' => NULL,
+      'civicrm_address_postal_code' => NULL,
+      'civicrm_address_postal_code_suffix' => NULL,
+      'civicrm_address_country_id' => NULL,
+      'civicrm_address_state_province_id' => NULL,
+      'civicrm_address_county_id' => NULL,
+      'civicrm_contact_contact_source_link' => '/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $this->contactIDs[2],
+      'civicrm_contact_contact_source_hover' => 'View Contact Summary for this Contact',
+      'civicrm_activity_activity_type_id_hover' => 'View Activity Record',
+      'class' => 'status-overdue',
+    ];
+    $row = $rows[0];
+    // This link is not relative - skip for now
+    unset($row['civicrm_activity_activity_type_id_link']);
+
+    $this->assertEquals($expected, $row);
+  }
+
+  /**
+   * Set up some activity data..... use some chars that challenge our utf handling.
+   */
+  public function createContactsWithActivities() {
+    $this->contactIDs[] = $this->individualCreate(['last_name' => 'Brzęczysław']);
+    $this->contactIDs[] = $this->individualCreate(['last_name' => 'Łąchowski-Roberts']);
+    $this->contactIDs[] = $this->individualCreate(['last_name' => 'Łąchowski-Roberts']);
+
+    $this->callAPISuccess('Activity', 'create', [
+      'subject' => 'Very secret meeting',
+      'activity_date_time' => '2018-07-16 03:42:32',
+      'duration' => 120,
+      'location' => 'Pennsylvania',
+      'details' => 'a test activity',
+      'status_id' => 1,
+      'activity_type_id' => 'Meeting',
+      'source_contact_id' => $this->contactIDs[2],
+      'target_contact_id' => array($this->contactIDs[0], $this->contactIDs[1]),
+      'assignee_contact_id' => $this->contactIDs[1],
+    ]);
   }
 
 }
