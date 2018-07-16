@@ -446,7 +446,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           strstr($clause, 'civicrm_email_target.') ||
           strstr($clause, 'civicrm_email_source.') ||
           strstr($clause, 'civicrm_phone_target.') ||
-          strstr($clause, 'civicrm_phone_source.')
+          strstr($clause, 'civicrm_phone_source.') ||
+          strstr($clause, 'civicrm_address_')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
@@ -461,7 +462,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           strstr($clause, 'civicrm_email_target.') ||
           strstr($clause, 'civicrm_email_assignee.') ||
           strstr($clause, 'civicrm_phone_target.') ||
-          strstr($clause, 'civicrm_phone_assignee.')
+          strstr($clause, 'civicrm_phone_assignee.') ||
+          strstr($clause, 'civicrm_address_')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
@@ -480,9 +482,10 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           strstr($clause, 'civicrm_email_contact_source_email') ||
           strstr($clause, 'civicrm_email_contact_assignee_email') ||
           strstr($clause, 'civicrm_email_contact_target_email') ||
-          strstr($clause, 'civicrm_phone_contact_target_phone')
+          strstr($clause, 'civicrm_phone_contact_target_phone') ||
+          strstr($clause, 'civicrm_address_')
         ) {
-          $this->_selectClauses[$key] = "GROUP_CONCAT($clause SEPARATOR ';') as $clause";
+          $this->_selectClauses[$key] = "GROUP_CONCAT(DISTINCT $clause SEPARATOR ';') as $clause";
         }
       }
     }
@@ -492,7 +495,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         unset($this->_selectAliases[$key]);
       }
 
-      if ($recordType != 'final') {
+      if ($recordType == 'target') {
         foreach ($this->_columns['civicrm_address']['order_bys'] as $fieldName => $field) {
           $orderByFld = $this->_columns['civicrm_address']['order_bys'][$fieldName];
           $fldInfo = $this->_columns['civicrm_address']['fields'][$fieldName];
@@ -1050,7 +1053,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
         }
       }
 
-      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'activity', 'List all activities for this ') ? TRUE : $entryFound;
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'activity', 'List all activities for this', ';') ? TRUE : $entryFound;
 
       if (!$entryFound) {
         break;
