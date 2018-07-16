@@ -61,6 +61,7 @@
   {/if}
     <td class="crm-grant-grant_status">{$row.grant_status}</td>
     <td class="crm-grant-grant_type">{$row.grant_type}</td>
+    <td class="crm-grant-financial_type">{$row.grant_financial_type}</td>
     <td class="right crm-grant-grant_amount_total">{$row.grant_amount_total|crmMoney}</td>
     <td class="right crm-grant-grant_amount_granted">{$row.grant_amount_granted|crmMoney}</td>
     <td class="right crm-grant-grant_application_received_date">{$row.grant_application_received_date|truncate:10:''|crmDate}</td>

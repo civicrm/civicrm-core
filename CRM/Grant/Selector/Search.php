@@ -74,6 +74,7 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     'grant_application_received_date',
     'grant_report_received',
     'grant_money_transfer_date',
+    'grant_financial_type',
   );
 
   /**
@@ -357,6 +358,11 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
         array(
           'name' => ts('Type'),
           'sort' => 'grant_type_id',
+          'direction' => CRM_Utils_Sort::DONTCARE,
+        ),
+        array(
+          'name' => ts('Financial Type'),
+          'sort' => 'grant_financial_type',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(
