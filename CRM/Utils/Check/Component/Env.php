@@ -910,7 +910,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $arrowUrl = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'packages/jquery/css/images/arrow.png';
     $headers = get_headers($arrowUrl);
     $fileExists = stripos($headers[0], "200 OK") ? 1 : 0;
-    if (!$fileExists) {
+    if ($fileExists === FALSE) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('The Resource URL is not set correctly. Please set the <a href="%1">CiviCRM Resource URL</a>.',
