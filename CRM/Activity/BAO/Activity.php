@@ -1826,7 +1826,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $activityID,
     $sourceContactID = NULL
   ) {
-    $doNotSms = TRUE;
+	$doNotSms = NULL;
     $toPhoneNumber = NULL;
 
     if ($smsProviderParams['To']) {
