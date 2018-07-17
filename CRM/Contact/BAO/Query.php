@@ -5705,26 +5705,13 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
 
             return $queryString;
           }
-
-          // This is the here-be-dragons zone. We have no other hopes left for an array so lets assume it 'should' be array('IN' => array(2,5))
-          // but we got only array(2,5) from the form.
-          // We could get away with keeping this in 4.6 if we make it such that it throws an enotice in 4.7 so
-          // people have to de-slopify it.
-          if (!empty($value[0])) {
-            if ($op != 'BETWEEN') {
-              $dragonPlace = $iAmAnIntentionalENoticeThatWarnsOfAProblemYouShouldReport;
-            }
+          if (!empty($value[0]) && $op === 'BETWEEN') {
+            CRM_Core_Error::deprecatedFunctionWarning('Fix search input params');
             if (($queryString = CRM_Core_DAO::createSqlFilter($field, array($op => $value), $dataType)) != FALSE) {
               return $queryString;
             }
           }
-          else {
-            $op = 'IN';
-            $dragonPlace = $iAmAnIntentionalENoticeThatWarnsOfAProblemYouShouldReportUsingOldFormat;
-            if (($queryString = CRM_Core_DAO::createSqlFilter($field, array($op => array_keys($value)), $dataType)) != FALSE) {
-              return $queryString;
-            }
-          }
+          throw new CRM_Core_Exception(ts('Failed to interpret input for search'));
         }
 
         $value = CRM_Utils_Type::escape($value, $dataType);
