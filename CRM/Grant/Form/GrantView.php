@@ -53,10 +53,18 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
     $values = array();
     $params['id'] = $this->_id;
     CRM_Grant_BAO_Grant::retrieve($params, $values);
-    $grantType = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id');
-    $grantStatus = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id');
-    $this->assign('grantType', $grantType[$values['grant_type_id']]);
-    $this->assign('grantStatus', $grantStatus[$values['status_id']]);
+    foreach ([
+      'status_id',
+      'grant_type_id',
+      'financial_type_id',
+    ] as $field) {
+      $label = CRM_Core_PseudoConstant::getLabel(
+        'CRM_Grant_DAO_Grant',
+        $field,
+        $values[$field]
+      );
+      $this->assign(str_replace('_id', '', $field), $label);
+    }
     $grantTokens = array(
       'amount_total',
       'amount_requested',
