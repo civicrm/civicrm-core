@@ -422,10 +422,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     chdir($root);
 
     // Create a mock $request object
-    $autoloader = require_once $root . '/vendor/autoload.php';
-    if ($autoloader === TRUE) {
-      $autoloader = ComposerAutoloaderInitDrupal8::getLoader();
-    }
+    $autoloader = require_once $root . '/autoload.php';
     // @Todo: do we need to handle case where $_SERVER has no HTTP_HOST key, ie. when run via cli?
     $request = new \Symfony\Component\HttpFoundation\Request(array(), array(), array(), array(), array(), $_SERVER);
 
