@@ -4,7 +4,7 @@
  * Class CRM_UF_Page_ProfileEditorTest
  * @group headless
  */
-class CRM_Upgrade_Incremental_Base_Test extends CiviUnitTestCase {
+class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
 
   /**
    * Test message upgrade process.
