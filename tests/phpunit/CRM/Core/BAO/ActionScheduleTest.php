@@ -1955,6 +1955,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       $this->assertTrue(is_numeric($contact->id));
       $emailParams = array(
         'contact_id' => $contact->id,
+        'is_primary' => 1,
         'email' => "test-member-{$interval_unit}@example.com",
         'location_type_id' => 1,
       );
