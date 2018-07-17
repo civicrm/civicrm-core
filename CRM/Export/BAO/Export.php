@@ -1158,7 +1158,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         else {
           // set the sql columns for custom data
           if (isset($queryFields[$field]['data_type'])) {
-
+            // @todo strip out this code.
+            CRM_Core_Error::deprecatedFunctionWarning('ensure type is always defined (this is believed to already be the case');
             switch ($queryFields[$field]['data_type']) {
               case 'String':
                 // May be option labels, which could be up to 512 characters

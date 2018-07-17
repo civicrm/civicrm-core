@@ -650,6 +650,7 @@ GROUP BY  participant.event_id
           'name' => 'participant_note',
           'headerPattern' => '/(participant.)?note$/i',
           'data_type' => CRM_Utils_Type::T_TEXT,
+          'type' => CRM_Utils_Type::T_TEXT,
         ),
       );
 
@@ -660,6 +661,7 @@ GROUP BY  participant.event_id
           'title' => ts('Participant Status'),
           'name' => 'participant_status',
           'data_type' => CRM_Utils_Type::T_STRING,
+          'type' => CRM_Utils_Type::T_STRING,
         ),
       );
       $tmpFields['participant_status_id']['title'] = ts('Participant Status Id');
@@ -671,6 +673,7 @@ GROUP BY  participant.event_id
           'title' => ts('Participant Role'),
           'name' => 'participant_role',
           'data_type' => CRM_Utils_Type::T_STRING,
+          'type' => CRM_Utils_Type::T_STRING,
         ),
       );
       $tmpFields['participant_role_id']['title'] = ts('Participant Role Id');
@@ -680,6 +683,7 @@ GROUP BY  participant.event_id
           'title' => ts('Event Type'),
           'name' => 'event_type',
           'data_type' => CRM_Utils_Type::T_STRING,
+          'type' => CRM_Utils_Type::T_STRING,
         ),
       );
 

@@ -821,6 +821,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           'name' => 'contribution_page',
           'where' => 'civicrm_contribution_page.title',
           'data_type' => CRM_Utils_Type::T_STRING,
+          'type' => CRM_Utils_Type::T_STRING,
         ),
       );
 
@@ -829,12 +830,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           'title' => ts('Contribution Note'),
           'name' => 'contribution_note',
           'data_type' => CRM_Utils_Type::T_TEXT,
+          'type' => CRM_Utils_Type::T_TEXT,
         ),
       );
 
       $extraFields = array(
         'contribution_batch' => array(
           'title' => ts('Batch Name'),
+          'type' => CRM_Utils_Type::T_STRING,
         ),
       );
 
@@ -845,6 +848,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           'name' => 'campaign_title',
           'where' => 'civicrm_campaign.title',
           'data_type' => CRM_Utils_Type::T_STRING,
+          'type' => CRM_Utils_Type::T_STRING,
         ),
       );
       $softCreditFields = array(
@@ -853,30 +857,35 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           'title' => ts('Soft Credit For'),
           'where' => 'civicrm_contact_d.display_name',
           'data_type' => CRM_Utils_Type::T_STRING,
+          'type' => CRM_Utils_Type::T_STRING,
         ),
         'contribution_soft_credit_amount' => array(
           'name' => 'contribution_soft_credit_amount',
           'title' => ts('Soft Credit Amount'),
           'where' => 'civicrm_contribution_soft.amount',
           'data_type' => CRM_Utils_Type::T_MONEY,
+          'type' => CRM_Utils_Type::T_MONEY,
         ),
         'contribution_soft_credit_type' => array(
           'name' => 'contribution_soft_credit_type',
           'title' => ts('Soft Credit Type'),
           'where' => 'contribution_softcredit_type.label',
           'data_type' => CRM_Utils_Type::T_STRING,
+          'type' => CRM_Utils_Type::T_STRING,
         ),
         'contribution_soft_credit_contribution_id' => array(
           'name' => 'contribution_soft_credit_contribution_id',
           'title' => ts('Soft Credit For Contribution ID'),
           'where' => 'civicrm_contribution_soft.contribution_id',
           'data_type' => CRM_Utils_Type::T_INT,
+          'type' => CRM_Utils_Type::T_INT,
         ),
         'contribution_soft_credit_contact_id' => array(
           'name' => 'contribution_soft_credit_contact_id',
           'title' => ts('Soft Credit For Contact ID'),
           'where' => 'civicrm_contact_d.id',
           'data_type' => CRM_Utils_Type::T_INT,
+          'type' => CRM_Utils_Type::T_INT,
         ),
       );
 
@@ -887,6 +896,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           'name' => 'contribution_product_id',
           'where' => 'civicrm_product.id',
           'data_type' => CRM_Utils_Type::T_INT,
+          'type' => CRM_Utils_Type::T_INT,
         ),
       );
 
