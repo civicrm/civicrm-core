@@ -444,21 +444,19 @@ class CRM_Export_BAO_Export {
       }
     }
     else {
-      $primary = TRUE;
+      $returnProperties = [
+        'location_type' => 1,
+        'im_provider' => 1,
+        'phone_type_id' => 1,
+        'provider_id' => 1,
+        'current_employer' => 1,
+       ];
       $fields = CRM_Contact_BAO_Contact::exportableFields('All', TRUE, TRUE);
       foreach ($fields as $key => $var) {
         if ($key && (substr($key, 0, 6) != 'custom')) {
           //for CRM=952
           $returnProperties[$key] = 1;
         }
-      }
-
-      if ($primary) {
-        $returnProperties['location_type'] = 1;
-        $returnProperties['im_provider'] = 1;
-        $returnProperties['phone_type_id'] = 1;
-        $returnProperties['provider_id'] = 1;
-        $returnProperties['current_employer'] = 1;
       }
 
       $extraProperties = self::defineExtraProperties($queryMode);
