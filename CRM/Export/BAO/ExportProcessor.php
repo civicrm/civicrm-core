@@ -49,13 +49,57 @@ class CRM_Export_BAO_ExportProcessor {
   protected $exportMode;
 
   /**
+   * Array of fields in the main query.
+   *
+   * @var array
+   */
+  protected $queryFields = [];
+
+  /**
+   * Either AND or OR.
+   *
+   * @var string
+   */
+  protected $queryOperator;
+
+  /**
    * CRM_Export_BAO_ExportProcessor constructor.
    *
    * @param int $exportMode
+   * @param string $queryOperator
    */
-  public function __construct($exportMode) {
+  public function __construct($exportMode, $queryOperator) {
     $this->setExportMode($exportMode);
     $this->setQueryMode();
+    $this->setQueryOperator($queryOperator);
+  }
+
+  /**
+   * @return string
+   */
+  public function getQueryOperator() {
+    return $this->queryOperator;
+  }
+
+  /**
+   * @param string $queryOperator
+   */
+  public function setQueryOperator($queryOperator) {
+    $this->queryOperator = $queryOperator;
+  }
+
+  /**
+   * @return array
+   */
+  public function getQueryFields() {
+    return $this->queryFields;
+  }
+
+  /**
+   * @param array $queryFields
+   */
+  public function setQueryFields($queryFields) {
+    $this->queryFields = $queryFields;
   }
 
   /**
@@ -116,6 +160,26 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function setExportMode($exportMode) {
     $this->exportMode = $exportMode;
+  }
+
+  /**
+   * @param $params
+   * @param $order
+   * @param $returnProperties
+   * @return array
+   */
+  public function runQuery($params, $order, $returnProperties) {
+    $query = new CRM_Contact_BAO_Query($params, $returnProperties, NULL,
+      FALSE, FALSE, $this->getQueryMode(),
+      FALSE, TRUE, TRUE, NULL, $this->getQueryOperator()
+    );
+
+    //sort by state
+    //CRM-15301
+    $query->_sort = $order;
+    list($select, $from, $where, $having) = $query->query();
+    $this->setQueryFields($query->_fields);
+    return array($query, $select, $from, $where, $having);
   }
 
 }

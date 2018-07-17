@@ -353,7 +353,7 @@ class CRM_Export_BAO_Export {
     $queryOperator = 'AND'
   ) {
 
-    $processor = new CRM_Export_BAO_ExportProcessor($exportMode);
+    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $queryOperator);
     $returnProperties = array();
     $paymentFields = $selectedPaymentFields = FALSE;
 
@@ -554,15 +554,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       CRM_Contact_BAO_ProximityQuery::fixInputParams($params);
     }
 
-    $query = new CRM_Contact_BAO_Query($params, $returnProperties, NULL,
-      FALSE, FALSE, $queryMode,
-      FALSE, TRUE, TRUE, NULL, $queryOperator
-    );
-
-    //sort by state
-    //CRM-15301
-    $query->_sort = $order;
-    list($select, $from, $where, $having) = $query->query();
+    list($query, $select, $from, $where, $having) = $processor->runQuery($params, $order, $returnProperties);
 
     if ($mergeSameHousehold == 1) {
       if (empty($returnProperties['id'])) {
@@ -685,7 +677,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     // for CRM-3157 purposes
     $i18n = CRM_Core_I18n::singleton();
 
-    list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $query, $relationQuery, $selectedPaymentFields);
+    list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor, $relationQuery, $selectedPaymentFields);
 
     $limitReached = FALSE;
     while (!$limitReached) {
@@ -835,7 +827,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           // where other header definitions take place.
           $headerRows = array_merge($headerRows, $paymentHeaders);
           foreach (array_keys($paymentHeaders) as $paymentHdr) {
-            self::sqlColumnDefn($query, $sqlColumns, $paymentHdr);
+            self::sqlColumnDefn($processor, $sqlColumns, $paymentHdr);
           }
         }
 
@@ -1063,15 +1055,15 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   }
 
   /**
-   * @param $query
+   * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param $sqlColumns
    * @param $field
    */
-  public static function sqlColumnDefn($query, &$sqlColumns, $field) {
+  public static function sqlColumnDefn($processor, &$sqlColumns, $field) {
     if (substr($field, -4) == '_a_b' || substr($field, -4) == '_b_a') {
       return;
     }
-    $queryFields = $query->_fields;
+    $queryFields = $processor->getQueryFields();
 
     $fieldName = CRM_Utils_String::munge(strtolower($field), '_', 64);
     if ($fieldName == 'id') {
@@ -1799,7 +1791,7 @@ WHERE  {$whereClause}";
    * @param array $headerRows
    * @param array $sqlColumns
    *   Columns to go in the temp table.
-   * @param CRM_Contact_BAO_Query $query
+   * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param array|string $value
    * @param array $phoneTypes
    * @param array $imProviders
@@ -1807,9 +1799,9 @@ WHERE  {$whereClause}";
    * @param array $selectedPaymentFields
    * @return array
    */
-  public static function setHeaderRows($field, $headerRows, $sqlColumns, $query, $value, $phoneTypes, $imProviders, $relationQuery, $selectedPaymentFields) {
+  public static function setHeaderRows($field, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery, $selectedPaymentFields) {
 
-    $queryFields = $query->_fields;
+    $queryFields = $processor->getQueryFields();
     // Split campaign into 2 fields for id and title
     if (substr($field, -14) == 'campaign_title') {
       $headerRows[] = ts('Campaign Title');
@@ -1847,22 +1839,22 @@ WHERE  {$whereClause}";
 
           $headerRows[] = $headerName;
 
-          self::sqlColumnDefn($query, $sqlColumns, $headerName);
+          self::sqlColumnDefn($processor, $sqlColumns, $headerName);
         }
         elseif ($relationField == 'phone_type_id') {
           $headerName = $field . '-' . 'Phone Type';
           $headerRows[] = $headerName;
-          self::sqlColumnDefn($query, $sqlColumns, $headerName);
+          self::sqlColumnDefn($processor, $sqlColumns, $headerName);
         }
         elseif ($relationField == 'provider_id') {
           $headerName = $field . '-' . 'Im Service Provider';
           $headerRows[] = $headerName;
-          self::sqlColumnDefn($query, $sqlColumns, $headerName);
+          self::sqlColumnDefn($processor, $sqlColumns, $headerName);
         }
         elseif ($relationField == 'state_province_id') {
           $headerName = $field . '-' . 'state_province_id';
           $headerRows[] = $headerName;
-          self::sqlColumnDefn($query, $sqlColumns, $headerName);
+          self::sqlColumnDefn($processor, $sqlColumns, $headerName);
         }
         elseif (is_array($relationValue) && $relationField == 'location') {
           // fix header for location type case
@@ -1882,7 +1874,7 @@ WHERE  {$whereClause}";
               }
               $headerName = $field . '-' . $hdr;
               $headerRows[] = $headerName;
-              self::sqlColumnDefn($query, $sqlColumns, $headerName);
+              self::sqlColumnDefn($processor, $sqlColumns, $headerName);
             }
           }
         }
@@ -1896,7 +1888,7 @@ WHERE  {$whereClause}";
       $headerRows[] = $field;
     }
 
-    self::sqlColumnDefn($query, $sqlColumns, $field);
+    self::sqlColumnDefn($processor, $sqlColumns, $field);
 
     return array($headerRows, $sqlColumns);
   }
@@ -1911,7 +1903,7 @@ WHERE  {$whereClause}";
    * as a step on the refactoring path rather than how it should be.
    *
    * @param array $returnProperties
-   * @param CRM_Contact_BAO_Contact $query
+   * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param string $relationQuery
    * @param array $selectedPaymentFields
    * @return array
@@ -1930,16 +1922,16 @@ WHERE  {$whereClause}";
    *    - b) this code is old & outdated. Submit your answers to circular bin or better
    *       yet find a way to comment them for posterity.
    */
-  public static function getExportStructureArrays($returnProperties, $query, $relationQuery, $selectedPaymentFields) {
+  public static function getExportStructureArrays($returnProperties, $processor, $relationQuery, $selectedPaymentFields) {
     $metadata = $headerRows = $outputColumns = $sqlColumns = array();
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
 
-    $queryFields = $query->_fields;
+    $queryFields = $processor->getQueryFields();
     foreach ($returnProperties as $key => $value) {
       if ($key != 'location' || !is_array($value)) {
         $outputColumns[$key] = $value;
-        list($headerRows, $sqlColumns) = self::setHeaderRows($key, $headerRows, $sqlColumns, $query, $value, $phoneTypes, $imProviders, $relationQuery, $selectedPaymentFields);
+        list($headerRows, $sqlColumns) = self::setHeaderRows($key, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery, $selectedPaymentFields);
       }
       else {
         foreach ($value as $locationType => $locationFields) {
@@ -1963,8 +1955,8 @@ WHERE  {$whereClause}";
               // Warning: shame inducing hack.
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
-            self::sqlColumnDefn($query, $sqlColumns, $outputFieldName);
-            list($headerRows, $sqlColumns) = self::setHeaderRows($outputFieldName, $headerRows, $sqlColumns, $query, $value, $phoneTypes, $imProviders, $relationQuery, $selectedPaymentFields);
+            self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
+            list($headerRows, $sqlColumns) = self::setHeaderRows($outputFieldName, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery, $selectedPaymentFields);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');
             }

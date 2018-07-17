@@ -44,7 +44,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Basic test to ensure the exportComponents function completes without error.
    */
   public function testExportComponentsNull() {
-    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
+    list($tableName) = CRM_Export_BAO_Export::exportComponents(
       TRUE,
       array(),
       array(),
@@ -192,8 +192,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $pattern = '/as `?([^`,]*)/';
     $queryFieldAliases = array();
     preg_match_all($pattern, $select, $queryFieldAliases, PREG_PATTERN_ORDER);
+    $processor = new CRM_Export_BAO_ExportProcessor(CRM_Contact_BAO_Query::MODE_CONTRIBUTE, 'AND');
+    $processor->setQueryFields($query->_fields);
 
-    list($outputFields) = CRM_Export_BAO_Export::getExportStructureArrays($returnProperties, $query, $contactRelationshipTypes, '', array());
+    list($outputFields) = CRM_Export_BAO_Export::getExportStructureArrays($returnProperties, $processor, $contactRelationshipTypes, '');
     foreach (array_keys($outputFields) as $fieldAlias) {
       if ($fieldAlias == 'Home-country') {
         $this->assertTrue(in_array($fieldAlias . '_id', $queryFieldAliases[1]), 'Country is subject to some funky translate so we make sure country id is present');
@@ -500,7 +502,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ));
 
     //create address for contact A
-    $result = $this->callAPISuccess('address', 'create', array(
+    $this->callAPISuccess('address', 'create', array(
       'contact_id' => $contactA['id'],
       'location_type_id' => 'Home',
       'street_address' => 'ABC 12',
@@ -511,7 +513,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ));
 
     //create address for contact B
-    $result = $this->callAPISuccess('address', 'create', array(
+    $this->callAPISuccess('address', 'create', array(
       'contact_id' => $contactB['id'],
       'location_type_id' => 'Home',
       'street_address' => 'ABC 12',
