@@ -2093,6 +2093,8 @@ AND cc.sort_name LIKE '%$name%'";
     unset($relationships['total_relationships']);
     if (!empty($relationships)) {
 
+      $displayName = CRM_Contact_BAO_Contact::displayName($params['contact_id']);
+
       // format params
       foreach ($relationships as $relationshipId => $values) {
         $relationship = array();
@@ -2131,25 +2133,33 @@ AND cc.sort_name LIKE '%$name%'";
           if (($params['contact_id'] == $values['contact_id_a'] and $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::EDIT) or
             ($params['contact_id'] == $values['contact_id_b'] and $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::EDIT)
           ) {
-            $relationship['sort_name'] .= ' <i class="crm-i fa-asterisk"></i>';
+            $relationship['sort_name'] .= <<<HEREDOC
+              <i class="crm-i fa-asterisk" title="{$values['display_name']} can be viewed and edited by $displayName"></i>
+HEREDOC;
           }
 
           if (($params['contact_id'] == $values['contact_id_a'] and $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::VIEW) or
             ($params['contact_id'] == $values['contact_id_b'] and $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::VIEW)
           ) {
-            $relationship['sort_name'] .= ' <i class="crm-i fa-eye"></i>';
+            $relationship['sort_name'] .= <<<HEREDOC
+              <i class="crm-i fa-eye" title="{$values['display_name']} can be viewed by $displayName"></i>
+HEREDOC;
           }
 
           if (($values['cid'] == $values['contact_id_a'] and $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::EDIT) or
             ($values['cid'] == $values['contact_id_b'] and $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::EDIT)
           ) {
-            $relationship['relation'] .= ' <i class="crm-i fa-asterisk"></i>';
+            $relationship['relation'] .= <<<HEREDOC
+              <i class="crm-i fa-asterisk" title="$displayName can be viewed and edited by {$values['display_name']}"></i>
+HEREDOC;
           }
 
           if (($values['cid'] == $values['contact_id_a'] and $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::VIEW) or
             ($values['cid'] == $values['contact_id_b'] and $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::VIEW)
           ) {
-            $relationship['relation'] .= ' <i class="crm-i fa-eye"></i>';
+            $relationship['relation'] .= <<<HEREDOC
+              <i class="crm-i fa-eye" title="$displayName can be viewed by {$values['display_name']}"></i>
+HEREDOC;
           }
         }
 
