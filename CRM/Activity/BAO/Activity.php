@@ -1826,8 +1826,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $activityID,
     $sourceContactID = NULL
   ) {
-	$doNotSms = NULL;
-    $toPhoneNumber = NULL;
+	$toPhoneNumber = NULL;
 
     if ($smsProviderParams['To']) {
       // If phone number is specified use it
@@ -1842,8 +1841,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
         $toPhoneNumberDetails = reset($toPhoneNumbers);
         $toPhoneNumber = CRM_Utils_Array::value('phone', $toPhoneNumberDetails);
         // Contact allows to send sms
-        $doNotSms = FALSE;
-      }
+       }
     }
 
     // make sure both phone are valid
