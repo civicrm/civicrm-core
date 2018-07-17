@@ -271,6 +271,7 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'headerPattern' => '',
           'dataPattern' => '',
           'export' => TRUE,
+          'default' => '0',
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
           'bao' => 'CRM_Case_BAO_Case',

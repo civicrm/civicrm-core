@@ -233,6 +233,7 @@ class CRM_Contribute_DAO_ContributionSoft extends CRM_Core_DAO {
           'name' => 'pcp_display_in_roll',
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Soft Contribution Display on PCP'),
+          'default' => '0',
           'table_name' => 'civicrm_contribution_soft',
           'entity' => 'ContributionSoft',
           'bao' => 'CRM_Contribute_BAO_ContributionSoft',

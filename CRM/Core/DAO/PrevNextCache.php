@@ -160,6 +160,7 @@ class CRM_Core_DAO_PrevNextCache extends CRM_Core_DAO {
           'name' => 'is_selected',
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is Selected'),
+          'default' => '0',
           'table_name' => 'civicrm_prevnext_cache',
           'entity' => 'PrevNextCache',
           'bao' => 'CRM_Core_BAO_PrevNextCache',

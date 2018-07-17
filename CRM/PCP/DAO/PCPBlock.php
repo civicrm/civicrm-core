@@ -225,6 +225,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Owner Notification'),
           'description' => 'FK to civicrm_option_group with name = PCP owner notifications',
+          'default' => '0',
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
