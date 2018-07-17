@@ -823,7 +823,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'current_user_value' => '0',
       'include_case_activities_op' => 'eq',
       'include_case_activities_value' => 0,
-      'order_bys' => [1 => ['column' => 'activity_date_time', 'order' => 'ASC'], 2 => ['column' => 'activity_type_id', 'order' => 'ASC']],
+      'order_bys' => [
+        1 => ['column' => 'activity_date_time', 'order' => 'ASC'],
+        2 => ['column' => 'activity_type_id', 'order' => 'ASC'],
+      ],
     ];
 
     $params['report_id'] = 'Activity';
@@ -838,7 +841,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'civicrm_contact_contact_target_id' => $this->contactIDs[0] . ';' . $this->contactIDs[1],
       'civicrm_email_contact_source_email' => 'anthony_anderson@civicrm.org',
       'civicrm_email_contact_assignee_email' => 'anthony_anderson@civicrm.org',
-      'civicrm_email_contact_target_email' => 'anthony_anderson@civicrm.org;anthony_anderson@civicrm.org',
+      'civicrm_email_contact_target_email' => 'techo@spying.com;anthony_anderson@civicrm.org',
       'civicrm_phone_contact_source_phone' => NULL,
       'civicrm_phone_contact_assignee_phone' => NULL,
       'civicrm_phone_contact_target_phone' => NULL,
@@ -874,6 +877,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $row = $rows[0];
     // This link is not relative - skip for now
     unset($row['civicrm_activity_activity_type_id_link']);
+    if ($rows['civicrm_email_contact_target_email'] === 'anthony_anderson@civicrm.org;techo@spying.com') {
+      // order is unpredictable
+      $expected['civicrm_email_contact_target_email'] = 'anthony_anderson@civicrm.org;techo@spying.com';
+    }
 
     $this->assertEquals($expected, $row);
   }
@@ -882,7 +889,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Set up some activity data..... use some chars that challenge our utf handling.
    */
   public function createContactsWithActivities() {
-    $this->contactIDs[] = $this->individualCreate(['last_name' => 'Brzęczysław']);
+    $this->contactIDs[] = $this->individualCreate(['last_name' => 'Brzęczysław', 'email' => 'techo@spying.com']);
     $this->contactIDs[] = $this->individualCreate(['last_name' => 'Łąchowski-Roberts']);
     $this->contactIDs[] = $this->individualCreate(['last_name' => 'Łąchowski-Roberts']);
 
