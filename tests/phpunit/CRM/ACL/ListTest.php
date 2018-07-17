@@ -123,6 +123,18 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
       $this->assertNotContains($contacts[2], $result, "User[0] should NOT have $permission_label permission on contact[2].");
       $this->assertNotContains($contacts[3], $result, "User[0] should NOT have $permission_label permission on contact[3].");
       $this->assertNotContains($contacts[4], $result, "User[0] should NOT have $permission_label permission on contact[4].");
+      // view (b_a)
+      if ($permission == CRM_Core_Permission::VIEW) {
+        $this->assertContains($contacts[5], $result, "User[0] should have $permission_label permission on contact[5].");
+      }
+      else {
+        $this->assertNotContains($contacts[5], $result, "User[0] should NOT have $permission_label permission on contact[5].");
+      }
+      $this->assertNotContains($contacts[6], $result, "User[0] should NOT have $permission_label permission on contact[6].");
+      $this->assertNotContains($contacts[7], $result, "User[0] should NOT have $permission_label permission on contact[7].");
+      // edit (a_b)
+      $this->assertContains($contacts[8], $result, "User[0] should have $permission_label permission on contact[8].");
+      $this->assertNotContains($contacts[9], $result, "User[0] should NOT have $permission_label permission on contact[9].");
     }
 
     // run this for SECOND DEGREE relations
@@ -132,11 +144,36 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
       $result = CRM_Contact_BAO_Contact_Permission::allowList($contacts, $permission);
       sort($result);
 
-      $this->assertNotContains($contacts[0], $result, "User[0] should NOT have $permission_label permission on contact[0].");
-      $this->assertContains($contacts[1], $result, "User[0] should have $permission_label permission on contact[1].");
+      $this->assertNotContains($contacts[0], $result, "User[0] should NOT have second degree $permission_label permission on contact[0].");
+      $this->assertContains($contacts[1], $result, "User[0] should have second degree $permission_label permission on contact[1].");
+      // Edit then edit -> edit
       $this->assertContains($contacts[2], $result, "User[0] should have second degree $permission_label permission on contact[2].");
-      $this->assertNotContains($contacts[3], $result, "User[0] should NOT have $permission_label permission on contact[3].");
-      $this->assertNotContains($contacts[4], $result, "User[0] should NOT have $permission_label permission on contact[4].");
+      $this->assertNotContains($contacts[3], $result, "User[0] should NOT have second degree $permission_label permission on contact[3].");
+      $this->assertNotContains($contacts[4], $result, "User[0] should NOT have second degree $permission_label permission on contact[4].");
+      // View then Edit -> View
+      if ($permission == CRM_Core_Permission::VIEW) {
+        $this->assertContains($contacts[5], $result, "User[0] should have second degree $permission_label permission on contact[5].");
+        $this->assertContains($contacts[6], $result, "User[0] should have second degree $permission_label permission on contact[6].");
+      }
+      else {
+        $this->assertNotContains($contacts[5], $result, "User[0] should NOT have second degree $permission_label permission on contact[5].");
+        $this->assertNotContains($contacts[6], $result, "User[0] should NOT have second degree $permission_label permission on contact[6].");
+      }
+      // View then Edit -> View
+      if ($permission == CRM_Core_Permission::VIEW) {
+        $this->assertContains($contacts[7], $result, "User[0] should have second degree $permission_label permission on contact[7].");
+      }
+      else {
+        $this->assertNotContains($contacts[7], $result, "User[0] should NOT have second degree $permission_label permission on contact[7].");
+      }
+      // Edit then View -> View
+      $this->assertContains($contacts[8], $result, "User[0] should have second degree $permission_label permission on contact[8].");
+      if ($permission == CRM_Core_Permission::VIEW) {
+        $this->assertContains($contacts[9], $result, "User[0] should have second degree $permission_label permission on contact[9].");
+      }
+      else {
+        $this->assertNotContains($contacts[9], $result, "User[0] should NOT have second degree $permission_label permission on contact[9].");
+      }
     }
   }
 
@@ -262,12 +299,17 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
     $this->assertNotEmpty($user_id);
 
     // create test contacts
-    $bush_sr_id    = $this->individualCreate(array('first_name' => 'George', 'middle_name' => 'W.', 'last_name' => 'Bush'));
-    $bush_jr_id    = $this->individualCreate(array('first_name' => 'George', 'middle_name' => 'H. W.', 'last_name' => 'Bush'));
+    $bush_sr_id    = $this->individualCreate(array('first_name' => 'George', 'middle_name' => 'H. W.', 'last_name' => 'Bush'));
+    $bush_jr_id    = $this->individualCreate(array('first_name' => 'George', 'middle_name' => 'W.', 'last_name' => 'Bush'));
     $bush_laura_id = $this->individualCreate(array('first_name' => 'Laura Lane', 'last_name' => 'Bush'));
     $bush_brbra_id = $this->individualCreate(array('first_name' => 'Barbara', 'last_name' => 'Bush'));
+    $bush_brother_id = $this->individualCreate(array('first_name' => 'Brother', 'last_name' => 'Bush'));
+    $bush_nephew_id = $this->individualCreate(array('first_name' => 'Nephew', 'last_name' => 'Bush'));
+    $bush_nephew2_id = $this->individualCreate(array('first_name' => 'Nephew2', 'last_name' => 'Bush'));
+    $bush_otherbro_id = $this->individualCreate(array('first_name' => 'Other Brother', 'last_name' => 'Bush'));
+    $bush_otherneph_id = $this->individualCreate(array('first_name' => 'Other Nephew', 'last_name' => 'Bush'));
 
-    $contacts = array($user_id, $bush_sr_id, $bush_jr_id, $bush_laura_id, $bush_brbra_id);
+    $contacts = array($user_id, $bush_sr_id, $bush_jr_id, $bush_laura_id, $bush_brbra_id, $bush_brother_id, $bush_nephew_id, $bush_nephew2_id, $bush_otherbro_id, $bush_otherneph_id);
     sort($contacts);
     return $contacts;
   }
@@ -295,7 +337,6 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
       'is_active'            => 1,
       ));
 
-    // create some relationships
     $this->callAPISuccess('Relationship', 'create', array(
       'relationship_type_id' => 1, // CHILD OF
       'contact_id_a'         => $contacts[4],
@@ -303,6 +344,46 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
       'is_permission_b_a'    => 1,
       'is_active'            => 1,
       ));
+
+    $this->callAPISuccess('Relationship', 'create', array(
+      'relationship_type_id' => 4, // SIBLING OF
+      'contact_id_a'         => $contacts[5],
+      'contact_id_b'         => $contacts[0],
+      'is_permission_b_a'    => 2, // View
+      'is_active'            => 1,
+    ));
+
+    $this->callAPISuccess('Relationship', 'create', array(
+      'relationship_type_id' => 1, // CHILD OF
+      'contact_id_a'         => $contacts[6],
+      'contact_id_b'         => $contacts[5],
+      'is_permission_b_a'    => 1, // Edit
+      'is_active'            => 1,
+    ));
+
+    $this->callAPISuccess('Relationship', 'create', array(
+      'relationship_type_id' => 1, // CHILD OF
+      'contact_id_a'         => $contacts[7],
+      'contact_id_b'         => $contacts[5],
+      'is_permission_b_a'    => 2, // View
+      'is_active'            => 1,
+    ));
+
+    $this->callAPISuccess('Relationship', 'create', array(
+      'relationship_type_id' => 4, // SIBLING OF
+      'contact_id_a'         => $contacts[0],
+      'contact_id_b'         => $contacts[8],
+      'is_permission_a_b'    => 1, // edit  (as a_b)
+      'is_active'            => 1,
+    ));
+
+    $this->callAPISuccess('Relationship', 'create', array(
+      'relationship_type_id' => 1, // CHILD OF
+      'contact_id_a'         => $contacts[9],
+      'contact_id_b'         => $contacts[8],
+      'is_permission_b_a'    => 2, // view
+      'is_active'            => 1,
+    ));
 
     return $contacts;
   }
