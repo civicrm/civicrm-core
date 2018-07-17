@@ -662,7 +662,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       $relTypes = CRM_Utils_Array::index(array('name_a_b'), CRM_Core_PseudoConstant::relationshipType('name'));
       if (
         (isset($relTypes['Employee of']) && $relationship->relationship_type_id == $relTypes['Employee of']['id']) ||
-        (isset ($relTypes['Household Member of']) && $relationship->relationship_type_id == $relTypes['Household Member of']['id'])
+        (isset($relTypes['Household Member of']) && $relationship->relationship_type_id == $relTypes['Household Member of']['id'])
       ) {
         $sharedContact = new CRM_Contact_DAO_Contact();
         $sharedContact->id = $relationship->contact_id_a;
@@ -1721,10 +1721,10 @@ SELECT relationship_type_id, relationship_direction
               $membershipValues['skipStatusCal'] = TRUE;
             }
             foreach (array(
-                       'join_date',
-                       'start_date',
-                       'end_date',
-                     ) as $dateField) {
+              'join_date',
+              'start_date',
+              'end_date',
+            ) as $dateField) {
               if (!empty($membershipValues[$dateField])) {
                 $membershipValues[$dateField] = CRM_Utils_Date::processDate($membershipValues[$dateField]);
               }
@@ -2128,26 +2128,26 @@ AND cc.sort_name LIKE '%$name%'";
         }
 
         if ($params['context'] == 'current') {
-          if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::EDIT) OR
-            ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::EDIT)
+          if (($params['contact_id'] == $values['contact_id_a'] and $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::EDIT) or
+            ($params['contact_id'] == $values['contact_id_b'] and $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::EDIT)
           ) {
             $relationship['sort_name'] .= ' <i class="crm-i fa-asterisk"></i>';
           }
 
-          if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::VIEW) OR
-            ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::VIEW)
+          if (($params['contact_id'] == $values['contact_id_a'] and $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::VIEW) or
+            ($params['contact_id'] == $values['contact_id_b'] and $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::VIEW)
           ) {
             $relationship['sort_name'] .= ' <i class="crm-i fa-eye"></i>';
           }
 
-          if (($values['cid'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::EDIT) OR
-            ($values['cid'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::EDIT)
+          if (($values['cid'] == $values['contact_id_a'] and $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::EDIT) or
+            ($values['cid'] == $values['contact_id_b'] and $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::EDIT)
           ) {
             $relationship['relation'] .= ' <i class="crm-i fa-asterisk"></i>';
           }
 
-          if (($values['cid'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::VIEW) OR
-            ($values['cid'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::VIEW)
+          if (($values['cid'] == $values['contact_id_a'] and $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::VIEW) or
+            ($values['cid'] == $values['contact_id_b'] and $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::VIEW)
           ) {
             $relationship['relation'] .= ' <i class="crm-i fa-eye"></i>';
           }
