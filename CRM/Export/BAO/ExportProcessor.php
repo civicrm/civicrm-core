@@ -234,12 +234,16 @@ class CRM_Export_BAO_ExportProcessor {
     }
     if ($this->getQueryMode() === CRM_Contact_BAO_Query::MODE_PLEDGE) {
       $componentSpecificFields = array_merge($componentSpecificFields, CRM_Pledge_BAO_Query::extraReturnProperties($this->getQueryMode()));
+      unset($componentSpecificFields['contribution_status_id']);
+      unset($componentSpecificFields['pledge_status_id']);
+      unset($componentSpecificFields['pledge_payment_status_id']);
     }
     if ($this->getQueryMode() === CRM_Contact_BAO_Query::MODE_CASE) {
       $componentSpecificFields = array_merge($componentSpecificFields, CRM_Case_BAO_Query::extraReturnProperties($this->getQueryMode()));
     }
     if ($this->getQueryMode() === CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
       $componentSpecificFields = array_merge($componentSpecificFields, CRM_Contribute_BAO_Query::softCreditReturnProperties(TRUE));
+      unset($componentSpecificFields['contribution_status_id']);
     }
     return array_merge(array_fill_keys($missing, 1), $componentSpecificFields);
   }

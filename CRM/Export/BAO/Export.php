@@ -399,31 +399,7 @@ class CRM_Export_BAO_Export {
       }
     }
     else {
-      $returnProperties = [];
-      $fields = CRM_Contact_BAO_Contact::exportableFields('All', TRUE, TRUE);
-      foreach ($fields as $key => $var) {
-        if ($key && (substr($key, 0, 6) != 'custom')) {
-          //for CRM=952
-          $returnProperties[$key] = 1;
-        }
-      }
-
-      $returnProperties = array_merge($returnProperties, $processor->getAdditionalReturnProperties());
-
-      if ($queryMode != CRM_Contact_BAO_Query::MODE_CONTACTS) {
-        // unset non exportable fields for components
-        $nonExpoFields = array(
-          'groups',
-          'tags',
-          'notes',
-          'contribution_status_id',
-          'pledge_status_id',
-          'pledge_payment_status_id',
-        );
-        foreach ($nonExpoFields as $value) {
-          unset($returnProperties[$value]);
-        }
-      }
+      $returnProperties = $processor->getDefaultReturnProperties();
     }
 
     if ($mergeSameAddress) {
