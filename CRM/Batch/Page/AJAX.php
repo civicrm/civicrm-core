@@ -54,7 +54,7 @@ class CRM_Batch_Page_AJAX {
    * @deprecated
    */
   public static function getBatchList() {
-    $context = isset($_REQUEST['context']) ? CRM_Utils_Type::escape($_REQUEST['context'], 'String') : NULL;
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric');
     if ($context != 'financialBatch') {
       $sortMapper = array(
         0 => 'title',

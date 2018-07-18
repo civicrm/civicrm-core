@@ -4,7 +4,7 @@
  * Class CRM_UF_Page_ProfileEditorTest
  * @group headless
  */
-class CRM_Upgrade_Incremental_Base_Test extends CiviUnitTestCase {
+class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
 
   /**
    * Test message upgrade process.
@@ -24,7 +24,7 @@ class CRM_Upgrade_Incremental_Base_Test extends CiviUnitTestCase {
 
     foreach ($templates as $template) {
       $msg_text = $this->callAPISuccessGetValue('MessageTemplate', ['id' => $template['id'], 'return' => 'msg_text']);
-      $this->assertContains('{ts}Membership Information{/ts}', $msg_text);
+      $this->assertContains('{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}', $msg_text);
       if ($msg_text !== $originalText) {
         // Reset value for future tests.
         $this->callAPISuccess('MessageTemplate', 'create', ['msg_text' => $originalText, 'id' => $template['id']]);
@@ -54,7 +54,7 @@ class CRM_Upgrade_Incremental_Base_Test extends CiviUnitTestCase {
     foreach ($templates as $template) {
       $msg_text = $this->callAPISuccessGetValue('MessageTemplate', ['id' => $template['id'], 'return' => 'msg_text']);
       if ($template['is_reserved']) {
-        $this->assertTrue(strstr($msg_text, '{ts}Membership Information{/ts}'));
+        $this->assertContains('{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}', $msg_text);
       }
       else {
         $this->assertEquals('great what a silly sausage you are', $msg_text);
@@ -73,7 +73,11 @@ class CRM_Upgrade_Incremental_Base_Test extends CiviUnitTestCase {
   public function testMessageTemplateGetUpgradeMessages() {
     $messageTemplateObject = new CRM_Upgrade_Incremental_MessageTemplates('5.4.alpha1');
     $messages = $messageTemplateObject->getUpgradeMessages();
-    $this->assertEquals(['Memberships - Receipt (on-line)' => 'Use email greeting at top where available'], $messages);
+    $this->assertEquals([
+      'Memberships - Receipt (on-line)' => 'Use email greeting at top where available',
+      'Contributions - Receipt (on-line)' => 'Use email greeting at top where available',
+      'Events - Registration Confirmation and Receipt (on-line)' => 'Use email greeting at top where available',
+    ], $messages);
   }
 
 }

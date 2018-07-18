@@ -36,7 +36,7 @@ CRM.$(function($) {
         $("#payment-info").html(html).trigger('crmLoad');
       }
     });
-
+    // Fixme: Possible bug - the following line won't be processed by smarty because it's in a literal block
     var taxAmount = "{$totalTaxAmount}";
     if (taxAmount) {
       $('.total_amount-section').show();

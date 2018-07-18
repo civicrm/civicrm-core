@@ -138,6 +138,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ON reserved.workflow_id = default_template.workflow_id
         WHERE reserved.workflow_id = $workFlowID
         AND reserved.is_reserved = 1 AND default_template.is_default = 1 AND reserved.id <> default_template.id
+        AND reserved.msg_{$template['type']} = default_template.msg_{$template['type']}
       ");
       if ($defaultTemplateID) {
         $templatesToUpdate[] = $defaultTemplateID;
