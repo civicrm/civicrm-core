@@ -877,7 +877,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $row = $rows[0];
     // This link is not relative - skip for now
     unset($row['civicrm_activity_activity_type_id_link']);
-    if ($rows['civicrm_email_contact_target_email'] === 'anthony_anderson@civicrm.org;techo@spying.com') {
+    if ($row['civicrm_email_contact_target_email'] === 'anthony_anderson@civicrm.org;techo@spying.com') {
       // order is unpredictable
       $expected['civicrm_email_contact_target_email'] = 'anthony_anderson@civicrm.org;techo@spying.com';
     }
