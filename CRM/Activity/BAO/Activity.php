@@ -2528,72 +2528,70 @@ AND cl.modified_id  = c.id
    * @return array
    *   array of exportable Fields
    */
-  public static function &exportableFields($name = 'Activity') {
-    if (!isset(self::$_exportableFields[$name])) {
-      self::$_exportableFields[$name] = array();
+  public static function exportableFields($name = 'Activity') {
+    self::$_exportableFields[$name] = array();
 
-      // TODO: ideally we should retrieve all fields from xml, in this case since activity processing is done
-      // my case hence we have defined fields as case_*
-      if ($name == 'Activity') {
-        $exportableFields = CRM_Activity_DAO_Activity::export();
-        $exportableFields['source_contact_id'] = [
-          'title' => ts('Source Contact ID'),
-          'type' => CRM_Utils_Type::T_INT,
-        ];
-        $exportableFields['source_contact'] = array(
-          'title' => ts('Source Contact'),
+    // TODO: ideally we should retrieve all fields from xml, in this case since activity processing is done
+    // my case hence we have defined fields as case_*
+    if ($name == 'Activity') {
+      $exportableFields = CRM_Activity_DAO_Activity::export();
+      $exportableFields['source_contact_id'] = [
+        'title' => ts('Source Contact ID'),
+        'type' => CRM_Utils_Type::T_INT,
+      ];
+      $exportableFields['source_contact'] = array(
+        'title' => ts('Source Contact'),
+        'type' => CRM_Utils_Type::T_STRING,
+      );
+
+      $Activityfields = array(
+        'activity_type' => array(
+          'title' => ts('Activity Type'),
+          'name' => 'activity_type',
           'type' => CRM_Utils_Type::T_STRING,
-        );
-
-        $Activityfields = array(
-          'activity_type' => array(
-            'title' => ts('Activity Type'),
-            'name' => 'activity_type',
-            'type' => CRM_Utils_Type::T_STRING,
-            'searchByLabel' => TRUE,
-          ),
-          'activity_status' => array(
-            'title' => ts('Activity Status'),
-            'name' => 'activity_status',
-            'type' => CRM_Utils_Type::T_STRING,
-            'searchByLabel' => TRUE,
-          ),
-          'activity_priority' => array(
-            'title' => ts('Activity Priority'),
-            'name' => 'activity_priority',
-            'type' => CRM_Utils_Type::T_STRING,
-            'searchByLabel' => TRUE,
-          ),
-        );
-        $fields = array_merge($Activityfields, $exportableFields);
-      }
-      else {
-        // Set title to activity fields.
-        $fields = array(
-          'case_activity_subject' => array('title' => ts('Activity Subject'), 'type' => CRM_Utils_Type::T_STRING),
-          'case_source_contact_id' => array('title' => ts('Activity Reporter'), 'type' => CRM_Utils_Type::T_STRING),
-          'case_recent_activity_date' => array('title' => ts('Activity Actual Date'), 'type' => CRM_Utils_Type::T_DATE),
-          'case_scheduled_activity_date' => array(
-            'title' => ts('Activity Scheduled Date'),
-            'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'case_recent_activity_type' => array('title' => ts('Activity Type'), 'type' => CRM_Utils_Type::T_STRING),
-          'case_activity_status' => array('title' => ts('Activity Status'), 'type' => CRM_Utils_Type::T_STRING),
-          'case_activity_duration' => array('title' => ts('Activity Duration'), 'type' => CRM_Utils_Type::T_INT),
-          'case_activity_medium_id' => array('title' => ts('Activity Medium'), 'type' => CRM_Utils_Type::T_INT),
-          'case_activity_details' => array('title' => ts('Activity Details'), 'type' => CRM_Utils_Type::T_TEXT),
-          'case_activity_is_auto' => array(
-            'title' => ts('Activity Auto-generated?'),
-            'type' => CRM_Utils_Type::T_BOOLEAN,
-          ),
-        );
-      }
-
-      // add custom data for case activities
-      $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Activity'));
-
-      self::$_exportableFields[$name] = $fields;
+          'searchByLabel' => TRUE,
+        ),
+        'activity_status' => array(
+          'title' => ts('Activity Status'),
+          'name' => 'activity_status',
+          'type' => CRM_Utils_Type::T_STRING,
+          'searchByLabel' => TRUE,
+        ),
+        'activity_priority' => array(
+          'title' => ts('Activity Priority'),
+          'name' => 'activity_priority',
+          'type' => CRM_Utils_Type::T_STRING,
+          'searchByLabel' => TRUE,
+        ),
+      );
+      $fields = array_merge($Activityfields, $exportableFields);
     }
+    else {
+      // Set title to activity fields.
+      $fields = array(
+        'case_activity_subject' => array('title' => ts('Activity Subject'), 'type' => CRM_Utils_Type::T_STRING),
+        'case_source_contact_id' => array('title' => ts('Activity Reporter'), 'type' => CRM_Utils_Type::T_STRING),
+        'case_recent_activity_date' => array('title' => ts('Activity Actual Date'), 'type' => CRM_Utils_Type::T_DATE),
+        'case_scheduled_activity_date' => array(
+          'title' => ts('Activity Scheduled Date'),
+          'type' => CRM_Utils_Type::T_DATE,
+        ),
+        'case_recent_activity_type' => array('title' => ts('Activity Type'), 'type' => CRM_Utils_Type::T_STRING),
+        'case_activity_status' => array('title' => ts('Activity Status'), 'type' => CRM_Utils_Type::T_STRING),
+        'case_activity_duration' => array('title' => ts('Activity Duration'), 'type' => CRM_Utils_Type::T_INT),
+        'case_activity_medium_id' => array('title' => ts('Activity Medium'), 'type' => CRM_Utils_Type::T_INT),
+        'case_activity_details' => array('title' => ts('Activity Details'), 'type' => CRM_Utils_Type::T_TEXT),
+        'case_activity_is_auto' => array(
+          'title' => ts('Activity Auto-generated?'),
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+        ),
+      );
+    }
+
+    // add custom data for case activities
+    $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Activity'));
+
+    self::$_exportableFields[$name] = $fields;
     return self::$_exportableFields[$name];
   }
 
