@@ -252,7 +252,7 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function isExportPaymentFields() {
     if ($this->getRequestedFields() === NULL
-      &&  in_array($this->getExportMode(), [
+      &&  in_array($this->getQueryMode(), [
         CRM_Contact_BAO_Query::MODE_EVENT,
         CRM_Contact_BAO_Query::MODE_MEMBER,
         CRM_Contact_BAO_Query::MODE_PLEDGE,

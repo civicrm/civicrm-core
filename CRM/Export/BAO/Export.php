@@ -257,41 +257,6 @@ class CRM_Export_BAO_Export {
   }
 
   /**
-   * Define extra properties for the export based on query mode
-   *
-   * @param string $queryMode
-   *   Query Mode
-   * @return array $extraProperties
-   *   Extra Properties
-   */
-  public static function defineExtraProperties($queryMode) {
-    switch ($queryMode) {
-      case CRM_Contact_BAO_Query::MODE_EVENT:
-        $paymentTableId = 'participant_id';
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_MEMBER:
-        $paymentTableId = 'membership_id';
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_PLEDGE:
-        $paymentTableId = 'pledge_payment_id';
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_CASE:
-        $paymentTableId = '';
-        break;
-
-      default:
-        $paymentTableId = '';
-    }
-    $extraProperties = array(
-      'paymentTableId' => $paymentTableId,
-    );
-    return $extraProperties;
-  }
-
-  /**
    * Get the list the export fields.
    *
    * @param int $selectAll
@@ -344,6 +309,8 @@ class CRM_Export_BAO_Export {
     $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator);
     $returnProperties = array();
     $selectedPaymentFields = FALSE;
+    // @todo - this variable is overwritten later - it should be wholly definable in the processor fn.
+    $paymentTableId = $processor->getPaymentTableID();
 
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     // Warning - this imProviders var is used in a somewhat fragile way - don't rename it
@@ -440,9 +407,6 @@ class CRM_Export_BAO_Export {
           $returnProperties[$key] = 1;
         }
       }
-
-      $extraProperties = self::defineExtraProperties($queryMode);
-      $paymentTableId = $extraProperties['paymentTableId'];
 
       $returnProperties = array_merge($returnProperties, $processor->getAdditionalReturnProperties());
 
