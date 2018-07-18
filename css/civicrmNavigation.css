@@ -63,7 +63,7 @@ html>body .innerbox
 }
 
 #civicrm-menu {
-  position:absolute;
+  position:fixed;
   top:0;
   left:0;
   background:#1B1B1B repeat-x;

@@ -10,8 +10,6 @@ CRM.$(function($) {
         // D7 hack, restore toolbar position (CRM-15341)
         $('#toolbar').css('z-index', '');
       }
-    })
-   .ready(function() {
-     $('#civicrm-menu').css({position: "fixed", top: "0px", 'width': '97%'});
-   });
+    });
+    $('#civicrm-menu').css({'width': '97%'});
 });

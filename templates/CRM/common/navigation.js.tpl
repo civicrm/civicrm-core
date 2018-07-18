@@ -150,9 +150,6 @@ $('#civicrm-menu').ready(function() {
     });
   $('.crm-hidemenu').click(function(e) {
     $('#civicrm-menu').slideUp();
-    if ($('#toolbar-bar').length) {
-      $('#toolbar-bar').slideDown();
-    }
     if ($('#crm-notification-container').length) {
       var alert = CRM.alert({/literal}'<a href="#" id="crm-restore-menu" style="text-align: center; margin-top: -8px;">{ts escape='js'}Restore CiviCRM Menu{/ts}</a>'{literal}, '', 'none', {expires: 10000});
       $('#crm-restore-menu')
@@ -161,9 +158,6 @@ $('#civicrm-menu').ready(function() {
           e.preventDefault();
           alert.close();
           $('#civicrm-menu').slideDown();
-          if ($('#toolbar-bar').length) {
-            $('#toolbar-bar').slideUp();
-          }
         })
         .parent().css('text-align', 'center').find('.ui-button-text').css({'padding-top': '4px', 'padding-bottom': '4px'})
       ;
