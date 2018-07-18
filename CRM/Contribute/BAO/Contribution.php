@@ -3400,6 +3400,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         // change Payment Instrument for a Completed contribution
         // first handle special case when contribution is changed from Pending to Completed status when initial payment
         // instrument is null and now new payment instrument is added along with the payment
+        if (!$params['contribution']->payment_instrument_id) {
+          $params['contribution']->find(TRUE);
+        }
         $params['trxnParams']['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
         $params['trxnParams']['check_number'] = CRM_Utils_Array::value('check_number', $params);
 
