@@ -422,7 +422,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     chdir($root);
 
     // Create a mock $request object
-    $autoloader = require_once $root . '/vendor/autoload.php';
+    $autoload_possible_paths = array($root, $root . "/..");
+    foreach ($autoload_possible_paths as $autoload_path) {
+      $autoload_path .= '/vendor/autoload.php';
+      if (file_exists($autoload_path)) {
+        break;
+      }
+    }
+    $autoloader = require_once $autoload_path;
     if ($autoloader === TRUE) {
       $autoloader = ComposerAutoloaderInitDrupal8::getLoader();
     }
