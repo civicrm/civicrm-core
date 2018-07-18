@@ -316,15 +316,7 @@ class CRM_Export_BAO_Export {
     // Warning - this imProviders var is used in a somewhat fragile way - don't rename it
     // without manually testing the export of IM provider still works.
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
-    self::$relationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(
-      NULL,
-      NULL,
-      NULL,
-      NULL,
-      TRUE,
-      'name',
-      FALSE
-    );
+    self::$relationshipTypes = $processor->getRelationshipTypes();
     //also merge Head of Household
     self::$memberOfHouseholdRelationshipKey = CRM_Utils_Array::key('Household Member of', self::$relationshipTypes);
     self::$headOfHouseholdRelationshipKey = CRM_Utils_Array::key('Head of Household for', self::$relationshipTypes);
@@ -357,7 +349,7 @@ class CRM_Export_BAO_Export {
           continue;
         }
 
-        if (array_key_exists($fieldName, self::$relationshipTypes) && (!empty($value[2]) || !empty($value[4]))) {
+        if ($processor->isRelationshipTypeKey($fieldName) && (!empty($value[2]) || !empty($value[4]))) {
           self::setRelationshipReturnProperties($value, $locationTypeFields, $fieldName);
           // @todo we can later not add this to this array but maintain a separate array.
           $returnProperties = array_merge($returnProperties, self::$relationshipReturnProperties);
@@ -471,7 +463,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
 
       foreach ($returnProperties as $key => $value) {
-        if (!array_key_exists($key, self::$relationshipTypes)) {
+        if (!$processor->isRelationshipTypeKey($key)) {
           $returnProperties[self::$memberOfHouseholdRelationshipKey][$key] = $value;
           $returnProperties[self::$headOfHouseholdRelationshipKey][$key] = $value;
         }
@@ -631,7 +623,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             }
           }
 
-          if (array_key_exists($field, self::$relationshipTypes)) {
+          if ($processor->isRelationshipTypeKey($field)) {
             $relDAO = CRM_Utils_Array::value($iterationDAO->contact_id, $allRelContactArray[$field]);
             $relationQuery[$field]->convertToPseudoNames($relDAO);
             self::fetchRelationshipDetails($relDAO, $value, $field, $row);
@@ -1638,7 +1630,7 @@ WHERE  {$whereClause}";
     elseif ($field == 'provider_id') {
       $headerRows[] = ts('IM Service Provider');
     }
-    elseif (array_key_exists($field, self::$relationshipTypes)) {
+    elseif ($processor->isRelationshipTypeKey($field)) {
       foreach ($value as $relationField => $relationValue) {
         // below block is same as primary block (duplicate)
         if (isset($relationQuery[$field]->_fields[$relationField]['title'])) {
