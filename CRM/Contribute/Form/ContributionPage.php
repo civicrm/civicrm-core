@@ -336,6 +336,9 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     else {
       $defaults['is_active'] = 1;
       // set current date as start date
+      // @todo look to change to $defaults['start_date'] = date('Ymd His');
+      // main settings form overrides this to implement above but this is left here
+      // 'in case' another extending form uses start_date - for now
       list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults();
     }
 
