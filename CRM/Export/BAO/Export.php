@@ -269,23 +269,19 @@ class CRM_Export_BAO_Export {
       case CRM_Contact_BAO_Query::MODE_EVENT:
         $paymentFields = TRUE;
         $paymentTableId = 'participant_id';
-        $extraReturnProperties = array();
         break;
 
       case CRM_Contact_BAO_Query::MODE_MEMBER:
         $paymentFields = TRUE;
         $paymentTableId = 'membership_id';
-        $extraReturnProperties = array();
         break;
 
       case CRM_Contact_BAO_Query::MODE_PLEDGE:
-        $extraReturnProperties = CRM_Pledge_BAO_Query::extraReturnProperties($queryMode);
         $paymentFields = TRUE;
         $paymentTableId = 'pledge_payment_id';
         break;
 
       case CRM_Contact_BAO_Query::MODE_CASE:
-        $extraReturnProperties = CRM_Case_BAO_Query::extraReturnProperties($queryMode);
         $paymentFields = FALSE;
         $paymentTableId = '';
         break;
@@ -293,12 +289,10 @@ class CRM_Export_BAO_Export {
       default:
         $paymentFields = FALSE;
         $paymentTableId = '';
-        $extraReturnProperties = array();
     }
     $extraProperties = array(
       'paymentFields' => $paymentFields,
       'paymentTableId' => $paymentTableId,
-      'extraReturnProperties' => $extraReturnProperties,
     );
     return $extraProperties;
   }
@@ -444,13 +438,7 @@ class CRM_Export_BAO_Export {
       }
     }
     else {
-      $returnProperties = [
-        'location_type' => 1,
-        'im_provider' => 1,
-        'phone_type_id' => 1,
-        'provider_id' => 1,
-        'current_employer' => 1,
-       ];
+      $returnProperties = [];
       $fields = CRM_Contact_BAO_Contact::exportableFields('All', TRUE, TRUE);
       foreach ($fields as $key => $var) {
         if ($key && (substr($key, 0, 6) != 'custom')) {
@@ -461,23 +449,11 @@ class CRM_Export_BAO_Export {
 
       $extraProperties = self::defineExtraProperties($queryMode);
       $paymentFields = $extraProperties['paymentFields'];
-      $extraReturnProperties = $extraProperties['extraReturnProperties'];
       $paymentTableId = $extraProperties['paymentTableId'];
 
+      $returnProperties = array_merge($returnProperties, $processor->getAdditionalReturnProperties());
+
       if ($queryMode != CRM_Contact_BAO_Query::MODE_CONTACTS) {
-        $componentReturnProperties = CRM_Contact_BAO_Query::defaultReturnProperties($queryMode);
-        if ($queryMode == CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
-          // soft credit columns are not automatically populated, because contribution search doesn't require them by default
-          $componentReturnProperties = array_merge(
-              $componentReturnProperties,
-              CRM_Contribute_BAO_Query::softCreditReturnProperties(TRUE));
-        }
-        $returnProperties = array_merge($returnProperties, $componentReturnProperties);
-
-        if (!empty($extraReturnProperties)) {
-          $returnProperties = array_merge($returnProperties, $extraReturnProperties);
-        }
-
         // unset non exportable fields for components
         $nonExpoFields = array(
           'groups',

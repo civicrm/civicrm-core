@@ -877,6 +877,451 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test our export all field metadata retrieval.
+   *
+   * @dataProvider additionalFieldsDataProvider
+   * @param int $exportMode
+   * @param $expected
+   */
+  public function testAdditionalReturnProperties($exportMode, $expected) {
+    $this->ensureComponentIsEnabled($exportMode);
+    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, NULL, 'AND');
+    $metadata = $processor->getAdditionalReturnProperties();
+    $this->assertEquals($expected, $metadata);
+  }
+
+  /**
+   * Test our export all field metadata retrieval.
+   *
+   * @dataProvider allFieldsDataProvider
+   * @param int $exportMode
+   * @param $expected
+   */
+  public function testDefaultReturnProperties($exportMode, $expected) {
+    $this->ensureComponentIsEnabled($exportMode);
+    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, NULL, 'AND');
+    $metadata = $processor->getDefaultReturnProperties();
+    $this->assertEquals($expected, $metadata);
+  }
+
+  /**
+   * Get fields returned from additionalFields function.
+   *
+   * @return array
+   */
+  public function additionalFieldsDataProvider() {
+    return [
+      [
+        'anything that will then be defaulting ton contact',
+        $this->getExtraReturnProperties(),
+      ],
+      [
+        CRM_Export_Form_Select::ACTIVITY_EXPORT,
+        array_merge($this->getExtraReturnProperties(), $this->getActivityReturnProperties()),
+      ],
+      [
+        CRM_Export_Form_Select::CASE_EXPORT,
+        array_merge($this->getExtraReturnProperties(), $this->getCaseReturnProperties()),
+      ],
+      [
+        CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
+        array_merge($this->getExtraReturnProperties(), $this->getContributionReturnProperties()),
+      ],
+      [
+        CRM_Export_Form_Select::EVENT_EXPORT,
+        array_merge($this->getExtraReturnProperties(), $this->getEventReturnProperties()),
+      ],
+      [
+        CRM_Export_Form_Select::MEMBER_EXPORT,
+        array_merge($this->getExtraReturnProperties(), $this->getMembershipReturnProperties()),
+      ],
+      [
+        CRM_Export_Form_Select::PLEDGE_EXPORT,
+        array_merge($this->getExtraReturnProperties(), $this->getPledgeReturnProperties()),
+      ],
+
+    ];
+  }
+
+  /**
+   * get data for testing field metadata by query mode.
+   */
+  public function allFieldsDataProvider() {
+    return [
+      [
+        'anything that will then be defaulting ton contact',
+        $this->getBasicReturnProperties(TRUE),
+      ],
+      [
+        CRM_Export_Form_Select::ACTIVITY_EXPORT,
+        array_merge($this->getBasicReturnProperties(FALSE), $this->getActivityReturnProperties()),
+      ],
+      [
+        CRM_Export_Form_Select::CASE_EXPORT,
+        array_merge($this->getBasicReturnProperties(FALSE), $this->getCaseReturnProperties()),
+      ],
+      [
+        CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
+        array_merge($this->getBasicReturnProperties(FALSE), $this->getContributionReturnProperties()),
+      ],
+      [
+        CRM_Export_Form_Select::EVENT_EXPORT,
+        array_merge($this->getBasicReturnProperties(FALSE), $this->getEventReturnProperties()),
+      ],
+      [
+        CRM_Export_Form_Select::MEMBER_EXPORT,
+        array_merge($this->getBasicReturnProperties(FALSE), $this->getMembershipReturnProperties()),
+      ],
+      [
+        CRM_Export_Form_Select::PLEDGE_EXPORT,
+        array_merge($this->getBasicReturnProperties(FALSE), $this->getPledgeReturnProperties()),
+      ],
+    ];
+  }
+
+  /**
+   * Get return properties manually added in.
+   */
+  public function getExtraReturnProperties() {
+    return [
+      'location_type' => 1,
+      'im_provider' => 1,
+      'phone_type_id' => 1,
+      'provider_id' => 1,
+      'current_employer' => 1,
+    ];
+  }
+
+  /**
+   * Get basic return properties.
+   *
+   * @bool $isContactMode
+   *   Are we in contact mode or not
+   *
+   * @return array
+   */
+  protected function getBasicReturnProperties($isContactMode) {
+    $returnProperties = [
+      'id' => 1,
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'do_not_email' => 1,
+      'do_not_phone' => 1,
+      'do_not_mail' => 1,
+      'do_not_sms' => 1,
+      'do_not_trade' => 1,
+      'is_opt_out' => 1,
+      'legal_identifier' => 1,
+      'external_identifier' => 1,
+      'sort_name' => 1,
+      'display_name' => 1,
+      'nick_name' => 1,
+      'legal_name' => 1,
+      'image_URL' => 1,
+      'preferred_communication_method' => 1,
+      'preferred_language' => 1,
+      'preferred_mail_format' => 1,
+      'hash' => 1,
+      'contact_source' => 1,
+      'first_name' => 1,
+      'middle_name' => 1,
+      'last_name' => 1,
+      'prefix_id' => 1,
+      'suffix_id' => 1,
+      'formal_title' => 1,
+      'communication_style_id' => 1,
+      'email_greeting_id' => 1,
+      'postal_greeting_id' => 1,
+      'addressee_id' => 1,
+      'job_title' => 1,
+      'gender_id' => 1,
+      'birth_date' => 1,
+      'is_deceased' => 1,
+      'deceased_date' => 1,
+      'household_name' => 1,
+      'organization_name' => 1,
+      'sic_code' => 1,
+      'user_unique_id' => 1,
+      'current_employer_id' => 1,
+      'contact_is_deleted' => 1,
+      'created_date' => 1,
+      'modified_date' => 1,
+      'addressee' => 1,
+      'email_greeting' => 1,
+      'postal_greeting' => 1,
+      'current_employer' => 1,
+      'location_type' => 1,
+      'street_address' => 1,
+      'street_number' => 1,
+      'street_number_suffix' => 1,
+      'street_name' => 1,
+      'street_unit' => 1,
+      'supplemental_address_1' => 1,
+      'supplemental_address_2' => 1,
+      'supplemental_address_3' => 1,
+      'city' => 1,
+      'postal_code_suffix' => 1,
+      'postal_code' => 1,
+      'geo_code_1' => 1,
+      'geo_code_2' => 1,
+      'address_name' => 1,
+      'master_id' => 1,
+      'county' => 1,
+      'state_province' => 1,
+      'country' => 1,
+      'phone' => 1,
+      'phone_ext' => 1,
+      'email' => 1,
+      'on_hold' => 1,
+      'is_bulkmail' => 1,
+      'signature_text' => 1,
+      'signature_html' => 1,
+      'im_provider' => 1,
+      'im' => 1,
+      'openid' => 1,
+      'world_region' => 1,
+      'url' => 1,
+      'groups' => 1,
+      'tags' => 1,
+      'notes' => 1,
+      'phone_type_id' => 1,
+      'provider_id' => 1,
+    ];
+    if (!$isContactMode) {
+      unset($returnProperties['groups']);
+      unset($returnProperties['tags']);
+      unset($returnProperties['notes']);
+    }
+    return $returnProperties;
+  }
+
+  /**
+   * Get return properties for pledges.
+   *
+   * @return array
+   */
+  public function getPledgeReturnProperties() {
+    return [
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'sort_name' => 1,
+      'display_name' => 1,
+      'pledge_id' => 1,
+      'pledge_amount' => 1,
+      'pledge_total_paid' => 1,
+      'pledge_create_date' => 1,
+      'pledge_start_date' => 1,
+      'pledge_next_pay_date' => 1,
+      'pledge_next_pay_amount' => 1,
+      'pledge_status' => 1,
+      'pledge_is_test' => 1,
+      'pledge_contribution_page_id' => 1,
+      'pledge_financial_type' => 1,
+      'pledge_frequency_interval' => 1,
+      'pledge_frequency_unit' => 1,
+      'pledge_currency' => 1,
+      'pledge_campaign_id' => 1,
+      'pledge_balance_amount' => 1,
+      'pledge_payment_id' => 1,
+      'pledge_payment_scheduled_amount' => 1,
+      'pledge_payment_scheduled_date' => 1,
+      'pledge_payment_paid_amount' => 1,
+      'pledge_payment_paid_date' => 1,
+      'pledge_payment_reminder_date' => 1,
+      'pledge_payment_reminder_count' => 1,
+      'pledge_payment_status' => 1,
+    ];
+  }
+
+  /**
+   * Get membership return properties.
+   *
+   * @return array
+   */
+  public function getMembershipReturnProperties() {
+    return [
+      'location_type' => 1,
+      'im_provider' => 1,
+      'phone_type_id' => 1,
+      'provider_id' => 1,
+      'current_employer' => 1,
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'sort_name' => 1,
+      'display_name' => 1,
+      'membership_type' => 1,
+      'member_is_test' => 1,
+      'member_is_pay_later' => 1,
+      'join_date' => 1,
+      'membership_start_date' => 1,
+      'membership_end_date' => 1,
+      'membership_source' => 1,
+      'membership_status' => 1,
+      'membership_id' => 1,
+      'owner_membership_id' => 1,
+      'max_related' => 1,
+      'membership_recur_id' => 1,
+      'member_campaign_id' => 1,
+      'member_is_override' => 1,
+      'member_auto_renew' => 1,
+    ];
+  }
+
+  /**
+   * Get return properties for events.
+   *
+   * @return array
+   */
+  public function getEventReturnProperties() {
+    return [
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'sort_name' => 1,
+      'display_name' => 1,
+      'event_id' => 1,
+      'event_title' => 1,
+      'event_start_date' => 1,
+      'event_end_date' => 1,
+      'event_type' => 1,
+      'participant_id' => 1,
+      'participant_status' => 1,
+      'participant_status_id' => 1,
+      'participant_role' => 1,
+      'participant_role_id' => 1,
+      'participant_note' => 1,
+      'participant_register_date' => 1,
+      'participant_source' => 1,
+      'participant_fee_level' => 1,
+      'participant_is_test' => 1,
+      'participant_is_pay_later' => 1,
+      'participant_fee_amount' => 1,
+      'participant_discount_name' => 1,
+      'participant_fee_currency' => 1,
+      'participant_registered_by_id' => 1,
+      'participant_campaign_id' => 1,
+    ];
+  }
+
+  /**
+   * Get return properties for activities.
+   *
+   * @return array
+   */
+  public function getActivityReturnProperties() {
+    return [
+      'activity_id' => 1,
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'sort_name' => 1,
+      'display_name' => 1,
+      'activity_type' => 1,
+      'activity_type_id' => 1,
+      'activity_subject' => 1,
+      'activity_date_time' => 1,
+      'activity_duration' => 1,
+      'activity_location' => 1,
+      'activity_details' => 1,
+      'activity_status' => 1,
+      'activity_priority' => 1,
+      'source_contact' => 1,
+      'source_record_id' => 1,
+      'activity_is_test' => 1,
+      'activity_campaign_id' => 1,
+      'result' => 1,
+      'activity_engagement_level' => 1,
+      'parent_id' => 1,
+    ];
+  }
+
+  /**
+   * Get return properties for Case.
+   *
+   * @return array
+   */
+  public function getCaseReturnProperties() {
+    return [
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'sort_name' => 1,
+      'display_name' => 1,
+      'phone' => 1,
+      'case_start_date' => 1,
+      'case_end_date' => 1,
+      'case_subject' => 1,
+      'case_source_contact_id' => 1,
+      'case_activity_status' => 1,
+      'case_activity_duration' => 1,
+      'case_activity_medium_id' => 1,
+      'case_activity_details' => 1,
+      'case_activity_is_auto' => 1,
+      'contact_id' => 1,
+      'case_id' => 1,
+      'case_activity_subject' => 1,
+      'case_status' => 1,
+      'case_type' => 1,
+      'case_role' => 1,
+      'case_deleted' => 1,
+      'case_recent_activity_date' => 1,
+      'case_recent_activity_type' => 1,
+      'case_scheduled_activity_date' => 1,
+    ];
+  }
+
+  /**
+   * Get return properties for contribution.
+   *
+   * @return array
+   */
+  public function getContributionReturnProperties() {
+    return [
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'sort_name' => 1,
+      'display_name' => 1,
+      'financial_type' => 1,
+      'contribution_source' => 1,
+      'receive_date' => 1,
+      'thankyou_date' => 1,
+      'cancel_date' => 1,
+      'total_amount' => 1,
+      'accounting_code' => 1,
+      'payment_instrument' => 1,
+      'payment_instrument_id' => 1,
+      'contribution_check_number' => 1,
+      'non_deductible_amount' => 1,
+      'fee_amount' => 1,
+      'net_amount' => 1,
+      'trxn_id' => 1,
+      'invoice_id' => 1,
+      'invoice_number' => 1,
+      'currency' => 1,
+      'cancel_reason' => 1,
+      'receipt_date' => 1,
+      'product_name' => 1,
+      'sku' => 1,
+      'product_option' => 1,
+      'fulfilled_date' => 1,
+      'contribution_start_date' => 1,
+      'contribution_end_date' => 1,
+      'is_test' => 1,
+      'is_pay_later' => 1,
+      'contribution_status' => 1,
+      'contribution_recur_id' => 1,
+      'amount_level' => 1,
+      'contribution_note' => 1,
+      'contribution_batch' => 1,
+      'contribution_campaign_title' => 1,
+      'contribution_campaign_id' => 1,
+      'contribution_product_id' => 1,
+      'contribution_soft_credit_name' => 1,
+      'contribution_soft_credit_amount' => 1,
+      'contribution_soft_credit_type' => 1,
+      'contribution_soft_credit_contact_id' => 1,
+      'contribution_soft_credit_contribution_id' => 1,
+    ];
+  }
+
+  /**
    * Test the column definition when 'all' fields defined.
    *
    * @param $exportMode

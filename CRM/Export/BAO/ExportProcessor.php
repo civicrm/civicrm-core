@@ -182,4 +182,40 @@ class CRM_Export_BAO_ExportProcessor {
     return array($query, $select, $from, $where, $having);
   }
 
+  /**
+   * Get array of fields to return, over & above those defined in the main contact exportable fields.
+   *
+   * These include export mode specific fields & some fields apparently required as 'exportableFields'
+   * but not returned by the function of the same name.
+   *
+   * @return array
+   *   Array of fields to return in the format ['field_name' => 1,...]
+   */
+  public function getAdditionalReturnProperties() {
+
+    $missing = [
+      'location_type',
+      'im_provider',
+      'phone_type_id',
+      'provider_id',
+      'current_employer',
+    ];
+    if ($this->getQueryMode() === CRM_Contact_BAO_Query::MODE_CONTACTS) {
+      $componentSpecificFields = [];
+    }
+    else {
+      $componentSpecificFields = CRM_Contact_BAO_Query::defaultReturnProperties($this->getQueryMode());
+    }
+    if ($this->getQueryMode() === CRM_Contact_BAO_Query::MODE_PLEDGE) {
+      $componentSpecificFields = array_merge($componentSpecificFields, CRM_Pledge_BAO_Query::extraReturnProperties($this->getQueryMode()));
+    }
+    if ($this->getQueryMode() === CRM_Contact_BAO_Query::MODE_CASE) {
+      $componentSpecificFields = array_merge($componentSpecificFields, CRM_Case_BAO_Query::extraReturnProperties($this->getQueryMode()));
+    }
+    if ($this->getQueryMode() === CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
+      $componentSpecificFields = array_merge($componentSpecificFields, CRM_Contribute_BAO_Query::softCreditReturnProperties(TRUE));
+    }
+    return array_merge(array_fill_keys($missing, 1), $componentSpecificFields);
+  }
+
 }
