@@ -200,9 +200,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $this->assign('feeBlockPaid', FALSE);
 
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
+    $this->_mode = CRM_Utils_Request::retrieve('mode', 'Alphanumeric', $this);
     $this->_eID = CRM_Utils_Request::retrieve('eid', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $this->_context);
 
     if ($this->_contactId) {

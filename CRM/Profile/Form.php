@@ -195,7 +195,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $this->_id = $this->get('id');
     $this->_profileIds = $this->get('profileIds');
     $this->_grid = CRM_Utils_Request::retrieve('grid', 'Integer', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     //unset from session when $_GET doesn't have it
     //except when the form is submitted

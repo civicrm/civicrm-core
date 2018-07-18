@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.6                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,54 +26,20 @@
  */
 
 /**
- *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2018
  * $Id$
- *
  */
 
 /**
- * Main page for activity dashlet
+ * Purify HTML to mitigate against XSS attacks
  *
+ * @param string $text
+ *   Input text, potentially containing XSS
+ *
+ * @return string
+ *   Output text, containing only clean HTML
  */
-class CRM_Dashlet_Page_Activity extends CRM_Core_Page {
-
-  /**
-   * List activities as dashlet.
-   *
-   * @return void
-   */
-  public function run() {
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
-    $this->assign('contactID', $contactID);
-    $this->assign('contactId', $contactID);
-
-    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'dashlet');
-    $this->assign('context', $context);
-
-    // a user can always view their own activity
-    // if they have access CiviCRM permission
-    $permission = CRM_Core_Permission::VIEW;
-
-    // make the permission edit if the user has edit permission on the contact
-    if (CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::EDIT)) {
-      $permission = CRM_Core_Permission::EDIT;
-    }
-
-    $admin = CRM_Core_Permission::check('view all activities') || CRM_Core_Permission::check('administer CiviCRM');
-
-    $this->assign('admin', $admin);
-
-    // also create the form element for the activity filter box
-    $controller = new CRM_Core_Controller_Simple('CRM_Activity_Form_ActivityFilter',
-      ts('Activity Filter'), NULL
-    );
-    $controller->setEmbedded(TRUE);
-    $controller->run();
-
-    return parent::run();
-  }
-
+function smarty_modifier_purify($text) {
+  return CRM_Utils_String::purifyHTML($text);
 }

@@ -50,7 +50,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this);
     $this->assign('component', $this->_component);
 
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $this->_context);
 
     $this->_pageId = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);

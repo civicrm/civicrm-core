@@ -425,7 +425,7 @@ LIMIT {$offset}, {$rowCount}
           // send query to hook to be modified if needed
           CRM_Utils_Hook::contactListQuery($query,
             $name,
-            CRM_Utils_Request::retrieve('context', 'String', CRM_Core_DAO::$_nullObject),
+            CRM_Utils_Request::retrieve('context', 'Alphanumeric', CRM_Core_DAO::$_nullObject),
             CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject)
           );
 
@@ -450,7 +450,7 @@ LIMIT {$offset}, {$rowCount}
           // send query to hook to be modified if needed
           CRM_Utils_Hook::contactListQuery($query,
             $name,
-            CRM_Utils_Request::retrieve('context', 'String', CRM_Core_DAO::$_nullObject),
+            CRM_Utils_Request::retrieve('context', 'Alphanumeric', CRM_Core_DAO::$_nullObject),
             CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject)
           );
 
@@ -521,7 +521,7 @@ LIMIT {$offset}, {$rowCount}
       // send query to hook to be modified if needed
       CRM_Utils_Hook::contactListQuery($query,
         $name,
-        CRM_Utils_Request::retrieve('context', 'String', CRM_Core_DAO::$_nullObject),
+        CRM_Utils_Request::retrieve('context', 'Alphanumeric', CRM_Core_DAO::$_nullObject),
         CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject)
       );
 
@@ -814,7 +814,7 @@ LIMIT {$offset}, {$rowCount}
    */
   public static function getContactRelationships() {
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
-    $context = CRM_Utils_Type::escape($_GET['context'], 'String');
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric');
     $relationship_type_id = CRM_Utils_Type::escape(CRM_Utils_Array::value('relationship_type_id', $_GET), 'Integer',
       FALSE);
 

@@ -60,10 +60,10 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'membership');
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'membership');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
+    $this->_mode = CRM_Utils_Request::retrieve('mode', 'Alphanumeric', $this);
 
     $this->assign('context', $this->_context);
     $this->assign('membershipMode', $this->_mode);

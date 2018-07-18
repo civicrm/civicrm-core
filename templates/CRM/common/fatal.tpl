@@ -29,7 +29,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 
 <head>
-  <title>{$pageTitle}</title>
+  <title>{$pageTitle|escape}</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <base href="{$config->resourceBase}" />
   <style type="text/css" media="screen">
@@ -48,10 +48,10 @@
 {/if}
 <div class="messages status no-popup">  <div class="icon red-icon ui-icon-alert"></div>
  <span class="status-fatal">{ts}Sorry but we are not able to provide this at the moment.{/ts}</span>
-    <div class="crm-section crm-error-message">{$message}</div>
+    <div class="crm-section crm-error-message">{$message|escape}</div>
     {if $error.message && $message != $error.message}
         <hr style="solid 1px" />
-        <div class="crm-section crm-error-message">{$error.message}</div>
+        <div class="crm-section crm-error-message">{$error.message|escape}</div>
     {/if}
     {if ($code OR $mysql_code OR $errorDetails) AND $config->debug}
         <div class="crm-accordion-wrapper collapsed crm-fatal-error-details-block" onclick="toggle(this);";>
@@ -60,13 +60,13 @@
          </div><!-- /.crm-accordion-header -->
          <div class="crm-accordion-body">
             {if $code}
-                <div class="crm-section">{ts}Error Code:{/ts} {$code}</div>
+                <div class="crm-section">{ts}Error Code:{/ts} {$code|purify}</div>
             {/if}
             {if $mysql_code}
-                <div class="crm-section">{ts}Database Error Code:{/ts} {$mysql_code}</div>
+                <div class="crm-section">{ts}Database Error Code:{/ts} {$mysql_code|purify}</div>
             {/if}
             {if $errorDetails}
-                <div class="crm-section">{ts}Additional Details:{/ts} {$errorDetails}</div>
+                <div class="crm-section">{ts}Additional Details:{/ts} {$errorDetails|purify}</div>
             {/if}
          </div><!-- /.crm-accordion-body -->
         </div><!-- /.crm-accordion-wrapper -->
