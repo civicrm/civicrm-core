@@ -76,7 +76,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       CRM_Utils_System::permissionDenied();
     }
 
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $this->assign('context', $this->_context);
 

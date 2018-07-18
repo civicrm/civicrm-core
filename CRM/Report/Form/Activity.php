@@ -893,6 +893,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
     $viewLinks = FALSE;
+
     // Would we ever want to retrieve from the form controller??
     $form = $this->noController ? NULL : $this;
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $form, FALSE, 'report');

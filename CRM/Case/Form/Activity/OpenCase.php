@@ -62,7 +62,7 @@ class CRM_Case_Form_Activity_OpenCase {
       return;
     }
 
-    $form->_context = CRM_Utils_Request::retrieve('context', 'String', $form);
+    $form->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $form);
     $form->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $form);
     $form->assign('context', $form->_context);
 
