@@ -209,7 +209,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $pattern = '/as `?([^`,]*)/';
     $queryFieldAliases = array();
     preg_match_all($pattern, $select, $queryFieldAliases, PREG_PATTERN_ORDER);
-    $processor = new CRM_Export_BAO_ExportProcessor(CRM_Contact_BAO_Query::MODE_CONTRIBUTE, 'AND');
+    $processor = new CRM_Export_BAO_ExportProcessor(CRM_Contact_BAO_Query::MODE_CONTRIBUTE, NULL, 'AND');
     $processor->setQueryFields($query->_fields);
 
     list($outputFields) = CRM_Export_BAO_Export::getExportStructureArrays($returnProperties, $processor, $contactRelationshipTypes, '');

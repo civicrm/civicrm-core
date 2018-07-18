@@ -63,15 +63,41 @@ class CRM_Export_BAO_ExportProcessor {
   protected $queryOperator;
 
   /**
+   * Requested output fields.
+   *
+   * If set to NULL then it is 'primary fields only'
+   * which actually means pretty close to all fields!
+   *
+   * @var array|null
+   */
+  protected $requestedFields;
+
+  /**
    * CRM_Export_BAO_ExportProcessor constructor.
    *
    * @param int $exportMode
+   * @param array|NULL $requestedFields
    * @param string $queryOperator
    */
-  public function __construct($exportMode, $queryOperator) {
+  public function __construct($exportMode, $requestedFields, $queryOperator) {
     $this->setExportMode($exportMode);
     $this->setQueryMode();
     $this->setQueryOperator($queryOperator);
+    $this->setRequestedFields($requestedFields);
+  }
+
+  /**
+   * @return array|null
+   */
+  public function getRequestedFields() {
+    return $this->requestedFields;
+  }
+
+  /**
+   * @param array|null $requestedFields
+   */
+  public function setRequestedFields($requestedFields) {
+    $this->requestedFields = $requestedFields;
   }
 
   /**
@@ -216,6 +242,63 @@ class CRM_Export_BAO_ExportProcessor {
       $componentSpecificFields = array_merge($componentSpecificFields, CRM_Contribute_BAO_Query::softCreditReturnProperties(TRUE));
     }
     return array_merge(array_fill_keys($missing, 1), $componentSpecificFields);
+  }
+
+  /**
+   * Should payment fields be appended to the export.
+   *
+   * (This is pretty hacky so hopefully this function won't last long - notice
+   * how obviously it should be part of the above function!).
+   */
+  public function isExportPaymentFields() {
+    if ($this->getRequestedFields() === NULL
+      &&  in_array($this->getExportMode(), [
+        CRM_Contact_BAO_Query::MODE_EVENT,
+        CRM_Contact_BAO_Query::MODE_MEMBER,
+        CRM_Contact_BAO_Query::MODE_PLEDGE,
+      ])) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Get the name of the id field in the table that connects contributions to the export entity.
+   */
+  public function getPaymentTableID() {
+    if ($this->getRequestedFields() === NULL) {
+      $mapping = [
+        CRM_Contact_BAO_Query::MODE_EVENT => 'participant_id',
+        CRM_Contact_BAO_Query::MODE_MEMBER => 'membership_id',
+        CRM_Contact_BAO_Query::MODE_PLEDGE => 'pledge_payment_id',
+      ];
+      return isset($mapping[$this->getQueryMode()]) ? $mapping[$this->getQueryMode()] : '';
+    }
+    return FALSE;
+  }
+
+  /**
+   * Get the default properties when not specified.
+   *
+   * In the UI this appears as 'Primary fields only' but in practice it's
+   * most of the kitchen sink and the hallway closet thrown in.
+   *
+   * Since CRM-952 custom fields are excluded, but no other form of mercy is shown.
+   *
+   * @return array
+   */
+  public function getDefaultReturnProperties() {
+    $returnProperties = [];
+    $fields = CRM_Contact_BAO_Contact::exportableFields('All', TRUE, TRUE);
+    $skippedFields = ($this->getQueryMode() === CRM_Contact_BAO_Query::MODE_CONTACTS) ? [] : ['groups', 'tags', 'notes'];
+
+    foreach ($fields as $key => $var) {
+      if ($key && (substr($key, 0, 6) != 'custom') && !in_array($key, $skippedFields)) {
+        $returnProperties[$key] = 1;
+      }
+    }
+    $returnProperties = array_merge($returnProperties, $this->getAdditionalReturnProperties());
+    return $returnProperties;
   }
 
 }

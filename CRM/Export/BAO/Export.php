@@ -267,31 +267,25 @@ class CRM_Export_BAO_Export {
   public static function defineExtraProperties($queryMode) {
     switch ($queryMode) {
       case CRM_Contact_BAO_Query::MODE_EVENT:
-        $paymentFields = TRUE;
         $paymentTableId = 'participant_id';
         break;
 
       case CRM_Contact_BAO_Query::MODE_MEMBER:
-        $paymentFields = TRUE;
         $paymentTableId = 'membership_id';
         break;
 
       case CRM_Contact_BAO_Query::MODE_PLEDGE:
-        $paymentFields = TRUE;
         $paymentTableId = 'pledge_payment_id';
         break;
 
       case CRM_Contact_BAO_Query::MODE_CASE:
-        $paymentFields = FALSE;
         $paymentTableId = '';
         break;
 
       default:
-        $paymentFields = FALSE;
         $paymentTableId = '';
     }
     $extraProperties = array(
-      'paymentFields' => $paymentFields,
       'paymentTableId' => $paymentTableId,
     );
     return $extraProperties;
@@ -347,9 +341,9 @@ class CRM_Export_BAO_Export {
     $queryOperator = 'AND'
   ) {
 
-    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $queryOperator);
+    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator);
     $returnProperties = array();
-    $paymentFields = $selectedPaymentFields = $paymentTableId = FALSE;
+    $selectedPaymentFields = FALSE;
 
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     // Warning - this imProviders var is used in a somewhat fragile way - don't rename it
@@ -448,7 +442,6 @@ class CRM_Export_BAO_Export {
       }
 
       $extraProperties = self::defineExtraProperties($queryMode);
-      $paymentFields = $extraProperties['paymentFields'];
       $paymentTableId = $extraProperties['paymentTableId'];
 
       $returnProperties = array_merge($returnProperties, $processor->getAdditionalReturnProperties());
@@ -618,7 +611,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $addPaymentHeader = FALSE;
 
     $paymentDetails = array();
-    if ($paymentFields || $selectedPaymentFields) {
+    if ($processor->isExportPaymentFields() || $selectedPaymentFields) {
 
       // get payment related in for event and members
       $paymentDetails = CRM_Contribute_BAO_Contribution::getContributionDetails($exportMode, $ids);
@@ -709,7 +702,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         }
 
         // add payment headers if required
-        if ($addPaymentHeader && $paymentFields) {
+        if ($addPaymentHeader && $processor->isExportPaymentFields()) {
           // @todo rather than do this for every single row do it before the loop starts.
           // where other header definitions take place.
           $headerRows = array_merge($headerRows, $paymentHeaders);
@@ -730,7 +723,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         // information, if appropriate.
         if ($addPaymentHeader) {
           if (!$selectedPaymentFields) {
-            if ($paymentFields) {
+            if ($processor->isExportPaymentFields()) {
               $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
               if (!is_array($paymentData) || empty($paymentData)) {
                 $paymentData = $nullContributionDetails;
