@@ -44,6 +44,11 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
+    // @todo handle properly on parent.
+    if (!$this->_id) {
+      $defaults['start_date'] = date('Y-m-d H:i:s');
+      unset($defaults['start_time']);
+    }
     $soft_credit_types = CRM_Core_OptionGroup::values('soft_credit_type', TRUE, FALSE, FALSE, NULL, 'name');
 
     if ($this->_id) {
