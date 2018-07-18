@@ -130,39 +130,22 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
   }
 
   /**
-   * @return array
+   * Filter out the memberships that are inherited from a contact that the
+   * recipient cannot edit.
+   *
+   * @return CRM_Utils_SQL_Select
    */
   protected function prepareMembershipPermissionsFilter() {
-    $query = '
-SELECT    cm.id AS owner_id, cm.contact_id AS owner_contact, m.id AS slave_id, m.contact_id AS slave_contact, cmt.relationship_type_id AS relation_type, rel.contact_id_a, rel.contact_id_b, rel.is_permission_a_b, rel.is_permission_b_a
-FROM      civicrm_membership m
-LEFT JOIN civicrm_membership cm ON cm.id = m.owner_membership_id
-LEFT JOIN civicrm_membership_type cmt ON cmt.id = m.membership_type_id
-LEFT JOIN civicrm_relationship rel ON ( ( rel.contact_id_a = m.contact_id AND rel.contact_id_b = cm.contact_id AND rel.relationship_type_id = cmt.relationship_type_id )
-                                        OR ( rel.contact_id_a = cm.contact_id AND rel.contact_id_b = m.contact_id AND rel.relationship_type_id = cmt.relationship_type_id ) )
-WHERE     m.owner_membership_id IS NOT NULL AND
-          ( rel.is_permission_a_b = 0 OR rel.is_permission_b_a = 0)
+    $joins = [
+      'cm' => 'LEFT JOIN civicrm_membership cm ON cm.id = e.owner_membership_id',
+      'rela' => 'LEFT JOIN civicrm_relationship rela ON rela.contact_id_a = e.contact_id AND rela.contact_id_b = cm.contact_id AND rela.is_permission_a_b = #editPerm',
+      'relb' => 'LEFT JOIN civicrm_relationship relb ON relb.contact_id_a = cm.contact_id AND relb.contact_id_b = e.contact_id AND relb.is_permission_b_a = #editPerm',
+    ];
 
-';
-    $excludeIds = array();
-    $dao = \CRM_Core_DAO::executeQuery($query, array());
-    while ($dao->fetch()) {
-      if ($dao->slave_contact == $dao->contact_id_a && $dao->is_permission_a_b == 0) {
-        $excludeIds[] = $dao->slave_contact;
-      }
-      elseif ($dao->slave_contact == $dao->contact_id_b && $dao->is_permission_b_a == 0) {
-        $excludeIds[] = $dao->slave_contact;
-      }
-    }
-
-    if (!empty($excludeIds)) {
-      return \CRM_Utils_SQL_Select::fragment()
-        ->where("!casContactIdField NOT IN (#excludeMemberIds)")
-        ->param(array(
-          '#excludeMemberIds' => $excludeIds,
-        ));
-    }
-    return NULL;
+    return \CRM_Utils_SQL_Select::fragment()
+      ->join(NULL, $joins)
+      ->param('#editPerm', CRM_Contact_BAO_Relationship::EDIT)
+      ->where('!( e.owner_membership_id IS NOT NULL AND rela.id IS NULL and relb.id IS NULL )');
   }
 
 }
