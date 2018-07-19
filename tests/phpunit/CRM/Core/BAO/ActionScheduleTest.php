@@ -223,6 +223,35 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => 'week',
       'subject' => 'subject sched_membership_join_2week (joined {membership.join_date})',
     );
+    $this->fixtures['sched_membership_start_1week'] = array(
+      'name' => 'sched_membership_start_1week',
+      'title' => 'sched_membership_start_1week',
+      'absolute_date' => '',
+      'body_html' => '<p>body sched_membership_start_1week</p>',
+      'body_text' => 'body sched_membership_start_1week',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => '',
+      'entity_value' => '',
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 4,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'membership_start_date',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'week',
+      'subject' => 'subject sched_membership_start_1week (joined {membership.start_date})',
+    );
     $this->fixtures['sched_membership_end_2week'] = array(
       'name' => 'sched_membership_end_2week',
       'title' => 'sched_membership_end_2week',
@@ -969,39 +998,57 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * an email should be sent.
    */
   public function testMembershipDateMatch() {
-    foreach (['membership_join_date', 'membership_start_date'] as $date) {
-      $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 1)));
-      $this->assertTrue(is_numeric($membership->id));
-      $result = $this->callAPISuccess('Email', 'create', array(
-        'contact_id' => $membership->contact_id,
-        'email' => 'test-member@example.com',
-        'location_type_id' => 1,
-      ));
-      $this->assertAPISuccess($result);
+    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 1)));
+    $this->assertTrue(is_numeric($membership->id));
+    $result = $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $membership->contact_id,
+      'email' => 'test-member@example.com',
+      'location_type_id' => 1,
+    ));
+    $this->assertAPISuccess($result);
 
-      $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
-      $actionSchedule = $this->fixtures['sched_membership_join_2week'];
-      $actionSchedule['start_action_date'] = $date;
-      $actionSchedule['entity_value'] = $membership->membership_type_id;
-      $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
-      $this->assertTrue(is_numeric($actionScheduleDao->id));
+    $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
+    $actionSchedule = $this->fixtures['sched_membership_join_2week'];
+    $actionSchedule['entity_value'] = $membership->membership_type_id;
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
 
-      // start_date=2012-03-15 ; schedule is 2 weeks after start_date
-      $this->assertCronRuns(array(
-        array(
-          // Before the 2-week mark, no email.
-          'time' => '2012-03-28 01:00:00',
-          'recipients' => array(),
-          'subjects' => array(),
-        ),
-        array(
-          // After the 2-week mark, send an email.
-          'time' => '2012-03-29 01:00:00',
-          'recipients' => array(array('test-member@example.com')),
-          'subjects' => array('subject sched_membership_join_2week (joined March 15th, 2012)'),
-        ),
-      ));
-    }
+    // start_date=2012-03-15 ; schedule is 2 weeks after join_date
+    $this->assertCronRuns(array(
+      array(
+        // Before the 2-week mark, no email.
+        'time' => '2012-03-28 01:00:00',
+        'recipients' => array(),
+        'subjects' => array(),
+      ),
+      array(
+        // After the 2-week mark, send an email.
+        'time' => '2012-03-29 01:00:00',
+        'recipients' => array(array('test-member@example.com')),
+        'subjects' => array('subject sched_membership_join_2week (joined March 15th, 2012)'),
+      ),
+    ));
+
+    $actionSchedule = $this->fixtures['sched_membership_start_1week'];
+    $actionSchedule['entity_value'] = $membership->membership_type_id;
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+
+    // start_date=2012-03-15 ; schedule is 1 weeks after start_date
+    $this->assertCronRuns(array(
+      array(
+        // Before the 2-week mark, no email.
+        'time' => '2012-03-21 01:00:00',
+        'recipients' => array(),
+        'subjects' => array(),
+      ),
+      array(
+        // After the 2-week mark, send an email.
+        'time' => '2012-03-22 01:00:00',
+        'recipients' => array(array('test-member@example.com')),
+        'subjects' => array('subject sched_membership_start_1week (joined March 15th, 2012)'),
+      ),
+    ));
   }
 
 
