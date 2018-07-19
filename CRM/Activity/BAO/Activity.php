@@ -1827,7 +1827,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $activityID,
     $sourceContactID = NULL
   ) {
-    $doNotSms = TRUE;
     $toPhoneNumber = NULL;
 
     if ($smsProviderParams['To']) {
@@ -1843,13 +1842,12 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
         $toPhoneNumberDetails = reset($toPhoneNumbers);
         $toPhoneNumber = CRM_Utils_Array::value('phone', $toPhoneNumberDetails);
         // Contact allows to send sms
-        $doNotSms = FALSE;
-      }
+        }
     }
 
     // make sure both phone are valid
     // and that the recipient wants to receive sms
-    if (empty($toPhoneNumber) or $doNotSms) {
+    if (empty($toPhoneNumber)) {
       return PEAR::raiseError(
         'Recipient phone number is invalid or recipient does not want to receive SMS',
         NULL,
