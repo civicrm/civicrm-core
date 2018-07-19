@@ -19,7 +19,7 @@ return array(
     'Psr\\Log\\' => array($vendorDir . '/psr/log'),
     'PHPUnit_' => array($baseDir . '/packages'),
     'PEAR' => array($vendorDir . '/pear/pear_exception'),
-    'Net' => array($vendorDir . '/pear/net_smtp', $vendorDir . '/pear/net_socket', $vendorDir . '/phpseclib/phpseclib/phpseclib'),
+    'Net' => array($vendorDir . '/phpseclib/phpseclib/phpseclib', $vendorDir . '/pear/net_socket', $vendorDir . '/pear/net_smtp'),
     'Math' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
     'File' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
     'Crypt' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
