@@ -27,6 +27,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected $activityIDs = [];
 
+
+  /**
+   * Contribution IDs created for testing.
+   *
+   * @var array
+   */
+  protected $membershipIDs = [];
+
   /**
    * Master Address ID created for testing.
    *
@@ -35,7 +43,16 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   protected $masterAddressID;
 
   public function tearDown() {
-    $this->quickCleanup(['civicrm_contact', 'civicrm_email', 'civicrm_address', 'civicrm_relationship']);
+    $this->quickCleanup([
+      'civicrm_contact',
+      'civicrm_email',
+      'civicrm_address',
+      'civicrm_relationship',
+      'civicrm_membership',
+      'civicrm_case',
+      'civicrm_case_contact',
+      'civicrm_case_activity',
+    ]);
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
@@ -214,6 +231,32 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->setUpContactExportData();
     $this->contributionIDs[] = $this->contributionCreate(array('contact_id' => $this->contactIDs[0], 'trxn_id' => 'null', 'invoice_id' => 'null'));
     $this->contributionIDs[] = $this->contributionCreate(array('contact_id' => $this->contactIDs[1], 'trxn_id' => 'null', 'invoice_id' => 'null'));
+  }
+
+  /**
+   * Set up some data for us to do testing on.
+   */
+  public function setUpMembershipExportData() {
+    $this->setUpContactExportData();
+    $this->membershipIDs[] = $this->contactMembershipCreate(['contact_id' => $this->contactIDs[0]]);
+  }
+
+  /**
+   * Set up data to test case export.
+   */
+  public function setupCaseExportData() {
+    $contactID1 = $this->individualCreate();
+    $contactID2 = $this->individualCreate(array(), 1);
+
+    $case = $this->callAPISuccess('case', 'create', array(
+      'case_type_id' => 1,
+      'subject' => 'blah',
+      'contact_id' => $contactID1,
+    ));
+    $this->callAPISuccess('CaseContact', 'create', [
+      'case_id' => $case['id'],
+      'contact_id' => $contactID2,
+    ]);
   }
 
   /**
@@ -552,7 +595,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         }
       }
     }
-    list($tableName, $sqlColumns) = $this->doExport($fields, $this->contactIDs[0]);
+    list($tableName) = $this->doExport($fields, $this->contactIDs[0]);
 
     $dao = CRM_Core_DAO::executeQuery('SELECT * FROM ' . $tableName);
     while ($dao->fetch()) {
@@ -820,6 +863,490 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       )
     );
     return array($tableName, $sqlColumns);
+  }
+
+  /**
+   * Ensure component is enabled.
+   *
+   * @param int $exportMode
+   */
+  public function ensureComponentIsEnabled($exportMode) {
+    if ($exportMode === CRM_Export_Form_Select::CASE_EXPORT) {
+      CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    }
+  }
+
+  /**
+   * Test the column definition when 'all' fields defined.
+   *
+   * @param $exportMode
+   * @param $expected
+   *
+   * @dataProvider getSqlColumnsOutput
+   */
+  public function testGetSQLColumns($exportMode, $expected) {
+    $this->ensureComponentIsEnabled($exportMode);
+    // We need some data so that we can get to the end of the export
+    // function. Hopefully one day that won't be required to get metadata info out.
+    // eventually aspire to call $provider->getSQLColumns straight after it
+    // is intiated.
+    $this->setupBaseExportData($exportMode);
+
+    $result = CRM_Export_BAO_Export::exportComponents(
+      TRUE,
+      [1],
+      [],
+      NULL,
+      NULL,
+      NULL,
+      $exportMode,
+      NULL,
+      NULL,
+      FALSE,
+      FALSE,
+      array(
+        'exportOption' => CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
+        'suppress_csv_for_testing' => TRUE,
+      )
+    );
+    $this->assertEquals($expected, $result[1]);
+  }
+
+  /**
+   * @param string $exportMode
+   */
+  public function setupBaseExportData($exportMode) {
+    $this->createLoggedInUser();
+    if ($exportMode === CRM_Export_Form_Select::CASE_EXPORT) {
+      $this->setupCaseExportData();
+    }
+    if ($exportMode === CRM_Export_Form_Select::CONTRIBUTE_EXPORT) {
+      $this->setUpContributionExportData();
+    }
+    if ($exportMode === CRM_Export_Form_Select::MEMBER_EXPORT) {
+      $this->setUpMembershipExportData();
+    }
+    if ($exportMode === CRM_Export_Form_Select::ACTIVITY_EXPORT) {
+      $this->setUpActivityExportData();
+    }
+  }
+
+  /**
+   * Get comprehensive sql columns output.
+   *
+   * @return array
+   */
+  public function getSqlColumnsOutput() {
+    return [
+      [
+        'anything that will then be defaulting ton contact',
+        $this->getBasicSqlColumnDefinition(TRUE),
+      ],
+      [
+        CRM_Export_Form_Select::ACTIVITY_EXPORT,
+        array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getActivitySqlColumns()),
+      ],
+      [
+        CRM_Export_Form_Select::CASE_EXPORT,
+        array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getCaseSqlColumns()),
+      ],
+      [
+        CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
+        array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getContributionSqlColumns()),
+      ],
+      [
+        CRM_Export_Form_Select::EVENT_EXPORT,
+        array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getParticipantSqlColumns()),
+      ],
+      [
+        CRM_Export_Form_Select::MEMBER_EXPORT,
+        array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getMembershipSqlColumns()),
+      ],
+      [
+        CRM_Export_Form_Select::PLEDGE_EXPORT,
+        array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getPledgeSqlColumns()),
+      ],
+
+    ];
+  }
+
+  /**
+   * Get the column definition for exports.
+   *
+   * @param bool $isContactExport
+   *
+   * @return array
+   */
+  protected function getBasicSqlColumnDefinition($isContactExport) {
+    $columns = [
+      'civicrm_primary_id' => 'civicrm_primary_id varchar(16)',
+      'contact_type' => 'contact_type varchar(64)',
+      'contact_sub_type' => 'contact_sub_type varchar(255)',
+      'do_not_email' => 'do_not_email varchar(16)',
+      'do_not_phone' => 'do_not_phone varchar(16)',
+      'do_not_mail' => 'do_not_mail varchar(16)',
+      'do_not_sms' => 'do_not_sms varchar(16)',
+      'do_not_trade' => 'do_not_trade varchar(16)',
+      'is_opt_out' => 'is_opt_out varchar(16)',
+      'legal_identifier' => 'legal_identifier varchar(32)',
+      'external_identifier' => 'external_identifier varchar(64)',
+      'sort_name' => 'sort_name varchar(128)',
+      'display_name' => 'display_name varchar(128)',
+      'nick_name' => 'nick_name varchar(128)',
+      'legal_name' => 'legal_name varchar(128)',
+      'image_url' => 'image_url longtext',
+      'preferred_communication_method' => 'preferred_communication_method varchar(255)',
+      'preferred_language' => 'preferred_language varchar(5)',
+      'preferred_mail_format' => 'preferred_mail_format varchar(8)',
+      'hash' => 'hash varchar(32)',
+      'contact_source' => 'contact_source varchar(255)',
+      'first_name' => 'first_name varchar(64)',
+      'middle_name' => 'middle_name varchar(64)',
+      'last_name' => 'last_name varchar(64)',
+      'prefix_id' => 'prefix_id varchar(255)',
+      'suffix_id' => 'suffix_id varchar(255)',
+      'formal_title' => 'formal_title varchar(64)',
+      'communication_style_id' => 'communication_style_id varchar(16)',
+      'email_greeting_id' => 'email_greeting_id varchar(16)',
+      'postal_greeting_id' => 'postal_greeting_id varchar(16)',
+      'addressee_id' => 'addressee_id varchar(16)',
+      'job_title' => 'job_title varchar(255)',
+      'gender_id' => 'gender_id varchar(16)',
+      'birth_date' => 'birth_date varchar(32)',
+      'is_deceased' => 'is_deceased varchar(16)',
+      'deceased_date' => 'deceased_date varchar(32)',
+      'household_name' => 'household_name varchar(128)',
+      'organization_name' => 'organization_name varchar(128)',
+      'sic_code' => 'sic_code varchar(8)',
+      'user_unique_id' => 'user_unique_id varchar(255)',
+      'current_employer_id' => 'current_employer_id varchar(16)',
+      'contact_is_deleted' => 'contact_is_deleted varchar(16)',
+      'created_date' => 'created_date varchar(32)',
+      'modified_date' => 'modified_date varchar(32)',
+      'addressee' => 'addressee varchar(255)',
+      'email_greeting' => 'email_greeting varchar(255)',
+      'postal_greeting' => 'postal_greeting varchar(255)',
+      'current_employer' => 'current_employer varchar(128)',
+      'location_type' => 'location_type text',
+      'street_address' => 'street_address varchar(96)',
+      'street_number' => 'street_number varchar(16)',
+      'street_number_suffix' => 'street_number_suffix varchar(8)',
+      'street_name' => 'street_name varchar(64)',
+      'street_unit' => 'street_unit varchar(16)',
+      'supplemental_address_1' => 'supplemental_address_1 varchar(96)',
+      'supplemental_address_2' => 'supplemental_address_2 varchar(96)',
+      'supplemental_address_3' => 'supplemental_address_3 varchar(96)',
+      'city' => 'city varchar(64)',
+      'postal_code_suffix' => 'postal_code_suffix varchar(12)',
+      'postal_code' => 'postal_code varchar(64)',
+      'geo_code_1' => 'geo_code_1 varchar(32)',
+      'geo_code_2' => 'geo_code_2 varchar(32)',
+      'address_name' => 'address_name varchar(255)',
+      'master_id' => 'master_id varchar(128)',
+      'county' => 'county varchar(64)',
+      'state_province' => 'state_province varchar(64)',
+      'country' => 'country varchar(64)',
+      'phone' => 'phone varchar(32)',
+      'phone_ext' => 'phone_ext varchar(16)',
+      'email' => 'email varchar(254)',
+      'on_hold' => 'on_hold varchar(16)',
+      'is_bulkmail' => 'is_bulkmail varchar(16)',
+      'signature_text' => 'signature_text longtext',
+      'signature_html' => 'signature_html longtext',
+      'im_provider' => 'im_provider text',
+      'im' => 'im varchar(64)',
+      'openid' => 'openid varchar(255)',
+      'world_region' => 'world_region varchar(128)',
+      'url' => 'url varchar(128)',
+      'groups' => 'groups text',
+      'tags' => 'tags text',
+      'notes' => 'notes text',
+      'phone_type_id' => 'phone_type_id varchar(255)',
+      'provider_id' => 'provider_id varchar(255)',
+    ];
+    if (!$isContactExport) {
+      unset($columns['groups']);
+      unset($columns['tags']);
+      unset($columns['notes']);
+    }
+    return $columns;
+  }
+
+  /**
+   * Get Case SQL columns.
+   *
+   * @return array
+   */
+  protected function getCaseSqlColumns() {
+    return [
+      'case_start_date' => 'case_start_date varchar(32)',
+      'case_end_date' => 'case_end_date varchar(32)',
+      'case_subject' => 'case_subject varchar(128)',
+      'case_source_contact_id' => 'case_source_contact_id varchar(255)',
+      'case_activity_status' => 'case_activity_status text',
+      'case_activity_duration' => 'case_activity_duration text',
+      'case_activity_medium_id' => 'case_activity_medium_id varchar(255)',
+      'case_activity_details' => 'case_activity_details text',
+      'case_activity_is_auto' => 'case_activity_is_auto text',
+      'contact_id' => 'contact_id varchar(255)',
+      'case_id' => 'case_id varchar(16)',
+      'case_activity_subject' => 'case_activity_subject text',
+      'case_status' => 'case_status text',
+      'case_type' => 'case_type text',
+      'case_role' => 'case_role text',
+      'case_deleted' => 'case_deleted varchar(16)',
+      'case_recent_activity_date' => 'case_recent_activity_date text',
+      'case_recent_activity_type' => 'case_recent_activity_type text',
+      'case_scheduled_activity_date' => 'case_scheduled_activity_date text',
+    ];
+  }
+
+  /**
+   * Get activity sql columns.
+   *
+   * @return array
+   */
+  protected function getActivitySqlColumns() {
+    return [
+      'activity_id' => 'activity_id varchar(16)',
+      'activity_type' => 'activity_type varchar(255)',
+      'activity_type_id' => 'activity_type_id varchar(16)',
+      'activity_subject' => 'activity_subject varchar(255)',
+      'activity_date_time' => 'activity_date_time varchar(32)',
+      'activity_duration' => 'activity_duration varchar(16)',
+      'activity_location' => 'activity_location varchar(255)',
+      'activity_details' => 'activity_details longtext',
+      'activity_status' => 'activity_status varchar(255)',
+      'activity_priority' => 'activity_priority varchar(255)',
+      'source_contact' => 'source_contact varchar(255)',
+      'source_record_id' => 'source_record_id varchar(255)',
+      'activity_is_test' => 'activity_is_test varchar(16)',
+      'activity_campaign_id' => 'activity_campaign_id varchar(128)',
+      'result' => 'result text',
+      'activity_engagement_level' => 'activity_engagement_level varchar(16)',
+      'parent_id' => 'parent_id varchar(255)',
+    ];
+  }
+
+  /**
+   * Get participant sql columns.
+   *
+   * @return array
+   */
+  protected function getParticipantSqlColumns() {
+    return [
+      'event_id' => 'event_id varchar(16)',
+      'event_title' => 'event_title varchar(255)',
+      'event_start_date' => 'event_start_date varchar(32)',
+      'event_end_date' => 'event_end_date varchar(32)',
+      'event_type' => 'event_type varchar(255)',
+      'participant_id' => 'participant_id varchar(16)',
+      'participant_status' => 'participant_status varchar(255)',
+      'participant_status_id' => 'participant_status_id varchar(16)',
+      'participant_role' => 'participant_role varchar(255)',
+      'participant_role_id' => 'participant_role_id varchar(128)',
+      'participant_note' => 'participant_note text',
+      'participant_register_date' => 'participant_register_date varchar(32)',
+      'participant_source' => 'participant_source varchar(128)',
+      'participant_fee_level' => 'participant_fee_level longtext',
+      'participant_is_test' => 'participant_is_test varchar(16)',
+      'participant_is_pay_later' => 'participant_is_pay_later varchar(16)',
+      'participant_fee_amount' => 'participant_fee_amount varchar(32)',
+      'participant_discount_name' => 'participant_discount_name varchar(16)',
+      'participant_fee_currency' => 'participant_fee_currency varchar(3)',
+      'participant_registered_by_id' => 'participant_registered_by_id varchar(16)',
+      'participant_campaign_id' => 'participant_campaign_id varchar(128)',
+    ];
+  }
+
+  /**
+   * Get contribution sql columns.
+   *
+   * @return array
+   */
+  public function getContributionSqlColumns() {
+    return [
+      'civicrm_primary_id' => 'civicrm_primary_id varchar(16)',
+      'contact_type' => 'contact_type varchar(64)',
+      'contact_sub_type' => 'contact_sub_type varchar(255)',
+      'do_not_email' => 'do_not_email varchar(16)',
+      'do_not_phone' => 'do_not_phone varchar(16)',
+      'do_not_mail' => 'do_not_mail varchar(16)',
+      'do_not_sms' => 'do_not_sms varchar(16)',
+      'do_not_trade' => 'do_not_trade varchar(16)',
+      'is_opt_out' => 'is_opt_out varchar(16)',
+      'legal_identifier' => 'legal_identifier varchar(32)',
+      'external_identifier' => 'external_identifier varchar(64)',
+      'sort_name' => 'sort_name varchar(128)',
+      'display_name' => 'display_name varchar(128)',
+      'nick_name' => 'nick_name varchar(128)',
+      'legal_name' => 'legal_name varchar(128)',
+      'image_url' => 'image_url longtext',
+      'preferred_communication_method' => 'preferred_communication_method varchar(255)',
+      'preferred_language' => 'preferred_language varchar(5)',
+      'preferred_mail_format' => 'preferred_mail_format varchar(8)',
+      'hash' => 'hash varchar(32)',
+      'contact_source' => 'contact_source varchar(255)',
+      'first_name' => 'first_name varchar(64)',
+      'middle_name' => 'middle_name varchar(64)',
+      'last_name' => 'last_name varchar(64)',
+      'prefix_id' => 'prefix_id varchar(255)',
+      'suffix_id' => 'suffix_id varchar(255)',
+      'formal_title' => 'formal_title varchar(64)',
+      'communication_style_id' => 'communication_style_id varchar(16)',
+      'email_greeting_id' => 'email_greeting_id varchar(16)',
+      'postal_greeting_id' => 'postal_greeting_id varchar(16)',
+      'addressee_id' => 'addressee_id varchar(16)',
+      'job_title' => 'job_title varchar(255)',
+      'gender_id' => 'gender_id varchar(16)',
+      'birth_date' => 'birth_date varchar(32)',
+      'is_deceased' => 'is_deceased varchar(16)',
+      'deceased_date' => 'deceased_date varchar(32)',
+      'household_name' => 'household_name varchar(128)',
+      'organization_name' => 'organization_name varchar(128)',
+      'sic_code' => 'sic_code varchar(8)',
+      'user_unique_id' => 'user_unique_id varchar(255)',
+      'current_employer_id' => 'current_employer_id varchar(16)',
+      'contact_is_deleted' => 'contact_is_deleted varchar(16)',
+      'created_date' => 'created_date varchar(32)',
+      'modified_date' => 'modified_date varchar(32)',
+      'addressee' => 'addressee varchar(255)',
+      'email_greeting' => 'email_greeting varchar(255)',
+      'postal_greeting' => 'postal_greeting varchar(255)',
+      'current_employer' => 'current_employer varchar(128)',
+      'location_type' => 'location_type text',
+      'street_address' => 'street_address varchar(96)',
+      'street_number' => 'street_number varchar(16)',
+      'street_number_suffix' => 'street_number_suffix varchar(8)',
+      'street_name' => 'street_name varchar(64)',
+      'street_unit' => 'street_unit varchar(16)',
+      'supplemental_address_1' => 'supplemental_address_1 varchar(96)',
+      'supplemental_address_2' => 'supplemental_address_2 varchar(96)',
+      'supplemental_address_3' => 'supplemental_address_3 varchar(96)',
+      'city' => 'city varchar(64)',
+      'postal_code_suffix' => 'postal_code_suffix varchar(12)',
+      'postal_code' => 'postal_code varchar(64)',
+      'geo_code_1' => 'geo_code_1 varchar(32)',
+      'geo_code_2' => 'geo_code_2 varchar(32)',
+      'address_name' => 'address_name varchar(255)',
+      'master_id' => 'master_id varchar(128)',
+      'county' => 'county varchar(64)',
+      'state_province' => 'state_province varchar(64)',
+      'country' => 'country varchar(64)',
+      'phone' => 'phone varchar(32)',
+      'phone_ext' => 'phone_ext varchar(16)',
+      'email' => 'email varchar(254)',
+      'on_hold' => 'on_hold varchar(16)',
+      'is_bulkmail' => 'is_bulkmail varchar(16)',
+      'signature_text' => 'signature_text longtext',
+      'signature_html' => 'signature_html longtext',
+      'im_provider' => 'im_provider text',
+      'im' => 'im varchar(64)',
+      'openid' => 'openid varchar(255)',
+      'world_region' => 'world_region varchar(128)',
+      'url' => 'url varchar(128)',
+      'phone_type_id' => 'phone_type_id varchar(255)',
+      'provider_id' => 'provider_id varchar(255)',
+      'financial_type' => 'financial_type varchar(64)',
+      'contribution_source' => 'contribution_source varchar(255)',
+      'receive_date' => 'receive_date varchar(32)',
+      'thankyou_date' => 'thankyou_date varchar(32)',
+      'cancel_date' => 'cancel_date varchar(32)',
+      'total_amount' => 'total_amount varchar(32)',
+      'accounting_code' => 'accounting_code varchar(64)',
+      'payment_instrument' => 'payment_instrument text',
+      'payment_instrument_id' => 'payment_instrument_id varchar(16)',
+      'contribution_check_number' => 'contribution_check_number varchar(255)',
+      'non_deductible_amount' => 'non_deductible_amount varchar(32)',
+      'fee_amount' => 'fee_amount varchar(32)',
+      'net_amount' => 'net_amount varchar(32)',
+      'trxn_id' => 'trxn_id varchar(255)',
+      'invoice_id' => 'invoice_id varchar(255)',
+      'invoice_number' => 'invoice_number varchar(255)',
+      'currency' => 'currency varchar(3)',
+      'cancel_reason' => 'cancel_reason longtext',
+      'receipt_date' => 'receipt_date varchar(32)',
+      'product_name' => 'product_name varchar(255)',
+      'sku' => 'sku varchar(50)',
+      'product_option' => 'product_option varchar(255)',
+      'fulfilled_date' => 'fulfilled_date varchar(32)',
+      'contribution_start_date' => 'contribution_start_date varchar(32)',
+      'contribution_end_date' => 'contribution_end_date varchar(32)',
+      'is_test' => 'is_test varchar(16)',
+      'is_pay_later' => 'is_pay_later varchar(16)',
+      'contribution_status' => 'contribution_status text',
+      'contribution_recur_id' => 'contribution_recur_id varchar(16)',
+      'amount_level' => 'amount_level longtext',
+      'contribution_note' => 'contribution_note text',
+      'contribution_batch' => 'contribution_batch text',
+      'contribution_campaign_title' => 'contribution_campaign_title varchar(255)',
+      'contribution_campaign_id' => 'contribution_campaign_id varchar(128)',
+      'contribution_product_id' => 'contribution_product_id varchar(255)',
+      'contribution_soft_credit_name' => 'contribution_soft_credit_name varchar(255)',
+      'contribution_soft_credit_amount' => 'contribution_soft_credit_amount varchar(255)',
+      'contribution_soft_credit_type' => 'contribution_soft_credit_type varchar(255)',
+      'contribution_soft_credit_contact_id' => 'contribution_soft_credit_contact_id varchar(255)',
+      'contribution_soft_credit_contribution_id' => 'contribution_soft_credit_contribution_id varchar(255)',
+    ];
+  }
+
+  /**
+   * Get pledge sql columns.
+   *
+   * @return array
+   */
+  public function getPledgeSqlColumns() {
+    return [
+      'pledge_id' => 'pledge_id varchar(16)',
+      'pledge_amount' => 'pledge_amount varchar(32)',
+      'pledge_total_paid' => 'pledge_total_paid text',
+      'pledge_create_date' => 'pledge_create_date varchar(32)',
+      'pledge_start_date' => 'pledge_start_date text',
+      'pledge_next_pay_date' => 'pledge_next_pay_date text',
+      'pledge_next_pay_amount' => 'pledge_next_pay_amount text',
+      'pledge_status' => 'pledge_status varchar(255)',
+      'pledge_is_test' => 'pledge_is_test varchar(16)',
+      'pledge_contribution_page_id' => 'pledge_contribution_page_id varchar(255)',
+      'pledge_financial_type' => 'pledge_financial_type text',
+      'pledge_frequency_interval' => 'pledge_frequency_interval varchar(255)',
+      'pledge_frequency_unit' => 'pledge_frequency_unit varchar(255)',
+      'pledge_currency' => 'pledge_currency text',
+      'pledge_campaign_id' => 'pledge_campaign_id varchar(128)',
+      'pledge_balance_amount' => 'pledge_balance_amount text',
+      'pledge_payment_id' => 'pledge_payment_id varchar(16)',
+      'pledge_payment_scheduled_amount' => 'pledge_payment_scheduled_amount varchar(32)',
+      'pledge_payment_scheduled_date' => 'pledge_payment_scheduled_date varchar(32)',
+      'pledge_payment_paid_amount' => 'pledge_payment_paid_amount text',
+      'pledge_payment_paid_date' => 'pledge_payment_paid_date text',
+      'pledge_payment_reminder_date' => 'pledge_payment_reminder_date varchar(32)',
+      'pledge_payment_reminder_count' => 'pledge_payment_reminder_count varchar(16)',
+      'pledge_payment_status' => 'pledge_payment_status varchar(255)',
+    ];
+  }
+
+  /**
+   * Get membership sql columns.
+   *
+   * @return array
+   */
+  public function getMembershipSqlColumns() {
+    return [
+      'membership_type' => 'membership_type varchar(128)',
+      'member_is_test' => 'member_is_test varchar(16)',
+      'member_is_pay_later' => 'member_is_pay_later varchar(16)',
+      'join_date' => 'join_date varchar(32)',
+      'membership_start_date' => 'membership_start_date varchar(32)',
+      'membership_end_date' => 'membership_end_date varchar(32)',
+      'membership_source' => 'membership_source varchar(128)',
+      'membership_status' => 'membership_status varchar(255)',
+      'membership_id' => 'membership_id varchar(16)',
+      'owner_membership_id' => 'owner_membership_id varchar(16)',
+      'max_related' => 'max_related text',
+      'membership_recur_id' => 'membership_recur_id varchar(255)',
+      'member_campaign_id' => 'member_campaign_id varchar(128)',
+      'member_is_override' => 'member_is_override text',
+      'member_auto_renew' => 'member_auto_renew text',
+    ];
   }
 
 }
