@@ -209,45 +209,63 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-14263 search builder failure with search profile & address in criteria
+   * CRM-14263 search builder failure with search profile & address in criteria.
+   *
    * We are retrieving primary here - checking the actual sql seems super prescriptive - but since the massive query object has
    * so few tests detecting any change seems good here :-)
+   *
+   * @dataProvider getSearchProfileData
+   *
+   * @param array $params
    */
-  public function testSearchProfilePrimaryCityCRM14263() {
+  public function testSearchProfilePrimaryCityCRM14263($params, $selectClause, $whereClause) {
     $contactID = $this->individualCreate();
     CRM_Core_Config::singleton()->defaultSearchProfileID = 1;
     $this->callAPISuccess('address', 'create', array(
         'contact_id' => $contactID,
         'city' => 'Cool City',
+        'street_address' => 'Long Street',
         'location_type_id' => 1,
       ));
-    $params = array(
-      0 => array(
-        0 => 'city',
-        1 => '=',
-        2 => 'Cool City',
-        3 => 1,
-        4 => 0,
-      ),
-    );
     $returnProperties = array(
       'contact_type' => 1,
       'contact_sub_type' => 1,
       'sort_name' => 1,
     );
-    $expectedSQL = "SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, civicrm_address.id as address_id, civicrm_address.city as `city`  FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 ) WHERE  (  ( LOWER(civicrm_address.city) = 'cool city' )  )  AND (contact_a.is_deleted = 0)    ORDER BY `contact_a`.`sort_name` ASC, `contact_a`.`id` ";
+    $expectedSQL = "SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, civicrm_address.id as address_id, " . $selectClause . "  FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 ) WHERE  (  ( " . $whereClause . " )  )  AND (contact_a.is_deleted = 0)    ORDER BY `contact_a`.`sort_name` ASC, `contact_a`.`id` ";
     $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
     try {
       $this->assertEquals($expectedSQL, $queryObj->searchQuery(0, 0, NULL,
         FALSE, FALSE,
         FALSE, FALSE,
         TRUE));
+      list($select, $from, $where, $having) = $queryObj->query();
+      $dao = CRM_Core_DAO::executeQuery("$select $from $where $having");
+      $dao->fetch();
+      $this->assertEquals('Anderson, Anthony', $dao->sort_name);
     }
     catch (PEAR_Exception $e) {
       $err = $e->getCause();
       $this->fail('invalid SQL created' . $e->getMessage() . " " . $err->userinfo);
 
     }
+  }
+
+  /**
+   * Get data sets to test for search.
+   */
+  public function getSearchProfileData() {
+    return [
+      [
+        [['city', '=', 'Cool City', 1, 0]], "civicrm_address.city as `city`", "LOWER(civicrm_address.city) = 'cool city'",
+      ],
+      [
+        // Note that in the query 'long street' is lower cased. We eventually want to change that & not mess with the vars - it turns out
+        // it doesn't work on some charsets. However, the the lcasing affects more vars & we are looking to stagger removal of lcasing 'in case'
+        // (although we have been removing without blowback since 2017)
+        [['street_address', '=', 'Long Street', 1, 0]], "civicrm_address.street_address as `street_address`", "civicrm_address.street_address LIKE '%long street%'",
+      ],
+    ];
   }
 
   /**

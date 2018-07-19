@@ -3558,14 +3558,13 @@ WHERE  $smartGroupClause
     $n = trim($value);
 
     if ($n) {
-      $value = strtolower($n);
       if (strpos($value, '%') === FALSE) {
         // only add wild card if not there
         $value = "%{$value}%";
       }
       $op = 'LIKE';
       // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-      $this->_where[$grouping][] = self::buildClause('LOWER(civicrm_address.street_address)', $op, $value, 'String');
+      $this->_where[$grouping][] = self::buildClause('civicrm_address.street_address', $op, $value, 'String');
       $this->_qill[$grouping][] = ts('Street') . " $op '$n'";
     }
     else {
