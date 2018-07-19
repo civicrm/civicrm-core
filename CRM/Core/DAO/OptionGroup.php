@@ -193,6 +193,7 @@ class CRM_Core_DAO_OptionGroup extends CRM_Core_DAO {
           'title' => ts('Option Group Is Locked'),
           'description' => 'A lock to remove the ability to add new options via the UI.',
           'required' => TRUE,
+          'default' => '0',
           'table_name' => 'civicrm_option_group',
           'entity' => 'OptionGroup',
           'bao' => 'CRM_Core_BAO_OptionGroup',

@@ -182,6 +182,7 @@ class CRM_Mailing_DAO_Component extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Mailing Component is Default?'),
           'description' => 'Is this the default component for this component_type?',
+          'default' => '0',
           'table_name' => 'civicrm_mailing_component',
           'entity' => 'Component',
           'bao' => 'CRM_Mailing_BAO_Component',

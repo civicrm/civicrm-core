@@ -207,6 +207,7 @@ class CRM_Financial_DAO_FinancialItem extends CRM_Core_DAO {
             20,
             2
           ],
+          'default' => '0',
           'table_name' => 'civicrm_financial_item',
           'entity' => 'FinancialItem',
           'bao' => 'CRM_Financial_BAO_FinancialItem',

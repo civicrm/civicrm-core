@@ -305,6 +305,7 @@ class CRM_Member_DAO_MembershipType extends CRM_Core_DAO {
             18,
             9
           ],
+          'default' => '0',
           'table_name' => 'civicrm_membership_type',
           'entity' => 'MembershipType',
           'bao' => 'CRM_Member_BAO_MembershipType',
@@ -484,6 +485,7 @@ class CRM_Member_DAO_MembershipType extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Auto Renew'),
           'description' => '0 = No auto-renew option; 1 = Give option, but not required; 2 = Auto-renew required;',
+          'default' => '0',
           'table_name' => 'civicrm_membership_type',
           'entity' => 'MembershipType',
           'bao' => 'CRM_Member_BAO_MembershipType',
