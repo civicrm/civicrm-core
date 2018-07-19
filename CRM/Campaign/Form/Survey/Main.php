@@ -60,7 +60,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
   public function preProcess() {
     parent::preProcess();
 
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $this->assign('context', $this->_context);
 

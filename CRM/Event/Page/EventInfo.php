@@ -59,7 +59,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     }
 
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'register');
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'register');
     $this->assign('context', $context);
 
     // Sometimes we want to suppress the Event Full msg

@@ -264,7 +264,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    */
   public function edit() {
     // set https for offline cc transaction
-    $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
+    $mode = CRM_Utils_Request::retrieve('mode', 'Alphanumeric', $this);
     if ($mode == 'test' || $mode == 'live') {
       CRM_Utils_System::redirectToSSL();
     }
@@ -306,7 +306,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   }
 
   public function preProcess() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
@@ -390,7 +390,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * @param int $contactId
    */
   public static function setContext(&$form, $contactId = NULL) {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $form, FALSE, 'search');
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $form, FALSE, 'search');
 
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
 

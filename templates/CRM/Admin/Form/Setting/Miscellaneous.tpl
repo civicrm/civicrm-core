@@ -117,6 +117,13 @@
               </span>
             </td>
         </tr>
+        <tr class="crm-miscellaneous-form-block-recaptchaPrivateKey">
+            <td class="label">{$form.forceRecaptcha.label}</td>
+            <td>
+              {$form.forceRecaptcha.html}
+              <p class="description">{ts}If enabled, reCAPTCHA will show on all contribution pages.{/ts}</p>
+            </td>
+        </tr>
         </table>
            <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
