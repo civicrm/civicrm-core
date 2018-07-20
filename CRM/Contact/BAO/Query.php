@@ -1020,11 +1020,27 @@ class CRM_Contact_BAO_Query {
     $addressCustomFields = CRM_Core_BAO_CustomField::getFieldsForImport('Address');
     $addressCustomFieldIds = array();
 
-    foreach ($this->_returnProperties['location'] as $name => $elements) {
+    foreach ($this->_returnProperties['location'] as $locationKey => $elements) {
+      if (is_numeric($locationKey) && !in_array($locationKey, $locationTypes)) {
+        // Historically we have expected the form layer to convert to an integer in
+        // order to convert back here. However, bug reports indicated this is not
+        // always reliable as some methods of getting location types return labels
+        // not names - which appear to work, until they don't.
+        // We should migrate to supporting the location being keyed by 'id'
+        // Note this format currently only comes from export and it's implicit
+        // in using it that unit test coverage must exist (as it does for the export
+        // class, and that the column name could change.)
+        $locationTypeId = $locationKey;
+        $name = $locationTypes[$locationTypeId];
+      }
+      else {
+        $name = $locationKey;
+        $locationTypeId = array_search($name, $locationTypes);
+      }
+
       $lCond = self::getPrimaryCondition($name);
 
       if (!$lCond) {
-        $locationTypeId = array_search($name, $locationTypes);
         if ($locationTypeId === FALSE) {
           continue;
         }

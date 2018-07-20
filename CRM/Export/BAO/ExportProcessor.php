@@ -63,6 +63,13 @@ class CRM_Export_BAO_ExportProcessor {
   protected $queryOperator;
 
   /**
+   * Array of properties to retrieve for relationships.
+   *
+   * @var array
+   */
+  protected $relationshipReturnProperties = [];
+
+  /**
    * CRM_Export_BAO_ExportProcessor constructor.
    *
    * @param int $exportMode
@@ -180,6 +187,86 @@ class CRM_Export_BAO_ExportProcessor {
     list($select, $from, $where, $having) = $query->query();
     $this->setQueryFields($query->_fields);
     return array($query, $select, $from, $where, $having);
+  }
+
+  /**
+   * Add the field to relationship return properties & return it.
+   *
+   * This function is doing both setting & getting which is yuck but it is an interim
+   * refactor.
+   *
+   * @param array $value
+   * @param string $relationshipKey
+   *
+   * @return array
+   */
+  public function setRelationshipReturnProperties($value, $relationshipKey) {
+    $relPhoneTypeId = $relIMProviderId = NULL;
+    if (!empty($value[2])) {
+      $relationField = CRM_Utils_Array::value(2, $value);
+      if (trim(CRM_Utils_Array::value(3, $value))) {
+        $relLocTypeId = CRM_Utils_Array::value(3, $value);
+      }
+      else {
+        $relLocTypeId = 'Primary';
+      }
+
+      if ($relationField == 'phone') {
+        $relPhoneTypeId = CRM_Utils_Array::value(4, $value);
+      }
+      elseif ($relationField == 'im') {
+        $relIMProviderId = CRM_Utils_Array::value(4, $value);
+      }
+    }
+    elseif (!empty($value[4])) {
+      $relationField = CRM_Utils_Array::value(4, $value);
+      $relLocTypeId = CRM_Utils_Array::value(5, $value);
+      if ($relationField == 'phone') {
+        $relPhoneTypeId = CRM_Utils_Array::value(6, $value);
+      }
+      elseif ($relationField == 'im') {
+        $relIMProviderId = CRM_Utils_Array::value(6, $value);
+      }
+    }
+    if (in_array($relationField, $this->getValidLocationFields()) && is_numeric($relLocTypeId)) {
+      if ($relPhoneTypeId) {
+        $this->relationshipReturnProperties[$relationshipKey]['location'][$relLocTypeId]['phone-' . $relPhoneTypeId] = 1;
+      }
+      elseif ($relIMProviderId) {
+        $this->relationshipReturnProperties[$relationshipKey]['location'][$relLocTypeId]['im-' . $relIMProviderId] = 1;
+      }
+      else {
+        $this->relationshipReturnProperties[$relationshipKey]['location'][$relLocTypeId][$relationField] = 1;
+      }
+    }
+    else {
+      $this->relationshipReturnProperties[$relationshipKey][$relationField] = 1;
+    }
+    return $this->relationshipReturnProperties[$relationshipKey];
+  }
+
+  /**
+   * Get the default location fields to request.
+   *
+   * @return array
+   */
+  public function getValidLocationFields() {
+    return [
+      'street_address',
+      'supplemental_address_1',
+      'supplemental_address_2',
+      'supplemental_address_3',
+      'city',
+      'postal_code',
+      'postal_code_suffix',
+      'geo_code_1',
+      'geo_code_2',
+      'state_province',
+      'country',
+      'phone',
+      'email',
+      'im',
+    ];
   }
 
 }

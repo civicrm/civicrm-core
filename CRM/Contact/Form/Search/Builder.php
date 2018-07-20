@@ -398,7 +398,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     }
 
     $this->_params = $this->convertFormValues($this->_formValues);
-    $this->_returnProperties = &$this->returnProperties();
+    $this->_returnProperties = $this->returnProperties();
 
     // CRM-10338 check if value is empty array
     foreach ($this->_params as $k => $v) {
