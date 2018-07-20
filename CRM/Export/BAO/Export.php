@@ -1729,9 +1729,6 @@ WHERE  {$whereClause}";
     elseif ($field == 'provider_id') {
       $headerRows[] = ts('IM Service Provider');
     }
-    elseif (substr($field, 0, 5) == 'case_' && $queryFields['case'][$field]['title']) {
-      $headerRows[] = $queryFields['case'][$field]['title'];
-    }
     elseif (array_key_exists($field, self::$relationshipTypes)) {
       foreach ($value as $relationField => $relationValue) {
         // below block is same as primary block (duplicate)
