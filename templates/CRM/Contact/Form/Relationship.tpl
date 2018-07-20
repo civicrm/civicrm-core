@@ -57,34 +57,18 @@
                 {if $row.is_permission_a_b}
                   <div>
                   {if $row.rtype EQ 'a_b' AND $is_contact_id_a}
-                    {if $row.is_permission_a_b == 1}
-                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view and update information about <strong>%2</strong>{/ts} {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=1 permDisplayName=$displayName otherDisplayName=$row.display_name}
-                    {else}
-                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view information about <strong>%2</strong>{/ts} {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=2 permDisplayName=$displayName otherDisplayName=$row.display_name}
-                    {/if}
+                    {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=$row.is_permission_a_b permDisplayName=$displayName otherDisplayName=$row.display_name displayText=true}
                   {else}
-                    {if $row.is_permission_a_b == 1}
-                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view and update information about <strong>%2</strong>{/ts} {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=1 otherDisplayName=$displayName permDisplayName=$row.display_name}
-                    {else}
-                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view information about <strong>%2</strong>{/ts} {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=2 otherDisplayName=$displayName permDisplayName=$row.display_name}
-                    {/if}
+                    {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=$row.is_permission_a_b otherDisplayName=$displayName permDisplayName=$row.display_name displayText=true}
                   {/if}
                   </div>
                 {/if}
                 {if $row.is_permission_b_a}
                   <div>
                   {if $row.rtype EQ 'a_b' AND $is_contact_id_a}
-                    {if $row.is_permission_b_a == 1}
-                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view and update information about <strong>%2</strong>{/ts} {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=1 otherDisplayName=$displayName permDisplayName=$row.display_name}
-                    {else}
-                      {ts 1=$row.display_name 2=$displayName}<strong>%1</strong> can view information about <strong>%2</strong>{/ts} {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=2 otherDisplayName=$displayName permDisplayName=$row.display_name}
-                    {/if}
+                    {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=$row.is_permission_b_a otherDisplayName=$displayName permDisplayName=$row.display_name displayText=true}
                   {else}
-                    {if $row.is_permission_b_a == 1}
-                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view and update information about <strong>%2</strong>{/ts} {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=1 permDisplayName=$displayName otherDisplayName=$row.display_name}
-                    {else}
-                      {ts 1=$displayName 2=$row.display_name}<strong>%1</strong> can view information about <strong>%2</strong>{/ts} {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=2 permDisplayName=$displayName otherDisplayName=$row.display_name}
-                    {/if}
+                    {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=$row.is_permission_b_a permDisplayName=$displayName otherDisplayName=$row.display_name displayText=true}
                   {/if}
                   </div>
                 {/if}
