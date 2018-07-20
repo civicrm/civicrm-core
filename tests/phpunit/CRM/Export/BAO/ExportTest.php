@@ -101,7 +101,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       array('Contribution', 'trxn_id'),
     );
 
-    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
+    list($tableName) = CRM_Export_BAO_Export::exportComponents(
       TRUE,
       $this->contributionIDs,
       array(),
@@ -595,7 +595,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         }
       }
     }
-    list($tableName) = $this->doExport($fields, $this->contactIDs[0]);
+    list($tableName, $sqlColumns) = $this->doExport($fields, $this->contactIDs[0]);
 
     $dao = CRM_Core_DAO::executeQuery('SELECT * FROM ' . $tableName);
     while ($dao->fetch()) {
@@ -610,9 +610,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         // @todo efforts to output 'im_provider' for related contacts seem to be giving a blank field.
       }
     }
-
-    // early return for now until we solve a leakage issue.
-    return;
 
     $this->assertEquals([
       'billing_im_provider' => 'billing_im_provider text',
@@ -775,7 +772,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ));
 
     //export and merge contacts with same address
-    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
+    list($tableName) = CRM_Export_BAO_Export::exportComponents(
       TRUE,
       array($contactA['id'], $contactB['id']),
       array(),
@@ -841,7 +838,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Do a CiviCRM export.
+   *
    * @param $selectedFields
+   * @param int $id
+   *
    * @return array
    */
   protected function doExport($selectedFields, $id) {
@@ -995,7 +996,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   /**
    * Get basic return properties.
    *
-   * @bool $isContactMode
+   * @param bool $isContactMode
    *   Are we in contact mode or not
    *
    * @return array
