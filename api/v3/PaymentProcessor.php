@@ -85,6 +85,10 @@ function civicrm_api3_payment_processor_delete($params) {
  *   API result array
  */
 function civicrm_api3_payment_processor_get($params) {
+  if ( ( CRM_Core_Permission::check('access CiviEvent') || CRM_Core_Permission::check('edit all events') ) && !CRM_Core_Permission::check('administer CiviCRM') ) {
+    $params['return'] = CRM_Financial_DAO_PaymentProcessor::fieldKeys();
+    unset($params['return']['password']);
+  }
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
