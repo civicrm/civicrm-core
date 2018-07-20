@@ -94,7 +94,7 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
    *
    * @return CRM_Contribute_DAO_Product
    */
-  public static function add(&$params, $ids) {
+  public static function add(&$params, $ids = []) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('premium', $ids));
     if (empty($id)) {
       $defaultParams = [
