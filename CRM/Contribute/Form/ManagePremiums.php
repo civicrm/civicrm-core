@@ -294,7 +294,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->_processImages($params);
 
     // Save to database
-    $premium = CRM_Contribute_BAO_Product::add($params);
+    $premium = CRM_Contribute_BAO_Product::create($params);
 
     CRM_Core_Session::setStatus(
       ts("The Premium '%1' has been saved.", array(1 => $premium->name)),

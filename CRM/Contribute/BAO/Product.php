@@ -88,14 +88,12 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
    * Add a premium product to the database, and return it.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
-   * @param array $ids (deprecated)
-   *   Reference array contains the id.
+   *   Update parameters.
    *
    * @return CRM_Contribute_DAO_Product
    */
-  public static function add(&$params, $ids = []) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('premium', $ids));
+  public static function create($params) {
+    $id = CRM_Utils_Array::value('id', $params);
     if (empty($id)) {
       $defaultParams = [
         'id' => $id,
