@@ -233,6 +233,15 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
         CRM_Core_BAO_Mapping::saveMappingFields($params, $saveMapping->id);
       }
     }
+    $returnProperties = $this->get('returnProperties');
+    if (isset($returnProperties['location'])) {
+      // Re-key location types. One day stop keying by name earlier on.
+      foreach ($returnProperties['location'] as $key => $value) {
+        $locationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $key);
+        $returnProperties['location'][$locationTypeID] = $value;
+        unset($returnProperties['location'][$key]);
+      }
+    }
 
     //get the csv file
     CRM_Export_BAO_Export::exportComponents($this->get('selectAll'),
@@ -240,7 +249,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
       (array) $this->get('queryParams'),
       $this->get(CRM_Utils_Sort::SORT_ORDER),
       $mapperKeys,
-      $this->get('returnProperties'),
+      $returnProperties,
       $this->get('exportMode'),
       $this->get('componentClause'),
       $this->get('componentTable'),

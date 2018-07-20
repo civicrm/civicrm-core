@@ -482,7 +482,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   public function testExportIMData() {
     // Use default providers.
     $providers = ['AIM', 'GTalk', 'Jabber', 'MSN', 'Skype', 'Yahoo'];
-    $locationTypes = ['Billing', 'Home', 'Main', 'Other'];
+    // Main sure labels are not all anglo chars.
+    $mainLocationTypeID = $this->callAPISuccessGetValue('Location_type', [
+      'name' => 'Main',
+      'return' => 'id',
+      'api.LocationType.Create' => ['display_name' => 'Méin'],
+    ]);
+    $locationTypes = ['Billing' => 'Billing', 'Home' => 'Home', 'Main' => 'Méin', 'Other' => 'Other'];
 
     $this->contactIDs[] = $this->individualCreate();
     $this->contactIDs[] = $this->individualCreate();
@@ -490,12 +496,12 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->contactIDs[] = $this->organizationCreate();
     foreach ($this->contactIDs as $contactID) {
       foreach ($providers as $provider) {
-        foreach ($locationTypes as $locationType) {
+        foreach ($locationTypes as $locationName => $locationLabel) {
           $this->callAPISuccess('IM', 'create', [
             'contact_id' => $contactID,
-            'location_type_id' => $locationType,
+            'location_type_id' => $locationName,
             'provider_id' => $provider,
-            'name' => $locationType . $provider . $contactID,
+            'name' => $locationName . $provider . $contactID,
           ]);
         }
       }
@@ -520,7 +526,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     $fields = [['Individual', 'contact_id']];
     // ' ' denotes primary location type.
-    foreach (array_merge($locationTypes, [' ']) as $locationType) {
+    foreach (array_keys(array_merge($locationTypes, [' ' => ['Primary']])) as $locationType) {
       $fields[] = [
         'Individual',
         'im_provider',

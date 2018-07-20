@@ -315,9 +315,7 @@ class CRM_Export_BAO_Export {
     $queryMode = $processor->getQueryMode();
 
     if ($fields) {
-      //construct return properties
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-
+      //Construct return properties.
       foreach ($fields as $key => $value) {
         $fieldName = CRM_Utils_Array::value(1, $value);
         if (!$fieldName) {
@@ -330,13 +328,13 @@ class CRM_Export_BAO_Export {
         elseif (is_numeric(CRM_Utils_Array::value(2, $value))) {
           $locTypeId = $value[2];
           if ($fieldName == 'phone') {
-            $returnProperties['location'][$locationTypes[$locTypeId]]['phone-' . CRM_Utils_Array::value(3, $value)] = 1;
+            $returnProperties['location'][$locTypeId]['phone-' . CRM_Utils_Array::value(3, $value)] = 1;
           }
           elseif ($fieldName == 'im') {
-            $returnProperties['location'][$locationTypes[$locTypeId]]['im-' . CRM_Utils_Array::value(3, $value)] = 1;
+            $returnProperties['location'][$locTypeId]['im-' . CRM_Utils_Array::value(3, $value)] = 1;
           }
           else {
-            $returnProperties['location'][$locationTypes[$locTypeId]][$fieldName] = 1;
+            $returnProperties['location'][$locTypeId][$fieldName] = 1;
           }
         }
         else {
@@ -1689,7 +1687,8 @@ WHERE  {$whereClause}";
         }
         elseif (is_array($relationValue) && $relationField == 'location') {
           // fix header for location type case
-          foreach ($relationValue as $ltype => $val) {
+          foreach ($relationValue as $locationTypeID => $val) {
+            $ltype = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $locationTypeID);
             foreach (array_keys($val) as $fld) {
               $type = explode('-', $fld);
 
@@ -1765,7 +1764,8 @@ WHERE  {$whereClause}";
         list($headerRows, $sqlColumns) = self::setHeaderRows($key, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery, $selectedPaymentFields);
       }
       else {
-        foreach ($value as $locationType => $locationFields) {
+        foreach ($value as $locationTypeID => $locationFields) {
+          $locationType = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $locationTypeID);
           foreach (array_keys($locationFields) as $locationFieldName) {
             $type = explode('-', $locationFieldName);
 
@@ -1851,7 +1851,8 @@ WHERE  {$whereClause}";
         $row[$relPrefix] = $relDAO->contact_id;
       }
       elseif (is_array($relationValue) && $relationField == 'location') {
-        foreach ($relationValue as $ltype => $val) {
+        foreach ($relationValue as $locationTypeID => $val) {
+          $ltype = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $locationTypeID);
           foreach (array_keys($val) as $fld) {
             $type = explode('-', $fld);
             $fldValue = "{$ltype}-" . $type[0];
