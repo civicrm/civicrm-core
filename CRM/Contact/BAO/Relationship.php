@@ -2130,36 +2130,36 @@ AND cc.sort_name LIKE '%$name%'";
         }
 
         if ($params['context'] == 'current') {
-          if (($params['contact_id'] == $values['contact_id_a'] and $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::EDIT) or
-            ($params['contact_id'] == $values['contact_id_b'] and $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::EDIT)
-          ) {
-            $relationship['sort_name'] .= <<<HEREDOC
-              <i class="crm-i fa-asterisk" title="{$values['display_name']} can be viewed and edited by $displayName"></i>
-HEREDOC;
-          }
+          $smarty = CRM_Core_Smarty::singleton();
 
-          if (($params['contact_id'] == $values['contact_id_a'] and $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::VIEW) or
-            ($params['contact_id'] == $values['contact_id_b'] and $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::VIEW)
-          ) {
-            $relationship['sort_name'] .= <<<HEREDOC
-              <i class="crm-i fa-eye" title="{$values['display_name']} can be viewed by $displayName"></i>
-HEREDOC;
-          }
+          $contactCombos = [
+            [
+              'permContact' => $params['contact_id'],
+              'permDisplayName' => $displayName,
+              'otherContact' => $values['cid'],
+              'otherDisplayName' => $values['display_name'],
+              'columnKey' => 'sort_name',
+            ],
+            [
+              'permContact' => $values['cid'],
+              'permDisplayName' => $values['display_name'],
+              'otherContact' => $params['contact_id'],
+              'otherDisplayName' => $displayName,
+              'columnKey' => 'relation',
+            ],
+          ];
 
-          if (($values['cid'] == $values['contact_id_a'] and $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::EDIT) or
-            ($values['cid'] == $values['contact_id_b'] and $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::EDIT)
-          ) {
-            $relationship['relation'] .= <<<HEREDOC
-              <i class="crm-i fa-asterisk" title="$displayName can be viewed and edited by {$values['display_name']}"></i>
-HEREDOC;
-          }
-
-          if (($values['cid'] == $values['contact_id_a'] and $values['is_permission_a_b'] == CRM_Contact_BAO_Relationship::VIEW) or
-            ($values['cid'] == $values['contact_id_b'] and $values['is_permission_b_a'] == CRM_Contact_BAO_Relationship::VIEW)
-          ) {
-            $relationship['relation'] .= <<<HEREDOC
-              <i class="crm-i fa-eye" title="$displayName can be viewed by {$values['display_name']}"></i>
-HEREDOC;
+          foreach ($contactCombos as $combo) {
+            foreach ([CRM_Contact_BAO_Relationship::EDIT, CRM_Contact_BAO_Relationship::VIEW] as $permType) {
+              $smarty->assign('permType', $permType);
+              if (($combo['permContact'] == $values['contact_id_a'] and $values['is_permission_a_b'] == $permType)
+                || ($combo['permContact'] == $values['contact_id_b'] and $values['is_permission_b_a'] == $permType)
+              ) {
+                $smarty->assign('permDisplayName', $combo['permDisplayName']);
+                $smarty->assign('otherDisplayName', $combo['otherDisplayName']);
+                $relationship[$combo['columnKey']] .= $smarty->fetch('CRM/Contact/Page/View/RelationshipPerm.tpl');
+              }
+            }
           }
         }
 
