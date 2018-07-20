@@ -526,7 +526,7 @@ FROM   {$this->_componentTable}
    * @return int
    */
   public function getQueryMode() {
-    return (int) $this->controller->get('component_mode');
+    return (int) ($this->queryMode ?: $this->controller->get('component_mode'));
   }
 
 }

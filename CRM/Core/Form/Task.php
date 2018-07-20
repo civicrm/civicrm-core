@@ -57,6 +57,11 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
   protected $_componentIds;
 
   /**
+   * @var int
+   */
+  protected $queryMode;
+
+  /**
    * The array that holds all the case ids
    *
    * @var array
@@ -210,7 +215,7 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    * @return int
    */
   public function getQueryMode() {
-    return CRM_Contact_BAO_Query::MODE_CONTACTS;
+    return $this->queryMode ?: CRM_Contact_BAO_Query::MODE_CONTACTS;
   }
 
 }
