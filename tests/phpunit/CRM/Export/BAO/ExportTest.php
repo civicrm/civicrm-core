@@ -568,9 +568,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       }
     }
 
-    // early return for now until we solve a leakage issue.
-    return;
-
     $this->assertEquals([
       'billing_im_provider' => 'billing_im_provider text',
       'billing_im_screen_name' => 'billing_im_screen_name text',
