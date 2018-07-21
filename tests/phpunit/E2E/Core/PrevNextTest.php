@@ -15,7 +15,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
   /**
    * @var string
    */
-  protected $cacheKey;
+  protected $cacheKey, $cacheKeyB;
 
   /**
    * @var \CRM_Core_PrevNextCache_Interface
@@ -26,6 +26,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     parent::setUp();
     $this->prevNext = \Civi::service('prevnext');
     $this->cacheKey = 'PrevNextTest_' . \CRM_Utils_String::createRandom(16, \CRM_Utils_String::ALPHANUMERIC);
+    $this->cacheKeyB = 'PrevNextTest_' . \CRM_Utils_String::createRandom(16, \CRM_Utils_String::ALPHANUMERIC);
     $this->assertTrue(
       \CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact') > 25,
       'The contact table must have at least 25 records.'
@@ -217,7 +218,17 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     $this->assertTrue(!isset($pos['prev']));
   }
 
-  public function testDeleteByKey() {
+  public function testDeleteByCacheKey() {
+    // Add background data
+    $this->prevNext->fillWithArray($this->cacheKeyB, [
+      ['entity_id1' => 100, 'data' => 'Alice'],
+      ['entity_id1' => 150, 'data' => 'Dave'],
+    ]);
+    $this->prevNext->markSelection($this->cacheKeyB, 'select', 100);
+    $this->assertSelections([100], 'get', $this->cacheKeyB);
+    $this->assertSelections([100, 150], 'getall', $this->cacheKeyB);
+
+    // Add some data that we're actually working with.
     $this->testFillArray();
 
     $all = $this->prevNext->getSelection($this->cacheKey, 'getall')[$this->cacheKey];
@@ -231,6 +242,62 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     $all = $this->prevNext->getSelection($this->cacheKey, 'getall')[$this->cacheKey];
     $this->assertEquals([], array_keys($all));
     $this->assertSelections([]);
+
+    // Ensure background data was untouched.
+    $this->assertSelections([100], 'get', $this->cacheKeyB);
+    $this->assertSelections([100, 150], 'getall', $this->cacheKeyB);
+  }
+
+  public function testDeleteByEntityId() {
+    // Fill two caches
+    $this->prevNext->fillWithArray($this->cacheKey, [
+      ['entity_id1' => 100, 'data' => 'Alice'],
+      ['entity_id1' => 150, 'data' => 'Dave'],
+    ]);
+    $this->prevNext->markSelection($this->cacheKey, 'select', 100);
+    $this->assertSelections([100], 'get', $this->cacheKey);
+    $this->assertSelections([100, 150], 'getall', $this->cacheKey);
+
+    $this->prevNext->fillWithArray($this->cacheKeyB, [
+      ['entity_id1' => 100, 'data' => 'Alice'],
+      ['entity_id1' => 400, 'data' => 'Bob'],
+    ]);
+    $this->prevNext->markSelection($this->cacheKeyB, 'select', [100, 400]);
+    $this->assertSelections([100, 400], 'get', $this->cacheKeyB);
+    $this->assertSelections([100, 400], 'getall', $this->cacheKeyB);
+
+    // Delete
+    $this->prevNext->deleteItem(100);
+    $this->assertSelections([], 'get', $this->cacheKey);
+    $this->assertSelections([150], 'getall', $this->cacheKey);
+    $this->assertSelections([400], 'get', $this->cacheKeyB);
+    $this->assertSelections([400], 'getall', $this->cacheKeyB);
+  }
+
+  public function testDeleteAll() {
+    // Fill two caches
+    $this->prevNext->fillWithArray($this->cacheKey, [
+      ['entity_id1' => 100, 'data' => 'Alice'],
+      ['entity_id1' => 150, 'data' => 'Dave'],
+    ]);
+    $this->prevNext->markSelection($this->cacheKey, 'select', 100);
+    $this->assertSelections([100], 'get', $this->cacheKey);
+    $this->assertSelections([100, 150], 'getall', $this->cacheKey);
+
+    $this->prevNext->fillWithArray($this->cacheKeyB, [
+      ['entity_id1' => 100, 'data' => 'Alice'],
+      ['entity_id1' => 400, 'data' => 'Bob'],
+    ]);
+    $this->prevNext->markSelection($this->cacheKeyB, 'select', [100, 400]);
+    $this->assertSelections([100, 400], 'get', $this->cacheKeyB);
+    $this->assertSelections([100, 400], 'getall', $this->cacheKeyB);
+
+    // Delete
+    $this->prevNext->deleteItem(NULL, NULL);
+    $this->assertSelections([], 'get', $this->cacheKey);
+    $this->assertSelections([], 'getall', $this->cacheKey);
+    $this->assertSelections([], 'get', $this->cacheKeyB);
+    $this->assertSelections([], 'getall', $this->cacheKeyB);
   }
 
 
@@ -240,8 +307,11 @@ class PrevNextTest extends \CiviEndToEndTestCase {
    * @param array $ids
    *   Contact IDs that should be selected.
    */
-  protected function assertSelections($ids) {
-    $selected = $this->prevNext->getSelection($this->cacheKey)[$this->cacheKey];
+  protected function assertSelections($ids, $action = 'get', $cacheKey = NULL) {
+    if ($cacheKey === NULL) {
+      $cacheKey = $this->cacheKey;
+    }
+    $selected = $this->prevNext->getSelection($cacheKey, $action)[$cacheKey];
     $this->assertEquals($ids, array_keys($selected));
     $this->assertCount(count($ids), $selected);
   }
