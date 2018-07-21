@@ -25,14 +25,6 @@
 *}
 {* Partial for displaying permissions associated with a relationship *}
 
-{if $displayText}
-{if $permType eq 1}
-{ts 1=$permDisplayName 2=$otherDisplayName}<strong>%1</strong> can view and update information about <strong>%2</strong>.{/ts}
-{else}
-{ts 1=$permDisplayName 2=$otherDisplayName}<strong>%1</strong> can view information about <strong>%2</strong>.{/ts}
-{/if}
-{/if}
-
 {if $permType eq 1}
 {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=2 displayText=false}
 {/if}
@@ -52,6 +44,16 @@
   <i class="crm-i {if $permType eq 1}fa-pencil{else}fa-eye{/if} fa-inverse fa-stack-1x"></i>
 </span>
 
+{* Used for viewing a relationship *}
+{if $displayText}
+{if $permType eq 1}
+{ts 1=$permDisplayName 2=$otherDisplayName}<strong>%1</strong> can view and update information about <strong>%2</strong>.{/ts}
+{else}
+{ts 1=$permDisplayName 2=$otherDisplayName}<strong>%1</strong> can view information about <strong>%2</strong>.{/ts}
+{/if}
+{/if}
+
+{* Used for legend on relationships tab *}
 {if $afterText}
 {if $permType eq 1}
 {ts}This contact can be edited by the other.{/ts}
