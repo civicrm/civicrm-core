@@ -39,7 +39,6 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
    * Check method add()
    */
   public function testAdd() {
-    $ids = array();
     $params = array(
       'name' => 'Test Product',
       'sku' => 'TP-10',
@@ -50,7 +49,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $product = CRM_Contribute_BAO_Product::add($params, $ids);
+    $product = CRM_Contribute_BAO_Product::create($params);
 
     $result = $this->assertDBNotNull('CRM_Contribute_BAO_Product', $product->id,
       'sku', 'id',
@@ -64,7 +63,6 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
    * Check method retrieve( )
    */
   public function testRetrieve() {
-    $ids = array();
     $params = array(
       'name' => 'Test Product',
       'sku' => 'TP-10',
@@ -75,7 +73,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $product = CRM_Contribute_BAO_Product::add($params, $ids);
+    $product = CRM_Contribute_BAO_Product::create($params);
     $params = array('id' => $product->id);
     $default = array();
     $result = CRM_Contribute_BAO_Product::retrieve($params, $default);
@@ -86,7 +84,6 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
    * Check method setIsActive( )
    */
   public function testSetIsActive() {
-    $ids = array();
     $params = array(
       'name' => 'Test Product',
       'sku' => 'TP-10',
@@ -97,7 +94,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $product = CRM_Contribute_BAO_Product::add($params, $ids);
+    $product = CRM_Contribute_BAO_Product::create($params);
     CRM_Contribute_BAO_Product::setIsActive($product->id, 0);
 
     $isActive = $this->assertDBNotNull('CRM_Contribute_BAO_Product', $product->id,
@@ -112,7 +109,6 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
    * Check method del( )
    */
   public function testDel() {
-    $ids = array();
     $params = array(
       'name' => 'Test Product',
       'sku' => 'TP-10',
@@ -123,7 +119,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
 
-    $product = CRM_Contribute_BAO_Product::add($params, $ids);
+    $product = CRM_Contribute_BAO_Product::create($params);
 
     CRM_Contribute_BAO_Product::del($product->id);
 

@@ -85,8 +85,12 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_BAO_Product {
    * @return CRM_Contribute_DAO_Product
    */
   public static function add(&$params, $ids) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Product::add');
-    return parent::add($params, $ids);
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Product::create');
+    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('premium', $ids));
+    if ($id) {
+      $params['id'] = $id;
+    }
+    return parent::create($params);
   }
 
   /**

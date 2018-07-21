@@ -362,10 +362,6 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   public function testAddPremium() {
     $contactId = $this->individualCreate();
 
-    $ids = array(
-      'premium' => NULL,
-    );
-
     $params = array(
       'name' => 'TEST Premium',
       'sku' => 111,
@@ -376,7 +372,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'min_contribution' => 100,
       'is_active' => 1,
     );
-    $premium = CRM_Contribute_BAO_Product::add($params, $ids);
+    $premium = CRM_Contribute_BAO_Product::create($params);
 
     $this->assertEquals('TEST Premium', $premium->name, 'Check for premium  name.');
 
