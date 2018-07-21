@@ -174,10 +174,32 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
 
   public function deleteItem($id = NULL, $cacheKey = NULL) {
     if ($id === NULL && $cacheKey !== NULL) {
+      // Delete by cacheKey.
       $allKey = $this->key($cacheKey, 'all');
       $selKey = $this->key($cacheKey, 'sel');
       $dataKey = $this->key($cacheKey, 'data');
       $this->redis->delete($allKey, $selKey, $dataKey);
+    }
+    elseif ($id === NULL && $cacheKey === NULL) {
+      // Delete everything.
+      $keys = $this->redis->keys($this->prefix . '*');
+      $this->redis->del($keys);
+    }
+    elseif ($id !== NULL && $cacheKey !== NULL) {
+      // Delete a specific contact, within a specific cache.
+      $this->redis->zDelete($this->key($cacheKey, 'all'), $id);
+      $this->redis->zDelete($this->key($cacheKey, 'sel'), $id);
+      $this->redis->hDel($this->key($cacheKey, 'data'), $id);
+    }
+    elseif ($id !== NULL && $cacheKey === NULL) {
+      // Delete a specific contact, across all prevnext caches.
+      $allKeys = $this->redis->keys($this->key('*', 'all'));
+      foreach ($allKeys as $allKey) {
+        $parts = explode(\CRM_Utils_Cache::DELIMITER, $allKey);
+        array_pop($parts);
+        $tmpCacheKey = array_pop($parts);
+        $this->deleteItem($id, $tmpCacheKey);
+      }
     }
     else {
       throw new CRM_Core_Exception("Not implemented: Redis::deleteItem");
@@ -201,7 +223,7 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
    *   Ex: 'dmaster/prevnext/abcd1234abcd1234/list'
    */
   private function key($cacheKey, $item) {
-    return $this->prefix . $cacheKey . '/' . $item;
+    return $this->prefix . $cacheKey . \CRM_Utils_Cache::DELIMITER . $item;
   }
 
   /**
