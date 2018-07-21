@@ -4965,27 +4965,45 @@ civicrm_relationship.start_date > {$today}
   }
 
   /**
-   * Fetch a list of contacts from the prev/next cache for displaying a search results page
+   * Fetch a list of contacts for displaying a search results page
    *
-   * @param string $cacheKey
-   * @param int $offset
-   * @param int $rowCount
+   * @param array $cids
+   *   List of contact IDs
    * @param bool $includeContactIds
    * @return CRM_Core_DAO
    */
-  public function getCachedContacts($cacheKey, $offset, $rowCount, $includeContactIds) {
+  public function getCachedContacts($cids, $includeContactIds) {
+    CRM_Utils_Type::validateAll($cids, 'Positive');
     $this->_includeContactIds = $includeContactIds;
     $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $this->_params);
     list($select, $from, $where) = $this->query(FALSE, FALSE, FALSE, $onlyDeleted);
-    $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
-    $order = " ORDER BY pnc.id";
-    $groupByCol = array('contact_a.id', 'pnc.id');
-    $select = self::appendAnyValueToSelect($this->_select, $groupByCol, 'GROUP_CONCAT');
-    $groupBy = " GROUP BY " . implode(', ', $groupByCol);
-    $limit = " LIMIT $offset, $rowCount";
+    $select .= sprintf(", (%s) AS _wgt", $this->createSqlCase('contact_a.id', $cids));
+    $where .= sprintf(' AND contact_a.id IN (%s)', implode(',', $cids));
+    $order = 'ORDER BY _wgt';
+    $groupBy = '';
+    $limit = '';
     $query = "$select $from $where $groupBy $order $limit";
 
     return CRM_Core_DAO::executeQuery($query);
+  }
+
+  /**
+   * Construct a SQL CASE expression.
+   *
+   * @param string $idCol
+   *   The name of a column with ID's (eg 'contact_a.id').
+   * @param array $cids
+   *   Array(int $weight => int $id).
+   * @return string
+   *   CASE WHEN id=123 THEN 1 WHEN id=456 THEN 2 END
+   */
+  private function createSqlCase($idCol, $cids) {
+    $buf = "CASE\n";
+    foreach ($cids as $weight => $cid) {
+      $buf .= " WHEN $idCol = $cid THEN $weight \n";
+    }
+    $buf .= "END\n";
+    return $buf;
   }
 
   /**

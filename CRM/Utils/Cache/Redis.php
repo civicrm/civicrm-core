@@ -43,20 +43,6 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
   const DEFAULT_PREFIX  = '';
 
   /**
-   * The host name of the redisd server
-   *
-   * @var string
-   */
-  protected $_host = self::DEFAULT_HOST;
-
-  /**
-   * The port on which to connect on
-   *
-   * @var int
-   */
-  protected $_port = self::DEFAULT_PORT;
-
-  /**
    * The default timeout to use
    *
    * @var int
@@ -82,6 +68,34 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
   protected $_cache;
 
   /**
+   * Create a connection. If a connection already exists, re-use it.
+   *
+   * @param array $config
+   * @return Redis
+   */
+  public static function connect($config) {
+    $host = isset($config['host']) ? $config['host'] : self::DEFAULT_HOST;
+    $port = isset($config['port']) ? $config['port'] : self::DEFAULT_PORT;
+    $pass = CRM_Utils_Constant::value('CIVICRM_DB_CACHE_PASSWORD'); // Ugh.
+    $id = implode(':', ['connect', $host, $port /* $pass is constant */]);
+    if (!isset(Civi::$statics[__CLASS__][$id])) {
+      // Ideally, we'd track the connection in the service-container, but the
+      // cache connection is boot-critical.
+      $redis = new Redis();
+      if (!$redis->connect($host, $port)) {
+        // dont use fatal here since we can go in an infinite loop
+        echo 'Could not connect to redisd server';
+        CRM_Utils_System::civiExit();
+      }
+      if ($pass) {
+        $redis->auth($pass);
+      }
+      Civi::$statics[__CLASS__][$id] = $redis;
+    }
+    return Civi::$statics[__CLASS__][$id];
+  }
+
+  /**
    * Constructor
    *
    * @param array $config
@@ -90,12 +104,6 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    * @return \CRM_Utils_Cache_Redis
    */
   public function __construct($config) {
-    if (isset($config['host'])) {
-      $this->_host = $config['host'];
-    }
-    if (isset($config['port'])) {
-      $this->_port = $config['port'];
-    }
     if (isset($config['timeout'])) {
       $this->_timeout = $config['timeout'];
     }
@@ -103,15 +111,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
       $this->_prefix = $config['prefix'];
     }
 
-    $this->_cache = new Redis();
-    if (!$this->_cache->connect($this->_host, $this->_port)) {
-      // dont use fatal here since we can go in an infinite loop
-      echo 'Could not connect to redisd server';
-      CRM_Utils_System::civiExit();
-    }
-    if (CRM_Utils_Constant::value('CIVICRM_DB_CACHE_PASSWORD')) {
-      $this->_cache->auth(CIVICRM_DB_CACHE_PASSWORD);
-    }
+    $this->_cache = self::connect($config);
   }
 
   /**

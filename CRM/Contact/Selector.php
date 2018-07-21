@@ -578,8 +578,11 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // and contain the search criteria (parameters)
     // note that the default action is basic
     if ($rowCount) {
+      /** @var CRM_Core_PrevNextCache_Interface $prevNext */
+      $prevNext = Civi::service('prevnext');
       $cacheKey = $this->buildPrevNextCache($sort);
-      $resultSet = $this->_query->getCachedContacts($cacheKey, $offset, $rowCount, $includeContactIds)->fetchGenerator();
+      $cids = $prevNext->fetch($cacheKey, $offset, $rowCount);
+      $resultSet = $this->_query->getCachedContacts($cids, $includeContactIds)->fetchGenerator();
     }
     else {
       $resultSet = $this->_query->searchQuery($offset, $rowCount, $sort, FALSE, $includeContactIds)->fetchGenerator();
@@ -881,7 +884,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // check for current != previous to ensure cache is not reset if paging is done without changing
     // sort criteria
     if (!$pageNum || (!empty($currentSortID) && $currentSortID != $previousSortID)) {
-      CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKey, 'civicrm_contact');
+      Civi::service('prevnext')->deleteItem(NULL, $cacheKey, 'civicrm_contact');
       // this means it's fresh search, so set pageNum=1
       if (!$pageNum) {
         $pageNum = 1;
@@ -900,10 +903,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter', 'String');
 
     //for text field pagination selection save
-    $countRow = CRM_Core_BAO_PrevNextCache::getCount($cacheKey, NULL, "entity_table = 'civicrm_contact'");
+    $countRow = Civi::service('prevnext')->getCount($cacheKey);
     // $sortByCharacter triggers a refresh in the prevNext cache
     if ($sortByCharacter && $sortByCharacter != 'all') {
-      $cacheKey .= "_alphabet";
       $this->fillupPrevNextCache($sort, $cacheKey, 0, max(self::CACHE_SIZE, $pageSize));
     }
     elseif (($firstRecord + $pageSize) >= $countRow) {
@@ -1039,17 +1041,11 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // the other alternative of running the FULL query will just be incredibly inefficient
     // and slow things down way too much on large data sets / complex queries
 
-    $insertSQL = "
-INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cacheKey, data )
-SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.sort_name
-";
+    $selectSQL = "SELECT DISTINCT '$cacheKey', contact_a.id, contact_a.sort_name";
 
-    $sql = str_replace(array("SELECT contact_a.id as contact_id", "SELECT contact_a.id as id"), $insertSQL, $sql);
+    $sql = str_replace(array("SELECT contact_a.id as contact_id", "SELECT contact_a.id as id"), $selectSQL, $sql);
     try {
-      $result = CRM_Core_DAO::executeQuery($sql, [], FALSE, NULL, FALSE, TRUE, TRUE);
-      if (is_a($result, 'DB_Error')) {
-        throw new CRM_Core_Exception($result->message);
-      }
+      Civi::service('prevnext')->fillWithSql($cacheKey, $sql);
     }
     catch (CRM_Core_Exception $e) {
       if ($coreSearch) {
@@ -1089,18 +1085,17 @@ SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', cont
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     // build insert query, note that currently we build cache for 500 (self::CACHE_SIZE) contact records at a time, hence below approach
-    $insertValues = array();
+    $rows = [];
     while ($dao->fetch()) {
-      $insertValues[] = "('civicrm_contact', {$dao->contact_id}, {$dao->contact_id}, '{$cacheKey}', '" . CRM_Core_DAO::escapeString($dao->sort_name) . "')";
+      $rows[] = [
+        'entity_table' => 'civicrm_contact',
+        'entity_id1' => $dao->contact_id,
+        'entity_id2' => $dao->contact_id,
+        'data' => $dao->sort_name,
+      ];
     }
 
-    //update pre/next cache using single insert query
-    if (!empty($insertValues)) {
-      $sql = 'INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cacheKey, data ) VALUES
-' . implode(',', $insertValues);
-
-      $result = CRM_Core_DAO::executeQuery($sql);
-    }
+    Civi::service('prevnext')->fillWithArray($cacheKey, $rows);
   }
 
   /**

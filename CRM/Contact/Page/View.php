@@ -117,7 +117,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       'nextPrevError' => 0,
     );
     if ($qfKey) {
-      $pos = CRM_Core_BAO_PrevNextCache::getPositions("civicrm search $qfKey",
+      $pos = Civi::service('prevnext')->getPositions("civicrm search $qfKey",
         $this->_contactId,
         $this->_contactId
       );

@@ -214,6 +214,24 @@ class Container {
         ->setFactory(array($class, 'singleton'));
     }
 
+    $container->setDefinition('prevnext', new Definition(
+      'CRM_Core_PrevNextCache_Interface',
+      [new Reference('service_container')]
+    ))->setFactory(array(new Reference(self::SELF), 'createPrevNextCache'));
+
+    $container->setDefinition('prevnext.driver.sql', new Definition(
+      'CRM_Core_PrevNextCache_Sql',
+      []
+    ));
+
+    $container->setDefinition('prevnext.driver.redis', new Definition(
+      'CRM_Core_PrevNextCache_Redis',
+      [new Reference('cache_config')]
+    ));
+
+    $container->setDefinition('cache_config', new Definition('ArrayObject'))
+      ->setFactory(array(new Reference(self::SELF), 'createCacheConfig'));
+
     $container->setDefinition('civi.mailing.triggers', new Definition(
       'Civi\Core\SqlTrigger\TimestampTriggers',
       array('civicrm_mailing', 'Mailing')
@@ -397,6 +415,25 @@ class Container {
     ));
 
     return $kernel;
+  }
+
+  /**
+   * @param ContainerInterface $container
+   * @return \CRM_Core_PrevNextCache_Interface
+   */
+  public static function createPrevNextCache($container) {
+    $cacheDriver = \CRM_Utils_Cache::getCacheDriver();
+    $service = 'prevnext.driver.' . strtolower($cacheDriver);
+    return $container->has($service)
+      ? $container->get($service)
+      : $container->get('prevnext.driver.sql');
+  }
+
+  public static function createCacheConfig() {
+    $driver = \CRM_Utils_Cache::getCacheDriver();
+    $settings = \CRM_Utils_Cache::getCacheSettings($driver);
+    $settings['driver'] = $driver;
+    return new \ArrayObject($settings);
   }
 
   /**
