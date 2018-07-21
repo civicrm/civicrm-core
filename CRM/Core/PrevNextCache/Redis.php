@@ -92,45 +92,9 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     return TRUE;
   }
 
-  public function fetch($cacheKey, $offset, $rowCount, $includeContactIds, $queryBao) {
-    // Get the list of contact ID's from Redis, then grab full details about
-    // each contact using $queryBao.
-
+  public function fetch($cacheKey, $offset, $rowCount) {
     $allKey = $this->key($cacheKey, 'all');
-    $cids = $this->redis->zRange($allKey, $offset, $offset + $rowCount - 1);
-    CRM_Utils_Type::validateAll($cids, 'Positive');
-
-    $queryBao->_includeContactIds = $includeContactIds;
-    $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $queryBao->_params);
-    list($select, $from, $where) = $queryBao->query(FALSE, FALSE, FALSE, $onlyDeleted);
-    $select .= sprintf(", (%s) AS _wgt", $this->createCase('contact_a.id', $cids));
-    $where .= sprintf(' AND contact_a.id IN (%s)', implode(',', $cids));
-    $order = 'ORDER BY _wgt';
-    $groupBy = '';
-    $limit = '';
-    $query = "$select $from $where $groupBy $order $limit";
-
-    return CRM_Core_DAO::executeQuery($query)->fetchGenerator();
-
-  }
-
-  /**
-   * Construct a SQL CASE expression.
-   *
-   * @param string $idCol
-   *   The name of a column with ID's (eg 'contact_a.id').
-   * @param array $cids
-   *   Array(int $weight => int $id).
-   * @return string
-   *   CASE WHEN id=123 THEN 1 WHEN id=456 THEN 2 END
-   */
-  private function createCase($idCol, $cids) {
-    $buf = "CASE\n";
-    foreach ($cids as $weight => $cid) {
-      $buf .= " WHEN $idCol = $cid THEN $weight \n";
-    }
-    $buf .= "END\n";
-    return $buf;
+    return $this->redis->zRange($allKey, $offset, $offset + $rowCount - 1);
   }
 
   public function markSelection($cacheKey, $action, $ids = NULL) {

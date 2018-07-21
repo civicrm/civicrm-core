@@ -78,28 +78,21 @@ INSERT INTO civicrm_prevnext_cache (cacheKey, entity_id1, data)
    * @param string $cacheKey
    * @param int $offset
    * @param int $rowCount
-   * @param bool $includeContactIds
-   *   FIXME: Masochistic.
-   *   If this is TRUE, then $query->_params will be searched for items beginning
-   *   with `mark_x_<number>`. Each <number> becomes part of a contact filter
-   *   (`WHERE contact_id IN (...)`).
-   * @param CRM_Contact_BAO_Query $queryBao
-   *   FIXME: Masochistic.
-   * @return Generator<CRM_Core_DAO>
+   * @return array
+   *   List of contact IDs.
    */
-  public function fetch($cacheKey, $offset, $rowCount, $includeContactIds, $queryBao) {
-    $queryBao->_includeContactIds = $includeContactIds;
-    $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $queryBao->_params);
-    list($select, $from, $where) = $queryBao->query(FALSE, FALSE, FALSE, $onlyDeleted);
-    $from = " FROM civicrm_prevnext_cache pnc INNER JOIN civicrm_contact contact_a ON contact_a.id = pnc.entity_id1 AND pnc.cacheKey = '$cacheKey' " . substr($from, 31);
-    $order = " ORDER BY pnc.id";
-    $groupByCol = array('contact_a.id', 'pnc.id');
-    $select = CRM_Contact_BAO_Query::appendAnyValueToSelect($queryBao->_select, $groupByCol, 'GROUP_CONCAT');
-    $groupBy = " GROUP BY " . implode(', ', $groupByCol);
-    $limit = " LIMIT $offset, $rowCount";
-    $query = "$select $from $where $groupBy $order $limit";
-
-    return CRM_Core_DAO::executeQuery($query)->fetchGenerator();
+  public function fetch($cacheKey, $offset, $rowCount) {
+    $cids = array();
+    $dao = CRM_Utils_SQL_Select::from('civicrm_prevnext_cache pnc')
+      ->where('pnc.cacheKey = @cacheKey', ['cacheKey' => $cacheKey])
+      ->select('pnc.entity_id1 as cid')
+      ->orderBy('pnc.id')
+      ->limit($rowCount, $offset)
+      ->execute();
+    while ($dao->fetch()) {
+      $cids[] = $dao->cid;
+    }
+    return $cids;
   }
 
   /**

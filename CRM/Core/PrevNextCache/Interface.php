@@ -62,16 +62,10 @@ interface CRM_Core_PrevNextCache_Interface {
    * @param string $cacheKey
    * @param int $offset
    * @param int $rowCount
-   * @param bool $includeContactIds
-   *   FIXME: Masochistic.
-   *   If this is TRUE, then $query->_params will be searched for items beginning
-   *   with `mark_x_<number>`. Each <number> becomes part of a contact filter
-   *   (`WHERE contact_id IN (...)`).
-   * @param CRM_Contact_BAO_Query $queryBao
-   *   FIXME: Masochistic.
-   * @return Generator<CRM_Core_DAO>
+   * @return array
+   *   List of contact IDs (entity_id1).
    */
-  public function fetch($cacheKey, $offset, $rowCount, $includeContactIds, $queryBao);
+  public function fetch($cacheKey, $offset, $rowCount);
 
   /**
    * Save checkbox selections.
