@@ -35,6 +35,13 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
    * Test Create, Read, Update Financial type with custom field.
    */
   public function testCreateUpdateFinancialTypeCustomField() {
+    $this->callAPISuccess('OptionValue', 'create', [
+      'label' => ts('Financial Type'),
+      'name' => 'civicrm_financial_type',
+      'value' => 'FinancialType',
+      'option_group_id' => 'cg_extend_objects',
+      'is_active' => 1,
+    ]);
     // create custom group and custom field
     $customFieldIds = $this->CustomGroupMultipleCreateWithFields([
       'name' => 'Test_Group_Financial_type',
