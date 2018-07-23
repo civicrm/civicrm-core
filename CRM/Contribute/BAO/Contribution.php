@@ -5465,18 +5465,14 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
         );
 
         // Does the contact have a "current" membership (ie. not expired/pending etc).
-        $currentMembership = CRM_Member_BAO_Membership::getContactMembership($membershipParams['contact_id'],
-          $membershipParams['membership_type_id'],
-          $membershipParams['is_test'],
-          $membershipParams['id']
-        );
-        if ($currentMembership) {
+        if (!empty($membership['status_id.is_current_member'])) {
           /*
            * Fixed FOR CRM-4433
            * In BAO/Membership.php(renewMembership function), we skip the extend membership date and status
            * when Contribution mode is notify and membership is for renewal )
+           * FIXME: Is this still required?
            */
-          CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, $changeDate);
+          CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($membership, $changeDate);
         }
 
         // Tell the Membership BAO to calculate membership status.
