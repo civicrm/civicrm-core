@@ -84,7 +84,6 @@
 $('#civicrm-menu').ready(function() {
   $('#root-menu-div .outerbox').css({'margin-top': '6px'});
   $('#root-menu-div .menu-ul li').css({'padding-bottom': '2px', 'margin-top': '2px'});
-  $('img.menu-item-arrow').css({top: '4px'});
   $("#civicrm-menu >li").each(function(i){
     $(this).attr("tabIndex",i+2);
   });
@@ -208,7 +207,7 @@ $('#civicrm-menu').ready(function() {
   // Close menu after selecting an item
   $('#root-menu-div').on('click', 'a', $.Menu.closeAll);
 });
-$('#civicrm-menu').menuBar({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
+$('#civicrm-menu').menuBar({arrowClass: 'crm-i fa-caret-right'});
 $(window).on("beforeunload", function() {
   $('.crm-logo-sm', '#civicrm-menu').addClass('crm-i fa-spin');
 });
