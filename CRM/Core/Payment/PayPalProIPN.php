@@ -236,16 +236,16 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
           $recur->start_date = $now;
         }
         else {
-          $input['invoice_id'] = md5(uniqid(rand(), TRUE));
-          $input['original_contribution_id'] = $ids['contribution'];
-          $input['contribution_recur_id'] = $ids['contributionRecur'];
-
           if ($input['paymentStatus'] != 'Completed') {
             throw new CRM_Core_Exception("Ignore all IPN payments that are not completed");
           }
+
           // In future moving to create pending & then complete, but this OK for now.
           // Also consider accepting 'Failed' like other processors.
-          $input['contribution_status_id'] = 1;
+          $input['contribution_status_id'] = $contributionStatuses['Completed'];
+          $input['invoice_id'] = md5(uniqid(rand(), TRUE));
+          $input['original_contribution_id'] = $ids['contribution'];
+          $input['contribution_recur_id'] = $ids['contributionRecur'];
 
           civicrm_api3('Contribution', 'repeattransaction', $input);
           return;
