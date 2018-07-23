@@ -14,3 +14,5 @@ UPDATE civicrm_option_group AS cog INNER JOIN civicrm_custom_field AS ccf
 ON cog.id = ccf.option_group_id
 SET cog.is_reserved = 0 WHERE cog.is_active = 1 AND ccf.is_active = 1;
 UPDATE civicrm_option_group SET is_reserved = 1 WHERE name='environment';
+
+UPDATE civicrm_navigation SET url = 'civicrm/admin/options?action=browse&reset=1' WHERE name = 'Dropdown Options' AND domain_id = {$domainID};
