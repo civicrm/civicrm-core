@@ -843,9 +843,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @param $selectedFields
    * @param int $id
    *
+   * @param int $exportMode
+   *
    * @return array
    */
-  protected function doExport($selectedFields, $id) {
+  protected function doExport($selectedFields, $id, $exportMode = CRM_Export_Form_Select::CONTACT_EXPORT) {
     list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
       TRUE,
       array($id),
@@ -853,7 +855,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       NULL,
       $selectedFields,
       NULL,
-      CRM_Export_Form_Select::CONTACT_EXPORT,
+      $exportMode,
       "contact_a.id IN ({$id})",
       NULL,
       FALSE,
@@ -1370,10 +1372,31 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   public function testExportSpecifyFields($exportMode, $selectedFields, $expected) {
     $this->ensureComponentIsEnabled($exportMode);
     $this->setUpContributionExportData();
-    list($tableName, $sqlColumns) = $this->doExport($selectedFields, $this->contactIDs[1]);
+    list($tableName, $sqlColumns) = $this->doExport($selectedFields, $this->contactIDs[1], $exportMode);
     $this->assertEquals($expected, $sqlColumns);
   }
 
+  /**
+   * Test export fields when no payment fields to be exported.
+   */
+  public function textExportParticipantSpecifyFieldsNoPayment() {
+    $selectedFields = $this->getAllSpecifiableParticipantReturnFields();
+    foreach ($selectedFields as $index => $field) {
+      if (substr($field[1], 0, 22) === 'componentPaymentField_') {
+        unset ($selectedFields[$index]);
+      }
+    }
+
+    $expected = $this->getAllSpecifiableParticipantReturnFields();
+    foreach ($expected as $index => $field) {
+      if (substr($index, 0, 22) === 'componentPaymentField_') {
+        unset ($expected[$index]);
+      }
+    }
+
+    list($tableName, $sqlColumns) = $this->doExport($selectedFields, $this->contactIDs[1], CRM_Export_Form_Select::EVENT_EXPORT);
+    $this->assertEquals($expected, $sqlColumns);
+  }
   /**
    * Get all return fields (@todo - still being built up.
    *
@@ -1384,39 +1407,48 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       [
         CRM_Export_Form_Select::EVENT_EXPORT,
         $this->getAllSpecifiableParticipantReturnFields(),
-        [
-          'participant_campaign_id' => 'participant_campaign_id varchar(128)',
-          'participant_contact_id' => 'participant_contact_id varchar(16)',
-          'componentpaymentfield_contribution_status' => 'componentpaymentfield_contribution_status text',
-          'currency' => 'currency varchar(3)',
-          'componentpaymentfield_received_date' => 'componentpaymentfield_received_date text',
-          'default_role_id' => 'default_role_id varchar(16)',
-          'participant_discount_name' => 'participant_discount_name varchar(16)',
-          'event_id' => 'event_id varchar(16)',
-          'event_end_date' => 'event_end_date varchar(32)',
-          'event_start_date' => 'event_start_date varchar(32)',
-          'template_title' => 'template_title varchar(255)',
-          'event_title' => 'event_title varchar(255)',
-          'participant_fee_amount' => 'participant_fee_amount varchar(32)',
-          'participant_fee_currency' => 'participant_fee_currency varchar(3)',
-          'fee_label' => 'fee_label varchar(255)',
-          'participant_fee_level' => 'participant_fee_level longtext',
-          'participant_is_pay_later' => 'participant_is_pay_later varchar(16)',
-          'participant_id' => 'participant_id varchar(16)',
-          'participant_note' => 'participant_note text',
-          'participant_role_id' => 'participant_role_id varchar(128)',
-          'participant_role' => 'participant_role varchar(255)',
-          'participant_source' => 'participant_source varchar(128)',
-          'participant_status_id' => 'participant_status_id varchar(16)',
-          'participant_status' => 'participant_status varchar(255)',
-          'participant_register_date' => 'participant_register_date varchar(32)',
-          'participant_registered_by_id' => 'participant_registered_by_id varchar(16)',
-          'participant_is_test' => 'participant_is_test varchar(16)',
-          'componentpaymentfield_total_amount' => 'componentpaymentfield_total_amount text',
-          'componentpaymentfield_transaction_id' => 'componentpaymentfield_transaction_id varchar(255)',
-          'transferred_to_contact_id' => 'transferred_to_contact_id varchar(16)',
-        ],
+        $this->getAllSpecifiableParticipantReturnColumns(),
       ],
+    ];
+  }
+
+  /**
+   * Get expected return column output for participant mode return all columns.
+   *
+   * @return array
+   */
+  public function getAllSpecifiableParticipantReturnColumns() {
+    return [
+      'participant_campaign_id' => 'participant_campaign_id varchar(128)',
+      'participant_contact_id' => 'participant_contact_id varchar(16)',
+      'componentpaymentfield_contribution_status' => 'componentpaymentfield_contribution_status text',
+      'currency' => 'currency varchar(3)',
+      'componentpaymentfield_received_date' => 'componentpaymentfield_received_date text',
+      'default_role_id' => 'default_role_id varchar(16)',
+      'participant_discount_name' => 'participant_discount_name varchar(16)',
+      'event_id' => 'event_id varchar(16)',
+      'event_end_date' => 'event_end_date varchar(32)',
+      'event_start_date' => 'event_start_date varchar(32)',
+      'template_title' => 'template_title varchar(255)',
+      'event_title' => 'event_title varchar(255)',
+      'participant_fee_amount' => 'participant_fee_amount varchar(32)',
+      'participant_fee_currency' => 'participant_fee_currency varchar(3)',
+      'fee_label' => 'fee_label varchar(255)',
+      'participant_fee_level' => 'participant_fee_level longtext',
+      'participant_is_pay_later' => 'participant_is_pay_later varchar(16)',
+      'participant_id' => 'participant_id varchar(16)',
+      'participant_note' => 'participant_note text',
+      'participant_role_id' => 'participant_role_id varchar(128)',
+      'participant_role' => 'participant_role varchar(255)',
+      'participant_source' => 'participant_source varchar(128)',
+      'participant_status_id' => 'participant_status_id varchar(16)',
+      'participant_status' => 'participant_status varchar(255)',
+      'participant_register_date' => 'participant_register_date varchar(32)',
+      'participant_registered_by_id' => 'participant_registered_by_id varchar(16)',
+      'participant_is_test' => 'participant_is_test varchar(16)',
+      'componentpaymentfield_total_amount' => 'componentpaymentfield_total_amount text',
+      'componentpaymentfield_transaction_id' => 'componentpaymentfield_transaction_id varchar(255)',
+      'transferred_to_contact_id' => 'transferred_to_contact_id varchar(16)',
     ];
   }
 

@@ -246,9 +246,6 @@ class CRM_Export_BAO_Export {
 
     $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator);
     $returnProperties = array();
-    $selectedPaymentFields = FALSE;
-    // @todo - this variable is overwritten later - it should be wholly definable in the processor fn.
-    $paymentTableId = $processor->getPaymentTableID();
 
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     // Warning - this imProviders var is used in a somewhat fragile way - don't rename it
@@ -292,14 +289,6 @@ class CRM_Export_BAO_Export {
           if ($fieldName == 'event_id') {
             $returnProperties['event_id'] = 1;
           }
-          elseif (
-            $exportMode == CRM_Export_Form_Select::EVENT_EXPORT &&
-            array_key_exists($fieldName, self::componentPaymentFields())
-          ) {
-            $selectedPaymentFields = TRUE;
-            $paymentTableId = 'participant_id';
-            $returnProperties[$fieldName] = 1;
-          }
           else {
             $returnProperties[$fieldName] = 1;
           }
@@ -313,6 +302,9 @@ class CRM_Export_BAO_Export {
     else {
       $returnProperties = $processor->getDefaultReturnProperties();
     }
+    // @todo - we are working towards this being entirely a property of the processor
+    $processor->setReturnProperties($returnProperties);
+    $paymentTableId = $processor->getPaymentTableID();
 
     if ($mergeSameAddress) {
       //make sure the addressee fields are selected
@@ -463,14 +455,14 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $addPaymentHeader = FALSE;
 
     $paymentDetails = array();
-    if ($processor->isExportPaymentFields() || $selectedPaymentFields) {
+    if ($processor->isExportPaymentFields()) {
 
       // get payment related in for event and members
       $paymentDetails = CRM_Contribute_BAO_Contribution::getContributionDetails($exportMode, $ids);
       //get all payment headers.
       // If we haven't selected specific payment fields, load in all the
       // payment headers.
-      if (!$selectedPaymentFields) {
+      if (!$processor->isExportSpecifiedPaymentFields()) {
         $paymentHeaders = self::componentPaymentFields();
         if (!empty($paymentDetails)) {
           $addPaymentHeader = TRUE;
@@ -498,7 +490,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     // for CRM-3157 purposes
     $i18n = CRM_Core_I18n::singleton();
 
-    list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor, $relationQuery, $selectedPaymentFields);
+    list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor, $relationQuery);
 
     $limitReached = FALSE;
     while (!$limitReached) {
@@ -549,7 +541,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             self::fetchRelationshipDetails($relDAO, $value, $field, $row);
           }
           else {
-            $row[$field] = self::getTransformedFieldValue($field, $iterationDAO, $fieldValue, $i18n, $metadata, $selectedPaymentFields, $paymentDetails, $paymentTableId);
+            $row[$field] = self::getTransformedFieldValue($field, $iterationDAO, $fieldValue, $i18n, $metadata, $paymentDetails, $processor);
           }
         }
 
@@ -574,7 +566,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         // data will already be in $row. Otherwise, add payment related
         // information, if appropriate.
         if ($addPaymentHeader) {
-          if (!$selectedPaymentFields) {
+          if (!$processor->isExportSpecifiedPaymentFields()) {
             if ($processor->isExportPaymentFields()) {
               $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
               if (!is_array($paymentData) || empty($paymentData)) {
@@ -1528,10 +1520,10 @@ WHERE  {$whereClause}";
    * @param array $phoneTypes
    * @param array $imProviders
    * @param string $relationQuery
-   * @param array $selectedPaymentFields
+   *
    * @return array
    */
-  public static function setHeaderRows($field, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery, $selectedPaymentFields) {
+  public static function setHeaderRows($field, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery) {
 
     $queryFields = $processor->getQueryFields();
     // Split campaign into 2 fields for id and title
@@ -1610,7 +1602,7 @@ WHERE  {$whereClause}";
       }
       self::manipulateHeaderRows($headerRows);
     }
-    elseif ($selectedPaymentFields && array_key_exists($field, self::componentPaymentFields())) {
+    elseif ($processor->isExportPaymentFields() && array_key_exists($field, self::componentPaymentFields())) {
       $headerRows[] = CRM_Utils_Array::value($field, self::componentPaymentFields());
     }
     else {
@@ -1634,7 +1626,7 @@ WHERE  {$whereClause}";
    * @param array $returnProperties
    * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param string $relationQuery
-   * @param array $selectedPaymentFields
+   *
    * @return array
    *   - outputColumns Array of columns to be exported. The values don't matter but the key must match the
    *   alias for the field generated by BAO_Query object.
@@ -1651,7 +1643,7 @@ WHERE  {$whereClause}";
    *    - b) this code is old & outdated. Submit your answers to circular bin or better
    *       yet find a way to comment them for posterity.
    */
-  public static function getExportStructureArrays($returnProperties, $processor, $relationQuery, $selectedPaymentFields) {
+  public static function getExportStructureArrays($returnProperties, $processor, $relationQuery) {
     $metadata = $headerRows = $outputColumns = $sqlColumns = array();
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
@@ -1660,7 +1652,7 @@ WHERE  {$whereClause}";
     foreach ($returnProperties as $key => $value) {
       if ($key != 'location' || !is_array($value)) {
         $outputColumns[$key] = $value;
-        list($headerRows, $sqlColumns) = self::setHeaderRows($key, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery, $selectedPaymentFields);
+        list($headerRows, $sqlColumns) = self::setHeaderRows($key, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery);
       }
       else {
         foreach ($value as $locationType => $locationFields) {
@@ -1685,7 +1677,7 @@ WHERE  {$whereClause}";
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
             self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
-            list($headerRows, $sqlColumns) = self::setHeaderRows($outputFieldName, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery, $selectedPaymentFields);
+            list($headerRows, $sqlColumns) = self::setHeaderRows($outputFieldName, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');
             }
@@ -1920,12 +1912,13 @@ WHERE  {$whereClause}";
    * @param $fieldValue
    * @param $i18n
    * @param $metadata
-   * @param $selectedPaymentFields
    * @param $paymentDetails
-   * @param string $paymentTableId
+   *
+   * @param \CRM_Export_BAO_ExportProcessor $processor
+   *
    * @return string
    */
-  protected static function getTransformedFieldValue($field, $iterationDAO, $fieldValue, $i18n, $metadata, $selectedPaymentFields, $paymentDetails, $paymentTableId) {
+  protected static function getTransformedFieldValue($field, $iterationDAO, $fieldValue, $i18n, $metadata, $paymentDetails, $processor) {
 
     if ($field == 'id') {
       return $iterationDAO->contact_id;
@@ -2002,7 +1995,8 @@ WHERE  {$whereClause}";
         }
       }
     }
-    elseif ($selectedPaymentFields && array_key_exists($field, self::componentPaymentFields())) {
+    elseif ($processor->isExportSpecifiedPaymentFields() && array_key_exists($field, self::componentPaymentFields())) {
+      $paymentTableId = $processor->getPaymentTableID();
       $paymentData = CRM_Utils_Array::value($iterationDAO->$paymentTableId, $paymentDetails);
       $payFieldMapper = array(
         'componentPaymentField_total_amount' => 'total_amount',
