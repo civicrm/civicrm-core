@@ -175,7 +175,7 @@
       {if $isLocked ne 1}
         {crmButton p="civicrm/admin/options/$gName" q='action=add&reset=1' class="new-option" icon="plus-circle"}{ts 1=$gLabel}Add %1{/ts}{/crmButton}
       {/if}
-      {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/options" q="action=browse&reset=1" class="next no-popup" icon="check"}{ts}Done{/ts}{/crmButton}
     </div>
 </div>
 {/if}
