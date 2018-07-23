@@ -5445,6 +5445,12 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     // Loop through all found memberships and update status/renew
     foreach ($memberships as $membershipId => $membership) {
       if ($membership) {
+        if ((!empty($contribution->contribution_recur_id))
+          && (!CRM_Member_BAO_Membership::isRecurFrequencyEqualToMembershipType($membership['membership_type_id'], $membership['contribution_recur_id']))) {
+          Civi::log()->warning('You have enabled auto-renew on membership (id=' . $membership['id'] . ') but the frequencies do not match! The membership will not be auto-renewed.');
+          continue;
+        }
+
         $membershipParams = array(
           'id' => $membership['id'],
           'contact_id' => $membership['contact_id'],

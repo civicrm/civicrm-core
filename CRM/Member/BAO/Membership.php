@@ -1706,6 +1706,34 @@ LEFT JOIN civicrm_membership mem ON ( cr.id = mem.contribution_recur_id )
   }
 
   /**
+   * Check if the membership type has the same frequency as the recurring contribution
+   * @param $membershipTypeId
+   * @param $contributionRecurId
+   *
+   * @return bool
+   */
+  public static function isRecurFrequencyEqualToMembershipType($membershipTypeId, $contributionRecurId) {
+    try {
+      $membershipType = civicrm_api3('MembershipType', 'getsingle', array(
+        'return' => array("duration_unit", "duration_interval"),
+        'id' => $membershipTypeId,
+      ));
+      $contributionRecur = civicrm_api3('ContributionRecur', 'getsingle', array(
+        'return' => array("frequency_unit", "frequency_interval"),
+        'id' => $contributionRecurId,
+      ));
+      if (($membershipType['duration_unit'] === $contributionRecur['frequency_unit'])
+        && ($membershipType['duration_interval'] === $contributionRecur['frequency_interval'])) {
+        return TRUE;
+      }
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      return FALSE;
+    }
+    return FALSE;
+  }
+
+  /**
    * Get membership joins for a specified membership type.
    *
    * Specifically, retrieves a count of still current memberships whose
