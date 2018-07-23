@@ -265,8 +265,8 @@ class CRM_Admin_Page_AJAX {
     $recipientMapping = array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels));
 
     $output = array(
-      'sel4' => CRM_Utils_Array::toKeyValueRows($dateFieldLabels),
-      'sel5' => CRM_Utils_Array::toKeyValueRows($entityRecipientLabels),
+      'sel4' => CRM_Utils_Array::makeNonAssociative($dateFieldLabels),
+      'sel5' => CRM_Utils_Array::makeNonAssociative($entityRecipientLabels),
       'recipientMapping' => $recipientMapping,
     );
 
@@ -291,7 +291,7 @@ class CRM_Admin_Page_AJAX {
     ));
 
     CRM_Utils_JSON::output(array(
-      'recipients' => CRM_Utils_Array::toKeyValueRows(CRM_Core_BAO_ActionSchedule::getRecipientListing($mappingID, $recipientType)),
+      'recipients' => CRM_Utils_Array::makeNonAssociative(CRM_Core_BAO_ActionSchedule::getRecipientListing($mappingID, $recipientType)),
     ));
   }
 
