@@ -733,16 +733,17 @@ GROUP BY  currency
 
       // set title to calculated fields
       $calculatedFields = array(
-        'pledge_total_paid' => array('title' => ts('Total Paid')),
-        'pledge_balance_amount' => array('title' => ts('Balance Amount')),
-        'pledge_next_pay_date' => array('title' => ts('Next Payment Date')),
-        'pledge_next_pay_amount' => array('title' => ts('Next Payment Amount')),
-        'pledge_payment_paid_amount' => array('title' => ts('Paid Amount')),
-        'pledge_payment_paid_date' => array('title' => ts('Paid Date')),
+        'pledge_total_paid' => array('title' => ts('Total Paid'), 'type' => CRM_Utils_Type::T_MONEY),
+        'pledge_balance_amount' => array('title' => ts('Balance Amount'), 'type' => CRM_Utils_Type::T_MONEY),
+        'pledge_next_pay_date' => array('title' => ts('Next Payment Date'), 'type' => CRM_Utils_Type::T_DATE),
+        'pledge_next_pay_amount' => array('title' => ts('Next Payment Amount'), 'type' => CRM_Utils_Type::T_MONEY),
+        'pledge_payment_paid_amount' => array('title' => ts('Paid Amount'), 'type' => CRM_Utils_Type::T_MONEY),
+        'pledge_payment_paid_date' => array('title' => ts('Paid Date'), 'type' => CRM_Utils_Type::T_DATE),
         'pledge_payment_status' => array(
           'title' => ts('Pledge Payment Status'),
           'name' => 'pledge_payment_status',
           'data_type' => CRM_Utils_Type::T_STRING,
+          'type' => CRM_Utils_Type::T_STRING,
         ),
       );
 
@@ -751,21 +752,24 @@ GROUP BY  currency
           'title' => ts('Pledge Status'),
           'name' => 'pledge_status',
           'data_type' => CRM_Utils_Type::T_STRING,
+          'type' => CRM_Utils_Type::T_STRING,
         ),
         'pledge_frequency_unit' => array(
           'title' => ts('Pledge Frequency Unit'),
           'name' => 'pledge_frequency_unit',
-          'data_type' => CRM_Utils_Type::T_ENUM,
+          'type' => CRM_Utils_Type::T_STRING,
         ),
         'pledge_frequency_interval' => array(
           'title' => ts('Pledge Frequency Interval'),
           'name' => 'pledge_frequency_interval',
           'data_type' => CRM_Utils_Type::T_INT,
+          'type' => CRM_Utils_Type::T_INT,
         ),
         'pledge_contribution_page_id' => array(
           'title' => ts('Pledge Contribution Page Id'),
           'name' => 'pledge_contribution_page_id',
           'data_type' => CRM_Utils_Type::T_INT,
+          'type' => CRM_Utils_Type::T_INT,
         ),
       );
 

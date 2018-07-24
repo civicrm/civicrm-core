@@ -1537,6 +1537,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             array(
               'name' => 'organization_name',
               'title' => ts('Current Employer'),
+              'type' => CRM_Utils_Type::T_STRING,
             ),
         ));
 
@@ -1545,6 +1546,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             'name' => 'location_type',
             'where' => 'civicrm_location_type.name',
             'title' => ts('Location Type'),
+            'type' => CRM_Utils_Type::T_STRING,
           ),
         );
 
@@ -1553,6 +1555,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             'name' => 'im_provider',
             'where' => 'civicrm_im.provider_id',
             'title' => ts('IM Provider'),
+            'type' => CRM_Utils_Type::T_INT,
           ),
         );
 
@@ -1610,14 +1613,17 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             'groups' => array(
               'title' => ts('Group(s)'),
               'name' => 'groups',
+              'type' => CRM_Utils_Type::T_TEXT,
             ),
             'tags' => array(
               'title' => ts('Tag(s)'),
               'name' => 'tags',
+              'type' => CRM_Utils_Type::T_TEXT,
             ),
             'notes' => array(
               'title' => ts('Note(s)'),
               'name' => 'notes',
+              'type' => CRM_Utils_Type::T_TEXT,
             ),
           ));
         }

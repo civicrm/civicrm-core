@@ -727,4 +727,16 @@ civicrm_relationship.is_active = 1 AND
     $this->assertEquals($modparams['member_is_primary'][2], $fv_orig['member_is_primary']);
   }
 
+  /**
+   * Tests that 'type' is defined for all metadata fields.
+   */
+  public function testFieldMetadata() {
+    $query = new CRM_Contact_BAO_Query();
+    $fields = $query->getFieldMetadata();
+    foreach ($fields as $field) {
+      $this->assertTrue(!empty($field['type']), print_r($field, 1));
+      $this->assertTrue(!empty(CRM_Utils_Type::typeToString($field['type'])));
+    }
+  }
+
 }

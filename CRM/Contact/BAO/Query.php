@@ -472,19 +472,7 @@ class CRM_Contact_BAO_Query {
       $this->_skipPermission = TRUE;
     }
     else {
-      $this->_fields = CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE, TRUE, FALSE, !$skipPermission);
-
-      $fields = CRM_Core_Component::getQueryFields(!$this->_skipPermission);
-      unset($fields['note']);
-      $this->_fields = array_merge($this->_fields, $fields);
-
-      // add activity fields
-      $fields = CRM_Activity_BAO_Activity::exportableFields();
-      $this->_fields = array_merge($this->_fields, $fields);
-
-      // add any fields provided by hook implementers
-      $extFields = CRM_Contact_BAO_Query_Hook::singleton()->getFields();
-      $this->_fields = array_merge($this->_fields, $extFields);
+      $this->setAllFieldMetadata(!$skipPermission);
     }
 
     // basically do all the work once, and then reuse it
@@ -6610,6 +6598,37 @@ AND   displayRelType.is_active = 1
     }
     $select .= implode(', ', $this->_select);
     return $select;
+  }
+
+  /**
+   * Get metadata for all fields accessible by the contact.
+   *
+   * @param bool $isCheckPermissions
+   */
+  public function setAllFieldMetadata($isCheckPermissions) {
+
+    $this->_fields = CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE, TRUE, FALSE, $isCheckPermissions);
+
+    $fields = CRM_Core_Component::getQueryFields($isCheckPermissions);
+    unset($fields['note']);
+    $this->_fields = array_merge($this->_fields, $fields);
+
+    // add activity fields
+    $fields = CRM_Activity_BAO_Activity::exportableFields();
+    $this->_fields = array_merge($this->_fields, $fields);
+
+    // add any fields provided by hook implementers
+    $extFields = CRM_Contact_BAO_Query_Hook::singleton()->getFields();
+    $this->_fields = array_merge($this->_fields, $extFields);
+  }
+
+  /**
+   * Get array of field metadata.
+   *
+   * @return array
+   */
+  public function getFieldMetadata() {
+    return $this->_fields;
   }
 
 }
