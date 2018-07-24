@@ -2341,7 +2341,7 @@ class CRM_Contact_BAO_Query {
         $this->_where[$grouping][] = CRM_Core_DAO::createSQLFilter($fieldName, $value, $type);
       }
       else {
-        if (!strpos($op, 'IN')) {
+        if (!self::caseImportant($op)) {
           $value = $strtolower($value);
         }
         if ($wildcard) {
@@ -5669,6 +5669,9 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
       case 'IS NOT EMPTY':
         $clause = ($dataType == 'Date') ? " $field IS NOT NULL " : " (NULLIF($field, '') IS NOT NULL) ";
         return $clause;
+
+      case 'RLIKE':
+        return " {$clause} BINARY '{$value}' ";
 
       case 'IN':
       case 'NOT IN':
