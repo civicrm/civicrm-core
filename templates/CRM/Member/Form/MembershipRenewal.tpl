@@ -240,10 +240,14 @@
       cj('#membership_type_id_1').change(function () {
         setPaymentBlock();
       });
+
+      cj('#total_amount').change(function () {
+          setPaymentBlock(false, true);
+      });
       setPaymentBlock();
     });
 
-    function setPaymentBlock(checkboxEvent) {
+    function setPaymentBlock(checkboxEvent, manualAmountUpdate) {
       var memType = cj('#membership_type_id_1').val();
 
       if (!memType) {
@@ -270,15 +274,34 @@
       }
 
       var term = cj("#num_terms").val();
-      if (term) {
-        var renewTotal = allMemberships[memType]['total_amount_numeric'] * term;
-        cj("#total_amount").val(CRM.formatMoney(renewTotal, true));
-      }
-      else {
-        cj("#total_amount").val(allMemberships[memType]['total_amount']);
+      var taxAmount = allMemberships[memType]['tax_amount'];
+      var totalAmountExTax = allMemberships[memType]['total_amount_ex_tax'];
+      var taxRate = allMemberships[memType]['tax_rate'];
+      var currencySymbol = {/literal}{$currency_symbol|@json_encode}{literal};
+
+      if (typeof manualAmountUpdate !== "undefined" && manualAmountUpdate) {
+        if (taxRate) {
+          var totalAmountIncTax = Number(cj("#total_amount").val());
+          taxAmount = (totalAmountIncTax - ((totalAmountIncTax * 100) / Number(100 + Number(taxRate)))).toFixed(2);
+        }
+      } else {
+        if (term) {
+          var renewTotal = allMemberships[memType]['total_amount_numeric'] * term;
+          totalAmountExTax = totalAmountExTax * term;
+          cj("#total_amount").val(CRM.formatMoney(renewTotal, true));
+        }
+        else {
+          cj("#total_amount").val(allMemberships[memType]['total_amount']);
+        }
+
+        taxAmount = Number(totalAmountExTax * (taxRate / 100)).toFixed(2);
       }
 
-      cj('.totaltaxAmount').html(allMemberships[memType]['tax_message']);
+      var taxMsg = '';
+      if(!isNaN(taxAmount) && taxRate) {
+        taxMsg = 'Includes '+allMemberships[memType]['tax_term']+ ' of '+currencySymbol + ' ' + taxAmount;
+      }
+      cj('.totaltaxAmount').html(taxMsg);
     }
 
     // show/hide different contact section
