@@ -2775,8 +2775,24 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
   /**
    * Set up initial recurring payment allowing subsequent IPN payments.
+   *
+   * @param array $recurParams (Optional)
+   * @param array $contributionParams (Optional)
    */
-  public function setupRecurringPaymentProcessorTransaction($params = array()) {
+  public function setupRecurringPaymentProcessorTransaction($recurParams = [], $contributionParams = []) {
+    $contributionParams = array_merge([
+        'total_amount' => '200',
+        'invoice_id' => $this->_invoiceID,
+        'financial_type_id' => 'Donation',
+        'contribution_status_id' => 'Pending',
+        'contact_id' => $this->_contactID,
+        'contribution_page_id' => $this->_contributionPageID,
+        'payment_processor_id' => $this->_paymentProcessorID,
+        'is_test' => 0,
+        'skipCleanMoney' => TRUE,
+      ],
+      $contributionParams
+    );
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge(array(
       'contact_id' => $this->_contactID,
       'amount' => 1000,
@@ -2789,18 +2805,8 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'payment_processor_id' => $this->_paymentProcessorID,
       // processor provided ID - use contact ID as proxy.
       'processor_id' => $this->_contactID,
-      'api.contribution.create' => array(
-        'total_amount' => '200',
-        'invoice_id' => $this->_invoiceID,
-        'financial_type_id' => 1,
-        'contribution_status_id' => 'Pending',
-        'contact_id' => $this->_contactID,
-        'contribution_page_id' => $this->_contributionPageID,
-        'payment_processor_id' => $this->_paymentProcessorID,
-        'is_test' => 0,
-        'skipCleanMoney' => TRUE,
-      ),
-    ), $params));
+      'api.contribution.create' => $contributionParams,
+    ), $recurParams));
     $this->_contributionRecurID = $contributionRecur['id'];
     $this->_contributionID = $contributionRecur['values']['0']['api.contribution.create']['id'];
   }

@@ -223,17 +223,14 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         throw new CRM_Core_Exception("Ignore all IPN payments that are not completed");
       }
 
-      $contribution->contact_id = $ids['contact'];
-      $contribution->financial_type_id = $objects['contributionType']->id;
-      $contribution->contribution_page_id = $ids['contributionPage'];
-      $contribution->contribution_recur_id = $ids['contributionRecur'];
-      $contribution->receive_date = $now;
-      $contribution->currency = $objects['contribution']->currency;
-      $contribution->payment_instrument_id = $objects['contribution']->payment_instrument_id;
-      $contribution->amount_level = $objects['contribution']->amount_level;
-      $contribution->campaign_id = $objects['contribution']->campaign_id;
+      // In future moving to create pending & then complete, but this OK for now.
+      // Also consider accepting 'Failed' like other processors.
+      $input['contribution_status_id'] = $contributionStatuses['Completed'];
+      $input['original_contribution_id'] = $ids['contribution'];
+      $input['contribution_recur_id'] = $ids['contributionRecur'];
 
-      $objects['contribution'] = &$contribution;
+      civicrm_api3('Contribution', 'repeattransaction', $input);
+      return;
     }
 
     $this->single($input, $ids, $objects,
@@ -333,23 +330,12 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       $ids['onbehalf_dupe_alert'] = $this->retrieve('onBehalfDupeAlert', 'Integer', FALSE);
     }
 
-    $paymentProcessorID = $this->retrieve('processor_id', 'Integer', FALSE);
-    if (empty($paymentProcessorID)) {
-      $processorParams = array(
-        'user_name' => $this->retrieve('business', 'String', FALSE),
-        'payment_processor_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType', 'PayPal_Standard', 'id', 'name'),
-        'is_test' => empty($input['is_test']) ? 0 : 1,
-      );
+    $paymentProcessorID = self::getPayPalPaymentProcessorID($input, $ids);
 
-      $processorInfo = array();
-      if (!CRM_Financial_BAO_PaymentProcessor::retrieve($processorParams, $processorInfo)) {
-        return FALSE;
-      }
-      $paymentProcessorID = $processorInfo['id'];
-    }
+    Civi::log()->debug('PayPalIPN: Received (ContactID: ' . $ids['contact'] . '; trxn_id: ' . $input['trxn_id'] . ').');
 
     if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
-      return FALSE;
+      return;
     }
 
     self::$_paymentProcessor = &$objects['paymentProcessor'];
@@ -404,6 +390,64 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $input['fee_amount'] = $this->retrieve('mc_fee', 'Money', FALSE);
     $input['net_amount'] = $this->retrieve('settle_amount', 'Money', FALSE);
     $input['trxn_id'] = $this->retrieve('txn_id', 'String', FALSE);
+
+    $paymentDate = $this->retrieve('payment_date', 'String', FALSE);
+    if (!empty($paymentDate)) {
+      $receiveDateTime = new DateTime($paymentDate);
+      $input['receive_date'] = $receiveDateTime->format('YmdHis');
+    }
+  }
+
+
+  /**
+   * Gets PaymentProcessorID for PayPal
+   *
+   * @param array $input
+   * @param array $ids
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getPayPalPaymentProcessorID($input, $ids) {
+    // First we try and retrieve from POST params
+    $paymentProcessorID = $this->retrieve('processor_id', 'Integer', FALSE);
+    if (!empty($paymentProcessorID)) {
+      return $paymentProcessorID;
+    }
+
+    // Then we try and get it from recurring contribution ID
+    if (!empty($ids['contributionRecur'])) {
+      $contributionRecur = civicrm_api3('ContributionRecur', 'getsingle', array(
+        'id' => $ids['contributionRecur'],
+        'return' => ['payment_processor_id'],
+      ));
+      if (!empty($contributionRecur['payment_processor_id'])) {
+        return $contributionRecur['payment_processor_id'];
+      }
+    }
+
+    // This is an unreliable method as there could be more than one instance.
+    // Recommended approach is to use the civicrm/payment/ipn/xx url where xx is the payment
+    // processor id & the handleNotification function (which should call the completetransaction api & by-pass this
+    // entirely). The only thing the IPN class should really do is extract data from the request, validate it
+    // & call completetransaction or call fail? (which may not exist yet).
+
+    Civi::log()->warning('Unreliable method used to get payment_processor_id for PayPal IPN - this will cause problems if you have more than one instance');
+    // Then we try and retrieve based on business email ID
+    $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType', 'PayPal_Standard', 'id', 'name');
+    $processorParams = [
+      'user_name' => $this->retrieve('business', 'String', FALSE),
+      'payment_processor_type_id' => $paymentProcessorTypeID,
+      'is_test' => empty($input['is_test']) ? 0 : 1,
+      'options' => ['limit' => 1],
+      'return' => ['id'],
+    ];
+    $paymentProcessorID = civicrm_api3('PaymentProcessor', 'getvalue', $processorParams);
+    if (empty($paymentProcessorID)) {
+      Throw new CRM_Core_Exception('PayPalIPN: Could not get Payment Processor ID');
+    }
+    return $paymentProcessorID;
   }
 
 }
