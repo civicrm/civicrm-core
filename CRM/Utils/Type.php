@@ -77,70 +77,13 @@ class CRM_Utils_Type {
    *   String identifying the data type, e.g. 'Int' or 'String'.
    */
   public static function typeToString($type) {
-    // @todo Use constants in the case statements, e.g. "case T_INT:".
-    // @todo return directly, instead of assigning a value.
-    // @todo Use a lookup array, as a property or as a local variable.
-    switch ($type) {
-      case 1:
-        $string = 'Int';
-        break;
-
-      case 2:
-        $string = 'String';
-        break;
-
-      case 3:
-        $string = 'Enum';
-        break;
-
-      case 4:
-        $string = 'Date';
-        break;
-
-      case 8:
-        $string = 'Time';
-        break;
-
-      case 16:
-        $string = 'Boolean';
-        break;
-
-      case 32:
-        $string = 'Text';
-        break;
-
-      case 64:
-        $string = 'Blob';
-        break;
-
-      // CRM-10404
-      case 12:
-      case 256:
-        $string = 'Timestamp';
-        break;
-
-      case 512:
-        $string = 'Float';
-        break;
-
-      case 1024:
-        $string = 'Money';
-        break;
-
-      case 2048:
-        $string = 'Date';
-        break;
-
-      case 4096:
-        $string = 'Email';
-        break;
-
-      case 16384:
-        $string = 'Mediumblob';
-        break;
+    // CRM-10404
+    if ($type == 12) {
+      return 'Timestamp';
     }
 
-    return (isset($string)) ? $string : "";
+    $typeStrings = self::getValidTypes();
+    return (array_search($type, $typeStrings)) ?: '';
   }
 
   /**
