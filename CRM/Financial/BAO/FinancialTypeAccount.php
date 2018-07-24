@@ -261,13 +261,27 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    */
   public static function validateRelationship($financialTypeAccount) {
     $financialAccountLinks = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
-    $financialAccountType = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialTypeAccount->financial_account_id, 'financial_account_type_id');
-    if (CRM_Utils_Array::value($financialTypeAccount->account_relationship, $financialAccountLinks) != $financialAccountType) {
+    $financialAccount = civicrm_api3('FinancialAccount', 'getsingle', [
+      'return' => ["name", "financial_account_type_id"],
+      'id' => $financialTypeAccount->financial_account_id,
+    ]);
+
+    if (CRM_Utils_Array::value($financialTypeAccount->account_relationship, $financialAccountLinks) != $financialAccount['financial_account_type_id']) {
       $accountRelationships = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
       $params = array(
         1 => $accountRelationships[$financialTypeAccount->account_relationship],
       );
       throw new CRM_Core_Exception(ts("This financial account cannot have '%1' relationship.", $params));
+    }
+    $accountRelationshipName = civicrm_api3('OptionValue', 'getvalue', [
+      'return' => 'name',
+      'option_group_id' => 'account_relationship',
+      'id' => $financialTypeAccount->account_relationship,
+    ]);
+    if ($accountRelationshipName == 'Asset Account is'
+      && $financialAccount['name'] == 'Accounts Receivable'
+    ) {
+      throw new CRM_Core_Exception(ts("'Accounts Receivable' financial account cannot have 'Asset Account is' relationship"));
     }
   }
 
