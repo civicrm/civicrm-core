@@ -38,12 +38,56 @@
  */
 class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
+  use CRM_Core_Form_EntityFormTrait;
+
+  /**
+   * Fields for the entity to be assigned to the template.
+   *
+   * Fields may have keys
+   *  - name (required to show in tpl from the array)
+   *  - description (optional, will appear below the field)
+   *  - not-auto-addable - this class will not attempt to add the field using addField.
+   *    (this will be automatically set if the field does not have html in it's metadata
+   *    or is not a core field on the form's entity).
+   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
+   *  - template - use a field specific template to render this field
+   *  - required
+   *  - is_freeze (field should be frozen).
+   *
+   * @var array
+   */
+  protected $entityFields = [];
+
+  /**
+   * Set entity fields to be assigned to the form.
+   */
+  protected function setEntityFields() {
+    // TODO: Add fields here per CRM/Admin/Form/RelationshipType.php.
+    // ... It's not as easy because MembershipType has multiple conditional fields/javascript etc.
+    $this->entityFields = [];
+  }
+
+  /**
+   * Deletion message to be assigned to the form.
+   *
+   * @var string
+   */
+  protected $deleteMessage;
 
   /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
     return 'MembershipType';
+  }
+
+  /**
+   * Set the delete message.
+   *
+   * We do this from the constructor in order to do a translation.
+   */
+  public function setDeleteMessage() {
+    $this->deleteMessage = ts('WARNING: Deleting this option will result in the loss of all membership records of this type.') . ts('This may mean the loss of a substantial amount of data, and the action cannot be undone.') . ts('Do you want to continue?');
   }
 
   /**
@@ -127,7 +171,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
-    parent::buildQuickForm();
+    self::buildQuickEntityForm();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -307,41 +351,16 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       CRM_Core_Session::setStatus(ts('Selected membership type has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {
-      $buttonName = $this->controller->getButtonName();
-      $submitted = $this->controller->exportValues($this->_name);
-
-      $fields = array(
-        'name',
-        'weight',
-        'is_active',
-        'member_of_contact_id',
-        'visibility',
-        'period_type',
-        'minimum_fee',
-        'description',
-        'auto_renew',
-        'duration_unit',
-        'duration_interval',
-        'financial_type_id',
-        'fixed_period_start_day',
-        'fixed_period_rollover_day',
-        'month_fixed_period_rollover_day',
-        'max_related',
-      );
-
-      $params = array();
-      foreach ($fields as $fld) {
-        $params[$fld] = CRM_Utils_Array::value($fld, $submitted, 'null');
-      }
+      $params = $this->exportValues();
 
       if ($params['minimum_fee']) {
         $params['minimum_fee'] = CRM_Utils_Rule::cleanMoney($params['minimum_fee']);
       }
 
       $hasRelTypeVal = FALSE;
-      if (!CRM_Utils_System::isNull($submitted['relationship_type_id'])) {
+      if (!CRM_Utils_System::isNull($params['relationship_type_id'])) {
         // To insert relation ids and directions with value separator
-        $relTypeDirs = $submitted['relationship_type_id'];
+        $relTypeDirs = $params['relationship_type_id'];
         $relIds = $relDirection = array();
         foreach ($relTypeDirs as $key => $value) {
           $relationId = explode('_', $value);
@@ -400,12 +419,14 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
         $params['id'] = $this->_id;
       }
 
-      $membershipType = CRM_Member_BAO_MembershipType::add($params);
+      $membershipTypeResult = civicrm_api3('MembershipType', 'create', $params);
+      $membershipTypeName = $membershipTypeResult['values'][$membershipTypeResult['id']]['name'];
 
-      CRM_Core_Session::setStatus(ts('The membership type \'%1\' has been saved.',
-        array(1 => $membershipType->name)
+      CRM_Core_Session::setStatus(ts("The membership type '%1' has been saved.",
+        array(1 => $membershipTypeName)
       ), ts('Saved'), 'success');
       $session = CRM_Core_Session::singleton();
+      $buttonName = $this->controller->getButtonName();
       if ($buttonName == $this->getButtonName('upload', 'new')) {
         $session->replaceUserContext(
           CRM_Utils_System::url('civicrm/admin/member/membershipType/add', 'action=add&reset=1')
