@@ -476,6 +476,8 @@ LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicr
       $in = "'$entityType'";
     }
 
+    $params = array();
+    $sqlParamKey = 1;
     if (!empty($subTypes)) {
       foreach ($subTypes as $key => $subType) {
         $subTypeClauses[] = self::whereListHas("civicrm_custom_group.extends_entity_column_value", self::validateSubTypeByEntity($entityType, $subType));
@@ -492,7 +494,9 @@ WHERE civicrm_custom_group.is_active = 1
   AND $subTypeClause
 ";
       if ($subName) {
-        $strWhere .= " AND civicrm_custom_group.extends_entity_column_id = {$subName} ";
+        $strWhere .= " AND civicrm_custom_group.extends_entity_column_id = %{$sqlParamKey}";
+        $params[$sqlParamKey] = array($subName, 'String');
+        $sqlParamKey = $sqlParamKey + 1;
       }
     }
     else {
@@ -506,11 +510,10 @@ WHERE civicrm_custom_group.is_active = 1
       }
     }
 
-    $params = array();
     if ($groupID > 0) {
       // since we want a specific group id we add it to the where clause
-      $strWhere .= " AND civicrm_custom_group.id = %1";
-      $params[1] = array($groupID, 'Integer');
+      $strWhere .= " AND civicrm_custom_group.id = %{$sqlParamKey}";
+      $params[$sqlParamKey] = array($groupID, 'Integer');
     }
     elseif (!$groupID) {
       // since groupID is false we need to show all Inline groups
