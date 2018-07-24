@@ -628,6 +628,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if (empty($defaults['status_id'])) {
       $defaults['status_id'] = CRM_Core_OptionGroup::getDefaultValue('activity_status');
     }
+
+    $defaults['separation'] = 'combined';
     return $defaults;
   }
 
@@ -749,8 +751,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         'separation',
         ts('Activity Separation'),
         array(
-          'separate' => ts('Create separate activities for each contact'),
           'combined' => ts('Create one activity with all contacts together'),
+          'separate' => ts('Create separate activities for each contact'),
         )
       );
     }
