@@ -266,10 +266,11 @@
 
     {literal}
     <script type="text/javascript">
-      function setPaymentBlock(mode, checkboxEvent) {
+      function setPaymentBlock(mode, checkboxEvent, manualAmountUpdate) {
         var memType = parseInt(cj('#membership_type_id_1').val( ));
         var isPriceSet = 0;
         var existingAmount = {/literal}{if !empty($onlinePendingContributionId)}1{else}0{/if}{literal};
+        var numTerms = cj('#num_terms').val();
 
         if ( cj('#price_set_id').length > 0 && cj('#price_set_id').val() ) {
           isPriceSet = 1;
@@ -303,35 +304,46 @@
         var taxTerm = {/literal}{$taxTerm|@json_encode}{literal};
         var taxRate = taxRates[allMemberships[memType]['financial_type_id']];
         var currency = {/literal}{$currency|@json_encode}{literal};
-        var taxAmount = (taxRate/100)*allMemberships[memType]['total_amount_numeric'];
-        taxAmount = isNaN (taxAmount) ? 0:taxAmount;
-        if (term) {
-          if (!taxRate) {
-            var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
-          }
-          else {
-            var feeTotal = Number((taxRate/100) * (allMemberships[memType]['total_amount_numeric'] * term))+Number
-           (allMemberships[memType]['total_amount_numeric'] * term );
-          }
-          cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
-        }
-        else {
+        var totalAmountExTax = allMemberships[memType]['total_amount_numeric'];
+        var taxAmount;
+
+        if (typeof manualAmountUpdate !== "undefined" && manualAmountUpdate) {
           if (taxRate) {
-            var feeTotal = parseFloat(Number((taxRate/100) * allMemberships[memType]['total_amount'])+Number(allMemberships[memType]['total_amount_numeric'])).toFixed(2);
+            var totalAmountIncTax = Number(cj("#total_amount").val());
+            taxAmount = (totalAmountIncTax - ((totalAmountIncTax * 100) / Number(100 + Number(taxRate)))).toFixed(2);
+          }
+        } else {
+          if (term) {
+            totalAmountExTax = totalAmountExTax * term;
+            if (!taxRate) {
+                var feeTotal = Number(totalAmountExTax);
+            }
+            else {
+                var feeTotal = Number((taxRate/100) * (totalAmountExTax))+Number(totalAmountExTax);
+            }
             cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
           }
           else {
-            var feeTotal = allMemberships[memType]['total_amount'];
-            if (!existingAmount) {
-              // CRM-16680 don't set amount if there is an existing contribution.
-              cj("#total_amount").val(allMemberships[memType]['total_amount']);
+            if (taxRate) {
+                var feeTotal = parseFloat(Number((taxRate/100) * allMemberships[memType]['total_amount'])+Number(totalAmountExTax)).toFixed(2);
+                cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
+            }
+            else {
+                var feeTotal = allMemberships[memType]['total_amount'];
+                if (!existingAmount) {
+                    // CRM-16680 don't set amount if there is an existing contribution.
+                    cj("#total_amount").val(allMemberships[memType]['total_amount']);
+                }
             }
           }
+          taxAmount = (taxRate/100)*(totalAmountExTax);
         }
-        var taxMessage = taxRate!=undefined ? 'Includes '+taxTerm+' amount of '+currency+' '+taxAmount:'';
+
+        taxAmount = isNaN (taxAmount) ? 0:taxAmount;
+
+        var taxMessage = (taxRate!=undefined && numTerms > 0) ? 'Includes '+taxTerm+' amount of '+currency+' '+taxAmount : '';
         cj('.totaltaxAmount').html(taxMessage);
       }
-
 
       CRM.$(function($) {
       var mode   = {/literal}'{$membershipMode}'{literal};
@@ -353,6 +365,9 @@
       });
       cj('#num_terms').change( function( ) {
         setPaymentBlock(mode);
+      });
+      cj('#total_amount').change( function( ) {
+        setPaymentBlock(mode, false, true);
       });
       setPaymentBlock(mode);
 

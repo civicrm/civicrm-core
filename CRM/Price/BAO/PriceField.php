@@ -352,6 +352,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $customOption[$optionKey][$valueFieldName] + $taxAmount,
           $count,
           $max_value,
+          $taxAmount,
         ));
 
         $extra = array();
@@ -439,7 +440,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           }
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
-          $priceVal = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
+          $priceVal = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value, $taxAmount));
           if (isset($opt['visibility_id'])) {
             $visibility_id = $opt['visibility_id'];
           }
@@ -499,7 +500,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           }
 
           $choice[] = $qf->createElement('radio', NULL, '', $none, '0',
-            array('price' => json_encode(array($elementName, '0')))
+            array('price' => json_encode(array($elementName, '0|0|0|0')))
           );
         }
 
@@ -535,7 +536,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             }
           }
 
-          $priceVal[$opt['id']] = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
+          $priceVal[$opt['id']] = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value, $taxAmount));
 
           if (!in_array($opt['id'], $freezeOptions)) {
             $allowedOptions[] = $opt['id'];
@@ -598,7 +599,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             }
             $opt['label'] = $preHelpText . $opt['label'] . $postHelpText;
           }
-          $priceVal = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value));
+          $priceVal = implode($seperator, array($opt[$valueFieldName] + $taxAmount, $count, $max_value, $taxAmount));
           $check[$opId] = &$qf->createElement('checkbox', $opt['id'], NULL, $opt['label'],
             array(
               'price' => json_encode(array($opt['id'], $priceVal)),

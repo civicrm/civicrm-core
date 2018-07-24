@@ -43,6 +43,7 @@ var thousandMarker = '{/literal}{$config->monetaryThousandSeparator}{literal}';
 var separator      = '{/literal}{$config->monetaryDecimalPoint}{literal}';
 var symbol         = '{/literal}{$currencySymbol}{literal}';
 var optionSep      = '|';
+var priceSetTaxes = {};
 
 cj("#priceset [price]").each(function () {
 
@@ -106,10 +107,13 @@ function calculateCheckboxLineItemValue(priceElement) {
   eval( 'var option = ' + cj(priceElement).attr('price') ) ;
   optionPart = option[1].split(optionSep);
   price = parseFloat(0);
+  tax = parseFloat(0);
   if (cj(priceElement).prop('checked')) {
     price = parseFloat(optionPart[0]);
+    tax = parseFloat(optionPart[3]);
   }
   cj(priceElement).data('line_raw_total', price);
+  cj(priceElement).data('line_raw_tax', tax);
 }
 
 /**
@@ -119,12 +123,16 @@ function calculateRadioLineItemValue(priceElement) {
   eval( 'var option = ' + cj(priceElement).attr('price') );
   optionPart = option[1].split(optionSep);
   var lineTotal = parseFloat(optionPart[0]);
+  var lineTax = parseFloat(optionPart[3]);
   cj(priceElement).data('line_raw_total', lineTotal);
+  cj(priceElement).data('line_raw_tax', lineTax);
+
   var radionGroupName = cj(priceElement).attr("name");
   // Reset all unchecked options to having a data value of 0.
   cj('input[name=' + radionGroupName + ']:radio:unchecked').each(
     function () {
       cj(this).data('line_raw_total', 0);
+      cj(this).data('line_raw_tax', 0);
     }
   );
 }
@@ -135,12 +143,15 @@ function calculateRadioLineItemValue(priceElement) {
 function calculateSelectLineItemValue(priceElement) {
   eval( 'var selectedText = ' + cj(priceElement).attr('price') );
   var price = parseFloat('0');
+  var tax = parseFloat('0');
   var option = cj(priceElement).val();
   if (option) {
     optionPart = selectedText[option].split(optionSep);
     price   = parseFloat(optionPart[0]);
+    tax = parseFloat(optionPart[3]);
   }
   cj(priceElement).data('line_raw_total', price);
+  cj(priceElement).data('line_raw_tax', tax);
 }
 
 /**
@@ -157,8 +168,11 @@ function calculateText(priceElement) {
   eval('var option = '+ cj(priceElement).attr('price'));
   optionPart = option[1].split(optionSep);
   addprice = parseFloat(optionPart[0]);
+  tax = parseFloat(optionPart[3]);
   var curval  = textval * addprice;
+  var taxval = textval * tax;
   cj(priceElement).data('line_raw_total', curval);
+  cj(priceElement).data('line_raw_tax', taxval);
   display(calculateTotalFee());
 }
 
@@ -167,10 +181,23 @@ function calculateText(priceElement) {
  */
 function calculateTotalFee() {
   var totalFee = 0;
+  var totalTax = 0;
   cj("#priceset [price]").each(function () {
     totalFee = totalFee + cj(this).data('line_raw_total');
+    totalTax = totalTax + cj(this).data('line_raw_tax');
   });
+
+  setTaxAmount(totalTax);
   return totalFee;
+}
+
+function setTaxAmount(totalTax) {
+    var taxText = '';
+    var currency = {/literal}{$currency|@json_encode}{literal};
+    if(totalTax > 0) {
+        taxText = 'Includes tax amount of '+currency+ ' '+totalTax;
+    }
+    cj('.totaltaxAmount').text(taxText);
 }
 
 /**

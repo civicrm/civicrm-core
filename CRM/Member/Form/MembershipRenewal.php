@@ -252,6 +252,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // auto renew options if enabled for the membership
     $options = CRM_Core_SelectValues::memberAutoRenew();
 
+    $this->assign('currency_symbol', CRM_Core_Config::singleton()->defaultCurrencySymbol);
+
     foreach ($this->allMembershipTypeDetails as $key => $values) {
       if (!empty($values['is_active'])) {
         if ($this->_mode && empty($values['minimum_fee'])) {
@@ -275,7 +277,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
         //CRM-16950
         $taxAmount = NULL;
+
         $totalAmount = CRM_Utils_Array::value('minimum_fee', $values);
+        $totalAmountExTax = $totalAmount;
         if (CRM_Utils_Array::value($values['financial_type_id'], $taxRates)) {
           $taxAmount = ($taxRate / 100) * CRM_Utils_Array::value('minimum_fee', $values);
           $totalAmount = $totalAmount + $taxAmount;
@@ -287,6 +291,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $values),
           'total_amount' => CRM_Utils_Money::format($totalAmount, NULL, '%a'),
           'total_amount_numeric' => $totalAmount,
+          'total_amount_ex_tax' => $totalAmountExTax,
+          'tax_term' => CRM_Utils_Array::value('tax_term', $invoiceSettings),
+          'tax_amount' => $taxAmount,
+          'tax_rate'   => $taxRate,
           'tax_message' => $taxAmount ? ts("Includes %1 amount of %2", array(1 => CRM_Utils_Array::value('tax_term', $invoiceSettings), 2 => CRM_Utils_Money::format($taxAmount))) : $taxAmount,
         );
 
