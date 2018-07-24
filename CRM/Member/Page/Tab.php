@@ -59,9 +59,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $membership = array();
     $dao = new CRM_Member_DAO_Membership();
     $dao->contact_id = $this->_contactId;
-    $dao->is_test = 0;
     $dao->whereAdd($addWhere);
-    //$dao->orderBy('name');
     $dao->find();
 
     //CRM--4418, check for view, edit, delete
