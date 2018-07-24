@@ -178,7 +178,6 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
     $mailParams['message'] = CRM_Utils_Array::value('suggested_message', $params);
 
     // Default "from email address" is default domain address.
-    // This is normally overridden by one of the if statements below
     list($_, $mailParams['email_from']) = CRM_Core_BAO_Domain::getNameAndEmail();
     list($username, $mailParams['domain']) = explode('@', $mailParams['email_from']);
 
@@ -218,9 +217,11 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
       $mailParams['module'] = 'event';
     }
     elseif ($params['entity_table'] == 'civicrm_pcp') {
-      $mailParams['email_from'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Email', $params['source_contact_id'],
-        'email', 'contact_id'
-      );
+      if (Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+        $mailParams['email_from'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Email', $params['source_contact_id'],
+          'email', 'contact_id'
+        );
+      }
       $urlPath = 'civicrm/pcp/info';
       $mailParams['module'] = 'contribute';
     }
@@ -298,9 +299,18 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
       $fromName = $email;
     }
 
-    // use contact email, CRM-4963
+    if (Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      // use contact email, CRM-4963
+      if (empty($values['email_from'])) {
+        $values['email_from'] = $email;
+      }
+    }
+
+    // If we have no "email_from" when we get to here, explicitly set it to the default domain email.
     if (empty($values['email_from'])) {
-      $values['email_from'] = $email;
+      list($domainFromName, $domainEmail) = CRM_Core_BAO_Domain::getNameAndEmail();
+      $values['email_from'] = $domainEmail;
+      $values['domain'] = $domainFromName;
     }
 
     $templateParams = array(
