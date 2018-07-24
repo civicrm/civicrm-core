@@ -173,7 +173,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       // assign vars to templates
       $this->assign('action', $this->_action);
       $this->assign('activeRecurRows', $activeContributions);
-      $this->assign('activeContributionsCount', $activeContributionsCount);
+      $this->assign('contributionRecurCount', $activeContributionsCount + $inactiveContributionsCount);
       $this->assign('inactiveRecurRows', $inactiveRecurringContributions);
       $this->assign('recur', TRUE);
     }
@@ -190,7 +190,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $contributionRecurResult = civicrm_api3('ContributionRecur', 'get', array(
         'contact_id' => $this->_contactId,
         'contribution_status_id' => array('NOT IN' => CRM_Contribute_BAO_ContributionRecur::getInactiveStatuses()),
-        'options' => array('limit' => 0, 'sort' => 'start_date ASC'),
+        'options' => ['limit' => 0, 'sort' => 'is_test, start_date ASC'],
       ));
       $recurContributions = CRM_Utils_Array::value('values', $contributionRecurResult);
     }
@@ -212,7 +212,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $contributionRecurResult = civicrm_api3('ContributionRecur', 'get', array(
         'contact_id' => $this->_contactId,
         'contribution_status_id' => array('IN' => CRM_Contribute_BAO_ContributionRecur::getInactiveStatuses()),
-        'options' => array('limit' => 0, 'sort' => 'start_date ASC'),
+        'options' => ['limit' => 0, 'sort' => 'is_test, start_date ASC'],
       ));
       $recurContributions = CRM_Utils_Array::value('values', $contributionRecurResult);
     }

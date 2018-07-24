@@ -51,7 +51,7 @@
           </li>
           <li id="tab_recurring" class="crm-tab-button ui-corner-all ui-tabs-tab ui-corner-top ui-state-default ui-tab">
             <a href="#recurring-subtab" title="{ts}Recurring Contributions{/ts}">
-              {ts}Recurring Contributions{/ts} <em>{$activeContributionsCount}</em>
+              {ts}Recurring Contributions{/ts} <em>{$contributionRecurCount}</em>
             </a>
           </li>
         </ul>
