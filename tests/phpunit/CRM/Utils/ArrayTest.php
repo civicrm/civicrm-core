@@ -260,7 +260,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
    * @dataProvider getRecursiveIssetExamples
    */
   public function testRecursiveIsset($array, $path, $expected) {
-    $result = CRM_Utils_Array::recursiveIsset($array, $path);
+    $result = CRM_Utils_Array::pathIsset($array, $path);
     $this->assertEquals($expected, $result);
   }
 
@@ -294,7 +294,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
    * @dataProvider getRecursiveValueExamples
    */
   public function testRecursiveValue($array, $path, $default, $expected) {
-    $result = CRM_Utils_Array::recursiveValue($array, $path, $default);
+    $result = CRM_Utils_Array::pathGet($array, $path, $default);
     $this->assertEquals($expected, $result);
   }
 
@@ -324,8 +324,8 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
    * @dataProvider getBuildValueExamples
    */
   public function testBuildRecursiveValue($source, $path, $expected) {
-    $result = CRM_Utils_Array::recursiveBuild($path, 'llama', $source);
-    $this->assertEquals($expected, $result);
+    CRM_Utils_Array::pathSet($source, $path, 'llama');
+    $this->assertEquals($expected, $source);
   }
 
 }
