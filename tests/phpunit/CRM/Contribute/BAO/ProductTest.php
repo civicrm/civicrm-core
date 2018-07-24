@@ -50,7 +50,6 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
     );
 
     $product = CRM_Contribute_BAO_Product::create($params);
-
     $result = $this->assertDBNotNull('CRM_Contribute_BAO_Product', $product->id,
       'sku', 'id',
       'Database check on updated product record.'
@@ -120,14 +119,13 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
     );
 
     $product = CRM_Contribute_BAO_Product::create($params);
-
     CRM_Contribute_BAO_Product::del($product->id);
 
     $params = array('id' => $product->id);
-    $default = array();
-    $result = CRM_Contribute_BAO_Product::retrieve($params, $defaults);
+    $defaults = array();
+    $retrievedProduct = CRM_Contribute_BAO_Product::retrieve($params, $defaults);
 
-    $this->assertEquals(empty($result), TRUE, 'Verify product record deletion.');
+    $this->assertEquals(empty($retrievedProduct), TRUE, 'Verify product record deletion.');
   }
 
 }

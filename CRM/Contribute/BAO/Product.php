@@ -134,13 +134,9 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
     $premiumsProduct = new CRM_Contribute_DAO_PremiumsProduct();
     $premiumsProduct->product_id = $productID;
     if ($premiumsProduct->find(TRUE)) {
-      $session = CRM_Core_Session::singleton();
-      $message .= ts('This Premium is being linked to <a href=\'%1\'>Online Contribution page</a>. Please remove it in order to delete this Premium.', array(1 => CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1')), ts('Deletion Error'), 'error');
-      CRM_Core_Session::setStatus($message);
-      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/contribute/managePremiums', 'reset=1&action=browse'));
+      throw new CRM_Core_Exception('Cannot delete a Premium that is linked to a Contribution page');
     }
-
-    //delete from financial Type table
+    // delete product
     $premium = new CRM_Contribute_DAO_Product();
     $premium->id = $productID;
     $premium->delete();

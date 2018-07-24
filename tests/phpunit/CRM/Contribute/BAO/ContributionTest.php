@@ -376,7 +376,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
     $this->assertEquals('TEST Premium', $premium->name, 'Check for premium  name.');
 
-    $param = array(
+    $contributionParams = array(
       'contact_id' => $contactId,
       'currency' => 'USD',
       'financial_type_id' => 1,
@@ -395,9 +395,9 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'thankyou_date' => '20080522',
       'sequential' => TRUE,
     );
-    $contribution = $this->callAPISuccess('Contribution', 'create', $param)['values'][0];
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams)['values'][0];
 
-    $this->assertEquals($param['trxn_id'], $contribution['trxn_id'], 'Check for transcation id creation.');
+    $this->assertEquals($contributionParams['trxn_id'], $contribution['trxn_id'], 'Check for transcation id creation.');
     $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
 
     //parameter for adding premium to contribution

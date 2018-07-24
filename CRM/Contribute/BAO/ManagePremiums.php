@@ -50,7 +50,7 @@ class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_BAO_Product {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_BAO_ManagePremiums
+   * @return CRM_Contribute_BAO_Product
    */
   public static function retrieve(&$params, &$defaults) {
     CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Product::retrieve');
