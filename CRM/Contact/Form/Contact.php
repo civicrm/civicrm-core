@@ -714,7 +714,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     // Check for duplicate contact if it wasn't already handled by ajax or disabled
-    if (!Civi::settings()->get('contact_ajax_check_similar')) {
+    if (!Civi::settings()->get('contact_ajax_check_similar') || !empty($fields['_qf_Contact_refresh_dedupe'])) {
       self::checkDuplicateContacts($fields, $errors, $contactId, $contactType);
     }
 
@@ -760,7 +760,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $className::buildQuickForm($this);
 
     // Ajax duplicate checking
-    $checkSimilar = $this->_action == CRM_Core_Action::ADD && Civi::settings()->get('contact_ajax_check_similar');
+    $checkSimilar = Civi::settings()->get('contact_ajax_check_similar');
     $this->assign('checkSimilar', $checkSimilar);
     if ($checkSimilar == 1) {
       $ruleParams = array('used' => 'Supervised', 'contact_type' => $this->_contactType);
