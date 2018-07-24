@@ -156,6 +156,41 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
+   * Returns an array containing final defaults for Activity Search Form
+   * that we want to be set by CRM_Core_Form::setDefaults() method.
+   *
+   * This method is executed by CRM_Core_Form::buildForm() method
+   * after a call to buildQuickForm() method is done. So at this place
+   * any Form's default values are already set.
+   *
+   * While doing Activity Search with force=1 we don't want to use any
+   * default values so we reset currently existing defaults (setting
+   * their values to '').
+   *
+   * However some of defaults shouldn't be reseted (such as any '*_operator'
+   * or 'q' field) so we do a check against each field's name before we 'reset'
+   * its default value.
+   *
+   * Finally we return an array of reseted defaults merged with submit values.
+   *
+   * @return array|NULL
+   */
+  public function setDefaultValues() {
+    if (!$this->_force) {
+      return NULL;
+    }
+
+    $defaults = $this->_defaultValues;
+    foreach ($defaults as $fieldName => $value) {
+      if ($fieldName !== 'q' && !CRM_Utils_String::endsWith($fieldName, '_operator')) {
+        $defaults[$fieldName] = '';
+      }
+    }
+
+    return array_merge($defaults, $this->_submitValues);
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
