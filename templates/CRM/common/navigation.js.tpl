@@ -62,7 +62,7 @@
 
   //Track Scrolling
   $(window).scroll(function () {
-    $('div.sticky-header').css({top: "23px", position: "fixed"});
+    $('div.sticky-header').css({top: $('#civicrm-menu').height() + "px", position: "fixed"});
   });
 
   if ($('#edit-shortcuts').length > 0) {
