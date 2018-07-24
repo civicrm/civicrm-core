@@ -113,6 +113,7 @@
   CRM.$(function($) {
     var $form = $("form.{/literal}{$form.formClass}{literal}"),
       action = {/literal}{$action|intval}{literal},
+      cid = {/literal}{$contactId|intval}{literal},
       _ = CRM._;
 
     $('.crm-accordion-body').each( function() {
@@ -335,6 +336,7 @@
       if (rule) {
         params.rule_type = rule;
         params.match = match;
+        params.exclude = cid ? [cid] : [];
       } else {
         _.extend(params, match);
       }
