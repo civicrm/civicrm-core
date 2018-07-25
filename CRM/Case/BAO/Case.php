@@ -1590,7 +1590,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
  AND civicrm_case.id IN( {$caseID})
  AND civicrm_case.is_deleted     = {$cases['case_deleted']}";
 
-    $query = self::getCaseActivityQuery($type, $userID, $condition, $cases['case_deleted']);
+    $query = self::getCaseActivityQuery($type, $userID, $condition);
 
     $res = CRM_Core_DAO::executeQuery($query);
 
