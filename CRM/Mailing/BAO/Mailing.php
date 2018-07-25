@@ -547,9 +547,9 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         $funcStruct['type'] = 'url';
       }
     }
-    elseif (preg_match('/^\{(' . $_categoryString . ')\.(\w+)\}$/', $token, $matches)) {
-      $funcStruct['type'] = $matches[1];
-      $funcStruct['token'] = $matches[2];
+    elseif (preg_match('/^\{(' . $_categoryString . ')\.(\w+)\}$/i', $token, $matches)) {
+      $funcStruct['type'] = strtolower($matches[1]);
+      $funcStruct['token'] = strtolower($matches[2]);
     }
     elseif (preg_match('/\\\\\{(\w+\.\w+)\\\\\}|\{\{(\w+\.\w+)\}\}/', $token, $matches)) {
       // we are an escaped token
