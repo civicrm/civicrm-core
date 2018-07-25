@@ -286,7 +286,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     }
 
     $forceParams = [
-      'activity_status_id' => ['name' => 'status', 'type' => 'String'],
+      'activity_status_id' => ['name' => 'status', 'type' => 'Alphanumeric'],
       'followup_parent_id' => ['name' => 'isFollowUp', 'type' => 'Positive'],
       'parent_id' => ['name' => 'hasFollowUp', 'type' => 'Positive'],
     ];
@@ -356,7 +356,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       }
     }
 
-    $dateLow = CRM_Utils_Request::retrieve('dateLow', 'String');
+    $dateLow = CRM_Utils_Request::retrieve('dateLow', 'Alphanumeric');
 
     if ($dateLow) {
       $dateLow = date('m/d/Y', strtotime($dateLow));
@@ -366,7 +366,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $this->_defaults['activity_date_low'] = $dateLow;
     }
 
-    $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'String');
+    $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'Alphanumeric');
 
     if ($dateHigh) {
       // Activity date time assumes midnight at the beginning of the date

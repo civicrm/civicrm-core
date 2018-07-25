@@ -445,7 +445,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues['participant_relative'] = $this->_defaults['participant_relative'] = 0;
     }
 
-    $status = CRM_Utils_Request::retrieve('status', 'String');
+    $status = CRM_Utils_Request::retrieve('status', 'Alphanumeric');
     if (isset($status)) {
       if ($status === 'true') {
         $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1");

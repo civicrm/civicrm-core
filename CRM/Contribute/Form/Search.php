@@ -393,7 +393,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       return;
     }
     $forceParams = [
-      'contribution_status_id' => ['name' => 'status', 'type' => 'String'],
+      'contribution_status_id' => ['name' => 'status', 'type' => 'Alphanumeric'],
       'financial_type_id' => ['name' => 'fid', 'type' => 'Positive'],
       'contribution_pay_later' => ['name' => 'pay_later', 'type' => 'Boolean'],
     ];
