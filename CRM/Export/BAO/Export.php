@@ -364,7 +364,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
     }
 
-    $allRelContactArray = self::buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $queryMode);
+    $allRelContactArray = self::buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $processor);
 
     // make sure the groups stuff is included only if specifically specified
     // by the fields param (CRM-1969), else we limit the contacts outputted to only
@@ -1697,10 +1697,10 @@ WHERE  {$whereClause}";
    * @param $exportMode
    * @param $componentTable
    * @param $returnProperties
-   * @param $queryMode
+   * @param \CRM_Export_BAO_ExportProcessor $processor
    * @return array
    */
-  protected static function buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $queryMode) {
+  protected static function buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $processor) {
     $allRelContactArray = [];
 
     foreach (self::$relationshipTypes as $rel => $dnt) {
@@ -1708,7 +1708,7 @@ WHERE  {$whereClause}";
         $allRelContactArray[$rel] = array();
         // build Query for each relationship
         $relationQuery[$rel] = new CRM_Contact_BAO_Query(NULL, $relationReturnProperties,
-          NULL, FALSE, FALSE, $queryMode
+          NULL, FALSE, FALSE, $processor->getQueryMode()
         );
         list($relationSelect, $relationFrom, $relationWhere, $relationHaving) = $relationQuery[$rel]->query();
 
