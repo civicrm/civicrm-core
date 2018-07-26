@@ -547,9 +547,20 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         $funcStruct['type'] = 'url';
       }
     }
+    elseif (preg_match('/^\{(' . $_categoryString . ')\.(\w+)\}$/', $token, $matches)) {
+      $funcStruct['type'] = $matches[1];
+      $funcStruct['token'] = $matches[2];
+    }
     elseif (preg_match('/^\{(' . $_categoryString . ')\.(\w+)\}$/i', $token, $matches)) {
+      //fix to address issues when token is converted to upercasse string by package rcube_html2text
+      $tokens = CRM_Utils_Token::$_tokens;
       $funcStruct['type'] = strtolower($matches[1]);
       $funcStruct['token'] = strtolower($matches[2]);
+
+      if (!empty($tokens[$funcStruct['type']] && in_array($funcStruct['token'], array_map('strtolower', $tokens[$funcStruct['type']])))) {
+        $token_key = array_search($funcStruct['token'], array_map('strtolower', $tokens[$funcStruct['type']]));
+        $funcStruct['token'] = $tokens[$funcStruct['type']][$token_key];
+      }
     }
     elseif (preg_match('/\\\\\{(\w+\.\w+)\\\\\}|\{\{(\w+\.\w+)\}\}/', $token, $matches)) {
       // we are an escaped token
