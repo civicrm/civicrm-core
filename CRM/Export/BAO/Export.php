@@ -364,7 +364,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
     }
 
-    list($relationQuery, $allRelContactArray) = self::buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $queryMode);
+    $allRelContactArray = self::buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $queryMode);
 
     // make sure the groups stuff is included only if specifically specified
     // by the fields param (CRM-1969), else we limit the contacts outputted to only
@@ -467,7 +467,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     // for CRM-3157 purposes
     $i18n = CRM_Core_I18n::singleton();
 
-    list($outputColumns, $headerRows, $metadata) = self::getExportStructureArrays($returnProperties, $processor, $relationQuery);
+    list($outputColumns, $headerRows, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
 
     $limitReached = FALSE;
     while (!$limitReached) {
@@ -514,7 +514,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
           if ($processor->isRelationshipTypeKey($field)) {
             $relDAO = CRM_Utils_Array::value($iterationDAO->contact_id, $allRelContactArray[$field]);
-            $relationQuery[$field]->convertToPseudoNames($relDAO);
             self::fetchRelationshipDetails($relDAO, $value, $field, $row);
           }
           else {
@@ -1371,11 +1370,10 @@ WHERE  {$whereClause}";
    * @param array|string $value
    * @param array $phoneTypes
    * @param array $imProviders
-   * @param string $relationQuery
    *
    * @return array
    */
-  public static function setHeaderRows($field, $headerRows, $processor, $value, $phoneTypes, $imProviders, $relationQuery) {
+  public static function setHeaderRows($field, $headerRows, $processor, $value, $phoneTypes, $imProviders) {
 
     $queryFields = $processor->getQueryFields();
     if (substr($field, -11) == 'campaign_id') {
@@ -1494,7 +1492,7 @@ WHERE  {$whereClause}";
    *    - b) this code is old & outdated. Submit your answers to circular bin or better
    *       yet find a way to comment them for posterity.
    */
-  public static function getExportStructureArrays($returnProperties, $processor, $relationQuery) {
+  public static function getExportStructureArrays($returnProperties, $processor) {
     $metadata = $headerRows = $outputColumns = [];
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
@@ -1503,7 +1501,7 @@ WHERE  {$whereClause}";
     foreach ($returnProperties as $key => $value) {
       if ($key != 'location' || !is_array($value)) {
         $outputColumns[$key] = $value;
-        $headerRows = self::setHeaderRows($key, $headerRows, $processor, $value, $phoneTypes, $imProviders, $relationQuery);
+        $headerRows = self::setHeaderRows($key, $headerRows, $processor, $value, $phoneTypes, $imProviders);
       }
       else {
         foreach ($value as $locationType => $locationFields) {
@@ -1528,7 +1526,7 @@ WHERE  {$whereClause}";
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
             $processor->setSqlOutputColumn($outputFieldName);
-            $headerRows = self::setHeaderRows($outputFieldName, $headerRows, $processor, $value, $phoneTypes, $imProviders, $relationQuery);
+            $headerRows = self::setHeaderRows($outputFieldName, $headerRows, $processor, $value, $phoneTypes, $imProviders);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');
             }
@@ -1703,7 +1701,7 @@ WHERE  {$whereClause}";
    * @return array
    */
   protected static function buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $queryMode) {
-    $allRelContactArray = $relationQuery = array();
+    $allRelContactArray = [];
 
     foreach (self::$relationshipTypes as $rel => $dnt) {
       if ($relationReturnProperties = CRM_Utils_Array::value($rel, $returnProperties)) {
@@ -1749,12 +1747,13 @@ WHERE  {$whereClause}";
         while ($allRelContactDAO->fetch()) {
           //FIX Me: Migrate this to table rather than array
           // build the array of all related contacts
-          $allRelContactArray[$rel][$allRelContactDAO->refContact] = clone($allRelContactDAO);
+          $allRelContactDAO->convertToPseudoNames();
+          $allRelContactArray[$rel][$allRelContactDAO->refContact] = $allRelContactDAO;
         }
         $allRelContactDAO->free();
       }
     }
-    return array($relationQuery, $allRelContactArray);
+    return $allRelContactArray;
   }
 
   /**
