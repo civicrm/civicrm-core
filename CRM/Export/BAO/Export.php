@@ -1362,56 +1362,6 @@ WHERE  {$whereClause}";
   }
 
   /**
-   * Set the definition for the header rows and sql columns based on the field to output.
-   *
-   * @param string $field
-   * @param array $headerRows
-   * @param \CRM_Export_BAO_ExportProcessor $processor
-   * @param array|string $value
-   *
-   * @return array
-   */
-  public static function setHeaderRows($field, $headerRows, $processor, $value) {
-
-    $queryFields = $processor->getQueryFields();
-    if (substr($field, -11) == 'campaign_id') {
-      // @todo - set this correctly in the xml rather than here.
-      $headerRows[] = ts('Campaign ID');
-    }
-    elseif (isset($queryFields[$field]['title'])) {
-      $headerRows[] = $queryFields[$field]['title'];
-    }
-    elseif ($field == 'provider_id') {
-      // @todo - set this correctly in the xml rather than here.
-      $headerRows[] = ts('IM Service Provider');
-    }
-    elseif ($processor->isRelationshipTypeKey($field)) {
-      foreach ($value as $relationField => $relationValue) {
-        $headerName = self::getHeaderName($field, $processor, $relationField, $relationValue);
-        if ($headerName) {
-          $headerRows[] = $headerName;
-          $processor->setSqlOutputColumn($headerName);
-        }
-      }
-      self::manipulateHeaderRows($headerRows);
-    }
-    elseif ($processor->isExportPaymentFields() && array_key_exists($field, self::componentPaymentFields())) {
-      $headerRows[] = CRM_Utils_Array::value($field, self::componentPaymentFields());
-    }
-    else {
-      $headerRows[] = $field;
-    }
-
-    if ($processor->isRelationshipTypeKey($field)) {
-      // Sql columns set above for relationships, return now.
-      return $headerRows;
-    }
-    $processor->setSqlOutputColumn($field);
-
-    return $headerRows;
-  }
-
-  /**
    * Get the various arrays that we use to structure our output.
    *
    * The extraction of these has been moved to a separate function for clarity and so that
@@ -1422,7 +1372,6 @@ WHERE  {$whereClause}";
    *
    * @param array $returnProperties
    * @param \CRM_Export_BAO_ExportProcessor $processor
-   * @param string $relationQuery
    *
    * @return array
    *   - outputColumns Array of columns to be exported. The values don't matter but the key must match the
@@ -1449,7 +1398,18 @@ WHERE  {$whereClause}";
     foreach ($returnProperties as $key => $value) {
       if ($key != 'location' || !is_array($value)) {
         $outputColumns[$key] = $value;
-        $headerRows = self::setHeaderRows($key, $headerRows, $processor, $value);
+        $headerRows[] = $processor->getHeaderForRow($key);
+        $processor->setSqlOutputColumn($key);
+      }
+      elseif ($processor->isRelationshipTypeKey($key)) {
+        foreach ($value as $relationField => $relationValue) {
+          $headerName = self::getHeaderName($key, $processor, $relationField, $relationValue);
+          if ($headerName) {
+            $headerRows[] = $processor->getHeaderForRow($headerName);
+            $processor->setSqlOutputColumn($key);
+          }
+        }
+        self::manipulateHeaderRows($headerRows);
       }
       else {
         foreach ($value as $locationType => $locationFields) {
@@ -1473,8 +1433,8 @@ WHERE  {$whereClause}";
               // Warning: shame inducing hack.
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
+            $headerRows[] = $processor->getHeaderForRow($outputFieldName);
             $processor->setSqlOutputColumn($outputFieldName);
-            $headerRows = self::setHeaderRows($outputFieldName, $headerRows, $processor, $value);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');
             }

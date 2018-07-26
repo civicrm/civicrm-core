@@ -660,4 +660,37 @@ class CRM_Export_BAO_ExportProcessor {
     return $fieldName;
   }
 
+  /**
+   * Get the header for the specified row.
+   *
+   * @param $field
+   *
+   * @return string
+   */
+  public function getHeaderForRow($field) {
+    $queryFields = $this->getQueryFields();
+    // Split campaign into 2 fields for id and title
+    if (substr($field, -14) == 'campaign_title') {
+      return ts('Campaign Title');
+    }
+    elseif (substr($field, -11) == 'campaign_id') {
+      return ts('Campaign ID');
+    }
+    elseif (isset($queryFields[$field]['title'])) {
+      return $queryFields[$field]['title'];
+    }
+    elseif ($field == 'phone_type_id') {
+      return ts('Phone Type');
+    }
+    elseif ($field == 'provider_id') {
+      return ts('IM Service Provider');
+    }
+    elseif ($this->isExportPaymentFields() && array_key_exists($field, $this->getComponentPaymentFields())) {
+      return CRM_Utils_Array::value($field, $this->getComponentPaymentFields());
+    }
+    else {
+      return $field;
+    }
+  }
+
 }
