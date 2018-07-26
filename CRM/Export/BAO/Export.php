@@ -44,24 +44,6 @@ class CRM_Export_BAO_Export {
   /**
    * Key representing the head of household in the relationship array.
    *
-   * e.g. 8_a_b.
-   *
-   * @var string
-   */
-  protected static $headOfHouseholdRelationshipKey;
-
-  /**
-   * Key representing the head of household in the relationship array.
-   *
-   * e.g. 8_a_b.
-   *
-   * @var string
-   */
-  protected static $memberOfHouseholdRelationshipKey;
-
-  /**
-   * Key representing the head of household in the relationship array.
-   *
    * e.g. ['8_b_a' => 'Household Member Is', '8_a_b = 'Household Member Of'.....]
    *
    * @var
@@ -252,9 +234,6 @@ class CRM_Export_BAO_Export {
     // without manually testing the export of IM provider still works.
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     self::$relationshipTypes = $processor->getRelationshipTypes();
-    //also merge Head of Household
-    self::$memberOfHouseholdRelationshipKey = CRM_Utils_Array::key('Household Member of', self::$relationshipTypes);
-    self::$headOfHouseholdRelationshipKey = CRM_Utils_Array::key('Head of Household for', self::$relationshipTypes);
 
     $queryMode = $processor->getQueryMode();
 
@@ -376,15 +355,13 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
       foreach ($returnProperties as $key => $value) {
         if (!$processor->isRelationshipTypeKey($key)) {
-          $returnProperties[self::$memberOfHouseholdRelationshipKey][$key] = $value;
-          $returnProperties[self::$headOfHouseholdRelationshipKey][$key] = $value;
+          foreach ($processor->getHouseholdRelationshipTypes() as $householdRelationshipType) {
+            if (!in_array($key, ['location_type', 'im_provider'])) {
+              $returnProperties[$householdRelationshipType][$key] = $value;
+            }
+          }
         }
       }
-
-      unset($returnProperties[self::$memberOfHouseholdRelationshipKey]['location_type']);
-      unset($returnProperties[self::$memberOfHouseholdRelationshipKey]['im_provider']);
-      unset($returnProperties[self::$headOfHouseholdRelationshipKey]['location_type']);
-      unset($returnProperties[self::$headOfHouseholdRelationshipKey]['im_provider']);
     }
 
     list($relationQuery, $allRelContactArray) = self::buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $queryMode);
@@ -620,8 +597,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
       // merge the records if they have corresponding households
       if ($mergeSameHousehold) {
-        self::mergeSameHousehold($exportTempTable, $headerRows, $sqlColumns, self::$memberOfHouseholdRelationshipKey);
-        self::mergeSameHousehold($exportTempTable, $headerRows, $sqlColumns, self::$headOfHouseholdRelationshipKey);
+        foreach ($processor->getHouseholdRelationshipTypes() as $householdRelationshipType) {
+          self::mergeSameHousehold($exportTempTable, $headerRows, $sqlColumns, $householdRelationshipType);
+        }
       }
 
       // call export hook

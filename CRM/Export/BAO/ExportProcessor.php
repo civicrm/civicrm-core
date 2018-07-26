@@ -160,6 +160,16 @@ class CRM_Export_BAO_ExportProcessor {
 
 
   /**
+   * @return mixed
+   */
+  public function getHouseholdRelationshipTypes() {
+    return [
+      CRM_Utils_Array::key('Household Member of', $this->getRelationshipTypes()),
+      CRM_Utils_Array::key('Head of Household for', $this->getRelationshipTypes()),
+    ];
+  }
+
+  /**
    * @param $fieldName
    * @return bool
    */
