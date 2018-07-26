@@ -172,7 +172,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
       // rather than prevnext cache table for most of the task actions except export where we rebuild query to fetch
       // final result set
       if ($useTable) {
-        $allCids = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey, "getall");
+        $allCids = Civi::service('prevnext')->getSelection($cacheKey, "getall");
       }
       else {
         $allCids[$cacheKey] = self::getContactIds($form);
@@ -233,7 +233,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
       }
       else {
         // fetching selected contact ids of passed cache key
-        $selectedCids = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey);
+        $selectedCids = Civi::service('prevnext')->getSelection($cacheKey);
         foreach ($selectedCids[$cacheKey] as $selectedCid => $ignore) {
           if ($useTable) {
             $insertString[] = " ( {$selectedCid} ) ";
@@ -273,7 +273,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     ) {
       $sel = CRM_Utils_Array::value('radio_ts', self::$_searchFormValues);
       $form->assign('searchtype', $sel);
-      $result = CRM_Core_BAO_PrevNextCache::getSelectedContacts();
+      $result = self::getSelectedContactNames();
       $form->assign("value", $result);
     }
 
@@ -475,6 +475,29 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
       ));
       $this->_contactIds = array_keys($result['values']);
     }
+  }
+
+  /**
+   * @return array
+   *   List of contact names.
+   *   NOTE: These are raw values from the DB. In current data-model, that means
+   *   they are pre-encoded HTML.
+   */
+  private static function getSelectedContactNames() {
+    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String');
+    $cacheKey = "civicrm search {$qfKey}";
+
+    $cids = array();
+    // Gymanstic time!
+    foreach (Civi::service('prevnext')->getSelection($cacheKey) as $cacheKey => $values) {
+      $cids = array_unique(array_merge($cids, array_keys($values)));
+    }
+
+    $result = CRM_Utils_SQL_Select::from('civicrm_contact')
+      ->where('id IN (#cids)', ['cids' => $cids])
+      ->execute()
+      ->fetchMap('id', 'sort_name');
+    return $result;
   }
 
   /**

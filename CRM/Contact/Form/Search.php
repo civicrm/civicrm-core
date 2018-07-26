@@ -497,7 +497,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     if ($qfKeyParam && ($this->get('component_mode') <= CRM_Contact_BAO_Query::MODE_CONTACTS || $this->get('component_mode') == CRM_Contact_BAO_Query::MODE_CONTACTSRELATED)) {
       $this->addClass('crm-ajax-selection-form');
       $qfKeyParam = "civicrm search {$qfKeyParam}";
-      $selectedContactIdsArr = CRM_Core_BAO_PrevNextCache::getSelection($qfKeyParam);
+      $selectedContactIdsArr = Civi::service('prevnext')->getSelection($qfKeyParam);
       $selectedContactIds = array_keys($selectedContactIdsArr[$qfKeyParam]);
     }
 

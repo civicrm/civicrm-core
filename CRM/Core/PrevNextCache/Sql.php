@@ -74,4 +74,105 @@ INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cache
     return TRUE;
   }
 
+  /**
+   * Save checkbox selections.
+   *
+   * @param string $cacheKey
+   * @param string $action
+   *   Ex: 'select', 'unselect'.
+   * @param array|int|NULL $cIds
+   *   A list of contact IDs to (un)select.
+   *   To unselect all contact IDs, use NULL.
+   */
+  public function markSelection($cacheKey, $action, $cIds = NULL) {
+    $entity_table = 'civicrm_contact';
+
+    if (!$cacheKey) {
+      return;
+    }
+    $params = array();
+
+    $entity_whereClause = " AND entity_table = '{$entity_table}'";
+    if ($cIds && $cacheKey && $action) {
+      if (is_array($cIds)) {
+        $cIdFilter = "(" . implode(',', $cIds) . ")";
+        $whereClause = "
+WHERE cacheKey LIKE %1
+AND (entity_id1 IN {$cIdFilter} OR entity_id2 IN {$cIdFilter})
+";
+      }
+      else {
+        $whereClause = "
+WHERE cacheKey LIKE %1
+AND (entity_id1 = %2 OR entity_id2 = %2)
+";
+        $params[2] = array("{$cIds}", 'Integer');
+      }
+      if ($action == 'select') {
+        $whereClause .= "AND is_selected = 0";
+        $sql = "UPDATE civicrm_prevnext_cache SET is_selected = 1 {$whereClause} {$entity_whereClause}";
+        $params[1] = array("{$cacheKey}%", 'String');
+      }
+      elseif ($action == 'unselect') {
+        $whereClause .= "AND is_selected = 1";
+        $sql = "UPDATE civicrm_prevnext_cache SET is_selected = 0 {$whereClause} {$entity_whereClause}";
+        $params[1] = array("%{$cacheKey}%", 'String');
+      }
+      // default action is reseting
+    }
+    elseif (!$cIds && $cacheKey && $action == 'unselect') {
+      $sql = "
+UPDATE civicrm_prevnext_cache
+SET    is_selected = 0
+WHERE  cacheKey LIKE %1 AND is_selected = 1
+       {$entity_whereClause}
+";
+      $params[1] = array("{$cacheKey}%", 'String');
+    }
+    CRM_Core_DAO::executeQuery($sql, $params);
+  }
+
+  /**
+   * Get the selections.
+   *
+   * @param string $cacheKey
+   *   Cache key.
+   * @param string $action
+   *   One of the following:
+   *   - 'get' - get only selection records
+   *   - 'getall' - get all the records of the specified cache key
+   *
+   * @return array|NULL
+   */
+  public function getSelection($cacheKey, $action = 'get') {
+    $entity_table = 'civicrm_contact';
+
+    if (!$cacheKey) {
+      return NULL;
+    }
+    $params = array();
+
+    $entity_whereClause = " AND entity_table = '{$entity_table}'";
+    if ($cacheKey && ($action == 'get' || $action == 'getall')) {
+      $actionGet = ($action == "get") ? " AND is_selected = 1 " : "";
+      $sql = "
+SELECT entity_id1, entity_id2 FROM civicrm_prevnext_cache
+WHERE cacheKey LIKE %1
+      $actionGet
+      $entity_whereClause
+ORDER BY id
+";
+      $params[1] = array("{$cacheKey}%", 'String');
+
+      $contactIds = array($cacheKey => array());
+      $cIdDao = CRM_Core_DAO::executeQuery($sql, $params);
+      while ($cIdDao->fetch()) {
+        if ($cIdDao->entity_id1 == $cIdDao->entity_id2) {
+          $contactIds[$cacheKey][$cIdDao->entity_id1] = 1;
+        }
+      }
+      return $contactIds;
+    }
+  }
+
 }

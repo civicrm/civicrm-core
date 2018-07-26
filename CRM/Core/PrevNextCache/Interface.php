@@ -58,4 +58,30 @@ interface CRM_Core_PrevNextCache_Interface {
    */
   public function fillWithArray($cacheKey, $rows);
 
+  /**
+   * Save checkbox selections.
+   *
+   * @param string $cacheKey
+   * @param string $action
+   *   Ex: 'select', 'unselect'.
+   * @param array|int|NULL $ids
+   *   A list of contact IDs to (un)select.
+   *   To unselect all contact IDs, use NULL.
+   */
+  public function markSelection($cacheKey, $action, $ids = NULL);
+
+  /**
+   * Get the selections.
+   *
+   * @param string $cacheKey
+   *   Cache key.
+   * @param string $action
+   *   One of the following:
+   *   - 'get' - get only selection records
+   *   - 'getall' - get all the records of the specified cache key
+   *
+   * @return array|NULL
+   */
+  public function getSelection($cacheKey, $action = 'get');
+
 }
