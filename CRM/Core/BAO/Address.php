@@ -1042,11 +1042,16 @@ SELECT is_primary,
     $query = 'SELECT id, contact_id FROM civicrm_address WHERE master_id = %1';
     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($addressId, 'Integer')));
 
+    // do we create shared address relationship ?
+    $createRelOnSharedAddress = \Civi::settings()->get('createRelOnSharedAddress');
+
     // unset contact id
     $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'contact_id');
     if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
       // call the function to create a relationship for the new shared address
-      self::processSharedAddressRelationship($params['master_id'], $params['contact_id']);
+      if ($createRelOnSharedAddress) {
+        self::processSharedAddressRelationship($params['master_id'], $params['contact_id']);
+      }
     }
     else {
       // else no new shares will be created, only update shared addresses
@@ -1059,7 +1064,7 @@ SELECT is_primary,
     $addressDAO = new CRM_Core_DAO_Address();
     while ($dao->fetch()) {
       // call the function to update the relationship
-      if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
+      if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id']) && $createRelOnSharedAddress) {
         self::processSharedAddressRelationship($params['master_id'], $dao->contact_id);
       }
       $addressDAO->copyValues($params);
