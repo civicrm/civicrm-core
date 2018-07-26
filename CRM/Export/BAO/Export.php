@@ -1389,6 +1389,7 @@ WHERE  {$whereClause}";
     }
     elseif ($processor->isRelationshipTypeKey($field)) {
       foreach ($value as $relationField => $relationValue) {
+        $headerName = '';
         // below block is same as primary block (duplicate)
         if (isset($queryFields[$relationField]['title'])) {
           if ($queryFields[$relationField]['name'] == 'name') {
@@ -1402,25 +1403,16 @@ WHERE  {$whereClause}";
               $headerName = $field . '-' . $queryFields[$relationField]['name'];
             }
           }
-
-          $headerRows[] = $headerName;
-
-          $processor->setSqlOutputColumn($headerName);
         }
         elseif ($relationField == 'phone_type_id') {
           $headerName = $field . '-' . 'Phone Type';
-          $headerRows[] = $headerName;
-          $processor->setSqlOutputColumn($headerName);
+
         }
         elseif ($relationField == 'provider_id') {
           $headerName = $field . '-' . 'Im Service Provider';
-          $headerRows[] = $headerName;
-          $processor->setSqlOutputColumn($headerName);
         }
         elseif ($relationField == 'state_province_id') {
           $headerName = $field . '-' . 'state_province_id';
-          $headerRows[] = $headerName;
-          $processor->setSqlOutputColumn($headerName);
         }
         elseif (is_array($relationValue) && $relationField == 'location') {
           // fix header for location type case
@@ -1439,10 +1431,12 @@ WHERE  {$whereClause}";
                 }
               }
               $headerName = $field . '-' . $hdr;
-              $headerRows[] = $headerName;
-              $processor->setSqlOutputColumn($headerName);
             }
           }
+        }
+        if ($headerName) {
+          $headerRows[] = $headerName;
+          $processor->setSqlOutputColumn($headerName);
         }
       }
       self::manipulateHeaderRows($headerRows);
