@@ -364,7 +364,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
     }
 
-    $allRelContactArray = self::buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $processor);
+    $allRelContactArray = self::buildRelatedContactArray($selectAll, $ids, $componentTable, $returnProperties, $processor);
 
     // make sure the groups stuff is included only if specifically specified
     // by the fields param (CRM-1969), else we limit the contacts outputted to only
@@ -1642,13 +1642,13 @@ WHERE  {$whereClause}";
   /**
    * @param $selectAll
    * @param $ids
-   * @param $exportMode
    * @param $componentTable
    * @param $returnProperties
+   *
    * @param \CRM_Export_BAO_ExportProcessor $processor
    * @return array
    */
-  protected static function buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $processor) {
+  protected static function buildRelatedContactArray($selectAll, $ids, $componentTable, $returnProperties, $processor) {
     $allRelContactArray = [];
 
     foreach (self::$relationshipTypes as $rel => $dnt) {
@@ -1668,7 +1668,7 @@ WHERE  {$whereClause}";
           $contactA = 'contact_id_b';
           $contactB = 'contact_id_a';
         }
-        $relIDs = self::getIDsForRelatedContact($ids, $exportMode);
+        $relIDs = self::getIDsForRelatedContact($ids, $processor->getExportMode());
 
         $relationshipJoin = $relationshipClause = '';
         if (!$selectAll && $componentTable) {
