@@ -796,12 +796,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       return;
     }
 
-    $fieldName = CRM_Utils_String::munge(strtolower($field), '_', 64);
-    if ($fieldName == 'id') {
-      $fieldName = 'civicrm_primary_id';
-    }
-
-    $sqlColumns[$fieldName] = $processor->getSqlColumnDefinition($field, $fieldName);
+    $sqlColumns[$processor->getMungedFieldName($field)] = $processor->getSqlColumnDefinition($field);
   }
 
   /**
