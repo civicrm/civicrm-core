@@ -101,19 +101,19 @@ INSERT INTO civicrm_prevnext_cache (cacheKey, entity_id1, data)
    * @param string $cacheKey
    * @param string $action
    *   Ex: 'select', 'unselect'.
-   * @param array|int|NULL $cIds
+   * @param array|int|NULL $ids
    *   A list of contact IDs to (un)select.
    *   To unselect all contact IDs, use NULL.
    */
-  public function markSelection($cacheKey, $action, $cIds = NULL) {
+  public function markSelection($cacheKey, $action, $ids = NULL) {
     if (!$cacheKey) {
       return;
     }
     $params = array();
 
-    if ($cIds && $cacheKey && $action) {
-      if (is_array($cIds)) {
-        $cIdFilter = "(" . implode(',', $cIds) . ")";
+    if ($ids && $cacheKey && $action) {
+      if (is_array($ids)) {
+        $cIdFilter = "(" . implode(',', $ids) . ")";
         $whereClause = "
 WHERE cacheKey = %1
 AND (entity_id1 IN {$cIdFilter} OR entity_id2 IN {$cIdFilter})
@@ -124,7 +124,7 @@ AND (entity_id1 IN {$cIdFilter} OR entity_id2 IN {$cIdFilter})
 WHERE cacheKey = %1
 AND (entity_id1 = %2 OR entity_id2 = %2)
 ";
-        $params[2] = array("{$cIds}", 'Integer');
+        $params[2] = array("{$ids}", 'Integer');
       }
       if ($action == 'select') {
         $whereClause .= "AND is_selected = 0";
@@ -138,7 +138,7 @@ AND (entity_id1 = %2 OR entity_id2 = %2)
       }
       // default action is reseting
     }
-    elseif (!$cIds && $cacheKey && $action == 'unselect') {
+    elseif (!$ids && $cacheKey && $action == 'unselect') {
       $sql = "
 UPDATE civicrm_prevnext_cache
 SET    is_selected = 0
