@@ -438,12 +438,14 @@ class CRM_Export_BAO_ExportProcessor {
   }
 
   /**
+   * Get the sql column definition for the given field.
+   *
    * @param $field
-   * @param $fieldName
    *
    * @return mixed
    */
-  public function getSqlColumnDefinition($field, $fieldName) {
+  public function getSqlColumnDefinition($field) {
+    $fieldName = $this->getMungedFieldName($field);
 
     // early exit for master_id, CRM-12100
     // in the DB it is an ID, but in the export, we retrive the display_name of the master record
@@ -543,6 +545,20 @@ class CRM_Export_BAO_ExportProcessor {
         }
       }
     }
+  }
+
+  /**
+   * Get the munged field name.
+   *
+   * @param string $field
+   * @return string
+   */
+  public function getMungedFieldName($field) {
+    $fieldName = CRM_Utils_String::munge(strtolower($field), '_', 64);
+    if ($fieldName == 'id') {
+      $fieldName = 'civicrm_primary_id';
+    }
+    return $fieldName;
   }
 
 }
