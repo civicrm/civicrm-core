@@ -1368,12 +1368,10 @@ WHERE  {$whereClause}";
    * @param array $headerRows
    * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param array|string $value
-   * @param array $phoneTypes
-   * @param array $imProviders
    *
    * @return array
    */
-  public static function setHeaderRows($field, $headerRows, $processor, $value, $phoneTypes, $imProviders) {
+  public static function setHeaderRows($field, $headerRows, $processor, $value) {
 
     $queryFields = $processor->getQueryFields();
     if (substr($field, -11) == 'campaign_id') {
@@ -1389,51 +1387,7 @@ WHERE  {$whereClause}";
     }
     elseif ($processor->isRelationshipTypeKey($field)) {
       foreach ($value as $relationField => $relationValue) {
-        $headerName = '';
-        // below block is same as primary block (duplicate)
-        if (isset($queryFields[$relationField]['title'])) {
-          if ($queryFields[$relationField]['name'] == 'name') {
-            $headerName = $field . '-' . $relationField;
-          }
-          else {
-            if ($relationField == 'current_employer') {
-              $headerName = $field . '-' . 'current_employer';
-            }
-            else {
-              $headerName = $field . '-' . $queryFields[$relationField]['name'];
-            }
-          }
-        }
-        elseif ($relationField == 'phone_type_id') {
-          $headerName = $field . '-' . 'Phone Type';
-
-        }
-        elseif ($relationField == 'provider_id') {
-          $headerName = $field . '-' . 'Im Service Provider';
-        }
-        elseif ($relationField == 'state_province_id') {
-          $headerName = $field . '-' . 'state_province_id';
-        }
-        elseif (is_array($relationValue) && $relationField == 'location') {
-          // fix header for location type case
-          foreach ($relationValue as $ltype => $val) {
-            foreach (array_keys($val) as $fld) {
-              $type = explode('-', $fld);
-
-              $hdr = "{$ltype}-" . $queryFields[$type[0]]['title'];
-
-              if (!empty($type[1])) {
-                if (CRM_Utils_Array::value(0, $type) == 'phone') {
-                  $hdr .= "-" . CRM_Utils_Array::value($type[1], $phoneTypes);
-                }
-                elseif (CRM_Utils_Array::value(0, $type) == 'im') {
-                  $hdr .= "-" . CRM_Utils_Array::value($type[1], $imProviders);
-                }
-              }
-              $headerName = $field . '-' . $hdr;
-            }
-          }
-        }
+        $headerName = self::getHeaderName($field, $processor, $relationField, $relationValue);
         if ($headerName) {
           $headerRows[] = $headerName;
           $processor->setSqlOutputColumn($headerName);
@@ -1495,7 +1449,7 @@ WHERE  {$whereClause}";
     foreach ($returnProperties as $key => $value) {
       if ($key != 'location' || !is_array($value)) {
         $outputColumns[$key] = $value;
-        $headerRows = self::setHeaderRows($key, $headerRows, $processor, $value, $phoneTypes, $imProviders);
+        $headerRows = self::setHeaderRows($key, $headerRows, $processor, $value);
       }
       else {
         foreach ($value as $locationType => $locationFields) {
@@ -1520,7 +1474,7 @@ WHERE  {$whereClause}";
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
             $processor->setSqlOutputColumn($outputFieldName);
-            $headerRows = self::setHeaderRows($outputFieldName, $headerRows, $processor, $value, $phoneTypes, $imProviders);
+            $headerRows = self::setHeaderRows($outputFieldName, $headerRows, $processor, $value);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');
             }
@@ -1854,6 +1808,65 @@ WHERE  {$whereClause}";
     else {
       // if field is empty or null
       return '';
+    }
+  }
+
+  /**
+   * Get the header for the column.
+   * @param $field
+   * @param \CRM_Export_BAO_ExportProcessor $processor
+   * @param $relationField
+   * @param $relationValue
+   *
+   * @return string
+   */
+  protected static function getHeaderName($field, $processor, $relationField, $relationValue) {
+    $queryFields = $processor->getQueryFields();
+    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    // below block is same as primary block (duplicate)
+    if (isset($queryFields[$relationField]['title'])) {
+      if ($queryFields[$relationField]['name'] == 'name') {
+        return $field . '-' . $relationField;
+      }
+      else {
+        if ($relationField == 'current_employer') {
+          return $field . '-' . 'current_employer';
+        }
+        else {
+          return $field . '-' . $queryFields[$relationField]['name'];
+        }
+      }
+    }
+    elseif ($relationField == 'phone_type_id') {
+      return $field . '-' . 'Phone Type';
+
+    }
+    elseif ($relationField == 'provider_id') {
+      return $field . '-' . 'Im Service Provider';
+    }
+    elseif ($relationField == 'state_province_id') {
+      return $field . '-' . 'state_province_id';
+    }
+    elseif (is_array($relationValue) && $relationField == 'location') {
+      // fix header for location type case
+      foreach ($relationValue as $ltype => $val) {
+        foreach (array_keys($val) as $fld) {
+          $type = explode('-', $fld);
+
+          $hdr = "{$ltype}-" . $queryFields[$type[0]]['title'];
+
+          if (!empty($type[1])) {
+            if (CRM_Utils_Array::value(0, $type) == 'phone') {
+              $hdr .= "-" . CRM_Utils_Array::value($type[1], $phoneTypes);
+            }
+            elseif (CRM_Utils_Array::value(0, $type) == 'im') {
+              $hdr .= "-" . CRM_Utils_Array::value($type[1], $imProviders);
+            }
+          }
+          return $field . '-' . $hdr;
+        }
+      }
     }
   }
 
