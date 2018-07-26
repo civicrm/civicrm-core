@@ -437,4 +437,112 @@ class CRM_Export_BAO_ExportProcessor {
     ];
   }
 
+  /**
+   * @param $field
+   * @param $fieldName
+   *
+   * @return mixed
+   */
+  public function getSqlColumnDefinition($field, $fieldName) {
+
+    // early exit for master_id, CRM-12100
+    // in the DB it is an ID, but in the export, we retrive the display_name of the master record
+    // also for current_employer, CRM-16939
+    if ($fieldName == 'master_id' || $fieldName == 'current_employer') {
+      return "$fieldName varchar(128)";
+    }
+
+    if (substr($fieldName, -11) == 'campaign_id') {
+      // CRM-14398
+      return "$fieldName varchar(128)";
+    }
+
+    $queryFields = $this->getQueryFields();
+    $lookUp = ['prefix_id', 'suffix_id'];
+    // set the sql columns
+    if (isset($queryFields[$field]['type'])) {
+      switch ($queryFields[$field]['type']) {
+        case CRM_Utils_Type::T_INT:
+        case CRM_Utils_Type::T_BOOLEAN:
+          if (in_array($field, $lookUp)) {
+            return "$fieldName varchar(255)";
+          }
+          else {
+            return "$fieldName varchar(16)";
+          }
+
+        case CRM_Utils_Type::T_STRING:
+          if (isset($queryFields[$field]['maxlength'])) {
+            return "$fieldName varchar({$queryFields[$field]['maxlength']})";
+          }
+          else {
+            return "$fieldName varchar(255)";
+          }
+
+        case CRM_Utils_Type::T_TEXT:
+        case CRM_Utils_Type::T_LONGTEXT:
+        case CRM_Utils_Type::T_BLOB:
+        case CRM_Utils_Type::T_MEDIUMBLOB:
+          return "$fieldName longtext";
+
+        case CRM_Utils_Type::T_FLOAT:
+        case CRM_Utils_Type::T_ENUM:
+        case CRM_Utils_Type::T_DATE:
+        case CRM_Utils_Type::T_TIME:
+        case CRM_Utils_Type::T_TIMESTAMP:
+        case CRM_Utils_Type::T_MONEY:
+        case CRM_Utils_Type::T_EMAIL:
+        case CRM_Utils_Type::T_URL:
+        case CRM_Utils_Type::T_CCNUM:
+        default:
+          return "$fieldName varchar(32)";
+      }
+    }
+    else {
+      if (substr($fieldName, -3, 3) == '_id') {
+        return "$fieldName varchar(255)";
+      }
+      elseif (substr($fieldName, -5, 5) == '_note') {
+        return "$fieldName text";
+      }
+      else {
+        $changeFields = [
+          'groups',
+          'tags',
+          'notes',
+        ];
+
+        if (in_array($fieldName, $changeFields)) {
+          return "$fieldName text";
+        }
+        else {
+          // set the sql columns for custom data
+          if (isset($queryFields[$field]['data_type'])) {
+
+            switch ($queryFields[$field]['data_type']) {
+              case 'String':
+                // May be option labels, which could be up to 512 characters
+                $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$field]));
+                return "$fieldName varchar($length)";
+
+              case 'Country':
+              case 'StateProvince':
+              case 'Link':
+                return "$fieldName varchar(255)";
+
+              case 'Memo':
+                return "$fieldName text";
+
+              default:
+                return "$fieldName varchar(255)";
+            }
+          }
+          else {
+            return "$fieldName text";
+          }
+        }
+      }
+    }
+  }
+
 }
