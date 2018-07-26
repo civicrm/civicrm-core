@@ -467,7 +467,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     // for CRM-3157 purposes
     $i18n = CRM_Core_I18n::singleton();
 
-    list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor, $relationQuery);
+    list($outputColumns, $headerRows, $metadata) = self::getExportStructureArrays($returnProperties, $processor, $relationQuery);
 
     $limitReached = FALSE;
     while (!$limitReached) {
@@ -528,12 +528,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           // where other header definitions take place.
           $headerRows = array_merge($headerRows, $paymentHeaders);
           foreach (array_keys($paymentHeaders) as $paymentHdr) {
-            self::sqlColumnDefn($processor, $sqlColumns, $paymentHdr);
+            $processor->setSqlOutputColumn($paymentHdr);
           }
         }
 
         if ($setHeader) {
-          $exportTempTable = self::createTempTable($sqlColumns);
+          $exportTempTable = self::createTempTable($processor->getSqlColumns());
         }
 
         //build header only once
@@ -569,7 +569,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
         // output every $tempRowCount rows
         if ($count % $tempRowCount == 0) {
-          self::writeDetailsToTable($exportTempTable, $componentDetails, $sqlColumns);
+          self::writeDetailsToTable($exportTempTable, $componentDetails, $processor->getSqlColumns());
           $componentDetails = array();
         }
       }
@@ -580,29 +580,30 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     }
 
     if ($exportTempTable) {
-      self::writeDetailsToTable($exportTempTable, $componentDetails, $sqlColumns);
+      self::writeDetailsToTable($exportTempTable, $componentDetails, $processor->getSqlColumns());
 
       // if postalMailing option is checked, exclude contacts who are deceased, have
       // "Do not mail" privacy setting, or have no street address
       if (isset($exportParams['postal_mailing_export']['postal_mailing_export']) &&
         $exportParams['postal_mailing_export']['postal_mailing_export'] == 1
       ) {
-        self::postalMailingFormat($exportTempTable, $headerRows, $sqlColumns, $exportMode);
+        self::postalMailingFormat($exportTempTable, $headerRows, $processor->getSqlColumns(), $exportMode);
       }
 
       // do merge same address and merge same household processing
       if ($mergeSameAddress) {
-        self::mergeSameAddress($exportTempTable, $headerRows, $sqlColumns, $exportParams);
+        self::mergeSameAddress($exportTempTable, $headerRows, $processor->getSqlColumns(), $exportParams);
       }
 
       // merge the records if they have corresponding households
       if ($mergeSameHousehold) {
         foreach ($processor->getHouseholdRelationshipTypes() as $householdRelationshipType) {
-          self::mergeSameHousehold($exportTempTable, $headerRows, $sqlColumns, $householdRelationshipType);
+          self::mergeSameHousehold($exportTempTable, $headerRows, $processor->getSqlColumns(), $householdRelationshipType);
         }
       }
 
       // call export hook
+      $sqlColumns = $processor->getSqlColumns();
       CRM_Utils_Hook::export($exportTempTable, $headerRows, $sqlColumns, $exportMode);
 
       // In order to be able to write a unit test against this function we need to suppress
@@ -754,19 +755,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     CRM_Core_Report_Excel::writeCSVFile(self::getExportFileName(), $header, $rows);
     CRM_Utils_System::civiExit();
-  }
-
-  /**
-   * @param \CRM_Export_BAO_ExportProcessor $processor
-   * @param $sqlColumns
-   * @param $field
-   */
-  public static function sqlColumnDefn($processor, &$sqlColumns, $field) {
-    if (substr($field, -4) == '_a_b' || substr($field, -4) == '_b_a') {
-      return;
-    }
-
-    $sqlColumns[$processor->getMungedFieldName($field)] = $processor->getSqlColumnDefinition($field);
   }
 
   /**
@@ -1379,8 +1367,6 @@ WHERE  {$whereClause}";
    *
    * @param string $field
    * @param array $headerRows
-   * @param array $sqlColumns
-   *   Columns to go in the temp table.
    * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param array|string $value
    * @param array $phoneTypes
@@ -1389,7 +1375,7 @@ WHERE  {$whereClause}";
    *
    * @return array
    */
-  public static function setHeaderRows($field, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery) {
+  public static function setHeaderRows($field, $headerRows, $processor, $value, $phoneTypes, $imProviders, $relationQuery) {
 
     $queryFields = $processor->getQueryFields();
     if (substr($field, -11) == 'campaign_id') {
@@ -1421,22 +1407,22 @@ WHERE  {$whereClause}";
 
           $headerRows[] = $headerName;
 
-          self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+          $processor->setSqlOutputColumn($headerName);
         }
         elseif ($relationField == 'phone_type_id') {
           $headerName = $field . '-' . 'Phone Type';
           $headerRows[] = $headerName;
-          self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+          $processor->setSqlOutputColumn($headerName);
         }
         elseif ($relationField == 'provider_id') {
           $headerName = $field . '-' . 'Im Service Provider';
           $headerRows[] = $headerName;
-          self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+          $processor->setSqlOutputColumn($headerName);
         }
         elseif ($relationField == 'state_province_id') {
           $headerName = $field . '-' . 'state_province_id';
           $headerRows[] = $headerName;
-          self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+          $processor->setSqlOutputColumn($headerName);
         }
         elseif (is_array($relationValue) && $relationField == 'location') {
           // fix header for location type case
@@ -1456,7 +1442,7 @@ WHERE  {$whereClause}";
               }
               $headerName = $field . '-' . $hdr;
               $headerRows[] = $headerName;
-              self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+              $processor->setSqlOutputColumn($headerName);
             }
           }
         }
@@ -1470,9 +1456,13 @@ WHERE  {$whereClause}";
       $headerRows[] = $field;
     }
 
-    self::sqlColumnDefn($processor, $sqlColumns, $field);
+    if ($processor->isRelationshipTypeKey($field)) {
+      // Sql columns set above for relationships, return now.
+      return $headerRows;
+    }
+    $processor->setSqlOutputColumn($field);
 
-    return array($headerRows, $sqlColumns);
+    return $headerRows;
   }
 
   /**
@@ -1505,7 +1495,7 @@ WHERE  {$whereClause}";
    *       yet find a way to comment them for posterity.
    */
   public static function getExportStructureArrays($returnProperties, $processor, $relationQuery) {
-    $metadata = $headerRows = $outputColumns = $sqlColumns = array();
+    $metadata = $headerRows = $outputColumns = [];
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
 
@@ -1513,7 +1503,7 @@ WHERE  {$whereClause}";
     foreach ($returnProperties as $key => $value) {
       if ($key != 'location' || !is_array($value)) {
         $outputColumns[$key] = $value;
-        list($headerRows, $sqlColumns) = self::setHeaderRows($key, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery);
+        $headerRows = self::setHeaderRows($key, $headerRows, $processor, $value, $phoneTypes, $imProviders, $relationQuery);
       }
       else {
         foreach ($value as $locationType => $locationFields) {
@@ -1537,8 +1527,8 @@ WHERE  {$whereClause}";
               // Warning: shame inducing hack.
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
-            self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
-            list($headerRows, $sqlColumns) = self::setHeaderRows($outputFieldName, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery);
+            $processor->setSqlOutputColumn($outputFieldName);
+            $headerRows = self::setHeaderRows($outputFieldName, $headerRows, $processor, $value, $phoneTypes, $imProviders, $relationQuery);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');
             }
@@ -1550,7 +1540,7 @@ WHERE  {$whereClause}";
         }
       }
     }
-    return array($outputColumns, $headerRows, $sqlColumns, $metadata);
+    return array($outputColumns, $headerRows, $metadata);
   }
 
   /**

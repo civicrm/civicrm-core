@@ -94,6 +94,13 @@ class CRM_Export_BAO_ExportProcessor {
   protected $returnProperties = [];
 
   /**
+   * Columns for temp table output.
+   *
+   * @var array
+   */
+  protected $sqlColumns = [];
+
+  /**
    * CRM_Export_BAO_ExportProcessor constructor.
    *
    * @param int $exportMode
@@ -122,6 +129,12 @@ class CRM_Export_BAO_ExportProcessor {
     $this->requestedFields = $requestedFields;
   }
 
+  /**
+   * @return array
+   */
+  public function getSqlColumns() {
+    return $this->sqlColumns;
+  }
 
   /**
    * @return array
@@ -514,6 +527,13 @@ class CRM_Export_BAO_ExportProcessor {
       'email',
       'im',
     ];
+  }
+
+  /**
+   * Add a column to the sql output.
+   */
+  public function setSqlOutputColumn($field) {
+    $this->sqlColumns[$this->getMungedFieldName($field)] = $this->getSqlColumnDefinition($field);
   }
 
   /**
