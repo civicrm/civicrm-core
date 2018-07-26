@@ -82,6 +82,14 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'event_online_receipt', 'type' => 'subject'],
         ]
       ],
+      [
+        'version' => '5.7.alpha1',
+        'upgrade_descriptor' => ts('Fix invoice number (human readable) instead of id (reference)'),
+        'label' => ts('Contributions - Invoice'),
+        'templates' => [
+          ['name' => 'contribution_invoice_receipt', 'type' => 'html'],
+        ]
+      ]
     ];
   }
 
@@ -109,12 +117,20 @@ class CRM_Upgrade_Incremental_MessageTemplates {
   public function getUpgradeMessages() {
     $updates = $this->getTemplatesToUpdate();
     $messages = [];
+    $templateLabel = '';
     foreach ($updates as $key => $value) {
-      $templateLabel = civicrm_api3('OptionValue', 'getvalue', [
-        'return' => 'label',
-        'name' => $value['name'],
-        'options' => ['limit' => 1],
-      ]);
+      try {
+        $templateLabel = civicrm_api3('OptionValue', 'getvalue', [
+          'return' => 'label',
+          'name' => $value['name'],
+          'options' => ['limit' => 1],
+        ]);
+      }
+      catch (Exception $e) {
+        if (!empty($value['label'])) {
+          $templateLabel = $value['label'];
+        }
+      }
       $messages[$templateLabel] = $value['upgrade_descriptor'];
     }
     return $messages;
@@ -131,24 +147,26 @@ class CRM_Upgrade_Incremental_MessageTemplates {
       ]);
       $content = file_get_contents(\Civi::paths()->getPath('[civicrm.root]/xml/templates/message_templates/' . $template['name'] . '_' . $template['type'] . '.tpl'));
       $templatesToUpdate = [];
-      $templatesToUpdate[] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_msg_template WHERE workflow_id = $workFlowID AND is_reserved = 1");
-      $defaultTemplateID = CRM_Core_DAO::singleValueQuery("
-        SELECT default_template.id FROM civicrm_msg_template reserved
-        LEFT JOIN civicrm_msg_template default_template
-          ON reserved.workflow_id = default_template.workflow_id
-        WHERE reserved.workflow_id = $workFlowID
-        AND reserved.is_reserved = 1 AND default_template.is_default = 1 AND reserved.id <> default_template.id
-        AND reserved.msg_{$template['type']} = default_template.msg_{$template['type']}
-      ");
-      if ($defaultTemplateID) {
-        $templatesToUpdate[] = $defaultTemplateID;
-      }
+      if (!empty($workFlowID)) {
+        $templatesToUpdate[] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_msg_template WHERE workflow_id = $workFlowID AND is_reserved = 1");
+        $defaultTemplateID = CRM_Core_DAO::singleValueQuery("
+          SELECT default_template.id FROM civicrm_msg_template reserved
+          LEFT JOIN civicrm_msg_template default_template
+            ON reserved.workflow_id = default_template.workflow_id
+          WHERE reserved.workflow_id = $workFlowID
+          AND reserved.is_reserved = 1 AND default_template.is_default = 1 AND reserved.id <> default_template.id
+          AND reserved.msg_{$template['type']} = default_template.msg_{$template['type']}
+        ");
+        if ($defaultTemplateID) {
+          $templatesToUpdate[] = $defaultTemplateID;
+        }
 
-      CRM_Core_DAO::executeQuery("
-        UPDATE civicrm_msg_template SET msg_{$template['type']} = %1 WHERE id IN (" . implode(',', $templatesToUpdate) . ")", [
-          1 => [$content, 'String']
-          ]
-      );
+        CRM_Core_DAO::executeQuery("
+          UPDATE civicrm_msg_template SET msg_{$template['type']} = %1 WHERE id IN (" . implode(',', $templatesToUpdate) . ")", [
+            1 => [$content, 'String']
+            ]
+        );
+      }
     }
   }
 
