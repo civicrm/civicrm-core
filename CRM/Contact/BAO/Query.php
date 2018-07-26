@@ -1612,7 +1612,7 @@ class CRM_Contact_BAO_Query {
         $contactType = array();
         $subType = array();
         foreach ((array) $values as $key => $type) {
-          $types = explode('__', is_numeric($type) ? $key : $type);
+          $types = explode('__', is_numeric($type) ? $key : $type, 2);
           $contactType[$types[0]] = $types[0];
           // Add sub-type if specified
           if (!empty($types[1])) {
