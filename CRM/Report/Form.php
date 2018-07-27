@@ -2056,9 +2056,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
           $customField['data_type']
         );
         break;
+
       case 'StateProvince':
       case 'Country':
-
         switch ($htmlType) {
           case 'Multi-Select Country':
             $value = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
