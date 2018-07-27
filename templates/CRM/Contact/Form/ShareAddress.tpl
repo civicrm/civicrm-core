@@ -38,8 +38,12 @@
             <input type="radio" name="{$sa_name}" id="{$sa_id}" value="{$sa.id}" {if $sa.id eq $sharedAddresses.$blockId.shared_address_display.master_id}checked="checked"{/if}>
             <label for="{$sa_id}">{$sa.display_text}</label>{if $sa.location_type}({$sa.location_type}){/if}<br/>
           {/foreach}
+
+          {assign var="update_name" value="update_current_employer-`$blockId`"}
+          <input type="checkbox" name="{$update_name}" id="{$update_name}" value="1" checked="checked"><label for="{$update_name}">{ts}Set Organization Name as current employer{/ts}</label> {help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}<br/>
         {/if}
       </div>
+
     </div>
   </td>
 </tr>
@@ -104,6 +108,15 @@
 
             if (!addressHTML) {
               addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
+            }
+            else {
+              // TODO: check if the contact is an organization and get the org name
+              /*$.post(CRM.url('civicrm/ajax/inline'), {
+                'contact_id': sharedContactId,*/
+              
+              var name = 'update_current_employer-'+ blockNo;
+              var display_text = {/literal}"{ts escape='js'}Set Organization Name as current employer{/ts}"{literal};
+              addressHTML += '<input type="checkbox" name="' + name + '" id="' + name + '" value="1" checked="checked"><label for="' + name + '">' + display_text + '</label>' + /*{/literal}'{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}'{literal} +*/ '<br/>';
             }
 
             $contentArea.html(addressHTML);
