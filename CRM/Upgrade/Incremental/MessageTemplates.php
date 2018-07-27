@@ -80,7 +80,6 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'event_online_receipt', 'type' => 'text'],
           ['name' => 'event_online_receipt', 'type' => 'html'],
           ['name' => 'event_online_receipt', 'type' => 'subject'],
-          ['name' => 'contribution_invoice_receipt', 'type' => 'html'],
         ]
       ],
       [
