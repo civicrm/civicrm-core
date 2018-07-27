@@ -2049,24 +2049,13 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         }
       case 'String':
       case 'Int':
-        if (in_array($htmlType, array(
-          'Text',
-          'TextArea',
-          'CheckBox',
-        ))) {
-          $retValue = $value;
-          break;
-        }
-        else {
-          $customField['options'] = CRM_Core_BAO_CustomOption::getCustomOption($customField['id']);
-          foreach ($customField['options'] as $cf_key => $cf_values) {
-            if ($cf_values['value'] == $value) {
-              $retValue = $cf_values['label'];
-            }
-          }
-          break;
-        }
-
+        $retValue = CRM_Core_BAO_CustomOption::getOptionLabel(
+          $customField['id'],
+          $value,
+          $htmlType,
+          $customField['data_type']
+        );
+        break;
       case 'StateProvince':
       case 'Country':
 
