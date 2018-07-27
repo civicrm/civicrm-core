@@ -1986,6 +1986,31 @@ AND cc.sort_name LIKE '%$name%'";
   }
 
   /**
+   * Set 'is_active' field to TRUE for all relationships whose start date is today (relationships that just started)
+   *
+   * This assumes that expired relationships with a future date are relationships-to-come, and should be activated when
+   * the time comes. Since start_date in the past indicate the relationship may have once been active but has since
+   * been manually disabled, the best we can do is assume that relationships with today's date were once created with
+   * a future date. In other words, the relationship was planned.
+   *
+   * @return bool
+   *   TRUE on success, FALSE if error is encountered.
+   */
+  public static function enablePlannedRelationships() {
+    $query = "SELECT id FROM civicrm_relationship WHERE is_active = 0 AND start_date = CURDATE();";
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      $result = CRM_Contact_BAO_Relationship::setIsActive($dao->id, TRUE);
+      // Result will be NULL if error occurred. We abort early if error detected.
+      if ($result == NULL) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
    * Function filters the query by possible relationships for the membership type.
    *
    * It is intended to be called when constructing queries for the api (reciprocal & non-reciprocal)

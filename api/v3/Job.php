@@ -665,6 +665,12 @@ function civicrm_api3_job_disable_expired_relationships($params) {
   if (!$result) {
     throw new API_Exception('Failed to disable all expired relationships.');
   }
+
+  $result = CRM_Contact_BAO_Relationship::enablePlannedRelationships();
+  if (!$result) {
+    throw new API_Exception('Failed to enable all planned relationships.');
+  }
+
   return civicrm_api3_create_success(1, $params, 'Job', 'disable_expired_relationships');
 }
 
