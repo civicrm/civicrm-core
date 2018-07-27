@@ -83,6 +83,13 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'contribution_invoice_receipt', 'type' => 'html'],
         ]
       ],
+      [
+        'version' => '5.5.alpha1',
+        'upgrade_descriptor' => ts('Fix invoice number (human readable) instead of id (reference)'),
+        'templates' => [
+          ['name' => 'contribution_invoice_receipt', 'type' => 'html'],
+        ]
+      ]
     ];
   }
 
