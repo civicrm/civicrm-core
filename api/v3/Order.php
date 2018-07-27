@@ -77,7 +77,12 @@ function civicrm_api3_order_create(&$params) {
   $entityIds = array();
   if (CRM_Utils_Array::value('line_items', $params) && is_array($params['line_items'])) {
     $priceSetID = NULL;
-    CRM_Contribute_BAO_Contribution::checkLineItems($params);
+
+    $isLineItemMatchTotalAmount = CRM_Contribute_BAO_Contribution::checkLineItems($params);
+    if (!$isLineItemMatchTotalAmount) {
+      throw new API_Exception("Line item total doesn't match with total amount.");
+    }
+
     foreach ($params['line_items'] as $lineItems) {
       $entityParams = CRM_Utils_Array::value('params', $lineItems, array());
       if (!empty($entityParams) && !empty($lineItems['line_item'])) {
