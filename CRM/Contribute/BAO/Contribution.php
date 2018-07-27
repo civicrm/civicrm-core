@@ -2008,7 +2008,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               );
             }
 
-            $updateResult['membership_end_date'] = CRM_Utils_Date::customFormat($dates['end_date'],
+            $updateResult['membership_end_date'] = CRM_Utils_Date::customFormat($membership->end_date,
               '%B %E%f, %Y'
             );
             $updateResult['updatedComponents']['CiviMember'] = $membership->status_id;
