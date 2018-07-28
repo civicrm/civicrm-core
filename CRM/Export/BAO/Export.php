@@ -122,10 +122,8 @@ class CRM_Export_BAO_Export {
 
   /**
    * Get Query Group By Clause
-   * @param int $exportMode
+   * @param \CRM_Export_BAO_ExportProcessor $processor
    *   Export Mode
-   * @param string $queryMode
-   *   Query Mode
    * @param array $returnProperties
    *   Return Properties
    * @param object $query
@@ -134,8 +132,10 @@ class CRM_Export_BAO_Export {
    * @return string $groupBy
    *   Group By Clause
    */
-  public static function getGroupBy($exportMode, $queryMode, $returnProperties, $query) {
+  public static function getGroupBy($processor, $returnProperties, $query) {
     $groupBy = '';
+    $exportMode = $processor->getExportMode();
+    $queryMode = $processor->getQueryMode();
     if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
       CRM_Utils_Array::value('notes', $returnProperties) ||
       // CRM-9552
@@ -364,7 +364,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
     }
 
-    list($relationQuery, $allRelContactArray) = self::buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $queryMode);
+    list($relationQuery, $allRelContactArray) = self::buildRelatedContactArray($selectAll, $ids, $processor, $componentTable, $returnProperties);
 
     // make sure the groups stuff is included only if specifically specified
     // by the fields param (CRM-1969), else we limit the contacts outputted to only
@@ -409,7 +409,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $queryString = "$select $from $where $having";
 
-    $groupBy = self::getGroupBy($exportMode, $queryMode, $returnProperties, $query);
+    $groupBy = self::getGroupBy($processor, $returnProperties, $query);
 
     $queryString .= $groupBy;
 
@@ -1701,15 +1701,16 @@ WHERE  {$whereClause}";
   /**
    * @param $selectAll
    * @param $ids
-   * @param $exportMode
+   * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param $componentTable
    * @param $returnProperties
-   * @param $queryMode
+   *
    * @return array
    */
-  protected static function buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $queryMode) {
+  protected static function buildRelatedContactArray($selectAll, $ids, $processor, $componentTable, $returnProperties) {
     $allRelContactArray = $relationQuery = array();
-
+    $queryMode = $processor->getQueryMode();
+    $exportMode = $processor->getExportMode();
     foreach (self::$relationshipTypes as $rel => $dnt) {
       if ($relationReturnProperties = CRM_Utils_Array::value($rel, $returnProperties)) {
         $allRelContactArray[$rel] = array();
