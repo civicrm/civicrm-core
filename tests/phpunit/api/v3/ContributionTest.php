@@ -2298,7 +2298,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    */
   public function testRepeatTransactionMembershipRenewCompletedContribution() {
-    list($originalContribution, $membership) = $this->setUpAutoRenewMembership();
+    list($originalContribution, $memberships) = $this->setUpAutoRenewMembership();
+    $membership = CRM_Utils_Array::first($memberships);
 
     $this->callAPISuccess('contribution', 'create', array(
       'contact_id' => $originalContribution['values'][1]['contact_id'],
@@ -2339,6 +2340,55 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-19945 Tests that Contribute.repeattransaction renews a membership when contribution status=Completed
+   *
+   */
+  public function testRepeatTransactionMultipleMembershipRenewCompletedContribution() {
+    list($originalContribution, $memberships) = $this->setUpAutoRenewMembership([], [], 2);
+
+    $this->callAPISuccess('contribution', 'create', array(
+      'contact_id' => $originalContribution['values'][1]['contact_id'],
+      'financial_type_id' => $originalContribution['values'][1]['financial_type_id'],
+      'total_amount' => $originalContribution['values'][1]['total_amount'],
+      'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
+      'contribution_status_id' => "Failed",
+    ));
+
+    foreach ($memberships as $membership) {
+      $membershipUpdated = $this->callAPISuccess('membership', 'create', array(
+        'id' => $membership['id'],
+        'end_date' => 'yesterday',
+        'status_id' => 'Expired',
+      ));
+    }
+
+    $contribution = $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 'bobsled',
+    ));
+
+    foreach ($memberships as $membership) {
+      $membershipStatusId = $this->callAPISuccess('membership', 'getvalue', array(
+        'id' => $membership['id'],
+        'return' => 'status_id',
+      ));
+
+      $membership = $this->callAPISuccess('membership', 'get', array(
+        'id' => $membership['id'],
+      ));
+
+      $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membershipStatusId));
+
+      $lineItem = $this->callAPISuccessGetSingle('LineItem', array('contribution_id' => $contribution['id']));
+      $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+      $this->callAPISuccessGetCount('MembershipPayment', array('membership_id' => $membership['id']));
+    }
+    $this->quickCleanUpFinancialEntities();
+    $this->contactDelete($originalContribution['values'][1]['contact_id']);
+  }
+
+  /**
    * CRM-19945 Tests that Contribute.repeattransaction DOES NOT renew a membership when contribution status=Failed
    *
    * @dataProvider contributionStatusProvider
@@ -2349,7 +2399,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     if (in_array($contributionStatus['name'], ['Completed', 'In Progress'])) {
       return;
     }
-    list($originalContribution, $membership) = $this->setUpAutoRenewMembership();
+    list($originalContribution, $memberships) = $this->setUpAutoRenewMembership();
+    $membership = CRM_Utils_Array::first($memberships);
 
     $this->callAPISuccess('contribution', 'create', array(
       'contact_id' => $originalContribution['values'][1]['contact_id'],
@@ -3846,36 +3897,44 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param array $generalParams
    *   Parameters that can be merged into the recurring AND the contribution.
    *
-   * @param array $recurParams
+   * @param array $overrideContributionRecurParams
    *   Parameters to merge into the recur only.
+   * @param int $membershipsCount
+   *   Number of memberships to create
    *
-   * @return array|int
+   * @return array
+   * @throws \Exception
    */
-  protected function setUpAutoRenewMembership($generalParams = array(), $recurParams = array()) {
-    $newContact = $this->callAPISuccess('Contact', 'create', array(
-     'contact_type' => 'Individual',
-     'sort_name' => 'McTesterson, Testy',
-     'display_name' => 'Testy McTesterson',
-     'preferred_language' => 'en_US',
-     'preferred_mail_format' => 'Both',
-     'first_name' => 'Testy',
-     'last_name' => 'McTesterson',
-     'contact_is_deleted' => '0',
-     'email_id' => '4',
-     'email' => 'tmctesterson@example.com',
-     'on_hold' => '0',
-    ));
-    $membershipType = $this->callAPISuccess('MembershipType', 'create', array(
-      'domain_id' => "Default Domain Name",
-      'member_of_contact_id' => 1,
-      'financial_type_id' => "Member Dues",
-      'duration_unit' => "month",
-      'duration_interval' => 1,
-      'period_type' => 'rolling',
-      'name' => "Standard Member",
-      'minimum_fee' => 100,
-    ));
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge(array(
+  protected function setUpAutoRenewMembership($generalParams = [], $overrideContributionRecurParams = [], $membershipsCount = 1) {
+    $contactParams = [
+      'contact_type' => 'Individual',
+      'sort_name' => 'McTesterson, Testy',
+      'display_name' => 'Testy McTesterson',
+      'preferred_language' => 'en_US',
+      'preferred_mail_format' => 'Both',
+      'first_name' => 'Testy',
+      'last_name' => 'McTesterson',
+      'contact_is_deleted' => '0',
+      'email_id' => '4',
+      'email' => 'tmctesterson@example.com',
+      'on_hold' => '0',
+    ];
+    for ($count = 1; $count <= $membershipsCount; $count++) {
+      $membershipTypeParams[] = [
+        'domain_id' => "Default Domain Name",
+        'member_of_contact_id' => 1,
+        'financial_type_id' => "Member Dues",
+        'duration_unit' => "month",
+        'duration_interval' => 1,
+        'period_type' => 'rolling',
+        'name' => "Standard Member_" . $count,
+        'minimum_fee' => $count * 100,
+      ];
+    }
+
+    $newContact = $this->callAPISuccess('Contact', 'create', $contactParams);
+
+    $contributionRecurParams = array_merge([
       'contact_id' => $newContact['id'],
       'installments' => '12',
       'frequency_interval' => '1',
@@ -3885,35 +3944,44 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'frequency_unit' => 'month',
       'payment_processor_id' => $this->paymentProcessorID,
-    ), $generalParams, $recurParams));
+    ], $generalParams, $overrideContributionRecurParams);
 
-    $membership = $this->callAPISuccess('membership', 'create', array(
-      'contact_id' => $newContact['id'],
-      'contribution_recur_id' => $contributionRecur['id'],
-      'financial_type_id' => "Member Dues",
-      'membership_type_id' => $membershipType['id'],
-      'num_terms' => 1,
-      'skipLineItem' => TRUE,
-    ));
+    foreach ($membershipTypeParams as $membershipTypeParam) {
+      $membershipTypes[] = $this->callAPISuccess('MembershipType', 'create', $membershipTypeParam);
+    }
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $contributionRecurParams);
 
-    CRM_Price_BAO_LineItem::getLineItemArray($this->_params, NULL, 'membership', $membershipType['id']);
+    foreach ($membershipTypes as $membershipType) {
+      $membershipParams = [
+        'contact_id' => $newContact['id'],
+        'contribution_recur_id' => $contributionRecur['id'],
+        'financial_type_id' => "Member Dues",
+        'membership_type_id' => $membershipType['id'],
+        'num_terms' => 1,
+        'skipLineItem' => TRUE,
+      ];
+      $memberships[] = $this->callAPISuccess('membership', 'create', $membershipParams);
+      CRM_Price_BAO_LineItem::getLineItemArray($this->_params, NULL, 'membership', $membershipType['id']);
+    }
+
     $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
       $this->_params,
       array(
         'contact_id' => $newContact['id'],
         'contribution_recur_id' => $contributionRecur['id'],
         'financial_type_id' => "Member Dues",
-        'contribution_status_id' => 1,
+        'contribution_status_id' => "Completed",
         'invoice_id' => uniqid(),
       ), $generalParams)
     );
-    $lineItem = $this->callAPISuccess('LineItem', 'getsingle', array());
-    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
-    $membership = $this->callAPISuccess('Membership', 'getsingle', array('id' => $lineItem['entity_id']));
-    $this->callAPISuccess('LineItem', 'getsingle', array());
-    $this->callAPISuccessGetCount('MembershipPayment', array('membership_id' => $membership['id']), 1);
+    $lineItems = $this->callAPISuccess('LineItem', 'get', []);
+    foreach ($lineItems['values'] as $lineItem) {
+      $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+      $membership = $this->callAPISuccess('Membership', 'getsingle', ['id' => $lineItem['entity_id']]);
+      $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id']], 1);
+    }
 
-    return array($originalContribution, $membership);
+    return [$originalContribution, $memberships];
   }
   /**
    * Set up a repeat transaction.
@@ -4020,7 +4088,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * CRM-20008 Tests repeattransaction creates pending membership.
    */
   public function testRepeatTransactionMembershipCreatePendingContribution() {
-    list($originalContribution, $membership) = $this->setUpAutoRenewMembership();
+    list($originalContribution, $memberships) = $this->setUpAutoRenewMembership();
+    $membership = CRM_Utils_Array::first($memberships);
+
     $this->callAPISuccess('membership', 'create', array(
       'id' => $membership['id'],
       'end_date' => 'yesterday',
