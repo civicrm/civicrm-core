@@ -26,36 +26,28 @@
  */
 
 /**
+ *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2018
  */
 
 /**
- * This class generates form task actions for CiviCase.
+ * This class gets the name of the file to upload
  */
-class CRM_Case_Form_Task extends CRM_Core_Form_Task {
-
-  // Must be set to entity table name (eg. civicrm_participant) by child class
-  static $tableName = 'civicrm_case';
-  // Must be set to entity shortname (eg. event)
-  static $entityShortname = 'case';
+class CRM_Export_Form_Select_Case extends CRM_Export_Form_Select {
 
   /**
-   * @inheritDoc
+   * @var int
    */
-  public function setContactIDs() {
-    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_entityIds,
-      'civicrm_case_contact', 'case_id'
-    );
-  }
+  protected $queryMode = CRM_Contact_BAO_Query::MODE_CASE;
 
   /**
-   * Get the query mode (eg. CRM_Core_BAO_Query::MODE_CASE)
+   * Use the form name to create the tpl file name.
    *
-   * @return int
+   * @return string
    */
-  public function getQueryMode() {
-    return CRM_Contact_BAO_Query::MODE_CASE;
+  public function getTemplateFileName() {
+    return 'CRM/Export/Form/Select.tpl';
   }
 
 }

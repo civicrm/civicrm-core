@@ -94,6 +94,8 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
    * Common pre-processing function.
    *
    * @param CRM_Core_Form $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function preProcessCommon(&$form) {
     $form->_contactIds = array();
