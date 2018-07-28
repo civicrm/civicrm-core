@@ -1428,8 +1428,8 @@ WHERE  {$whereClause}";
     elseif ($processor->isRelationshipTypeKey($field)) {
       foreach ($value as $relationField => $relationValue) {
         // below block is same as primary block (duplicate)
-        if (isset($relationQuery[$field]->_fields[$relationField]['title'])) {
-          if ($relationQuery[$field]->_fields[$relationField]['name'] == 'name') {
+        if (isset($queryFields[$relationField]['title'])) {
+          if ($queryFields[$relationField]['name'] == 'name') {
             $headerName = $field . '-' . $relationField;
           }
           else {
@@ -1437,7 +1437,7 @@ WHERE  {$whereClause}";
               $headerName = $field . '-' . 'current_employer';
             }
             else {
-              $headerName = $field . '-' . $relationQuery[$field]->_fields[$relationField]['name'];
+              $headerName = $field . '-' . $queryFields[$relationField]['name'];
             }
           }
 
@@ -1466,7 +1466,7 @@ WHERE  {$whereClause}";
             foreach (array_keys($val) as $fld) {
               $type = explode('-', $fld);
 
-              $hdr = "{$ltype}-" . $relationQuery[$field]->_fields[$type[0]]['title'];
+              $hdr = "{$ltype}-" . $queryFields[$type[0]]['title'];
 
               if (!empty($type[1])) {
                 if (CRM_Utils_Array::value(0, $type) == 'phone') {
