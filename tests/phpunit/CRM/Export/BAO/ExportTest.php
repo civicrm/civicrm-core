@@ -1765,26 +1765,26 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         66 => 'Country',
         67 => 'Phone',
         68 => 'Phone Extension',
-        69 => 'Email',
-        70 => 'On Hold',
-        71 => 'Use for Bulk Mail',
-        72 => 'Signature Text',
-        73 => 'Signature Html',
-        74 => 'IM Provider',
-        75 => 'IM Screen Name',
-        76 => 'OpenID',
-        77 => 'World Region',
-        78 => 'Website',
-        79 => 'Group(s)',
-        80 => 'Tag(s)',
-        81 => 'Note(s)',
-        82 => 'Phone Type',
+        69 => 'Phone Type',
+        70 => 'Email',
+        71 => 'On Hold',
+        72 => 'Use for Bulk Mail',
+        73 => 'Signature Text',
+        74 => 'Signature Html',
+        75 => 'IM Provider',
+        76 => 'IM Screen Name',
+        77 => 'OpenID',
+        78 => 'World Region',
+        79 => 'Website',
+        80 => 'Group(s)',
+        81 => 'Tag(s)',
+        82 => 'Note(s)',
         83 => 'IM Service Provider',
       ];
     if (!$isContactExport) {
-      unset($headers[79]);
       unset($headers[80]);
       unset($headers[81]);
+      unset($headers[82]);
     }
     return $headers;
   }
@@ -2063,6 +2063,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'country' => 'country varchar(64)',
       'phone' => 'phone varchar(32)',
       'phone_ext' => 'phone_ext varchar(16)',
+      'phone_type_id' => 'phone_type_id varchar(16)',
       'email' => 'email varchar(254)',
       'on_hold' => 'on_hold varchar(16)',
       'is_bulkmail' => 'is_bulkmail varchar(16)',
@@ -2076,7 +2077,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'groups' => 'groups text',
       'tags' => 'tags text',
       'notes' => 'notes text',
-      'phone_type_id' => 'phone_type_id varchar(255)',
       'provider_id' => 'provider_id varchar(255)',
     ];
     if (!$isContactExport) {
@@ -2260,7 +2260,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'openid' => 'openid varchar(255)',
       'world_region' => 'world_region varchar(128)',
       'url' => 'url varchar(128)',
-      'phone_type_id' => 'phone_type_id varchar(255)',
+      'phone_type_id' => 'phone_type_id varchar(16)',
       'provider_id' => 'provider_id varchar(255)',
       'financial_type' => 'financial_type varchar(64)',
       'contribution_source' => 'contribution_source varchar(255)',

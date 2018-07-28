@@ -1414,20 +1414,15 @@ WHERE  {$whereClause}";
   public static function setHeaderRows($field, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery) {
 
     $queryFields = $processor->getQueryFields();
-    // Split campaign into 2 fields for id and title
-    if (substr($field, -14) == 'campaign_title') {
-      $headerRows[] = ts('Campaign Title');
-    }
-    elseif (substr($field, -11) == 'campaign_id') {
+    if (substr($field, -11) == 'campaign_id') {
+      // @todo - set this correctly in the xml rather than here.
       $headerRows[] = ts('Campaign ID');
     }
     elseif (isset($queryFields[$field]['title'])) {
       $headerRows[] = $queryFields[$field]['title'];
     }
-    elseif ($field == 'phone_type_id') {
-      $headerRows[] = ts('Phone Type');
-    }
     elseif ($field == 'provider_id') {
+      // @todo - set this correctly in the xml rather than here.
       $headerRows[] = ts('IM Service Provider');
     }
     elseif ($processor->isRelationshipTypeKey($field)) {
