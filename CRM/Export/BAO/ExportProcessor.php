@@ -96,6 +96,21 @@ class CRM_Export_BAO_ExportProcessor {
   protected $relationshipReturnProperties = [];
 
   /**
+   * Get return properties by relationship.
+   * @return array
+   */
+  public function getRelationshipReturnProperties() {
+    return $this->relationshipReturnProperties;
+  }
+
+  /**
+   * Export values for related contacts.
+   *
+   * @var array
+   */
+  protected $relatedContactValues = [];
+
+  /**
    * @var array
    */
   protected $returnProperties = [];
@@ -131,7 +146,6 @@ class CRM_Export_BAO_ExportProcessor {
     $this->requestedFields = $requestedFields;
   }
 
-
   /**
    * @return array
    */
@@ -165,6 +179,41 @@ class CRM_Export_BAO_ExportProcessor {
       'name',
       FALSE
     );
+  }
+
+  /**
+   * Set the value for a relationship type field.
+   *
+   * In this case we are building up an array of properties for a related contact.
+   *
+   * These may be used for direct exporting or for merge to household depending on the
+   * options selected.
+   *
+   * @param string $relationshipType
+   * @param int $contactID
+   * @param string $field
+   * @param string $value
+   */
+  public function setRelationshipValue($relationshipType, $contactID, $field, $value) {
+    $this->relatedContactValues[$relationshipType][$contactID][$field] = $value;
+  }
+
+  /**
+   * Get the value for a relationship type field.
+   *
+   * In this case we are building up an array of properties for a related contact.
+   *
+   * These may be used for direct exporting or for merge to household depending on the
+   * options selected.
+   *
+   * @param string $relationshipType
+   * @param int $contactID
+   * @param string $field
+   *
+   * @return string
+   */
+  public function getRelationshipValue($relationshipType, $contactID, $field) {
+    return isset($this->relatedContactValues[$relationshipType][$contactID][$field]) ? $this->relatedContactValues[$relationshipType][$contactID][$field] : '';
   }
 
   /**
@@ -565,6 +614,20 @@ class CRM_Export_BAO_ExportProcessor {
       $this->relationshipReturnProperties[$relationshipKey][$relationField] = 1;
     }
     return $this->relationshipReturnProperties[$relationshipKey];
+  }
+
+  /**
+   * Add the main return properties to the household merge properties if needed for merging.
+   *
+   * If we are using household merge we need to add these to the relationship properties to
+   * be retrieved.
+   *
+   * @param $returnProperties
+   */
+  public function setHouseholdMergeReturnProperties($returnProperties) {
+    foreach ($this->getHouseholdRelationshipTypes() as $householdRelationshipType) {
+      $this->relationshipReturnProperties[$householdRelationshipType] = $returnProperties;
+    }
   }
 
   /**

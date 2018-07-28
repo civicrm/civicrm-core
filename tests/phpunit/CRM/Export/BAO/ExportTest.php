@@ -421,6 +421,49 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Test exporting relationships.
+   */
+  public function testExportRelationships() {
+    $organization1 = $this->organizationCreate(['organization_name' => 'Org 1', 'legal_name' => 'pretty legal']);
+    $organization2 = $this->organizationCreate(['organization_name' => 'Org 2', 'legal_name' => 'well dodgey']);
+    $contact1 = $this->individualCreate(['employer_id' => $organization1, 'first_name' => 'one']);
+    $contact2 = $this->individualCreate(['employer_id' => $organization2, 'first_name' => 'one']);
+    $employerRelationshipTypeID = $this->callAPISuccessGetValue('RelationshipType', ['return' => 'id', 'label_a_b' => 'Employee of']);
+    $selectedFields = [
+      ['Individual', 'first_name', ''],
+      ['Individual', $employerRelationshipTypeID . '_a_b', 'organization_name', ''],
+      ['Individual', $employerRelationshipTypeID . '_a_b', 'legal_name', ''],
+    ];
+    list($tableName, $sqlColumns, $headerRows) = CRM_Export_BAO_Export::exportComponents(
+      FALSE,
+      [$contact1, $contact2],
+      [],
+      NULL,
+      $selectedFields,
+      NULL,
+      CRM_Export_Form_Select::CONTACT_EXPORT,
+      "contact_a.id IN ( $contact1, $contact2 )",
+      NULL,
+      FALSE,
+      FALSE,
+      [
+        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
+        'suppress_csv_for_testing' => TRUE,
+      ]
+    );
+
+    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM {$tableName}");
+    $dao->fetch();
+    $this->assertEquals('one', $dao->first_name);
+    $this->assertEquals('Org 1', $dao->{$employerRelationshipTypeID . '_a_b_organization_name'});
+    $this->assertEquals('pretty legal', $dao->{$employerRelationshipTypeID . '_a_b_legal_name'});
+
+    $dao->fetch();
+    $this->assertEquals('Org 2', $dao->{$employerRelationshipTypeID . '_a_b_organization_name'});
+    $this->assertEquals('well dodgey', $dao->{$employerRelationshipTypeID . '_a_b_legal_name'});
+  }
+
+  /**
+   * Test exporting relationships.
    *
    * This is to ensure that CRM-13995 remains fixed.
    */
