@@ -634,7 +634,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
       else {
         // return tableName and sqlColumns in test context
-        return array($exportTempTable, $sqlColumns);
+        return array($exportTempTable, $sqlColumns, $headerRows);
       }
 
       // delete the export temp table and component table
