@@ -62,9 +62,77 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    * Set entity fields to be assigned to the form.
    */
   protected function setEntityFields() {
-    // TODO: Add fields here per CRM/Admin/Form/RelationshipType.php.
-    // ... It's not as easy because MembershipType has multiple conditional fields/javascript etc.
-    $this->entityFields = [];
+    $this->entityFields = [
+      'name' => [
+        'required' => 'TRUE',
+        'name' => 'name',
+        'description' => ts("e.g. 'Student', 'Senior', 'Honor Society'..."),
+      ],
+      'description' => [
+        'name' => 'description',
+        'description' => ts("Description of this membership type for internal use. May include eligibility, benefits, terms, etc."),
+      ],
+      'member_of_contact_id' => [
+        'name' => 'member_of_contact_id',
+        'description' => ts("Members assigned this membership type belong to which organization (e.g. this is for membership in 'Save the Whales - Northwest Chapter'). NOTE: This organization/group/chapter must exist as a CiviCRM Organization type contact."),
+      ],
+      'minimum_fee' => [
+        'name' => 'minimum_fee',
+        'description' => ts('Minimum fee required for this membership type. For free/complimentary memberships - set minimum fee to zero (0). NOTE: When using CiviCRM to process sales taxes this should be the tax exclusive amount.'),
+        'formatter' => 'crmMoney',
+      ],
+      'financial_type_id' => [
+        'name' => 'financial_type_id',
+        'description' => ts('Select the financial type assigned to fees for this membership type (for example \'Membership Fees\'). This is required for all membership types - including free or complimentary memberships.'),
+      ],
+      'auto_renew' => [
+        'name' => 'auto_renew',
+        'options' => CRM_Core_SelectValues::memberAutoRenew(),
+        'place_holder' => ts('You will need to select and configure a supported payment processor (currently Authorize.Net, PayPal Pro, or PayPal Website Standard) in order to offer automatically renewing memberships.'),
+      ],
+      'duration_interval' => [
+        'name' => 'duration_interval',
+      ],
+      'duration_unit' => [
+        'name' => 'duration_unit',
+        'description' => ts('Duration of this membership (e.g. 30 days, 2 months, 5 years, 1 lifetime)'),
+      ],
+      'period_type' => [
+        'name' => 'period_type',
+        'description' => ts("Select 'rolling' if membership periods begin at date of signup. Select 'fixed' if membership periods begin on a set calendar date."),
+        'help' => ['id' => 'period-type', 'file' => "CRM/Member/Page/MembershipType.hlp"],
+      ],
+      'fixed_period_start_day' => [
+        'name' => 'fixed_period_start_day',
+        'description' => ts("Month and day on which a <strong>fixed</strong> period membership or subscription begins. Example: A fixed period membership with Start Day set to Jan 01 means that membership periods would be 1/1/06 - 12/31/06 for anyone signing up during 2006."),
+      ],
+      'fixed_period_rollover_day' => [
+        'name' => 'fixed_period_rollover_day',
+        'description' => ts('Membership signups on or after this date cover the following calendar year as well. Example: If the rollover day is November 30, membership period for signups during December will cover the following year.'),
+      ],
+      'relationship_type_id' => [
+        'name' => 'relationship_type_id',
+      ],
+      'max_related' => [
+        'name' => 'max_related',
+        'description' => ts('Maximum number of related memberships (leave blank for unlimited).'),
+      ],
+      'visibility' => [
+        'name' => 'visibility',
+        'description' => ts("Can this membership type be used for self-service signups ('Public'), or is it only for CiviCRM users with 'Edit Contributions' permission ('Admin')."),
+      ],
+      'weight' => [
+        'name' => 'weight',
+      ],
+      'is_active' => [
+        'name' => 'is_active',
+      ],
+    ];
+
+    if (!CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('Recurring'))) {
+      $this->entityFields['auto_renew']['not-auto-addable'] = TRUE;
+      $this->entityFields['auto_renew']['documentation_link'] = ['page' => 'user/contributions/payment-processors'];
+    }
   }
 
   /**
