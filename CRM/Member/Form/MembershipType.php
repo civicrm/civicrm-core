@@ -250,21 +250,10 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     // to stop & make that one work.
     $this->assign('tpl_standardised_fields', ['name', 'description', 'member_of_contact_id', 'minimum_fee']);
 
-    $this->addField('minimum_fee');
-    $this->addField('duration_unit', [], TRUE);
-    $this->addField('period_type', [], TRUE);
-    $this->addField('is_active');
-    $this->addField('weight');
-    $this->addField('max_related');
-
     $this->addRule('name', ts('A membership type with this name already exists. Please select another name.'),
       'objectExists', array('CRM_Member_DAO_MembershipType', $this->_id)
     );
     $this->addRule('minimum_fee', ts('Please enter a monetary value for the Minimum Fee.'), 'money');
-
-    $this->add('text', 'duration_interval', ts('Duration Interval'),
-      CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'duration_interval')
-    );
 
     $props = array('api' => array('params' => array('contact_type' => 'Organization')));
     $this->addEntityRef('member_of_contact_id', ts('Membership Organization'), $props, TRUE);
