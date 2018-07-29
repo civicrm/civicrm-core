@@ -1589,6 +1589,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->addEntityRef($name, $label, $props, $required);
 
       case 'Password':
+        $props['size'] = isset($props['size']) ? $props['size'] : 60;
         return $this->add('password', $name, $label, $props, $required);
 
       // Check datatypes of fields
