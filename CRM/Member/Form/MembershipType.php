@@ -244,10 +244,12 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
+    // This is a temporary variable as we work towards moving over towards using the EntityField.tpl.
+    // Fields in this array have been tested & in the tpl have been switched over to metadata.
+    // Note this kinda 'works from the top' - ie. once we hit a field that needs some thought we need
+    // to stop & make that one work.
+    $this->assign('tpl_standardised_fields', ['name', 'description', 'member_of_contact_id', 'minimum_fee']);
 
-    $this->applyFilter('__ALL__', 'trim');
-    $this->addField('name', [], TRUE);
-    $this->addField('description');
     $this->addField('minimum_fee');
     $this->addField('duration_unit', [], TRUE);
     $this->addField('period_type', [], TRUE);

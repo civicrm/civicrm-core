@@ -32,34 +32,12 @@
   <div class="form-item" id="membership_type_form">
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
-      <tr class="crm-membership-type-form-block-name">
-        <td class="label">{$form.name.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_type' field='name' id=$membershipTypeId}{/if}
-        </td>
-        <td>{$form.name.html}<br />
-          <span class="description">{ts}e.g. 'Student', 'Senior', 'Honor Society'...{/ts}</span>
-        </td>
-      </tr>
-      <tr class="crm-membership-type-form-block-description">
-        <td class="label">{$form.description.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_type' field='description' id=$membershipTypeId}{/if}
-        </td>
-        <td>{$form.description.html}<br />
-          <span class="description">{ts}Description of this membership type for internal use. May include eligibility, benefits, terms, etc.{/ts}</span>
-        </td>
-      </tr>
-
-      <tr class="crm-membership-type-form-block-member_org">
-        <td class="label">{$form.member_of_contact_id.label}</td>
-        <td>{$form.member_of_contact_id.html}<br />
-          <span class="description">{ts}Members assigned this membership type belong to which organization (e.g. this is for membership in 'Save the Whales - Northwest Chapter'). NOTE: This organization/group/chapter must exist as a CiviCRM Organization type contact.{/ts}</span>
-        </td>
-      </tr>
-
-      <tr class="crm-membership-type-form-block-minimum_fee">
-        <td class="label">{$form.minimum_fee.label}</td>
-        <td>{$form.minimum_fee.html|crmMoney}<br />
-          <span  class="description">{ts}Minimum fee required for this membership type. For free/complimentary memberships - set minimum fee to zero (0). NOTE: When using CiviCRM to process sales taxes this should be the tax exclusive amount.{/ts}</span>
-        </td>
-      </tr>
+      {foreach from=$tpl_standardised_fields item=fieldName}
+       {assign var=fieldSpec value=$entityFields.$fieldName}
+       <tr class="crm-{$entityInClassFormat}-form-block-{$fieldName}">
+          {include file="CRM/Core/Form/Field.tpl"}
+        </tr>
+      {/foreach}
       <tr class="crm-membership-type-form-block-financial_type_id">
         <td class="label">{$form.financial_type_id.label}</td>
         <td>{$form.financial_type_id.html}<br />
