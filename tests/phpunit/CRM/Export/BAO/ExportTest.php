@@ -1327,12 +1327,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   /**
    * Test the column definition when 'all' fields defined.
    *
-   * @param $exportMode
-   * @param $expected
+   * @param int $exportMode
+   * @param array $expected
+   * @param array $expectedHeaders
    *
    * @dataProvider getSqlColumnsOutput
    */
-  public function testGetSQLColumns($exportMode, $expected) {
+  public function testGetSQLColumnsAndHeaders($exportMode, $expected, $expectedHeaders) {
     $this->ensureComponentIsEnabled($exportMode);
     // We need some data so that we can get to the end of the export
     // function. Hopefully one day that won't be required to get metadata info out.
@@ -1358,6 +1359,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       )
     );
     $this->assertEquals($expected, $result[1]);
+    $this->assertEquals($expectedHeaders, $result[2]);
   }
 
   /**
@@ -1649,32 +1651,337 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       [
         'anything that will then be defaulting ton contact',
         $this->getBasicSqlColumnDefinition(TRUE),
+        $this->getBasicHeaderDefinition(TRUE),
       ],
       [
         CRM_Export_Form_Select::ACTIVITY_EXPORT,
         array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getActivitySqlColumns()),
+        array_merge($this->getBasicHeaderDefinition(FALSE), $this->getActivityHeaderDefinition()),
       ],
       [
         CRM_Export_Form_Select::CASE_EXPORT,
         array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getCaseSqlColumns()),
+        array_merge($this->getBasicHeaderDefinition(FALSE), $this->getCaseHeaderDefinition()),
       ],
       [
         CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
         array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getContributionSqlColumns()),
+        array_merge($this->getBasicHeaderDefinition(FALSE), $this->getContributeHeaderDefinition()),
       ],
       [
         CRM_Export_Form_Select::EVENT_EXPORT,
         array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getParticipantSqlColumns()),
+        array_merge($this->getBasicHeaderDefinition(FALSE), $this->getParticipantHeaderDefinition()),
       ],
       [
         CRM_Export_Form_Select::MEMBER_EXPORT,
         array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getMembershipSqlColumns()),
+        array_merge($this->getBasicHeaderDefinition(FALSE), $this->getMemberHeaderDefinition()),
       ],
       [
         CRM_Export_Form_Select::PLEDGE_EXPORT,
         array_merge($this->getBasicSqlColumnDefinition(FALSE), $this->getPledgeSqlColumns()),
+        array_merge($this->getBasicHeaderDefinition(FALSE), $this->getPledgeHeaderDefinition()),
       ],
 
+    ];
+  }
+
+  /**
+   * Get the header definition for exports.
+   *
+   * @param bool $isContactExport
+   *
+   * @return array
+   */
+  protected function getBasicHeaderDefinition($isContactExport) {
+    $headers = [
+        0 => 'Contact ID',
+        1 => 'Contact Type',
+        2 => 'Contact Subtype',
+        3 => 'Do Not Email',
+        4 => 'Do Not Phone',
+        5 => 'Do Not Mail',
+        6 => 'Do Not Sms',
+        7 => 'Do Not Trade',
+        8 => 'No Bulk Emails (User Opt Out)',
+        9 => 'Legal Identifier',
+        10 => 'External Identifier',
+        11 => 'Sort Name',
+        12 => 'Display Name',
+        13 => 'Nickname',
+        14 => 'Legal Name',
+        15 => 'Image Url',
+        16 => 'Preferred Communication Method',
+        17 => 'Preferred Language',
+        18 => 'Preferred Mail Format',
+        19 => 'Contact Hash',
+        20 => 'Contact Source',
+        21 => 'First Name',
+        22 => 'Middle Name',
+        23 => 'Last Name',
+        24 => 'Individual Prefix',
+        25 => 'Individual Suffix',
+        26 => 'Formal Title',
+        27 => 'Communication Style',
+        28 => 'Email Greeting ID',
+        29 => 'Postal Greeting ID',
+        30 => 'Addressee ID',
+        31 => 'Job Title',
+        32 => 'Gender',
+        33 => 'Birth Date',
+        34 => 'Deceased',
+        35 => 'Deceased Date',
+        36 => 'Household Name',
+        37 => 'Organization Name',
+        38 => 'Sic Code',
+        39 => 'Unique ID (OpenID)',
+        40 => 'Current Employer ID',
+        41 => 'Contact is in Trash',
+        42 => 'Created Date',
+        43 => 'Modified Date',
+        44 => 'Addressee',
+        45 => 'Email Greeting',
+        46 => 'Postal Greeting',
+        47 => 'Current Employer',
+        48 => 'Location Type',
+        49 => 'Street Address',
+        50 => 'Street Number',
+        51 => 'Street Number Suffix',
+        52 => 'Street Name',
+        53 => 'Street Unit',
+        54 => 'Supplemental Address 1',
+        55 => 'Supplemental Address 2',
+        56 => 'Supplemental Address 3',
+        57 => 'City',
+        58 => 'Postal Code Suffix',
+        59 => 'Postal Code',
+        60 => 'Latitude',
+        61 => 'Longitude',
+        62 => 'Address Name',
+        63 => 'Master Address Belongs To',
+        64 => 'County',
+        65 => 'State',
+        66 => 'Country',
+        67 => 'Phone',
+        68 => 'Phone Extension',
+        69 => 'Phone Type',
+        70 => 'Email',
+        71 => 'On Hold',
+        72 => 'Use for Bulk Mail',
+        73 => 'Signature Text',
+        74 => 'Signature Html',
+        75 => 'IM Provider',
+        76 => 'IM Screen Name',
+        77 => 'OpenID',
+        78 => 'World Region',
+        79 => 'Website',
+        80 => 'Group(s)',
+        81 => 'Tag(s)',
+        82 => 'Note(s)',
+        83 => 'IM Service Provider',
+      ];
+    if (!$isContactExport) {
+      unset($headers[80]);
+      unset($headers[81]);
+      unset($headers[82]);
+    }
+    return $headers;
+  }
+
+  /**
+   * Get the definition for activity headers.
+   *
+   * @return array
+   */
+  protected function getActivityHeaderDefinition() {
+    return [
+      81 => 'Activity ID',
+      82 => 'Activity Type',
+      83 => 'Activity Type ID',
+      84 => 'Subject',
+      85 => 'Activity Date',
+      86 => 'Duration',
+      87 => 'Location',
+      88 => 'Details',
+      89 => 'Activity Status',
+      90 => 'Activity Priority',
+      91 => 'Source Contact',
+      92 => 'source_record_id',
+      93 => 'Test',
+      94 => 'Campaign ID',
+      95 => 'result',
+      96 => 'Engagement Index',
+      97 => 'parent_id',
+    ];
+  }
+
+  /**
+   * Get the definition for case headers.
+   *
+   * @return array
+   */
+  protected function getCaseHeaderDefinition() {
+    return [
+      81 => 'contact_id',
+      82 => 'Case ID',
+      83 => 'case_activity_subject',
+      84 => 'Case Subject',
+      85 => 'Case Status',
+      86 => 'Case Type',
+      87 => 'Role in Case',
+      88 => 'Case is in the Trash',
+      89 => 'case_recent_activity_date',
+      90 => 'case_recent_activity_type',
+      91 => 'case_scheduled_activity_date',
+      92 => 'Case Start Date',
+      93 => 'Case End Date',
+      94 => 'case_source_contact_id',
+      95 => 'case_activity_status',
+      96 => 'case_activity_duration',
+      97 => 'case_activity_medium_id',
+      98 => 'case_activity_details',
+      99 => 'case_activity_is_auto',
+    ];
+  }
+
+  /**
+   * Get the definition for contribute headers.
+   *
+   * @return array
+   */
+  protected function getContributeHeaderDefinition() {
+    return [
+      81 => 'Financial Type',
+      82 => 'Contribution Source',
+      83 => 'Date Received',
+      84 => 'Thank-you Date',
+      85 => 'Cancel Date',
+      86 => 'Total Amount',
+      87 => 'Accounting Code',
+      88 => 'payment_instrument',
+      89 => 'Payment Method ID',
+      90 => 'Check Number',
+      91 => 'Non-deductible Amount',
+      92 => 'Fee Amount',
+      93 => 'Net Amount',
+      94 => 'Transaction ID',
+      95 => 'Invoice Reference',
+      96 => 'Invoice Number',
+      97 => 'Currency',
+      98 => 'Cancel Reason',
+      99 => 'Receipt Date',
+      100 => 'Product Name',
+      101 => 'SKU',
+      102 => 'Product Option',
+      103 => 'Fulfilled Date',
+      104 => 'Start date for premium',
+      105 => 'End date for premium',
+      106 => 'Test',
+      107 => 'Is Pay Later',
+      108 => 'contribution_status',
+      109 => 'Recurring Contribution ID',
+      110 => 'Amount Label',
+      111 => 'Contribution Note',
+      112 => 'Batch Name',
+      113 => 'Campaign Title',
+      114 => 'Campaign ID',
+      115 => 'Premium',
+      116 => 'Soft Credit For',
+      117 => 'Soft Credit Amount',
+      118 => 'Soft Credit Type',
+      119 => 'Soft Credit For Contact ID',
+      120 => 'Soft Credit For Contribution ID',
+    ];
+  }
+
+  /**
+   * Get the definition for event headers.
+   *
+   * @return array
+   */
+  protected function getParticipantHeaderDefinition() {
+    return [
+      81 => 'Event',
+      82 => 'Event Title',
+      83 => 'Event Start Date',
+      84 => 'Event End Date',
+      85 => 'Event Type',
+      86 => 'Participant ID',
+      87 => 'Participant Status',
+      88 => 'Participant Status Id',
+      89 => 'Participant Role',
+      90 => 'Participant Role Id',
+      91 => 'Participant Note',
+      92 => 'Register date',
+      93 => 'Participant Source',
+      94 => 'Fee level',
+      95 => 'Test',
+      96 => 'Is Pay Later',
+      97 => 'Fee Amount',
+      98 => 'Discount Name',
+      99 => 'Fee Currency',
+      100 => 'Registered By ID',
+      101 => 'Campaign ID',
+    ];
+  }
+
+  /**
+   * Get the definition for member headers.
+   *
+   * @return array
+   */
+  protected function getMemberHeaderDefinition() {
+    return [
+      81 => 'Membership Type',
+      82 => 'Test',
+      83 => 'Is Pay Later',
+      84 => 'Member Since',
+      85 => 'Membership Start Date',
+      86 => 'Membership Expiration Date',
+      87 => 'Source',
+      88 => 'Membership Status',
+      89 => 'Membership ID',
+      90 => 'Primary Member ID',
+      91 => 'max_related',
+      92 => 'membership_recur_id',
+      93 => 'Campaign ID',
+      94 => 'member_is_override',
+      95 => 'member_auto_renew',
+    ];
+  }
+
+  /**
+   * Get the definition for pledge headers.
+   *
+   * @return array
+   */
+  protected function getPledgeHeaderDefinition() {
+    return [
+      81 => 'Pledge ID',
+      82 => 'Total Pledged',
+      83 => 'Total Paid',
+      84 => 'Pledge Made',
+      85 => 'pledge_start_date',
+      86 => 'Next Payment Date',
+      87 => 'Next Payment Amount',
+      88 => 'Pledge Status',
+      89 => 'Test',
+      90 => 'Pledge Contribution Page Id',
+      91 => 'pledge_financial_type',
+      92 => 'Pledge Frequency Interval',
+      93 => 'Pledge Frequency Unit',
+      94 => 'pledge_currency',
+      95 => 'Campaign ID',
+      96 => 'Balance Amount',
+      97 => 'Payment ID',
+      98 => 'Scheduled Amount',
+      99 => 'Scheduled Date',
+      100 => 'Paid Amount',
+      101 => 'Paid Date',
+      102 => 'Last Reminder',
+      103 => 'Reminders Sent',
+      104 => 'Pledge Payment Status',
     ];
   }
 
@@ -1756,6 +2063,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'country' => 'country varchar(64)',
       'phone' => 'phone varchar(32)',
       'phone_ext' => 'phone_ext varchar(16)',
+      'phone_type_id' => 'phone_type_id varchar(16)',
       'email' => 'email varchar(254)',
       'on_hold' => 'on_hold varchar(16)',
       'is_bulkmail' => 'is_bulkmail varchar(16)',
@@ -1769,7 +2077,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'groups' => 'groups text',
       'tags' => 'tags text',
       'notes' => 'notes text',
-      'phone_type_id' => 'phone_type_id varchar(255)',
       'provider_id' => 'provider_id varchar(255)',
     ];
     if (!$isContactExport) {
@@ -1953,7 +2260,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'openid' => 'openid varchar(255)',
       'world_region' => 'world_region varchar(128)',
       'url' => 'url varchar(128)',
-      'phone_type_id' => 'phone_type_id varchar(255)',
+      'phone_type_id' => 'phone_type_id varchar(16)',
       'provider_id' => 'provider_id varchar(255)',
       'financial_type' => 'financial_type varchar(64)',
       'contribution_source' => 'contribution_source varchar(255)',
