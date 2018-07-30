@@ -98,6 +98,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   protected $_params = array();
 
+  /**
+   * Array of information about the membership.
+   *
+   * @var array
+   */
+  protected $membershipInfoArray = [];
+
   public function preProcess() {
     // Check for edit permission.
     if (!CRM_Core_Permission::checkActionPermission('CiviMember', $this->_action)) {
@@ -463,6 +470,41 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $this->_memType = $formValues['membership_type_id'][1];
     $this->_params = $formValues;
     $this->submit();
+  }
+
+
+  /**
+   * Build membership info array, which is used when membership type is selected.
+   *
+   * Data is used to:
+   * - set the payment information block
+   * - set the max related block
+   *
+   * @param array $values
+   * @param string $totalAmount
+   * @param string $taxAmount
+   *   (only used from membership renewal)
+   *
+   * @return array
+   */
+  protected function getMembershipInfoArray($values, $totalAmount, $taxAmount = NULL) {
+    // @todo - we really should assign the tax rate for the financial_type_id to the template.
+
+    $membershipInfo = [
+      'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $values),
+      'total_amount' => CRM_Utils_Money::format($totalAmount, NULL, '%a'),
+      'total_amount_numeric' => $totalAmount,
+      'auto_renew' => CRM_Utils_Array::value('auto_renew', $values),
+      'has_related' => isset($values['relationship_type_id']),
+      'max_related' => CRM_Utils_Array::value('max_related', $values),
+      // @todo tax message is only used for renewal and is specifically referred to in Renewal.tpl only
+      // @todo should this really be assigned? Or js calculated?
+      'tax_message' => $taxAmount ? ts("Includes %1 amount of %2", [
+        1 => $this->getSalesTaxTerm(),
+        2 => CRM_Utils_Money::format($taxAmount)
+      ]) : $taxAmount,
+    ];
+    return $membershipInfo;
   }
 
 }
