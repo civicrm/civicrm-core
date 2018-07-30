@@ -1548,20 +1548,11 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
           ),
         );
 
-        $IMProvider = array(
-          'im_provider' => array(
-            'name' => 'im_provider',
-            'where' => 'civicrm_im.provider_id',
-            'title' => ts('IM Provider'),
-          ),
-        );
-
         $locationFields = array_merge($locationType,
           CRM_Core_DAO_Address::export(),
-          CRM_Core_DAO_Phone::export(),
+          CRM_Core_DAO::getExportableFieldsWithPseudoConstants('CRM_Core_BAO_Phone'),
           CRM_Core_DAO_Email::export(),
-          $IMProvider,
-          CRM_Core_DAO_IM::export(TRUE),
+          CRM_Core_DAO::getExportableFieldsWithPseudoConstants('CRM_Core_BAO_IM'),
           CRM_Core_DAO_OpenID::export()
         );
 

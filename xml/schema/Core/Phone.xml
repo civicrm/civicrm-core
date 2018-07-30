@@ -144,10 +144,11 @@
   </field>
   <field>
     <name>phone_type_id</name>
-    <title>Phone Type</title>
+    <title>Phone Type ID</title>
     <type>int unsigned</type>
     <export>true</export>
     <comment>Which type of phone does this number belongs.</comment>
+    <export>true</export>
     <pseudoconstant>
       <optionGroupName>phone_type</optionGroupName>
     </pseudoconstant>
