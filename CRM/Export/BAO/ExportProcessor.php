@@ -288,9 +288,6 @@ class CRM_Export_BAO_ExportProcessor {
 
     $missing = [
       'location_type',
-      'im_provider',
-      'phone_type_id',
-      'provider_id',
       'current_employer',
     ];
     if ($this->getQueryMode() === CRM_Contact_BAO_Query::MODE_CONTACTS) {
@@ -503,6 +500,7 @@ class CRM_Export_BAO_ExportProcessor {
       'phone',
       'email',
       'im',
+      'im_provider_id',
     ];
   }
 

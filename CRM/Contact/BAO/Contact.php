@@ -674,6 +674,31 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
+   * Get field metadata for locations.
+   *
+   * @return array
+   */
+  public static function getLocationFields() {
+    // @todo - ideally use getExportableFieldsWithPseudoConstants as a standard for all entities.
+    $locationFields = array_merge(
+      CRM_Core_DAO_Address::export(),
+      CRM_Core_DAO::getExportableFieldsWithPseudoConstants('CRM_Core_BAO_Phone'),
+      CRM_Core_DAO_Email::export(),
+      CRM_Core_DAO::getExportableFieldsWithPseudoConstants('CRM_Core_BAO_IM'),
+      CRM_Core_DAO_OpenID::export()
+    );
+
+    $locationFields = array_merge($locationFields,
+      CRM_Core_BAO_CustomField::getFieldsForImport('Address')
+    );
+
+    foreach ($locationFields as $key => $field) {
+      $locationFields[$key]['hasLocationType'] = TRUE;
+    }
+    return $locationFields;
+  }
+
+  /**
    * Create last viewed link to recently updated contact.
    *
    * @param array $crudLinkSpec
@@ -1548,21 +1573,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
           ),
         );
 
-        $locationFields = array_merge($locationType,
-          CRM_Core_DAO_Address::export(),
-          CRM_Core_DAO::getExportableFieldsWithPseudoConstants('CRM_Core_BAO_Phone'),
-          CRM_Core_DAO_Email::export(),
-          CRM_Core_DAO::getExportableFieldsWithPseudoConstants('CRM_Core_BAO_IM'),
-          CRM_Core_DAO_OpenID::export()
-        );
-
-        $locationFields = array_merge($locationFields,
-          CRM_Core_BAO_CustomField::getFieldsForImport('Address')
-        );
-
-        foreach ($locationFields as $key => $field) {
-          $locationFields[$key]['hasLocationType'] = TRUE;
-        }
+        $locationFields = array_merge($locationType, self::getLocationFields());
 
         $fields = array_merge($fields, $locationFields);
 
