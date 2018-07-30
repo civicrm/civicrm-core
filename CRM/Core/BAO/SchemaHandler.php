@@ -633,8 +633,8 @@ MODIFY      {$columnName} varchar( $length )
    * @return bool
    */
   public static function checkIfFieldExists($tableName, $columnName, $i18nRewrite = TRUE) {
-    $query = "SHOW COLUMNS FROM $tableName LIKE %1";
-    $dao = CRM_Core_DAO::executeQuery($query, [1 => [$columnName, 'String']], TRUE, NULL, FALSE, $i18nRewrite);
+    $query = "SHOW COLUMNS FROM $tableName LIKE '%1'";
+    $dao = CRM_Core_DAO::executeQuery($query, [1 => [$columnName, 'Alphanumeric']], TRUE, NULL, FALSE, $i18nRewrite);
     $result = $dao->fetch() ? TRUE : FALSE;
     $dao->free();
     return $result;
