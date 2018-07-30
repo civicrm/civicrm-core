@@ -515,32 +515,18 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function getSqlColumnDefinition($field) {
     $fieldName = $this->getMungedFieldName($field);
-
-    // early exit for master_id, CRM-12100
-    // in the DB it is an ID, but in the export, we retrive the display_name of the master record
-    // also for current_employer, CRM-16939
-    if ($fieldName == 'master_id' || $fieldName == 'current_employer') {
-      return "$fieldName varchar(128)";
-    }
-
-    if (substr($fieldName, -11) == 'campaign_id') {
-      // CRM-14398
-      return "$fieldName varchar(128)";
-    }
-
     $queryFields = $this->getQueryFields();
-    $lookUp = ['prefix_id', 'suffix_id'];
     // set the sql columns
     if (isset($queryFields[$field]['type'])) {
       switch ($queryFields[$field]['type']) {
         case CRM_Utils_Type::T_INT:
+          // Integer fields may be references that are retrieved for export as text of arbitrary length.
+          // We use "text" instead of "varchar(xyz)" to avoid row width limitations of mysql.
+          // This solution replaces a previous collection of ad-hoc partial solutions.
+          return "$fieldName text";
+
         case CRM_Utils_Type::T_BOOLEAN:
-          if (in_array($field, $lookUp)) {
-            return "$fieldName varchar(255)";
-          }
-          else {
-            return "$fieldName varchar(16)";
-          }
+          return "$fieldName varchar(16)";
 
         case CRM_Utils_Type::T_STRING:
           if (isset($queryFields[$field]['maxlength'])) {
@@ -570,8 +556,10 @@ class CRM_Export_BAO_ExportProcessor {
       }
     }
     else {
+      // handle fields for which we have no 'type' configured (yet!)
       if (substr($fieldName, -3, 3) == '_id') {
-        return "$fieldName varchar(255)";
+        // Will likely get expanded into text of arbitrary length.
+        return "$fieldName text";
       }
       elseif (substr($fieldName, -5, 5) == '_note') {
         return "$fieldName text";
