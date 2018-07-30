@@ -278,19 +278,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           $taxAmount = ($taxRate / 100) * CRM_Utils_Array::value('minimum_fee', $values);
           $totalAmount = $totalAmount + $taxAmount;
         }
-
-        // build membership info array, which is used to set the payment information block when
-        // membership type is selected.
-        $allMembershipInfo[$key] = array(
-          'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $values),
-          'total_amount' => CRM_Utils_Money::format($totalAmount, NULL, '%a'),
-          'total_amount_numeric' => $totalAmount,
-          'tax_message' => $taxAmount ? ts("Includes %1 amount of %2", array(1 => $this->getSalesTaxTerm(), 2 => CRM_Utils_Money::format($taxAmount))) : $taxAmount,
-        );
-
-        if (!empty($values['auto_renew'])) {
-          $allMembershipInfo[$key]['auto_renew'] = $options[$values['auto_renew']];
-        }
+        $allMembershipInfo = $this->addToAllMembershipInfo($values, $totalAmount, $taxAmount, $allMembershipInfo, $key, $options);
       }
     }
 
@@ -714,6 +702,34 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         )
       );
     }
+  }
+
+  /**
+   * @param $values
+   * @param $totalAmount
+   * @param $taxAmount
+   * @param $allMembershipInfo
+   * @param $key
+   * @param $options
+   * @return array
+   */
+  protected function addToAllMembershipInfo($values, $totalAmount, $taxAmount, $allMembershipInfo, $key, $options) {
+// build membership info array, which is used to set the payment information block when
+    // membership type is selected.
+    $allMembershipInfo[$key] = [
+      'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $values),
+      'total_amount' => CRM_Utils_Money::format($totalAmount, NULL, '%a'),
+      'total_amount_numeric' => $totalAmount,
+      'tax_message' => $taxAmount ? ts("Includes %1 amount of %2", [
+        1 => $this->getSalesTaxTerm(),
+        2 => CRM_Utils_Money::format($taxAmount)
+      ]) : $taxAmount,
+    ];
+
+    if (!empty($values['auto_renew'])) {
+      $allMembershipInfo[$key]['auto_renew'] = $options[$values['auto_renew']];
+    }
+    return [$allMembershipInfo, $values];
   }
 
 }
