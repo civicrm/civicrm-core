@@ -1673,12 +1673,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   public static function getModuleUFGroup($moduleName = NULL, $count = 0, $skipPermission = TRUE, $op = CRM_Core_Permission::VIEW, $returnFields = NULL) {
     $selectFields = array('id', 'title', 'created_id', 'is_active', 'is_reserved', 'group_type');
 
-    if (CRM_Core_DAO::checkFieldExists('civicrm_uf_group', 'description')) {
+    if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_uf_group', 'description')) {
       // CRM-13555, since description field was added later (4.4), and to avoid any problems with upgrade
       $selectFields[] = 'description';
     }
 
-    if (CRM_Core_DAO::checkFieldExists('civicrm_uf_group', 'frontend_title')) {
+    if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_uf_group', 'frontend_title')) {
       $selectFields[] = 'frontend_title';
     }
 

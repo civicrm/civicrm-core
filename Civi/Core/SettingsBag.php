@@ -139,7 +139,7 @@ class SettingsBag {
 
     $isUpgradeMode = \CRM_Core_Config::isUpgradeMode();
 
-    if ($isUpgradeMode && empty($this->contactId) && \CRM_Core_DAO::checkFieldExists('civicrm_domain', 'config_backend', FALSE)) {
+    if ($isUpgradeMode && empty($this->contactId) && \CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_domain', 'config_backend', FALSE)) {
       $config_backend = \CRM_Core_DAO::singleValueQuery('SELECT config_backend FROM civicrm_domain WHERE id = %1',
         array(1 => array($this->domainId, 'Positive')));
       $oldSettings = \CRM_Upgrade_Incremental_php_FourSeven::convertBackendToSettings($this->domainId, $config_backend);
@@ -373,7 +373,7 @@ class SettingsBag {
     if (!isset(\Civi::$statics[__CLASS__]['upgradeMode'])) {
       \Civi::$statics[__CLASS__]['upgradeMode'] = \CRM_Core_Config::isUpgradeMode();
     }
-    if (\Civi::$statics[__CLASS__]['upgradeMode'] && \CRM_Core_DAO::checkFieldExists('civicrm_setting', 'group_name')) {
+    if (\Civi::$statics[__CLASS__]['upgradeMode'] && \CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_setting', 'group_name')) {
       $dao->group_name = 'placeholder';
     }
 

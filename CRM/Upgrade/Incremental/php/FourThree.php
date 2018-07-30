@@ -277,7 +277,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
    */
   public function upgrade_4_3_alpha2($rev) {
     //CRM-11847
-    $isColumnPresent = CRM_Core_DAO::checkFieldExists('civicrm_dedupe_rule_group', 'is_default');
+    $isColumnPresent = CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_dedupe_rule_group', 'is_default');
     if ($isColumnPresent) {
       CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_dedupe_rule_group DROP COLUMN is_default');
     }
@@ -300,7 +300,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
     // CRM-12002
     if (
       CRM_Core_DAO::checkTableExists('log_civicrm_line_item') &&
-      CRM_Core_DAO::checkFieldExists('log_civicrm_line_item', 'label')
+      CRM_Core_BAO_SchemaHandler::checkIfFieldExists('log_civicrm_line_item', 'label')
     ) {
       CRM_Core_DAO::executeQuery('ALTER TABLE `log_civicrm_line_item` CHANGE `label` `label` VARCHAR(255) NULL DEFAULT NULL');
     }
@@ -335,7 +335,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
     // CRM-12205
     if (
       CRM_Core_DAO::checkTableExists('log_civicrm_financial_trxn') &&
-      CRM_Core_DAO::checkFieldExists('log_civicrm_financial_trxn', 'trxn_id')
+      CRM_Core_BAO_SchemaHandler::checkIfFieldExists('log_civicrm_financial_trxn', 'trxn_id')
     ) {
       CRM_Core_DAO::executeQuery('ALTER TABLE `log_civicrm_financial_trxn` CHANGE `trxn_id` `trxn_id` VARCHAR(255) NULL DEFAULT NULL');
     }
@@ -343,7 +343,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
     // CRM-12367 - add this column to single lingual sites only
     $upgrade = new CRM_Upgrade_Form();
     if (!$upgrade->multilingual &&
-      !CRM_Core_DAO::checkFieldExists('civicrm_premiums', 'premiums_nothankyou_label')
+      !CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_premiums', 'premiums_nothankyou_label')
     ) {
       $query = "
 ALTER TABLE civicrm_premiums
@@ -925,7 +925,7 @@ AND TABLE_SCHEMA = %1
       }
     }
     // check if column contact_id is present or not in civicrm_financial_account
-    $fieldExists = CRM_Core_DAO::checkFieldExists('civicrm_financial_account', 'contact_id', FALSE);
+    $fieldExists = CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_financial_account', 'contact_id', FALSE);
     if (!$fieldExists) {
       $query = "
 ALTER TABLE civicrm_financial_account
