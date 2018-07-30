@@ -796,7 +796,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
    * @param $details
    * @param $sqlColumns
    */
-  public static function writeDetailsToTable($tableName, &$details, &$sqlColumns) {
+  public static function writeDetailsToTable($tableName, $details, $sqlColumns) {
     if (empty($details)) {
       return;
     }
@@ -813,10 +813,10 @@ FROM   $tableName
 
     $sqlClause = array();
 
-    foreach ($details as $dontCare => $row) {
+    foreach ($details as $row) {
       $id++;
       $valueString = array($id);
-      foreach ($row as $dontCare => $value) {
+      foreach ($row as $value) {
         if (empty($value)) {
           $valueString[] = "''";
         }
@@ -843,7 +843,7 @@ VALUES $sqlValueString
    *
    * @return string
    */
-  public static function createTempTable(&$sqlColumns) {
+  public static function createTempTable($sqlColumns) {
     //creating a temporary table for the search result that need be exported
     $exportTempTable = CRM_Utils_SQL_TempTable::build()->setDurable()->setCategory('export')->getName();
 
