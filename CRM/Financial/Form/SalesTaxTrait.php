@@ -65,7 +65,26 @@ trait CRM_Financial_Form_SalesTaxTrait {
    * Assign information to the template required for sales tax purposes.
    */
   public function assignSalesTaxMetadataToTemplate() {
+    $this->assignSalesTaxRates();
+    $this->assignSalesTaxTermToTemplate();
+  }
 
+  /**
+   * Get sales tax rates.
+   *
+   * @return array
+   */
+  public function getTaxRatesForFinancialTypes() {
+    return CRM_Core_PseudoConstant::getTaxRates();
+  }
+
+  /**
+   * @param int $financialTypeID
+   *
+   * @return string
+   */
+  public function getTaxRateForFinancialType($financialTypeID) {
+    return CRM_Utils_Array::value($financialTypeID, $this->getTaxRatesForFinancialTypes());
   }
 
 }

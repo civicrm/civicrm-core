@@ -241,10 +241,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $defaults['membership_type_id'] = $defaults['membership_type_id'][1];
     }
 
-    //CRM-16950
-    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-    $taxRate = CRM_Utils_Array::value($this->allMembershipTypeDetails[$defaults['membership_type_id']]['financial_type_id'], $taxRates);
-
     foreach ($this->allMembershipTypeDetails as $key => $values) {
       if (!empty($values['is_active'])) {
         if ($this->_mode && empty($values['minimum_fee'])) {
@@ -266,14 +262,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           }
         }
 
-        //CRM-16950
-        $taxAmount = NULL;
-        $totalAmount = CRM_Utils_Array::value('minimum_fee', $values);
-        if (CRM_Utils_Array::value($values['financial_type_id'], $taxRates)) {
-          $taxAmount = ($taxRate / 100) * CRM_Utils_Array::value('minimum_fee', $values);
-          $totalAmount = $totalAmount + $taxAmount;
-        }
-        $this->membershipInfoArray[$key] = $this->getMembershipInfoArray($values, $totalAmount, $taxAmount);
+        $this->membershipInfoArray[$key] = $this->getMembershipInfoArray($values, $totalAmount);
       }
     }
 
@@ -714,6 +703,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @return array
    */
   protected function getMembershipInfoArray($values, $totalAmount, $taxAmount = NULL) {
+    $taxAmount = NULL;
+    $taxRate = $this->getTaxRateForFinancialType($values['financial_type_id']);
+    if ($taxRate) {
+      $taxAmount = ($taxRate / 100) * CRM_Utils_Array::value('minimum_fee', $values);
+      $totalAmount = $totalAmount + $taxAmount;
+    }
     $membershipInfo = parent::getMembershipInfoArray($values, $totalAmount, $taxAmount);
     // @todo Figure out why this auto_renew value is different for this form than for the Membership form
     $options = CRM_Core_SelectValues::memberAutoRenew();

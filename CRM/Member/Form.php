@@ -497,6 +497,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       'auto_renew' => CRM_Utils_Array::value('auto_renew', $values),
       'has_related' => isset($values['relationship_type_id']),
       'max_related' => CRM_Utils_Array::value('max_related', $values),
+      'tax_rate' => $this->getTaxRateForFinancialType($values['financial_type_id']),
       // @todo tax message is only used for renewal and is specifically referred to in Renewal.tpl only
       // @todo should this really be assigned? Or js calculated?
       'tax_message' => $taxAmount ? ts("Includes %1 amount of %2", [
