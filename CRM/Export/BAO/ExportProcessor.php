@@ -89,6 +89,11 @@ class CRM_Export_BAO_ExportProcessor {
   protected $relationshipReturnProperties = [];
 
   /**
+   * @var array
+   */
+  protected $returnProperties = [];
+
+  /**
    * CRM_Export_BAO_ExportProcessor constructor.
    *
    * @param int $exportMode
@@ -115,6 +120,21 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function setRequestedFields($requestedFields) {
     $this->requestedFields = $requestedFields;
+  }
+
+
+  /**
+   * @return array
+   */
+  public function getReturnProperties() {
+    return $this->returnProperties;
+  }
+
+  /**
+   * @param array $returnProperties
+   */
+  public function setReturnProperties($returnProperties) {
+    $this->returnProperties = $returnProperties;
   }
 
   /**
@@ -310,7 +330,23 @@ class CRM_Export_BAO_ExportProcessor {
       ])) {
       return TRUE;
     }
+    elseif ($this->isExportSpecifiedPaymentFields()) {
+      return TRUE;
+    }
     return FALSE;
+  }
+
+  /**
+   * Has specific payment fields been requested (as opposed to via all fields).
+   *
+   * If specific fields have been requested then they get added at various points.
+   *
+   * @return bool
+   */
+  public function isExportSpecifiedPaymentFields() {
+    if ($this->getRequestedFields() !== NULL && $this->hasRequestedComponentPaymentFields()) {
+      return TRUE;
+    }
   }
 
   /**
@@ -325,7 +361,40 @@ class CRM_Export_BAO_ExportProcessor {
       ];
       return isset($mapping[$this->getQueryMode()]) ? $mapping[$this->getQueryMode()] : '';
     }
+    elseif ($this->hasRequestedComponentPaymentFields()) {
+      return 'participant_id';
+    }
     return FALSE;
+  }
+
+  /**
+   * Have component payment fields been requested.
+   *
+   * @return bool
+   */
+  protected function hasRequestedComponentPaymentFields() {
+    if ($this->getQueryMode() === CRM_Contact_BAO_Query::MODE_EVENT) {
+      $participantPaymentFields = array_intersect_key($this->getComponentPaymentFields(), $this->getReturnProperties());
+      if (!empty($participantPaymentFields)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Get fields that indicate payment fields have been requested for a component.
+   *
+   * @return array
+   */
+  protected function getComponentPaymentFields() {
+    return [
+      'componentPaymentField_total_amount' => ts('Total Amount'),
+      'componentPaymentField_contribution_status' => ts('Contribution Status'),
+      'componentPaymentField_received_date' => ts('Date Received'),
+      'componentPaymentField_payment_instrument' => ts('Payment Method'),
+      'componentPaymentField_transaction_id' => ts('Transaction ID'),
+    ];
   }
 
   /**

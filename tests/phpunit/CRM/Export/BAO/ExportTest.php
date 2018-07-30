@@ -843,9 +843,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @param $selectedFields
    * @param int $id
    *
+   * @param int $exportMode
+   *
    * @return array
    */
-  protected function doExport($selectedFields, $id) {
+  protected function doExport($selectedFields, $id, $exportMode = CRM_Export_Form_Select::CONTACT_EXPORT) {
     list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
       TRUE,
       array($id),
@@ -853,7 +855,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       NULL,
       $selectedFields,
       NULL,
-      CRM_Export_Form_Select::CONTACT_EXPORT,
+      $exportMode,
       "contact_a.id IN ({$id})",
       NULL,
       FALSE,
@@ -1356,6 +1358,266 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       )
     );
     $this->assertEquals($expected, $result[1]);
+  }
+
+  /**
+   * Test exported with fields to output specified.
+   *
+   * @dataProvider getAllSpecifiableReturnFields
+   *
+   * @param int $exportMode
+   * @param array $selectedFields
+   * @param array $expected
+   */
+  public function testExportSpecifyFields($exportMode, $selectedFields, $expected) {
+    $this->ensureComponentIsEnabled($exportMode);
+    $this->setUpContributionExportData();
+    list($tableName, $sqlColumns) = $this->doExport($selectedFields, $this->contactIDs[1], $exportMode);
+    $this->assertEquals($expected, $sqlColumns);
+  }
+
+  /**
+   * Test export fields when no payment fields to be exported.
+   */
+  public function textExportParticipantSpecifyFieldsNoPayment() {
+    $selectedFields = $this->getAllSpecifiableParticipantReturnFields();
+    foreach ($selectedFields as $index => $field) {
+      if (substr($field[1], 0, 22) === 'componentPaymentField_') {
+        unset ($selectedFields[$index]);
+      }
+    }
+
+    $expected = $this->getAllSpecifiableParticipantReturnFields();
+    foreach ($expected as $index => $field) {
+      if (substr($index, 0, 22) === 'componentPaymentField_') {
+        unset ($expected[$index]);
+      }
+    }
+
+    list($tableName, $sqlColumns) = $this->doExport($selectedFields, $this->contactIDs[1], CRM_Export_Form_Select::EVENT_EXPORT);
+    $this->assertEquals($expected, $sqlColumns);
+  }
+  /**
+   * Get all return fields (@todo - still being built up.
+   *
+   * @return array
+   */
+  public function getAllSpecifiableReturnFields() {
+    return [
+      [
+        CRM_Export_Form_Select::EVENT_EXPORT,
+        $this->getAllSpecifiableParticipantReturnFields(),
+        $this->getAllSpecifiableParticipantReturnColumns(),
+      ],
+    ];
+  }
+
+  /**
+   * Get expected return column output for participant mode return all columns.
+   *
+   * @return array
+   */
+  public function getAllSpecifiableParticipantReturnColumns() {
+    return [
+      'participant_campaign_id' => 'participant_campaign_id varchar(128)',
+      'participant_contact_id' => 'participant_contact_id varchar(16)',
+      'componentpaymentfield_contribution_status' => 'componentpaymentfield_contribution_status text',
+      'currency' => 'currency varchar(3)',
+      'componentpaymentfield_received_date' => 'componentpaymentfield_received_date text',
+      'default_role_id' => 'default_role_id varchar(16)',
+      'participant_discount_name' => 'participant_discount_name varchar(16)',
+      'event_id' => 'event_id varchar(16)',
+      'event_end_date' => 'event_end_date varchar(32)',
+      'event_start_date' => 'event_start_date varchar(32)',
+      'template_title' => 'template_title varchar(255)',
+      'event_title' => 'event_title varchar(255)',
+      'participant_fee_amount' => 'participant_fee_amount varchar(32)',
+      'participant_fee_currency' => 'participant_fee_currency varchar(3)',
+      'fee_label' => 'fee_label varchar(255)',
+      'participant_fee_level' => 'participant_fee_level longtext',
+      'participant_is_pay_later' => 'participant_is_pay_later varchar(16)',
+      'participant_id' => 'participant_id varchar(16)',
+      'participant_note' => 'participant_note text',
+      'participant_role_id' => 'participant_role_id varchar(128)',
+      'participant_role' => 'participant_role varchar(255)',
+      'participant_source' => 'participant_source varchar(128)',
+      'participant_status_id' => 'participant_status_id varchar(16)',
+      'participant_status' => 'participant_status varchar(255)',
+      'participant_register_date' => 'participant_register_date varchar(32)',
+      'participant_registered_by_id' => 'participant_registered_by_id varchar(16)',
+      'participant_is_test' => 'participant_is_test varchar(16)',
+      'componentpaymentfield_total_amount' => 'componentpaymentfield_total_amount text',
+      'componentpaymentfield_transaction_id' => 'componentpaymentfield_transaction_id varchar(255)',
+      'transferred_to_contact_id' => 'transferred_to_contact_id varchar(16)',
+    ];
+  }
+
+  /**
+   * @return array
+   */
+  public function getAllSpecifiableParticipantReturnFields() {
+    return [
+      0 =>
+        [
+          0 => 'Participant',
+          1 => '',
+        ],
+      1 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_campaign_id',
+        ],
+      2 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_contact_id',
+        ],
+      3 =>
+        [
+          0 => 'Participant',
+          1 => 'componentPaymentField_contribution_status',
+        ],
+      4 =>
+        [
+          0 => 'Participant',
+          1 => 'currency',
+        ],
+      5 =>
+        [
+          0 => 'Participant',
+          1 => 'componentPaymentField_received_date',
+        ],
+      6 =>
+        [
+          0 => 'Participant',
+          1 => 'default_role_id',
+        ],
+      7 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_discount_name',
+        ],
+      8 =>
+        [
+          0 => 'Participant',
+          1 => 'event_id',
+        ],
+      9 =>
+        [
+          0 => 'Participant',
+          1 => 'event_end_date',
+        ],
+      10 =>
+        [
+          0 => 'Participant',
+          1 => 'event_start_date',
+        ],
+      11 =>
+        [
+          0 => 'Participant',
+          1 => 'template_title',
+        ],
+      12 =>
+        [
+          0 => 'Participant',
+          1 => 'event_title',
+        ],
+      13 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_fee_amount',
+        ],
+      14 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_fee_currency',
+        ],
+      15 =>
+        [
+          0 => 'Participant',
+          1 => 'fee_label',
+        ],
+      16 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_fee_level',
+        ],
+      17 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_is_pay_later',
+        ],
+      18 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_id',
+        ],
+      19 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_note',
+        ],
+      20 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_role_id',
+        ],
+      21 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_role',
+        ],
+      22 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_source',
+        ],
+      23 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_status_id',
+        ],
+      24 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_status',
+        ],
+      25 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_status',
+        ],
+      26 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_register_date',
+        ],
+      27 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_registered_by_id',
+        ],
+      28 =>
+        [
+          0 => 'Participant',
+          1 => 'participant_is_test',
+        ],
+      29 =>
+        [
+          0 => 'Participant',
+          1 => 'componentPaymentField_total_amount',
+        ],
+      30 =>
+        [
+          0 => 'Participant',
+          1 => 'componentPaymentField_transaction_id',
+        ],
+      31 =>
+        [
+          0 => 'Participant',
+          1 => 'transferred_to_contact_id',
+        ],
+    ];
   }
 
   /**
