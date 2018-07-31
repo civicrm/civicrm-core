@@ -30,7 +30,7 @@ install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
 cd <extension-dir>
-cv dl org.civicrm.afform@https://github.com/FIXME/org.civicrm.afform/archive/master.zip
+cv dl org.civicrm.afform@https://github.com/totten/afform/archive/master.zip
 ```
 
 ## Installation (CLI, Git)
@@ -39,7 +39,7 @@ Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) 
 install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
-git clone https://github.com/FIXME/org.civicrm.afform.git
+git clone https://github.com/totten/afform.git
 cv en afform
 ```
 
