@@ -7,8 +7,8 @@ need these?  Here are few tricks:
 * You can create your own applications and pages with full AngularJS. (See also: [CiviCRM Developer Guide: AngularJS: Quick Start](https://docs.civicrm.org/dev/en/latest/framework/angular/quickstart/)).
   Then embed the afform (like `helloworld`) in your page with these steps:
     * Declare a dependency on module (`afformHelloworld`). This is usually done in `ang/MYMODULE.ang.php` and/or `ang/MYMODULE.js`.
-    * In your HTML template, use the directive `<div afform-helloworld=""></div>`. I
-    * f you want to provide extra data, services, or actions for the form author -- then pass them along.
+    * In your HTML template, use the directive `<div afform-helloworld=""></div>`.
+    * If you want to provide extra data, services, or actions for the form author -- then pass them along.
 * You can write your own directives with full AngularJS (e.g. `civix generate:angular-directive`). These directives become available for use in other afforms.
 * If you start out distributing an `afform` and later find it too limiting, then you can change your mind and convert it to static code in full AngularJS.
   As long as you name it consistently (e.g. `afform-helloworld`), downstream consumers can use the static version as a drop-in replacement.

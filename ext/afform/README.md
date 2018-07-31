@@ -43,7 +43,7 @@ git clone https://github.com/FIXME/org.civicrm.afform.git
 cv en afform
 ```
 
-## Development
+## Developer Documentation
 
 * [Quick Start: Creating the canonical definition of a basic form](docs/quickstart.md)
 * [Writing Forms: Afform as basic AngularJS templates](docs/writing.md) (With example: *Contact Record*)
