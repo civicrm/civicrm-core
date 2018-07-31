@@ -1119,6 +1119,10 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function getSqlColumnDefinition($fieldName, $columnName) {
     $queryFields = $this->getQueryFields();
+    // special case: civicirm_primary_id exports the contact id and is an index field
+    if ($fieldName == 'civicrm_primary_id') {
+      return "$fieldName varchar(16)";
+    }
     // set the sql columns
     if (isset($queryFields[$columnName]['type'])) {
       switch ($queryFields[$columnName]['type']) {
