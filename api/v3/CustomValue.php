@@ -149,7 +149,10 @@ function civicrm_api3_custom_value_get($params) {
       if (!empty(substr($id, 7))) {
         $returnVal = substr($id, 7);
       }
-      foreach ((array) $returnVal as $value) {
+      if (!is_array($returnVal)) {
+        $returnVal = explode(',', $returnVal);
+      }
+      foreach ($returnVal as $value) {
         list($c, $i) = CRM_Utils_System::explode('_', $value, 2);
         if ($c == 'custom' && is_numeric($i)) {
           $names['custom_' . $i] = 'custom_' . $i;
