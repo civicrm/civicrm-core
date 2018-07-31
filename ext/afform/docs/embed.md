@@ -2,7 +2,7 @@
 
 In the [quick-start example](quickstart.md), we registered a new route (`"server_route": "civicrm/hello-world"`) -- this created a
 simple, standalone page with the sole purpose of displaying the `helloworld` form.  What if we want to embed the form
-somewhere else -- e.g. as a dialog inside an event-listing or membership directory?  Afforms are actualy *re-usable
+somewhere else -- e.g. as a dialog inside an event-listing or membership directory?  Afforms are actually *re-usable
 sub-forms*.
 
 How does this work?  Every `afform` is an *AngularJS directive*.  For example, `helloworld` can be embedded with:

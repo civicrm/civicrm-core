@@ -1,4 +1,4 @@
-# [Writing Forms: Afform as basic AngularJS templates
+# Writing Forms: Afform as basic AngularJS templates
 
 In AngularJS, the primary language for orchestrating a screen is HTML. You can do interesting things in Angular
 HTML, such as displaying variables and applying directives.
