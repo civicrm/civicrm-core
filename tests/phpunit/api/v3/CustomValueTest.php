@@ -552,4 +552,72 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   }
 
+  /**
+   * Creates a multi-valued custom field set and creates a contact with mutliple values for it.
+   *
+   * @return array
+   */
+  private function _testGetCustomValueMultiple() {
+    $fieldIDs = $this->CustomGroupMultipleCreateWithFields();
+    $customFieldValues = [];
+    foreach ($fieldIDs['custom_field_id'] as $id) {
+      $customFieldValues["custom_{$id}"] = "field_{$id}_value_1";
+    }
+    $this->assertNotEmpty($customFieldValues);
+    $contactParams = [
+      'first_name' => 'Jane',
+      'last_name' => 'Doe',
+      'contact_type' => 'Individual',
+    ];
+    $contact = $this->callAPISuccess('Contact', 'create', array_merge($contactParams, $customFieldValues));
+    foreach ($fieldIDs['custom_field_id'] as $id) {
+      $customFieldValues["custom_{$id}"] = "field_{$id}_value_2";
+    }
+    $result = $this->callAPISuccess('Contact', 'create', array_merge(['id' => $contact['id']], $customFieldValues));
+    return [
+      $contact['id'],
+      $customFieldValues,
+    ];
+  }
+
+  /**
+   * Test that specific custom values can be retrieved while using return with comma separated values as genererated by the api explorer.
+   * ['return' => 'custom_1,custom_2']
+   */
+  public function testGetCustomValueReturnMultipleApiExplorer() {
+    list($cid, $customFieldValues) = $this->_testGetCustomValueMultiple();
+    $result = $this->callAPISuccess('CustomValue', 'get', [
+      'return' => implode(',', array_keys($customFieldValues)),
+      'entity_id' => $cid,
+    ]);
+    $this->assertEquals(count($customFieldValues), $result['count']);
+  }
+
+  /**
+   * Test that specific custom values can be retrieved while using return with array style syntax.
+   * ['return => ['custom_1', 'custom_2']]
+   */
+  public function testGetCustomValueReturnMultipleArray() {
+    list($cid, $customFieldValues) = $this->_testGetCustomValueMultiple();
+    $result = $this->callAPISuccess('CustomValue', 'get', [
+      'return' => array_keys($customFieldValues),
+      'entity_id' => $cid,
+    ]);
+    $this->assertEquals(count($customFieldValues), $result['count']);
+  }
+
+  /**
+   * Test that specific custom values can be retrieved while using a list of return parameters.
+   * [['return.custom_1' => '1'], ['return.custom_2' => '1']]
+   */
+  public function testGetCustomValueReturnMultipleList() {
+    list($cid, $customFieldValues) = $this->_testGetCustomValueMultiple();
+    $returnArray = [];
+    foreach ($customFieldValues as $field => $value) {
+      $returnArray["return.{$field}"] = 1;
+    }
+    $result = $this->callAPISuccess('CustomValue', 'get', array_merge($returnArray, ['entity_id' => $cid]));
+    $this->assertEquals(count($customFieldValues), $result['count']);
+  }
+
 }
