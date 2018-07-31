@@ -20,7 +20,9 @@ This extension is expected to be the base for a suite of related extensions:
 * `afform_auditor`: Report on upgrade compatibility. Test changesets. Highlight dangerous/unknown/unsupported form elements.
    Score maintainability of the system.
 
-## Known Issues (`org.civicrm.afform`)
+## Known Issues
+
+Within this extension, there are things which need updating/addressing:
 
 * There are several `FIXME`/`TODO` declarations in the code for checking pre-conditions, reporting errors, handling edge-cases, etc.
 * Although afforms are can be used in AngularJS, they don't fully support tooling like `cv ang:html:list`
