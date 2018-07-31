@@ -413,6 +413,13 @@ class CRM_Contact_BAO_Query {
   public $_pseudoConstantsSelect = array();
 
   /**
+   * Mapping of fields to pseudoconstants derived from them.
+   *
+   * @var array
+   */
+  public $pseudoFields = [];
+
+  /**
    * Class constructor which also does all the work.
    *
    * @param array $params
@@ -486,6 +493,7 @@ class CRM_Contact_BAO_Query {
       $extFields = CRM_Contact_BAO_Query_Hook::singleton()->getFields();
       $this->_fields = array_merge($this->_fields, $extFields);
     }
+    $this->setPseudoFields();
 
     // basically do all the work once, and then reuse it
     $this->initialize($apiEntity);
@@ -1053,6 +1061,16 @@ class CRM_Contact_BAO_Query {
         $index++;
         $elementName = $elementCmpName = $elementFullName;
 
+        if (in_array($elementFullName, $this->pseudoFields)) {
+          $realField = array_search($elementFullName, $this->pseudoFields);
+          $this->_pseudoConstantsSelect[$elementFullName] = array(
+            'pseudoField' => $realField ,
+            'idCol' => $this->_fields[$realField]['name'],
+            'field_name' => $realField,
+            'bao' => $this->_fields[$realField]['bao'],
+            'pseudoconstant' => $this->_fields[$realField]['pseudoconstant'],
+          );
+        }
         if (substr($elementCmpName, 0, 5) == 'phone') {
           $elementCmpName = 'phone';
         }
@@ -6613,6 +6631,20 @@ AND   displayRelType.is_active = 1
     }
     $select .= implode(', ', $this->_select);
     return $select;
+  }
+
+  /**
+   * Set the pseudofields.
+   *
+   * This array allows us to determine which fields involve a lookup.
+   */
+  protected function setPseudoFields() {
+    $this->pseudoFields = [];
+    foreach ($this->_fields as $fieldIndex => $field) {
+      if (isset($field['pseudoconstant']['optionGroupName'])) {
+        $this->pseudoFields[$fieldIndex] = $field['pseudoconstant']['optionGroupName'];
+      }
+    }
   }
 
 }

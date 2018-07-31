@@ -501,6 +501,7 @@ class CRM_Export_BAO_ExportProcessor {
       'email',
       'im',
       'im_provider_id',
+      'instant_messenger_service',
     ];
   }
 

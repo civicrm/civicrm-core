@@ -566,14 +566,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     foreach (array_merge($locationTypes, [' ']) as $locationType) {
       $fields[] = [
         'Individual',
-        'im_provider_id',
+        'instant_messenger_service',
         CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
       ];
       foreach ($relationships as $contactID => $relationship) {
         $fields[] = [
           'Individual',
           $relationship['relationship_type_id'] . '_a_b',
-          'im_provider_id',
+          'instant_messenger_service',
           CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
         ];
       }
@@ -600,7 +600,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $dao = CRM_Core_DAO::executeQuery('SELECT * FROM ' . $tableName);
     while ($dao->fetch()) {
       $id = $dao->contact_id;
-      $this->assertEquals('AIM', $dao->billing_im_provider);
+      $this->assertEquals('AIM', $dao->billing_instant_messenger_service);
       $this->assertEquals('BillingJabber' . $id, $dao->billing_im_screen_name_jabber);
       $this->assertEquals('BillingSkype' . $id, $dao->billing_im_screen_name_skype);
       foreach ($relationships as $relatedContactID => $relationship) {
