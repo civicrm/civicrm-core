@@ -317,7 +317,7 @@ class CRM_Core_Menu {
       $menu->find(TRUE);
 
       if (!CRM_Core_Config::isUpgradeMode() ||
-        CRM_Core_DAO::checkFieldExists('civicrm_menu', 'module_data', FALSE)
+        CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_menu', 'module_data', FALSE)
       ) {
         // Move unrecognized fields to $module_data.
         $module_data = array();

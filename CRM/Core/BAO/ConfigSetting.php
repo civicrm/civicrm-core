@@ -96,7 +96,7 @@ class CRM_Core_BAO_ConfigSetting {
       $urlVar = 'task';
     }
 
-    if ($isUpgrade && CRM_Core_DAO::checkFieldExists('civicrm_domain', 'config_backend')) {
+    if ($isUpgrade && CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_domain', 'config_backend')) {
       $domain->selectAdd('config_backend');
     }
     else {

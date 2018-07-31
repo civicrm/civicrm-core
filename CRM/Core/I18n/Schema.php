@@ -265,7 +265,7 @@ class CRM_Core_I18n_Schema {
       // add new columns
       foreach ($hash as $column => $type) {
         // CRM-7854: skip existing columns
-        if (CRM_Core_DAO::checkFieldExists($table, "{$column}_{$locale}", FALSE)) {
+        if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, "{$column}_{$locale}", FALSE)) {
           continue;
         }
         $queries[] = "ALTER TABLE {$table} ADD {$column}_{$locale} {$type}";
