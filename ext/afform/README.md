@@ -46,8 +46,8 @@ cv en afform
 ## Development
 
 * [Quick Start: Creating the canonical definition of a basic form](docs/quickstart.md)
-* [Writing: Forms as basic AngularJS templates](docs/writing.md) (With example: *Contact Record*)
-* [Embedding: Forms as reusable building-block](docs/embed.md) (With example: *Contact Record*)
+* [Writing Forms: Afform as basic AngularJS templates](docs/writing.md) (With example: *Contact Record*)
+* [Embedding Forms: Afform as reusable building-block](docs/embed.md) (With example: *Contact Record*)
 * [Form CRUD: Updating forms via programmatic API](docs/crud.md)
 * [Full AngularJS: Integrating between Afform and vanilla AngularJS](docs/angular.md)
 * [Roadmap and Known Issues](docs/roadmap.md)

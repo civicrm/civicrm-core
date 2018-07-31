@@ -1,4 +1,4 @@
-## Development: Quick Start
+# Quick Start: Creating the canonical definition of a basic form
 
 As an extension author, you can define a form along with its default,
 canonical content. Simply create a folder named  `afform/<MY-FORM>`. In

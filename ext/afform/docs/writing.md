@@ -1,4 +1,4 @@
-## Development: Writing HTML templates
+# [Writing Forms: Afform as basic AngularJS templates
 
 In AngularJS, the primary language for orchestrating a screen is HTML. You can do interesting things in Angular
 HTML, such as displaying variables and applying directives.
@@ -20,7 +20,7 @@ Additionally, AngularJS allows *directives* -- these are extra HTML attributes w
 A full explanation of these features is out-of-scope for this document, but the key point is that you can use standard
 AngularJS markup.
 
-## Development: Writing HTML templates: Contact record example
+## Example: Contact record
 
 Let's say we want `helloworld` to become a basic "View Contact" page. A user
 would request a URL like:

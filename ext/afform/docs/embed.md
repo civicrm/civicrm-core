@@ -1,4 +1,4 @@
-## Development: Embedding forms
+# Embedding Forms: Afform as reusable building-block
 
 In the [quick-start example](quickstart.md), we registered a new route (`"server_route": "civicrm/hello-world"`) -- this created a
 simple, standalone page with the sole purpose of displaying the `helloworld` form.  What if we want to embed the form
@@ -23,7 +23,7 @@ Now, in `afform/helloworld/layout.html`, you can use `options.phaseOfMoon`:
 Hello, {{routeParams.name}}. The moon is currently {{options.phaseOfMoon}}.
 ```
 
-## Development: Embedding forms: Contact record example
+## Example: Contact record
 
 Is this useful? Let's suppose you're building a contact record page.
 

@@ -1,4 +1,4 @@
-## Development: Full AngularJS
+# Full AngularJS: Integrating between Afform and vanilla AngularJS
 
 Afform is a subset of AngularJS -- it emphasizes the use of *directives* as a way to *choose and arrange* the parts of
 your form.  There is more to AngularJS -- such as client-side routing, controllers, services, etc.  What to do if you
