@@ -168,13 +168,14 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * Get all the recurring contribution information and assign to the template
    */
   private function addRecurringContributionsBlock() {
-    $activeContributions = $this->getActiveRecurringContributions();
-    $inactiveRecurringContributions = $this->getInactiveRecurringContributions();
+    list($activeContributions, $activeContributionsCount) = $this->getActiveRecurringContributions();
+    list($inactiveRecurringContributions, $inactiveContributionsCount) = $this->getInactiveRecurringContributions();
 
     if (!empty($activeContributions) || !empty($inactiveRecurringContributions)) {
       // assign vars to templates
       $this->assign('action', $this->_action);
       $this->assign('activeRecurRows', $activeContributions);
+      $this->assign('contributionRecurCount', $activeContributionsCount + $inactiveContributionsCount);
       $this->assign('inactiveRecurRows', $inactiveRecurringContributions);
       $this->assign('recur', TRUE);
     }
@@ -191,7 +192,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $contributionRecurResult = civicrm_api3('ContributionRecur', 'get', array(
         'contact_id' => $this->_contactId,
         'contribution_status_id' => array('NOT IN' => CRM_Contribute_BAO_ContributionRecur::getInactiveStatuses()),
-        'options' => array('limit' => 0, 'sort' => 'start_date ASC'),
+        'options' => ['limit' => 0, 'sort' => 'is_test, start_date ASC'],
       ));
       $recurContributions = CRM_Utils_Array::value('values', $contributionRecurResult);
     }
@@ -213,7 +214,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $contributionRecurResult = civicrm_api3('ContributionRecur', 'get', array(
         'contact_id' => $this->_contactId,
         'contribution_status_id' => array('IN' => CRM_Contribute_BAO_ContributionRecur::getInactiveStatuses()),
-        'options' => array('limit' => 0, 'sort' => 'start_date ASC'),
+        'options' => ['limit' => 0, 'sort' => 'is_test, start_date ASC'],
       ));
       $recurContributions = CRM_Utils_Array::value('values', $contributionRecurResult);
     }
@@ -230,10 +231,15 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * @return mixed
    */
   private function buildRecurringContributionsArray($recurContributions) {
+    $liveRecurringContributionCount = 0;
     foreach ($recurContributions as $recurId => $recurDetail) {
       $action = array_sum(array_keys($this->recurLinks($recurId)));
       // no action allowed if it's not active
       $recurContributions[$recurId]['is_active'] = (!CRM_Contribute_BAO_Contribution::isContributionStatusNegative($recurDetail['contribution_status_id']));
+
+      if (empty($recurDetail['is_test'])) {
+        $liveRecurringContributionCount++;
+      }
 
       // Get the name of the payment processor
       if (!empty($recurDetail['payment_processor_id'])) {
@@ -267,7 +273,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       }
     }
 
-    return $recurContributions;
+    return [$recurContributions, $liveRecurringContributionCount];
   }
 
   /**
