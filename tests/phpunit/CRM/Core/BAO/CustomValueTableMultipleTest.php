@@ -35,6 +35,20 @@ class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
     $this->assertEquals($params["custom_{$customField['id']}_-1"], $result["custom_{$customField['id']}_1"]);
     $this->assertEquals($params['entityID'], $result['entityID']);
 
+    $updateParams = array(
+      'id' => 1,
+      'entityID' => $contactID,
+      "custom_{$customField['id']}" => 2,
+    );
+    CRM_Core_BAO_CustomValueTable::setValues($updateParams);
+
+    $criteria = array(
+      'id' => 1,
+      'entityID' => $contactID,
+    );
+    $result = CRM_Core_BAO_CustomValueTable::getValues($criteria);
+    $this->assertEquals(2, $result["custom_{$customField['id']}_1"]);
+
     $this->customFieldDelete($customField['id']);
     $this->customGroupDelete($customGroup['id']);
     $this->contactDelete($contactID);
