@@ -551,7 +551,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * Test the submit function of the membership form on membership type change.
    *  Check if the related contribuion is also updated if the minimum_fee didn't match
    */
-  // KG
   public function testContributionUpdateOnMembershipTypeChange() {
     // Step 1: Create a Membership via backoffice whose with 50.00 payment
     $form = $this->getForm();
@@ -1285,7 +1284,6 @@ Expires: ',
    * CRM-21656: Test the submit function of the membership form if Sale Tax is enabled.
    * Check that the tax rate isn't reapplied to line item's unit price and total amount
    */
-  // KG
   public function testLineItemAmountOnSaleTax() {
     $this->enableTaxAndInvoicing();
     $this->relationForFinancialTypeWithFinancialAccount(2);
