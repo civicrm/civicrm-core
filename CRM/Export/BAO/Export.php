@@ -490,7 +490,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     // for CRM-3157 purposes
     $i18n = CRM_Core_I18n::singleton();
 
-    list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor, $relationQuery);
+    list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
 
     $limitReached = FALSE;
     while (!$limitReached) {
@@ -1407,11 +1407,10 @@ WHERE  {$whereClause}";
    * @param array|string $value
    * @param array $phoneTypes
    * @param array $imProviders
-   * @param string $relationQuery
    *
    * @return array
    */
-  public static function setHeaderRows($field, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery) {
+  public static function setHeaderRows($field, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders) {
 
     $queryFields = $processor->getQueryFields();
     // Split campaign into 2 fields for id and title
@@ -1433,8 +1432,8 @@ WHERE  {$whereClause}";
     elseif ($processor->isRelationshipTypeKey($field)) {
       foreach ($value as $relationField => $relationValue) {
         // below block is same as primary block (duplicate)
-        if (isset($relationQuery[$field]->_fields[$relationField]['title'])) {
-          if ($relationQuery[$field]->_fields[$relationField]['name'] == 'name') {
+        if (isset($queryFields[$relationField]['title'])) {
+          if ($queryFields[$relationField]['name'] == 'name') {
             $headerName = $field . '-' . $relationField;
           }
           else {
@@ -1442,7 +1441,7 @@ WHERE  {$whereClause}";
               $headerName = $field . '-' . 'current_employer';
             }
             else {
-              $headerName = $field . '-' . $relationQuery[$field]->_fields[$relationField]['name'];
+              $headerName = $field . '-' . $queryFields[$relationField]['name'];
             }
           }
 
@@ -1471,7 +1470,7 @@ WHERE  {$whereClause}";
             foreach (array_keys($val) as $fld) {
               $type = explode('-', $fld);
 
-              $hdr = "{$ltype}-" . $relationQuery[$field]->_fields[$type[0]]['title'];
+              $hdr = "{$ltype}-" . $queryFields[$type[0]]['title'];
 
               if (!empty($type[1])) {
                 if (CRM_Utils_Array::value(0, $type) == 'phone') {
@@ -1513,7 +1512,6 @@ WHERE  {$whereClause}";
    *
    * @param array $returnProperties
    * @param \CRM_Export_BAO_ExportProcessor $processor
-   * @param string $relationQuery
    *
    * @return array
    *   - outputColumns Array of columns to be exported. The values don't matter but the key must match the
@@ -1531,7 +1529,7 @@ WHERE  {$whereClause}";
    *    - b) this code is old & outdated. Submit your answers to circular bin or better
    *       yet find a way to comment them for posterity.
    */
-  public static function getExportStructureArrays($returnProperties, $processor, $relationQuery) {
+  public static function getExportStructureArrays($returnProperties, $processor) {
     $metadata = $headerRows = $outputColumns = $sqlColumns = array();
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
@@ -1540,7 +1538,7 @@ WHERE  {$whereClause}";
     foreach ($returnProperties as $key => $value) {
       if ($key != 'location' || !is_array($value)) {
         $outputColumns[$key] = $value;
-        list($headerRows, $sqlColumns) = self::setHeaderRows($key, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery);
+        list($headerRows, $sqlColumns) = self::setHeaderRows($key, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders);
       }
       else {
         foreach ($value as $locationType => $locationFields) {
@@ -1565,7 +1563,7 @@ WHERE  {$whereClause}";
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
             self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
-            list($headerRows, $sqlColumns) = self::setHeaderRows($outputFieldName, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders, $relationQuery);
+            list($headerRows, $sqlColumns) = self::setHeaderRows($outputFieldName, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');
             }
