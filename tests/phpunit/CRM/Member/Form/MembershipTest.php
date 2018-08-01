@@ -1345,7 +1345,9 @@ Expires: ',
 
     // ensure that total_amount at the Contribution level matches line_total + tax_amount at the Line Item Level
     $contribution = $this->callAPISuccessGetSingle('Contribution',
-      array('contribution_id' => 1, 'return' => array('tax_amount', 'total_amount'),
+      array(
+        'contribution_id' => 1,
+        'return' => array('tax_amount', 'total_amount'),
       )
     );
     $this->assertEquals($contribution['total_amount'], $lineItem['line_total'] + $lineItem['tax_amount']);
