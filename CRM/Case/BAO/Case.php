@@ -684,7 +684,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
 
       $casesList[$key]['activity_list'] = sprintf('<a title="%s" class="crm-expand-row" href="%s"></a>',
         ts('Activities'),
-        CRM_Utils_System::url('civicrm/case/details', array('caseid' => $case['case_id'], 'cid' => $case['contact_id'], 'type' => $type))
+        CRM_Utils_System::url('civicrm/case/details', array('caseId' => $case['case_id'], 'cid' => $case['contact_id'], 'type' => $type))
       );
 
       $phone = empty($case['phone']) ? '' : '<br /><span class="description">' . $case['phone'] . '</span>';
