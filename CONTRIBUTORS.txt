@@ -9,17 +9,28 @@ CiviCRM - Coleman Watts, Tim Otten
 AGH Strategies - Alice Frumin, Andrew Hunt, Eli Lisseck
 Agileware - Alok Patel, Francis Whittle, Justin Freeman
 Andrew Thompson
+applicado
 Australian Greens - Seamus Lee
-CiviDesk - Yashodha Chaku
-CompuCorp - Michael Devery, Mukesh Ram, Omar Abu Hussein, René Olivo, Vinu
-    Varshith Sekar
-Coop SymbioTIC - Samuel Vanhove
+Bastien Ho
+Blackfly Solutions - Alan Dixon
+Caltha - Tomasz Pietrzkowski
+CEDC - Laryn Kragt Bakker
+Chris Burgess
+CiviCoop - Jaap Jansma
+CiviDesk - Sunil Pawar, Yashodha Chaku
+CompuCorp - Camilo Rodriguez, Davi Alexandre, Debarshi Bhaumik, Michael Devery,
+    Mukesh Ram, Omar Abu Hussein, René Olivo, Vinu Varshith Sekar
+Coop SymbioTIC - Mathieu Lutfy, Samuel Vanhove
 Davis Media Access - Darrick Servis
+Electronic Frontier Foundation - Mark Burdett
 Fuzion - Jitendra Purohit
 Ginkgo Street Labs - Frank Gómez
+Hossein Amin
 JMA Consulting - Monish Deb
+Johan Vervloet
 John Kingsnorth
 Joinery - Allen Shaw
+Kanzu Code - Carl Andrew Lema
 Kompetenzzentrum Technik-Diversity-Chancengleichheit - Niels Heinemann
 Left Join Labs - Sean Madsen
 Lighthouse Design and Consulting - Brian Shaughnessy
@@ -30,11 +41,17 @@ myDropWizard - David Snopek
 Naomi Rosenberg
 Olivier Tétard
 Oxfam Germany - Thomas Schüttler, Yuliyana Liyana
+Pradeep Nayak
 Progressive Technology Project - Jamie McClelland
+Romain Thouvenin
+Squiffle Consulting - Aidan Saunders
 Systopia - Björn Endres
 Tadpole Collective - Kevin Cristiano
 Third Sector Design - Michael McAndrew
+Tom Bloor
 Wikimedia Foundation - Eileen McNaughton
+Wildsight - Lars Sanders-Green
+Will Long
 
 ************************************************
 Key Contributors and Sponsors for 4.7
