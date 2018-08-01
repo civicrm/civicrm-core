@@ -551,6 +551,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * Test the submit function of the membership form on membership type change.
    *  Check if the related contribuion is also updated if the minimum_fee didn't match
    */
+  // KG
   public function testContributionUpdateOnMembershipTypeChange() {
     // Step 1: Create a Membership via backoffice whose with 50.00 payment
     $form = $this->getForm();
@@ -1282,8 +1283,9 @@ Expires: ',
 
   /**
    * CRM-21656: Test the submit function of the membership form if Sale Tax is enabled.
-   *  Check that the tax rate isn't reapplied to line item's unit price and total amount
+   * Check that the tax rate isn't reapplied to line item's unit price and total amount
    */
+  // KG
   public function testLineItemAmountOnSaleTax() {
     $this->enableTaxAndInvoicing();
     $this->relationForFinancialTypeWithFinancialAccount(2);
@@ -1339,7 +1341,17 @@ Expires: ',
     // ensure that the line-item values got unaffected
     $lineItem = $this->callAPISuccessGetSingle('LineItem', array('entity_id' => $membership['id'], 'entity_table' => 'civicrm_membership'));
     $this->assertEquals(1, $lineItem['qty']);
+    $this->assertEquals(50.00, $lineItem['unit_price']);
+    $this->assertEquals(50.00, $lineItem['line_total']);
     $this->assertEquals(5.00, $lineItem['tax_amount']); // ensure that tax amount is not changed
+
+    // ensure that total_amount at the Contribution level matches line_total + tax_amount at the Line Item Level
+    $contribution = $this->callAPISuccessGetSingle('Contribution',
+      array('contribution_id' => 1, 'return' => array('tax_amount', 'total_amount'),
+      )
+    );
+    $this->assertEquals($contribution['total_amount'], $lineItem['line_total'] + $lineItem['tax_amount']);
+    $this->assertEquals($contribution['tax_amount'], $lineItem['tax_amount']);
 
     // reset the price options static variable so not leave any dummy data, that might hamper other unit tests
     \Civi::$statics['CRM_Price_BAO_PriceField']['priceOptions'] = NULL;
