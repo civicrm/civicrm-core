@@ -589,6 +589,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       define('JDEBUG', FALSE);
     }
 
+    // Set timezone for Joomla on Cron
+    $config = JFactory::getConfig();
+    $timezone = $config->get('offset');
+    if ($timezone) {
+      date_default_timezone_set($timezone);
+      CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
+    }
+
     // CRM-14281 Joomla wasn't available during bootstrap, so hook_civicrm_config never executes.
     $config = CRM_Core_Config::singleton();
     CRM_Utils_Hook::config($config);
