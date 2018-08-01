@@ -175,4 +175,41 @@ ORDER BY id
     }
   }
 
+  /**
+   * Get the previous and next keys.
+   *
+   * @param string $cacheKey
+   * @param int $id1
+   * @param int $id2
+   *
+   * NOTE: I don't really get why there are two ID columns, but we'll
+   * keep passing them through as a matter of safe-refactoring.
+   *
+   * @return array
+   */
+  public function getPositions($cacheKey, $id1, $id2) {
+    return CRM_Core_BAO_PrevNextCache::getPositions($cacheKey, $id1, $id2);
+  }
+
+  /**
+   * Delete an item from the prevnext cache table based on the entity.
+   *
+   * @param int $id
+   * @param string $cacheKey
+   * @param string $entityTable
+   */
+  public function deleteItem($id = NULL, $cacheKey = NULL, $entityTable = 'civicrm_contact') {
+    CRM_Core_BAO_PrevNextCache::deleteItem($id, $cacheKey, $entityTable);
+  }
+
+  /**
+   * Get count of matching rows.
+   *
+   * @param string $cacheKey
+   * @return int
+   */
+  public function getCount($cacheKey) {
+    return CRM_Core_BAO_PrevNextCache::getCount($cacheKey, NULL, "entity_table = 'civicrm_contact'");
+  }
+
 }

@@ -271,7 +271,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
 
     if (!$crmPID) {
       $cacheKey = "civicrm search {$this->_key}";
-      CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKey, 'civicrm_contact');
+      Civi::service('prevnext')->deleteItem(NULL, $cacheKey, 'civicrm_contact');
 
       $sql = $this->_query->searchQuery(0, 0, $sort,
         FALSE, FALSE,
