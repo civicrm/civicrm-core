@@ -1405,12 +1405,10 @@ WHERE  {$whereClause}";
    *   Columns to go in the temp table.
    * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param array|string $value
-   * @param array $phoneTypes
-   * @param array $imProviders
    *
    * @return array
    */
-  public static function setHeaderRows($field, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders) {
+  public static function setHeaderRows($field, $headerRows, $sqlColumns, $processor, $value) {
 
     $queryFields = $processor->getQueryFields();
     if (substr($field, -11) == 'campaign_id') {
@@ -1469,10 +1467,10 @@ WHERE  {$whereClause}";
 
               if (!empty($type[1])) {
                 if (CRM_Utils_Array::value(0, $type) == 'phone') {
-                  $hdr .= "-" . CRM_Utils_Array::value($type[1], $phoneTypes);
+                  $hdr .= "-" . CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id', $type[1]);
                 }
                 elseif (CRM_Utils_Array::value(0, $type) == 'im') {
-                  $hdr .= "-" . CRM_Utils_Array::value($type[1], $imProviders);
+                  $hdr .= "-" . CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $type[1]);
                 }
               }
               $headerName = $field . '-' . $hdr;
@@ -1528,12 +1526,11 @@ WHERE  {$whereClause}";
     $metadata = $headerRows = $outputColumns = $sqlColumns = array();
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
-
     $queryFields = $processor->getQueryFields();
     foreach ($returnProperties as $key => $value) {
       if ($key != 'location' || !is_array($value)) {
         $outputColumns[$key] = $value;
-        list($headerRows, $sqlColumns) = self::setHeaderRows($key, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders);
+        list($headerRows, $sqlColumns) = self::setHeaderRows($key, $headerRows, $sqlColumns, $processor, $value);
       }
       else {
         foreach ($value as $locationType => $locationFields) {
@@ -1558,7 +1555,7 @@ WHERE  {$whereClause}";
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
             self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
-            list($headerRows, $sqlColumns) = self::setHeaderRows($outputFieldName, $headerRows, $sqlColumns, $processor, $value, $phoneTypes, $imProviders);
+            list($headerRows, $sqlColumns) = self::setHeaderRows($outputFieldName, $headerRows, $sqlColumns, $processor, $value);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');
             }
