@@ -192,7 +192,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $contributionRecurResult = civicrm_api3('ContributionRecur', 'get', array(
         'contact_id' => $this->_contactId,
         'contribution_status_id' => array('NOT IN' => CRM_Contribute_BAO_ContributionRecur::getInactiveStatuses()),
-        'options' => ['limit' => 0, 'sort' => 'is_test, start_date ASC'],
+        'options' => ['limit' => 0, 'sort' => 'is_test, start_date DESC'],
       ));
       $recurContributions = CRM_Utils_Array::value('values', $contributionRecurResult);
     }
@@ -214,7 +214,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $contributionRecurResult = civicrm_api3('ContributionRecur', 'get', array(
         'contact_id' => $this->_contactId,
         'contribution_status_id' => array('IN' => CRM_Contribute_BAO_ContributionRecur::getInactiveStatuses()),
-        'options' => ['limit' => 0, 'sort' => 'is_test, start_date ASC'],
+        'options' => ['limit' => 0, 'sort' => 'is_test, start_date DESC'],
       ));
       $recurContributions = CRM_Utils_Array::value('values', $contributionRecurResult);
     }
