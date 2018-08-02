@@ -1312,4 +1312,73 @@ $text
     return array($sent, $activityId, $success);
   }
 
+  public function testCaseTokens() {
+    $caseTest = new CiviCaseTestCase();
+    $caseTest->setUp();
+    // Create a contact and contactDetails array.
+    $contactId = $this->individualCreate();
+
+    // create a case for this user
+    $result = civicrm_api3('Case', 'create', array(
+      'contact_id' => $contactId,
+      'case_type_id' => '1',
+      'subject' => "my case",
+      'status_id' => "Open",
+    ));
+
+    $caseId = $result['id'];
+    $html_message = "<p>This is a test case with id: {case.id} and subject: {case.subject}</p>";
+    $html_message = CRM_Utils_Token::replaceCaseTokens($caseId, $html_message);
+
+    $this->assertTrue(strpos($html_message, 'id: '.$caseId) !== 0);
+    $this->assertTrue(strpos($html_message, 'subject: my case') !== 0);
+  }
+
+  public function testSendEmailWithCaseId() {
+    // Create a contact and contactDetails array.
+    $contactId = $this->individualCreate();
+
+    // create a logged in USER since the code references it for sendEmail user.
+    $this->createLoggedInUser();
+    $session = CRM_Core_Session::singleton();
+    $loggedInUser = $session->get('userID');
+
+    $contact = $this->civicrm_api('contact', 'getsingle', array('id' => $contactId, 'version' => $this->_apiversion));
+
+    // create a case for this user
+    $result = civicrm_api3('Case', 'create', array(
+      'contact_id' => $contactId,
+      'case_type_id' => 1,
+      'subject' => "my case",
+      'status_id' => "Open",
+    ));
+
+    $caseId = $result['id'];
+
+    $subject = __FUNCTION__ . ' subject';
+    $html = __FUNCTION__ . ' html';
+    $text = __FUNCTION__ . ' text';
+    $userID = $loggedInUser;
+
+    list($sent, $activity_id) = $email_result = CRM_Activity_BAO_Activity::sendEmail(
+      $contactDetails,
+      $subject,
+      $text,
+      $html,
+      $contact['email'],
+      $userID,
+      $from = __FUNCTION__ . '@example.com',
+      $attachments = NULL,
+      $cc = NULL,
+      $bcc = NULL,
+      $contactIds = NULL,
+      $additionalDetails = NULL,
+      NULL,
+      $campaign_id = NULL,
+      $caseId
+    );
+    $activity = $this->civicrm_api('activity', 'getsingle', array('id' => $activity_id, 'version' => $this->_apiversion));
+    $this->assertEquals($activity['case_id'], $caseId, 'Activity case_id does not match.');
+  }
+
 }
