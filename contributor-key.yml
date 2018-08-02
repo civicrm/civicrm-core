@@ -148,6 +148,11 @@
 - name        : Matthias Bärnthaler
   jira        : baerm
 
+- github      : baernm
+
+- github      : bastienho
+  name        : Bastien Ho
+
 - github      : bhahumanists
   name        : Andrew West
   organization: British Humanist Association
@@ -331,6 +336,10 @@
 - name        : Dina London
   organization: Jvillage Network
   jira        : dinalondon
+
+- name        : Lizz Trudeau
+  organization: Drupal Association
+  jira        : drupal_lizz
 
 - github      : dsnopek
   name        : David Snopek
@@ -520,6 +529,9 @@
 - name        : Holly Hanks
   organization: AGH Strategies
   jira        : hollyhanks
+
+- name        : Hugo do Carmo
+  jira        : hugo.carmo
 
 - name        : Anthony Colombo
   organization: DreamSpace
@@ -891,8 +903,15 @@
   organization: Coop SymbioTIC
   jira        : mlutfy
 
-- name        : Michal Mach
+- github      : michau
+  name        : Michal Mach
+  organization: Caltha
   jira        : mover
+
+- github      : MikeyMJCO
+  name        : Mikey O'Toole
+  organization: MJCO
+  jira        : MikeyMJCO
 
 - github      : mmauroy
   name        : Matthias de Mauroy
@@ -1085,6 +1104,9 @@
   organization: Botanical Society of America
   jira        : robbrandt
 
+- github      : robfenwickuk
+  name        : Robin Fenwick
+
 - name        : Robert Lang
   jira        : rjlang
 
@@ -1142,7 +1164,7 @@
 
 - github      : scardinius
   name        : Tomasz Pietrzkowski
-  organization: We Move Europe/Caltha
+  organization: Caltha
   jira        : scardinius
 
 - github      : seamuslee001
