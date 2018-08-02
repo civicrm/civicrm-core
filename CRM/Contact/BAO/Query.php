@@ -2235,6 +2235,7 @@ class CRM_Contact_BAO_Query {
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
     }
     elseif ($name === 'email_greeting') {
+      CRM_Core_Error::deprecatedFunctionWarning('pass in email_greeting_id or email_greeting_display');
       $filterCondition = array('greeting_type' => 'email_greeting');
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
@@ -2244,6 +2245,7 @@ class CRM_Contact_BAO_Query {
       );
     }
     elseif ($name === 'postal_greeting') {
+      CRM_Core_Error::deprecatedFunctionWarning('pass in postal_greeting_id or postal_greeting_display');
       $filterCondition = array('greeting_type' => 'postal_greeting');
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
@@ -2253,6 +2255,7 @@ class CRM_Contact_BAO_Query {
       );
     }
     elseif ($name === 'addressee') {
+      CRM_Core_Error::deprecatedFunctionWarning('pass in addressee_id or addressee_display');
       $filterCondition = array('greeting_type' => 'addressee');
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
@@ -5965,8 +5968,8 @@ AND   displayRelType.is_active = 1
       }
     }
     else {
-      // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-      $wc = self::caseImportant($op) ? "LOWER({$field['where']})" : "{$field['where']}";
+      CRM_Core_Error::deprecatedFunctionWarning('pass $ids to this method');
+      $wc = "{$field['where']}";
     }
     if (in_array($name, $pseudoFields)) {
       if (!in_array($name, array('gender_id', 'prefix_id', 'suffix_id', 'communication_style_id'))) {
