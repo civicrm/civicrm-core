@@ -849,7 +849,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'civicrm_activity_source_record_id' => NULL,
       'civicrm_activity_activity_type_id' => 'Meeting',
       'civicrm_activity_activity_subject' => 'Very secret meeting',
-      'civicrm_activity_activity_date_time' => '2018-07-16 03:42:32',
+      'civicrm_activity_activity_date_time' => date('Y-m-d 23:59:58', strtotime('now')),
       'civicrm_activity_status_id' => 'Scheduled',
       'civicrm_activity_duration' => '120',
       'civicrm_activity_location' => 'Pennsylvania',
@@ -872,7 +872,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'civicrm_contact_contact_source_link' => '/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $this->contactIDs[2],
       'civicrm_contact_contact_source_hover' => 'View Contact Summary for this Contact',
       'civicrm_activity_activity_type_id_hover' => 'View Activity Record',
-      'class' => 'status-overdue',
     ];
     $row = $rows[0];
     // This link is not relative - skip for now
@@ -895,7 +894,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('Activity', 'create', [
       'subject' => 'Very secret meeting',
-      'activity_date_time' => '2018-07-16 03:42:32',
+      'activity_date_time' => date('Y-m-d 23:59:58', strtotime('now')),
       'duration' => 120,
       'location' => 'Pennsylvania',
       'details' => 'a test activity',
