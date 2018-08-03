@@ -676,7 +676,8 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
     $mask = CRM_Core_Action::mask($permissions);
 
     $caseTypes = CRM_Case_PseudoConstant::caseType('name');
-    foreach ($result->fetchAll() as $key => $case) {
+    foreach ($result->fetchAll() as $case) {
+      $key = $case['case_id'];
       $casesList[$key] = array();
       $casesList[$key]['DT_RowId'] = $case['case_id'];
       $casesList[$key]['DT_RowAttr'] = array('data-entity' => 'case', 'data-id' => $case['case_id']);
