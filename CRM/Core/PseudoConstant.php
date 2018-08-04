@@ -100,6 +100,12 @@ class CRM_Core_PseudoConstant {
   private static $group;
 
   /**
+   * ParticipantRoles
+   * @var array
+   */
+  private static $participantRoles;
+
+  /**
    * RelationshipType
    * @var array
    */
@@ -1039,6 +1045,27 @@ WHERE  id = %1";
     }
 
     return self::$relationshipType[$cacheKey];
+  }
+
+  /**
+   * Returns participant roles in the form value => label.
+   *
+   * @return array
+   */
+  public static function &participantRoles() {
+    if (!isset(self::$participantRoles)) {
+      $participantRoles = array();
+      $participantRolesRaw = civicrm_api3('OptionValue', 'get', array(
+        'sequential' => 1,
+        'option_group_id' => 'participant_role',
+      ));
+      foreach($participantRolesRaw['values'] as $eachParticipantRole) {
+        $participantRoles[$eachParticipantRole['value']] = $eachParticipantRole['label'];
+      }
+
+      self::$participantRoles = $participantRoles;
+    }
+    return self::$participantRoles;
   }
 
   /**
