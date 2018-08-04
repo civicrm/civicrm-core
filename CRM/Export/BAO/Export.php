@@ -247,10 +247,6 @@ class CRM_Export_BAO_Export {
     $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator);
     $returnProperties = array();
 
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    // Warning - this imProviders var is used in a somewhat fragile way - don't rename it
-    // without manually testing the export of IM provider still works.
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     self::$relationshipTypes = $processor->getRelationshipTypes();
     //also merge Head of Household
     self::$memberOfHouseholdRelationshipKey = CRM_Utils_Array::key('Household Member of', self::$relationshipTypes);
@@ -382,9 +378,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
 
       unset($returnProperties[self::$memberOfHouseholdRelationshipKey]['location_type']);
-      unset($returnProperties[self::$memberOfHouseholdRelationshipKey]['im_provider']);
       unset($returnProperties[self::$headOfHouseholdRelationshipKey]['location_type']);
-      unset($returnProperties[self::$headOfHouseholdRelationshipKey]['im_provider']);
     }
 
     list($relationQuery, $allRelContactArray) = self::buildRelatedContactArray($selectAll, $ids, $exportMode, $componentTable, $returnProperties, $queryMode);
@@ -509,23 +503,11 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         //first loop through output columns so that we return what is required, and in same order.
         foreach ($outputColumns as $field => $value) {
 
-          // add im_provider to $dao object
-          if ($field == 'im_provider' && property_exists($iterationDAO, 'provider_id')) {
-            $iterationDAO->im_provider = $iterationDAO->provider_id;
-          }
-
           //build row values (data)
           $fieldValue = NULL;
           if (property_exists($iterationDAO, $field)) {
             $fieldValue = $iterationDAO->$field;
-            // to get phone type from phone type id
-            if ($field == 'phone_type_id' && isset($phoneTypes[$fieldValue])) {
-              $fieldValue = $phoneTypes[$fieldValue];
-            }
-            elseif ($field == 'provider_id' || $field == 'im_provider') {
-              $fieldValue = CRM_Utils_Array::value($fieldValue, $imProviders);
-            }
-            elseif (strstr($field, 'master_id')) {
+            if (strstr($field, 'master_id')) {
               $masterAddressId = NULL;
               if (isset($iterationDAO->$field)) {
                 $masterAddressId = $iterationDAO->$field;
@@ -1191,8 +1173,6 @@ WHERE  id IN ( $deleteIDString )
       'current_employer_id' => 'employer_id',
       'contact_is_deleted' => 'is_deleted',
       'name' => 'address_name',
-      'provider_id' => 'im_service_provider',
-      'phone_type_id' => 'phone_type',
     );
 
     //figure out which columns are to be replaced by which ones
@@ -1418,10 +1398,6 @@ WHERE  {$whereClause}";
     elseif (isset($queryFields[$field]['title'])) {
       $headerRows[] = $queryFields[$field]['title'];
     }
-    elseif ($field == 'provider_id') {
-      // @todo - set this correctly in the xml rather than here.
-      $headerRows[] = ts('IM Service Provider');
-    }
     elseif ($processor->isRelationshipTypeKey($field)) {
       foreach ($value as $relationField => $relationValue) {
         // below block is same as primary block (duplicate)
@@ -1550,10 +1526,6 @@ WHERE  {$whereClause}";
                 $outputFieldName .= "-" . CRM_Utils_Array::value($type[1], $imProviders);
               }
             }
-            if ($type[0] == 'im_provider') {
-              // Warning: shame inducing hack.
-              $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
-            }
             self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
             list($headerRows, $sqlColumns) = self::setHeaderRows($outputFieldName, $headerRows, $sqlColumns, $processor, $value);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
@@ -1579,20 +1551,12 @@ WHERE  {$whereClause}";
    * @param array $row
    */
   private static function fetchRelationshipDetails($relDAO, $value, $field, &$row) {
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     $i18n = CRM_Core_I18n::singleton();
     foreach ($value as $relationField => $relationValue) {
       if (is_object($relDAO) && property_exists($relDAO, $relationField)) {
         $fieldValue = $relDAO->$relationField;
-        if ($relationField == 'phone_type_id') {
-          $fieldValue = $phoneTypes[$relationValue];
-        }
-        elseif ($relationField == 'provider_id') {
-          $fieldValue = CRM_Utils_Array::value($relationValue, $imProviders);
-        }
         // CRM-13995
-        elseif (is_object($relDAO) && in_array($relationField, array(
+        if (is_object($relDAO) && in_array($relationField, array(
             'email_greeting',
             'postal_greeting',
             'addressee',
@@ -1851,21 +1815,6 @@ WHERE  {$whereClause}";
               // make better use of pseudoConstants.
               if (!empty($metadata[$field]['context'])) {
                 return $i18n->crm_translate($fieldValue, $metadata[$field]);
-              }
-              if (!empty($metadata[$field]['pseudoconstant'])) {
-                // This is not our normal syntax for pseudoconstants but I am a bit loath to
-                // call an external function until sure it is not increasing php processing given this
-                // may be iterated 100,000 times & we already have the $imProvider var loaded.
-                // That can be next refactor...
-                // Yes - definitely feeling hatred for this bit of code - I know you will beat me up over it's awfulness
-                // but I have to reach a stable point....
-                $varName = $metadata[$field]['pseudoconstant']['var'];
-                if ($varName === 'imProviders') {
-                  return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_IM', 'provider_id', $fieldValue);
-                }
-                if ($varName === 'phoneTypes') {
-                  return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_Phone', 'phone_type_id', $fieldValue);
-                }
               }
 
             }

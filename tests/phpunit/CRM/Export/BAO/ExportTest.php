@@ -181,7 +181,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
           'country' => 1,
           'email' => 1,
           'im-1' => 1,
-          'im_provider' => 1,
+          'im_provider_id' => 1,
           'phone-1' => 1,
         ),
       ),
@@ -566,14 +566,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     foreach (array_merge($locationTypes, [' ']) as $locationType) {
       $fields[] = [
         'Individual',
-        'im_provider',
+        'instant_messenger_service',
         CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
       ];
       foreach ($relationships as $contactID => $relationship) {
         $fields[] = [
           'Individual',
           $relationship['relationship_type_id'] . '_a_b',
-          'im_provider',
+          'instant_messenger_service',
           CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
         ];
       }
@@ -600,7 +600,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $dao = CRM_Core_DAO::executeQuery('SELECT * FROM ' . $tableName);
     while ($dao->fetch()) {
       $id = $dao->contact_id;
-      $this->assertEquals('AIM', $dao->billing_im_provider);
+      $this->assertEquals('AIM', $dao->billing_instant_messenger_service);
       $this->assertEquals('BillingJabber' . $id, $dao->billing_im_screen_name_jabber);
       $this->assertEquals('BillingSkype' . $id, $dao->billing_im_screen_name_skype);
       foreach ($relationships as $relatedContactID => $relationship) {
@@ -988,9 +988,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   public function getExtraReturnProperties() {
     return [
       'location_type' => 1,
-      'im_provider' => 1,
-      'phone_type_id' => 1,
-      'provider_id' => 1,
       'current_employer' => 1,
     ];
   }
@@ -1074,21 +1071,22 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'country' => 1,
       'phone' => 1,
       'phone_ext' => 1,
+      'phone_type_id' => 1,
+      'phone_type' => 1,
       'email' => 1,
       'on_hold' => 1,
       'is_bulkmail' => 1,
       'signature_text' => 1,
       'signature_html' => 1,
-      'im_provider' => 1,
       'im' => 1,
+      'im_provider_id' => 1,
+      'instant_messenger_service' => 1,
       'openid' => 1,
       'world_region' => 1,
       'url' => 1,
       'groups' => 1,
       'tags' => 1,
       'notes' => 1,
-      'phone_type_id' => 1,
-      'provider_id' => 1,
     ];
     if (!$isContactMode) {
       unset($returnProperties['groups']);
@@ -1144,9 +1142,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   public function getMembershipReturnProperties() {
     return [
       'location_type' => 1,
-      'im_provider' => 1,
-      'phone_type_id' => 1,
-      'provider_id' => 1,
       'current_employer' => 1,
       'contact_type' => 1,
       'contact_sub_type' => 1,
@@ -2064,12 +2059,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'phone' => 'phone varchar(32)',
       'phone_ext' => 'phone_ext varchar(16)',
       'phone_type_id' => 'phone_type_id varchar(16)',
+      'phone_type' => 'phone_type varchar(255)',
       'email' => 'email varchar(254)',
       'on_hold' => 'on_hold varchar(16)',
       'is_bulkmail' => 'is_bulkmail varchar(16)',
       'signature_text' => 'signature_text longtext',
       'signature_html' => 'signature_html longtext',
-      'im_provider' => 'im_provider text',
+      'im_provider_id' => 'im_provider_id varchar(16)',
+      'instant_messenger_service' => 'instant_messenger_service varchar(255)',
       'im' => 'im varchar(64)',
       'openid' => 'openid varchar(255)',
       'world_region' => 'world_region varchar(128)',
@@ -2077,7 +2074,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'groups' => 'groups text',
       'tags' => 'tags text',
       'notes' => 'notes text',
-      'provider_id' => 'provider_id varchar(255)',
     ];
     if (!$isContactExport) {
       unset($columns['groups']);
@@ -2255,13 +2251,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'is_bulkmail' => 'is_bulkmail varchar(16)',
       'signature_text' => 'signature_text longtext',
       'signature_html' => 'signature_html longtext',
-      'im_provider' => 'im_provider text',
       'im' => 'im varchar(64)',
       'openid' => 'openid varchar(255)',
       'world_region' => 'world_region varchar(128)',
       'url' => 'url varchar(128)',
       'phone_type_id' => 'phone_type_id varchar(16)',
-      'provider_id' => 'provider_id varchar(255)',
       'financial_type' => 'financial_type varchar(64)',
       'contribution_source' => 'contribution_source varchar(255)',
       'receive_date' => 'receive_date varchar(32)',

@@ -57,6 +57,8 @@
     <name>name</name>
     <title>IM Screen Name</title>
     <type>varchar</type>
+    <uniqueName>im</uniqueName>
+    <export>true</export>
     <length>64</length>
     <import>true</import>
     <headerPattern>/I(nstant )?M(ess.*)?|screen(\s+)?name/i</headerPattern>
@@ -69,8 +71,10 @@
   </field>
   <field>
     <name>provider_id</name>
-    <title>IM Provider</title>
+    <title>IM Provider ID</title>
     <type>int unsigned</type>
+    <export>true</export>
+    <uniqueName>im_provider_id</uniqueName>
     <comment>Which IM Provider does this screen name belong to.</comment>
     <add>1.1</add>
     <pseudoconstant>

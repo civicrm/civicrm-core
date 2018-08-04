@@ -2809,4 +2809,22 @@ SELECT contact_id
     }
   }
 
+  /**
+   * Get exportable fields with pseudoconstants rendered as an extra field.
+   *
+   * @param string $baoClass
+   *
+   * @return array
+   */
+  public static function getExportableFieldsWithPseudoConstants($baoClass) {
+    if (method_exists($baoClass, 'exportableFields')) {
+      $fields = $baoClass::exportableFields();
+    }
+    else {
+      $fields = $baoClass::export();
+    }
+    CRM_Core_DAO::appendPseudoConstantsToFields($fields);
+    return $fields;
+  }
+
 }

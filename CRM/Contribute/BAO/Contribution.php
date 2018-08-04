@@ -787,15 +787,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * Get exportable fields with pseudoconstants rendered as an extra field.
-   */
-  public static function getExportableFieldsWithPseudoConstants() {
-    $fields = self::exportableFields();
-    CRM_Core_DAO::appendPseudoConstantsToFields($fields);
-    return $fields;
-  }
-
-  /**
    * Combine all the exportable fields from the lower level objects.
    *
    * @param bool $checkPermission

@@ -256,7 +256,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
         'phone_type_id' => [
           'name' => 'phone_type_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Phone Type'),
+          'title' => ts('Phone Type ID'),
           'description' => 'Which type of phone does this number belongs.',
           'export' => TRUE,
           'where' => 'civicrm_phone.phone_type_id',
