@@ -184,7 +184,7 @@ FROM civicrm_pcp_block block
 LEFT JOIN civicrm_pcp pcp ON pcp.pcp_block_id = block.id
 WHERE block.is_active = 1
 {$clause}
-GROUP BY block.id, pcp.id
+GROUP BY block.id
 ORDER BY target_entity_type, target_entity_id
 ";
     $pcpBlockDao = CRM_Core_DAO::executeQuery($query);
