@@ -273,7 +273,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    */
   public static function getAllPaymentProcessors($mode = 'all', $reset = FALSE, $isCurrentDomainOnly = TRUE) {
 
-    $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . $mode . '_' . CRM_Core_Config::domainID();
+    $cacheKey = 'CRM_Financial_BAO_Payment_Processor_' . $mode . '_' . $isCurrentDomainOnly . '_' . CRM_Core_Config::domainID();
     if (!$reset) {
       $processors = CRM_Utils_Cache::singleton()->get($cacheKey);
       if (!empty($processors)) {
@@ -370,10 +370,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   public static function getPaymentProcessors($capabilities = array(), $ids = FALSE) {
     $testProcessors = in_array('TestMode', $capabilities) ? self::getAllPaymentProcessors('test') : array();
     if (is_array($ids)) {
-      $processors = self::getAllPaymentProcessors('all', TRUE, FALSE);
+      $processors = self::getAllPaymentProcessors('all', FALSE, FALSE);
     }
     else {
-      $processors = self::getAllPaymentProcessors('all', TRUE);
+      $processors = self::getAllPaymentProcessors('all');
     }
 
     if (in_array('TestMode', $capabilities) && is_array($ids)) {
