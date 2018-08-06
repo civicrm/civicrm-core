@@ -2064,9 +2064,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    *   the permission that the user has (or null)
    */
   public static function checkPermission($eventId = NULL, $type = CRM_Core_Permission::VIEW) {
-    static $permissions = NULL;
-
-    if (empty($permissions)) {
+    if (!isset(Civi::$statics[__CLASS__]['permissions'])) {
       $params = array(
         'check_permissions' => 1,
         'return' => 'title',
@@ -2090,14 +2088,14 @@ WHERE  ce.loc_block_id = $locBlockId";
       // Note: for a multisite setup, a user with edit all events, can edit all events
       // including those from other sites
       if (CRM_Core_Permission::check('edit all events')) {
-        $permissions[CRM_Core_Permission::EDIT] = array_keys($allEvents);
+        Civi::$statics[__CLASS__]['permissions'][CRM_Core_Permission::EDIT] = array_keys($allEvents);
       }
       else {
-        $permissions[CRM_Core_Permission::EDIT] = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_event', $allEvents, $createdEvents);
+        Civi::$statics[__CLASS__]['permissions'][CRM_Core_Permission::EDIT] = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_event', $allEvents, $createdEvents);
       }
 
       if (CRM_Core_Permission::check('edit all events')) {
-        $permissions[CRM_Core_Permission::VIEW] = array_keys($allEvents);
+        Civi::$statics[__CLASS__]['permissions'][CRM_Core_Permission::VIEW] = array_keys($allEvents);
       }
       else {
         if (CRM_Core_Permission::check('access CiviEvent') &&
@@ -2108,25 +2106,25 @@ WHERE  ce.loc_block_id = $locBlockId";
           // at the same time also allow any hook to override if needed.
           $createdEvents = array_keys($allEvents);
         }
-        $permissions[CRM_Core_Permission::VIEW] = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_event', $allEvents, $createdEvents);
+        Civi::$statics[__CLASS__]['permissions'][CRM_Core_Permission::VIEW] = CRM_ACL_API::group(CRM_Core_Permission::VIEW, NULL, 'civicrm_event', $allEvents, $createdEvents);
       }
 
-      $permissions[CRM_Core_Permission::DELETE] = array();
+      Civi::$statics[__CLASS__]['permissions'][CRM_Core_Permission::DELETE] = array();
       if (CRM_Core_Permission::check('delete in CiviEvent')) {
         // Note: we want to restrict the scope of delete permission to
         // events that are editable/viewable (usecase multisite).
         // We can remove array_intersect once we have ACL support for delete functionality.
-        $permissions[CRM_Core_Permission::DELETE] = array_intersect($permissions[CRM_Core_Permission::EDIT],
-          $permissions[CRM_Core_Permission::VIEW]
+        Civi::$statics[__CLASS__]['permissions'][CRM_Core_Permission::DELETE] = array_intersect(Civi::$statics[__CLASS__]['permissions'][CRM_Core_Permission::EDIT],
+          Civi::$statics[__CLASS__]['permissions'][CRM_Core_Permission::VIEW]
         );
       }
     }
 
     if ($eventId) {
-      return in_array($eventId, $permissions[$type]) ? TRUE : FALSE;
+      return in_array($eventId, Civi::$statics[__CLASS__]['permissions'][$type]) ? TRUE : FALSE;
     }
 
-    return $permissions;
+    return Civi::$statics[__CLASS__]['permissions'];
   }
 
   /**

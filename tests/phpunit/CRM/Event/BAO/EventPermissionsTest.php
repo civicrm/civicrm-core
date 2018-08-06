@@ -42,8 +42,9 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
 
   public function testEditOwnEvent() {
     CRM_Core_Config::singleton()->userPermissionTemp = ['access civievent', 'access CiviCRM', 'view event info'];
+    unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
     $permissions = CRM_Event_BAO_Event::checkPermission($this->_eventId, CRM_Core_Permission::EDIT);
-    $this->assertEquals($permissions, TRUE);
+    $this->assertTrue($permissions);
   }
 
 }
