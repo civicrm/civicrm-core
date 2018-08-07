@@ -32,6 +32,7 @@ module.exports = function(config) {
       'bower_components/jquery-validation/dist/jquery.validate.min.js',
       'packages/jquery/plugins/jquery.timeentry.js',
       'js/Common.js',
+      'js/crm.datepicker.js',
       'bower_components/angular/angular.js',
       'js/crm.angular.js',
       angularTempFile,
