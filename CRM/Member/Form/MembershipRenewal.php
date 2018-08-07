@@ -236,21 +236,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('entityID', $this->_id);
     $selOrgMemType[0][0] = $selMemTypeOrg[0] = ts('- select -');
 
-    $allMembershipInfo = array();
-
     // CRM-21485
     if (is_array($defaults['membership_type_id'])) {
       $defaults['membership_type_id'] = $defaults['membership_type_id'][1];
     }
-
-    //CRM-16950
-    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-    $taxRate = CRM_Utils_Array::value($this->allMembershipTypeDetails[$defaults['membership_type_id']]['financial_type_id'], $taxRates);
-
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-
-    // auto renew options if enabled for the membership
-    $options = CRM_Core_SelectValues::memberAutoRenew();
 
     foreach ($this->allMembershipTypeDetails as $key => $values) {
       if (!empty($values['is_active'])) {
@@ -273,30 +262,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           }
         }
 
-        //CRM-16950
-        $taxAmount = NULL;
-        $totalAmount = CRM_Utils_Array::value('minimum_fee', $values);
-        if (CRM_Utils_Array::value($values['financial_type_id'], $taxRates)) {
-          $taxAmount = ($taxRate / 100) * CRM_Utils_Array::value('minimum_fee', $values);
-          $totalAmount = $totalAmount + $taxAmount;
-        }
-
-        // build membership info array, which is used to set the payment information block when
-        // membership type is selected.
-        $allMembershipInfo[$key] = array(
-          'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $values),
-          'total_amount' => CRM_Utils_Money::format($totalAmount, NULL, '%a'),
-          'total_amount_numeric' => $totalAmount,
-          'tax_message' => $taxAmount ? ts("Includes %1 amount of %2", array(1 => CRM_Utils_Array::value('tax_term', $invoiceSettings), 2 => CRM_Utils_Money::format($taxAmount))) : $taxAmount,
-        );
-
-        if (!empty($values['auto_renew'])) {
-          $allMembershipInfo[$key]['auto_renew'] = $options[$values['auto_renew']];
-        }
+        $this->membershipInfoArray[$key] = $this->getMembershipInfoArray($values, $totalAmount);
       }
     }
 
-    $this->assign('allMembershipInfo', json_encode($allMembershipInfo));
+    $this->assign('allMembershipInfo', json_encode($this->membershipInfoArray));
 
     if ($this->_memType) {
       $this->assign('orgName', $selMemTypeOrg[$this->allMembershipTypeDetails[$this->_memType]['member_of_contact_id']]);
@@ -716,6 +686,36 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         )
       );
     }
+  }
+
+  /**
+   * Build membership info array, which is used when membership type is selected.
+   *
+   * Data is used to:
+   * - set the payment information block
+   * - set the max related block
+   *
+   * @param array $values
+   * @param string $totalAmount
+   * @param string $taxAmount
+   *   (only used from membership renewal)
+   *
+   * @return array
+   */
+  protected function getMembershipInfoArray($values, $totalAmount, $taxAmount = NULL) {
+    $taxAmount = NULL;
+    $taxRate = $this->getTaxRateForFinancialType($values['financial_type_id']);
+    if ($taxRate) {
+      $taxAmount = ($taxRate / 100) * CRM_Utils_Array::value('minimum_fee', $values);
+      $totalAmount = $totalAmount + $taxAmount;
+    }
+    $membershipInfo = parent::getMembershipInfoArray($values, $totalAmount, $taxAmount);
+    // @todo Figure out why this auto_renew value is different for this form than for the Membership form
+    $options = CRM_Core_SelectValues::memberAutoRenew();
+    if (!empty($values['auto_renew'])) {
+      $membershipInfo['auto_renew'] = $options[$values['auto_renew']];
+    }
+    return $membershipInfo;
   }
 
 }
