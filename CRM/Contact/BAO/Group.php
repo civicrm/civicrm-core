@@ -539,8 +539,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param bool $isActive
    *   Value we want to set the is_active field.
    *
-   * @return CRM_Core_DAO|null
-   *   DAO object on success, NULL otherwise
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Group', $id, 'is_active', $isActive);

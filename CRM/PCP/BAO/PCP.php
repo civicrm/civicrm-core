@@ -709,7 +709,9 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *   Campaign page id.
    *
    * @param bool $is_active
-   * @return null
+   *
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setDisable($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_PCP_DAO_PCP', $id, 'is_active', $is_active);
