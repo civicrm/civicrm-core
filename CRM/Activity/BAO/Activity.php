@@ -780,7 +780,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         continue;
       }
 
-      $isBulkActivity = (!$bulkActivityTypeID || ($bulkActivityTypeID != $activity['activity_type_id']));
+      $isBulkActivity = (!$bulkActivityTypeID || ($bulkActivityTypeID === $activity['activity_type_id']));
       foreach ($mappingParams as $apiKey => $expectedName) {
         if (in_array($apiKey, array('assignee_contact_name', 'target_contact_name'))) {
           $activities[$id][$expectedName] = CRM_Utils_Array::value($apiKey, $activity, array());
@@ -2876,7 +2876,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     }
 
     // Get contact activities.
-    $activities = CRM_Activity_BAO_Activity::deprecatedGetActivities($params);
+    $activities = CRM_Activity_BAO_Activity::getActivities($params);
 
     // Add total.
     $params['total'] = CRM_Activity_BAO_Activity::deprecatedGetActivitiesCount($params);
@@ -2946,19 +2946,19 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
         }
         elseif (isset($values['target_contact_counter']) && $values['target_contact_counter']) {
           $activity['target_contact_name'] = '';
-          foreach ($values['target_contact_name'] as $tcID => $tcName) {
-            $targetTypeImage = "";
-            $targetLink = CRM_Utils_System::href($tcName, 'civicrm/contact/view', "reset=1&cid={$tcID}");
-            if ($showContactOverlay) {
-              $targetTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
-                CRM_Contact_BAO_Contact::getContactType($tcID),
-                FALSE,
-                $tcID);
-              $activity['target_contact_name'] .= "<div>$targetTypeImage  $targetLink";
-            }
-            else {
-              $activity['target_contact_name'] .= $targetLink;
-            }
+          $firstTargetName = reset($values['target_contact_name']);
+          $firstTargetContactID = key($values['target_contact_name']);
+
+          $targetLink = CRM_Utils_System::href($firstTargetName, 'civicrm/contact/view', "reset=1&cid={$firstTargetContactID}");
+          if ($showContactOverlay) {
+            $targetTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
+              CRM_Contact_BAO_Contact::getContactType($firstTargetContactID),
+              FALSE,
+              $firstTargetContactID);
+            $activity['target_contact_name'] .= "<div>$targetTypeImage  $targetLink";
+          }
+          else {
+            $activity['target_contact_name'] .= $targetLink;
           }
 
           if ($extraCount = $values['target_contact_counter'] - 1) {
