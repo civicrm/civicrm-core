@@ -1285,16 +1285,6 @@ Expires: ',
    * This test simulates what happens when one hits Edit on a Contribution that has both LineItems and Sales Tax components
    * Without making any Edits -> check that the LineItem data remain the same
    * In addition (a data-integrity check) -> check that the LineItem data add up to the data at the Contribution level
-   *
-   * NOTE/discussion on merging in assertions that are commented out (for now):
-   * https://github.com/civicrm/civicrm-core/pull/12611
-   *
-   * Quick summary: the following assertions are commented out for now as they currently Fail. Work is being done to figure out why the
-   *   $form->testSubmit produces different numbers when compared to the GUI
-   *
-   * // $this->assertEquals(50.00, $lineItem['unit_price']);
-   * // $this->assertEquals(50.00, $lineItem['line_total']);
-   * // $this->assertEquals($contribution['total_amount'], $lineItem['line_total'] + $lineItem['tax_amount']);
    */
   public function testLineItemAmountOnSalesTax() {
     $this->enableTaxAndInvoicing();
@@ -1305,6 +1295,8 @@ Expires: ',
     $this->createLoggedInUser();
     $priceSet = $this->callAPISuccess('PriceSet', 'Get', array("extends" => "CiviMember"));
     $form->set('priceSetId', $priceSet['id']);
+    // we are simulating the creation of a Price Set in Administer -> CiviContribute -> Manage Price Sets so set is_quick_config = 0
+    $this->callAPISuccess('PriceSet', 'Create', array("id" => $priceSet['id'], 'is_quick_config' => 0));
     // clean the price options static variable to repopulate the options, in order to fetch tax information
     \Civi::$statics['CRM_Price_BAO_PriceField']['priceOptions'] = NULL;
     CRM_Price_BAO_PriceSet::buildPriceSet($form);
@@ -1351,10 +1343,9 @@ Expires: ',
     // ensure that the LineItem data remain the same
     $lineItem = $this->callAPISuccessGetSingle('LineItem', array('entity_id' => $membership['id'], 'entity_table' => 'civicrm_membership'));
     $this->assertEquals(1, $lineItem['qty']);
-    // See documentation block + https://github.com/civicrm/civicrm-core/pull/12611
-    // $this->assertEquals(50.00, $lineItem['unit_price']);
-    // $this->assertEquals(50.00, $lineItem['line_total']);
-    $this->assertEquals(5.00, $lineItem['tax_amount']); // ensure that tax amount is not changed
+    $this->assertEquals(50.00, $lineItem['unit_price']);
+    $this->assertEquals(50.00, $lineItem['line_total']);
+    $this->assertEquals(5.00, $lineItem['tax_amount']);
 
     // ensure that the LineItem data add up to the data at the Contribution level
     $contribution = $this->callAPISuccessGetSingle('Contribution',
@@ -1363,8 +1354,7 @@ Expires: ',
         'return' => array('tax_amount', 'total_amount'),
       )
     );
-    // See documentation block + https://github.com/civicrm/civicrm-core/pull/12611
-    // $this->assertEquals($contribution['total_amount'], $lineItem['line_total'] + $lineItem['tax_amount']);
+    $this->assertEquals($contribution['total_amount'], $lineItem['line_total'] + $lineItem['tax_amount']);
     $this->assertEquals($contribution['tax_amount'], $lineItem['tax_amount']);
 
     // reset the price options static variable so not leave any dummy data, that might hamper other unit tests
