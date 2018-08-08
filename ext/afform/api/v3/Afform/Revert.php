@@ -42,6 +42,9 @@ function civicrm_api3_afform_revert($params) {
     }
   }
 
+  // We may have changed list of files covered by the cache.
+  $scanner->clear();
+
   // FIXME if `server_route` changes, then flush the menu cache.
   // FIXME if asset-caching is enabled, then flush the asset cache.
 
