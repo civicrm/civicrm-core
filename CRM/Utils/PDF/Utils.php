@@ -48,7 +48,7 @@ class CRM_Utils_PDF_Utils {
    *
    * @return string|void
    */
-  public static function html2pdf(&$text, $fileName = 'civicrm.pdf', $output = FALSE, $pdfFormat = NULL) {
+  public static function html2pdf(&$text, $fileName = 'civicrm.pdf', $output = FALSE, $pdfFormat = NULL, $type = 'pdf') {
     if (is_array($text)) {
       $pages = &$text;
     }
@@ -127,6 +127,14 @@ class CRM_Utils_PDF_Utils {
     </div>
   </body>
 </html>";
+
+    //output HTML if needed
+	  if($type == 'html') {
+		  header('Content-Disposition: attachment; filename="' . $fileName);
+		  echo $html;
+		  return;
+	  }
+
     if ($config->wkhtmltopdfPath) {
       return self::_html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName);
     }

@@ -431,7 +431,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $mimeType = self::getMimeType($type);
     // ^^ Useful side-effect: consistently throws error for unrecognized types.
 
-    if ($type == 'pdf') {
+    if ($type == 'pdf' || $type == 'html') {
       $fileName = "CiviLetter.$type";
       CRM_Utils_PDF_Utils::html2pdf($html, $fileName, FALSE, $formValues);
     }
