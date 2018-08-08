@@ -1830,8 +1830,10 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $toPhoneNumber = NULL;
 
     if ($smsProviderParams['To']) {
-      // If phone number is specified use it
+      // If phone number is specified use it. We assume this contact has
+      // been checked to ensure Do Not SMS is not selected.
       $toPhoneNumber = trim($smsProviderParams['To']);
+      $doNotSms = FALSE;
     }
     elseif ($toID) {
       // No phone number specified, so find a suitable one for the contact
