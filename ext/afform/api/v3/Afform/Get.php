@@ -59,5 +59,5 @@ function civicrm_api3_afform_get($params) {
     $records[$name] = $record;
   }
 
-  return _civicrm_api3_basic_array_get('CxnApp', $params, $records, 'name', _afform_fields());
+  return _civicrm_api3_basic_array_get('Afform', $params, $records, 'name', _afform_fields());
 }
