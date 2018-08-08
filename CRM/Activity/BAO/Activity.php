@@ -1394,6 +1394,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     if ($smsProviderParams['To']) {
       // If phone number is specified use it
       $toPhoneNumber = trim($smsProviderParams['To']);
+      $doNotSMS = FALSE;
     }
     elseif ($toID) {
       // No phone number specified, so find a suitable one for the contact
