@@ -37,6 +37,7 @@
     "dompdf/dompdf" : "0.8.*",
     "electrolinux/phpquery": "^0.9.6",
     "symfony/config": "^2.8.44 || ~3.0",
+    "symfony/polyfill-iconv": "~1.0",
     "symfony/dependency-injection": "^2.8.44 || ~3.0",
     "symfony/event-dispatcher": "^2.8.44 || ~3.0",
     "symfony/filesystem": "^2.8.44 || ~3.0",
