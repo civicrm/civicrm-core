@@ -1833,6 +1833,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     if ($smsProviderParams['To']) {
       // If phone number is specified use it
       $toPhoneNumber = trim($smsProviderParams['To']);
+      $doNotSMS = FALSE;
     }
     elseif ($toID) {
       // No phone number specified, so find a suitable one for the contact
@@ -1857,7 +1858,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
       );
     }
 
-    $recipient = $smsProviderParams['To'];
+    $recipient = $toPhoneNumber;
     $smsProviderParams['contact_id'] = $toID;
     $smsProviderParams['parent_activity_id'] = $activityID;
 
