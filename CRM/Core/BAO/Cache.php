@@ -448,7 +448,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       return $escape . md5($key);
     }
 
-    $r = preg_replace_callback(';[^A-Za-z0-9_\. ];', function($m) use ($escape) {
+    $r = preg_replace_callback(';[^A-Za-z0-9_\.];', function($m) use ($escape) {
       return $escape . dechex(ord($m[0]));
     }, $key);
 
