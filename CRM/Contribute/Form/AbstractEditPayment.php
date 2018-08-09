@@ -46,6 +46,9 @@
  *
  */
 class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
+
+  use CRM_Financial_Form_SalesTaxTrait;
+
   public $_mode;
 
   public $_action;
