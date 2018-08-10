@@ -397,7 +397,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   public function buildQuickForm() {
 
     $this->assign('currency', CRM_Core_Config::singleton()->defaultCurrencySymbol);
-
+    $isUpdateToExistingRecurringMembership = $this->isUpdateToExistingRecurringMembership();
     // build price set form.
     $buildPriceSet = FALSE;
     if ($this->_priceSetId || !empty($_POST['price_set_id'])) {
@@ -558,9 +558,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     );
 
     $sel->setOptions(array($selMemTypeOrg, $selOrgMemType));
-    $elementsFrozenOnMembershipsAlreadyRecurring = array();
-    if ($sel) {
-      $elementsFrozenOnMembershipsAlreadyRecurring[] = $sel;
+    if ($isUpdateToExistingRecurringMembership) {
+      $sel->freeze();
     }
 
     $this->applyFilter('__ALL__', 'trim');
@@ -572,8 +571,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->addDate('join_date', ts('Member Since'), FALSE, array('formatType' => 'activityDate'));
     $this->addDate('start_date', ts('Start Date'), FALSE, array('formatType' => 'activityDate'));
     $endDate = $this->addDate('end_date', ts('End Date'), FALSE, array('formatType' => 'activityDate'));
-    if ($endDate) {
-      $elementsFrozenOnMembershipsAlreadyRecurring[] = $endDate;
+    if ($endDate && $isUpdateToExistingRecurringMembership) {
+      $endDate->freeze();
     }
 
     $this->add('text', 'source', ts('Source'),
@@ -595,8 +594,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $statusOverride = $this->addElement('select', 'is_override', ts('Status Override?'),
         CRM_Member_StatusOverrideTypes::getSelectOptions()
       );
-      if ($statusOverride) {
-        $elementsFrozenOnMembershipsAlreadyRecurring[] = $statusOverride;
+      if ($statusOverride && $isUpdateToExistingRecurringMembership) {
+        $statusOverride->freeze();
       }
 
       $this->add('datepicker', 'status_override_end_date', ts('Status Override End Date'), '', FALSE, array('minDate' => time(), 'time' => FALSE));
@@ -663,17 +662,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->assign('displayName', $this->_memberDisplayName);
     }
 
-    $isUpdateToExistingRecurringMembership = $this->isUpdateToExistingRecurringMembership();
     if ($isUpdateToExistingRecurringMembership && CRM_Member_BAO_Membership::isCancelSubscriptionSupported($this->_id)) {
       $this->assign('cancelAutoRenew',
         CRM_Utils_System::url('civicrm/contribute/unsubscribe', "reset=1&mid={$this->_id}")
       );
     }
-    if ($isUpdateToExistingRecurringMembership) {
-      foreach ($elementsFrozenOnMembershipsAlreadyRecurring as $elem) {
-        $elem->freeze();
-      }
-    }
+
     $this->assign('isRecur', $isUpdateToExistingRecurringMembership);
 
     $this->addFormRule(array('CRM_Member_Form_Membership', 'formRule'), $this);
