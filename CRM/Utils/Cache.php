@@ -184,6 +184,10 @@ class CRM_Utils_Cache {
   public static function create($params = array()) {
     $types = (array) $params['type'];
 
+    if (!empty($params['name'])) {
+      $params['name'] = CRM_Core_BAO_Cache::cleanKey($params['name']);
+    }
+
     foreach ($types as $type) {
       switch ($type) {
         case '*memory*':
