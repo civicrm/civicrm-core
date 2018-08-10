@@ -160,6 +160,9 @@ class CRM_Utils_Cache {
    * @param array $params
    *   Array with keys:
    *   - name: string, unique symbolic name.
+   *     For a naming convention, use `snake_case` or `CamelCase` to maximize
+   *     portability/cleanliness. Any other punctuation or whitespace
+   *     should function correctly, but it can be harder to inspect/debug.
    *   - type: array|string, list of acceptable cache types, in order of preference.
    *   - prefetch: bool, whether to prefetch all data in cache (if possible).
    * @return CRM_Utils_Cache_Interface
