@@ -84,11 +84,12 @@ class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
 
   public function getCleanKeyExamples() {
     $es = [];
-    $es[] = ['hello_world and other.planets', 'hello_world and other.planets']; // allowed chars
+    $es[] = ['hello_world and/other.planets', 'hello_world-20and-2fother.planets']; // allowed chars
     $es[] = ['hello/world+-#@{}', 'hello-2fworld-2b-2d-23-40-7b-7d']; // escaped chars
-    $es[] = ['123456789 123456789 123456789 123456789 123456789 123456789 123', '123456789 123456789 123456789 123456789 123456789 123456789 123']; // long but allowed
-    $es[] = ['123456789 123456789 123456789 123456789 123456789 123456789 1234', '-2a008e182a4dcd1a78f405f30119e5f2']; // too long, md5 fallback
-    $es[] = ['123456789 /23456789 +23456789 -23456789 123456789 123456789', '-1b6baab5961431ed443ab321f5dfa0fb']; // too long, md5 fallback
+    $es[] = ['123456789 123456789 123456789 123456789 123456789 123', '123456789-20123456789-20123456789-20123456789-20123456789-20123']; // spaces are escaped
+    $es[] = ['123456789-123456789-123456789-123456789-123456789-123456789-123', '123456789-123456789-123456789-123456789-123456789-123456789-123']; // long but allowed
+    $es[] = ['123456789-123456789-123456789-123456789-123456789-123456789-1234', '-afe584fe1d38b9a007df7d7ba30558e2']; // too long, md5 fallback
+    $es[] = ['123456789-/23456789-+23456789--23456789-123456789-123456789', '-afe584fe1d38b9a007df7d7ba30558e2']; // too long, md5 fallback
     return $es;
   }
 
