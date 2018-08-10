@@ -664,20 +664,19 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     $isRecur = FALSE;
-    if ($this->_action & CRM_Core_Action::UPDATE) {
-      $recurContributionId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id,
-        'contribution_recur_id'
-      );
-      if ($recurContributionId && !CRM_Member_BAO_Membership::isSubscriptionCancelled($this->_id)) {
-        $isRecur = TRUE;
-        if (CRM_Member_BAO_Membership::isCancelSubscriptionSupported($this->_id)) {
-          $this->assign('cancelAutoRenew',
-            CRM_Utils_System::url('civicrm/contribute/unsubscribe', "reset=1&mid={$this->_id}")
-          );
-        }
-        foreach ($elements as $elem) {
-          $elem->freeze();
-        }
+    if ($this->_action & CRM_Core_Action::UPDATE
+      && CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id,
+      'contribution_recur_id')
+      && !CRM_Member_BAO_Membership::isSubscriptionCancelled($this->_id)) {
+
+      $isRecur = TRUE;
+      if (CRM_Member_BAO_Membership::isCancelSubscriptionSupported($this->_id)) {
+        $this->assign('cancelAutoRenew',
+          CRM_Utils_System::url('civicrm/contribute/unsubscribe', "reset=1&mid={$this->_id}")
+        );
+      }
+      foreach ($elements as $elem) {
+        $elem->freeze();
       }
     }
     $this->assign('isRecur', $isRecur);
