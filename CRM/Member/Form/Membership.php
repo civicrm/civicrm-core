@@ -558,9 +558,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     );
 
     $sel->setOptions(array($selMemTypeOrg, $selOrgMemType));
-    $elements = array();
+    $elementsFrozenOnMembershipsAlreadyRecurring = array();
     if ($sel) {
-      $elements[] = $sel;
+      $elementsFrozenOnMembershipsAlreadyRecurring[] = $sel;
     }
 
     $this->applyFilter('__ALL__', 'trim');
@@ -573,7 +573,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->addDate('start_date', ts('Start Date'), FALSE, array('formatType' => 'activityDate'));
     $endDate = $this->addDate('end_date', ts('End Date'), FALSE, array('formatType' => 'activityDate'));
     if ($endDate) {
-      $elements[] = $endDate;
+      $elementsFrozenOnMembershipsAlreadyRecurring[] = $endDate;
     }
 
     $this->add('text', 'source', ts('Source'),
@@ -596,7 +596,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         CRM_Member_StatusOverrideTypes::getSelectOptions()
       );
       if ($statusOverride) {
-        $elements[] = $statusOverride;
+        $elementsFrozenOnMembershipsAlreadyRecurring[] = $statusOverride;
       }
 
       $this->add('datepicker', 'status_override_end_date', ts('Status Override End Date'), '', FALSE, array('minDate' => time(), 'time' => FALSE));
@@ -663,23 +663,18 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->assign('displayName', $this->_memberDisplayName);
     }
 
-    $isRecur = FALSE;
-    if ($this->_action & CRM_Core_Action::UPDATE
-      && CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id,
-      'contribution_recur_id')
-      && !CRM_Member_BAO_Membership::isSubscriptionCancelled($this->_id)) {
-
-      $isRecur = TRUE;
-      if (CRM_Member_BAO_Membership::isCancelSubscriptionSupported($this->_id)) {
-        $this->assign('cancelAutoRenew',
-          CRM_Utils_System::url('civicrm/contribute/unsubscribe', "reset=1&mid={$this->_id}")
-        );
-      }
-      foreach ($elements as $elem) {
+    $isUpdateToExistingRecurringMembership = $this->isUpdateToExistingRecurringMembership();
+    if ($isUpdateToExistingRecurringMembership && CRM_Member_BAO_Membership::isCancelSubscriptionSupported($this->_id)) {
+      $this->assign('cancelAutoRenew',
+        CRM_Utils_System::url('civicrm/contribute/unsubscribe', "reset=1&mid={$this->_id}")
+      );
+    }
+    if ($isUpdateToExistingRecurringMembership) {
+      foreach ($elementsFrozenOnMembershipsAlreadyRecurring as $elem) {
         $elem->freeze();
       }
     }
-    $this->assign('isRecur', $isRecur);
+    $this->assign('isRecur', $isUpdateToExistingRecurringMembership);
 
     $this->addFormRule(array('CRM_Member_Form_Membership', 'formRule'), $this);
     $mailingInfo = Civi::settings()->get('mailing_backend');
@@ -1937,6 +1932,21 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         );
       }
     }
+  }
+
+  /**
+   * @return bool
+   */
+  protected function isUpdateToExistingRecurringMembership() {
+    $isRecur = FALSE;
+    if ($this->_action & CRM_Core_Action::UPDATE
+      && CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id,
+        'contribution_recur_id')
+      && !CRM_Member_BAO_Membership::isSubscriptionCancelled($this->_id)) {
+
+      $isRecur = TRUE;
+    }
+    return $isRecur;
   }
 
 }
