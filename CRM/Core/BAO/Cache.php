@@ -73,7 +73,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     $argString = "CRM_CT_{$group}_{$path}_{$componentID}";
     if (!array_key_exists($argString, self::$_cache)) {
       $cache = CRM_Utils_Cache::singleton();
-      self::$_cache[$argString] = $cache->get(self::cleanKey($argString));
+      $cleanKey = self::cleanKey($argString);
+      self::$_cache[$argString] = $cache->get($cleanKey);
       if (!self::$_cache[$argString]) {
         $table = self::getTableName();
         $where = self::whereCache($group, $path, $componentID);
@@ -81,7 +82,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         $data = $rawData ? self::decode($rawData) : NULL;
 
         self::$_cache[$argString] = $data;
-        $cache->set(self::cleanKey($argString), self::$_cache[$argString]);
+        $cache->set($cleanKey, self::$_cache[$argString]);
       }
     }
     return self::$_cache[$argString];
@@ -106,7 +107,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     $argString = "CRM_CT_CI_{$group}_{$componentID}";
     if (!array_key_exists($argString, self::$_cache)) {
       $cache = CRM_Utils_Cache::singleton();
-      self::$_cache[$argString] = $cache->get(self::cleanKey($argString));
+      $cleanKey = self::cleanKey($argString);
+      self::$_cache[$argString] = $cache->get($cleanKey);
       if (!self::$_cache[$argString]) {
         $table = self::getTableName();
         $where = self::whereCache($group, NULL, $componentID);
@@ -119,7 +121,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         $dao->free();
 
         self::$_cache[$argString] = $result;
-        $cache->set(self::cleanKey($argString), self::$_cache[$argString]);
+        $cache->set($cleanKey, self::$_cache[$argString]);
       }
     }
 
@@ -448,7 +450,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       return $escape . md5($key);
     }
 
-    $r = preg_replace_callback(';[^A-Za-z0-9_\. ];', function($m) use ($escape) {
+    $r = preg_replace_callback(';[^A-Za-z0-9_\.];', function($m) use ($escape) {
       return $escape . dechex(ord($m[0]));
     }, $key);
 
