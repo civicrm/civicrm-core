@@ -42,12 +42,17 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    *
    * @param string $str
    *   The permission to check.
+   * @param int $userId
    *
    * @return bool
    *   true if yes, else false
    */
-  public function check($str) {
+  public function check($str, $userId = NULL) {
     $config = CRM_Core_Config::singleton();
+    // JFactory::getUser does strict type checking, so convert falesy values to NULL
+    if (!$userId) {
+      $userId = NULL;
+    }
 
     $translated = $this->translateJoomlaPermission($str);
     if ($translated === CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
@@ -61,7 +66,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     // we've not yet figured out how to bootstrap joomla, so we should
     // not execute hooks if joomla is not loaded
     if (defined('_JEXEC')) {
-      $user = JFactory::getUser();
+      $user = JFactory::getUser($userId);
       $api_key    = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
 
       // If we are coming from REST we don't have a user but we do have the api_key for a user.

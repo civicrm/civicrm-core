@@ -1820,13 +1820,15 @@ abstract class CRM_Utils_Hook {
    *   The name of an atomic permission, ie. 'access deleted contacts'
    * @param bool $granted
    *   Whether this permission is currently granted. The hook can change this value.
+   * @param int $contactId
+   *   Contact whose permissions we are checking (if null, assume current user).
    *
    * @return null
    *   The return value is ignored
    */
-  public static function permission_check($permission, &$granted) {
-    return self::singleton()->invoke(array('permission', 'granted'), $permission, $granted,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+  public static function permission_check($permission, &$granted, $contactId) {
+    return self::singleton()->invoke(array('permission', 'granted', 'contactId'), $permission, $granted, $contactId,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_permission_check'
     );
   }
