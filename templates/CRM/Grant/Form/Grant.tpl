@@ -49,6 +49,10 @@
          <td class="label">{$form.grant_type_id.label}</td>
          <td>{$form.grant_type_id.html}</td>
       </tr>
+      <tr class="crm-grant-form-block-financial_type_id">
+         <td class="label">{$form.financial_type_id.label}</td>
+         <td>{$form.financial_type_id.html}</td>
+      </tr>
       <tr class="crm-grant-form-block-amount_total">
          <td class="label">{$form.amount_total.label}</td>
          <td>{$form.amount_total.html}</td>

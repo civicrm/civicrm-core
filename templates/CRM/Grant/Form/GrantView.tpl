@@ -44,8 +44,9 @@
     </div>
     <table class="crm-info-panel">
         <tr class="crm-grant-view-form-block-name"><td class="label">{ts}Name{/ts}</td><td class="bold">{$displayName}</td></tr>
-        <tr class="crm-grant-view-form-block-status_id"><td class="label">{ts}Grant Status{/ts}</td> <td>{$grantStatus}</td></tr>
-        <tr class="crm-grant-view-form-block-grant_type_id"><td class="label">{ts}Grant Type{/ts}</td> <td>{$grantType}</td></tr>
+        <tr class="crm-grant-view-form-block-status_id"><td class="label">{ts}Grant Status{/ts}</td> <td>{$status}</td></tr>
+        <tr class="crm-grant-view-form-block-grant_type_id"><td class="label">{ts}Grant Type{/ts}</td> <td>{$grant_type}</td></tr>
+        <tr class="crm-grant-view-form-block-grant_type_id"><td class="label">{ts}Financial Type{/ts}</td> <td>{$financial_type}</td></tr>
         <tr class="crm-grant-view-form-block-application_received_date"><td class="label">{ts}Application Received{/ts}</td> <td>{$application_received_date|crmDate}</td></tr>
         <tr class="crm-grant-view-form-block-decision_date"><td class="label">{ts}Grant Decision{/ts}</td> <td>{$decision_date|crmDate}</td></tr>
         <tr class="crm-grant-view-form-block-money_transfer_date"><td class="label">{ts}Money Transferred{/ts}</td> <td>{$money_transfer_date|crmDate}</td></tr>

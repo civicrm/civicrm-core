@@ -83,6 +83,12 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
       $query->_element['grant_note'] = 1;
       $query->_tables['grant_note'] = 1;
     }
+    if (!empty($query->_returnProperties['grant_financial_type'])) {
+      $query->_select['grant_financial_type'] = "civicrm_financial_type.name as grant_financial_type";
+      $query->_element['grant_financial_type'] = 1;
+      $query->_tables['civicrm_grant'] = 1;
+      $query->_tables['grant_financial_type'] = 1;
+    }
 
     if ($query->_mode & CRM_Contact_BAO_Query::MODE_GRANT) {
       $query->_select['grant_amount_requested'] = 'civicrm_grant.amount_requested as grant_amount_requested';
@@ -259,6 +265,10 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
         }
         break;
 
+      case 'grant_financial_type':
+        $from .= " $side JOIN civicrm_financial_type ON civicrm_grant.financial_type_id = civicrm_financial_type.id ";
+        break;
+
       case 'grant_note':
         $from .= " $side JOIN civicrm_note ON ( civicrm_note.entity_table = 'civicrm_grant' AND
                                                         civicrm_grant.id = civicrm_note.entity_id )";
@@ -291,6 +301,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
         'grant_report_received' => 1,
         'grant_money_transfer_date' => 1,
         'grant_note' => 1,
+        'grant_financial_type' => 1,
       );
     }
 

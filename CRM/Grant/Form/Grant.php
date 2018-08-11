@@ -212,6 +212,19 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     $this->add('text', 'amount_requested', ts('Amount Requested<br />(original currency)'));
     $this->addRule('amount_requested', ts('Please enter a valid amount.'), 'money');
 
+    // Check permissions for financial type first
+    $financialTypes = [];
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $this->_action);
+    if (empty($financialTypes)) {
+      CRM_Core_Error::statusBounce(ts('You do not have all the permissions needed for this page.'));
+    }
+    $this->add('select', 'financial_type_id',
+      ts('Financial Type'),
+      $financialTypes,
+      FALSE,
+      ['class' => 'crm-select2', 'placeholder' => ts('- select -')]
+    );
+
     $noteAttrib = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Note');
     $this->add('textarea', 'note', ts('Notes'), $noteAttrib['note']);
 
