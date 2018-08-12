@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,62 +26,41 @@
  */
 
 /**
- * This api exposes CiviCRM option groups.
+ * Class CRM_Core_BAO_SchemaHandlerTest.
  *
- * OptionGroups are containers for option values.
- *
- * @package CiviCRM_APIv3
+ * These tests create and drop indexes on the civicrm_uf_join table. The indexes
+ * being added and dropped we assume will never exist.
+ * @group headless
  */
+class CRM_Core_BAO_OptionGroupTest extends CiviUnitTestCase {
 
-/**
- * Get option groups.
- *
- * @param array $params
- *
- * @return array
- */
-function civicrm_api3_option_group_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-}
+  /**
+   * Test setup for every test.
+   */
+  public function setUp() {
+    parent::setUp();
+    $this->useTransaction(TRUE);
+  }
 
-/**
- * Create/update option group.
- *
- * @param array $params
- *   Array per getfields metadata.
- *
- * @return array
- */
-function civicrm_api3_option_group_create($params) {
-  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'OptionGroup');
-  civicrm_api('option_value', 'getfields', array('version' => 3, 'cache_clear' => 1));
-  return $result;
-}
+  /**
+   * Ensure only one option value exists after calling ensureOptionValueExists.
+   */
+  public function testEnsureOptionGroupExistsExistingValue() {
+    CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(array('name' => 'contribution_status'));
+    $this->callAPISuccessGetSingle('OptionGroup', array('name' => 'contribution_status'));
+  }
 
-/**
- * Adjust Metadata for Create action.
- *
- * The metadata is used for setting defaults, documentation & validation.
- *
- * @param array $params
- *   Array of parameters determined by getfields.
- */
-function _civicrm_api3_option_group_create_spec(&$params) {
-  $params['name']['api.unique'] = 1;
-  $params['is_active']['api.default'] = TRUE;
-}
+  /**
+   * Ensure only one option value exists adds a new value.
+   */
+  public function testEnsureOptionGroupExistsNewValue() {
+    CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(array('name' => 'Bombed'));
+    $optionGroups = $this->callAPISuccess('OptionValue', 'getoptions', array('field' => 'option_group_id'))['values'];
+    $this->assertTrue(in_array('Bombed', $optionGroups));
 
-/**
- * Delete an existing Option Group.
- *
- * This method is used to delete any existing OptionGroup given its id.
- *
- * @param array $params
- *   [id]
- *
- * @return array
- *   API Result Array
- */
-function civicrm_api3_option_group_delete($params) {
-  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+    CRM_Core_BAO_OptionGroup::ensureOptionGroupExists(array('name' => 'Bombed Again'));
+    $optionGroups = $this->callAPISuccess('OptionValue', 'getoptions', array('field' => 'option_group_id'))['values'];
+    $this->assertTrue(in_array('Bombed Again', $optionGroups));
+  }
+
 }
