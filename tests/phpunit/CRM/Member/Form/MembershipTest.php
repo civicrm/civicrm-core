@@ -1357,6 +1357,13 @@ Expires: ',
     $this->assertEquals($contribution['total_amount'], $lineItem['line_total'] + $lineItem['tax_amount']);
     $this->assertEquals($contribution['tax_amount'], $lineItem['tax_amount']);
 
+    $financialItems = $this->callAPISuccess('FinancialItem', 'get', array());
+    $financialItems_sum = 0;
+    foreach ($financialItems['values'] as $financialItem) {
+      $financialItems_sum += $financialItem['amount'];
+    }
+    $this->assertEquals($contribution['total_amount'], $financialItems_sum);
+
     // reset the price options static variable so not leave any dummy data, that might hamper other unit tests
     \Civi::$statics['CRM_Price_BAO_PriceField']['priceOptions'] = NULL;
     $this->disableTaxAndInvoicing();
