@@ -1460,7 +1460,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
 
-      if ($paymentStatus !== 'Completed') {
+      if ($formValues['payment_status_id'] != $completedContributionStatusId) {
         $params['status_id'] = $pendingMembershipStatusId;
         $params['skipStatusCal'] = TRUE;
         // unset send-receipt option, since receipt will be sent when ipn is received.
@@ -1478,7 +1478,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           }
         }
       }
-      $now = date('YmdHis');
+
       $params['receive_date'] = date('YmdHis');
       $params['invoice_id'] = $formValues['invoiceID'];
       $params['contribution_source'] = ts('%1 Membership Signup: Credit card or direct debit (by %2)',
@@ -1488,7 +1488,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $params['trxn_id'] = CRM_Utils_Array::value('trxn_id', $result);
       $params['is_test'] = ($this->_mode == 'live') ? 0 : 1;
       if (!empty($formValues['send_receipt'])) {
-        $params['receipt_date'] = $now;
+        $params['receipt_date'] = date('YmdHis');
       }
       else {
         $params['receipt_date'] = NULL;
@@ -1496,8 +1496,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       $this->set('params', $formValues);
       $this->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $result));
-      $this->assign('receive_date',
-        CRM_Utils_Date::mysqlToIso($params['receive_date'])
+      $this->assign('receive_date', CRM_Utils_Date::mysqlToIso($params['receive_date'])
       );
 
       // required for creating membership for related contacts
