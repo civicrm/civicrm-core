@@ -47,6 +47,40 @@ class CRM_Upgrade_Incremental_php_FiveFive extends CRM_Upgrade_Incremental_Base 
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_5_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Entity File schema updates', 'entityFileSchemaUpdate');
+  }
+
+  /**
+   * dev/core#321 - Prevent duplicate entries in civicrm_entity_file
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function entityFileSchemaUpdate(CRM_Queue_TaskContext $ctx) {
+    if (CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_entity_file', 'index_entity_file_id')) {
+      // Delete any stray duplicate rows and add unique index to prevent new dupes and enable INSERT/UPDATE combo query
+      CRM_Core_DAO::executeQuery('
+        DELETE ef1 FROM civicrm_entity_file ef1, civicrm_entity_file ef2
+          WHERE ef1.entity_table = ef2.entity_table AND
+           ef1.entity_id = ef2.entity_id AND
+           ef1.file_id = ef2.file_id AND
+           ef1.id > ef2.id
+      ');
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_entity_file DROP INDEX `index_entity_file_id`');
+      CRM_Core_BAO_SchemaHandler::createUniqueIndex('civicrm_entity_file', ['entity_table', 'entity_id', 'file_id']);
+    }
+
+    return TRUE;
+  }
+
+  /**
    * Compute any messages which should be displayed after upgrade.
    *
    * @param string $postUpgradeMessage

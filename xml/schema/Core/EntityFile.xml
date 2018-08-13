@@ -60,10 +60,11 @@
     <add>1.5</add>
   </foreignKey>
   <index>
-    <name>index_entity_file_id</name>
+    <name>UI_entity_table_entity_id_file_id</name>
     <fieldName>entity_table</fieldName>
     <fieldName>entity_id</fieldName>
     <fieldName>file_id</fieldName>
+    <unique>true</unique>
     <add>1.1</add>
   </index>
 </table>

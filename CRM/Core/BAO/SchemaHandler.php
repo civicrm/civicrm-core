@@ -412,6 +412,17 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
   }
 
   /**
+   * @param string $tableName
+   * @param array $fields
+   * @param string $prefix
+   */
+  public static function createUniqueIndex($tableName, $fields, $prefix = 'UI') {
+    $uniqueIndexName = sprintf('%s_%s', $prefix, implode('_', $fields));
+    $sql = sprintf(" ALTER TABLE %s ADD UNIQUE INDEX `%s` (%s)", $tableName, $uniqueIndexName, implode(', ', $fields));
+    CRM_Core_DAO::executeQuery($sql);
+  }
+
+  /**
    * Create indexes.
    *
    * @param $tables

@@ -533,7 +533,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
       // copy files attached to old activity if any, to new one,
       // as long as users have not selected the 'delete attachment' option.
-      if (empty($newActParams['is_delete_attachment'])) {
+      if (empty($newActParams['is_delete_attachment']) && ($this->_activityId != $activity->id)) {
         CRM_Core_BAO_File::copyEntityFile('civicrm_activity', $this->_activityId,
           'civicrm_activity', $activity->id
         );
