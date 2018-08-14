@@ -1403,7 +1403,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     $this->sqlArray[] = $sql;
     foreach ($this->sqlArray as $sql) {
       foreach (array('LEFT JOIN') as $term) {
-        $sql = str_replace($term, '<br>&nbsp&nbsp' . $term, $sql);
+        $sql = str_replace($term, '<br>  ' . $term, $sql);
       }
       foreach (array('FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT', ';') as $term) {
         $sql = str_replace($term, '<br><br>' . $term, $sql);
