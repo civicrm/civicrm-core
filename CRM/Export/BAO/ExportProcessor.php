@@ -73,6 +73,13 @@ class CRM_Export_BAO_ExportProcessor {
   protected $requestedFields;
 
   /**
+   * Is the contact being merged into a single household.
+   *
+   * @var bool
+   */
+  protected $isMergeSameHousehold;
+
+  /**
    * Key representing the head of household in the relationship array.
    *
    * e.g. ['8_b_a' => 'Household Member Is', '8_a_b = 'Household Member Of'.....]
@@ -99,13 +106,15 @@ class CRM_Export_BAO_ExportProcessor {
    * @param int $exportMode
    * @param array|NULL $requestedFields
    * @param string $queryOperator
+   * @param bool $isMergeSameHousehold
    */
-  public function __construct($exportMode, $requestedFields, $queryOperator) {
+  public function __construct($exportMode, $requestedFields, $queryOperator, $isMergeSameHousehold = FALSE) {
     $this->setExportMode($exportMode);
     $this->setQueryMode();
     $this->setQueryOperator($queryOperator);
     $this->setRequestedFields($requestedFields);
     $this->setRelationshipTypes();
+    $this->setIsMergeSameHousehold($isMergeSameHousehold);
   }
 
   /**
@@ -158,6 +167,34 @@ class CRM_Export_BAO_ExportProcessor {
     );
   }
 
+  /**
+   * @return bool
+   */
+  public function isMergeSameHousehold() {
+    return $this->isMergeSameHousehold;
+  }
+
+  /**
+   * @param bool $isMergeSameHousehold
+   */
+  public function setIsMergeSameHousehold($isMergeSameHousehold) {
+    $this->isMergeSameHousehold = $isMergeSameHousehold;
+  }
+
+  /**
+   * Return relationship types for household merge.
+   *
+   * @return mixed
+   */
+  public function getHouseholdRelationshipTypes() {
+    if (!$this->isMergeSameHousehold()) {
+      return [];
+    }
+    return [
+      CRM_Utils_Array::key('Household Member of', $this->getRelationshipTypes()),
+      CRM_Utils_Array::key('Head of Household for', $this->getRelationshipTypes()),
+    ];
+  }
 
   /**
    * @param $fieldName
@@ -165,6 +202,15 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function isRelationshipTypeKey($fieldName) {
     return array_key_exists($fieldName, $this->relationshipTypes);
+  }
+
+
+  /**
+   * @param $fieldName
+   * @return bool
+   */
+  public function isHouseholdMergeRelationshipTypeKey($fieldName) {
+    return in_array($fieldName, $this->getHouseholdRelationshipTypes());
   }
 
   /**
