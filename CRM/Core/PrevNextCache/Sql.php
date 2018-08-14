@@ -244,4 +244,27 @@ ORDER BY id
     return (int) CRM_Core_DAO::singleValueQuery($query, $params, TRUE, FALSE);
   }
 
+  /**
+   * Fetch a list of contacts from the prev/next cache for displaying a search results page
+   *
+   * @param string $cacheKey
+   * @param int $offset
+   * @param int $rowCount
+   * @return array
+   *   List of contact IDs.
+   */
+  public function fetch($cacheKey, $offset, $rowCount) {
+    $cids = array();
+    $dao = CRM_Utils_SQL_Select::from('civicrm_prevnext_cache pnc')
+      ->where('pnc.cacheKey = @cacheKey', ['cacheKey' => $cacheKey])
+      ->select('pnc.entity_id1 as cid')
+      ->orderBy('pnc.id')
+      ->limit($rowCount, $offset)
+      ->execute();
+    while ($dao->fetch()) {
+      $cids[] = $dao->cid;
+    }
+    return $cids;
+  }
+
 }
