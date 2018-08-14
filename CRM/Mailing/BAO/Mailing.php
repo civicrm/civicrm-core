@@ -233,6 +233,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         'mg.search_id IS NULL',
         "$contact.is_opt_out = 0",
         "$contact.is_deceased <> 1",
+        "$contact.do_not_sms = 0",
         "$entityTable.phone_type_id = " . CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_Phone', 'phone_type_id', 'Mobile'),
         "$entityTable.phone IS NOT NULL",
         "$entityTable.phone != ''",

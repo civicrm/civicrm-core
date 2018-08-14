@@ -1772,20 +1772,27 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
         $smsProviderParams['To'] = '';
       }
 
-      $sendResult = self::sendSMSMessage(
-        $contactId,
-        $tokenText,
-        $smsProviderParams,
-        $activityID,
-        $sourceContactId
-      );
+      $doNotSms = CRM_Utils_Array::value('do_not_sms', $contact, 0);
 
-      if (PEAR::isError($sendResult)) {
-        // Collect all of the PEAR_Error objects
-        $errMsgs[] = $sendResult;
+      if ($doNotSms) {
+        $errMsgs[] = PEAR::raiseError('Contact Does not accept SMS', NULL, PEAR_ERROR_RETURN);
       }
       else {
-        $success++;
+        $sendResult = self::sendSMSMessage(
+          $contactId,
+          $tokenText,
+          $smsProviderParams,
+          $activityID,
+          $sourceContactId
+        );
+
+        if (PEAR::isError($sendResult)) {
+          // Collect all of the PEAR_Error objects
+          $errMsgs[] = $sendResult;
+        }
+        else {
+          $success++;
+        }
       }
     }
 
@@ -1826,9 +1833,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     $activityID,
     $sourceContactID = NULL
   ) {
-    $doNotSms = TRUE;
     $toPhoneNumber = NULL;
-
     if ($smsProviderParams['To']) {
       // If phone number is specified use it
       $toPhoneNumber = trim($smsProviderParams['To']);
@@ -1842,13 +1847,12 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
         $toPhoneNumberDetails = reset($toPhoneNumbers);
         $toPhoneNumber = CRM_Utils_Array::value('phone', $toPhoneNumberDetails);
         // Contact allows to send sms
-        $doNotSms = FALSE;
       }
     }
 
     // make sure both phone are valid
     // and that the recipient wants to receive sms
-    if (empty($toPhoneNumber) or $doNotSms) {
+    if (empty($toPhoneNumber)) {
       return PEAR::raiseError(
         'Recipient phone number is invalid or recipient does not want to receive SMS',
         NULL,
@@ -1856,7 +1860,7 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
       );
     }
 
-    $recipient = $smsProviderParams['To'];
+    $recipient = $toPhoneNumber;
     $smsProviderParams['contact_id'] = $toID;
     $smsProviderParams['parent_activity_id'] = $activityID;
 
