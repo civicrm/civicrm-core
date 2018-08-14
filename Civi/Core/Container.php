@@ -441,11 +441,17 @@ class Container {
    * @return \CRM_Core_PrevNextCache_Interface
    */
   public static function createPrevNextCache($container) {
-    $cacheDriver = \CRM_Utils_Cache::getCacheDriver();
-    $service = 'prevnext.driver.' . strtolower($cacheDriver);
-    return $container->has($service)
-      ? $container->get($service)
-      : $container->get('prevnext.driver.sql');
+    $setting = \Civi::settings()->get('prevNextBackend');
+    if ($setting === 'default') {
+      $cacheDriver = \CRM_Utils_Cache::getCacheDriver();
+      $service = 'prevnext.driver.' . strtolower($cacheDriver);
+      return $container->has($service)
+        ? $container->get($service)
+        : $container->get('prevnext.driver.sql');
+    }
+    else {
+      return $container->get('prevnext.driver.' . $setting);
+    }
   }
 
   public static function createCacheConfig() {

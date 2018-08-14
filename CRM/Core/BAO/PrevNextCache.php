@@ -483,4 +483,18 @@ AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
     }
   }
 
+  /**
+   * Get a list of available backend services.
+   *
+   * @return array
+   *   Array(string $id => string $label).
+   */
+  public static function getPrevNextBackends() {
+    return [
+      'default' => ts('Default (Auto-detect)'),
+      'sql' => ts('SQL'),
+      'redis' => ts('Redis'),
+    ];
+  }
+
 }
