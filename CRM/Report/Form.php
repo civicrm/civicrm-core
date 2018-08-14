@@ -5374,7 +5374,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'title' => $options['prefix_label'] . ts('Gender'),
         'options' => CRM_Contact_BAO_Contact::buildOptions('gender_id'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-        'alter_display' => 'alterGenderID',
         'is_fields' => TRUE,
         'is_filters' => TRUE,
       ),
