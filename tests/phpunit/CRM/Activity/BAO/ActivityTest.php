@@ -1235,9 +1235,35 @@ $text
   }
 
   /**
-   * @param int $phoneType (0=no phone, phone_type option group (1=fixed, 2=mobile)
+   * Test that when a numbe ris specified in the To Param of the SMS provider parameters that an SMS is sent
+   * @see dev/core/#273
    */
-  public function createSendSmsTest($phoneType = 0) {
+  public function testSendSMSMobileInToProviderParam() {
+    list($sent, $activityId, $success) = $this->createSendSmsTest(2, TRUE);
+    $this->assertEquals(TRUE, $sent, "Expected sent should be true");
+    $this->assertEquals(1, $success, "Expected success to be 1");
+  }
+
+  /**
+   * Test that when a numbe ris specified in the To Param of the SMS provider parameters that an SMS is sent
+   * @see dev/core/#273
+   */
+  public function testSendSMSMobileInToProviderParamWithDoNotSMS() {
+    list($sent, $activityId, $success) = $this->createSendSmsTest(2, TRUE, ['do_not_sms' => 1]);
+    foreach ($sent as $error) {
+      $this->assertEquals('Contact Does not accept SMS', $error->getMessage());
+    }
+    $this->assertEquals(1, count($sent), "Expected sent should a PEAR Error");
+    $this->assertEquals(0, $success, "Expected success to be 0");
+  }
+
+
+  /**
+   * @param int $phoneType (0=no phone, phone_type option group (1=fixed, 2=mobile)
+   * @param bool $passPhoneTypeInContactDetails
+   * @param array $additionalContactParams additional contact creation params
+   */
+  public function createSendSmsTest($phoneType = 0, $passPhoneTypeInContactDetails = FALSE, $additionalContactParams = []) {
     $provider = civicrm_api3('SmsProvider', 'create', array(
       'name' => "CiviTestSMSProvider",
       'api_type' => "1",
@@ -1250,11 +1276,15 @@ $text
       "is_active" => "1",
       "domain_id" => "1",
     ));
+
     $smsProviderParams['provider_id'] = $provider['id'];
 
     // Create a contact
     $contactId = $this->individualCreate();
-    $contactsResult = $this->civicrm_api('contact', 'get', array('id' => $contactId, 'version' => $this->_apiversion));
+    if (!empty($additionalContactParams)) {
+      $this->callAPISuccess('contact', 'create', ['id' => $contactId] + $additionalContactParams);
+    }
+    $contactsResult = $this->callApiSuccess('contact', 'get', ['id' => $contactId, 'version' => $this->_apiversion]);
     $contactDetails = $contactsResult['values'];
 
     // Get contactIds from contact details
@@ -1288,6 +1318,10 @@ $text
           'phone' => 123456,
           'phone_type_id' => "Mobile",
         ));
+        if ($passPhoneTypeInContactDetails) {
+          $contactDetails[$contactId]['phone'] = $phone['values'][$phone['id']]['phone'];
+          $contactDetails[$contactId]['phone_type_id'] = $phone['values'][$phone['id']]['phone_type_id'];
+        }
         break;
 
       case 1:
@@ -1297,6 +1331,10 @@ $text
           'phone' => 654321,
           'phone_type_id' => "Phone",
         ));
+        if ($passPhoneTypeInContactDetails) {
+          $contactDetails[$contactId]['phone'] = $phone['values'][$phone['id']]['phone'];
+          $contactDetails[$contactId]['phone_type_id'] = $phone['values'][$phone['id']]['phone_type_id'];
+        }
         break;
     }
 
