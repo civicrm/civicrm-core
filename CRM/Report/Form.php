@@ -5387,7 +5387,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ),
       'age' => array(
         'title' => $options['prefix_label'] . ts('Age'),
-        'dbAlias' => 'TIMESTAMPDIFF(YEAR, ' . $tableAlias . '.birth_date, CURDATE())',
+        'dbAlias' => 'TIMESTAMPDIFF(YEAR, ' . $tableAlias . '_civireport.birth_date, CURDATE())',
         'type' => CRM_Utils_Type::T_INT,
         'is_fields' => TRUE,
       ),
