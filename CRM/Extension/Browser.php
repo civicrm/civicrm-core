@@ -34,45 +34,45 @@
  */
 class CRM_Extension_Browser {
 
-/**
- * An URL for public extensions repository.
- *
- * Note: This default is now handled through setting/*.php.
- *
- * @deprecated
- */
-const DEFAULT_EXTENSIONS_REPOSITORY = 'https://civicrm.org/extdir/ver={ver}|cms={uf}';
+  /**
+   * An URL for public extensions repository.
+   *
+   * Note: This default is now handled through setting/*.php.
+   *
+   * @deprecated
+   */
+  const DEFAULT_EXTENSIONS_REPOSITORY = 'https://civicrm.org/extdir/ver={ver}|cms={uf}';
 
-/**
- * Relative path below remote repository URL for single extensions file.
- */
-const SINGLE_FILE_PATH = '/single';
+  /**
+   * Relative path below remote repository URL for single extensions file.
+   */
+  const SINGLE_FILE_PATH = '/single';
 
-/**
- * The name of the single JSON extension cache file.
- */
-const CACHE_JSON_FILE = 'extensions.json';
+  /**
+   * The name of the single JSON extension cache file.
+   */
+  const CACHE_JSON_FILE = 'extensions.json';
 
-// timeout for when the connection or the server is slow
-const CHECK_TIMEOUT = 5;
-/**
- * @var CRM_Utils_HttpClient
- */
-// protected $client;
-/**
- * @var CRM_Utils_Cache_Interface
- */
-protected $cache;
-/**
- * Create default instance.
- * @return CRM_Extension_Browser
- */
-public static function create() {
-  return new CRM_Extension_Browser(
-    Civi::cache('extension_browser'),
-    CRM_Utils_HttpClient::singleton()
-  );
-}
+  // timeout for when the connection or the server is slow
+  const CHECK_TIMEOUT = 5;
+  /**
+   * @var CRM_Utils_HttpClient
+   */
+  // protected $client;
+  /**
+   * @var CRM_Utils_Cache_Interface
+   */
+  protected $cache;
+  /**
+   * Create default instance.
+   * @return CRM_Extension_Browser
+   */
+  public static function create() {
+    return new CRM_Extension_Browser(
+      Civi::cache('extension_browser'),
+      CRM_Utils_HttpClient::singleton()
+    );
+  }
 
 /**
  * @param string $repoUrl
@@ -329,5 +329,5 @@ public function grabCachedJson() {
   public static function downloadError($errorNumber, $errorString) {
   }
 
- }
+}
 }
