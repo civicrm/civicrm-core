@@ -66,26 +66,23 @@ class CRM_Extension_Browser {
 
   /**
    * Create default instance.
-   *
    * @return CRM_Extension_Browser
    */
 
    public static function create() {
-     return new CRM_Extension_Browser(
-       Civi::cache('extension_browser'),
-       CRM_Utils_HttpClient::singleton()
+    return new CRM_Extension_Browser(
+      Civi::cache('extension_browser'),
+      CRM_Utils_HttpClient::singleton()
      );
    }
 
    /**
     * @param string $repoUrl
-    *   URL of the remote repository.
+    *  URL of the remote repository.
     * @param string $indexPath
-    *   Relative path of the 'index' file within the repository.
-    * @param string $cacheDir
-    *   Local path in which to cache files.
+    *  Relative path of the 'index' file within the repository.
+    *  Local path in which to cache files.
     * @param CRM_Utils_Cache_Interface $cache
-    * @param CRM_Utils_HttpClient $client
     */
 
   public function __construct($cache, $client, $repoUrl, $indexPath) {
@@ -95,18 +92,16 @@ class CRM_Extension_Browser {
     // $this->client = $client;
     $this->indexPath = empty($indexPath) ? self::SINGLE_FILE_PATH : $indexPath;
     // if ($cacheDir && !file_exists($cacheDir) && is_dir(dirname($cacheDir)) && is_writable(dirname($cacheDir))) {
-    //   CRM_Utils_File::createDir($cacheDir, FALSE);
+    // CRM_Utils_File::createDir($cacheDir, FALSE);
     // }
   }
 
-  /**
-   * Determine whether the system policy allows downloading new extensions.
-   *
-   * This is reflection of *policy* and *intent*; it does not indicate whether
-   * the browser will actually *work*. For that, see checkRequirements().
-   *
-   * @return bool
-   */
+ /**
+  * Determine whether the system policy allows downloading new extensions.
+  * This is reflection of *policy* and *intent*; it does not indicate whether
+  * the browser will actually *work*. For that, see checkRequirements().
+  * @return bool
+  */
   public function isEnabled() {
     return (FALSE !== $this->getRepositoryUrl());
   }
@@ -241,17 +236,20 @@ class CRM_Extension_Browser {
    *
    * @return string
    */
-  // private function grabCachedJson() {
-  //   $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this->getRepositoryUrl());
-  //   $json = NULL;
-  //   if (file_exists($filename)) {
-  //     $json = file_get_contents($filename);
-  //   }
-  //   if (empty($json)) {
-  //     $json = $this->grabRemoteJson();
-  //   }
-  //   return $json;
-  // }
+
+/**   
+private function grabCachedJson() {
+     $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this-   >getRepositoryUrl());
+     $json = NULL;
+     if (file_exists($filename)) {
+       $json = file_get_contents($filename);
+     }
+     if (empty($json)) {
+       $json = $this->grabRemoteJson();
+     }
+     return $json;
+   }
+*/
 
   public function grabCachedJson() {
     $isChanged = FALSE;
@@ -268,10 +266,9 @@ class CRM_Extension_Browser {
       $newExtension = $this->grabRemoteJson();
         $extension = $newExtension;
         $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['ttl'];
-
-      // else {
-      //   // keep the old extensions for now, try again later
-      //   $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['retry'];
+     else {
+      // keep the old extensions for now, try again later
+      // $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['retry'];
       // }
       $isChanged = TRUE;
     }

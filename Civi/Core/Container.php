@@ -163,7 +163,7 @@ class Container {
     $basicCaches = array(
       'js_strings' => 'js_strings',
       'community_messages' => 'community_messages',
-      'extension_browser' =>  'extension_browser',
+      'extension_browser' => 'extension_browser',
       'checks' => 'checks',
       'session' => 'CiviCRM Session',
     );
