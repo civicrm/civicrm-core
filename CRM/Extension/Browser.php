@@ -63,12 +63,10 @@ const CHECK_TIMEOUT = 5;
  * @var CRM_Utils_Cache_Interface
  */
 protected $cache;
-
 /**
  * Create default instance.
  * @return CRM_Extension_Browser
  */
-
 public static function create() {
   return new CRM_Extension_Browser(
     Civi::cache('extension_browser'),
