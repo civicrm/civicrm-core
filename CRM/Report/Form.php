@@ -1393,6 +1393,10 @@ class CRM_Report_Form extends CRM_Core_Form {
     if (!CRM_Core_Permission::check('view report sql')) {
       return;
     }
+    $ignored_output_modes = array('pdf', 'csv', 'print');
+    if (in_array($this->_outputMode, $ignored_output_modes)) {
+      return;
+    }
     $this->tabs['Developer'] = array(
       'title' => ts('Developer'),
       'tpl' => 'Developer',
