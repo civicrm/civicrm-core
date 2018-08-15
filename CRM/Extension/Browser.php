@@ -296,29 +296,29 @@ class CRM_Extension_Browser {
         return array();
       }
 
-    $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this->getRepositoryUrl());
-    $url = $this->getRepositoryUrl() . $this->indexPath;
-    $status = CRM_Utils_HttpClient::singleton()->fetch($url, $filename);
+      $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this->getRepositoryUrl());
+      $url = $this->getRepositoryUrl() . $this->indexPath;
+      $status = CRM_Utils_HttpClient::singleton()->fetch($url, $filename);
 
-    ini_restore('allow_url_fopen');
-    ini_restore('default_socket_timeout');
+      ini_restore('allow_url_fopen');
+      ini_restore('default_socket_timeout');
 
-    restore_error_handler();
+      restore_error_handler();
 
-    if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
-      throw new CRM_Extension_Exception(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests or contact CiviCRM team on <a href="http://forum.civicrm.org/">CiviCRM forum</a>.', array(1 => $this->getRepositoryUrl())), 'connection_error');
+      if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
+        throw new CRM_Extension_Exception(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests or contact CiviCRM team on <a href="http://forum.civicrm.org/">CiviCRM forum</a>.', array(1 => $this->getRepositoryUrl())), 'connection_error');
+      }
+
+      // Don't call grabCachedJson here, that would risk infinite recursion
+      return file_get_contents($filename);
     }
 
-    // Don't call grabCachedJson here, that would risk infinite recursion
-    return file_get_contents($filename);
-  }
-
-  /**
-   * @return string
-   */
-  private function getTsPath() {
-    return $this->cacheDir . DIRECTORY_SEPARATOR . 'timestamp.txt';
-  }
+    /**
+     * @return string
+     */
+    private function getTsPath() {
+      return $this->cacheDir . DIRECTORY_SEPARATOR . 'timestamp.txt';
+    }
 
   /**
    * A dummy function required for suppressing download errors.
