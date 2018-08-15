@@ -320,14 +320,14 @@ class CRM_Extension_Browser {
       return $this->cacheDir . DIRECTORY_SEPARATOR . 'timestamp.txt';
     }
 
-  /**
-   * A dummy function required for suppressing download errors.
-   *
-   * @param $errorNumber
-   * @param $errorString
-   */
-  public static function downloadError($errorNumber, $errorString) {
-  }
+    /**
+     * A dummy function required for suppressing download errors.
+     *
+     * @param $errorNumber
+     * @param $errorString
+     */
+    public static function downloadError($errorNumber, $errorString) {
+    }
 
   }
 }
