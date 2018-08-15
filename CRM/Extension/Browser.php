@@ -154,7 +154,7 @@ class CRM_Extension_Browser {
    * Get a list of all available extensions.
    *
    * @return array
-   *($key => CRM_Extension_Info)
+   * ($key => CRM_Extension_Info)
    */
   public function getExtensions() {
     if (!$this->isEnabled() || count($this->checkRequirements())) {
@@ -330,4 +330,5 @@ class CRM_Extension_Browser {
     }
 
   }
+
 }
