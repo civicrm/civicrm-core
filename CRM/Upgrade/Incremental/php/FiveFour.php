@@ -56,7 +56,7 @@ class CRM_Upgrade_Incremental_php_FiveFour extends CRM_Upgrade_Incremental_Base 
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '5.4.alpha1') {
-      $postUpgradeMessage .= '<p>' . ts('A new %1 permission has been added. It is not granted by default. If your users create reports, you may wish to review your permissions.', array(1 => 'save Report Criteria')) . '</p>';
+      $postUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. It is not granted by default. If your users create reports, you may wish to review their permissions.', array(1 => ts('save Report Criteria'))) . '</p>';
     }
     // Example: Generate a post-upgrade message.
     // if ($rev == '5.12.34') {
