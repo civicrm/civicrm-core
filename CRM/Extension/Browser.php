@@ -117,8 +117,8 @@ class CRM_Extension_Browser {
     $file = $this->getTsPath();
     if (file_exists($file)) {
       unlink($file);
-      }
     }
+  }
 
   /**
    * Determine whether downloading is supported.
@@ -281,20 +281,20 @@ class CRM_Extension_Browser {
      * @return string
      * @throws \CRM_Extension_Exception
      */
-  private function grabRemoteJson() {
+    private function grabRemoteJson() {
 
       ini_set('default_socket_timeout', self::CHECK_TIMEOUT);
       set_error_handler(array('CRM_Extension_Browser', 'downloadError'));
 
       if (!ini_get('allow_url_fopen')) {
         ini_set('allow_url_fopen', 1);
-    }
+      }
 
-    if (FALSE === $this->getRepositoryUrl()) {
-      // don't check if the user has configured civi not to check an external
-      // url for extensions. See CRM-10575.
-      return array();
-    }
+      if (FALSE === $this->getRepositoryUrl()) {
+        // don't check if the user has configured civi not to check an external
+        // url for extensions. See CRM-10575.
+        return array();
+      }
 
     $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this->getRepositoryUrl());
     $url = $this->getRepositoryUrl() . $this->indexPath;
