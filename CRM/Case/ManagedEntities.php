@@ -111,7 +111,7 @@ class CRM_Case_ManagedEntities {
     $result = array();
 
     if (!isset(Civi::$statics[__CLASS__]['reltypes'])) {
-      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE, NULL);
+      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('name', TRUE, NULL);
       Civi::$statics[__CLASS__]['reltypes'] = CRM_Utils_Array::collect(CRM_Case_XMLProcessor::REL_TYPE_CNAME, $relationshipInfo);
     }
     $validRelTypes = Civi::$statics[__CLASS__]['reltypes'];
