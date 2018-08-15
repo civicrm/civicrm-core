@@ -241,6 +241,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     $processorParams['month'] = $processorParams['credit_card_exp_date']['M'];
     $processorParams['year'] = $processorParams['credit_card_exp_date']['Y'];
     $processorParams['subscriptionId'] = $this->_subscriptionDetails->subscription_id;
+    $processorParams['recur_id'] = $this->_subscriptionDetails->recur_id;
     $processorParams['amount'] = $this->_subscriptionDetails->amount;
     $updateSubscription = $this->_paymentProcessor['object']->updateSubscriptionBillingInfo($message, $processorParams);
     if (is_a($updateSubscription, 'CRM_Core_Error')) {
