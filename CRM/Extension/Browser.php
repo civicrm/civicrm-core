@@ -116,9 +116,9 @@ class CRM_Extension_Browser {
   public function refresh() {
     $file = $this->getTsPath();
     if (file_exists($file)) {
-    unlink($file);
+      unlink($file);
+      }
     }
-  }
 
   /**
    * Determine whether downloading is supported.
@@ -274,20 +274,20 @@ class CRM_Extension_Browser {
       return $extension;
     }
 
-  /**
-   * Connects to public server and grabs the list of publicly available
-   * extensions.
-   *
-   * @return string
-   * @throws \CRM_Extension_Exception
-   */
+    /**
+     * Connects to public server and grabs the list of publicly available
+     * extensions.
+     *
+     * @return string
+     * @throws \CRM_Extension_Exception
+     */
   private function grabRemoteJson() {
 
-    ini_set('default_socket_timeout', self::CHECK_TIMEOUT);
-    set_error_handler(array('CRM_Extension_Browser', 'downloadError'));
+      ini_set('default_socket_timeout', self::CHECK_TIMEOUT);
+      set_error_handler(array('CRM_Extension_Browser', 'downloadError'));
 
-    if (!ini_get('allow_url_fopen')) {
-      ini_set('allow_url_fopen', 1);
+      if (!ini_get('allow_url_fopen')) {
+        ini_set('allow_url_fopen', 1);
     }
 
     if (FALSE === $this->getRepositoryUrl()) {
@@ -329,5 +329,5 @@ class CRM_Extension_Browser {
   public static function downloadError($errorNumber, $errorString) {
   }
 
-}
+  }
 }
