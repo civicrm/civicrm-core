@@ -266,12 +266,12 @@ public function grabCachedJson() {
     $newExtension = $this->grabRemoteJson();
     $extension = $newExtension;
     $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['ttl'];
-   else {
-    // keep the old extensions for now, try again later
-    // $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['retry'];
-    // }
-    $isChanged = TRUE;
-   }
+    else {
+      // keep the old extensions for now, try again later
+      // $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['retry'];
+      // }
+      $isChanged = TRUE;
+    }
     if ($isChanged) {
       $this->cache->set('Extension_Browser', $extension);
     }
