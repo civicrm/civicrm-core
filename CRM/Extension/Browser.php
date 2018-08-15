@@ -76,166 +76,166 @@ public static function create() {
   );
 }
 
-    /**
-     * @param string $repoUrl
-     *  URL of the remote repository.
-     * @param string $indexPath
-     *  Relative path of the 'index' file within the repository.
-     *  Local path in which to cache files.
-     * @param CRM_Utils_Cache_Interface $cache
-     */
+/**
+ * @param string $repoUrl
+ *  URL of the remote repository.
+ * @param string $indexPath
+ *  Relative path of the 'index' file within the repository.
+ *  Local path in which to cache files.
+ * @param CRM_Utils_Cache_Interface $cache
+ */
 
-    public function __construct($cache, $client, $repoUrl, $indexPath) {
-      $this->repoUrl = $repoUrl;
-      // $this->cacheDir = $cacheDir;
-      $this->cache = $cache;
-      // $this->client = $client;
-      $this->indexPath = empty($indexPath) ? self::SINGLE_FILE_PATH : $indexPath;
-      // if ($cacheDir && !file_exists($cacheDir) && is_dir(dirname($cacheDir)) && is_writable(dirname($cacheDir))) {
-      // CRM_Utils_File::createDir($cacheDir, FALSE);
-      // }
-    }
+public function __construct($cache, $client, $repoUrl, $indexPath) {
+  $this->repoUrl = $repoUrl;
+  // $this->cacheDir = $cacheDir;
+  $this->cache = $cache;
+  // $this->client = $client;
+  $this->indexPath = empty($indexPath) ? self::SINGLE_FILE_PATH : $indexPath;
+  // if ($cacheDir && !file_exists($cacheDir) && is_dir(dirname($cacheDir)) && is_writable(dirname($cacheDir))) {
+  // CRM_Utils_File::createDir($cacheDir, FALSE);
+  // }
+}
 
- /**
-  * Determine whether the system policy allows downloading new extensions.
-  * This is reflection of *policy* and *intent*; it does not indicate whether
-  * the browser will actually *work*. For that, see checkRequirements().
-  * @return bool
-  */
-  public function isEnabled() {
-    return (FALSE !== $this->getRepositoryUrl());
+/**
+ * Determine whether the system policy allows downloading new extensions.
+ * This is reflection of *policy* and *intent*; it does not indicate whether
+ * the browser will actually *work*. For that, see checkRequirements().
+ * @return bool
+ */
+public function isEnabled() {
+  return (FALSE !== $this->getRepositoryUrl());
+}
+
+/**
+ * @return string
+ */
+public function getRepositoryUrl() {
+  return $this->repoUrl;
+}
+
+/**
+ * Refresh the cache of remotely-available extensions.
+ */
+public function refresh() {
+  $file = $this->getTsPath();
+  if (file_exists($file)) {
+    unlink($file);
+  }
+}
+
+/**
+ * Determine whether downloading is supported.
+ *
+ * @return array
+ *   List of error messages; empty if OK.
+ */
+public function checkRequirements() {
+  if (!$this->isEnabled()) {
+    return array();
   }
 
-  /**
-   * @return string
-   */
-  public function getRepositoryUrl() {
-    return $this->repoUrl;
+  $errors = array();
+
+  // if (!$this->cacheDir || !is_dir($this->cacheDir) || !is_writable($this->cacheDir)) {
+  //   $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
+  //   $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination=${civicrmDestination}");
+  //   $errors[] = array(
+  //     'title' => ts('Directory Unwritable'),
+  //     'message' => ts('Your extensions cache directory (%1) is not web server writable. Please go to the <a href="%2">path setting page</a> and correct it.<br/>',
+  //       array(
+  //         1 => $this->cacheDir,
+  //         2 => $url,
+  //       )
+  //     ),
+  //   );
+  // }
+
+  return $errors;
+}
+
+/**
+ * Get a list of all available extensions.
+ *
+ * @return array
+ *   ($key => CRM_Extension_Info)
+ */
+public function getExtensions() {
+  if (!$this->isEnabled() || count($this->checkRequirements())) {
+    return array();
   }
 
-  /**
-   * Refresh the cache of remotely-available extensions.
-   */
-  public function refresh() {
-    $file = $this->getTsPath();
-    if (file_exists($file)) {
-      unlink($file);
-    }
-  }
+  $exts = array();
 
-  /**
-   * Determine whether downloading is supported.
-   *
-   * @return array
-   *   List of error messages; empty if OK.
-   */
-  public function checkRequirements() {
-    if (!$this->isEnabled()) {
-      return array();
-    }
-
-    $errors = array();
-
-    // if (!$this->cacheDir || !is_dir($this->cacheDir) || !is_writable($this->cacheDir)) {
-    //   $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
-    //   $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination=${civicrmDestination}");
-    //   $errors[] = array(
-    //     'title' => ts('Directory Unwritable'),
-    //     'message' => ts('Your extensions cache directory (%1) is not web server writable. Please go to the <a href="%2">path setting page</a> and correct it.<br/>',
-    //       array(
-    //         1 => $this->cacheDir,
-    //         2 => $url,
-    //       )
-    //     ),
-    //   );
-    // }
-
-    return $errors;
-  }
-
-  /**
-   * Get a list of all available extensions.
-   *
-   * @return array
-   *   ($key => CRM_Extension_Info)
-   */
-  public function getExtensions() {
-    if (!$this->isEnabled() || count($this->checkRequirements())) {
-      return array();
-    }
-
-    $exts = array();
-
-    $remote = $this->_discoverRemote();
-    if (is_array($remote)) {
-      foreach ($remote as $dc => $e) {
-        $exts[$e->key] = $e;
-      }
-    }
-
-    return $exts;
-  }
-
-  /**
-   * Get a description of a particular extension.
-   *
-   * @param string $key
-   *   Fully-qualified extension name.
-   *
-   * @return CRM_Extension_Info|NULL
-   */
-  public function getExtension($key) {
-    // TODO optimize performance -- we don't need to fetch/cache the entire repo
-    $exts = $this->getExtensions();
-    if (array_key_exists($key, $exts)) {
-      return $exts[$key];
-    }
-    else {
-      return NULL;
+  $remote = $this->_discoverRemote();
+  if (is_array($remote)) {
+    foreach ($remote as $dc => $e) {
+      $exts[$e->key] = $e;
     }
   }
 
-  /**
-   * @return array
-   * @throws CRM_Extension_Exception_ParseException
-   */
-  private function _discoverRemote() {
-    $tsPath = $this->getTsPath();
-    $timestamp = FALSE;
+  return $exts;
+}
 
-    if (file_exists($tsPath)) {
-      $timestamp = file_get_contents($tsPath);
-    }
+/**
+ * Get a description of a particular extension.
+ *
+ * @param string $key
+ *   Fully-qualified extension name.
+ *
+ * @return CRM_Extension_Info|NULL
+ */
+public function getExtension($key) {
+  // TODO optimize performance -- we don't need to fetch/cache the entire repo
+  $exts = $this->getExtensions();
+  if (array_key_exists($key, $exts)) {
+    return $exts[$key];
+  }
+  else {
+    return NULL;
+  }
+}
 
-    // 3 minutes ago for now
-    $outdated = (int) $timestamp < (time() - 180) ? TRUE : FALSE;
+/**
+ * @return array
+ * @throws CRM_Extension_Exception_ParseException
+ */
+private function _discoverRemote() {
+  $tsPath = $this->getTsPath();
+  $timestamp = FALSE;
 
-    if (!$timestamp || $outdated) {
-      $remotes = json_decode($this->grabRemoteJson(), TRUE);
-    }
-    else {
-      $remotes = json_decode($this->grabCachedJson(), TRUE);
-    }
-
-    $this->_remotesDiscovered = array();
-    foreach ((array) $remotes as $id => $xml) {
-      $ext = CRM_Extension_Info::loadFromString($xml);
-      $this->_remotesDiscovered[] = $ext;
-    }
-
-    if (file_exists(dirname($tsPath))) {
-      file_put_contents($tsPath, (string) time());
-    }
-
-    return $this->_remotesDiscovered;
+  if (file_exists($tsPath)) {
+    $timestamp = file_get_contents($tsPath);
   }
 
-  /**
-   * Loads the extensions data from the cache file. If it is empty
-   * or doesn't exist, try fetching from remote instead.
-   *
-   * @return string
-   */
+  // 3 minutes ago for now
+  $outdated = (int) $timestamp < (time() - 180) ? TRUE : FALSE;
+
+  if (!$timestamp || $outdated) {
+    $remotes = json_decode($this->grabRemoteJson(), TRUE);
+  }
+  else {
+    $remotes = json_decode($this->grabCachedJson(), TRUE);
+  }
+
+  $this->_remotesDiscovered = array();
+  foreach ((array) $remotes as $id => $xml) {
+    $ext = CRM_Extension_Info::loadFromString($xml);
+    $this->_remotesDiscovered[] = $ext;
+  }
+
+  if (file_exists(dirname($tsPath))) {
+    file_put_contents($tsPath, (string) time());
+  }
+
+  return $this->_remotesDiscovered;
+}
+
+/**
+ * Loads the extensions data from the cache file. If it is empty
+ * or doesn't exist, try fetching from remote instead.
+ *
+ * @return string
+ */
 
 /**   
 private function grabCachedJson() {
@@ -251,27 +251,27 @@ private function grabCachedJson() {
    }
 */
 
-  public function grabCachedJson() {
-    $isChanged = FALSE;
-    $extension = $this->cache->get('Extension_Browser');
-    if (empty($extension) || !is_array($extension)) {
-      $extension = array(
-        'expires' => 0, // ASAP
-        'ttl' => self::DEFAULT_RETRY,
-        'retry' => self::DEFAULT_RETRY,
-      );
-      $isChanged = TRUE;
-    }
-    if ($extension['expires'] <= CRM_Utils_Time::getTimeRaw()) {
-      $newExtension = $this->grabRemoteJson();
-        $extension = $newExtension;
-        $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['ttl'];
-     else {
-      // keep the old extensions for now, try again later
-      // $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['retry'];
-      // }
-      $isChanged = TRUE;
-    }
+public function grabCachedJson() {
+  $isChanged = FALSE;
+  $extension = $this->cache->get('Extension_Browser');
+  if (empty($extension) || !is_array($extension)) {
+    $extension = array(
+      'expires' => 0, // ASAP
+      'ttl' => self::DEFAULT_RETRY,
+      'retry' => self::DEFAULT_RETRY,
+    );
+    $isChanged = TRUE;
+  }
+  if ($extension['expires'] <= CRM_Utils_Time::getTimeRaw()) {
+    $newExtension = $this->grabRemoteJson();
+    $extension = $newExtension;
+    $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['ttl'];
+   else {
+    // keep the old extensions for now, try again later
+    // $extension['expires'] = CRM_Utils_Time::getTimeRaw() + $extension['retry'];
+    // }
+    $isChanged = TRUE;
+   }
     if ($isChanged) {
       $this->cache->set('Extension_Browser', $extension);
     }
