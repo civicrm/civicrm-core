@@ -80,9 +80,8 @@ public static function create() {
  * @param string $indexPath
  *  Relative path of the 'index' file within the repository.
  *  Local path in which to cache files.
- * @param CRM_Utils_Cache_Interface $cache
+ *
  */
-
 public function __construct($cache, $client, $repoUrl, $indexPath) {
   $this->repoUrl = $repoUrl;
   // $this->cacheDir = $cacheDir;
@@ -235,7 +234,7 @@ private function _discoverRemote() {
  * @return string
  */
 
-/**   
+/**
 private function grabCachedJson() {
      $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this-   >getRepositoryUrl());
      $json = NULL;
@@ -247,8 +246,7 @@ private function grabCachedJson() {
      }
      return $json;
    }
-*/
-
+ */
 public function grabCachedJson() {
   $isChanged = FALSE;
   $extension = $this->cache->get('Extension_Browser');
@@ -331,4 +329,5 @@ public function grabCachedJson() {
   public static function downloadError($errorNumber, $errorString) {
   }
 
+ }
 }
