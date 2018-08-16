@@ -759,10 +759,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
    * @param $field
    */
   public static function sqlColumnDefn($processor, &$sqlColumns, $field) {
-    if (substr($field, -4) == '_a_b' || substr($field, -4) == '_b_a') {
-      return;
-    }
-
     $sqlColumns[$processor->getMungedFieldName($field)] = $processor->getSqlColumnDefinition($field);
   }
 
@@ -1370,13 +1366,11 @@ WHERE  {$whereClause}";
    *
    * @param string $field
    * @param array $headerRows
-   * @param array $sqlColumns
-   *   Columns to go in the temp table.
    * @param \CRM_Export_BAO_ExportProcessor $processor
    *
    * @return array
    */
-  public static function setHeaderRows($field, $headerRows, $sqlColumns, $processor) {
+  public static function setHeaderRows($field, $headerRows, $processor) {
 
     $queryFields = $processor->getQueryFields();
     if (substr($field, -11) == 'campaign_id') {
@@ -1400,9 +1394,7 @@ WHERE  {$whereClause}";
       $headerRows[] = $field;
     }
 
-    self::sqlColumnDefn($processor, $sqlColumns, $field);
-
-    return array($headerRows, $sqlColumns);
+    return $headerRows;
   }
 
   /**
@@ -1441,7 +1433,8 @@ WHERE  {$whereClause}";
     foreach ($returnProperties as $key => $value) {
       if (($key != 'location' || !is_array($value)) && !$processor->isRelationshipTypeKey($key)) {
         $outputColumns[$key] = $value;
-        list($headerRows, $sqlColumns) = self::setHeaderRows($key, $headerRows, $sqlColumns, $processor);
+        $headerRows = self::setHeaderRows($key, $headerRows, $processor);
+        self::sqlColumnDefn($processor, $sqlColumns, $key);
       }
       elseif ($processor->isRelationshipTypeKey($key)) {
         $outputColumns[$key] = $value;
@@ -1531,7 +1524,8 @@ WHERE  {$whereClause}";
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
             self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
-            list($headerRows, $sqlColumns) = self::setHeaderRows($outputFieldName, $headerRows, $sqlColumns, $processor);
+            $headerRows = self::setHeaderRows($outputFieldName, $headerRows, $processor);
+            self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');
             }
