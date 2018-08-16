@@ -138,7 +138,7 @@ class CRM_Core_Form_RecurringEntity {
       if (self::$_scheduleReminderDetails->start_action_offset) {
         $defaults['ends'] = 1;
       }
-      list($defaults['repeat_absolute_date']) = CRM_Utils_Date::setDateDefaults(self::$_scheduleReminderDetails->absolute_date);
+      $defaults['repeat_absolute_date'] = self::$_scheduleReminderDetails->absolute_date;
       if (self::$_scheduleReminderDetails->absolute_date) {
         $defaults['ends'] = 2;
       }
@@ -184,7 +184,7 @@ class CRM_Core_Form_RecurringEntity {
     $form->add('select', 'repetition_frequency_unit', ts('Repeats every'), CRM_Core_SelectValues::getRecurringFrequencyUnits(), FALSE, array('class' => 'required'));
     $numericOptions = CRM_Core_SelectValues::getNumericOptions(1, 30);
     $form->add('select', 'repetition_frequency_interval', NULL, $numericOptions, FALSE, array('class' => 'required'));
-    $form->addDateTime('repetition_start_date', ts('Repetition Start Date'), FALSE, array('formatType' => 'activityDateTime'));
+    $form->add('datepicker', 'repetition_start_date', ts('Start Date'), array(), FALSE, array('time' => TRUE));
     foreach ($dayOfTheWeek as $key => $val) {
       $startActionCondition[] = $form->createElement('checkbox', $key, NULL, $val);
     }
@@ -193,7 +193,7 @@ class CRM_Core_Form_RecurringEntity {
       '1' => ts('day of the month'),
       '2' => ts('day of the week'),
     );
-    $form->addRadio('repeats_by', ts("Repeats by"), $roptionTypes, array('required' => TRUE), NULL);
+    $form->addRadio('repeats_by', ts("Repeats on"), $roptionTypes, array('required' => TRUE), NULL);
     $form->add('select', 'limit_to', '', CRM_Core_SelectValues::getNumericOptions(1, 31));
     $dayOfTheWeekNo = array(
       'first' => ts('First'),
@@ -215,10 +215,8 @@ class CRM_Core_Form_RecurringEntity {
     unset($offsetOptions[0]);
     $form->add('select', 'start_action_offset', NULL, $offsetOptions, FALSE);
     $form->addFormRule(array('CRM_Core_Form_RecurringEntity', 'formRule'));
-    $form->addDate('repeat_absolute_date', ts('On'), FALSE, array('formatType' => 'mailing'));
-    $form->add('text', 'exclude_date_list', ts('Exclude Dates'), array(
-        'class' => 'twenty',
-      ));
+    $form->add('datepicker', 'repeat_absolute_date', ts('On'), array(), FALSE, array('time' => FALSE));
+    $form->add('text', 'exclude_date_list', ts('Exclude Dates'), array('class' => 'twenty'));
     $form->addElement('hidden', 'allowRepeatConfigToSubmit', '', array('id' => 'allowRepeatConfigToSubmit'));
     $form->addButtons(array(
         array(
@@ -334,7 +332,7 @@ class CRM_Core_Form_RecurringEntity {
    * @throws \CiviCRM_API3_Exception
    */
   public static function postProcess($params = array(), $type, $linkedEntities = array()) {
-    //Check entity_id not present in params take it from class variable
+    // Check entity_id not present in params take it from class variable
     if (empty($params['entity_id'])) {
       $params['entity_id'] = self::$_entityId;
     }
