@@ -903,7 +903,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $countRow = Civi::service('prevnext')->getCount($cacheKey);
     // $sortByCharacter triggers a refresh in the prevNext cache
     if ($sortByCharacter && $sortByCharacter != 'all') {
-      $cacheKey .= "_alphabet";
       $this->fillupPrevNextCache($sort, $cacheKey, 0, max(self::CACHE_SIZE, $pageSize));
     }
     elseif (($firstRecord + $pageSize) >= $countRow) {
