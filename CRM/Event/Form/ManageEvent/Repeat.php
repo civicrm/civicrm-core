@@ -110,7 +110,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       unset($params['id']);
 
       $url = 'civicrm/event/manage/repeat';
-      $urlParams = "action=update&reset=1&id={$this->_id}";
+      $urlParams = "action=update&reset=1&id={$this->_id}&selectedChild=repeat";
 
       $linkedEntities = array(
         array(

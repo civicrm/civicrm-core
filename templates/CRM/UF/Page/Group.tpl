@@ -157,17 +157,8 @@
             </div>
         </div>{* reserved profile*}
 
-  </div> {* maincontainer*}
-  <script type='text/javascript'>
-    var selectedTab = 'user-profiles';
-    {if $selectedChild}selectedTab = '{$selectedChild}';{/if}
-    {literal}
-      CRM.$(function($) {
-        var tabIndex = $('#tab_' + selectedTab).prevAll().length
-        $("#mainTabContainer").tabs( {active: tabIndex} );
-      });
-    {/literal}
-  </script>
+  </div>
+{include file="CRM/common/TabSelected.tpl" defaultTab="user-profiles"}
 
     {else}
     {if $action ne 1} {* When we are adding an item, we should not display this message *}
