@@ -1827,7 +1827,7 @@ WHERE  id = $cfID
         foreach ($additionalIDs as $pId => $cId) {
           //get the params submitted by participant.
           $participantParams = NULL;
-          if(isset($values['params'])) {
+          if (isset($values['params'])) {
             $participantParams = CRM_Utils_Array::value($pId, $values['params'], array());
           }
 
