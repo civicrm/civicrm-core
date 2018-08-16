@@ -152,7 +152,7 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
     // ensure that only 1 activity is created
     $this->assertEquals(1, count($rows));
     // ensure that country values of respective target contacts are only shown
-    $this->assertEquals('India;United States', $rows[0]['civicrm_address_country_id']);
+    $this->assertTrue(in_array($rows[0]['civicrm_address_country_id'], ['India;United States', 'United States;India']));
     // ensure that city values of respective target contacts are only shown
     $this->assertEquals('ABC;DEF', $rows[0]['civicrm_address_city']);
   }
