@@ -42,7 +42,7 @@ class CRM_Upgrade_Incremental_php_FiveFour extends CRM_Upgrade_Incremental_Base 
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     // Example: Generate a pre-upgrade message.
     // if ($rev == '5.12.34') {
-    //   $preUpgradeMessage .= '<p>' . ts('A new permission has been added called %1 This Permission is now used to control access to the Manage Tags screen', array(1 => 'manage tags')) . '</p>';
+    //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
     // }
   }
 
@@ -55,7 +55,9 @@ class CRM_Upgrade_Incremental_php_FiveFour extends CRM_Upgrade_Incremental_Base 
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    $postUpgradeMessage .= '<p>' . ts('A new %1 permission has been added. It is not granted by default. If your users create reports, you may wish to review your permissions.', array(1 => 'save Report Criteria')) . '</p>';
+    if ($rev == '5.4.alpha1') {
+      $postUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. It is not granted by default. If your users create reports, you may wish to review their permissions.', array(1 => ts('save Report Criteria'))) . '</p>';
+    }
     // Example: Generate a post-upgrade message.
     // if ($rev == '5.12.34') {
     //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
