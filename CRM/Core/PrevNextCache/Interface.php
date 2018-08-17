@@ -39,7 +39,7 @@ interface CRM_Core_PrevNextCache_Interface {
    * @param string $cacheKey
    * @param string $sql
    *   A SQL query. The query *MUST* be a SELECT statement which yields
-   *   the following columns (in order): entity_table, entity_id1, entity_id2, cacheKey, data
+   *   the following columns (in order): cacheKey, entity_id1, data
    * @return bool
    */
   public function fillWithSql($cacheKey, $sql);
@@ -50,9 +50,7 @@ interface CRM_Core_PrevNextCache_Interface {
    * @param string $cacheKey
    * @param array $rows
    *   A list of cache records. Each record should have keys:
-   *    - entity_table
    *    - entity_id1
-   *    - entity_id2
    *    - data
    * @return bool
    */
@@ -89,20 +87,24 @@ interface CRM_Core_PrevNextCache_Interface {
    *
    * @param string $cacheKey
    * @param int $id1
-   * @param int $id2
    *
    * @return array
+   *   List of neighbors.
+   *   [
+   *     'foundEntry' => 1,
+   *     'prev' => ['id1' => 123, 'data'=>'foo'],
+   *     'next' => ['id1' => 456, 'data'=>'foo'],
+   *   ]
    */
-  public function getPositions($cacheKey, $id1, $id2);
+  public function getPositions($cacheKey, $id1);
 
   /**
    * Delete an item from the prevnext cache table based on the entity.
    *
    * @param int $id
    * @param string $cacheKey
-   * @param string $entityTable
    */
-  public function deleteItem($id = NULL, $cacheKey = NULL, $entityTable = 'civicrm_contact');
+  public function deleteItem($id = NULL, $cacheKey = NULL);
 
   /**
    * Get count of matching rows.
