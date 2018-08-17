@@ -437,7 +437,6 @@ class CRM_Export_BAO_ExportProcessor {
    * @return array
    */
   public function setRelationshipReturnProperties($value, $relationshipKey) {
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $relPhoneTypeId = $relIMProviderId = NULL;
     if (!empty($value[2])) {
       $relationField = CRM_Utils_Array::value(2, $value);
@@ -466,14 +465,15 @@ class CRM_Export_BAO_ExportProcessor {
       }
     }
     if (in_array($relationField, $this->getValidLocationFields()) && is_numeric($relLocTypeId)) {
+      $locationName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $relLocTypeId);
       if ($relPhoneTypeId) {
-        $this->relationshipReturnProperties[$relationshipKey]['location'][$locationTypes[$relLocTypeId]]['phone-' . $relPhoneTypeId] = 1;
+        $this->relationshipReturnProperties[$relationshipKey]['location'][$locationName]['phone-' . $relPhoneTypeId] = 1;
       }
       elseif ($relIMProviderId) {
-        $this->relationshipReturnProperties[$relationshipKey]['location'][$locationTypes[$relLocTypeId]]['im-' . $relIMProviderId] = 1;
+        $this->relationshipReturnProperties[$relationshipKey]['location'][$locationName]['im-' . $relIMProviderId] = 1;
       }
       else {
-        $this->relationshipReturnProperties[$relationshipKey]['location'][$locationTypes[$relLocTypeId]][$relationField] = 1;
+        $this->relationshipReturnProperties[$relationshipKey]['location'][$locationName][$relationField] = 1;
       }
     }
     else {
