@@ -522,7 +522,8 @@ LIMIT 1
    *   Amount rounded and returned with the desired decimal places
    */
   public static function formatAmount($amount, $decimals = 2) {
-    return number_format((float) round($amount, (int) $decimals), (int) $decimals, '.', '');
+    $config = CRM_Core_Config::singleton();
+    return number_format((float) round($amount, (int) $decimals), (int) $decimals, $config->monetaryDecimalPoint, '');
   }
 
   /**

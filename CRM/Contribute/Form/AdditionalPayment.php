@@ -171,10 +171,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     if ($this->_refund) {
-      $defaults['total_amount'] = CRM_Utils_Money::format(abs($this->_refund), NULL, NULL, TRUE);
+      $defaults['total_amount'] = CRM_Contribute_BAO_Contribution_Utils::formatAmount(abs($this->_refund));
     }
     elseif ($this->_owed) {
-      $defaults['total_amount'] = number_format($this->_owed, 2);
+      $defaults['total_amount'] = CRM_Contribute_BAO_Contribution_Utils::formatAmount($this->_owed);
     }
 
     // Set $newCredit variable in template to control whether link to credit card mode is included
