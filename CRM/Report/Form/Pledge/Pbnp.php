@@ -181,20 +181,6 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
         'fields' => array('email' => NULL),
         'grouping' => 'contact-fields',
       ),
-      'civicrm_group' => array(
-        'dao' => 'CRM_Contact_DAO_Group',
-        'alias' => 'cgroup',
-        'filters' => array(
-          'gid' => array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'type' => CRM_Utils_Type::T_INT,
-            'group' => TRUE,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::staticGroup(),
-          ),
-        ),
-      ),
     );
 
     // If we have a campaign, build out the relevant elements
@@ -211,6 +197,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
       );
     }
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     $this->_currencyColumn = 'civicrm_pledge_currency';
     parent::__construct();
