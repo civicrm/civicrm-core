@@ -337,21 +337,16 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     }
     else {
       //cancel 'from' participant row
-      try{
-        $contact_id_result = civicrm_api3('Contact', 'get', array(
-          'sequential' => 1,
-          'return' => array("id"),
-          'email' => $params['email'],
-          'options' => array('limit' => 1),
-        ));
-        $contact_id_result = $contact_id_result['values'][0];
-        $contact_id = $contact_id_result['contact_id'];
-        $contact_is_deleted = $contact_id_result['contact_is_deleted'];
-        if ($contact_is_deleted || !is_numeric($contact_id)) {
-          CRM_Core_Error::statusBounce(ts('Contact does not exist.'));
-        }
-      }
-      catch (CiviCRM_API3_Exception $e) {
+      $contact_id_result = civicrm_api3('Contact', 'get', array(
+        'sequential' => 1,
+        'return' => array("id"),
+        'email' => $params['email'],
+        'options' => array('limit' => 1),
+      ));
+      $contact_id_result = $contact_id_result['values'][0];
+      $contact_id = $contact_id_result['contact_id'];
+      $contact_is_deleted = $contact_id_result['contact_is_deleted'];
+      if ($contact_is_deleted || !is_numeric($contact_id)) {
         CRM_Core_Error::statusBounce(ts('Contact does not exist.'));
       }
     }
