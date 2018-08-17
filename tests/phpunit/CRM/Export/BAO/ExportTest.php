@@ -42,6 +42,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected $masterAddressID;
 
+  protected $locationTypes = [];
+
   public function tearDown() {
     $this->quickCleanup([
       'civicrm_contact',
@@ -54,6 +56,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'civicrm_case_activity',
     ]);
     $this->quickCleanUpFinancialEntities();
+    if (!empty($this->locationTypes)) {
+      $this->callAPISuccess('LocationType', 'delete', ['id' => $this->locationTypes['Whare Kai']['id']]);
+      $this->callAPISuccess('LocationType', 'create', ['id' => $this->locationTypes['Main']['id'], 'name' => 'Main']);
+    }
     parent::tearDown();
   }
 
@@ -536,7 +542,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   public function testExportIMData() {
     // Use default providers.
     $providers = ['AIM', 'GTalk', 'Jabber', 'MSN', 'Skype', 'Yahoo'];
-    $locationTypes = ['Billing', 'Home', 'Main', 'Other'];
+    // Main sure labels are not all anglo chars.
+    $this->diversifyLocationTypes();
+
+    $locationTypes = ['Billing' => 'Billing', 'Home' => 'Home', 'Main' => 'Méin', 'Other' => 'Other', 'Whare Kai' => 'Whare Kai'];
 
     $this->contactIDs[] = $this->individualCreate();
     $this->contactIDs[] = $this->individualCreate();
@@ -544,12 +553,12 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->contactIDs[] = $this->organizationCreate();
     foreach ($this->contactIDs as $contactID) {
       foreach ($providers as $provider) {
-        foreach ($locationTypes as $locationType) {
+        foreach ($locationTypes as $locationName => $locationLabel) {
           $this->callAPISuccess('IM', 'create', [
             'contact_id' => $contactID,
-            'location_type_id' => $locationType,
+            'location_type_id' => $locationName,
             'provider_id' => $provider,
-            'name' => $locationType . $provider . $contactID,
+            'name' => $locationName . $provider . $contactID,
           ]);
         }
       }
@@ -574,7 +583,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     $fields = [['Individual', 'contact_id']];
     // ' ' denotes primary location type.
-    foreach (array_merge($locationTypes, [' ']) as $locationType) {
+    foreach (array_keys(array_merge($locationTypes, [' ' => ['Primary']])) as $locationType) {
       $fields[] = [
         'Individual',
         'im_provider',
@@ -700,8 +709,134 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       '5_a_b_other_im_screen_name_skype' => '5_a_b_other_im_screen_name_skype text',
       '5_a_b_other_im_screen_name_yahoo' => '5_a_b_other_im_screen_name_yahoo text',
       '5_a_b_im' => '5_a_b_im text',
+      'whare_kai_im_provider' => 'whare_kai_im_provider text',
+      'whare_kai_im_screen_name' => 'whare_kai_im_screen_name text',
+      'whare_kai_im_screen_name_jabber' => 'whare_kai_im_screen_name_jabber text',
+      'whare_kai_im_screen_name_skype' => 'whare_kai_im_screen_name_skype text',
+      'whare_kai_im_screen_name_yahoo' => 'whare_kai_im_screen_name_yahoo text',
+      '2_a_b_whare_kai_im_screen_name' => '2_a_b_whare_kai_im_screen_name text',
+      '2_a_b_whare_kai_im_screen_name_jabber' => '2_a_b_whare_kai_im_screen_name_jabber text',
+      '2_a_b_whare_kai_im_screen_name_skype' => '2_a_b_whare_kai_im_screen_name_skype text',
+      '2_a_b_whare_kai_im_screen_name_yahoo' => '2_a_b_whare_kai_im_screen_name_yahoo text',
+      '8_a_b_whare_kai_im_screen_name' => '8_a_b_whare_kai_im_screen_name text',
+      '8_a_b_whare_kai_im_screen_name_jabber' => '8_a_b_whare_kai_im_screen_name_jabber text',
+      '8_a_b_whare_kai_im_screen_name_skype' => '8_a_b_whare_kai_im_screen_name_skype text',
+      '8_a_b_whare_kai_im_screen_name_yahoo' => '8_a_b_whare_kai_im_screen_name_yahoo text',
+      '5_a_b_whare_kai_im_screen_name' => '5_a_b_whare_kai_im_screen_name text',
+      '5_a_b_whare_kai_im_screen_name_jabber' => '5_a_b_whare_kai_im_screen_name_jabber text',
+      '5_a_b_whare_kai_im_screen_name_skype' => '5_a_b_whare_kai_im_screen_name_skype text',
+      '5_a_b_whare_kai_im_screen_name_yahoo' => '5_a_b_whare_kai_im_screen_name_yahoo text',
     ], $sqlColumns);
 
+  }
+
+  /**
+   * Export City against multiple location types.
+   */
+  public function testExportAddressData() {
+    $this->diversifyLocationTypes();
+
+    $locationTypes = ['Billing' => 'Billing', 'Home' => 'Home', 'Main' => 'Méin', 'Other' => 'Other', 'Whare Kai' => 'Whare Kai'];
+
+    $this->contactIDs[] = $this->individualCreate();
+    $this->contactIDs[] = $this->individualCreate();
+    $this->contactIDs[] = $this->householdCreate();
+    $this->contactIDs[] = $this->organizationCreate();
+    $fields = [['Individual', 'contact_id']];
+    foreach ($this->contactIDs as $contactID) {
+      foreach ($locationTypes as $locationName => $locationLabel) {
+        $this->callAPISuccess('Address', 'create', [
+          'contact_id' => $contactID,
+          'location_type_id' => $locationName,
+          'street_address' => $locationLabel . $contactID . 'street_address',
+          'city' => $locationLabel . $contactID . 'city',
+          'postal_code' => $locationLabel . $contactID . 'postal_code',
+        ]);
+        $fields[] = ['Individual', 'city', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $locationName)];
+        $fields[] = ['Individual', 'street_address', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $locationName)];
+        $fields[] = ['Individual', 'postal_code', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $locationName)];
+      }
+    }
+
+    $relationships = [
+      $this->contactIDs[1] => ['label' => 'Spouse of'],
+      $this->contactIDs[2] => ['label' => 'Household Member of'],
+      $this->contactIDs[3] => ['label' => 'Employee of']
+    ];
+
+    foreach ($relationships as $contactID => $relationshipType) {
+      $relationshipTypeID = $this->callAPISuccess('RelationshipType', 'getvalue', ['label_a_b' => $relationshipType['label'], 'return' => 'id']);
+      $result = $this->callAPISuccess('Relationship', 'create', [
+        'contact_id_a' => $this->contactIDs[0],
+        'relationship_type_id' => $relationshipTypeID,
+        'contact_id_b' => $contactID
+      ]);
+      $relationships[$contactID]['id'] = $result['id'];
+      $relationships[$contactID]['relationship_type_id'] = $relationshipTypeID;
+    }
+
+    // ' ' denotes primary location type.
+    foreach (array_keys(array_merge($locationTypes, [' ' => ['Primary']])) as $locationType) {
+      foreach ($relationships as $contactID => $relationship) {
+        $fields[] = [
+          'Individual',
+          $relationship['relationship_type_id'] . '_a_b',
+          'city',
+          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
+        ];
+      }
+    }
+    list($tableName, $sqlColumns) = $this->doExport($fields, $this->contactIDs[0]);
+
+    $dao = CRM_Core_DAO::executeQuery('SELECT * FROM ' . $tableName);
+    while ($dao->fetch()) {
+      $id = $dao->contact_id;
+      $this->assertEquals('Méin' . $id . 'city', $dao->main_city);
+      $this->assertEquals('Billing' . $id . 'street_address', $dao->billing_street_address);
+      $this->assertEquals('Whare Kai' . $id . 'postal_code', $dao->whare_kai_postal_code);
+      foreach ($relationships as $relatedContactID => $relationship) {
+        $relationshipString = $field = $relationship['relationship_type_id'] . '_a_b';
+        $field = $relationshipString . '_main_city';
+        $this->assertEquals('Méin' . $relatedContactID . 'city', $dao->$field);
+      }
+    }
+
+    $this->assertEquals([
+      'contact_id' => 'contact_id varchar(255)',
+      'billing_city' => 'billing_city text',
+      'billing_street_address' => 'billing_street_address text',
+      'billing_postal_code' => 'billing_postal_code text',
+      'home_city' => 'home_city text',
+      'home_street_address' => 'home_street_address text',
+      'home_postal_code' => 'home_postal_code text',
+      'main_city' => 'main_city text',
+      'main_street_address' => 'main_street_address text',
+      'main_postal_code' => 'main_postal_code text',
+      'other_city' => 'other_city text',
+      'other_street_address' => 'other_street_address text',
+      'other_postal_code' => 'other_postal_code text',
+      'whare_kai_city' => 'whare_kai_city text',
+      'whare_kai_street_address' => 'whare_kai_street_address text',
+      'whare_kai_postal_code' => 'whare_kai_postal_code text',
+      '2_a_b_billing_city' => '2_a_b_billing_city text',
+      '2_a_b_home_city' => '2_a_b_home_city text',
+      '2_a_b_main_city' => '2_a_b_main_city text',
+      '2_a_b_other_city' => '2_a_b_other_city text',
+      '2_a_b_whare_kai_city' => '2_a_b_whare_kai_city text',
+      '2_a_b_city' => '2_a_b_city text',
+      '8_a_b_billing_city' => '8_a_b_billing_city text',
+      '8_a_b_home_city' => '8_a_b_home_city text',
+      '8_a_b_main_city' => '8_a_b_main_city text',
+      '8_a_b_other_city' => '8_a_b_other_city text',
+      '8_a_b_whare_kai_city' => '8_a_b_whare_kai_city text',
+      '8_a_b_city' => '8_a_b_city text',
+      '5_a_b_billing_city' => '5_a_b_billing_city text',
+      '5_a_b_home_city' => '5_a_b_home_city text',
+      '5_a_b_main_city' => '5_a_b_main_city text',
+      '5_a_b_other_city' => '5_a_b_other_city text',
+      '5_a_b_whare_kai_city' => '5_a_b_whare_kai_city text',
+      '5_a_b_city' => '5_a_b_city text',
+    ], $sqlColumns);
   }
 
   /**
@@ -2373,6 +2508,25 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'member_is_override' => 'member_is_override text',
       'member_auto_renew' => 'member_auto_renew text',
     ];
+  }
+
+  /**
+   * Change our location types so we have some edge cases in the mix.
+   *
+   * - a space in the name
+   * - name differs from label
+   * - non-anglo char in the label (not valid in the name).
+   */
+  protected function diversifyLocationTypes() {
+    $this->locationTypes['Main'] = $this->callAPISuccess('Location_type', 'get', [
+      'name' => 'Main',
+      'return' => 'id',
+      'api.LocationType.Create' => ['display_name' => 'Méin'],
+    ]);
+    $this->locationTypes['Whare Kai'] = $this->callAPISuccess('Location_type', 'create', [
+      'name' => 'Whare Kai',
+      'display_name' => 'Whare Kai',
+    ]);
   }
 
 }

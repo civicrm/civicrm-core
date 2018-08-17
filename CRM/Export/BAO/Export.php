@@ -238,9 +238,6 @@ class CRM_Export_BAO_Export {
     $queryMode = $processor->getQueryMode();
 
     if ($fields) {
-      //construct return properties
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-
       foreach ($fields as $key => $value) {
         $fieldName = CRM_Utils_Array::value(1, $value);
         if (!$fieldName) {
@@ -251,15 +248,15 @@ class CRM_Export_BAO_Export {
           $returnProperties[$fieldName] = $processor->setRelationshipReturnProperties($value, $fieldName);
         }
         elseif (is_numeric(CRM_Utils_Array::value(2, $value))) {
-          $locTypeId = $value[2];
+          $locationName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $value[2]);
           if ($fieldName == 'phone') {
-            $returnProperties['location'][$locationTypes[$locTypeId]]['phone-' . CRM_Utils_Array::value(3, $value)] = 1;
+            $returnProperties['location'][$locationName]['phone-' . CRM_Utils_Array::value(3, $value)] = 1;
           }
           elseif ($fieldName == 'im') {
-            $returnProperties['location'][$locationTypes[$locTypeId]]['im-' . CRM_Utils_Array::value(3, $value)] = 1;
+            $returnProperties['location'][$locationName]['im-' . CRM_Utils_Array::value(3, $value)] = 1;
           }
           else {
-            $returnProperties['location'][$locationTypes[$locTypeId]][$fieldName] = 1;
+            $returnProperties['location'][$locationName][$fieldName] = 1;
           }
         }
         else {
@@ -1598,6 +1595,10 @@ WHERE  {$whereClause}";
       }
       elseif (is_array($relationValue) && $relationField == 'location') {
         foreach ($relationValue as $ltype => $val) {
+          // If the location name has a space in it the we need to handle that. This
+          // is kinda hacky but specifically covered in the ExportTest so later efforts to
+          // improve it should be secure in the knowled it will be caught.
+          $ltype = str_replace(' ', '_', $ltype);
           foreach (array_keys($val) as $fld) {
             $type = explode('-', $fld);
             $fldValue = "{$ltype}-" . $type[0];
