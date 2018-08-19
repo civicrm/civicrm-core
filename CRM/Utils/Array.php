@@ -1068,12 +1068,12 @@ class CRM_Utils_Array {
    *
    * @return array
    */
-  public static function recursiveBuild($path, $value, $source = []) {
+  public static function recursiveBuild($path, $value, $source = array()) {
     $arrayKey = array_shift($path);
     // Recurse through array keys
     if ($path) {
       if (!isset($source[$arrayKey])) {
-        $source[$arrayKey] = [];
+        $source[$arrayKey] = array();
       }
       $source[$arrayKey] = self::recursiveBuild($path, $value, $source[$arrayKey]);
     }
