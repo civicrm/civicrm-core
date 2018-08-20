@@ -1106,8 +1106,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $formValues = $this->setPriceSetParameters($formValues);
     $params = $softParams = $ids = array();
 
-    $allMemberStatus = CRM_Member_PseudoConstant::membershipStatus();
-    $allContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $this->processBillingAddress();
 
     if ($this->_id) {
@@ -1178,7 +1176,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $params['tax_amount'] = $formValues['tax_amount'];
     }
     $params['total_amount'] = CRM_Utils_Array::value('amount', $formValues);
-    $submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $formValues);
     if (!empty($lineItem[$this->_priceSetId])) {
       foreach ($lineItem[$this->_priceSetId] as &$li) {
         if (!empty($li['membership_type_id'])) {
@@ -1190,6 +1187,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         ///CRM-11529 for quick config backoffice transactions
         //when financial_type_id is passed in form, update the
         //lineitems with the financial type selected in form
+        $submittedFinancialType = CRM_Utils_Array::value('financial_type_id', $formValues);
         if ($isQuickConfig && $submittedFinancialType) {
           $li['financial_type_id'] = $submittedFinancialType;
         }
@@ -1251,9 +1249,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
 
-    // max related memberships - take from form or inherit from membership type
     foreach ($this->_memTypeSelected as $memType) {
       if (array_key_exists('max_related', $formValues)) {
+        // max related memberships - take from form or inherit from membership type
         $membershipTypeValues[$memType]['max_related'] = CRM_Utils_Array::value('max_related', $formValues);
       }
       $membershipTypeValues[$memType]['custom'] = CRM_Core_BAO_CustomField::postProcess($formValues,
@@ -1278,6 +1276,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $softParams['contact_id'] = $this->_contactID;
       }
     }
+
+    $pendingMembershipStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending');
+
     if (!empty($formValues['record_contribution'])) {
       $recordContribution = array(
         'total_amount',
@@ -1308,10 +1309,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
 
+      $completedContributionStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       if (empty($params['is_override']) &&
-        CRM_Utils_Array::value('contribution_status_id', $params) != array_search('Completed', $allContributionStatus)
+        CRM_Utils_Array::value('contribution_status_id', $params) != $completedContributionStatusId
       ) {
-        $params['status_id'] = array_search('Pending', $allMemberStatus);
+        $params['status_id'] = $pendingMembershipStatusId;
         $params['skipStatusCal'] = TRUE;
         $params['is_pay_later'] = 1;
         $this->assign('is_pay_later', 1);
@@ -1430,12 +1432,14 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $ids['contribution'] = $contribution->id;
         $params['contribution_recur_id'] = $paymentParams['contributionRecurID'];
       }
+      $paymentStatus = NULL;
 
       if ($params['total_amount'] > 0.0) {
         $payment = $this->_paymentProcessor['object'];
         try {
           $result = $payment->doPayment($paymentParams);
           $formValues = array_merge($formValues, $result);
+          $paymentStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $formValues['payment_status_id']);
           // Assign amount to template if payment was successful.
           $this->assign('amount', $params['total_amount']);
         }
@@ -1456,8 +1460,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
 
-      if ($formValues['payment_status_id'] != array_search('Completed', $allContributionStatus)) {
-        $params['status_id'] = array_search('Pending', $allMemberStatus);
+      if ($paymentStatus !== 'Completed') {
+        $params['status_id'] = $pendingMembershipStatusId;
         $params['skipStatusCal'] = TRUE;
         // unset send-receipt option, since receipt will be sent when ipn is received.
         unset($formValues['send_receipt'], $formValues['send_receipt']);
@@ -1475,7 +1479,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
       $now = date('YmdHis');
-      $params['receive_date'] = $now;
+      $params['receive_date'] = date('YmdHis');
       $params['invoice_id'] = $formValues['invoiceID'];
       $params['contribution_source'] = ts('%1 Membership Signup: Credit card or direct debit (by %2)',
         array(1 => $membershipType, 2 => $userName)
