@@ -1723,7 +1723,19 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $isRecur = CRM_Utils_Array::value('is_recur', $params);
     $this->updateContributionOnMembershipTypeChange($params, $membership);
-    $this->setStatusMessage($membership, $endDate, $receiptSent, $membershipTypes, $createdMemberships, $isRecur, $calcDates, $mailSend);
+    if (($this->_action & CRM_Core_Action::UPDATE)) {
+      $this->addStatusMessage($this->getStatusMessageForUpdate($membership, $endDate));
+    }
+    elseif (($this->_action & CRM_Core_Action::ADD)) {
+      $this->addStatusMessage($this->getStatusMessageForCreate($endDate, $membershipTypes, $createdMemberships,
+        $isRecur, $calcDates));
+    }
+    if ($receiptSent && $mailSend) {
+      $this->addStatusMessage(ts('A membership confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail)));
+    }
+
+    CRM_Core_Session::setStatus($this->getStatusMessage(), ts('Complete'), 'success');
+    $this->setStatusMessage($membership);
   }
 
   /**
@@ -1900,19 +1912,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @param $calcDates
    * @param bool $mailSent
    */
-  protected function setStatusMessage($membership, $endDate, $receiptSend, $membershipTypes, $createdMemberships, $isRecur, $calcDates, $mailSent) {
-    if (($this->_action & CRM_Core_Action::UPDATE)) {
-      $this->addStatusMessage($this->getStatusMessageForUpdate($membership, $endDate));
-    }
-    elseif (($this->_action & CRM_Core_Action::ADD)) {
-      $this->addStatusMessage($this->getStatusMessageForCreate($endDate, $membershipTypes, $createdMemberships,
-        $isRecur, $calcDates));
-    }
-    if ($receiptSend && $mailSent) {
-      $this->addStatusMessage(ts('A membership confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail)));
-    }
-
-    CRM_Core_Session::setStatus($this->getStatusMessage(), ts('Complete'), 'success');
+  protected function setStatusMessage($membership) {
     //CRM-15187
     // display message when membership type is changed
     if (($this->_action & CRM_Core_Action::UPDATE) && $this->_id && !in_array($this->_memType, $this->_memTypeSelected)) {
