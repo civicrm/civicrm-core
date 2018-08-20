@@ -974,6 +974,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   /**
    * Send email receipt.
    *
+   * @deprecated
+   *   This function is shared with Batch_Entry which has limited overlap
+   *   & needs rationalising.
+   *
    * @param CRM_Core_Form $form
    *   Form object.
    * @param array $formValues
@@ -1728,7 +1732,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $formValues['receipt_text_signup'] = $formValues['receipt_text'];
       // send email receipt
       $this->assignBillingName();
-      $mailSend = self::emailReceipt($this, $formValues, $membership);
+      $mailSend = $this->emailMembershipReceipt();
       $receiptSent = TRUE;
     }
 
@@ -1965,6 +1969,18 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $isRecur = TRUE;
     }
     return $isRecur;
+  }
+
+  /**
+   * Send a receipt for the membership.
+   *
+   * @param array $formValues
+   * @param array $membership
+   * @return array
+   */
+  protected function emailMembershipReceipt($formValues, $membership) {
+    $mailSend = self::emailReceipt($this, $formValues, $membership);
+    return [$membership, $mailSend];
   }
 
 }
