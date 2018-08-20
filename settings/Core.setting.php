@@ -1003,4 +1003,18 @@ return array(
     ),
     'quick_form_type' => 'Select',
   ),
+  'encryption_provider' => array(
+    'add' => '5.6',
+    'help_text' => ts('Provider of encryption services'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'encryption_provider',
+    'type' => 'String',
+    'default' => NULL,
+    'title' => ts('Encryption Provider'),
+    'description' => ts('Care must be used when changing providers as encrypted variables may need to be re-entered.'),
+  ),
+
 );
