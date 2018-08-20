@@ -12,8 +12,10 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
 
   /**
    * @dataProvider subtractCurrenciesDataProvider
-   * @param $inputData
-   * @param $expectedResult
+   * @param string $leftOp
+   * @param string $rightOp
+   * @param string $currency
+   * @param float $expectedResult
    */
   public function testSubtractCurrencies($leftOp, $rightOp, $currency, $expectedResult) {
     $this->assertEquals($expectedResult, CRM_Utils_Money::subtractCurrencies($leftOp, $rightOp, $currency));
@@ -42,6 +44,31 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
       array(number_format(19.99, 2), number_format(20.00, 2), 'USD', number_format(-0.01, 2)),
       array('notanumber', 5.00, 'USD', NULL),
     );
+  }
+
+  /**
+   * Test rounded by currency function.
+   *
+   * In practice this only does rounding to 2 since rounding by any other amount is
+   * only place-holder supported.
+   */
+  public function testFormatLocaleNumericRoundedByCurrency() {
+    $result = CRM_Utils_Money::formatLocaleNumericRoundedByCurrency(8950.3678, 'NZD');
+    $this->assertEquals('8,950.37', $result);
+  }
+
+  /**
+   * Test rounded by currency function.
+   *
+   * This should be formatted according to European standards - . thousand separator
+   * and , for decimal. (The Europeans are wrong but they don't know that. We will forgive them
+   * because ... metric).
+   */
+  public function testFormatLocaleNumericRoundedByCurrencyEuroThousand() {
+    $this->setCurrencySeparators('.');
+    $result = CRM_Utils_Money::formatLocaleNumericRoundedByCurrency(8950.3678, 'NZD');
+    $this->assertEquals('8.950,37', $result);
+    $this->setCurrencySeparators(',');
   }
 
 }
