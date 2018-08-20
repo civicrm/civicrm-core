@@ -1825,11 +1825,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    *
    * @param CRM_Member_BAO_Membership $membership
    * @param string $endDate
-   * @param bool $receiptSend
    *
    * @return string
    */
-  protected function getStatusMessageForUpdate($membership, $endDate, $receiptSend) {
+  protected function getStatusMessageForUpdate($membership, $endDate) {
     // End date can be modified by hooks, so if end date is set then use it.
     $endDate = ($membership->end_date) ? $membership->end_date : $endDate;
 
@@ -1838,10 +1837,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $endDate = CRM_Utils_Date::customFormat($endDate);
       $statusMsg .= ' ' . ts('The membership End Date is %1.', array(1 => $endDate));
     }
-
-    if ($receiptSend) {
-      $statusMsg .= ' ' . ts('A confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail));
-    }
     return $statusMsg;
   }
 
@@ -1849,17 +1844,15 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Get status message for create action.
    *
    * @param string $endDate
-   * @param bool $receiptSend
    * @param array $membershipTypes
    * @param array $createdMemberships
    * @param bool $isRecur
    * @param array $calcDates
-   * @param bool $mailSent
    *
    * @return array|string
    */
-  protected function getStatusMessageForCreate($endDate, $receiptSend, $membershipTypes, $createdMemberships,
-                                               $isRecur, $calcDates, $mailSent) {
+  protected function getStatusMessageForCreate($endDate, $membershipTypes, $createdMemberships,
+                                               $isRecur, $calcDates) {
     // FIX ME: fix status messages
 
     $statusMsg = array();
@@ -1883,9 +1876,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
     $statusMsg = implode('<br/>', $statusMsg);
-    if ($receiptSend && !empty($mailSent)) {
-      $statusMsg .= ' ' . ts('A membership confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail));
-    }
     return $statusMsg;
   }
 
@@ -1897,19 +1887,21 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @param $createdMemberships
    * @param $isRecur
    * @param $calcDates
-   * @param $mailSend
+   * @param $mailSent
    */
-  protected function setStatusMessage($membership, $endDate, $receiptSend, $membershipTypes, $createdMemberships, $isRecur, $calcDates, $mailSend) {
-    $statusMsg = '';
+  protected function setStatusMessage($membership, $endDate, $receiptSend, $membershipTypes, $createdMemberships, $isRecur, $calcDates, $mailSent) {
     if (($this->_action & CRM_Core_Action::UPDATE)) {
-      $statusMsg = $this->getStatusMessageForUpdate($membership, $endDate, $receiptSend);
+      $this->addStatusMessage($this->getStatusMessageForUpdate($membership, $endDate));
     }
     elseif (($this->_action & CRM_Core_Action::ADD)) {
-      $statusMsg = $this->getStatusMessageForCreate($endDate, $receiptSend, $membershipTypes, $createdMemberships,
-        $isRecur, $calcDates, $mailSend);
+      $this->addStatusMessage($this->getStatusMessageForCreate($endDate, $membershipTypes, $createdMemberships,
+        $isRecur, $calcDates));
+    }
+    if ($receiptSend && $mailSent) {
+      $this->addStatusMessage(ts('A membership confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail)));
     }
 
-    CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
+    CRM_Core_Session::setStatus($this->getStatusMessage(), ts('Complete'), 'success');
     //CRM-15187
     // display message when membership type is changed
     if (($this->_action & CRM_Core_Action::UPDATE) && $this->_id && !in_array($this->_memType, $this->_memTypeSelected)) {
