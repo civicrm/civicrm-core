@@ -1650,6 +1650,14 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
     }
+    $isRecur = CRM_Utils_Array::value('is_recur', $params);
+    if (($this->_action & CRM_Core_Action::UPDATE)) {
+      $this->addStatusMessage($this->getStatusMessageForUpdate($membership, $endDate));
+    }
+    elseif (($this->_action & CRM_Core_Action::ADD)) {
+      $this->addStatusMessage($this->getStatusMessageForCreate($endDate, $membershipTypes, $createdMemberships,
+        $isRecur, $calcDates));
+    }
 
     if (!empty($lineItem[$this->_priceSetId])) {
       $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
@@ -1721,15 +1729,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->_id = $membership->id;
     }
 
-    $isRecur = CRM_Utils_Array::value('is_recur', $params);
     $this->updateContributionOnMembershipTypeChange($params, $membership);
-    if (($this->_action & CRM_Core_Action::UPDATE)) {
-      $this->addStatusMessage($this->getStatusMessageForUpdate($membership, $endDate));
-    }
-    elseif (($this->_action & CRM_Core_Action::ADD)) {
-      $this->addStatusMessage($this->getStatusMessageForCreate($endDate, $membershipTypes, $createdMemberships,
-        $isRecur, $calcDates));
-    }
     if ($receiptSent && $mailSend) {
       $this->addStatusMessage(ts('A membership confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail)));
     }
@@ -1904,13 +1904,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
   /**
    * @param $membership
-   * @param $endDate
-   * @param $receiptSend
-   * @param $membershipTypes
-   * @param $createdMemberships
-   * @param $isRecur
-   * @param $calcDates
-   * @param bool $mailSent
    */
   protected function setStatusMessage($membership) {
     //CRM-15187
