@@ -95,6 +95,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
       if ($pcomponent == 'event') {
         $this->_entityTable = 'civicrm_event';
         $isShare = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_entityId, 'is_share');
+        $this->_title = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_entityId, 'title');
       }
       else {
         $isShare = CRM_Utils_Array::value('is_share', $values);
