@@ -1103,8 +1103,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Submit function.
    *
    * This is also accessed by unit tests.
-   *
-   * @return array
    */
   public function submit() {
     $isTest = ($this->_mode == 'test') ? 1 : 0;
@@ -1726,7 +1724,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $isRecur = CRM_Utils_Array::value('is_recur', $params);
     $this->updateContributionOnMembershipTypeChange($params, $membership);
     $this->setStatusMessage($membership, $endDate, $receiptSent, $membershipTypes, $createdMemberships, $isRecur, $calcDates, $mailSend);
-    return $createdMemberships;
   }
 
   /**
