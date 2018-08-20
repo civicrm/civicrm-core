@@ -185,7 +185,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
    */
   public function generateLabel($text) {
     $args = array(
-      'w' => $this->width,
+      'w' => $this->width - 2 * $this->paddingLeft,
       'h' => 0,
       'txt' => $text,
       'border' => 0,
