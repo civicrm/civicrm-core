@@ -21,6 +21,10 @@ div#crm-contact-thumbnail {
   border-bottom: 1px solid #FFF;
 }
 
+.crm-summary-block {
+  clear: both;
+}
+
 #crm-container div.crm-inline-edit {
   border: 2px dashed transparent;
   background: none;
@@ -35,7 +39,14 @@ div#crm-contact-thumbnail {
 #crm-container div.crm-inline-edit.form {
   cursor: default;
   border: 2px dashed #6665BF;
-  overflow: auto;
+  box-shadow: rgba(255, 255, 255, 0.3) 0 0 0 99999px;
+  background-color: white;
+  float: left;
+  z-index: 99;
+}
+
+#mainTabContainer:not(.narrowpage) .contactCardRight div.crm-inline-edit.form {
+  float: right;
 }
 
 #crm-container .crm-inline-edit.add-new {
@@ -76,7 +87,8 @@ div#crm-contact-thumbnail {
   white-space: nowrap;
 }
 #crm-container table.crm-inline-edit-form td.crm-label,
-#crm-container div.crm-inline-edit-form .crm-label {
+#crm-container div.crm-inline-edit-form .crm-label,
+#crm-container div.crm-inline-edit-form .messages {
   white-space: normal;
 }
 
