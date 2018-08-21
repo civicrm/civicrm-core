@@ -493,8 +493,9 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     $config = CRM_Core_Config::singleton();
 
     $makeLink = FALSE;
-    if (isset($url) && $url) {
-      if (substr($url, 0, 4) !== 'http') {
+    if (!empty($url)) {
+      // Skip processing fully-formed urls
+      if (substr($url, 0, 4) !== 'http' && $url[0] !== '/') {
         //CRM-7656 --make sure to separate out url path from url params,
         //as we'r going to validate url path across cross-site scripting.
         $parsedUrl = parse_url($url);
