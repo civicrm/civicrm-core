@@ -43,6 +43,11 @@
     <required>true</required>
     <comment>ID of Country that State/Province belong</comment>
     <add>1.1</add>
+    <pseudoconstant>
+      <table>civicrm_country</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>country_id</name>
