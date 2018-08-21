@@ -174,6 +174,7 @@ class CRM_Utils_Recent {
       }
     }
 
+    CRM_Utils_Hook::recent(self::$_recent);
     $session = CRM_Core_Session::singleton();
     $session->set(self::STORE_NAME, self::$_recent);
   }
@@ -200,15 +201,17 @@ class CRM_Utils_Recent {
       self::$_recent[] = $tempRecent[$i];
     }
 
+    CRM_Utils_Hook::recent(self::$_recent);
     $session = CRM_Core_Session::singleton();
     $session->set(self::STORE_NAME, self::$_recent);
   }
 
   /**
    * Check if a provider is allowed to add stuff.
-   * If correspondig setting is empty, all are allowed
+   * If corresponding setting is empty, all are allowed
    *
    * @param string $providerName
+   * @return bool
    */
   public static function isProviderEnabled($providerName) {
 
@@ -230,6 +233,8 @@ class CRM_Utils_Recent {
 
   /**
    * Gets the list of available providers to civi's recent items stack
+   *
+   * @return array
    */
   public static function getProviders() {
     $providers = array(
