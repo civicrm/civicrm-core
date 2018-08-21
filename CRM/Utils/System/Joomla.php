@@ -529,7 +529,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function getBasePath() {
     global $civicrm_root;
-    $joomlaPath = explode('/administrator', $civicrm_root);
+    $joomlaPath = explode(DIRECTORY_SEPARATOR . 'administrator', $civicrm_root);
     $joomlaBase = $joomlaPath[0];
     return $joomlaBase;
   }
