@@ -697,7 +697,7 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
       'sort_name',
       'financial_type_id',
       'contribution_page_id',
-      'payment_instrument_id',
+      'contribution_payment_instrument_id',
       'contribution_trxn_id',
       'contribution_source',
       'contribution_currency_type',
