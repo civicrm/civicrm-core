@@ -319,15 +319,21 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $this->freeze('data_type');
     }
 
-    $optionGroupParams = [
-      'is_reserved' => 0,
-      'is_active' => 1,
-      'options' => ['limit' => 0, 'sort' => "title ASC"],
-      'return' => ['title'],
-    ];
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $optionGroupParams['id'] = $this->_values['id'];
+      $optionGroupParams = [
+        'id' => $this->_values['option_group_id'],
+        'return' => ['title'],
+      ];
     }
+    else {
+      $optionGroupParams = [
+        'is_reserved' => 0,
+        'is_active' => 1,
+        'options' => ['limit' => 0, 'sort' => "title ASC"],
+        'return' => ['title'],
+      ];
+    }
+
     // Get all custom (is_reserved=0) option groups
     $optionGroupMetadata = civicrm_api3('OptionGroup', 'get', $optionGroupParams);
 
