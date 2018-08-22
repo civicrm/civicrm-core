@@ -272,7 +272,7 @@
     <name>option_group_id</name>
     <table>civicrm_option_group</table>
     <key>id</key>
-    <add>5.3</add>
+    <add>5.6</add>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
