@@ -384,6 +384,10 @@ input.crm-form-entityref {
   text-align: right;
 }
 
+.crm-container .crm-section .label label{
+  white-space: normal;
+}
+
 .crm-container .label-left .label {
   text-align: left;
 }
