@@ -371,14 +371,14 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Cancelled')
     ) {
 
-      $this->addElement('checkbox', 'is_acknowledge', ts('Send Acknowledgment?'), NULL,
+      $this->addElement('checkbox', 'is_acknowledge', ts('Send Acknowledgement?'), NULL,
         array('onclick' => "showHideByValue( 'is_acknowledge', '', 'acknowledgeDate', 'table-row', 'radio', true); showHideByValue( 'is_acknowledge', '', 'fromEmail', 'table-row', 'radio', false );")
       );
 
       $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
     }
 
-    $this->addDate('acknowledge_date', ts('Acknowledgment Date'));
+    $this->addDate('acknowledge_date', ts('Acknowledgement Date'));
 
     $this->add('select', 'financial_type_id',
       ts('Financial Type'),
