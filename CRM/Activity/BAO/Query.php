@@ -413,7 +413,7 @@ class CRM_Activity_BAO_Query {
         break;
 
       case 'source_contact':
-        $sourceID =  CRM_Core_PseudoConstant::getKey(
+        $sourceID = CRM_Core_PseudoConstant::getKey(
           'CRM_Activity_BAO_ActivityContact',
           'record_type_id',
           'Activity Source'
