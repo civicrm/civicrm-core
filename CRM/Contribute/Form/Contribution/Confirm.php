@@ -1842,7 +1842,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * Ie the membership block supports a separate transactions AND the contribution form has been configured for a
    * contribution
-   * transaction AND a membership transaction AND the payment processor supports double financial transactions (ie. NOT doTransferPayment style)
+   * transaction AND a membership transaction AND the payment processor supports double financial transactions (ie. NOT doTransferCheckout style)
    *
    * @param int $formID
    * @param bool $amountBlockActiveOnForm
