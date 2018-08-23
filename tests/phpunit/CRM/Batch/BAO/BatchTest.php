@@ -48,7 +48,7 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
     // create two contributions: one check and one credit card
 
     $contactId = $this->individualCreate(array('first_name' => 'John', 'last_name' => 'Doe'));
-    $contribParams = array(
+    $this->contributionCreate([
       'contact_id' => $contactId,
       'total_amount' => 1,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
@@ -61,12 +61,12 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
       'fee_amount' => 0,
       'net_amount' => 1,
       'currency' => 'USD',
+      'invoice_id' => '22ed39c9e9ee6ef6031621ce0eafe6da70',
       'skipCleanMoney' => TRUE,
-    );
-    $contribCheck = CRM_Contribute_BAO_Contribution::create($contribParams);
-    $contribParams = array(
+    ]);
+    $this->contributionCreate([
       'contact_id' => $contactId,
-      'total_amount' => 1,
+     'total_amount' => 1,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit Card'),
       'financial_type_id' => 1,
       'contribution_status_id' => 1,
@@ -77,9 +77,9 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
       'fee_amount' => 0,
       'net_amount' => 1,
       'currency' => 'USD',
+      'invoice_id' => '22ed39c9e9ee6ef6031621ce0eafe6da71',
       'skipCleanMoney' => TRUE,
-    );
-    $contribCC = CRM_Contribute_BAO_Contribution::create($contribParams);
+    ]);
 
     //create an empty batch to use for the search, and run the search
 
@@ -91,27 +91,12 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
       'civicrm_financial_trxn.payment_instrument_id as payment_method',
     );
     $notPresent = TRUE;
-    $params['contribution_payment_instrument_id']
-      = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
-    $resultChecksOnly = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityId, $returnvalues, $notPresent, $params, TRUE);
-
-    //test that the search results make sense
-
-    while ($resultChecksOnly->fetch()) {
-      error_log("fetching");
-      $resultChecksOnlyCount[] = $resultChecksOnly->id;
-      $key = 'payment_method';
-      $paymentMethod = CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $resultChecksOnly->$key);
-      $this->assertEquals($paymentMethod, 'Check');
-    }
-    if (isset($resultChecksOnlyCount)) {
-      $totalChecksOnly = count($resultChecksOnlyCount);
-      $this->assertEquals($totalChecksOnly, 1);
-    }
-    else {
-      $this->fail("Search results expected.");
-    }
+    $params['contribution_payment_instrument_id'] =
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
+    $result = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityId, $returnvalues, $notPresent, $params, TRUE)->fetchAll();
+    $this->assertEquals(count($result), 1, 'In line' . __LINE__);
+    $this->assertEquals($result[0]['payment_method'], CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'), 'In line' . __LINE__);
 
   }
-
 }
+?>
