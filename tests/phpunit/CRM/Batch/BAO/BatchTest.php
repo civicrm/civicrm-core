@@ -48,39 +48,37 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
     // create two contributions: one check and one credit card
 
     $contactId = $this->individualCreate(array('first_name' => 'John', 'last_name' => 'Doe'));
-    $contribParams = 
-      array(
-        'contact_id' => $contactId,
-        'total_amount' => 1,
-        'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
-        'financial_type_id' => 1,
-        'contribution_status_id' => 1,
-        'receive_date' => '20080522000000',
-        'receipt_date' => '20080522000000',
-        'trxn_id' => '22ereerwww322323',
-        'id' => NULL,
-        'fee_amount' => 0,
-        'net_amount' => 1,
-        'currency' => 'USD',
-        'skipCleanMoney' => TRUE,
-      );
+    $contribParams = array(
+      'contact_id' => $contactId,
+      'total_amount' => 1,
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'financial_type_id' => 1,
+      'contribution_status_id' => 1,
+      'receive_date' => '20080522000000',
+      'receipt_date' => '20080522000000',
+      'trxn_id' => '22ereerwww322323',
+      'id' => NULL,
+      'fee_amount' => 0,
+      'net_amount' => 1,
+      'currency' => 'USD',
+      'skipCleanMoney' => TRUE,
+    );
     $contribCheck = CRM_Contribute_BAO_Contribution::create($contribParams);
-    $contribParams = 
-      array(
-        'contact_id' => $contactId,
-        'total_amount' => 1,
-        'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit Card'),
-        'financial_type_id' => 1,
-        'contribution_status_id' => 1,
-        'receive_date' => '20080523000000',
-        'receipt_date' => '20080523000000',
-        'trxn_id' => '22ereerwww323323',
-        'id' => NULL,
-        'fee_amount' => 0,
-        'net_amount' => 1,
-        'currency' => 'USD',
-        'skipCleanMoney' => TRUE,
-      );
+    $contribParams = array(
+      'contact_id' => $contactId,
+      'total_amount' => 1,
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit Card'),
+      'financial_type_id' => 1,
+      'contribution_status_id' => 1,
+      'receive_date' => '20080523000000',
+      'receipt_date' => '20080523000000',
+      'trxn_id' => '22ereerwww323323',
+      'id' => NULL,
+      'fee_amount' => 0,
+      'net_amount' => 1,
+      'currency' => 'USD',
+      'skipCleanMoney' => TRUE,
+    );
     $contribCC = CRM_Contribute_BAO_Contribution::create($contribParams);
 
     //create an empty batch to use for the search, and run the search
@@ -93,9 +91,9 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
       'civicrm_financial_trxn.payment_instrument_id as payment_method',
     );
     $notPresent = TRUE;
-    $params['contribution_payment_instrument_id'] = 
-      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
-    $resultChecksOnly = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityId,$returnvalues,$notPresent,$params,TRUE);
+    $params['contribution_payment_instrument_id']
+      = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
+    $resultChecksOnly = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityId, $returnvalues, $notPresent, $params, TRUE);
 
     //test that the search results make sense
 
@@ -104,15 +102,16 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
       $resultChecksOnlyCount[] = $resultChecksOnly->id;
       $key = 'payment_method';
       $paymentMethod = CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $resultChecksOnly->$key);
-      $this->assertEquals($paymentMethod,'Check');
+      $this->assertEquals($paymentMethod, 'Check');
     }
     if (isset($resultChecksOnlyCount)) {
       $totalChecksOnly = count($resultChecksOnlyCount);
-      $this->assertEquals($totalChecksOnly,1);
-    } else {
+      $this->assertEquals($totalChecksOnly, 1);
+    }
+    else {
       $this->fail("Search results expected.");
     }
 
   }
+
 }
-?>
