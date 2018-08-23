@@ -721,6 +721,7 @@ class CRM_Core_Resources {
       "packages/jquery/plugins/jquery.form.min.js",
       "packages/jquery/plugins/jquery.timeentry.min.js",
       "packages/jquery/plugins/jquery.blockUI.min.js",
+      "packages/jquery/plugins/jquery.notify.min.js",
       "bower_components/datatables/media/js/jquery.dataTables.min.js",
       "bower_components/datatables/media/css/jquery.dataTables.min.css",
       "bower_components/jquery-validation/dist/jquery.validate.min.js",
@@ -747,7 +748,6 @@ class CRM_Core_Resources {
       $items[] = "packages/jquery/plugins/jquery.tableHeader.js";
       $items[] = "packages/jquery/plugins/jquery.menu.min.js";
       $items[] = "css/civicrmNavigation.css";
-      $items[] = "packages/jquery/plugins/jquery.notify.min.js";
     }
 
     // JS for multilingual installations

@@ -30,3 +30,4 @@
     {ts 1=$civilogo}empowered by %1{/ts}
   </div>
 {/if}
+{include file="CRM/common/notifications.tpl"}
