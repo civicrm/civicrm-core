@@ -97,7 +97,15 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
     $query['casContactIdField'] = 'e.contact_id';
     $query['casEntityIdField'] = 'e.id';
     $query['casContactTableAlias'] = NULL;
+
+    // Leaving this in case of legacy databases
     $query['casDateField'] = str_replace('membership_', 'e.', $schedule->start_action_date);
+
+    // Options currently are just 'join_date', 'start_date', and 'end_date':
+    // they need an alias
+    if (strpos($query['casDateField'], 'e.') !== 0) {
+      $query['casDateField'] = 'e.' . $query['casDateField'];
+    }
 
     // FIXME: Numbers should be constants.
     if (in_array(2, $selectedStatuses)) {
