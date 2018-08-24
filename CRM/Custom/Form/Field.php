@@ -315,26 +315,22 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $this->add('checkbox', 'in_selector', ts('Display in Table?'));
     }
 
+    $optionGroupParams = [
+      'is_reserved' => 0,
+      'is_active' => 1,
+      'options' => ['limit' => 0, 'sort' => "title ASC"],
+      'return' => ['title'],
+    ];
+
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $this->freeze('data_type');
+      // Before dev/core#155 we didn't set the is_reserved flag properly, which should be handled by the upgrade script...
+      //  but it is still possible that existing installs may have optiongroups linked to custom fields that are marked reserved.
+      $optionGroupParams['id'] = $this->_values['option_group_id'];
+      $optionGroupParams['options']['or'] = [["is_reserved", "id"]];
     }
 
-    if ($this->_action == CRM_Core_Action::UPDATE) {
-      $optionGroupParams = [
-        'id' => $this->_values['option_group_id'],
-        'return' => ['title'],
-      ];
-    }
-    else {
-      $optionGroupParams = [
-        'is_reserved' => 0,
-        'is_active' => 1,
-        'options' => ['limit' => 0, 'sort' => "title ASC"],
-        'return' => ['title'],
-      ];
-    }
-
-    // Get all custom (is_reserved=0) option groups
+    // Retrieve optiongroups for selection list
     $optionGroupMetadata = civicrm_api3('OptionGroup', 'get', $optionGroupParams);
 
     // OptionGroup selection
