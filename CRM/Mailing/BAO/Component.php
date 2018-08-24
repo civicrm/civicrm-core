@@ -30,7 +30,7 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2018
  */
-class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
+class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_MailingComponent {
 
   /**
    * Class constructor.
@@ -50,7 +50,7 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    * @return CRM_Core_BAO_LocationType.
    */
   public static function retrieve(&$params, &$defaults) {
-    $component = new CRM_Mailing_DAO_Component();
+    $component = new CRM_Mailing_BAO_Component();
     $component->copyValues($params);
     if ($component->find(TRUE)) {
       CRM_Core_DAO::storeValues($component, $defaults);
@@ -71,7 +71,7 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
-    return CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_Component', $id, 'is_active', $is_active);
+    return CRM_Core_DAO::setFieldValue('CRM_Mailing_BAO_Component', $id, 'is_active', $is_active);
   }
 
   /**
@@ -86,7 +86,7 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    */
   public static function add(&$params, $ids = array()) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
-    $component = new CRM_Mailing_DAO_Component();
+    $component = new CRM_Mailing_BAO_Component();
     if ($id) {
       $component->id = $id;
       $component->find(TRUE);

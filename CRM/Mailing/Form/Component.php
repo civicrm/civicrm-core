@@ -62,24 +62,24 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     $this->applyFilter(array('name', 'subject', 'body_html'), 'trim');
 
     $this->add('text', 'name', ts('Name'),
-      CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'name'), TRUE
+      CRM_Core_DAO::getAttribute('CRM_Mailing_BAO_Component', 'name'), TRUE
     );
     $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
-        'CRM_Mailing_DAO_Component',
+        'CRM_Mailing_BAO_Component',
         $this->_id,
       ));
 
     $this->add('select', 'component_type', ts('Component Type'), CRM_Core_SelectValues::mailingComponents());
 
     $this->add('text', 'subject', ts('Subject'),
-      CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'subject'),
+      CRM_Core_DAO::getAttribute('CRM_Mailing_BAO_Component', 'subject'),
       TRUE
     );
     $this->add('textarea', 'body_text', ts('Body - TEXT Format'),
-      CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'body_text')
+      CRM_Core_DAO::getAttribute('CRM_Mailing_BAO_Component', 'body_text')
     );
     $this->add('textarea', 'body_html', ts('Body - HTML Format'),
-      CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Component', 'body_html')
+      CRM_Core_DAO::getAttribute('CRM_Mailing_BAO_Component', 'body_html')
     );
 
     $this->addYesNo('is_default', ts('Default?'));

@@ -122,9 +122,9 @@ return [
     'class' => 'CRM_Batch_DAO_EntityBatch',
     'table' => 'civicrm_entity_batch',
   ],
-  'CRM_Mailing_DAO_Component' => [
-    'name' => 'Component',
-    'class' => 'CRM_Mailing_DAO_Component',
+  'CRM_Mailing_DAO_MailingComponent' => [
+    'name' => 'MailingComponent',
+    'class' => 'CRM_Mailing_DAO_MailingComponent',
     'table' => 'civicrm_mailing_component',
   ],
   'CRM_Mailing_DAO_MailingAB' => [
