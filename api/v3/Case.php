@@ -202,7 +202,7 @@ function _civicrm_api3_case_get_spec(&$params) {
   );
   $params['tag_id'] = array(
     'title' => 'Tags',
-    'description' => 'Find activities with specified tags.',
+    'description' => 'Find cases with specified tags.',
     'type' => 1,
     'FKClassName' => 'CRM_Core_DAO_Tag',
     'FKApiName' => 'Tag',
