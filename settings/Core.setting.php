@@ -54,6 +54,7 @@ return array(
     'is_contact' => 0,
     'description' => ts("Select the tabs that should be displayed when viewing a contact record. EXAMPLE: If your organization does not keep track of 'Relationships', then un-check this option to simplify the screen display. Tabs for Contributions, Pledges, Memberships, Events, Grants and Cases are also hidden if the corresponding component is not enabled. Go to Administer > System Settings > Enable Components to modify the components which are available for your site."),
     'help_text' => NULL,
+    'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
   ),
   'contact_edit_options' => array(
     'group_name' => 'CiviCRM Preferences',

@@ -145,7 +145,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     }
     try {
       $settings = $this->getSettingsToSetByMetadata($params);
-      civicrm_api3('setting', 'create', $settings);
+      $this->saveMetadataDefinedSettings($params);
     }
     catch (CiviCRM_API3_Exception $e) {
       CRM_Core_Session::setStatus($e->getMessage(), ts('Save Failed'), 'error');

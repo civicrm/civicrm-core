@@ -116,6 +116,8 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   }
 
   /**
+   * @todo deprecate in favour of setting using metadata.
+   *
    * @param $defaults
    */
   public function cbsDefaultValues(&$defaults) {
@@ -257,6 +259,14 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    * Process the form submission.
    */
   public function postProcessCommon() {
+    try {
+      $this->saveMetadataDefinedSettings($this->_params);
+      $this->filterParamsSetByMetadata($this->_params);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      CRM_Core_Session::setStatus($e->getMessage(), ts('Save Failed'), 'error');
+    }
+
     foreach ($this->_varNames as $groupName => $groupValues) {
       foreach ($groupValues as $settingName => $fieldValue) {
         switch ($fieldValue['html_type']) {
