@@ -90,6 +90,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
     $this->addFieldsDefinedInSettingsMetadata();
     $settings = Civi::settings();
+    // @todo replace this by defining all in settings.
     foreach ($this->_varNames as $groupName => $settingNames) {
       foreach ($settingNames as $settingName => $options) {
         $this->_config->$settingName = $settings->get($settingName);
@@ -102,15 +103,16 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $this->_defaults = array();
 
+    $this->setDefaultsForMetadataDefinedFields();
     foreach ($this->_varNames as $groupName => $settings) {
       foreach ($settings as $settingName => $settingDetails) {
-        $defaults[$settingName] = isset($this->_config->$settingName) ? $this->_config->$settingName : CRM_Utils_Array::value('default', $settingDetails, NULL);
+        $this->_defaults[$settingName] = isset($this->_config->$settingName) ? $this->_config->$settingName : CRM_Utils_Array::value('default', $settingDetails, NULL);
       }
     }
 
-    return $defaults;
+    return $this->_defaults;
   }
 
   /**

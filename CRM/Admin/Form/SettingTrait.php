@@ -168,4 +168,17 @@ trait CRM_Admin_Form_SettingTrait {
     $this->assign('settings_fields', $settingMetaData);
   }
 
+
+  /**
+   * Get the defaults for all fields defined in the metadata.
+   *
+   * All others are pending conversion.
+   */
+  protected function setDefaultsForMetadataDefinedFields() {
+    CRM_Core_BAO_ConfigSetting::retrieve($this->_defaults);
+    foreach ($this->_settings as $setting => $group) {
+      $this->_defaults[$setting] = civicrm_api3('setting', 'getvalue', ['name' => $setting]);
+    }
+  }
+
 }
