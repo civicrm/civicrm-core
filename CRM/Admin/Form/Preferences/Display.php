@@ -35,17 +35,17 @@
  * This class generates form components for the display preferences.
  */
 class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
+
+  protected $_settings = array(
+    'contact_view_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+  );
+
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('Settings - Display Preferences'));
     $optionValues = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
 
     $this->_varNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
-        'contact_view_options' => array(
-          'html_type' => 'checkboxes',
-          'title' => ts('Viewing Contacts'),
-          'weight' => 1,
-        ),
         'contact_smart_group_display' => array(
           'html_type' => 'radio',
           'title' => ts('Viewing Smart Groups'),

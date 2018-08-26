@@ -125,6 +125,19 @@ trait CRM_Admin_Form_SettingTrait {
         elseif ($add == 'addCheckBox') {
           $this->addCheckBox($setting, ts($props['title']), $options['values'], NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, ['&nbsp;&nbsp;']);
         }
+        elseif ($add == 'addCheckBoxes') {
+          $options = array_flip($options['values']);
+          $newOptions = [];
+          foreach ($options as $key => $val) {
+            $newOptions[$key] = $val;
+          }
+          $this->addCheckBox($setting,
+            $props['title'],
+            $newOptions,
+            NULL, NULL, NULL, NULL,
+            ['&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>']
+          );
+        }
         elseif ($add == 'addChainSelect') {
           $this->addChainSelect($setting, [
             'label' => ts($props['title']),

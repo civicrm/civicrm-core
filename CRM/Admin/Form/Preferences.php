@@ -35,6 +35,9 @@
  * Base class for settings forms.
  */
 class CRM_Admin_Form_Preferences extends CRM_Core_Form {
+
+  use CRM_Admin_Form_SettingTrait;
+
   protected $_system = FALSE;
   protected $_contactID = NULL;
   public $_action = NULL;
@@ -85,6 +88,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
       $this->_config->contact_id = $this->_contactID;
     }
 
+    $this->addFieldsDefinedInSettingsMetadata();
     $settings = Civi::settings();
     foreach ($this->_varNames as $groupName => $settingNames) {
       foreach ($settingNames as $settingName => $options) {
