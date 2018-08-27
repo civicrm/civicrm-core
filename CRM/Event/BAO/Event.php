@@ -1826,7 +1826,10 @@ WHERE  id = $cfID
         $title = $groupTitles = array();
         foreach ($additionalIDs as $pId => $cId) {
           //get the params submitted by participant.
-          $participantParams = CRM_Utils_Array::value($pId, $values['params'], array());
+          $participantParams = NULL;
+          if (isset($values['params'])) {
+            $participantParams = CRM_Utils_Array::value($pId, $values['params'], array());
+          }
 
           list($profilePre, $groupTitles) = self::buildCustomDisplay($preProfileID,
             'additionalCustomPre',
