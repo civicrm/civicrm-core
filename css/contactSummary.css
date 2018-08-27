@@ -21,10 +21,6 @@ div#crm-contact-thumbnail {
   border-bottom: 1px solid #FFF;
 }
 
-.crm-summary-block {
-  clear: both;
-}
-
 #crm-container div.crm-inline-edit {
   border: 2px dashed transparent;
   background: none;
