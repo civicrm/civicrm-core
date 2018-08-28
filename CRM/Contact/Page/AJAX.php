@@ -1015,8 +1015,7 @@ LIMIT {$offset}, {$rowCount}
 
   /**
    * Check if a employee/employer relationship could be created between the 2 contact
-   *
-   * @return string organization name if the relationship is valid otherewise FALSE
+   * Return organization name if the relationship is possible otherwise FALSE
    */
   public static function isPotentialEmployer() {
     $contactId = CRM_Utils_Request::retrieve('contact_id', 'Positive');
