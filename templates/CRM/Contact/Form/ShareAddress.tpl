@@ -40,6 +40,13 @@
           {/foreach}
         {/if}
       </div>
+      <div class="shared-address-update-employer">
+        {capture name="update_employer_help"}{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}{/capture}
+        {if $isPotentialEmployer.$blockId}
+          {$form.address.$blockId.update_current_employer.html} {$smarty.capture.update_employer_help}<br/>
+        {/if}
+      </div>
+
     </div>
   </td>
 </tr>
@@ -50,6 +57,7 @@
   CRM.$(function($) {
     var blockNo = {/literal}{$blockId}{literal},
       $contentArea = $('#shared-address-' + blockNo + ' .shared-address-list'),
+      $contentAreaUpdate = $('#shared-address-' + blockNo + ' .shared-address-update-employer'),
       $masterElement = $('input[name="address[' + blockNo + '][master_id]"]');
 
     function showHideSharedAddress() {
@@ -73,45 +81,69 @@
         sharedContactId = $el.val();
 
       $contentArea.html('');
+      $contentAreaUpdate.html('');
       $masterElement.val('');
 
       if (!sharedContactId || isNaN(sharedContactId)) {
         return;
       }
 
+      // first, find out if the shared address could be an implicit employer/employee relationship
       $.post(CRM.url('civicrm/ajax/inline'), {
-          'contact_id': sharedContactId,
+          'contact_id': {/literal}{$contactId}{literal},
+          'org_id': sharedContactId,
           'type': 'method',
           'class_name': 'CRM_Contact_Page_AJAX',
-          'fn_name': 'getAddressDisplay'
+          'fn_name': 'isPotentialEmployer'
         },
-        function(response) {
+        function(resp) {
           // Avoid race conditions - check that value hasn't been changed by the user while we were waiting for response
-          if (response && $el.val() === sharedContactId) {
-            var selected = ' checked="checked"',
-              addressHTML = '';
+          if ($el.val() === sharedContactId) {
+            var employerName = resp;
 
-            $.each(response, function(i, val) {
-              if (addressHTML) {
-                selected = '';
-              } else {
-                $('input[name="address[' + blockNo + '][master_id]"]').val(val.id);
-              }
-              var name = 'selected_shared_address-'+ blockNo,
-                id = name + '-' + val.id;
-              addressHTML += '<input type="radio" name="' + name + '" id="' + id + '" value="' + val.id + '"' + selected +'><label for="' + id + '">' + val.display_text + '</label>('+val.location_type+')<br/>';
-            });
+            $.post(CRM.url('civicrm/ajax/inline'), {
+                'contact_id': sharedContactId,
+                'type': 'method',
+                'class_name': 'CRM_Contact_Page_AJAX',
+                'fn_name': 'getAddressDisplay'
+              },
+              function(response) {
+                // Avoid race conditions - check that value hasn't been changed by the user while we were waiting for response
+                if (response && $el.val() === sharedContactId) {
+                  var selected = ' checked="checked"',
+                    addressHTML = '';
 
-            if (!addressHTML) {
-              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
-            }
+                  $.each(response, function(i, val) {
+                    if (addressHTML) {
+                      selected = '';
+                    } else {
+                      $('input[name="address[' + blockNo + '][master_id]"]').val(val.id);
+                    }
+                    var name = 'selected_shared_address-'+ blockNo,
+                      id = name + '-' + val.id;
+                    addressHTML += '<input type="radio" name="' + name + '" id="' + id + '" value="' + val.id + '"' + selected +'><label for="' + id + '">' + val.display_text + '</label>('+val.location_type+')<br/>';
+                  });
 
-            $contentArea.html(addressHTML);
+                  if (!addressHTML) {
+                    addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
+                  }
+                  else {
+                    if (employerName) {
+                      name = 'address[' + blockNo + '][update_current_employer]';
+                      var display_text = ts('Set %1 as current employer', {1: employerName});
+                      updateHTML = '<input type="checkbox" name="' + name + '" id="' + name + '" value="1" checked="checked"><label for="' + name + '">' + display_text + '</label> ' + {/literal}'{$smarty.capture.update_employer_help|escape:'javascript'}'{literal} + '<br/>';
+                      $contentAreaUpdate.html(updateHTML);
+                    }
+                  }
+
+                  $contentArea.html(addressHTML);
+                }
+              },'json');
           }
+
         },'json');
+
     });
   });
 </script>
 {/literal}
-
-
