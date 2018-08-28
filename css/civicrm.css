@@ -19,6 +19,10 @@ div.crm-container fieldset label{
   float: none;
 }
 
+input.crm-form-radio + label, input.crm-form-checkbox + label{
+  margin-left: 7px;
+}
+
 .crm-container .crm-quickSearchField {
   font-weight: normal;
 }
