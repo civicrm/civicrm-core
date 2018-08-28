@@ -279,7 +279,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     // Get recipients selected in prior mailings
     if (!empty($priorMailingIDs['Include'])) {
       CRM_Utils_SQL_Select::from('civicrm_mailing_recipients')
-        ->select("civicrm_mailing_recipients.contact_id, $entityColumn")
+        ->select("DISTINCT civicrm_mailing_recipients.contact_id, $entityColumn")
         ->join('temp', " LEFT JOIN $excludeTempTablename temp ON civicrm_mailing_recipients.contact_id = temp.contact_id ")
         ->where('mailing_id IN (#mailings)')
         ->where('temp.contact_id IS NULL')
