@@ -1,0 +1,1417 @@
+From 4bb4d5999acc364bb2b6ea5a8d3fadddd5b25e27 Mon Sep 17 00:00:00 2001
+From: Samuel Vanhove <samuel@symbiotic.coop>
+Date: Fri, 27 Jul 2018 17:12:51 -0400
+Subject: [PATCH 01/16] CRM-21008 - add a checkbox to let user decide if he
+ wants to update current employer / relationships
+
+---
+ templates/CRM/Contact/Form/Contact.hlp      |  3 +++
+ templates/CRM/Contact/Form/ShareAddress.tpl | 13 +++++++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/templates/CRM/Contact/Form/Contact.hlp b/templates/CRM/Contact/Form/Contact.hlp
+index 54f9695d2e6..2674a18719f 100644
+--- a/templates/CRM/Contact/Form/Contact.hlp
++++ b/templates/CRM/Contact/Form/Contact.hlp
+@@ -75,6 +75,9 @@
+ <p>{ts}Check this option if you want to link this address to another contact's address. For example, you might want to link a person's "Work" address to their employer's address. Or, you might want to link their "Home" address to a Household record. Changes made to the linked address will automatically be applied to this address. For example, if you use an employer (organization) address for an individual's work address - any updates to the employer address will also be applied to the individual's work address.{/ts}</p>
+ <p>{ts}You can use an address belonging to an existing contact or create a new contact by selecting the desired contact type from the select field. If you link an individual's address to an organization, an employee-employer relationship will be automatically created. If you link an individual's address to a household, a household member relationship is created.{/ts}</p>
+ {/htxt}
++{htxt id="id-sharedAddress-updateRelationships"}
++<p>{ts}Check this option if you want to DISABLE any current employer relationship for this contact and replace the employer by this one{/ts}</p>
++{/htxt}
+ 
+ {htxt id="id-communication_style-title"}
+   {ts}Communication Style{/ts}
+diff --git a/templates/CRM/Contact/Form/ShareAddress.tpl b/templates/CRM/Contact/Form/ShareAddress.tpl
+index af34e82c017..fcfc8108d75 100644
+--- a/templates/CRM/Contact/Form/ShareAddress.tpl
++++ b/templates/CRM/Contact/Form/ShareAddress.tpl
+@@ -38,8 +38,12 @@
+             <input type="radio" name="{$sa_name}" id="{$sa_id}" value="{$sa.id}" {if $sa.id eq $sharedAddresses.$blockId.shared_address_display.master_id}checked="checked"{/if}>
+             <label for="{$sa_id}">{$sa.display_text}</label>{if $sa.location_type}({$sa.location_type}){/if}<br/>
+           {/foreach}
++
++          {assign var="update_name" value="update_current_employer-`$blockId`"}
++          <input type="checkbox" name="{$update_name}" id="{$update_name}" value="1" checked="checked"><label for="{$update_name}">{ts}Set Organization Name as current employer{/ts}</label> {help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}<br/>
+         {/if}
+       </div>
++
+     </div>
+   </td>
+ </tr>
+@@ -105,6 +109,15 @@
+             if (!addressHTML) {
+               addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
+             }
++            else {
++              // TODO: check if the contact is an organization and get the org name
++              /*$.post(CRM.url('civicrm/ajax/inline'), {
++                'contact_id': sharedContactId,*/
++              
++              var name = 'update_current_employer-'+ blockNo;
++              var display_text = {/literal}"{ts escape='js'}Set Organization Name as current employer{/ts}"{literal};
++              addressHTML += '<input type="checkbox" name="' + name + '" id="' + name + '" value="1" checked="checked"><label for="' + name + '">' + display_text + '</label>' + /*{/literal}'{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}'{literal} +*/ '<br/>';
++            }
+ 
+             $contentArea.html(addressHTML);
+           }
+
+From b680483db01cd039dcc7af79f9dada267ec43d21 Mon Sep 17 00:00:00 2001
+From: Samuel Vanhove <samuel@symbiotic.coop>
+Date: Thu, 23 Aug 2018 12:12:10 -0400
+Subject: [PATCH 02/16] Dynamicly add checkbox to define as current employer
+ when shared address changes
+
+---
+ templates/CRM/Contact/Form/ShareAddress.tpl | 85 ++++++++++++---------
+ 1 file changed, 50 insertions(+), 35 deletions(-)
+
+diff --git a/templates/CRM/Contact/Form/ShareAddress.tpl b/templates/CRM/Contact/Form/ShareAddress.tpl
+index fcfc8108d75..4c858a6d207 100644
+--- a/templates/CRM/Contact/Form/ShareAddress.tpl
++++ b/templates/CRM/Contact/Form/ShareAddress.tpl
+@@ -39,8 +39,10 @@
+             <label for="{$sa_id}">{$sa.display_text}</label>{if $sa.location_type}({$sa.location_type}){/if}<br/>
+           {/foreach}
+ 
+-          {assign var="update_name" value="update_current_employer-`$blockId`"}
+-          <input type="checkbox" name="{$update_name}" id="{$update_name}" value="1" checked="checked"><label for="{$update_name}">{ts}Set Organization Name as current employer{/ts}</label> {help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}<br/>
++          {* FIXME: only display this in case of an individual that shared an organization address *}
++          {assign var="update_employer_name" value="update_current_employer-`$blockId`"}
++          {capture name="update_employer_help"}{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}{/capture}
++          <input type="checkbox" name="{$update_employer_name}" id="{$update_employer_name}" value="1" checked="checked"><label for="{$update_name}">{ts}Set Organization Name as current employer{/ts}</label> {$smarty.capture.update_employer_help}<br/>
+         {/if}
+       </div>
+ 
+@@ -83,48 +85,61 @@
+         return;
+       }
+ 
++      // first, find out if the shared address could be an implicit employer/employee relationship
+       $.post(CRM.url('civicrm/ajax/inline'), {
+-          'contact_id': sharedContactId,
++          'contact_id': {/literal}{$contactId}{literal},
++          'org_id': sharedContactId,
+           'type': 'method',
+           'class_name': 'CRM_Contact_Page_AJAX',
+-          'fn_name': 'getAddressDisplay'
++          'fn_name': 'isPotentialEmployer'
+         },
+         function(response) {
+           // Avoid race conditions - check that value hasn't been changed by the user while we were waiting for response
+-          if (response && $el.val() === sharedContactId) {
+-            var selected = ' checked="checked"',
+-              addressHTML = '';
+-
+-            $.each(response, function(i, val) {
+-              if (addressHTML) {
+-                selected = '';
+-              } else {
+-                $('input[name="address[' + blockNo + '][master_id]"]').val(val.id);
+-              }
+-              var name = 'selected_shared_address-'+ blockNo,
+-                id = name + '-' + val.id;
+-              addressHTML += '<input type="radio" name="' + name + '" id="' + id + '" value="' + val.id + '"' + selected +'><label for="' + id + '">' + val.display_text + '</label>('+val.location_type+')<br/>';
+-            });
+-
+-            if (!addressHTML) {
+-              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
+-            }
+-            else {
+-              // TODO: check if the contact is an organization and get the org name
+-              /*$.post(CRM.url('civicrm/ajax/inline'), {
+-                'contact_id': sharedContactId,*/
+-              
+-              var name = 'update_current_employer-'+ blockNo;
+-              var display_text = {/literal}"{ts escape='js'}Set Organization Name as current employer{/ts}"{literal};
+-              addressHTML += '<input type="checkbox" name="' + name + '" id="' + name + '" value="1" checked="checked"><label for="' + name + '">' + display_text + '</label>' + /*{/literal}'{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}'{literal} +*/ '<br/>';
+-            }
+-
+-            $contentArea.html(addressHTML);
++          if ($el.val() === sharedContactId) {
++            var employerName = response;
++
++            $.post(CRM.url('civicrm/ajax/inline'), {
++                'contact_id': sharedContactId,
++                'type': 'method',
++                'class_name': 'CRM_Contact_Page_AJAX',
++                'fn_name': 'getAddressDisplay'
++              },
++              function(response) {
++                // Avoid race conditions - check that value hasn't been changed by the user while we were waiting for response
++                if (response && $el.val() === sharedContactId) {
++                  var selected = ' checked="checked"',
++                    addressHTML = '';
++
++                  $.each(response, function(i, val) {
++                    if (addressHTML) {
++                      selected = '';
++                    } else {
++                      $('input[name="address[' + blockNo + '][master_id]"]').val(val.id);
++                    }
++                    var name = 'selected_shared_address-'+ blockNo,
++                      id = name + '-' + val.id;
++                    addressHTML += '<input type="radio" name="' + name + '" id="' + id + '" value="' + val.id + '"' + selected +'><label for="' + id + '">' + val.display_text + '</label>('+val.location_type+')<br/>';
++                  });
++
++                  if (!addressHTML) {
++                    addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
++                  }
++                  else {
++                    if (employerName) {
++                      var name = 'update_current_employer-'+ blockNo;
++                      var display_text = ts('Set %1 as current employer', {1: employerName});
++                      addressHTML += '<input type="checkbox" name="' + name + '" id="' + name + '" value="1" checked="checked"><label for="' + name + '">' + display_text + '</label> ' + {/literal}'{$smarty.capture.update_employer_help|escape:'javascript'}'{literal} + '<br/>';
++                    }
++                  }
++
++                  $contentArea.html(addressHTML);
++                }
++              },'json');
+           }
++
+         },'json');
++
+     });
+   });
+ </script>
+ {/literal}
+-
+-
+
+From 689b45f857df96d1e1e3e8f3a14e2afbb0afd69b Mon Sep 17 00:00:00 2001
+From: Samuel Vanhove <samuel@symbiotic.coop>
+Date: Tue, 28 Aug 2018 11:20:46 -0400
+Subject: [PATCH 03/16] CRM-21008 interface is now working
+
+---
+ CRM/Contact/BAO/Contact/Utils.php           |  2 +-
+ CRM/Contact/Form/Edit/Address.php           | 17 ++++++++++++++++
+ CRM/Contact/Page/AJAX.php                   | 15 ++++++++++++++
+ CRM/Core/BAO/Address.php                    | 18 ++++++++++++++---
+ templates/CRM/Contact/Form/ShareAddress.tpl | 22 ++++++++++++---------
+ 5 files changed, 61 insertions(+), 13 deletions(-)
+
+diff --git a/CRM/Contact/BAO/Contact/Utils.php b/CRM/Contact/BAO/Contact/Utils.php
+index f3b391362af..465d5e2c33f 100644
+--- a/CRM/Contact/BAO/Contact/Utils.php
++++ b/CRM/Contact/BAO/Contact/Utils.php
+@@ -825,7 +825,7 @@ public static function processSharedAddress(&$address) {
+     // Normal update process will automatically create new address with submitted values
+ 
+     // 1. loop through entire submitted address array
+-    $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'master_id');
++    $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'master_id', 'update_current_employer');
+     foreach ($address as & $values) {
+       // 2. check if "Use another contact's address" is checked, if not continue
+       // Additionally, if master_id is set (address was shared), set master_id to empty value.
+diff --git a/CRM/Contact/Form/Edit/Address.php b/CRM/Contact/Form/Edit/Address.php
+index 027fbe253ff..33bccbbe094 100644
+--- a/CRM/Contact/Form/Edit/Address.php
++++ b/CRM/Contact/Form/Edit/Address.php
+@@ -164,6 +164,9 @@ public static function buildQuickForm(&$form, $addressBlockCount = NULL, $sharin
+       // shared address
+       $form->addElement('checkbox', "address[$blockId][use_shared_address]", NULL, ts('Use another contact\'s address'));
+ 
++      // do we want to update employer for shared address
++      $form->addElement('checkbox', "address[$blockId][update_current_employer]", NULL, ts('Set this organization as current employer'));
++
+       // Override the default profile links to add address form
+       $profileLinks = CRM_Core_BAO_UFGroup::getCreateLinks(array(
+           'new_individual',
+@@ -249,6 +252,7 @@ public static function setDefaultValues(&$defaults, &$form) {
+       // start of contact shared adddress defaults
+       $sharedAddresses = array();
+       $masterAddress = array();
++      $isPotentialEmployer = array();
+ 
+       // get contact name of shared contact names
+       $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($defaults['address']);
+@@ -266,6 +270,18 @@ public static function setDefaultValues(&$defaults, &$form) {
+             'master_id' => $addressValue['master_id'],
+           );
+           $defaults['address'][$key]['master_contact_id'] = $master_cid;
++
++          // is it a potential case of employee/employer ?
++          $contactType1 = CRM_Contact_BAO_Contact::getContactType($form->_contactId);
++          $contactType2 = CRM_Contact_BAO_Contact::getContactType($master_cid);
++
++          if ($contactType1 == 'Individual' && $contactType2 == 'Organization') {
++            $isPotentialEmployer[$key] = 1;
++            // when editing an existing shared address, assume that we don't want to update current employer
++            $defaults['address'][$key]['update_current_employer'] = 0;
++            // TODO: replace input label to include employer name
++            //$employer = CRM_Contact_BAO_Contact::displayName($master_cid);
++          }
+         }
+         else {
+           $defaults['address'][$key]['use_shared_address'] = 0;
+@@ -277,6 +293,7 @@ public static function setDefaultValues(&$defaults, &$form) {
+ 
+       $form->assign('sharedAddresses', $sharedAddresses);
+       $form->assign('masterAddress', $masterAddress);
++      $form->assign('isPotentialEmployer', $isPotentialEmployer);
+       // end of shared address defaults
+ 
+       // start of parse address functionality
+diff --git a/CRM/Contact/Page/AJAX.php b/CRM/Contact/Page/AJAX.php
+index 8270d7b753a..cd66bdbfac5 100644
+--- a/CRM/Contact/Page/AJAX.php
++++ b/CRM/Contact/Page/AJAX.php
+@@ -1013,6 +1013,21 @@ public static function getAddressDisplay() {
+     CRM_Utils_JSON::output($addressVal);
+   }
+ 
++  public static function isPotentialEmployer() {
++    $contactId = CRM_Utils_Request::retrieve('contact_id', 'Positive');
++    $orgId = CRM_Utils_Request::retrieve('org_id', 'Positive');
++    $employer = False;
++    if ($contactId && $orgId) {
++      $contactType1 = CRM_Contact_BAO_Contact::getContactType($contactId);
++      $contactType2 = CRM_Contact_BAO_Contact::getContactType($orgId);
++      if ($contactType1 == 'Individual' && $contactType2 == 'Organization') {
++        $employer = CRM_Contact_BAO_Contact::displayName($orgId);
++      }
++    }
++    CRM_Utils_JSON::output($employer);
++
++  }
++
+   /**
+    * Mark dupe pairs as selected from un-selected state or vice-versa, in dupe cache table.
+    */
+diff --git a/CRM/Core/BAO/Address.php b/CRM/Core/BAO/Address.php
+index 338712adfba..eccc1501dbc 100644
+--- a/CRM/Core/BAO/Address.php
++++ b/CRM/Core/BAO/Address.php
+@@ -1042,11 +1042,23 @@ public static function processSharedAddress($addressId, $params) {
+     $query = 'SELECT id, contact_id FROM civicrm_address WHERE master_id = %1';
+     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($addressId, 'Integer')));
+ 
++Civi::log()->debug('processSharedAddress -- ' . print_r($params,1));
++
++    // TODO: VALIDATION REQUIRED = was implicit and is now explicit
++    // should we keep it backward compatible (i.e. no params means creating relationship) ?
++    // this should only impact API calls
++    $createRelationship = FALSE;
++    if (isset($params['update_current_employer']) && $params['update_current_employer']) {
++      $createRelationship = TRUE;
++    }
++
+     // unset contact id
+     $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'contact_id');
+     if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
+-      // call the function to create a relationship for the new shared address
+-      self::processSharedAddressRelationship($params['master_id'], $params['contact_id']);
++      if ($createRelationship) {
++        // call the function to create a relationship for the new shared address
++        self::processSharedAddressRelationship($params['master_id'], $params['contact_id']);
++      }
+     }
+     else {
+       // else no new shares will be created, only update shared addresses
+@@ -1059,7 +1071,7 @@ public static function processSharedAddress($addressId, $params) {
+     $addressDAO = new CRM_Core_DAO_Address();
+     while ($dao->fetch()) {
+       // call the function to update the relationship
+-      if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
++      if ($createRelationship && isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
+         self::processSharedAddressRelationship($params['master_id'], $dao->contact_id);
+       }
+       $addressDAO->copyValues($params);
+diff --git a/templates/CRM/Contact/Form/ShareAddress.tpl b/templates/CRM/Contact/Form/ShareAddress.tpl
+index 4c858a6d207..b973dd298f6 100644
+--- a/templates/CRM/Contact/Form/ShareAddress.tpl
++++ b/templates/CRM/Contact/Form/ShareAddress.tpl
+@@ -38,11 +38,12 @@
+             <input type="radio" name="{$sa_name}" id="{$sa_id}" value="{$sa.id}" {if $sa.id eq $sharedAddresses.$blockId.shared_address_display.master_id}checked="checked"{/if}>
+             <label for="{$sa_id}">{$sa.display_text}</label>{if $sa.location_type}({$sa.location_type}){/if}<br/>
+           {/foreach}
+-
+-          {* FIXME: only display this in case of an individual that shared an organization address *}
+-          {assign var="update_employer_name" value="update_current_employer-`$blockId`"}
+-          {capture name="update_employer_help"}{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}{/capture}
+-          <input type="checkbox" name="{$update_employer_name}" id="{$update_employer_name}" value="1" checked="checked"><label for="{$update_name}">{ts}Set Organization Name as current employer{/ts}</label> {$smarty.capture.update_employer_help}<br/>
++        {/if}
++      </div>
++      <div class="shared-address-update-employer">
++        {capture name="update_employer_help"}{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}{/capture}
++        {if $isPotentialEmployer.$blockId}
++          {$form.address.$blockId.update_current_employer.html} {$smarty.capture.update_employer_help}<br/>
+         {/if}
+       </div>
+ 
+@@ -56,6 +57,7 @@
+   CRM.$(function($) {
+     var blockNo = {/literal}{$blockId}{literal},
+       $contentArea = $('#shared-address-' + blockNo + ' .shared-address-list'),
++      $contentAreaUpdate = $('#shared-address-' + blockNo + ' .shared-address-update-employer'),
+       $masterElement = $('input[name="address[' + blockNo + '][master_id]"]');
+ 
+     function showHideSharedAddress() {
+@@ -79,6 +81,7 @@
+         sharedContactId = $el.val();
+ 
+       $contentArea.html('');
++      $contentAreaUpdate.html('');
+       $masterElement.val('');
+ 
+       if (!sharedContactId || isNaN(sharedContactId)) {
+@@ -93,10 +96,10 @@
+           'class_name': 'CRM_Contact_Page_AJAX',
+           'fn_name': 'isPotentialEmployer'
+         },
+-        function(response) {
++        function(resp) {
+           // Avoid race conditions - check that value hasn't been changed by the user while we were waiting for response
+           if ($el.val() === sharedContactId) {
+-            var employerName = response;
++            var employerName = resp;
+ 
+             $.post(CRM.url('civicrm/ajax/inline'), {
+                 'contact_id': sharedContactId,
+@@ -126,9 +129,10 @@
+                   }
+                   else {
+                     if (employerName) {
+-                      var name = 'update_current_employer-'+ blockNo;
++                      name = 'address[' + blockNo + '][update_current_employer]';
+                       var display_text = ts('Set %1 as current employer', {1: employerName});
+-                      addressHTML += '<input type="checkbox" name="' + name + '" id="' + name + '" value="1" checked="checked"><label for="' + name + '">' + display_text + '</label> ' + {/literal}'{$smarty.capture.update_employer_help|escape:'javascript'}'{literal} + '<br/>';
++                      updateHTML = '<input type="checkbox" name="' + name + '" id="' + name + '" value="1" checked="checked"><label for="' + name + '">' + display_text + '</label> ' + {/literal}'{$smarty.capture.update_employer_help|escape:'javascript'}'{literal} + '<br/>';
++                      $contentAreaUpdate.html(updateHTML);
+                     }
+                   }
+ 
+
+From 2e1abe5d8c33d8c440c6290ab758be6dcfb5e2e2 Mon Sep 17 00:00:00 2001
+From: Pradeep Nayak <pradpnayak@gmail.com>
+Date: Fri, 13 Jul 2018 14:26:56 +0100
+Subject: [PATCH 04/16] added unit test to search contact based on contact sub
+ type
+
+---
+ .../Contact/Form/Search/SearchContactTest.php | 94 +++++++++++++++++++
+ 1 file changed, 94 insertions(+)
+ create mode 100644 tests/phpunit/CRM/Contact/Form/Search/SearchContactTest.php
+
+diff --git a/tests/phpunit/CRM/Contact/Form/Search/SearchContactTest.php b/tests/phpunit/CRM/Contact/Form/Search/SearchContactTest.php
+new file mode 100644
+index 00000000000..f503b048bec
+--- /dev/null
++++ b/tests/phpunit/CRM/Contact/Form/Search/SearchContactTest.php
+@@ -0,0 +1,94 @@
++<?php
++/*
++  +--------------------------------------------------------------------+
++  | CiviCRM version 5                                                  |
++  +--------------------------------------------------------------------+
++  | Copyright CiviCRM LLC (c) 2004-2018                                |
++  +--------------------------------------------------------------------+
++  | This file is a part of CiviCRM.                                    |
++  |                                                                    |
++  | CiviCRM is free software; you can copy, modify, and distribute it  |
++  | under the terms of the GNU Affero General Public License           |
++  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
++  |                                                                    |
++  | CiviCRM is distributed in the hope that it will be useful, but     |
++  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
++  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
++  | See the GNU Affero General Public License for more details.        |
++  |                                                                    |
++  | You should have received a copy of the GNU Affero General Public   |
++  | License and the CiviCRM Licensing Exception along                  |
++  | with this program; if not, contact CiviCRM LLC                     |
++  | at info[AT]civicrm[DOT]org. If you have questions about the        |
++  | GNU Affero General Public License or the licensing of CiviCRM,     |
++  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
++  +--------------------------------------------------------------------+
++ */
++
++/**
++ * Test class for CRM_Contact_BAO_Group BAO
++ *
++ * @package CiviCRM
++ * @group headless
++ */
++class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
++
++  /**
++   * Test contact sub type search.
++   */
++  public function testContactSubtype() {
++    foreach (['Contact_sub_type', 'Contact2__sub__type'] as $contactSubType) {
++      $subType = $this->callAPISuccess('ContactType', 'create', [
++        'name' => $contactSubType,
++        'label' => $contactSubType,
++        'is_active' => 1,
++        'parent_id' => "Individual",
++      ]);
++      // Contact Type api munge name in create mode
++      // Therefore updating the name in update mode
++      $this->callAPISuccess('ContactType', 'create', [
++        'name' => $contactSubType,
++        'id' => $subType['id'],
++      ]);
++    }
++    $this->searchContacts('Contact_sub_type');
++    $this->searchContacts('Contact2__sub__type');
++  }
++
++  protected function searchContacts($contactSubType) {
++    // create contact
++    $params = [
++      'first_name' => 'Peter' . substr(sha1(rand()), 0, 4),
++      'last_name' => 'Lastname',
++      'contact_type' => 'Individual',
++      'contact_sub_type' => $contactSubType,
++    ];
++    $contacts = $this->callAPISuccess('Contact', 'create', $params);
++    $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(TRUE);
++    foreach ($contactTypes as $contactType => $ignore) {
++      if (strpos($contactType, $contactSubType) !== FALSE) {
++        $formValues = [
++          'contact_type' => $contactType,
++        ];
++        break;
++      }
++    }
++    CRM_Contact_BAO_Query::convertFormValues($formValues);
++    $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($formValues));
++    list($select, $from, $where, $having) = $query->query();
++    // get and assert contact count
++    $contactsResult = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id %s %s', $from, $where))->fetchAll();
++    foreach ($contactsResult as $key => $value) {
++      $contactsResult[$key] = $value['id'];
++    }
++    // assert the contacts count
++    $this->assertEquals(1, count($contactsResult));
++    // assert the contact IDs
++    $expectedResult = [$contacts['id']];
++    $this->checkArrayEquals($expectedResult, $contactsResult);
++    // get and assert qill string
++    $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
++    $this->assertEquals("Contact Type In IndividualANDContact Subtype Like {$contactSubType}", $qill);
++  }
++
++}
+
+From 3c27958680bd4147e9e4fb5570f75bdeb6c4002c Mon Sep 17 00:00:00 2001
+From: Pradeep Nayak <pradpnayak@gmail.com>
+Date: Thu, 26 Jul 2018 10:57:14 +0100
+Subject: [PATCH 05/16] dev/core/issues/232, fixed how contact sub type is
+ using separator
+
+---
+ CRM/Contact/BAO/Query.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CRM/Contact/BAO/Query.php b/CRM/Contact/BAO/Query.php
+index c389a822609..f515564998a 100644
+--- a/CRM/Contact/BAO/Query.php
++++ b/CRM/Contact/BAO/Query.php
+@@ -1612,7 +1612,7 @@ public static function convertFormValues(&$formValues, $wildcard = 0, $useEquals
+         $contactType = array();
+         $subType = array();
+         foreach ((array) $values as $key => $type) {
+-          $types = explode('__', is_numeric($type) ? $key : $type);
++          $types = explode('__', is_numeric($type) ? $key : $type, 2);
+           $contactType[$types[0]] = $types[0];
+           // Add sub-type if specified
+           if (!empty($types[1])) {
+
+From 60e9b7248ab60080be35ce1caf0666809cba9bf2 Mon Sep 17 00:00:00 2001
+From: Pradeep Nayak <pradpnayak@gmail.com>
+Date: Thu, 26 Jul 2018 10:57:46 +0100
+Subject: [PATCH 06/16] updated explode function in custom search
+
+---
+ CRM/Contact/Form/Search/Custom/MultipleValues.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CRM/Contact/Form/Search/Custom/MultipleValues.php b/CRM/Contact/Form/Search/Custom/MultipleValues.php
+index acc1bd580f8..31b9cebbc55 100644
+--- a/CRM/Contact/Form/Search/Custom/MultipleValues.php
++++ b/CRM/Contact/Form/Search/Custom/MultipleValues.php
+@@ -246,7 +246,7 @@ public function where($includeContactIDs = FALSE) {
+       $this->_formValues
+     );
+     if ($contact_type != NULL) {
+-      $contactType = explode('__', $contact_type);
++      $contactType = explode('__', $contact_type, 2);
+       if (count($contactType) > 1) {
+         $clause[] = "contact_a.contact_type = '$contactType[0]' AND contact_a.contact_sub_type = '$contactType[1]'";
+       }
+
+From d7bfcfae3cc55099811a37469265a4b3b697338b Mon Sep 17 00:00:00 2001
+From: Pradeep Nayak <pradpnayak@gmail.com>
+Date: Wed, 27 Jun 2018 05:01:34 +0530
+Subject: [PATCH 07/16] Moved code from form layer to BAO and used api instead
+ of BAO function
+
+---
+ CRM/Admin/Form/Options.php   | 12 ------------
+ CRM/Core/BAO/OptionValue.php | 23 +++++++++++++++++++++++
+ 2 files changed, 23 insertions(+), 12 deletions(-)
+
+diff --git a/CRM/Admin/Form/Options.php b/CRM/Admin/Form/Options.php
+index 1f2821d399d..fd4aa9dfa18 100644
+--- a/CRM/Admin/Form/Options.php
++++ b/CRM/Admin/Form/Options.php
+@@ -486,18 +486,6 @@ public function postProcess() {
+ 
+       $optionValue = CRM_Core_OptionValue::addOptionValue($params, $this->_gName, $this->_action, $this->_id);
+ 
+-      // CRM-11516
+-      if (!empty($params['financial_account_id'])) {
+-        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
+-        $params = array(
+-          'entity_table' => 'civicrm_option_value',
+-          'entity_id' => $optionValue->id,
+-          'account_relationship' => $relationTypeId,
+-          'financial_account_id' => $params['financial_account_id'],
+-        );
+-        CRM_Financial_BAO_FinancialTypeAccount::add($params);
+-      }
+-
+       CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', array(
+             1 => $this->_gLabel,
+             2 => $optionValue->label,
+diff --git a/CRM/Core/BAO/OptionValue.php b/CRM/Core/BAO/OptionValue.php
+index cfb4b45dce4..98a331c6f44 100644
+--- a/CRM/Core/BAO/OptionValue.php
++++ b/CRM/Core/BAO/OptionValue.php
+@@ -243,6 +243,29 @@ public static function add(&$params, $ids = array()) {
+     $optionValue->id = $id;
+     $optionValue->save();
+     CRM_Core_PseudoConstant::flush();
++
++    // Create relationship for payment intrument options
++    if (!empty($params['financial_account_id'])) {
++      $optionName = civicrm_api3('OptionGroup', 'getvalue', [
++        'return' => 'name',
++        'id' => $params['option_group_id'],
++      ]);
++      // Only create relationship for payment intrument options
++      if ($optionName == 'payment_instrument') {
++        $relationTypeId = civicrm_api3('OptionValue', 'getvalue', [
++          'return' => 'value',
++          'option_group_id' => 'account_relationship',
++          'name' => 'Asset Account is',
++        ]);
++        $params = [
++          'entity_table' => 'civicrm_option_value',
++          'entity_id' => $optionValue->id,
++          'account_relationship' => $relationTypeId,
++          'financial_account_id' => $params['financial_account_id'],
++        ];
++        CRM_Financial_BAO_FinancialTypeAccount::add($params);
++      }
++    }
+     return $optionValue;
+   }
+ 
+
+From 95655576aa9ad077f2afa346a2ec4bdfcf7dee00 Mon Sep 17 00:00:00 2001
+From: Pradeep Nayak <pradpnayak@gmail.com>
+Date: Thu, 26 Jul 2018 12:05:45 +0100
+Subject: [PATCH 08/16] Added code to throw exception on getvalue api call
+
+---
+ Civi/Test/Api3TestTrait.php | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Civi/Test/Api3TestTrait.php b/Civi/Test/Api3TestTrait.php
+index 1efcd13ce69..2a10abf7e73 100644
+--- a/Civi/Test/Api3TestTrait.php
++++ b/Civi/Test/Api3TestTrait.php
+@@ -235,6 +235,9 @@ public function callAPISuccessGetValue($entity, $params, $type = NULL) {
+       'debug' => 1,
+     );
+     $result = $this->civicrm_api($entity, 'getvalue', $params);
++    if (is_array($result) && (!empty($result['is_error']) || isset($result['values']))) {
++      throw new \Exception('Invalid getvalue result' . print_r($result, TRUE));
++    }
+     if ($type) {
+       if ($type == 'integer') {
+         // api seems to return integers as strings
+
+From 1a34bdce5a1d54bd46bf7705aa874bdb5b4c4637 Mon Sep 17 00:00:00 2001
+From: Coleman Watts <coleman@civicrm.org>
+Date: Sat, 21 Jul 2018 17:18:41 -0400
+Subject: [PATCH 09/16] crmRouteBinder - Don't convert arrays to objects
+
+---
+ ang/crmRouteBinder.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ang/crmRouteBinder.js b/ang/crmRouteBinder.js
+index 16947a3d79d..0dd232dd637 100644
+--- a/ang/crmRouteBinder.js
++++ b/ang/crmRouteBinder.js
+@@ -66,7 +66,7 @@
+           value = fmt.decode($route.current.params[options.param]);
+         }
+         else {
+-          value = _.isObject(options.default) ? angular.extend({}, options.default) : options.default;
++          value = _.cloneDeep(options.default);
+           ignorable[options.param] = fmt.encode(options.default);
+         }
+         $parse(options.expr).assign(_scope, value);
+
+From 595ff6f4a4ea8b3e5587fe7806ba86aa77f13f5c Mon Sep 17 00:00:00 2001
+From: John Kingsnorth <john@johnkingsnorth.co.uk>
+Date: Thu, 26 Jul 2018 23:19:03 +0100
+Subject: [PATCH 10/16]  Update readme to link to GitLab instead of JIRA
+
+---
+ README.md | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/README.md b/README.md
+index cf7462f47db..69835a0b75c 100644
+--- a/README.md
++++ b/README.md
+@@ -46,5 +46,5 @@ questions and ideas in the [Developer Discussion room](https://chat.civicrm.org/
+ 
+ Installing the latest developmental code requires some [special steps](http://wiki.civicrm.org/confluence/display/CRMDOC/Contributing+to+CiviCRM+using+GitHub). 
+ 
+-Report all issues to CiviCRM via JIRA:
+-https://issues.civicrm.org
++Report all issues to CiviCRM via GitLab:
++https://lab.civicrm.org
+
+From dc9c6e818614224adaaab07505c1354c0fea4813 Mon Sep 17 00:00:00 2001
+From: eileen <emcnaughton@wikimedia.org>
+Date: Fri, 27 Jul 2018 01:40:30 +1200
+Subject: [PATCH 11/16] Extract getSqlColumnDefinition off to processor class.
+
+Note that I wrote test coverage that was pretty extensive on the output of this function earlier
+---
+ CRM/Export/BAO/Export.php          | 109 +----------------------------
+ CRM/Export/BAO/ExportProcessor.php | 108 ++++++++++++++++++++++++++++
+ 2 files changed, 109 insertions(+), 108 deletions(-)
+
+diff --git a/CRM/Export/BAO/Export.php b/CRM/Export/BAO/Export.php
+index 8822076944f..dc000248d79 100644
+--- a/CRM/Export/BAO/Export.php
++++ b/CRM/Export/BAO/Export.php
+@@ -795,120 +795,13 @@ public static function sqlColumnDefn($processor, &$sqlColumns, $field) {
+     if (substr($field, -4) == '_a_b' || substr($field, -4) == '_b_a') {
+       return;
+     }
+-    $queryFields = $processor->getQueryFields();
+ 
+     $fieldName = CRM_Utils_String::munge(strtolower($field), '_', 64);
+     if ($fieldName == 'id') {
+       $fieldName = 'civicrm_primary_id';
+     }
+ 
+-    // early exit for master_id, CRM-12100
+-    // in the DB it is an ID, but in the export, we retrive the display_name of the master record
+-    // also for current_employer, CRM-16939
+-    if ($fieldName == 'master_id' || $fieldName == 'current_employer') {
+-      $sqlColumns[$fieldName] = "$fieldName varchar(128)";
+-      return;
+-    }
+-
+-    if (substr($fieldName, -11) == 'campaign_id') {
+-      // CRM-14398
+-      $sqlColumns[$fieldName] = "$fieldName varchar(128)";
+-      return;
+-    }
+-
+-    $lookUp = array('prefix_id', 'suffix_id');
+-    // set the sql columns
+-    if (isset($queryFields[$field]['type'])) {
+-      switch ($queryFields[$field]['type']) {
+-        case CRM_Utils_Type::T_INT:
+-        case CRM_Utils_Type::T_BOOLEAN:
+-          if (in_array($field, $lookUp)) {
+-            $sqlColumns[$fieldName] = "$fieldName varchar(255)";
+-          }
+-          else {
+-            $sqlColumns[$fieldName] = "$fieldName varchar(16)";
+-          }
+-          break;
+-
+-        case CRM_Utils_Type::T_STRING:
+-          if (isset($queryFields[$field]['maxlength'])) {
+-            $sqlColumns[$fieldName] = "$fieldName varchar({$queryFields[$field]['maxlength']})";
+-          }
+-          else {
+-            $sqlColumns[$fieldName] = "$fieldName varchar(255)";
+-          }
+-          break;
+-
+-        case CRM_Utils_Type::T_TEXT:
+-        case CRM_Utils_Type::T_LONGTEXT:
+-        case CRM_Utils_Type::T_BLOB:
+-        case CRM_Utils_Type::T_MEDIUMBLOB:
+-          $sqlColumns[$fieldName] = "$fieldName longtext";
+-          break;
+-
+-        case CRM_Utils_Type::T_FLOAT:
+-        case CRM_Utils_Type::T_ENUM:
+-        case CRM_Utils_Type::T_DATE:
+-        case CRM_Utils_Type::T_TIME:
+-        case CRM_Utils_Type::T_TIMESTAMP:
+-        case CRM_Utils_Type::T_MONEY:
+-        case CRM_Utils_Type::T_EMAIL:
+-        case CRM_Utils_Type::T_URL:
+-        case CRM_Utils_Type::T_CCNUM:
+-        default:
+-          $sqlColumns[$fieldName] = "$fieldName varchar(32)";
+-          break;
+-      }
+-    }
+-    else {
+-      if (substr($fieldName, -3, 3) == '_id') {
+-        $sqlColumns[$fieldName] = "$fieldName varchar(255)";
+-      }
+-      elseif (substr($fieldName, -5, 5) == '_note') {
+-        $sqlColumns[$fieldName] = "$fieldName text";
+-      }
+-      else {
+-        $changeFields = array(
+-          'groups',
+-          'tags',
+-          'notes',
+-        );
+-
+-        if (in_array($fieldName, $changeFields)) {
+-          $sqlColumns[$fieldName] = "$fieldName text";
+-        }
+-        else {
+-          // set the sql columns for custom data
+-          if (isset($queryFields[$field]['data_type'])) {
+-
+-            switch ($queryFields[$field]['data_type']) {
+-              case 'String':
+-                // May be option labels, which could be up to 512 characters
+-                $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$field]));
+-                $sqlColumns[$fieldName] = "$fieldName varchar($length)";
+-                break;
+-
+-              case 'Country':
+-              case 'StateProvince':
+-              case 'Link':
+-                $sqlColumns[$fieldName] = "$fieldName varchar(255)";
+-                break;
+-
+-              case 'Memo':
+-                $sqlColumns[$fieldName] = "$fieldName text";
+-                break;
+-
+-              default:
+-                $sqlColumns[$fieldName] = "$fieldName varchar(255)";
+-                break;
+-            }
+-          }
+-          else {
+-            $sqlColumns[$fieldName] = "$fieldName text";
+-          }
+-        }
+-      }
+-    }
++    $sqlColumns[$fieldName] = $processor->getSqlColumnDefinition($field, $fieldName);
+   }
+ 
+   /**
+diff --git a/CRM/Export/BAO/ExportProcessor.php b/CRM/Export/BAO/ExportProcessor.php
+index 8efc7102551..deea2d9e81f 100644
+--- a/CRM/Export/BAO/ExportProcessor.php
++++ b/CRM/Export/BAO/ExportProcessor.php
+@@ -437,4 +437,112 @@ public function getValidLocationFields() {
+     ];
+   }
+ 
++  /**
++   * @param $field
++   * @param $fieldName
++   *
++   * @return mixed
++   */
++  public function getSqlColumnDefinition($field, $fieldName) {
++
++    // early exit for master_id, CRM-12100
++    // in the DB it is an ID, but in the export, we retrive the display_name of the master record
++    // also for current_employer, CRM-16939
++    if ($fieldName == 'master_id' || $fieldName == 'current_employer') {
++      return "$fieldName varchar(128)";
++    }
++
++    if (substr($fieldName, -11) == 'campaign_id') {
++      // CRM-14398
++      return "$fieldName varchar(128)";
++    }
++
++    $queryFields = $this->getQueryFields();
++    $lookUp = ['prefix_id', 'suffix_id'];
++    // set the sql columns
++    if (isset($queryFields[$field]['type'])) {
++      switch ($queryFields[$field]['type']) {
++        case CRM_Utils_Type::T_INT:
++        case CRM_Utils_Type::T_BOOLEAN:
++          if (in_array($field, $lookUp)) {
++            return "$fieldName varchar(255)";
++          }
++          else {
++            return "$fieldName varchar(16)";
++          }
++
++        case CRM_Utils_Type::T_STRING:
++          if (isset($queryFields[$field]['maxlength'])) {
++            return "$fieldName varchar({$queryFields[$field]['maxlength']})";
++          }
++          else {
++            return "$fieldName varchar(255)";
++          }
++
++        case CRM_Utils_Type::T_TEXT:
++        case CRM_Utils_Type::T_LONGTEXT:
++        case CRM_Utils_Type::T_BLOB:
++        case CRM_Utils_Type::T_MEDIUMBLOB:
++          return "$fieldName longtext";
++
++        case CRM_Utils_Type::T_FLOAT:
++        case CRM_Utils_Type::T_ENUM:
++        case CRM_Utils_Type::T_DATE:
++        case CRM_Utils_Type::T_TIME:
++        case CRM_Utils_Type::T_TIMESTAMP:
++        case CRM_Utils_Type::T_MONEY:
++        case CRM_Utils_Type::T_EMAIL:
++        case CRM_Utils_Type::T_URL:
++        case CRM_Utils_Type::T_CCNUM:
++        default:
++          return "$fieldName varchar(32)";
++      }
++    }
++    else {
++      if (substr($fieldName, -3, 3) == '_id') {
++        return "$fieldName varchar(255)";
++      }
++      elseif (substr($fieldName, -5, 5) == '_note') {
++        return "$fieldName text";
++      }
++      else {
++        $changeFields = [
++          'groups',
++          'tags',
++          'notes',
++        ];
++
++        if (in_array($fieldName, $changeFields)) {
++          return "$fieldName text";
++        }
++        else {
++          // set the sql columns for custom data
++          if (isset($queryFields[$field]['data_type'])) {
++
++            switch ($queryFields[$field]['data_type']) {
++              case 'String':
++                // May be option labels, which could be up to 512 characters
++                $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$field]));
++                return "$fieldName varchar($length)";
++
++              case 'Country':
++              case 'StateProvince':
++              case 'Link':
++                return "$fieldName varchar(255)";
++
++              case 'Memo':
++                return "$fieldName text";
++
++              default:
++                return "$fieldName varchar(255)";
++            }
++          }
++          else {
++            return "$fieldName text";
++          }
++        }
++      }
++    }
++  }
++
+ }
+
+From 5e0ee2fc73e0ac149306a4f4042d67c8a5d04a7b Mon Sep 17 00:00:00 2001
+From: eileen <emcnaughton@wikimedia.org>
+Date: Fri, 27 Jul 2018 01:48:53 +1200
+Subject: [PATCH 12/16] Extract getMungedFieldName
+
+---
+ CRM/Export/BAO/Export.php          |  7 +------
+ CRM/Export/BAO/ExportProcessor.php | 20 ++++++++++++++++++--
+ 2 files changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/CRM/Export/BAO/Export.php b/CRM/Export/BAO/Export.php
+index dc000248d79..f2f1793ce7f 100644
+--- a/CRM/Export/BAO/Export.php
++++ b/CRM/Export/BAO/Export.php
+@@ -796,12 +796,7 @@ public static function sqlColumnDefn($processor, &$sqlColumns, $field) {
+       return;
+     }
+ 
+-    $fieldName = CRM_Utils_String::munge(strtolower($field), '_', 64);
+-    if ($fieldName == 'id') {
+-      $fieldName = 'civicrm_primary_id';
+-    }
+-
+-    $sqlColumns[$fieldName] = $processor->getSqlColumnDefinition($field, $fieldName);
++    $sqlColumns[$processor->getMungedFieldName($field)] = $processor->getSqlColumnDefinition($field);
+   }
+ 
+   /**
+diff --git a/CRM/Export/BAO/ExportProcessor.php b/CRM/Export/BAO/ExportProcessor.php
+index deea2d9e81f..49f24e636c2 100644
+--- a/CRM/Export/BAO/ExportProcessor.php
++++ b/CRM/Export/BAO/ExportProcessor.php
+@@ -438,12 +438,14 @@ public function getValidLocationFields() {
+   }
+ 
+   /**
++   * Get the sql column definition for the given field.
++   *
+    * @param $field
+-   * @param $fieldName
+    *
+    * @return mixed
+    */
+-  public function getSqlColumnDefinition($field, $fieldName) {
++  public function getSqlColumnDefinition($field) {
++    $fieldName = $this->getMungedFieldName($field);
+ 
+     // early exit for master_id, CRM-12100
+     // in the DB it is an ID, but in the export, we retrive the display_name of the master record
+@@ -545,4 +547,18 @@ public function getSqlColumnDefinition($field, $fieldName) {
+     }
+   }
+ 
++  /**
++   * Get the munged field name.
++   *
++   * @param string $field
++   * @return string
++   */
++  public function getMungedFieldName($field) {
++    $fieldName = CRM_Utils_String::munge(strtolower($field), '_', 64);
++    if ($fieldName == 'id') {
++      $fieldName = 'civicrm_primary_id';
++    }
++    return $fieldName;
++  }
++
+ }
+
+From 83fa622e5d2ffc498488c2238b2ae592cd7b9eae Mon Sep 17 00:00:00 2001
+From: Samuel Vanhove <samuel@symbiotic.coop>
+Date: Fri, 27 Jul 2018 17:12:51 -0400
+Subject: [PATCH 13/16] CRM-21008 - add a checkbox to let user decide if he
+ wants to update current employer / relationships
+
+---
+ templates/CRM/Contact/Form/Contact.hlp      |  3 +++
+ templates/CRM/Contact/Form/ShareAddress.tpl | 13 +++++++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/templates/CRM/Contact/Form/Contact.hlp b/templates/CRM/Contact/Form/Contact.hlp
+index 54f9695d2e6..2674a18719f 100644
+--- a/templates/CRM/Contact/Form/Contact.hlp
++++ b/templates/CRM/Contact/Form/Contact.hlp
+@@ -75,6 +75,9 @@
+ <p>{ts}Check this option if you want to link this address to another contact's address. For example, you might want to link a person's "Work" address to their employer's address. Or, you might want to link their "Home" address to a Household record. Changes made to the linked address will automatically be applied to this address. For example, if you use an employer (organization) address for an individual's work address - any updates to the employer address will also be applied to the individual's work address.{/ts}</p>
+ <p>{ts}You can use an address belonging to an existing contact or create a new contact by selecting the desired contact type from the select field. If you link an individual's address to an organization, an employee-employer relationship will be automatically created. If you link an individual's address to a household, a household member relationship is created.{/ts}</p>
+ {/htxt}
++{htxt id="id-sharedAddress-updateRelationships"}
++<p>{ts}Check this option if you want to DISABLE any current employer relationship for this contact and replace the employer by this one{/ts}</p>
++{/htxt}
+ 
+ {htxt id="id-communication_style-title"}
+   {ts}Communication Style{/ts}
+diff --git a/templates/CRM/Contact/Form/ShareAddress.tpl b/templates/CRM/Contact/Form/ShareAddress.tpl
+index af34e82c017..fcfc8108d75 100644
+--- a/templates/CRM/Contact/Form/ShareAddress.tpl
++++ b/templates/CRM/Contact/Form/ShareAddress.tpl
+@@ -38,8 +38,12 @@
+             <input type="radio" name="{$sa_name}" id="{$sa_id}" value="{$sa.id}" {if $sa.id eq $sharedAddresses.$blockId.shared_address_display.master_id}checked="checked"{/if}>
+             <label for="{$sa_id}">{$sa.display_text}</label>{if $sa.location_type}({$sa.location_type}){/if}<br/>
+           {/foreach}
++
++          {assign var="update_name" value="update_current_employer-`$blockId`"}
++          <input type="checkbox" name="{$update_name}" id="{$update_name}" value="1" checked="checked"><label for="{$update_name}">{ts}Set Organization Name as current employer{/ts}</label> {help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}<br/>
+         {/if}
+       </div>
++
+     </div>
+   </td>
+ </tr>
+@@ -105,6 +109,15 @@
+             if (!addressHTML) {
+               addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
+             }
++            else {
++              // TODO: check if the contact is an organization and get the org name
++              /*$.post(CRM.url('civicrm/ajax/inline'), {
++                'contact_id': sharedContactId,*/
++              
++              var name = 'update_current_employer-'+ blockNo;
++              var display_text = {/literal}"{ts escape='js'}Set Organization Name as current employer{/ts}"{literal};
++              addressHTML += '<input type="checkbox" name="' + name + '" id="' + name + '" value="1" checked="checked"><label for="' + name + '">' + display_text + '</label>' + /*{/literal}'{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}'{literal} +*/ '<br/>';
++            }
+ 
+             $contentArea.html(addressHTML);
+           }
+
+From e1109e5a5bbc68d94e59903964ea9c7449bced30 Mon Sep 17 00:00:00 2001
+From: Samuel Vanhove <samuel@symbiotic.coop>
+Date: Thu, 23 Aug 2018 12:12:10 -0400
+Subject: [PATCH 14/16] Dynamicly add checkbox to define as current employer
+ when shared address changes
+
+---
+ templates/CRM/Contact/Form/ShareAddress.tpl | 85 ++++++++++++---------
+ 1 file changed, 50 insertions(+), 35 deletions(-)
+
+diff --git a/templates/CRM/Contact/Form/ShareAddress.tpl b/templates/CRM/Contact/Form/ShareAddress.tpl
+index fcfc8108d75..4c858a6d207 100644
+--- a/templates/CRM/Contact/Form/ShareAddress.tpl
++++ b/templates/CRM/Contact/Form/ShareAddress.tpl
+@@ -39,8 +39,10 @@
+             <label for="{$sa_id}">{$sa.display_text}</label>{if $sa.location_type}({$sa.location_type}){/if}<br/>
+           {/foreach}
+ 
+-          {assign var="update_name" value="update_current_employer-`$blockId`"}
+-          <input type="checkbox" name="{$update_name}" id="{$update_name}" value="1" checked="checked"><label for="{$update_name}">{ts}Set Organization Name as current employer{/ts}</label> {help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}<br/>
++          {* FIXME: only display this in case of an individual that shared an organization address *}
++          {assign var="update_employer_name" value="update_current_employer-`$blockId`"}
++          {capture name="update_employer_help"}{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}{/capture}
++          <input type="checkbox" name="{$update_employer_name}" id="{$update_employer_name}" value="1" checked="checked"><label for="{$update_name}">{ts}Set Organization Name as current employer{/ts}</label> {$smarty.capture.update_employer_help}<br/>
+         {/if}
+       </div>
+ 
+@@ -83,48 +85,61 @@
+         return;
+       }
+ 
++      // first, find out if the shared address could be an implicit employer/employee relationship
+       $.post(CRM.url('civicrm/ajax/inline'), {
+-          'contact_id': sharedContactId,
++          'contact_id': {/literal}{$contactId}{literal},
++          'org_id': sharedContactId,
+           'type': 'method',
+           'class_name': 'CRM_Contact_Page_AJAX',
+-          'fn_name': 'getAddressDisplay'
++          'fn_name': 'isPotentialEmployer'
+         },
+         function(response) {
+           // Avoid race conditions - check that value hasn't been changed by the user while we were waiting for response
+-          if (response && $el.val() === sharedContactId) {
+-            var selected = ' checked="checked"',
+-              addressHTML = '';
+-
+-            $.each(response, function(i, val) {
+-              if (addressHTML) {
+-                selected = '';
+-              } else {
+-                $('input[name="address[' + blockNo + '][master_id]"]').val(val.id);
+-              }
+-              var name = 'selected_shared_address-'+ blockNo,
+-                id = name + '-' + val.id;
+-              addressHTML += '<input type="radio" name="' + name + '" id="' + id + '" value="' + val.id + '"' + selected +'><label for="' + id + '">' + val.display_text + '</label>('+val.location_type+')<br/>';
+-            });
+-
+-            if (!addressHTML) {
+-              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
+-            }
+-            else {
+-              // TODO: check if the contact is an organization and get the org name
+-              /*$.post(CRM.url('civicrm/ajax/inline'), {
+-                'contact_id': sharedContactId,*/
+-              
+-              var name = 'update_current_employer-'+ blockNo;
+-              var display_text = {/literal}"{ts escape='js'}Set Organization Name as current employer{/ts}"{literal};
+-              addressHTML += '<input type="checkbox" name="' + name + '" id="' + name + '" value="1" checked="checked"><label for="' + name + '">' + display_text + '</label>' + /*{/literal}'{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}'{literal} +*/ '<br/>';
+-            }
+-
+-            $contentArea.html(addressHTML);
++          if ($el.val() === sharedContactId) {
++            var employerName = response;
++
++            $.post(CRM.url('civicrm/ajax/inline'), {
++                'contact_id': sharedContactId,
++                'type': 'method',
++                'class_name': 'CRM_Contact_Page_AJAX',
++                'fn_name': 'getAddressDisplay'
++              },
++              function(response) {
++                // Avoid race conditions - check that value hasn't been changed by the user while we were waiting for response
++                if (response && $el.val() === sharedContactId) {
++                  var selected = ' checked="checked"',
++                    addressHTML = '';
++
++                  $.each(response, function(i, val) {
++                    if (addressHTML) {
++                      selected = '';
++                    } else {
++                      $('input[name="address[' + blockNo + '][master_id]"]').val(val.id);
++                    }
++                    var name = 'selected_shared_address-'+ blockNo,
++                      id = name + '-' + val.id;
++                    addressHTML += '<input type="radio" name="' + name + '" id="' + id + '" value="' + val.id + '"' + selected +'><label for="' + id + '">' + val.display_text + '</label>('+val.location_type+')<br/>';
++                  });
++
++                  if (!addressHTML) {
++                    addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
++                  }
++                  else {
++                    if (employerName) {
++                      var name = 'update_current_employer-'+ blockNo;
++                      var display_text = ts('Set %1 as current employer', {1: employerName});
++                      addressHTML += '<input type="checkbox" name="' + name + '" id="' + name + '" value="1" checked="checked"><label for="' + name + '">' + display_text + '</label> ' + {/literal}'{$smarty.capture.update_employer_help|escape:'javascript'}'{literal} + '<br/>';
++                    }
++                  }
++
++                  $contentArea.html(addressHTML);
++                }
++              },'json');
+           }
++
+         },'json');
++
+     });
+   });
+ </script>
+ {/literal}
+-
+-
+
+From 09e40dd5835e1ddcc90939c0554b468707c30460 Mon Sep 17 00:00:00 2001
+From: Samuel Vanhove <samuel@symbiotic.coop>
+Date: Tue, 28 Aug 2018 11:20:46 -0400
+Subject: [PATCH 15/16] CRM-21008 interface is now working
+
+---
+ CRM/Contact/BAO/Contact/Utils.php           |  2 +-
+ CRM/Contact/Form/Edit/Address.php           | 17 ++++++++++++++++
+ CRM/Contact/Page/AJAX.php                   | 15 ++++++++++++++
+ CRM/Core/BAO/Address.php                    | 18 ++++++++++++++---
+ templates/CRM/Contact/Form/ShareAddress.tpl | 22 ++++++++++++---------
+ 5 files changed, 61 insertions(+), 13 deletions(-)
+
+diff --git a/CRM/Contact/BAO/Contact/Utils.php b/CRM/Contact/BAO/Contact/Utils.php
+index f3b391362af..465d5e2c33f 100644
+--- a/CRM/Contact/BAO/Contact/Utils.php
++++ b/CRM/Contact/BAO/Contact/Utils.php
+@@ -825,7 +825,7 @@ public static function processSharedAddress(&$address) {
+     // Normal update process will automatically create new address with submitted values
+ 
+     // 1. loop through entire submitted address array
+-    $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'master_id');
++    $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'master_id', 'update_current_employer');
+     foreach ($address as & $values) {
+       // 2. check if "Use another contact's address" is checked, if not continue
+       // Additionally, if master_id is set (address was shared), set master_id to empty value.
+diff --git a/CRM/Contact/Form/Edit/Address.php b/CRM/Contact/Form/Edit/Address.php
+index 027fbe253ff..33bccbbe094 100644
+--- a/CRM/Contact/Form/Edit/Address.php
++++ b/CRM/Contact/Form/Edit/Address.php
+@@ -164,6 +164,9 @@ public static function buildQuickForm(&$form, $addressBlockCount = NULL, $sharin
+       // shared address
+       $form->addElement('checkbox', "address[$blockId][use_shared_address]", NULL, ts('Use another contact\'s address'));
+ 
++      // do we want to update employer for shared address
++      $form->addElement('checkbox', "address[$blockId][update_current_employer]", NULL, ts('Set this organization as current employer'));
++
+       // Override the default profile links to add address form
+       $profileLinks = CRM_Core_BAO_UFGroup::getCreateLinks(array(
+           'new_individual',
+@@ -249,6 +252,7 @@ public static function setDefaultValues(&$defaults, &$form) {
+       // start of contact shared adddress defaults
+       $sharedAddresses = array();
+       $masterAddress = array();
++      $isPotentialEmployer = array();
+ 
+       // get contact name of shared contact names
+       $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($defaults['address']);
+@@ -266,6 +270,18 @@ public static function setDefaultValues(&$defaults, &$form) {
+             'master_id' => $addressValue['master_id'],
+           );
+           $defaults['address'][$key]['master_contact_id'] = $master_cid;
++
++          // is it a potential case of employee/employer ?
++          $contactType1 = CRM_Contact_BAO_Contact::getContactType($form->_contactId);
++          $contactType2 = CRM_Contact_BAO_Contact::getContactType($master_cid);
++
++          if ($contactType1 == 'Individual' && $contactType2 == 'Organization') {
++            $isPotentialEmployer[$key] = 1;
++            // when editing an existing shared address, assume that we don't want to update current employer
++            $defaults['address'][$key]['update_current_employer'] = 0;
++            // TODO: replace input label to include employer name
++            //$employer = CRM_Contact_BAO_Contact::displayName($master_cid);
++          }
+         }
+         else {
+           $defaults['address'][$key]['use_shared_address'] = 0;
+@@ -277,6 +293,7 @@ public static function setDefaultValues(&$defaults, &$form) {
+ 
+       $form->assign('sharedAddresses', $sharedAddresses);
+       $form->assign('masterAddress', $masterAddress);
++      $form->assign('isPotentialEmployer', $isPotentialEmployer);
+       // end of shared address defaults
+ 
+       // start of parse address functionality
+diff --git a/CRM/Contact/Page/AJAX.php b/CRM/Contact/Page/AJAX.php
+index 8270d7b753a..cd66bdbfac5 100644
+--- a/CRM/Contact/Page/AJAX.php
++++ b/CRM/Contact/Page/AJAX.php
+@@ -1013,6 +1013,21 @@ public static function getAddressDisplay() {
+     CRM_Utils_JSON::output($addressVal);
+   }
+ 
++  public static function isPotentialEmployer() {
++    $contactId = CRM_Utils_Request::retrieve('contact_id', 'Positive');
++    $orgId = CRM_Utils_Request::retrieve('org_id', 'Positive');
++    $employer = False;
++    if ($contactId && $orgId) {
++      $contactType1 = CRM_Contact_BAO_Contact::getContactType($contactId);
++      $contactType2 = CRM_Contact_BAO_Contact::getContactType($orgId);
++      if ($contactType1 == 'Individual' && $contactType2 == 'Organization') {
++        $employer = CRM_Contact_BAO_Contact::displayName($orgId);
++      }
++    }
++    CRM_Utils_JSON::output($employer);
++
++  }
++
+   /**
+    * Mark dupe pairs as selected from un-selected state or vice-versa, in dupe cache table.
+    */
+diff --git a/CRM/Core/BAO/Address.php b/CRM/Core/BAO/Address.php
+index 338712adfba..eccc1501dbc 100644
+--- a/CRM/Core/BAO/Address.php
++++ b/CRM/Core/BAO/Address.php
+@@ -1042,11 +1042,23 @@ public static function processSharedAddress($addressId, $params) {
+     $query = 'SELECT id, contact_id FROM civicrm_address WHERE master_id = %1';
+     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($addressId, 'Integer')));
+ 
++Civi::log()->debug('processSharedAddress -- ' . print_r($params,1));
++
++    // TODO: VALIDATION REQUIRED = was implicit and is now explicit
++    // should we keep it backward compatible (i.e. no params means creating relationship) ?
++    // this should only impact API calls
++    $createRelationship = FALSE;
++    if (isset($params['update_current_employer']) && $params['update_current_employer']) {
++      $createRelationship = TRUE;
++    }
++
+     // unset contact id
+     $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'contact_id');
+     if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
+-      // call the function to create a relationship for the new shared address
+-      self::processSharedAddressRelationship($params['master_id'], $params['contact_id']);
++      if ($createRelationship) {
++        // call the function to create a relationship for the new shared address
++        self::processSharedAddressRelationship($params['master_id'], $params['contact_id']);
++      }
+     }
+     else {
+       // else no new shares will be created, only update shared addresses
+@@ -1059,7 +1071,7 @@ public static function processSharedAddress($addressId, $params) {
+     $addressDAO = new CRM_Core_DAO_Address();
+     while ($dao->fetch()) {
+       // call the function to update the relationship
+-      if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
++      if ($createRelationship && isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
+         self::processSharedAddressRelationship($params['master_id'], $dao->contact_id);
+       }
+       $addressDAO->copyValues($params);
+diff --git a/templates/CRM/Contact/Form/ShareAddress.tpl b/templates/CRM/Contact/Form/ShareAddress.tpl
+index 4c858a6d207..b973dd298f6 100644
+--- a/templates/CRM/Contact/Form/ShareAddress.tpl
++++ b/templates/CRM/Contact/Form/ShareAddress.tpl
+@@ -38,11 +38,12 @@
+             <input type="radio" name="{$sa_name}" id="{$sa_id}" value="{$sa.id}" {if $sa.id eq $sharedAddresses.$blockId.shared_address_display.master_id}checked="checked"{/if}>
+             <label for="{$sa_id}">{$sa.display_text}</label>{if $sa.location_type}({$sa.location_type}){/if}<br/>
+           {/foreach}
+-
+-          {* FIXME: only display this in case of an individual that shared an organization address *}
+-          {assign var="update_employer_name" value="update_current_employer-`$blockId`"}
+-          {capture name="update_employer_help"}{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}{/capture}
+-          <input type="checkbox" name="{$update_employer_name}" id="{$update_employer_name}" value="1" checked="checked"><label for="{$update_name}">{ts}Set Organization Name as current employer{/ts}</label> {$smarty.capture.update_employer_help}<br/>
++        {/if}
++      </div>
++      <div class="shared-address-update-employer">
++        {capture name="update_employer_help"}{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}{/capture}
++        {if $isPotentialEmployer.$blockId}
++          {$form.address.$blockId.update_current_employer.html} {$smarty.capture.update_employer_help}<br/>
+         {/if}
+       </div>
+ 
+@@ -56,6 +57,7 @@
+   CRM.$(function($) {
+     var blockNo = {/literal}{$blockId}{literal},
+       $contentArea = $('#shared-address-' + blockNo + ' .shared-address-list'),
++      $contentAreaUpdate = $('#shared-address-' + blockNo + ' .shared-address-update-employer'),
+       $masterElement = $('input[name="address[' + blockNo + '][master_id]"]');
+ 
+     function showHideSharedAddress() {
+@@ -79,6 +81,7 @@
+         sharedContactId = $el.val();
+ 
+       $contentArea.html('');
++      $contentAreaUpdate.html('');
+       $masterElement.val('');
+ 
+       if (!sharedContactId || isNaN(sharedContactId)) {
+@@ -93,10 +96,10 @@
+           'class_name': 'CRM_Contact_Page_AJAX',
+           'fn_name': 'isPotentialEmployer'
+         },
+-        function(response) {
++        function(resp) {
+           // Avoid race conditions - check that value hasn't been changed by the user while we were waiting for response
+           if ($el.val() === sharedContactId) {
+-            var employerName = response;
++            var employerName = resp;
+ 
+             $.post(CRM.url('civicrm/ajax/inline'), {
+                 'contact_id': sharedContactId,
+@@ -126,9 +129,10 @@
+                   }
+                   else {
+                     if (employerName) {
+-                      var name = 'update_current_employer-'+ blockNo;
++                      name = 'address[' + blockNo + '][update_current_employer]';
+                       var display_text = ts('Set %1 as current employer', {1: employerName});
+-                      addressHTML += '<input type="checkbox" name="' + name + '" id="' + name + '" value="1" checked="checked"><label for="' + name + '">' + display_text + '</label> ' + {/literal}'{$smarty.capture.update_employer_help|escape:'javascript'}'{literal} + '<br/>';
++                      updateHTML = '<input type="checkbox" name="' + name + '" id="' + name + '" value="1" checked="checked"><label for="' + name + '">' + display_text + '</label> ' + {/literal}'{$smarty.capture.update_employer_help|escape:'javascript'}'{literal} + '<br/>';
++                      $contentAreaUpdate.html(updateHTML);
+                     }
+                   }
+ 
+
+From 95d04120f97c7b7a278a193bb451789ed344c710 Mon Sep 17 00:00:00 2001
+From: Samuel Vanhove <samuel@symbiotic.coop>
+Date: Tue, 28 Aug 2018 11:26:35 -0400
+Subject: [PATCH 16/16] Removing log
+
+---
+ CRM/Core/BAO/Address.php | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/CRM/Core/BAO/Address.php b/CRM/Core/BAO/Address.php
+index eccc1501dbc..58599dbaaf2 100644
+--- a/CRM/Core/BAO/Address.php
++++ b/CRM/Core/BAO/Address.php
+@@ -1042,8 +1042,6 @@ public static function processSharedAddress($addressId, $params) {
+     $query = 'SELECT id, contact_id FROM civicrm_address WHERE master_id = %1';
+     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($addressId, 'Integer')));
+ 
+-Civi::log()->debug('processSharedAddress -- ' . print_r($params,1));
+-
+     // TODO: VALIDATION REQUIRED = was implicit and is now explicit
+     // should we keep it backward compatible (i.e. no params means creating relationship) ?
+     // this should only impact API calls

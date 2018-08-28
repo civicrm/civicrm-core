@@ -75,6 +75,9 @@
 <p>{ts}Check this option if you want to link this address to another contact's address. For example, you might want to link a person's "Work" address to their employer's address. Or, you might want to link their "Home" address to a Household record. Changes made to the linked address will automatically be applied to this address. For example, if you use an employer (organization) address for an individual's work address - any updates to the employer address will also be applied to the individual's work address.{/ts}</p>
 <p>{ts}You can use an address belonging to an existing contact or create a new contact by selecting the desired contact type from the select field. If you link an individual's address to an organization, an employee-employer relationship will be automatically created. If you link an individual's address to a household, a household member relationship is created.{/ts}</p>
 {/htxt}
+{htxt id="id-sharedAddress-updateRelationships"}
+<p>{ts}Check this option if you want to DISABLE any current employer relationship for this contact and replace the employer by this one{/ts}</p>
+{/htxt}
 
 {htxt id="id-communication_style-title"}
   {ts}Communication Style{/ts}
