@@ -4208,6 +4208,12 @@ civicrm_relationship.start_date > {$today}
       }
       $sql = "
         CREATE TEMPORARY TABLE {$relationshipTempTable}
+          (
+            `contact_id` int(10) unsigned NOT NULL DEFAULT '0',
+            `contact_id_alt` int(10) unsigned NOT NULL DEFAULT '0',
+            KEY `contact_id` (`contact_id`),
+            KEY `contact_id_alt` (`contact_id_alt`)
+          )
           (SELECT contact_id_b as contact_id, contact_id_a as contact_id_alt, civicrm_relationship.id
             FROM civicrm_relationship
             INNER JOIN  civicrm_contact c ON civicrm_relationship.contact_id_a = c.id
