@@ -262,26 +262,24 @@
       // @param mailing Object (per APIv3)
       // @return Promise an object with "subject", "body_text", "body_html"
       preview: function preview(mailing) {
+        return this.getPreviewContent(qApi, mailing);
+      },
+
+      // @param backend
+      // @param mailing Object (per APIv3)
+      // @return preview content
+      getPreviewContent: function getPreviewContent(backend, mailing) {
         if (CRM.crmMailing.workflowEnabled && !CRM.checkPerm('create mailings') && !CRM.checkPerm('access CiviMail')) {
-          return qApi('Mailing', 'preview', {id: mailing.id}).then(function(result) {
+          return backend('Mailing', 'preview', {id: mailing.id}).then(function(result) {
             return result.values;
           });
         }
         else {
-          // Protect against races in saving and previewing by chaining create+preview.
-          var params = angular.extend({}, mailing, mailing.recipients, {
-            id: mailing.id,
-            'api.Mailing.preview': {
-              id: '$value.id'
-            }
-          });
-          delete params.scheduled_date;
-          delete params.recipients; // the content was merged in
-          params._skip_evil_bao_auto_recipients_ = 1; // skip recipient rebuild on mail preview
-          return qApi('Mailing', 'create', params).then(function(result) {
-            mailing.modified_date = result.values[result.id].modified_date;
+          var params = angular.extend({}, mailing);
+          delete params.id;
+          return backend('Mailing', 'preview', params).then(function(result) {
             // changes rolled back, so we don't care about updating mailing
-            return result.values[result.id]['api.Mailing.preview'].values;
+            return result.values;
           });
         }
       },
@@ -451,7 +449,7 @@
         };
         var result = null;
         var p = crmMailingMgr
-          .preview(mailing)
+          .getPreviewContent(CRM.api3, mailing)
           .then(function (content) {
             var options = CRM.utils.adjustDialogDefaults({
               autoOpen: false,

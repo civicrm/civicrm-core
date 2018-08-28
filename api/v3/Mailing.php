@@ -547,21 +547,22 @@ function civicrm_api3_mailing_event_open($params) {
  * @throws \API_Exception
  */
 function civicrm_api3_mailing_preview($params) {
-  civicrm_api3_verify_mandatory($params,
-    'CRM_Mailing_DAO_Mailing',
-    array('id'),
-    FALSE
-  );
-
   $fromEmail = NULL;
   if (!empty($params['from_email'])) {
     $fromEmail = $params['from_email'];
   }
 
-  $session = CRM_Core_Session::singleton();
   $mailing = new CRM_Mailing_BAO_Mailing();
-  $mailing->id = $params['id'];
-  $mailing->find(TRUE);
+  $mailingID = CRM_Utils_Array::value('id', $params);
+  if ($mailingID) {
+    $mailing->id = $mailingID;
+    $mailing->find(TRUE);
+  }
+  else {
+    $mailing->copyValues($params);
+  }
+
+  $session = CRM_Core_Session::singleton();
 
   CRM_Mailing_BAO_Mailing::tokenReplace($mailing);
 
