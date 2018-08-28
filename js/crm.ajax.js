@@ -164,11 +164,11 @@
         return false;
       }
       // Compare arguments
-      $.each(newUrl.split('?')[1].split('&'), function(k, v) {
+      $.each((newUrl.split('?')[1] || '').split('&'), function(k, v) {
         var arg = v.split('=');
         args[arg[0]] = arg[1];
       });
-      $.each(oldUrl.split('?')[1].split('&'), function(k, v) {
+      $.each((oldUrl.split('?')[1] || '').split('&'), function(k, v) {
         var arg = v.split('=');
         if (args[arg[0]] !== undefined && arg[1] !== args[arg[0]]) {
           same = false;
