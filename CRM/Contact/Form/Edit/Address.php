@@ -164,6 +164,9 @@ class CRM_Contact_Form_Edit_Address {
       // shared address
       $form->addElement('checkbox', "address[$blockId][use_shared_address]", NULL, ts('Use another contact\'s address'));
 
+      // do we want to update employer for shared address
+      $form->addElement('checkbox', "address[$blockId][update_current_employer]", NULL, ts('Set this organization as current employer'));
+
       // Override the default profile links to add address form
       $profileLinks = CRM_Core_BAO_UFGroup::getCreateLinks(array(
           'new_individual',
@@ -249,6 +252,7 @@ class CRM_Contact_Form_Edit_Address {
       // start of contact shared adddress defaults
       $sharedAddresses = array();
       $masterAddress = array();
+      $isPotentialEmployer = array();
 
       // get contact name of shared contact names
       $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($defaults['address']);
@@ -266,6 +270,18 @@ class CRM_Contact_Form_Edit_Address {
             'master_id' => $addressValue['master_id'],
           );
           $defaults['address'][$key]['master_contact_id'] = $master_cid;
+
+          // is it a potential case of employee/employer ?
+          $contactType1 = CRM_Contact_BAO_Contact::getContactType($form->_contactId);
+          $contactType2 = CRM_Contact_BAO_Contact::getContactType($master_cid);
+
+          if ($contactType1 == 'Individual' && $contactType2 == 'Organization') {
+            $isPotentialEmployer[$key] = 1;
+            // when editing an existing shared address, assume that we don't want to update current employer
+            $defaults['address'][$key]['update_current_employer'] = 0;
+            // TODO: replace input label to include employer name
+            //$employer = CRM_Contact_BAO_Contact::displayName($master_cid);
+          }
         }
         else {
           $defaults['address'][$key]['use_shared_address'] = 0;
@@ -277,6 +293,7 @@ class CRM_Contact_Form_Edit_Address {
 
       $form->assign('sharedAddresses', $sharedAddresses);
       $form->assign('masterAddress', $masterAddress);
+      $form->assign('isPotentialEmployer', $isPotentialEmployer);
       // end of shared address defaults
 
       // start of parse address functionality

@@ -38,11 +38,12 @@
             <input type="radio" name="{$sa_name}" id="{$sa_id}" value="{$sa.id}" {if $sa.id eq $sharedAddresses.$blockId.shared_address_display.master_id}checked="checked"{/if}>
             <label for="{$sa_id}">{$sa.display_text}</label>{if $sa.location_type}({$sa.location_type}){/if}<br/>
           {/foreach}
-
-          {* FIXME: only display this in case of an individual that shared an organization address *}
-          {assign var="update_employer_name" value="update_current_employer-`$blockId`"}
-          {capture name="update_employer_help"}{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}{/capture}
-          <input type="checkbox" name="{$update_employer_name}" id="{$update_employer_name}" value="1" checked="checked"><label for="{$update_name}">{ts}Set Organization Name as current employer{/ts}</label> {$smarty.capture.update_employer_help}<br/>
+        {/if}
+      </div>
+      <div class="shared-address-update-employer">
+        {capture name="update_employer_help"}{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact.hlp"}{/capture}
+        {if $isPotentialEmployer.$blockId}
+          {$form.address.$blockId.update_current_employer.html} {$smarty.capture.update_employer_help}<br/>
         {/if}
       </div>
 
@@ -56,6 +57,7 @@
   CRM.$(function($) {
     var blockNo = {/literal}{$blockId}{literal},
       $contentArea = $('#shared-address-' + blockNo + ' .shared-address-list'),
+      $contentAreaUpdate = $('#shared-address-' + blockNo + ' .shared-address-update-employer'),
       $masterElement = $('input[name="address[' + blockNo + '][master_id]"]');
 
     function showHideSharedAddress() {
@@ -79,6 +81,7 @@
         sharedContactId = $el.val();
 
       $contentArea.html('');
+      $contentAreaUpdate.html('');
       $masterElement.val('');
 
       if (!sharedContactId || isNaN(sharedContactId)) {
@@ -93,10 +96,10 @@
           'class_name': 'CRM_Contact_Page_AJAX',
           'fn_name': 'isPotentialEmployer'
         },
-        function(response) {
+        function(resp) {
           // Avoid race conditions - check that value hasn't been changed by the user while we were waiting for response
           if ($el.val() === sharedContactId) {
-            var employerName = response;
+            var employerName = resp;
 
             $.post(CRM.url('civicrm/ajax/inline'), {
                 'contact_id': sharedContactId,
@@ -126,9 +129,10 @@
                   }
                   else {
                     if (employerName) {
-                      var name = 'update_current_employer-'+ blockNo;
+                      name = 'address[' + blockNo + '][update_current_employer]';
                       var display_text = ts('Set %1 as current employer', {1: employerName});
-                      addressHTML += '<input type="checkbox" name="' + name + '" id="' + name + '" value="1" checked="checked"><label for="' + name + '">' + display_text + '</label> ' + {/literal}'{$smarty.capture.update_employer_help|escape:'javascript'}'{literal} + '<br/>';
+                      updateHTML = '<input type="checkbox" name="' + name + '" id="' + name + '" value="1" checked="checked"><label for="' + name + '">' + display_text + '</label> ' + {/literal}'{$smarty.capture.update_employer_help|escape:'javascript'}'{literal} + '<br/>';
+                      $contentAreaUpdate.html(updateHTML);
                     }
                   }
 
