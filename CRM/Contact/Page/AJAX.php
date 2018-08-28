@@ -1013,10 +1013,15 @@ LIMIT {$offset}, {$rowCount}
     CRM_Utils_JSON::output($addressVal);
   }
 
+  /**
+   * Check if a employee/employer relationship could be created between the 2 contact
+   *
+   * @return string organization name if the relationship is valid otherewise FALSE
+   */
   public static function isPotentialEmployer() {
     $contactId = CRM_Utils_Request::retrieve('contact_id', 'Positive');
     $orgId = CRM_Utils_Request::retrieve('org_id', 'Positive');
-    $employer = False;
+    $employer = FALSE;
     if ($contactId && $orgId) {
       $contactType1 = CRM_Contact_BAO_Contact::getContactType($contactId);
       $contactType2 = CRM_Contact_BAO_Contact::getContactType($orgId);
