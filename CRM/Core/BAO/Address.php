@@ -1042,8 +1042,6 @@ SELECT is_primary,
     $query = 'SELECT id, contact_id FROM civicrm_address WHERE master_id = %1';
     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($addressId, 'Integer')));
 
-Civi::log()->debug('processSharedAddress -- ' . print_r($params,1));
-
     // TODO: VALIDATION REQUIRED = was implicit and is now explicit
     // should we keep it backward compatible (i.e. no params means creating relationship) ?
     // this should only impact API calls
