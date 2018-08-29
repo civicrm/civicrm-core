@@ -413,11 +413,16 @@ class CRM_Activity_BAO_Query {
         break;
 
       case 'source_contact':
-        $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-        $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+        $sourceID = CRM_Core_PseudoConstant::getKey(
+          'CRM_Activity_BAO_ActivityContact',
+          'record_type_id',
+          'Activity Source'
+        );
         $from = "
-        INNER JOIN civicrm_contact source_contact ON
-          (civicrm_activity_contact.contact_id = source_contact.id) AND civicrm_activity_contact.record_type_id = {$sourceID}";
+          LEFT JOIN civicrm_activity_contact source_activity
+            ON (source_activity.activity_id = civicrm_activity_contact.activity_id
+              AND source_activity.record_type_id = {$sourceID})
+          LEFT JOIN civicrm_contact source_contact ON (source_activity.contact_id = source_contact.id)";
         break;
 
       case 'parent_id':
