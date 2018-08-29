@@ -76,8 +76,12 @@
                         {/if}
                         {if $defaultInvoicePage && $row.contribution_status_name == 'Pending' }
                           <td>
+                            {assign var='checksum_url' value=""}
+                            {if $userChecksum}
+                              {assign var='checksum_url' value="&cid=$contactId&cs=$userChecksum"}
+                            {/if}
                             {assign var='id' value=$row.contribution_id}
-                            {capture assign=payNowLink}{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$defaultInvoicePage`&ccid=`$id`"}{/capture}
+                            {capture assign=payNowLink}{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$defaultInvoicePage`&ccid=`$id`$checksum_url"}{/capture}
                             <a class="button" href="{$payNowLink}"><span class='nowrap'>{ts}Pay Now{/ts}</span></a>
                           </td>
                         {/if}

@@ -72,6 +72,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
     $validUser = FALSE;
     if (empty($userID) && $this->_contactId && $userChecksum) {
+      $this->assign('userChecksum', $userChecksum);
       $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($this->_contactId, $userChecksum);
     }
 
