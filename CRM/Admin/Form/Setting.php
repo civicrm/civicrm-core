@@ -40,6 +40,8 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
   protected $_settings = array();
 
+  protected $includesReadOnlyFields;
+
   /**
    * Set default values for the form.
    *
@@ -110,7 +112,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
         //Load input as readonly whose values are overridden in civicrm.settings.php.
         if (Civi::settings()->getMandatory($setting)) {
           $props['html_attributes']['readonly'] = TRUE;
-          $setStatus = TRUE;
+          $this->includesReadOnlyFields = TRUE;
         }
 
         $add = 'add' . $props['quick_form_type'];
@@ -154,12 +156,13 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       }
     }
-    if (!empty($setStatus)) {
-      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', array('expires' => 0));
-    }
     // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
     $this->assign('setting_descriptions', $descriptions);
     $this->assign('settings_fields', $settingMetaData);
+
+    if ($this->includesReadOnlyFields) {
+      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', array('expires' => 0));
+    }
   }
 
   /**
