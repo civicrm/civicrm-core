@@ -51,7 +51,11 @@ class CRM_Utils_Crypt {
     if (empty($string)) {
       return $string;
     }
-
+    $encryptionProvider = Civi::settings()->get('encryption_provider');
+    if ($encryptionProvider) {
+      $encryptionClass = new $encryptionProvider();
+      return base64_encode($encryptionClass->encrypt($string));
+    }
     if (function_exists('mcrypt_module_open') &&
       defined('CIVICRM_SITE_KEY')
     ) {
@@ -89,6 +93,12 @@ class CRM_Utils_Crypt {
     $string = base64_decode($string);
     if (empty($string)) {
       return $string;
+    }
+
+    $encryptionProvider = Civi::settings()->get('encryption_provider');
+    if ($encryptionProvider) {
+      $encryptionClass = new $encryptionProvider();
+      return $encryptionClass->decrypt($string);
     }
 
     if (function_exists('mcrypt_module_open') &&
