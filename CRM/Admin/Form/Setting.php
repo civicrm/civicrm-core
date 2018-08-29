@@ -36,6 +36,8 @@
  */
 class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
+  use CRM_Admin_Form_SettingTrait;
+
   protected $_settings = array();
 
   /**
@@ -161,15 +163,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   }
 
   /**
-   * Get default entity.
-   *
-   * @return string
-   */
-  public function getDefaultEntity() {
-    return 'Setting';
-  }
-
-  /**
    * Process the form submission.
    */
   public function postProcess() {
@@ -185,6 +178,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    * @todo Document what I do.
    *
    * @param array $params
+   * @throws \CRM_Core_Exception
    */
   public function commonProcess(&$params) {
 
@@ -216,20 +210,19 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
         unset($params[$name]);
       }
     }
-    $settings = array_intersect_key($params, $this->_settings);
-    $result = civicrm_api('setting', 'create', $settings + array('version' => 3));
-    foreach ($settings as $setting => $settingGroup) {
-      //@todo array_diff this
-      unset($params[$setting]);
+    try {
+      $settings = $this->getSettingsToSetByMetadata($params);
+      civicrm_api3('setting', 'create', $settings);
     }
-    if (!empty($result['error_message'])) {
-      CRM_Core_Session::setStatus($result['error_message'], ts('Save Failed'), 'error');
+    catch (CiviCRM_API3_Exception $e) {
+      CRM_Core_Session::setStatus($e->getMessage(), ts('Save Failed'), 'error');
     }
 
-    //CRM_Core_BAO_ConfigSetting::create($params);
+    $this->filterParamsSetByMetadata($params);
+
     $params = CRM_Core_BAO_ConfigSetting::filterSkipVars($params);
     if (!empty($params)) {
-      CRM_Core_Error::fatal('Unrecognized setting. This may be a config field which has not been properly migrated to a setting. (' . implode(', ', array_keys($params)) . ')');
+      throw new CRM_Core_Exception('Unrecognized setting. This may be a config field which has not been properly migrated to a setting. (' . implode(', ', array_keys($params)) . ')');
     }
 
     CRM_Core_Config::clearDBCache();
@@ -297,19 +290,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     return array(
       '1' => 1,
     ) + $autoSearchFields;
-  }
-
-  /**
-   * Get the metadata relating to the settings on the form, ordered by the keys in $this->_settings.
-   *
-   * @return array
-   */
-  protected function getSettingsMetaData() {
-    $allSettingMetaData = civicrm_api3('setting', 'getfields', array());
-    $settingMetaData = array_intersect_key($allSettingMetaData['values'], $this->_settings);
-    // This array_merge re-orders to the key order of $this->_settings.
-    $settingMetaData = array_merge($this->_settings, $settingMetaData);
-    return $settingMetaData;
   }
 
 }
