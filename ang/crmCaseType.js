@@ -355,7 +355,8 @@
     }
 
     function addActivityToSet(activitySet, activityTypeName) {
-      var activity = {
+      activitySet.activityTypes = activitySet.activityTypes || [];
+	    var activity = {
           name: activityTypeName,
           label: $scope.activityTypes[activityTypeName].label,
           status: 'Scheduled',
