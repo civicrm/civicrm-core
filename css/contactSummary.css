@@ -21,10 +21,6 @@ div#crm-contact-thumbnail {
   border-bottom: 1px solid #FFF;
 }
 
-.crm-summary-block {
-  clear: both;
-}
-
 #crm-container div.crm-inline-edit {
   border: 2px dashed transparent;
   background: none;
@@ -63,18 +59,22 @@ div#crm-contact-thumbnail {
   border-bottom-left-radius: 1em;
 }
 
-#crm-container .crm-inline-edit.add-new .crm-edit-help {
+#crm-container .crm-address-block+.crm-address-block .add-new .crm-edit-help {
   display: block;
   background-color: #EBEBEB;
 }
 
-#crm-container .crm-edit-ready .crm-inline-edit:hover .crm-edit-help {
+#crm-container .crm-edit-ready .crm-summary-block .crm-inline-edit:hover .crm-edit-help {
   display: block;
   background-color: #DFE1FF;
 }
 
 #crm-container div.crm-inline-edit.form .crm-edit-help {
   display: none !important;
+}
+
+#crm-container .crm-address-block+.crm-address-block .add-new .crm-summary-row {
+  display: none;
 }
 
 #crm-container span.crm-custom-greeting {

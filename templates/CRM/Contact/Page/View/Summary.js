@@ -268,7 +268,7 @@
             CRM.api3('address', 'delete', {id: $block.data('edit-params').aid}, true)
               .done(function(data) {
                 $('.crm-inline-edit-container').addClass('crm-edit-ready');
-                $block.remove();
+                $block.closest('.crm-address-block').remove();
                 reloadBlock('.crm-inline-edit.address:not(.add-new)');
               });
             });
