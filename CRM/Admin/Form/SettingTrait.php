@@ -87,4 +87,72 @@ trait CRM_Admin_Form_SettingTrait {
     }
   }
 
+  /**
+   * Add fields in the metadata to the template.
+   */
+  protected function addFieldsDefinedInSettingsMetadata() {
+    $settingMetaData = $this->getSettingsMetaData();
+    $descriptions = [];
+    foreach ($settingMetaData as $setting => $props) {
+      if (isset($props['quick_form_type'])) {
+        if (isset($props['pseudoconstant'])) {
+          $options = civicrm_api3('Setting', 'getoptions', [
+            'field' => $setting,
+          ]);
+        }
+        else {
+          $options = NULL;
+        }
+        //Load input as readonly whose values are overridden in civicrm.settings.php.
+        if (Civi::settings()->getMandatory($setting)) {
+          $props['html_attributes']['readonly'] = TRUE;
+          $this->includesReadOnlyFields = TRUE;
+        }
+
+        $add = 'add' . $props['quick_form_type'];
+        if ($add == 'addElement') {
+          $this->$add(
+            $props['html_type'],
+            $setting,
+            ts($props['title']),
+            ($options !== NULL) ? $options['values'] : CRM_Utils_Array::value('html_attributes', $props, []),
+            ($options !== NULL) ? CRM_Utils_Array::value('html_attributes', $props, []) : NULL
+          );
+        }
+        elseif ($add == 'addSelect') {
+          $this->addElement('select', $setting, ts($props['title']), $options['values'], CRM_Utils_Array::value('html_attributes', $props));
+        }
+        elseif ($add == 'addCheckBox') {
+          $this->addCheckBox($setting, ts($props['title']), $options['values'], NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, ['&nbsp;&nbsp;']);
+        }
+        elseif ($add == 'addChainSelect') {
+          $this->addChainSelect($setting, [
+            'label' => ts($props['title']),
+          ]);
+        }
+        elseif ($add == 'addMonthDay') {
+          $this->add('date', $setting, ts($props['title']), CRM_Core_SelectValues::date(NULL, 'M d'));
+        }
+        else {
+          $this->$add($setting, ts($props['title']));
+        }
+        // Migrate to using an array as easier in smart...
+        $descriptions[$setting] = ts($props['description']);
+        $this->assign("{$setting}_description", ts($props['description']));
+        if ($setting == 'max_attachments') {
+          //temp hack @todo fix to get from metadata
+          $this->addRule('max_attachments', ts('Value should be a positive number'), 'positiveInteger');
+        }
+        if ($setting == 'maxFileSize') {
+          //temp hack
+          $this->addRule('maxFileSize', ts('Value should be a positive number'), 'positiveInteger');
+        }
+
+      }
+    }
+    // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
+    $this->assign('setting_descriptions', $descriptions);
+    $this->assign('settings_fields', $settingMetaData);
+  }
+
 }
