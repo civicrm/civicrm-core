@@ -279,7 +279,7 @@ class CRM_Contact_Form_Edit_Address {
             $isPotentialEmployer[$key] = 1;
             // when editing an existing shared address, assume that we don't want to update current employer
             $defaults['address'][$key]['update_current_employer'] = 0;
-            // TODO: replace input label to include employer name
+            // TODO: nice to have -- replace input label to include employer name
             //$employer = CRM_Contact_BAO_Contact::displayName($master_cid);
           }
         }

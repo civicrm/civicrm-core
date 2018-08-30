@@ -1042,12 +1042,12 @@ SELECT is_primary,
     $query = 'SELECT id, contact_id FROM civicrm_address WHERE master_id = %1';
     $dao = CRM_Core_DAO::executeQuery($query, array(1 => array($addressId, 'Integer')));
 
-    // TODO: VALIDATION REQUIRED = was implicit and is now explicit
-    // should we keep it backward compatible (i.e. no params means creating relationship) ?
-    // this should only impact API calls
-    $createRelationship = FALSE;
-    if (isset($params['update_current_employer']) && $params['update_current_employer']) {
-      $createRelationship = TRUE;
+    // for backward compatibility reason, we keep it implicit
+    // i.e. no params means creating relationship
+    // used for API calls (in the UI, we should always pass the parameter)
+    $createRelationship = TRUE;
+    if (isset($params['update_current_employer']) && !$params['update_current_employer']) {
+      $createRelationship = FALSE;
     }
 
     // unset contact id

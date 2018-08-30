@@ -835,6 +835,12 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
         }
         continue;
       }
+      // in the UI, we always have a checkbox for specifying whether to update the current employer or not
+      // but if not checked, the parameter is just not defined in the address array
+      // we need to force a value because of API backward compatibility (implicitely create relationship if no parameter)
+      if (!isset($values['update_current_employer'])) {
+        $values['update_current_employer'] = 0;
+      }
 
       // 3. get the address details for master_id
       $masterAddress = new CRM_Core_BAO_Address();
