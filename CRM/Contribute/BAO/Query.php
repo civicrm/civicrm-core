@@ -258,6 +258,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       case (strpos($name, '_amount') !== FALSE):
       case (strpos($name, '_date') !== FALSE && $name != 'contribution_fulfilled_date'):
       case 'contribution_campaign_id':
+      case 'contribution_cancel_reason':
 
         $fieldNamesNotToStripContributionFrom = array(
           'contribution_currency_type',
