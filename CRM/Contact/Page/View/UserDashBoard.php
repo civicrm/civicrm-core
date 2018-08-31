@@ -74,6 +74,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     if (empty($userID) && $this->_contactId && $userChecksum) {
       $this->assign('userChecksum', $userChecksum);
       $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($this->_contactId, $userChecksum);
+      $this->_isChecksumUser = $validUser;
     }
 
     if (!$this->_contactId) {
@@ -169,7 +170,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
       $this->assign('pcpInfo', $pcpInfo);
     }
 
-    if (!empty($this->_userOptions['Assigned Activities'])) {
+    if (!empty($this->_userOptions['Assigned Activities']) && empty($this->_isChecksumUser)) {
       // Assigned Activities section
       $dashboardElements[] = array(
         'class' => 'crm-dashboard-assignedActivities',
