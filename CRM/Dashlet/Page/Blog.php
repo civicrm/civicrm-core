@@ -73,27 +73,21 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
    * @return array
    */
   protected function getData() {
-    // Fetch data from cache
-    $cache = CRM_Core_DAO::executeQuery("SELECT data, created_date FROM civicrm_cache
-      WHERE group_name = 'dashboard' AND path = 'newsfeed'");
-    if ($cache->fetch()) {
-      $expire = time() - (60 * 60 * 24 * self::CACHE_DAYS);
-      // Refresh data after CACHE_DAYS
-      if (strtotime($cache->created_date) < $expire) {
-        $new_data = $this->getFeeds();
-        // If fetching the new rss feed was successful, return it
-        // Otherwise use the old cached data - it's better than nothing
-        if ($new_data) {
-          return $new_data;
-        }
+    $value = Civi::cache('community_messages')->get('dashboard_newsfeed');
+
+    if (!$value) {
+      $value = $this->getFeeds();
+
+      if ($value) {
+        Civi::cache('community_messages')->set('dashboard_newsfeed', $value, (60 * 60 * 24 * self::CACHE_DAYS));
       }
-      return unserialize($cache->data);
     }
-    return $this->getFeeds();
+
+    return $value;
   }
 
   /**
-   * Fetch all feeds & cache results.
+   * Fetch all feeds.
    *
    * @return array
    */
@@ -104,7 +98,6 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
       return array();
     }
     $feeds = $this->formatItems($newsFeed);
-    CRM_Core_BAO_Cache::setItem($feeds, 'dashboard', 'newsfeed');
     return $feeds;
   }
 
