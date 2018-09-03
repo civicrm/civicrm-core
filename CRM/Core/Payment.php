@@ -376,6 +376,18 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Does this processor support updating billing info for recurring contributions through code.
+   *
+   * If the processor returns true then it must be possible to update billing info from within CiviCRM
+   * that will be updated at the payment processor.
+   *
+   * @return bool
+   */
+  protected function supportsUpdateSubscriptionBillingInfo() {
+    return method_exists(CRM_Utils_System::getClassName($this), 'updateSubscriptionBillingInfo');
+  }
+
+  /**
    * Can recurring contributions be set against pledges.
    *
    * In practice all processors that use the baseIPN function to finish transactions or
@@ -590,7 +602,7 @@ abstract class CRM_Core_Payment {
    * @return array
    */
   public function getEditableRecurringScheduleFields() {
-    if (method_exists($this, 'changeSubscriptionAmount')) {
+    if ($this->supports('changeSubscriptionAmount')) {
       return array('amount');
     }
   }
@@ -1453,7 +1465,7 @@ abstract class CRM_Core_Payment {
 
       case 'billing':
         //in notify mode don't return the update billing url
-        if (!$this->isSupported('updateSubscriptionBillingInfo')) {
+        if (!$this->supports('updateSubscriptionBillingInfo')) {
           return NULL;
         }
         $url = 'civicrm/contribute/updatebilling';
@@ -1504,7 +1516,7 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     }
 
     // Else login URL
-    if ($this->isSupported('accountLoginURL')) {
+    if ($this->supports('accountLoginURL')) {
       return $this->accountLoginURL();
     }
 
@@ -1551,6 +1563,18 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
   }
 
   /**
+   * Does this processor support changing the amount for recurring contributions through code.
+   *
+   * If the processor returns true then it must be possible to update the amount from within CiviCRM
+   * that will be updated at the payment processor.
+   *
+   * @return bool
+   */
+  protected function supportsChangeSubscriptionAmount() {
+    return method_exists(CRM_Utils_System::getClassName($this), 'changeSubscriptionAmount');
+  }
+
+  /**
    * Checks if payment processor supports recurring contributions
    *
    * @return bool
@@ -1560,6 +1584,17 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Checks if payment processor supports an account login URL
+   * TODO: This is checked by self::subscriptionURL but is only used if no entityID is found.
+   * TODO: It is implemented by AuthorizeNET, any others?
+   *
+   * @return bool
+   */
+  protected function supportsAccountLoginURL() {
+    return method_exists(CRM_Utils_System::getClassName($this), 'accountLoginURL');
   }
 
   /**
