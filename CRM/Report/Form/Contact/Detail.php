@@ -462,6 +462,11 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     $this->joinPhoneFromContact();
     $this->joinEmailFromContact();
 
+    // only include tables that are in from clause
+    $componentTables = array_intersect($this->_aliases,  $this->_component);
+    $componentTables = array_flip($componentTables);
+    $this->_selectedTables = array_diff($this->_selectedTables, $componentTables);
+
     if (!empty($this->_selectComponent['contribution_civireport'])) {
       $this->_formComponent['contribution_civireport'] = " FROM
         civicrm_contact {$this->_aliases['civicrm_contact']}
