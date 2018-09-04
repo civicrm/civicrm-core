@@ -1344,8 +1344,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
     $tplParams = $activityInfo = array();
     //if its a case activity
+    $activityTypeId = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityId, 'activity_type_id');
     if ($caseId) {
-      $activityTypeId = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityId, 'activity_type_id');
       $nonCaseActivityTypes = CRM_Core_PseudoConstant::activityType();
       if (!empty($nonCaseActivityTypes[$activityTypeId])) {
         $anyActivity = TRUE;
@@ -1369,6 +1369,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     if ($caseId) {
       $activityInfo['fields'][] = array('label' => 'Case ID', 'type' => 'String', 'value' => $caseId);
     }
+    $tplParams['activityTypeName'] = $nonCaseActivityTypes[$activityTypeId];
     $tplParams['activity'] = $activityInfo;
     foreach ($tplParams['activity']['fields'] as $k => $val) {
       if (CRM_Utils_Array::value('label', $val) == ts('Subject')) {
