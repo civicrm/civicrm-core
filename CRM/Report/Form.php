@@ -5406,7 +5406,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'title' => $options['prefix_label'] . ts('Gender'),
         'options' => CRM_Contact_BAO_Contact::buildOptions('gender_id'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-        'alter_display' => 'alterGenderID',
         'is_fields' => TRUE,
         'is_filters' => TRUE,
       ),
@@ -5419,7 +5418,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ),
       'age' => array(
         'title' => $options['prefix_label'] . ts('Age'),
-        'dbAlias' => 'TIMESTAMPDIFF(YEAR, ' . $tableAlias . '.birth_date, CURDATE())',
+        'dbAlias' => 'TIMESTAMPDIFF(YEAR, ' . $tableAlias . '_civireport.birth_date, CURDATE())',
         'type' => CRM_Utils_Type::T_INT,
         'is_fields' => TRUE,
       ),
