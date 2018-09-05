@@ -66,9 +66,8 @@ class CRM_Contribute_PseudoConstantTest extends CiviUnitTestCase {
       );
       $this->assertEquals($accountIDFromBetterFunction, $accountID);
     }
-
   }
-  
+
   /**
    * Test that getRelationalFinancialAccount works and returns the same as the performant alternative.
    *
