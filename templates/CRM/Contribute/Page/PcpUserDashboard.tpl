@@ -37,7 +37,7 @@
     <th>{ts}In Support of{/ts}</th>
     <th>{ts}Campaign Ends{/ts}</th>
     <th>{ts}Status{/ts}</th>
-    <th></th>
+    {if !$userChecksum} <th></th> {/if}
   </tr>
 
   {foreach from=$pcpInfo item=row}
@@ -46,7 +46,9 @@
         <td>{$row.pageTitle}</td>
         <td>{if $row.end_date}{$row.end_date|truncate:10:''|crmDate}{else}({ts}ongoing{/ts}){/if}</td>
         <td>{$row.pcpStatus}</td>
-        <td>{$row.action|replace:'xx':$row.pcpId}</td>
+        {if !$userChecksum}
+          <td>{$row.action|replace:'xx':$row.pcpId}</td>
+        {/if}
   </tr>
   {/foreach}
 </table>
@@ -58,7 +60,6 @@
   {ts}You do not have any active Personal Campaign pages.{/ts}
 </div>
 {/if}
-
 
 {if $pcpBlock}
 {strip}
