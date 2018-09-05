@@ -263,7 +263,9 @@ WHERE cft.id = %1
           Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$accountRelationshipID] = $incomeAccountFinancialAccountID;
         }
       }
-
+      if (!isset(Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$relationTypeId])) {
+        Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$relationTypeId] = NULL;
+      }
     }
     return Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$relationTypeId];
   }
