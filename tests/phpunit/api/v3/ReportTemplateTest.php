@@ -906,4 +906,29 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ]);
   }
 
+  /**
+   * Test the group filter works on the contribution summary.
+   */
+  public function testContributionDetailTotalHeader() {
+    $contactID = $this->individualCreate();
+    $contactID2 = $this->individualCreate();
+    $this->contributionCreate(['contact_id' => $contactID, 'api.ContributionSoft.create' => ['amount' => 5, 'contact_id' => $contactID2]]);
+    $template = 'contribute/detail';
+    $rows = $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => $template,
+      'contribution_or_soft_value' => 'contributions_only',
+      'fields' => [
+        'sort_name' => '1',
+        'age' => '1',
+        'email' => '1',
+        'phone' => '1',
+        'financial_type_id' => '1',
+        'receive_date' => '1',
+        'total_amount' => '1',
+       ],
+      'order_bys' => [['column' => 'sort_name', 'order' => 'ASC', 'section' => '1']],
+      'options' => array('metadata' => array('sql')),
+    ));
+  }
+
 }

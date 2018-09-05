@@ -161,6 +161,9 @@
 - name        : Ben Jarlett
   jira        : benjarlett
 
+- github      : bmango
+  name        : Ben Mango
+
 - github      : BorislavZlatanov
   name        : Borislav Zlatanov
   jira        : BorislavZlatanov
@@ -184,6 +187,10 @@
   name        : Charlie Wilder
   organization: Monadnock Developmental Services
   jira        : chagrawil
+
+- github      : chamilwijesooriya
+  name        : Chamil Wijesooriya
+  organization: MillerTech
 
 - name        : Charles Register
   organization: Hemophilia of North Carolina
@@ -477,7 +484,8 @@
   name        : Michael Z Daryabeygi
   organization: Ginkgo Street Labs
 
-- name        : Jon-Man Cheung
+- github      : jmcheung
+  name        : Jon-Man Cheung
   organization: GMCVO Databases
   Jira        : gmcvo
 
@@ -754,6 +762,10 @@
   organization: CEDC
   jira        : lpkb
 
+- github      : laurynnlowe
+  name        : Laurynn Lowe
+  jira        : laurynnlowe
+
 - github      : lcdservices
   name        : Brian Shaughnessy
   organization: Lighthouse Design and Consulting
@@ -801,6 +813,10 @@
   organization: Oxfam Germany
   jira        : liyana
 
+- github      : madhavimalgaonkar
+  name        : Madhavi Malgaonkar
+  organization: OSSeed Technologies
+
 - name        : Madura Krishnamoorthy
   organization: CompuCorp
   jira        : madura
@@ -816,6 +832,8 @@
 
 - name        : Manish Zope
   jira        : manish
+
+- github      : marsh-circle
 
 - name        : Martin Castle
   organization: Circle Interactive
@@ -1215,6 +1233,10 @@
   organization: Spry Digital
   jira        : ehendricks
 
+- github      : stesi561
+  name        : Luke Stewart
+  organization: Fuzion
+
 - github      : stevekessler
   name        : Steve Kessler
   organization: CiviDesk
@@ -1242,6 +1264,9 @@
   name        : Tamar Meir
   organization: Forest CRM Consulting
   jira        : tamar
+
+- github      : tanyabouman
+  name        : Tanya Bouman
 
 - github      : TBSliver
   name        : Tom Bloor
@@ -1367,6 +1392,10 @@
 - github      : waddyvic
   name        : Victor Huang
   jira        : waddyvic
+
+- github      : wannesderoy
+  name        : Wannes De Roy
+  organization: Calibrate
 
 - name        : Milli Aje
   organization: Debre-Genet Holy Trinity Ethiopian Orthodox Tewahedo Church

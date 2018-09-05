@@ -1,7 +1,7 @@
 The following people and organizations sponsored and/or contributed new and improved features to the project.
 
 ************************************************
-Key Contributors and Sponsors for 5.x
+Code Contributors for 5.x
 ************************************************
 
 CiviCRM - Coleman Watts, Tim Otten
@@ -13,6 +13,7 @@ applicado
 Australian Greens - Seamus Lee
 Bastien Ho
 Blackfly Solutions - Alan Dixon
+Calibrate - Wannes De Roy
 Caltha - Tomasz Pietrzkowski
 CEDC - Laryn Kragt Bakker
 Chris Burgess
@@ -23,6 +24,8 @@ CompuCorp - Camilo Rodriguez, Davi Alexandre, Debarshi Bhaumik, Michael Devery,
 Coop SymbioTIC - Mathieu Lutfy, Samuel Vanhove
 Davis Media Access - Darrick Servis
 Electronic Frontier Foundation - Mark Burdett
+eQuality Technology - Greg Rundlett
+Freeform Solutions - Herb van den Dool
 Fuzion - Jitendra Purohit
 Ginkgo Street Labs - Frank Gómez
 Hossein Amin
@@ -40,9 +43,11 @@ MJW Consulting - Matthew Wire
 myDropWizard - David Snopek
 Naomi Rosenberg
 Olivier Tétard
+OSSeed Technologies - Madhavi Malgaonkar
 Oxfam Germany - Thomas Schüttler, Yuliyana Liyana
 Pradeep Nayak
 Progressive Technology Project - Jamie McClelland
+Richard van Oosterhout
 Romain Thouvenin
 Squiffle Consulting - Aidan Saunders
 Systopia - Björn Endres

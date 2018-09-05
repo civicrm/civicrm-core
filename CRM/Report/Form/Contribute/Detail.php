@@ -821,6 +821,12 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       // pull section aliases out of $this->_sections
       $sectionAliases = array_keys($this->_sections);
 
+      // hack alert - but it's tested so go forth & make pretty, or whack the new mole that popped up with gay abandon.
+      if (in_array('civicrm_contribution_total_amount', $this->_selectAliases)) {
+        $keyToHack = array_search('civicrm_contribution_total_amount', $this->_selectAliases);
+        $this->_selectAliases[$keyToHack] = 'civicrm_contribution_total_amount_sum';
+      }
+
       $ifnulls = array();
       foreach (array_merge($sectionAliases, $this->_selectAliases) as $alias) {
         $ifnulls[] = "ifnull($alias, '') as $alias";
@@ -835,10 +841,10 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
 
       $addtotals = '';
 
-      if (array_search("civicrm_contribution_total_amount", $this->_selectAliases) !==
+      if (array_search("civicrm_contribution_total_amount_sum", $this->_selectAliases) !==
         FALSE
       ) {
-        $addtotals = ", sum(civicrm_contribution_total_amount) as sumcontribs";
+        $addtotals = ", sum(civicrm_contribution_total_amount_sum) as sumcontribs";
         $showsumcontribs = TRUE;
       }
 
