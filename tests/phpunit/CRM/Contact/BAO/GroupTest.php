@@ -199,4 +199,42 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Ensure that when updating a group with a linked organisation record even tho that record's id doesn't match the group id no db error is produced
+   */
+  public function testGroupUpdateWithOrganization() {
+    $params = array(
+      'name' => uniqid(),
+      'title' => 'Group A',
+      'description' => 'Group One',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+    );
+    $group1 = CRM_Contact_BAO_Group::create($params);
+
+    $domain1 = $this->callAPISuccess('Domain', 'get', ['id' => 1]);
+    $params2 = array(
+      'name' => uniqid(),
+      'title' => 'Group B',
+      'description' => 'Group Two',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+      'organization_id' => $domain1['values'][1]['contact_id'],
+    );
+    $group2 = CRM_Contact_BAO_Group::create($params2);
+
+    $domain2 = $this->callAPISuccess('Domain', 'get', ['id' => 2]);
+    $params3 = array(
+      'name' => uniqid(),
+      'title' => 'Group C',
+      'description' => 'Group Three',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+      'organization_id' => $domain2['values'][2]['contact_id'],
+    );
+    $group3 = CRM_Contact_BAO_Group::create($params3);
+    $params2['id'] = $group2->id;
+    $testUpdate = CRM_Contact_BAO_Group::create($params2);
+  }
+
 }
