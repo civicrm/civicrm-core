@@ -82,7 +82,10 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         $data = $rawData ? self::decode($rawData) : NULL;
 
         self::$_cache[$argString] = $data;
-        $cache->set($cleanKey, self::$_cache[$argString]);
+        if ($data !== NULL) {
+          // Do not cache 'null' as that is most likely a cache miss & we shouldn't then cache it.
+          $cache->set($cleanKey, self::$_cache[$argString]);
+        }
       }
     }
     return self::$_cache[$argString];
