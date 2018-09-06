@@ -234,9 +234,9 @@ WHERE  v.option_group_id = g.id
 
     $cache = CRM_Utils_Cache::singleton();
     if (!$fresh) {
-      $var = $cache->get($cacheKey);
-      if ($var) {
-        return $var;
+      self::$_cache[$cacheKey] = $cache->get($cacheKey);
+      if (self::$_cache[$cacheKey] !== NULL) {
+        return self::$_cache[$cacheKey];
       }
     }
     $query = "
