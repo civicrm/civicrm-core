@@ -539,7 +539,7 @@ class CRM_Core_PseudoConstant {
     $cacheKey = CRM_Core_BAO_Cache::cleanKey("CRM_PC_{$name}_{$all}_{$key}_{$retrieve}_{$filter}_{$condition}_{$orderby}");
     $cache = CRM_Utils_Cache::singleton();
     $var = $cache->get($cacheKey);
-    if ($var && empty($force)) {
+    if ($var !== NULL && empty($force)) {
       return $var;
     }
 
