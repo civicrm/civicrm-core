@@ -322,7 +322,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       'return' => ['title'],
     ];
 
-    if ($this->_action == CRM_Core_Action::UPDATE) {
+    if ($this->_action == CRM_Core_Action::UPDATE && !empty($this->_values['option_group_id'])) {
       $this->freeze('data_type');
       // Before dev/core#155 we didn't set the is_reserved flag properly, which should be handled by the upgrade script...
       //  but it is still possible that existing installs may have optiongroups linked to custom fields that are marked reserved.
