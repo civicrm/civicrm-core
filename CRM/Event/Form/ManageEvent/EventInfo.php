@@ -173,8 +173,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $this->addElement('checkbox', 'is_share', ts('Allow sharing through social media?'));
     $this->addElement('checkbox', 'is_map', ts('Include Map to Event Location'));
 
-    $this->add('datepicker', 'start_date', ts('Start Date'), [], FALSE, ['time' => TRUE]);
-    $this->add('datepicker', 'end_date', ts('End Date / Time'), [], FALSE, ['time' => TRUE]);
+    $this->add('datepicker', 'start_date', ts('Start'), [], FALSE, ['time' => TRUE]);
+    $this->add('datepicker', 'end_date', ts('End'), [], FALSE, ['time' => TRUE]);
 
     $this->add('text', 'max_participants', ts('Max Number of Participants'),
       array('onchange' => "if (this.value != '') {cj('#id-waitlist').show(); showHideByValue('has_waitlist','0','id-waitlist-text','table-row','radio',false); showHideByValue('has_waitlist','0','id-event_full','table-row','radio',true); return;} else {cj('#id-event_full, #id-waitlist, #id-waitlist-text').hide(); return;}")
