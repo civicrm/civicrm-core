@@ -26,14 +26,6 @@
  */
 
 /**
- *  File for the MembershipTest class
- *
- *  (PHP 5)
- *
- * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- */
-
-/**
  *  Test CRM_Member_Form_Membership functions.
  *
  * @package   CiviCRM
@@ -80,6 +72,12 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @var array
    */
   protected $paymentInstruments = array();
+
+
+  /**
+   * @var CiviMailUtils
+   */
+  protected $mut;
 
   /**
    * Test setup for every test.
@@ -307,7 +305,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    */
   public function testSubmitRecurCompleteInstant() {
     $form = $this->getForm();
-
+    /** @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
     $processor->setDoDirectPaymentResult(array(
       'payment_status_id' => 1,
@@ -355,15 +353,57 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
     $this->assertEquals('kettles boil water', $contribution['trxn_id']);
     $this->assertEquals(.29, $contribution['fee_amount']);
-    $this->assertEquals(78, $contribution['total_amount']);
-    $this->assertEquals(77.71, $contribution['net_amount']);
+    $this->assertEquals(7800.90, $contribution['total_amount']);
+    $this->assertEquals(7800.61, $contribution['net_amount']);
 
     $this->callAPISuccessGetCount('LineItem', array(
       'entity_id' => $membership['id'],
       'entity_table' => 'civicrm_membership',
       'contribution_id' => $contribution['id'],
     ), 1);
+  }
 
+  /**
+   * Test the submit function of the membership form.
+   *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
+   */
+  public function testSubmitRecurCompleteInstantWithMail($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
+    $form = $this->getForm();
+    $this->mut = new CiviMailUtils($this, TRUE);
+    /** @var \CRM_Core_Payment_Dummy $processor */
+    $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
+    $processor->setDoDirectPaymentResult(array(
+      'payment_status_id' => 1,
+      'trxn_id' => 'kettles boil water',
+      'fee_amount' => .29,
+    ));
+
+    $this->callAPISuccess('MembershipType', 'create', array(
+      'id' => $this->membershipTypeAnnualFixedID,
+      'duration_unit' => 'month',
+      'duration_interval' => 1,
+      'auto_renew' => TRUE,
+    ));
+    $this->createLoggedInUser();
+    $form->preProcess();
+
+    $form->_contactID = $this->_individualId;
+    $params = $this->getBaseSubmitParams();
+    $params['send_receipt'] = 1;
+    $form->_mode = 'test';
+
+    $form->testSubmit($params);
+    $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', array('contact_id' => $this->_individualId));
+    $this->assertEquals(1, $contributionRecur['is_email_receipt']);
+    $this->mut->checkMailLog([
+      '$ ' . $this->formatMoneyInput(7800.90)
+    ]);
+    $this->mut->stop();
+    $this->setCurrencySeparators(',');
   }
 
   /**
@@ -570,7 +610,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'max_related' => 0,
       'num_terms' => '1',
       'source' => '',
-      'total_amount' => '78.00',
+      'total_amount' => $this->formatMoneyInput('7800.90'),
       'financial_type_id' => '2', //Member dues, see data.xml
       'soft_credit_type_id' => 11,
       'soft_credit_contact_id' => '',
