@@ -349,7 +349,23 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     else {
       CRM_Utils_Hook::pre('create', 'Group', NULL, $params);
     }
-
+    //  CRM-287 Disable child groups if all parents are disabled.
+    if(!empty($params['id'])) {
+      $allChildGroupIds = self::getChildGroupIds($params['id']);
+      foreach ($allChildGroupIds as $childKey => $childValue) {
+        $parentIds = CRM_Contact_BAO_GroupNesting::getParentGroupIds($childValue);
+        $activeParentsCount = civicrm_api3('Group', 'getcount', [
+          'id' => ['IN' => $parentIds],
+          'is_active' => 1,
+        ]);
+        if (count($parentIds) == 1) {
+          $setDisable = self::setIsActive($childValue, $params['is_active']);
+        }
+        if (count($parentIds) > 1 && $activeParentsCount <= 1) {
+          $setDisable = self::setIsActive($childValue, $params['is_active']);
+        }
+      }
+    }
     // form the name only if missing: CRM-627
     $nameParam = CRM_Utils_Array::value('name', $params, NULL);
     if (!$nameParam && empty($params['id'])) {
