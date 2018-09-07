@@ -61,11 +61,20 @@
     </tr>
     <tr class="crm-url-form-block-disable_core_css">
         <td class="label">
-            {$form.disable_core_css.label} {help id='id-css_url'}
+            {$form.disable_core_css.label} {help id='id-disable_core_css'}
         </td>
         <td>
             {$form.disable_core_css.html}<br />
             <p class="description">{ts}{$disable_core_css_description}{/ts}</p>
+        </td>
+    </tr>
+    <tr class="crm-url-form-block-disable_frontend_core_css">
+        <td class="label">
+            {$form.disable_frontend_core_css.label} {help id='id-disable_frontend_core_css'}
+        </td>
+        <td>
+            {$form.disable_frontend_core_css.html}<br />
+            <p class="description">{ts}{$disable_frontend_core_css_description}{/ts}</p>
         </td>
     </tr>
     <tr class="crm-url-form-block-extensionsURL">

@@ -108,3 +108,17 @@
     {ts}These variables are computed automatically using <tt>civicrm.settings.php</tt> and its options, such as <tt>CIVICRM_TEMPLATE_COMPILEDIR</tt>.{/ts}
   </p>
 {/htxt}
+
+{htxt id='id-disable_core_css-title'}
+  {ts}Disable CiviCRM css{/ts}
+{/htxt}
+{htxt id='id-disable_core_css'}
+<p>{ts}Prevent the stylesheet "civicrm.css" from being loaded on all pages.{/ts}</p>
+{/htxt}
+
+{htxt id='id-disable_frontend_core_css-title'}
+  {ts}Disable CiviCRM css on Frontend{/ts}
+{/htxt}
+{htxt id='id-disable_frontend_core_css'}
+<p>{ts}Prevent the stylesheet "civicrm.css" from being loaded on frontend pages.{/ts}</p>
+{/htxt}
