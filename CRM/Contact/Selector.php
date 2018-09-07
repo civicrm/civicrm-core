@@ -903,7 +903,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $countRow = Civi::service('prevnext')->getCount($cacheKey);
     // $sortByCharacter triggers a refresh in the prevNext cache
     if ($sortByCharacter && $sortByCharacter != 'all') {
-      $cacheKey .= "_alphabet";
       $this->fillupPrevNextCache($sort, $cacheKey, 0, max(self::CACHE_SIZE, $pageSize));
     }
     elseif (($firstRecord + $pageSize) >= $countRow) {
@@ -1039,7 +1038,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     // the other alternative of running the FULL query will just be incredibly inefficient
     // and slow things down way too much on large data sets / complex queries
 
-    $selectSQL = "SELECT DISTINCT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.sort_name";
+    $selectSQL = "SELECT DISTINCT '$cacheKey', contact_a.id, contact_a.sort_name";
 
     $sql = str_replace(array("SELECT contact_a.id as contact_id", "SELECT contact_a.id as id"), $selectSQL, $sql);
     try {

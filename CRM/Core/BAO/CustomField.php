@@ -363,8 +363,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
 

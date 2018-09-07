@@ -152,6 +152,12 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
             $displayOpt = CRM_Utils_Array::value('tax_display_settings', $invoiceSettings);
             $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
             foreach ($fieldValues['options'] as $optionId => $optionVal) {
+              if (CRM_Utils_Array::value('visibility_id', $optionVal) != array_search('public', $visibility) &&
+                $adminFieldVisible == FALSE
+              ) {
+                continue;
+              }
+
               $values['feeBlock']['isDisplayAmount'][$fieldCnt] = CRM_Utils_Array::value('is_display_amounts', $fieldValues);
               if ($invoicing && isset($optionVal['tax_amount'])) {
                 $values['feeBlock']['value'][$fieldCnt] = CRM_Price_BAO_PriceField::getTaxLabel($optionVal, 'amount', $displayOpt, $taxTerm);

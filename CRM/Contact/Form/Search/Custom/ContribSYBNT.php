@@ -404,7 +404,7 @@ AND      c.receive_date < {$this->start_date_1}
    * @param array $formValues
    *
    */
-  public static function formatSavedSearchFields(&$formValues) {
+  public static function formatSavedSearchFields($formValues) {
     $dateFields = array(
       'start_date_1',
       'end_date_1',
@@ -418,6 +418,8 @@ AND      c.receive_date < {$this->start_date_1}
         $formValues[$element] = date('Y-m-d', strtotime($value));
       }
     }
+
+    return $formValues;
   }
 
 }

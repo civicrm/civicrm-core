@@ -83,9 +83,11 @@ class CRM_Core_Permission {
 
   /**
    * Given a permission string or array, check for access requirements
-   * @param mixed $permissions
+   * @param string|array $permissions
    *   The permission to check as an array or string -see examples.
-   *   arrays
+   *
+   * @param int $contactId
+   *   Contact id to check permissions for. Defaults to current logged-in user.
    *
    *  Ex 1
    *
@@ -117,15 +119,20 @@ class CRM_Core_Permission {
    * @return bool
    *   true if yes, else false
    */
-  public static function check($permissions) {
+  public static function check($permissions, $contactId = NULL) {
     $permissions = (array) $permissions;
+    $userId = NULL;
+    if ($contactId) {
+      $userId = CRM_Core_BAO_UFMatch::getUFId($contactId);
+    }
 
+    /** @var CRM_Core_Permission_Temp $tempPerm */
     $tempPerm = CRM_Core_Config::singleton()->userPermissionTemp;
 
     foreach ($permissions as $permission) {
       if (is_array($permission)) {
         foreach ($permission as $orPerm) {
-          if (self::check($orPerm)) {
+          if (self::check($orPerm, $contactId)) {
             //one of our 'or' permissions has succeeded - stop checking this permission
             return TRUE;
           }
@@ -135,9 +142,9 @@ class CRM_Core_Permission {
       }
       else {
         // This is an individual permission
-        $granted = CRM_Core_Config::singleton()->userPermissionClass->check($permission);
+        $granted = CRM_Core_Config::singleton()->userPermissionClass->check($permission, $userId);
         // Call the permission_check hook to permit dynamic escalation (CRM-19256)
-        CRM_Utils_Hook::permission_check($permission, $granted);
+        CRM_Utils_Hook::permission_check($permission, $granted, $contactId);
         if (
           !$granted
           && !($tempPerm && $tempPerm->check($permission))

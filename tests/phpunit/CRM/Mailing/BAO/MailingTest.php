@@ -131,6 +131,59 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test mailing receipients when using previous mailing as include and contact is in exclude as well
+   */
+  public function testMailingIncludePreviousMailingExcludeGroup() {
+    $groupName = 'Test static group ' . substr(sha1(rand()), 0, 7);
+    $groupName2 = 'Test static group 2' . substr(sha1(rand()), 0, 7);
+    $groupID = $this->groupCreate([
+      'name' => $groupName,
+      'title' => $groupName,
+      'is_active' => 1,
+    ]);
+    $groupID2 = $this->groupCreate([
+      'name' => $groupName2,
+      'title' => $groupName2,
+      'is_active' => 1,
+    ]);
+    $contactID = $this->individualCreate(array(), 0);
+    $contactID2 = $this->individualCreate(array(), 2);
+    $this->callAPISuccess('GroupContact', 'Create', array(
+      'group_id' => $groupID,
+      'contact_id' => $contactID,
+    ));
+    $this->callAPISuccess('GroupContact', 'Create', array(
+      'group_id' => $groupID,
+      'contact_id' => $contactID2,
+    ));
+    $this->callAPISuccess('GroupContact', 'Create', array(
+      'group_id' => $groupID2,
+      'contact_id' => $contactID2,
+    ));
+    // Create dummy mailing
+    $mailingID = $this->callAPISuccess('Mailing', 'create', array())['id'];
+    $this->createMailingGroup($mailingID, $groupID);
+    $expectedContactIDs = [$contactID, $contactID2];
+    $this->assertRecipientsCorrect($mailingID, $expectedContactIDs);
+    $mailingID2 = $this->callAPISuccess('Mailing', 'create', array())['id'];
+    $this->createMailingGroup($mailingID2, $groupID2, 'Exclude');
+    $this->callAPISuccess('MailingGroup', 'create', array(
+      'mailing_id' => $mailingID2,
+      'group_type' => 'Include',
+      'entity_table' => CRM_Mailing_BAO_Mailing::getTableName(),
+      'entity_id' => $mailingID,
+    ));
+    $expectedContactIDs = [$contactID];
+    $this->assertRecipientsCorrect($mailingID2, $expectedContactIDs);
+    $this->callAPISuccess('mailing', 'delete', ['id' => $mailingID2]);
+    $this->callAPISuccess('mailing', 'delete', ['id' => $mailingID]);
+    $this->callAPISuccess('group', 'delete', ['id' => $groupID]);
+    $this->callAPISuccess('group', 'delete', ['id' => $groupID2]);
+    $this->callAPISuccess('contact', 'delete', ['id' => $contactID, 'skip_undelete' => TRUE]);
+    $this->callAPISuccess('contact', 'delete', ['id' => $contactID2, 'skip_undelete' => TRUE]);
+  }
+
+  /**
    * Test verify that a disabled mailing group doesn't prvent access to the mailing generated with the group.
    */
   public function testGetMailingDisabledGroup() {

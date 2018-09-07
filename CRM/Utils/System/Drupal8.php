@@ -664,4 +664,13 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return \Drupal::languageManager()->getCurrentLanguage()->getId();
   }
 
+  /**
+   * Append Drupal8 js to coreResourcesList.
+   *
+   * @param array $list
+   */
+  public function appendCoreResources(&$list) {
+    $list[] = 'js/crm.drupal8.js';
+  }
+
 }

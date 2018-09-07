@@ -1692,7 +1692,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
               }
             }
             $this->assign('totalTaxAmount', $totalTaxAmount);
-            $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
+            $this->assign('taxTerm', $this->getSalesTaxTerm());
             $this->assign('dataArray', $dataArray);
           }
           if (!empty($additionalParticipantDetails)) {

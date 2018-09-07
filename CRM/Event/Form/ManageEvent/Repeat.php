@@ -192,8 +192,8 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
   }
 
   /**
-   * This function checks if there was any registraion for related event ids,
-   * and returns array of ids with no regsitrations
+   * This function checks if there was any registration for related event ids,
+   * and returns array of ids with no registrations
    *
    * @param string or int or object... $eventID
    *

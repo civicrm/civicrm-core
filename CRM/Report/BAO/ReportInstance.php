@@ -45,7 +45,6 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    * @return CRM_Report_DAO_ReportInstance
    */
   public static function add(&$params) {
-    $instance = new CRM_Report_DAO_ReportInstance();
     if (empty($params)) {
       return NULL;
     }
@@ -109,10 +108,10 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     $instance->save();
 
     if ($instanceID) {
-      CRM_Utils_Hook::pre('edit', 'ReportInstance', $instance->id, $instance);
+      CRM_Utils_Hook::post('edit', 'ReportInstance', $instance->id, $instance);
     }
     else {
-      CRM_Utils_Hook::pre('create', 'ReportInstance', $instance->id, $instance);
+      CRM_Utils_Hook::post('create', 'ReportInstance', $instance->id, $instance);
     }
     return $instance;
   }

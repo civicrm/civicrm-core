@@ -92,6 +92,29 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
+   * @var array
+   */
+  protected $statusMessage = [];
+
+  /**
+   * Add to the status message.
+   *
+   * @param $message
+   */
+  protected function addStatusMessage($message) {
+    $this->statusMessage[] = $message;
+  }
+
+  /**
+   * Get the status message.
+   *
+   * @return string
+   */
+  protected function getStatusMessage() {
+    return implode(' ', $this->statusMessage);
+  }
+
+  /**
    * Values submitted to the form, processed along the way.
    *
    * @var array
@@ -189,6 +212,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * Build the form object.
    */
   public function buildQuickForm() {
+    $this->assignSalesTaxMetadataToTemplate();
 
     $this->addPaymentProcessorSelect(TRUE, FALSE, TRUE);
     CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->getDefaultPaymentInstrumentId());

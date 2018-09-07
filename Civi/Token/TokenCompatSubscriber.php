@@ -90,7 +90,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       // less randomly.
       \CRM_Utils_Hook::tokenValues($contactArray,
         (array) $contactId,
-        empty($row->context['mailingJob']) ? NULL : $row->context['mailingJob']->id,
+        empty($row->context['mailingJobId']) ? NULL : $row->context['mailingJobId'],
         $messageTokens,
         $row->context['controller']
       );

@@ -433,7 +433,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['Individual', 'city', ''],
       ['Individual', 'state_province', ''],
     ];
-    list($tableName) = CRM_Export_BAO_Export::exportComponents(
+    list($tableName, $sqlColumns, $headerRows) = CRM_Export_BAO_Export::exportComponents(
       FALSE,
       $this->contactIDs,
       [],
@@ -458,6 +458,17 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $this->assertEquals($householdID, $dao->civicrm_primary_id);
     }
 
+    $this->assertEquals([
+      0 => 'City',
+      1 => 'State',
+      2 => 'Household ID',
+    ], $headerRows);
+    $this->assertEquals(
+      [
+        'city' => 'city varchar(64)',
+        'state_province' => 'state_province varchar(64)',
+        'civicrm_primary_id' => 'civicrm_primary_id varchar(16)',
+      ], $sqlColumns);
   }
 
   /**

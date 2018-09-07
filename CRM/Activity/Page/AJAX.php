@@ -302,8 +302,8 @@ class CRM_Activity_Page_AJAX {
     $mainActivity->activity_date_time = $actDateTime;
     // Make sure this is current revision.
     $mainActivity->is_current_revision = TRUE;
-    // Drop all relations.
-    $mainActivity->parent_id = $mainActivity->original_id = NULL;
+    $mainActivity->original_id = $otherActivity->id;
+    $otherActivity->is_current_revision = FALSE;
 
     $mainActivity->save();
     $mainActivityId = $mainActivity->id;
@@ -327,7 +327,6 @@ class CRM_Activity_Page_AJAX {
           1 => $params['caseID'],
         )) . ' ' . $otherActivity->subject;
       }
-      $otherActivity->activity_date_time = $actDateTime;
       $otherActivity->save();
 
       $caseActivity->free();

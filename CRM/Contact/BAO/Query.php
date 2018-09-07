@@ -2235,6 +2235,7 @@ class CRM_Contact_BAO_Query {
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
     }
     elseif ($name === 'email_greeting') {
+      CRM_Core_Error::deprecatedFunctionWarning('pass in email_greeting_id or email_greeting_display');
       $filterCondition = array('greeting_type' => 'email_greeting');
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
@@ -2244,6 +2245,7 @@ class CRM_Contact_BAO_Query {
       );
     }
     elseif ($name === 'postal_greeting') {
+      CRM_Core_Error::deprecatedFunctionWarning('pass in postal_greeting_id or postal_greeting_display');
       $filterCondition = array('greeting_type' => 'postal_greeting');
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
@@ -2253,6 +2255,7 @@ class CRM_Contact_BAO_Query {
       );
     }
     elseif ($name === 'addressee') {
+      CRM_Core_Error::deprecatedFunctionWarning('pass in addressee_id or addressee_display');
       $filterCondition = array('greeting_type' => 'addressee');
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
@@ -4205,6 +4208,12 @@ civicrm_relationship.start_date > {$today}
       }
       $sql = "
         CREATE TEMPORARY TABLE {$relationshipTempTable}
+          (
+            `contact_id` int(10) unsigned NOT NULL DEFAULT '0',
+            `contact_id_alt` int(10) unsigned NOT NULL DEFAULT '0',
+            KEY `contact_id` (`contact_id`),
+            KEY `contact_id_alt` (`contact_id_alt`)
+          )
           (SELECT contact_id_b as contact_id, contact_id_a as contact_id_alt, civicrm_relationship.id
             FROM civicrm_relationship
             INNER JOIN  civicrm_contact c ON civicrm_relationship.contact_id_a = c.id
@@ -5965,8 +5974,8 @@ AND   displayRelType.is_active = 1
       }
     }
     else {
-      // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-      $wc = self::caseImportant($op) ? "LOWER({$field['where']})" : "{$field['where']}";
+      CRM_Core_Error::deprecatedFunctionWarning('pass $ids to this method');
+      $wc = "{$field['where']}";
     }
     if (in_array($name, $pseudoFields)) {
       if (!in_array($name, array('gender_id', 'prefix_id', 'suffix_id', 'communication_style_id'))) {

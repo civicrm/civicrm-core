@@ -68,7 +68,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     elseif (version_compare($phpVersion, CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER) >= 0) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('This system uses PHP version %1. This meets the minimum requirements for CiviCRM to function but is not recommended. At least PHP version %2 is recommended; the preferrred version is %3.',
+        ts('This system uses PHP version %1. This meets the minimum requirements for CiviCRM to function but is not recommended. At least PHP version %2 is recommended; the preferred version is %3.',
           array(
             1 => $phpVersion,
             2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
@@ -125,13 +125,21 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    */
   public function checkPhpEcrypt() {
     $messages = array();
+    $mailingBackend = Civi::settings()->get('mailing_backend');
+    if (!is_array($mailingBackend)
+      || !isset($mailingBackend['outBound_option'])
+      || $mailingBackend['outBound_option'] != CRM_Mailing_Config::OUTBOUND_OPTION_SMTP
+      || !CRM_Utils_Array::value('smtpAuth', $mailingBackend)
+    ) {
+      return $messages;
+    }
+
     $test_pass = 'iAmARandomString';
     $encrypted_test_pass = CRM_Utils_Crypt::encrypt($test_pass);
     if ($encrypted_test_pass == base64_encode($test_pass)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('Your PHP does not include the recommended encryption functions. Some passwords will not be stored encrypted, and if you have recently upgraded from a PHP that does include these functions, your encrypted passwords will not be decrypted correctly. If you are using PHP 7.0 or earlier, you probably want to include the "%1" extension.',
-          array('1' => 'mcrypt')
+        ts('Your PHP does not include the mcrypt encryption functions. Your SMTP password will not be stored encrypted, and if you have recently upgraded from a PHP that stored it with encryption, it will not be decrypted correctly.'
         ),
         ts('PHP Missing Extension "mcrypt"'),
         \Psr\Log\LogLevel::WARNING,
@@ -560,26 +568,24 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
     elseif (!is_writable($basedir)) {
       $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
+        __FUNCTION__ . 'Writable',
         ts('Your extensions directory (%1) is read-only. If you would like to perform downloads or upgrades, then change the file permissions.',
           array(1 => $basedir)),
         ts('Read-Only Extensions'),
         \Psr\Log\LogLevel::WARNING,
         'fa-plug'
       );
-      return $messages;
     }
 
     if (empty($extensionSystem->getDefaultContainer()->baseUrl)) {
       $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
+        __FUNCTION__ . 'URL',
         ts('The extensions URL is not properly set. Please go to the <a href="%1">URL setting page</a> and correct it.',
           array(1 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1'))),
         ts('Extensions url missing'),
         \Psr\Log\LogLevel::ERROR,
         'fa-plug'
       );
-      return $messages;
     }
 
     if (!$extensionSystem->getBrowser()->isEnabled()) {
@@ -680,7 +686,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     if ($errors) {
       $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
+        __FUNCTION__ . 'Error',
         '<ul><li>' . implode('</li><li>', $errors) . '</li></ul>',
         ts('Extension Error'),
         \Psr\Log\LogLevel::ERROR,

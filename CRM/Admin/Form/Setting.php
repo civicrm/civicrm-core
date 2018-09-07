@@ -36,7 +36,11 @@
  */
 class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
+  use CRM_Admin_Form_SettingTrait;
+
   protected $_settings = array();
+
+  protected $includesReadOnlyFields;
 
   /**
    * Set default values for the form.
@@ -93,80 +97,11 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
       )
     );
 
-    $descriptions = array();
-    $settingMetaData = $this->getSettingsMetaData();
-    foreach ($settingMetaData as $setting => $props) {
-      if (isset($props['quick_form_type'])) {
-        if (isset($props['pseudoconstant'])) {
-          $options = civicrm_api3('Setting', 'getoptions', array(
-            'field' => $setting,
-          ));
-        }
-        else {
-          $options = NULL;
-        }
-        //Load input as readonly whose values are overridden in civicrm.settings.php.
-        if (Civi::settings()->getMandatory($setting)) {
-          $props['html_attributes']['readonly'] = TRUE;
-          $setStatus = TRUE;
-        }
+    $this->addFieldsDefinedInSettingsMetadata();
 
-        $add = 'add' . $props['quick_form_type'];
-        if ($add == 'addElement') {
-          $this->$add(
-            $props['html_type'],
-            $setting,
-            ts($props['title']),
-            ($options !== NULL) ? $options['values'] : CRM_Utils_Array::value('html_attributes', $props, array()),
-            ($options !== NULL) ? CRM_Utils_Array::value('html_attributes', $props, array()) : NULL
-          );
-        }
-        elseif ($add == 'addSelect') {
-          $this->addElement('select', $setting, ts($props['title']), $options['values'], CRM_Utils_Array::value('html_attributes', $props));
-        }
-        elseif ($add == 'addCheckBox') {
-          $this->addCheckBox($setting, ts($props['title']), $options['values'], NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, array('&nbsp;&nbsp;'));
-        }
-        elseif ($add == 'addChainSelect') {
-          $this->addChainSelect($setting, array(
-            'label' => ts($props['title']),
-          ));
-        }
-        elseif ($add == 'addMonthDay') {
-          $this->add('date', $setting, ts($props['title']), CRM_Core_SelectValues::date(NULL, 'M d'));
-        }
-        else {
-          $this->$add($setting, ts($props['title']));
-        }
-        // Migrate to using an array as easier in smart...
-        $descriptions[$setting] = ts($props['description']);
-        $this->assign("{$setting}_description", ts($props['description']));
-        if ($setting == 'max_attachments') {
-          //temp hack @todo fix to get from metadata
-          $this->addRule('max_attachments', ts('Value should be a positive number'), 'positiveInteger');
-        }
-        if ($setting == 'maxFileSize') {
-          //temp hack
-          $this->addRule('maxFileSize', ts('Value should be a positive number'), 'positiveInteger');
-        }
-
-      }
-    }
-    if (!empty($setStatus)) {
+    if ($this->includesReadOnlyFields) {
       CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', array('expires' => 0));
     }
-    // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
-    $this->assign('setting_descriptions', $descriptions);
-    $this->assign('settings_fields', $settingMetaData);
-  }
-
-  /**
-   * Get default entity.
-   *
-   * @return string
-   */
-  public function getDefaultEntity() {
-    return 'Setting';
   }
 
   /**
@@ -185,6 +120,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    * @todo Document what I do.
    *
    * @param array $params
+   * @throws \CRM_Core_Exception
    */
   public function commonProcess(&$params) {
 
@@ -216,20 +152,19 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
         unset($params[$name]);
       }
     }
-    $settings = array_intersect_key($params, $this->_settings);
-    $result = civicrm_api('setting', 'create', $settings + array('version' => 3));
-    foreach ($settings as $setting => $settingGroup) {
-      //@todo array_diff this
-      unset($params[$setting]);
+    try {
+      $settings = $this->getSettingsToSetByMetadata($params);
+      civicrm_api3('setting', 'create', $settings);
     }
-    if (!empty($result['error_message'])) {
-      CRM_Core_Session::setStatus($result['error_message'], ts('Save Failed'), 'error');
+    catch (CiviCRM_API3_Exception $e) {
+      CRM_Core_Session::setStatus($e->getMessage(), ts('Save Failed'), 'error');
     }
 
-    //CRM_Core_BAO_ConfigSetting::create($params);
+    $this->filterParamsSetByMetadata($params);
+
     $params = CRM_Core_BAO_ConfigSetting::filterSkipVars($params);
     if (!empty($params)) {
-      CRM_Core_Error::fatal('Unrecognized setting. This may be a config field which has not been properly migrated to a setting. (' . implode(', ', array_keys($params)) . ')');
+      throw new CRM_Core_Exception('Unrecognized setting. This may be a config field which has not been properly migrated to a setting. (' . implode(', ', array_keys($params)) . ')');
     }
 
     CRM_Core_Config::clearDBCache();
@@ -297,19 +232,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     return array(
       '1' => 1,
     ) + $autoSearchFields;
-  }
-
-  /**
-   * Get the metadata relating to the settings on the form, ordered by the keys in $this->_settings.
-   *
-   * @return array
-   */
-  protected function getSettingsMetaData() {
-    $allSettingMetaData = civicrm_api3('setting', 'getfields', array());
-    $settingMetaData = array_intersect_key($allSettingMetaData['values'], $this->_settings);
-    // This array_merge re-orders to the key order of $this->_settings.
-    $settingMetaData = array_merge($this->_settings, $settingMetaData);
-    return $settingMetaData;
   }
 
 }

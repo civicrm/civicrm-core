@@ -32,7 +32,7 @@
   <table id="scheduleReminders" class="display">
     <thead>
     <tr id="options" class="columnheader">
-      <th class="sortable">{ts}Title{/ts}</th>
+      <th id="sortable">{ts}Title{/ts}</th>
       <th >{ts}Reminder For{/ts}</th>
       <th >{ts}When{/ts}</th>
       <th >{ts}While{/ts}</th>

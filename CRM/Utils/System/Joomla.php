@@ -529,7 +529,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
    */
   public function getBasePath() {
     global $civicrm_root;
-    $joomlaPath = explode('/administrator', $civicrm_root);
+    $joomlaPath = explode(DIRECTORY_SEPARATOR . 'administrator', $civicrm_root);
     $joomlaBase = $joomlaPath[0];
     return $joomlaBase;
   }
@@ -587,6 +587,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     if (!defined('JDEBUG')) {
       define('JDEBUG', FALSE);
+    }
+
+    // Set timezone for Joomla on Cron
+    $config = JFactory::getConfig();
+    $timezone = $config->get('offset');
+    if ($timezone) {
+      date_default_timezone_set($timezone);
+      CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
     }
 
     // CRM-14281 Joomla wasn't available during bootstrap, so hook_civicrm_config never executes.

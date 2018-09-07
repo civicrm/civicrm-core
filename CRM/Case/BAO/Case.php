@@ -676,7 +676,8 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
     $mask = CRM_Core_Action::mask($permissions);
 
     $caseTypes = CRM_Case_PseudoConstant::caseType('name');
-    foreach ($result->fetchAll() as $key => $case) {
+    foreach ($result->fetchAll() as $case) {
+      $key = $case['case_id'];
       $casesList[$key] = array();
       $casesList[$key]['DT_RowId'] = $case['case_id'];
       $casesList[$key]['DT_RowAttr'] = array('data-entity' => 'case', 'data-id' => $case['case_id']);
@@ -909,15 +910,13 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    *
    * @param null $context
    * @param int $userID
-   * @param null $type
+   * @param null $type (deprecated)
    *
    * @return array
    *   Array of case activities
    *
    */
   public static function getCaseActivity($caseID, &$params, $contactID, $context = NULL, $userID = NULL, $type = NULL) {
-    $values = array();
-
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
@@ -1088,9 +1087,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       CRM_Activity_BAO_Activity::getStatusesByType(CRM_Activity_BAO_Activity::CANCELLED)
     );
 
-    $contactViewUrl = CRM_Utils_System::url("civicrm/contact/view", "reset=1&cid=", FALSE, NULL, FALSE);
-    $hasViewContact = CRM_Core_Permission::giveMeAllACLs();
-
     if (!$userID) {
       $session = CRM_Core_Session::singleton();
       $userID = $session->get('userID');
@@ -1112,75 +1108,74 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         continue;
       }
 
-      $caseActivity['DT_RowId'] = $caseActivityId;
+      $caseActivities[$caseActivityId]['DT_RowId'] = $caseActivityId;
       //Add classes to the row, via DataTables syntax
-      $caseActivity['DT_RowClass'] = "crm-entity status-id-$dao->status";
+      $caseActivities[$caseActivityId]['DT_RowClass'] = "crm-entity status-id-$dao->status";
 
       if (CRM_Utils_Array::crmInArray($dao->status, $compStatusValues)) {
-        $caseActivity['DT_RowClass'] .= " status-completed";
+        $caseActivities[$caseActivityId]['DT_RowClass'] .= " status-completed";
       }
       else {
         if (CRM_Utils_Date::overdue($dao->display_date)) {
-          $caseActivity['DT_RowClass'] .= " status-overdue";
+          $caseActivities[$caseActivityId]['DT_RowClass'] .= " status-overdue";
         }
         else {
-          $caseActivity['DT_RowClass'] .= " status-scheduled";
+          $caseActivities[$caseActivityId]['DT_RowClass'] .= " status-scheduled";
         }
       }
 
       if (!empty($dao->priority)) {
         if ($dao->priority == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'priority_id', 'Urgent')) {
-          $caseActivity['DT_RowClass'] .= " priority-urgent ";
+          $caseActivities[$caseActivityId]['DT_RowClass'] .= " priority-urgent ";
         }
         elseif ($dao->priority == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'priority_id', 'Low')) {
-          $caseActivity['DT_RowClass'] .= " priority-low ";
+          $caseActivities[$caseActivityId]['DT_RowClass'] .= " priority-low ";
         }
       }
 
       //Add data to the row for inline editing, via DataTable syntax
-      $caseActivity['DT_RowAttr'] = array();
-      $caseActivity['DT_RowAttr']['data-entity'] = 'activity';
-      $caseActivity['DT_RowAttr']['data-id'] = $caseActivityId;
+      $caseActivities[$caseActivityId]['DT_RowAttr'] = array();
+      $caseActivities[$caseActivityId]['DT_RowAttr']['data-entity'] = 'activity';
+      $caseActivities[$caseActivityId]['DT_RowAttr']['data-id'] = $caseActivityId;
 
       //Activity Date and Time
-      $caseActivity['activity_date_time'] = CRM_Utils_Date::customFormat($dao->display_date);
+      $caseActivities[$caseActivityId]['activity_date_time'] = CRM_Utils_Date::customFormat($dao->display_date);
 
       //Activity Subject
-      $caseActivity['subject'] = $dao->subject;
+      $caseActivities[$caseActivityId]['subject'] = $dao->subject;
 
       //Activity Type
-      $caseActivity['type'] = (!empty($activityTypes[$dao->type]['icon']) ? '<span class="crm-i ' . $activityTypes[$dao->type]['icon'] . '"></span> ' : '')
+      $caseActivities[$caseActivityId]['type'] = (!empty($activityTypes[$dao->type]['icon']) ? '<span class="crm-i ' . $activityTypes[$dao->type]['icon'] . '"></span> ' : '')
         . $activityTypes[$dao->type]['label'];
 
-      //Activity Target (With)
-      $targetContact = '';
-      if (isset($dao->target_contact_id)) {
-        $targetContact = $dao->target_contact_name;
-        if ($hasViewContact) {
-          $targetContact = '<a href="' . $contactViewUrl . $dao->target_contact_id . '">' . $dao->target_contact_name . '</a>';
+      // Activity Target (With Contact) (There can be more than one)
+      $targetContact = self::formatContactLink($dao->target_contact_id, $dao->target_contact_name);
+      if (empty($caseActivities[$caseActivityId]['target_contact_name'])) {
+        $caseActivities[$caseActivityId]['target_contact_name'] = $targetContact;
+      }
+      else {
+        if (strpos($caseActivities[$caseActivityId]['target_contact_name'], $targetContact) === FALSE) {
+          $caseActivities[$caseActivityId]['target_contact_name'] .= '; ' . $targetContact;
         }
       }
-      $caseActivity['target_contact_name'] = $targetContact;
 
-      //Activity Source Contact (Reporter)
-      $sourceContact = $dao->source_contact_name;
-      if ($hasViewContact) {
-        $sourceContact = '<a href="' . $contactViewUrl . $dao->source_contact_id . '">' . $dao->source_contact_name . '</a>';
+      // Activity Source Contact (Reporter) (There can only be one)
+      $sourceContact = self::formatContactLink($dao->source_contact_id, $dao->source_contact_name);
+      $caseActivities[$caseActivityId]['source_contact_name'] = $sourceContact;
+
+      // Activity Assignee (There can be more than one)
+      $assigneeContact = self::formatContactLink($dao->assignee_contact_id, $dao->assignee_contact_name);
+      if (empty($caseActivities[$caseActivityId]['assignee_contact_name'])) {
+        $caseActivities[$caseActivityId]['assignee_contact_name'] = $assigneeContact;
       }
-      $caseActivity['source_contact_name'] = $sourceContact;
-
-      //Activity Assignee. CRM-4485.
-      $assigneeContact = '';
-      if (isset($dao->assignee_contact_id)) {
-        $assigneeContact = $dao->assignee_contact_name;
-        if ($hasViewContact) {
-          $assigneeContact = '<a href="' . $contactViewUrl . $dao->assignee_contact_id . '">' . $dao->assignee_contact_name . '</a>';
+      else {
+        if (strpos($caseActivities[$caseActivityId]['assignee_contact_name'], $assigneeContact) === FALSE) {
+          $caseActivities[$caseActivityId]['assignee_contact_name'] .= '; ' . $assigneeContact;
         }
       }
-      $caseActivity['assignee_contact_name'] = $assigneeContact;
 
       //Activity Status
-      $caseActivity['status_id'] = $activityStatuses[$dao->status];
+      $caseActivities[$caseActivityId]['status_id'] = $activityStatuses[$dao->status];
 
       // FIXME: Why are we not using CRM_Core_Action for these links? This is too much manual work and likely to get out-of-sync with core markup.
       $url = "";
@@ -1204,7 +1199,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       }
       elseif (!$caseDeleted) {
         $url = ' <a ' . $css . ' href="' . $restoreUrl . $additionalUrl . '">' . ts('Restore') . '</a>';
-        $caseActivity['status_id'] = $caseActivity['status_id'] . '<br /> (deleted)';
+        $caseActivities[$caseActivityId]['status_id'] = $caseActivities[$caseActivityId]['status_id'] . '<br /> (deleted)';
       }
 
       //check for operations.
@@ -1217,22 +1212,44 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       // if there are file attachments we will return how many and, if only one, add a link to it
       if (!empty($dao->attachment_ids)) {
         $attachmentIDs = array_unique(explode(',', $dao->attachment_ids));
-        $caseActivity['no_attachments'] = count($attachmentIDs);
+        $caseActivities[$caseActivityId]['no_attachments'] = count($attachmentIDs);
         $url .= implode(' ', CRM_Core_BAO_File::paperIconAttachment('civicrm_activity', $caseActivityId));
       }
 
-      $caseActivity['links'] = $url;
-
-      array_push($caseActivities, $caseActivity);
+      $caseActivities[$caseActivityId]['links'] = $url;
     }
     $dao->free();
 
     $caseActivitiesDT = array();
-    $caseActivitiesDT['data'] = $caseActivities;
+    $caseActivitiesDT['data'] = array_values($caseActivities);
     $caseActivitiesDT['recordsTotal'] = $caseCount;
     $caseActivitiesDT['recordsFiltered'] = $caseCount;
 
     return $caseActivitiesDT;
+  }
+
+  /**
+   * Helper function to generate a formatted contact link/name for display in the Case activities tab
+   *
+   * @param $contactId
+   * @param $contactName
+   *
+   * @return string
+   */
+  private static function formatContactLink($contactId, $contactName) {
+    if (empty($contactId)) {
+      return NULL;
+    }
+
+    $hasViewContact = CRM_Contact_BAO_Contact_Permission::allow($contactId);
+
+    if ($hasViewContact) {
+      $contactViewUrl = CRM_Utils_System::url("civicrm/contact/view", "reset=1&cid={$contactId}");
+      return "<a href=\"{$contactViewUrl}\">" . $contactName . "</a>";
+    }
+    else {
+      return $contactName;
+    }
   }
 
   /**

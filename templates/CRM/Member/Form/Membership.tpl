@@ -617,7 +617,7 @@
         var fname = '#priceset';
         if ( !priceSetId ) {
         cj('#membership_type_id_1').val(0);
-        CRM.buildCustomData(customDataType, 'null' );
+        CRM.buildCustomData(customDataType, null );
 
         // hide price set fields.
         cj( fname ).hide( );
@@ -797,7 +797,7 @@
 
       subTypeNames = currentMembershipType.join(',');
       if ( subTypeNames.length < 1 ) {
-        subTypeNames = 'null';
+        subTypeNames = null;
       }
 
       CRM.buildCustomData( customDataType, subTypeNames );
