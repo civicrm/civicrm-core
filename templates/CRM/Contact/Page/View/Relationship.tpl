@@ -43,9 +43,8 @@
     </div>
 
     <div class="spacer"></div>
-    <p></p>
     {* display past relationships *}
-    <div class="label font-red">{ts}Inactive Relationships{/ts}</div>
+    <h3 class="font-red">{ts}Inactive Relationships{/ts}</h3>
     <div class="description">{ts}These relationships are Disabled OR have a past End Date.{/ts}</div>
     {include file="CRM/Contact/Page/View/RelationshipSelector.tpl" context="past"}
   </div>
