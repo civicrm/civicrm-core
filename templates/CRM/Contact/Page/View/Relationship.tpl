@@ -36,16 +36,16 @@
 
     {* display current relationships *}
     <h3>{ts}Current Relationships{/ts}</h3>
-    {include file="CRM/Contact/Page/View/RelationshipSelector.tpl" context="current"}
-    <div id="permission-legend" class="crm-content-block">
-      <span class="label">Permissioned Relationships: </span>
+    <div id="permission-legend" class="help">
+      <span class="crm-label">Permissioned Relationships: </span>
       {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=1 afterText=true}
     </div>
+    {include file="CRM/Contact/Page/View/RelationshipSelector.tpl" context="current"}
 
     <div class="spacer"></div>
     {* display past relationships *}
     <h3 class="font-red">{ts}Inactive Relationships{/ts}</h3>
-    <div class="description">{ts}These relationships are Disabled OR have a past End Date.{/ts}</div>
+    <div class="help">{ts}These relationships are Disabled OR have a past End Date.{/ts}</div>
     {include file="CRM/Contact/Page/View/RelationshipSelector.tpl" context="past"}
   </div>
 
