@@ -1311,73 +1311,20 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
   }
 
   /**
-   * @param int $contactID
+   * Generate summary of amount received in the current fiscal year to date from the contact or contacts.
+   *
+   * @param int|array $contactIDs
    *
    * @return array
    */
-  public static function annual($contactID) {
-    if (is_array($contactID)) {
-      $contactIDs = implode(',', $contactID);
-    }
-    else {
-      $contactIDs = $contactID;
+  public static function annual($contactIDs) {
+    if (!is_array($contactIDs)) {
+      // In practice I can't fine any evidence that this function is ever called with
+      // anything other than a single contact id, but left like this due to .... fear.
+      $contactIDs = explode(',', $contactIDs);
     }
 
-    $config = CRM_Core_Config::singleton();
-    $startDate = $endDate = NULL;
-
-    $currentMonth = date('m');
-    $currentDay = date('d');
-    if ((int ) $config->fiscalYearStart['M'] > $currentMonth ||
-      ((int ) $config->fiscalYearStart['M'] == $currentMonth &&
-        (int ) $config->fiscalYearStart['d'] > $currentDay
-      )
-    ) {
-      $year = date('Y') - 1;
-    }
-    else {
-      $year = date('Y');
-    }
-    $nextYear = $year + 1;
-
-    if ($config->fiscalYearStart) {
-      $newFiscalYearStart = $config->fiscalYearStart;
-      if ($newFiscalYearStart['M'] < 10) {
-        $newFiscalYearStart['M'] = '0' . $newFiscalYearStart['M'];
-      }
-      if ($newFiscalYearStart['d'] < 10) {
-        $newFiscalYearStart['d'] = '0' . $newFiscalYearStart['d'];
-      }
-      $config->fiscalYearStart = $newFiscalYearStart;
-      $monthDay = $config->fiscalYearStart['M'] . $config->fiscalYearStart['d'];
-    }
-    else {
-      $monthDay = '0101';
-    }
-    $startDate = "$year$monthDay";
-    $endDate = "$nextYear$monthDay";
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-    $additionalWhere = " AND b.financial_type_id IN (0)";
-    $liWhere = " AND i.financial_type_id IN (0)";
-    if (!empty($financialTypes)) {
-      $additionalWhere = " AND b.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ") AND i.id IS NULL";
-      $liWhere = " AND i.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ")";
-    }
-    $query = "
-      SELECT count(*) as count,
-             sum(total_amount) as amount,
-             avg(total_amount) as average,
-             currency
-        FROM civicrm_contribution b
-        LEFT JOIN civicrm_line_item i ON i.contribution_id = b.id AND i.entity_table = 'civicrm_contribution' $liWhere
-       WHERE b.contact_id IN ( $contactIDs )
-         AND b.contribution_status_id = 1
-         AND b.is_test = 0
-         AND b.receive_date >= $startDate
-         AND b.receive_date <  $endDate
-      $additionalWhere
-      GROUP BY currency
-      ";
+    $query = self::getAnnualQuery($contactIDs);
     $dao = CRM_Core_DAO::executeQuery($query);
     $count = 0;
     $amount = $average = array();
@@ -5558,6 +5505,82 @@ LIMIT 1;";
       );
     }
     return $actionLinks;
+  }
+
+  /**
+   * Get a query to determine the amount donated by the contact/s in the current financial year.
+   *
+   * @param array $contactIDs
+   *
+   * @return string
+   */
+  public static function getAnnualQuery($contactIDs) {
+    $contactIDs = implode(',', $contactIDs);
+    $config = CRM_Core_Config::singleton();
+    $currentMonth = date('m');
+    $currentDay = date('d');
+    if (
+      (int) $config->fiscalYearStart['M'] > $currentMonth ||
+      (
+        (int) $config->fiscalYearStart['M'] == $currentMonth &&
+        (int) $config->fiscalYearStart['d'] > $currentDay
+      )
+    ) {
+      $year = date('Y') - 1;
+    }
+    else {
+      $year = date('Y');
+    }
+    $nextYear = $year + 1;
+
+    if ($config->fiscalYearStart) {
+      $newFiscalYearStart = $config->fiscalYearStart;
+      if ($newFiscalYearStart['M'] < 10) {
+        // This is just a clumsy way of adding padding.
+        // @todo next round look for a nicer way.
+        $newFiscalYearStart['M'] = '0' . $newFiscalYearStart['M'];
+      }
+      if ($newFiscalYearStart['d'] < 10) {
+        // This is just a clumsy way of adding padding.
+        // @todo next round look for a nicer way.
+        $newFiscalYearStart['d'] = '0' . $newFiscalYearStart['d'];
+      }
+      $config->fiscalYearStart = $newFiscalYearStart;
+      $monthDay = $config->fiscalYearStart['M'] . $config->fiscalYearStart['d'];
+    }
+    else {
+      // First of January.
+      $monthDay = '0101';
+    }
+    $startDate = "$year$monthDay";
+    $endDate = "$nextYear$monthDay";
+    $financialTypes = [];
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    // this is a clumsy way of saying never return anything
+    // @todo improve!
+    $liWhere = " AND i.financial_type_id IN (0)";
+    if (!empty($financialTypes)) {
+      $liWhere = " AND i.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ")";
+    }
+    $whereClauses = [
+      'b.contact_id IN (' . $contactIDs . ')',
+      'b.contribution_status_id = ' . (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'b.is_test = 0',
+      'b.receive_date >= ' . $startDate,
+      'b.receive_date <  ' . $endDate,
+    ];
+    CRM_Financial_BAO_FinancialType::buildPermissionedClause($whereClauses, NULL, 'b');
+    $query = "
+      SELECT COUNT(*) as count,
+             SUM(total_amount) as amount,
+             AVG(total_amount) as average,
+             currency
+      FROM civicrm_contribution b
+      LEFT JOIN civicrm_line_item i ON i.contribution_id = b.id AND i.entity_table = 'civicrm_contribution' $liWhere
+      WHERE " . implode(' AND ', $whereClauses) . "
+      GROUP BY currency
+      ";
+    return $query;
   }
 
   /**
