@@ -185,7 +185,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     }
     if (isset(self::$_entityID)) {
       $paymentInstrumentID = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'payment_instrument_id');
-      $defaults['payment_instrument_id'] = $paymentInstrumentID;
+      $defaults['contribution_payment_instrument_id'] = $paymentInstrumentID;
       $this->assign('paymentInstrumentID', $paymentInstrumentID);
     }
     return $defaults;
