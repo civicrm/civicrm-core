@@ -4235,7 +4235,7 @@ civicrm_relationship.start_date > {$today}
 
       $allRelationshipPermissions = CRM_Contact_BAO_Relationship::buildOptions('is_permission_a_b');
       $relPermNames = array_intersect_key($allRelationshipPermissions, array_flip($relPermission[2]));
-      $this->_qill[$grouping][] = ts('Permissioned Relationships') . ' - ' . join(' OR ', $relPermNames);
+      $this->_qill[$grouping][] = ts('Permissioned Relationships') . ' - ' . implode(' OR ', $relPermNames);
     }
   }
 
