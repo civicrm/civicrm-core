@@ -247,7 +247,6 @@
       {/if}
     {/if}
 
-    <div class="spacer"></div>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   </div> <!-- end form-block -->
 
