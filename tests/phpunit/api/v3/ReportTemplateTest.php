@@ -118,6 +118,77 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test api to get rows from reports.
+   *
+   * @dataProvider getReportTemplatesSupportingSelectWhere
+   *
+   * @param $reportID
+   *
+   * @throws \PHPUnit_Framework_IncompleteTestError
+   */
+  public function testReportTemplateSelectWhere($reportID) {
+    $this->hookClass->setHook('civicrm_selectWhereClause', array($this, 'hookSelectWhere'));
+    $result = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => $reportID,
+      'options' => ['metadata' => ['sql']],
+    ]);
+    $found = FALSE;
+    foreach ($result['metadata']['sql'] as $sql) {
+      if (strstr($sql, " =  'Organization' ")) {
+        $found = TRUE;
+      }
+    }
+    $this->assertTrue($found, $reportID);
+  }
+
+  /**
+   * Get templates suitable for SelectWhere test.
+   *
+   * @return array
+   */
+  public function getReportTemplatesSupportingSelectWhere() {
+    $allTemplates = $this->getReportTemplates();
+    // Exclude all that do not work as of test being written. I have not dug into why not.
+    $currentlyExcluded = [
+      'contribute/repeat',
+      'contact/detail',
+      'member/summary',
+      'event/summary',
+      'case/summary',
+      'case/timespent',
+      'case/demographics',
+      'contact/log',
+      'contribute/bookkeeping',
+      'grant/detail',
+      'event/incomesummary',
+      'case/detail',
+      'Mailing/bounce',
+      'Mailing/summary',
+      'grant/statistics',
+      'logging/contact/detail',
+      'logging/contact/summary',
+    ];
+    foreach ($allTemplates as $index => $template) {
+      $reportID = $template[0];
+      if (in_array($reportID, $currentlyExcluded) || stristr($reportID, 'has existing issues')) {
+        unset($allTemplates[$index]);
+      }
+    }
+    return $allTemplates;
+  }
+
+  /**
+   * @param \CRM_Core_DAO $entity
+   * @param array $clauses
+   */
+  public function hookSelectWhere($entity, &$clauses) {
+    // Restrict access to cases by type
+    if ($entity == 'Contact') {
+      $clauses['contact_type'][] = " =  'Organization' ";
+    }
+  }
+
+  /**
    * Test getrows on contact summary report.
    */
   public function testReportTemplateGetRowsContactSummary() {
