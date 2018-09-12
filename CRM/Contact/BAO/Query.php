@@ -4231,6 +4231,10 @@ civicrm_relationship.start_date > {$today}
   public function addRelationshipPermissionClauses($grouping, &$where) {
     $relPermission = $this->getWhereValues('relation_permission', $grouping);
     if ($relPermission) {
+      if (!is_array($relPermission[2])) {
+        // this form value was scalar in previous versions of Civi
+        $relPermission[2] = array($relPermission[2]);
+      }
       $where[$grouping][] = "(civicrm_relationship.is_permission_a_b IN (" . implode(",", $relPermission[2]) . "))";
 
       $allRelationshipPermissions = CRM_Contact_BAO_Relationship::buildOptions('is_permission_a_b');
