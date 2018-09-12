@@ -350,7 +350,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       CRM_Utils_Hook::pre('create', 'Group', NULL, $params);
     }
 
-    //  CRM-287 Disable child groups if all parents are disabled.
+    // dev/core#287 Disable child groups if all parents are disabled.
     if(!empty($params['id'])) {
       $allChildGroupIds = self::getChildGroupIds($params['id']);
       foreach ($allChildGroupIds as $childKey => $childValue) {
@@ -359,10 +359,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           'id' => ['IN' => $parentIds],
           'is_active' => 1,
         ]);
-        if (count($parentIds) == 1) {
-          $setDisable = self::setIsActive($childValue, $params['is_active']);
-        }
-        if (count($parentIds) > 1 && $activeParentsCount <= 1) {
+        if (count($parentIds) == 1 || count($parentIds) > 1 && $activeParentsCount <= 1) {
           $setDisable = self::setIsActive($childValue, $params['is_active']);
         }
       }
