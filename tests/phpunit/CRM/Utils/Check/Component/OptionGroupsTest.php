@@ -24,8 +24,9 @@ class CRM_Utils_Check_Component_OptionGroupsTest extends CiviUnitTestCase {
       'label' => 'zero',
       'value' => 0,
     ]);
-    $check = new \CRM_Utils_Check_Component_OptionGroups;
+    $check = new \CRM_Utils_Check_Component_OptionGroups();
     $result = $check->checkOptionGroupValues();
     $this->assertArrayNotHasKey(0, $result);
   }
+
 }
