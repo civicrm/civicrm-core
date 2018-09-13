@@ -5514,12 +5514,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_filters' => TRUE,
         'is_fields' => TRUE,
       ),
-      $options['prefix'] . 'street_name' => array(
-        'name' => 'street_name',
-        'title' => ts($options['prefix_label'] . 'Street Name'),
-        'type' => 1,
-        'is_fields' => TRUE,
-      ),
       $options['prefix'] . 'street_unit' => array(
         'name' => 'street_unit',
         'title' => ts($options['prefix_label'] . 'Street Unit'),
