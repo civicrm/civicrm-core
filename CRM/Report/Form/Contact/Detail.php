@@ -463,7 +463,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     $this->joinEmailFromContact();
 
     // only include tables that are in from clause
-    $componentTables = array_intersect($this->_aliases,  $this->_component);
+    $componentTables = array_intersect($this->_aliases, $this->_component);
     $componentTables = array_flip($componentTables);
     $this->_selectedTables = array_diff($this->_selectedTables, $componentTables);
 
