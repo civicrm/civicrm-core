@@ -41,7 +41,9 @@
             </div>
             <div class="content">
                 {$form.$paymentField.html}
-              {if $paymentField == 'cvv2'}{* @todo move to form assignment*}
+              {if $paymentFieldsMetadata.$name.description}
+                <div class="description">{$paymentFieldsMetadata.$name.description}</div>
+              {elseif $paymentField == 'cvv2'}{* @todo move to form assignment*}
                 <span class="cvv2-icon" title="{ts}Usually the last 3-4 digits in the signature area on the back of the card.{/ts}"> </span>
               {/if}
               {if $paymentField == 'credit_card_type'}

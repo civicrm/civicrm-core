@@ -689,6 +689,7 @@ abstract class CRM_Core_Payment {
           'class' => 'creditcard',
         ),
         'is_required' => TRUE,
+        // 'description' => '16 digit card number', // If you enable a description field it will be shown below the field on the form
       ),
       'cvv2' => array(
         'htmlType' => 'text',
