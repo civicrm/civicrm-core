@@ -117,6 +117,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     if (!empty($defaults['end_date'])) {
       list($defaults['end_date'], $defaults['end_date_time']) = CRM_Utils_Date::setDateDefaults($defaults['end_date'], 'activityDateTime');
     }
+
+    $defaults['template_id'] = $this->_templateId;
     return $defaults;
   }
 
