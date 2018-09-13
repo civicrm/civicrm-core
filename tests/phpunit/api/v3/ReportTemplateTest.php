@@ -151,7 +151,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     // Exclude all that do not work as of test being written. I have not dug into why not.
     $currentlyExcluded = [
       'contribute/repeat',
-      'contact/detail',
       'member/summary',
       'event/summary',
       'case/summary',

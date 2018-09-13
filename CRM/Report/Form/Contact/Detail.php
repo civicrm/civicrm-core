@@ -453,85 +453,86 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   }
 
   public function from() {
-    $group = " ";
     $this->_from = "
-        FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}";
+      FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
+    ";
 
     $this->joinAddressFromContact();
     $this->joinCountryFromAddress();
     $this->joinPhoneFromContact();
     $this->joinEmailFromContact();
 
-    $this->_from .= "{$group}";
+    // only include tables that are in from clause
+    $componentTables = array_intersect($this->_aliases, $this->_component);
+    $componentTables = array_flip($componentTables);
+    $this->_selectedTables = array_diff($this->_selectedTables, $componentTables);
 
-    foreach ($this->_component as $val) {
-      if (!empty($this->_selectComponent['contribution_civireport'])) {
-        $this->_formComponent['contribution_civireport'] = " FROM
-                            civicrm_contact  {$this->_aliases['civicrm_contact']}
-                            INNER JOIN civicrm_contribution       {$this->_aliases['civicrm_contribution']}
-                                    ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
-                            {$group}
-                    ";
-      }
-      if (!empty($this->_selectComponent['membership_civireport'])) {
-        $this->_formComponent['membership_civireport'] = " FROM
-                            civicrm_contact  {$this->_aliases['civicrm_contact']}
-                            INNER JOIN civicrm_membership       {$this->_aliases['civicrm_membership']}
-                                    ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_membership']}.contact_id
-                            {$group} ";
-      }
-      if (!empty($this->_selectComponent['participant_civireport'])) {
-        $this->_formComponent['participant_civireport'] = " FROM
-                            civicrm_contact  {$this->_aliases['civicrm_contact']}
-                            INNER JOIN civicrm_participant       {$this->_aliases['civicrm_participant']}
-                                    ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_participant']}.contact_id
-                            {$group} ";
-      }
+    if (!empty($this->_selectComponent['contribution_civireport'])) {
+      $this->_formComponent['contribution_civireport'] = " FROM
+        civicrm_contact {$this->_aliases['civicrm_contact']}
+        INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
+      ";
+    }
+    if (!empty($this->_selectComponent['membership_civireport'])) {
+      $this->_formComponent['membership_civireport'] = " FROM
+        civicrm_contact {$this->_aliases['civicrm_contact']}
+        INNER JOIN civicrm_membership {$this->_aliases['civicrm_membership']}
+          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_membership']}.contact_id
+      ";
+    }
+    if (!empty($this->_selectComponent['participant_civireport'])) {
+      $this->_formComponent['participant_civireport'] = " FROM
+        civicrm_contact {$this->_aliases['civicrm_contact']}
+        INNER JOIN civicrm_participant {$this->_aliases['civicrm_participant']}
+        ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_participant']}.contact_id
+      ";
+    }
 
-      if (!empty($this->_selectComponent['activity_civireport'])) {
-        $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-        $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-        $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-        $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    if (!empty($this->_selectComponent['activity_civireport'])) {
+      $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
+      $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+      $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+      $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
-        $this->_formComponent['activity_civireport'] = "FROM
-                        civicrm_activity {$this->_aliases['civicrm_activity']}
-                        LEFT JOIN civicrm_activity_contact civicrm_activity_target ON
-                            {$this->_aliases['civicrm_activity']}.id = civicrm_activity_target.activity_id AND
-                            civicrm_activity_target.record_type_id = {$targetID}
-                        LEFT JOIN civicrm_activity_contact civicrm_activity_assignment ON
-                            {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id AND                                                                      civicrm_activity_assignment.record_type_id = {$assigneeID}
-                        LEFT JOIN civicrm_activity_contact civicrm_activity_source
-                            ON {$this->_aliases['civicrm_activity']}.id = civicrm_activity_source.activity_id AND
-                            civicrm_activity_source.record_type_id = {$sourceID}
-                        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_target']} ON
-                            civicrm_activity_target.contact_id = {$this->_aliases['civicrm_activity_target']}.id
+      $this->_formComponent['activity_civireport'] = "FROM
+          civicrm_activity {$this->_aliases['civicrm_activity']}
+          LEFT JOIN civicrm_activity_contact civicrm_activity_target
+            ON {$this->_aliases['civicrm_activity']}.id = civicrm_activity_target.activity_id
+            AND civicrm_activity_target.record_type_id = {$targetID}
+          LEFT JOIN civicrm_activity_contact civicrm_activity_assignment
+            ON {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id
+            AND civicrm_activity_assignment.record_type_id = {$assigneeID}
+          LEFT JOIN civicrm_activity_contact civicrm_activity_source
+            ON {$this->_aliases['civicrm_activity']}.id = civicrm_activity_source.activity_id
+            AND civicrm_activity_source.record_type_id = {$sourceID}
+          LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_target']}
+            ON civicrm_activity_target.contact_id = {$this->_aliases['civicrm_activity_target']}.id
+          LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_assignment']}
+            ON civicrm_activity_assignment.contact_id = {$this->_aliases['civicrm_activity_assignment']}.id
+          LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_source']}
+            ON civicrm_activity_source.contact_id = {$this->_aliases['civicrm_activity_source']}.id
+          LEFT JOIN civicrm_option_value
+            ON ( {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value )
+          LEFT JOIN civicrm_option_group
+            ON civicrm_option_group.id = civicrm_option_value.option_group_id
+          LEFT JOIN civicrm_case_activity
+            ON civicrm_case_activity.activity_id = {$this->_aliases['civicrm_activity']}.id
+          LEFT JOIN civicrm_case
+            ON civicrm_case_activity.case_id = civicrm_case.id
+          LEFT JOIN civicrm_case_contact
+            ON civicrm_case_contact.case_id = civicrm_case.id
+      ";
+    }
 
-                        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_assignment']} ON
-                            civicrm_activity_assignment.contact_id = {$this->_aliases['civicrm_activity_assignment']}.id
-                        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_source']} ON
-                            civicrm_activity_source.contact_id = {$this->_aliases['civicrm_activity_source']}.id
-                        LEFT JOIN civicrm_option_value ON
-                            ( {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value )
-                        LEFT JOIN civicrm_option_group ON
-                            civicrm_option_group.id = civicrm_option_value.option_group_id
-                        LEFT JOIN civicrm_case_activity ON
-                            civicrm_case_activity.activity_id = {$this->_aliases['civicrm_activity']}.id
-                        LEFT JOIN civicrm_case ON
-                            civicrm_case_activity.case_id = civicrm_case.id
-                        LEFT JOIN civicrm_case_contact ON
-                            civicrm_case_contact.case_id = civicrm_case.id ";
-      }
-
-      if (!empty($this->_selectComponent['relationship_civireport'])) {
-        $this->_formComponent['relationship_civireport'] = "FROM
-                            civicrm_relationship {$this->_aliases['civicrm_relationship']}
-
-                            LEFT JOIN civicrm_contact  {$this->_aliases['civicrm_contact']} ON
-                                {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_relationship']}.contact_id_b
-                            LEFT JOIN civicrm_contact  contact_a ON
-                               contact_a.id = {$this->_aliases['civicrm_relationship']}.contact_id_a ";
-      }
+    if (!empty($this->_selectComponent['relationship_civireport'])) {
+      $this->_formComponent['relationship_civireport'] = "FROM
+        civicrm_relationship {$this->_aliases['civicrm_relationship']}
+        LEFT JOIN civicrm_contact  {$this->_aliases['civicrm_contact']}
+          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_relationship']}.contact_id_b
+        LEFT JOIN civicrm_contact  contact_a
+          ON contact_a.id = {$this->_aliases['civicrm_relationship']}.contact_id_a
+      ";
     }
   }
 
