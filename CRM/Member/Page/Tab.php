@@ -108,9 +108,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         $paymentObject = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity(
           $membership[$dao->id]['membership_id'], 'membership', 'obj');
         if (!empty($paymentObject)) {
-          // @todo - get this working with syntax style $paymentObject->supports(array
-          //('updateSubscriptionBillingInfo'));
-          $isUpdateBilling = $paymentObject->isSupported('updateSubscriptionBillingInfo');
+          $isUpdateBilling = $paymentObject->supports('updateSubscriptionBillingInfo');
         }
 
         // @todo - get this working with syntax style $paymentObject->supports(array
