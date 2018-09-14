@@ -45,6 +45,12 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    */
   static $_actionLinks = NULL;
 
+  /**
+   * The event links to display for the browse screen.
+   * @var array
+   */
+  static $_eventLinks = NULL;
+
   static $_links = NULL;
 
   static $_tabLinks = NULL;
@@ -95,6 +101,41 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
       );
     }
     return self::$_actionLinks;
+  }
+
+  public function eventLinks() {
+    if (!(self::$_eventLinks)) {
+      self::$_eventLinks = [
+        'register_participant' => [
+          'name' => ts('Register Participant'),
+          'title' => ts('Register Participant'),
+          'url' => 'civicrm/participant/add',
+          'qs' => 'reset=1&action=add&context=standalone&eid=%%id%%',
+        ],
+        'event_info' => [
+          'name' => ts('Event Info'),
+          'title' => ts('Event Info'),
+          'url' => 'civicrm/event/info',
+          'qs' => 'reset=1&id=%%id%%',
+          'fe' => TRUE,
+        ],
+        'online_registration_test' => [
+          'name' => ts('Registration (Test-drive)'),
+          'title' => ts('Online Registration (Test-drive)'),
+          'url' => 'civicrm/event/register',
+          'qs' => 'reset=1&action=preview&id=%%id%%',
+          'fe' => TRUE,
+        ],
+        'online_registration_live' => [
+          'name' => ts('Registration (Live)'),
+          'title' => ts('Online Registration (Live)'),
+          'url' => 'civicrm/event/register',
+          'qs' => 'reset=1&id=%%id%%',
+          'fe' => TRUE,
+        ],
+      ];
+    }
+    return self::$_eventLinks;
   }
 
   /**
@@ -344,6 +385,20 @@ ORDER BY start_date desc
           $action -= CRM_Core_Action::UPDATE;
         }
 
+        $eventLinks = self::eventLinks();
+        if (!CRM_Core_Permission::check('edit event participants')) {
+          unset($eventLinks['register_participant']);
+        }
+
+        $manageEvent[$dao->id]['eventlinks'] = CRM_Core_Action::formLink($eventLinks,
+          NULL,
+          array('id' => $dao->id),
+          ts('Event Links'),
+          TRUE,
+          'event.manage.eventlinks',
+          'Event',
+          $dao->id
+        );
         $manageEvent[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(),
           $action,
           array('id' => $dao->id),
