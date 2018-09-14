@@ -159,7 +159,9 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
     $allNull = $contact->copyValues($params);
 
-    $contact->id = CRM_Utils_Array::value('contact_id', $params);
+    if (!empty($params['contact_id'])) {
+      $contact->id = $params['contact_id'];
+    }
 
     if ($contact->contact_type == 'Individual') {
       $allNull = FALSE;
