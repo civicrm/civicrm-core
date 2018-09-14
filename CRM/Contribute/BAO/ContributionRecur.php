@@ -783,6 +783,15 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     $form->addElement('text', 'contribution_recur_processor_id', ts('Processor ID'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur', 'processor_id'));
     $form->addElement('text', 'contribution_recur_trxn_id', ts('Transaction ID'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur', 'trxn_id'));
 
+    $paymentProcessorParams = [
+      'return' => ["id", "name", 'is_test'],
+    ];
+    $paymentProcessors = civicrm_api3('PaymentProcessor', 'get', $paymentProcessorParams);
+    foreach ($paymentProcessors['values'] as $key => $value) {
+      $paymentProcessorOpts[$key] = $value['name'] . ($value['is_test'] ? ' (Test)' : '');
+    }
+    $form->add('select', 'contribution_recur_payment_processor_id', ts('Payment Processor ID'), $paymentProcessorOpts, FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple']);
+
     CRM_Core_BAO_Query::addCustomFormFields($form, array('ContributionRecur'));
 
   }

@@ -376,6 +376,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'contribution_recur_processor_id':
+      case 'contribution_recur_payment_processor_id':
       case 'contribution_recur_trxn_id':
         $fieldName = str_replace('contribution_recur_', '', $name);
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_recur.{$fieldName}",
