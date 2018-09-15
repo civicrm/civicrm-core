@@ -36,25 +36,14 @@ use Dompdf\Options;
 class CRM_Utils_PDF_Utils {
 
   /**
-   * @param array $text
-   *   List of HTML snippets.
-   * @param string $fileName
-   *   The logical filename to display.
-   *   Ex: "HelloWorld.pdf".
-   * @param bool $output
-   *   FALSE to display PDF. TRUE to return as string.
+   * Get relevant PDF page format
+   *
    * @param null $pdfFormat
    *   Unclear. Possibly PdfFormat or formValues.
    *
-   * @return string|void
+   * @return array|$values
    */
-  public static function html2pdf(&$text, $fileName = 'civicrm.pdf', $output = FALSE, $pdfFormat = NULL) {
-    if (is_array($text)) {
-      $pages = &$text;
-    }
-    else {
-      $pages = array($text);
-    }
+  public static function getPDFformat($pdfFormat = NULL) {
     // Get PDF Page Format
     $format = CRM_Core_BAO_PdfFormat::getDefaultValues();
     if (is_array($pdfFormat)) {
@@ -65,33 +54,60 @@ class CRM_Utils_PDF_Utils {
       // PDF Page Format ID passed in
       $format = CRM_Core_BAO_PdfFormat::getById($pdfFormat);
     }
-    $paperSize = CRM_Core_BAO_PaperSize::getByName($format['paper_size']);
-    $paper_width = self::convertMetric($paperSize['width'], $paperSize['metric'], 'pt');
+    $paperSize    = CRM_Core_BAO_PaperSize::getByName($format['paper_size']);
+    $paper_width  = self::convertMetric($paperSize['width'], $paperSize['metric'], 'pt');
     $paper_height = self::convertMetric($paperSize['height'], $paperSize['metric'], 'pt');
     // dompdf requires dimensions in points
-    $paper_size = array(0, 0, $paper_width, $paper_height);
-    $orientation = CRM_Core_BAO_PdfFormat::getValue('orientation', $format);
-    $metric = CRM_Core_BAO_PdfFormat::getValue('metric', $format);
-    $t = CRM_Core_BAO_PdfFormat::getValue('margin_top', $format);
-    $r = CRM_Core_BAO_PdfFormat::getValue('margin_right', $format);
-    $b = CRM_Core_BAO_PdfFormat::getValue('margin_bottom', $format);
-    $l = CRM_Core_BAO_PdfFormat::getValue('margin_left', $format);
+    $values['paper_size']  = [0, 0, $paper_width, $paper_height];
+    $values['orientation'] = CRM_Core_BAO_PdfFormat::getValue('orientation', $format);
+    $values['metric']      = $metric = CRM_Core_BAO_PdfFormat::getValue('metric', $format);
+    $values['t']           = $t = CRM_Core_BAO_PdfFormat::getValue('margin_top', $format);
+    $values['r']           = $r = CRM_Core_BAO_PdfFormat::getValue('margin_right', $format);
+    $values['b']           = $b = CRM_Core_BAO_PdfFormat::getValue('margin_bottom', $format);
+    $values['l']           = $l = CRM_Core_BAO_PdfFormat::getValue('margin_left', $format);
+    $values['margins']     = [$metric, $t, $r, $b, $l];
 
-    $stationery_path_partial = CRM_Core_BAO_PdfFormat::getValue('stationery', $format);
+    //    $stationery_path_partial = CRM_Core_BAO_PdfFormat::getValue('stationery', $format);
+    //
+    //    $stationery_path = NULL;
+    //    if (strlen($stationery_path_partial)) {
+    //      $doc_root = $_SERVER['DOCUMENT_ROOT'];
+    //      $stationery_path = $doc_root . "/" . $stationery_path_partial;
+    //    }
+    //    $values['stationery_path'] = $stationery_path;
 
-    $stationery_path = NULL;
-    if (strlen($stationery_path_partial)) {
-      $doc_root = $_SERVER['DOCUMENT_ROOT'];
-      $stationery_path = $doc_root . "/" . $stationery_path_partial;
+    return $values;
+  }
+
+  /**
+   * Process the HTML ready for conversion to PDF or straight export
+   *
+   * @param array $text
+   *   List of HTML snippets.
+   * @param null $pdfFormat
+   *   Formatting details from getPDFformats()
+   *
+   * @return string|$html
+   */
+  public static function getProcessedHTML(&$text, $pdfFormat) {
+    if (is_array($text)) {
+      $pages = &$text;
     }
-
-    $margins = array($metric, $t, $r, $b, $l);
-
-    $config = CRM_Core_Config::singleton();
+    else {
+      $pages = [$text];
+    }
 
     // Add a special region for the HTML header of PDF files:
     $pdfHeaderRegion = CRM_Core_Region::instance('export-document-header', FALSE);
-    $htmlHeader = ($pdfHeaderRegion) ? $pdfHeaderRegion->render('', FALSE) : '';
+    $htmlHeader      = ($pdfHeaderRegion) ? $pdfHeaderRegion->render('', FALSE) : '';
+
+    $metric = $pdfFormat['metric'];
+    $t      = $pdfFormat['t'];
+    $r      = $pdfFormat['r'];
+    $b      = $pdfFormat['b'];
+    $l      = $pdfFormat['l'];
+
+    $config = CRM_Core_Config::singleton();
 
     $html = "
 <html>
@@ -105,7 +121,7 @@ class CRM_Utils_PDF_Utils {
     <div id=\"crm-container\">\n";
 
     // Strip <html>, <header>, and <body> tags from each page
-    $htmlElementstoStrip = array(
+    $htmlElementstoStrip = [
       '@<head[^>]*?>.*?</head>@siu',
       '@<script[^>]*?>.*?</script>@siu',
       '@<body>@siu',
@@ -113,8 +129,8 @@ class CRM_Utils_PDF_Utils {
       '@<html[^>]*?>@siu',
       '@</html>@siu',
       '@<!DOCTYPE[^>]*?>@siu',
-    );
-    $htmlElementsInstead = array('', '', '', '', '', '');
+    ];
+    $htmlElementsInstead = ['', '', '', '', '', ''];
     foreach ($pages as & $page) {
       $page = preg_replace($htmlElementstoStrip,
         $htmlElementsInstead,
@@ -127,6 +143,32 @@ class CRM_Utils_PDF_Utils {
     </div>
   </body>
 </html>";
+
+    return $html;
+  }
+
+  /**
+   * @param array $html
+   *   List of HTML snippets.
+   * @param string $fileName
+   *   The logical filename to display.
+   *   Ex: "HelloWorld.pdf".
+   * @param bool $output
+   *   FALSE to display PDF. TRUE to return as string.
+   * @param null $pdfFormat
+   *   Formatting details from getPDFformats().
+   *
+   * @return string|void
+   */
+  public static function html2pdf(&$html, $fileName = 'civicrm.pdf', $output = FALSE, $pdfFormat = NULL) {
+
+    $paper_size  = $pdfFormat['paper_size'];
+    $orientation = $pdfFormat['orientation'];
+    $margins     = $pdfFormat['margins'];
+    //$stationery_path = $pdfFormat['stationery_path'];
+
+    $config = CRM_Core_Config::singleton();
+
     if ($config->wkhtmltopdfPath) {
       return self::_html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName);
     }
