@@ -120,6 +120,18 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   );
 
   /**
+   * Set entity fields to be assigned to the form.
+   */
+  protected function setEntityFields() {}
+
+  /**
+   * Set the delete message.
+   *
+   * We do this from the constructor in order to do a translation.
+   */
+  public function setDeleteMessage() {}
+
+  /**
    * Pre-process form.
    *
    * @throws \Exception

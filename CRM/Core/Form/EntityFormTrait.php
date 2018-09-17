@@ -79,7 +79,7 @@ trait CRM_Core_Form_EntityFormTrait {
    * Build the form object.
    */
   public function buildQuickEntityForm() {
-    if ($this->_action & CRM_Core_Action::DELETE) {
+    if ($this->isDeleteContext()) {
       $this->buildDeleteForm();
       return;
     }
@@ -202,12 +202,23 @@ trait CRM_Core_Form_EntityFormTrait {
   protected function addEntityFieldsToTemplate() {
     foreach ($this->getEntityFields() as $fieldSpec) {
       if (empty($fieldSpec['not-auto-addable'])) {
-        $element = $this->addField($fieldSpec['name'], [], CRM_Utils_Array::value('required', $fieldSpec));
+        $element = $this->addField($fieldSpec['name'], [], CRM_Utils_Array::value('required', $fieldSpec), FALSE);
         if (!empty($fieldSpec['is_freeze'])) {
           $element->freeze();
         }
       }
     }
+  }
+
+  /**
+   * Is the form being used in the context of a deletion.
+   *
+   * (For some reason rather than having separate forms Civi overloads one form).
+   *
+   * @return bool
+   */
+  protected function isDeleteContext() {
+    return ($this->_action & CRM_Core_Action::DELETE);
   }
 
 }

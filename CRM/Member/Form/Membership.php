@@ -112,13 +112,53 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   );
 
   /**
-   * Get the entity id being edited.
-   *
-   * @return int|null
+   * Set entity fields to be assigned to the form.
    */
-  public function getEntityId() {
-    return $this->_id;
+  protected function setEntityFields() {
+    $this->entityFields = [
+      'join_date' => [
+        'name' => 'join_date',
+        'description' => ts('Member Since'),
+      ],
+      'start_date' => [
+        'name' => 'start_date',
+        'description' => ts('Start Date'),
+      ],
+      'end_date' => [
+        'name' => 'end_date',
+        'description' => ts('End Date'),
+      ],
+    ];
   }
+
+  /**
+   * Set the delete message.
+   *
+   * We do this from the constructor in order to do a translation.
+   */
+  public function setDeleteMessage() {
+    $this->deleteMessage = '<span class="font-red bold">'
+      . ts("WARNING: Deleting this membership will also delete any related payment (contribution) records." .  ts("This action cannot be undone.")
+        . '</span><p>'
+        . ts("Consider modifying the membership status instead if you want to maintain an audit trail and avoid losing payment data. You can set the status to Cancelled by editing the membership and clicking the Status Override checkbox.")
+          . '</p><p>'
+        . ts("Click 'Delete' if you want to continue.") . '</p>');
+  }
+
+  /**
+   * Overriding this entity trait function as not yet tested.
+   *
+   * We continue to rely on legacy handling.
+   */
+  public function addCustomDataToForm() {}
+
+
+  /**
+   * Overriding this entity trait function as not yet tested.
+   *
+   * We continue to rely on legacy handling.
+   */
+  public function addFormButtons() {}
 
   /**
    * Get selected membership type from the form values.
@@ -182,6 +222,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
     $this->assign('formClass', 'membership');
     parent::preProcess();
+    if ($this->isUpdateToExistingRecurringMembership()) {
+      $this->entityFields['end_date']['is_freeze'] = TRUE;
+    }
     // get price set id.
     $this->_priceSetId = CRM_Utils_Array::value('priceSetId', $_GET);
     $this->set('priceSetId', $this->_priceSetId);
@@ -372,16 +415,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       // $defaults['credit_card_exp_date'] = array( 'Y' => '2012', 'M' => '05' );
     }
 
-    $dates = array('join_date', 'start_date', 'end_date');
-    foreach ($dates as $key) {
-      if (!empty($defaults[$key])) {
-        list($defaults[$key]) = CRM_Utils_Date::setDateDefaults(CRM_Utils_Array::value($key, $defaults));
-      }
-    }
-
     //setting default join date if there is no join date
     if (empty($defaults['join_date'])) {
-      $defaults['join_date'] = $now;
+      $defaults['join_date'] = date('Y-m-d H:i:s');
     }
 
     if (!empty($defaults['membership_end_date'])) {
@@ -396,6 +432,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   public function buildQuickForm() {
 
+    $this->buildQuickEntityForm();
     $this->assign('currency', CRM_Core_Config::singleton()->defaultCurrencySymbol);
     $isUpdateToExistingRecurringMembership = $this->isUpdateToExistingRecurringMembership();
     // build price set form.
@@ -562,17 +599,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $sel->freeze();
     }
 
-    $this->applyFilter('__ALL__', 'trim');
-
     if ($this->_action & CRM_Core_Action::ADD) {
       $this->add('text', 'num_terms', ts('Number of Terms'), array('size' => 6));
-    }
-
-    $this->addDate('join_date', ts('Member Since'), FALSE, array('formatType' => 'activityDate'));
-    $this->addDate('start_date', ts('Start Date'), FALSE, array('formatType' => 'activityDate'));
-    $endDate = $this->addDate('end_date', ts('End Date'), FALSE, array('formatType' => 'activityDate'));
-    if ($endDate && $isUpdateToExistingRecurringMembership) {
-      $endDate->freeze();
     }
 
     $this->add('text', 'source', ts('Source'),
@@ -1930,9 +1958,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected function isUpdateToExistingRecurringMembership() {
     $isRecur = FALSE;
     if ($this->_action & CRM_Core_Action::UPDATE
-      && CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id,
+      && CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->getEntityId(),
         'contribution_recur_id')
-      && !CRM_Member_BAO_Membership::isSubscriptionCancelled($this->_id)) {
+      && !CRM_Member_BAO_Membership::isSubscriptionCancelled($this->getEntityId())) {
 
       $isRecur = TRUE;
     }
