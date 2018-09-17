@@ -51,17 +51,27 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *
    * @return CRM_Contact_BAO_Group
    */
-  public static function add(&$params) {
+  public static function add($params) {
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'GroupContact', CRM_Utils_Array::value('id', $params), $params);
 
-    $dataExists = self::dataExists($params);
-    if (!$dataExists) {
+    if (!self::dataExists($params)) {
       return NULL;
     }
 
     $groupContact = new CRM_Contact_BAO_GroupContact();
     $groupContact->copyValues($params);
-    CRM_Contact_BAO_SubscriptionHistory::create($params);
     $groupContact->save();
+
+    // Lookup existing info for the sake of subscription history
+    if (!empty($params['id'])) {
+      $groupContact->find(TRUE);
+      $params = $groupContact->toArray();
+    }
+    CRM_Contact_BAO_SubscriptionHistory::create($params);
+
+    CRM_Utils_Hook::post($hook, 'GroupContact', $groupContact->id, $groupContact);
+
     return $groupContact;
   }
 
@@ -74,12 +84,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @return bool
    */
   public static function dataExists(&$params) {
-    // return if no data present
-    if ($params['group_id'] == 0) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return (!empty($params['id']) || (!empty($params['group_id']) && !empty($params['contact_id'])));
   }
 
   /**
