@@ -5,9 +5,9 @@
 The Affable Administrative Angular Form Framework (`afform`) is a system for administering AngularJS-based forms
 in CiviCRM which:
 
-1. Allows developers to declaratively define a canonical, baseline form.
+1. Allows developers to declaratively define a canonical, baseline form using AngularJS.
 2. Allows administrators (or administrative tools) to use the CRUD API to customize the forms.
-3. Allows developers to embed these forms in other CiviCRM-AngularJS apps.
+3. Allows developers (or administrators/tools) to embed these forms in other CiviCRM-AngularJS apps.
 4. (WIP; pending upstream support) Allow developers to apply [change sets](https://docs.civicrm.org/dev/en/latest/framework/angular/changeset/).
 
 This extension is a proof-of-concept.  It aims to demonstrate the core model/concept -- however, there are 
