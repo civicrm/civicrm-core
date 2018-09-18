@@ -158,7 +158,7 @@
                 </div>
               {/if}
                 <div class="{if !empty($imageURL)} float-left{/if}">
-                  <div class="crm-clear crm-summary-block">
+                  <div class="crm-summary-basic-block crm-summary-block">
                     {include file="CRM/Contact/Page/Inline/Basic.tpl"}
                   </div>
                 </div>

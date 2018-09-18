@@ -1,4 +1,4 @@
-{*<div class="crm-clear crm-inline-block-content">*}
+<div class="crm-clear crm-inline-block-content">
   <div class="crm-summary-row">
     <div class="crm-label" id="tagLink">
       <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contactId&selectedChild=tag"}"
@@ -38,4 +38,4 @@
       {if isset($external_identifier)}{$external_identifier}{/if}
     </div>
   </div>
-{*</div>*}
+</div>
