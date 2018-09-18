@@ -96,7 +96,7 @@
           <tr class="crm-pledge-form-block-create_date">
             <td class="label"><label>{ts}Pledge Made{/ts}</label></td>
             <td class="view-value">{$create_date|truncate:10:''|crmDate}
-        {/if}<br />
+        {/if}
             <span class="description">{ts}Date when pledge was made by the contributor.{/ts}</span>
             </td>
           </tr>
@@ -111,7 +111,6 @@
             <td class="label"><label>{ts}Payments Start{/ts}</label></td>
             <td class="view-value">{$start_date|truncate:10:''|crmDate}
         {/if}
-              <br />
               <span class="description">{ts}Date of first pledge payment.{/ts}</span>
             </td>
           </tr>
