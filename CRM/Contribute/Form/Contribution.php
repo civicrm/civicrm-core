@@ -1049,14 +1049,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $now = date('YmdHis');
 
-    // we need to retrieve email address
-    if ($this->_context == 'standalone' && !empty($submittedValues['is_email_receipt'])) {
-      list($this->userDisplayName,
-        $this->userEmail
-        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
-      $this->assign('displayName', $this->userDisplayName);
-    }
-
     $this->_contributorEmail = $this->userEmail;
     $this->_contributorContactID = $contactID;
     $this->processBillingAddress();
