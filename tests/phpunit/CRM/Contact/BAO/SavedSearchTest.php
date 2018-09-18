@@ -135,27 +135,46 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    * index so it is properly detects when executed.
    */
   public function testCustomFieldRelativeDates() {
+    // Create a custom field.
+    $customGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'relative_date_test_group'));
+    $params = array(
+      'custom_group_id' => $customGroup['id'],
+      'name' => 'test_datefield',
+      'label' => 'Date Field for Testing',
+      'html_type' => 'Select Date',
+      'data_type' => 'Date',
+      'default_value' => NULL,
+      'weight' => 4,
+      'is_required' => 1,
+      'is_searchable' => 1,
+      'date_format' => 'mm/dd/yyyy',
+      'is_active' => 1,
+    );
+    $customField = $this->callAPIAndDocument('custom_field', 'create', $params, __FUNCTION__, __FILE__);
+    $id = $customField['id'];
+
     $queryParams = array(
       0 => array(
-        0 => 'custom_13_low',
+        0 => "custom_${id}_low",
         1 => '=',
         2 => '20170425000000',
       ),
       1 => array(
-        0 => 'custom_13_high',
+        0 => "custom_${id}_high",
         1 => '=',
         2 => '20170501235959',
       ),
     );
     $formValues = array(
-      'custom_13_relative' => 'ending.week',
+      "custom_${id}_relative" => 'ending.week',
     );
     CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
     // Since custom_13 doesn't have the word 'date' in it, the key is
     // set to 0, rather than the field name.
     $err = 'Relative date in custom field smart group creation failed.';
     $this->assertArrayHasKey('relative_dates', $queryParams, $err);
-
+    $dropCustomValueTables = TRUE;
+    $this->quickCleanup(array('civicrm_saved_search'), $dropCustomValueTables);
   }
 
   /**
