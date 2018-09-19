@@ -84,4 +84,21 @@ class CRM_Upgrade_Incremental_php_FiveFive extends CRM_Upgrade_Incremental_Base 
   //   return TRUE;
   // }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_5_2($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('dev/core#107 - Add Activity\'s default assignee options', 'addActivityDefaultAssigneeOptions');
+  }
+
+  public static function addActivityDefaultAssigneeOptions() {
+    // This data was originally added via upgrader in 5.4.alpha1. However, it was omitted from the
+    // default data for new installations. Re-running the upgrader should fix sites initialized
+    // between 5.4.alpha1-5.5.1.
+    return CRM_Upgrade_Incremental_php_FiveFour::addActivityDefaultAssigneeOptions();
+  }
+
 }
