@@ -1,17 +1,16 @@
 # Philosophy, Beliefs, Assumptions
 
-Afform is generally grounded in a few beliefs..
+Afform is generally grounded in a few beliefs.
 
 ## Leap by extension
 
 Afform represents a major conceptual change in how core forms are developed.  It is incubated as an extension that can
-be enabled or disabled to taste.  The aim is for oother extension using `afform` can incrementally override/replace
-particular forms in core.
+be enabled or disabled to taste.  The aim is to write further extensions which (a) build on afform APIs in order to (b) incrementally override/replace particular forms in core.
 
 ## Features and user-experiences evolve in funny workflows
 
 If we could sit down and define one true, correct version of a "Donation" form, then our lives as Civi devlopers would
-be easy: draw a mockup, write code, ship, and retire.  But we can't -- because Civi users and integrators engage with
+be easy: draw a mockup, write code, ship, and retire.  But we can't -- because Civi users / integrators / developers engage with
 the system creatively.  They aim to optimize conversion-rates, to integrate with donor journerys, to question how each
 detail makes sense in their situation, etc.  That means switching between open-ended donation amounts, sliders, radios,
 etc; revising the language and layout; maybe adding an informational question or newsletter opt-in.
@@ -25,6 +24,9 @@ cross-cutting hooks and selectors.  Compatibility with multiple workflows is a p
 This is *not* an argument for maximal customization or maximal decentralization.  As participants in an ecosystem, we
 must still communicate and exercise judgment about the best way to approach each problem.  But there are legitimate
 instances for each workflow; given that each will be sought, we want them to be safe and somewhat consistent.
+
+The aims are *not* achieved by developing every feature in-house. Rather, this is conceived as an effort to use
+existing tools/frameworks while relaxing workflows.
 
 What distinguishes `afform` from the original form architecture (Civi's combination of HTML_Quickform, Smarty and
 Profiles)?  Each of those workflows has been given some consideration upfront with the aim of providing a *consistent,
