@@ -20,7 +20,7 @@
       }
       var
         $dataField = $(this).wrap('<span class="crm-form-date-wrapper" />'),
-        settings = CRM._.cloneDeep(options || {}),
+        settings = _.cloneDeep(options || {}),
         $dateField = $(),
         $timeField = $(),
         $clearLink = $(),
@@ -28,7 +28,7 @@
         type = hasDatepicker ? 'text' : 'number';
 
       if (settings.allowClear !== undefined ? settings.allowClear : !$dataField.is('.required, [required]')) {
-        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ CRM._.escape(ts('Clear')) +'"><i class="crm-i fa-times"></i></a>')
+        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ _.escape(ts('Clear')) +'"><i class="crm-i fa-times"></i></a>')
           .insertAfter($dataField);
       }
       if (settings.time !== false) {
@@ -53,8 +53,8 @@
           settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
           settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;
           settings.dateFormat = typeof settings.date === 'string' ? settings.date : CRM.config.dateInputFormat;
-          settings.changeMonth = CRM._.includes(settings.dateFormat, 'm');
-          settings.changeYear = CRM._.includes(settings.dateFormat, 'y');
+          settings.changeMonth = _.includes(settings.dateFormat, 'm');
+          settings.changeYear = _.includes(settings.dateFormat, 'y');
           if (!settings.yearRange && settings.minDate !== null && settings.maxDate !== null) {
             settings.yearRange = '' + CRM.utils.formatDate(settings.minDate, 'yy') + ':' + CRM.utils.formatDate(settings.maxDate, 'yy');
           }
@@ -97,7 +97,7 @@
           time = null;
         if (context !== 'userInput' && context !== 'crmClear') {
           if (hasDatepicker) {
-            $dateField.datepicker('setDate', CRM._.includes(val, '-') ? $.datepicker.parseDate('yy-mm-dd', val) : null);
+            $dateField.datepicker('setDate', _.includes(val, '-') ? $.datepicker.parseDate('yy-mm-dd', val) : null);
           } else if ($dateField.length) {
             $dateField.val(val.slice(0, 4));
           }
