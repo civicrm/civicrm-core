@@ -511,7 +511,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * View all activities is required unless id is passed in, in which case ACLs are used.
+   * Without view all activities contact level acls are used.
    */
   public function testGetActivityViewAllContactsEnoughWIthID() {
     $activity = $this->activityCreate();
@@ -526,6 +526,23 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $activity = $this->activityCreate();
     $this->setPermissions(array('access CiviCRM'));
     $this->callAPIFailure('Activity', 'getsingle', array('check_permissions' => 1, 'id' => $activity['id']));
+  }
+
+  /**
+   * Check that component related activity filtering.
+   *
+   * If the contact does NOT have permission to 'view all contacts' but they DO have permission
+   * to view the contact in question they will only see the activities of components they have access too.
+   *
+   * (logically the same component limit should apply when they have access to view all too but....
+   * adding test for 'how it is at the moment.)
+   */
+  public function testGetActivityCheckPermissionsByComponent() {
+    $activity = $this->activityCreate(['activity_type_id' => 'Contribution']);
+    $activity2 = $this->activityCreate(['activity_type_id' => 'Pledge Reminder']);
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute']);
+    $this->callAPISuccessGetSingle('Activity', ['check_permissions' => 1, 'id' => ['IN' => [$activity['id'], $activity2['id']]]]);
   }
 
   /**

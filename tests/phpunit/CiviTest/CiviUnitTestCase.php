@@ -1796,7 +1796,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'location' => 'Baker Street',
       'details' => 'Lets schedule a meeting',
       'status_id' => 1,
-      'activity_name' => 'Meeting',
+      'activity_type_id' => 'Meeting',
     ), $params);
     if (!isset($params['source_contact_id'])) {
       $params['source_contact_id'] = $this->individualCreate();
