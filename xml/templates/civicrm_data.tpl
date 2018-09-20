@@ -1048,7 +1048,7 @@ VALUES
 (@option_group_id_default_assignee, '{ts escape="sql"}None{/ts}',                           '1',     'NONE',                    NULL,       0,         1,           1,         NULL,          0,             0,             1,           NULL,            NULL,           NULL),
 (@option_group_id_default_assignee, '{ts escape="sql"}By relationship to case client{/ts}', '2',     'BY_RELATIONSHIP',         NULL,       0,         0,           1,         NULL,          0,             0,             1,           NULL,            NULL,           NULL),
 (@option_group_id_default_assignee, '{ts escape="sql"}Specific contact{/ts}',               '3',     'SPECIFIC_CONTACT',        NULL,       0,         0,           1,         NULL,          0,             0,             1,           NULL,            NULL,           NULL),
-(@option_group_id_default_assignee, '{ts escape="sql"}ser creating the case{/ts}',          '4',     'USER_CREATING_THE_CASE',  NULL,       0,         0,           1,         NULL,          0,             0,             1,           NULL,            NULL,           NULL);
+(@option_group_id_default_assignee, '{ts escape="sql"}User creating the case{/ts}',          '4',     'USER_CREATING_THE_CASE',  NULL,       0,         0,           1,         NULL,          0,             0,             1,           NULL,            NULL,           NULL);
 
 -- financial accounts
 SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
