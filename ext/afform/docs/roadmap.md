@@ -34,3 +34,9 @@ Within this extension, there are things which need updating/addressing:
 * Haven't decided if we should support a `client_route` property (i.e. defining a skeletal controller and route for any form).
   On the plus side, make it easier to add items to the `civicrm/a` base-page. On the flipside, we don't currently have
   a strong use-case, and developers can get the same effect with `civix generate:angular-page` and embedding `<div afform-helloworld/>`.
+* Injecting an afform onto an existing Civi page is currently as difficult as injecting any other AngularJS widget --
+  which is to say that (a) it's fine a pure-Angular page and (b) it's lousy on a non-Angular page.
+* The data-storage of user-edited forms supports primitive branching and no merging or rebasing.  In an ideal world
+  (OHUPA-4), we'd incorporate a merge or rebase mechanism (and provide the diff/export on web+cli).  To reduce unnecessary
+  merge-conflicts and allow structured UI for bona-fide merge-conflicts, the diff/merge should be based on HTML elements and
+  IDs (rather than lines-of-text).
