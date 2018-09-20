@@ -101,13 +101,17 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
 
     if (defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
       $this->configAndLogDir = CRM_Utils_File::baseFilePath() . 'ConfigAndLog' . DIRECTORY_SEPARATOR;
-      CRM_Utils_File::createDir($this->configAndLogDir);
-      CRM_Utils_File::restrictAccess($this->configAndLogDir);
-
       $this->templateCompileDir = defined('CIVICRM_TEMPLATE_COMPILEDIR') ? CRM_Utils_File::addTrailingSlash(CIVICRM_TEMPLATE_COMPILEDIR) : NULL;
       CRM_Utils_File::createDir($this->templateCompileDir);
       CRM_Utils_File::restrictAccess($this->templateCompileDir);
     }
+
+    $civicrm_private = Civi::paths()->getPath('[civicrm.private]');
+    if (!empty($civicrm_private)) {
+      $this->configAndLogDir = rtrim($civicrm_private, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'ConfigAndLog' . DIRECTORY_SEPARATOR;
+    }
+    CRM_Utils_File::createDir($this->configAndLogDir);
+    CRM_Utils_File::restrictAccess($this->configAndLogDir);
 
     if (!defined('CIVICRM_UF')) {
       $this->fatal('You need to define CIVICRM_UF in civicrm.settings.php');

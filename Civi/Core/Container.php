@@ -496,10 +496,10 @@ class Container {
     $bootServices = [];
     \Civi::$statics[__CLASS__]['boot'] = &$bootServices;
 
+    $bootServices['paths'] = new \Civi\Core\Paths();
+
     $bootServices['runtime'] = $runtime = new \CRM_Core_Config_Runtime();
     $runtime->initialize($loadFromDB);
-
-    $bootServices['paths'] = new \Civi\Core\Paths();
 
     $class = $runtime->userFrameworkClass;
     $bootServices['userSystem'] = $userSystem = new $class();

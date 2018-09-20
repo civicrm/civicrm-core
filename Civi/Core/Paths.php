@@ -56,6 +56,9 @@ class Paths {
       ->register('civicrm.files', function () {
         return \CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
       })
+      ->register('civicrm.private', function () {
+        return \CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
+      })
       ->register('wp.frontend.base', function () {
         return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/'];
       })
