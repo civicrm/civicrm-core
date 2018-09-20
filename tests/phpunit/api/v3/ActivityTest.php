@@ -134,7 +134,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'subject' => 'this case should fail',
       'scheduled_date_time' => date('Ymd'),
     );
-    $result = $this->callAPIFailure('activity', 'create', $params);
+    $this->callAPIFailure('activity', 'create', $params);
   }
 
   /**
@@ -155,7 +155,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'scheduled_date_time' => date('Ymd'),
     );
 
-    $result = $this->callAPIFailure('activity', 'create', $params);
+    $this->callAPIFailure('activity', 'create', $params);
   }
 
   /**
@@ -231,7 +231,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'activity_type_id' => 'Invalid Test activity type',
     );
 
-    $result = $this->callAPIFailure('activity', 'create', $params);
+    $this->callAPIFailure('activity', 'create', $params);
   }
 
   /**
@@ -556,7 +556,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'activity_name' => 'Test activity type',
     );
 
-    $result = $this->callAPIFailure('activity', 'create', $params,
+    $this->callAPIFailure('activity', 'create', $params,
       "'Invalid' is not a valid option for field status_id");
   }
 
@@ -589,7 +589,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * Test civicrm_activity_get() with no params
    */
   public function testActivityGetEmpty() {
-    $result = $this->callAPISuccess('activity', 'get', array());
+    $this->callAPISuccess('activity', 'get', array());
   }
 
   /**
@@ -713,11 +713,11 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $subject = 'test activity ' . __FUNCTION__ . mt_rand();
     $params = $this->_params;
     $params['subject'] = $subject;
-    $activity = $this->callAPISuccess('Activity', 'Create', $params);
-    $activityget = $this->callAPISuccess('activity', 'getsingle', array(
+    $this->callAPISuccess('Activity', 'Create', $params);
+    $activityGet = $this->callAPISuccess('activity', 'getsingle', array(
       'subject' => $subject,
     ));
-    $this->assertEquals($activityget['subject'], $subject);
+    $this->assertEquals($activityGet['subject'], $subject);
   }
 
   /**
