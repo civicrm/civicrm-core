@@ -98,16 +98,16 @@
     {/if}
 
     <div class="spacer"></div>
-      <h3>{if $myCases}{ts}My Cases With Recently Performed Activities{/ts}{else}{ts}All Cases With Recently Performed Activities{/ts}{/if}</h3>
-      {if $recentCases}
-        {include file="CRM/Case/Form/CaseFilter.tpl" context="$context" list="recent"}
-        <div class="form-item">
-          {include file="CRM/Case/Page/DashboardSelector.tpl" context="dashboard" list="recent" all="$all"}
-        </div>
-      {else}
-        <div class="messages status no-popup">
-          {ts 1=$findCasesURL}There are no cases with activities scheduled in the past two weeks. Use %1 to expand your search.{/ts}
-        </div>
-      {/if}
+    <h3>{if $myCases}{ts}My Cases With Recently Performed Activities{/ts}{else}{ts}All Cases With Recently Performed Activities{/ts}{/if}</h3>
+    {if $recentCases}
+      {include file="CRM/Case/Form/CaseFilter.tpl" context="$context" list="recent"}
+      <div class="form-item">
+        {include file="CRM/Case/Page/DashboardSelector.tpl" context="dashboard" list="recent" all="$all"}
+      </div>
+    {else}
+      <div class="messages status no-popup">
+        {ts 1=$findCasesURL}There are no cases with activities scheduled in the past two weeks. Use %1 to expand your search.{/ts}
+      </div>
+    {/if}
   {/if}
 </div>
