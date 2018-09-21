@@ -211,7 +211,7 @@
                 <tr>
                   <td colspan = "2"></td>
                   <td><font size = "1" align = "right" style="font-weight:bold;">{ts}Invoice Number: {/ts}</font></td>
-                  <td><font size = "1" align = "right">{$invoice_id}</font></td>
+                  <td><font size = "1" align = "right">{$invoice_number}</font></td>
                 </tr>
                 <tr><td colspan = "5"style = "color:#F5F5F5;"><hr></hr></td></tr>
                 {if $is_pay_later == 1}
