@@ -210,4 +210,5 @@ INSERT INTO civicrm_currency (id, name, symbol, numeric_code, full_name) VALUES
 (182, "XXX", NULL, "999", "No currency involved"),
 (183, "YER",  "﷼", "886", "Yemeni Rial"),
 (184, "ZMK", NULL, "894", "Zambian Kwacha"),
-(185, "ZWD", "Z$", "716", "Zimbabwe Dollar");
+(185, "ZWD", "Z$", "716", "Zimbabwe Dollar"),
+(186, "BTC", "Ƀ", NULL, "Bitcoin");
