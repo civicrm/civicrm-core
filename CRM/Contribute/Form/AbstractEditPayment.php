@@ -253,6 +253,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
     $this->_mode = empty($this->_mode) ? CRM_Utils_Request::retrieve('mode', 'Alphanumeric', $this) : $this->_mode;
     $this->assign('isBackOffice', $this->isBackOffice);
+    $this->assignContactEmailDetails();
     $this->assignPaymentRelatedVariables();
   }
 
@@ -546,10 +547,6 @@ WHERE  contribution_id = {$id}
    */
   protected function assignPaymentRelatedVariables() {
     try {
-      if ($this->_contactID) {
-        list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
-        $this->assign('displayName', $this->userDisplayName);
-      }
       $this->assignProcessors();
       $this->assignBillingType();
       CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor, FALSE, TRUE, CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer', $this));
@@ -590,6 +587,11 @@ WHERE  contribution_id = {$id}
       if (isset($this->_params[$moneyField])) {
         $this->_params[$moneyField] = CRM_Utils_Rule::cleanMoney($this->_params[$moneyField]);
       }
+    }
+    if (!empty($this->_params['contact_id']) && empty($this->_contactID)) {
+      // Contact ID has been set in the standalone form.
+      $this->_contactID = $this->_params['contact_id'];
+      $this->assignContactEmailDetails();
     }
   }
 
@@ -746,6 +748,13 @@ WHERE  contribution_id = {$id}
     $this->assign('payments', $paymentInfo['transaction']);
     $this->assign('paymentLinks', $paymentInfo['payment_links']);
     return $title;
+  }
+
+  protected function assignContactEmailDetails() {
+    if ($this->_contactID) {
+      list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+      $this->assign('displayName', $this->userDisplayName);
+    }
   }
 
 }
