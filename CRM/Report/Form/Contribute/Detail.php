@@ -253,6 +253,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'contribution_id' => array(
             'name' => 'id',
             'required' => TRUE,
+            'default' => TRUE,
             'title' => ts('Contribution'),
           ),
         ),
@@ -262,6 +263,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         'dao' => 'CRM_Contribute_DAO_ContributionSoft',
         'fields' => array(
           'soft_credit_type_id' => array('title' => ts('Soft Credit Type')),
+          'soft_credit_amount' => ['title' => ts('Soft Credit amount'), 'name' => 'amount', 'type' => CRM_Utils_Type::T_MONEY]
         ),
         'filters' => array(
           'soft_credit_type_id' => array(
@@ -270,6 +272,12 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'options' => CRM_Core_OptionGroup::values('soft_credit_type'),
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
+          ),
+        ),
+        'group_bys' => array(
+          'soft_credit_id' => array(
+            'name' => 'id',
+            'title' => ts('Soft Credit'),
           ),
         ),
       ),
@@ -376,18 +384,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
         AND {$this->_aliases['civicrm_contribution']}.is_test = 0";
 
-    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
-      'both'
-    ) {
-      $this->_from .= "\n LEFT JOIN civicrm_contribution_soft contribution_soft_civireport
-                         ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id";
-    }
-    elseif (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
-      'soft_credits_only'
-    ) {
-      $this->_from .= "\n INNER JOIN civicrm_contribution_soft contribution_soft_civireport
-                         ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id";
-    }
+    $this->joinContributionToSoftCredit();
     $this->appendAdditionalFromJoins();
   }
 
@@ -551,13 +548,10 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
 
     $select = str_ireplace('contribution_civireport.total_amount', 'contribution_soft_civireport.amount', $this->_select);
     $select = str_ireplace("'Contribution' as", "'Soft Credit' as", $select);
-    // We really don't want to join soft credit in if not required.
-    if (!empty($this->_groupBy) && !$this->noDisplayContributionOrSoftColumn) {
-      $this->_groupBy .= ', contribution_soft_civireport.amount';
-    }
+
     // we inner join with temp1 to restrict soft contributions to those in temp1 table.
     // no group by here as we want to display as many soft credit rows as actually exist.
-    $sql = "{$select} {$this->_from} {$this->_where}";
+    $sql = "{$select} {$this->_from} {$this->_where} $this->_groupBy";
     $tempQuery = "CREATE TEMPORARY TABLE civireport_contribution_detail_temp2 {$this->_databaseAttributes} AS {$sql}";
     $this->executeReportQuery($tempQuery);
     $this->temporaryTables['civireport_contribution_detail_temp2'] = ['name' => 'civireport_contribution_detail_temp2', 'temporary' => TRUE];
@@ -606,12 +600,11 @@ UNION ALL
   /**
    * Store group bys into array - so we can check elsewhere what is grouped.
    *
-   * If we are generating a table of soft credits we do not want to be using
-   * group by.
+   * If we are generating a table of soft credits we need to group by them.
    */
   protected function storeGroupByArray() {
     if ($this->queryMode === 'SoftCredit') {
-      $this->_groupByArray = [];
+      $this->_groupByArray = [$this->_aliases['civicrm_contribution_soft'] . '.id'];
     }
     else {
       parent::storeGroupByArray();
@@ -975,4 +968,20 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
     $this->addFinancialTrxnFromClause();
   }
 
+  /**
+   * Add join to the soft credit table.
+   */
+  protected function joinContributionToSoftCredit() {
+    if (!CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) && !$this->isTableSelected('civicrm_contribution_soft')) {
+      return;
+    }
+    $joinType = ' LEFT ';
+    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'soft_credits_only') {
+      $joinType = ' INNER ';
+    }
+    $this->_from .= "
+      $joinType JOIN civicrm_contribution_soft {$this->_aliases['civicrm_contribution_soft']}
+      ON {$this->_aliases['civicrm_contribution_soft']}.contribution_id = {$this->_aliases['civicrm_contribution']}.id
+   ";
+  }
 }
