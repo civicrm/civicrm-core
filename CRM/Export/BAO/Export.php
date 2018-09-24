@@ -625,45 +625,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   }
 
   /**
-   * Name of the export file based on mode.
-   *
-   * @param string $output
-   *   Type of output.
-   * @param int $mode
-   *   Export mode.
-   *
-   * @return string
-   *   name of the file
-   */
-  public static function getExportFileName($output = 'csv', $mode = CRM_Export_Form_Select::CONTACT_EXPORT) {
-    switch ($mode) {
-      case CRM_Export_Form_Select::CONTACT_EXPORT:
-        return ts('CiviCRM Contact Search');
-
-      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
-        return ts('CiviCRM Contribution Search');
-
-      case CRM_Export_Form_Select::MEMBER_EXPORT:
-        return ts('CiviCRM Member Search');
-
-      case CRM_Export_Form_Select::EVENT_EXPORT:
-        return ts('CiviCRM Participant Search');
-
-      case CRM_Export_Form_Select::PLEDGE_EXPORT:
-        return ts('CiviCRM Pledge Search');
-
-      case CRM_Export_Form_Select::CASE_EXPORT:
-        return ts('CiviCRM Case Search');
-
-      case CRM_Export_Form_Select::GRANT_EXPORT:
-        return ts('CiviCRM Grant Search');
-
-      case CRM_Export_Form_Select::ACTIVITY_EXPORT:
-        return ts('CiviCRM Activity Search');
-    }
-  }
-
-  /**
    * Handle import error file creation.
    */
   public static function invoke() {
@@ -1249,13 +1210,7 @@ LIMIT $offset, $limit
         }
         $componentDetails[] = $row;
       }
-      if ($exportMode == 'financial') {
-        $getExportFileName = 'CiviCRM Contribution Search';
-      }
-      else {
-        $getExportFileName = self::getExportFileName('csv', $exportMode);
-      }
-      CRM_Core_Report_Excel::writeCSVFile($getExportFileName,
+      CRM_Core_Report_Excel::writeCSVFile($processor->getExportFileName(),
         $headerRows,
         $componentDetails,
         NULL,

@@ -302,6 +302,45 @@ class CRM_Export_BAO_ExportProcessor {
   }
 
   /**
+   * Get the name for the export file.
+   *
+   * @return string
+   */
+  public function getExportFileName() {
+    switch ($this->getExportMode()) {
+      case CRM_Export_Form_Select::CONTACT_EXPORT:
+        return ts('CiviCRM Contact Search');
+
+      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
+        return ts('CiviCRM Contribution Search');
+
+      case CRM_Export_Form_Select::MEMBER_EXPORT:
+        return ts('CiviCRM Member Search');
+
+      case CRM_Export_Form_Select::EVENT_EXPORT:
+        return ts('CiviCRM Participant Search');
+
+      case CRM_Export_Form_Select::PLEDGE_EXPORT:
+        return ts('CiviCRM Pledge Search');
+
+      case CRM_Export_Form_Select::CASE_EXPORT:
+        return ts('CiviCRM Case Search');
+
+      case CRM_Export_Form_Select::GRANT_EXPORT:
+        return ts('CiviCRM Grant Search');
+
+      case CRM_Export_Form_Select::ACTIVITY_EXPORT:
+        return ts('CiviCRM Activity Search');
+
+      default:
+        // Legacy code suggests the value could be 'financial' - ie. something
+        // other than what should be accepted. However, I suspect that this line is
+        // never hit.
+        return ts('CiviCRM Search');
+    }
+  }
+
+  /**
    * @param $params
    * @param $order
    * @param $returnProperties
