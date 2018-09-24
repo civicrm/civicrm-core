@@ -227,7 +227,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         $defaults['description'] = CRM_Utils_Array::value('description', $this->_values);
         $defaults['is_active'] = CRM_Utils_Array::value('is_active', $this->_values);
 
-        // The javascript on the form will swap these fields if it is a b_a relationship, so we compensate here
+        // The postprocess function will swap these fields if it is a b_a relationship, so we compensate here
         $defaults['is_permission_a_b'] = CRM_Utils_Array::value('is_permission_' . $this->_rtype, $this->_values);
         $defaults['is_permission_b_a'] = CRM_Utils_Array::value('is_permission_' . strrev($this->_rtype), $this->_values);
 
@@ -584,17 +584,17 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    */
   private function preparePostProcessParameters($values) {
     $params = $values;
-    list($relationshipTypeId, $relationshipContactA, $relationshipContactB) = explode('_', $params['relationship_type_id']);
+    list($relationshipTypeId, $a, $b) = explode('_', $params['relationship_type_id']);
 
     $params['relationship_type_id'] = $relationshipTypeId;
-    $params['contact_id_' . $relationshipContactA] = $this->_contactId;
+    $params['contact_id_' . $a] = $this->_contactId;
 
     if (empty($this->_relationshipId)) {
-      $params['contact_id_' . $relationshipContactB] = explode(',', $params['related_contact_id']);
+      $params['contact_id_' . $b] = explode(',', $params['related_contact_id']);
     }
     else {
       $params['id'] = $this->_relationshipId;
-      $params['contact_id_' . $relationshipContactB] = $params['related_contact_id'];
+      $params['contact_id_' . $b] = $params['related_contact_id'];
 
       foreach (array('start_date', 'end_date') as $dateParam) {
         if (!empty($params[$dateParam])) {
@@ -603,12 +603,11 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       }
     }
 
-    // The javascript on the form will swap these fields if it is a b_a relationship, so we compensate here
-    $relationshipType = "${relationshipContactA}_${relationshipContactB}";
-    $params['is_permission_a_b'] = CRM_Utils_Array::value('is_permission_' . $relationshipType, $values, 0);
-    $params['is_permission_b_a'] = CRM_Utils_Array::value('is_permission_' . strrev($relationshipType), $values, 0);
+    // If this is a b_a relationship these form elements are flipped
+    $params['is_permission_a_b'] = CRM_Utils_Array::value("is_permission_{$a}_{$b}", $values, 0);
+    $params['is_permission_b_a'] = CRM_Utils_Array::value("is_permission_{$b}_{$a}", $values, 0);
 
-    return array($params, $relationshipContactA);
+    return array($params, $a);
   }
 
   /**

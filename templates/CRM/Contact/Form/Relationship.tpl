@@ -262,10 +262,6 @@
             // Show/hide employer field
             $('.crm-relationship-form-block-is_current_employer', $form).toggle(rType === {/literal}'{$employmentRelationship}'{literal});
 
-            // Swap the permission checkboxes to match selected relationship direction
-            $('#is_permission_a_b', $form).attr('name', 'is_permission_' + source + '_' + target);
-            $('#is_permission_b_a', $form).attr('name', 'is_permission_' + target + '_' + source);
-
             CRM.buildCustomData('Relationship', rType);
           }
         }
