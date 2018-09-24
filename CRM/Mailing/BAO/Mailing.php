@@ -823,14 +823,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    */
   private function getHeaderFooter() {
     if (!$this->header and $this->header_id) {
-      $this->header = new CRM_Mailing_BAO_Component();
+      $this->header = new CRM_Mailing_BAO_MailingComponent();
       $this->header->id = $this->header_id;
       $this->header->find(TRUE);
       $this->header->free();
     }
 
     if (!$this->footer and $this->footer_id) {
-      $this->footer = new CRM_Mailing_BAO_Component();
+      $this->footer = new CRM_Mailing_BAO_MailingComponent();
       $this->footer->id = $this->footer_id;
       $this->footer->find(TRUE);
       $this->footer->free();
@@ -1691,8 +1691,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     if (!Civi::settings()->get('disable_mandatory_tokens_check')) {
-      $header = $mailing->header_id && $mailing->header_id != 'null' ? CRM_Mailing_BAO_Component::findById($mailing->header_id) : NULL;
-      $footer = $mailing->footer_id && $mailing->footer_id != 'null' ? CRM_Mailing_BAO_Component::findById($mailing->footer_id) : NULL;
+      $header = $mailing->header_id && $mailing->header_id != 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->header_id) : NULL;
+      $footer = $mailing->footer_id && $mailing->footer_id != 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->footer_id) : NULL;
       foreach (array('body_html', 'body_text') as $field) {
         if (empty($mailing->{$field})) {
           continue;
@@ -1784,7 +1784,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'forward' => CRM_Mailing_Event_BAO_Forward::getTableName(),
       'url' => CRM_Mailing_BAO_TrackableURL::getTableName(),
       'urlopen' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTableName(),
-      'component' => CRM_Mailing_BAO_Component::getTableName(),
+      'component' => CRM_Mailing_BAO_MailingComponent::getTableName(),
       'spool' => CRM_Mailing_BAO_Spool::getTableName(),
     );
 
@@ -2718,7 +2718,7 @@ SELECT  $mailing.id as mailing_id
 
     if (!$isSMS) {
       if ($report['mailing']['header_id']) {
-        $header = new CRM_Mailing_BAO_Component();
+        $header = new CRM_Mailing_BAO_MailingComponent();
         $header->id = $report['mailing']['header_id'];
         $header->find(TRUE);
         $htmlHeader = $header->body_html;
@@ -2726,7 +2726,7 @@ SELECT  $mailing.id as mailing_id
       }
 
       if ($report['mailing']['footer_id']) {
-        $footer = new CRM_Mailing_BAO_Component();
+        $footer = new CRM_Mailing_BAO_MailingComponent();
         $footer->id = $report['mailing']['footer_id'];
         $footer->find(TRUE);
         $htmlFooter = $footer->body_html;

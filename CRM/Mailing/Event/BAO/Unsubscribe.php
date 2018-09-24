@@ -353,7 +353,7 @@ WHERE  email = %2
                         WHERE $jobTable.id = $job");
     $dao->fetch();
 
-    $component = new CRM_Mailing_BAO_Component();
+    $component = new CRM_Mailing_BAO_MailingComponent();
 
     if ($is_domain) {
       $component->id = $dao->optout_id;
