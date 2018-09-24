@@ -605,7 +605,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       // In order to be able to write a unit test against this function we need to suppress
       // the csv writing. In future hopefully the csv writing & the main processing will be in separate functions.
       if (empty($exportParams['suppress_csv_for_testing'])) {
-        self::writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $exportMode);
+        self::writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $processor);
       }
       else {
         // return tableName sqlColumns headerRows in test context
@@ -1220,11 +1220,10 @@ GROUP BY civicrm_primary_id ";
    * @param $exportTempTable
    * @param $headerRows
    * @param $sqlColumns
-   * @param $exportMode
-   * @param null $saveFile
-   * @param string $batchItems
+   * @param \CRM_Export_BAO_ExportProcessor $processor
    */
-  public static function writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $exportMode, $saveFile = NULL, $batchItems = '') {
+  public static function writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $processor) {
+    $exportMode = $processor->getExportMode();
     $writeHeader = TRUE;
     $offset = 0;
     $limit = self::EXPORT_ROW_COUNT;
@@ -1256,16 +1255,12 @@ LIMIT $offset, $limit
       else {
         $getExportFileName = self::getExportFileName('csv', $exportMode);
       }
-      $csvRows = CRM_Core_Report_Excel::writeCSVFile($getExportFileName,
+      CRM_Core_Report_Excel::writeCSVFile($getExportFileName,
         $headerRows,
         $componentDetails,
         NULL,
-        $writeHeader,
-        $saveFile);
-
-      if ($saveFile && !empty($csvRows)) {
-        $batchItems .= $csvRows;
-      }
+        $writeHeader
+      );
 
       $writeHeader = FALSE;
       $offset += $limit;
