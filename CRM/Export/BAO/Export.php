@@ -759,10 +759,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
    * @param $field
    */
   public static function sqlColumnDefn($processor, &$sqlColumns, $field) {
-    if (substr($field, -4) == '_a_b' || substr($field, -4) == '_b_a') {
-      return;
-    }
-
     $sqlColumns[$processor->getMungedFieldName($field)] = $processor->getSqlColumnDefinition($field);
   }
 
@@ -1370,14 +1366,11 @@ WHERE  {$whereClause}";
    *
    * @param string $field
    * @param array $headerRows
-   * @param array $sqlColumns
-   *   Columns to go in the temp table.
    * @param \CRM_Export_BAO_ExportProcessor $processor
-   * @param array|string $value
    *
    * @return array
    */
-  public static function setHeaderRows($field, $headerRows, $sqlColumns, $processor, $value) {
+  public static function setHeaderRows($field, $headerRows, $processor) {
 
     $queryFields = $processor->getQueryFields();
     if (substr($field, -11) == 'campaign_id') {
@@ -1394,69 +1387,6 @@ WHERE  {$whereClause}";
       // @todo - set this correctly in the xml rather than here.
       $headerRows[] = ts('IM Service Provider');
     }
-    elseif ($processor->isRelationshipTypeKey($field)) {
-      foreach ($value as $relationField => $relationValue) {
-        // below block is same as primary block (duplicate)
-        if (isset($queryFields[$relationField]['title'])) {
-          if ($queryFields[$relationField]['name'] == 'name') {
-            $headerName = $field . '-' . $relationField;
-          }
-          else {
-            if ($relationField == 'current_employer') {
-              $headerName = $field . '-' . 'current_employer';
-            }
-            else {
-              $headerName = $field . '-' . $queryFields[$relationField]['name'];
-            }
-          }
-
-          if (!$processor->isHouseholdMergeRelationshipTypeKey($field)) {
-            // Do not add to header row if we are only generating for merge reasons.
-            $headerRows[] = $headerName;
-          }
-
-          self::sqlColumnDefn($processor, $sqlColumns, $headerName);
-        }
-        elseif ($relationField == 'phone_type_id') {
-          $headerName = $field . '-' . 'Phone Type';
-          $headerRows[] = $headerName;
-          self::sqlColumnDefn($processor, $sqlColumns, $headerName);
-        }
-        elseif ($relationField == 'provider_id') {
-          $headerName = $field . '-' . 'Im Service Provider';
-          $headerRows[] = $headerName;
-          self::sqlColumnDefn($processor, $sqlColumns, $headerName);
-        }
-        elseif ($relationField == 'state_province_id') {
-          $headerName = $field . '-' . 'state_province_id';
-          $headerRows[] = $headerName;
-          self::sqlColumnDefn($processor, $sqlColumns, $headerName);
-        }
-        elseif (is_array($relationValue) && $relationField == 'location') {
-          // fix header for location type case
-          foreach ($relationValue as $ltype => $val) {
-            foreach (array_keys($val) as $fld) {
-              $type = explode('-', $fld);
-
-              $hdr = "{$ltype}-" . $queryFields[$type[0]]['title'];
-
-              if (!empty($type[1])) {
-                if (CRM_Utils_Array::value(0, $type) == 'phone') {
-                  $hdr .= "-" . CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id', $type[1]);
-                }
-                elseif (CRM_Utils_Array::value(0, $type) == 'im') {
-                  $hdr .= "-" . CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $type[1]);
-                }
-              }
-              $headerName = $field . '-' . $hdr;
-              $headerRows[] = $headerName;
-              self::sqlColumnDefn($processor, $sqlColumns, $headerName);
-            }
-          }
-        }
-      }
-      self::manipulateHeaderRows($headerRows);
-    }
     elseif ($processor->isExportPaymentFields() && array_key_exists($field, self::componentPaymentFields())) {
       $headerRows[] = CRM_Utils_Array::value($field, self::componentPaymentFields());
     }
@@ -1464,9 +1394,7 @@ WHERE  {$whereClause}";
       $headerRows[] = $field;
     }
 
-    self::sqlColumnDefn($processor, $sqlColumns, $field);
-
-    return array($headerRows, $sqlColumns);
+    return $headerRows;
   }
 
   /**
@@ -1503,9 +1431,75 @@ WHERE  {$whereClause}";
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     $queryFields = $processor->getQueryFields();
     foreach ($returnProperties as $key => $value) {
-      if ($key != 'location' || !is_array($value)) {
+      if (($key != 'location' || !is_array($value)) && !$processor->isRelationshipTypeKey($key)) {
         $outputColumns[$key] = $value;
-        list($headerRows, $sqlColumns) = self::setHeaderRows($key, $headerRows, $sqlColumns, $processor, $value);
+        $headerRows = self::setHeaderRows($key, $headerRows, $processor);
+        self::sqlColumnDefn($processor, $sqlColumns, $key);
+      }
+      elseif ($processor->isRelationshipTypeKey($key)) {
+        $outputColumns[$key] = $value;
+        $field = $key;
+        foreach ($value as $relationField => $relationValue) {
+          // below block is same as primary block (duplicate)
+          if (isset($queryFields[$relationField]['title'])) {
+            if ($queryFields[$relationField]['name'] == 'name') {
+              $headerName = $field . '-' . $relationField;
+            }
+            else {
+              if ($relationField == 'current_employer') {
+                $headerName = $field . '-' . 'current_employer';
+              }
+              else {
+                $headerName = $field . '-' . $queryFields[$relationField]['name'];
+              }
+            }
+
+            if (!$processor->isHouseholdMergeRelationshipTypeKey($field)) {
+              // Do not add to header row if we are only generating for merge reasons.
+              $headerRows[] = $headerName;
+            }
+
+            self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+          }
+          elseif ($relationField == 'phone_type_id') {
+            $headerName = $field . '-' . 'Phone Type';
+            $headerRows[] = $headerName;
+            self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+          }
+          elseif ($relationField == 'provider_id') {
+            $headerName = $field . '-' . 'Im Service Provider';
+            $headerRows[] = $headerName;
+            self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+          }
+          elseif ($relationField == 'state_province_id') {
+            $headerName = $field . '-' . 'state_province_id';
+            $headerRows[] = $headerName;
+            self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+          }
+          elseif (is_array($relationValue) && $relationField == 'location') {
+            // fix header for location type case
+            foreach ($relationValue as $ltype => $val) {
+              foreach (array_keys($val) as $fld) {
+                $type = explode('-', $fld);
+
+                $hdr = "{$ltype}-" . $queryFields[$type[0]]['title'];
+
+                if (!empty($type[1])) {
+                  if (CRM_Utils_Array::value(0, $type) == 'phone') {
+                    $hdr .= "-" . CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id', $type[1]);
+                  }
+                  elseif (CRM_Utils_Array::value(0, $type) == 'im') {
+                    $hdr .= "-" . CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $type[1]);
+                  }
+                }
+                $headerName = $field . '-' . $hdr;
+                $headerRows[] = $headerName;
+                self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+              }
+            }
+          }
+        }
+        self::manipulateHeaderRows($headerRows);
       }
       else {
         foreach ($value as $locationType => $locationFields) {
@@ -1530,7 +1524,8 @@ WHERE  {$whereClause}";
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
             self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
-            list($headerRows, $sqlColumns) = self::setHeaderRows($outputFieldName, $headerRows, $sqlColumns, $processor, $value);
+            $headerRows = self::setHeaderRows($outputFieldName, $headerRows, $processor);
+            self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');
             }
