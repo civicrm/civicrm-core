@@ -165,7 +165,7 @@ class CRM_Admin_Page_AJAX {
           $ret['content'] = ts('Are you sure you want to disable this Participant Status?') . '<br/><br/> ' . ts('Users will no longer be able to select this value when adding or editing Participant Status.');
           break;
 
-        case 'CRM_Mailing_BAO_Component':
+        case 'CRM_Mailing_BAO_MailingComponent':
           $ret['content'] = ts('Are you sure you want to disable this component?');
           break;
 

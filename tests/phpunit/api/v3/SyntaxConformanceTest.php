@@ -842,7 +842,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->createLoggedInUser();// so subsidiary activities are created
 
     $entitiesWithNamingIssues = [
-      'MailingComponent' => 'Component',
       'SmsProvider' => 'Provider',
       'AclRole' => 'EntityRole',
       'MailingEventQueue' => 'Queue',

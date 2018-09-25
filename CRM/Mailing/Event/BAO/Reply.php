@@ -242,7 +242,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
     $to = empty($replyto) ? $eq->email : $replyto;
 
-    $component = new CRM_Mailing_BAO_Component();
+    $component = new CRM_Mailing_BAO_MailingComponent();
     $component->id = $mailing->reply_id;
     $component->find(TRUE);
 
