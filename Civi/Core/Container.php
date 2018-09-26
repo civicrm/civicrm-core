@@ -165,6 +165,7 @@ class Container {
       'community_messages' => 'community_messages',
       'checks' => 'checks',
       'session' => 'CiviCRM Session',
+      'long' => 'long',
     );
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $container->setDefinition("cache.{$cacheSvc}", new Definition(
@@ -213,6 +214,7 @@ class Container {
       ))
         ->setFactory(array($class, 'singleton'));
     }
+    $container->setAlias('cache.short', 'cache.default');
 
     $container->setDefinition('prevnext', new Definition(
       'CRM_Core_PrevNextCache_Interface',
