@@ -171,12 +171,23 @@ class SettingsManager {
 
   /**
    * @param int|NULL $domainId
+   *   For the default domain, leave $domainID as NULL.
    * @param int|NULL $contactId
+   *   For the default/active user's contact, leave $domainID as NULL.
    * @return SettingsBag
+   * @throws \CRM_Core_Exception
+   *   If there is no contact, then there's no SettingsBag, and we'll throw
+   *   an exception.
    */
   public function getBagByContact($domainId, $contactId) {
     if ($domainId === NULL) {
       $domainId = \CRM_Core_Config::domainID();
+    }
+    if ($contactId === NULL) {
+      $contactId = \CRM_Core_Session::getLoggedInContactID();
+      if (!$contactId) {
+        throw new \CRM_Core_Exception("Cannot access settings subsystem - user or domain is unavailable");
+      }
     }
 
     $key = "$domainId:$contactId";
