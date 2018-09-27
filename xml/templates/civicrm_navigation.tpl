@@ -62,7 +62,7 @@ VALUES
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, icon )
 VALUES
-    (  @domainID, NULL, '{ts escape="sql" skip="true"}Search{/ts}',  'Search...',    NULL, '',  NULL, '1', NULL, 10, 'crm-i fa-search' );
+    (  @domainID, NULL, '{ts escape="sql" skip="true"}Search{/ts}',  'Search',    NULL, '',  NULL, '1', NULL, 10, 'crm-i fa-search' );
 
 SET @searchlastID:=LAST_INSERT_ID();
 

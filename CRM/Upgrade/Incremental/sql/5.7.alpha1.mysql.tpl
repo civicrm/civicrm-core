@@ -1,6 +1,7 @@
 {* file to handle db changes in 5.7.alpha1 during upgrade *}
 
-UPDATE civicrm_navigation SET icon = "crm-i fa-search" WHERE name = "Search..." AND domain_id = {$domainID} AND icon IS NULL;
+UPDATE civicrm_navigation SET name = "Search" WHERE name = "Search..." AND domain_id = {$domainID};
+UPDATE civicrm_navigation SET icon = "crm-i fa-search" WHERE name = "Search" AND domain_id = {$domainID} AND icon IS NULL;
 UPDATE civicrm_navigation SET icon = "crm-i fa-address-book-o" WHERE name = "Contacts" AND domain_id = {$domainID} AND icon IS NULL;
 UPDATE civicrm_navigation SET icon = "crm-i fa-money" WHERE name = "Contributions" AND domain_id = {$domainID} AND icon IS NULL;
 UPDATE civicrm_navigation SET icon = "crm-i fa-calendar" WHERE name = "Events" AND domain_id = {$domainID} AND icon IS NULL;
