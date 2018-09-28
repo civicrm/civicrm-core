@@ -40,3 +40,8 @@ Within this extension, there are things which need updating/addressing:
   (OHUPA-4), we'd incorporate a merge or rebase mechanism (and provide the diff/export on web+cli).  To reduce unnecessary
   merge-conflicts and allow structured UI for bona-fide merge-conflicts, the diff/merge should be based on HTML elements and
   IDs (rather than lines-of-text).
+* API Request Batching -- If a page makes multiple API calls at the same time, they fire as separate HTTP requests. This concern is somewhat
+  mitigated by HTTP/2, but not really -- because each subrequest requires a separate CMS+CRM bootstrap. Instead, the JS API adapter should
+  support batching (i.e. all API calls issued within a 5ms window are sent as a batch).
+* Default CSS: There's no mechanism for defining adhoc CSS. This is arguably a feature, though, because the CSS classes
+  should be validated (to ensure theme interoperability).
