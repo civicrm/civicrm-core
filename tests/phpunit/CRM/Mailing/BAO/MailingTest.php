@@ -443,7 +443,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       'group_id' => $group,
       'contact_id' => $contactID2,
     ));
-    
+
     // Create contact 3 and add in group
     $contactID3 = $this->individualCreate(array(), 2);
     $this->callAPISuccess('GroupContact', 'Create', array(
