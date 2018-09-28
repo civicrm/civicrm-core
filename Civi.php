@@ -109,6 +109,22 @@ class Civi {
   }
 
   /**
+   * Obtain the contact's personal settings.
+   *
+   * @param NULL|int $contactID
+   *   For the default/active user's contact, leave $domainID as NULL.
+   * @param NULL|int $domainID
+   *   For the default domain, leave $domainID as NULL.
+   * @return \Civi\Core\SettingsBag
+   * @throws CRM_Core_Exception
+   *   If there is no contact, then there's no SettingsBag, and we'll throw
+   *   an exception.
+   */
+  public static function contactSettings($contactID = NULL, $domainID = NULL) {
+    return \Civi\Core\Container::getBootService('settings_manager')->getBagByContact($domainID, $contactID);
+  }
+
+  /**
    * Obtain the domain settings.
    *
    * @param int|null $domainID
