@@ -207,7 +207,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
 
     foreach ($domains as $domainID) {
-      Civi::settings($domainID)->add($fieldsToSet);
+      $settings = empty($params['contact_id']) ? Civi::settings($domainID) : Civi::contactSettings($params['contact_id'], $domainID);
+      $settings->add($fieldsToSet);
       $result[$domainID] = $fieldsToSet;
     }
 

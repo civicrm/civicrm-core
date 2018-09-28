@@ -300,6 +300,10 @@ function _civicrm_api3_setting_create_spec(&$params) {
     'title' => 'Setting Group',
     'description' => 'if you know the group defining it will make the api more efficient',
   );
+  $params['contact_id'] = array(
+    'title' => 'Contact ID',
+    'description' => 'Optional - if this setting applies to a specific contact',
+  );
 }
 
 /**
