@@ -482,7 +482,6 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     $parentID = CRM_Utils_Array::value('parentID', $value['attributes']);
     $navID = CRM_Utils_Array::value('navID', $value['attributes']);
     $active = CRM_Utils_Array::value('active', $value['attributes']);
-    $menuName = CRM_Utils_Array::value('name', $value['attributes']);
     $target = CRM_Utils_Array::value('target', $value['attributes']);
 
     if (in_array($parentID, $skipMenuItems) || !$active) {
@@ -495,7 +494,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     $makeLink = FALSE;
     if (!empty($url)) {
       // Skip processing fully-formed urls
-      if (substr($url, 0, 4) !== 'http' && $url[0] !== '/') {
+      if (substr($url, 0, 4) !== 'http' && $url[0] !== '/' && $url[0] !== '#') {
         //CRM-7656 --make sure to separate out url path from url params,
         //as we'r going to validate url path across cross-site scripting.
         $parsedUrl = parse_url($url);
