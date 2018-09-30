@@ -356,7 +356,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     ));
     $this->callAPISuccess('Email', 'create', array(
       'id' => $emailId,
-      'on_hold' => TRUE,
+      'on_hold' => 1,
     ));
 
     $this->callAPISuccess('GroupContact', 'create', array(

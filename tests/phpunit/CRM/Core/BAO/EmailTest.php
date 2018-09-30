@@ -70,7 +70,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
       'Database check for created email address.'
     );
 
-    // Now call add() to update on_hold=true and check record state
+    // Now call add() to update on_hold=1 ("On Hold Bounce") and check record state
     $params = array();
     $params = array(
       'id' => $emailId,
@@ -94,7 +94,31 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
       'Check if on_hold=1 in updated email record.'
     );
 
-    // Now call add() with on_hold=false and verify that reset_date is set.
+    // Now call add() to update on_hold=2 ("On Hold Opt-out") and check record state
+    $params = array();
+    $params = array(
+      'id' => $emailId,
+      'contact_id' => $contactId,
+      'on_hold' => 2,
+    );
+
+    CRM_Core_BAO_Email::add($params);
+
+    // Use assertDBNotNull to get back value of hold_date and check that it's in the current year.
+    // NOTE: The assertEquals will fail IF this test is run just as the year is changing (low likelihood).
+    $holdDate = $this->assertDBNotNull('CRM_Core_DAO_Email', $emailId, 'hold_date', 'id',
+      'Retrieve hold_date from the updated email record.'
+    );
+
+    $this->assertEquals(substr($holdDate, 0, 4), substr(date('YmdHis'), 0, 4),
+      'Compare hold_date (' . $holdDate . ') in DB to current year.'
+    );
+
+    $this->assertDBCompareValue('CRM_Core_DAO_Email', $emailId, 'on_hold', 'id', 2,
+      'Check if on_hold=2 in updated email record.'
+    );
+
+    // Now call add() with on_hold=null (not on hold) and verify that reset_date is set.
     $params = array();
     $params = array(
       'id' => $emailId,
