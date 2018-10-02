@@ -413,7 +413,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   public function testgetRecipientsSMS() {
     // Tests for SMS bulk mailing recipients
     // +CRM-21320 Ensure primary mobile number is selected over non-primary
-    // +CUDARW-905 Ensure that a secondary mobile number is selected if the primary can not receive SMS
+    // +core/384 Ensure that a secondary mobile number is selected if the primary can not receive SMS
 
     // Setup
     $smartGroupParams = array(
@@ -485,7 +485,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
           'is_primary' => 1,
         ))),
       ),
-      // Create primary that cant recieve SMS but a secondary that can, to test CUDARW-905
+      // Create primary that cant recieve SMS but a secondary that can, to test core/384
       $contactID3 => array(
         'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
           'contact_id' => $contactID3,
