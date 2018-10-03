@@ -45,7 +45,7 @@
       </table>
     </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
-  <table class="contact-activity-selector-{$context} crm-ajax-table">
+  <table class="contact-activity-selector-{$context} crm-ajax-table" style="width: 100%;">
     <thead>
     <tr>
       <th data-data="activity_type" class="crm-contact-activity-activity_type">{ts}Type{/ts}</th>
