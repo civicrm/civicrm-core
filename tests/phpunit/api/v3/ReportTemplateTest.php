@@ -457,6 +457,31 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the amount column is populated on soft credit details.
+   */
+  public function testContributionDetailSoftCreditsOnly() {
+    $contactID = $this->individualCreate();
+    $contactID2 = $this->individualCreate();
+    $this->contributionCreate(['contact_id' => $contactID, 'api.ContributionSoft.create' => ['amount' => 5, 'contact_id' => $contactID2]]);
+    $template = 'contribute/detail';
+    $rows = $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => $template,
+      'contribution_or_soft_value' => 'soft_credits_only',
+      'fields' => [
+        'sort_name' => '1',
+        'email' => '1',
+        'financial_type_id' => '1',
+        'receive_date' => '1',
+        'total_amount' => '1',
+      ],
+      'options' => array('metadata' => ['sql', 'labels']),
+    ));
+    foreach (array_keys($rows['metadata']['labels']) as $header) {
+      $this->assertTrue(!empty($rows['values'][0][$header]));
+    }
+  }
+
+  /**
    * Test the group filter works on the various reports.
    *
    * @dataProvider getMembershipAndContributionReportTemplatesForGroupTests
