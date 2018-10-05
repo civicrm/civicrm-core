@@ -325,7 +325,7 @@ class CRM_Activity_BAO_Query {
       case 'activity_result':
         if (is_array($value)) {
           $safe = [];
-          foreach ($values as $id => $k) {
+          foreach ($value as $id => $k) {
             $safe[] = "'" . CRM_Utils_Type::escape($k, 'String') . "'";
           }
           $query->_where[$grouping][] = "civicrm_activity.result IN (" . implode(',', $safe) . ")";
