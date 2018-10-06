@@ -107,6 +107,7 @@
     <add>1.6</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
@@ -118,6 +119,7 @@
     <add>1.6</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
@@ -128,6 +130,7 @@
     <add>1.6</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
@@ -138,6 +141,7 @@
     <add>1.6</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
@@ -148,6 +152,7 @@
     <add>1.6</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
@@ -253,6 +258,7 @@
     <add>4.4</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
@@ -274,6 +280,7 @@
     <add>1.6</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
