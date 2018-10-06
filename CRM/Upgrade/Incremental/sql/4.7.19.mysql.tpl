@@ -44,8 +44,9 @@ VALUES
 -- Some legacy sites have `0000-00-00 00:00:00` values in
 -- `civicrm_financial_trxn.trxn_date` which correspond to the same value in
 -- `civicrm_contribution.receive_date`
-UPDATE civicrm_financial_trxn SET trxn_date = NULL WHERE trxn_date = '0000-00-00 00:00:00';
-UPDATE civicrm_contribution SET receive_date = NULL WHERE receive_date = '0000-00-00 00:00:00';
+-- MySQL 5.7 may bork when comparing datetime columns to '0000-00-00 00:00:00' so cast the column to a CHAR(20) when comparing
+UPDATE civicrm_financial_trxn SET trxn_date = NULL WHERE CAST(trxn_date AS CHAR(20)) = '0000-00-00 00:00:00';
+UPDATE civicrm_contribution SET receive_date = NULL WHERE CAST(receive_date AS CHAR(20)) = '0000-00-00 00:00:00';
 
 -- CRM-20439 rename card_type to card_type_id of civicrm_financial_trxn table (IIDA-126)
 ALTER TABLE `civicrm_financial_trxn` CHANGE `card_type` `card_type_id` INT(10) UNSIGNED NULL DEFAULT NULL COMMENT 'FK to accept_creditcard option group values';
