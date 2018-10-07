@@ -180,6 +180,12 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->rel_types,
           ),
+          'is_active' => array(
+            'title' => ts('Active Role?'),
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+            'default' => TRUE,
+            'options' => CRM_Core_SelectValues::boolean(),
+          ),
         ),
       ),
       'civicrm_email' => array(
@@ -572,8 +578,9 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
   }
 
   public function checkEnabledFields() {
-    if (isset($this->_params['case_role_value'])
-      && !empty($this->_params['case_role_value'])
+    if ((isset($this->_params['case_role_value'])
+        && !empty($this->_params['case_role_value'])) ||
+        (isset($this->_params['is_active_value']))
     ) {
       $this->_relField = TRUE;
     }
