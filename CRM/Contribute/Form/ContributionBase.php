@@ -212,6 +212,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $paymentInstrumentID;
 
   /**
+   * Is the price set quick config.
+   * @return bool
+   */
+  public function isQuickConfig() {
+    return isset(self::$_quickConfig) ? self::$_quickConfig : FALSE;
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @throws \CRM_Contribute_Exception_InactiveContributionPageException

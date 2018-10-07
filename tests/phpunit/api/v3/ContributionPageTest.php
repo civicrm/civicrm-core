@@ -139,13 +139,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testSubmit() {
     $this->setUpContributionPage();
-    $priceFieldID = reset($this->_ids['price_field']);
-    $priceFieldValueID = reset($this->_ids['price_field_value']);
-    $submitParams = array(
-      'price_' . $priceFieldID => $priceFieldValueID,
-      'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
-    );
+    $submitParams = $this->getBasicSubmitParams();
 
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
@@ -1887,6 +1881,21 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($lineItem_TaxAmount, round(180 * 16.95 * 0.10, 2), 'Wrong Sales Tax Amount is calculated and stored.');
   }
 
+
+  /**
+   * Test validating a contribution page submit.
+   */
+  public function testValidate() {
+    $this->setUpContributionPage();
+    $errors = $this->callAPISuccess('ContributionPage', 'validate', array_merge($this->getBasicSubmitParams(), ['action' => 'submit']))['values'];
+    $this->assertEmpty($errors);
+  }
+
+  /**
+   * Implements hook_civicrm_alterPaymentProcessorParams().
+   *
+   * @throws \Exception
+   */
   public function hook_civicrm_alterPaymentProcessorParams($paymentObj, &$rawParams, &$cookedParams) {
     // Ensure total_amount are the same if they're both given.
     $total_amount = CRM_Utils_Array::value('total_amount', $rawParams);
@@ -1905,6 +1914,24 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $message .= json_encode($log_params);
     $log = new CRM_Utils_SystemLogger();
     $log->debug($message, $_REQUEST);
+  }
+
+  /**
+   * Get the params for a basic simple submit.
+   *
+   * @return array
+   */
+  protected function getBasicSubmitParams() {
+    $priceFieldID = reset($this->_ids['price_field']);
+    $priceFieldValueID = reset($this->_ids['price_field_value']);
+    $submitParams = [
+      'price_' . $priceFieldID => $priceFieldValueID,
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'priceSetId' => $this->_ids['price_set'][0],
+      'payment_processor_id' => 0,
+    ];
+    return $submitParams;
   }
 
 }

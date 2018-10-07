@@ -626,7 +626,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param CRM_Core_Form $self
+   * @param \CRM_Contribute_Form_Contribution_Main $self
    *
    * @return bool|array
    *   true if no errors, else array of errors
@@ -670,7 +670,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $previousId = $otherAmount = FALSE;
       while ($priceField->fetch()) {
 
-        if ($self->_quickConfig && ($priceField->name == 'contribution_amount' || $priceField->name == 'membership_amount')) {
+        if ($self->isQuickConfig() && ($priceField->name == 'contribution_amount' || $priceField->name == 'membership_amount')) {
           $previousId = $priceField->id;
           if ($priceField->name == 'membership_amount' && !$priceField->is_active) {
             $membershipIsActive = FALSE;
@@ -951,7 +951,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       return $errors;
     }
 
-    if (CRM_Utils_Array::value('payment_processor_id', $fields) == NULL) {
+    if (CRM_Utils_Array::value('payment_processor_id', $fields) === NULL) {
       $errors['payment_processor_id'] = ts('Payment Method is a required field.');
     }
     else {
