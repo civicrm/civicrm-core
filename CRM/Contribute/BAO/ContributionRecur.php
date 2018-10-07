@@ -96,7 +96,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       $config = CRM_Core_Config::singleton();
       $recurring->currency = $config->defaultCurrency;
     }
-    $result = $recurring->save();
+    $recurring->save();
 
     if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'ContributionRecur', $recurring->id, $recurring);
@@ -111,7 +111,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution_recur', $recurring->id);
     }
 
-    return $result;
+    return $recurring;
   }
 
   /**
