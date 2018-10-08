@@ -83,6 +83,33 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @return object
    */
   public static function add(&$params) {
+    // System Workflow Templates have a specific wodkflow_id in them but normal user end message templates don't
+    // If we have an id check to see if we are update, and need to check if original is a system workflow or not.
+    $systemWorkflowPermissionDeniedMessage = 'Editing or creating system workflow messages requires edit system workflow message templates permission or the edit message templates permission';
+    $userWorkflowPermissionDeniedMessage = 'Editing or creating user driven workflow messages requires edit user-driven message templates or the edit message templates permission';
+    if (!empty($params['check_permissions'])) {
+      if (!CRM_Core_Permission::check('edit message templates')) {
+        if (!empty($params['id'])) {
+          $details = civicrm_api3('MessageTemplate', 'getSingle', ['id' => $params['id']]);
+          if (!empty($details['workflow_id'])) {
+            if (!CRM_Core_Permission::check('edit system workflow message templates')) {
+              throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $systemWorkflowPermissionDeniedMessage]));
+            }
+          }
+          elseif (!CRM_Core_Permission::check('edit user-driven message templates')) {
+            throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $userWorkflowPermissionDeniedMessage]));
+          }
+        }
+        else {
+          if (!empty($params['workflow_id']) && !CRM_Core_Permission::check('edit system workflow message templates')) {
+            throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $systemWorkflowPermissionDeniedMessage]));
+          }
+          elseif (!CRM_Core_Permission::check('edit user-driven message templates')) {
+            throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $userWorkflowPermissionDeniedMessage]));
+          }
+        }
+      }
+    }
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'MessageTemplate', CRM_Utils_Array::value('id', $params), $params);
 
