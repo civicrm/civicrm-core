@@ -38,6 +38,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
   protected $_settings = array(
     'contact_view_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'contact_smart_group_display' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
 
   public function preProcess() {
@@ -46,11 +47,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
     $this->_varNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
-        'contact_smart_group_display' => array(
-          'html_type' => 'radio',
-          'title' => ts('Viewing Smart Groups'),
-          'weight' => 2,
-        ),
         'contact_edit_options' => array(
           'html_type' => 'checkboxes',
           'title' => ts('Editing Contacts'),

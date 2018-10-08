@@ -324,8 +324,11 @@ return array(
     'title' => ts('Viewing Smart Groups'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
+    'description' => ts('Controls display of the smart groups that a contact is part of in each contact\'s "Groups" tab. "Show on Demand" provides the best performance, and is recommended for most sites.'),
     'help_text' => NULL,
+    'pseudoconstant' => array(
+      'optionGroupName' => 'contact_smart_group_display',
+    ),
   ),
   'smart_group_cache_refresh_mode' => array(
     'group_name' => 'CiviCRM Preferences',

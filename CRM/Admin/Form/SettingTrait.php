@@ -116,7 +116,8 @@ trait CRM_Admin_Form_SettingTrait {
     $settingMetaData = $this->getSettingsMetaData();
     $descriptions = [];
     foreach ($settingMetaData as $setting => $props) {
-      if (isset($props['quick_form_type'])) {
+      $quickFormType = $this->getQuickFormType($props);
+      if (isset($quickFormType)) {
         if (isset($props['pseudoconstant'])) {
           $options = civicrm_api3('Setting', 'getoptions', [
             'field' => $setting,
@@ -131,7 +132,7 @@ trait CRM_Admin_Form_SettingTrait {
           $this->includesReadOnlyFields = TRUE;
         }
 
-        $add = 'add' . $props['quick_form_type'];
+        $add = 'add' . $quickFormType;
         if ($add == 'addElement') {
           $this->$add(
             $props['html_type'],
@@ -169,7 +170,7 @@ trait CRM_Admin_Form_SettingTrait {
           $this->add('date', $setting, ts($props['title']), CRM_Core_SelectValues::date(NULL, 'M d'));
         }
         else {
-          $this->$add($setting, ts($props['title']));
+          $this->$add($setting, ts($props['title']), $options['values']);
         }
         // Migrate to using an array as easier in smart...
         $descriptions[$setting] = ts($props['description']);
@@ -190,7 +191,23 @@ trait CRM_Admin_Form_SettingTrait {
     $this->assign('settings_fields', $settingMetaData);
   }
 
-
+  /**
+   * Get the quickform type for the given html type.
+   *
+   * @param array $spec
+   *
+   * @return string
+   */
+  protected function getQuickFormType($spec) {
+    if (isset($spec['quick_form_type'])) {
+      return $spec['quick_form_type'];
+    }
+    $mapping = [
+      'checkboxes' => 'CheckBoxes',
+      'radio' => 'Radio',
+    ];
+    return $mapping[$spec['html_type']];
+  }
   /**
    * Get the defaults for all fields defined in the metadata.
    *
@@ -204,7 +221,7 @@ trait CRM_Admin_Form_SettingTrait {
       if (!empty($spec['serialize'])) {
         $this->_defaults[$setting] = CRM_Core_DAO::unSerializeField($this->_defaults[$setting], $spec['serialize']);
       }
-      if ($spec['quick_form_type'] === 'CheckBoxes') {
+      if ($this->getQuickFormType($spec) === 'CheckBoxes') {
         $this->_defaults[$setting] = array_fill_keys($this->_defaults[$setting], 1);
       }
     }
