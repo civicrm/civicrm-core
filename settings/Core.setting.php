@@ -89,6 +89,7 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Select the sections that should be included in the Basic and Advanced Search forms. EXAMPLE: If you don\'t track Relationships - then you do not need this section included in the advanced search form. Simplify the form by un-checking this option.'),
+    'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
   ),
   'user_dashboard_options' => array(
     'group_name' => 'CiviCRM Preferences',

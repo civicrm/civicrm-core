@@ -39,6 +39,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   protected $_settings = array(
     'contact_view_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'contact_smart_group_display' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'advanced_search_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
 
   public function preProcess() {
@@ -51,11 +52,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'html_type' => 'checkboxes',
           'title' => ts('Editing Contacts'),
           'weight' => 3,
-        ),
-        'advanced_search_options' => array(
-          'html_type' => 'checkboxes',
-          'title' => ts('Contact Search'),
-          'weight' => 4,
         ),
         'activity_assignee_notification' => array(
           'html_type' => 'checkbox',

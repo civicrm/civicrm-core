@@ -234,7 +234,7 @@ trait CRM_Admin_Form_SettingTrait {
   protected function saveMetadataDefinedSettings($params) {
     $settings = $this->getSettingsToSetByMetadata($params);
     foreach ($settings as $setting => $settingValue) {
-      if ($this->getSettingMetadataItem($setting, 'quick_form_type') === 'CheckBoxes') {
+      if ($this->getQuickFormType($this->getSettingMetadata($setting)) === 'CheckBoxes') {
         $settings[$setting] = array_keys($settingValue);
       }
     }
