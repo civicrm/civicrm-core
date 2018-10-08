@@ -465,7 +465,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
     $form->postProcessHook();
 
-    CRM_Utils_System::civiExit(1);
+    CRM_Utils_System::civiExit();
   }
 
   /**
