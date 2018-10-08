@@ -88,6 +88,28 @@ trait CRM_Admin_Form_SettingTrait {
   }
 
   /**
+   * Get the metadata for a particular field.
+   *
+   * @param $setting
+   * @return mixed
+   */
+  protected function getSettingMetadata($setting) {
+    return $this->getSettingsMetaData()[$setting];
+  }
+
+  /**
+   * Get the metadata for a particular field for a particular item.
+   *
+   * e.g get 'serialize' key, if exists, for a field.
+   *
+   * @param $setting
+   * @return mixed
+   */
+  protected function getSettingMetadataItem($setting, $item) {
+    return CRM_Utils_Array::value($item, $this->getSettingsMetaData()[$setting]);
+  }
+
+  /**
    * Add fields in the metadata to the template.
    */
   protected function addFieldsDefinedInSettingsMetadata() {
@@ -125,6 +147,19 @@ trait CRM_Admin_Form_SettingTrait {
         elseif ($add == 'addCheckBox') {
           $this->addCheckBox($setting, ts($props['title']), $options['values'], NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, ['&nbsp;&nbsp;']);
         }
+        elseif ($add == 'addCheckBoxes') {
+          $options = array_flip($options['values']);
+          $newOptions = [];
+          foreach ($options as $key => $val) {
+            $newOptions[$key] = $val;
+          }
+          $this->addCheckBox($setting,
+            $props['title'],
+            $newOptions,
+            NULL, NULL, NULL, NULL,
+            ['&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>']
+          );
+        }
         elseif ($add == 'addChainSelect') {
           $this->addChainSelect($setting, [
             'label' => ts($props['title']),
@@ -153,6 +188,40 @@ trait CRM_Admin_Form_SettingTrait {
     // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
     $this->assign('setting_descriptions', $descriptions);
     $this->assign('settings_fields', $settingMetaData);
+  }
+
+
+  /**
+   * Get the defaults for all fields defined in the metadata.
+   *
+   * All others are pending conversion.
+   */
+  protected function setDefaultsForMetadataDefinedFields() {
+    CRM_Core_BAO_ConfigSetting::retrieve($this->_defaults);
+    foreach (array_keys($this->_settings) as $setting) {
+      $this->_defaults[$setting] = civicrm_api3('setting', 'getvalue', ['name' => $setting]);
+      $spec = $this->getSettingsMetadata()[$setting];
+      if (!empty($spec['serialize'])) {
+        $this->_defaults[$setting] = CRM_Core_DAO::unSerializeField($this->_defaults[$setting], $spec['serialize']);
+      }
+      if ($spec['quick_form_type'] === 'CheckBoxes') {
+        $this->_defaults[$setting] = array_fill_keys($this->_defaults[$setting], 1);
+      }
+    }
+  }
+
+  /**
+   * @param $params
+   *
+   */
+  protected function saveMetadataDefinedSettings($params) {
+    $settings = $this->getSettingsToSetByMetadata($params);
+    foreach ($settings as $setting => $settingValue) {
+      if ($this->getSettingMetadataItem($setting, 'quick_form_type') === 'CheckBoxes') {
+        $settings[$setting] = array_keys($settingValue);
+      }
+    }
+    civicrm_api3('setting', 'create', $settings);
   }
 
 }
