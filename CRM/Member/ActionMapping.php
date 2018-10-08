@@ -133,6 +133,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
    * @return array
    */
   protected function prepareMembershipPermissionsFilter() {
+    throw new CRM_Core_Exception('ha ha he he (aka checking if this is actually hit in test suite)');
     $query = '
 SELECT    cm.id AS owner_id, cm.contact_id AS owner_contact, m.id AS slave_id, m.contact_id AS slave_contact, cmt.relationship_type_id AS relation_type, rel.contact_id_a, rel.contact_id_b, rel.is_permission_a_b, rel.is_permission_b_a
 FROM      civicrm_membership m
