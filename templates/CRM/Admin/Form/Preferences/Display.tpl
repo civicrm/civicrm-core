@@ -50,7 +50,7 @@
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">
-        {ts}Controls display of the smart groups that a contact is part of in each contact's "Groups" tab. "Show on Demand" provides the best performance, and is recommended for most sites.{/ts}
+        {$settings_fields.contact_smart_group_display.description}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-contact_edit_options">
