@@ -40,6 +40,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     'contact_view_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'contact_smart_group_display' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'advanced_search_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'preserve_activity_tab_filter' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
 
   public function preProcess() {
@@ -62,11 +63,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'html_type' => 'checkbox',
           'title' => ts('Include ICal Invite to Activity Assignees'),
           'weight' => 6,
-        ),
-        'preserve_activity_tab_filter' => array(
-          'html_type' => 'checkbox',
-          'title' => ts('Preserve activity filters as a user preference'),
-          'weight' => 7,
         ),
         'contact_ajax_check_similar' => array(
           'title' => ts('Check for Similar Contacts'),
