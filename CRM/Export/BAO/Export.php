@@ -605,7 +605,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       // In order to be able to write a unit test against this function we need to suppress
       // the csv writing. In future hopefully the csv writing & the main processing will be in separate functions.
       if (empty($exportParams['suppress_csv_for_testing'])) {
-        self::writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $exportMode);
+        self::writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $processor);
       }
       else {
         // return tableName sqlColumns headerRows in test context
@@ -621,45 +621,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     else {
       CRM_Core_DAO::reenableFullGroupByMode();
       throw new CRM_Core_Exception(ts('No records to export'));
-    }
-  }
-
-  /**
-   * Name of the export file based on mode.
-   *
-   * @param string $output
-   *   Type of output.
-   * @param int $mode
-   *   Export mode.
-   *
-   * @return string
-   *   name of the file
-   */
-  public static function getExportFileName($output = 'csv', $mode = CRM_Export_Form_Select::CONTACT_EXPORT) {
-    switch ($mode) {
-      case CRM_Export_Form_Select::CONTACT_EXPORT:
-        return ts('CiviCRM Contact Search');
-
-      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
-        return ts('CiviCRM Contribution Search');
-
-      case CRM_Export_Form_Select::MEMBER_EXPORT:
-        return ts('CiviCRM Member Search');
-
-      case CRM_Export_Form_Select::EVENT_EXPORT:
-        return ts('CiviCRM Participant Search');
-
-      case CRM_Export_Form_Select::PLEDGE_EXPORT:
-        return ts('CiviCRM Pledge Search');
-
-      case CRM_Export_Form_Select::CASE_EXPORT:
-        return ts('CiviCRM Case Search');
-
-      case CRM_Export_Form_Select::GRANT_EXPORT:
-        return ts('CiviCRM Grant Search');
-
-      case CRM_Export_Form_Select::ACTIVITY_EXPORT:
-        return ts('CiviCRM Activity Search');
     }
   }
 
@@ -749,7 +710,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       $rows[] = $row;
     }
 
-    CRM_Core_Report_Excel::writeCSVFile(self::getExportFileName(), $header, $rows);
+    CRM_Core_Report_Excel::writeCSVFile(ts('CiviCRM Contact Search'), $header, $rows);
     CRM_Utils_System::civiExit();
   }
 
@@ -1220,11 +1181,10 @@ GROUP BY civicrm_primary_id ";
    * @param $exportTempTable
    * @param $headerRows
    * @param $sqlColumns
-   * @param $exportMode
-   * @param null $saveFile
-   * @param string $batchItems
+   * @param \CRM_Export_BAO_ExportProcessor $processor
    */
-  public static function writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $exportMode, $saveFile = NULL, $batchItems = '') {
+  public static function writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $processor) {
+    $exportMode = $processor->getExportMode();
     $writeHeader = TRUE;
     $offset = 0;
     $limit = self::EXPORT_ROW_COUNT;
@@ -1250,22 +1210,12 @@ LIMIT $offset, $limit
         }
         $componentDetails[] = $row;
       }
-      if ($exportMode == 'financial') {
-        $getExportFileName = 'CiviCRM Contribution Search';
-      }
-      else {
-        $getExportFileName = self::getExportFileName('csv', $exportMode);
-      }
-      $csvRows = CRM_Core_Report_Excel::writeCSVFile($getExportFileName,
+      CRM_Core_Report_Excel::writeCSVFile($processor->getExportFileName(),
         $headerRows,
         $componentDetails,
         NULL,
-        $writeHeader,
-        $saveFile);
-
-      if ($saveFile && !empty($csvRows)) {
-        $batchItems .= $csvRows;
-      }
+        $writeHeader
+      );
 
       $writeHeader = FALSE;
       $offset += $limit;
