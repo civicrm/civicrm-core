@@ -265,6 +265,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     return TRUE;
   }
 
+  
   /**
    * @inheritDoc
    */
@@ -607,7 +608,7 @@ AND    u.status = 1
     //need to get back for windows.
     $firstVar = array_shift($pathVars);
 
-    //lets remove sript name to reduce one iteration.
+    //lets remove script name to reduce one iteration.
     array_pop($pathVars);
 
     // CRM-7429 -- do check for uppermost 'includes' dir, which would
