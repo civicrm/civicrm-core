@@ -417,8 +417,15 @@ class CRM_Core_Block {
       $values[$key] = self::setShortCutValues($short);
     }
 
-    // call links hook to add user defined links
+    // Deprecated hook with typo.  Please don't use this!
     CRM_Utils_Hook::links('create.new.shorcuts',
+      NULL,
+      CRM_Core_DAO::$_nullObject,
+      $values
+    );
+
+    // Hook that enables extensions to add user-defined links
+    CRM_Utils_Hook::links('create.new.shortcuts',
       NULL,
       CRM_Core_DAO::$_nullObject,
       $values
