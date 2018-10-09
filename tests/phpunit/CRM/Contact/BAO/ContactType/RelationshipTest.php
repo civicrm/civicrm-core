@@ -299,4 +299,22 @@ DELETE FROM civicrm_contact_type
     $this->relationshipTypeDelete($relType->id);
   }
 
+  public function testGetAnyToAnyRelTypes() {
+    // Create an any to any relationship.
+    $relTypeParams = array(
+      'name_a_b' => 'MookieIs',
+      'name_b_a' => 'MookieOf',
+      'contact_type_a' => '',
+      'contact_type_b' => '',
+    );
+    $relType = CRM_Contact_BAO_RelationshipType::add($relTypeParams);
+    $indTypes = CRM_Contact_BAO_Relationship::getRelationType('Individual');
+    $orgTypes = CRM_Contact_BAO_Relationship::getRelationType('Organization');
+
+    $this->assertContains('MookieIs', $indTypes);
+    $this->assertContains('MookieIs', $orgTypes);
+    $this->relationshipTypeDelete($relType->id);
+
+  }
+
 }
