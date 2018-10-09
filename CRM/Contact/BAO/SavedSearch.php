@@ -124,20 +124,30 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
             continue;
           }
         }
+        // Check for a date range field, which might be a standard date
+        // range or a relative date.
         if (strpos($id, '_date_low') !== FALSE || strpos($id, '_date_high') !== FALSE) {
           $entityName = strstr($id, '_date', TRUE);
-          if (!empty($result['relative_dates']) && array_key_exists($entityName, $result['relative_dates'])) {
-            $result[$id] = NULL;
-            $result["{$entityName}_date_relative"] = $result['relative_dates'][$entityName];
-          }
-          elseif (!empty($specialDateFields[$id])) {
-            $entityName = strstr($specialDateFields[$id], '_date', TRUE);
-            $result[$id] = NULL;
-            $result["{$entityName}_relative"] = $result['relative_dates'][$entityName];
-          }
-          else {
-            $result[$id] = $value;
-            $result["{$entityName}_date_relative"] = 0;
+
+          // This is the default, for non relative dates. We will overwrite
+          // it if we determine this is a relative date.
+          $result[$id] = $value;
+          $result["{$entityName}_date_relative"] = 0;
+
+          if (!empty($result['relative_dates'])) {
+            if (array_key_exists($entityName, $result['relative_dates'])) {
+              // We have a match from a regular field.
+              $result[$id] = NULL;
+              $result["{$entityName}_date_relative"] = $result['relative_dates'][$entityName];
+            }
+            elseif (!empty($specialDateFields[$id])) {
+              // We may have a match on a special date field.
+              $entityName = strstr($specialDateFields[$id], '_date', TRUE);
+              if (array_key_exists($entityName, $result['relative_dates'])) {
+                $result[$id] = NULL;
+                $result["{$entityName}_relative"] = $result['relative_dates'][$entityName];
+              }
+            }
           }
         }
         else {
