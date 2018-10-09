@@ -310,6 +310,8 @@ AND    co.id IN ( $contribIDs )";
    * @return array
    */
   public static function &getDetails($contributionIDs) {
+    //Fix for empty param, avoiding payment hangs
+    $contributionIDs = (!empty($contributionIDs)) ? $contributionIDs : 'NULL';
     $query = "
 SELECT    c.id              as contribution_id,
           c.contact_id      as contact_id     ,
