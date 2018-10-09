@@ -61,7 +61,7 @@ class CRM_Contact_Page_AJAX {
     $cf = array();
     CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $cf, $returnProperties);
     if (!$cf['id'] || !$cf['is_active'] || $cf['data_type'] != 'ContactReference') {
-      CRM_Utils_System::civiExit('error');
+      CRM_Utils_System::civiExit(1);
     }
 
     if (!empty($cf['filter'])) {
@@ -70,7 +70,7 @@ class CRM_Contact_Page_AJAX {
 
       $action = CRM_Utils_Array::value('action', $filterParams);
       if (!empty($action) && !in_array($action, array('get', 'lookup'))) {
-        CRM_Utils_System::civiExit('error');
+        CRM_Utils_System::civiExit(1);
       }
 
       if (!empty($filterParams['group'])) {
@@ -136,7 +136,7 @@ class CRM_Contact_Page_AJAX {
     $contact = civicrm_api('Contact', 'Get', $params);
 
     if (!empty($contact['is_error'])) {
-      CRM_Utils_System::civiExit('error');
+      CRM_Utils_System::civiExit(1);
     }
 
     $contactList = array();
