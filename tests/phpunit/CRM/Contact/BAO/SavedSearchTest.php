@@ -98,6 +98,52 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test if dates ranges are stored correctly
+   * in civicrm_saved_search table and are
+   * extracted properly.
+   */
+  public function testDateRange() {
+    $savedSearch = new CRM_Contact_BAO_SavedSearch();
+    $formValues = array(
+      'hidden_basic' => 1,
+      'group_search_selected' => 'group',
+      'component_mode' => 1,
+      'operator' => 'AND',
+      'privacy_operator' => 'OR',
+      'privacy_toggle' => 1,
+      'participant_register_date_low' => '01/01/2009',
+      'participant_register_date_high' => '01/01/2018',
+      'radio_ts' => 'ts_all',
+      'title' => 'bah bah bah',
+    );
+
+    $queryParams = array(
+      0 => array(
+        0 => 'participant_register_date_low',
+        1 => '=',
+        2 => '01/01/2009',
+        3 => 0,
+        4 => 0,
+      ),
+      1 => array(
+        0 => 'participant_register_date_high',
+        1 => '=',
+        2 => '01/01/2018',
+        3 => 0,
+        4 => 0,
+      ),
+    );
+
+    CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
+    CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
+    $savedSearch->form_values = serialize($queryParams);
+    $savedSearch->save();
+
+    $result = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
+    $this->assertEquals('01/01/2009', $result['participant_register_date_low']);
+    $this->assertEquals('01/01/2018', $result['participant_register_date_high']);
+  }
+  /**
    * Test if relative dates are stored correctly
    * in civicrm_saved_search table.
    */
