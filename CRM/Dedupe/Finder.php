@@ -170,7 +170,7 @@ class CRM_Dedupe_Finder {
    * @param int $rgid
    *   Rule group id.
    * @param int $gid
-   *   Contact group id (currently, works only with non-smart groups).
+   *   Contact group id.
    *
    * @param int $searchLimit
    *  Limit for the number of contacts to be used for comparison.
