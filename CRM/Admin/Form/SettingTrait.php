@@ -116,39 +116,42 @@ trait CRM_Admin_Form_SettingTrait {
     $settingMetaData = $this->getSettingsMetaData();
     $descriptions = [];
     foreach ($settingMetaData as $setting => $props) {
-      if (isset($props['quick_form_type'])) {
+      $quickFormType = $this->getQuickFormType($props);
+      if (isset($quickFormType)) {
+        $options = NULL;
         if (isset($props['pseudoconstant'])) {
           $options = civicrm_api3('Setting', 'getoptions', [
             'field' => $setting,
-          ]);
+          ])['values'];
         }
-        else {
-          $options = NULL;
+        if ($props['type'] === 'Boolean') {
+          $options = [$props['title'] => $props['name']];
         }
+
         //Load input as readonly whose values are overridden in civicrm.settings.php.
         if (Civi::settings()->getMandatory($setting)) {
           $props['html_attributes']['readonly'] = TRUE;
           $this->includesReadOnlyFields = TRUE;
         }
 
-        $add = 'add' . $props['quick_form_type'];
+        $add = 'add' . $quickFormType;
         if ($add == 'addElement') {
           $this->$add(
             $props['html_type'],
             $setting,
             ts($props['title']),
-            ($options !== NULL) ? $options['values'] : CRM_Utils_Array::value('html_attributes', $props, []),
+            ($options !== NULL) ? $options : CRM_Utils_Array::value('html_attributes', $props, []),
             ($options !== NULL) ? CRM_Utils_Array::value('html_attributes', $props, []) : NULL
           );
         }
         elseif ($add == 'addSelect') {
-          $this->addElement('select', $setting, ts($props['title']), $options['values'], CRM_Utils_Array::value('html_attributes', $props));
+          $this->addElement('select', $setting, ts($props['title']), $options, CRM_Utils_Array::value('html_attributes', $props));
         }
         elseif ($add == 'addCheckBox') {
-          $this->addCheckBox($setting, ts($props['title']), $options['values'], NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, ['&nbsp;&nbsp;']);
+          $this->addCheckBox($setting, ts($props['title']), $options, NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, ['&nbsp;&nbsp;']);
         }
         elseif ($add == 'addCheckBoxes') {
-          $options = array_flip($options['values']);
+          $options = array_flip($options);
           $newOptions = [];
           foreach ($options as $key => $val) {
             $newOptions[$key] = $val;
@@ -169,7 +172,7 @@ trait CRM_Admin_Form_SettingTrait {
           $this->add('date', $setting, ts($props['title']), CRM_Core_SelectValues::date(NULL, 'M d'));
         }
         else {
-          $this->$add($setting, ts($props['title']));
+          $this->$add($setting, ts($props['title']), $options);
         }
         // Migrate to using an array as easier in smart...
         $descriptions[$setting] = ts($props['description']);
@@ -190,7 +193,24 @@ trait CRM_Admin_Form_SettingTrait {
     $this->assign('settings_fields', $settingMetaData);
   }
 
-
+  /**
+   * Get the quickform type for the given html type.
+   *
+   * @param array $spec
+   *
+   * @return string
+   */
+  protected function getQuickFormType($spec) {
+    if (isset($spec['quick_form_type'])) {
+      return $spec['quick_form_type'];
+    }
+    $mapping = [
+      'checkboxes' => 'CheckBoxes',
+      'checkbox' => 'CheckBox',
+      'radio' => 'Radio',
+    ];
+    return $mapping[$spec['html_type']];
+  }
   /**
    * Get the defaults for all fields defined in the metadata.
    *
@@ -204,7 +224,7 @@ trait CRM_Admin_Form_SettingTrait {
       if (!empty($spec['serialize'])) {
         $this->_defaults[$setting] = CRM_Core_DAO::unSerializeField($this->_defaults[$setting], $spec['serialize']);
       }
-      if ($spec['quick_form_type'] === 'CheckBoxes') {
+      if ($this->getQuickFormType($spec) === 'CheckBoxes') {
         $this->_defaults[$setting] = array_fill_keys($this->_defaults[$setting], 1);
       }
     }
@@ -217,7 +237,7 @@ trait CRM_Admin_Form_SettingTrait {
   protected function saveMetadataDefinedSettings($params) {
     $settings = $this->getSettingsToSetByMetadata($params);
     foreach ($settings as $setting => $settingValue) {
-      if ($this->getSettingMetadataItem($setting, 'quick_form_type') === 'CheckBoxes') {
+      if ($this->getQuickFormType($this->getSettingMetadata($setting)) === 'CheckBoxes') {
         $settings[$setting] = array_keys($settingValue);
       }
     }
