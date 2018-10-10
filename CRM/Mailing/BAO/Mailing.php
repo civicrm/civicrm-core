@@ -160,7 +160,9 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         ->param('#groupIDs', $groupIDs)
         ->execute();
       while ($groupDAO->fetch()) {
-        if ($groupDAO->cache_date == NULL) {
+        // hidden smart groups always have a cache date and there is no other way
+        //  we can rebuilt the contact list from UI so consider such smart group
+        if ($groupDAO->cache_date == NULL || $groupDAO->is_hidden) {
           CRM_Contact_BAO_GroupContactCache::load($groupDAO);
         }
         if ($groupType == 'Include') {
