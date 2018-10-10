@@ -709,6 +709,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       return $url;
     }
 
+    // Drupal might not be bootstrapped if being called by the REST API.
+    if (!class_exists('Drupal')) {
+      return NULL;
+    }
+
     $language = $this->getCurrentLanguage();
     if (\Drupal::service('module_handler')->moduleExists('language')) {
       $config = \Drupal::config('language.negotiation')->get('url');
@@ -722,7 +727,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
         //url prefix
         if ($urlType == \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::CONFIG_PATH_PREFIX) {
           if (!empty($language)) {
-            if ($addLanguagePart) {
+            if ($addLanguagePart && !empty($config['prefixes'][$language])) {
               $url .= $config['prefixes'][$language] . '/';
             }
             if ($removeLanguagePart) {
