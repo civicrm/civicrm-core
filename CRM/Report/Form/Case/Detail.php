@@ -650,18 +650,6 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         }
         $entryFound = TRUE;
       }
-      if (array_key_exists('civicrm_address_country_id', $row)) {
-        if ($value = $row['civicrm_address_country_id']) {
-          $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
-        }
-        $entryFound = TRUE;
-      }
-      if (array_key_exists('civicrm_address_state_province_id', $row)) {
-        if ($value = $row['civicrm_address_state_province_id']) {
-          $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
-        }
-        $entryFound = TRUE;
-      }
       if (array_key_exists('civicrm_activity_last_last_activity_activity_subject', $row) &&
         empty($row['civicrm_activity_last_last_activity_activity_subject'])
       ) {
@@ -715,6 +703,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
       if (!$entryFound) {
         break;
       }
