@@ -173,16 +173,7 @@
     {/foreach}
   </div>
 </div>
-  <script type='text/javascript'>
-    var selectedTab = 'user';
-    {if $selectedChild}selectedTab = '{$selectedChild}';{/if}
-    {literal}
-      CRM.$(function($) {
-        var tabIndex = $('#tab_' + selectedTab).prevAll().length
-        $("#mainTabContainer").tabs( {active: tabIndex} );
-      });
-    {/literal}
-  </script>
+{include file="CRM/common/TabSelected.tpl" defaultTab="user"}
 
 {elseif $action ne 1 and $action ne 2 and $action ne 4 and $action ne 8}
   <div class="messages status no-popup">
