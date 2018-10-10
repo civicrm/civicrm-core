@@ -146,8 +146,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $localExtensionRows = $this->formatLocalExtensionRows();
     $this->assign('localExtensionRows', $localExtensionRows);
 
-    $remoteExtensionRows = $this->formatRemoteExtensionRows($localExtensionRows);
-    $this->assign('remoteExtensionRows', $remoteExtensionRows);
+    $remoteExtensionCategories = $this->formatRemoteExtensionRowsByCategory($localExtensionRows);
+    $this->assign('remoteExtensionCategories', $remoteExtensionCategories);
   }
 
   /**
@@ -221,13 +221,139 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
   }
 
   /**
+   *
+   * @param array $row
+   * @return string
+   */
+  private function getExtensionCategory($extensionDetails) {
+    // In the future, this hardcoding should not be needed. It is present until
+    // the extension development standards catch up.
+
+    $category = 'Uncategorised';
+
+    switch($extensionDetails['key']) {
+      case 'nz.co.fuzion.extendedreport':
+      case 'ca.bidon.reporterror':
+      case 'uk.co.compucorp.civicrm.pivotreport':
+      case 'biz.jmaconsulting.financialaclreport':
+      case 'ca.civicrm.logviewer':
+      case 'biz.jmaconsulting.printgrantpdfs':
+      case 'com.joineryhq.percentagepricesetfield':
+      case 'coop.palantetech.nodrilldown':
+        $category = 'Reports';
+        break;
+      case 'uk.co.compucorp.civicrm.giftaid':
+      case 'uk.co.vedaconsulting.module.giftaidonline':
+      case 'com.webaccessglobal.simpledonate':
+      case 'org.project60.sepa':
+      case 'com.drastikbydesign.stripe':
+      case 'com.iatspayments.civicrm':
+      case 'org.civicrm.cdntaxreceipts':
+      case 'net.ourpowerbase.report.advancedfundraising':
+      case 'nz.co.fuzion.omnipaymultiprocessor':
+      case 'com.joineryhq.percentagepricesetfield':
+      case 'com.chrischinchilla.ewayrecurring':
+      case 'com.aghstrategies.idbsurvey':
+      case 'biz.jmaconsulting.lineitemedit':
+        $category = 'Finance';
+        break;
+      case 'com.osseed.eventcalendar':
+      case 'com.aghstrategies.eventmembershipsignup':
+      case 'com.fountaintribe.eventhelper':
+        $category = 'Events';
+        break;
+      case 'com.pogstone.contenttokens':
+      case 'nz.co.fuzion.civitoken':
+      case 'org.civicrm.casetokens':
+      case 'com.pogstone.fancytokens':
+        $category = 'Tokens';
+        break;
+      case 'org.civicrm.api4':
+      case 'org.civicoop.emailapi':
+      case 'org.civicoop.smsapi':
+      case 'org.civicoop.pdfapi':
+      case 'com.cividesk.apikey':
+        $category = 'APIs';
+        break;
+      case 'uk.co.vedaconsulting.module.civicrmpostcodelookup':
+      case 'org.civicoop.postcodenl':
+      case 'org.civicoop.areas':
+      case 'com.aghstrategies.uscounties':
+        $category = 'Location';
+        break;
+      case 'org.wikimedia.rip':
+      case 'eu.tttp.group2summary':
+      case 'net.ourpowerbase.sumfields':
+      case 'eu.tttp.normalise':
+      case 'org.wikimedia.contacteditor':
+      case 'com.ginkgostreet.nickfix':
+      case 'org.civicoop.relationship2summary':
+      case 'eu.tttp.noverwrite':
+      case 'org.wikimedia.relationshipblock':
+      case 'org.civicrm.contactlayout':
+      case 'org.woolman.genderselfidentify':
+      case 'nz.co.fuzion.relatedpermissions':
+        $category = 'Contacts';
+        break;
+      case 'uk.co.vedaconsulting.mosaico':
+      case 'org.wikimedia.unsubscribeemail':
+      case 'uk.co.vedaconsulting.mailchimp':
+      case 'com.cividesk.email.sparkpost':
+      case 'biz.jmaconsulting.ode':
+      case 'biz.jmaconsulting.olarkchat':
+      case 'uk.co.vedaconsulting.gotowebinar':
+      case 'org.civicoop.templateattachments':
+      // SMS Providers can go here for now.
+      case 'org.civicrm.sms.clickatell':
+      case 'org.civicrm.sms.twilio':
+      case 'io.3sd.dummysms':
+      case 'com.aghstrategies.tinymce':
+        $category = 'Communications';
+        break;
+      case 'com.webaccessglobal.module.civimobile':
+      case 'eu.tttp.bootstrapvisualize':
+      case 'com.aghstrategies.slicknav':
+      case 'nz.co.fuzion.environmentindicator':
+      case 'org.civicrm.recentmenu':
+      case 'com.megaphonetech.fastactionlinks':
+        $category = 'Interface';
+        break;
+      case 'org.civicoop.documents':
+      case 'org.civicrm.multisite':
+      case 'uk.co.compucorp.civicrm.booking':
+      case 'biz.jmaconsulting.grantapplications':
+          $category = 'Modules';
+          break;
+      case 'com.megaphonetech.entitytemplates':
+      case 'form-processor':
+      case 'nz.co.fuzion.csvimport':
+      case 'nz.co.fuzion.entitysetting':
+      case 'ca.bidon.imagecrop':
+      case 'ca.bidon.civiexportexcel':
+      case 'biz.jmaconsulting.bugp':
+      case 'com.joineryhq.activityical':
+      case 'uk.co.vedaconsulting.gdpr':
+          $category = 'Utilities';
+    }
+
+    // Override it with whatever's in the info file.
+    if (array_key_exists('category', $extensionDetails)) {
+      if (!empty($row['category'])) {
+        $category = $row['category'];
+      }
+    }
+
+    return $category;
+  }
+
+  /**
    * Get the list of local extensions and format them as a table with
    * status and action data.
    *
    * @param array $localExtensionRows
    * @return array
    */
-  public function formatRemoteExtensionRows($localExtensionRows) {
+  public function formatRemoteExtensionRowsByCategory($localExtensionRows) {
     try {
       $remoteExtensions = CRM_Extension_System::singleton()->getBrowser()->getExtensions();
     }
@@ -240,6 +366,9 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $remoteExtensionRows = array();
     foreach ($remoteExtensions as $info) {
       $row = (array) $info;
+
+      $category = $this->getExtensionCategory($row);
+
       $row['id'] = $info->key;
       $action = CRM_Core_Action::UPDATE;
       $row['action'] = CRM_Core_Action::formLink(self::links(),
@@ -261,7 +390,10 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
           }
         }
       }
-      $remoteExtensionRows[$row['id']] = $row;
+      if (!array_key_exists($category, $remoteExtensionRows)) {
+        $remoteExtensionRows[$category] = array();
+      }
+      $remoteExtensionRows[$category][$row['id']] = $row;
     }
 
     return $remoteExtensionRows;

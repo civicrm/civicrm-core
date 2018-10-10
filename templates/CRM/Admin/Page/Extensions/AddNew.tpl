@@ -3,8 +3,8 @@ Display a table of remotely-available extensions
 
 Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
 *}
-{if $remoteExtensionRows}
-  <div id="extensions-addnew">
+{if $remoteExtensionCategories}
+  <div id="extensions-addnew-{$categoryName}">
     {strip}
     <table id="extensions-addnew-table" class="display">
       <thead>
@@ -16,24 +16,30 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
         </tr>
       </thead>
       <tbody>
-        {foreach from=$remoteExtensionRows key=extKey item=row}
-        {if $localExtensionRows[$extKey]}
-          {continue}
-        {/if}
-        <tr id="addnew-row_{$row.file}" class="crm-extensions crm-extensions_{$row.file}">
-          <td class="crm-extensions-label">
+        <!-- Category name -->
+        {foreach from=$remoteExtensionCategories key=categoryName item=remoteExtensionRows}
+          {if $categoryName != $thisCategory}
+            {continue}
+          {/if}
+          {foreach from=$remoteExtensionRows key=extKey item=row}
+          {if $localExtensionRows[$extKey]}
+            {continue}
+          {/if}
+          <tr id="addnew-row_{$row.file}" class="crm-extensions crm-extensions_{$row.file}">
+            <td class="crm-extensions-label">
               <a class="collapsed" href="#"></a>&nbsp;<strong>{$row.label}</strong><br/>({$row.key})
-          </td>
-          <td class="crm-extensions-label">{$row.version} {if $row.upgradable}<br/>({$row.upgradeVersion}){/if}</td>
-          <td class="crm-extensions-description">{$row.type|capitalize}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
-        </tr>
-        <tr class="hiddenElement" id="crm-extensions-details-addnew-{$row.file}">
-            <td>
-                {include file="CRM/Admin/Page/ExtensionDetails.tpl" extension=$row}
             </td>
-            <td></td><td></td><td></td>
-        </tr>
+            <td class="crm-extensions-label">{$row.version} {if $row.upgradable}<br/>({$row.upgradeVersion}){/if}</td>
+            <td class="crm-extensions-description">{$row.type|capitalize}</td>
+            <td>{$row.action|replace:'xx':$row.id}</td>
+          </tr>
+          <tr class="hiddenElement" id="crm-extensions-details-addnew-{$row.file}">
+              <td>
+                  {include file="CRM/Admin/Page/ExtensionDetails.tpl" extension=$row}
+              </td>
+              <td></td><td></td><td></td>
+          </tr>
+          {/foreach}
         {/foreach}
       </tbody>
     </table>
