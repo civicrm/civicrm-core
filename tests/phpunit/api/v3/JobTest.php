@@ -1721,7 +1721,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Test processing membership for deceased contacts.
    */
-  public function testProcessMembership() {
+  public function testProcessMembershipDeceased() {
     $this->callAPISuccess('Job', 'process_membership', []);
     $deadManWalkingID = $this->individualCreate();
     $membershipID = $this->contactMembershipCreate(array('contact_id' => $deadManWalkingID));
@@ -1746,6 +1746,141 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->callAPIFailure('Job', 'process_membership', []);
 
     $this->callAPISuccess('MembershipStatus', 'create', ['is_active' => 1, 'id' => $deceasedStatusId]);
+  }
+
+  /**
+   * Test processing membership: check that status is updated when it should be
+   * and left alone when it shouldn't.
+   */
+  public function testProcessMembershipUpdateStatus() {
+    $membershipTypeId = $this->membershipTypeCreate();
+
+    // Create admin-only membership status and get all statuses.
+    $result = $this->callAPISuccess('membership_status', 'create', ['name' => 'Admin', 'is_admin' => 1, 'sequential' => 1]);
+    $membershipStatusIdAdmin = $result['values'][0]['id'];
+    $memStatus = CRM_Member_PseudoConstant::membershipStatus();
+
+    // Default params, which we'll expand on below.
+    $params = [
+      'membership_type_id' => $membershipTypeId,
+      'skipStatusCal' => 1, // Don't calculate status.
+      'source' => 'Test',
+      'sequential' => 1,
+    ];
+
+    /*
+     * We create various memberships with wrong status, then check that the
+     * process_membership job sets the correct status for each.
+     * Also some memberships that should not be updated.
+     */
+
+    // Create membership with incorrect status but dates implying status New.
+    $params['contact_id'] = $this->individualCreate();
+    $params['join_date'] = date('Y-m-d');
+    $params['start_date'] = date('Y-m-d');
+    $params['end_date'] = date('Y-m-d', strtotime('now + 1 year'));
+    $params['status_id'] = 'Current'; // Intentionally incorrect status.
+    $resultNew = $this->callAPISuccess('Membership', 'create', $params);
+    $this->assertEquals(array_search('Current', $memStatus), $resultNew['values'][0]['status_id']);
+
+    // Create membership with incorrect status but dates implying status Current.
+    $params['contact_id'] = $this->individualCreate();
+    $params['join_date'] = date('Y-m-d', strtotime('now - 6 month'));
+    $params['start_date'] = date('Y-m-d', strtotime('now - 6 month'));
+    $params['end_date'] = date('Y-m-d', strtotime('now + 6 month'));
+    $params['status_id'] = 'New'; // Intentionally incorrect status.
+    $resultCurrent = $this->callAPISuccess('Membership', 'create', $params);
+    $this->assertEquals(array_search('New', $memStatus), $resultCurrent['values'][0]['status_id']);
+
+    // Create membership with incorrect status but dates implying status Grace.
+    $params['contact_id'] = $this->individualCreate();
+    $params['join_date'] = date('Y-m-d', strtotime('now - 53 week'));
+    $params['start_date'] = date('Y-m-d', strtotime('now - 53 week'));
+    $params['end_date'] = date('Y-m-d', strtotime('now - 1 week'));
+    $params['status_id'] = 'Current'; // Intentionally incorrect status.
+    $resultGrace = $this->callAPISuccess('Membership', 'create', $params);
+    $this->assertEquals(array_search('Current', $memStatus), $resultGrace['values'][0]['status_id']);
+
+    // Create membership with incorrect status but dates implying status Expired.
+    $params['contact_id'] = $this->individualCreate();
+    $params['join_date'] = date('Y-m-d', strtotime('now - 16 month'));
+    $params['start_date'] = date('Y-m-d', strtotime('now - 16 month'));
+    $params['end_date'] = date('Y-m-d', strtotime('now - 4 month'));
+    $params['status_id'] = 'Grace'; // Intentionally incorrect status.
+    $resultExpired = $this->callAPISuccess('Membership', 'create', $params);
+    $this->assertEquals(array_search('Grace', $memStatus), $resultExpired['values'][0]['status_id']);
+
+    // Create Pending membership with dates implying New: should not get updated.
+    $params['contact_id'] = $this->individualCreate();
+    $params['join_date'] = date('Y-m-d');
+    $params['start_date'] = date('Y-m-d');
+    $params['end_date'] = date('Y-m-d', strtotime('now + 1 year'));
+    $params['status_id'] = 'Pending';
+    $resultPending = $this->callAPISuccess('Membership', 'create', $params);
+    $this->assertEquals(array_search('Pending', $memStatus), $resultPending['values'][0]['status_id']);
+
+    // Create Cancelled membership with dates implying Current: should not get updated.
+    $params['contact_id'] = $this->individualCreate();
+    $params['join_date'] = date('Y-m-d', strtotime('now - 6 month'));
+    $params['start_date'] = date('Y-m-d', strtotime('now - 6 month'));
+    $params['end_date'] = date('Y-m-d', strtotime('now + 6 month'));
+    $params['status_id'] = 'Cancelled';
+    $resultCancelled = $this->callAPISuccess('Membership', 'create', $params);
+    $this->assertEquals(array_search('Cancelled', $memStatus), $resultCancelled['values'][0]['status_id']);
+
+    // Create status-overridden membership with dates implying Expired: should not get updated.
+    $params['contact_id'] = $this->individualCreate();
+    $params['join_date'] = date('Y-m-d', strtotime('now - 16 month'));
+    $params['start_date'] = date('Y-m-d', strtotime('now - 16 month'));
+    $params['end_date'] = date('Y-m-d', strtotime('now - 4 month'));
+    $params['status_id'] = 'Current';
+    $params['is_override'] = 1;
+    $resultOverride = $this->callAPISuccess('Membership', 'create', $params);
+    $this->assertEquals(array_search('Current', $memStatus), $resultOverride['values'][0]['status_id']);
+
+    // Create membership with admin-only status but dates implying Expired: should not get updated.
+    $params['contact_id'] = $this->individualCreate();
+    $params['join_date'] = date('Y-m-d', strtotime('now - 16 month'));
+    $params['start_date'] = date('Y-m-d', strtotime('now - 16 month'));
+    $params['end_date'] = date('Y-m-d', strtotime('now - 4 month'));
+    $params['status_id'] = $membershipStatusIdAdmin;
+    $resultAdmin = $this->callAPISuccess('Membership', 'create', $params);
+    $this->assertEquals($membershipStatusIdAdmin, $resultAdmin['values'][0]['status_id']);
+
+    // Check that after running process_membership job, statuses are correct.
+    $this->callAPISuccess('Job', 'process_membership', []);
+
+    // New - should get updated.
+    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultNew['values'][0]['id']]);
+    $this->assertEquals(array_search('New', $memStatus), $membership['status_id']);
+
+    // Current - should get updated.
+    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultCurrent['values'][0]['id']]);
+    $this->assertEquals(array_search('Current', $memStatus), $membership['status_id']);
+
+    // Grace - should get updated.
+    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultGrace['values'][0]['id']]);
+    $this->assertEquals(array_search('Grace', $memStatus), $membership['status_id']);
+
+    // Expired - should get updated.
+    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultExpired['values'][0]['id']]);
+    $this->assertEquals(array_search('Expired', $memStatus), $membership['status_id']);
+
+    // Pending - should not get updated.
+    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultPending['values'][0]['id']]);
+    $this->assertEquals(array_search('Pending', $memStatus), $membership['status_id']);
+
+    // Cancelled - should not get updated.
+    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultCancelled['values'][0]['id']]);
+    $this->assertEquals(array_search('Cancelled', $memStatus), $membership['status_id']);
+
+    // Override - should not get updated.
+    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultOverride['values'][0]['id']]);
+    $this->assertEquals(array_search('Current', $memStatus), $membership['status_id']);
+
+    // Admin - should not get updated.
+    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultAdmin['values'][0]['id']]);
+    $this->assertEquals($membershipStatusIdAdmin, $membership['status_id']);
   }
 
 }
