@@ -41,6 +41,8 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     'contact_smart_group_display' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'advanced_search_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'preserve_activity_tab_filter' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'display_name_format' =>  CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'sort_name_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
 
   public function preProcess() {
@@ -74,16 +76,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'title' => ts('Contact Dashboard'),
           'weight' => 9,
         ),
-        'display_name_format' => array(
-          'html_type' => 'textarea',
-          'title' => ts('Individual Display Name Format'),
-          'weight' => 10,
-        ),
-        'sort_name_format' => array(
-          'html_type' => 'textarea',
-          'title' => ts('Individual Sort Name Format'),
-          'weight' => 11,
-        ),
         'editor_id' => array(
           'html_type' => NULL,
           'weight' => 12,
@@ -112,13 +104,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     parent::cbsDefaultValues($defaults);
-
-    if ($this->_config->display_name_format) {
-      $defaults['display_name_format'] = $this->_config->display_name_format;
-    }
-    if ($this->_config->sort_name_format) {
-      $defaults['sort_name_format'] = $this->_config->sort_name_format;
-    }
 
     return $defaults;
   }

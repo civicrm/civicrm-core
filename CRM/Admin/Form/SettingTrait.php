@@ -210,6 +210,7 @@ trait CRM_Admin_Form_SettingTrait {
       'checkbox' => 'CheckBox',
       'radio' => 'Radio',
       'select' => 'Select',
+      'textarea' => 'Element',
     ];
     return $mapping[$spec['html_type']];
   }
