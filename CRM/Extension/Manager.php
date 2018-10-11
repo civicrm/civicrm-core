@@ -64,6 +64,11 @@ class CRM_Extension_Manager {
   const STATUS_DISABLED_MISSING = 'disabled-missing';
 
   /**
+   * The Extension is available to download remotely.
+   */
+  const STATUS_REMOTE = 'remote';
+
+  /**
    * @var CRM_Extension_Container_Interface
    *
    * Note: Treat as private. This is only public to facilitate debugging.

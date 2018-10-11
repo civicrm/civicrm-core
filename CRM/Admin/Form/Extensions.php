@@ -46,7 +46,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
     $localExtensionRows = $mainPage->formatLocalExtensionRows();
     $this->assign('localExtensionRows', $localExtensionRows);
 
-    $remoteExtensionCategories = $mainPage->formatRemoteExtensionRowsByCategory($localExtensionRows);
+    $remoteExtensionCategories = $mainPage->formatRemoteExtensionRows($localExtensionRows);
     $this->assign('remoteExtensionCategories', $remoteExtensionCategories);
 
     $this->_key = CRM_Utils_Request::retrieve('key', 'String',

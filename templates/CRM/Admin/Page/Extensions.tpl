@@ -51,10 +51,10 @@
               <em>&nbsp;</em>
               </a>
             </li>
-            {foreach from=$remoteExtensionCategories key=categoryName item=remoteExtensionRows}
+            {foreach from=$extensionCategoryToTabMap key=tabName item=categories}
             <li id="tab_addnew" class="crm-tab-button">
-              <a href="#extensions-addnew-{$categoryName}" title="{$categoryName}">
-              <span> </span> {$categoryName}
+              <a href="#extensions-addnew-{$tabName}" title="{ts}{$tabName}{/ts}">
+              <span> </span> {ts}{$extensionCategoryNames.$tabName}{/ts}
               <em>&nbsp;</em>
               </a>
             </li>
@@ -64,13 +64,13 @@
         <div id="extensions-main" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
             {include file="CRM/Admin/Page/Extensions/Main.tpl"}
         </div>
-        {foreach from=$remoteExtensionCategories key=categoryName item=remoteExtensionRows}
-            <div id="extensions-addnew-{$categoryName}" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
+        {foreach from=$extensionCategoryToTabMap key=tabName item=categories}
+            <div id="extensions-addnew-{$tabName}" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
                 {if $extAddNewEnabled}
                     {if $extAddNewReqs}
                         {include file="CRM/Admin/Page/Extensions/AddNewReq.tpl"}
                     {else}
-                        {include file="CRM/Admin/Page/Extensions/AddNew.tpl" thisCategory=$categoryName}
+                        {include file="CRM/Admin/Page/Extensions/AddNew.tpl" thisTab=$tabName}
                     {/if}
                 {else}
                     {ts}The system administrator has disabled this feature.{/ts}
