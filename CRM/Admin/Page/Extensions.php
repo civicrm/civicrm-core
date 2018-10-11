@@ -144,15 +144,14 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     // $manager->refresh();
 
     $localExtensionRows = $this->formatLocalExtensionRows();
-    usort($localExtensionRows, 'CRM_Admin_Page_Extensions::sortExtensionByStatus');
+    uasort($localExtensionRows, 'CRM_Admin_Page_Extensions::sortExtensionByStatus');
     $this->assign('localExtensionRows', $localExtensionRows);
 
     $remoteExtensionRows = $this->formatRemoteExtensionRows($localExtensionRows);
-    //$this->assign('remoteExtensionRows', $remoteExtensionRows);
+    $this->assign('remoteExtensionRows', $remoteExtensionRows);
 
     $extensionRows = array_replace($remoteExtensionRows, $localExtensionRows);
-    $this->assign('remoteExtensionRows', $remoteExtensionRows);
-    
+
     $this->categoriseExtensions($extensionRows);
     $this->sortExtensions($extensionRows);
     $this->assign('extensionsByCategory', $extensionRows);
@@ -348,7 +347,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       case 'org.civicoop.postcodenl':
       case 'org.civicoop.areas':
       case 'com.aghstrategies.uscounties':
-        $category = 'Location';
+        $category = 'Geography';
         break;
 
       case 'org.wikimedia.rip':
@@ -374,7 +373,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       case 'biz.jmaconsulting.olarkchat':
       case 'uk.co.vedaconsulting.gotowebinar':
       case 'org.civicoop.templateattachments':
-        $category = 'Communications';
+        $category = 'Communication';
         break;
 
       case 'org.civicrm.sms.clickatell':
@@ -510,10 +509,12 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     // We then merge categories manually underneath.
     $extensionCategoryToTabMap['Developers'][] = 'APIs';
     unset ($extensionCategoryToTabMap['APIs']);
-    $extensionCategoryToTabMap['Communications'][] = 'Tokens';
+    $extensionCategoryToTabMap['Communication'][] = 'Tokens';
     unset ($extensionCategoryToTabMap['Tokens']);
-    $extensionCategoryToTabMap['Communications'][] = 'SMSProviders';
+    $extensionCategoryToTabMap['Communication'][] = 'SMSProviders';
     unset ($extensionCategoryToTabMap['SMSProviders']);
+    $extensionCategoryToTabMap['Utilities'][] = 'DataCleaning';
+    unset ($extensionCategoryToTabMap['DataCleaning']);
 
     $this->assign('extensionCategoryToTabMap', $extensionCategoryToTabMap);
   }
