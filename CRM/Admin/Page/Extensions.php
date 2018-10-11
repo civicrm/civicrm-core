@@ -355,6 +355,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     }
     $extensionCategoryNames['DataCleaning'] = 'Data Cleaning';
     $extensionCategoryNames['SMSProviders'] = 'SMS Providers';
+    $extensionCategoryNames['PaymentProcessors'] = 'Payment Processors';
     $this->assign('extensionCategoryNames', $extensionCategoryNames);
   }
 
@@ -379,6 +380,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     unset ($extensionCategoryToTabMap['SMSProviders']);
     $extensionCategoryToTabMap['Utilities'][] = 'DataCleaning';
     unset ($extensionCategoryToTabMap['DataCleaning']);
+    $extensionCategoryToTabMap['Finance'][] = 'PaymentProcessors';
+    unset ($extensionCategoryToTabMap['PaymentProcessors']);
 
     $this->assign('extensionCategoryToTabMap', $extensionCategoryToTabMap);
   }

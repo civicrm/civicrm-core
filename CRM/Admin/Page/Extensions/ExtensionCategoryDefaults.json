@@ -11,18 +11,19 @@
 
        "uk.co.compucorp.civicrm.giftaid": "Finance",
        "uk.co.vedaconsulting.module.giftaidonline": "Finance",
-       "com.webaccessglobal.simpledonate": "Finance",
-       "org.project60.sepa": "Finance",
-       "com.drastikbydesign.stripe": "Finance",
-       "com.iatspayments.civicrm": "Finance",
        "org.civicrm.cdntaxreceipts": "Finance",
        "net.ourpowerbase.report.advancedfundraising": "Finance",
-       "nz.co.fuzion.omnipaymultiprocessor": "Finance",
        "com.joineryhq.percentagepricesetfield": "Finance",
-       "com.chrischinchilla.ewayrecurring": "Finance",
        "com.aghstrategies.idbsurvey": "Finance",
        "biz.jmaconsulting.lineitemedit": "Finance",
        "org.civicrm.module.cividiscount": "Finance",
+       "org.project60.sepa": "Finance",
+       "com.webaccessglobal.simpledonate": "Finance",
+
+       "nz.co.fuzion.omnipaymultiprocessor": "PaymentProcessors",
+       "com.drastikbydesign.stripe": "PaymentProcessors",
+       "com.iatspayments.civicrm": "PaymentProcessors",
+       "com.chrischinchilla.ewayrecurring": "PaymentProcessors",
 
        "com.osseed.eventcalendar": "Events",
        "com.aghstrategies.eventmembershipsignup": "Events",
@@ -32,6 +33,7 @@
        "nz.co.fuzion.civitoken": "Tokens",
        "org.civicrm.tokens": "Tokens",
        "com.pogstone.fancytokens": "Tokens",
+       "org.civicrm.casetokens": "Tokens",
 
        "org.civicrm.api4": "APIs",
        "org.civicoop.emailapi": "APIs",
