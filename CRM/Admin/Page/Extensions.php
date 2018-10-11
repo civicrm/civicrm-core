@@ -282,175 +282,39 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
   /**
    *
-   * @param array $extensionDetails - only the key is looked at for the switch,
-   *   but the category is needed later.
-   * @return string
+   * @param array $extensions of the form $key => array of extension details.
    */
-  private function getExtensionCategory($extensionDetails) {
-    // In the future, this hardcoding should not be needed. It is present until
-    // the extension development standards catch up.
-
-    $category = 'Uncategorised';
-
-    switch ($extensionDetails['key']) {
-      case 'nz.co.fuzion.extendedreport':
-      case 'ca.bidon.reporterror':
-      case 'uk.co.compucorp.civicrm.pivotreport':
-      case 'biz.jmaconsulting.financialaclreport':
-      case 'ca.civicrm.logviewer':
-      case 'biz.jmaconsulting.printgrantpdfs':
-      case 'com.joineryhq.percentagepricesetfield':
-      case 'coop.palantetech.nodrilldown':
-      case 'eu.tttp.civisualize':
-        $category = 'Reports';
-        break;
-
-      case 'uk.co.compucorp.civicrm.giftaid':
-      case 'uk.co.vedaconsulting.module.giftaidonline':
-      case 'com.webaccessglobal.simpledonate':
-      case 'org.project60.sepa':
-      case 'com.drastikbydesign.stripe':
-      case 'com.iatspayments.civicrm':
-      case 'org.civicrm.cdntaxreceipts':
-      case 'net.ourpowerbase.report.advancedfundraising':
-      case 'nz.co.fuzion.omnipaymultiprocessor':
-      case 'com.joineryhq.percentagepricesetfield':
-      case 'com.chrischinchilla.ewayrecurring':
-      case 'com.aghstrategies.idbsurvey':
-      case 'biz.jmaconsulting.lineitemedit':
-      case 'org.civicrm.module.cividiscount':
-        $category = 'Finance';
-        break;
-
-      case 'com.osseed.eventcalendar':
-      case 'com.aghstrategies.eventmembershipsignup':
-      case 'com.fountaintribe.eventhelper':
-        $category = 'Events';
-        break;
-
-      case 'com.pogstone.contenttokens':
-      case 'nz.co.fuzion.civitoken':
-      case 'org.civicrm.casetokens':
-      case 'com.pogstone.fancytokens':
-        $category = 'Tokens';
-        break;
-
-      case 'org.civicrm.api4':
-      case 'org.civicoop.emailapi':
-      case 'org.civicoop.smsapi':
-      case 'org.civicoop.pdfapi':
-      case 'com.cividesk.apikey':
-        $category = 'APIs';
-        break;
-
-      case 'uk.co.vedaconsulting.module.civicrmpostcodelookup':
-      case 'org.civicoop.postcodenl':
-      case 'org.civicoop.areas':
-      case 'com.aghstrategies.uscounties':
-        $category = 'Geography';
-        break;
-
-      case 'org.wikimedia.rip':
-      case 'eu.tttp.group2summary':
-      case 'net.ourpowerbase.sumfields':
-      case 'eu.tttp.normalise':
-      case 'org.wikimedia.contacteditor':
-      case 'com.ginkgostreet.nickfix':
-      case 'org.civicoop.relationship2summary':
-      case 'eu.tttp.noverwrite':
-      case 'org.wikimedia.relationshipblock':
-      case 'org.civicrm.contactlayout':
-      case 'org.woolman.genderselfidentify':
-      case 'nz.co.fuzion.relatedpermissions':
-        $category = 'Contacts';
-        break;
-
-      case 'uk.co.vedaconsulting.mosaico':
-      case 'org.wikimedia.unsubscribeemail':
-      case 'uk.co.vedaconsulting.mailchimp':
-      case 'com.cividesk.email.sparkpost':
-      case 'biz.jmaconsulting.ode':
-      case 'biz.jmaconsulting.olarkchat':
-      case 'uk.co.vedaconsulting.gotowebinar':
-      case 'org.civicoop.templateattachments':
-        $category = 'Communication';
-        break;
-
-      case 'org.civicrm.sms.clickatell':
-      case 'org.civicrm.sms.twilio':
-      case 'io.3sd.dummysms':
-      case 'com.aghstrategies.tinymce':
-        $category = 'SMSProviders';
-        break;
-
-      case 'com.webaccessglobal.module.civimobile':
-      case 'eu.tttp.bootstrapvisualize':
-      case 'com.aghstrategies.slicknav':
-      case 'nz.co.fuzion.environmentindicator':
-      case 'org.civicrm.recentmenu':
-      case 'com.megaphonetech.fastactionlinks':
-        $category = 'Interface';
-        break;
-
-      case 'org.civicoop.documents':
-      case 'org.civicrm.multisite':
-      case 'uk.co.compucorp.civicrm.booking':
-      case 'biz.jmaconsulting.grantapplications':
-      case 'org.civicrm.volunteer':
-      case 'org.civicoop.civirules':
-        $category = 'Modules';
-        break;
-
-      case 'com.megaphonetech.entitytemplates':
-      case 'form-processor':
-      case 'nz.co.fuzion.csvimport':
-      case 'nz.co.fuzion.entitysetting':
-      case 'ca.bidon.imagecrop':
-      case 'ca.bidon.civiexportexcel':
-      case 'biz.jmaconsulting.bugp':
-      case 'com.joineryhq.activityical':
-      case 'uk.co.vedaconsulting.gdpr':
-        $category = 'Utilities';
-        break;
-
-      case 'test.extension.manager.paymenttest':
-      case 'test.extension.manager.moduletest':
-      case 'org.civicrm.angularex':
-      case 'test.extension.manager.searchtest':
-      case 'test.extension.manager.reporttest':
-      case 'org.civicrm.angularprofiles':
-      case 'org.civicrm.demoqueue':
-        $category = 'Developers';
-        break;
-
-      default:
-        $category = 'Uncategorised';
-        break;
-    }
-
-    // Override it with whatever's in the info file.
-    if (array_key_exists('category', $extensionDetails)) {
-      if (!empty($extensionDetails['category'])) {
-        // Spaces can break the behaviour. We remove them here and add them in
-        // the label list in case any slip past the reviewers.
-        $category = str_replace(' ', '', $extensionDetails['category']);
-      }
-    }
-
-    return $category;
-  }
-
   private function categoriseExtensions(&$extensions) {
     $categorisedExtensions = array();
 
-    foreach ($extensions as $extensionKey => $eachExtension) {
-      $category = $this->getExtensionCategory($eachExtension);
+    $extensionCategoryDefaultsJson = file_get_contents(__DIR__ . '/Extensions/ExtensionCategoryDefaults.json');
+    if (FALSE === $extensionCategoryDefaultsJson) {
+      throw new CRM_Exception('Missing file Page/Extensions/ExtensionCategoryDefaults.json');
+    }
+    $extensionCategoryLookupTable = json_decode($extensionCategoryDefaultsJson, TRUE);
+
+    foreach ($extensions as $extensionKey => $eachExtensionDetails) {
+      if (array_key_exists($eachExtensionDetails['key'], $extensionCategoryLookupTable)) {
+        $category = $extensionCategoryLookupTable[$eachExtensionDetails['key']];
+      }
+      else {
+        $category = 'Unknown';
+      }
+
+      // Override it with whatever's in the info file.
+      if (array_key_exists('category', $eachExtensionDetails)) {
+        if (!empty($eachExtensionDetails['category'])) {
+          // Spaces can break the behaviour. We remove them here and add them in
+          // the label list in case any slip past the reviewers.
+          $category = str_replace(' ', '', $eachExtensionDetails['category']);
+        }
+      }
 
       if (!array_key_exists($category, $categorisedExtensions)) {
         $categorisedExtensions[$category] = array();
       }
 
-      $categorisedExtensions[$category][$eachExtension['key']] = $eachExtension;
+      $categorisedExtensions[$category][$eachExtensionDetails['key']] = $eachExtensionDetails;
 
       unset($extensions[$extensionKey]); // Remove old entry to prevent memory spike.
     }

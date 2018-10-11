@@ -52,7 +52,7 @@
               </a>
             </li>
             {foreach from=$extensionCategoryToTabMap key=tabName item=categories}
-            <li id="tab_addnew" class="crm-tab-button">
+            <li id="tab_{$tabName}" class="crm-tab-button">
               <a href="#extensions-addnew-{$tabName}" title="{ts}{$tabName}{/ts}">
               <span> </span> {ts}{$extensionCategoryNames.$tabName}{/ts}
               <em>&nbsp;</em>
