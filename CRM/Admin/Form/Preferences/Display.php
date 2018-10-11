@@ -40,8 +40,9 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     'contact_view_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'contact_smart_group_display' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'advanced_search_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'user_dashboard_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'preserve_activity_tab_filter' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'display_name_format' =>  CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'display_name_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'sort_name_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
 
@@ -71,11 +72,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'weight' => 8,
           'html_type' => NULL,
         ),
-        'user_dashboard_options' => array(
-          'html_type' => 'checkboxes',
-          'title' => ts('Contact Dashboard'),
-          'weight' => 9,
-        ),
+
         'editor_id' => array(
           'html_type' => NULL,
           'weight' => 12,

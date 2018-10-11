@@ -169,7 +169,7 @@
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">
-        {ts}Select the sections that should be included in the Contact Dashboard. EXAMPLE: If you don't want constituents to view their own contribution history, un-check that option.{/ts}
+        {$settings_fields.user_dashboard_options.description}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-editor_id">

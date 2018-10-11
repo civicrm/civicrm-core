@@ -105,8 +105,9 @@ return array(
     'title' => ts('Contact Dashboard'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
+    'description' => ts('Select the sections that should be included in the Contact Dashboard. EXAMPLE: If you don\'t want constituents to view their own contribution history, un-check that option.'),
     'help_text' => NULL,
+    'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
   ),
   'address_options' => array(
     'group_name' => 'CiviCRM Preferences',
