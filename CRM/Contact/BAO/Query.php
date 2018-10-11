@@ -5961,7 +5961,15 @@ AND   displayRelType.is_active = 1
         $wc = "contact_a.$fieldName";
       }
       else {
-        $wc = "$tableName.id";
+        // Special handling for on_hold, so that we actually use the 'where'
+        // property in order to limit the query by the on_hold status of the email,
+        // instead of using email.id which would be nonsensical.
+        if ($field['name'] == 'on_hold') {
+          $wc = "{$field['where']}";
+        }
+        else {
+          $wc = "$tableName.id";
+        }
       }
     }
     else {

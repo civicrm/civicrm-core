@@ -1571,4 +1571,17 @@ WHERE  id = %1
     return Civi::$statics[__CLASS__]['taxRates'];
   }
 
+  /**
+   * Get participant status class options.
+   *
+   * @return array
+   */
+  public static function emailOnHoldOptions() {
+    return array(
+      '0' => ts('No'),
+      '1' => ts('On Hold Bounce'),
+      '2' => ts('On Hold Opt Out'),
+    );
+  }
+
 }
