@@ -1844,8 +1844,66 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $params['start_date'] = date('Y-m-d', strtotime('now - 16 month'));
     $params['end_date'] = date('Y-m-d', strtotime('now - 4 month'));
     $params['status_id'] = $membershipStatusIdAdmin;
+    $params['is_override'] = 1;
     $resultAdmin = $this->callAPISuccess('Membership', 'create', $params);
     $this->assertEquals($membershipStatusIdAdmin, $resultAdmin['values'][0]['status_id']);
+
+    /*
+     * Create membership type with inheritence and check processing of secondary memberships.
+     */
+    $employerRelationshipId = $this->callAPISuccessGetValue('RelationshipType', [
+      'return' => "id",
+      'name_b_a' => "Employer Of",
+    ]);
+    // Create membership type: inherited through employment.
+    $membershipOrgId = $this->organizationCreate();
+    $params = [
+      'name' => 'Corporate Membership',
+      'duration_unit' => 'year',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'member_of_contact_id' => $membershipOrgId,
+      'domain_id' => 1,
+      'financial_type_id' => 1,
+      'relationship_type_id' => $employerRelationshipId,
+      'relationship_direction' => 'b_a',
+      'is_active' => 1,
+    ];
+    $result = $this->callAPISuccess('membership_type', 'create', $params);
+    $membershipTypeId = $result['id'];
+
+    // Create employer and first employee
+    $employerId = $this->organizationCreate([], 1);
+    $memberContactId = $this->individualCreate(['employer_id' => $employerId], 0);
+
+    // Create inherited membership with incorrect status but dates implying status Expired.
+    $params = [
+      'contact_id' => $employerId,
+      'membership_type_id' => $membershipTypeId,
+      'source' => 'Test suite',
+      'join_date' => date('Y-m-d', strtotime('now - 16 month')),
+      'start_date' => date('Y-m-d', strtotime('now - 16 month')),
+      'end_date' => date('Y-m-d', strtotime('now - 4 month')),
+      'status_id' => 'Grace', // Intentionally incorrect status.
+      'skipStatusCal' => 1, // Don't calculate status.
+    ];
+    $organizationMembershipID = $this->contactMembershipCreate($params);
+
+    // Check that the employee inherited the membership and status.
+    $params = [
+      'contact_id' => $memberContactId,
+      'membership_type_id' => $membershipTypeId,
+      'sequential' => 1,
+    ];
+    $resultInheritExpired = $this->callAPISuccess('membership', 'get', $params);
+    $this->assertEquals(1, $resultInheritExpired['count']);
+    $this->assertEquals($organizationMembershipID, $resultInheritExpired['values'][0]['owner_membership_id']);
+    $this->assertEquals(array_search('Grace', $memStatus), $resultInheritExpired['values'][0]['status_id']);
+
+    // Reset static $relatedContactIds array in createRelatedMemberships(),
+    // to avoid bug where inherited membership gets deleted.
+    $var = TRUE;
+    CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
 
     // Check that after running process_membership job, statuses are correct.
     $this->callAPISuccess('Job', 'process_membership', []);
@@ -1881,6 +1939,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
     // Admin - should not get updated.
     $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultAdmin['values'][0]['id']]);
     $this->assertEquals($membershipStatusIdAdmin, $membership['status_id']);
+
+    // Inherit Expired - should get updated.
+    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultInheritExpired['values'][0]['id']]);
+    $this->assertEquals(array_search('Expired', $memStatus), $membership['status_id']);
   }
 
 }
