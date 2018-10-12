@@ -1393,6 +1393,9 @@ abstract class CRM_Core_Payment {
       $extension_instance_found = TRUE;
     }
 
+    // Call IPN alterIPNData hook to allow for custom processing of IPN data.
+    $IPNParams = array_merge($_GET, $_REQUEST);
+    CRM_Utils_Hook::postIPNProcess($IPNParams);
     if (!$extension_instance_found) {
       $message = "No extension instances of the '%1' payment processor were found.<br />" .
         "%2 method is unsupported in legacy payment processors.";

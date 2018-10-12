@@ -37,6 +37,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   protected $_contributionRecurID;
   protected $_contributionPageID;
   protected $_paymentProcessorID;
+  protected $_customFieldID;
   /**
    * IDs of entities created to support the tests.
    *
@@ -237,6 +238,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'first_name' => 'Robert',
       'txn_id' => '8XA571746W2698126',
       'residence_country' => 'US',
+      'custom' => json_encode(['cgid' => 'test12345']),
     );
   }
 
@@ -247,6 +249,71 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    */
   public function getPaypalRecurSubsequentTransaction() {
     return array_merge($this->getPaypalRecurTransaction(), array('txn_id' => 'secondone'));
+  }
+
+  /**
+   * Test IPN response updates contribution and invoice is attached in mail reciept
+   * Test also AlterIPNData intercepts at the right point and allows for custom processing
+   * The scenario is that a pending contribution exists and the IPN call will update it to completed.
+   * And also if Tax and Invoicing is enabled, this unit test ensure that invoice pdf is attached with email recipet
+   */
+  public function testhookAlterIPNDataOnIPNPaymentSuccess() {
+
+    $pendingStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+    $completedStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    $params = array(
+      'payment_processor_id' => $this->_paymentProcessorID,
+      'contact_id' => $this->_contactID,
+      'trxn_id' => NULL,
+      'invoice_id' => $this->_invoiceID,
+      'contribution_status_id' => $pendingStatusID,
+      'is_email_receipt' => TRUE,
+    );
+    $this->_contributionID = $this->contributionCreate($params);
+    $this->createCustomField();
+    $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $this->_contributionID, 'sequential' => 1));
+    // assert that contribution created before handling payment via paypal standard has no transaction id set and pending status
+    $this->assertEquals(NULL, $contribution['values'][0]['trxn_id']);
+    $this->assertEquals($pendingStatusID, $contribution['values'][0]['contribution_status_id']);
+    $this->hookClass->setHook('civicrm_postIPNProcess', array($this, 'hookCiviCRMAlterIPNData'));
+    global $_REQUEST;
+    $_REQUEST = array('q' => CRM_Utils_System::url('civicrm/payment/ipn/' . $this->_paymentProcessorID)) + $this->getPaypalTransaction();
+
+    $mut = new CiviMailUtils($this, TRUE);
+    $payment = CRM_Core_Payment::handlePaymentMethod('PaymentNotification', ['processor_id' => $this->_paymentProcessorID]);
+
+    $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $this->_contributionID, 'sequential' => 1));
+    // assert that contribution is completed after getting response from paypal standard which has transaction id set and completed status
+    $this->assertEquals($_REQUEST['txn_id'], $contribution['values'][0]['trxn_id']);
+    $this->assertEquals($completedStatusID, $contribution['values'][0]['contribution_status_id']);
+    $this->assertEquals('test12345', $contribution['values'][0]['custom_' . $this->_customFieldID]);
+  }
+
+  /**
+   * Store Custom data passed in from the PayPalIPN in a custom field
+   */
+  public function hookCiviCRMAlterIPNData($data) {
+    if (!empty($data['custom'])) {
+      $customData = json_decode($data['custom'], TRUE);
+      $customField = $this->callAPISuccess('custom_field', 'get', ['label' => 'TestCustomFieldIPNHook']);
+      $this->callAPISuccess('contribution', 'create', ['id' => $this->_contributionID, 'custom_' . $customField['id'] => $customData['cgid']]);
+    }
+  }
+
+  /**
+   * @return array
+   */
+  protected function createCustomField() {
+    $customGroup = $this->customGroupCreate(array('extends' => 'Contribution'));
+    $fields = array(
+      'label' => 'TestCustomFieldIPNHook',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+      'custom_group_id' => $customGroup['id'],
+    );
+    $field = CRM_Core_BAO_CustomField::create($fields);
+    $this->_customFieldID = $field->id;
+    return $customGroup;
   }
 
 }
