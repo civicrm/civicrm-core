@@ -340,11 +340,13 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'participant_fee_id':
+        $val_regexp = [];
         foreach ($value as $k => &$val) {
           $val = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label');
+          $val_regexp[$k] = CRM_Core_DAO::escapeString(preg_quote(trim($val)));
           $val = CRM_Core_DAO::escapeString(trim($val));
         }
-        $feeLabel = implode('|', $value);
+        $feeLabel = implode('|', $val_regexp);
         $query->_where[$grouping][] = "civicrm_participant.fee_level REGEXP '{$feeLabel}'";
         $query->_qill[$grouping][] = ts("Fee level") . " IN " . implode(', ', $value);
         $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
