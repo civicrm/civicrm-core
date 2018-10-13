@@ -148,6 +148,27 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test form submission with basic price set.
+   */
+  public function testSubmitZeroDollar() {
+    $this->setUpContributionPage();
+    $priceFieldID = reset($this->_ids['price_field']);
+    $submitParams = [
+      'price_' . $priceFieldID => $this->_ids['price_field_value']['cheapskate'],
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 0,
+      'priceSetId' => $this->_ids['price_set'][0],
+      'payment_processor_id' => '',
+    ];
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
+
+    $this->assertEquals($this->formatMoneyInput(0), $contribution['non_deductible_amount']);
+    $this->assertEquals($this->formatMoneyInput(0), $contribution['total_amount']);
+  }
+
+  /**
    * Test form submission with billing first & last name where the contact does NOT
    * otherwise have one.
    */
@@ -1499,6 +1520,16 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
         )
       );
       $this->_ids['price_field_value'] = array($priceFieldValue['id']);
+
+      $this->_ids['price_field_value']['cheapskate'] = $this->callAPISuccess('price_field_value', 'create', array(
+          'price_set_id' => $priceSetID,
+          'price_field_id' => $priceField['id'],
+          'label' => 'Stingy Goat',
+          'financial_type_id' => 'Donation',
+          'amount' => 0,
+          'non_deductible_amount' => 0,
+        )
+      )['id'];
     }
     $this->_ids['contribution_page'] = $contributionPageResult['id'];
   }

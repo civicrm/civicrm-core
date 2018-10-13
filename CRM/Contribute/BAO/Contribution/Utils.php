@@ -244,6 +244,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
   /**
    * Is a payment being made.
+   *
    * Note that setting is_monetary on the form is somewhat legacy and the behaviour around this setting is confusing. It would be preferable
    * to look for the amount only (assuming this cannot refer to payment in goats or other non-monetary currency
    * @param CRM_Core_Form $form
