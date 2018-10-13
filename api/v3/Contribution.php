@@ -533,6 +533,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
   if (isset($params['payment_processor_id'])) {
     $input['payment_processor_id'] = $params['payment_processor_id'];
   }
+  $input['total_amount'] = CRM_Utils_Array::value('total_amount', $params);
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['id'];
   if (!$contribution->find(TRUE)) {
