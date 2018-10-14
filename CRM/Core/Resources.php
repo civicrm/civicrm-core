@@ -615,6 +615,7 @@ class CRM_Core_Resources {
       $settings = array(
         'config' => array(
           'isFrontend' => $config->userFrameworkFrontend,
+          'isDrupal' => $config->userSystem->is_drupal,
         ),
       );
       // Disable profile creation if user lacks permission

@@ -19,7 +19,12 @@
       CRM.console('error', 'Error: CRM.url called before initialization');
     }
     if (!mode) {
-      mode = CRM.config && CRM.config.isFrontend ? 'front' : 'back';
+      if (CRM.config && CRM.config.isDrupal == 'Drupal') {
+        mode = 'back';
+      }
+      else {
+        mode = CRM.config && CRM.config.isFrontend ? 'front' : 'back';
+      }
     }
     query = query || '';
     var frag = path.split('?');

@@ -54,6 +54,9 @@ function smarty_function_crmNavigationMenu($params, &$smarty) {
   if ($config->userFrameworkFrontend) {
     $buildNavigation = FALSE;
   }
+  if ($config->userSystem->is_drupal) {
+    $buildNavigation = TRUE;
+  }
   if ($buildNavigation) {
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
