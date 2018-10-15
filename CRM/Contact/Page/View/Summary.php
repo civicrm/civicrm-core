@@ -308,6 +308,54 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
   /**
    * @return array
+   */
+  public static function basicTabs() {
+    return [
+      [
+        'id' => 'summary',
+        'url' => '#contact-summary',
+        'title' => ts('Summary'),
+        'weight' => 0,
+      ],
+      [
+        'id' => 'activity',
+        'title' => ts('Activities'),
+        'class' => 'livePage',
+        'weight' => 70,
+      ],
+      [
+        'id' => 'rel',
+        'title' => ts('Relationships'),
+        'class' => 'livePage',
+        'weight' => 80,
+      ],
+      [
+        'id' => 'group',
+        'title' => ts('Groups'),
+        'class' => 'ajaxForm',
+        'weight' => 90,
+      ],
+      [
+        'id' => 'note',
+        'title' => ts('Notes'),
+        'class' => 'livePage',
+        'weight' => 100,
+      ],
+      [
+        'id' => 'tag',
+        'title' => ts('Tags'),
+        'weight' => 110,
+      ],
+      [
+        'id' => 'log',
+        'title' => ts('Change Log'),
+        'weight' => 120,
+      ],
+    ];
+  }
+
+  /**
+   * @return array
    * @throws \CRM_Core_Exception
    */
   public function getTabs() {
@@ -344,53 +392,24 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
           'count' => CRM_Contact_BAO_Contact::getCountComponent($u, $this->_contactId),
           'class' => 'livePage',
         ];
-        // make sure to get maximum weight, rest of tabs go after
-        // FIXME: not very elegant again
-        if ($weight < $elem['weight']) {
-          $weight = $elem['weight'];
-        }
       }
     }
 
-    $rest = [
-      'activity' => [
-        'title' => ts('Activities'),
-        'class' => 'livePage',
-      ],
-      'rel' => [
-        'title' => ts('Relationships'),
-        'class' => 'livePage',
-      ],
-      'group' => [
-        'title' => ts('Groups'),
-        'class' => 'ajaxForm',
-      ],
-      'note' => [
-        'title' => ts('Notes'),
-        'class' => 'livePage',
-      ],
-      'tag' => [
-        'title' => ts('Tags'),
-      ],
-      'log' => [
-        'title' => ts('Change Log'),
-      ],
-    ];
-
     // show the tabs only if user has generic access to CiviCRM
     $accessCiviCRM = CRM_Core_Permission::check('access CiviCRM');
-    foreach ($rest as $k => $v) {
-      if ($accessCiviCRM && !empty($this->_viewOptions[$k])) {
-        $allTabs[] = $v + [
-          'id' => $k,
+    foreach (self::basicTabs() as $tab) {
+      if ($tab['id'] == 'summary') {
+        $allTabs[] = $tab;
+      }
+      elseif ($accessCiviCRM && !empty($this->_viewOptions[$tab['id']])) {
+        $allTabs[] = $tab + [
           'url' => CRM_Utils_System::url(
-            "civicrm/contact/view/$k",
+            "civicrm/contact/view/{$tab['id']}",
             "reset=1&cid={$this->_contactId}"
           ),
-          'weight' => $weight,
-          'count' => CRM_Contact_BAO_Contact::getCountComponent($k, $this->_contactId),
+          'count' => CRM_Contact_BAO_Contact::getCountComponent($tab['id'], $this->_contactId),
         ];
-        $weight += 10;
+        $weight = $tab['weight'] + 10;
       }
     }
 
@@ -420,13 +439,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     // see if any other modules want to add any tabs
     CRM_Utils_Hook::tabs($allTabs, $this->_contactId);
     CRM_Utils_Hook::tabset('civicrm/contact/view', $allTabs, $context);
-
-    $allTabs[] = [
-      'id' => 'summary',
-      'url' => '#contact-summary',
-      'title' => ts('Summary'),
-      'weight' => 0,
-    ];
 
     // now sort the tabs based on weight
     usort($allTabs, ['CRM_Utils_Sort', 'cmpFunc']);
