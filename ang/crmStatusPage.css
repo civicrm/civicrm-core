@@ -67,12 +67,13 @@
   width: auto;
   margin: 0;
   padding: 0;
+  z-index: 99;
 }
 
 #crm-status-list .hush-menu li {
   padding: 0.2em 0.5em;
   background-color: rgba(255, 255, 255, 0.9);
-  z-index: 99999;
+  z-index: 99;
   font-weight: normal;
 }
 
