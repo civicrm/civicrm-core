@@ -29,10 +29,7 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
  *
- */
-/*
  * Settings metadata file
  */
 
@@ -125,7 +122,8 @@ return array(
     'quick_form_type' => 'Element',
     'default' => NULL,
     'pseudoconstant' => array(
-      'name' => 'contributionPage',
+      // @todo - handle table style pseudoconstants for settings & avoid deprecated function.
+      'callback' => 'CRM_Contribute_PseudoConstant::contributionPage',
     ),
     'html_type' => 'select',
     'add' => '4.7',
