@@ -133,7 +133,7 @@
     <headerPattern>/(participant.)?(source)$/i</headerPattern>
     <import>true</import>
     <type>varchar</type>
-    <length>128</length>
+    <length>512</length>
     <comment>Source of this event registration.</comment>
     <html>
       <type>Text</type>
