@@ -11,5 +11,7 @@ CRM.$(function($) {
         $('#toolbar').css('z-index', '');
       }
     });
-    $('#civicrm-menu').css({'width': '97%'});
+  if ($('#toolbar a.toggle').length) {
+    $('#civicrm-menu').css({width: 'calc(100% - 40px)'});
+  }
 });
