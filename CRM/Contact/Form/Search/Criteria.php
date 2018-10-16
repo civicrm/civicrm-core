@@ -231,9 +231,13 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addRadio('privacy_toggle', ts('Privacy Options'), $options, array('allowClear' => FALSE));
 
     // preferred communication method
-
-    $onHold[] = $form->createElement('advcheckbox', 'on_hold', NULL, '');
-    $form->addGroup($onHold, 'email_on_hold', ts('Email On Hold'));
+    if (Civi::settings()->get('civimail_multiple_bulk_emails')) {
+      $form->addSelect('email_on_hold',
+        array('entity' => 'email', 'multiple' => 'multiple', 'label' => ts('Email On Hold'), 'options' => CRM_Core_PseudoConstant::emailOnHoldOptions()));
+    }
+    else {
+      $form->add('advcheckbox', 'email_on_hold', ts('Email On Hold'));
+    }
 
     $form->addSelect('preferred_communication_method',
       array('entity' => 'contact', 'multiple' => 'multiple', 'label' => ts('Preferred Communication Method'), 'option_url' => NULL, 'placeholder' => ts('- any -')));
