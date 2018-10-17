@@ -380,3 +380,29 @@ ul#civicrm-menu li#crm-qsearch {
   width: inherit;
   display: block;
 }
+
+/* Remove Joomla subhead toolbar & whitespace border */
+	
+body.admin.com_civicrm .subhead-collapse {
+	display:none;
+}
+body.admin.com_civicrm .container-fluid.container-main {
+	padding: 0;
+	border-top: 1px solid #787878;
+}
+body.admin.com_civicrm #crm-nav-menu-container {
+	padding-bottom: 0 !important;
+}
+body.admin.com_civicrm #content-right {
+	padding: 12px;
+}
+body.admin.com_civicrm #civicrm-menu #crm-qsearch {
+  padding-left: 20px;
+}
+
+/* Shoreditch-specific */
+
+body.admin.com_civicrm {
+	padding-top: 0px !important;
+	margin-top: 30px !important; 
+}
