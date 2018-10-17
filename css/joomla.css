@@ -227,7 +227,7 @@ br.clear {
   background-color: #ddd;
   width: 16em;
   /* padding in px not ex because IE messes up 100% width tables otherwise */
-  padding: 10px;
+  padding: 20px;
   vertical-align: top;
 }
 
