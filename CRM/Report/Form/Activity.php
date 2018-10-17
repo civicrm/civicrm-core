@@ -1080,7 +1080,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($ifnulls, $sectionAliases);
 
       $query = $this->_select .
-        ", count(DISTINCT civicrm_activity_id) as ct from {$this->temporaryTables['activity_temp_table']} group by " .
+        ", count(DISTINCT civicrm_activity_id) as ct from {$this->temporaryTables['activity_temp_table']['name']} group by " .
         implode(", ", $sectionAliases);
 
       // initialize array of total counts
