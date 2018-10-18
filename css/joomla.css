@@ -403,7 +403,7 @@ body.admin.com_civicrm #root-menu-div div.outerbox:first-of-type {
 	margin-left: 20px;
 } 
 body.admin.com_civicrm div.outerbox {
-	z-index: 10;
+	z-index: 1000;
 }
 
 /* Shoreditch-specific */
