@@ -693,7 +693,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $new_having = ' addtogroup_contact_id';
     $having = str_ireplace(' civicrm_contact_contact_target_id', $new_having, $this->_having);
     $query = "$select
-FROM {$this->temporaryTables['activity_temp_table']} tar
+FROM {$this->temporaryTables['activity_temp_table']['name']} tar
 GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $select = 'AS addtogroup_contact_id';
     $query = str_ireplace('AS civicrm_contact_contact_target_id', $select, $query);
