@@ -1004,11 +1004,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     if (array_key_exists('TagsAndGroups', $this->_editOptions)) {
       //add contact to tags
-      if (isset($params['tag']) && !empty($params['tag'])) {
+      if (isset($params['tag'])) {
         $params['tag'] = array_flip(explode(',', $params['tag']));
         CRM_Core_BAO_EntityTag::create($params['tag'], 'civicrm_contact', $params['contact_id']);
       }
-
       //save free tags
       if (isset($params['contact_taglist']) && !empty($params['contact_taglist'])) {
         CRM_Core_Form_Tag::postProcess($params['contact_taglist'], $params['contact_id'], 'civicrm_contact', $this);
