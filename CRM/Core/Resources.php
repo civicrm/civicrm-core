@@ -115,13 +115,7 @@ class CRM_Core_Resources {
       self::$_singleton = $instance;
     }
     if (self::$_singleton === NULL) {
-      $sys = CRM_Extension_System::singleton();
-      $cache = Civi::cache('js_strings');
-      self::$_singleton = new CRM_Core_Resources(
-        $sys->getMapper(),
-        $cache,
-        CRM_Core_Config::isUpgradeMode() ? NULL : 'resCacheCode'
-      );
+      self::$_singleton = Civi::service('resources');
     }
     return self::$_singleton;
   }
