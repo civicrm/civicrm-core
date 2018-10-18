@@ -2708,6 +2708,13 @@ AND cl.modified_id  = c.id
     if (!$activity->find(TRUE)) {
       return FALSE;
     }
+
+    // Return early when it is case activity.
+    // Check for CiviCase related permission.
+    if (CRM_Case_BAO_Case::isCaseActivity($activityId)) {
+      return self::isContactPermittedAccessToCaseActivity($activityId, $action, $activity->activity_type_id);
+    }
+
     $allow = FALSE;
     // Component related permissions.
     $compPermissions = array(
@@ -2725,33 +2732,6 @@ AND cl.modified_id  = c.id
       'CiviContribute' => array('access CiviContribute'),
       'CiviCampaign' => array('administer CiviCampaign'),
     );
-
-    // Return early when it is case activity.
-    $isCaseActivity = CRM_Case_BAO_Case::isCaseActivity($activityId);
-    // Check for civicase related permission.
-    if ($isCaseActivity) {
-      $allow = FALSE;
-      foreach ($compPermissions['CiviCase'] as $per) {
-        if (CRM_Core_Permission::check($per)) {
-          $allow = TRUE;
-          break;
-        }
-      }
-
-      // Check for case specific permissions.
-      if ($allow) {
-        $oper = 'view';
-        if ($action == CRM_Core_Action::UPDATE) {
-          $oper = 'edit';
-        }
-        $allow = CRM_Case_BAO_Case::checkPermission($activityId,
-          $oper,
-          $activity->activity_type_id
-        );
-      }
-
-      return $allow;
-    }
 
     // First check the component permission.
     $sql = "
@@ -2830,6 +2810,39 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
           }
         }
       }
+    }
+
+    return $allow;
+  }
+
+  /**
+   * Check if the logged in user has permission for the given case activity.
+   *
+   * @param int $activityId
+   * @param int $action
+   * @param int $activityTypeID
+   *
+   * @return bool
+   */
+  protected static function isContactPermittedAccessToCaseActivity($activityId, $action, $activityTypeID) {
+    $allow = FALSE;
+    foreach (['administer CiviCase', 'access my cases and activities', 'access all cases and activities'] as $per) {
+      if (CRM_Core_Permission::check($per)) {
+        $allow = TRUE;
+        break;
+      }
+    }
+
+    // Check for case specific permissions.
+    if ($allow) {
+      $oper = 'view';
+      if ($action == CRM_Core_Action::UPDATE) {
+        $oper = 'edit';
+      }
+      $allow = CRM_Case_BAO_Case::checkPermission($activityId,
+        $oper,
+        $activityTypeID
+      );
     }
 
     return $allow;
