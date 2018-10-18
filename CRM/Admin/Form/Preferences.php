@@ -44,7 +44,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
   protected $_checkbox = NULL;
 
-  protected $_varNames = NULL;
+  protected $_varNames = [];
 
   protected $_config = NULL;
 
