@@ -296,6 +296,7 @@ br.clear {
 
 ul#civicrm-menu {
   position:relative;
+  z-index:1;
 }
 
 div#toolbar-box div.m {
