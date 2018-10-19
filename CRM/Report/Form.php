@@ -2449,8 +2449,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * @return mixed
    */
   protected function alterLocationTypeID($value, &$row, $selectedfield, $criteriaFieldName) {
-    $values = $this->getLocationTypeOptions();
-    return CRM_Utils_Array::value($value, $values);
+    return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_Address', 'location_type_id', $value);
   }
 
   /**
