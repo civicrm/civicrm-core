@@ -75,6 +75,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     $form->_contactIds = $form->_contactIds ?: [CRM_Core_Session::getLoggedInContactID()];
 
     $fromEmailValues = CRM_Core_BAO_Email::getFromEmail();
+    $toEmailValues = CRM_Core_BAO_Email::getToEmail();
 
     $form->_noEmails = FALSE;
     if (empty($fromEmailValues)) {
@@ -94,6 +95,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
       $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
     }
+    $form->_toEmails = $toEmailValues;
     if (is_numeric(key($form->_fromEmails))) {
       // Add signature
       $defaultEmail = civicrm_api3('email', 'getsingle', array('id' => key($form->_fromEmails)));

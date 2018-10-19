@@ -44,6 +44,18 @@
     <td class="label">{$form.from_email_address.label}</td>
     <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
   </tr>
+  <tr id="selectEmailTo" style="display: none" class="crm-contactEmail-to-block-toEmailAddress crm-email-element">
+    <td class="label">{$form.to_email_address.label}</td>
+    <td>{$form.to_email_address.html} {help id="id-to_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
+  </tr>
+  <tr id="textEmailCc" style="display: none" class="crm-contactEmail-cc-block-ccEmailAddress crm-email-element">
+    <td class="label">{$form.cc_email_address.label}</td>
+    <td>{$form.cc_email_address.html}</td>
+  </tr>
+  <tr id="textEmailBcc" style="display: none" class="crm-contactEmail-bcc-block-toEmailAddress crm-email-element">
+    <td class="label">{$form.bcc_email_address.label}</td>
+    <td>{$form.bcc_email_address.html}</td>
+  </tr>
   <tr class="crm-email-element">
     <td class="label">{$form.email_comment.label}</td>
     <td>{$form.email_comment.html}</td>

@@ -42,6 +42,13 @@
 {/if}
 {/htxt}
 
+{htxt id="id-to_email-title"}
+  {ts}Address to send email{/ts}
+{/htxt}
+{htxt id="id-to_email}
+ <p>Email address to send the invoice</p>
+{/htxt}
+
 {htxt id="id-token-subject-title"}
   {ts}Subject Tokens{/ts}
 {/htxt}
