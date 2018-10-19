@@ -697,7 +697,9 @@ FROM {$this->temporaryTables['activity_temp_table']['name']} tar
 GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $select = 'AS addtogroup_contact_id';
     $query = str_ireplace('AS civicrm_contact_contact_target_id', $select, $query);
+    CRM_Core_DAO::disableFullGroupByMode();
     $dao = $this->executeReportQuery($query);
+    CRM_Core_DAO::reenableFullGroupByMode();
 
     $contactIDs = array();
     // Add resulting contacts to group
