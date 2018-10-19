@@ -399,6 +399,21 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
 
     // Tear down: delete mailing, groups, contacts
     $this->deleteMailing($mailing['id']);
+
+    // Create a New mailing, Testing contacts removed from smart group.
+    // In this case groupIDs6 will only pick up contacts[0] amd contacts[8] with it's
+    // criteria. However we are deliberly going to remove contactIds[8] from the group
+    // Which should mean the mainling only finds 1 contact that is contactIds[0]
+    $mailing = $this->callAPISuccess('Mailing', 'create', array());
+    $this->callAPISuccess('GroupContact', 'Create', array(
+      'group_id' => $groupIDs[6],
+      'contact_id' => $contactIDs[8],
+      'status' => 'Removed',
+    ));
+    $this->createMailingGroup($mailing['id'], $groupIDs[6]);
+    $this->assertRecipientsCorrect($mailing['id'], [$contactIDs[0]]);
+    // Tear down: delete mailing, groups, contacts
+    $this->deleteMailing($mailing['id']);
     foreach ($groupIDs as $groupID) {
       $this->groupDelete($groupID);
     }
