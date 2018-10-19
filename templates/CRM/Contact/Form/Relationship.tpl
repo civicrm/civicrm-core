@@ -101,8 +101,7 @@
         </tr>
         <tr class="crm-relationship-form-block-start_date">
           <td class="label">{$form.start_date.label}</td>
-          <td>{include file="CRM/common/jcalendar.tpl" elementName=start_date}<span>{$form.end_date.label} {include file="CRM/common/jcalendar.tpl" elementName=end_date}</span><br />
-            <span class="description">{ts}If this relationship has start and/or end dates, specify them here.{/ts}</span></td>
+          <td>{$form.start_date.html} {$form.end_date.label} {$form.end_date.html}<br /><span class="description">{ts}If this relationship has start and/or end dates, specify them here.{/ts}</span></td>
         </tr>
         <tr class="crm-relationship-form-block-description">
           <td class="label">{$form.description.label}</td>
