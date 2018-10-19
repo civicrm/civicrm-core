@@ -5,9 +5,9 @@
 {* add campaign in component search *}
 <tr class="{$campaignTrClass}">
     {assign var=elementName value=$campaignInfo.elementName}
-
-    <td class="{$campaignTdClass}">{$form.$elementName.label}<br />
-    <div class="crm-select-container">{$form.$elementName.html}</div>
+    <td class="{$campaignTdClass}">
+      <label>{$form.$elementName.label}</label>
+      {$form.$elementName.html}
     </td>
 </tr>
 
