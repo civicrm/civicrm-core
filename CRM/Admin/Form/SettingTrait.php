@@ -191,6 +191,7 @@ trait CRM_Admin_Form_SettingTrait {
     // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
     $this->assign('setting_descriptions', $descriptions);
     $this->assign('settings_fields', $settingMetaData);
+    $this->assign('fields', $settingMetaData);
   }
 
   /**
@@ -208,6 +209,7 @@ trait CRM_Admin_Form_SettingTrait {
       'checkboxes' => 'CheckBoxes',
       'checkbox' => 'CheckBox',
       'radio' => 'Radio',
+      'select' => 'Select',
     ];
     return $mapping[$spec['html_type']];
   }
