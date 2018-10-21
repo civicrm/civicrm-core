@@ -693,7 +693,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $new_having = ' addtogroup_contact_id';
     $having = str_ireplace(' civicrm_contact_contact_target_id', $new_having, $this->_having);
     $query = "$select
-FROM {$this->temporaryTables['activity_temp_table']} tar
+FROM {$this->temporaryTables['activity_temp_table']['name']} tar
 GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $select = 'AS addtogroup_contact_id';
     $query = str_ireplace('AS civicrm_contact_contact_target_id', $select, $query);
@@ -1080,7 +1080,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($ifnulls, $sectionAliases);
 
       $query = $this->_select .
-        ", count(DISTINCT civicrm_activity_id) as ct from {$this->temporaryTables['activity_temp_table']} group by " .
+        ", count(DISTINCT civicrm_activity_id) as ct from {$this->temporaryTables['activity_temp_table']['name']} group by " .
         implode(", ", $sectionAliases);
 
       // initialize array of total counts
