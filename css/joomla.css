@@ -227,7 +227,7 @@ br.clear {
   background-color: #ddd;
   width: 16em;
   /* padding in px not ex because IE messes up 100% width tables otherwise */
-  padding: 10px;
+  padding: 20px;
   vertical-align: top;
 }
 
@@ -296,7 +296,7 @@ br.clear {
 
 ul#civicrm-menu {
   position:relative;
-  z-index:1;
+  z-index: 1;
 }
 
 div#toolbar-box div.m {
@@ -379,4 +379,36 @@ ul#civicrm-menu li#crm-qsearch {
   background-color: inherit;
   width: inherit;
   display: block;
+}
+
+/* Remove Joomla subhead toolbar & whitespace border */
+	
+body.admin.com_civicrm .subhead-collapse {
+	display:none;
+}
+body.admin.com_civicrm .container-fluid.container-main {
+	padding: 0;
+	border-top: 1px solid #787878;
+}
+body.admin.com_civicrm #crm-nav-menu-container {
+	padding-bottom: 0 !important;
+}
+body.admin.com_civicrm #content-right {
+	padding: 12px;
+}
+body.admin.com_civicrm #civicrm-menu #crm-qsearch {
+  padding-left: 20px;
+}
+body.admin.com_civicrm #root-menu-div div.outerbox:first-of-type {
+	margin-left: 20px;
+} 
+body.admin.com_civicrm div.outerbox {
+	z-index: 1000;
+}
+
+/* Shoreditch-specific */
+
+body.admin.com_civicrm {
+	padding-top: 0px !important;
+	margin-top: 30px !important; 
 }
