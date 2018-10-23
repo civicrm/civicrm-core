@@ -3402,8 +3402,6 @@ WHERE  $smartGroupClause
     //By default, $sub elements should be joined together with OR statements (don't change this variable).
     $subGlue = ' OR ';
 
-    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-
     $firstChar = substr($value, 0, 1);
     $lastChar = substr($value, -1, 1);
     $quotes = array("'", '"');
@@ -3416,22 +3414,19 @@ WHERE  $smartGroupClause
     elseif ($op == 'LIKE' && strpos($value, ',') === FALSE) {
       $value = str_replace(' ', '%', $value);
     }
-    $value = $strtolower(CRM_Core_DAO::escapeString(trim($value)));
+    $value = CRM_Core_DAO::escapeString(trim($value));
     if (strlen($value)) {
       $fieldsub = array();
       $value = "'" . self::getWildCardedValue($wildcard, $op, $value) . "'";
       if ($fieldName == 'sort_name') {
-        // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-        $wc = self::caseImportant($op) ? "LOWER(contact_a.sort_name)" : "contact_a.sort_name";
+        $wc = "contact_a.sort_name";
       }
       else {
-        // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-        $wc = self::caseImportant($op) ? "LOWER(contact_a.display_name)" : "contact_a.display_name";
+        $wc = "contact_a.display_name";
       }
       $fieldsub[] = " ( $wc $op $value )";
       if ($config->includeNickNameInName) {
-        // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-        $wc = self::caseImportant($op) ? "LOWER(contact_a.nick_name)" : "contact_a.nick_name";
+        $wc = "contact_a.nick_name";
         $fieldsub[] = " ( $wc $op $value )";
       }
       if ($config->includeEmailInName) {
