@@ -223,8 +223,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->defaultSearchProfileID = 1;
     $this->callAPISuccess('address', 'create', array(
         'contact_id' => $contactID,
-        'city' => 'Cool City',
-        'street_address' => 'Long Street',
+        'city' => 'Cool CITY',
+        'street_address' => 'Long STREET',
         'location_type_id' => 1,
       ));
     $returnProperties = array(
@@ -257,7 +257,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   public function getSearchProfileData() {
     return [
       [
-        [['city', '=', 'Cool City', 1, 0]], "civicrm_address.city as `city`", "LOWER(civicrm_address.city) = 'cool city'",
+        [['city', '=', 'Cool City', 1, 0]], "civicrm_address.city as `city`", "civicrm_address.city = 'cool city'",
       ],
       [
         // Note that in the query 'long street' is lower cased. We eventually want to change that & not mess with the vars - it turns out
