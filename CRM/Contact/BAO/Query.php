@@ -3490,7 +3490,7 @@ WHERE  $smartGroupClause
       return;
     }
 
-    $n = strtolower(trim($value));
+    $n = trim($value);
     if ($n) {
       if (substr($n, 0, 1) == '"' &&
         substr($n, -1, 1) == '"'
