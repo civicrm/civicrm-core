@@ -259,11 +259,12 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
       $params = array_merge(CRM_Event_BAO_Event::getTemplateDefaultValues($params['template_id']), $params);
     }
 
-    $event = CRM_Event_BAO_Event::create($params);
-
     // now that we have the event’s id, do some more template-based stuff
     if (!empty($params['template_id'])) {
-      CRM_Event_BAO_Event::copy($params['template_id'], $event, TRUE);
+      $event = CRM_Event_BAO_Event::copy($params['template_id']);
+    }
+    else {
+      $event = CRM_Event_BAO_Event::create($params);
     }
 
     $this->set('id', $event->id);

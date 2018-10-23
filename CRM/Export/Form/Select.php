@@ -98,6 +98,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
     $components = array('Contact', 'Contribute', 'Member', 'Event', 'Pledge', 'Case', 'Grant', 'Activity');
 
     // FIXME: This should use a modified version of CRM_Contact_Form_Search::getModeValue but it doesn't have all the contexts
+    // FIXME: Or better still, use CRM_Core_DAO_AllCoreTables::getBriefName($daoName) to get the $entityShortName
     switch ($this->getQueryMode()) {
       case CRM_Contact_BAO_Query::MODE_CONTRIBUTE:
         $entityShortname = 'Contribute';
