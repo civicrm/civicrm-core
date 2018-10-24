@@ -204,6 +204,7 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'localizable' => 0,
           'html' => [
             'type' => 'Select Date',
+            'formatType' => 'activityDateTime',
           ],
         ],
         'case_end_date' => [
@@ -222,6 +223,7 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'localizable' => 0,
           'html' => [
             'type' => 'Select Date',
+            'formatType' => 'activityDateTime',
           ],
         ],
         'details' => [
