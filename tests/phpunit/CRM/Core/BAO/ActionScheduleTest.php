@@ -1004,6 +1004,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'contact_id' => $membership->contact_id,
       'email' => 'test-member@example.com',
       'location_type_id' => 1,
+      'is_primary' => 1,
     ));
 
     $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
@@ -2091,6 +2092,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'contact_id' => $mainMembership->contact_id,
       'email' => 'test-member@example.com',
       'location_type_id' => 1,
+      'is_primary' => 1,
     ];
     $email = $this->createTestObject('CRM_Core_DAO_Email', $emailParams);
 
