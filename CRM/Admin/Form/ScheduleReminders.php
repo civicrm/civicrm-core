@@ -370,10 +370,10 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $errors['is_repeat'] = ts('If you are enabling repetition you must indicate the frequency and ending term.');
     }
 
-    $actionSchedule = $self->parseActionSchedule($fields);
-    if ($actionSchedule->mapping_id) {
-      $mapping = CRM_Core_BAO_ActionSchedule::getMapping($actionSchedule->mapping_id);
-      CRM_Utils_Array::extend($errors, $mapping->validateSchedule($actionSchedule));
+    $self->_actionSchedule = $self->parseActionSchedule($fields);
+    if ($self->_actionSchedule->mapping_id) {
+      $mapping = CRM_Core_BAO_ActionSchedule::getMapping($self->_actionSchedule->mapping_id);
+      CRM_Utils_Array::extend($errors, $mapping->validateSchedule($self->_actionSchedule));
     }
 
     if (!empty($errors)) {
@@ -452,7 +452,12 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       return;
     }
     $values = $this->controller->exportValues($this->getName());
-    $bao = $this->parseActionSchedule($values)->save();
+    if (empty($this->_actionSchedule)) {
+      $bao = $this->parseActionSchedule($values)->save();
+    }
+    else {
+      $bao = $this->_actionSchedule->save();
+    }
 
     // we need to set this on the form so that hooks can identify the created entity
     $this->set('id', $bao->id);
