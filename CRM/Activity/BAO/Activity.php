@@ -2715,50 +2715,8 @@ AND cl.modified_id  = c.id
       return self::isContactPermittedAccessToCaseActivity($activityId, $action, $activity->activity_type_id);
     }
 
-    $allow = FALSE;
     // Component related permissions.
-    $compPermissions = array(
-      'CiviCase' => array(
-        'administer CiviCase',
-        'access my cases and activities',
-        'access all cases and activities',
-      ),
-      'CiviMail' => array('access CiviMail'),
-      'CiviEvent' => array('access CiviEvent'),
-      'CiviGrant' => array('access CiviGrant'),
-      'CiviPledge' => array('access CiviPledge'),
-      'CiviMember' => array('access CiviMember'),
-      'CiviReport' => array('access CiviReport'),
-      'CiviContribute' => array('access CiviContribute'),
-      'CiviCampaign' => array('administer CiviCampaign'),
-    );
-
-    // First check the component permission.
-    $sql = "
-    SELECT  component_id
-      FROM  civicrm_option_value val
-INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.name = %1 )
-     WHERE  val.value = %2";
-    $params = array(
-      1 => array('activity_type', 'String'),
-      2 => array($activity->activity_type_id, 'Integer'),
-    );
-    $componentId = CRM_Core_DAO::singleValueQuery($sql, $params);
-
-    if ($componentId) {
-      $componentName = CRM_Core_Component::getComponentName($componentId);
-      $compPermission = CRM_Utils_Array::value($componentName, $compPermissions);
-
-      // Here we are interesting in any single permission.
-      if (is_array($compPermission)) {
-        foreach ($compPermission as $per) {
-          if (CRM_Core_Permission::check($per)) {
-            $allow = TRUE;
-            break;
-          }
-        }
-      }
-    }
+    $allow = self::hasPermissionForActivityType($activity->activity_type_id);
 
     // Check for this permission related to contact.
     $permission = CRM_Core_Permission::VIEW;
@@ -2772,7 +2730,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
     // Check for source contact.
-    if (!$componentId || $allow) {
+    if ($allow) {
       $sourceContactId = self::getActivityContact($activity->id, $sourceID);
       // Account for possibility of activity not having a source contact (as it may have been deleted).
       $allow = $sourceContactId ? CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission) : TRUE;
@@ -2846,6 +2804,58 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     }
 
     return $allow;
+  }
+
+  /**
+   * @param int $activityTypeID
+   * @return bool
+   */
+  protected static function hasPermissionForActivityType($activityTypeID) {
+    $compPermissions = [
+      'CiviCase' => [
+        'administer CiviCase',
+        'access my cases and activities',
+        'access all cases and activities',
+      ],
+      'CiviMail' => ['access CiviMail'],
+      'CiviEvent' => ['access CiviEvent'],
+      'CiviGrant' => ['access CiviGrant'],
+      'CiviPledge' => ['access CiviPledge'],
+      'CiviMember' => ['access CiviMember'],
+      'CiviReport' => ['access CiviReport'],
+      'CiviContribute' => ['access CiviContribute'],
+      'CiviCampaign' => ['administer CiviCampaign'],
+    ];
+
+    // First check the component permission.
+    $sql = "
+    SELECT  component_id
+      FROM  civicrm_option_value val
+INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.name = %1 )
+     WHERE  val.value = %2";
+    $params = [
+      1 => ['activity_type', 'String'],
+      2 => [$activityTypeID, 'Integer'],
+    ];
+    $componentId = CRM_Core_DAO::singleValueQuery($sql, $params);
+
+    if ($componentId) {
+      $componentName = CRM_Core_Component::getComponentName($componentId);
+      $compPermission = CRM_Utils_Array::value($componentName, $compPermissions);
+
+      // Here we are interesting in any single permission.
+      if (is_array($compPermission)) {
+        foreach ($compPermission as $per) {
+          if (CRM_Core_Permission::check($per)) {
+            return TRUE;
+          }
+        }
+      }
+    }
+    else {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
