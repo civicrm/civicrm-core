@@ -316,6 +316,14 @@ function civicrm_api3_activity_get($params) {
   }
 
   _civicrm_api3_activity_get_extraFilters($params, $sql);
+  if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')) {
+    $permittedActivityTypeIDs = CRM_Activity_BAO_Activity::getPermittedActivityTypes();
+    if (empty($permittedActivityTypeIDs)) {
+      // This just prevents a mysql fail if they have no access - should be extremely edge case.
+      $permittedActivityTypeIDs = [0];
+    }
+    $sql->where('activity_type_id IN (' . implode(', ', $permittedActivityTypeIDs) . ')');
+  }
 
   // Handle is_overdue sort
   if (!empty($options['sort'])) {
@@ -341,16 +349,18 @@ function civicrm_api3_activity_get($params) {
   }
 
   $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $sql);
+  if ($options['is_count']) {
+    return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
+  }
   if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')) {
     // @todo get this to work at the query level - see contact_id join above.
+    // Also note the activity type checks in this function are now no longer required by the api as we filter out
+    // unpermitted activity types in the query now. The goal is not to call this function at all....
     foreach ($activities as $activity) {
       if (!CRM_Activity_BAO_Activity::checkPermission($activity['id'], CRM_Core_Action::VIEW)) {
         unset($activities[$activity['id']]);
       }
     }
-  }
-  if ($options['is_count']) {
-    return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
   }
 
   $activities = _civicrm_api3_activity_get_formatResult($params, $activities, $options);

@@ -543,6 +543,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
     $this->setPermissions(['access CiviCRM', 'access CiviContribute']);
     $this->callAPISuccessGetSingle('Activity', ['check_permissions' => 1, 'id' => ['IN' => [$activity['id'], $activity2['id']]]]);
+    $this->callAPISuccessGetCount('Activity', ['check_permissions' => 1, 'id' => ['IN' => [$activity['id'], $activity2['id']]]], 1);
   }
 
   /**
@@ -555,6 +556,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
     $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'access all cases and activities']);
     $this->callAPISuccessGetSingle('Activity', ['check_permissions' => 1, 'id' => ['IN' => [$activity['id'], $activity2['id']]]]);
+    $this->callAPISuccessGetCount('Activity', ['check_permissions' => 1, 'id' => ['IN' => [$activity['id'], $activity2['id']]]], 1);
   }
 
   /**
