@@ -295,8 +295,6 @@ SELECT f.id, f.label, f.data_type,
         continue;
       }
 
-      $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-
       foreach ($values as $tuple) {
         list($name, $op, $value, $grouping, $wildcard) = $tuple;
 
@@ -335,7 +333,7 @@ SELECT f.id, f.label, f.data_type,
               // fix $value here to escape sql injection attacks
               if (!is_array($value)) {
                 if ($field['data_type'] == 'String') {
-                  $value = CRM_Utils_Type::escape($strtolower($value), 'String');
+                  $value = CRM_Utils_Type::escape($value, 'String');
                 }
                 elseif ($value) {
                   $value = CRM_Utils_Type::escape($value, 'Integer');

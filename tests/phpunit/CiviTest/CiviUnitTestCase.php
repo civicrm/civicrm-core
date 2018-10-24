@@ -1964,6 +1964,45 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Create a custom group with a single text custom field, multi-select widget, with a variety of option values including upper and lower case.
+   * See api_v3_SyntaxConformanceTest:testCustomDataGet for how to use this
+   *
+   * @param string $function
+   *   __FUNCTION__.
+   * @param string $filename
+   *   $file __FILE__.
+   *
+   * @return array
+   *   ids of created objects
+   */
+  public function entityCustomGroupWithSingleStringMultiSelectFieldCreate($function, $filename) {
+    $params = array('title' => $function);
+    $entity = substr(basename($filename), 0, strlen(basename($filename)) - 8);
+    $params['extends'] = $entity ? $entity : 'Contact';
+    $customGroup = $this->CustomGroupCreate($params);
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'label' => $function, 'html_type' => 'Multi-Select', 'default_value' => 1));
+    CRM_Core_PseudoConstant::flush();
+    $options = [
+      'defaultValue' => 'Default Value',
+      'lowercasevalue' => 'Lowercase Value',
+      1 => 'Integer Value',
+    ];
+    $custom_field_params = ['sequential' => 1, 'id' => $customField['id']];
+    $custom_field_api_result = $this->callAPISuccess('custom_field', 'get', $custom_field_params);
+    $this->assertNotEmpty($custom_field_api_result['values'][0]['option_group_id']);
+    $option_group_params = ['sequential' => 1, 'id' => $custom_field_api_result['values'][0]['option_group_id']];
+    $option_group_result = $this->callAPISuccess('OptionGroup', 'get', $option_group_params);
+    $this->assertNotEmpty($option_group_result['values'][0]['name']);
+    foreach ($options as $option_value => $option_label) {
+      $option_group_params = ['option_group_id' => $option_group_result['values'][0]['name'], 'value' => $option_value, 'label' => $option_label];
+      $option_value_result = $this->callAPISuccess('OptionValue', 'create', $option_group_params);
+    }
+
+    return array('custom_group_id' => $customGroup['id'], 'custom_field_id' => $customField['id'], 'custom_field_option_group_id' => $custom_field_api_result['values'][0]['option_group_id'], 'custom_field_group_options' => $options);
+  }
+
+
+  /**
    * Delete custom group.
    *
    * @param int $customGroupID
