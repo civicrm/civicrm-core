@@ -546,6 +546,18 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check that component related activity filtering works for CiviCase.
+   */
+  public function testGetActivityCheckPermissionsByCaseComponent() {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    $activity = $this->activityCreate(['activity_type_id' => 'Open Case']);
+    $activity2 = $this->activityCreate(['activity_type_id' => 'Pledge Reminder']);
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'access all cases and activities']);
+    $this->callAPISuccessGetSingle('Activity', ['check_permissions' => 1, 'id' => ['IN' => [$activity['id'], $activity2['id']]]]);
+  }
+
+  /**
    * Check that activities can be retrieved by ACL.
    *
    * The activities api applies ACLs in a very limited circumstance, if id is passed in.
