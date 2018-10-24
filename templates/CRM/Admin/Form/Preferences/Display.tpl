@@ -169,7 +169,7 @@
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">
-        {ts}Select the sections that should be included in the Contact Dashboard. EXAMPLE: If you don't want constituents to view their own contribution history, un-check that option.{/ts}
+        {$settings_fields.user_dashboard_options.description}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-editor_id">
@@ -199,7 +199,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
-      <td class="description">{ts}Display name format for individual contact display names.{/ts}</td>
+      <td class="description">{$settings_fields.display_name_format.description}</td>
     </tr>
     <tr class="crm-preferences-display-form-block-sort_name_format">
       <td class="label">{$form.sort_name_format.label}</td>
@@ -207,7 +207,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
-      <td class="description">{ts}Sort name format for individual contact display names.{/ts}</td>
+      <td class="description">{$settings_fields.sort_name_format.description}</td>
     </tr>
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
