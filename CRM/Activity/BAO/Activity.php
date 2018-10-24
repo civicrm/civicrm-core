@@ -2721,14 +2721,14 @@ AND cl.modified_id  = c.id
       return FALSE;
     }
 
+    if (!self::hasPermissionForActivityType($activity->activity_type_id)) {
+      return FALSE;
+    }
     // Return early when it is case activity.
     // Check for CiviCase related permission.
     if (CRM_Case_BAO_Case::isCaseActivity($activityId)) {
       return self::isContactPermittedAccessToCaseActivity($activityId, $action, $activity->activity_type_id);
     }
-
-    // Component related permissions.
-    $allow = self::hasPermissionForActivityType($activity->activity_type_id);
 
     // Check for this permission related to contact.
     $permission = CRM_Core_Permission::VIEW;
@@ -2742,11 +2742,9 @@ AND cl.modified_id  = c.id
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
     // Check for source contact.
-    if ($allow) {
-      $sourceContactId = self::getActivityContact($activity->id, $sourceID);
-      // Account for possibility of activity not having a source contact (as it may have been deleted).
-      $allow = $sourceContactId ? CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission) : TRUE;
-    }
+    $sourceContactId = self::getActivityContact($activity->id, $sourceID);
+    // Account for possibility of activity not having a source contact (as it may have been deleted).
+    $allow = $sourceContactId ? CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission) : TRUE;
 
     // Check for target and assignee contacts.
     if ($allow) {
@@ -2795,25 +2793,14 @@ AND cl.modified_id  = c.id
    * @return bool
    */
   protected static function isContactPermittedAccessToCaseActivity($activityId, $action, $activityTypeID) {
-    $allow = FALSE;
-    foreach (['access my cases and activities', 'access all cases and activities'] as $per) {
-      if (CRM_Core_Permission::check($per)) {
-        $allow = TRUE;
-        break;
-      }
+    $oper = 'view';
+    if ($action == CRM_Core_Action::UPDATE) {
+      $oper = 'edit';
     }
-
-    // Check for case specific permissions.
-    if ($allow) {
-      $oper = 'view';
-      if ($action == CRM_Core_Action::UPDATE) {
-        $oper = 'edit';
-      }
-      $allow = CRM_Case_BAO_Case::checkPermission($activityId,
-        $oper,
-        $activityTypeID
-      );
-    }
+    $allow = CRM_Case_BAO_Case::checkPermission($activityId,
+      $oper,
+      $activityTypeID
+    );
 
     return $allow;
   }
