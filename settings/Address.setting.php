@@ -29,10 +29,9 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
  */
-/*
+
+/**
  * Settings metadata file
  */
 return array(
@@ -41,10 +40,11 @@ return array(
     'group' => 'address',
     'name' => 'address_standardization_provider',
     'type' => 'String',
-    'html_type' => 'Select',
+    'html_type' => 'select',
     'default' => NULL,
     'add' => '4.1',
-    'title' => 'Address Standardization Provider.',
+    'title' => ts('Address Standardization Provider.'),
+    'pseudoconstant' => ['callback' => 'CRM_Core_SelectValues::addressProvider'],
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => NULL,
@@ -55,10 +55,10 @@ return array(
     'group' => 'address',
     'name' => 'address_standardization_userid',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'default' => NULL,
     'add' => '4.1',
-    'title' => 'Web service user ID',
+    'title' => ts('Provider service user ID'),
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => NULL,
@@ -69,10 +69,10 @@ return array(
     'group' => 'address',
     'name' => 'address_standardization_url',
     'type' => 'Text',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'default' => NULL,
     'add' => '4.1',
-    'title' => 'Web Service URL',
+    'title' => ts('Provider Service URL'),
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => NULL,
@@ -87,7 +87,7 @@ return array(
     'quick_form_type' => 'YesNo',
     'default' => 0,
     'add' => '4.7',
-    'title' => 'Hide Country in Mailing Labels when same as domain country',
+    'title' => ts('Hide Country in Mailing Labels when same as domain country'),
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Do not display the country field in mailing labels when the country is the same as that of the domain',
