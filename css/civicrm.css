@@ -2683,10 +2683,14 @@ div.crm-container form {
 /* Date plugin */
 .crm-container input.dateplugin,
 .crm-container input.crm-form-date {
-  background: white url(../i/cal.gif) no-repeat scroll right center;
-  padding-right: 16px;
   /* so that text doesn't flow on top of icon */
   width: 9em;
+}
+
+.crm-container input.dateplugin::placeholder,
+.crm-container input.crm-form-date::placeholder {
+  font-family: "FontAwesome";
+  text-align: right;
 }
 
 .crm-container div.batch-update {
