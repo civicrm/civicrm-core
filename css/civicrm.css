@@ -3564,27 +3564,8 @@ span.crm-select-item-color {
   color: #E43D2B;
 }
 
-.crm-status-icon {
-  background: transparent url("../i/message-icons.png") no-repeat 0 0;
-  width: 24px;
-  height: 24px;
-  margin-right: 6px;
-}
-.crm-status-icon.success {
-  background-position: -24px 0;
-}
-.crm-status-icon.info {
-  background-position: -48px 0;
-}
-.crm-status-icon.error {
-  background-position: -72px 0;
-}
-.crm-container div.ui-notify-message.none div.icon {
+.crm-container div.ui-notify-message.none div.notify-icon {
   display: none;
-}
-
-span.crm-status-icon {
-  display: inline-block;
 }
 
 /* Public Pages */

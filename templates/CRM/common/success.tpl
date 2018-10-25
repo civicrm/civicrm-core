@@ -31,12 +31,12 @@
   <div class="crm-container" style="margin-top: 2em; padding: 1em; background-color: #FFFFE3; border: 1px #F8FF00 solid; color: black;">
     <form method="post">
         <p>
-          <span class="crm-status-icon info"> </span>
+          <i class="crm-i fa-info-circle fa-lg"></i>
           {ts 1=$currentVersion 2=$newVersion}The database will be upgraded from %1 to %2.{/ts}
         </p>
         {if $preUpgradeMessage}
             <div style="border: 2px solid #E43D2B; background-color: rgba(228, 61, 43, 0.08); padding: 10px; margin-bottom: 15px;">
-              <span class="crm-status-icon"></span>
+              <i class="crm-i fa-exclamation-triangle fa-lg"></i>
               <strong style="vertical-align: middle; font-size: 1.2em;">{ts}Warning:{/ts}</strong>
               {$preUpgradeMessage}
             </div>
@@ -64,7 +64,7 @@
           {ts 1="https://civicrm.org/core-team" 2="https://civicrm.org/providers/contributors" 3="https://civicrm.org/become-a-member?src=ug&sid=$sid" 4=$newVersion}Thank you for upgrading to %4, the latest version of CiviCRM. Packed with new features and improvements, this release was made possible by both the <a href="%1">CiviCRM Core Team</a> and an incredible group of <a href="%2">contributors</a>, combined with the financial support of CiviCRM Members and Partners, without whom the project could not exist. We invite you to join their ranks by <a href="%3">becoming a member of CiviCRM today</a>. There is no better way to say thanks than to support those that have made CiviCRM %4 possible. <a href="%3">Join today</a>.{/ts}
         </p>
       </div>
-      <p><span class="crm-status-icon success"> </span>{$message}</p>
+      <p><i class="crm-i fa-flag-checkered fa-lg"></i> {$message}</p>
       {if $afterUpgradeMessage}
         <h3>{ts}Important Notes{/ts}</h3>
         <p>{$afterUpgradeMessage}</p>
