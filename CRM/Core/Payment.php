@@ -1393,7 +1393,7 @@ abstract class CRM_Core_Payment {
       $extension_instance_found = TRUE;
     }
 
-    // Call IPN alterIPNData hook to allow for custom processing of IPN data.
+    // Call IPN postIPNProcess hook to allow for custom processing of IPN data.
     $IPNParams = array_merge($_GET, $_REQUEST);
     CRM_Utils_Hook::postIPNProcess($IPNParams);
     if (!$extension_instance_found) {
