@@ -434,14 +434,25 @@ class CRM_Activity_BAO_Query {
   }
 
   /**
+   * Get the metadata for fields to be included on the activity search form.
+   *
+   * @todo ideally this would be a trait included on the activity search & advanced search
+   * rather than a static function.
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = ['activity_type_id'];
+    $metadata = civicrm_api3('Activity', 'getfields', [])['values'];
+    return array_intersect_key($metadata, array_flip($fields));
+  }
+
+  /**
    * Add all the elements shared between case activity search and advanced search.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Core_Form_Search $form
    */
   public static function buildSearchForm(&$form) {
-    $form->addSelect('activity_type_id',
-      array('entity' => 'activity', 'label' => ts('Activity Type(s)'), 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
-    );
+    $form->addSearchFieldMetadata(['Activity' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
 
     CRM_Core_Form_Date::buildDateRange($form, 'activity_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
     $form->addElement('hidden', 'activity_date_range_error');

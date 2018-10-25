@@ -70,6 +70,13 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   protected $_ssID;
 
   /**
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'Activity';
+  }
+
+  /**
    * Processing needed for buildForm and later.
    */
   public function preProcess() {
@@ -95,6 +102,8 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       if ($this->_force) {
         // If we force the search then merge form values with url values
         // and set submit values to form values.
+        // @todo this is not good security practice. Instead define the fields in metadata & use
+        // getEntityDefaults.
         $this->_formValues = array_merge((array) $this->_formValues, CRM_Utils_Request::exportValues());
         $this->_submitValues = $this->_formValues;
       }
@@ -203,7 +212,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
       CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams, $changeNames);
     }
-
     $this->fixFormValues();
 
     if (isset($this->_ssID) && empty($_POST)) {
@@ -369,6 +377,8 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     }
 
     // Enable search activity by custom value
+    // @todo this is not good security practice. Instead define entity fields in metadata &
+    // use getEntity Defaults
     $requestParams = CRM_Utils_Request::exportValues();
     foreach (array_keys($requestParams) as $key) {
       if (substr($key, 0, 7) != 'custom_') {
@@ -397,12 +407,26 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
+   * This virtual function is used to set the default values of various form elements.
+   *
+   * @return array|NULL
+   *   reference to the array of default values
+   */
+  public function setDefaultValues() {
+    return array_merge($this->getEntityDefaults($this->getDefaultEntity()), $this->_formValues);
+  }
+
+  /**
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
    */
   public function getTitle() {
     return ts('Find Activities');
+  }
+
+  protected function getEntityMetadata() {
+    return CRM_Activity_BAO_Query::getSearchFieldMetadata();
   }
 
 }
