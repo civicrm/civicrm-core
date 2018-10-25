@@ -2473,4 +2473,17 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * ALlow Extensions to custom process IPN hook data such as sending Google Analyitcs information based on the IPN
+   * @param array $IPNData - Array of IPN Data
+   * @return mixed
+   */
+  public static function postIPNProcess(&$IPNData) {
+    return self::singleton()->invoke(array('IPNData'),
+      $IPNData, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_postIPNProcess'
+    );
+  }
+
 }
