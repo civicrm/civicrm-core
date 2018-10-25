@@ -1292,7 +1292,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * Return string
    */
-  private function getApiAction() {
+  protected function getApiAction() {
     $action = $this->getAction();
     if ($action & (CRM_Core_Action::UPDATE + CRM_Core_Action::ADD)) {
       return 'create';

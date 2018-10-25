@@ -32,10 +32,11 @@
  */
 
 trait CRM_Core_Form_EntityFormTrait {
+
   /**
    * Get entity fields for the entity to be added to the form.
    *
-   * @var array
+   * @return array
    */
   public function getEntityFields() {
     return $this->entityFields;
@@ -51,7 +52,7 @@ trait CRM_Core_Form_EntityFormTrait {
   /**
    * Get entity fields for the entity to be added to the form.
    *
-   * @var array
+   * @return string
    */
   public function getDeleteMessage() {
     return $this->deleteMessage;
@@ -219,6 +220,24 @@ trait CRM_Core_Form_EntityFormTrait {
    */
   protected function isDeleteContext() {
     return ($this->_action & CRM_Core_Action::DELETE);
+  }
+
+  protected function setEntityFieldsMetadata() {
+    foreach ($this->entityFields as $field => &$props) {
+      if (!empty($props['not-auto-addable'])) {
+        // We can't load this field using metadata
+        continue;
+      }
+      // Resolve action.
+      if (empty($props['action'])) {
+        $props['action'] = $this->getApiAction();
+      }
+      $fieldSpec = civicrm_api3($this->getDefaultEntity(), 'getfield', $props);
+      $fieldSpec = $fieldSpec['values'];
+      if (!isset($props['description']) && isset($fieldSpec['description'])) {
+        $props['description'] = $fieldSpec['description'];
+      }
+    }
   }
 
 }
