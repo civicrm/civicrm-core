@@ -4537,6 +4537,15 @@ WHERE ft.is_payment = 1
    */
   public static function completeOrder(&$input, &$ids, $objects, $transaction, $recur, $contribution) {
     $primaryContributionID = isset($contribution->id) ? $contribution->id : $objects['first_contribution']->id;
+    $paymentProcessorId = '';
+    if (isset($objects['paymentProcessor'])) {
+      if (is_array($objects['paymentProcessor'])) {
+        $paymentProcessorId = $objects['paymentProcessor']['id'];
+      }
+      else {
+        $paymentProcessorId = $objects['paymentProcessor']->id;
+      }
+    }
 
     $partiallyPaidStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid');
     if (!empty($contribution->contribution_status_id) && $contribution->contribution_status_id == $partiallyPaidStatusID) {
@@ -4544,6 +4553,15 @@ WHERE ft.is_payment = 1
       if (!empty($paymentInfo['amount_owed'])) {
         $input['amount'] = $input['total_amount'] = $paymentInfo['amount_owed'];
         CRM_Contribute_BAO_Contribution::processAdditionalPayment($primaryContributionID, $input);
+
+        $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
+        $sendReceipt = FALSE;
+        if (!empty($invoiceSettings['default_invoice_page'])) {
+          $sendReceipt = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $invoiceSettings['default_invoice_page'], 'is_email_receipt');
+        }
+        if (!empty($input['is_email_receipt']) || (!array_key_exists('is_email_receipt', $input) && $sendReceipt)) {
+          civicrm_api3('Contribution', 'sendconfirmation', array('id' => $primaryContributionID, 'payment_processor_id' => $paymentProcessorId));
+        }
         return NULL;
       }
     }
@@ -4574,16 +4592,6 @@ WHERE ft.is_payment = 1
     $recurContrib = CRM_Utils_Array::value('contributionRecur', $objects);
     $recurringContributionID = (empty($recurContrib->id)) ? NULL : $recurContrib->id;
     $event = CRM_Utils_Array::value('event', $objects);
-
-    $paymentProcessorId = '';
-    if (isset($objects['paymentProcessor'])) {
-      if (is_array($objects['paymentProcessor'])) {
-        $paymentProcessorId = $objects['paymentProcessor']['id'];
-      }
-      else {
-        $paymentProcessorId = $objects['paymentProcessor']->id;
-      }
-    }
 
     $completedContributionStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
 
