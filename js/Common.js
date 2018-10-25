@@ -1110,8 +1110,8 @@ if (!CRM.vars) CRM.vars = {};
         case 'error':
           params.icon = 'fa-times';
           break;
-        case 'alert':
         default:
+          // including case 'alert':
           params.icon = 'fa-exclamation';
       }
       // By default, don't expire errors and messages containing links
