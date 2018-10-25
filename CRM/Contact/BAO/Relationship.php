@@ -675,7 +675,13 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
         $employerRelTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
 
         if ($relationship->relationship_type_id == $employerRelTypeId && $relationship->contact_id_b == $sharedContact->employer_id) {
-          CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($relationship->contact_id_a);
+          $currentEmployerRlationship = new CRM_Contact_DAO_Relationship();
+			$currentEmployerRlationship->contact_id_a = $relationship->contact_id_a;
+			$currentEmployerRlationship->end_date=NULL;
+			$currentEmployerRlationship->is_active=1;
+			if(!$currentEmployerRlationship->find(TRUE)){
+					 CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($relationship->contact_id_a);
+			}
         }
 
       }
@@ -2271,6 +2277,15 @@ AND cc.sort_name LIKE '%$name%'";
     if ($existingTypeName !== 'Employer of') {
       return FALSE;
     }
+	//check if there are another relationship which is not expired 
+	  $relationship = new CRM_Contact_DAO_Relationship();
+      $relationship->contact_id_a = $params['contactID'];
+      $relationship->relationship_type_id = $params['relationship_type_id'];
+	  $relationship->end_date = NULL;
+	  if ($relationship->find(TRUE)) {
+		return FALSE;
+      }
+	  
     //Clear employer if relationship is expired.
     if (!empty($params['end_date']) && strtotime($params['end_date']) < time()) {
       return TRUE;
