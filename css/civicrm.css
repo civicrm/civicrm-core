@@ -3552,19 +3552,19 @@ span.crm-select-item-color {
   color: #ffffff;
 }
 
-.crm-container div.ui-notify-message.success div.notify-icon {
+.crm-container div.ui-notify-message.civi-notification-success div.notify-icon {
   color: #00994D;
 }
 
-.crm-container div.ui-notify-message.info div.notify-icon {
+.crm-container div.ui-notify-message.civi-notification-info div.notify-icon {
   color: #4d90eb;
 }
 
-.crm-container div.ui-notify-message.error div.notify-icon {
+.crm-container div.ui-notify-message.civi-notification-error div.notify-icon {
   color: #E43D2B;
 }
 
-.crm-container div.ui-notify-message.none div.notify-icon {
+.crm-container div.ui-notify-message.civi-notification-none div.notify-icon {
   display: none;
 }
 

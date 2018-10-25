@@ -1,5 +1,5 @@
 <div id="crm-notification-container" role="alert" aria-live="assertive" aria-atomic=”true” style="display:none">
-  <div id="crm-notification-alert" class="#{ldelim}type{rdelim}">
+  <div id="crm-notification-alert" class="civi-notification-#{ldelim}type{rdelim}">
     <div class="notify-icon ui-notify-close" title="{ts}close{/ts}"><span class="fa-stack">
       <i class="fa fa-circle fa-stack-2x"></i>
       <i class="crm-i fa-stack-1x #{ldelim}icon{rdelim}"></i></i>
