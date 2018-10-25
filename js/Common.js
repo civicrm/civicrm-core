@@ -1100,6 +1100,20 @@ if (!CRM.vars) CRM.vars = {};
         title: title,
         type: type
       };
+      switch(type) {
+        case 'success':
+          params.icon = 'fa-check';
+          break;
+        case 'info':
+          params.icon = 'fa-info';
+          break;
+        case 'error':
+          params.icon = 'fa-times';
+          break;
+        case 'alert':
+        default:
+          params.icon = 'fa-exclamation';
+      }
       // By default, don't expire errors and messages containing links
       var extra = {
         expires: (type == 'error' || text.indexOf('<a ') > -1) ? 0 : (text ? 10000 : 5000),
@@ -1108,9 +1122,10 @@ if (!CRM.vars) CRM.vars = {};
       options = $.extend(extra, options);
       options.expires = (options.expires === false || !CRM.config.allowAlertAutodismissal) ? 0 : parseInt(options.expires, 10);
       if (options.unique && options.unique !== '0') {
+        // If an identical notification comes up, dismiss the prior one.
         $('#crm-notification-container .ui-notify-message').each(function () {
           if (title === $('h1', this).html() && text === $('.notify-content', this).html()) {
-            $('.icon.ui-notify-close', this).click();
+            $('.notify-icon.ui-notify-close', this).click();
           }
         });
       }
