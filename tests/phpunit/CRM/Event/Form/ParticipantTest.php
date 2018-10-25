@@ -21,8 +21,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   public function testSubmit() {
     $form = $this->getForm();
     $form->submit(array(
-      'register_date' => 'now',
-      'register_date_time' => '00:00:00',
+      'register_date' => date('Ymd'),
       'status_id' => 1,
       'role_id' => 1,
       'event_id' => $form->_eventId,
@@ -36,7 +35,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testSubmitUpaidPriceChangeWhileStillPending() {
+  public function testSubmitUnpaidPriceChangeWhileStillPending() {
     $form = $this->getForm(array('is_monetary' => 1, 'financial_type_id' => 1));
     $form->_quickConfig = TRUE;
 
@@ -66,8 +65,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $form->setAction(CRM_Core_Action::ADD);
     $form->_priceSetId = $this->_ids['price_set'];
     $form->submit(array(
-      'register_date' => 'now',
-      'register_date_time' => '00:00:00',
+      'register_date' => date('Ymd'),
       'status_id' => 5,
       'role_id' => 1,
       'event_id' => $form->_eventId,
@@ -135,8 +133,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'from_email_id' => array('abc@gmail.com' => 1),
     );
     $form->submit(array(
-      'register_date' => 'now',
-      'register_date_time' => '00:00:00',
+      'register_date' => date('Ymd'),
       'status_id' => 1,
       'role_id' => 1,
       'event_id' => $form->_eventId,
