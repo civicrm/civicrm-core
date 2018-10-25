@@ -117,7 +117,7 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Location Block ID'),
-          'description' => 'Unique ID',
+          'description' => ts('Unique ID'),
           'required' => TRUE,
           'table_name' => 'civicrm_loc_block',
           'entity' => 'LocBlock',
