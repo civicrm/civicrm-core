@@ -368,13 +368,11 @@ function civicrm_api3_activity_get($params) {
  */
 function _civicrm_api3_activity_get_extraFilters(&$params, &$sql) {
   // Filter by activity contacts
-  $recordTypes = civicrm_api3('ActivityContact', 'getoptions', array('field' => 'record_type_id'));
-  $recordTypes = $recordTypes['values'];
   $activityContactOptions = array(
     'contact_id' => NULL,
-    'target_contact_id' => array_search('Activity Targets', $recordTypes),
-    'source_contact_id' => array_search('Activity Source', $recordTypes),
-    'assignee_contact_id' => array_search('Activity Assignees', $recordTypes),
+    'target_contact_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets'),
+    'source_contact_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Source'),
+    'assignee_contact_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees'),
   );
   foreach ($activityContactOptions as $activityContactName => $activityContactValue) {
     if (!empty($params[$activityContactName])) {
