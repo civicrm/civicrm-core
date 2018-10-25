@@ -317,7 +317,11 @@ AND ac.user_id IS NULL
   public static function cacheSubquery() {
     if (!CRM_Core_Permission::check(array(array('view all contacts', 'edit all contacts')))) {
       $contactID = (int) CRM_Core_Session::getLoggedInContactID();
-      self::cache($contactID);
+      if ($contactID) {
+        // If this is being called under anonymous user this query will fail hard.
+        // returning no contacts is appropriate.
+        self::cache($contactID);
+      }
       return "IN (SELECT contact_id FROM civicrm_acl_contact_cache WHERE user_id = $contactID)";
     }
     return NULL;

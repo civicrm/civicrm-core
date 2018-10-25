@@ -305,16 +305,6 @@ function civicrm_api3_activity_get($params) {
   $options = _civicrm_api3_get_options_from_params($params, FALSE, 'Activity', 'get');
   $sql = CRM_Utils_SQL_Select::fragment();
 
-  if (empty($params['target_contact_id']) && empty($params['source_contact_id'])
-    && empty($params['assignee_contact_id']) &&
-    !empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')
-    && !CRM_Core_Permission::check('view all contacts')
-  ) {
-    // Force join on the activity contact table.
-    // @todo get this & other acl filters to work, remove check further down.
-    //$params['contact_id'] = array('IS NOT NULL' => TRUE);
-  }
-
   _civicrm_api3_activity_get_extraFilters($params, $sql);
   if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')) {
     $permittedActivityTypeIDs = CRM_Activity_BAO_Activity::getPermittedActivityTypes();
@@ -349,9 +339,11 @@ function civicrm_api3_activity_get($params) {
   }
 
   $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $sql);
+
   if ($options['is_count']) {
     return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
   }
+
   if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')) {
     // @todo get this to work at the query level - see contact_id join above.
     // Also note the activity type checks in this function are now no longer required by the api as we filter out
@@ -377,6 +369,9 @@ function civicrm_api3_activity_get($params) {
  * @throws \Exception
  */
 function _civicrm_api3_activity_get_extraFilters(&$params, &$sql) {
+  $isCheckContactPermission = (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')
+    && !CRM_Core_Permission::check('view all contacts'));
+
   // Filter by activity contacts
   $activityContactOptions = array(
     'contact_id' => NULL,
@@ -385,12 +380,23 @@ function _civicrm_api3_activity_get_extraFilters(&$params, &$sql) {
     'assignee_contact_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees'),
   );
   foreach ($activityContactOptions as $activityContactName => $activityContactValue) {
-    if (!empty($params[$activityContactName])) {
-      if (!is_array($params[$activityContactName])) {
-        $params[$activityContactName] = array('=' => $params[$activityContactName]);
+    if (!empty($params[$activityContactName]) || ($isCheckContactPermission && $activityContactName)) {
+      if (!empty($params[$activityContactName])) {
+        if (!is_array($params[$activityContactName])) {
+          $params[$activityContactName] = ['=' => $params[$activityContactName]];
+        }
+        $clause = \CRM_Core_DAO::createSQLFilter('contact_id', $params[$activityContactName]);
       }
-      $clause = \CRM_Core_DAO::createSQLFilter('contact_id', $params[$activityContactName]);
+      else {
+        $clause = ' 1 ';
+      }
       $typeClause = $activityContactValue ? 'record_type_id = #typeId AND ' : '';
+      if (!empty($params['check_permissions'])) {
+        $clauses = CRM_Contact_BAO_Contact::getSelectWhereClause('civicrm_activity_contact');
+        // We allow activities to be viewed even if some of the contacts are deleted.
+        unset($clauses['is_deleted']);
+        $clause .= ' AND ' . str_replace('`civicrm_activity_contact`.`id`', 'contact_id', implode(' AND ', $clauses));
+      }
       $sql->where("a.id IN (SELECT activity_id FROM civicrm_activity_contact WHERE $typeClause !clause)",
         array('#typeId' => $activityContactValue, '!clause' => $clause)
       );

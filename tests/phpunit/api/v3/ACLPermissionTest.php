@@ -566,6 +566,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * Otherwise it sticks with the blunt original permissions.
    */
   public function testGetActivityByACL() {
+    $this->createLoggedInUser();
     $this->setPermissions(array('access CiviCRM'));
     $activity = $this->activityCreate();
 
@@ -577,6 +578,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * To leverage ACL permission to view an activity you must be able to see all of the contacts.
    */
   public function testGetActivityByAclCannotViewAllContacts() {
+    $this->createLoggedInUser();
     $activity = $this->activityCreate();
     $contacts = $this->getActivityContacts($activity);
     $this->setPermissions(array('access CiviCRM'));
@@ -667,6 +669,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     );
     $result = $this->callAPISuccess('activity', 'get', $params);
     $this->assertEquals(0, $result['count']);
+    $this->callAPISuccessGetCount('Activity', $params);
   }
 
   /**
