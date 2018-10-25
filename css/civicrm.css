@@ -2683,7 +2683,6 @@ div.crm-container form {
 /* Date plugin */
 .crm-container input.dateplugin,
 .crm-container input.crm-form-date {
-  /* so that text doesn't flow on top of icon */
   width: 9em;
 }
 
