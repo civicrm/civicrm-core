@@ -1123,16 +1123,11 @@ WHERE  id IN ( $deleteIDString )
    */
   public static function mergeSameHousehold($exportTempTable, &$sqlColumns, $prefix) {
     $prefixColumn = $prefix . '_';
-    $allKeys = array_keys($sqlColumns);
     $replaced = array();
 
     // name map of the non standard fields in header rows & sql columns
     $mappingFields = array(
       'civicrm_primary_id' => 'id',
-      'contact_source' => 'source',
-      'current_employer_id' => 'employer_id',
-      'contact_is_deleted' => 'is_deleted',
-      'name' => 'address_name',
       'provider_id' => 'im_service_provider',
       'phone_type_id' => 'phone_type',
     );
@@ -1413,7 +1408,7 @@ WHERE  {$whereClause}";
                 $headerName = $field . '-' . 'current_employer';
               }
               else {
-                $headerName = $field . '-' . $queryFields[$relationField]['name'];
+                $headerName = $field . '-' . $relationField;
               }
             }
 
