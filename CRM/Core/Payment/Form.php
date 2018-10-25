@@ -282,27 +282,6 @@ class CRM_Core_Payment_Form {
   }
 
   /**
-   * The credit card pseudo constant results only the CC label, not the key ID
-   * So we normalize the name to use it as a CSS class.
-   */
-  public static function getCreditCardCSSNames($creditCards = array()) {
-    $creditCardTypes = array();
-    if (empty($creditCards)) {
-      $creditCards = CRM_Contribute_PseudoConstant::creditCard();
-    }
-    foreach ($creditCards as $key => $name) {
-      // Replace anything not css-friendly by an underscore
-      // Non-latin names will not like this, but so many things are wrong with
-      // the credit-card type configurations already.
-      $key = str_replace(' ', '', $key);
-      $key = preg_replace('/[^a-zA-Z0-9]/', '_', $key);
-      $key = strtolower($key);
-      $creditCardTypes[$key] = $name;
-    }
-    return $creditCardTypes;
-  }
-
-  /**
    * Set default values for the form.
    *
    * @param CRM_Core_Form $form
