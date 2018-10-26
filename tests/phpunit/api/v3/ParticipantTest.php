@@ -447,12 +447,22 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
    * Check with complete array.
    */
   public function testCreateAllParams() {
-    $params = $this->_params;
-
-    $participant = $this->callAPISuccess('participant', 'create', $params);
+    $participant = $this->callAPISuccess('participant', 'create', $this->_params);
     $this->_participantID = $participant['id'];
-    // assertDBState compares expected values in $match to actual values in the DB
-    $this->assertDBState('CRM_Event_DAO_Participant', $participant['id'], $params);
+    $this->assertDBState('CRM_Event_DAO_Participant', $participant['id'], $this->_params);
+  }
+
+  /**
+   * Test that an overlong source is handled.
+   */
+  public function testLongSource() {
+    $params = array_merge($this->_params, [
+      'source' => 'a string that is even longer than the 128 character limit that is allowed for this field because sometimes you want, you know, an essay',
+    ]);
+    $baoCreated = CRM_Event_BAO_Participant::create($params);
+    $this->assertEquals('a string that is even longer than the 128 character limit that is allowed for this field because sometimes you want, you know...', $baoCreated->source);
+    // @todo - currently the api will still reject the long string.
+    //$this->callAPISuccess('participant', 'create', $params);
   }
 
   /**
