@@ -166,6 +166,14 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-credit-card';
+  }
+
+  /**
+   * @inheritDoc
    * Provides information about advanced search pane
    * offered by this component.
    *

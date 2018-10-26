@@ -145,6 +145,14 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-calendar';
+  }
+
+  /**
+   * @inheritDoc
    * @return array
    */
   public function registerAdvancedSearchPane() {
