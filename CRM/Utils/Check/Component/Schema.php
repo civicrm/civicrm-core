@@ -82,7 +82,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
     $logging = new CRM_Logging_Schema();
     $missingLogTables = $logging->getMissingLogTables();
 
-    if ($missingLogTables) {
+    if (Civi::settings()->get('logging') && $missingLogTables) {
       $msg = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts("You don't have logging enabled on some tables. This may cause errors on performing insert/update operation on them."),
