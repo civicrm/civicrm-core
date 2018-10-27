@@ -345,8 +345,10 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
   }
 
   /**
-   * buildNavigationTree retreives items in order. We call this function to
+   * buildNavigationTree retrieves items in order. We call this function to
    * ensure that any items added by the hook are also in the correct order.
+   *
+   * @param array $navigations
    */
   private static function orderByWeight(&$navigations) {
     // sort each item in navigations by weight
@@ -463,7 +465,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
   }
 
   /**
-   * Get Menu name.
+   * Get Menu name. This also checks permissions for menu items
    *
    * @param $value
    * @param array $skipMenuItems
@@ -561,8 +563,8 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     }
 
     if (!empty($value['attributes']['icon'])) {
-      $menuIcon = sprintf('<i class="%s"></i>', $value['attributes']['icon']);
-      $name = $menuIcon . $name;
+      $menuIcon = sprintf('<i class="%s menumain-icon"></i>', $value['attributes']['icon']);
+      $name = $menuIcon . '<span class="menumain-label">' . $name . '</span>';
     }
 
     if ($makeLink) {
