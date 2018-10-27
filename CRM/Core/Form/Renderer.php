@@ -307,7 +307,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       foreach (explode(',', $val) as $item) {
         $match = CRM_Utils_Array::findInTree($item, $params['data']);
         if (isset($match['text']) && strlen($match['text'])) {
-          $display[] = $match['text'];
+          $display[] = CRM_Utils_String::purifyHTML($match['text']);
         }
       }
       $el['html'] = implode('; ', $display) . '<input type="hidden" value="' . $field->getValue() . '" name="' . $field->getAttribute('name') . '">';
@@ -335,7 +335,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       // Format contact as link
       if ($entity == 'contact' && CRM_Contact_BAO_Contact_Permission::allow($val['id'], CRM_Core_Permission::VIEW)) {
         $url = CRM_Utils_System::url("civicrm/contact/view", array('reset' => 1, 'cid' => $val['id']));
-        $val['label'] = '<a class="view-' . $entity . ' no-popup" href="' . $url . '" title="' . ts('View Contact') . '">' . $val['label'] . '</a>';
+        $val['label'] = '<a class="view-' . $entity . ' no-popup" href="' . $url . '" title="' . ts('View Contact') . '">' . CRM_Utils_String::purifyHTML($val['label']) . '</a>';
       }
       $display[] = $val['label'];
     }
