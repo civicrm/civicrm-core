@@ -3902,4 +3902,69 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertTrue($g3Contacts['count'] == 1);
   }
 
+  /**
+   * Verify that passing tag IDs to Contact.get works
+   *
+   * Tests the following formats
+   * - Contact.get tag='id1'
+   * - Contact.get tag='id1,id2'
+   * - Contact.get tag='id1, id2'
+   */
+  public function testContactGetWithTag() {
+    $contact = $this->callApiSuccess('Contact', 'create', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Test',
+      'last_name' => 'Tagged',
+      'email' => 'test@example.org',
+    ]);
+    $tags = [];
+    foreach (['Tag A', 'Tag B'] as $name) {
+      $tags[] = $this->callApiSuccess('Tag', 'create', [
+        'name' => $name
+      ]);
+    }
+
+    // assign contact to "Tag B"
+    $this->callApiSuccess('EntityTag', 'create', [
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $contact['id'],
+      'tag_id' => $tags[1]['id'],
+    ]);
+
+    // test format Contact.get tag='id1'
+    $contact_get = $this->callAPISuccess('Contact', 'get', [
+      'tag' => $tags[1]['id'],
+      'return' => 'tag',
+    ]);
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($contact['id'], $contact_get['id']);
+    $this->assertEquals('Tag B', $contact_get['values'][$contact['id']]['tags']);
+
+    // test format Contact.get tag='id1,id2'
+    $contact_get = $this->callAPISuccess('Contact', 'get', [
+      'tag' => $tags[0]['id'] . ',' . $tags[1]['id'],
+      'return' => 'tag',
+    ]);
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($contact['id'], $contact_get['id']);
+    $this->assertEquals('Tag B', $contact_get['values'][$contact['id']]['tags']);
+
+    // test format Contact.get tag='id1, id2'
+    $contact_get = $this->callAPISuccess('Contact', 'get', [
+      'tag' => $tags[0]['id'] . ', ' . $tags[1]['id'],
+      'return' => 'tag',
+    ]);
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($contact['id'], $contact_get['id']);
+    $this->assertEquals('Tag B', $contact_get['values'][$contact['id']]['tags']);
+
+    foreach ($tags as $tag) {
+      $this->callAPISuccess('Tag', 'delete', ['id' => $tag['id']]);
+    }
+    $this->callAPISuccess('Contact', 'delete', [
+      'id' => $contact['id'],
+      'skip_undelete' => TRUE
+    ]);
+  }
+
 }
