@@ -89,7 +89,7 @@ class StaticTriggers {
 
       if (\CRM_Core_Config::isUpgradeMode() && isset($trigger['upgrade_check'])) {
         $uc = $trigger['upgrade_check'];
-        if (!\CRM_Core_DAO::checkFieldExists($uc['table'], $uc['column'])
+        if (!\CRM_Core_BAO_SchemaHandler::checkIfFieldExists($uc['table'], $uc['column'])
         ) {
           continue;
         }

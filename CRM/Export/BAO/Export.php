@@ -42,48 +42,13 @@ class CRM_Export_BAO_Export {
   const EXPORT_ROW_COUNT = 100000;
 
   /**
-   * Get Querymode based on ExportMode
+   * Key representing the head of household in the relationship array.
    *
-   * @param int $exportMode
-   *   Export mode.
+   * e.g. ['8_b_a' => 'Household Member Is', '8_a_b = 'Household Member Of'.....]
    *
-   * @return string $Querymode
-   *   Query Mode
+   * @var
    */
-  public static function getQueryMode($exportMode) {
-    $queryMode = CRM_Contact_BAO_Query::MODE_CONTACTS;
-
-    switch ($exportMode) {
-      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_CONTRIBUTE;
-        break;
-
-      case CRM_Export_Form_Select::EVENT_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_EVENT;
-        break;
-
-      case CRM_Export_Form_Select::MEMBER_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_MEMBER;
-        break;
-
-      case CRM_Export_Form_Select::PLEDGE_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_PLEDGE;
-        break;
-
-      case CRM_Export_Form_Select::CASE_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_CASE;
-        break;
-
-      case CRM_Export_Form_Select::GRANT_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_GRANT;
-        break;
-
-      case CRM_Export_Form_Select::ACTIVITY_EXPORT:
-        $queryMode = CRM_Contact_BAO_Query::MODE_ACTIVITY;
-        break;
-    }
-    return $queryMode;
-  }
+  protected static $relationshipTypes = [];
 
   /**
    * Get default return property for export based on mode
@@ -157,10 +122,8 @@ class CRM_Export_BAO_Export {
 
   /**
    * Get Query Group By Clause
-   * @param int $exportMode
+   * @param \CRM_Export_BAO_ExportProcessor $processor
    *   Export Mode
-   * @param string $queryMode
-   *   Query Mode
    * @param array $returnProperties
    *   Return Properties
    * @param object $query
@@ -169,8 +132,10 @@ class CRM_Export_BAO_Export {
    * @return string $groupBy
    *   Group By Clause
    */
-  public static function getGroupBy($exportMode, $queryMode, $returnProperties, $query) {
+  public static function getGroupBy($processor, $returnProperties, $query) {
     $groupBy = '';
+    $exportMode = $processor->getExportMode();
+    $queryMode = $processor->getQueryMode();
     if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
       CRM_Utils_Array::value('notes', $returnProperties) ||
       // CRM-9552
@@ -209,53 +174,6 @@ class CRM_Export_BAO_Export {
     }
 
     return $groupBy;
-  }
-
-  /**
-   * Define extra properties for the export based on query mode
-   *
-   * @param string $queryMode
-   *   Query Mode
-   * @return array $extraProperties
-   *   Extra Properties
-   */
-  public static function defineExtraProperties($queryMode) {
-    switch ($queryMode) {
-      case CRM_Contact_BAO_Query::MODE_EVENT:
-        $paymentFields = TRUE;
-        $paymentTableId = 'participant_id';
-        $extraReturnProperties = array();
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_MEMBER:
-        $paymentFields = TRUE;
-        $paymentTableId = 'membership_id';
-        $extraReturnProperties = array();
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_PLEDGE:
-        $extraReturnProperties = CRM_Pledge_BAO_Query::extraReturnProperties($queryMode);
-        $paymentFields = TRUE;
-        $paymentTableId = 'pledge_payment_id';
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_CASE:
-        $extraReturnProperties = CRM_Case_BAO_Query::extraReturnProperties($queryMode);
-        $paymentFields = FALSE;
-        $paymentTableId = '';
-        break;
-
-      default:
-        $paymentFields = FALSE;
-        $paymentTableId = '';
-        $extraReturnProperties = array();
-    }
-    $extraProperties = array(
-      'paymentFields' => $paymentFields,
-      'paymentTableId' => $paymentTableId,
-      'extraReturnProperties' => $extraReturnProperties,
-    );
-    return $extraProperties;
   }
 
   /**
@@ -308,109 +226,37 @@ class CRM_Export_BAO_Export {
     $queryOperator = 'AND'
   ) {
 
+    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator, $mergeSameHousehold);
     $returnProperties = array();
-    $paymentFields = $selectedPaymentFields = FALSE;
 
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     // Warning - this imProviders var is used in a somewhat fragile way - don't rename it
     // without manually testing the export of IM provider still works.
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
-    $contactRelationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(
-      NULL,
-      NULL,
-      NULL,
-      NULL,
-      TRUE,
-      'name',
-      FALSE
-    );
+    self::$relationshipTypes = $processor->getRelationshipTypes();
 
-    $queryMode = self::getQueryMode($exportMode);
+    $queryMode = $processor->getQueryMode();
 
     if ($fields) {
-      //construct return properties
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-      $locationTypeFields = array(
-        'street_address',
-        'supplemental_address_1',
-        'supplemental_address_2',
-        'supplemental_address_3',
-        'city',
-        'postal_code',
-        'postal_code_suffix',
-        'geo_code_1',
-        'geo_code_2',
-        'state_province',
-        'country',
-        'phone',
-        'email',
-        'im',
-      );
-
       foreach ($fields as $key => $value) {
-        $relationField = NULL;
-        $relationshipTypes = $fieldName = CRM_Utils_Array::value(1, $value);
+        $fieldName = CRM_Utils_Array::value(1, $value);
         if (!$fieldName) {
           continue;
         }
 
-        if (array_key_exists($relationshipTypes, $contactRelationshipTypes) && (!empty($value[2]) || !empty($value[4]))) {
-          $relPhoneTypeId = $relIMProviderId = NULL;
-          if (!empty($value[2])) {
-            $relationField = CRM_Utils_Array::value(2, $value);
-            if (trim(CRM_Utils_Array::value(3, $value))) {
-              $relLocTypeId = CRM_Utils_Array::value(3, $value);
-            }
-            else {
-              $relLocTypeId = 'Primary';
-            }
-
-            if ($relationField == 'phone') {
-              $relPhoneTypeId = CRM_Utils_Array::value(4, $value);
-            }
-            elseif ($relationField == 'im') {
-              $relIMProviderId = CRM_Utils_Array::value(4, $value);
-            }
-          }
-          elseif (!empty($value[4])) {
-            $relationField = CRM_Utils_Array::value(4, $value);
-            $relLocTypeId = CRM_Utils_Array::value(5, $value);
-            if ($relationField == 'phone') {
-              $relPhoneTypeId = CRM_Utils_Array::value(6, $value);
-            }
-            elseif ($relationField == 'im') {
-              $relIMProviderId = CRM_Utils_Array::value(6, $value);
-            }
-          }
-          if (in_array($relationField, $locationTypeFields) && is_numeric($relLocTypeId)) {
-            if ($relPhoneTypeId) {
-              $returnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]]['phone-' . $relPhoneTypeId] = 1;
-            }
-            elseif ($relIMProviderId) {
-              $returnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]]['im-' . $relIMProviderId] = 1;
-            }
-            else {
-              $returnProperties[$relationshipTypes]['location'][$locationTypes[$relLocTypeId]][$relationField] = 1;
-            }
-          }
-          else {
-            $returnProperties[$relationshipTypes][$relationField] = 1;
-          }
-        }
-
-        if ($relationField) {
-          // already handled.
+        if ($processor->isRelationshipTypeKey($fieldName) && (!empty($value[2]) || !empty($value[4]))) {
+          $returnProperties[$fieldName] = $processor->setRelationshipReturnProperties($value, $fieldName);
         }
         elseif (is_numeric(CRM_Utils_Array::value(2, $value))) {
-          $locTypeId = $value[2];
+          $locationName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $value[2]);
           if ($fieldName == 'phone') {
-            $returnProperties['location'][$locationTypes[$locTypeId]]['phone-' . CRM_Utils_Array::value(3, $value)] = 1;
+            $returnProperties['location'][$locationName]['phone-' . CRM_Utils_Array::value(3, $value)] = 1;
           }
           elseif ($fieldName == 'im') {
-            $returnProperties['location'][$locationTypes[$locTypeId]]['im-' . CRM_Utils_Array::value(3, $value)] = 1;
+            $returnProperties['location'][$locationName]['im-' . CRM_Utils_Array::value(3, $value)] = 1;
           }
           else {
-            $returnProperties['location'][$locationTypes[$locTypeId]][$fieldName] = 1;
+            $returnProperties['location'][$locationName][$fieldName] = 1;
           }
         }
         else {
@@ -418,14 +264,6 @@ class CRM_Export_BAO_Export {
           //revert mix of event_id and title
           if ($fieldName == 'event_id') {
             $returnProperties['event_id'] = 1;
-          }
-          elseif (
-            $exportMode == CRM_Export_Form_Select::EVENT_EXPORT &&
-            array_key_exists($fieldName, self::componentPaymentFields())
-          ) {
-            $selectedPaymentFields = TRUE;
-            $paymentTableId = 'participant_id';
-            $returnProperties[$fieldName] = 1;
           }
           else {
             $returnProperties[$fieldName] = 1;
@@ -438,56 +276,11 @@ class CRM_Export_BAO_Export {
       }
     }
     else {
-      $primary = TRUE;
-      $fields = CRM_Contact_BAO_Contact::exportableFields('All', TRUE, TRUE);
-      foreach ($fields as $key => $var) {
-        if ($key && (substr($key, 0, 6) != 'custom')) {
-          //for CRM=952
-          $returnProperties[$key] = 1;
-        }
-      }
-
-      if ($primary) {
-        $returnProperties['location_type'] = 1;
-        $returnProperties['im_provider'] = 1;
-        $returnProperties['phone_type_id'] = 1;
-        $returnProperties['provider_id'] = 1;
-        $returnProperties['current_employer'] = 1;
-      }
-
-      $extraProperties = self::defineExtraProperties($queryMode);
-      $paymentFields = $extraProperties['paymentFields'];
-      $extraReturnProperties = $extraProperties['extraReturnProperties'];
-      $paymentTableId = $extraProperties['paymentTableId'];
-
-      if ($queryMode != CRM_Contact_BAO_Query::MODE_CONTACTS) {
-        $componentReturnProperties = CRM_Contact_BAO_Query::defaultReturnProperties($queryMode);
-        if ($queryMode == CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
-          // soft credit columns are not automatically populated, because contribution search doesn't require them by default
-          $componentReturnProperties = array_merge(
-              $componentReturnProperties,
-              CRM_Contribute_BAO_Query::softCreditReturnProperties(TRUE));
-        }
-        $returnProperties = array_merge($returnProperties, $componentReturnProperties);
-
-        if (!empty($extraReturnProperties)) {
-          $returnProperties = array_merge($returnProperties, $extraReturnProperties);
-        }
-
-        // unset non exportable fields for components
-        $nonExpoFields = array(
-          'groups',
-          'tags',
-          'notes',
-          'contribution_status_id',
-          'pledge_status_id',
-          'pledge_payment_status_id',
-        );
-        foreach ($nonExpoFields as $value) {
-          unset($returnProperties[$value]);
-        }
-      }
+      $returnProperties = $processor->getDefaultReturnProperties();
     }
+    // @todo - we are working towards this being entirely a property of the processor
+    $processor->setReturnProperties($returnProperties);
+    $paymentTableId = $processor->getPaymentTableID();
 
     if ($mergeSameAddress) {
       //make sure the addressee fields are selected
@@ -550,113 +343,25 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       CRM_Contact_BAO_ProximityQuery::fixInputParams($params);
     }
 
-    $query = new CRM_Contact_BAO_Query($params, $returnProperties, NULL,
-      FALSE, FALSE, $queryMode,
-      FALSE, TRUE, TRUE, NULL, $queryOperator
-    );
-
-    //sort by state
-    //CRM-15301
-    $query->_sort = $order;
-    list($select, $from, $where, $having) = $query->query();
+    list($query, $select, $from, $where, $having) = $processor->runQuery($params, $order, $returnProperties);
 
     if ($mergeSameHousehold == 1) {
       if (empty($returnProperties['id'])) {
         $returnProperties['id'] = 1;
       }
 
-      //also merge Head of Household
-      $relationKeyMOH = CRM_Utils_Array::key('Household Member of', $contactRelationshipTypes);
-      $relationKeyHOH = CRM_Utils_Array::key('Head of Household for', $contactRelationshipTypes);
-
       foreach ($returnProperties as $key => $value) {
-        if (!array_key_exists($key, $contactRelationshipTypes)) {
-          $returnProperties[$relationKeyMOH][$key] = $value;
-          $returnProperties[$relationKeyHOH][$key] = $value;
+        if (!$processor->isRelationshipTypeKey($key)) {
+          foreach ($processor->getHouseholdRelationshipTypes() as $householdRelationshipType) {
+            if (!in_array($key, ['location_type', 'im_provider'])) {
+              $returnProperties[$householdRelationshipType][$key] = $value;
+            }
+          }
         }
       }
-
-      unset($returnProperties[$relationKeyMOH]['location_type']);
-      unset($returnProperties[$relationKeyMOH]['im_provider']);
-      unset($returnProperties[$relationKeyHOH]['location_type']);
-      unset($returnProperties[$relationKeyHOH]['im_provider']);
     }
 
-    $allRelContactArray = $relationQuery = array();
-
-    foreach ($contactRelationshipTypes as $rel => $dnt) {
-      if ($relationReturnProperties = CRM_Utils_Array::value($rel, $returnProperties)) {
-        $allRelContactArray[$rel] = array();
-        // build Query for each relationship
-        $relationQuery[$rel] = new CRM_Contact_BAO_Query(NULL, $relationReturnProperties,
-          NULL, FALSE, FALSE, $queryMode
-        );
-        list($relationSelect, $relationFrom, $relationWhere, $relationHaving) = $relationQuery[$rel]->query();
-
-        list($id, $direction) = explode('_', $rel, 2);
-        // identify the relationship direction
-        $contactA = 'contact_id_a';
-        $contactB = 'contact_id_b';
-        if ($direction == 'b_a') {
-          $contactA = 'contact_id_b';
-          $contactB = 'contact_id_a';
-        }
-        if ($exportMode == CRM_Export_Form_Select::CONTACT_EXPORT) {
-          $relIDs = $ids;
-        }
-        elseif ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
-          $sourceID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Source');
-          $dao = CRM_Core_DAO::executeQuery("
-            SELECT contact_id FROM civicrm_activity_contact
-            WHERE activity_id IN ( " . implode(',', $ids) . ") AND
-            record_type_id = {$sourceID}
-          ");
-
-          while ($dao->fetch()) {
-            $relIDs[] = $dao->contact_id;
-          }
-        }
-        else {
-          $component = self::exportComponent($exportMode);
-
-          if ($exportMode == CRM_Export_Form_Select::CASE_EXPORT) {
-            $relIDs = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($ids);
-          }
-          else {
-            $relIDs = CRM_Core_DAO::getContactIDsFromComponent($ids, $component);
-          }
-        }
-
-        $relationshipJoin = $relationshipClause = '';
-        if (!$selectAll && $componentTable) {
-          $relationshipJoin = " INNER JOIN {$componentTable} ctTable ON ctTable.contact_id = {$contactA}";
-        }
-        elseif (!empty($relIDs)) {
-          $relID = implode(',', $relIDs);
-          $relationshipClause = " AND crel.{$contactA} IN ( {$relID} )";
-        }
-
-        $relationFrom = " {$relationFrom}
-                INNER JOIN civicrm_relationship crel ON crel.{$contactB} = contact_a.id AND crel.relationship_type_id = {$id}
-                {$relationshipJoin} ";
-
-        //check for active relationship status only
-        $today = date('Ymd');
-        $relationActive = " AND (crel.is_active = 1 AND ( crel.end_date is NULL OR crel.end_date >= {$today} ) )";
-        $relationWhere = " WHERE contact_a.is_deleted = 0 {$relationshipClause} {$relationActive}";
-        $relationGroupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($relationQuery[$rel]->_select, "crel.{$contactA}");
-        $relationSelect = "{$relationSelect}, {$contactA} as refContact ";
-        $relationQueryString = "$relationSelect $relationFrom $relationWhere $relationHaving $relationGroupBy";
-
-        $allRelContactDAO = CRM_Core_DAO::executeQuery($relationQueryString);
-        while ($allRelContactDAO->fetch()) {
-          //FIX Me: Migrate this to table rather than array
-          // build the array of all related contacts
-          $allRelContactArray[$rel][$allRelContactDAO->refContact] = clone($allRelContactDAO);
-        }
-        $allRelContactDAO->free();
-      }
-    }
+    list($relationQuery, $allRelContactArray) = self::buildRelatedContactArray($selectAll, $ids, $processor, $componentTable, $returnProperties);
 
     // make sure the groups stuff is included only if specifically specified
     // by the fields param (CRM-1969), else we limit the contacts outputted to only
@@ -701,7 +406,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $queryString = "$select $from $where $having";
 
-    $groupBy = self::getGroupBy($exportMode, $queryMode, $returnProperties, $query);
+    $groupBy = self::getGroupBy($processor, $returnProperties, $query);
 
     $queryString .= $groupBy;
 
@@ -724,14 +429,14 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $addPaymentHeader = FALSE;
 
     $paymentDetails = array();
-    if ($paymentFields || $selectedPaymentFields) {
+    if ($processor->isExportPaymentFields()) {
 
       // get payment related in for event and members
       $paymentDetails = CRM_Contribute_BAO_Contribution::getContributionDetails($exportMode, $ids);
       //get all payment headers.
       // If we haven't selected specific payment fields, load in all the
       // payment headers.
-      if (!$selectedPaymentFields) {
+      if (!$processor->isExportSpecifiedPaymentFields()) {
         $paymentHeaders = self::componentPaymentFields();
         if (!empty($paymentDetails)) {
           $addPaymentHeader = TRUE;
@@ -759,7 +464,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     // for CRM-3157 purposes
     $i18n = CRM_Core_I18n::singleton();
 
-    list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $query, $contactRelationshipTypes, $relationQuery, $selectedPaymentFields);
+    list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
 
     $limitReached = FALSE;
     while (!$limitReached) {
@@ -804,112 +509,23 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             }
           }
 
-          if ($field == 'id') {
-            $row[$field] = $iterationDAO->contact_id;
-            // special case for calculated field
-          }
-          elseif ($field == 'source_contact_id') {
-            $row[$field] = $iterationDAO->contact_id;
-          }
-          elseif ($field == 'pledge_balance_amount') {
-            $row[$field] = $iterationDAO->pledge_amount - $iterationDAO->pledge_total_paid;
-            // special case for calculated field
-          }
-          elseif ($field == 'pledge_next_pay_amount') {
-            $row[$field] = $iterationDAO->pledge_next_pay_amount + $iterationDAO->pledge_outstanding_amount;
-          }
-          elseif (array_key_exists($field, $contactRelationshipTypes)) {
+          if ($processor->isRelationshipTypeKey($field)) {
             $relDAO = CRM_Utils_Array::value($iterationDAO->contact_id, $allRelContactArray[$field]);
             $relationQuery[$field]->convertToPseudoNames($relDAO);
             self::fetchRelationshipDetails($relDAO, $value, $field, $row);
           }
-          elseif (isset($fieldValue) &&
-            $fieldValue != ''
-          ) {
-            //check for custom data
-            if ($cfID = CRM_Core_BAO_CustomField::getKeyID($field)) {
-              $row[$field] = CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
-            }
-
-            elseif (in_array($field, array(
-              'email_greeting',
-              'postal_greeting',
-              'addressee',
-            ))) {
-              //special case for greeting replacement
-              $fldValue = "{$field}_display";
-              $row[$field] = $iterationDAO->$fldValue;
-            }
-            else {
-              //normal fields with a touch of CRM-3157
-              switch ($field) {
-                case 'country':
-                case 'world_region':
-                  $row[$field] = $i18n->crm_translate($fieldValue, array('context' => 'country'));
-                  break;
-
-                case 'state_province':
-                  $row[$field] = $i18n->crm_translate($fieldValue, array('context' => 'province'));
-                  break;
-
-                case 'gender':
-                case 'preferred_communication_method':
-                case 'preferred_mail_format':
-                case 'communication_style':
-                  $row[$field] = $i18n->crm_translate($fieldValue);
-                  break;
-
-                default:
-                  if (isset($metadata[$field])) {
-                    // No I don't know why we do it this way & whether we could
-                    // make better use of pseudoConstants.
-                    if (!empty($metadata[$field]['context'])) {
-                      $row[$field] = $i18n->crm_translate($fieldValue, $metadata[$field]);
-                      break;
-                    }
-                    if (!empty($metadata[$field]['pseudoconstant'])) {
-                      // This is not our normal syntax for pseudoconstants but I am a bit loath to
-                      // call an external function until sure it is not increasing php processing given this
-                      // may be iterated 100,000 times & we already have the $imProvider var loaded.
-                      // That can be next refactor...
-                      // Yes - definitely feeling hatred for this bit of code - I know you will beat me up over it's awfulness
-                      // but I have to reach a stable point....
-                      $varName = $metadata[$field]['pseudoconstant']['var'];
-                      $labels = $$varName;
-                      $row[$field] = $labels[$fieldValue];
-                      break;
-                    }
-
-                  }
-                  $row[$field] = $fieldValue;
-                  break;
-              }
-            }
-          }
-          elseif ($selectedPaymentFields && array_key_exists($field, self::componentPaymentFields())) {
-            $paymentData = CRM_Utils_Array::value($iterationDAO->$paymentTableId, $paymentDetails);
-            $payFieldMapper = array(
-              'componentPaymentField_total_amount' => 'total_amount',
-              'componentPaymentField_contribution_status' => 'contribution_status',
-              'componentPaymentField_payment_instrument' => 'pay_instru',
-              'componentPaymentField_transaction_id' => 'trxn_id',
-              'componentPaymentField_received_date' => 'receive_date',
-            );
-            $row[$field] = CRM_Utils_Array::value($payFieldMapper[$field], $paymentData, '');
-          }
           else {
-            // if field is empty or null
-            $row[$field] = '';
+            $row[$field] = self::getTransformedFieldValue($field, $iterationDAO, $fieldValue, $i18n, $metadata, $paymentDetails, $processor);
           }
         }
 
         // add payment headers if required
-        if ($addPaymentHeader && $paymentFields) {
+        if ($addPaymentHeader && $processor->isExportPaymentFields()) {
           // @todo rather than do this for every single row do it before the loop starts.
           // where other header definitions take place.
           $headerRows = array_merge($headerRows, $paymentHeaders);
           foreach (array_keys($paymentHeaders) as $paymentHdr) {
-            self::sqlColumnDefn($query, $sqlColumns, $paymentHdr);
+            self::sqlColumnDefn($processor, $sqlColumns, $paymentHdr);
           }
         }
 
@@ -924,8 +540,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         // data will already be in $row. Otherwise, add payment related
         // information, if appropriate.
         if ($addPaymentHeader) {
-          if (!$selectedPaymentFields) {
-            if ($paymentFields) {
+          if (!$processor->isExportSpecifiedPaymentFields()) {
+            if ($processor->isExportPaymentFields()) {
               $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
               if (!is_array($paymentData) || empty($paymentData)) {
                 $paymentData = $nullContributionDetails;
@@ -978,8 +594,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
       // merge the records if they have corresponding households
       if ($mergeSameHousehold) {
-        self::mergeSameHousehold($exportTempTable, $headerRows, $sqlColumns, $relationKeyMOH);
-        self::mergeSameHousehold($exportTempTable, $headerRows, $sqlColumns, $relationKeyHOH);
+        foreach ($processor->getHouseholdRelationshipTypes() as $householdRelationshipType) {
+          self::mergeSameHousehold($exportTempTable, $sqlColumns, $householdRelationshipType);
+        }
       }
 
       // call export hook
@@ -991,8 +608,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         self::writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $exportMode);
       }
       else {
-        // return tableName and sqlColumns in test context
-        return array($exportTempTable, $sqlColumns);
+        // return tableName sqlColumns headerRows in test context
+        return array($exportTempTable, $sqlColumns, $headerRows);
       }
 
       // delete the export temp table and component table
@@ -1137,127 +754,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   }
 
   /**
-   * @param $query
+   * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param $sqlColumns
    * @param $field
    */
-  public static function sqlColumnDefn($query, &$sqlColumns, $field) {
-    if (substr($field, -4) == '_a_b' || substr($field, -4) == '_b_a') {
-      return;
-    }
-
-    $fieldName = CRM_Utils_String::munge(strtolower($field), '_', 64);
-    if ($fieldName == 'id') {
-      $fieldName = 'civicrm_primary_id';
-    }
-
-    // early exit for master_id, CRM-12100
-    // in the DB it is an ID, but in the export, we retrive the display_name of the master record
-    // also for current_employer, CRM-16939
-    if ($fieldName == 'master_id' || $fieldName == 'current_employer') {
-      $sqlColumns[$fieldName] = "$fieldName varchar(128)";
-      return;
-    }
-
-    if (substr($fieldName, -11) == 'campaign_id') {
-      // CRM-14398
-      $sqlColumns[$fieldName] = "$fieldName varchar(128)";
-      return;
-    }
-
-    $lookUp = array('prefix_id', 'suffix_id');
-    // set the sql columns
-    if (isset($query->_fields[$field]['type'])) {
-      switch ($query->_fields[$field]['type']) {
-        case CRM_Utils_Type::T_INT:
-        case CRM_Utils_Type::T_BOOLEAN:
-          if (in_array($field, $lookUp)) {
-            $sqlColumns[$fieldName] = "$fieldName varchar(255)";
-          }
-          else {
-            $sqlColumns[$fieldName] = "$fieldName varchar(16)";
-          }
-          break;
-
-        case CRM_Utils_Type::T_STRING:
-          if (isset($query->_fields[$field]['maxlength'])) {
-            $sqlColumns[$fieldName] = "$fieldName varchar({$query->_fields[$field]['maxlength']})";
-          }
-          else {
-            $sqlColumns[$fieldName] = "$fieldName varchar(255)";
-          }
-          break;
-
-        case CRM_Utils_Type::T_TEXT:
-        case CRM_Utils_Type::T_LONGTEXT:
-        case CRM_Utils_Type::T_BLOB:
-        case CRM_Utils_Type::T_MEDIUMBLOB:
-          $sqlColumns[$fieldName] = "$fieldName longtext";
-          break;
-
-        case CRM_Utils_Type::T_FLOAT:
-        case CRM_Utils_Type::T_ENUM:
-        case CRM_Utils_Type::T_DATE:
-        case CRM_Utils_Type::T_TIME:
-        case CRM_Utils_Type::T_TIMESTAMP:
-        case CRM_Utils_Type::T_MONEY:
-        case CRM_Utils_Type::T_EMAIL:
-        case CRM_Utils_Type::T_URL:
-        case CRM_Utils_Type::T_CCNUM:
-        default:
-          $sqlColumns[$fieldName] = "$fieldName varchar(32)";
-          break;
-      }
-    }
-    else {
-      if (substr($fieldName, -3, 3) == '_id') {
-        $sqlColumns[$fieldName] = "$fieldName varchar(255)";
-      }
-      elseif (substr($fieldName, -5, 5) == '_note') {
-        $sqlColumns[$fieldName] = "$fieldName text";
-      }
-      else {
-        $changeFields = array(
-          'groups',
-          'tags',
-          'notes',
-        );
-
-        if (in_array($fieldName, $changeFields)) {
-          $sqlColumns[$fieldName] = "$fieldName text";
-        }
-        else {
-          // set the sql columns for custom data
-          if (isset($query->_fields[$field]['data_type'])) {
-
-            switch ($query->_fields[$field]['data_type']) {
-              case 'String':
-                // May be option labels, which could be up to 512 characters
-                $length = max(512, CRM_Utils_Array::value('text_length', $query->_fields[$field]));
-                $sqlColumns[$fieldName] = "$fieldName varchar($length)";
-                break;
-
-              case 'Country':
-              case 'StateProvince':
-              case 'Link':
-                $sqlColumns[$fieldName] = "$fieldName varchar(255)";
-                break;
-
-              case 'Memo':
-                $sqlColumns[$fieldName] = "$fieldName text";
-                break;
-
-              default:
-                $sqlColumns[$fieldName] = "$fieldName varchar(255)";
-                break;
-            }
-          }
-          else {
-            $sqlColumns[$fieldName] = "$fieldName text";
-          }
-        }
-      }
-    }
+  public static function sqlColumnDefn($processor, &$sqlColumns, $field) {
+    $sqlColumns[$processor->getMungedFieldName($field)] = $processor->getSqlColumnDefinition($field);
   }
 
   /**
@@ -1265,7 +767,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
    * @param $details
    * @param $sqlColumns
    */
-  public static function writeDetailsToTable($tableName, &$details, &$sqlColumns) {
+  public static function writeDetailsToTable($tableName, $details, $sqlColumns) {
     if (empty($details)) {
       return;
     }
@@ -1282,10 +784,10 @@ FROM   $tableName
 
     $sqlClause = array();
 
-    foreach ($details as $dontCare => $row) {
+    foreach ($details as $row) {
       $id++;
       $valueString = array($id);
-      foreach ($row as $dontCare => $value) {
+      foreach ($row as $value) {
         if (empty($value)) {
           $valueString[] = "''";
         }
@@ -1312,9 +814,9 @@ VALUES $sqlValueString
    *
    * @return string
    */
-  public static function createTempTable(&$sqlColumns) {
+  public static function createTempTable($sqlColumns) {
     //creating a temporary table for the search result that need be exported
-    $exportTempTable = CRM_Core_DAO::createTempTableName('civicrm_export', TRUE);
+    $exportTempTable = CRM_Utils_SQL_TempTable::build()->setDurable()->setCategory('export')->getName();
 
     // also create the sql table
     $sql = "DROP TABLE IF EXISTS {$exportTempTable}";
@@ -1640,18 +1142,15 @@ WHERE  id IN ( $deleteIDString )
    *
    * @param string $exportTempTable
    *   Temporary temp table that stores the records.
-   * @param array $headerRows
-   *   Array of headers for the export file.
    * @param array $sqlColumns
    *   Array of names of the table columns of the temp table.
    * @param string $prefix
    *   Name of the relationship type that is prefixed to the table columns.
    */
-  public static function mergeSameHousehold($exportTempTable, &$headerRows, &$sqlColumns, $prefix) {
+  public static function mergeSameHousehold($exportTempTable, &$sqlColumns, $prefix) {
     $prefixColumn = $prefix . '_';
     $allKeys = array_keys($sqlColumns);
     $replaced = array();
-    $headerRows = array_values($headerRows);
 
     // name map of the non standard fields in header rows & sql columns
     $mappingFields = array(
@@ -1683,9 +1182,6 @@ WHERE  id IN ( $deleteIDString )
     foreach ($replaced as $from => $to) {
       $clause[] = "$from = $to ";
       unset($sqlColumns[$to]);
-      if ($key = CRM_Utils_Array::key($to, $allKeys)) {
-        unset($headerRows[$key]);
-      }
     }
     $query .= implode(",\n", $clause);
     $query .= " WHERE {$replaced['civicrm_primary_id']} != ''";
@@ -1780,12 +1276,11 @@ LIMIT $offset, $limit
    * Manipulate header rows for relationship fields.
    *
    * @param $headerRows
-   * @param $contactRelationshipTypes
    */
-  public static function manipulateHeaderRows(&$headerRows, $contactRelationshipTypes) {
+  public static function manipulateHeaderRows(&$headerRows) {
     foreach ($headerRows as & $header) {
       $split = explode('-', $header);
-      if ($relationTypeName = CRM_Utils_Array::value($split[0], $contactRelationshipTypes)) {
+      if ($relationTypeName = CRM_Utils_Array::value($split[0], self::$relationshipTypes)) {
         $split[0] = $relationTypeName;
         $header = implode('-', $split);
       }
@@ -1871,108 +1366,35 @@ WHERE  {$whereClause}";
    *
    * @param string $field
    * @param array $headerRows
-   * @param array $sqlColumns
-   *   Columns to go in the temp table.
-   * @param CRM_Contact_BAO_Query $query
-   * @param array|string $value
-   * @param array $phoneTypes
-   * @param array $imProviders
-   * @param array $contactRelationshipTypes
-   * @param string $relationQuery
-   * @param array $selectedPaymentFields
+   * @param \CRM_Export_BAO_ExportProcessor $processor
+   *
    * @return array
    */
-  public static function setHeaderRows($field, $headerRows, $sqlColumns, $query, $value, $phoneTypes, $imProviders, $contactRelationshipTypes, $relationQuery, $selectedPaymentFields) {
+  public static function setHeaderRows($field, $headerRows, $processor) {
 
-    // Split campaign into 2 fields for id and title
-    if (substr($field, -14) == 'campaign_title') {
-      $headerRows[] = ts('Campaign Title');
-    }
-    elseif (substr($field, -11) == 'campaign_id') {
+    $queryFields = $processor->getQueryFields();
+    if (substr($field, -11) == 'campaign_id') {
+      // @todo - set this correctly in the xml rather than here.
       $headerRows[] = ts('Campaign ID');
     }
-    elseif (isset($query->_fields[$field]['title'])) {
-      $headerRows[] = $query->_fields[$field]['title'];
+    elseif ($processor->isMergeSameHousehold() && $field === 'id') {
+      $headerRows[] = ts('Household ID');
     }
-    elseif ($field == 'phone_type_id') {
-      $headerRows[] = ts('Phone Type');
+    elseif (isset($queryFields[$field]['title'])) {
+      $headerRows[] = $queryFields[$field]['title'];
     }
     elseif ($field == 'provider_id') {
+      // @todo - set this correctly in the xml rather than here.
       $headerRows[] = ts('IM Service Provider');
     }
-    elseif (substr($field, 0, 5) == 'case_' && $query->_fields['case'][$field]['title']) {
-      $headerRows[] = $query->_fields['case'][$field]['title'];
-    }
-    elseif (array_key_exists($field, $contactRelationshipTypes)) {
-      foreach ($value as $relationField => $relationValue) {
-        // below block is same as primary block (duplicate)
-        if (isset($relationQuery[$field]->_fields[$relationField]['title'])) {
-          if ($relationQuery[$field]->_fields[$relationField]['name'] == 'name') {
-            $headerName = $field . '-' . $relationField;
-          }
-          else {
-            if ($relationField == 'current_employer') {
-              $headerName = $field . '-' . 'current_employer';
-            }
-            else {
-              $headerName = $field . '-' . $relationQuery[$field]->_fields[$relationField]['name'];
-            }
-          }
-
-          $headerRows[] = $headerName;
-
-          self::sqlColumnDefn($query, $sqlColumns, $headerName);
-        }
-        elseif ($relationField == 'phone_type_id') {
-          $headerName = $field . '-' . 'Phone Type';
-          $headerRows[] = $headerName;
-          self::sqlColumnDefn($query, $sqlColumns, $headerName);
-        }
-        elseif ($relationField == 'provider_id') {
-          $headerName = $field . '-' . 'Im Service Provider';
-          $headerRows[] = $headerName;
-          self::sqlColumnDefn($query, $sqlColumns, $headerName);
-        }
-        elseif ($relationField == 'state_province_id') {
-          $headerName = $field . '-' . 'state_province_id';
-          $headerRows[] = $headerName;
-          self::sqlColumnDefn($query, $sqlColumns, $headerName);
-        }
-        elseif (is_array($relationValue) && $relationField == 'location') {
-          // fix header for location type case
-          foreach ($relationValue as $ltype => $val) {
-            foreach (array_keys($val) as $fld) {
-              $type = explode('-', $fld);
-
-              $hdr = "{$ltype}-" . $relationQuery[$field]->_fields[$type[0]]['title'];
-
-              if (!empty($type[1])) {
-                if (CRM_Utils_Array::value(0, $type) == 'phone') {
-                  $hdr .= "-" . CRM_Utils_Array::value($type[1], $phoneTypes);
-                }
-                elseif (CRM_Utils_Array::value(0, $type) == 'im') {
-                  $hdr .= "-" . CRM_Utils_Array::value($type[1], $imProviders);
-                }
-              }
-              $headerName = $field . '-' . $hdr;
-              $headerRows[] = $headerName;
-              self::sqlColumnDefn($query, $sqlColumns, $headerName);
-            }
-          }
-        }
-      }
-      self::manipulateHeaderRows($headerRows, $contactRelationshipTypes);
-    }
-    elseif ($selectedPaymentFields && array_key_exists($field, self::componentPaymentFields())) {
+    elseif ($processor->isExportPaymentFields() && array_key_exists($field, self::componentPaymentFields())) {
       $headerRows[] = CRM_Utils_Array::value($field, self::componentPaymentFields());
     }
     else {
       $headerRows[] = $field;
     }
 
-    self::sqlColumnDefn($query, $sqlColumns, $field);
-
-    return array($headerRows, $sqlColumns);
+    return $headerRows;
   }
 
   /**
@@ -1985,10 +1407,8 @@ WHERE  {$whereClause}";
    * as a step on the refactoring path rather than how it should be.
    *
    * @param array $returnProperties
-   * @param CRM_Contact_BAO_Contact $query
-   * @param array $contactRelationshipTypes
-   * @param string $relationQuery
-   * @param array $selectedPaymentFields
+   * @param \CRM_Export_BAO_ExportProcessor $processor
+   *
    * @return array
    *   - outputColumns Array of columns to be exported. The values don't matter but the key must match the
    *   alias for the field generated by BAO_Query object.
@@ -2005,15 +1425,81 @@ WHERE  {$whereClause}";
    *    - b) this code is old & outdated. Submit your answers to circular bin or better
    *       yet find a way to comment them for posterity.
    */
-  public static function getExportStructureArrays($returnProperties, $query, $contactRelationshipTypes, $relationQuery, $selectedPaymentFields) {
+  public static function getExportStructureArrays($returnProperties, $processor) {
     $metadata = $headerRows = $outputColumns = $sqlColumns = array();
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
-
+    $queryFields = $processor->getQueryFields();
     foreach ($returnProperties as $key => $value) {
-      if ($key != 'location' || !is_array($value)) {
+      if (($key != 'location' || !is_array($value)) && !$processor->isRelationshipTypeKey($key)) {
         $outputColumns[$key] = $value;
-        list($headerRows, $sqlColumns) = self::setHeaderRows($key, $headerRows, $sqlColumns, $query, $value, $phoneTypes, $imProviders, $contactRelationshipTypes, $relationQuery, $selectedPaymentFields);
+        $headerRows = self::setHeaderRows($key, $headerRows, $processor);
+        self::sqlColumnDefn($processor, $sqlColumns, $key);
+      }
+      elseif ($processor->isRelationshipTypeKey($key)) {
+        $outputColumns[$key] = $value;
+        $field = $key;
+        foreach ($value as $relationField => $relationValue) {
+          // below block is same as primary block (duplicate)
+          if (isset($queryFields[$relationField]['title'])) {
+            if ($queryFields[$relationField]['name'] == 'name') {
+              $headerName = $field . '-' . $relationField;
+            }
+            else {
+              if ($relationField == 'current_employer') {
+                $headerName = $field . '-' . 'current_employer';
+              }
+              else {
+                $headerName = $field . '-' . $queryFields[$relationField]['name'];
+              }
+            }
+
+            if (!$processor->isHouseholdMergeRelationshipTypeKey($field)) {
+              // Do not add to header row if we are only generating for merge reasons.
+              $headerRows[] = $headerName;
+            }
+
+            self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+          }
+          elseif ($relationField == 'phone_type_id') {
+            $headerName = $field . '-' . 'Phone Type';
+            $headerRows[] = $headerName;
+            self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+          }
+          elseif ($relationField == 'provider_id') {
+            $headerName = $field . '-' . 'Im Service Provider';
+            $headerRows[] = $headerName;
+            self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+          }
+          elseif ($relationField == 'state_province_id') {
+            $headerName = $field . '-' . 'state_province_id';
+            $headerRows[] = $headerName;
+            self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+          }
+          elseif (is_array($relationValue) && $relationField == 'location') {
+            // fix header for location type case
+            foreach ($relationValue as $ltype => $val) {
+              foreach (array_keys($val) as $fld) {
+                $type = explode('-', $fld);
+
+                $hdr = "{$ltype}-" . $queryFields[$type[0]]['title'];
+
+                if (!empty($type[1])) {
+                  if (CRM_Utils_Array::value(0, $type) == 'phone') {
+                    $hdr .= "-" . CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id', $type[1]);
+                  }
+                  elseif (CRM_Utils_Array::value(0, $type) == 'im') {
+                    $hdr .= "-" . CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $type[1]);
+                  }
+                }
+                $headerName = $field . '-' . $hdr;
+                $headerRows[] = $headerName;
+                self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+              }
+            }
+          }
+        }
+        self::manipulateHeaderRows($headerRows);
       }
       else {
         foreach ($value as $locationType => $locationFields) {
@@ -2021,7 +1507,7 @@ WHERE  {$whereClause}";
             $type = explode('-', $locationFieldName);
 
             $actualDBFieldName = $type[0];
-            $outputFieldName = $locationType . '-' . $query->_fields[$actualDBFieldName]['title'];
+            $outputFieldName = $locationType . '-' . $queryFields[$actualDBFieldName]['title'];
             $daoFieldName = CRM_Utils_String::munge($locationType) . '-' . $actualDBFieldName;
 
             if (!empty($type[1])) {
@@ -2037,8 +1523,9 @@ WHERE  {$whereClause}";
               // Warning: shame inducing hack.
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
-            self::sqlColumnDefn($query, $sqlColumns, $outputFieldName);
-            list($headerRows, $sqlColumns) = self::setHeaderRows($outputFieldName, $headerRows, $sqlColumns, $query, $value, $phoneTypes, $imProviders, $contactRelationshipTypes, $relationQuery, $selectedPaymentFields);
+            self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
+            $headerRows = self::setHeaderRows($outputFieldName, $headerRows, $processor);
+            self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');
             }
@@ -2103,6 +1590,10 @@ WHERE  {$whereClause}";
       }
       elseif (is_array($relationValue) && $relationField == 'location') {
         foreach ($relationValue as $ltype => $val) {
+          // If the location name has a space in it the we need to handle that. This
+          // is kinda hacky but specifically covered in the ExportTest so later efforts to
+          // improve it should be secure in the knowled it will be caught.
+          $ltype = str_replace(' ', '_', $ltype);
           foreach (array_keys($val) as $fld) {
             $type = explode('-', $fld);
             $fldValue = "{$ltype}-" . $type[0];
@@ -2164,6 +1655,214 @@ WHERE  {$whereClause}";
         // if relation field is empty or null
         $row[$relPrefix] = '';
       }
+    }
+  }
+
+  /**
+   * Get the ids that we want to get related contact details for.
+   *
+   * @param array $ids
+   * @param int $exportMode
+   *
+   * @return array
+   */
+  protected static function getIDsForRelatedContact($ids, $exportMode) {
+    if ($exportMode == CRM_Export_Form_Select::CONTACT_EXPORT) {
+      return $ids;
+    }
+    if ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
+      $relIDs = [];
+      $sourceID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Source');
+      $dao = CRM_Core_DAO::executeQuery("
+            SELECT contact_id FROM civicrm_activity_contact
+            WHERE activity_id IN ( " . implode(',', $ids) . ") AND
+            record_type_id = {$sourceID}
+          ");
+
+      while ($dao->fetch()) {
+        $relIDs[] = $dao->contact_id;
+      }
+      return $relIDs;
+    }
+    $component = self::exportComponent($exportMode);
+
+    if ($exportMode == CRM_Export_Form_Select::CASE_EXPORT) {
+      return CRM_Case_BAO_Case::retrieveContactIdsByCaseId($ids);
+    }
+    else {
+      return CRM_Core_DAO::getContactIDsFromComponent($ids, $component);
+    }
+  }
+
+  /**
+   * @param $selectAll
+   * @param $ids
+   * @param \CRM_Export_BAO_ExportProcessor $processor
+   * @param $componentTable
+   * @param $returnProperties
+   *
+   * @return array
+   */
+  protected static function buildRelatedContactArray($selectAll, $ids, $processor, $componentTable, $returnProperties) {
+    $allRelContactArray = $relationQuery = array();
+    $queryMode = $processor->getQueryMode();
+    $exportMode = $processor->getExportMode();
+    foreach (self::$relationshipTypes as $rel => $dnt) {
+      if ($relationReturnProperties = CRM_Utils_Array::value($rel, $returnProperties)) {
+        $allRelContactArray[$rel] = array();
+        // build Query for each relationship
+        $relationQuery[$rel] = new CRM_Contact_BAO_Query(NULL, $relationReturnProperties,
+          NULL, FALSE, FALSE, $queryMode
+        );
+        list($relationSelect, $relationFrom, $relationWhere, $relationHaving) = $relationQuery[$rel]->query();
+
+        list($id, $direction) = explode('_', $rel, 2);
+        // identify the relationship direction
+        $contactA = 'contact_id_a';
+        $contactB = 'contact_id_b';
+        if ($direction == 'b_a') {
+          $contactA = 'contact_id_b';
+          $contactB = 'contact_id_a';
+        }
+        $relIDs = self::getIDsForRelatedContact($ids, $exportMode);
+
+        $relationshipJoin = $relationshipClause = '';
+        if (!$selectAll && $componentTable) {
+          $relationshipJoin = " INNER JOIN {$componentTable} ctTable ON ctTable.contact_id = {$contactA}";
+        }
+        elseif (!empty($relIDs)) {
+          $relID = implode(',', $relIDs);
+          $relationshipClause = " AND crel.{$contactA} IN ( {$relID} )";
+        }
+
+        $relationFrom = " {$relationFrom}
+                INNER JOIN civicrm_relationship crel ON crel.{$contactB} = contact_a.id AND crel.relationship_type_id = {$id}
+                {$relationshipJoin} ";
+
+        //check for active relationship status only
+        $today = date('Ymd');
+        $relationActive = " AND (crel.is_active = 1 AND ( crel.end_date is NULL OR crel.end_date >= {$today} ) )";
+        $relationWhere = " WHERE contact_a.is_deleted = 0 {$relationshipClause} {$relationActive}";
+        $relationGroupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($relationQuery[$rel]->_select, "crel.{$contactA}");
+        $relationSelect = "{$relationSelect}, {$contactA} as refContact ";
+        $relationQueryString = "$relationSelect $relationFrom $relationWhere $relationHaving $relationGroupBy";
+
+        $allRelContactDAO = CRM_Core_DAO::executeQuery($relationQueryString);
+        while ($allRelContactDAO->fetch()) {
+          //FIX Me: Migrate this to table rather than array
+          // build the array of all related contacts
+          $allRelContactArray[$rel][$allRelContactDAO->refContact] = clone($allRelContactDAO);
+        }
+        $allRelContactDAO->free();
+      }
+    }
+    return array($relationQuery, $allRelContactArray);
+  }
+
+  /**
+   * @param $field
+   * @param $iterationDAO
+   * @param $fieldValue
+   * @param $i18n
+   * @param $metadata
+   * @param $paymentDetails
+   *
+   * @param \CRM_Export_BAO_ExportProcessor $processor
+   *
+   * @return string
+   */
+  protected static function getTransformedFieldValue($field, $iterationDAO, $fieldValue, $i18n, $metadata, $paymentDetails, $processor) {
+
+    if ($field == 'id') {
+      return $iterationDAO->contact_id;
+      // special case for calculated field
+    }
+    elseif ($field == 'source_contact_id') {
+      return $iterationDAO->contact_id;
+    }
+    elseif ($field == 'pledge_balance_amount') {
+      return $iterationDAO->pledge_amount - $iterationDAO->pledge_total_paid;
+      // special case for calculated field
+    }
+    elseif ($field == 'pledge_next_pay_amount') {
+      return $iterationDAO->pledge_next_pay_amount + $iterationDAO->pledge_outstanding_amount;
+    }
+    elseif (isset($fieldValue) &&
+      $fieldValue != ''
+    ) {
+      //check for custom data
+      if ($cfID = CRM_Core_BAO_CustomField::getKeyID($field)) {
+        return CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
+      }
+
+      elseif (in_array($field, array(
+        'email_greeting',
+        'postal_greeting',
+        'addressee',
+      ))) {
+        //special case for greeting replacement
+        $fldValue = "{$field}_display";
+        return $iterationDAO->$fldValue;
+      }
+      else {
+        //normal fields with a touch of CRM-3157
+        switch ($field) {
+          case 'country':
+          case 'world_region':
+            return $i18n->crm_translate($fieldValue, array('context' => 'country'));
+
+          case 'state_province':
+            return $i18n->crm_translate($fieldValue, array('context' => 'province'));
+
+          case 'gender':
+          case 'preferred_communication_method':
+          case 'preferred_mail_format':
+          case 'communication_style':
+            return $i18n->crm_translate($fieldValue);
+
+          default:
+            if (isset($metadata[$field])) {
+              // No I don't know why we do it this way & whether we could
+              // make better use of pseudoConstants.
+              if (!empty($metadata[$field]['context'])) {
+                return $i18n->crm_translate($fieldValue, $metadata[$field]);
+              }
+              if (!empty($metadata[$field]['pseudoconstant'])) {
+                // This is not our normal syntax for pseudoconstants but I am a bit loath to
+                // call an external function until sure it is not increasing php processing given this
+                // may be iterated 100,000 times & we already have the $imProvider var loaded.
+                // That can be next refactor...
+                // Yes - definitely feeling hatred for this bit of code - I know you will beat me up over it's awfulness
+                // but I have to reach a stable point....
+                $varName = $metadata[$field]['pseudoconstant']['var'];
+                if ($varName === 'imProviders') {
+                  return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_IM', 'provider_id', $fieldValue);
+                }
+                if ($varName === 'phoneTypes') {
+                  return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_Phone', 'phone_type_id', $fieldValue);
+                }
+              }
+
+            }
+            return $fieldValue;
+        }
+      }
+    }
+    elseif ($processor->isExportSpecifiedPaymentFields() && array_key_exists($field, self::componentPaymentFields())) {
+      $paymentTableId = $processor->getPaymentTableID();
+      $paymentData = CRM_Utils_Array::value($iterationDAO->$paymentTableId, $paymentDetails);
+      $payFieldMapper = array(
+        'componentPaymentField_total_amount' => 'total_amount',
+        'componentPaymentField_contribution_status' => 'contribution_status',
+        'componentPaymentField_payment_instrument' => 'pay_instru',
+        'componentPaymentField_transaction_id' => 'trxn_id',
+        'componentPaymentField_received_date' => 'receive_date',
+      );
+      return CRM_Utils_Array::value($payFieldMapper[$field], $paymentData, '');
+    }
+    else {
+      // if field is empty or null
+      return '';
     }
   }
 

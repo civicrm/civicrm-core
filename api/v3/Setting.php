@@ -313,7 +313,7 @@ function _civicrm_api3_setting_create_spec(&$params) {
  */
 function civicrm_api3_setting_get($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
-  $result = $result = CRM_Core_BAO_Setting::getItems($params, $domains, CRM_Utils_Array::value('return', $params, array()));
+  $result = CRM_Core_BAO_Setting::getItems($params, $domains, CRM_Utils_Array::value('return', $params, array()));
   return civicrm_api3_create_success($result, $params, 'Setting', 'get');
 }
 /**

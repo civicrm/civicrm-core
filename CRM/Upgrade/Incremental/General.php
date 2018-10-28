@@ -41,12 +41,12 @@ class CRM_Upgrade_Incremental_General {
   /**
    * The recommended PHP version.
    */
-  const RECOMMENDED_PHP_VER = '7.0';
+  const RECOMMENDED_PHP_VER = '7.1';
 
   /**
    * The previous recommended PHP version.
    */
-  const MIN_RECOMMENDED_PHP_VER = '5.6';
+  const MIN_RECOMMENDED_PHP_VER = '7.0';
 
   /**
    * The minimum PHP version required to install Civi.
@@ -118,12 +118,40 @@ class CRM_Upgrade_Incremental_General {
   }
 
   /**
+   * Perform any message template updates. 5.0+.
+   * @param $message
+   * @param $version
+   */
+  public static function updateMessageTemplate(&$message, $version) {
+    if (version_compare($version, 5.0, '<')) {
+      return;
+    }
+    $messageObj = new CRM_Upgrade_Incremental_MessageTemplates($version);
+    $messages = $messageObj->getUpgradeMessages();
+    if (empty($messages)) {
+      return;
+    }
+    $messagesHtml = array_map(function($k, $v) {
+      return sprintf("<li><em>%s</em> - %s</li>", htmlentities($k), htmlentities($v));
+    }, array_keys($messages), $messages);
+
+    $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", array(
+        1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Message+Templates#MessageTemplates-UpgradesandCustomizedSystemWorkflowTemplates',
+        2 => '<ul>' . implode('', $messagesHtml) . '</ul>',
+      ));
+
+    $messageObj->updateTemplates();
+  }
+
+  /**
    * @param $message
    * @param $latestVer
    * @param $currentVer
    */
   public static function checkMessageTemplate(&$message, $latestVer, $currentVer) {
-
+    if (version_compare($currentVer, 5.0, '>')) {
+      return;
+    }
     $sql = "SELECT orig.workflow_id as workflow_id,
              orig.msg_title as title
             FROM civicrm_msg_template diverted JOIN civicrm_msg_template orig ON (

@@ -1,0 +1,122 @@
+<div id="bootstrap-theme" class="api4-explorer-page">
+  <div crm-ui-debug="availableParams"></div>
+
+  <h1 crm-page-title>
+    {{ ts('CiviCRM API v4') }}{{ entity ? (' (' + entity + '::' + action + ')') : '' }}
+  </h1>
+
+  <div class="row">
+    <div class="col-md-8">
+      <form name="api4-explorer" class="panel panel-default explorer-params-panel">
+        <div class="panel-heading">
+          <div class="form-inline">
+            <input class="collapsible-optgroups form-control" ng-model="entity" ng-disabled="!entities.length" ng-class="{loading: !entities.length}" crm-ui-select="{placeholder: ts('Entity'), data: entities}" />
+            <input class="collapsible-optgroups form-control" ng-model="action" ng-disabled="!entity || !actions.length" ng-class="{loading: entity && !actions.length}" crm-ui-select="{placeholder: ts('Action'), data: actions}" />
+            <button class="btn btn-success pull-right" crm-icon="fa-bolt" ng-disabled="!entity || !action || loading" ng-click="execute()">{{ ts('Execute') }}</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="api4-input form-inline">
+            <div class="form-control" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-class="{'api4-option-selected': params[name]}" ng-repeat="(name, param) in availableParams" ng-if="param.type[0] === 'bool'">
+              <input type="checkbox" id="api4-param-{{ name }}" ng-model="params[name]"/>
+              <label for="api4-param-{{ name }}">{{ name }}<span class="crm-marker" ng-if="param.required"> *</span></label>
+            </div>
+          </div>
+          <div class="api4-input form-inline" ng-mouseenter="help('select', availableParams.select)" ng-mouseleave="help()" ng-if="availableParams.select">
+            <label for="api4-param-select">select<span class="crm-marker" ng-if="availableParams.select.required"> *</span></label>
+            <input class="collapsible-optgroups form-control" ng-list crm-ui-select="{data: selectOptions(), multiple: true}" id="api4-param-select" ng-model="params.select" style="width: 85%;"/>
+          </div>
+          <div class="api4-input form-inline" ng-mouseenter="help('fields', availableParams.fields)" ng-mouseleave="help()"ng-if="availableParams.fields">
+            <label for="api4-param-fields">fields<span class="crm-marker" ng-if="availableParams.fields.required"> *</span></label>
+            <input class="form-control" ng-list crm-ui-select="{data: fields, multiple: true}" id="api4-param-fields" ng-model="params.fields" style="width: 85%;"/>
+          </div>
+          <div class="api4-input form-inline" ng-mouseenter="help('action', availableParams.action)" ng-mouseleave="help()"ng-if="availableParams.action">
+            <label for="api4-param-action">action<span class="crm-marker" ng-if="availableParams.action.required"> *</span></label>
+            <input class="form-control" crm-ui-select="{data: actions, allowClear: true, placeholder: 'None'}" id="api4-param-action" ng-model="params.action"/>
+          </div>
+          <div class="api4-input form-inline" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in availableParams" ng-if="name !== 'action' && (param.type[0] === 'string' || param.type[0] === 'int')">
+            <label for="api4-param-{{ name }}">{{ name }}<span class="crm-marker" ng-if="param.required"> *</span></label>
+            <input class="form-control" type="{{ param.type[0] === 'int' ? 'number' : 'text' }}" id="api4-param-{{ name }}" ng-model="params[name]"/>
+          </div>
+          <fieldset ng-if="availableParams.where" class="api4-where-fieldset" ng-mouseenter="help('where', availableParams.where)" ng-mouseleave="help()" crm-api4-where-clause="{where: params.where, required: availableParams.where.required, op: 'AND', label: 'where', fields: fieldsAndJoins, operators: operators}">
+          </fieldset>
+          <fieldset ng-if="availableParams.values" ng-mouseenter="help('values', availableParams.values)" ng-mouseleave="help()">
+            <legend>values<span class="crm-marker" ng-if="availableParams.values.required"> *</span></legend>
+            <div class="api4-input form-inline" ng-repeat="(index, clause) in params.values">
+              <input class="collapsible-optgroups form-control" ng-model="clause[0]" crm-ui-select="{formatResult: formatSelect2Item, formatSelection: formatSelect2Item, data: valuesFields(), allowClear: true, placeholder: 'Field'}" />
+              <input class="form-control" ng-model="clause[1]" />
+            </div>
+            <div class="api4-input form-inline">
+              <input class="collapsible-optgroups form-control" ng-model="controls.values" crm-ui-select="{formatResult: formatSelect2Item, formatSelection: formatSelect2Item, data: valuesFields()}" placeholder="Add value" />
+            </div>
+          </fieldset>
+          <fieldset ng-if="availableParams.orderBy" ng-mouseenter="help('orderBy', availableParams.orderBy)" ng-mouseleave="help()">
+            <legend>orderBy<span class="crm-marker" ng-if="availableParams.orderBy.required"> *</span></legend>
+            <div class="api4-input form-inline" ng-repeat="(index, clause) in params.orderBy">
+              <input class="collapsible-optgroups form-control" ng-model="clause[0]" crm-ui-select="{data: fieldsAndJoins, allowClear: true, placeholder: 'Field'}" />
+              <select class="form-control" ng-model="clause[1]">
+                <option value="ASC">ASC</option>
+                <option value="DESC">DESC</option>
+              </select>
+            </div>
+            <div class="api4-input form-inline">
+              <input class="collapsible-optgroups form-control" ng-model="controls.orderBy" crm-ui-select="{data: fieldsAndJoins}" placeholder="Add orderBy" />
+            </div>
+          </fieldset>
+          <!--<input class="form-control" ng-repeat="(name, param) in availableParams" placeholder="{{ name }}" ng-model="params[name]"/>-->
+        </div>
+      </form>
+    </div>
+    <div class="col-md-4">
+      <div class="panel panel-info explorer-help-panel">
+        <div class="panel-heading">
+          <h3 class="panel-title" crm-icon="fa-info-circle">{{ helpTitle }}</h3>
+        </div>
+        <div class="panel-body">
+          <h4>{{ helpContent.description }}</h4>
+          <div ng-if="helpContent.comment">
+            <p ng-repeat='text in helpContent.comment.split("\n\n")'>{{ text }}</p>
+          </div>
+          <p ng-repeat="(key, item) in helpContent" ng-if="key !== 'description' && key !== 'comment'">
+            <strong>{{ key }}:</strong> {{ item }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="panel panel-warning explorer-code-panel">
+        <div class="panel-heading">
+          <h3 class="panel-title" crm-icon="fa-code">{{ ts('Code') }}</h3>
+        </div>
+        <div class="panel-body">
+          <table>
+            <tr ng-repeat="(type, item) in code">
+              <td>{{ type }}</td>
+              <td><pre>{{ item }}</pre></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="panel explorer-result-panel panel-{{ status }}" >
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            <i class="fa fa-circle-o" ng-if="status === 'default'"></i>
+            <i class="fa fa-check-circle" ng-if="status === 'success'"></i>
+            <i class="fa fa-minus-circle" ng-if="status === 'danger'"></i>
+            <i class="fa fa-spinner fa-pulse" ng-if="status === 'warning'"></i>
+            {{ ts('Result') }}
+          </h3>
+        </div>
+        <div class="panel-body">
+          <pre ng-repeat="code in result">{{ code }}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>

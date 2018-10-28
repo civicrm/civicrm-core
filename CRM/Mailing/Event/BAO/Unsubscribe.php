@@ -353,7 +353,7 @@ WHERE  email = %2
                         WHERE $jobTable.id = $job");
     $dao->fetch();
 
-    $component = new CRM_Mailing_BAO_Component();
+    $component = new CRM_Mailing_BAO_MailingComponent();
 
     if ($is_domain) {
       $component->id = $dao->optout_id;
@@ -418,10 +418,10 @@ WHERE  email = %2
 
     $headers = array(
       'Subject' => $component->subject,
-      'From' => "\"$domainEmailName\" <do-not-reply@$emailDomain>",
+      'From' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
       'To' => $eq->email,
-      'Reply-To' => "do-not-reply@$emailDomain",
-      'Return-Path' => "do-not-reply@$emailDomain",
+      'Reply-To' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
     );
     CRM_Mailing_BAO_Mailing::addMessageIdHeader($headers, 'u', $job, $queue_id, $eq->hash);
 

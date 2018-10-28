@@ -295,6 +295,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
     // clear all caches
     self::clearDBCache();
+    Civi::cache('session')->clear();
     CRM_Utils_System::flushCache();
 
     if ($sessionReset) {
@@ -356,7 +357,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       'TRUNCATE TABLE civicrm_group_contact_cache',
       'TRUNCATE TABLE civicrm_menu',
       'UPDATE civicrm_setting SET value = NULL WHERE name="navigation" AND contact_id IS NOT NULL',
-      'DELETE FROM civicrm_setting WHERE name="modulePaths"', // CRM-10543
     );
 
     foreach ($queries as $query) {
@@ -389,11 +389,12 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       WHERE  TABLE_SCHEMA = %1
       AND (
         TABLE_NAME LIKE 'civicrm_import_job_%'
-        OR TABLE_NAME LIKE 'civicrm_export_temp%'
-        OR TABLE_NAME LIKE 'civicrm_task_action_temp%'
         OR TABLE_NAME LIKE 'civicrm_report_temp%'
+        OR TABLE_NAME LIKE 'civicrm_tmp_d%'
         )
     ";
+    // NOTE: Cannot find use-cases where "civicrm_report_temp" would be durable. Could probably remove.
+
     if ($timeInterval) {
       $query .= " AND CREATE_TIME < DATE_SUB(NOW(), INTERVAL {$timeInterval})";
     }

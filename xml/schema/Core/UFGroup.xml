@@ -281,4 +281,12 @@
     <localizable>true</localizable>
     <add>4.7</add>
   </field>
+  <field>
+    <name>add_cancel_button</name>
+    <title>Include Cancel Button</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Should a Cancel button be included in this Profile form.</comment>
+    <add>5.0</add>
+  </field>
 </table>

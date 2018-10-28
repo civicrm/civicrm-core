@@ -1140,7 +1140,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
    * @return bool
    */
   public static function addMailingTemplateType() {
-    if (!CRM_Core_DAO::checkFieldExists('civicrm_mailing', 'template_type', FALSE)) {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_mailing', 'template_type', FALSE)) {
       CRM_Core_DAO::executeQuery('
         ALTER TABLE civicrm_mailing
         ADD COLUMN `template_type` varchar(64)  NOT NULL DEFAULT \'traditional\' COMMENT \'The language/processing system used for email templates.\',

@@ -180,7 +180,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
    */
   public function postProcess() {
 
-    CRM_Utils_System::flushCache('CRM_Core_DAO_Job');
+    CRM_Utils_System::flushCache();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Core_BAO_Job::del($this->_id);

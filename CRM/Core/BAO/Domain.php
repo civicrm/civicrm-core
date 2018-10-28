@@ -319,4 +319,12 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     return array($userName, $userEmail);
   }
 
+  /**
+   * Get address to be used for system from addresses when a reply is not expected.
+   */
+  public static function getNoReplyEmailAddress() {
+    $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
+    return "do-not-reply@$emailDomain";
+  }
+
 }

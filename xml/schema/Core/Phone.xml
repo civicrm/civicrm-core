@@ -146,6 +146,7 @@
     <name>phone_type_id</name>
     <title>Phone Type</title>
     <type>int unsigned</type>
+    <export>true</export>
     <comment>Which type of phone does this number belongs.</comment>
     <pseudoconstant>
       <optionGroupName>phone_type</optionGroupName>

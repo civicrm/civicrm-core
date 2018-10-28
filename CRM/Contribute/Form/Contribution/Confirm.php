@@ -740,21 +740,18 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * Comments from previous refactor indicate doubt as to what was going on.
    *
-   * @param int $contributionTypeId
+   * @param int $financialTypeID
    *
    * @return null|string
    */
-  public function wrangleFinancialTypeID($contributionTypeId) {
-    if (isset($paymentParams['financial_type'])) {
-      $contributionTypeId = $paymentParams['financial_type'];
-    }
-    elseif (!empty($this->_values['pledge_id'])) {
-      $contributionTypeId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
+  public function wrangleFinancialTypeID($financialTypeID) {
+    if (empty($financialTypeID) && !empty($this->_values['pledge_id'])) {
+      $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge',
         $this->_values['pledge_id'],
         'financial_type_id'
       );
     }
-    return $contributionTypeId;
+    return $financialTypeID;
   }
 
   /**
@@ -1845,7 +1842,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * Ie the membership block supports a separate transactions AND the contribution form has been configured for a
    * contribution
-   * transaction AND a membership transaction AND the payment processor supports double financial transactions (ie. NOT doTransferPayment style)
+   * transaction AND a membership transaction AND the payment processor supports double financial transactions (ie. NOT doTransferCheckout style)
    *
    * @param int $formID
    * @param bool $amountBlockActiveOnForm
@@ -1997,6 +1994,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
     $form->set('memberPriceFieldIDS', $membershipPriceFieldIDs);
+    $form->setRecurringMembershipParams();
     $form->processFormSubmission(CRM_Utils_Array::value('contact_id', $params));
   }
 
@@ -2395,26 +2393,19 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $priceFieldIds = $this->get('memberPriceFieldIDS');
 
     if (!empty($priceFieldIds)) {
-      $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
+      $membershipParams['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
       unset($priceFieldIds['id']);
       $membershipTypeIds = array();
       $membershipTypeTerms = array();
       foreach ($priceFieldIds as $priceFieldId) {
-        if ($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) {
-          $membershipTypeIds[] = $id;
-          //@todo the value for $term is immediately overwritten. It is unclear from the code whether it was intentional to
-          // do this or a double = was intended (this ambiguity is the reason many IDEs complain about 'assignment in condition'
-          $term = 1;
-          if ($term = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_num_terms')) {
-            $membershipTypeTerms[$id] = ($term > 1) ? $term : 1;
-          }
-          else {
-            $membershipTypeTerms[$id] = 1;
-          }
+        $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id');
+        if ($membershipTypeId) {
+          $membershipTypeIds[] = $membershipTypeId;
+          $term = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_num_terms') ?: 1;
+          $membershipTypeTerms[$membershipTypeId] = ($term > 1) ? $term : 1;
         }
       }
       $membershipParams['selectMembership'] = $membershipTypeIds;
-      $membershipParams['financial_type_id'] = $financialTypeID;
       $membershipParams['types_terms'] = $membershipTypeTerms;
     }
     if (!empty($membershipParams['selectMembership'])) {

@@ -189,22 +189,9 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
           ),
         ),
       ),
-      'civicrm_group' => array(
-        'dao' => 'CRM_Contact_DAO_Group',
-        'alias' => 'cgroup',
-        'filters' => array(
-          'gid' => array(
-            'name' => 'group_id',
-            'title' => ts('Group'),
-            'type' => CRM_Utils_Type::T_INT,
-            'group' => TRUE,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::staticGroup(),
-          ),
-        ),
-      ),
     );
 
+    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
   }
@@ -373,7 +360,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
 
       // Handle ID to label conversion for contact fields
       $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, 'contact/currentEmployer', 'View Contact Detail') ? TRUE : $entryFound;
-
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
       // display birthday in the configured custom format
       if (array_key_exists('civicrm_contact_birth_date', $row)) {
         $birthDate = $row['civicrm_contact_birth_date'];
@@ -393,21 +380,6 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts('View Contact Detail Report for this contact');
-        $entryFound = TRUE;
-      }
-
-      // handle country
-      if (array_key_exists('civicrm_address_country_id', $row)) {
-        if ($value = $row['civicrm_address_country_id']) {
-          $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
-        }
-        $entryFound = TRUE;
-      }
-
-      if (array_key_exists('civicrm_address_state_province_id', $row)) {
-        if ($value = $row['civicrm_address_state_province_id']) {
-          $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
-        }
         $entryFound = TRUE;
       }
 

@@ -1612,7 +1612,7 @@ class CRM_Contact_BAO_Query {
         $contactType = array();
         $subType = array();
         foreach ((array) $values as $key => $type) {
-          $types = explode('__', is_numeric($type) ? $key : $type);
+          $types = explode('__', is_numeric($type) ? $key : $type, 2);
           $contactType[$types[0]] = $types[0];
           // Add sub-type if specified
           if (!empty($types[1])) {
@@ -2235,6 +2235,7 @@ class CRM_Contact_BAO_Query {
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
     }
     elseif ($name === 'email_greeting') {
+      CRM_Core_Error::deprecatedFunctionWarning('pass in email_greeting_id or email_greeting_display');
       $filterCondition = array('greeting_type' => 'email_greeting');
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
@@ -2244,6 +2245,7 @@ class CRM_Contact_BAO_Query {
       );
     }
     elseif ($name === 'postal_greeting') {
+      CRM_Core_Error::deprecatedFunctionWarning('pass in postal_greeting_id or postal_greeting_display');
       $filterCondition = array('greeting_type' => 'postal_greeting');
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
@@ -2253,6 +2255,7 @@ class CRM_Contact_BAO_Query {
       );
     }
     elseif ($name === 'addressee') {
+      CRM_Core_Error::deprecatedFunctionWarning('pass in addressee_id or addressee_display');
       $filterCondition = array('greeting_type' => 'addressee');
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
@@ -2341,7 +2344,7 @@ class CRM_Contact_BAO_Query {
         $this->_where[$grouping][] = CRM_Core_DAO::createSQLFilter($fieldName, $value, $type);
       }
       else {
-        if (!strpos($op, 'IN')) {
+        if (!self::caseImportant($op)) {
           $value = $strtolower($value);
         }
         if ($wildcard) {
@@ -3558,14 +3561,13 @@ WHERE  $smartGroupClause
     $n = trim($value);
 
     if ($n) {
-      $value = strtolower($n);
       if (strpos($value, '%') === FALSE) {
         // only add wild card if not there
         $value = "%{$value}%";
       }
       $op = 'LIKE';
       // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-      $this->_where[$grouping][] = self::buildClause('LOWER(civicrm_address.street_address)', $op, $value, 'String');
+      $this->_where[$grouping][] = self::buildClause('civicrm_address.street_address', $op, $value, 'String');
       $this->_qill[$grouping][] = ts('Street') . " $op '$n'";
     }
     else {
@@ -4042,7 +4044,6 @@ WHERE  $smartGroupClause
     $relationType = $this->getWhereValues('relation_type_id', $grouping);
     $targetName = $this->getWhereValues('relation_target_name', $grouping);
     $relStatus = $this->getWhereValues('relation_status', $grouping);
-    $relPermission = $this->getWhereValues('relation_permission', $grouping);
     $targetGroup = $this->getWhereValues('relation_target_group', $grouping);
 
     $nameClause = $name = NULL;
@@ -4066,7 +4067,7 @@ WHERE  $smartGroupClause
       $relationType[2] = (array) $relationType[2];
       foreach ($relationType[2] as $relType) {
         $rel = explode('_', $relType);
-        self::$_relType .= $rel[1];
+        self::$_relType = $rel[1];
         $params = array('id' => $rel[0]);
         $typeValues = array();
         $rTypeValue = CRM_Contact_BAO_RelationshipType::retrieve($params, $typeValues);
@@ -4188,21 +4189,7 @@ civicrm_relationship.start_date > {$today}
     }
     $where[$grouping][] = "(contact_b.is_deleted = {$onlyDeleted})";
 
-    //check for permissioned, non-permissioned and all permissioned relations
-    if ($relPermission[2] == 1) {
-      $where[$grouping][] = "(
-civicrm_relationship.is_permission_a_b = 1
-)";
-      $this->_qill[$grouping][] = ts('Relationship - Permissioned');
-    }
-    elseif ($relPermission[2] == 2) {
-      //non-allowed permission relationship.
-      $where[$grouping][] = "(
-civicrm_relationship.is_permission_a_b = 0
-)";
-      $this->_qill[$grouping][] = ts('Relationship - Non-permissioned');
-    }
-
+    $this->addRelationshipPermissionClauses($grouping, $where);
     $this->addRelationshipDateClauses($grouping, $where);
     $this->addRelationshipActivePeriodClauses($grouping, $where);
     if (!empty($relTypes)) {
@@ -4221,6 +4208,12 @@ civicrm_relationship.is_permission_a_b = 0
       }
       $sql = "
         CREATE TEMPORARY TABLE {$relationshipTempTable}
+          (
+            `contact_id` int(10) unsigned NOT NULL DEFAULT '0',
+            `contact_id_alt` int(10) unsigned NOT NULL DEFAULT '0',
+            KEY `contact_id` (`contact_id`),
+            KEY `contact_id_alt` (`contact_id_alt`)
+          )
           (SELECT contact_id_b as contact_id, contact_id_a as contact_id_alt, civicrm_relationship.id
             FROM civicrm_relationship
             INNER JOIN  civicrm_contact c ON civicrm_relationship.contact_id_a = c.id
@@ -4232,6 +4225,27 @@ civicrm_relationship.is_permission_a_b = 0
             $whereClause )
       ";
       CRM_Core_DAO::executeQuery($sql);
+    }
+  }
+
+  public function addRelationshipPermissionClauses($grouping, &$where) {
+    $relPermission = $this->getWhereValues('relation_permission', $grouping);
+    if ($relPermission) {
+      if (!is_array($relPermission[2])) {
+        // this form value was scalar in previous versions of Civi
+        $relPermission[2] = array($relPermission[2]);
+      }
+      $where[$grouping][] = "(civicrm_relationship.is_permission_a_b IN (" . implode(",", $relPermission[2]) . "))";
+
+      $allRelationshipPermissions = CRM_Contact_BAO_Relationship::buildOptions('is_permission_a_b');
+      $relQill = '';
+      foreach ($relPermission[2] as $rel) {
+        if (!empty($relQill)) {
+          $relQill .= ' OR ';
+        }
+        $relQill .= ts($allRelationshipPermissions[$rel]);
+      }
+      $this->_qill[$grouping][] = ts('Permissioned Relationships') . ' - ' . $relQill;
     }
   }
 
@@ -5662,12 +5676,15 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         return $clause;
 
       case 'IS EMPTY':
-        $clause = " (NULLIF($field, '') IS NULL) ";
+        $clause = ($dataType == 'Date') ? " $field IS NULL " : " (NULLIF($field, '') IS NULL) ";
         return $clause;
 
       case 'IS NOT EMPTY':
-        $clause = " (NULLIF($field, '') IS NOT NULL) ";
+        $clause = ($dataType == 'Date') ? " $field IS NOT NULL " : " (NULLIF($field, '') IS NOT NULL) ";
         return $clause;
+
+      case 'RLIKE':
+        return " {$clause} BINARY '{$value}' ";
 
       case 'IN':
       case 'NOT IN':
@@ -5677,7 +5694,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         }
 
       default:
-        if (empty($dataType)) {
+        if (empty($dataType) || $dataType == 'Date') {
           $dataType = 'String';
         }
         if (is_array($value)) {
@@ -5961,8 +5978,8 @@ AND   displayRelType.is_active = 1
       }
     }
     else {
-      // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-      $wc = self::caseImportant($op) ? "LOWER({$field['where']})" : "{$field['where']}";
+      CRM_Core_Error::deprecatedFunctionWarning('pass $ids to this method');
+      $wc = "{$field['where']}";
     }
     if (in_array($name, $pseudoFields)) {
       if (!in_array($name, array('gender_id', 'prefix_id', 'suffix_id', 'communication_style_id'))) {

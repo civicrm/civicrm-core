@@ -246,7 +246,7 @@ contact_a.sort_name    as sort_name,
       $this->_formValues
     );
     if ($contact_type != NULL) {
-      $contactType = explode('__', $contact_type);
+      $contactType = explode('__', $contact_type, 2);
       if (count($contactType) > 1) {
         $clause[] = "contact_a.contact_type = '$contactType[0]' AND contact_a.contact_sub_type = '$contactType[1]'";
       }

@@ -129,7 +129,7 @@
         $(this).parents('.collapsed').crmAccordionToggle();
       }
     });
-    if (action === '2') {
+    if (action === 2) {
       $('.crm-accordion-wrapper').not('.crm-accordion-wrapper .crm-accordion-wrapper').each(function() {
         highlightTabs(this);
       });

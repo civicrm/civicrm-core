@@ -6,6 +6,7 @@
   ],
   "ignore": [
   ],
+  "license": "MIT",
   "dependencies": {
     "jquery": ">=1.6"
   }

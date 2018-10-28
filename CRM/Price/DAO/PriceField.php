@@ -254,6 +254,7 @@ class CRM_Price_DAO_PriceField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Price Field Quantity Required?'),
           'description' => 'Enter a quantity for this field?',
+          'default' => '0',
           'table_name' => 'civicrm_price_field',
           'entity' => 'PriceField',
           'bao' => 'CRM_Price_BAO_PriceField',

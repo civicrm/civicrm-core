@@ -61,6 +61,9 @@
       {if $qfKey}
         dataUrl += '&qf=' + '{$qfKey}';
       {/if}
+      {if $action}
+      dataUrl += '&action=' + '{$action}';
+      {/if}
       {literal}
 
       if (!cgCount) {

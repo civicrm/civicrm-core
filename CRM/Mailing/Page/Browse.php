@@ -181,6 +181,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     if ($this->_action & CRM_Core_Action::DISABLE) {
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {
         CRM_Mailing_BAO_MailingJob::cancel($this->_mailingId);
+        CRM_Core_Session::setStatus(ts('The mailing has been canceled.'), ts('Canceled'), 'success');
         CRM_Utils_System::redirect($context);
       }
       else {
@@ -191,6 +192,22 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
         $controller->setEmbedded(TRUE);
         $controller->run();
       }
+    }
+    elseif ($this->_action & CRM_Core_Action::CLOSE) {
+      if (!CRM_Core_Permission::checkActionPermission('CiviMail', CRM_Core_Action::CLOSE)) {
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      }
+      CRM_Mailing_BAO_MailingJob::pause($this->_mailingId);
+      CRM_Core_Session::setStatus(ts('The mailing has been paused. Active message deliveries may continue for a few minutes, but CiviMail will not begin delivery of any more batches.'), ts('Paused'), 'success');
+      CRM_Utils_System::redirect($context);
+    }
+    elseif ($this->_action & CRM_Core_Action::REOPEN) {
+      if (!CRM_Core_Permission::checkActionPermission('CiviMail', CRM_Core_Action::CLOSE)) {
+        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      }
+      CRM_Mailing_BAO_MailingJob::resume($this->_mailingId);
+      CRM_Core_Session::setStatus(ts('The mailing has been resumed.'), ts('Resumed'), 'success');
+      CRM_Utils_System::redirect($context);
     }
     elseif ($this->_action & CRM_Core_Action::DELETE) {
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {

@@ -92,9 +92,6 @@
           {ts}Edit Widget Colors{/ts}
          </div><!-- /.crm-accordion-header -->
          <div class="crm-accordion-body">
-            <div class="description">
-                {ts}Enter colors in hexadecimal format prefixed with <em>#</em>. EXAMPLE: <em>#FF0000</em> = Red. You can do a web search on 'hexadecimal colors' to find a chart of color codes.{/ts}
-            </div>
             <table class="form-layout-compressed">
             {foreach from=$colorFields item=field key=fieldName}
               <tr><td class="label">{$form.$fieldName.label}<span class="crm-marker"> *</span></td><td>{$form.$fieldName.html}</td></tr>
@@ -138,5 +135,5 @@
 </script>
 {/literal}
 {/crmRegion}
-{crmRegion name="contribute-form-contributionpage-widget-post}
+{crmRegion name="contribute-form-contributionpage-widget-post"}
 {/crmRegion}

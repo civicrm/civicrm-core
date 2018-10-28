@@ -35,7 +35,7 @@ Required vars: caseTypes
         <span>
           <a class="action-item crm-hover-button" ng-href="#/caseType/{{caseType.id}}">{{ts('Edit')}}</a>
 
-          <span class="btn-slide crm-hover-button">
+          <span class="btn-slide crm-hover-button" ng-show="!caseType.is_reserved || (!caseType.is_active || caseType.is_forked)">
             {{ts('more')}}
             <ul class="panel" style="display: none;">
               <li ng-hide="caseType.is_active">

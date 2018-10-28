@@ -184,6 +184,18 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Do any relevant message template updates.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $version
+   */
+  public static function updateMessageTemplates($ctx, $version) {
+    $messageTemplateObject = new CRM_Upgrade_Incremental_MessageTemplates($version);
+    $messageTemplateObject->updateTemplates();
+
+  }
+
+  /**
    * Drop a column from a table if it exist.
    *
    * @param CRM_Queue_TaskContext $ctx

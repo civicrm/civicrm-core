@@ -209,7 +209,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     );
 
     $productDetails = array();
-    CRM_Contribute_BAO_ManagePremiums::retrieve($premiumParams, $productDetails);
+    CRM_Contribute_BAO_Product::retrieve($premiumParams, $productDetails);
     $dao->financial_type_id = CRM_Utils_Array::value('financial_type_id', $productDetails);
     if (!empty($options[$selectedProductID])) {
       $dao->product_option = $options[$selectedProductID][$selectedProductOptionID];

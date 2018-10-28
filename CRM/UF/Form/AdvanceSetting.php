@@ -50,6 +50,8 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     $form->addGroup($options, 'is_update_dupe', ts('What to do upon duplicate match'));
     // we do not have any url checks to allow relative urls
     $form->addElement('text', 'post_URL', ts('Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'post_URL'));
+
+    $form->add('advcheckbox', 'add_cancel_button', ts('Include Cancel Button?'));
     $form->addElement('text', 'cancel_URL', ts('Cancel Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_URL'));
     $form->addElement('text', 'cancel_button_text', ts('Cancel Button Text'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_button_text'));
     $form->addElement('text', 'submit_button_text', ts('Submit Button Text'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'submit_button_text'));

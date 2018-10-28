@@ -112,11 +112,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $defaults['event_full_text'] = CRM_Utils_Array::value('event_full_text', $defaults, ts('This event is currently full.'));
 
     $defaults['waitlist_text'] = CRM_Utils_Array::value('waitlist_text', $defaults, ts('This event is currently full. However you can register now and get added to a waiting list. You will be notified if spaces become available.'));
-    list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults(CRM_Utils_Array::value('start_date', $defaults), 'activityDateTime');
-
-    if (!empty($defaults['end_date'])) {
-      list($defaults['end_date'], $defaults['end_date_time']) = CRM_Utils_Date::setDateDefaults($defaults['end_date'], 'activityDateTime');
-    }
+    $defaults['template_id'] = $this->_templateId;
     return $defaults;
   }
 
@@ -177,8 +173,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $this->addElement('checkbox', 'is_share', ts('Allow sharing through social media?'));
     $this->addElement('checkbox', 'is_map', ts('Include Map to Event Location'));
 
-    $this->addDateTime('start_date', ts('Start Date'), FALSE, array('formatType' => 'activityDateTime'));
-    $this->addDateTime('end_date', ts('End Date / Time'), FALSE, array('formatType' => 'activityDateTime'));
+    $this->add('datepicker', 'start_date', ts('Start'), [], FALSE, ['time' => TRUE]);
+    $this->add('datepicker', 'end_date', ts('End'), [], FALSE, ['time' => TRUE]);
 
     $this->add('text', 'max_participants', ts('Max Number of Participants'),
       array('onchange' => "if (this.value != '') {cj('#id-waitlist').show(); showHideByValue('has_waitlist','0','id-waitlist-text','table-row','radio',false); showHideByValue('has_waitlist','0','id-event_full','table-row','radio',true); return;} else {cj('#id-event_full, #id-waitlist, #id-waitlist-text').hide(); return;}")
@@ -215,13 +211,11 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $errors = array();
 
     if (!$values['is_template']) {
-      if (CRM_Utils_System::isNull($values['start_date'])) {
+      if (empty($values['start_date'])) {
         $errors['start_date'] = ts('Start Date and Time are required fields');
       }
       else {
-        $start = CRM_Utils_Date::processDate($values['start_date']);
-        $end = CRM_Utils_Date::processDate($values['end_date']);
-        if (($end < $start) && ($end != 0)) {
+        if (($values['end_date'] < $values['start_date']) && !empty($values['end_date'])) {
           $errors['end_date'] = ts('End date should be after Start date.');
         }
       }
@@ -242,11 +236,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $params = $this->controller->exportValues($this->_name);
 
     //format params
-    $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
-    $params['end_date'] = CRM_Utils_Date::processDate(CRM_Utils_Array::value('end_date', $params),
-      CRM_Utils_Array::value('end_date_time', $params),
-      TRUE
-    );
+    $params['start_date'] = CRM_Utils_Array::value('start_date', $params);
+    $params['end_date'] = CRM_Utils_Array::value('end_date', $params);
     $params['has_waitlist'] = CRM_Utils_Array::value('has_waitlist', $params, FALSE);
     $params['is_map'] = CRM_Utils_Array::value('is_map', $params, FALSE);
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);

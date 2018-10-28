@@ -586,7 +586,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
 
     $toName = CRM_Contact_BAO_Contact::displayName($params['contactId']);
 
-    $replyTo = "do-not-reply@$emailDomain";
+    $replyTo = CRM_Core_BAO_Domain::getNoReplyEmailAddress();
 
     // set additional general message template params (custom tokens to use in email msg templates)
     // tokens then available in msg template as {$petition.title}, etc

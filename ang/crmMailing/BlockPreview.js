@@ -21,6 +21,7 @@
           });
         };
         scope.doSend = function doSend(recipient) {
+          recipient = JSON.parse(JSON.stringify(recipient).replace(/\,\s/g, ','));
           scope.$eval(attr.onSend, {
             preview: {recipient: recipient}
           });

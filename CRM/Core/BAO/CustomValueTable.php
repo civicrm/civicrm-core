@@ -637,6 +637,10 @@ AND    cf.id IN ( $fieldIDList )
           'extends' => $dao->extends,
         );
 
+        if (!empty($params['id'])) {
+          $cvParam['id'] = $params['id'];
+        }
+
         if ($cvParam['type'] == 'File') {
           $cvParam['file_id'] = $fieldValue['value'];
         }

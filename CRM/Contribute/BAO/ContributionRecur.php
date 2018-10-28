@@ -33,6 +33,13 @@
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
   /**
+   * Array with statuses that mark a recurring contribution as inactive.
+   *
+   * @var array
+   */
+  private static $inactiveStatuses = array('Cancelled', 'Chargeback', 'Refunded', 'Completed');
+
+  /**
    * Create recurring contribution.
    *
    * @param array $params
@@ -233,15 +240,12 @@ SELECT r.payment_processor_id
    *
    * @param int $recurId
    *   Recur contribution id.
-   * @param array $objects
-   *   An array of objects that is to be cancelled like.
-   *                          contribution, membership, event. At least contribution object is a must.
    *
    * @param array $activityParams
    *
    * @return bool
    */
-  public static function cancelRecurContribution($recurId, $objects, $activityParams = array()) {
+  public static function cancelRecurContribution($recurId, $activityParams = array()) {
     if (!$recurId) {
       return FALSE;
     }
@@ -282,7 +286,7 @@ SELECT r.payment_processor_id
         }
         $activityParams = array(
           'source_contact_id' => $dao->contact_id,
-          'source_record_id' => CRM_Utils_Array::value('source_record_id', $activityParams),
+          'source_record_id' => $dao->recur_id,
           'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Cancel Recurring Contribution'),
           'subject' => CRM_Utils_Array::value('subject', $activityParams, ts('Recurring contribution cancelled')),
           'details' => $details,
@@ -299,16 +303,8 @@ SELECT r.payment_processor_id
         CRM_Activity_BAO_Activity::create($activityParams);
       }
 
-      // if there are associated objects, cancel them as well
-      if (!$objects) {
-        $transaction->commit();
-        return TRUE;
-      }
-      else {
-        // @todo - this is bad! Get the function out of the ipn.
-        $baseIPN = new CRM_Core_Payment_BaseIPN();
-        return $baseIPN->cancelled($objects, $transaction);
-      }
+      $transaction->commit();
+      return TRUE;
     }
     else {
       // if already cancelled, return true
@@ -936,6 +932,16 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     }
 
     return $lineSets;
+  }
+
+  /**
+   * Returns array with statuses that are considered to make a recurring
+   * contribution inacteve.
+   *
+   * @return array
+   */
+  public static function getInactiveStatuses() {
+    return self::$inactiveStatuses;
   }
 
 }

@@ -117,7 +117,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       'nextPrevError' => 0,
     );
     if ($qfKey) {
-      $pos = CRM_Core_BAO_PrevNextCache::getPositions("civicrm search $qfKey",
+      $pos = Civi::service('prevnext')->getPositions("civicrm search $qfKey",
         $this->_contactId,
         $this->_contactId
       );
@@ -306,7 +306,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    */
   public static function setTitle($contactId, $isDeleted = FALSE) {
     static $contactDetails;
-    $displayName = $contactImage = NULL;
+    $contactImage = NULL;
     if (!isset($contactDetails[$contactId])) {
       list($displayName, $contactImage) = self::getContactDetails($contactId);
       $contactDetails[$contactId] = array(
@@ -327,6 +327,15 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     }
     if ($isDeleted) {
       $title = "<del>{$title}</del>";
+      $mergedTo = civicrm_api3('Contact', 'getmergedto', ['contact_id' => $contactId, 'api.Contact.get' => ['return' => 'display_name']]);
+      if ($mergedTo['count']) {
+        $mergedToContactID = $mergedTo['id'];
+        $mergedToDisplayName = $mergedTo['values'][$mergedToContactID]['api.Contact.get']['values'][0]['display_name'];
+        $title .= ' ' . ts('(This contact has been merged to <a href="%1">%2</a>)', [
+            1 => CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $mergedToContactID]),
+            2 => $mergedToDisplayName,
+          ]);
+      }
     }
 
     // Inline-edit places its own title on the page

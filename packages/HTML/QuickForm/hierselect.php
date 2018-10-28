@@ -230,8 +230,8 @@ class HTML_QuickForm_hierselect extends HTML_QuickForm_group
         $arrayKeys = [];
         foreach (array_keys($this->_elements) AS $key) {
           if (isset($this->_options[$key])) {
-            if ((empty($arrayKeys)) || CRM_Utils_Array::recursiveIsset($this->_options[$key], $arrayKeys)) {
-              $array = empty($arrayKeys) ? $this->_options[$key] : CRM_Utils_Array::recursiveValue($this->_options[$key], $arrayKeys);
+            if ((empty($arrayKeys)) || CRM_Utils_Array::pathIsset($this->_options[$key], $arrayKeys)) {
+              $array = empty($arrayKeys) ? $this->_options[$key] : CRM_Utils_Array::pathGet($this->_options[$key], $arrayKeys);
                 if (is_array($array)) {
                     $select =& $this->_elements[$key];
                     $select->_options = array();
@@ -364,6 +364,7 @@ class HTML_QuickForm_hierselect extends HTML_QuickForm_group
             if ($js != '') {
                 $js .= ",\n";
             }
+            $options = utf8_encode($options);
             $js .= '"'.$optValue.'":'.json_encode($options);
         }
     }

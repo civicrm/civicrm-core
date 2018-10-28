@@ -308,6 +308,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       CRM_Activity_BAO_Activity::checkPermission($this->_activityId, CRM_Core_Action::UPDATE)
     ) {
       $this->assign('permission', 'edit');
+      $this->assign('allow_edit_inbound_emails', CRM_Activity_BAO_Activity::checkEditInboundEmailsPermissions());
     }
 
     if (!$this->_activityTypeId && $this->_activityId) {
@@ -516,10 +517,20 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $params = array('id' => $this->_activityId);
         CRM_Activity_BAO_Activity::retrieve($params, $this->_values);
       }
+
       $this->set('values', $this->_values);
     }
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
+      // We filter out alternatives, in case this is a stored e-mail, before sending to front-end
+      $this->_values['details'] = CRM_Utils_String::stripAlternatives($this->_values['details']) ?: '';
+
+      if ($this->_activityTypeName === 'Inbound Email' &&
+        !CRM_Core_Permission::check('edit inbound email basic information and content')
+      ) {
+        $this->_fields['details']['type'] = 'static';
+      }
+
       CRM_Core_Form_RecurringEntity::preProcess('civicrm_activity');
     }
 

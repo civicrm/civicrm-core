@@ -151,8 +151,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_OptionValue', $id, 'is_active', $is_active);
@@ -243,6 +243,29 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $optionValue->id = $id;
     $optionValue->save();
     CRM_Core_PseudoConstant::flush();
+
+    // Create relationship for payment intrument options
+    if (!empty($params['financial_account_id'])) {
+      $optionName = civicrm_api3('OptionGroup', 'getvalue', [
+        'return' => 'name',
+        'id' => $params['option_group_id'],
+      ]);
+      // Only create relationship for payment intrument options
+      if ($optionName == 'payment_instrument') {
+        $relationTypeId = civicrm_api3('OptionValue', 'getvalue', [
+          'return' => 'value',
+          'option_group_id' => 'account_relationship',
+          'name' => 'Asset Account is',
+        ]);
+        $params = [
+          'entity_table' => 'civicrm_option_value',
+          'entity_id' => $optionValue->id,
+          'account_relationship' => $relationTypeId,
+          'financial_account_id' => $params['financial_account_id'],
+        ];
+        CRM_Financial_BAO_FinancialTypeAccount::add($params);
+      }
+    }
     return $optionValue;
   }
 
@@ -547,16 +570,23 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * that an option value exists, without hitting an error if it already exists.
    *
    * This is sympathetic to sites who might pre-add it.
+   *
+   * @param array $params the option value attributes.
+   * @return array the option value attributes.
    */
   public static function ensureOptionValueExists($params) {
-    $existingValues = civicrm_api3('OptionValue', 'get', array(
+    $result = civicrm_api3('OptionValue', 'get', array(
       'option_group_id' => $params['option_group_id'],
       'name' => $params['name'],
-      'return' => 'id',
+      'return' => ['id', 'value'],
+      'sequential' => 1,
     ));
-    if (!$existingValues['count']) {
-      civicrm_api3('OptionValue', 'create', $params);
+
+    if (!$result['count']) {
+      $result = civicrm_api3('OptionValue', 'create', $params);
     }
+
+    return CRM_Utils_Array::first($result['values']);
   }
 
 }

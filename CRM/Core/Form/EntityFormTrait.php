@@ -79,7 +79,7 @@ trait CRM_Core_Form_EntityFormTrait {
    * Build the form object.
    */
   public function buildQuickEntityForm() {
-    if ($this->_action & CRM_Core_Action::DELETE) {
+    if ($this->isDeleteContext()) {
       $this->buildDeleteForm();
       return;
     }
@@ -132,6 +132,47 @@ trait CRM_Core_Form_EntityFormTrait {
   }
 
   /**
+   * Get the defaults for the entity.
+   */
+  protected function getEntityDefaults() {
+    $defaults = [];
+    if ($this->_action != CRM_Core_Action::DELETE &&
+      $this->getEntityId()
+    ) {
+      $params = ['id' => $this->getEntityId()];
+      $baoName = $this->_BAOName;
+      $baoName::retrieve($params, $defaults);
+    }
+    foreach ($this->entityFields as $fieldSpec) {
+      $value = CRM_Utils_Request::retrieveValue($fieldSpec['name'], $this->getValidationTypeForField($fieldSpec['name']));
+      if ($value !== FALSE) {
+        $defaults[$fieldSpec['name']] = $value;
+      }
+    }
+    return $defaults;
+  }
+
+  /**
+   * Get the validation rule to apply to a function.
+   *
+   * Alphanumeric is designed to always be safe & for now we just return
+   * that but in future we can use tighter rules for types like int, bool etc.
+   *
+   * @param string $fieldName
+   *
+   * @return string|int|bool
+   */
+  protected function getValidationTypeForField($fieldName) {
+    switch ($this->metadata[$fieldName]['type']) {
+      case CRM_Utils_Type::T_BOOLEAN:
+        return 'Boolean';
+
+      default:
+        return 'Alphanumeric';
+    }
+  }
+
+  /**
    * Set translated fields.
    *
    * This function is called from the class constructor, allowing us to set
@@ -161,12 +202,23 @@ trait CRM_Core_Form_EntityFormTrait {
   protected function addEntityFieldsToTemplate() {
     foreach ($this->getEntityFields() as $fieldSpec) {
       if (empty($fieldSpec['not-auto-addable'])) {
-        $element = $this->addField($fieldSpec['name'], [], CRM_Utils_Array::value('required', $fieldSpec));
+        $element = $this->addField($fieldSpec['name'], [], CRM_Utils_Array::value('required', $fieldSpec), FALSE);
         if (!empty($fieldSpec['is_freeze'])) {
           $element->freeze();
         }
       }
     }
+  }
+
+  /**
+   * Is the form being used in the context of a deletion.
+   *
+   * (For some reason rather than having separate forms Civi overloads one form).
+   *
+   * @return bool
+   */
+  protected function isDeleteContext() {
+    return ($this->_action & CRM_Core_Action::DELETE);
   }
 
 }

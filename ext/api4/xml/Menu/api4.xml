@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/ajax/api4</path>
+    <page_callback>CRM_Api4_Page_AJAX</page_callback>
+    <title>Api v4</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

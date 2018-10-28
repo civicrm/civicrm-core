@@ -87,27 +87,21 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
    * @return array
    */
   private function _gettingStarted() {
-    // Fetch data from cache
-    $cache = CRM_Core_DAO::executeQuery("SELECT data, created_date FROM civicrm_cache
-      WHERE group_name = 'dashboard' AND path = 'gettingStarted'");
-    if ($cache->fetch()) {
-      $expire = time() - (60 * 60 * 24 * self::CACHE_DAYS);
-      // Refresh data after CACHE_DAYS
-      if (strtotime($cache->created_date) < $expire) {
-        $new_data = $this->_getHtml($this->gettingStartedUrl());
-        // If fetching the new html was successful, return it
-        // Otherwise use the old cached data - it's better than nothing
-        if ($new_data) {
-          return $new_data;
-        }
+    $value = Civi::cache('community_messages')->get('dashboard_gettingStarted');
+
+    if (!$value) {
+      $value = $this->_getHtml($this->gettingStartedUrl());
+
+      if ($value) {
+        Civi::cache('community_messages')->set('dashboard_gettingStarted', $value, (60 * 60 * 24 * self::CACHE_DAYS));
       }
-      return unserialize($cache->data);
     }
-    return $this->_getHtml($this->gettingStartedUrl());
+
+    return $value;
   }
 
   /**
-   * Get html and cache results.
+   * Get html.
    *
    * @param $url
    *
@@ -115,18 +109,15 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
    *   array of gettingStarted items; or NULL if not available
    */
   public function _getHtml($url) {
-
     $httpClient = new CRM_Utils_HttpClient(self::CHECK_TIMEOUT);
     list ($status, $html) = $httpClient->get($url);
+
     if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
       return NULL;
     }
 
     $tokensList = CRM_Utils_Token::getTokens($html);
     $this->replaceLinkToken($tokensList, $html);
-    if ($html) {
-      CRM_Core_BAO_Cache::setItem($html, 'dashboard', 'gettingStarted');
-    }
     return $html;
   }
 

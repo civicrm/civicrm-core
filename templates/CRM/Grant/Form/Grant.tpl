@@ -63,34 +63,25 @@
       </tr>
       <tr class="crm-grant-form-block-application_received_date">
          <td class="label">{$form.application_received_date.label}</td>
-         <td>{if $hideCalendar neq true}
-                      {include file="CRM/common/jcalendar.tpl" elementName=application_received_date}
-                   {else}
-                      {$form.application_received_date.value|crmDate}
-                   {/if}</td>
+         <td>{$form.application_received_date.html}</td>
       </tr>
       <tr class="crm-grant-form-block-decision_date">
          <td class="label">{$form.decision_date.label}</td>
-         <td>{if $hideCalendar neq true}
-                      {include file="CRM/common/jcalendar.tpl" elementName=decision_date}
-                   {else}
-                      {$form.decision_date.value|crmDate}
-                   {/if}<br />
-                   <span class="description">{ts}Date on which the grant decision was finalized.{/ts}</span></td>
+         <td>
+           {$form.decision_date.html}<br />
+           <span class="description">{ts}Date on which the grant decision was finalized.{/ts}</span>
+         </td>
       </tr>
-      <tr class="crm-grant-form-block-money_transfer_date"><td class="label">{$form.money_transfer_date.label}</td>
-        <td>{if $hideCalendar neq true}
-                       {include file="CRM/common/jcalendar.tpl" elementName=money_transfer_date}
-                    {else}
-                       {$form.money_transfer_date.value|crmDate}
-                    {/if}<br /><span class="description">{ts}Date on which the grant money was transferred.{/ts}</span></td>
+      <tr class="crm-grant-form-block-money_transfer_date">
+        <td class="label">{$form.money_transfer_date.label}</td>
+        <td>
+          {$form.money_transfer_date.html}<br />
+          <span class="description">{ts}Date on which the grant money was transferred.{/ts}</span>
+        </td>
       </tr>
-      <tr class="crm-grant-form-block-grant_due_date"><td class="label">{$form.grant_due_date.label}</td>
-    <td>{if $hideCalendar neq true}
-                       {include file="CRM/common/jcalendar.tpl" elementName=grant_due_date}
-                    {else}
-                       {$form.grant_due_date.value|crmDate}
-                    {/if}</td>
+      <tr class="crm-grant-form-block-grant_due_date">
+        <td class="label">{$form.grant_due_date.label}</td>
+        <td>{$form.grant_due_date.html}</td>
       </tr>
       <tr class="crm-grant-form-block-grant_report_received">
           <td class="label">{$form.grant_report_received.label}</td>

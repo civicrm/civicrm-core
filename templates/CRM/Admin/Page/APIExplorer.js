@@ -576,7 +576,6 @@
 
   /**
    * Format value to look like php code
-   * TODO: Use short array syntax when we drop support for php 5.3
    * @param val
    */
   function phpFormat(val) {
@@ -736,7 +735,7 @@
       q.php += "]";
       q.json += "\n}";
     }
-    q.php += "];";
+    q.php += ");";
     q.json += ").done(function(result) {\n  // do something\n});";
     q.smarty += "}\n{foreach from=$result.values item=" + entity.toLowerCase() + "}\n  {$" + entity.toLowerCase() + ".some_field}\n{/foreach}";
     if (!_.includes(action, 'get')) {
