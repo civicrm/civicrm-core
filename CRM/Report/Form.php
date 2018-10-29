@@ -3935,7 +3935,7 @@ ORDER BY cg.weight, cf.weight";
           $curFilters[$fieldName]['type'] = CRM_Utils_Type::T_STRING;
 
           $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $customDAO->cf_id, array(), 'search');
-          if ($options !== FALSE) {
+          if ((is_array($options) && count($options)!=0) || (!is_array($options) && $options !== FALSE)) {
             $curFilters[$fieldName]['operatorType'] = CRM_Core_BAO_CustomField::isSerialized($customDAO) ? CRM_Report_Form::OP_MULTISELECT_SEPARATOR : CRM_Report_Form::OP_MULTISELECT;
             $curFilters[$fieldName]['options'] = $options;
           }
