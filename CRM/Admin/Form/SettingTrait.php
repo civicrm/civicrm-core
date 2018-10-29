@@ -74,7 +74,16 @@ trait CRM_Admin_Form_SettingTrait {
    * @return array
    */
   protected function getSettingsToSetByMetadata($params) {
-    return array_intersect_key($params, $this->_settings);
+    $setValues = array_intersect_key($params, $this->_settings);
+    // Checkboxes will be unset rather than empty so we need to add them back in.
+    // Handle quickform hateability just once, right here right now.
+    $unsetValues = array_diff_key($this->_settings, $params);
+    foreach ($unsetValues as $key => $unsetValue) {
+      if ($this->getQuickFormType($this->getSettingMetadata($key)) === 'CheckBox') {
+        $setValues[$key] = [$key => 0];
+      }
+    }
+    return $setValues;
   }
 
   /**
@@ -231,6 +240,9 @@ trait CRM_Admin_Form_SettingTrait {
       if ($this->getQuickFormType($spec) === 'CheckBoxes') {
         $this->_defaults[$setting] = array_fill_keys($this->_defaults[$setting], 1);
       }
+      if ($this->getQuickFormType($spec) === 'CheckBox') {
+        $this->_defaults[$setting] = [$setting => $this->_defaults[$setting]];
+      }
     }
   }
 
@@ -243,6 +255,10 @@ trait CRM_Admin_Form_SettingTrait {
     foreach ($settings as $setting => $settingValue) {
       if ($this->getQuickFormType($this->getSettingMetadata($setting)) === 'CheckBoxes') {
         $settings[$setting] = array_keys($settingValue);
+      }
+      if ($this->getQuickFormType($this->getSettingMetadata($setting)) === 'CheckBox') {
+        // This will be an array with one value.
+        $settings[$setting] = (int) reset($settings[$setting]);
       }
     }
     civicrm_api3('setting', 'create', $settings);
