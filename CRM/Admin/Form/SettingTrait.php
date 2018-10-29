@@ -202,7 +202,8 @@ trait CRM_Admin_Form_SettingTrait {
    * @return string
    */
   protected function getQuickFormType($spec) {
-    if (isset($spec['quick_form_type'])) {
+    if (isset($spec['quick_form_type']) &&
+    !($spec['quick_form_type'] === 'Element' && !empty($spec['html_type']))) {
       return $spec['quick_form_type'];
     }
     $mapping = [

@@ -126,16 +126,17 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
   public function buildQuickForm() {
     $htmlFields = array();
     foreach ($this->_settings as $setting => $group) {
+      // @todo - remove this whole loop! The parent form does this - it's just because of the werid handling
+      // of $htmlFields for this form that needs to be unwound that we have it atm.
+      // The 'basicform' has been contaminated with processing $htlFields
+      // to cater to this form - probably due to the way invoicing settings were handled as
+      // an array not a bunch of keys.
       $settingMetaData = civicrm_api3('setting', 'getfields', array('name' => $setting));
       $props = $settingMetaData['values'][$setting];
       if (isset($props['quick_form_type'])) {
         $add = 'add' . $props['quick_form_type'];
         if ($add == 'addElement') {
           if (in_array($props['html_type'], array('checkbox', 'textarea'))) {
-            $this->add($props['html_type'],
-              $setting,
-              $props['title']
-            );
           }
           else {
             if ($props['html_type'] == 'select') {
@@ -144,23 +145,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
                 $props['option_values'] = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::$functionName();
               }
             }
-            $this->$add(
-              $props['html_type'],
-              $setting,
-              ts($props['title']),
-              CRM_Utils_Array::value($props['html_type'] == 'select' ? 'option_values' : 'html_attributes', $props, array()),
-              $props['html_type'] == 'select' ? CRM_Utils_Array::value('html_attributes', $props) : NULL
-            );
           }
-        }
-        elseif ($add == 'addMonthDay') {
-          $this->add('date', $setting, ts($props['title']), CRM_Core_SelectValues::date(NULL, 'M d'));
-        }
-        elseif ($add == 'addDate') {
-          $this->addDate($setting, ts($props['title']), FALSE, array('formatType' => $props['type']));
-        }
-        else {
-          $this->$add($setting, ts($props['title']));
         }
       }
       $htmlFields[$setting] = ts($props['description']);
@@ -197,9 +182,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     unset($params['qfKey']);
     unset($params['entryURL']);
     Civi::settings()->set('contribution_invoice_settings', $params);
-    Civi::settings()->set('update_contribution_on_membership_type_change',
-      CRM_Utils_Array::value('update_contribution_on_membership_type_change', $params)
-    );
 
     // to set default value for 'Invoices / Credit Notes' checkbox on display preferences
     $values = CRM_Core_BAO_Setting::getItem("CiviCRM Preferences");
