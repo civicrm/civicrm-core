@@ -2294,8 +2294,7 @@ class CRM_Contact_BAO_Query {
 
         //get the location name
         list($tName, $fldName) = self::getLocationTableName($field['where'], $locType);
-        // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-        $fieldName = "LOWER(`$tName`.$fldName)";
+        $fieldName = "`$tName`.$fldName";
 
         // we set both _tables & whereTables because whereTables doesn't seem to do what the name implies it should
         $this->_tables[$tName] = $this->_whereTables[$tName] = 1;
@@ -2307,8 +2306,7 @@ class CRM_Contact_BAO_Query {
         }
         else {
           if ($op != 'IN' && !is_numeric($value) && !is_array($value)) {
-            // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-            $fieldName = "LOWER({$field['where']})";
+            $fieldName = "{$field['where']}";
           }
           else {
             $fieldName = "{$field['where']}";
@@ -3566,7 +3564,6 @@ WHERE  $smartGroupClause
         $value = "%{$value}%";
       }
       $op = 'LIKE';
-      // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
       $this->_where[$grouping][] = self::buildClause('civicrm_address.street_address', $op, $value, 'String');
       $this->_qill[$grouping][] = ts('Street') . " $op '$n'";
     }
