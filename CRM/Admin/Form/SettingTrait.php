@@ -143,6 +143,11 @@ trait CRM_Admin_Form_SettingTrait {
           $this->includesReadOnlyFields = TRUE;
         }
 
+        if (isset($props['help_link'])) {
+          // Set both the value in this loop & the outer value as we assign both to the template while we deprecate the $descriptions assignment.
+          $settingMetaData[$setting]['description'] = $props['description'] .= ' ' . CRM_Utils_System::docURL2($props['help_link']['page'], NULL, NULL, NULL, NULL, $props['help_link']['resource']);
+
+        }
         $add = 'add' . $quickFormType;
         if ($add == 'addElement') {
           $this->$add(
@@ -179,6 +184,9 @@ trait CRM_Admin_Form_SettingTrait {
         }
         elseif ($add == 'addMonthDay') {
           $this->add('date', $setting, ts($props['title']), CRM_Core_SelectValues::date(NULL, 'M d'));
+        }
+        elseif ($add === 'addEntityRef') {
+          $this->$add($setting, ts($props['title']), $props['entity_reference_options']);
         }
         else {
           $this->$add($setting, ts($props['title']), $options);
@@ -221,6 +229,7 @@ trait CRM_Admin_Form_SettingTrait {
       'radio' => 'Radio',
       'select' => 'Select',
       'textarea' => 'Element',
+      'entity_reference' => 'EntityRef',
     ];
     return $mapping[$spec['html_type']];
   }
