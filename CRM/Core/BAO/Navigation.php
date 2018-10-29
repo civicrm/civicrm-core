@@ -598,7 +598,9 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       $homeIcon = '<span class="crm-logo-sm" ></span>';
       self::retrieve($homeParams, $homeNav);
       if ($homeNav) {
-        list($path, $q) = explode('?', $homeNav['url']);
+        $path = parse_url($homeNav['url'], PHP_URL_PATH);
+        $q = parse_url($homeNav['url'], PHP_URL_QUERY);
+
         $homeURL = CRM_Utils_System::url($path, $q);
         $homeLabel = $homeNav['label'];
         // CRM-6804 (we need to special-case this as we don’t ts()-tag variables)
