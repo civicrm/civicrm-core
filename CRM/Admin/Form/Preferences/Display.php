@@ -41,7 +41,10 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     'contact_smart_group_display' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'advanced_search_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'user_dashboard_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'activity_assignee_notification' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'activity_assignee_notification_ics' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'preserve_activity_tab_filter' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'ajaxPopupsEnabled' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'display_name_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'sort_name_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
@@ -57,30 +60,14 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'title' => ts('Editing Contacts'),
           'weight' => 3,
         ),
-        'activity_assignee_notification' => array(
-          'html_type' => 'checkbox',
-          'title' => ts('Notify Activity Assignees'),
-          'weight' => 5,
-        ),
-        'activity_assignee_notification_ics' => array(
-          'html_type' => 'checkbox',
-          'title' => ts('Include ICal Invite to Activity Assignees'),
-          'weight' => 6,
-        ),
         'contact_ajax_check_similar' => array(
           'title' => ts('Check for Similar Contacts'),
           'weight' => 8,
           'html_type' => NULL,
         ),
-
         'editor_id' => array(
           'html_type' => NULL,
           'weight' => 12,
-        ),
-        'ajaxPopupsEnabled' => array(
-          'html_type' => 'checkbox',
-          'title' => ts('Enable Popup Forms'),
-          'weight' => 13,
         ),
         'do_not_notify_assignees_for' => array(
           'html_type' => 'select',

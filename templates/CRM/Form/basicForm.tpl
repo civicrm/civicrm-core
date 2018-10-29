@@ -61,7 +61,7 @@
                     {if $field.html_type EQ 'checkbox'|| $field.html_type EQ 'checkboxes'}
                         <td class="label"></td>
                         <td>
-                            {$form.$n.html} {$form.$n.label}
+                            {$form.$n.html}
                             {if $field.description}
                                 <br /><span class="description">{$field.description}</span>
                             {/if}

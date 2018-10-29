@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
  */
 
 /**
@@ -243,7 +241,7 @@ return array(
     'group' => 'core',
     'name' => 'ajaxPopupsEnabled',
     'type' => 'Boolean',
-    'quick_form_type' => 'YesNo',
+    'html_type' => 'checkbox',
     'default' => 1,
     'add' => '4.5',
     'title' => ts('Enable Popup Forms'),
@@ -256,8 +254,8 @@ return array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'activity_assignee_notification',
-    'type' => 'String',
-    'html_type' => 'Text',
+    'type' => 'Boolean',
+    'html_type' => 'checkbox',
     'default' => '1',
     'add' => '4.1',
     'title' => ts('Notify Activity Assignees'),
@@ -270,8 +268,8 @@ return array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'activity_assignee_notification_ics',
-    'type' => 'String',
-    'html_type' => 'Text',
+    'type' => 'Boolean',
+    'html_type' => 'checkbox',
     'default' => '0',
     'add' => '4.3',
     'title' => ts('Include ICal Invite to Activity Assignees'),
