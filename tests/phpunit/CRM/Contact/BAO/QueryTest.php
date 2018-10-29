@@ -175,7 +175,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
         0 => array(
           0 => 'email',
           1 => 'LIKE',
-          2 => 'secondary@example.com',
+          2 => 'sEcondary@example.com',
           3 => 0,
           4 => 1,
         ),
