@@ -50,7 +50,6 @@
 {literal}
 <script type="text/javascript">
 cj('#mainTabContainer').children(':first').remove();
-cj('#contact-summary' ).children(':first').remove();
 
 </script>
 {/literal}
