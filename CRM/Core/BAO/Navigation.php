@@ -581,15 +581,10 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
   /**
    * Create navigation for CiviCRM Admin Menu.
    *
-   * @param int $contactID
-   *   Contact id.
-   *
    * @return string
    *   returns navigation html
    */
-  public static function createNavigation($contactID) {
-    $config = CRM_Core_Config::singleton();
-
+  public static function createNavigation() {
     $navigation = self::buildNavigation();
 
     if ($navigation) {
