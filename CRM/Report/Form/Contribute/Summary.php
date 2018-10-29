@@ -525,15 +525,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           AND {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn')";
     }
 
-    // for credit card type
-    if ($this->isTableSelected('civicrm_financial_trxn')) {
-      $this->_from .= "
-        LEFT JOIN civicrm_entity_financial_trxn eftcc
-          ON ({$this->_aliases['civicrm_contribution']}.id = eftcc.entity_id AND
-            eftcc.entity_table = 'civicrm_contribution')
-        LEFT JOIN civicrm_financial_trxn {$this->_aliases['civicrm_financial_trxn']}
-          ON {$this->_aliases['civicrm_financial_trxn']}.id = eftcc.financial_trxn_id";
-    }
+    $this->addFinancialTrxnFromClause();
   }
 
   /**
