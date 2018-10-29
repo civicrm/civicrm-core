@@ -4045,16 +4045,16 @@ WHERE  $smartGroupClause
         substr($name, -1, 1) == '"'
       ) {
         $name = substr($name, 1, -1);
-        $name = strtolower(CRM_Core_DAO::escapeString($name));
+        $name = CRM_Core_DAO::escapeString($name);
         $nameClause = "= '$name'";
       }
       else {
-        $name = strtolower(CRM_Core_DAO::escapeString($name));
+        $name = CRM_Core_DAO::escapeString($name);
         $nameClause = "LIKE '%{$name}%'";
       }
     }
 
-    $rTypeValues = $relTypes = $relTypesIds = array();
+    $relTypes = $relTypesIds = array();
     if (!empty($relationType)) {
       $relationType[2] = (array) $relationType[2];
       foreach ($relationType[2] as $relType) {
@@ -4064,21 +4064,16 @@ WHERE  $smartGroupClause
         $typeValues = array();
         $rTypeValue = CRM_Contact_BAO_RelationshipType::retrieve($params, $typeValues);
         if (!empty($rTypeValue)) {
-          $rTypeValues[] = $rTypeValue;
+          if ($rTypeValue->name_a_b == $rTypeValue->name_b_a) {
+            // if we don't know which end of the relationship we are dealing with we'll create a temp table
+            self::$_relType = 'reciprocal';
+          }
           $relTypesIds[] = $rel[0];
           $relTypes[] = $relType;
         }
       }
     }
-    if (!empty($rTypeValues)) {
-      foreach ($rTypeValues as $rTypeValue) {
-        $rTypeValue = (array) $rTypeValue;
-        if ($rTypeValue['name_a_b'] == $rTypeValue['name_b_a']) {
-          // if we don't know which end of the relationship we are dealing with we'll create a temp table
-          self::$_relType = 'reciprocal';
-        }
-      }
-    }
+
     // if we are creating a temp table we build our own where for the relationship table
     $relationshipTempTable = NULL;
     if (self::$_relType == 'reciprocal') {
