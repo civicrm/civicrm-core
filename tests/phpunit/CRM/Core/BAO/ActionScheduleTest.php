@@ -223,6 +223,35 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_unit' => 'week',
       'subject' => 'subject sched_membership_join_2week (joined {membership.join_date})',
     );
+    $this->fixtures['sched_membership_start_1week'] = array(
+      'name' => 'sched_membership_start_1week',
+      'title' => 'sched_membership_start_1week',
+      'absolute_date' => '',
+      'body_html' => '<p>body sched_membership_start_1week</p>',
+      'body_text' => 'body sched_membership_start_1week',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => '',
+      'entity_value' => '',
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 4,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'membership_start_date',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'week',
+      'subject' => 'subject sched_membership_start_1week (joined {membership.start_date})',
+    );
     $this->fixtures['sched_membership_end_2week'] = array(
       'name' => 'sched_membership_end_2week',
       'title' => 'sched_membership_end_2week',
@@ -969,39 +998,57 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * an email should be sent.
    */
   public function testMembershipDateMatch() {
-    foreach (['membership_join_date', 'membership_start_date'] as $date) {
-      $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 1)));
-      $this->assertTrue(is_numeric($membership->id));
-      $result = $this->callAPISuccess('Email', 'create', array(
-        'contact_id' => $membership->contact_id,
-        'email' => 'test-member@example.com',
-        'location_type_id' => 1,
-      ));
-      $this->assertAPISuccess($result);
+    $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 1)));
+    $this->assertTrue(is_numeric($membership->id));
+    $result = $this->callAPISuccess('Email', 'create', array(
+      'contact_id' => $membership->contact_id,
+      'email' => 'test-member@example.com',
+      'location_type_id' => 1,
+      'is_primary' => 1,
+    ));
 
-      $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
-      $actionSchedule = $this->fixtures['sched_membership_join_2week'];
-      $actionSchedule['start_action_date'] = $date;
-      $actionSchedule['entity_value'] = $membership->membership_type_id;
-      $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
-      $this->assertTrue(is_numeric($actionScheduleDao->id));
+    $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
+    $actionSchedule = $this->fixtures['sched_membership_join_2week'];
+    $actionSchedule['entity_value'] = $membership->membership_type_id;
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
 
-      // start_date=2012-03-15 ; schedule is 2 weeks after start_date
-      $this->assertCronRuns(array(
-        array(
-          // Before the 2-week mark, no email.
-          'time' => '2012-03-28 01:00:00',
-          'recipients' => array(),
-          'subjects' => array(),
-        ),
-        array(
-          // After the 2-week mark, send an email.
-          'time' => '2012-03-29 01:00:00',
-          'recipients' => array(array('test-member@example.com')),
-          'subjects' => array('subject sched_membership_join_2week (joined March 15th, 2012)'),
-        ),
-      ));
-    }
+    // start_date=2012-03-15 ; schedule is 2 weeks after join_date
+    $this->assertCronRuns(array(
+      array(
+        // Before the 2-week mark, no email.
+        'time' => '2012-03-28 01:00:00',
+        'recipients' => array(),
+        'subjects' => array(),
+      ),
+      array(
+        // After the 2-week mark, send an email.
+        'time' => '2012-03-29 01:00:00',
+        'recipients' => array(array('test-member@example.com')),
+        'subjects' => array('subject sched_membership_join_2week (joined March 15th, 2012)'),
+      ),
+    ));
+
+    $actionSchedule = $this->fixtures['sched_membership_start_1week'];
+    $actionSchedule['entity_value'] = $membership->membership_type_id;
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+
+    // start_date=2012-03-15 ; schedule is 1 weeks after start_date
+    $this->assertCronRuns(array(
+      array(
+        // Before the 2-week mark, no email.
+        'time' => '2012-03-21 01:00:00',
+        'recipients' => array(),
+        'subjects' => array(),
+      ),
+      array(
+        // After the 2-week mark, send an email.
+        'time' => '2012-03-22 01:00:00',
+        'recipients' => array(array('test-member@example.com')),
+        'subjects' => array('subject sched_membership_start_1week (joined March 15th, 2012)'),
+      ),
+    ));
   }
 
 
@@ -2003,6 +2050,123 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       $actionSchedule->delete();
       $membership->delete();
     }
+  }
+
+  /**
+   * Inherited members without permission to edit the main member contact should
+   * not get reminders.
+   *
+   * However, just because a contact inherits one membership doesn't mean
+   * reminders for other memberships should be suppressed.
+   *
+   * See CRM-14098
+   */
+  public function testInheritedMembershipPermissions() {
+    // Set up common parameters for memberships.
+    $membershipParams = $this->fixtures['rolling_membership'];
+    $membershipParams['status_id'] = 1;
+
+    $membershipParams['membership_type_id']['relationship_type_id'] = 1;
+    $membershipParams['membership_type_id']['relationship_direction'] = 'b_a';
+    $membershipType1 = $this->createTestObject('CRM_Member_DAO_MembershipType', $membershipParams['membership_type_id']);
+
+    // We'll create a new membership type that can be held at the same time as
+    // the first one.
+    $membershipParams['membership_type_id']['relationship_type_id'] = 'NULL';
+    $membershipParams['membership_type_id']['relationship_direction'] = 'NULL';
+    $membershipType2 = $this->createTestObject('CRM_Member_DAO_MembershipType', $membershipParams['membership_type_id']);
+
+    // Create the parent membership and contact
+    $membershipParams['membership_type_id'] = $membershipType1->id;
+    $mainMembership = $this->createTestObject('CRM_Member_DAO_Membership', $membershipParams);
+
+    $contactParams = [
+      'contact_type' => 'Individual',
+      'first_name' => 'Mom',
+      'last_name' => 'Rel',
+      'is_deceased' => 0,
+    ];
+    $this->createTestObject('CRM_Contact_DAO_Contact', array_merge($contactParams, ['id' => $mainMembership->contact_id]));
+
+    $emailParams = [
+      'contact_id' => $mainMembership->contact_id,
+      'email' => 'test-member@example.com',
+      'location_type_id' => 1,
+      'is_primary' => 1,
+    ];
+    $email = $this->createTestObject('CRM_Core_DAO_Email', $emailParams);
+
+    // Set up contacts and emails for the two children
+    $contactParams['first_name'] = 'Favorite';
+    $permChild = $this->createTestObject('CRM_Contact_DAO_Contact', $contactParams);
+    $emailParams['email'] = 'favorite@example.com';
+    $emailParams['contact_id'] = $permChild->id;
+    $this->createTestObject('CRM_Core_DAO_Email', $emailParams);
+
+    $contactParams['first_name'] = 'Black Sheep';
+    $nonPermChild = $this->createTestObject('CRM_Contact_DAO_Contact', $contactParams);
+    $emailParams['email'] = 'black.sheep@example.com';
+    $emailParams['contact_id'] = $nonPermChild->id;
+    $this->createTestObject('CRM_Core_DAO_Email', $emailParams);
+
+    // Each child gets a relationship, one with permission to edit the parent.  This
+    // will trigger inherited memberships for the first membership type
+    $relParams = [
+      'relationship_type_id' => 1,
+      'contact_id_a' => $nonPermChild->id,
+      'contact_id_b' => $mainMembership->contact_id,
+      'is_active' => 1,
+    ];
+    $this->callAPISuccess('relationship', 'create', $relParams);
+
+    $relParams['contact_id_a'] = $permChild->id;
+    $relParams['is_permission_a_b'] = CRM_Contact_BAO_Relationship::EDIT;
+    $this->callAPISuccess('relationship', 'create', $relParams);
+
+    // Mom and Black Sheep get their own memberships of the second type.
+    $membershipParams['membership_type_id'] = $membershipType2->id;
+    $membershipParams['owner_membership_id'] = 'NULL';
+    $membershipParams['contact_id'] = $mainMembership->contact_id;
+    $this->createTestObject('CRM_Member_DAO_Membership', $membershipParams);
+
+    $membershipParams['contact_id'] = $nonPermChild->id;
+    $this->createTestObject('CRM_Member_DAO_Membership', $membershipParams);
+
+    // Test a reminder for the first membership type - that should exclude Black
+    // Sheep.
+    $actionSchedule = $this->fixtures['sched_membership_join_2week'];
+    $actionSchedule['entity_value'] = $membershipType1->id;
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+
+    $this->assertCronRuns([
+      [
+        'time' => '2012-03-29 01:00:00',
+        'recipients' => [['test-member@example.com'], ['favorite@example.com']],
+        'subjects' => [
+          'subject sched_membership_join_2week (joined March 15th, 2012)',
+          'subject sched_membership_join_2week (joined March 15th, 2012)',
+        ],
+      ],
+    ]);
+
+    // Test a reminder for the second membership type - that should include
+    // Black Sheep.
+    $actionSchedule = $this->fixtures['sched_membership_start_1week'];
+    $actionSchedule['entity_value'] = $membershipType2->id;
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+
+    $this->assertCronRuns([
+      [
+        'time' => '2012-03-22 01:00:00',
+        'recipients' => [['test-member@example.com'], ['black.sheep@example.com']],
+        'subjects' => [
+          'subject sched_membership_start_1week (joined March 15th, 2012)',
+          'subject sched_membership_start_1week (joined March 15th, 2012)',
+        ],
+      ],
+    ]);
   }
 
   public function createModifiedDateTime($origDateTime, $modifyRule) {
