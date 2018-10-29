@@ -1109,4 +1109,12 @@ class CRM_Core_SelectValues {
     );
   }
 
+  public static function getDisabilityAccessLevels() {
+    return [
+      1 => ts('Full Disability Access'),
+      2 => ts('Partial Disability Access'),
+      3 => ts('No Disability Access'),
+    ];
+  }
+
 }
