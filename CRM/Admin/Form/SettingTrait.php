@@ -229,6 +229,7 @@ trait CRM_Admin_Form_SettingTrait {
       'radio' => 'Radio',
       'select' => 'Select',
       'textarea' => 'Element',
+      'text' => 'Element',
       'entity_reference' => 'EntityRef',
     ];
     return $mapping[$spec['html_type']];
