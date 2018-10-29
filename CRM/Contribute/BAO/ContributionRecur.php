@@ -762,6 +762,14 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       }
     }
 
+    // If values have been supplied for recurring contribution fields, open the recurring contributions pane.
+    foreach (array('contribution_status_id', 'payment_processor_id', 'processor_id', 'trxn_id') as $fieldName) {
+      if (!empty($form->_formValues['contribution_recur_' . $fieldName])) {
+        $form->assign('contribution_recur_pane_open', TRUE);
+        break;
+      }
+    }
+
     // Add field to check if payment is made for recurring contribution
     $recurringPaymentOptions = array(
       1 => ts('All recurring contributions'),
