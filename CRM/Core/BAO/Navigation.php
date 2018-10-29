@@ -600,8 +600,10 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       if ($homeNav) {
         $path = parse_url($homeNav['url'], PHP_URL_PATH);
         $q = parse_url($homeNav['url'], PHP_URL_QUERY);
+        $fragment = parse_url($homeNav['url'], PHP_URL_FRAGMENT);
 
-        $homeURL = CRM_Utils_System::url($path, $q);
+        $homeURL = CRM_Utils_System::url($path, $q, FALSE, $fragment);
+
         $homeLabel = $homeNav['label'];
         // CRM-6804 (we need to special-case this as we don’t ts()-tag variables)
         if ($homeLabel == 'Home') {
