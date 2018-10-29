@@ -357,11 +357,13 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
               $returnProperties[$householdRelationshipType][$key] = $value;
             }
           }
+          // @todo - don't use returnProperties above.
+          $processor->setHouseholdMergeReturnProperties($returnProperties[$householdRelationshipType]);
         }
       }
     }
 
-    list($relationQuery, $allRelContactArray) = self::buildRelatedContactArray($selectAll, $ids, $processor, $componentTable, $returnProperties);
+    self::buildRelatedContactArray($selectAll, $ids, $processor, $componentTable);
 
     // make sure the groups stuff is included only if specifically specified
     // by the fields param (CRM-1969), else we limit the contacts outputted to only
@@ -510,9 +512,20 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           }
 
           if ($processor->isRelationshipTypeKey($field)) {
-            $relDAO = CRM_Utils_Array::value($iterationDAO->contact_id, $allRelContactArray[$field]);
-            $relationQuery[$field]->convertToPseudoNames($relDAO);
-            self::fetchRelationshipDetails($relDAO, $value, $field, $row);
+            foreach (array_keys($value) as $property) {
+              if ($property === 'location') {
+                // @todo just undo all this nasty location wrangling!
+                foreach ($value['location'] as $locationKey => $locationFields) {
+                  foreach (array_keys($locationFields) as $locationField) {
+                    $fieldKey = str_replace(' ', '_', $locationKey . '-' . $locationField);
+                    $row[$field . '_' . $fieldKey] = $processor->getRelationshipValue($field, $iterationDAO->contact_id, $fieldKey);
+                  }
+                }
+              }
+              else {
+                $row[$field . '_' . $property] = $processor->getRelationshipValue($field, $iterationDAO->contact_id, $property);
+              }
+            }
           }
           else {
             $row[$field] = self::getTransformedFieldValue($field, $iterationDAO, $fieldValue, $i18n, $metadata, $paymentDetails, $processor);
@@ -1110,16 +1123,11 @@ WHERE  id IN ( $deleteIDString )
    */
   public static function mergeSameHousehold($exportTempTable, &$sqlColumns, $prefix) {
     $prefixColumn = $prefix . '_';
-    $allKeys = array_keys($sqlColumns);
     $replaced = array();
 
     // name map of the non standard fields in header rows & sql columns
     $mappingFields = array(
       'civicrm_primary_id' => 'id',
-      'contact_source' => 'source',
-      'current_employer_id' => 'employer_id',
-      'contact_is_deleted' => 'is_deleted',
-      'name' => 'address_name',
       'provider_id' => 'im_service_provider',
       'phone_type_id' => 'phone_type',
     );
@@ -1400,7 +1408,7 @@ WHERE  {$whereClause}";
                 $headerName = $field . '-' . 'current_employer';
               }
               else {
-                $headerName = $field . '-' . $queryFields[$relationField]['name'];
+                $headerName = $field . '-' . $relationField;
               }
             }
 
@@ -1502,6 +1510,8 @@ WHERE  {$whereClause}";
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     $i18n = CRM_Core_I18n::singleton();
+    $field = $field . '_';
+
     foreach ($value as $relationField => $relationValue) {
       if (is_object($relDAO) && property_exists($relDAO, $relationField)) {
         $fieldValue = $relDAO->$relationField;
@@ -1532,7 +1542,6 @@ WHERE  {$whereClause}";
       else {
         $fieldValue = '';
       }
-      $field = $field . '_';
       $relPrefix = $field . $relationField;
 
       if (is_object($relDAO) && $relationField == 'id') {
@@ -1649,64 +1658,74 @@ WHERE  {$whereClause}";
    * @param $ids
    * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param $componentTable
-   * @param $returnProperties
-   *
-   * @return array
    */
-  protected static function buildRelatedContactArray($selectAll, $ids, $processor, $componentTable, $returnProperties) {
+  protected static function buildRelatedContactArray($selectAll, $ids, $processor, $componentTable) {
     $allRelContactArray = $relationQuery = array();
     $queryMode = $processor->getQueryMode();
     $exportMode = $processor->getExportMode();
-    foreach (self::$relationshipTypes as $rel => $dnt) {
-      if ($relationReturnProperties = CRM_Utils_Array::value($rel, $returnProperties)) {
-        $allRelContactArray[$rel] = array();
-        // build Query for each relationship
-        $relationQuery[$rel] = new CRM_Contact_BAO_Query(NULL, $relationReturnProperties,
-          NULL, FALSE, FALSE, $queryMode
-        );
-        list($relationSelect, $relationFrom, $relationWhere, $relationHaving) = $relationQuery[$rel]->query();
 
-        list($id, $direction) = explode('_', $rel, 2);
-        // identify the relationship direction
-        $contactA = 'contact_id_a';
-        $contactB = 'contact_id_b';
-        if ($direction == 'b_a') {
-          $contactA = 'contact_id_b';
-          $contactB = 'contact_id_a';
+    foreach ($processor->getRelationshipReturnProperties() as $relationshipKey => $relationReturnProperties) {
+      $allRelContactArray[$relationshipKey] = array();
+      // build Query for each relationship
+      $relationQuery = new CRM_Contact_BAO_Query(NULL, $relationReturnProperties,
+        NULL, FALSE, FALSE, $queryMode
+      );
+      list($relationSelect, $relationFrom, $relationWhere, $relationHaving) = $relationQuery->query();
+
+      list($id, $direction) = explode('_', $relationshipKey, 2);
+      // identify the relationship direction
+      $contactA = 'contact_id_a';
+      $contactB = 'contact_id_b';
+      if ($direction == 'b_a') {
+        $contactA = 'contact_id_b';
+        $contactB = 'contact_id_a';
+      }
+      $relIDs = self::getIDsForRelatedContact($ids, $exportMode);
+
+      $relationshipJoin = $relationshipClause = '';
+      if (!$selectAll && $componentTable) {
+        $relationshipJoin = " INNER JOIN {$componentTable} ctTable ON ctTable.contact_id = {$contactA}";
+      }
+      elseif (!empty($relIDs)) {
+        $relID = implode(',', $relIDs);
+        $relationshipClause = " AND crel.{$contactA} IN ( {$relID} )";
+      }
+
+      $relationFrom = " {$relationFrom}
+              INNER JOIN civicrm_relationship crel ON crel.{$contactB} = contact_a.id AND crel.relationship_type_id = {$id}
+              {$relationshipJoin} ";
+
+      //check for active relationship status only
+      $today = date('Ymd');
+      $relationActive = " AND (crel.is_active = 1 AND ( crel.end_date is NULL OR crel.end_date >= {$today} ) )";
+      $relationWhere = " WHERE contact_a.is_deleted = 0 {$relationshipClause} {$relationActive}";
+      $relationGroupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($relationQuery->_select, "crel.{$contactA}");
+      $relationSelect = "{$relationSelect}, {$contactA} as refContact ";
+      $relationQueryString = "$relationSelect $relationFrom $relationWhere $relationHaving $relationGroupBy";
+
+      $allRelContactDAO = CRM_Core_DAO::executeQuery($relationQueryString);
+      while ($allRelContactDAO->fetch()) {
+        $relationQuery->convertToPseudoNames($allRelContactDAO);
+        $row = [];
+        // @todo pass processor to fetchRelationshipDetails and set fields directly within it.
+        self::fetchRelationshipDetails($allRelContactDAO, $relationReturnProperties, $relationshipKey, $row);
+        foreach (array_keys($relationReturnProperties) as $property) {
+          if ($property === 'location') {
+            // @todo - simplify location in self::fetchRelationshipDetails - remove handling here. Or just call
+            // $processor->setRelationshipValue from fetchRelationshipDetails
+            foreach ($relationReturnProperties['location'] as $locationName => $locationValues) {
+              foreach (array_keys($locationValues) as $locationValue) {
+                $key = str_replace(' ', '_', $locationName) . '-' . $locationValue;
+                $processor->setRelationshipValue($relationshipKey, $allRelContactDAO->refContact, $key, $row[$relationshipKey . '__' . $key]);
+              }
+            }
+          }
+          else {
+            $processor->setRelationshipValue($relationshipKey, $allRelContactDAO->refContact, $property, $row[$relationshipKey . '_' . $property]);
+          }
         }
-        $relIDs = self::getIDsForRelatedContact($ids, $exportMode);
-
-        $relationshipJoin = $relationshipClause = '';
-        if (!$selectAll && $componentTable) {
-          $relationshipJoin = " INNER JOIN {$componentTable} ctTable ON ctTable.contact_id = {$contactA}";
-        }
-        elseif (!empty($relIDs)) {
-          $relID = implode(',', $relIDs);
-          $relationshipClause = " AND crel.{$contactA} IN ( {$relID} )";
-        }
-
-        $relationFrom = " {$relationFrom}
-                INNER JOIN civicrm_relationship crel ON crel.{$contactB} = contact_a.id AND crel.relationship_type_id = {$id}
-                {$relationshipJoin} ";
-
-        //check for active relationship status only
-        $today = date('Ymd');
-        $relationActive = " AND (crel.is_active = 1 AND ( crel.end_date is NULL OR crel.end_date >= {$today} ) )";
-        $relationWhere = " WHERE contact_a.is_deleted = 0 {$relationshipClause} {$relationActive}";
-        $relationGroupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($relationQuery[$rel]->_select, "crel.{$contactA}");
-        $relationSelect = "{$relationSelect}, {$contactA} as refContact ";
-        $relationQueryString = "$relationSelect $relationFrom $relationWhere $relationHaving $relationGroupBy";
-
-        $allRelContactDAO = CRM_Core_DAO::executeQuery($relationQueryString);
-        while ($allRelContactDAO->fetch()) {
-          //FIX Me: Migrate this to table rather than array
-          // build the array of all related contacts
-          $allRelContactArray[$rel][$allRelContactDAO->refContact] = clone($allRelContactDAO);
-        }
-        $allRelContactDAO->free();
       }
     }
-    return array($relationQuery, $allRelContactArray);
   }
 
   /**

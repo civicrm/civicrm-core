@@ -421,6 +421,51 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Test exporting relationships.
+   */
+  public function testExportRelationships() {
+    $organization1 = $this->organizationCreate(['organization_name' => 'Org 1', 'legal_name' => 'pretty legal', 'contact_source' => 'friend who took a law paper once']);
+    $organization2 = $this->organizationCreate(['organization_name' => 'Org 2', 'legal_name' => 'well dodgey']);
+    $contact1 = $this->individualCreate(['employer_id' => $organization1, 'first_name' => 'one']);
+    $contact2 = $this->individualCreate(['employer_id' => $organization2, 'first_name' => 'one']);
+    $employerRelationshipTypeID = $this->callAPISuccessGetValue('RelationshipType', ['return' => 'id', 'label_a_b' => 'Employee of']);
+    $selectedFields = [
+      ['Individual', 'first_name', ''],
+      ['Individual', $employerRelationshipTypeID . '_a_b', 'organization_name', ''],
+      ['Individual', $employerRelationshipTypeID . '_a_b', 'legal_name', ''],
+      ['Individual', $employerRelationshipTypeID . '_a_b', 'contact_source', ''],
+    ];
+    list($tableName, $sqlColumns, $headerRows) = CRM_Export_BAO_Export::exportComponents(
+      FALSE,
+      [$contact1, $contact2],
+      [],
+      NULL,
+      $selectedFields,
+      NULL,
+      CRM_Export_Form_Select::CONTACT_EXPORT,
+      "contact_a.id IN ( $contact1, $contact2 )",
+      NULL,
+      FALSE,
+      FALSE,
+      [
+        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
+        'suppress_csv_for_testing' => TRUE,
+      ]
+    );
+
+    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM {$tableName}");
+    $dao->fetch();
+    $this->assertEquals('one', $dao->first_name);
+    $this->assertEquals('Org 1', $dao->{$employerRelationshipTypeID . '_a_b_organization_name'});
+    $this->assertEquals('pretty legal', $dao->{$employerRelationshipTypeID . '_a_b_legal_name'});
+    $this->assertEquals('friend who took a law paper once', $dao->{$employerRelationshipTypeID . '_a_b_contact_source'});
+
+    $dao->fetch();
+    $this->assertEquals('Org 2', $dao->{$employerRelationshipTypeID . '_a_b_organization_name'});
+    $this->assertEquals('well dodgey', $dao->{$employerRelationshipTypeID . '_a_b_legal_name'});
+  }
+
+  /**
+   * Test exporting relationships.
    *
    * This is to ensure that CRM-13995 remains fixed.
    */
@@ -432,6 +477,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['Individual', $houseHoldTypeID . '_a_b', 'city', ''],
       ['Individual', 'city', ''],
       ['Individual', 'state_province', ''],
+      ['Individual', 'contact_source', ''],
     ];
     list($tableName, $sqlColumns, $headerRows) = CRM_Export_BAO_Export::exportComponents(
       FALSE,
@@ -456,18 +502,21 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $this->assertEquals('ME', $dao->state_province);
       $this->assertEquals($householdID, $dao->civicrm_primary_id);
       $this->assertEquals($householdID, $dao->civicrm_primary_id);
+      $this->assertEquals('household sauce', $dao->contact_source);
     }
 
     $this->assertEquals([
       0 => 'City',
       1 => 'State',
-      2 => 'Household ID',
+      2 => 'Contact Source',
+      3 => 'Household ID',
     ], $headerRows);
     $this->assertEquals(
       [
         'city' => 'city varchar(64)',
         'state_province' => 'state_province varchar(64)',
         'civicrm_primary_id' => 'civicrm_primary_id varchar(16)',
+        'contact_source' => 'contact_source varchar(255)',
       ], $sqlColumns);
   }
 
@@ -956,6 +1005,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   protected function setUpHousehold() {
     $this->setUpContactExportData();
     $householdID = $this->householdCreate([
+      'source' => 'household sauce',
       'api.Address.create' => [
         'city' => 'Portland',
         'state_province_id' => 'Maine',
