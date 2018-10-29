@@ -397,6 +397,22 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that name searches are case insensitive.
+   */
+  public function testGetNameVariantsCaseInsensitive() {
+    $this->callAPISuccess('contact', 'create', [
+      'display_name' => 'Abc1',
+      'contact_type' => 'Individual',
+    ]);
+    $this->callAPISuccessGetSingle('Contact', ['display_name' => 'aBc1']);
+    $this->callAPISuccessGetSingle('Contact', ['sort_name' => 'aBc1']);
+    Civi::settings()->set('includeNickNameInName', TRUE);
+    $this->callAPISuccessGetSingle('Contact', ['display_name' => 'aBc1']);
+    $this->callAPISuccessGetSingle('Contact', ['sort_name' => 'aBc1']);
+    Civi::settings()->set('includeNickNameInName', FALSE);
+  }
+
+  /**
    * Test old keys still work.
    *
    * Verify that attempt to create individual contact with
@@ -3183,7 +3199,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * CRM-15443 - ensure getlist api does not return deleted contacts.
    */
   public function testGetlistExcludeConditions() {
-    $name = md5(time());
+    $name = 'Scarabée';
     $contact = $this->individualCreate(array('last_name' => $name));
     $this->individualCreate(array('last_name' => $name, 'is_deceased' => 1));
     $this->individualCreate(array('last_name' => $name, 'is_deleted' => 1));
