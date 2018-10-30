@@ -591,13 +591,21 @@ class CRM_Core_Resources {
         if (is_array($item)) {
           $this->addSetting($item);
         }
-        elseif (substr($item, -2) == 'js') {
-          // Don't bother  looking for ts() calls in packages, there aren't any
-          $translate = (substr($item, 0, 3) == 'js/');
-          $this->addScriptFile('civicrm', $item, $jsWeight++, $region, $translate);
-        }
         else {
-          $this->addStyleFile('civicrm', $item, -100, $region);
+          $ext = 'civicrm';
+          // Parse extension name in square brackets e.g. '[org.civicrm.api4]/js/api4.js'
+          if ($item[0] === '[') {
+            list($ext, $item) = explode(']', substr($item, 1));
+          }
+          $item = trim($item, '/\\');
+          if (substr($item, -2) == 'js') {
+            // Don't bother  looking for ts() calls in packages or bower_components
+            $translate = (substr($item, 0, 8) != 'packages' && substr($item, 0, 5) != 'bower');
+            $this->addScriptFile($ext, $item, $jsWeight++, $region, $translate);
+          }
+          else {
+            $this->addStyleFile($ext, $item, -100, $region);
+          }
         }
       }
 

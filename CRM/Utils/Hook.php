@@ -2341,6 +2341,8 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called when core resources are being loaded
    *
+   * For adding resources from an extension, place the extension name in square brackets like '[org.civicrm.api4]/js/api4.js'
+   *
    * @see CRM_Core_Resources::coreResourceList
    *
    * @param array $list
