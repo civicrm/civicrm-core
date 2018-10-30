@@ -1124,4 +1124,38 @@ class CRM_Core_SelectValues {
     return $optionValues;
   }
 
+  /**
+   * Dropdown options for quicksearch in the menu
+   *
+   * @return array
+   */
+  public static function quicksearchOptions() {
+    $includeEmail = civicrm_api3('setting', 'getvalue', array('name' => 'includeEmailInName', 'group' => 'Search Preferences'));
+    $options = [
+      'sort_name' => $includeEmail ? ts('Name/Email') : ts('Name'),
+      'contact_id' => ts('Contact ID'),
+      'external_identifier' => ts('External ID'),
+      'first_name' => ts('First Name'),
+      'last_name' => ts('Last Name'),
+      'email' => ts('Email'),
+      'phone_numeric' => ts('Phone'),
+      'street_address' => ts('Street Address'),
+      'city' => ts('City'),
+      'postal_code' => ts('Postal Code'),
+      'job_title' => ts('Job Title'),
+    ];
+    $custom = civicrm_api3('CustomField', 'get', [
+      'return' => ["name", "label", "custom_group_id.title"],
+      'custom_group_id.extends' => ['IN' => ["Contact", "Individual", "Organization", "Household"]],
+      'custom_group_id.is_active' => 1,
+      'is_active' => 1,
+      'is_searchable' => 1,
+      'options' => ['sort' => ['custom_group_id.weight', 'weight']],
+    ]);
+    foreach ($custom['values'] as $field) {
+      $options['custom_' . $field['name']] = $field['custom_group_id.title'] . ': ' . $field['label'];
+    }
+    return $options;
+  }
+
 }

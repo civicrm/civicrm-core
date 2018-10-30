@@ -758,10 +758,18 @@ function civicrm_api3_contact_getquick($params) {
     )
   );
 
+  $table_names = [
+    'email' => 'eml',
+    'phone_numeric' => 'phe',
+    'street_address' => 'sts',
+    'city' => 'sts',
+    'postal_code' => 'sts',
+  ];
+
   // get the option values for contact autocomplete
   $acOptions = CRM_Core_OptionGroup::values('contact_autocomplete_options', FALSE, FALSE, FALSE, NULL, 'name');
 
-  $list = array();
+  $list = $from = array();
   foreach ($acpref as $value) {
     if ($value && !empty($acOptions[$value])) {
       $list[$value] = $acOptions[$value];
@@ -773,6 +781,18 @@ function civicrm_api3_contact_getquick($params) {
     // Unique name contact_id = id
     if ($field_name == 'contact_id') {
       $field_name = 'id';
+    }
+    if (isset($table_names[$field_name])) {
+      $table_name = $table_names[$field_name];
+    }
+    elseif (strpos($field_name, 'custom_') === 0) {
+      $customInfo = civicrm_api3('CustomField', 'getsingle', [
+        'return' => ["custom_group_id.table_name", "column_name"],
+        'id' => substr($field_name, 7),
+      ]);
+      $field_name = $customInfo['column_name'];
+      $table_name = CRM_Utils_String::munge($customInfo['custom_group_id.table_name']);
+      $from[$field_name] = "LEFT JOIN `$table_name` ON cc.id = `$table_name`.entity_id";
     }
     // phone_numeric should be phone
     $searchField = str_replace('_numeric', '', $field_name);
@@ -787,7 +807,6 @@ function civicrm_api3_contact_getquick($params) {
 
   $select = $actualSelectElements = array('sort_name');
   $where  = '';
-  $from   = array();
   foreach ($list as $value) {
     $suffix = substr($value, 0, 2) . substr($value, -1);
     switch ($value) {
@@ -817,10 +836,13 @@ function civicrm_api3_contact_getquick($params) {
         break;
 
       default:
-        if ($value != 'id') {
+        if ($value == 'id') {
+          $actualSelectElements[] = 'cc.id';
+        }
+        elseif ($value != 'sort_name') {
           $suffix = 'cc';
-          if (!empty($params['field_name']) && $params['field_name'] == 'value') {
-            $suffix = CRM_Utils_String::munge(CRM_Utils_Array::value('table_name', $params, 'cc'));
+          if ($field_name == $value) {
+            $suffix = $table_name;
           }
           $actualSelectElements[] = $select[] = $suffix . '.' . $value;
         }
