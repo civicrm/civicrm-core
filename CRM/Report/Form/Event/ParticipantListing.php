@@ -294,6 +294,15 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           ),
         ),
       ),
+      'civicrm_note' => array(
+        'dao' => 'CRM_Core_DAO_Note',
+        'fields' => array(
+          'participant_note' => array(
+            'name' => 'note',
+            'title' => ts('Participant Note'),
+          ),
+        ),
+      ),
       'civicrm_contribution' => array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
         'fields' => array(
@@ -518,6 +527,14 @@ ORDER BY  cv.label
     $this->joinAddressFromContact();
     $this->joinPhoneFromContact();
     $this->joinEmailFromContact();
+
+    // Include participant note.
+    if ($this->isTableSelected('civicrm_note')) {
+      $this->_from .= "
+            LEFT JOIN civicrm_note {$this->_aliases['civicrm_note']}
+                   ON ( {$this->_aliases['civicrm_note']}.entity_table = 'civicrm_participant' AND
+                   {$this->_aliases['civicrm_participant']}.id = {$this->_aliases['civicrm_note']}.entity_id )";
+    }
 
     if ($this->_contribField) {
       $this->_from .= "
