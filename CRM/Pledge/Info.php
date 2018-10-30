@@ -138,6 +138,14 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-paper-plane';
+  }
+
+  /**
+   * @inheritDoc
    * Provides information about advanced search pane
    * offered by this component.
    *

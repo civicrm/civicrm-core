@@ -178,6 +178,14 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-folder-open-o';
+  }
+
+  /**
+   * @inheritDoc
    * @return array
    */
   public function registerAdvancedSearchPane() {

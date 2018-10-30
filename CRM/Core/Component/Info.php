@@ -199,6 +199,15 @@ abstract class CRM_Core_Component_Info {
   abstract public function registerTab();
 
   /**
+   * Get icon font class representing this component.
+   *
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-puzzle-piece';
+  }
+
+  /**
    * Provides information about advanced search pane
    * offered by this component.
    *

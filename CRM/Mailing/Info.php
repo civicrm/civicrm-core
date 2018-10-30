@@ -278,6 +278,14 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-envelope-o';
+  }
+
+  /**
+   * @inheritDoc
    * @return array
    */
   public function registerAdvancedSearchPane() {
