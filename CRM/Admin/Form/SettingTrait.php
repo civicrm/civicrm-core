@@ -127,7 +127,7 @@ trait CRM_Admin_Form_SettingTrait {
     foreach ($settingMetaData as $setting => $props) {
       $quickFormType = $this->getQuickFormType($props);
       if (isset($quickFormType)) {
-        $options = NULL;
+        $options = CRM_Utils_Array::value('options', $props);
         if (isset($props['pseudoconstant'])) {
           $options = civicrm_api3('Setting', 'getoptions', [
             'field' => $setting,
