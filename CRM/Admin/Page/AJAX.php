@@ -48,7 +48,7 @@ class CRM_Admin_Page_AJAX {
       $smarty = CRM_Core_Smarty::singleton();
       $smarty->assign('includeEmail', civicrm_api3('setting', 'getvalue', array('name' => 'includeEmailInName', 'group' => 'Search Preferences')));
       print $smarty->fetchWith('CRM/common/navigation.js.tpl', array(
-        'navigation' => CRM_Core_BAO_Navigation::createNavigation($contactID),
+        'navigation' => CRM_Core_BAO_Navigation::createNavigation(),
       ));
     }
     CRM_Utils_System::civiExit();

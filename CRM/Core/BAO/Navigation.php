@@ -493,22 +493,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
 
     $makeLink = FALSE;
     if (!empty($url)) {
-      // Skip processing fully-formed urls
-      if (substr($url, 0, 4) !== 'http' && $url[0] !== '/' && $url[0] !== '#') {
-        //CRM-7656 --make sure to separate out url path from url params,
-        //as we'r going to validate url path across cross-site scripting.
-        $parsedUrl = parse_url($url);
-        if (empty($parsedUrl['query'])) {
-          $parsedUrl['query'] = NULL;
-        }
-        if (empty($parsedUrl['fragment'])) {
-          $parsedUrl['fragment'] = NULL;
-        }
-        $url = CRM_Utils_System::url($parsedUrl['path'], $parsedUrl['query'], FALSE, $parsedUrl['fragment'], TRUE);
-      }
-      elseif (strpos($url, '&amp;') === FALSE) {
-        $url = htmlspecialchars($url);
-      }
+      $url = self::makeFullyFormedUrl($url);
       $makeLink = TRUE;
     }
 
@@ -581,15 +566,10 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
   /**
    * Create navigation for CiviCRM Admin Menu.
    *
-   * @param int $contactID
-   *   Contact id.
-   *
    * @return string
    *   returns navigation html
    */
-  public static function createNavigation($contactID) {
-    $config = CRM_Core_Config::singleton();
-
+  public static function createNavigation() {
     $navigation = self::buildNavigation();
 
     if ($navigation) {
@@ -603,8 +583,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       $homeIcon = '<span class="crm-logo-sm" ></span>';
       self::retrieve($homeParams, $homeNav);
       if ($homeNav) {
-        list($path, $q) = explode('?', $homeNav['url']);
-        $homeURL = CRM_Utils_System::url($path, $q);
+        $homeURL = self::makeFullyFormedUrl($homeNav['url']);
         $homeLabel = $homeNav['label'];
         // CRM-6804 (we need to special-case this as we don’t ts()-tag variables)
         if ($homeLabel == 'Home') {
@@ -628,6 +607,44 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       // <li> tag doesn't need to be closed
     }
     return $prepandString . $navigation;
+  }
+
+  /**
+   * Turns relative URLs (like civicrm/foo/bar) into fully-formed
+   * ones (i.e. example.com/wp-admin?q=civicrm/dashboard).
+   *
+   * If the URL is already fully-formed, nothing will be done.
+   *
+   * @param string $url
+   *
+   * @return string
+   */
+  private static function makeFullyFormedUrl($url) {
+    if (self::isNotFullyFormedUrl($url)) {
+      //CRM-7656 --make sure to separate out url path from url params,
+      //as we'r going to validate url path across cross-site scripting.
+      $path = parse_url($url, PHP_URL_PATH);
+      $q = parse_url($url, PHP_URL_QUERY);
+      $fragment = parse_url($url, PHP_URL_FRAGMENT);
+      return CRM_Utils_System::url($path, $q, FALSE, $fragment);
+    }
+
+    if (strpos($url, '&amp;') === FALSE) {
+      return htmlspecialchars($url);
+    }
+
+    return $url;
+  }
+
+  /**
+   * Checks if the given URL is not fully-formed
+   *
+   * @param string $url
+   *
+   * @return bool
+   */
+  private static function isNotFullyFormedUrl($url) {
+    return substr($url, 0, 4) !== 'http' && $url[0] !== '/' && $url[0] !== '#';
   }
 
   /**
