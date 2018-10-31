@@ -1145,8 +1145,9 @@ class CRM_Core_SelectValues {
       'job_title' => ts('Job Title'),
     ];
     $custom = civicrm_api3('CustomField', 'get', [
-      'return' => ["name", "label", "custom_group_id.title"],
-      'custom_group_id.extends' => ['IN' => ["Contact", "Individual", "Organization", "Household"]],
+      'return' => ['name', 'label', 'custom_group_id.title'],
+      'custom_group_id.extends' => ['IN' => ['Contact', 'Individual', 'Organization', 'Household']],
+      'data_type' => ['NOT IN' => ['ContactReference', 'Date', 'File']],
       'custom_group_id.is_active' => 1,
       'is_active' => 1,
       'is_searchable' => 1,
