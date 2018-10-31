@@ -125,7 +125,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-activity_assignee_notification">
       <td class="label"></td>
-      <td>{$form.activity_assignee_notification.html} {$form.activity_assignee_notification.label}</td>
+      <td>{$form.activity_assignee_notification.html}</td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
@@ -145,7 +145,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-activity_assignee_notification_ics">
       <td class="label"></td>
-      <td>{$form.activity_assignee_notification_ics.html} {$form.activity_assignee_notification_ics.label}</td>
+      <td>{$form.activity_assignee_notification_ics.html}</td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
@@ -238,8 +238,8 @@
         }
 
         // show/hide activity types based on checkbox value
-        $('.crm-preferences-display-form-activity_types').toggle($('#activity_assignee_notification').is(":checked"));
-        $('#activity_assignee_notification').click(function() {
+        $('.crm-preferences-display-form-activity_types').toggle($('#activity_assignee_notification_activity_assignee_notification').is(":checked"));
+        $('#activity_assignee_notification_activity_assignee_notification').click(function() {
           $('.crm-preferences-display-form-activity_types').toggle($(this).is(":checked"));
         });
 
