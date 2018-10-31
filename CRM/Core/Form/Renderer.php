@@ -244,10 +244,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     }
     if ($val) {
       $entity = $field->getAttribute('data-api-entity');
-      // Get api params, ensure it is an array
-      $params = $field->getAttribute('data-api-params');
-      $params = $params ? json_decode($params, TRUE) : array();
-      $result = civicrm_api3($entity, 'getlist', array('id' => $val) + $params);
+      $result = civicrm_api3($entity, 'getlist', array('id' => $val));
       if ($field->isFrozen()) {
         // Prevent js from treating frozen entityRef as a "live" field
         $field->removeAttribute('class');
