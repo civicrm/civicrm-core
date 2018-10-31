@@ -219,7 +219,7 @@ class CRM_Core_BAO_CustomValueTable {
             default:
               break;
           }
-          if (strtolower($value) === "null") {
+          if (is_null($value)) {
             // when unsetting a value to null, we don't need to validate the type
             // https://projectllr.atlassian.net/browse/VGQBMP-20
             $set[$field['column_name']] = $value;
