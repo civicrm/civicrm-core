@@ -23,8 +23,31 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-{$formName}-block">
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-    {include file="CRM/Form/basicFormFields.tpl"}
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-</div>
+{* @todo the invoicing_blocks id is used by contribution preferences - get that out of the shared code & back to where it belongs *}
+{* @todo with a small amount of tinkering most of this can be replaced by re-using the foreach loop in CRM_Core_EntityForm.tpl *}
+<table class="form-layout" id="invoicing_blocks">
+  {foreach from=$fields item=field key=fieldName}
+    {assign var=n value=$fieldName}
+    {if $form.$n}
+      <tr class="crm-preferences-form-block-{$fieldName}">
+        {if $field.html_type EQ 'checkbox'|| $field.html_type EQ 'checkboxes'}
+          <td class="label"></td>
+          <td>
+            {$form.$n.html}
+            {if $field.description}
+              <br /><span class="description">{$field.description}</span>
+            {/if}
+          </td>
+        {else}
+          <td class="label">{$form.$n.label}</td>
+          <td>
+            {$form.$n.html}
+            {if $field.description}
+              <br /><span class="description">{$field.description}</span>
+            {/if}
+          </td>
+        {/if}
+      </tr>
+    {/if}
+  {/foreach}
+</table>
