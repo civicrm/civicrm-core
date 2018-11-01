@@ -173,7 +173,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $this->addElement('checkbox', 'is_share', ts('Allow sharing through social media?'));
     $this->addElement('checkbox', 'is_map', ts('Include Map to Event Location'));
 
-    $this->add('datepicker', 'start_date', ts('Start'), [], FALSE, ['time' => TRUE]);
+    $this->add('datepicker', 'start_date', ts('Start'), [], !$this->_isTemplate, ['time' => TRUE]);
     $this->add('datepicker', 'end_date', ts('End'), [], FALSE, ['time' => TRUE]);
 
     $this->add('text', 'max_participants', ts('Max Number of Participants'),
@@ -210,15 +210,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
   public static function formRule($values) {
     $errors = array();
 
-    if (!$values['is_template']) {
-      if (empty($values['start_date'])) {
-        $errors['start_date'] = ts('Start Date and Time are required fields');
-      }
-      else {
-        if (($values['end_date'] < $values['start_date']) && !empty($values['end_date'])) {
-          $errors['end_date'] = ts('End date should be after Start date.');
-        }
-      }
+    if (!empty($values['end_date']) && ($values['end_date'] < $values['start_date'])) {
+      $errors['end_date'] = ts('End date should be after Start date.');
     }
 
     //CRM-4286
