@@ -2305,12 +2305,7 @@ class CRM_Contact_BAO_Query {
           $fieldName = "contact_a.{$fieldName}";
         }
         else {
-          if ($op != 'IN' && !is_numeric($value) && !is_array($value)) {
-            $fieldName = "{$field['where']}";
-          }
-          else {
-            $fieldName = "{$field['where']}";
-          }
+          $fieldName = $field['where'];
         }
       }
 
