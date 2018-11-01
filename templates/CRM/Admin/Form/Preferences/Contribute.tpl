@@ -25,7 +25,6 @@
 *}
 <div class="crm-block crm-form-block crm-{$formName}-block">
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-  {if $formName == "Contribute_Preferences"}
     <table class = "form-layout">
       {foreach from=$htmlFields item=desc key=htmlField}
         {if $form.$htmlField}
@@ -52,12 +51,10 @@
         {/if}
       {/foreach}
     </table>
-  {/if}
-
   {include file="CRM/Form/basicFormFields.tpl"}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-{if $formName == "Contribute_Preferences"}
+
 {literal}
   <script type="text/javascript">
     cj(document).ready(function() {
@@ -80,4 +77,3 @@
     });
   </script>
 {/literal}
-{/if}
