@@ -53,33 +53,8 @@
         {/foreach}
       </table>
     {/if}
-    <table class="form-layout" id="invoicing_blocks">
-        {foreach from=$fields item=field key=fieldName}
-            {assign var=n value=$fieldName}
-            {if $form.$n}
-              <tr class="crm-preferences-form-block-{$fieldName}">
-                    {if $field.html_type EQ 'checkbox'|| $field.html_type EQ 'checkboxes'}
-                        <td class="label"></td>
-                        <td>
-                            {$form.$n.html}
-                            {if $field.description}
-                                <br /><span class="description">{$field.description}</span>
-                            {/if}
-                        </td>
-                    {else}
-                        <td class="label">{$form.$n.label}</td>
-                        <td>
-                            {$form.$n.html}
-                            {if $field.description}
-                                <br /><span class="description">{$field.description}</span>
-                            {/if}
-                        </td>
-                    {/if}
-              </tr>
-          {/if}
-        {/foreach}
-  </table>
 
+    {include file="CRM/Form/basicFormFields.tpl"}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 {if $formName == "Contribute_Preferences"}
