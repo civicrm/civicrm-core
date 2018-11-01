@@ -101,6 +101,7 @@ return array(
     'is_contact' => 0,
     'description' => NULL,
     'help_text' => NULL,
+    'help' => ['id' => 'acl_financial_type'],
   ),
   'deferred_revenue_enabled' => array(
     'group_name' => 'Contribute Preferences',
