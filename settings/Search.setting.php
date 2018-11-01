@@ -82,7 +82,7 @@ return array(
       'size' => 64,
       'maxlength' => 64,
     ),
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'default' => 'simple',
     'add' => '4.5',
     'title' => 'How to handle full-tet queries',
