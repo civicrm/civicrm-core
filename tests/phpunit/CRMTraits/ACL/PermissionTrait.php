@@ -1,4 +1,5 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
@@ -22,31 +23,61 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-{* @todo with a small amount of tinkering most of this can be replaced by re-using the foreach loop in CRM_Core_EntityForm.tpl *}
-<table class="form-layout">
-  {foreach from=$fields item=field key=fieldName}
-    {assign var=n value=$fieldName}
-    {if $form.$n}
-      <tr class="crm-preferences-form-block-{$fieldName}">
-        {if $field.html_type EQ 'checkbox'|| $field.html_type EQ 'checkboxes'}
-          <td class="label"></td>
-          <td>
-            {$form.$n.html}
-            {if $field.description}
-              <br /><span class="description">{$field.description}</span>
-            {/if}
-          </td>
-        {else}
-          <td class="label">{$form.$n.label}</td>
-          <td>
-            {$form.$n.html}
-            {if $field.description}
-              <br /><span class="description">{$field.description}</span>
-            {/if}
-          </td>
-        {/if}
-      </tr>
-    {/if}
-  {/foreach}
-</table>
+ */
+
+/**
+ * Trait ACL_Permission_Trait.
+ *
+ * Trait for working with ACLs in tests
+ */
+trait CRMTraits_ACL_PermissionTrait {
+
+  protected $allowedContactId = 0;
+  protected $allowedContacts = [];
+
+  /**
+   * All results returned.
+   *
+   * @implements CRM_Utils_Hook::aclWhereClause
+   *
+   * @param string $type
+   * @param array $tables
+   * @param array $whereTables
+   * @param int $contactID
+   * @param string $where
+   */
+  public function aclWhereHookAllResults($type, &$tables, &$whereTables, &$contactID, &$where) {
+    $where = " (1) ";
+  }
+
+  /**
+   * All but first results returned.
+   *
+   * @implements CRM_Utils_Hook::aclWhereClause
+   *
+   * @param string $type
+   * @param array $tables
+   * @param array $whereTables
+   * @param int $contactID
+   * @param string $where
+   */
+  public function aclWhereOnlySecond($type, &$tables, &$whereTables, &$contactID, &$where) {
+    $where = " contact_a.id > 1";
+  }
+
+  /**
+   * Only specified contact returned.
+   *
+   * @implements CRM_Utils_Hook::aclWhereClause
+   *
+   * @param string $type
+   * @param array $tables
+   * @param array $whereTables
+   * @param int $contactID
+   * @param string $where
+   */
+  public function aclWhereOnlyOne($type, &$tables, &$whereTables, &$contactID, &$where) {
+    $where = " contact_a.id = " . $this->allowedContactId;
+  }
+
+}
