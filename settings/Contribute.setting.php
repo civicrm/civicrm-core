@@ -39,6 +39,7 @@ return array(
     'group' => 'contribute',
     'name' => 'cvv_backoffice_required',
     'type' => 'Boolean',
+    'html_type' => 'radio',
     'quick_form_type' => 'YesNo',
     'default' => '1',
     'add' => '4.1',
@@ -49,6 +50,8 @@ return array(
     'help_text' => 'If set it back-office credit card transactions will required a cvv code. Leave as required unless you have a very strong reason to change',
   ),
   'contribution_invoice_settings' => array(
+    // @todo our standard is to have a setting per item not to hide settings in an array with
+    // no useful metadata. Undo this setting.
     'group_name' => 'Contribute Preferences',
     'group' => 'contribute',
     'name' => 'contribution_invoice_settings',

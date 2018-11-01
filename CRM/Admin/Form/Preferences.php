@@ -92,6 +92,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
     $settings = Civi::settings();
     // @todo replace this by defining all in settings.
     foreach ($this->_varNames as $groupName => $settingNames) {
+      CRM_Core_Error::deprecatedFunctionWarning('deprecated use of preferences form. This will be removed from core soon');
       foreach ($settingNames as $settingName => $options) {
         $this->_config->$settingName = $settings->get($settingName);
       }
@@ -107,6 +108,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
 
     $this->setDefaultsForMetadataDefinedFields();
     foreach ($this->_varNames as $groupName => $settings) {
+      CRM_Core_Error::deprecatedFunctionWarning('deprecated use of preferences form. This will be removed from core soon');
       foreach ($settings as $settingName => $settingDetails) {
         $this->_defaults[$settingName] = isset($this->_config->$settingName) ? $this->_config->$settingName : CRM_Utils_Array::value('default', $settingDetails, NULL);
       }
@@ -123,6 +125,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   public function cbsDefaultValues(&$defaults) {
 
     foreach ($this->_varNames as $groupName => $groupValues) {
+      CRM_Core_Error::deprecatedFunctionWarning('deprecated use of preferences form. This will be removed from core soon');
       foreach ($groupValues as $settingName => $fieldValue) {
         if ($fieldValue['html_type'] == 'checkboxes') {
           if (isset($this->_config->$settingName) &&
@@ -150,6 +153,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
     parent::buildQuickForm();
 
     if (!empty($this->_varNames)) {
+      CRM_Core_Error::deprecatedFunctionWarning('deprecated use of preferences form. This will be removed from core soon');
       foreach ($this->_varNames as $groupName => $groupValues) {
         $formName = CRM_Utils_String::titleToVar($groupName);
         $this->assign('formName', $formName);

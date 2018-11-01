@@ -25,25 +25,27 @@
 *}
 <div class="crm-block crm-form-block crm-{$formName}-block">
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-  <table class = "form-layout">
-    {foreach from=$htmlFields item=desc key=htmlField}
+  {include file="CRM/Form/basicFormFields.tpl"}
+
+  <table class="form-layout" id="invoicing_blocks">
+    {foreach from=$htmlFields item=fieldSpec key=htmlField}
       {if $form.$htmlField}
         {assign var=n value=$htmlField|cat:'_description'}
         <tr class="crm-preferences-form-block-{$htmlField}">
-          {if $form.$htmlField.html_type EQ 'checkbox'|| $form.$htmlField.html_type EQ 'checkboxes'}
+          {if $fieldSpec.html_type EQ 'checkbox'|| $fieldSpec.html_type EQ 'checkboxes'}
             <td class="label"></td>
             <td>
               {$form.$htmlField.html} {$form.$htmlField.label}
               {if $desc}
-                <br /><span class="description">{$desc}</span>
+                <br /><span class="description">{$fieldSpec.description}</span>
               {/if}
             </td>
           {else}
             <td class="label">{$form.$htmlField.label}&nbsp;{if $htmlField eq 'acl_financial_type'}{help id="$htmlField"}{/if}</td>
             <td>
               {$form.$htmlField.html}
-              {if $desc}
-                <br /><span class="description">{$desc}</span>
+              {if $fieldSpec.description}
+                <br /><span class="description">{$fieldSpec.description}</span>
               {/if}
             </td>
           {/if}
@@ -51,14 +53,13 @@
       {/if}
     {/foreach}
   </table>
-  {include file="CRM/Form/basicFormFields.tpl"}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 
 {literal}
   <script type="text/javascript">
     cj(document).ready(function() {
-      if (document.getElementById("invoicing").checked) {
+      if (document.getElementById("invoicing_invoicing").checked) {
         cj("#invoicing_blocks").show();
       }
       else {
@@ -67,7 +68,7 @@
     });
     cj(function () {
       cj("input[type=checkbox]").click(function() {
-        if (cj("#invoicing").is(":checked")) {
+        if (cj("#invoicing_invoicing").is(":checked")) {
           cj("#invoicing_blocks").show();
         }
         else {
