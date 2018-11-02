@@ -54,6 +54,18 @@ class CRM_Core_Page_File extends CRM_Core_Page {
 
       list($path, $mimeType) = CRM_Core_BAO_File::path($id, $eid, NULL, $quest);
     }
+    if ($mimeType && strpos($mimeType, 'image') == '0') {
+      $width  = CRM_Utils_Request::retrieve('width', 'Positive', CRM_Core_DAO::$_nullObject);
+      $height = CRM_Utils_Request::retrieve('height', 'Positive', CRM_Core_DAO::$_nullObject);
+      if ($width && $height) {
+        $suffix = '_w' . $width . '_h' . $height;
+        try {
+          $path = CRM_Utils_File::resizeImage($path, $width, $height, $suffix, TRUE, 'cache', TRUE);
+        } catch (CRM_Core_Exception $e) {
+          CRM_Core_Session::singleton()->setStatus($e->getMessage());
+        }
+      }
+    }
 
     if (!$path) {
       CRM_Core_Error::statusBounce('Could not retrieve the file');

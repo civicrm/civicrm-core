@@ -884,8 +884,8 @@ HTACCESS;
       case 'image/jpg':
         list($imageWidth, $imageHeight) = getimagesize($path);
         list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
-        $url = "<a href=\"$url\" class='crm-image-popup'>
-          <img src=\"$url\" width=$imageThumbWidth height=$imageThumbHeight/>
+        $url = "<a href='$url' class='crm-image-popup'>
+          <img src='{$url}&width={$imageThumbWidth}&height={$imageThumbHeight}' width=$imageThumbWidth height=$imageThumbHeight/>
           </a>";
         break;
 
@@ -940,7 +940,10 @@ HTACCESS;
    *   which the resized image will not extend.
    *   When FALSE, the image will be resized exactly to $width and $height, even
    *   if it means stretching it.
-   *
+   * @param string $subDir = null
+   *   create sub dir and copy resize Image to it.
+   * @param bool $returnPath = FALSE
+   *   When TRUE return new file name path otherwise return url
    * @return string
    *   Path to image
    * @throws \CRM_Core_Exception
@@ -948,8 +951,25 @@ HTACCESS;
    *   - When GD is not available.
    *   - When the source file is not an image.
    */
-  public static function resizeImage($sourceFile, $targetWidth, $targetHeight, $suffix = "", $preserveAspect = TRUE) {
+  public static function resizeImage($sourceFile, $targetWidth, $targetHeight, $suffix = "", $preserveAspect = TRUE, $subDir = null, $returnPath = FALSE) {
 
+    if ( !file_exists($sourceFile) && $returnPath) {
+      return $sourceFile;
+    }
+    // figure out the new filename
+    $pathParts = pathinfo($sourceFile);
+    $targetDirectory = $pathParts['dirname'] . DIRECTORY_SEPARATOR;
+    if (!empty($subDir)) {
+      $targetDirectory = $targetDirectory . $subDir . DIRECTORY_SEPARATOR;
+      CRM_Utils_File::createDir($targetDirectory);
+    }
+    $targetFile = $targetDirectory
+      . $pathParts['filename'] . $suffix . "." . $pathParts['extension'];
+
+    // return file path if resize file already exist
+    if (!empty($subDir) && file_exists($targetFile) && $returnPath) {
+      return $targetFile;
+    }
     // Check if GD is installed
     $gdSupport = CRM_Utils_System::getModuleSetting('gd', 'GD Support');
     if (!$gdSupport) {
@@ -987,22 +1007,61 @@ HTACCESS;
       }
     }
 
-    // figure out the new filename
-    $pathParts = pathinfo($sourceFile);
-    $targetFile = $pathParts['dirname'] . DIRECTORY_SEPARATOR
-      . $pathParts['filename'] . $suffix . "." . $pathParts['extension'];
 
     $targetData = imagecreatetruecolor($targetWidth, $targetHeight);
+    /* Check if this image is PNG or GIF, then set if Transparent*/
+    if ($sourceMime == 'image/gif') {
+      $transparent = imagecolortransparent($sourceData);
+      if ($transparent >= 0) {
+        // Find out the number of colors in the image palette. It will be 0 for truecolor images.
+        $palette_size = imagecolorstotal($sourceData);
+        if ($palette_size == 0 || $transparent < $palette_size) {
+          // Set the transparent color in the new resource, either if it is a
+          // truecolor image or if the transparent color is part of the palette.
+          // Since the index of the transparency color is a property of the
+          // image rather than of the palette, it is possible that an image
+          // could be created with this index set outside the palette size (see
+          // http://stackoverflow.com/a/3898007).
+          $transparent_color = imagecolorsforindex($sourceData, $transparent);
+          $transparent = imagecolorallocate($targetData, $transparent_color['red'], $transparent_color['green'], $transparent_color['blue']);
+
+          // Flood with our new transparent color.
+          imagefill($targetData, 0, 0, $transparent);
+          imagecolortransparent($targetData, $transparent);
+        }
+        else {
+          imagefill($targetData, 0, 0, imagecolorallocate($targetData, 255, 255, 255));
+        }
+      }
+    }
+    elseif ($sourceMime == 'image/png') {
+      // Set alphablending to off
+      imagealphablending($targetData, FALSE);
+      // alpha values
+      $transparency = imagecolorallocatealpha($targetData, 0, 0, 0, 127);
+      imagefill($targetData, 0, 0, $transparency);
+      // Set alphablending to on
+      imagealphablending($targetData, TRUE);
+      imagesavealpha($targetData, TRUE);
+    }
+    elseif ($sourceMime == 'image/jpeg') {
+      imagefill($targetData, 0, 0, imagecolorallocate($targetData, 255, 255, 255));
+    }
 
     // resize
-    imagecopyresized($targetData, $sourceData,
+    imagecopyresampled($targetData, $sourceData,
       0, 0, 0, 0,
       $targetWidth, $targetHeight, $sourceWidth, $sourceHeight);
 
     // save the resized image
     $fp = fopen($targetFile, 'w+');
     ob_start();
-    imagejpeg($targetData);
+    switch ($sourceInfo[2]) {
+      case 1: imagegif($targetData); break;
+      case 2: imagejpeg($targetData); break;
+      case 3: imagepng($targetData); break;
+      default: imagejpeg($targetData); break;
+    }
     $image_buffer = ob_get_contents();
     ob_end_clean();
     imagedestroy($targetData);
@@ -1010,6 +1069,9 @@ HTACCESS;
     rewind($fp);
     fclose($fp);
 
+    if ($returnPath) {
+      return $targetFile;
+    }
     // return the URL to link to
     $config = CRM_Core_Config::singleton();
     return $config->imageUploadURL . basename($targetFile);
