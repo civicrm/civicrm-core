@@ -73,7 +73,8 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
         $suffix = '_w' . $width . '_h' . $height;
         try {
           $thisFileName = CRM_Utils_File::resizeImage($thisFileName, $width, $height, $suffix, TRUE, 'cache', TRUE);
-        } catch (CRM_Core_Exception $e) {
+        }
+        catch (CRM_Core_Exception $e) {
           CRM_Core_Session::singleton()->setStatus($e->getMessage());
         }
       }

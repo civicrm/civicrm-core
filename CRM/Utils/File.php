@@ -951,9 +951,9 @@ HTACCESS;
    *   - When GD is not available.
    *   - When the source file is not an image.
    */
-  public static function resizeImage($sourceFile, $targetWidth, $targetHeight, $suffix = "", $preserveAspect = TRUE, $subDir = null, $returnPath = FALSE) {
+  public static function resizeImage($sourceFile, $targetWidth, $targetHeight, $suffix = "", $preserveAspect = TRUE, $subDir = NULL, $returnPath = FALSE) {
 
-    if ( !file_exists($sourceFile) && $returnPath) {
+    if (!file_exists($sourceFile) && $returnPath) {
       return $sourceFile;
     }
     // figure out the new filename
@@ -1007,7 +1007,6 @@ HTACCESS;
       }
     }
 
-
     $targetData = imagecreatetruecolor($targetWidth, $targetHeight);
     /* Check if this image is PNG or GIF, then set if Transparent*/
     if ($sourceMime == 'image/gif') {
@@ -1057,10 +1056,21 @@ HTACCESS;
     $fp = fopen($targetFile, 'w+');
     ob_start();
     switch ($sourceInfo[2]) {
-      case 1: imagegif($targetData); break;
-      case 2: imagejpeg($targetData); break;
-      case 3: imagepng($targetData); break;
-      default: imagejpeg($targetData); break;
+      case 1:
+        imagegif($targetData);
+        break;
+
+      case 2:
+        imagejpeg($targetData);
+        break;
+
+      case 3:
+        imagepng($targetData);
+        break;
+
+      default:
+        imagejpeg($targetData);
+        break;
     }
     $image_buffer = ob_get_contents();
     ob_end_clean();
