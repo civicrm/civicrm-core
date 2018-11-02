@@ -1013,16 +1013,16 @@ HTACCESS;
       $transparent = imagecolortransparent($sourceData);
       if ($transparent >= 0) {
         // Find out the number of colors in the image palette. It will be 0 for truecolor images.
-        $palette_size = imagecolorstotal($sourceData);
-        if ($palette_size == 0 || $transparent < $palette_size) {
+        $paletteSize = imagecolorstotal($sourceData);
+        if ($paletteSize == 0 || $transparent < $paletteSize) {
           // Set the transparent color in the new resource, either if it is a
           // truecolor image or if the transparent color is part of the palette.
           // Since the index of the transparency color is a property of the
           // image rather than of the palette, it is possible that an image
           // could be created with this index set outside the palette size (see
           // http://stackoverflow.com/a/3898007).
-          $transparent_color = imagecolorsforindex($sourceData, $transparent);
-          $transparent = imagecolorallocate($targetData, $transparent_color['red'], $transparent_color['green'], $transparent_color['blue']);
+          $transparentColor = imagecolorsforindex($sourceData, $transparent);
+          $transparent = imagecolorallocate($targetData, $transparentColor['red'], $transparentColor['green'], $transparentColor['blue']);
 
           // Flood with our new transparent color.
           imagefill($targetData, 0, 0, $transparent);
