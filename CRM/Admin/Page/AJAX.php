@@ -46,12 +46,26 @@ class CRM_Admin_Page_AJAX {
     if ($contactID) {
       CRM_Core_Page_AJAX::setJsHeaders();
       $smarty = CRM_Core_Smarty::singleton();
-      $smarty->assign('includeEmail', civicrm_api3('setting', 'getvalue', array('name' => 'includeEmailInName', 'group' => 'Search Preferences')));
+      $smarty->assign('quicksearchOptions', self::getSearchOptions());
       print $smarty->fetchWith('CRM/common/navigation.js.tpl', array(
         'navigation' => CRM_Core_BAO_Navigation::createNavigation(),
       ));
     }
     CRM_Utils_System::civiExit();
+  }
+
+  public static function getSearchOptions() {
+    $searchOptions = Civi::settings()->get('quicksearch_options');
+    $searchOptions[] = 'sort_name';
+    $searchOptions = array_intersect_key(CRM_Core_SelectValues::quicksearchOptions(), array_flip($searchOptions));
+    foreach ($searchOptions as $key => $label) {
+      if (strpos($key, 'custom_') === 0) {
+        unset($searchOptions[$key]);
+        $id = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', substr($key, 7), 'id', 'name');
+        $searchOptions["custom_$id"] = $label;
+      }
+    }
+    return $searchOptions;
   }
 
   /**
