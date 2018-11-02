@@ -2212,14 +2212,15 @@ class CRM_Contact_BAO_Query {
       }
     }
     elseif ($name === 'name') {
-      $value = $strtolower(CRM_Core_DAO::escapeString($value));
+      $value = CRM_Core_DAO::escapeString($value);
       if ($wildcard) {
         $op = 'LIKE';
         $value = self::getWildCardedValue($wildcard, $op, $value);
       }
-      // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-      $wc = self::caseImportant($op) ? "LOWER({$field['where']})" : "{$field['where']}";
-      $this->_where[$grouping][] = self::buildClause($wc, $op, "'$value'");
+      CRM_Core_Error::deprecatedFunctionWarning('Untested code path');
+      // @todo it's likely this code path is obsolete / never called. It is definitely not
+      // passed through in our test suite.
+      $this->_where[$grouping][] = self::buildClause($field['where'], $op, "'$value'");
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
     }
     elseif ($name === 'current_employer') {
