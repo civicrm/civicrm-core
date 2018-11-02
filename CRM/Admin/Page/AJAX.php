@@ -217,6 +217,7 @@ class CRM_Admin_Page_AJAX {
 
         case 'CRM_Contact_BAO_Group':
           $ret['content'] = ts('Are you sure you want to disable this Group?');
+          $ret['content'] .= '<br /><br /><strong>' . ts('WARNING - Disabling this group will disable all the child groups associated if any.') . '</strong>';
           break;
 
         case 'CRM_Core_BAO_OptionGroup':
