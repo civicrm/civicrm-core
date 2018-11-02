@@ -1151,7 +1151,7 @@ class CRM_Core_SelectValues {
       'custom_group_id.is_active' => 1,
       'is_active' => 1,
       'is_searchable' => 1,
-      'options' => ['sort' => ['custom_group_id.weight', 'weight']],
+      'options' => ['sort' => ['custom_group_id.weight', 'weight'], 'limit' => 0],
     ]);
     foreach ($custom['values'] as $field) {
       $options['custom_' . $field['name']] = $field['custom_group_id.title'] . ': ' . $field['label'];
