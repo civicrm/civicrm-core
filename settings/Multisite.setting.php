@@ -48,7 +48,7 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Make CiviCRM aware of multiple domains. You should configure a domain group if enabled'),
-    'help_link' => ['page' => 'Multi Site Installation', 'resource' => 'wiki'],
+    'documentation_link' => ['page' => 'Multi Site Installation', 'resource' => 'wiki'],
     'help_text' => NULL,
   ),
   'domain_group_id' => array(

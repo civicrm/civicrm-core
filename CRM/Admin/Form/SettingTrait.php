@@ -143,11 +143,6 @@ trait CRM_Admin_Form_SettingTrait {
           $this->includesReadOnlyFields = TRUE;
         }
 
-        if (isset($props['help_link'])) {
-          // Set both the value in this loop & the outer value as we assign both to the template while we deprecate the $descriptions assignment.
-          $settingMetaData[$setting]['description'] = $props['description'] .= ' ' . CRM_Utils_System::docURL2($props['help_link']['page'], NULL, NULL, NULL, NULL, $props['help_link']['resource']);
-
-        }
         $add = 'add' . $quickFormType;
         if ($add == 'addElement') {
           $this->$add(
@@ -162,7 +157,7 @@ trait CRM_Admin_Form_SettingTrait {
           $this->addElement('select', $setting, ts($props['title']), $options, CRM_Utils_Array::value('html_attributes', $props));
         }
         elseif ($add == 'addCheckBox') {
-          $this->addCheckBox($setting, ts($props['title']), $options, NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, ['&nbsp;&nbsp;']);
+          $this->addCheckBox($setting, '', $options, NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, ['&nbsp;&nbsp;']);
         }
         elseif ($add == 'addCheckBoxes') {
           $options = array_flip($options);

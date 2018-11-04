@@ -48,7 +48,7 @@ return array(
     'is_contact' => 0,
     'description' => ts('This feature allows users to register for more than one event at a time. When enabled, users will add event(s) to a "cart" and then pay for them all at once. Enabling this setting will affect online registration for all active events. The code is an alpha state, and you will potentially need to have developer resources to debug and fix sections of the codebase while testing and deploying it'),
     'help_text' => '',
-    'help_link' => ['page' => 'CiviEvent Cart Checkout', 'resource' => 'wiki'],
+    'documentation_link' => ['page' => 'CiviEvent Cart Checkout', 'resource' => 'wiki'],
   ),
   'show_events' => array(
     'name' => 'show_events',
