@@ -360,7 +360,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           'is_active' => 1,
         ]);
         if (count($parentIds) >= 1 && $activeParentsCount <= 1) {
-          $setDisable = self::setIsActive($childValue, $params['is_active']);
+          $setDisable = self::setIsActive($childValue, CRM_Utils_Array::value('is_active', $params, 1));
         }
       }
     }
