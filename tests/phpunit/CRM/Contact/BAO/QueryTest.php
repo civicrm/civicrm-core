@@ -257,13 +257,13 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   public function getSearchProfileData() {
     return [
       [
-        [['city', '=', 'Cool City', 1, 0]], "civicrm_address.city as `city`", "civicrm_address.city = 'cool city'",
+        [['city', '=', 'Cool City', 1, 0]], "civicrm_address.city as `city`", "civicrm_address.city = 'Cool City'",
       ],
       [
         // Note that in the query 'long street' is lower cased. We eventually want to change that & not mess with the vars - it turns out
         // it doesn't work on some charsets. However, the the lcasing affects more vars & we are looking to stagger removal of lcasing 'in case'
         // (although we have been removing without blowback since 2017)
-        [['street_address', '=', 'Long Street', 1, 0]], "civicrm_address.street_address as `street_address`", "civicrm_address.street_address LIKE '%long street%'",
+        [['street_address', '=', 'Long Street', 1, 0]], "civicrm_address.street_address as `street_address`", "civicrm_address.street_address LIKE '%Long Street%'",
       ],
     ];
   }
@@ -382,7 +382,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     );
 
     $sql = $query->query(FALSE);
-    $this->assertEquals("WHERE  ( civicrm_address.postal_code = 'eh10 4rb-889' )  AND (contact_a.is_deleted = 0)", $sql[2]);
+    $this->assertEquals("WHERE  ( civicrm_address.postal_code = 'EH10 4RB-889' )  AND (contact_a.is_deleted = 0)", $sql[2]);
     $result = CRM_Core_DAO::executeQuery(implode(' ', $sql));
     $this->assertEquals(1, $result->N);
 

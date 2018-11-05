@@ -2129,7 +2129,6 @@ class CRM_Contact_BAO_Query {
 
     $setTables = TRUE;
 
-    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     if (isset($locType[1]) && is_numeric($locType[1])) {
       $lType = $locationType[$locType[1]];
@@ -2268,7 +2267,7 @@ class CRM_Contact_BAO_Query {
     elseif (substr($name, 0, 4) === 'url-') {
       $tName = 'civicrm_website';
       $this->_whereTables[$tName] = $this->_tables[$tName] = "\nLEFT JOIN civicrm_website ON ( civicrm_website.contact_id = contact_a.id )";
-      $value = $strtolower(CRM_Core_DAO::escapeString($value));
+      $value = CRM_Core_DAO::escapeString($value);
       if ($wildcard) {
         $op = 'LIKE';
         $value = self::getWildCardedValue($wildcard, $op, $value);
@@ -2338,9 +2337,6 @@ class CRM_Contact_BAO_Query {
         $this->_where[$grouping][] = CRM_Core_DAO::createSQLFilter($fieldName, $value, $type);
       }
       else {
-        if (!self::caseImportant($op)) {
-          $value = $strtolower($value);
-        }
         if ($wildcard) {
           $op = 'LIKE';
           $value = self::getWildCardedValue($wildcard, $op, $value);
@@ -3312,9 +3308,8 @@ WHERE  $smartGroupClause
     $this->_tables['civicrm_note'] = $this->_whereTables['civicrm_note']
       = " LEFT JOIN civicrm_note ON ( civicrm_note.entity_table = 'civicrm_contact' AND contact_a.id = civicrm_note.entity_id ) ";
 
-    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $n = trim($value);
-    $value = $strtolower(CRM_Core_DAO::escapeString($n));
+    $value = CRM_Core_DAO::escapeString($n);
     if ($wildcard) {
       if (strpos($value, '%') === FALSE) {
         $value = "%$value%";
@@ -3589,10 +3584,8 @@ WHERE  $smartGroupClause
       $this->_qill[$grouping][] = ts('Street Number is even');
     }
     else {
-      $value = strtolower($n);
-
-      // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-      $this->_where[$grouping][] = self::buildClause('LOWER(civicrm_address.street_number)', $op, $value, 'String');
+      $value = $n;
+      $this->_where[$grouping][] = self::buildClause('civicrm_address.street_number', $op, $value, 'String');
       $this->_qill[$grouping][] = ts('Street Number') . " $op '$n'";
     }
 
@@ -3608,7 +3601,7 @@ WHERE  $smartGroupClause
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     $name = trim($value);
-    $cond = " contact_a.sort_name LIKE '" . strtolower(CRM_Core_DAO::escapeWildCardString($name)) . "%'";
+    $cond = " contact_a.sort_name LIKE '" . CRM_Core_DAO::escapeWildCardString($name) . "%'";
     $this->_where[$grouping][] = $cond;
     $this->_qill[$grouping][] = ts('Showing only Contacts starting with: \'%1\'', array(1 => $name));
   }
@@ -3875,7 +3868,7 @@ WHERE  $smartGroupClause
     }
 
     $name = trim($targetName[2]);
-    $name = strtolower(CRM_Core_DAO::escapeString($name));
+    $name = CRM_Core_DAO::escapeString($name);
     $name = $targetName[4] ? "%$name%" : $name;
     $this->_where[$grouping][] = "contact_b_log.sort_name LIKE '%$name%'";
     $this->_tables['civicrm_log'] = $this->_whereTables['civicrm_log'] = 1;
@@ -3968,6 +3961,7 @@ WHERE  $smartGroupClause
     if ($opValues &&
       strtolower($opValues[2] == 'AND')
     ) {
+      // @todo this line is logially unreachable
       $operator = 'AND';
     }
 
@@ -5700,7 +5694,7 @@ SELECT COUNT( conts.total_amount ) as cancel_count,
         $value = CRM_Utils_Type::escape($value, $dataType);
         // if we don't have a dataType we should assume
         if ($dataType == 'String' || $dataType == 'Text') {
-          $value = "'" . strtolower($value) . "'";
+          $value = "'" . $value . "'";
         }
         return "$clause $value";
     }
