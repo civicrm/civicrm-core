@@ -219,7 +219,16 @@ trait CRM_Admin_Form_SettingTrait {
   protected function getQuickFormType($spec) {
     if (isset($spec['quick_form_type']) &&
     !($spec['quick_form_type'] === 'Element' && !empty($spec['html_type']))) {
+      // This is kinda transitional
       return $spec['quick_form_type'];
+    }
+
+    // The spec for settings has been updated for consistency - we provide deprecation notices for sites that have
+    // not made this change.
+    $htmlType = $spec['html_type'];
+    if ($htmlType !== strtolower($htmlType)) {
+      CRM_Core_Error::deprecatedFunctionWarning(ts('Settings fields html_type should be lower case - see https://docs.civicrm.org/dev/en/latest/framework/setting/ - this needs to be fixed for ' . $spec['name']));
+      $htmlType = strtolower($spec['html_type']);
     }
     $mapping = [
       'checkboxes' => 'CheckBoxes',
@@ -229,8 +238,9 @@ trait CRM_Admin_Form_SettingTrait {
       'textarea' => 'Element',
       'text' => 'Element',
       'entity_reference' => 'EntityRef',
+      'advmultiselect' => 'Element',
     ];
-    return $mapping[$spec['html_type']];
+    return $mapping[$htmlType];
   }
   /**
    * Get the defaults for all fields defined in the metadata.
