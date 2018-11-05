@@ -528,9 +528,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
         ON t_act.case_id = civicrm_case.id
  LEFT JOIN civicrm_phone ON (civicrm_phone.contact_id = civicrm_contact.id AND civicrm_phone.is_primary=1)
  LEFT JOIN civicrm_relationship case_relationship
- ON ( case_relationship.contact_id_a = civicrm_case_contact.contact_id AND case_relationship.contact_id_b = {$userID}
-      AND case_relationship.case_id = civicrm_case.id )
-
+ ON ( case_relationship.contact_id_a = civicrm_case_contact.contact_id AND case_relationship.contact_id_b = {$userID} AND case_relationship.is_active AND case_relationship.case_id = civicrm_case.id )
  LEFT JOIN civicrm_relationship_type case_relation_type
  ON ( case_relation_type.id = case_relationship.relationship_type_id
       AND case_relation_type.id = case_relationship.relationship_type_id )
@@ -794,7 +792,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
     else {
       $all = 0;
       $case_owner = 2;
-      $myCaseWhereClause = " AND case_relationship.contact_id_b = {$userID}";
+      $myCaseWhereClause = " AND case_relationship.contact_id_b = {$userID} AND case_relationship.is_active ";
       $myGroupByClause = " GROUP BY CONCAT(case_relationship.case_id,'-',case_relationship.contact_id_b)";
     }
     $myGroupByClause .= ", case_status.label, status_id, case_type_id";
@@ -810,7 +808,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
  LEFT JOIN civicrm_option_value case_status ON ( civicrm_case.status_id = case_status.value
  AND option_group_case_status.id = case_status.option_group_id )
  LEFT JOIN civicrm_relationship case_relationship ON ( case_relationship.case_id  = civicrm_case.id
- AND case_relationship.contact_id_b = {$userID})
+ AND case_relationship.contact_id_b = {$userID}) AND case_relationship.is_active
  WHERE is_deleted = 0 AND cc.contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted <> 1)
 {$myCaseWhereClause} {$myGroupByClause}";
 
