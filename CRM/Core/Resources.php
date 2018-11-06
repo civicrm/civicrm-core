@@ -788,7 +788,8 @@ class CRM_Core_Resources {
     ) {
       return TRUE;
     }
-    return strpos(CRM_Utils_System::getUrlPath(), 'civicrm/ajax') === 0;
+    $url = CRM_Utils_System::getUrlPath();
+    return (strpos($url, 'civicrm/ajax') === 0) || (strpos($url, 'civicrm/angular') === 0);
   }
 
   /**
