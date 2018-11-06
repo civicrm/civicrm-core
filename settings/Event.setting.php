@@ -38,6 +38,7 @@ return array(
   'enable_cart' => array(
     'name' => 'enable_cart',
     'group_name' => 'Event Preferences',
+    'settings_pages' => ['event' => ['weight' => 10]],
     'group' => 'event',
     'type' => 'Boolean',
     'quick_form_type' => 'CheckBox',
@@ -54,6 +55,7 @@ return array(
     'name' => 'show_events',
     'group_name' => 'Event Preferences',
     'group' => 'event',
+    'settings_pages' => ['event' => ['weight' => 20]],
     'type' => 'Integer',
     'quick_form_type' => 'Select',
     'default' => 10,
