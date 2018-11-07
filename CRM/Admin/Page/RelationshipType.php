@@ -94,15 +94,6 @@ class CRM_Admin_Page_RelationshipType extends CRM_Core_Page_Basic {
         ),
       );
     }
-
-    // See if other modules want to add links to the Relationship Type row
-    CRM_Utils_Hook::links(
-      'relationshipType.selector.row',
-      'RelationshipType',
-      CRM_Core_DAO::$_nullObject,
-      self::$_links
-    );
-
     return self::$_links;
   }
 
