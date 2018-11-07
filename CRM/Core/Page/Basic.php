@@ -319,11 +319,12 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
       }
     }
 
+    $object_type = get_class($object);
+
     if (!$forceAction) {
       if (array_key_exists('is_reserved', $object) && $object->is_reserved) {
         $values['class'] = 'reserved';
         // check if object is relationship type
-        $object_type = get_class($object);
 
         $exceptions = array(
           'CRM_Contact_BAO_RelationshipType',
@@ -365,7 +366,16 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     // make sure we only allow those actions that the user is permissioned for
     $newAction = $newAction & CRM_Core_Action::mask($permissions);
 
-    $values['action'] = CRM_Core_Action::formLink($links, $newAction, array('id' => $object->id));
+    $values['action'] = CRM_Core_Action::formLink(
+      $links,
+      $newAction,
+      ['id' => $object->id],
+      'more',
+      FALSE,
+      "basic.$object_type.page",
+      $object_type,
+      $object->id
+    );
   }
 
   /**
