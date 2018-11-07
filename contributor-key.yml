@@ -936,6 +936,8 @@
   organization: CYIM
   jira        : mmauroy
 
+- github      : mmyriam
+
 - github      : mohamedziada
   name        : Mohamed Ziada
   jira        : mohamedziada
