@@ -649,6 +649,9 @@ class CRM_Core_I18n {
     global $dbLocale;
     $dbLocale = "_{$locale}";
 
+    // For self::getLocale()
+    global $tsLocale;
+    $tsLocale = $locale;
   }
 
   /**
