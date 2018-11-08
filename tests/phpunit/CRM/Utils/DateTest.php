@@ -133,6 +133,43 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    *
    * Go backwards one year at a time through the sequence.
    */
+  public function testRelativeEnding() {
+    $relativeDateValues = [
+      'ending.week' => '- 6 days',
+      'ending_30.day' => '- 29 days',
+      'ending.year' => '- 1 year + 1 day',
+      'ending_90.day' => '- 89 days',
+      'ending_60.day' => '- 59 days',
+      'ending_2.year' => '- 2 years + 1 day',
+      'ending_3.year' => '- 3 years + 1 day',
+      'ending_18.year' => '- 18 years + 1 day',
+      'ending_18.quarter' => '- 54 months + 1 day',
+      'ending_18.week' => '- 18 weeks + 1 day',
+      'ending_18.month' => '- 18 months + 1 day',
+      'ending_18.day' => '- 17 days',
+    ];
+
+    foreach ($relativeDateValues as $key => $value) {
+      $parts = explode('.', $key);
+      $date = CRM_Utils_Date::relativeToAbsolute($parts[0], $parts[1]);
+      $this->assertEquals([
+        'from' => date('Ymd000000', strtotime($value)),
+        'to' => date('Ymd235959'),
+      ], $date, 'relative term is ' . $key);
+    }
+
+    $date = CRM_Utils_Date::relativeToAbsolute('ending', 'month');
+    $this->assertEquals([
+      'from' => date('Ymd000000', strtotime('- 29 days')),
+      'to' => date('Ymd235959'),
+    ], $date, 'relative term is ending.week');
+  }
+
+  /**
+   * Test relativeToAbsolute function on a range of year options.
+   *
+   * Go backwards one year at a time through the sequence.
+   */
   public function testRelativeToAbsoluteYearRange() {
     $sequence = ['previous_2'];
     $lastYear = (date('Y') - 1);
