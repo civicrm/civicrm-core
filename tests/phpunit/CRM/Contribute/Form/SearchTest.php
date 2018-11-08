@@ -542,14 +542,14 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
         'form_value' => array('cancel_reason' => 'Invalid Credit Card Number'),
         'expected_count' => 1,
         'expected_contribution' => array($Contribution3['id']),
-        'expected_qill' => "Cancel Reason Like '%Invalid Credit Card Number%'",
+        'expected_qill' => "Cancellation / Refund Reason Like '%Invalid Credit Card Number%'",
       ),
       // Case 3: Search for Cancelled Date and Cancelled Reason
       array(
         'form_value' => array('cancel_date' => date('Y-m-d'), 'cancel_reason' => 'Insufficient funds'),
         'expected_count' => 1,
         'expected_contribution' => array($Contribution1['id']),
-        'expected_qill' => "Cancel Date Like '%" . date('Y-m-d') . "%'ANDCancel Reason Like '%Insufficient funds%'",
+        'expected_qill' => "Cancel Date Like '%" . date('Y-m-d') . "%'ANDCancellation / Refund Reason Like '%Insufficient funds%'",
       ),
     );
 

@@ -2065,7 +2065,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       95 => 'Invoice Reference',
       96 => 'Invoice Number',
       97 => 'Currency',
-      98 => 'Cancel Reason',
+      98 => 'Cancellation / Refund Reason',
       99 => 'Receipt Date',
       100 => 'Product Name',
       101 => 'SKU',

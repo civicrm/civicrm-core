@@ -506,7 +506,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
           return;
         }
         $whereTable = $fields[$fldName];
-        $value = trim($value);
+        if (!is_array($value)) {
+          $value = trim($value);
+        }
 
         $dataType = "String";
         if (!empty($whereTable['type'])) {
@@ -929,8 +931,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     $form->add('text', 'contribution_amount_high', ts('To'), array('size' => 8, 'maxlength' => 8));
     $form->addRule('contribution_amount_high', ts('Please enter a valid money value (e.g. %1).', array(1 => CRM_Utils_Money::format('99.99', ' '))), 'money');
 
-    // Adding Cancelled Contribution fields -- CRM-21343
-    $form->add('text', 'contribution_cancel_reason', ts('Cancellation / Refund Reason'), array('size' => 40));
+    $form->addField('cancel_reason');
     CRM_Core_Form_Date::buildDateRange($form, 'contribution_cancel_date', 1, '_low', '_high', ts('From:'), FALSE);
     $form->addElement('hidden', 'contribution_cancel_date_range_error');
 
