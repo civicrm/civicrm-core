@@ -210,4 +210,48 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test customFormat() function
+   */
+  public function testCustomFormat() {
+    $dateTime = "2018-11-08 21:46:44";
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%b"), "Nov");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%B"), "November");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%d"), "08");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%e"), " 8");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%E"), "8");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%f"), "th");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%H"), "21");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%I"), "09");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%k"), "21");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%l"), " 9");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%m"), "11");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%M"), "46");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%p"), "pm");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%P"), "PM");
+    $this->assertEquals(CRM_Utils_Date::customFormat($dateTime, "%Y"), "2018");
+  }
+
+  /**
+   * Test customFormat() function
+   */
+  public function testCustomFormatTs() {
+    $ts = mktime(21, 46, 44, 11, 8, 2018);
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%b"), "Nov");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%B"), "November");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%d"), "08");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%e"), " 8");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%E"), "8");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%f"), "th");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%H"), "21");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%I"), "09");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%k"), "21");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%l"), " 9");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%m"), "11");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%M"), "46");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%p"), "pm");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%P"), "PM");
+    $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%Y"), "2018");
+  }
+
 }

@@ -439,6 +439,23 @@ class CRM_Utils_Date {
   }
 
   /**
+   * Wrapper for customFormat that takes a timestamp
+   *
+   * @param int $timestamp
+   *   Date and time in timestamp format.
+   * @param string $format
+   *   The output format.
+   * @param array $dateParts
+   *   An array with the desired date parts.
+   *
+   * @return string
+   *   the $format-formatted $date
+   */
+  public static function customFormatTs($timestamp, $format = NULL, $dateParts = NULL) {
+    return CRM_Utils_Date::customFormat(date("Y-m-d H:i:s", $timestamp), $format, $dateParts);
+  }
+
+  /**
    * Converts the date/datetime from MySQL format to ISO format
    *
    * @param string $mysql
