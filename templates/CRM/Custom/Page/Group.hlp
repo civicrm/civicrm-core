@@ -104,7 +104,7 @@
   {ts}Is this Custom Group Public{/ts}
 {/htxt}
 {htxt id="id-is-public"}
-  {ts}Check this box if you want this custom group to be displayed on public forms e.g. Event Information page. Only public custom groups will be included in event receipts.{/ts}  {docURL page="user/organising-your-data/creating-custom-fields/#is-this-custom-field-set-public" title"Read More"}
+  {ts}Check this box if you want this custom group to be displayed on public forms e.g. Event Information page. Only public custom groups will be included in event receipts.{/ts}  {docURL page="user/organising-your-data/creating-custom-fields/#is-this-custom-field-set-public"}
 {/htxt}
 
 {htxt id="id-help_pre-title"}
