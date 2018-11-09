@@ -56,6 +56,17 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   protected $groupFilterNotOptimised = TRUE;
 
   /**
+   * Store the joins for civicrm_activity_contact
+   *
+   * Activities are retrieved by a union of four queries in order to catch
+   * activities where the contact is the source, target, assignee, or case
+   * contact.
+   *
+   * @var array
+   */
+  protected $activityContactJoin = [];
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -493,40 +504,80 @@ HERESQL;
     }
 
     if (!empty($this->_selectComponent['activity_civireport'])) {
+
+      // First, prepare all the joins to filter activities by contact
       $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-      $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-      $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-      $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+
+      $aliasMap = [
+        'Activity Assignees' => 'civicrm_activity_assignment',
+        'Activity Targets' => 'civicrm_activity_target',
+        'Activity Source' => 'civicrm_activity_source',
+      ];
+
+      $this->activityContactJoin['case'] = <<<HERESQL
+        JOIN civicrm_case_activity
+          ON civicrm_case_activity.activity_id = activity_civireport.id
+        JOIN civicrm_case
+          ON civicrm_case_activity.case_id = civicrm_case.id
+        JOIN civicrm_case_contact
+          ON civicrm_case_contact.case_id = civicrm_case.id
+          AND civicrm_case_contact.contact_id IN ([FILTERCONTACTSHERE])
+HERESQL;
+
+      // Collect the joins for civicrm_contact to each of the activity contact joins
+      $contactJoins = [];
+
+      foreach ($activityContacts as $recordTypeId => $label) {
+        if (empty($aliasMap[$label])) {
+          continue;
+        }
+
+        // Inner join on this record type
+        $this->activityContactJoin[$recordTypeId] = <<<HERESQL
+          JOIN civicrm_activity_contact {$aliasMap[$label]}
+            ON activity_civireport.id = {$aliasMap[$label]}.activity_id
+              AND {$aliasMap[$label]}.record_type_id = $recordTypeId
+              AND {$aliasMap[$label]}.contact_id IN ([FILTERCONTACTSHERE])
+HERESQL;
+
+        // Cycle through other record types to add left joins
+        foreach ($activityContacts as $recordTypeIdX => $labelX) {
+          if ($recordTypeIdX == $recordTypeId || empty($aliasMap[$labelX])) {
+            continue;
+          }
+          $this->activityContactJoin[$recordTypeId] .= <<<HERESQL
+            LEFT JOIN civicrm_activity_contact {$aliasMap[$labelX]}
+              ON activity_civireport.id = {$aliasMap[$labelX]}.activity_id
+                AND {$aliasMap[$labelX]}.record_type_id = $recordTypeIdX
+HERESQL;
+        }
+
+        // Add to the joins for case activities
+        $this->activityContactJoin['case'] .= <<<HERESQL
+          LEFT JOIN civicrm_activity_contact {$aliasMap[$label]}
+            ON activity_civireport.id = {$aliasMap[$label]}.activity_id
+              AND {$aliasMap[$label]}.record_type_id = $recordTypeId
+HERESQL;
+
+        // Each activity_contact join gets joined to civicrm_contact
+        $contactJoins[] = <<<HERESQL
+        LEFT JOIN civicrm_contact {$this->_aliases[$aliasMap[$label]]}
+          ON $aliasMap[$label].contact_id = {$this->_aliases[$aliasMap[$label]]}.id
+HERESQL;
+      }
+
+      $contactJoins = implode(PHP_EOL, $contactJoins);
 
       $this->_formComponent['activity_civireport'] = <<<HERESQL
       FROM
           civicrm_activity {$this->_aliases['civicrm_activity']}
-          LEFT JOIN civicrm_activity_contact civicrm_activity_target
-            ON {$this->_aliases['civicrm_activity']}.id = civicrm_activity_target.activity_id
-            AND civicrm_activity_target.record_type_id = {$targetID}
-          LEFT JOIN civicrm_activity_contact civicrm_activity_assignment
-            ON {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id
-            AND civicrm_activity_assignment.record_type_id = {$assigneeID}
-          LEFT JOIN civicrm_activity_contact civicrm_activity_source
-            ON {$this->_aliases['civicrm_activity']}.id = civicrm_activity_source.activity_id
-            AND civicrm_activity_source.record_type_id = {$sourceID}
-          LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_target']}
-            ON civicrm_activity_target.contact_id = {$this->_aliases['civicrm_activity_target']}.id
-          LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_assignment']}
-            ON civicrm_activity_assignment.contact_id = {$this->_aliases['civicrm_activity_assignment']}.id
-          LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_source']}
-            ON civicrm_activity_source.contact_id = {$this->_aliases['civicrm_activity_source']}.id
+          [ACTIVITYCONTACTJOINSHERE]
+          $contactJoins
           JOIN civicrm_option_value
             ON {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value
           JOIN civicrm_option_group
             ON civicrm_option_group.id = civicrm_option_value.option_group_id
             AND civicrm_option_group.name = 'activity_type'
-          LEFT JOIN civicrm_case_activity
-            ON civicrm_case_activity.activity_id = {$this->_aliases['civicrm_activity']}.id
-          LEFT JOIN civicrm_case
-            ON civicrm_case_activity.case_id = civicrm_case.id
-          LEFT JOIN civicrm_case_contact
-            ON civicrm_case_contact.case_id = civicrm_case.id
 HERESQL;
     }
 
@@ -683,20 +734,34 @@ HERESQL;
 
       $val = 'activity_civireport';
       $eligibleResult[$val] = $val;
-      $sql = <<<HERESQL
-      {$this->_selectComponent[$val]},
-      {$this->_aliases['civicrm_activity_source']}.display_name as added_by
-      {$this->_formComponent[$val]}
 
-      WHERE ( civicrm_activity_source.contact_id IN ($selectedContacts)
-          OR civicrm_activity_target.contact_id IN ($selectedContacts)
-          OR civicrm_activity_assignment.contact_id IN ($selectedContacts)
-          OR civicrm_case_contact.contact_id IN ($selectedContacts) )
-        AND {$this->_aliases['civicrm_activity']}.is_test = 0
-        AND ($componentClause)
-      ORDER BY {$this->_aliases['civicrm_activity']}.activity_date_time desc
+      // The activities we want to show are those where the contact is the
+      // target, assignee, source, or the client on a case.  Since the vast
+      // majority of activities will not involve the client, it's impractical to
+      // retrieve all activities and use OR clauses in the WHERE.  Instead, we
+      // use a union of subqueries for each of the four ways activities might
+      // join to the contact.
+      $unionParts = [];
+      foreach ($this->activityContactJoin as $activityContactJoinClauses) {
+        $fromClauses = str_replace(
+          '[ACTIVITYCONTACTJOINSHERE]',
+          str_replace('[FILTERCONTACTSHERE]', $selectedContacts, $activityContactJoinClauses),
+          $this->_formComponent[$val]
+        );
+        $unionParts[] = <<<HERESQL
+        (
+          {$this->_selectComponent[$val]},
+          {$this->_aliases['civicrm_activity_source']}.display_name as added_by,
+          {$this->_aliases['civicrm_activity']}.activity_date_time as date_time_for_sort
+          $fromClauses
+
+          WHERE {$this->_aliases['civicrm_activity']}.is_test = 0
+            AND ($componentClause)
+        )
 HERESQL;
+      }
 
+      $sql = implode(' UNION ', $unionParts) . ' ORDER BY date_time_for_sort DESC';
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
         foreach ($this->_columnHeadersComponent[$val] as $key => $value) {
