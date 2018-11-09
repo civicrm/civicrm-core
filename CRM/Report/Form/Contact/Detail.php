@@ -516,10 +516,11 @@ HERESQL;
             ON civicrm_activity_assignment.contact_id = {$this->_aliases['civicrm_activity_assignment']}.id
           LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_source']}
             ON civicrm_activity_source.contact_id = {$this->_aliases['civicrm_activity_source']}.id
-          LEFT JOIN civicrm_option_value
-            ON ( {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value )
-          LEFT JOIN civicrm_option_group
+          JOIN civicrm_option_value
+            ON {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value
+          JOIN civicrm_option_group
             ON civicrm_option_group.id = civicrm_option_value.option_group_id
+            AND civicrm_option_group.name = 'activity_type'
           LEFT JOIN civicrm_case_activity
             ON civicrm_case_activity.activity_id = {$this->_aliases['civicrm_activity']}.id
           LEFT JOIN civicrm_case
@@ -690,8 +691,7 @@ HERESQL;
       WHERE ( civicrm_activity_source.contact_id IN ($selectedContacts)
           OR civicrm_activity_target.contact_id IN ($selectedContacts)
           OR civicrm_activity_assignment.contact_id IN ($selectedContacts)
-          OR civicrm_case_contact.contact_id IN ($selectedContacts) ) 
-        AND civicrm_option_group.name = 'activity_type'
+          OR civicrm_case_contact.contact_id IN ($selectedContacts) )
         AND {$this->_aliases['civicrm_activity']}.is_test = 0
         AND ($componentClause)
       ORDER BY {$this->_aliases['civicrm_activity']}.activity_date_time desc
