@@ -566,7 +566,25 @@ HERESQL;
 HERESQL;
       }
 
+      // civicrm_contact joins into a single string
       $contactJoins = implode(PHP_EOL, $contactJoins);
+
+      // Now filter out component activities that should be suppressed
+      $compInfo = CRM_Core_Component::getEnabledComponents();
+      $componentsList = [];
+      foreach ($compInfo as $compObj) {
+        if ($compObj->info['showActivitiesInCore']) {
+          $componentsList[] = $compObj->componentID;
+        }
+      }
+      $componentClause = "civicrm_option_value.component_id IS NULL";
+      if (!empty($componentsList)) {
+        $componentsIn = implode(', ', $componentsList);
+        $componentClause = <<<HERESQL
+        ( $componentClause
+          OR civicrm_option_value.component_id IN ($componentsIn) )
+HERESQL;
+      }
 
       $this->_formComponent['activity_civireport'] = <<<HERESQL
       FROM
@@ -575,6 +593,7 @@ HERESQL;
           $contactJoins
           JOIN civicrm_option_value
             ON {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value
+            AND $componentClause
           JOIN civicrm_option_group
             ON civicrm_option_group.id = civicrm_option_value.option_group_id
             AND civicrm_option_group.name = 'activity_type'
@@ -717,21 +736,6 @@ HERESQL;
     }
 
     if (!empty($this->_selectComponent['activity_civireport'])) {
-
-      $componentClause = "civicrm_option_value.component_id IS NULL";
-      $componentsIn = NULL;
-      $compInfo = CRM_Core_Component::getEnabledComponents();
-      foreach ($compInfo as $compObj) {
-        if ($compObj->info['showActivitiesInCore']) {
-          $componentsIn = $componentsIn ? ($componentsIn . ', ' .
-            $compObj->componentID) : $compObj->componentID;
-        }
-      }
-      if ($componentsIn) {
-        $componentClause = "( $componentClause OR
-                                      civicrm_option_value.component_id IN ($componentsIn) )";
-      }
-
       $val = 'activity_civireport';
       $eligibleResult[$val] = $val;
 
@@ -756,7 +760,6 @@ HERESQL;
           $fromClauses
 
           WHERE {$this->_aliases['civicrm_activity']}.is_test = 0
-            AND ($componentClause)
         )
 HERESQL;
       }
