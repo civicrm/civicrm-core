@@ -534,6 +534,19 @@ class CRM_Export_BAO_ExportProcessor {
   }
 
   /**
+   * Get headers for payment fields.
+   *
+   * Returns an array of contribution fields when the entity supports payment fields and specific fields
+   * are not specified. This is a transitional function for refactoring legacy code.
+   */
+  public function getPaymentHeaders() {
+    if ($this->isExportPaymentFields() && !$this->isExportSpecifiedPaymentFields()) {
+      return $this->getcomponentPaymentFields();
+    }
+    return [];
+  }
+
+  /**
    * Get the default properties when not specified.
    *
    * In the UI this appears as 'Primary fields only' but in practice it's

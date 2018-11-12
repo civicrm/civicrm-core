@@ -432,25 +432,16 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $paymentDetails = array();
     if ($processor->isExportPaymentFields()) {
-
       // get payment related in for event and members
       $paymentDetails = CRM_Contribute_BAO_Contribution::getContributionDetails($exportMode, $ids);
       //get all payment headers.
       // If we haven't selected specific payment fields, load in all the
       // payment headers.
       if (!$processor->isExportSpecifiedPaymentFields()) {
-        $paymentHeaders = $processor->getcomponentPaymentFields();
         if (!empty($paymentDetails)) {
           $addPaymentHeader = TRUE;
         }
       }
-      // If we have selected specific payment fields, leave the payment headers
-      // as an empty array; the headers for each selected field will be added
-      // elsewhere.
-      else {
-        $paymentHeaders = array();
-      }
-      $nullContributionDetails = array_fill_keys(array_keys($paymentHeaders), NULL);
     }
 
     $componentDetails = array();
@@ -536,8 +527,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         if ($addPaymentHeader && $processor->isExportPaymentFields()) {
           // @todo rather than do this for every single row do it before the loop starts.
           // where other header definitions take place.
-          $headerRows = array_merge($headerRows, $paymentHeaders);
-          foreach (array_keys($paymentHeaders) as $paymentHdr) {
+          $headerRows = array_merge($headerRows, $processor->getPaymentHeaders());
+          foreach (array_keys($processor->getPaymentHeaders()) as $paymentHdr) {
             self::sqlColumnDefn($processor, $sqlColumns, $paymentHdr);
           }
         }
@@ -554,6 +545,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         // information, if appropriate.
         if ($addPaymentHeader) {
           if (!$processor->isExportSpecifiedPaymentFields()) {
+            $nullContributionDetails = array_fill_keys(array_keys($processor->getPaymentHeaders()), NULL);
             if ($processor->isExportPaymentFields()) {
               $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
               if (!is_array($paymentData) || empty($paymentData)) {
