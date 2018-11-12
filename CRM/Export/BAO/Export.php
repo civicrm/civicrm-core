@@ -1400,17 +1400,7 @@ WHERE  {$whereClause}";
         foreach ($value as $relationField => $relationValue) {
           // below block is same as primary block (duplicate)
           if (isset($queryFields[$relationField]['title'])) {
-            if ($queryFields[$relationField]['name'] == 'name') {
-              $headerName = $field . '-' . $relationField;
-            }
-            else {
-              if ($relationField == 'current_employer') {
-                $headerName = $field . '-' . 'current_employer';
-              }
-              else {
-                $headerName = $field . '-' . $relationField;
-              }
-            }
+            $headerName = $field . '-' . $relationField;
 
             if (!$processor->isHouseholdMergeRelationshipTypeKey($field)) {
               // Do not add to header row if we are only generating for merge reasons.
