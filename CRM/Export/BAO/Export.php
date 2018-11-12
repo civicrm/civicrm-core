@@ -459,6 +459,16 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
 
+    // add payment headers if required
+    if ($addPaymentHeader && $processor->isExportPaymentFields()) {
+      // @todo rather than do this for every single row do it before the loop starts.
+      // where other header definitions take place.
+      $headerRows = array_merge($headerRows, $processor->getPaymentHeaders());
+      foreach (array_keys($processor->getPaymentHeaders()) as $paymentHdr) {
+        self::sqlColumnDefn($processor, $sqlColumns, $paymentHdr);
+      }
+    }
+
     $limitReached = FALSE;
     while (!$limitReached) {
       $limitQuery = "{$queryString} LIMIT {$offset}, {$rowCount}";
@@ -520,16 +530,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           }
           else {
             $row[$field] = self::getTransformedFieldValue($field, $iterationDAO, $fieldValue, $i18n, $metadata, $paymentDetails, $processor);
-          }
-        }
-
-        // add payment headers if required
-        if ($addPaymentHeader && $processor->isExportPaymentFields()) {
-          // @todo rather than do this for every single row do it before the loop starts.
-          // where other header definitions take place.
-          $headerRows = array_merge($headerRows, $processor->getPaymentHeaders());
-          foreach (array_keys($processor->getPaymentHeaders()) as $paymentHdr) {
-            self::sqlColumnDefn($processor, $sqlColumns, $paymentHdr);
           }
         }
 
