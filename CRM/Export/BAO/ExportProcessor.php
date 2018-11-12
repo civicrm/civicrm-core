@@ -519,9 +519,11 @@ class CRM_Export_BAO_ExportProcessor {
   /**
    * Get fields that indicate payment fields have been requested for a component.
    *
+   * Ideally this should be protected but making it temporarily public helps refactoring..
+   *
    * @return array
    */
-  protected function getComponentPaymentFields() {
+  public function getComponentPaymentFields() {
     return [
       'componentPaymentField_total_amount' => ts('Total Amount'),
       'componentPaymentField_contribution_status' => ts('Contribution Status'),

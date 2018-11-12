@@ -439,7 +439,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       // If we haven't selected specific payment fields, load in all the
       // payment headers.
       if (!$processor->isExportSpecifiedPaymentFields()) {
-        $paymentHeaders = self::componentPaymentFields();
+        $paymentHeaders = $processor->getcomponentPaymentFields();
         if (!empty($paymentDetails)) {
           $addPaymentHeader = TRUE;
         }
@@ -1304,6 +1304,11 @@ WHERE  {$whereClause}";
 
   /**
    * Build componentPayment fields.
+   *
+   * This is no longer used by export but BAO_Mapping still calls it & we
+   * should find a generic way to handle this or move this to that class.
+   *
+   * @deprecated
    */
   public static function componentPaymentFields() {
     static $componentPaymentFields;
@@ -1345,8 +1350,8 @@ WHERE  {$whereClause}";
       // @todo - set this correctly in the xml rather than here.
       $headerRows[] = ts('IM Service Provider');
     }
-    elseif ($processor->isExportPaymentFields() && array_key_exists($field, self::componentPaymentFields())) {
-      $headerRows[] = CRM_Utils_Array::value($field, self::componentPaymentFields());
+    elseif ($processor->isExportPaymentFields() && array_key_exists($field, $processor->getcomponentPaymentFields())) {
+      $headerRows[] = CRM_Utils_Array::value($field, $processor->getcomponentPaymentFields());
     }
     else {
       $headerRows[] = $field;
@@ -1807,7 +1812,7 @@ WHERE  {$whereClause}";
         }
       }
     }
-    elseif ($processor->isExportSpecifiedPaymentFields() && array_key_exists($field, self::componentPaymentFields())) {
+    elseif ($processor->isExportSpecifiedPaymentFields() && array_key_exists($field, $processor->getcomponentPaymentFields())) {
       $paymentTableId = $processor->getPaymentTableID();
       $paymentData = CRM_Utils_Array::value($iterationDAO->$paymentTableId, $paymentDetails);
       $payFieldMapper = array(
