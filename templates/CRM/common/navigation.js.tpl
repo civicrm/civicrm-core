@@ -195,6 +195,7 @@ $('#civicrm-menu').ready(function() {
   $('#root-menu-div').on('click', 'a', $.Menu.closeAll);
 });
 $('#civicrm-menu').menuBar({arrowClass: 'crm-i fa-caret-right'});
+$('#civicrm-menu').trigger('crmLoad');
 $(window).on("beforeunload", function() {
   $('.crm-logo-sm', '#civicrm-menu').addClass('crm-i fa-spin');
 });
