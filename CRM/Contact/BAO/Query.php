@@ -1427,7 +1427,7 @@ class CRM_Contact_BAO_Query {
           $group->find(TRUE);
 
           if (!isset($group->saved_search_id)) {
-            $tbName = "`civicrm_group_contact-{$groupId}`";
+            $tbName = "civicrm_group_contact";
             // CRM-17254 don't retrieve extra fields if contact_id is specifically requested
             // as this will add load to an intentionally light query.
             // ideally this code would be removed as it appears to be to support CRM-1203
@@ -3020,7 +3020,7 @@ class CRM_Contact_BAO_Query {
         $op = strpos($op, 'IN') ? $op : ($op == '!=') ? 'NOT IN' : 'IN';
       }
       $groupIds = implode(',', (array) $regularGroupIDs);
-      $gcTable = "`civicrm_group_contact-{$groupIds}`";
+      $gcTable = "`civicrm_group_contact-" . uniqid() . "`";
       $joinClause = array("contact_a.id = {$gcTable}.contact_id");
 
       if (strpos($op, 'IN') !== FALSE) {
@@ -3043,14 +3043,12 @@ class CRM_Contact_BAO_Query {
     //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
     $groupContactCacheClause = '';
     if (count($smartGroupIDs) || empty($value)) {
-      $isNullOp = (strpos($op, 'NULL') !== FALSE);
-      $gccTableAlias = "`civicrm_group_contact_cache_";
-      $gccTableAlias .= ($isNullOp) ? "a`" : implode(',', $smartGroupIDs) . "`";
+      $gccTableAlias = "civicrm_group_contact_cache";
       $groupContactCacheClause = $this->addGroupContactCache($smartGroupIDs, $gccTableAlias, "contact_a", $op);
       if (!empty($groupContactCacheClause)) {
         if ($isNotOp) {
           $groupIds = implode(',', (array) $smartGroupIDs);
-          $gcTable = "`civicrm_group_contact-{$groupIds}`";
+          $gcTable = "civicrm_group_contact";
           $joinClause = array("contact_a.id = {$gcTable}.contact_id");
           $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
           if (strpos($op, 'IN') !== FALSE) {
@@ -3103,7 +3101,7 @@ class CRM_Contact_BAO_Query {
    *
    * @return string WHERE clause component for smart group criteria.
    */
-  public function addGroupContactCache($groups, $tableAlias = NULL, $joinTable = "contact_a", $op, $joinColumn = 'id') {
+  public function addGroupContactCache($groups, $tableAlias, $joinTable = "contact_a", $op, $joinColumn = 'id') {
     $isNullOp = (strpos($op, 'NULL') !== FALSE);
     $groupsIds = $groups;
 
@@ -3144,10 +3142,6 @@ WHERE  $smartGroupClause
       return NULL;
     }
 
-    if (!$tableAlias) {
-      $tableAlias = "`civicrm_group_contact_cache_";
-      $tableAlias .= ($isNullOp) ? "a`" : implode(',', (array) $groupsIds) . "`";
-    }
     $this->_tables[$tableAlias] = $this->_whereTables[$tableAlias] = " LEFT JOIN civicrm_group_contact_cache {$tableAlias} ON {$joinTable}.{$joinColumn} = {$tableAlias}.contact_id ";
 
     if ($op == 'NOT IN') {
