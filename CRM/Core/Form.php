@@ -680,6 +680,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           $attrs['accesskey'] = 'S';
         }
         $icon = CRM_Utils_Array::value('icon', $button, $defaultIcon);
+        // If someone sends the param crm-icon use that instead of the default
+        if (!empty($button['crm-icon'])) {
+          $icon = CRM_Utils_Array::value('icon', $button, $button['crm-icon']);
+        }
         if ($icon) {
           $attrs['crm-icon'] = $icon;
         }
