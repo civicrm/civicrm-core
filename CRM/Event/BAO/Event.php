@@ -920,13 +920,11 @@ WHERE civicrm_event.is_active = 1
    * @param int $id
    *   The event id to copy.
    *        boolean $afterCreate call to copy after the create function
-   * @param null $newEvent
-   * @param bool $afterCreate
    *
    * @return CRM_Event_DAO_Event
+   * @throws \CRM_Core_Exception
    */
-  public static function copy($id, $newEvent = NULL, $afterCreate = FALSE) {
-
+  public static function copy($id) {
     $eventValues = array();
 
     //get the require event values.
@@ -941,30 +939,19 @@ WHERE civicrm_event.is_active = 1
 
     CRM_Core_DAO::commonRetrieve('CRM_Event_DAO_Event', $eventParams, $eventValues, $returnProperties);
 
-    // since the location is sharable, lets use the same loc_block_id.
-    $locBlockId = CRM_Utils_Array::value('loc_block_id', $eventValues);
-
-    $fieldsFix = ($afterCreate) ? array() : array('prefix' => array('title' => ts('Copy of') . ' '));
+    $fieldsFix = array('prefix' => array('title' => ts('Copy of') . ' '));
     if (empty($eventValues['is_show_location'])) {
       $fieldsFix['prefix']['is_show_location'] = 0;
     }
 
-    if ($newEvent && is_a($newEvent, 'CRM_Event_DAO_Event')) {
-      $copyEvent = $newEvent;
-    }
-
-    if (!isset($copyEvent)) {
-      $copyEvent = &CRM_Core_DAO::copyGeneric('CRM_Event_DAO_Event',
-        array('id' => $id),
-        array(
-          'loc_block_id' =>
-          ($locBlockId) ? $locBlockId : NULL,
-        ),
-        $fieldsFix
-      );
-    }
+    $copyEvent = CRM_Core_DAO::copyGeneric('CRM_Event_DAO_Event',
+      array('id' => $id),
+      // since the location is sharable, lets use the same loc_block_id.
+      array('loc_block_id' => CRM_Utils_Array::value('loc_block_id', $eventValues)),
+      $fieldsFix
+    );
     CRM_Price_BAO_PriceSet::copyPriceSet('civicrm_event', $id, $copyEvent->id);
-    $copyUF = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin',
+    CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin',
       array(
         'entity_id' => $id,
         'entity_table' => 'civicrm_event',
@@ -972,7 +959,7 @@ WHERE civicrm_event.is_active = 1
       array('entity_id' => $copyEvent->id)
     );
 
-    $copyTellFriend = &CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend',
+    CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend',
       array(
         'entity_id' => $id,
         'entity_table' => 'civicrm_event',
@@ -980,7 +967,7 @@ WHERE civicrm_event.is_active = 1
       array('entity_id' => $copyEvent->id)
     );
 
-    $copyPCP = &CRM_Core_DAO::copyGeneric('CRM_PCP_DAO_PCPBlock',
+    CRM_Core_DAO::copyGeneric('CRM_PCP_DAO_PCPBlock',
       array(
         'entity_id' => $id,
         'entity_table' => 'civicrm_event',
@@ -995,22 +982,17 @@ WHERE civicrm_event.is_active = 1
     $copyMapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
       'id' => ($copyEvent->is_template == 1 ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID),
     )));
-    $copyReminder = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_ActionSchedule',
+    CRM_Core_DAO::copyGeneric('CRM_Core_DAO_ActionSchedule',
       array('entity_value' => $id, 'mapping_id' => $oldMapping->getId()),
       array('entity_value' => $copyEvent->id, 'mapping_id' => $copyMapping->getId())
     );
-
-    if (!$afterCreate) {
-      // CRM-19302
-      self::copyCustomFields($id, $copyEvent->id);
-    }
+    self::copyCustomFields($id, $copyEvent->id);
 
     $copyEvent->save();
 
     CRM_Utils_System::flushCache();
-    if (!$afterCreate) {
-      CRM_Utils_Hook::copy('Event', $copyEvent);
-    }
+    CRM_Utils_Hook::copy('Event', $copyEvent);
+
     return $copyEvent;
   }
 

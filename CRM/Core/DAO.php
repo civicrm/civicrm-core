@@ -1678,7 +1678,9 @@ FROM   civicrm_domain
         }
       }
       $newObject->save();
+      CRM_Utils_Hook::post('create', CRM_Core_DAO_AllCoreTables::getBriefName($daoName), $newObject->id, $newObject);
     }
+
     return $newObject;
   }
 
