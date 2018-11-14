@@ -1145,19 +1145,20 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * This function creates a table AND adds the details to the developer tab & $this->>temporary tables.
    *
-   * @todo improve presentation on the developer tab since CREATE TEMPORARY is removed.
-   *
    * @param string $identifier
    * @param $sql
-   * @param bool $isTrueTemporary
-   *   Is this a mysql temporary table or temporary in a less technical sense.
    *
    * @return string
    */
-  public function createTemporaryTable($identifier, $sql, $isTrueTemporary = TRUE) {
+  public function createTemporaryTable($identifier, $sql) {
+    $tempTable = CRM_Utils_SQL_TempTable::build()->setUtf8(TRUE)->createWithQuery($sql);
+    $name = $tempTable->getName();
+    // Developers may force tables to be durable to assist in debugging so lets check.
+    $isNotTrueTemporary = $tempTable->isDurable();
+    // The TempTable build routine adds the next line - we output it to help developers see what has happened.
+    $sql = 'CREATE ' . ($isNotTrueTemporary ? '' : 'TEMPORARY ') . "TABLE $name DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci " . $sql;
     $this->addToDeveloperTab($sql);
-    $name = CRM_Utils_SQL_TempTable::build()->setUtf8(TRUE)->setDurable($isTrueTemporary)->createWithQuery($sql)->getName();
-    $this->temporaryTables[$identifier] = ['temporary' => $isTrueTemporary, 'name' => $name];
+    $this->temporaryTables[$identifier] = ['temporary' => !$isNotTrueTemporary, 'name' => $name];
     return $name;
   }
 
@@ -3692,11 +3693,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         WHERE smartgroup_contact.group_id IN ({$smartGroups}) ";
     }
 
-    $this->groupTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('rptgrp')->setId(date('Ymd_') . uniqid())->getName();
-    $this->executeReportQuery("
-      CREATE TEMPORARY TABLE $this->groupTempTable $this->_databaseAttributes
-      $query
-    ");
+    $this->groupTempTable = $this->createTemporaryTable('rptgrp', $query);
     CRM_Core_DAO::executeQuery("ALTER TABLE $this->groupTempTable ADD INDEX i_id(id)");
   }
 
