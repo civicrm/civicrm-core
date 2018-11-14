@@ -55,6 +55,14 @@ class CRM_Upgrade_Incremental_php_FiveNine extends CRM_Upgrade_Incremental_Base 
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+    if ($rev == '5.9.0') {
+      $args = array(
+        1 => ts('Enable multiple bulk email address for a contact'),
+        2 => ts('Email on Hold'),
+      );
+      $postUpgradeMessage .= '<p>' . ts('If the setting "%1" is enabled, you should update any smart groups based on the "%2" field.', $args) . '</p>';
+    }
+
     // Example: Generate a post-upgrade message.
     // if ($rev == '5.12.34') {
     //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");

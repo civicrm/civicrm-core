@@ -189,7 +189,7 @@ return array(
     'title' => ts('Enable multiple bulk email address for a contact.'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('CiviMail will deliver a copy of the email to each bulk email listed for the contact.'),
+    'description' => ts('CiviMail will deliver a copy of the email to each bulk email listed for the contact. Enabling this setting will also change the options for the "Email on Hold" field in Advanced Search.'),
     'help_text' => NULL,
   ),
   'include_message_id' => array(
