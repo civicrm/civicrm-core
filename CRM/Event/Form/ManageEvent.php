@@ -357,7 +357,14 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       switch ($className) {
         case 'Event':
           $attributes = $this->getVar('_attributes');
-          $subPage = strtolower(basename(CRM_Utils_Array::value('action', $attributes)));
+          $rawSubPage = CRM_Utils_Array::value('action', $attributes);
+          // WordPress may have urlencoded URLs
+          if (rawurlencode(rawurldecode($rawSubPage)) !== $rawSubPage) {
+            $subPage = strtolower(basename(rawurldecode($rawSubPage)));
+          }
+          else {
+            $subPage = strtolower(basename($rawSubPage));
+          }
           break;
 
         case 'EventInfo':
