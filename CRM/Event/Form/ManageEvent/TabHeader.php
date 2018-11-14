@@ -168,7 +168,14 @@ WHERE      e.id = %1
     switch ($className) {
       case 'Event':
         $attributes = $form->getVar('_attributes');
-        $class = strtolower(basename(CRM_Utils_Array::value('action', $attributes)));
+        $rawUrl = CRM_Utils_Array::value('action', $attributes);
+        // WordPress may have urlencoded URLs
+        if (rawurlencode(rawurldecode($rawUrl)) !== $rawUrl) {
+          $class = strtolower(basename(rawurldecode($rawUrl)));
+        }
+        else {
+          $class = strtolower(basename($rawUrl));
+        }
         break;
 
       case 'EventInfo':

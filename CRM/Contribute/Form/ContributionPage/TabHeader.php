@@ -142,7 +142,14 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     switch ($className) {
       case 'Contribute':
         $attributes = $form->getVar('_attributes');
-        $class = strtolower(basename(CRM_Utils_Array::value('action', $attributes)));
+        $rawUrl = CRM_Utils_Array::value('action', $attributes);
+        // WordPress may have urlencoded URLs
+        if (rawurlencode(rawurldecode($rawUrl)) !== $rawUrl) {
+          $class = strtolower(basename(rawurldecode($rawUrl)));
+        }
+        else {
+          $class = strtolower(basename($rawUrl));
+        }
         break;
 
       case 'MembershipBlock':
