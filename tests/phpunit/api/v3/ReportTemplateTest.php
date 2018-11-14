@@ -431,15 +431,19 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     $this->assertEquals(2, $rows['count'], "Report failed - the sql used to generate the results was " . print_r($rows['metadata']['sql'], TRUE));
 
-    $expected = 'DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
+    $expected = preg_replace('/\s+/', ' ', 'DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
       SELECT SQL_CALC_FOUND_ROWS contact_civireport.id as cid  FROM civicrm_contact contact_civireport    INNER JOIN civicrm_contribution contribution_civireport USE index (received_date) ON contribution_civireport.contact_id = contact_civireport.id
          AND contribution_civireport.is_test = 0
          AND contribution_civireport.receive_date BETWEEN \'20140701000000\' AND \'20150630235959\'
-
-       LEFT JOIN civicrm_contribution cont_exclude ON cont_exclude.contact_id = contact_civireport.id
-         AND cont_exclude.receive_date BETWEEN \'2015-7-1\' AND \'20160630235959\' WHERE cont_exclude.id IS NULL AND 1 AND ( contribution_civireport.contribution_status_id IN (1) )
-      GROUP BY contact_civireport.id';
-    $this->assertContains(preg_replace('/\s+/', ' ', $expected), preg_replace('/\s+/', ' ', $rows['metadata']['sql'][0]));
+         WHERE contact_civireport.id NOT IN (
+      SELECT cont_exclude.contact_id
+          FROM civicrm_contribution cont_exclude
+          WHERE cont_exclude.receive_date BETWEEN \'2015-7-1\' AND \'20160630235959\')
+          AND ( contribution_civireport.contribution_status_id IN (1) )
+      GROUP BY contact_civireport.id');
+    // Exclude whitespace in comparison as we don't care if it changes & this allows us to make the above readable.
+    $whitespacelessSql = preg_replace('/\s+/', ' ', $rows['metadata']['sql'][0]);
+    $this->assertContains($expected, $whitespacelessSql);
   }
 
   /**
