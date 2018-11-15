@@ -2008,9 +2008,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               );
             }
 
-            $updateResult['membership_end_date'] = CRM_Utils_Date::customFormat($membership->end_date,
-              '%B %E%f, %Y'
-            );
             $updateResult['updatedComponents']['CiviMember'] = $membership->status_id;
             if ($processContributionObject) {
               $processContribution = TRUE;
@@ -5223,7 +5220,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
           $statusMsg .= "<br />" . ts("Membership for %1 has been Expired.", array(1 => $userDisplayName));
         }
         else {
-          $endDate = CRM_Utils_Array::value('membership_end_date', $updateResult);
+          $endDate = self::getFormattedMembershipEndDateFromContributionId($contributionId);
           if ($endDate) {
             $statusMsg .= "<br />" . ts("Membership for %1 has been updated. The membership End Date is %2.",
                 array(
@@ -5264,6 +5261,25 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     }
 
     return $statusMsg;
+  }
+
+  private static function getFormattedMembershipEndDateFromContributionId($contributionId) {
+    $endDateResponse = civicrm_api3('MembershipPayment', 'get', [
+      'sequential' => 1,
+      'contribution_id' => $contributionId,
+      'api.Membership.get' => ['id' => '$value.id', 'return' => ['end_date']],
+      'options' => ['limit' => 1, 'sort' => 'id DESC'],
+    ]);
+
+    $endDate = NULL;
+    if (!empty($endDateResponse['values'][0]['api.Membership.get']['count'])) {
+      $endDate = $endDateResponse['values'][0]['api.Membership.get']['values'][0]['end_date'];
+      $endDate = CRM_Utils_Date::customFormat($endDate,
+        '%B %E%f, %Y'
+      );
+    }
+
+    return $endDate;
   }
 
   /**
