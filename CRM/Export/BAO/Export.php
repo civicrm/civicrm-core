@@ -235,8 +235,6 @@ class CRM_Export_BAO_Export {
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     self::$relationshipTypes = $processor->getRelationshipTypes();
 
-    $queryMode = $processor->getQueryMode();
-
     if ($fields) {
       foreach ($fields as $key => $value) {
         $fieldName = CRM_Utils_Array::value(1, $value);
@@ -445,7 +443,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     }
 
     $componentDetails = array();
-    $setHeader = TRUE;
 
     $rowCount = self::EXPORT_ROW_COUNT;
     $offset = 0;
@@ -469,7 +466,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
     }
 
+    $exportTempTable = self::createTempTable($sqlColumns);
     $limitReached = FALSE;
+
     while (!$limitReached) {
       $limitQuery = "{$queryString} LIMIT {$offset}, {$rowCount}";
       $iterationDAO = CRM_Core_DAO::executeQuery($limitQuery);
@@ -532,13 +531,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             $row[$field] = self::getTransformedFieldValue($field, $iterationDAO, $fieldValue, $i18n, $metadata, $paymentDetails, $processor);
           }
         }
-
-        if ($setHeader) {
-          $exportTempTable = self::createTempTable($sqlColumns);
-        }
-
-        //build header only once
-        $setHeader = FALSE;
 
         // If specific payment fields have been selected for export, payment
         // data will already be in $row. Otherwise, add payment related
