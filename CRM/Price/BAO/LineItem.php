@@ -833,8 +833,9 @@ WHERE li.contribution_id = %1";
       }
       // INSERT a financial item to record surplus/lesser amount when a text price fee is changed
       elseif (!empty($lineItemsToUpdate) &&
-      $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['html_type'] == 'Text' &&
-      $updateFinancialItemInfoValues['amount'] > 0
+        $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['html_type'] == 'Text' &&
+        $updateFinancialItemInfoValues['amount'] > 0 &&
+        ($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['line_total'] - $totalFinancialAmount) > 0
       ) {
         // calculate the amount difference, considered as financial item amount
         $updateFinancialItemInfoValues['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['line_total'] - $totalFinancialAmount;
