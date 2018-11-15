@@ -1627,7 +1627,6 @@ WHERE  {$whereClause}";
    * @param $field
    * @param $iterationDAO
    * @param $fieldValue
-   * @param $i18n
    * @param $metadata
    * @param $paymentDetails
    *
@@ -1635,8 +1634,9 @@ WHERE  {$whereClause}";
    *
    * @return string
    */
-  protected static function getTransformedFieldValue($field, $iterationDAO, $fieldValue, $i18n, $metadata, $paymentDetails, $processor) {
+  protected static function getTransformedFieldValue($field, $iterationDAO, $fieldValue, $metadata, $paymentDetails, $processor) {
 
+    $i18n = CRM_Core_I18n::singleton();
     if ($field == 'id') {
       return $iterationDAO->contact_id;
       // special case for calculated field
@@ -1747,7 +1747,6 @@ WHERE  {$whereClause}";
   protected static function buildRow($query, $iterationDAO, $processor, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader, $paymentTableId) {
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
-    $i18n = CRM_Core_I18n::singleton();
 
     $row = [];
     $query->convertToPseudoNames($iterationDAO);
@@ -1798,7 +1797,7 @@ WHERE  {$whereClause}";
         }
       }
       else {
-        $row[$field] = self::getTransformedFieldValue($field, $iterationDAO, $fieldValue, $i18n, $metadata, $paymentDetails, $processor);
+        $row[$field] = self::getTransformedFieldValue($field, $iterationDAO, $fieldValue, $metadata, $paymentDetails, $processor);
       }
     }
 
