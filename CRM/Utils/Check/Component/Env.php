@@ -572,7 +572,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ts('Your extensions directory (%1) is read-only. If you would like to perform downloads or upgrades, then change the file permissions.',
           array(1 => $basedir)),
         ts('Read-Only Extensions'),
-        \Psr\Log\LogLevel::WARNING,
+        \Psr\Log\LogLevel::NOTICE,
         'fa-plug'
       );
     }
