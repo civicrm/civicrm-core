@@ -46,19 +46,27 @@
   </field>
   <field>
     <name>title</name>
+    <title>Profile Name</title>
     <type>varchar</type>
     <length>64</length>
     <localizable>true</localizable>
     <required>true</required>
+    <html>
+      <type>Text</type>
+    </html>
     <comment>Form title.</comment>
     <add>1.1</add>
   </field>
   <field>
     <name>frontend_title</name>
+    <title>Public Title</title>
     <type>varchar</type>
     <length>64</length>
     <localizable>true</localizable>
     <comment>Profile Form Public title</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>4.7</add>
   </field>
   <field>

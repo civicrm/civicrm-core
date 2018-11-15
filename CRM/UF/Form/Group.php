@@ -29,14 +29,50 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2018
- * $Id$
- *
  */
 
 /**
- *  This class is for UF Group
+ *  This class is for UF Group (Profile) configuration.
  */
 class CRM_UF_Form_Group extends CRM_Core_Form {
+
+  use CRM_Core_Form_EntityFormTrait;
+
+  /**
+   * Fields for the entity to be assigned to the template.
+   *
+   * Fields may have keys
+   *  - name (required to show in tpl from the array)
+   *  - description (optional, will appear below the field)
+   *  - not-auto-addable - this class will not attempt to add the field using addField.
+   *    (this will be automatically set if the field does not have html in it's metadata
+   *    or is not a core field on the form's entity).
+   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
+   *  - template - use a field specific template to render this field
+   *  - required
+   *  - is_freeze (field should be frozen).
+   *
+   * @var array
+   */
+  protected $entityFields = [];
+
+  /**
+   * Set entity fields to be assigned to the form.
+   */
+  protected function setEntityFields() {
+    $this->entityFields = [
+      'title' => ['name' => 'title'],
+      'frontend_title' => ['name' => 'frontend_title'],
+      'description' => ['name' => 'description', 'help' => ['id' => 'id-description', 'file' => 'CRM/UF/Form/Group.hlp']],
+    ];
+  }
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'UFGroup';
+  }
 
   /**
    * The form id saved to the session for an update.
@@ -57,8 +93,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
-   *
-   * @return void
    */
   public function preProcess() {
     // current form id
@@ -111,6 +145,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
+    self::buildQuickEntityForm();
     if ($this->_action & (CRM_Core_Action::DISABLE | CRM_Core_Action::DELETE)) {
       if ($this->_action & (CRM_Core_Action::DISABLE)) {
         $display = 'Disable Profile';
@@ -132,12 +167,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       ));
       return;
     }
-    $this->applyFilter('__ALL__', 'trim');
-
-    // title
-    $this->add('text', 'title', ts('Profile Name'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'title'), TRUE);
-    $this->add('text', 'frontend_title', ts('Public Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'frontend_title'));
-    $this->add('textarea', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'description'));
 
     //add checkboxes
     $uf_group_type = array();
@@ -335,7 +364,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     }
     else {
       // get the submitted form values.
-      $params = $ids = array();
+      $ids = array();
       $params = $this->controller->exportValues($this->_name);
 
       if (!array_key_exists('is_active', $params)) {
@@ -385,5 +414,12 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     // update cms integration with registration / my account
     CRM_Utils_System::updateCategories();
   }
+
+  /**
+   * Set the delete message.
+   *
+   * We do this from the constructor in order to do a translation.
+   */
+  public function setDeleteMessage() {}
 
 }
