@@ -1387,12 +1387,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * Create a paid event.
    *
    * @param array $params
+   * @param string $priceFieldType
    *
    * @return array
    */
-  protected function eventCreatePaid($params) {
+  protected function eventCreatePaid($params, $priceFieldType = 'Radio') {
     $event = $this->eventCreate($params);
-    $this->priceSetID = $this->eventPriceSetCreate(55, 0, 'Radio');
+    $this->priceSetID = $this->eventPriceSetCreate(55, 0, $priceFieldType);
     CRM_Price_BAO_PriceSet::addTo('civicrm_event', $event['id'], $this->priceSetID);
     $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->priceSetID, TRUE, FALSE);
     $priceSet = CRM_Utils_Array::value($this->priceSetID, $priceSet);

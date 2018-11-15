@@ -96,7 +96,7 @@ class CRM_Financial_BAO_Payment {
         }
       }
       elseif (!empty($trxn)) {
-        CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution['total_amount']);
+        CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution['total_amount'], $contributionStatus);
       }
     }
 
