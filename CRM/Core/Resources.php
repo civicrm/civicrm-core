@@ -611,6 +611,10 @@ class CRM_Core_Resources {
           'isFrontend' => $config->userFrameworkFrontend,
         ),
       );
+      $contactID = CRM_Core_Session::getLoggedInContactID();
+      if ($contactID) {
+        $settings['config']['menuCacheCode'] = CRM_Core_BAO_Navigation::getCacheKey($contactID);
+      }
       // Disable profile creation if user lacks permission
       if (!CRM_Core_Permission::check('edit all contacts') && !CRM_Core_Permission::check('add contacts')) {
         $settings['config']['entityRef']['contactCreate'] = FALSE;
@@ -685,6 +689,7 @@ class CRM_Core_Resources {
       ),
       'ajaxPopupsEnabled' => self::singleton()->ajaxPopupsEnabled,
       'allowAlertAutodismissal' => (bool) Civi::settings()->get('allow_alert_autodismissal'),
+      'resourceCacheCode' => self::singleton()->getCacheCode(),
     );
     print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $vars);
     CRM_Utils_System::civiExit();
