@@ -3154,7 +3154,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
     if ($this->_rowsFound && ($this->_rowsFound > $count)) {
       $statistics['counts']['rowsFound'] = array(
-        'title' => ts('Total Row(s)'),
+        'title' => ts('Total Row(s)') . $this->getCalculatedRowWarning(),
         'value' => $this->_rowsFound,
       );
     }
@@ -5820,6 +5820,34 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       }
     }
     return '';
+  }
+
+  /**
+   * Get a string to indicate the presence of calculated rows in the row count.
+   *
+   * We have 3 possible scenarios here:
+   *  - no rollup is used so no row calculations are included in the rows
+   *  - rollup is used with one level of group by. There will be a single calculated row
+   *  - rollup is used with more than one level of group by. There will be an
+   *    unknown number of calculated rows.
+   *
+   * Where there is only one calculated row we could remove it from the total
+   * but then the total would not match the pager which could be more confusing.
+   * If we remove if from the page it could be rendered unreachable.
+   *
+   * @return string
+   */
+  protected function getCalculatedRowWarning() {
+    $calculatedRowWarning = '';
+    if ($this->_rollup) {
+      if (count($this->_groupByArray) === 1) {
+        $calculatedRowWarning = ' ' . ts('Including 1 calculated row');
+      }
+      if (count($this->_groupByArray) > 1) {
+        $calculatedRowWarning = ' ' . ts('Including calculation rows');
+      }
+    }
+    return $calculatedRowWarning;
   }
 
 }

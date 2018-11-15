@@ -448,10 +448,12 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   public function testLybuntReportWithFYDataOrderByLastYearAmount() {
     $inInd = $this->individualCreate();
     $outInd = $this->individualCreate();
+    $ind3 = $this->individualCreate();
     $this->contributionCreate(array('contact_id' => $inInd, 'receive_date' => '2014-10-01'));
+    $this->contributionCreate(array('contact_id' => $ind3, 'trxn_id' => NULL, 'invoice_id' => NULL, 'receive_date' => '2014-11-01'));
     $this->contributionCreate(array('contact_id' => $outInd, 'receive_date' => '2015-03-01', 'trxn_id' => NULL, 'invoice_id' => NULL));
     $this->callAPISuccess('Setting', 'create', array('fiscalYearStart' => array('M' => 7, 'd' => 1)));
-    $rows = $this->callAPISuccess('report_template', 'getrows', array(
+    $params = [
       'report_id' => 'contribute/lybunt',
       'yid_value' => 2015,
       'yid_op' => 'fiscal',
@@ -463,9 +465,16 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
           'order' => 'ASC',
         ),
       ),
-    ));
+    ];
+    $rows = $this->callAPISuccess('report_template', 'getrows', $params);
 
-    $this->assertEquals(2, $rows['count'], "Report failed - the sql used to generate the results was " . print_r($rows['metadata']['sql'], TRUE));
+    $this->assertEquals(3, $rows['count'], "Report failed - the sql used to generate the results was " . print_r($rows['metadata']['sql'], TRUE));
+
+    $params['options']['limit'] = 2;
+    $stats = $this->callAPISuccess('report_template', 'getstatistics', $params)['values'];
+    $this->assertEquals(2, $stats['counts']['rowCount']['value']);
+    $this->assertEquals(3, $stats['counts']['rowsFound']['value']);
+    $this->assertEquals('Total Row(s) Including 1 calculated row', $stats['counts']['rowsFound']['title']);
   }
 
   /**

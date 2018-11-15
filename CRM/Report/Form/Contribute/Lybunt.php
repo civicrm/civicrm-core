@@ -501,9 +501,21 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     return date('YmdHis', strtotime('+ 1 year - 1 second', strtotime($this->getFirstDateOfPriorRange())));
   }
 
+  /**
+   * Store group bys into array - so we can check elsewhere what is grouped.
+   */
+  protected function storeGroupByArray() {
+    $this->_groupByArray['contact_id'] = "{$this->_aliases['civicrm_contribution']}.contact_id ";
+  }
 
+  /**
+   * Group by clause.
+   *
+   * Override the parent because it does bad stuff in it's attempt to handle full group by.
+   */
   public function groupBy() {
-    $this->_groupBy = "GROUP BY  {$this->_aliases['civicrm_contribution']}.contact_id ";
+    $this->storeGroupByArray();
+    $this->_groupBy = "GROUP BY " . implode(',', $this->_groupByArray);
     $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, "{$this->_aliases['civicrm_contribution']}.contact_id");
     $this->assign('chartSupported', TRUE);
   }
@@ -516,9 +528,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
   public function statistics(&$rows) {
 
     $statistics = parent::statistics($rows);
-    // The parent class does something odd where it adds an extra row to the count for the grand total.
-    // Perhaps that works on some other report? But here it just seems odd.
-    $this->countStat($statistics, count($rows));
     if (!empty($rows)) {
       if (!empty($this->rollupRow) && !empty($this->rollupRow['civicrm_contribution_last_year_total_amount'])) {
         $statistics['counts']['civicrm_contribution_last_year_total_amount'] = array(
