@@ -666,10 +666,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public static function formatFieldsForOptionFull(&$form) {
     $priceSet = $form->get('priceSet');
     $priceSetId = $form->get('priceSetId');
-    $defaultPricefieldIds = array();
+    $selectedPricefieldIds = array();
     if (!empty($form->_values['line_items'])) {
       foreach ($form->_values['line_items'] as $lineItem) {
-        $defaultPricefieldIds[] = $lineItem['price_field_value_id'];
+        if ($lineItem['qty'] > 0) {
+          $selectedPricefieldIds[] = $lineItem['price_field_value_id'];
+        }
       }
     }
     if (!$priceSetId ||
@@ -723,14 +725,18 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           (empty($form->_lineItem[$currentParticipantNo][$optId]['price_field_id']) || $dbTotalCount >= $maxValue))
         ) {
           $isFull = TRUE;
+          // @todo this is a bit confusing - for CheckBox & Select we won't freeze
+          // already selected options that are full (so they can be
+          // deselected if need be)
+          // But what about Radio & Text? How do they fit in?
           $optionFullIds[$optId] = $optId;
-          if ($field['html_type'] != 'Select') {
-            if (in_array($optId, $defaultPricefieldIds)) {
+          if ($field['html_type'] != 'Select' && $field['html_type'] !== 'CheckBox') {
+            if (in_array($optId, $selectedPricefieldIds)) {
               $optionFullTotalAmount += CRM_Utils_Array::value('amount', $option);
             }
           }
           else {
-            if (!empty($defaultPricefieldIds) && in_array($optId, $defaultPricefieldIds)) {
+            if (in_array($optId, $selectedPricefieldIds)) {
               unset($optionFullIds[$optId]);
             }
           }
