@@ -168,7 +168,7 @@ WHERE      e.id = %1
     switch ($className) {
       case 'Event':
         $attributes = $form->getVar('_attributes');
-        $class = strtolower(basename(CRM_Utils_Array::value('action', $attributes)));
+        $class = CRM_Utils_Request::retrieveComponent($attributes);
         break;
 
       case 'EventInfo':

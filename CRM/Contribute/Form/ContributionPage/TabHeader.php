@@ -142,7 +142,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     switch ($className) {
       case 'Contribute':
         $attributes = $form->getVar('_attributes');
-        $class = strtolower(basename(CRM_Utils_Array::value('action', $attributes)));
+        $class = CRM_Utils_Request::retrieveComponent($attributes);
         break;
 
       case 'MembershipBlock':
