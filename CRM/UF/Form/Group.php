@@ -64,6 +64,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       'title' => ['name' => 'title'],
       'frontend_title' => ['name' => 'frontend_title'],
       'description' => ['name' => 'description', 'help' => ['id' => 'id-description', 'file' => 'CRM/UF/Form/Group.hlp']],
+      'uf_group_type' => ['name' => 'uf_group_type', 'not-auto-addable' => TRUE, 'help' => ['id' => 'id-used_for', 'file' => 'CRM/UF/Form/Group.hlp'], 'post_html_text' => ' ' . $this->getOtherModuleString()]
     ];
   }
 
@@ -266,17 +267,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       }
       $defaults['uf_group_type'] = isset($checked) ? $checked : "";
 
-      //get the uf join records for current uf group other than default modules
-      $otherModules = array();
-      $otherModules = CRM_Core_BAO_UFGroup::getUFJoinRecord($this->_id, TRUE, TRUE);
-      if (!empty($otherModules)) {
-        $otherModuleString = NULL;
-        foreach ($otherModules as $key) {
-          $otherModuleString .= " [ x ] <label>" . $key . "</label>";
-        }
-        $this->assign('otherModuleString', $otherModuleString);
-      }
-
       $showAdvanced = 0;
       $advFields = array(
         'group',
@@ -421,5 +411,21 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * We do this from the constructor in order to do a translation.
    */
   public function setDeleteMessage() {}
+
+  /**
+   * Get the string to display next to the used for field indicating unchangeable uses.
+   *
+   * @return string
+   */
+  protected function getOtherModuleString() {
+    $otherModules = CRM_Core_BAO_UFGroup::getUFJoinRecord($this->_id, TRUE, TRUE);
+    if (!empty($otherModules)) {
+      $otherModuleString = NULL;
+      foreach ($otherModules as $key) {
+        $otherModuleString .= " [ x ] <label>" . $key . "</label>";
+      }
+    }
+    return $otherModuleString;
+  }
 
 }
