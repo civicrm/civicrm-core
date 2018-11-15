@@ -228,11 +228,6 @@ class CRM_Export_BAO_Export {
 
     $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator, $mergeSameHousehold);
     $returnProperties = array();
-
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    // Warning - this imProviders var is used in a somewhat fragile way - don't rename it
-    // without manually testing the export of IM provider still works.
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     self::$relationshipTypes = $processor->getRelationshipTypes();
 
     if ($fields) {
@@ -451,9 +446,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $count = -1;
 
-    // for CRM-3157 purposes
-    $i18n = CRM_Core_I18n::singleton();
-
     list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
 
     // add payment headers if required
@@ -479,83 +471,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       while ($iterationDAO->fetch()) {
         $count++;
         $rowsThisIteration++;
-        $row = array();
-        $query->convertToPseudoNames($iterationDAO);
-
-        //first loop through output columns so that we return what is required, and in same order.
-        foreach ($outputColumns as $field => $value) {
-
-          // add im_provider to $dao object
-          if ($field == 'im_provider' && property_exists($iterationDAO, 'provider_id')) {
-            $iterationDAO->im_provider = $iterationDAO->provider_id;
-          }
-
-          //build row values (data)
-          $fieldValue = NULL;
-          if (property_exists($iterationDAO, $field)) {
-            $fieldValue = $iterationDAO->$field;
-            // to get phone type from phone type id
-            if ($field == 'phone_type_id' && isset($phoneTypes[$fieldValue])) {
-              $fieldValue = $phoneTypes[$fieldValue];
-            }
-            elseif ($field == 'provider_id' || $field == 'im_provider') {
-              $fieldValue = CRM_Utils_Array::value($fieldValue, $imProviders);
-            }
-            elseif (strstr($field, 'master_id')) {
-              $masterAddressId = NULL;
-              if (isset($iterationDAO->$field)) {
-                $masterAddressId = $iterationDAO->$field;
-              }
-              // get display name of contact that address is shared.
-              $fieldValue = CRM_Contact_BAO_Contact::getMasterDisplayName($masterAddressId);
-            }
-          }
-
-          if ($processor->isRelationshipTypeKey($field)) {
-            foreach (array_keys($value) as $property) {
-              if ($property === 'location') {
-                // @todo just undo all this nasty location wrangling!
-                foreach ($value['location'] as $locationKey => $locationFields) {
-                  foreach (array_keys($locationFields) as $locationField) {
-                    $fieldKey = str_replace(' ', '_', $locationKey . '-' . $locationField);
-                    $row[$field . '_' . $fieldKey] = $processor->getRelationshipValue($field, $iterationDAO->contact_id, $fieldKey);
-                  }
-                }
-              }
-              else {
-                $row[$field . '_' . $property] = $processor->getRelationshipValue($field, $iterationDAO->contact_id, $property);
-              }
-            }
-          }
-          else {
-            $row[$field] = self::getTransformedFieldValue($field, $iterationDAO, $fieldValue, $i18n, $metadata, $paymentDetails, $processor);
-          }
-        }
-
-        // If specific payment fields have been selected for export, payment
-        // data will already be in $row. Otherwise, add payment related
-        // information, if appropriate.
-        if ($addPaymentHeader) {
-          if (!$processor->isExportSpecifiedPaymentFields()) {
-            $nullContributionDetails = array_fill_keys(array_keys($processor->getPaymentHeaders()), NULL);
-            if ($processor->isExportPaymentFields()) {
-              $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
-              if (!is_array($paymentData) || empty($paymentData)) {
-                $paymentData = $nullContributionDetails;
-              }
-              $row = array_merge($row, $paymentData);
-            }
-            elseif (!empty($paymentDetails)) {
-              $row = array_merge($row, $nullContributionDetails);
-            }
-          }
-        }
-        //remove organization name for individuals if it is set for current employer
-        if (!empty($row['contact_type']) &&
-          $row['contact_type'] == 'Individual' && array_key_exists('organization_name', $row)
-        ) {
-          $row['organization_name'] = '';
-        }
+        $row = self::buildRow($query, $iterationDAO, $processor, $outputColumns,  $metadata, $paymentDetails, $addPaymentHeader, $paymentTableId);
 
         // add component info
         // write the row to a file
@@ -1812,6 +1728,105 @@ WHERE  {$whereClause}";
       // if field is empty or null
       return '';
     }
+  }
+
+  /**
+   * Build the row for output.
+   *
+   * @param \CRM_Contact_BAO_Query $query
+   * @param CRM_Core_DAO $iterationDAO
+   * @param \CRM_Export_BAO_ExportProcessor$processor
+   * @param array $outputColumns
+   * @param $metadata
+   * @param $paymentDetails
+   * @param $addPaymentHeader
+   * @param $paymentTableId
+   *
+   * @return array
+   */
+  protected static function buildRow($query, $iterationDAO, $processor, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader, $paymentTableId) {
+    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    $i18n = CRM_Core_I18n::singleton();
+
+    $row = [];
+    $query->convertToPseudoNames($iterationDAO);
+
+    //first loop through output columns so that we return what is required, and in same order.
+    foreach ($outputColumns as $field => $value) {
+
+      // add im_provider to $dao object
+      if ($field == 'im_provider' && property_exists($iterationDAO, 'provider_id')) {
+        $iterationDAO->im_provider = $iterationDAO->provider_id;
+      }
+
+      //build row values (data)
+      $fieldValue = NULL;
+      if (property_exists($iterationDAO, $field)) {
+        $fieldValue = $iterationDAO->$field;
+        // to get phone type from phone type id
+        if ($field == 'phone_type_id' && isset($phoneTypes[$fieldValue])) {
+          $fieldValue = $phoneTypes[$fieldValue];
+        }
+        elseif ($field == 'provider_id' || $field == 'im_provider') {
+          $fieldValue = CRM_Utils_Array::value($fieldValue, $imProviders);
+        }
+        elseif (strstr($field, 'master_id')) {
+          $masterAddressId = NULL;
+          if (isset($iterationDAO->$field)) {
+            $masterAddressId = $iterationDAO->$field;
+          }
+          // get display name of contact that address is shared.
+          $fieldValue = CRM_Contact_BAO_Contact::getMasterDisplayName($masterAddressId);
+        }
+      }
+
+      if ($processor->isRelationshipTypeKey($field)) {
+        foreach (array_keys($value) as $property) {
+          if ($property === 'location') {
+            // @todo just undo all this nasty location wrangling!
+            foreach ($value['location'] as $locationKey => $locationFields) {
+              foreach (array_keys($locationFields) as $locationField) {
+                $fieldKey = str_replace(' ', '_', $locationKey . '-' . $locationField);
+                $row[$field . '_' . $fieldKey] = $processor->getRelationshipValue($field, $iterationDAO->contact_id, $fieldKey);
+              }
+            }
+          }
+          else {
+            $row[$field . '_' . $property] = $processor->getRelationshipValue($field, $iterationDAO->contact_id, $property);
+          }
+        }
+      }
+      else {
+        $row[$field] = self::getTransformedFieldValue($field, $iterationDAO, $fieldValue, $i18n, $metadata, $paymentDetails, $processor);
+      }
+    }
+
+    // If specific payment fields have been selected for export, payment
+    // data will already be in $row. Otherwise, add payment related
+    // information, if appropriate.
+    if ($addPaymentHeader) {
+      if (!$processor->isExportSpecifiedPaymentFields()) {
+        $nullContributionDetails = array_fill_keys(array_keys($processor->getPaymentHeaders()), NULL);
+        if ($processor->isExportPaymentFields()) {
+          $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
+          if (!is_array($paymentData) || empty($paymentData)) {
+            $paymentData = $nullContributionDetails;
+          }
+          $row = array_merge($row, $paymentData);
+        }
+        elseif (!empty($paymentDetails)) {
+          $row = array_merge($row, $nullContributionDetails);
+        }
+      }
+    }
+    //remove organization name for individuals if it is set for current employer
+    if (!empty($row['contact_type']) &&
+      $row['contact_type'] == 'Individual' && array_key_exists('organization_name', $row)
+    ) {
+      $row['organization_name'] = '';
+    }
+    return $row;
   }
 
 }
