@@ -391,7 +391,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       switch ($className) {
         case 'Contribute':
           $attributes = $this->getVar('_attributes');
-          $subPage = strtolower(basename(CRM_Utils_Array::value('action', $attributes)));
+          $subPage = CRM_Utils_Request::retrieveComponent($attributes);
           if ($subPage == 'friend') {
             $nextPage = 'custom';
           }
