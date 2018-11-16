@@ -5213,23 +5213,16 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
         $updatedStatusName = CRM_Utils_Array::value($updatedStatusId,
           CRM_Member_PseudoConstant::membershipStatus()
         );
-        if ($updatedStatusName == 'Cancelled') {
-          $statusMsg .= "<br />" . ts("Membership for %1 has been Cancelled.", array(1 => $userDisplayName));
+
+        $statusNameMsgPart = 'updated';
+        switch ($updatedStatusName) {
+          case 'Cancelled':
+          case 'Expired':
+            $statusNameMsgPart = $updatedStatusName;
+            break;
         }
-        elseif ($updatedStatusName == 'Expired') {
-          $statusMsg .= "<br />" . ts("Membership for %1 has been Expired.", array(1 => $userDisplayName));
-        }
-        else {
-          $endDate = self::getFormattedMembershipEndDateFromContributionId($contributionId);
-          if ($endDate) {
-            $statusMsg .= "<br />" . ts("Membership for %1 has been updated. The membership End Date is %2.",
-                array(
-                  1 => $userDisplayName,
-                  2 => $endDate,
-                )
-              );
-          }
-        }
+
+        $statusMsg .= "<br />" . ts("Membership for %1 has been %2.", array(1 => $userDisplayName, 2 => $statusNameMsgPart));
       }
 
       if ($componentName == 'CiviEvent') {
@@ -5261,25 +5254,6 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
     }
 
     return $statusMsg;
-  }
-
-  private static function getFormattedMembershipEndDateFromContributionId($contributionId) {
-    $endDateResponse = civicrm_api3('MembershipPayment', 'get', [
-      'sequential' => 1,
-      'contribution_id' => $contributionId,
-      'api.Membership.get' => ['id' => '$value.id', 'return' => ['end_date']],
-      'options' => ['limit' => 1, 'sort' => 'id DESC'],
-    ]);
-
-    $endDate = NULL;
-    if (!empty($endDateResponse['values'][0]['api.Membership.get']['count'])) {
-      $endDate = $endDateResponse['values'][0]['api.Membership.get']['values'][0]['end_date'];
-      $endDate = CRM_Utils_Date::customFormat($endDate,
-        '%B %E%f, %Y'
-      );
-    }
-
-    return $endDate;
   }
 
   /**
