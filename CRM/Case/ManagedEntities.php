@@ -112,7 +112,10 @@ class CRM_Case_ManagedEntities {
 
     if (!isset(Civi::$statics[__CLASS__]['reltypes'])) {
       $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE, NULL);
-      Civi::$statics[__CLASS__]['reltypes'] = CRM_Utils_Array::collect(CRM_Case_XMLProcessor::REL_TYPE_CNAME, $relationshipInfo);
+      $label_a_bs = CRM_Utils_Array::collect(CRM_Case_XMLProcessor::label_a_b, $relationshipInfo);
+      $label_b_as = CRM_Utils_Array::collect(CRM_Case_XMLProcessor::label_b_a, $relationshipInfo);
+      $labelsBidrectional = array_merge($label_a_bs, $label_b_as);
+      Civi::$statics[__CLASS__]['reltypes'] = $labelsBidrectional;
     }
     $validRelTypes = Civi::$statics[__CLASS__]['reltypes'];
 

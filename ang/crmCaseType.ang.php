@@ -4,13 +4,6 @@
 // http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_angularModules
 
 // ODDITY: This only loads if CiviCase is active.
-
-CRM_Core_Resources::singleton()->addSetting(array(
-  'crmCaseType' => array(
-    'REL_TYPE_CNAME' => CRM_Case_XMLProcessor::REL_TYPE_CNAME,
-  ),
-));
-
 return array(
   'ext' => 'civicrm',
   'js' => array('ang/crmCaseType.js'),

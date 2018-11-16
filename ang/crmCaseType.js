@@ -247,12 +247,9 @@
   });
 
   crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls) {
-    var REL_TYPE_CNAME, defaultAssigneeDefaultValue, ts;
+    var defaultAssigneeDefaultValue, ts;
 
     (function init () {
-      // CRM_Case_XMLProcessor::REL_TYPE_CNAME
-      REL_TYPE_CNAME = CRM.crmCaseType.REL_TYPE_CNAME;
-
       ts = $scope.ts = CRM.ts(null);
       $scope.locks = { caseTypeName: true, activitySetName: true };
       $scope.workflows = { timeline: 'Timeline', sequence: 'Sequence' };
