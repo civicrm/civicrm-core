@@ -235,8 +235,6 @@ class CRM_Export_BAO_Export {
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     self::$relationshipTypes = $processor->getRelationshipTypes();
 
-    $queryMode = $processor->getQueryMode();
-
     if ($fields) {
       foreach ($fields as $key => $value) {
         $fieldName = CRM_Utils_Array::value(1, $value);
@@ -432,29 +430,19 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $paymentDetails = array();
     if ($processor->isExportPaymentFields()) {
-
       // get payment related in for event and members
       $paymentDetails = CRM_Contribute_BAO_Contribution::getContributionDetails($exportMode, $ids);
       //get all payment headers.
       // If we haven't selected specific payment fields, load in all the
       // payment headers.
       if (!$processor->isExportSpecifiedPaymentFields()) {
-        $paymentHeaders = self::componentPaymentFields();
         if (!empty($paymentDetails)) {
           $addPaymentHeader = TRUE;
         }
       }
-      // If we have selected specific payment fields, leave the payment headers
-      // as an empty array; the headers for each selected field will be added
-      // elsewhere.
-      else {
-        $paymentHeaders = array();
-      }
-      $nullContributionDetails = array_fill_keys(array_keys($paymentHeaders), NULL);
     }
 
     $componentDetails = array();
-    $setHeader = TRUE;
 
     $rowCount = self::EXPORT_ROW_COUNT;
     $offset = 0;
@@ -468,7 +456,19 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
 
+    // add payment headers if required
+    if ($addPaymentHeader && $processor->isExportPaymentFields()) {
+      // @todo rather than do this for every single row do it before the loop starts.
+      // where other header definitions take place.
+      $headerRows = array_merge($headerRows, $processor->getPaymentHeaders());
+      foreach (array_keys($processor->getPaymentHeaders()) as $paymentHdr) {
+        self::sqlColumnDefn($processor, $sqlColumns, $paymentHdr);
+      }
+    }
+
+    $exportTempTable = self::createTempTable($sqlColumns);
     $limitReached = FALSE;
+
     while (!$limitReached) {
       $limitQuery = "{$queryString} LIMIT {$offset}, {$rowCount}";
       $iterationDAO = CRM_Core_DAO::executeQuery($limitQuery);
@@ -532,28 +532,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           }
         }
 
-        // add payment headers if required
-        if ($addPaymentHeader && $processor->isExportPaymentFields()) {
-          // @todo rather than do this for every single row do it before the loop starts.
-          // where other header definitions take place.
-          $headerRows = array_merge($headerRows, $paymentHeaders);
-          foreach (array_keys($paymentHeaders) as $paymentHdr) {
-            self::sqlColumnDefn($processor, $sqlColumns, $paymentHdr);
-          }
-        }
-
-        if ($setHeader) {
-          $exportTempTable = self::createTempTable($sqlColumns);
-        }
-
-        //build header only once
-        $setHeader = FALSE;
-
         // If specific payment fields have been selected for export, payment
         // data will already be in $row. Otherwise, add payment related
         // information, if appropriate.
         if ($addPaymentHeader) {
           if (!$processor->isExportSpecifiedPaymentFields()) {
+            $nullContributionDetails = array_fill_keys(array_keys($processor->getPaymentHeaders()), NULL);
             if ($processor->isExportPaymentFields()) {
               $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
               if (!is_array($paymentData) || empty($paymentData)) {
@@ -1304,6 +1288,11 @@ WHERE  {$whereClause}";
 
   /**
    * Build componentPayment fields.
+   *
+   * This is no longer used by export but BAO_Mapping still calls it & we
+   * should find a generic way to handle this or move this to that class.
+   *
+   * @deprecated
    */
   public static function componentPaymentFields() {
     static $componentPaymentFields;
@@ -1345,8 +1334,8 @@ WHERE  {$whereClause}";
       // @todo - set this correctly in the xml rather than here.
       $headerRows[] = ts('IM Service Provider');
     }
-    elseif ($processor->isExportPaymentFields() && array_key_exists($field, self::componentPaymentFields())) {
-      $headerRows[] = CRM_Utils_Array::value($field, self::componentPaymentFields());
+    elseif ($processor->isExportPaymentFields() && array_key_exists($field, $processor->getcomponentPaymentFields())) {
+      $headerRows[] = CRM_Utils_Array::value($field, $processor->getcomponentPaymentFields());
     }
     else {
       $headerRows[] = $field;
@@ -1807,7 +1796,7 @@ WHERE  {$whereClause}";
         }
       }
     }
-    elseif ($processor->isExportSpecifiedPaymentFields() && array_key_exists($field, self::componentPaymentFields())) {
+    elseif ($processor->isExportSpecifiedPaymentFields() && array_key_exists($field, $processor->getcomponentPaymentFields())) {
       $paymentTableId = $processor->getPaymentTableID();
       $paymentData = CRM_Utils_Array::value($iterationDAO->$paymentTableId, $paymentDetails);
       $payFieldMapper = array(

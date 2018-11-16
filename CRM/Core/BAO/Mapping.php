@@ -440,6 +440,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       if (CRM_Core_Permission::access('CiviEvent')) {
         $fields['Participant'] = CRM_Event_BAO_Participant::exportableFields();
         //get the component payment fields
+        // @todo - review this - inconsistent with other entities & hacky.
         if ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT) {
           $componentPaymentFields = array();
           foreach (CRM_Export_BAO_Export::componentPaymentFields() as $payField => $payTitle) {

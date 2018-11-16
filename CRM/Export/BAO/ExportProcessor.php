@@ -519,9 +519,11 @@ class CRM_Export_BAO_ExportProcessor {
   /**
    * Get fields that indicate payment fields have been requested for a component.
    *
+   * Ideally this should be protected but making it temporarily public helps refactoring..
+   *
    * @return array
    */
-  protected function getComponentPaymentFields() {
+  public function getComponentPaymentFields() {
     return [
       'componentPaymentField_total_amount' => ts('Total Amount'),
       'componentPaymentField_contribution_status' => ts('Contribution Status'),
@@ -529,6 +531,19 @@ class CRM_Export_BAO_ExportProcessor {
       'componentPaymentField_payment_instrument' => ts('Payment Method'),
       'componentPaymentField_transaction_id' => ts('Transaction ID'),
     ];
+  }
+
+  /**
+   * Get headers for payment fields.
+   *
+   * Returns an array of contribution fields when the entity supports payment fields and specific fields
+   * are not specified. This is a transitional function for refactoring legacy code.
+   */
+  public function getPaymentHeaders() {
+    if ($this->isExportPaymentFields() && !$this->isExportSpecifiedPaymentFields()) {
+      return $this->getcomponentPaymentFields();
+    }
+    return [];
   }
 
   /**
