@@ -419,10 +419,14 @@
         if (_.where($scope.relationshipTypeOptions, {id: roleName}).length) {
           roles.push({name: roleName});
         } else {
-          CRM.loadForm(CRM.url('civicrm/admin/reltype', {action: 'add', reset: 1, label_a_b: roleName, label_b_a: roleName}))
+          CRM.loadForm(CRM.url('civicrm/admin/reltype', {action: 'add', reset: 1, label_a_b: roleName}))
             .on('crmFormSuccess', function(e, data) {
-              roles.push({name: data.relationshipType[REL_TYPE_CNAME]});
-              $scope.relationshipTypeOptions.push({id: data.relationshipType[REL_TYPE_CNAME], text: data.relationshipType.label_b_a});
+              // Assume that the case role should be A-B but add both directions as options.
+              roles.push({name: data.relationshipType[Object.keys(data.relationshipType)[0]].label_a_b});
+              $scope.relationshipTypeOptions.push({id: data.relationshipType.label_a_b, text: data.relationshipType.label_a_b});
+              if (data.relationshipType.label_a_b != data.relationshipType.label_b_a) {
+                $scope.relationshipTypeOptions.push({id: data.relationshipType.label_b_a, text: data.relationshipType.label_b_a});
+              }
               $scope.$digest();
             });
         }
