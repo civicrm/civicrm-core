@@ -1179,14 +1179,14 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-   * Test for function createProportionalEntry().
+   * Test for function createProportionalFinancialEntries().
    *
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
    * @dataProvider getThousandSeparators
    */
-  public function testCreateProportionalEntry($thousandSeparator) {
+  public function testCreateProportionalFinancialEntries($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
     list($contribution, $financialAccount) = $this->createContributionWithTax();
     $params = array(
@@ -1198,18 +1198,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'entity_id' => $contribution['id'],
     );
     $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'create', $params);
-    $entityParams = array(
-      'contribution_total_amount' => $contribution['total_amount'],
-      'trxn_total_amount' => 55,
-      'line_item_amount' => 100,
-    );
-    $previousLineItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
-    $eftParams = array(
-      'entity_table' => 'civicrm_financial_item',
-      'entity_id' => $previousLineItem['id'],
-      'financial_trxn_id' => (string) $financialTrxn['id'],
-    );
-    CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
+
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
+    list($financialItems, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItems($contribution['id']);
+    CRM_Contribute_BAO_Contribution::createProportionalFinancialEntries($financialTrxn['id'], $lineItems, $financialItems, $taxItems);
     $trxnTestArray = array_merge($eftParams, array(
       'amount' => '50.00',
     ));
@@ -1217,14 +1209,14 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-   * Test for function createProportionalEntry with zero amount().
+   * Test for function createProportionalFinancialEntries with zero amount().
    *
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
    * @dataProvider getThousandSeparators
    */
-  public function testCreateProportionalEntryZeroAmount($thousandSeparator) {
+  public function testCreateProportionalFinancialEntriesZeroAmount($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
     list($contribution, $financialAccount) = $this->createContributionWithTax(array('total_amount' => 0));
     $params = array(
@@ -1236,18 +1228,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'entity_id' => $contribution['id'],
     );
     $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'create', $params);
-    $entityParams = array(
-      'contribution_total_amount' => $contribution['total_amount'],
-      'trxn_total_amount' => 0,
-      'line_item_amount' => 0,
-    );
-    $previousLineItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
-    $eftParams = array(
-      'entity_table' => 'civicrm_financial_item',
-      'entity_id' => $previousLineItem['id'],
-      'financial_trxn_id' => (string) $financialTrxn['id'],
-    );
-    CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
+
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
+    list($financialItems, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItems($contribution['id']);
+    CRM_Contribute_BAO_Contribution::createProportionalFinancialEntries($financialTrxn['id'], $lineItems, $financialItems, $taxItems);
     $trxnTestArray = array_merge($eftParams, array(
       'amount' => '0.00',
     ));
@@ -1255,12 +1239,12 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-   * Test for function getLastFinancialItemIds().
+   * Test for function getLastFinancialItems().
    */
-  public function testgetLastFinancialItemIds() {
+  public function testgetLastFinancialItems() {
     list($contribution, $financialAccount) = $this->createContributionWithTax();
-    list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($contribution['id']);
-    $this->assertEquals(count($ftIds), 1, 'Invalid count.');
+    list($financialItems, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItems($contribution['id']);
+    $this->assertEquals(count($financialItems), 1, 'Invalid count.');
     $this->assertEquals(count($taxItems), 1, 'Invalid count.');
     foreach ($taxItems as $value) {
       $this->assertEquals($value['amount'], 10, 'Invalid tax amount.');
@@ -1270,7 +1254,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   /**
    * Test for function createProportionalFinancialEntries().
    */
-  public function testcreateProportionalFinancialEntries() {
+  public function testCreateProportionalEntityFinancialEntries() {
     list($contribution, $financialAccount) = $this->createContributionWithTax();
     $params = array(
       'total_amount' => 50,
@@ -1286,9 +1270,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'trxn_total_amount' => 55,
       'trxn_id' => $financialTrxn['id'],
     );
+
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
-    list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($contribution['id']);
-    CRM_Contribute_BAO_Contribution::createProportionalFinancialEntries($entityParams, $lineItems, $ftIds, $taxItems);
+    list($financialItems, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItems($contribution['id']);
+    CRM_Contribute_BAO_Contribution::createProportionalFinancialEntries($financialTrxn['id'], $lineItems, $financialItems, $taxItems);
     $eftParams = array(
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $financialTrxn['id'],
