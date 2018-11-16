@@ -41,7 +41,7 @@
 
 <div class="crm-public-form-item" id="on-behalf-block">
   {crmRegion name="onbehalf-block"}
-    {if $onBehalfOfFields|@count}
+    {if $onBehalfOfFields && $onBehalfOfFields|@count}
       <fieldset>
       <legend>{$fieldSetTitle}</legend>
       {if $form.org_option}
