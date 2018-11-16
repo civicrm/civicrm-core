@@ -74,10 +74,20 @@
                 limit: 0
               }
             }];
-            reqs.relTypes = ['RelationshipType', 'get', {
+            reqs.relTypes = ['Relationship', 'getoptions', {
               sequential: 1,
+              field: 'relationship_type_id',
+              context: 'create',
               options: {
-                sort: CRM.crmCaseType.REL_TYPE_CNAME,
+                limit: 0
+              }
+            }];
+            reqs.relTypesForm = ['Relationship', 'getoptions', {
+              sequential: 1,
+              field: 'relationship_type_id',
+              context: 'create',
+              isForm: 1,
+              options: {
                 limit: 0
               }
             }];
@@ -262,34 +272,14 @@
       $scope.activityTypeOptions = _.map(apiCalls.actTypes.values, formatActivityTypeOption);
       $scope.defaultAssigneeTypes = apiCalls.defaultAssigneeTypes.values;
       $scope.relationshipTypeOptions = _.map(apiCalls.relTypes.values, function(type) {
-        return {id: type[REL_TYPE_CNAME], text: type.label_b_a};
+        return {id: type.key, text: type.value};
       });
-      $scope.defaultRelationshipTypeOptions = getDefaultRelationshipTypeOptions();
+      $scope.defaultRelationshipTypeOptions = _.map(apiCalls.relTypesForm.values, function(type) {
+        return {value: type.key, label: type.value};
+      });
       // stores the default assignee values indexed by their option name:
       $scope.defaultAssigneeTypeValues = _.chain($scope.defaultAssigneeTypes)
         .indexBy('name').mapValues('value').value();
-    }
-
-    /// Returns the default relationship type options. If the relationship is
-    /// bidirectional (Ex: Spouse of) it adds a single option otherwise it adds
-    /// two options representing the relationship type directions
-    /// (Ex: Employee of, Employer is)
-    function getDefaultRelationshipTypeOptions() {
-      return _.transform(apiCalls.relTypes.values, function(result, relType) {
-        var isBidirectionalRelationship = relType.label_a_b === relType.label_b_a;
-
-        result.push({
-          label: relType.label_b_a,
-          value: relType.id + '_b_a'
-        });
-
-        if (!isBidirectionalRelationship) {
-          result.push({
-            label: relType.label_a_b,
-            value: relType.id + '_a_b'
-          });
-        }
-      }, []);
     }
 
     /// initializes the case type object
