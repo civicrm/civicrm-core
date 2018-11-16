@@ -510,6 +510,12 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $this->assertContains('INNER JOIN civicrm_rel_temp_', $sql, "Query appears to use temporary table of compiled relationships?", TRUE);
   }
 
+  public function testRelationshipPermissionClause() {
+    $params = [['relation_type_id', 'IN', ['1_b_a'], 0, 0], ['relation_permission', 'IN', [2], 0, 0]];
+    $sql = CRM_Contact_BAO_Query::getQuery($params);
+    $this->assertContains('(civicrm_relationship.is_permission_a_b IN (2))', $sql);
+  }
+
   /**
    * Test Relationship Clause
    */
