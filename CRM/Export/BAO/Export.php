@@ -1624,113 +1624,6 @@ WHERE  {$whereClause}";
   }
 
   /**
-   * @param $field
-   * @param $iterationDAO
-   * @param $fieldValue
-   * @param $metadata
-   * @param $paymentDetails
-   *
-   * @param \CRM_Export_BAO_ExportProcessor $processor
-   *
-   * @return string
-   */
-  protected static function getTransformedFieldValue($field, $iterationDAO, $fieldValue, $metadata, $paymentDetails, $processor) {
-
-    $i18n = CRM_Core_I18n::singleton();
-    if ($field == 'id') {
-      return $iterationDAO->contact_id;
-      // special case for calculated field
-    }
-    elseif ($field == 'source_contact_id') {
-      return $iterationDAO->contact_id;
-    }
-    elseif ($field == 'pledge_balance_amount') {
-      return $iterationDAO->pledge_amount - $iterationDAO->pledge_total_paid;
-      // special case for calculated field
-    }
-    elseif ($field == 'pledge_next_pay_amount') {
-      return $iterationDAO->pledge_next_pay_amount + $iterationDAO->pledge_outstanding_amount;
-    }
-    elseif (isset($fieldValue) &&
-      $fieldValue != ''
-    ) {
-      //check for custom data
-      if ($cfID = CRM_Core_BAO_CustomField::getKeyID($field)) {
-        return CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
-      }
-
-      elseif (in_array($field, array(
-        'email_greeting',
-        'postal_greeting',
-        'addressee',
-      ))) {
-        //special case for greeting replacement
-        $fldValue = "{$field}_display";
-        return $iterationDAO->$fldValue;
-      }
-      else {
-        //normal fields with a touch of CRM-3157
-        switch ($field) {
-          case 'country':
-          case 'world_region':
-            return $i18n->crm_translate($fieldValue, array('context' => 'country'));
-
-          case 'state_province':
-            return $i18n->crm_translate($fieldValue, array('context' => 'province'));
-
-          case 'gender':
-          case 'preferred_communication_method':
-          case 'preferred_mail_format':
-          case 'communication_style':
-            return $i18n->crm_translate($fieldValue);
-
-          default:
-            if (isset($metadata[$field])) {
-              // No I don't know why we do it this way & whether we could
-              // make better use of pseudoConstants.
-              if (!empty($metadata[$field]['context'])) {
-                return $i18n->crm_translate($fieldValue, $metadata[$field]);
-              }
-              if (!empty($metadata[$field]['pseudoconstant'])) {
-                // This is not our normal syntax for pseudoconstants but I am a bit loath to
-                // call an external function until sure it is not increasing php processing given this
-                // may be iterated 100,000 times & we already have the $imProvider var loaded.
-                // That can be next refactor...
-                // Yes - definitely feeling hatred for this bit of code - I know you will beat me up over it's awfulness
-                // but I have to reach a stable point....
-                $varName = $metadata[$field]['pseudoconstant']['var'];
-                if ($varName === 'imProviders') {
-                  return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_IM', 'provider_id', $fieldValue);
-                }
-                if ($varName === 'phoneTypes') {
-                  return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_Phone', 'phone_type_id', $fieldValue);
-                }
-              }
-
-            }
-            return $fieldValue;
-        }
-      }
-    }
-    elseif ($processor->isExportSpecifiedPaymentFields() && array_key_exists($field, $processor->getcomponentPaymentFields())) {
-      $paymentTableId = $processor->getPaymentTableID();
-      $paymentData = CRM_Utils_Array::value($iterationDAO->$paymentTableId, $paymentDetails);
-      $payFieldMapper = array(
-        'componentPaymentField_total_amount' => 'total_amount',
-        'componentPaymentField_contribution_status' => 'contribution_status',
-        'componentPaymentField_payment_instrument' => 'pay_instru',
-        'componentPaymentField_transaction_id' => 'trxn_id',
-        'componentPaymentField_received_date' => 'receive_date',
-      );
-      return CRM_Utils_Array::value($payFieldMapper[$field], $paymentData, '');
-    }
-    else {
-      // if field is empty or null
-      return '';
-    }
-  }
-
-  /**
    * Build the row for output.
    *
    * @param \CRM_Contact_BAO_Query $query
@@ -1797,7 +1690,7 @@ WHERE  {$whereClause}";
         }
       }
       else {
-        $row[$field] = self::getTransformedFieldValue($field, $iterationDAO, $fieldValue, $metadata, $paymentDetails, $processor);
+        $row[$field] = $processor->getTransformedFieldValue($field, $iterationDAO, $fieldValue, $metadata, $paymentDetails);
       }
     }
 
