@@ -753,6 +753,9 @@ WHERE  contribution_id = {$id}
   protected function assignContactEmailDetails() {
     if ($this->_contactID) {
       list($this->userDisplayName, $this->userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+      if (empty($this->userDisplayName)) {
+        $this->userDisplayName = civicrm_api3('contact', 'getvalue', ['id' => $this->_contactID, 'return' => 'display_name']);
+      }
       $this->assign('displayName', $this->userDisplayName);
     }
   }
