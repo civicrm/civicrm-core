@@ -4206,6 +4206,13 @@ civicrm_relationship.start_date > {$today}
     }
   }
 
+  /**
+   * Add relationship permission criteria to where clause.
+   *
+   * @param string $grouping
+   * @param array $where Array to add "where" criteria to, in case you are generating a temp table.
+   *   Not the main query.
+   */
   public function addRelationshipPermissionClauses($grouping, &$where) {
     $relPermission = $this->getWhereValues('relation_permission', $grouping);
     if ($relPermission) {
@@ -4216,14 +4223,9 @@ civicrm_relationship.start_date > {$today}
       $where[$grouping][] = "(civicrm_relationship.is_permission_a_b IN (" . implode(",", $relPermission[2]) . "))";
 
       $allRelationshipPermissions = CRM_Contact_BAO_Relationship::buildOptions('is_permission_a_b');
-      $relQill = '';
-      foreach ($relPermission[2] as $rel) {
-        if (!empty($relQill)) {
-          $relQill .= ' OR ';
-        }
-        $relQill .= ts($allRelationshipPermissions[$rel]);
-      }
-      $this->_qill[$grouping][] = ts('Permissioned Relationships') . ' - ' . $relQill;
+
+      $relPermNames = array_intersect_key($allRelationshipPermissions, array_flip($relPermission[2]));
+      $this->_qill[$grouping][] = ts('Permissioned Relationships') . ' - ' . implode(' OR ', $relPermNames);
     }
   }
 
