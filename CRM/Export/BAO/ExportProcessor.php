@@ -419,14 +419,6 @@ class CRM_Export_BAO_ExportProcessor {
    *   Array of fields to return in the format ['field_name' => 1,...]
    */
   public function getAdditionalReturnProperties() {
-
-    $missing = [
-      'location_type',
-      'im_provider',
-      'phone_type_id',
-      'provider_id',
-      'current_employer',
-    ];
     if ($this->getQueryMode() === CRM_Contact_BAO_Query::MODE_CONTACTS) {
       $componentSpecificFields = [];
     }
@@ -446,7 +438,7 @@ class CRM_Export_BAO_ExportProcessor {
       $componentSpecificFields = array_merge($componentSpecificFields, CRM_Contribute_BAO_Query::softCreditReturnProperties(TRUE));
       unset($componentSpecificFields['contribution_status_id']);
     }
-    return array_merge(array_fill_keys($missing, 1), $componentSpecificFields);
+    return $componentSpecificFields;
   }
 
   /**

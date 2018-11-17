@@ -1330,10 +1330,6 @@ WHERE  {$whereClause}";
     elseif (isset($queryFields[$field]['title'])) {
       $headerRows[] = $queryFields[$field]['title'];
     }
-    elseif ($field == 'provider_id') {
-      // @todo - set this correctly in the xml rather than here.
-      $headerRows[] = ts('IM Service Provider');
-    }
     elseif ($processor->isExportPaymentFields() && array_key_exists($field, $processor->getcomponentPaymentFields())) {
       $headerRows[] = CRM_Utils_Array::value($field, $processor->getcomponentPaymentFields());
     }
@@ -1400,11 +1396,6 @@ WHERE  {$whereClause}";
           }
           elseif ($relationField == 'phone_type_id') {
             $headerName = $field . '-' . 'Phone Type';
-            $headerRows[] = $headerName;
-            self::sqlColumnDefn($processor, $sqlColumns, $headerName);
-          }
-          elseif ($relationField == 'provider_id') {
-            $headerName = $field . '-' . 'Im Service Provider';
             $headerRows[] = $headerName;
             self::sqlColumnDefn($processor, $sqlColumns, $headerName);
           }
