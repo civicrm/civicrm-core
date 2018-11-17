@@ -1131,21 +1131,6 @@ LIMIT $offset, $limit
   }
 
   /**
-   * Manipulate header rows for relationship fields.
-   *
-   * @param $headerRows
-   */
-  public static function manipulateHeaderRows(&$headerRows) {
-    foreach ($headerRows as & $header) {
-      $split = explode('-', $header);
-      if ($relationTypeName = CRM_Utils_Array::value($split[0], self::$relationshipTypes)) {
-        $split[0] = $relationTypeName;
-        $header = implode('-', $split);
-      }
-    }
-  }
-
-  /**
    * Exclude contacts who are deceased, have "Do not mail" privacy setting,
    * or have no street address
    * @param $exportTempTable
@@ -1301,13 +1286,11 @@ WHERE  {$whereClause}";
         foreach ($value as $relationField => $relationValue) {
           // below block is same as primary block (duplicate)
           if (isset($queryFields[$relationField]['title'])) {
-            $headerName = $field . '-' . $relationField;
-
             if (!$processor->isHouseholdMergeRelationshipTypeKey($field)) {
               // Do not add to header row if we are only generating for merge reasons.
-              $headerRows[] = $headerName;
+              $headerRows[] = $processor->getRelationshipTypes()[$key] . '-' . $queryFields[$relationField]['title'];
             }
-            self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+            self::sqlColumnDefn($processor, $sqlColumns, $field . '-' . $relationField);
           }
           elseif (is_array($relationValue) && $relationField == 'location') {
             // fix header for location type case
@@ -1325,14 +1308,12 @@ WHERE  {$whereClause}";
                     $hdr .= "-" . CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $type[1]);
                   }
                 }
-                $headerName = $field . '-' . $hdr;
-                $headerRows[] = $headerName;
-                self::sqlColumnDefn($processor, $sqlColumns, $headerName);
+                $headerRows[] = $processor->getRelationshipTypes()[$key] . $hdr;
+                self::sqlColumnDefn($processor, $sqlColumns, $field . '-' . $hdr);
               }
             }
           }
         }
-        self::manipulateHeaderRows($headerRows);
       }
       else {
         foreach ($value as $locationType => $locationFields) {
