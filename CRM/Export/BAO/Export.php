@@ -1307,17 +1307,6 @@ WHERE  {$whereClause}";
               // Do not add to header row if we are only generating for merge reasons.
               $headerRows[] = $headerName;
             }
-
-            self::sqlColumnDefn($processor, $sqlColumns, $headerName);
-          }
-          elseif ($relationField == 'phone_type_id') {
-            $headerName = $field . '-' . 'Phone Type';
-            $headerRows[] = $headerName;
-            self::sqlColumnDefn($processor, $sqlColumns, $headerName);
-          }
-          elseif ($relationField == 'state_province_id') {
-            $headerName = $field . '-' . 'state_province_id';
-            $headerRows[] = $headerName;
             self::sqlColumnDefn($processor, $sqlColumns, $headerName);
           }
           elseif (is_array($relationValue) && $relationField == 'location') {
