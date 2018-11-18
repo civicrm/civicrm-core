@@ -51,9 +51,9 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
     $this->contributionCreate([
       'contact_id' => $contactId,
       'total_amount' => 1,
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
-      'financial_type_id' => 1,
-      'contribution_status_id' => 1,
+      'payment_instrument_id' => 'Check',
+      'financial_type_id' => 'Donation',
+      'contribution_status_id' => 'Completed',
       'receive_date' => '20080522000000',
       'receipt_date' => '20080522000000',
       'trxn_id' => '22ereerwww322323',
@@ -67,9 +67,9 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
     $this->contributionCreate([
       'contact_id' => $contactId,
      'total_amount' => 1,
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit Card'),
-      'financial_type_id' => 1,
-      'contribution_status_id' => 1,
+      'payment_instrument_id' => 'Credit Card',
+      'financial_type_id' => 'Member Dues',
+      'contribution_status_id' => 'Completed',
       'receive_date' => '20080523000000',
       'receipt_date' => '20080523000000',
       'trxn_id' => '22ereerwww323323',
@@ -96,7 +96,12 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
     $result = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityId, $returnvalues, $notPresent, $params, TRUE)->fetchAll();
     $this->assertEquals(count($result), 1, 'In line' . __LINE__);
     $this->assertEquals($result[0]['payment_method'], CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'), 'In line' . __LINE__);
-
+    $params['financial_type_id'] = implode(',', [
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Member Dues'),
+    ]);
+    $result = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityId, $returnvalues, $notPresent, $params, TRUE)->fetchAll();
+    $this->assertEquals(count($result), 1, 'In line' . __LINE__);
   }
 
 }
