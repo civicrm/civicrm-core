@@ -1216,11 +1216,7 @@ WHERE  {$whereClause}";
   public static function setHeaderRows($field, $headerRows, $processor) {
 
     $queryFields = $processor->getQueryFields();
-    if (substr($field, -11) == 'campaign_id') {
-      // @todo - set this correctly in the xml rather than here.
-      $headerRows[] = ts('Campaign ID');
-    }
-    elseif ($processor->isMergeSameHousehold() && $field === 'id') {
+    if ($processor->isMergeSameHousehold() && $field === 'id') {
       $headerRows[] = ts('Household ID');
     }
     elseif (isset($queryFields[$field]['title'])) {
