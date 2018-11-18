@@ -1207,38 +1207,6 @@ WHERE  {$whereClause}";
   }
 
   /**
-   * Set the definition for the header rows and sql columns based on the field to output.
-   *
-   * @param string $field
-   * @param array $headerRows
-   * @param \CRM_Export_BAO_ExportProcessor $processor
-   *
-   * @return array
-   */
-  public static function setHeaderRows($field, $headerRows, $processor) {
-
-    $queryFields = $processor->getQueryFields();
-    if (substr($field, -11) == 'campaign_id') {
-      // @todo - set this correctly in the xml rather than here.
-      $headerRows[] = ts('Campaign ID');
-    }
-    elseif ($processor->isMergeSameHousehold() && $field === 'id') {
-      $headerRows[] = ts('Household ID');
-    }
-    elseif (isset($queryFields[$field]['title'])) {
-      $headerRows[] = $queryFields[$field]['title'];
-    }
-    elseif ($processor->isExportPaymentFields() && array_key_exists($field, $processor->getcomponentPaymentFields())) {
-      $headerRows[] = CRM_Utils_Array::value($field, $processor->getcomponentPaymentFields());
-    }
-    else {
-      $headerRows[] = $field;
-    }
-
-    return $headerRows;
-  }
-
-  /**
    * Get the various arrays that we use to structure our output.
    *
    * The extraction of these has been moved to a separate function for clarity and so that
@@ -1274,7 +1242,7 @@ WHERE  {$whereClause}";
     foreach ($returnProperties as $key => $value) {
       if (($key != 'location' || !is_array($value)) && !$processor->isRelationshipTypeKey($key)) {
         $outputColumns[$key] = $value;
-        $headerRows = self::setHeaderRows($key, $headerRows, $processor);
+        $headerRows[] = $processor->getHeaderForRow($key);
         self::sqlColumnDefn($processor, $sqlColumns, $key);
       }
       elseif ($processor->isRelationshipTypeKey($key)) {
@@ -1335,7 +1303,7 @@ WHERE  {$whereClause}";
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
             self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
-            $headerRows = self::setHeaderRows($outputFieldName, $headerRows, $processor);
+            $headerRows[] = $processor->getHeaderForRow($outputFieldName);
             self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');

@@ -390,6 +390,33 @@ class CRM_Export_BAO_ExportProcessor {
   }
 
   /**
+   * Get the label for the header row based on the field to output.
+   *
+   * @param string $field
+   *
+   * @return string
+   */
+  public function getHeaderForRow($field) {
+    if (substr($field, -11) == 'campaign_id') {
+      // @todo - set this correctly in the xml rather than here.
+      // This will require a generalised handling cleanup
+      return ts('Campaign ID');
+    }
+    if ($this->isMergeSameHousehold() && $field === 'id') {
+      return ts('Household ID');
+    }
+    elseif (isset($this->getQueryFields()[$field]['title'])) {
+      return $this->getQueryFields()[$field]['title'];
+    }
+    elseif ($this->isExportPaymentFields() && array_key_exists($field, $this->getcomponentPaymentFields())) {
+      return CRM_Utils_Array::value($field, $this->getcomponentPaymentFields());
+    }
+    else {
+      return $field;
+    }
+  }
+
+  /**
    * @param $params
    * @param $order
    * @param $returnProperties
