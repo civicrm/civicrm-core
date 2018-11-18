@@ -748,7 +748,20 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
       }
     }
 
-    $searchParams = CRM_Contact_BAO_Query::convertFormValues($values);
+    $searchParams = CRM_Contact_BAO_Query::convertFormValues(
+      $values,
+      0,
+      FALSE,
+      NULL,
+      [
+        'financial_type_id',
+        'contribution_soft_credit_type_id',
+        'contribution_status_id',
+        'contribution_page_id',
+        'financial_trxn_card_type_id',
+        'contribution_payment_instrument_id',
+      ]
+    );
     // @todo the use of defaultReturnProperties means the search will be inefficient
     // as slow-unneeded properties are included.
     $query = new CRM_Contact_BAO_Query($searchParams,
