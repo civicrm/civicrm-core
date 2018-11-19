@@ -439,7 +439,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $count = -1;
 
-    list($outputColumns, $headerRows, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
+    list($outputColumns, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
+    $headerRows = $processor->getHeaderRows();
 
     // add payment headers if required
     if ($addPaymentHeader && $processor->isExportPaymentFields()) {
@@ -1235,14 +1236,14 @@ WHERE  {$whereClause}";
    *       yet find a way to comment them for posterity.
    */
   public static function getExportStructureArrays($returnProperties, $processor) {
-    $metadata = $headerRows = $outputColumns = $sqlColumns = array();
+    $metadata = $outputColumns = $sqlColumns = array();
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     $queryFields = $processor->getQueryFields();
     foreach ($returnProperties as $key => $value) {
       if (($key != 'location' || !is_array($value)) && !$processor->isRelationshipTypeKey($key)) {
         $outputColumns[$key] = $value;
-        $headerRows[] = $processor->getHeaderForRow($key);
+        $processor->addOutputSpecification($key, $processor->getHeaderForRow($key));
         self::sqlColumnDefn($processor, $sqlColumns, $key);
       }
       elseif ($processor->isRelationshipTypeKey($key)) {
@@ -1253,7 +1254,7 @@ WHERE  {$whereClause}";
           if (isset($queryFields[$relationField]['title'])) {
             if (!$processor->isHouseholdMergeRelationshipTypeKey($field)) {
               // Do not add to header row if we are only generating for merge reasons.
-              $headerRows[] = $processor->getRelationshipTypes()[$key] . '-' . $queryFields[$relationField]['title'];
+              $processor->addOutputSpecification($relationField, $processor->getHeaderForRow($relationField), $key);
             }
             self::sqlColumnDefn($processor, $sqlColumns, $field . '-' . $relationField);
           }
@@ -1273,7 +1274,7 @@ WHERE  {$whereClause}";
                     $hdr .= "-" . CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $type[1]);
                   }
                 }
-                $headerRows[] = $processor->getRelationshipTypes()[$key] . $hdr;
+                $processor->addOutputSpecification($field, $hdr, $key);
                 self::sqlColumnDefn($processor, $sqlColumns, $field . '-' . $hdr);
               }
             }
@@ -1303,7 +1304,7 @@ WHERE  {$whereClause}";
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
             self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
-            $headerRows[] = $processor->getHeaderForRow($outputFieldName);
+            $processor->addOutputSpecification($outputFieldName, $processor->getHeaderForRow($outputFieldName));
             self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');
@@ -1316,7 +1317,7 @@ WHERE  {$whereClause}";
         }
       }
     }
-    return array($outputColumns, $headerRows, $sqlColumns, $metadata);
+    return array($outputColumns, $sqlColumns, $metadata);
   }
 
   /**

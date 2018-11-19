@@ -116,6 +116,11 @@ class CRM_Export_BAO_ExportProcessor {
   protected $returnProperties = [];
 
   /**
+   * @var array
+   */
+  protected $outputSpecification = [];
+
+  /**
    * CRM_Export_BAO_ExportProcessor constructor.
    *
    * @param int $exportMode
@@ -434,6 +439,33 @@ class CRM_Export_BAO_ExportProcessor {
     list($select, $from, $where, $having) = $query->query();
     $this->setQueryFields($query->_fields);
     return array($query, $select, $from, $where, $having);
+  }
+
+  /**
+   * Add a row to the specification for how to output data.
+   * @param string $key
+   * @param string $label
+   * @param string $relationshipType
+   */
+  public function addOutputSpecification($key, $label, $relationshipType = NULL) {
+    $labelPrefix = '';
+    if ($relationshipType) {
+      $labelPrefix = $this->getRelationshipTypes()[$relationshipType] . '-';
+    }
+    $this->outputSpecification[$key] = [
+      'header' => $labelPrefix . $label
+    ];
+  }
+
+  /**
+   * @return array
+   */
+  public function getHeaderRows() {
+    $headerRows = [];
+    foreach ($this->outputSpecification as $key => $spec) {
+      $headerRows[] = $spec['header'];
+    }
+    return $headerRows;
   }
 
   /**
