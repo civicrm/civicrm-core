@@ -147,7 +147,7 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
     if (!$activeTokens) {
       return;
     }
-    $prefetch = $this->prefetch($e);
+    $prefetch = $this->prefetch($e, $activeTokens);
 
     foreach ($e->getRows() as $row) {
       foreach ((array) $activeTokens as $field) {
@@ -158,6 +158,7 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
 
   /**
    * To handle variable tokens, override this function and return the active tokens.
+   * Active tokens are those used in the message, for this entity and declared by this processor
    *
    * @param \Civi\Token\Event\TokenValueEvent $e
    *
@@ -179,7 +180,7 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
    *
    * @return mixed
    */
-  public function prefetch(TokenValueEvent $e) {
+  public function prefetch(TokenValueEvent $e, $activeTokens) {
     return NULL;
   }
 
