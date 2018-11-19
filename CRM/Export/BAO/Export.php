@@ -166,14 +166,7 @@ class CRM_Export_BAO_Export {
       $groupBy = "civicrm_activity.id ";
     }
 
-    if (!empty($groupBy)) {
-      if (!Civi::settings()->get('searchPrimaryDetailsOnly')) {
-        CRM_Core_DAO::disableFullGroupByMode();
-      }
-      $groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($query->_select, $groupBy);
-    }
-
-    return $groupBy;
+    return $groupBy ? ' GROUP BY ' . $groupBy : '';
   }
 
   /**
@@ -463,7 +456,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     while (!$limitReached) {
       $limitQuery = "{$queryString} LIMIT {$offset}, {$rowCount}";
+      CRM_Core_DAO::disableFullGroupByMode();
       $iterationDAO = CRM_Core_DAO::executeQuery($limitQuery);
+      CRM_Core_DAO::reenableFullGroupByMode();
       // If this is less than our limit by the end of the iteration we do not need to run the query again to
       // check if some remain.
       $rowsThisIteration = 0;
@@ -1585,11 +1580,13 @@ WHERE  {$whereClause}";
       $today = date('Ymd');
       $relationActive = " AND (crel.is_active = 1 AND ( crel.end_date is NULL OR crel.end_date >= {$today} ) )";
       $relationWhere = " WHERE contact_a.is_deleted = 0 {$relationshipClause} {$relationActive}";
-      $relationGroupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($relationQuery->_select, "crel.{$contactA}");
+      CRM_Core_DAO::disableFullGroupByMode();
       $relationSelect = "{$relationSelect}, {$contactA} as refContact ";
-      $relationQueryString = "$relationSelect $relationFrom $relationWhere $relationHaving $relationGroupBy";
+      $relationQueryString = "$relationSelect $relationFrom $relationWhere $relationHaving GROUP BY crel.{$contactA}";
 
       $allRelContactDAO = CRM_Core_DAO::executeQuery($relationQueryString);
+      CRM_Core_DAO::reenableFullGroupByMode();
+
       while ($allRelContactDAO->fetch()) {
         $relationQuery->convertToPseudoNames($allRelContactDAO);
         $row = [];
