@@ -177,14 +177,28 @@ class TokenProcessor {
    * @return array
    *   Ex: [12, 34, 56].
    */
-  public function getContextValues($field) {
+  public function getContextValues($field, $subfield = NULL) {
     $values = [];
     if (isset($this->context[$field])) {
-      $values[] = $this->context[$field];
+      if ($subfield) {
+        if (isset($this->context[$field]->$subfield)) {
+          $values[] = $this->context[$field]->$subfield;
+        }
+      }
+      else {
+        $values[] = $this->context[$field];
+      }
     }
     foreach ($this->getRows() as $row) {
       if (isset($row->context[$field])) {
-        $values[] = $row->context[$field];
+        if ($subfield) {
+          if (isset($row->context[$field]->$subfield)) {
+            $values[] = $row->context[$field]->$subfield;
+          }
+        }
+        else {
+          $values[] = $row->context[$field];
+        }
       }
     }
     $values = array_unique($values);
