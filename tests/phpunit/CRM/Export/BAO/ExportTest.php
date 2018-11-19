@@ -462,6 +462,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $dao->fetch();
     $this->assertEquals('Org 2', $dao->{$employerRelationshipTypeID . '_a_b_organization_name'});
     $this->assertEquals('well dodgey', $dao->{$employerRelationshipTypeID . '_a_b_legal_name'});
+
+    $this->assertEquals([
+      0 => 'First Name',
+      1 => 'Employee of-Organization Name',
+      2 => 'Employee of-Legal Name',
+      3 => 'Employee of-Contact Source',
+    ], $headerRows);
   }
 
   /**
