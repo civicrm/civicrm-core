@@ -287,6 +287,7 @@ class CRM_Export_BAO_Export {
         if (!array_key_exists($column, $returnProperties)) {
           $returnProperties[$column] = 1;
           $column = $column == 'id' ? 'civicrm_primary_id' : $column;
+          $processor->setColumnAsCalculationOnly($column);
           $exportParams['merge_same_address']['temp_columns'][$column] = 1;
         }
       }
@@ -319,6 +320,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         if (!array_key_exists($column, $returnProperties)) {
           $returnProperties[$column] = 1;
           $exportParams['postal_mailing_export']['temp_columns'][$column] = 1;
+          $processor->setColumnAsCalculationOnly($column);
         }
       }
     }
@@ -493,12 +495,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       if (isset($exportParams['postal_mailing_export']['postal_mailing_export']) &&
         $exportParams['postal_mailing_export']['postal_mailing_export'] == 1
       ) {
-        self::postalMailingFormat($exportTempTable, $headerRows, $sqlColumns, $exportMode);
+        self::postalMailingFormat($exportTempTable, $sqlColumns, $exportMode);
       }
 
       // do merge same address and merge same household processing
       if ($mergeSameAddress) {
-        self::mergeSameAddress($exportTempTable, $headerRows, $sqlColumns, $exportParams);
+        self::mergeSameAddress($exportTempTable, $sqlColumns, $exportParams);
       }
 
       // merge the records if they have corresponding households
@@ -726,11 +728,10 @@ CREATE TABLE {$exportTempTable} (
 
   /**
    * @param string $tableName
-   * @param $headerRows
    * @param $sqlColumns
    * @param array $exportParams
    */
-  public static function mergeSameAddress($tableName, &$headerRows, &$sqlColumns, $exportParams) {
+  public static function mergeSameAddress($tableName, &$sqlColumns, $exportParams) {
     // check if any records are present based on if they have used shared address feature,
     // and not based on if city / state .. matches.
     $sql = "
@@ -827,7 +828,7 @@ WHERE  id IN ( $deleteIDString )
       $unsetKeys = array_keys($sqlColumns);
       foreach ($unsetKeys as $headerKey => $sqlColKey) {
         if (array_key_exists($sqlColKey, $exportParams['merge_same_address']['temp_columns'])) {
-          unset($sqlColumns[$sqlColKey], $headerRows[$headerKey]);
+          unset($sqlColumns[$sqlColKey]);
         }
       }
     }
@@ -1132,11 +1133,10 @@ LIMIT $offset, $limit
    * Exclude contacts who are deceased, have "Do not mail" privacy setting,
    * or have no street address
    * @param $exportTempTable
-   * @param $headerRows
    * @param $sqlColumns
    * @param $exportParams
    */
-  public static function postalMailingFormat($exportTempTable, &$headerRows, &$sqlColumns, $exportParams) {
+  public static function postalMailingFormat($exportTempTable, &$sqlColumns, $exportParams) {
     $whereClause = array();
 
     if (array_key_exists('is_deceased', $sqlColumns)) {
@@ -1179,7 +1179,7 @@ WHERE  {$whereClause}";
       $unsetKeys = array_keys($sqlColumns);
       foreach ($unsetKeys as $headerKey => $sqlColKey) {
         if (array_key_exists($sqlColKey, $exportParams['postal_mailing_export']['temp_columns'])) {
-          unset($sqlColumns[$sqlColKey], $headerRows[$headerKey]);
+          unset($sqlColumns[$sqlColKey]);
         }
       }
     }

@@ -452,9 +452,18 @@ class CRM_Export_BAO_ExportProcessor {
     if ($relationshipType) {
       $labelPrefix = $this->getRelationshipTypes()[$relationshipType] . '-';
     }
-    $this->outputSpecification[$key] = [
-      'header' => $labelPrefix . $label
-    ];
+    $this->outputSpecification[$key]['header'] = $labelPrefix . $label;
+  }
+
+  /**
+   * Mark a column as only required for calculations.
+   *
+   * Do not include the row with headers.
+   *
+   * @param string $column
+   */
+  public function setColumnAsCalculationOnly($column) {
+    $this->outputSpecification[$column]['do_not_output_to_csv'] = TRUE;
   }
 
   /**
@@ -463,7 +472,9 @@ class CRM_Export_BAO_ExportProcessor {
   public function getHeaderRows() {
     $headerRows = [];
     foreach ($this->outputSpecification as $key => $spec) {
-      $headerRows[] = $spec['header'];
+      if (empty($spec['do_not_output_to_csv'])) {
+        $headerRows[] = $spec['header'];
+      }
     }
     return $headerRows;
   }
