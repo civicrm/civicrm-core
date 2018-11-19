@@ -443,16 +443,33 @@ class CRM_Export_BAO_ExportProcessor {
 
   /**
    * Add a row to the specification for how to output data.
+   *
    * @param string $key
-   * @param string $label
    * @param string $relationshipType
+   * @param string $locationType
+   * @param int $entityTypeID phone_type_id or provider_id for phone or im fields.
    */
-  public function addOutputSpecification($key, $label, $relationshipType = NULL) {
-    $labelPrefix = '';
+  public function addOutputSpecification($key, $relationshipType = NULL, $locationType = NULL, $entityTypeID = NULL) {
+    $label = $this->getHeaderForRow($key);
+    $labelPrefix = $fieldPrefix = [];
     if ($relationshipType) {
-      $labelPrefix = $this->getRelationshipTypes()[$relationshipType] . '-';
+      $labelPrefix[] = $this->getRelationshipTypes()[$relationshipType];
+      $fieldPrefix[] = $relationshipType;
     }
-    $this->outputSpecification[$key]['header'] = $labelPrefix . $label;
+    if ($locationType) {
+      $labelPrefix[] = $fieldPrefix[] = $locationType;
+    }
+    if ($entityTypeID) {
+      if ($key === 'phone') {
+        $labelPrefix[] = $fieldPrefix[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id', $entityTypeID);
+      }
+      if ($key === 'im') {
+        $labelPrefix[] = $fieldPrefix[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $entityTypeID);
+      }
+    }
+    $index = ($fieldPrefix ? (implode('-', $fieldPrefix)  . '-') : '') . $key;
+    $this->outputSpecification[$index]['header'] = ($labelPrefix ? (implode('-', $labelPrefix) . '-') : '') . $label;
+
   }
 
   /**

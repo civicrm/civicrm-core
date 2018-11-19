@@ -1243,7 +1243,7 @@ WHERE  {$whereClause}";
     foreach ($returnProperties as $key => $value) {
       if (($key != 'location' || !is_array($value)) && !$processor->isRelationshipTypeKey($key)) {
         $outputColumns[$key] = $value;
-        $processor->addOutputSpecification($key, $processor->getHeaderForRow($key));
+        $processor->addOutputSpecification($key);
         self::sqlColumnDefn($processor, $sqlColumns, $key);
       }
       elseif ($processor->isRelationshipTypeKey($key)) {
@@ -1254,7 +1254,7 @@ WHERE  {$whereClause}";
           if (isset($queryFields[$relationField]['title'])) {
             if (!$processor->isHouseholdMergeRelationshipTypeKey($field)) {
               // Do not add to header row if we are only generating for merge reasons.
-              $processor->addOutputSpecification($relationField, $processor->getHeaderForRow($relationField), $key);
+              $processor->addOutputSpecification($relationField, $key);
             }
             self::sqlColumnDefn($processor, $sqlColumns, $field . '-' . $relationField);
           }
@@ -1274,7 +1274,7 @@ WHERE  {$whereClause}";
                     $hdr .= "-" . CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $type[1]);
                   }
                 }
-                $processor->addOutputSpecification($field, $hdr, $key);
+                $processor->addOutputSpecification($field, $key, $ltype, CRM_Utils_Array::value(1, $type));
                 self::sqlColumnDefn($processor, $sqlColumns, $field . '-' . $hdr);
               }
             }
@@ -1304,7 +1304,7 @@ WHERE  {$whereClause}";
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
             self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
-            $processor->addOutputSpecification($outputFieldName, $processor->getHeaderForRow($outputFieldName));
+            $processor->addOutputSpecification($outputFieldName, NULL, $locationType, CRM_Utils_Array::value(1, $type));
             self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');
