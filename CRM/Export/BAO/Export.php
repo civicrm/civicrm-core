@@ -1306,12 +1306,6 @@ WHERE  {$whereClause}";
             self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
             $processor->addOutputSpecification($outputFieldName, NULL, $locationType, CRM_Utils_Array::value(1, $type));
             self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
-            if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
-              $metadata[$daoFieldName] = array('context' => 'country');
-            }
-            if ($actualDBFieldName == 'state_province') {
-              $metadata[$daoFieldName] = array('context' => 'province');
-            }
             $outputColumns[$daoFieldName] = TRUE;
           }
         }
@@ -1388,19 +1382,6 @@ WHERE  {$whereClause}";
                 $row[$field . '_' . $fldValue] = '';
                 break;
 
-              case in_array('country', $type):
-              case in_array('world_region', $type):
-                $row[$field . '_' . $fldValue] = $i18n->crm_translate($relDAO->$fldValue,
-                  array('context' => 'country')
-                );
-                break;
-
-              case in_array('state_province', $type):
-                $row[$field . '_' . $fldValue] = $i18n->crm_translate($relDAO->$fldValue,
-                  array('context' => 'province')
-                );
-                break;
-
               default:
                 $row[$field . '_' . $fldValue] = $relDAO->$fldValue;
                 break;
@@ -1414,22 +1395,7 @@ WHERE  {$whereClause}";
           $row[$relPrefix] = CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
         }
         else {
-          //normal relationship fields
-          // CRM-3157: localise country, region (both have ‘country’ context) and state_province (‘province’ context)
-          switch ($relationField) {
-            case 'country':
-            case 'world_region':
-              $row[$relPrefix] = $i18n->crm_translate($fieldValue, array('context' => 'country'));
-              break;
-
-            case 'state_province':
-              $row[$relPrefix] = $i18n->crm_translate($fieldValue, array('context' => 'province'));
-              break;
-
-            default:
-              $row[$relPrefix] = $fieldValue;
-              break;
-          }
+          $row[$relPrefix] = $fieldValue;
         }
       }
       else {
