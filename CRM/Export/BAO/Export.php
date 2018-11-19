@@ -1071,7 +1071,9 @@ CREATE TABLE {$exportTempTable}_temp SELECT *
 FROM {$exportTempTable}
 GROUP BY civicrm_primary_id ";
 
+    CRM_Core_DAO::disableFullGroupByMode();
     CRM_Core_DAO::executeQuery($query);
+    CRM_Core_DAO::reenableFullGroupByMode();
 
     $query = "DROP TABLE $exportTempTable";
     CRM_Core_DAO::executeQuery($query);
