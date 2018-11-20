@@ -187,6 +187,11 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
     $invoiceParams = array_intersect_key($params, $this->invoiceSettings);
+    // This is a hack - invoicing is it's own setting but it is being used from invoice params
+    // too. This means that saving from api will not have the desired core effect.
+    // but we should fix that elsewhere - ie. stop abusing the settings
+    // and fix the code repetition associated with invoicing
+    $invoiceParams['invoicing'] = CRM_Utils_Array::value('invoicing', $params, 0);
     Civi::settings()->set('contribution_invoice_settings', $invoiceParams);
     parent::postProcess();
 
