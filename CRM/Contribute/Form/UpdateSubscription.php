@@ -191,10 +191,10 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    * Actually build the components of the form.
    */
   public function buildQuickForm() {
-    // CRM-16398: If current recurring contribution got > 1 lineitems then make amount field readonly
+    // dev/core#535 Update: If current recurring contribution got >= 1 lineitems then make amount field readonly
     $amtAttr = array('size' => 20);
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->_coid);
-    if (count($lineItems) > 1) {
+    if (count($lineItems) >= 1) {
       $amtAttr += array('readonly' => TRUE);
     }
     $this->addMoney('amount', ts('Recurring Contribution Amount'), TRUE, $amtAttr,
