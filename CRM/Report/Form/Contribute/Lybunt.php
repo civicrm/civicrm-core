@@ -567,13 +567,12 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     // @todo this acl has no test coverage and is very hard to test manually so could be fragile.
     $this->resetFormSqlAndWhereHavingClauses();
 
-    $this->contactTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('rptlybunt')->setId(date('Ymd_') . uniqid())->getName();
+    $this->contactTempTable = $this->createTemporaryTable('rptlybunt', "
+      SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from}
+      {$this->_where}
+      GROUP BY {$this->_aliases['civicrm_contact']}.id"
+    );
     $this->limit();
-    $getContacts = "
-      CREATE TEMPORARY TABLE $this->contactTempTable {$this->_databaseAttributes}
-      SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where}
-      GROUP BY {$this->_aliases['civicrm_contact']}.id";
-    $this->executeReportQuery($getContacts);
     if (empty($this->_params['charts'])) {
       $this->setPager();
     }
