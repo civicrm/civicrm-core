@@ -66,7 +66,7 @@ class CRM_Invoicing_Utils {
    * set within contribution_invoice_settings (which stores multiple settings
    * as an array in a non-standard way).
    *
-   * We check both here.
+   * We check both here. But will deprecate the latter in time.
    */
   public static function isInvoicingEnabled() {
     if (Civi::settings()->get('invoicing')) {
@@ -74,6 +74,24 @@ class CRM_Invoicing_Utils {
     }
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     return CRM_Utils_Array::value('invoicing', $invoiceSettings);
+  }
+
+  /**
+   * Function to call to determine default invoice page.
+   *
+   * Historically the invoicing was declared as a setting but actually
+   * set within contribution_invoice_settings (which stores multiple settings
+   * as an array in a non-standard way).
+   *
+   * We check both here. But will deprecate the latter in time.
+   */
+  public static function getDefaultPaymentPage() {
+    $value = Civi::settings()->get('default_invoice_page');
+    if (is_numeric($value)) {
+      return $value;
+    }
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
+    return CRM_Utils_Array::value('default_invoice_page', $invoiceSettings);
   }
 
 }

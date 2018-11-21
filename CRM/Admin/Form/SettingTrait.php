@@ -190,8 +190,9 @@ trait CRM_Admin_Form_SettingTrait {
           $this->$add($setting, ts($props['title']), $options);
         }
         // Migrate to using an array as easier in smart...
-        $descriptions[$setting] = ts($props['description']);
-        $this->assign("{$setting}_description", ts($props['description']));
+        $description = CRM_Utils_Array::value('description', $props);
+        $descriptions[$setting] = $description;
+        $this->assign("{$setting}_description", $description);
         if ($setting == 'max_attachments') {
           //temp hack @todo fix to get from metadata
           $this->addRule('max_attachments', ts('Value should be a positive number'), 'positiveInteger');
