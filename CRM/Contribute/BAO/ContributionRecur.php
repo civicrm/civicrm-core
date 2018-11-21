@@ -795,6 +795,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       'return' => ["id", "name", 'is_test'],
     ];
     $paymentProcessors = civicrm_api3('PaymentProcessor', 'get', $paymentProcessorParams);
+    $paymentProcessorOpts = [];
     foreach ($paymentProcessors['values'] as $key => $value) {
       $paymentProcessorOpts[$key] = $value['name'] . ($value['is_test'] ? ' (Test)' : '');
     }

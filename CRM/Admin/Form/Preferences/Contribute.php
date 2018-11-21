@@ -194,31 +194,6 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     $invoiceParams['invoicing'] = CRM_Utils_Array::value('invoicing', $params, 0);
     Civi::settings()->set('contribution_invoice_settings', $invoiceParams);
     parent::postProcess();
-
-    // @todo - all this should be handled by defining an on change action in the metadata.
-    // to set default value for 'Invoices / Credit Notes' checkbox on display preferences
-    $values = CRM_Core_BAO_Setting::getItem("CiviCRM Preferences");
-    $optionValues = CRM_Core_OptionGroup::values('user_dashboard_options', FALSE, FALSE, FALSE, NULL, 'name');
-    $setKey = array_search('Invoices / Credit Notes', $optionValues);
-
-    if (isset($params['invoicing'])) {
-      $value = array($setKey => $optionValues[$setKey]);
-      $setInvoice = CRM_Core_DAO::VALUE_SEPARATOR .
-        implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($value)) .
-        CRM_Core_DAO::VALUE_SEPARATOR;
-      Civi::settings()->set('user_dashboard_options', $values['user_dashboard_options'] . $setInvoice);
-    }
-    else {
-      $setting = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($values['user_dashboard_options'], 1, -1));
-      $invoiceKey = array_search($setKey, $setting);
-      if ($invoiceKey !== FALSE) {
-        unset($setting[$invoiceKey]);
-      }
-      $settingName = CRM_Core_DAO::VALUE_SEPARATOR .
-        implode(CRM_Core_DAO::VALUE_SEPARATOR, array_values($setting)) .
-        CRM_Core_DAO::VALUE_SEPARATOR;
-      Civi::settings()->set('user_dashboard_options', $settingName);
-    }
   }
 
 }

@@ -84,8 +84,9 @@ return array(
     'title' => 'Enable Tax and Invoicing',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
-    'help_text' => NULL,
+    'on_change' => array(
+      'CRM_Invoicing_Utils::onToggle',
+    ),
   ),
   'acl_financial_type' => array(
     'group_name' => 'Contribute Preferences',
