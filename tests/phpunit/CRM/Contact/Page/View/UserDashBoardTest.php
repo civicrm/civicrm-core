@@ -57,6 +57,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_uf_match']);
+    CRM_Utils_Hook::singleton()->reset();
   }
 
   /**
