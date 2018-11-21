@@ -270,7 +270,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @return string
    */
   public static function environment($env = NULL, $reset = FALSE) {
-    static $environment;
     if ($env) {
       $environment = $env;
     }
