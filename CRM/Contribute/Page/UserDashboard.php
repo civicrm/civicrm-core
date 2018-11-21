@@ -140,9 +140,8 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
    */
   public function run() {
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $defaultInvoicePage = CRM_Utils_Array::value('default_invoice_page', $invoiceSettings);
-    $this->assign('invoicing', $invoicing);
+    $this->assign('invoicing', CRM_Invoicing_Utils::isInvoicingEnabled());
     $this->assign('defaultInvoicePage', $defaultInvoicePage);
     parent::preProcess();
     $this->listContribution();

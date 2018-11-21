@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2018
  */
-
 class CRM_Invoicing_Utils {
 
   /**
@@ -47,7 +46,7 @@ class CRM_Invoicing_Utils {
       return;
     }
     $existingUserViewOptions = civicrm_api3('Setting', 'get', ['return' => 'user_dashboard_options'])['values'][CRM_Core_Config::domainID()]['user_dashboard_options'];
-    $optionValues= civicrm_api3('Setting', 'getoptions', ['field' => 'user_dashboard_options'])['values'];
+    $optionValues = civicrm_api3('Setting', 'getoptions', ['field' => 'user_dashboard_options'])['values'];
     $invoiceKey = array_search('Invoices / Credit Notes', $optionValues);
     $existingIndex = in_array($invoiceKey, $existingUserViewOptions);
 

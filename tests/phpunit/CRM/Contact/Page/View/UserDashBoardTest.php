@@ -52,6 +52,14 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   }
 
   /**
+   * Clean up after each test.
+   */
+  public function tearDown() {
+    $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_uf_match']);
+  }
+
+  /**
    * Test the content of the dashboard.
    */
   public function testDashboardContentEmptyContact() {
@@ -88,9 +96,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
    */
   public function testDashboardContentContributionsWithInvoicingEnabled() {
     $this->contributionCreate(['contact_id' => $this->contactID]);
-    $this->callAPISuccess('Setting', 'create', ['invoicing' => 1, 'contribution_invoice_settings' => [
-      'invoicing' => 1,
-    ]]);
+    $this->callAPISuccess('Setting', 'create', ['invoicing' => 1]);
     $this->runUserDashboard();
     $expectedStrings = [
       'Your Contribution(s)',
