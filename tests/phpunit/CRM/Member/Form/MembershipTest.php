@@ -135,6 +135,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
         'civicrm_membership_type',
         'civicrm_membership',
         'civicrm_uf_match',
+        'civicrm_email',
       )
     );
     foreach (array(17, 18, 23, 32) as $contactID) {

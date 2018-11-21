@@ -1302,8 +1302,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'financial_type_id' => 1,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 1,
     ), $params);
