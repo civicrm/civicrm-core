@@ -108,7 +108,7 @@ class CRM_Contribute_Page_DashBoard extends CRM_Core_Page {
     $this->preProcess();
 
     $controller = new CRM_Core_Controller_Simple('CRM_Contribute_Form_Search',
-      ts('Contributions'), CRM_Core_Action::BROWSE
+      ts('Contributions'), NULL
     );
     $controller->setEmbedded(TRUE);
 
