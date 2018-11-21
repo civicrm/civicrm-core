@@ -116,6 +116,11 @@ class CRM_Export_BAO_ExportProcessor {
   protected $returnProperties = [];
 
   /**
+   * @var array
+   */
+  protected $outputSpecification = [];
+
+  /**
    * CRM_Export_BAO_ExportProcessor constructor.
    *
    * @param int $exportMode
@@ -390,6 +395,33 @@ class CRM_Export_BAO_ExportProcessor {
   }
 
   /**
+   * Get the label for the header row based on the field to output.
+   *
+   * @param string $field
+   *
+   * @return string
+   */
+  public function getHeaderForRow($field) {
+    if (substr($field, -11) == 'campaign_id') {
+      // @todo - set this correctly in the xml rather than here.
+      // This will require a generalised handling cleanup
+      return ts('Campaign ID');
+    }
+    if ($this->isMergeSameHousehold() && $field === 'id') {
+      return ts('Household ID');
+    }
+    elseif (isset($this->getQueryFields()[$field]['title'])) {
+      return $this->getQueryFields()[$field]['title'];
+    }
+    elseif ($this->isExportPaymentFields() && array_key_exists($field, $this->getcomponentPaymentFields())) {
+      return CRM_Utils_Array::value($field, $this->getcomponentPaymentFields());
+    }
+    else {
+      return $field;
+    }
+  }
+
+  /**
    * @param $params
    * @param $order
    * @param $returnProperties
@@ -407,6 +439,61 @@ class CRM_Export_BAO_ExportProcessor {
     list($select, $from, $where, $having) = $query->query();
     $this->setQueryFields($query->_fields);
     return array($query, $select, $from, $where, $having);
+  }
+
+  /**
+   * Add a row to the specification for how to output data.
+   *
+   * @param string $key
+   * @param string $relationshipType
+   * @param string $locationType
+   * @param int $entityTypeID phone_type_id or provider_id for phone or im fields.
+   */
+  public function addOutputSpecification($key, $relationshipType = NULL, $locationType = NULL, $entityTypeID = NULL) {
+    $label = $this->getHeaderForRow($key);
+    $labelPrefix = $fieldPrefix = [];
+    if ($relationshipType) {
+      $labelPrefix[] = $this->getRelationshipTypes()[$relationshipType];
+      $fieldPrefix[] = $relationshipType;
+    }
+    if ($locationType) {
+      $labelPrefix[] = $fieldPrefix[] = $locationType;
+    }
+    if ($entityTypeID) {
+      if ($key === 'phone') {
+        $labelPrefix[] = $fieldPrefix[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id', $entityTypeID);
+      }
+      if ($key === 'im') {
+        $labelPrefix[] = $fieldPrefix[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $entityTypeID);
+      }
+    }
+    $index = ($fieldPrefix ? (implode('-', $fieldPrefix)  . '-') : '') . $key;
+    $this->outputSpecification[$index]['header'] = ($labelPrefix ? (implode('-', $labelPrefix) . '-') : '') . $label;
+
+  }
+
+  /**
+   * Mark a column as only required for calculations.
+   *
+   * Do not include the row with headers.
+   *
+   * @param string $column
+   */
+  public function setColumnAsCalculationOnly($column) {
+    $this->outputSpecification[$column]['do_not_output_to_csv'] = TRUE;
+  }
+
+  /**
+   * @return array
+   */
+  public function getHeaderRows() {
+    $headerRows = [];
+    foreach ($this->outputSpecification as $key => $spec) {
+      if (empty($spec['do_not_output_to_csv'])) {
+        $headerRows[] = $spec['header'];
+      }
+    }
+    return $headerRows;
   }
 
   /**
