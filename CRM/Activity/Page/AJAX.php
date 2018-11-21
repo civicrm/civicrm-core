@@ -149,8 +149,14 @@ class CRM_Activity_Page_AJAX {
     $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
+    $groupingValues = CRM_Core_OptionGroup::values('case_status', FALSE, TRUE, FALSE, NULL, 'value');
 
-    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($contactID, $caseID);
+    $onlyActive = TRUE;
+    $statusId = CRM_Core_DAO::getFieldValue('CRM_Case_BAO_Case', $caseID, 'status_id');
+    if (CRM_Utils_Array::value($statusId, $groupingValues) == 'Closed') {
+      $onlyActive = FALSE;
+    }
+    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($contactID, $caseID, NULL, $onlyActive);
     $caseTypeName = CRM_Case_BAO_Case::getCaseType($caseID, 'name');
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $caseRoles = $xmlProcessor->get($caseTypeName, 'CaseRoles');
