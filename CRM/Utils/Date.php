@@ -873,8 +873,11 @@ class CRM_Utils_Date {
    */
   public static function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = '235959') {
     if ($relative) {
-      list($term, $unit) = explode('.', $relative, 2);
-      $dateRange = self::relativeToAbsolute($term, $unit);
+      $dateRange = CRM_Utils_Hook::relativeDate($relative);
+      if (!is_array($dateRange) || (empty($dateRange['from']) && empty($dateRange['to']))) {
+        list($term, $unit) = explode('.', $relative, 2);
+        $dateRange = self::relativeToAbsolute($term, $unit);
+      }
       $from = substr($dateRange['from'], 0, 8);
       $to = substr($dateRange['to'], 0, 8);
       // @todo fix relativeToAbsolute & add tests

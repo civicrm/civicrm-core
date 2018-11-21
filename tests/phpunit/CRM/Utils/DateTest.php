@@ -43,8 +43,7 @@
 class CRM_Utils_DateTest extends CiviUnitTestCase {
 
   public function setUp() {
-    // There are only unit tests here at present, we can skip database loading.
-    return TRUE;
+    parent::setUp();
   }
 
   public function tearDown() {
@@ -67,6 +66,11 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $expectedFrom = $date->format('Ymd') . '000000';
     $expectedTo = $date->format('Ymd') . '235959';
     $cases[] = array($expectedFrom, $expectedTo, 'previous.day', '', '');
+    // "q1" relative date filter defined in hook (below)
+    $expectedFrom = (new DateTime('first day of January'))->format('Ymd') . '000000';
+    $expectedTo = (new DateTime('last day of March'))->format('Ymd') . '235959';
+    $cases[] = array($expectedFrom, $expectedTo, 'q1', '', '');
+
     return $cases;
   }
 
@@ -81,10 +85,22 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
    * @param $to
    */
   public function testGetFromTo($expectedFrom, $expectedTo, $relative, $from, $to) {
+    // dev#339 - test the relativeDate hook.
+    $this->hookClass->setHook('civicrm_relativeDate', [$this, 'hook_civicrm_relativeDate_q1']);
     $obj = new CRM_Utils_Date();
     list($calculatedFrom, $calculatedTo) = $obj->getFromTo($relative, $from, $to);
     $this->assertEquals($expectedFrom, $calculatedFrom);
     $this->assertEquals($expectedTo, $calculatedTo);
+  }
+
+  public function hook_civicrm_relativeDate_q1($filter) {
+    $dates = [];
+    if ($filter == 'q1') {
+      //First quarter of this year.
+      $dates['from'] = (new DateTime('January 1st'))->format('Ymd');
+      $dates['to'] = (new DateTime('March 31st'))->format('Ymd');
+    }
+    return $dates;
   }
 
   /**
