@@ -462,7 +462,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $onlySubType = FALSE,
     $checkPermission = TRUE
   ) {
-    if (empty($customDataType)) {
+    if (empty($customDataType) || $customDataType == 'Contact') {
       $customDataType = array('Contact', 'Individual', 'Organization', 'Household');
     }
     if ($customDataType && !is_array($customDataType)) {

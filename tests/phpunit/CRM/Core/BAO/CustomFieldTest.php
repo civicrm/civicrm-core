@@ -200,6 +200,49 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test custom fields are correctly formatted during import.
+   */
+  public function testGetCustomFields() {
+    $contactCustomGroup = $this->customGroupCreate();
+    $fields = [
+      'custom_group_id' => $contactCustomGroup['id'],
+      'label' => 'Contact Field',
+      'dataType' => 'Memo',
+      'htmlType' => 'TextArea',
+    ];
+    $contactCustomField = $this->customFieldCreate($fields);
+
+    $individualCustomGroup = $this->customGroupCreate(['extends' => 'Individual']);
+    $fields = [
+      'custom_group_id' => $individualCustomGroup['id'],
+      'label' => 'Individual Field',
+      'dataType' => 'Memo',
+      'htmlType' => 'TextArea',
+    ];
+    $individualCustomField = $this->customFieldCreate($fields);
+
+    $extendValue = ['Contact', 'Individual'];
+    foreach ($extendValue as $extends) {
+      $contactCustomFields = CRM_Core_BAO_CustomField::getFields($extends);
+      $this->assertEquals(count($contactCustomFields), 2);
+      $this->assertContains($contactCustomField['id'], array_keys($contactCustomFields));
+      $this->assertContains($individualCustomField['id'], array_keys($contactCustomFields));
+
+      //Check if custom params are formatted correctly during import.
+      $params = $formatted = [
+        "custom_{$contactCustomField['id']}" => 'Test contact value',
+        "custom_{$individualCustomField['id']}" => 'Test individual value',
+      ];
+      _civicrm_api3_custom_format_params($params, $formatted, $extends);
+      $this->assertContains($contactCustomField['id'], array_keys($formatted['custom']));
+      $this->assertContains($individualCustomField['id'], array_keys($formatted['custom']));
+    }
+
+    $this->customGroupDelete($contactCustomGroup['id']);
+    $this->customGroupDelete($individualCustomGroup['id']);
+  }
+
+  /**
    * Move a custom field from $groupA to $groupB.
    *
    * Make sure that data records are correctly matched and created.
