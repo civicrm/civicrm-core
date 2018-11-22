@@ -1263,12 +1263,17 @@ abstract class CRM_Utils_Hook {
    *   SQL columns.
    * @param int $exportMode
    *   Export mode ( contact, contribution, etc...).
+   * @param string $componentTable
+   *   Name of temporary table
+   * @param array $ids
+   *   Array of object's ids
    *
    * @return mixed
    */
-  public static function export(&$exportTempTable, &$headerRows, &$sqlColumns, &$exportMode) {
-    return self::singleton()->invoke(array('exportTempTable', 'headerRows', 'sqlColumns', 'exportMode'), $exportTempTable, $headerRows, $sqlColumns, $exportMode,
-      self::$_nullObject, self::$_nullObject,
+  public static function export(&$exportTempTable, &$headerRows, &$sqlColumns, &$exportMode, &$componentTable, &$ids) {
+    return self::singleton()->invoke(array('exportTempTable', 'headerRows', 'sqlColumns', 'exportMode', 'componentTable', 'ids'),
+      $exportTempTable, $headerRows, $sqlColumns,
+      $exportMode, $componentTable, $ids,
       'civicrm_export'
     );
   }
@@ -2470,6 +2475,19 @@ abstract class CRM_Utils_Hook {
       $mailingObject, $criteria, $context,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_alterMailingRecipients'
+    );
+  }
+
+  /**
+   * ALlow Extensions to custom process IPN hook data such as sending Google Analyitcs information based on the IPN
+   * @param array $IPNData - Array of IPN Data
+   * @return mixed
+   */
+  public static function postIPNProcess(&$IPNData) {
+    return self::singleton()->invoke(array('IPNData'),
+      $IPNData, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_postIPNProcess'
     );
   }
 

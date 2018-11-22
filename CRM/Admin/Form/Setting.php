@@ -56,18 +56,9 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
         $formMode = TRUE;
       }
 
-      CRM_Core_BAO_ConfigSetting::retrieve($this->_defaults);
+      $this->setDefaultsForMetadataDefinedFields();
 
-      // we can handle all the ones defined in the metadata here. Others to be converted
-      foreach ($this->_settings as $setting => $group) {
-        $this->_defaults[$setting] = civicrm_api('setting', 'getvalue', array(
-            'version' => 3,
-            'name' => $setting,
-            'group' => $group,
-          )
-        );
-      }
-
+      // @todo thise should be retrievable from the above function.
       $this->_defaults['contact_autocomplete_options'] = self::getAutocompleteContactSearch();
       $this->_defaults['contact_reference_options'] = self::getAutocompleteContactReference();
       $this->_defaults['enableSSL'] = Civi::settings()->get('enableSSL');
@@ -154,7 +145,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     }
     try {
       $settings = $this->getSettingsToSetByMetadata($params);
-      civicrm_api3('setting', 'create', $settings);
+      $this->saveMetadataDefinedSettings($params);
     }
     catch (CiviCRM_API3_Exception $e) {
       CRM_Core_Session::setStatus($e->getMessage(), ts('Save Failed'), 'error');

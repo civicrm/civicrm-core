@@ -96,9 +96,29 @@ class CRM_Export_BAO_ExportProcessor {
   protected $relationshipReturnProperties = [];
 
   /**
+   * Get return properties by relationship.
+   * @return array
+   */
+  public function getRelationshipReturnProperties() {
+    return $this->relationshipReturnProperties;
+  }
+
+  /**
+   * Export values for related contacts.
+   *
+   * @var array
+   */
+  protected $relatedContactValues = [];
+
+  /**
    * @var array
    */
   protected $returnProperties = [];
+
+  /**
+   * @var array
+   */
+  protected $outputSpecification = [];
 
   /**
    * CRM_Export_BAO_ExportProcessor constructor.
@@ -130,7 +150,6 @@ class CRM_Export_BAO_ExportProcessor {
   public function setRequestedFields($requestedFields) {
     $this->requestedFields = $requestedFields;
   }
-
 
   /**
    * @return array
@@ -165,6 +184,41 @@ class CRM_Export_BAO_ExportProcessor {
       'name',
       FALSE
     );
+  }
+
+  /**
+   * Set the value for a relationship type field.
+   *
+   * In this case we are building up an array of properties for a related contact.
+   *
+   * These may be used for direct exporting or for merge to household depending on the
+   * options selected.
+   *
+   * @param string $relationshipType
+   * @param int $contactID
+   * @param string $field
+   * @param string $value
+   */
+  public function setRelationshipValue($relationshipType, $contactID, $field, $value) {
+    $this->relatedContactValues[$relationshipType][$contactID][$field] = $value;
+  }
+
+  /**
+   * Get the value for a relationship type field.
+   *
+   * In this case we are building up an array of properties for a related contact.
+   *
+   * These may be used for direct exporting or for merge to household depending on the
+   * options selected.
+   *
+   * @param string $relationshipType
+   * @param int $contactID
+   * @param string $field
+   *
+   * @return string
+   */
+  public function getRelationshipValue($relationshipType, $contactID, $field) {
+    return isset($this->relatedContactValues[$relationshipType][$contactID][$field]) ? $this->relatedContactValues[$relationshipType][$contactID][$field] : '';
   }
 
   /**
@@ -302,6 +356,72 @@ class CRM_Export_BAO_ExportProcessor {
   }
 
   /**
+   * Get the name for the export file.
+   *
+   * @return string
+   */
+  public function getExportFileName() {
+    switch ($this->getExportMode()) {
+      case CRM_Export_Form_Select::CONTACT_EXPORT:
+        return ts('CiviCRM Contact Search');
+
+      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
+        return ts('CiviCRM Contribution Search');
+
+      case CRM_Export_Form_Select::MEMBER_EXPORT:
+        return ts('CiviCRM Member Search');
+
+      case CRM_Export_Form_Select::EVENT_EXPORT:
+        return ts('CiviCRM Participant Search');
+
+      case CRM_Export_Form_Select::PLEDGE_EXPORT:
+        return ts('CiviCRM Pledge Search');
+
+      case CRM_Export_Form_Select::CASE_EXPORT:
+        return ts('CiviCRM Case Search');
+
+      case CRM_Export_Form_Select::GRANT_EXPORT:
+        return ts('CiviCRM Grant Search');
+
+      case CRM_Export_Form_Select::ACTIVITY_EXPORT:
+        return ts('CiviCRM Activity Search');
+
+      default:
+        // Legacy code suggests the value could be 'financial' - ie. something
+        // other than what should be accepted. However, I suspect that this line is
+        // never hit.
+        return ts('CiviCRM Search');
+    }
+  }
+
+  /**
+   * Get the label for the header row based on the field to output.
+   *
+   * @param string $field
+   *
+   * @return string
+   */
+  public function getHeaderForRow($field) {
+    if (substr($field, -11) == 'campaign_id') {
+      // @todo - set this correctly in the xml rather than here.
+      // This will require a generalised handling cleanup
+      return ts('Campaign ID');
+    }
+    if ($this->isMergeSameHousehold() && $field === 'id') {
+      return ts('Household ID');
+    }
+    elseif (isset($this->getQueryFields()[$field]['title'])) {
+      return $this->getQueryFields()[$field]['title'];
+    }
+    elseif ($this->isExportPaymentFields() && array_key_exists($field, $this->getcomponentPaymentFields())) {
+      return CRM_Utils_Array::value($field, $this->getcomponentPaymentFields());
+    }
+    else {
+      return $field;
+    }
+  }
+
+  /**
    * @param $params
    * @param $order
    * @param $returnProperties
@@ -322,6 +442,263 @@ class CRM_Export_BAO_ExportProcessor {
   }
 
   /**
+   * Add a row to the specification for how to output data.
+   *
+   * @param string $key
+   * @param string $relationshipType
+   * @param string $locationType
+   * @param int $entityTypeID phone_type_id or provider_id for phone or im fields.
+   */
+  public function addOutputSpecification($key, $relationshipType = NULL, $locationType = NULL, $entityTypeID = NULL) {
+    $label = $this->getHeaderForRow($key);
+    $labelPrefix = $fieldPrefix = [];
+    if ($relationshipType) {
+      $labelPrefix[] = $this->getRelationshipTypes()[$relationshipType];
+      $fieldPrefix[] = $relationshipType;
+    }
+    if ($locationType) {
+      $labelPrefix[] = $fieldPrefix[] = $locationType;
+    }
+    if ($entityTypeID) {
+      if ($key === 'phone') {
+        $labelPrefix[] = $fieldPrefix[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id', $entityTypeID);
+      }
+      if ($key === 'im') {
+        $labelPrefix[] = $fieldPrefix[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $entityTypeID);
+      }
+    }
+    $index = ($fieldPrefix ? (implode('-', $fieldPrefix)  . '-') : '') . $key;
+    $this->outputSpecification[$index]['header'] = ($labelPrefix ? (implode('-', $labelPrefix) . '-') : '') . $label;
+
+  }
+
+  /**
+   * Mark a column as only required for calculations.
+   *
+   * Do not include the row with headers.
+   *
+   * @param string $column
+   */
+  public function setColumnAsCalculationOnly($column) {
+    $this->outputSpecification[$column]['do_not_output_to_csv'] = TRUE;
+  }
+
+  /**
+   * @return array
+   */
+  public function getHeaderRows() {
+    $headerRows = [];
+    foreach ($this->outputSpecification as $key => $spec) {
+      if (empty($spec['do_not_output_to_csv'])) {
+        $headerRows[] = $spec['header'];
+      }
+    }
+    return $headerRows;
+  }
+
+  /**
+   * Build the row for output.
+   *
+   * @param \CRM_Contact_BAO_Query $query
+   * @param CRM_Core_DAO $iterationDAO
+   * @param array $outputColumns
+   * @param $metadata
+   * @param $paymentDetails
+   * @param $addPaymentHeader
+   * @param $paymentTableId
+   *
+   * @return array
+   */
+  public function buildRow($query, $iterationDAO, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader, $paymentTableId) {
+    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+
+    $row = [];
+    $query->convertToPseudoNames($iterationDAO);
+
+    //first loop through output columns so that we return what is required, and in same order.
+    foreach ($outputColumns as $field => $value) {
+
+      // add im_provider to $dao object
+      if ($field == 'im_provider' && property_exists($iterationDAO, 'provider_id')) {
+        $iterationDAO->im_provider = $iterationDAO->provider_id;
+      }
+
+      //build row values (data)
+      $fieldValue = NULL;
+      if (property_exists($iterationDAO, $field)) {
+        $fieldValue = $iterationDAO->$field;
+        // to get phone type from phone type id
+        if ($field == 'phone_type_id' && isset($phoneTypes[$fieldValue])) {
+          $fieldValue = $phoneTypes[$fieldValue];
+        }
+        elseif ($field == 'provider_id' || $field == 'im_provider') {
+          $fieldValue = CRM_Utils_Array::value($fieldValue, $imProviders);
+        }
+        elseif (strstr($field, 'master_id')) {
+          $masterAddressId = NULL;
+          if (isset($iterationDAO->$field)) {
+            $masterAddressId = $iterationDAO->$field;
+          }
+          // get display name of contact that address is shared.
+          $fieldValue = CRM_Contact_BAO_Contact::getMasterDisplayName($masterAddressId);
+        }
+      }
+
+      if ($this->isRelationshipTypeKey($field)) {
+        foreach (array_keys($value) as $property) {
+          if ($property === 'location') {
+            // @todo just undo all this nasty location wrangling!
+            foreach ($value['location'] as $locationKey => $locationFields) {
+              foreach (array_keys($locationFields) as $locationField) {
+                $fieldKey = str_replace(' ', '_', $locationKey . '-' . $locationField);
+                $row[$field . '_' . $fieldKey] = $this->getRelationshipValue($field, $iterationDAO->contact_id, $fieldKey);
+              }
+            }
+          }
+          else {
+            $row[$field . '_' . $property] = $this->getRelationshipValue($field, $iterationDAO->contact_id, $property);
+          }
+        }
+      }
+      else {
+        $row[$field] = $this->getTransformedFieldValue($field, $iterationDAO, $fieldValue, $metadata, $paymentDetails);
+      }
+    }
+
+    // If specific payment fields have been selected for export, payment
+    // data will already be in $row. Otherwise, add payment related
+    // information, if appropriate.
+    if ($addPaymentHeader) {
+      if (!$this->isExportSpecifiedPaymentFields()) {
+        $nullContributionDetails = array_fill_keys(array_keys($this->getPaymentHeaders()), NULL);
+        if ($this->isExportPaymentFields()) {
+          $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
+          if (!is_array($paymentData) || empty($paymentData)) {
+            $paymentData = $nullContributionDetails;
+          }
+          $row = array_merge($row, $paymentData);
+        }
+        elseif (!empty($paymentDetails)) {
+          $row = array_merge($row, $nullContributionDetails);
+        }
+      }
+    }
+    //remove organization name for individuals if it is set for current employer
+    if (!empty($row['contact_type']) &&
+      $row['contact_type'] == 'Individual' && array_key_exists('organization_name', $row)
+    ) {
+      $row['organization_name'] = '';
+    }
+    return $row;
+  }
+
+  /**
+   * @param $field
+   * @param $iterationDAO
+   * @param $fieldValue
+   * @param $metadata
+   * @param $paymentDetails
+   *
+   * @return string
+   */
+  public function getTransformedFieldValue($field, $iterationDAO, $fieldValue, $metadata, $paymentDetails) {
+
+    $i18n = CRM_Core_I18n::singleton();
+    if ($field == 'id') {
+      return $iterationDAO->contact_id;
+      // special case for calculated field
+    }
+    elseif ($field == 'source_contact_id') {
+      return $iterationDAO->contact_id;
+    }
+    elseif ($field == 'pledge_balance_amount') {
+      return $iterationDAO->pledge_amount - $iterationDAO->pledge_total_paid;
+      // special case for calculated field
+    }
+    elseif ($field == 'pledge_next_pay_amount') {
+      return $iterationDAO->pledge_next_pay_amount + $iterationDAO->pledge_outstanding_amount;
+    }
+    elseif (isset($fieldValue) &&
+      $fieldValue != ''
+    ) {
+      //check for custom data
+      if ($cfID = CRM_Core_BAO_CustomField::getKeyID($field)) {
+        return CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
+      }
+
+      elseif (in_array($field, array(
+        'email_greeting',
+        'postal_greeting',
+        'addressee',
+      ))) {
+        //special case for greeting replacement
+        $fldValue = "{$field}_display";
+        return $iterationDAO->$fldValue;
+      }
+      else {
+        //normal fields with a touch of CRM-3157
+        switch ($field) {
+          case 'country':
+          case 'world_region':
+            return $i18n->crm_translate($fieldValue, array('context' => 'country'));
+
+          case 'state_province':
+            return $i18n->crm_translate($fieldValue, array('context' => 'province'));
+
+          case 'gender':
+          case 'preferred_communication_method':
+          case 'preferred_mail_format':
+          case 'communication_style':
+            return $i18n->crm_translate($fieldValue);
+
+          default:
+            if (isset($metadata[$field])) {
+              // No I don't know why we do it this way & whether we could
+              // make better use of pseudoConstants.
+              if (!empty($metadata[$field]['context'])) {
+                return $i18n->crm_translate($fieldValue, $metadata[$field]);
+              }
+              if (!empty($metadata[$field]['pseudoconstant'])) {
+                // This is not our normal syntax for pseudoconstants but I am a bit loath to
+                // call an external function until sure it is not increasing php processing given this
+                // may be iterated 100,000 times & we already have the $imProvider var loaded.
+                // That can be next refactor...
+                // Yes - definitely feeling hatred for this bit of code - I know you will beat me up over it's awfulness
+                // but I have to reach a stable point....
+                $varName = $metadata[$field]['pseudoconstant']['var'];
+                if ($varName === 'imProviders') {
+                  return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_IM', 'provider_id', $fieldValue);
+                }
+                if ($varName === 'phoneTypes') {
+                  return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_Phone', 'phone_type_id', $fieldValue);
+                }
+              }
+
+            }
+            return $fieldValue;
+        }
+      }
+    }
+    elseif ($this->isExportSpecifiedPaymentFields() && array_key_exists($field, $this->getcomponentPaymentFields())) {
+      $paymentTableId = $this->getPaymentTableID();
+      $paymentData = CRM_Utils_Array::value($iterationDAO->$paymentTableId, $paymentDetails);
+      $payFieldMapper = array(
+        'componentPaymentField_total_amount' => 'total_amount',
+        'componentPaymentField_contribution_status' => 'contribution_status',
+        'componentPaymentField_payment_instrument' => 'pay_instru',
+        'componentPaymentField_transaction_id' => 'trxn_id',
+        'componentPaymentField_received_date' => 'receive_date',
+      );
+      return CRM_Utils_Array::value($payFieldMapper[$field], $paymentData, '');
+    }
+    else {
+      // if field is empty or null
+      return '';
+    }
+  }
+
+  /**
    * Get array of fields to return, over & above those defined in the main contact exportable fields.
    *
    * These include export mode specific fields & some fields apparently required as 'exportableFields'
@@ -331,14 +708,6 @@ class CRM_Export_BAO_ExportProcessor {
    *   Array of fields to return in the format ['field_name' => 1,...]
    */
   public function getAdditionalReturnProperties() {
-
-    $missing = [
-      'location_type',
-      'im_provider',
-      'phone_type_id',
-      'provider_id',
-      'current_employer',
-    ];
     if ($this->getQueryMode() === CRM_Contact_BAO_Query::MODE_CONTACTS) {
       $componentSpecificFields = [];
     }
@@ -358,7 +727,7 @@ class CRM_Export_BAO_ExportProcessor {
       $componentSpecificFields = array_merge($componentSpecificFields, CRM_Contribute_BAO_Query::softCreditReturnProperties(TRUE));
       unset($componentSpecificFields['contribution_status_id']);
     }
-    return array_merge(array_fill_keys($missing, 1), $componentSpecificFields);
+    return $componentSpecificFields;
   }
 
   /**
@@ -431,9 +800,11 @@ class CRM_Export_BAO_ExportProcessor {
   /**
    * Get fields that indicate payment fields have been requested for a component.
    *
+   * Ideally this should be protected but making it temporarily public helps refactoring..
+   *
    * @return array
    */
-  protected function getComponentPaymentFields() {
+  public function getComponentPaymentFields() {
     return [
       'componentPaymentField_total_amount' => ts('Total Amount'),
       'componentPaymentField_contribution_status' => ts('Contribution Status'),
@@ -441,6 +812,19 @@ class CRM_Export_BAO_ExportProcessor {
       'componentPaymentField_payment_instrument' => ts('Payment Method'),
       'componentPaymentField_transaction_id' => ts('Transaction ID'),
     ];
+  }
+
+  /**
+   * Get headers for payment fields.
+   *
+   * Returns an array of contribution fields when the entity supports payment fields and specific fields
+   * are not specified. This is a transitional function for refactoring legacy code.
+   */
+  public function getPaymentHeaders() {
+    if ($this->isExportPaymentFields() && !$this->isExportSpecifiedPaymentFields()) {
+      return $this->getcomponentPaymentFields();
+    }
+    return [];
   }
 
   /**
@@ -526,6 +910,20 @@ class CRM_Export_BAO_ExportProcessor {
       $this->relationshipReturnProperties[$relationshipKey][$relationField] = 1;
     }
     return $this->relationshipReturnProperties[$relationshipKey];
+  }
+
+  /**
+   * Add the main return properties to the household merge properties if needed for merging.
+   *
+   * If we are using household merge we need to add these to the relationship properties to
+   * be retrieved.
+   *
+   * @param $returnProperties
+   */
+  public function setHouseholdMergeReturnProperties($returnProperties) {
+    foreach ($this->getHouseholdRelationshipTypes() as $householdRelationshipType) {
+      $this->relationshipReturnProperties[$householdRelationshipType] = $returnProperties;
+    }
   }
 
   /**

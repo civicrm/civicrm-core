@@ -113,7 +113,7 @@ class CRM_Core_Payment_Form {
    *   Fields that are to be shown on the payment form.
    */
   protected static function addCommonFields(&$form, $paymentFields) {
-    $requiredPaymentFields = array();
+    $requiredPaymentFields = $paymentFieldsMetadata = [];
     foreach ($paymentFields as $name => $field) {
       if ($field['htmlType'] == 'chainSelect') {
         $form->addChainSelect($field['name'], array('required' => FALSE));
@@ -129,8 +129,10 @@ class CRM_Core_Payment_Form {
       // This will cause the fields to be marked as required - but it is up to the payment processor to
       // validate it.
       $requiredPaymentFields[$field['name']] = $field['is_required'];
+      $paymentFieldsMetadata[$field['name']] = $field;
     }
 
+    $form->assign('paymentFieldsMetadata', $paymentFieldsMetadata);
     $form->assign('requiredPaymentFields', $requiredPaymentFields);
   }
 
@@ -277,27 +279,6 @@ class CRM_Core_Payment_Form {
     $payment = Civi\Payment\System::singleton()->getById($payment_processor_id);
     $payment->setBillingProfile($billing_profile_id);
     $payment->validatePaymentInstrument($values, $errors);
-  }
-
-  /**
-   * The credit card pseudo constant results only the CC label, not the key ID
-   * So we normalize the name to use it as a CSS class.
-   */
-  public static function getCreditCardCSSNames($creditCards = array()) {
-    $creditCardTypes = array();
-    if (empty($creditCards)) {
-      $creditCards = CRM_Contribute_PseudoConstant::creditCard();
-    }
-    foreach ($creditCards as $key => $name) {
-      // Replace anything not css-friendly by an underscore
-      // Non-latin names will not like this, but so many things are wrong with
-      // the credit-card type configurations already.
-      $key = str_replace(' ', '', $key);
-      $key = preg_replace('/[^a-zA-Z0-9]/', '_', $key);
-      $key = strtolower($key);
-      $creditCardTypes[$key] = $name;
-    }
-    return $creditCardTypes;
   }
 
   /**

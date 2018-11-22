@@ -532,4 +532,104 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     ));
   }
 
+  /**
+   * @expectedException CiviCRM_API3_Exception
+   * @expectedExceptionMessage Line item total doesn't match with total amount.
+   */
+  public function testCreateOrderIfTotalAmountDoesNotMatchLineItemsAmountsIfNoTaxSupplied() {
+    $params = [
+      'contact_id' => $this->_individualId,
+      'receive_date' => '2018-01-01',
+      'total_amount' => 50,
+      'financial_type_id' => $this->_financialTypeId,
+      'contribution_status_id' => 1,
+      'line_items' => [
+        0 => [
+          'line_item' => [
+            '0' => [
+              'price_field_id' => 1,
+              'price_field_value_id' => 1,
+              'label' => 'Test 1',
+              'field_title' => 'Test 1',
+              'qty' => 1,
+              'unit_price' => 40,
+              'line_total' => 40,
+              'financial_type_id' => 1,
+              'entity_table' => 'civicrm_contribution',
+            ],
+          ]
+        ],
+      ],
+    ];
+
+    civicrm_api3('Order', 'create', $params);
+  }
+
+  /**
+   * @expectedException CiviCRM_API3_Exception
+   * @expectedExceptionMessage Line item total doesn't match with total amount.
+   */
+  public function testCreateOrderIfTotalAmountDoesNotMatchLineItemsAmountsIfTaxSupplied() {
+    $params = [
+      'contact_id' => $this->_individualId,
+      'receive_date' => '2018-01-01',
+      'total_amount' => 50,
+      'financial_type_id' => $this->_financialTypeId,
+      'contribution_status_id' => 1,
+      'tax_amount' => 15,
+      'line_items' => [
+        0 => [
+          'line_item' => [
+            '0' => [
+              'price_field_id' => 1,
+              'price_field_value_id' => 1,
+              'label' => 'Test 1',
+              'field_title' => 'Test 1',
+              'qty' => 1,
+              'unit_price' => 30,
+              'line_total' => 30,
+              'financial_type_id' => 1,
+              'entity_table' => 'civicrm_contribution',
+              'tax_amount' => 15,
+            ],
+          ]
+        ],
+      ],
+    ];
+
+    civicrm_api3('Order', 'create', $params);
+  }
+
+  public function testCreateOrderIfTotalAmountDoesMatchLineItemsAmountsAndTaxSupplied() {
+    $params = [
+      'contact_id' => $this->_individualId,
+      'receive_date' => '2018-01-01',
+      'total_amount' => 50,
+      'financial_type_id' => $this->_financialTypeId,
+      'contribution_status_id' => 1,
+      'tax_amount' => 15,
+      'line_items' => [
+        0 => [
+          'line_item' => [
+            '0' => [
+              'price_field_id' => 1,
+              'price_field_value_id' => 1,
+              'label' => 'Test 1',
+              'field_title' => 'Test 1',
+              'qty' => 1,
+              'unit_price' => 35,
+              'line_total' => 35,
+              'financial_type_id' => 1,
+              'entity_table' => 'civicrm_contribution',
+              'tax_amount' => 15,
+            ],
+          ]
+        ],
+      ],
+    ];
+
+    $order = civicrm_api3('Order', 'create', $params);
+    $this->assertEquals(1, $order['count']);
+  }
+
 }

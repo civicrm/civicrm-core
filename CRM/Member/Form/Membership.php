@@ -112,13 +112,53 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   );
 
   /**
-   * Get the entity id being edited.
-   *
-   * @return int|null
+   * Set entity fields to be assigned to the form.
    */
-  public function getEntityId() {
-    return $this->_id;
+  protected function setEntityFields() {
+    $this->entityFields = [
+      'join_date' => [
+        'name' => 'join_date',
+        'description' => ts('Member Since'),
+      ],
+      'start_date' => [
+        'name' => 'start_date',
+        'description' => ts('Start Date'),
+      ],
+      'end_date' => [
+        'name' => 'end_date',
+        'description' => ts('End Date'),
+      ],
+    ];
   }
+
+  /**
+   * Set the delete message.
+   *
+   * We do this from the constructor in order to do a translation.
+   */
+  public function setDeleteMessage() {
+    $this->deleteMessage = '<span class="font-red bold">'
+      . ts("WARNING: Deleting this membership will also delete any related payment (contribution) records." .  ts("This action cannot be undone.")
+        . '</span><p>'
+        . ts("Consider modifying the membership status instead if you want to maintain an audit trail and avoid losing payment data. You can set the status to Cancelled by editing the membership and clicking the Status Override checkbox.")
+          . '</p><p>'
+        . ts("Click 'Delete' if you want to continue.") . '</p>');
+  }
+
+  /**
+   * Overriding this entity trait function as not yet tested.
+   *
+   * We continue to rely on legacy handling.
+   */
+  public function addCustomDataToForm() {}
+
+
+  /**
+   * Overriding this entity trait function as not yet tested.
+   *
+   * We continue to rely on legacy handling.
+   */
+  public function addFormButtons() {}
 
   /**
    * Get selected membership type from the form values.
@@ -182,6 +222,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
     $this->assign('formClass', 'membership');
     parent::preProcess();
+    if ($this->isUpdateToExistingRecurringMembership()) {
+      $this->entityFields['end_date']['is_freeze'] = TRUE;
+    }
     // get price set id.
     $this->_priceSetId = CRM_Utils_Array::value('priceSetId', $_GET);
     $this->set('priceSetId', $this->_priceSetId);
@@ -372,16 +415,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       // $defaults['credit_card_exp_date'] = array( 'Y' => '2012', 'M' => '05' );
     }
 
-    $dates = array('join_date', 'start_date', 'end_date');
-    foreach ($dates as $key) {
-      if (!empty($defaults[$key])) {
-        list($defaults[$key]) = CRM_Utils_Date::setDateDefaults(CRM_Utils_Array::value($key, $defaults));
-      }
-    }
-
     //setting default join date if there is no join date
     if (empty($defaults['join_date'])) {
-      $defaults['join_date'] = $now;
+      $defaults['join_date'] = date('Y-m-d H:i:s');
     }
 
     if (!empty($defaults['membership_end_date'])) {
@@ -396,6 +432,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   public function buildQuickForm() {
 
+    $this->buildQuickEntityForm();
     $this->assign('currency', CRM_Core_Config::singleton()->defaultCurrencySymbol);
     $isUpdateToExistingRecurringMembership = $this->isUpdateToExistingRecurringMembership();
     // build price set form.
@@ -562,17 +599,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $sel->freeze();
     }
 
-    $this->applyFilter('__ALL__', 'trim');
-
     if ($this->_action & CRM_Core_Action::ADD) {
       $this->add('text', 'num_terms', ts('Number of Terms'), array('size' => 6));
-    }
-
-    $this->addDate('join_date', ts('Member Since'), FALSE, array('formatType' => 'activityDate'));
-    $this->addDate('start_date', ts('Start Date'), FALSE, array('formatType' => 'activityDate'));
-    $endDate = $this->addDate('end_date', ts('End Date'), FALSE, array('formatType' => 'activityDate'));
-    if ($endDate && $isUpdateToExistingRecurringMembership) {
-      $endDate->freeze();
     }
 
     $this->add('text', 'source', ts('Source'),
@@ -946,50 +974,34 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   /**
    * Send email receipt.
    *
+   * @deprecated
+   *   This function is shared with Batch_Entry which has limited overlap
+   *   & needs rationalising.
+   *
    * @param CRM_Core_Form $form
    *   Form object.
    * @param array $formValues
    * @param object $membership
    *   Object.
+   * @param array $customValues
    *
    * @return bool
    *   true if mail was sent successfully
    */
-  public static function emailReceipt(&$form, &$formValues, &$membership) {
+  public static function emailReceipt(&$form, &$formValues, &$membership, $customValues = NULL) {
     // retrieve 'from email id' for acknowledgement
     $receiptFrom = CRM_Utils_Array::value('from_email_address', $formValues);
 
+    // @todo figure out how much of the stuff below is genuinely shared with the batch form & a logical shared place.
     if (!empty($formValues['payment_instrument_id'])) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       $formValues['paidBy'] = $paymentInstrument[$formValues['payment_instrument_id']];
     }
 
-    // retrieve custom data
-    $customFields = $customValues = array();
-    if (property_exists($form, '_groupTree')
-      && !empty($form->_groupTree)
-    ) {
-      foreach ($form->_groupTree as $groupID => $group) {
-        if ($groupID == 'info') {
-          continue;
-        }
-        foreach ($group['fields'] as $k => $field) {
-          $field['title'] = $field['label'];
-          $customFields["custom_{$k}"] = $field;
-        }
-      }
-    }
-
-    $members = array(array('member_id', '=', $membership->id, 0, 0));
-    // check whether its a test drive
-    if ($form->_mode == 'test') {
-      $members[] = array('member_test', '=', 1, 0, 0);
-    }
-
-    CRM_Core_BAO_UFGroup::getValues($formValues['contact_id'], $customFields, $customValues, FALSE, $members);
     $form->assign('customValues', $customValues);
 
     if ($form->_mode) {
+      // @todo move this outside shared code as Batch entry just doesn't
       $form->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
         $form->_params,
         $form->_bltID
@@ -1042,6 +1054,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $form->assign('membership_name', CRM_Member_PseudoConstant::membershipType($membership->membership_type_id));
     }
 
+    // @todo - if we have to figure out if this is for batch processing it doesn't belong in the shared function.
     $isBatchProcess = is_a($form, 'CRM_Batch_Form_Entry');
     if ((empty($form->_contributorDisplayName) || empty($form->_contributorEmail)) || $isBatchProcess) {
       // in this case the form is being called statically from the batch editing screen
@@ -1055,6 +1068,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $form->_receiptContactId = $formValues['contact_id'];
       }
     }
+    // @todo determine isEmailPdf in calling function.
     $template = CRM_Core_Smarty::singleton();
     $taxAmt = $template->get_template_vars('dataArray');
     $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
@@ -1089,8 +1103,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Submit function.
    *
    * This is also accessed by unit tests.
-   *
-   * @return array
    */
   public function submit() {
     $isTest = ($this->_mode == 'test') ? 1 : 0;
@@ -1638,6 +1650,14 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
     }
+    $isRecur = CRM_Utils_Array::value('is_recur', $params);
+    if (($this->_action & CRM_Core_Action::UPDATE)) {
+      $this->addStatusMessage($this->getStatusMessageForUpdate($membership, $endDate));
+    }
+    elseif (($this->_action & CRM_Core_Action::ADD)) {
+      $this->addStatusMessage($this->getStatusMessageForCreate($endDate, $membershipTypes, $createdMemberships,
+        $isRecur, $calcDates));
+    }
 
     if (!empty($lineItem[$this->_priceSetId])) {
       $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
@@ -1700,7 +1720,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $formValues['receipt_text_signup'] = $formValues['receipt_text'];
       // send email receipt
       $this->assignBillingName();
-      $mailSend = self::emailReceipt($this, $formValues, $membership);
+      $mailSend = $this->emailMembershipReceipt($formValues, $membership);
       $receiptSent = TRUE;
     }
 
@@ -1709,10 +1729,13 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->_id = $membership->id;
     }
 
-    $isRecur = CRM_Utils_Array::value('is_recur', $params);
     $this->updateContributionOnMembershipTypeChange($params, $membership);
-    $this->setStatusMessage($membership, $endDate, $receiptSent, $membershipTypes, $createdMemberships, $isRecur, $calcDates, $mailSend);
-    return $createdMemberships;
+    if ($receiptSent && $mailSend) {
+      $this->addStatusMessage(ts('A membership confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail)));
+    }
+
+    CRM_Core_Session::setStatus($this->getStatusMessage(), ts('Complete'), 'success');
+    $this->setStatusMessage($membership);
   }
 
   /**
@@ -1825,11 +1848,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    *
    * @param CRM_Member_BAO_Membership $membership
    * @param string $endDate
-   * @param bool $receiptSend
    *
    * @return string
    */
-  protected function getStatusMessageForUpdate($membership, $endDate, $receiptSend) {
+  protected function getStatusMessageForUpdate($membership, $endDate) {
     // End date can be modified by hooks, so if end date is set then use it.
     $endDate = ($membership->end_date) ? $membership->end_date : $endDate;
 
@@ -1838,10 +1860,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $endDate = CRM_Utils_Date::customFormat($endDate);
       $statusMsg .= ' ' . ts('The membership End Date is %1.', array(1 => $endDate));
     }
-
-    if ($receiptSend) {
-      $statusMsg .= ' ' . ts('A confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail));
-    }
     return $statusMsg;
   }
 
@@ -1849,17 +1867,15 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Get status message for create action.
    *
    * @param string $endDate
-   * @param bool $receiptSend
    * @param array $membershipTypes
    * @param array $createdMemberships
    * @param bool $isRecur
    * @param array $calcDates
-   * @param bool $mailSent
    *
    * @return array|string
    */
-  protected function getStatusMessageForCreate($endDate, $receiptSend, $membershipTypes, $createdMemberships,
-                                               $isRecur, $calcDates, $mailSent) {
+  protected function getStatusMessageForCreate($endDate, $membershipTypes, $createdMemberships,
+                                               $isRecur, $calcDates) {
     // FIX ME: fix status messages
 
     $statusMsg = array();
@@ -1883,33 +1899,13 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
     $statusMsg = implode('<br/>', $statusMsg);
-    if ($receiptSend && !empty($mailSent)) {
-      $statusMsg .= ' ' . ts('A membership confirmation and receipt has been sent to %1.', array(1 => $this->_contributorEmail));
-    }
     return $statusMsg;
   }
 
   /**
    * @param $membership
-   * @param $endDate
-   * @param $receiptSend
-   * @param $membershipTypes
-   * @param $createdMemberships
-   * @param $isRecur
-   * @param $calcDates
-   * @param $mailSend
    */
-  protected function setStatusMessage($membership, $endDate, $receiptSend, $membershipTypes, $createdMemberships, $isRecur, $calcDates, $mailSend) {
-    $statusMsg = '';
-    if (($this->_action & CRM_Core_Action::UPDATE)) {
-      $statusMsg = $this->getStatusMessageForUpdate($membership, $endDate, $receiptSend);
-    }
-    elseif (($this->_action & CRM_Core_Action::ADD)) {
-      $statusMsg = $this->getStatusMessageForCreate($endDate, $receiptSend, $membershipTypes, $createdMemberships,
-        $isRecur, $calcDates, $mailSend);
-    }
-
-    CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
+  protected function setStatusMessage($membership) {
     //CRM-15187
     // display message when membership type is changed
     if (($this->_action & CRM_Core_Action::UPDATE) && $this->_id && !in_array($this->_memType, $this->_memTypeSelected)) {
@@ -1938,13 +1934,62 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected function isUpdateToExistingRecurringMembership() {
     $isRecur = FALSE;
     if ($this->_action & CRM_Core_Action::UPDATE
-      && CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id,
+      && CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->getEntityId(),
         'contribution_recur_id')
-      && !CRM_Member_BAO_Membership::isSubscriptionCancelled($this->_id)) {
+      && !CRM_Member_BAO_Membership::isSubscriptionCancelled($this->getEntityId())) {
 
       $isRecur = TRUE;
     }
     return $isRecur;
+  }
+
+  /**
+   * Send a receipt for the membership.
+   *
+   * @param array $formValues
+   * @param \CRM_Member_BAO_Membership $membership
+   *
+   * @return bool
+   */
+  protected function emailMembershipReceipt($formValues, $membership) {
+    $customValues = $this->getCustomValuesForReceipt($formValues, $membership);
+
+    return self::emailReceipt($this, $formValues, $membership, $customValues);
+  }
+
+  /**
+   * Filter the custom values from the input parameters (for display in the email).
+   *
+   * @todo figure out why the scary code this calls does & document.
+   *
+   * @param array $formValues
+   * @param \CRM_Member_BAO_Membership $membership
+   * @return array
+   */
+  protected function getCustomValuesForReceipt($formValues, $membership) {
+    $customFields = $customValues = [];
+    if (property_exists($this, '_groupTree')
+      && !empty($this->_groupTree)
+    ) {
+      foreach ($this->_groupTree as $groupID => $group) {
+        if ($groupID == 'info') {
+          continue;
+        }
+        foreach ($group['fields'] as $k => $field) {
+          $field['title'] = $field['label'];
+          $customFields["custom_{$k}"] = $field;
+        }
+      }
+    }
+
+    $members = [['member_id', '=', $membership->id, 0, 0]];
+    // check whether its a test drive
+    if ($this->_mode == 'test') {
+      $members[] = ['member_test', '=', 1, 0, 0];
+    }
+
+    CRM_Core_BAO_UFGroup::getValues($formValues['contact_id'], $customFields, $customValues, FALSE, $members);
+    return $customValues;
   }
 
 }

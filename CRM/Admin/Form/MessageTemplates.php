@@ -139,6 +139,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
+      $this->assign('msg_title', $this->_values['msg_title']);
       return;
     }
 

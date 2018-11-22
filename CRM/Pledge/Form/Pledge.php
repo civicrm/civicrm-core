@@ -127,7 +127,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   public function setDefaultValues() {
     $defaults = $this->_values;
 
-    $fields = array();
     if ($this->_action & CRM_Core_Action::DELETE) {
       return $defaults;
     }
@@ -137,25 +136,13 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     if ($this->_id) {
-      $startDate = CRM_Utils_Array::value('start_date', $this->_values);
-      $createDate = CRM_Utils_Array::value('create_date', $this->_values);
-      list($defaults['start_date']) = CRM_Utils_Date::setDateDefaults($startDate);
-      list($defaults['create_date']) = CRM_Utils_Date::setDateDefaults($createDate);
-
-      if ($ackDate = CRM_Utils_Array::value('acknowledge_date', $this->_values)) {
-        list($defaults['acknowledge_date']) = CRM_Utils_Date::setDateDefaults($ackDate);
-      }
-
       // check is this pledge pending.
       // fix the display of the monetary value, CRM-4038.
       if ($this->_isPending) {
         $defaults['eachPaymentAmount'] = $this->_values['amount'] / $this->_values['installments'];
         $defaults['eachPaymentAmount'] = CRM_Utils_Money::format($defaults['eachPaymentAmount'], NULL, '%a');
       }
-      else {
-        $this->assign('start_date', $startDate);
-        $this->assign('create_date', $createDate);
-      }
+
       // fix the display of the monetary value, CRM-4038
       if (isset($this->_values['amount'])) {
         $defaults['amount'] = CRM_Utils_Money::format($this->_values['amount'], NULL, '%a');
@@ -165,9 +152,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
     else {
       // default values.
-      list($now) = CRM_Utils_Date::setDateDefaults();
-      $defaults['create_date'] = $now;
-      $defaults['start_date'] = $now;
+      $defaults['create_date'] = date('Y-m-d');
+      $defaults['start_date'] = date('Y-m-d');
       $defaults['installments'] = 12;
       $defaults['frequency_interval'] = 1;
       $defaults['frequency_day'] = 1;
@@ -277,68 +263,34 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       'onkeyup' => "calculatedPaymentAmount( );",
     );
 
-    $currencyFreeze = FALSE;
-    if ($this->_id &&
-      !$this->_isPending
-    ) {
-      $currencyFreeze = TRUE;
-    }
-
-    $element = $this->addMoney('amount', ts('Total Pledge Amount'), TRUE,
+    $amount = $this->addMoney('amount', ts('Total Pledge Amount'), TRUE,
       array_merge($attributes['pledge_amount'], $js), TRUE,
-      'currency', NULL, $currencyFreeze
+      'currency', NULL, $this->_id && !$this->_isPending
     );
 
-    if ($this->_id &&
-      !$this->_isPending
-    ) {
-      $element->freeze();
-    }
-
-    $element = &$this->add('text', 'installments', ts('To be paid in'),
+    $installments = &$this->add('text', 'installments', ts('To be paid in'),
       array_merge($attributes['installments'], $js), TRUE
     );
     $this->addRule('installments', ts('Please enter a valid number of installments.'), 'positiveInteger');
-    if ($this->_id &&
-      !$this->_isPending
-    ) {
-      $element->freeze();
-    }
 
-    $element = &$this->add('text', 'frequency_interval', ts('every'),
+    $frequencyInterval = $this->add('text', 'frequency_interval', ts('every'),
       $attributes['pledge_frequency_interval'], TRUE
     );
     $this->addRule('frequency_interval', ts('Please enter a number for frequency (e.g. every "3" months).'), 'positiveInteger');
-    if ($this->_id &&
-      !$this->_isPending
-    ) {
-      $element->freeze();
-    }
 
     // Fix frequency unit display for use with frequency_interval
     $freqUnitsDisplay = array();
     foreach ($this->_freqUnits as $val => $label) {
       $freqUnitsDisplay[$val] = ts('%1(s)', array(1 => $label));
     }
-    $element = &$this->add('select', 'frequency_unit',
+    $frequencyUnit = $this->add('select', 'frequency_unit',
       ts('Frequency'),
       array('' => ts('- select -')) + $freqUnitsDisplay,
       TRUE
     );
 
-    if ($this->_id &&
-      !$this->_isPending
-    ) {
-      $element->freeze();
-    }
-
-    $element = &$this->add('text', 'frequency_day', ts('Payments are due on the'), $attributes['frequency_day'], TRUE);
+    $frequencyDay = $this->add('text', 'frequency_day', ts('Payments are due on the'), $attributes['frequency_day'], TRUE);
     $this->addRule('frequency_day', ts('Please enter a valid payment due day.'), 'positiveInteger');
-    if ($this->_id &&
-      !$this->_isPending
-    ) {
-      $element->freeze();
-    }
 
     $this->add('text', 'eachPaymentAmount', ts('each'), array(
         'size' => 10,
@@ -347,10 +299,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       ));
 
     // add various dates
-    if (!$this->_id || $this->_isPending) {
-      $this->addDate('create_date', ts('Pledge Made'), TRUE);
-      $this->addDate('start_date', ts('Payments Start'), TRUE);
-    }
+    $createDate = $this->add('datepicker', 'create_date', ts('Pledge Made'), [], TRUE, ['time' => FALSE]);
+    $startDate = $this->add('datepicker', 'start_date', ts('Payments Start'), [], TRUE, ['time' => FALSE]);
 
     if (!empty($this->_values['currency'])) {
       $this->assign('currency', $this->_values['currency']);
@@ -359,12 +309,16 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $this->assign('currency', $this->_submitValues['currency']);
     }
 
-    if ($this->_id &&
-      !$this->_isPending
-    ) {
+    if ($this->_id && !$this->_isPending) {
+      $amount->freeze();
+      $installments->freeze();
+      $createDate->freeze();
+      $startDate->freeze();
+      $frequencyInterval->freeze();
+      $frequencyUnit->freeze();
+      $frequencyDay->freeze();
       $eachPaymentAmount = $this->_values['original_installment_amount'];
       $this->assign('eachPaymentAmount', $eachPaymentAmount);
-      $this->assign('hideCalender', TRUE);
     }
 
     if (CRM_Utils_Array::value('status_id', $this->_values) !=
@@ -378,7 +332,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
     }
 
-    $this->addDate('acknowledge_date', ts('Acknowledgment Date'));
+    $this->add('datepicker', 'acknowledge_date', ts('Acknowledgment Date'), [], FALSE, ['time' => FALSE]);
 
     $this->add('select', 'financial_type_id',
       ts('Financial Type'),
@@ -398,7 +352,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     foreach ($pageIds as $key => $value) {
       $pledgePages[$value['entity_id']] = $pages[$value['entity_id']];
     }
-    $ele = $this->add('select', 'contribution_page_id', ts('Self-service Payments Page'),
+    $this->add('select', 'contribution_page_id', ts('Self-service Payments Page'),
       array('' => ts('- select -')) + $pledgePages
     );
 

@@ -1311,73 +1311,20 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
   }
 
   /**
-   * @param int $contactID
+   * Generate summary of amount received in the current fiscal year to date from the contact or contacts.
+   *
+   * @param int|array $contactIDs
    *
    * @return array
    */
-  public static function annual($contactID) {
-    if (is_array($contactID)) {
-      $contactIDs = implode(',', $contactID);
-    }
-    else {
-      $contactIDs = $contactID;
+  public static function annual($contactIDs) {
+    if (!is_array($contactIDs)) {
+      // In practice I can't fine any evidence that this function is ever called with
+      // anything other than a single contact id, but left like this due to .... fear.
+      $contactIDs = explode(',', $contactIDs);
     }
 
-    $config = CRM_Core_Config::singleton();
-    $startDate = $endDate = NULL;
-
-    $currentMonth = date('m');
-    $currentDay = date('d');
-    if ((int ) $config->fiscalYearStart['M'] > $currentMonth ||
-      ((int ) $config->fiscalYearStart['M'] == $currentMonth &&
-        (int ) $config->fiscalYearStart['d'] > $currentDay
-      )
-    ) {
-      $year = date('Y') - 1;
-    }
-    else {
-      $year = date('Y');
-    }
-    $nextYear = $year + 1;
-
-    if ($config->fiscalYearStart) {
-      $newFiscalYearStart = $config->fiscalYearStart;
-      if ($newFiscalYearStart['M'] < 10) {
-        $newFiscalYearStart['M'] = '0' . $newFiscalYearStart['M'];
-      }
-      if ($newFiscalYearStart['d'] < 10) {
-        $newFiscalYearStart['d'] = '0' . $newFiscalYearStart['d'];
-      }
-      $config->fiscalYearStart = $newFiscalYearStart;
-      $monthDay = $config->fiscalYearStart['M'] . $config->fiscalYearStart['d'];
-    }
-    else {
-      $monthDay = '0101';
-    }
-    $startDate = "$year$monthDay";
-    $endDate = "$nextYear$monthDay";
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-    $additionalWhere = " AND b.financial_type_id IN (0)";
-    $liWhere = " AND i.financial_type_id IN (0)";
-    if (!empty($financialTypes)) {
-      $additionalWhere = " AND b.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ") AND i.id IS NULL";
-      $liWhere = " AND i.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ")";
-    }
-    $query = "
-      SELECT count(*) as count,
-             sum(total_amount) as amount,
-             avg(total_amount) as average,
-             currency
-        FROM civicrm_contribution b
-        LEFT JOIN civicrm_line_item i ON i.contribution_id = b.id AND i.entity_table = 'civicrm_contribution' $liWhere
-       WHERE b.contact_id IN ( $contactIDs )
-         AND b.contribution_status_id = 1
-         AND b.is_test = 0
-         AND b.receive_date >= $startDate
-         AND b.receive_date <  $endDate
-      $additionalWhere
-      GROUP BY currency
-      ";
+    $query = self::getAnnualQuery($contactIDs);
     $dao = CRM_Core_DAO::executeQuery($query);
     $count = 0;
     $amount = $average = array();
@@ -3208,14 +3155,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $partialAmtPay = CRM_Utils_Rule::cleanMoney($params['partial_amount_to_pay']);
       $partialAmtTotal = CRM_Utils_Rule::cleanMoney($params['partial_payment_total']);
 
-      $fromFinancialAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['financial_type_id'], 'Accounts Receivable Account is');
+      $fromFinancialAccountId = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($params['financial_type_id'], 'Accounts Receivable Account is');
       $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       $params['total_amount'] = $partialAmtPay;
 
       $balanceTrxnInfo = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($params['contribution']->id, $params['financial_type_id']);
       if (empty($balanceTrxnInfo['trxn_id'])) {
         // create new balance transaction record
-        $toFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['financial_type_id'], 'Accounts Receivable Account is');
+        $toFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($params['financial_type_id'], 'Accounts Receivable Account is');
 
         $balanceTrxnParams['total_amount'] = $partialAmtTotal;
         $balanceTrxnParams['to_financial_account_id'] = $toFinancialAccount;
@@ -3356,12 +3303,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           if (!empty($params['revenue_recognition_date']) || $params['prevContribution']->revenue_recognition_date) {
             $accountRelationship = 'Deferred Revenue Account is';
           }
-          $oldFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['prevContribution']->financial_type_id, $accountRelationship);
-          $newFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['financial_type_id'], $accountRelationship);
+          $oldFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($params['prevContribution']->financial_type_id, $accountRelationship);
+          $newFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($params['financial_type_id'], $accountRelationship);
           if ($oldFinancialAccount != $newFinancialAccount) {
             $params['total_amount'] = 0;
             if (in_array($params['contribution']->contribution_status_id, $pendingStatus)) {
-              $params['trxnParams']['to_financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount(
+              $params['trxnParams']['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
                 $params['prevContribution']->financial_type_id, $accountRelationship);
             }
             else {
@@ -3855,6 +3802,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $params = array_merge($defaults, $params);
     $params['skipLineItem'] = TRUE;
     $trxnsData['trxn_date'] = !empty($trxnsData['trxn_date']) ? $trxnsData['trxn_date'] : date('YmdHis');
+    $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $trxnsData, CRM_Utils_Array::value('payment_instrument_id', $params));
     $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionDAO->financial_type_id, 'Accounts Receivable Account is');
 
     $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
@@ -3866,6 +3814,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $trxnsData['net_amount'] = !empty($trxnsData['net_amount']) ? $trxnsData['net_amount'] : $trxnsData['total_amount'];
       $params['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $trxnsData);
       $params['card_type_id'] = CRM_Utils_Array::value('card_type_id', $trxnsData);
+      $params['check_number'] = CRM_Utils_Array::value('check_number', $trxnsData);
 
       // record the entry
       $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnsData);
@@ -4115,10 +4064,11 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     }
 
     $paymentBalance = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($id, $entity, FALSE, $total);
-    $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $contributionId, 'return' => array('is_pay_later', 'contribution_status_id', 'financial_type_id')));
+    $contribution = civicrm_api3('Contribution', 'getsingle', array('id' => $contributionId, 'return' => array('currency', 'is_pay_later', 'contribution_status_id', 'financial_type_id')));
 
     $info['payLater'] = $contribution['is_pay_later'];
     $info['contribution_status'] = $contribution['contribution_status'];
+    $info['currency'] = $contribution['currency'];
 
     $financialTypeId = $contribution['financial_type_id'];
     $feeFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeId, 'Expense Account is');
@@ -4991,7 +4941,8 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
   }
 
   /**
-   * Function to check line items.
+   * Checks if line items total amounts
+   * match the contribution total amount.
    *
    * @param array $params
    *  array of order params.
@@ -5007,7 +4958,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
         if (empty($item['financial_type_id'])) {
           $item['financial_type_id'] = $params['financial_type_id'];
         }
-        $lineItemAmount += $item['line_total'];
+        $lineItemAmount += $item['line_total'] + CRM_Utils_Array::value('tax_amount', $item, 0.00);
       }
     }
 
@@ -5557,6 +5508,82 @@ LIMIT 1;";
       );
     }
     return $actionLinks;
+  }
+
+  /**
+   * Get a query to determine the amount donated by the contact/s in the current financial year.
+   *
+   * @param array $contactIDs
+   *
+   * @return string
+   */
+  public static function getAnnualQuery($contactIDs) {
+    $contactIDs = implode(',', $contactIDs);
+    $config = CRM_Core_Config::singleton();
+    $currentMonth = date('m');
+    $currentDay = date('d');
+    if (
+      (int) $config->fiscalYearStart['M'] > $currentMonth ||
+      (
+        (int) $config->fiscalYearStart['M'] == $currentMonth &&
+        (int) $config->fiscalYearStart['d'] > $currentDay
+      )
+    ) {
+      $year = date('Y') - 1;
+    }
+    else {
+      $year = date('Y');
+    }
+    $nextYear = $year + 1;
+
+    if ($config->fiscalYearStart) {
+      $newFiscalYearStart = $config->fiscalYearStart;
+      if ($newFiscalYearStart['M'] < 10) {
+        // This is just a clumsy way of adding padding.
+        // @todo next round look for a nicer way.
+        $newFiscalYearStart['M'] = '0' . $newFiscalYearStart['M'];
+      }
+      if ($newFiscalYearStart['d'] < 10) {
+        // This is just a clumsy way of adding padding.
+        // @todo next round look for a nicer way.
+        $newFiscalYearStart['d'] = '0' . $newFiscalYearStart['d'];
+      }
+      $config->fiscalYearStart = $newFiscalYearStart;
+      $monthDay = $config->fiscalYearStart['M'] . $config->fiscalYearStart['d'];
+    }
+    else {
+      // First of January.
+      $monthDay = '0101';
+    }
+    $startDate = "$year$monthDay";
+    $endDate = "$nextYear$monthDay";
+    $financialTypes = [];
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
+    // this is a clumsy way of saying never return anything
+    // @todo improve!
+    $liWhere = " AND i.financial_type_id IN (0)";
+    if (!empty($financialTypes)) {
+      $liWhere = " AND i.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ")";
+    }
+    $whereClauses = [
+      'b.contact_id IN (' . $contactIDs . ')',
+      'b.contribution_status_id = ' . (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'b.is_test = 0',
+      'b.receive_date >= ' . $startDate,
+      'b.receive_date <  ' . $endDate,
+    ];
+    CRM_Financial_BAO_FinancialType::buildPermissionedClause($whereClauses, NULL, 'b');
+    $query = "
+      SELECT COUNT(*) as count,
+             SUM(total_amount) as amount,
+             AVG(total_amount) as average,
+             currency
+      FROM civicrm_contribution b
+      LEFT JOIN civicrm_line_item i ON i.contribution_id = b.id AND i.entity_table = 'civicrm_contribution' $liWhere
+      WHERE " . implode(' AND ', $whereClauses) . "
+      GROUP BY currency
+      ";
+    return $query;
   }
 
   /**

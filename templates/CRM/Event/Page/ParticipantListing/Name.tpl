@@ -26,7 +26,7 @@
 {* Displays participant listing for an event. *}
 {if $rows}
     {include file="CRM/common/pager.tpl" location="top"}
-       <table cellpadding="0" cellspacing="0" border="0">
+       <table class="selector" cellpadding="0" cellspacing="0" border="0">
          <tr class="columnheader">
         {foreach from=$headers item=header}
         <th scope="col">

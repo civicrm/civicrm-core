@@ -237,9 +237,6 @@ class CRM_Mailing_BAO_Query {
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    $fields = array();
-    $fields = self::getFields();
-
     switch ($name) {
       case 'mailing_id':
         $selectedMailings = array_flip($value);
@@ -259,14 +256,13 @@ class CRM_Mailing_BAO_Query {
         return;
 
       case 'mailing_name':
-        $value = strtolower(addslashes($value));
+        $value = addslashes($value);
         if ($wildcard) {
           $value = "%$value%";
           $op = 'LIKE';
         }
 
-        // LOWER in query below roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-        $query->_where[$grouping][] = "LOWER(civicrm_mailing.name) $op '$value'";
+        $query->_where[$grouping][] = "civicrm_mailing.name $op '$value'";
         $query->_qill[$grouping][] = "Mailing Namename $op \"$value\"";
         $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
         $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;

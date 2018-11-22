@@ -134,7 +134,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'subject' => 'this case should fail',
       'scheduled_date_time' => date('Ymd'),
     );
-    $result = $this->callAPIFailure('activity', 'create', $params);
+    $this->callAPIFailure('activity', 'create', $params);
   }
 
   /**
@@ -155,7 +155,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'scheduled_date_time' => date('Ymd'),
     );
 
-    $result = $this->callAPIFailure('activity', 'create', $params);
+    $this->callAPIFailure('activity', 'create', $params);
   }
 
   /**
@@ -231,7 +231,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'activity_type_id' => 'Invalid Test activity type',
     );
 
-    $result = $this->callAPIFailure('activity', 'create', $params);
+    $this->callAPIFailure('activity', 'create', $params);
   }
 
   /**
@@ -556,7 +556,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'activity_name' => 'Test activity type',
     );
 
-    $result = $this->callAPIFailure('activity', 'create', $params,
+    $this->callAPIFailure('activity', 'create', $params,
       "'Invalid' is not a valid option for field status_id");
   }
 
@@ -589,7 +589,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * Test civicrm_activity_get() with no params
    */
   public function testActivityGetEmpty() {
-    $result = $this->callAPISuccess('activity', 'get', array());
+    $this->callAPISuccess('activity', 'get', array());
   }
 
   /**
@@ -684,25 +684,27 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $contact2 = $this->individualCreate($contact2Params);
 
+    $this->callAPISuccess('OptionValue', 'get', ['name' => 'Activity Targets', 'api.OptionValue.create' => ['label' => 'oh so creative']]);
+
     $params['assignee_contact_id'] = array($contact1, $contact2);
     $params['target_contact_id'] = array($contact2 => $contact2);
     $activity = $this->callAPISuccess('Activity', 'Create', $params);
 
-    $activityget = $this->callAPISuccess('Activity', 'get', array(
+    $activityGet = $this->callAPISuccess('Activity', 'get', array(
       'id' => $activity['id'],
       'target_contact_id' => $contact2,
       'return.target_contact_id' => 1,
     ));
-    $this->assertEquals($activity['id'], $activityget['id']);
-    $this->assertEquals($contact2, $activityget['values'][$activityget['id']]['target_contact_id'][0]);
+    $this->assertEquals($activity['id'], $activityGet['id']);
+    $this->assertEquals($contact2, $activityGet['values'][$activityGet['id']]['target_contact_id'][0]);
 
-    $activityget = $this->callAPISuccess('activity', 'get', array(
+    $activityGet = $this->callAPISuccess('activity', 'get', array(
       'target_contact_id' => $this->_contactID,
       'return.target_contact_id' => 1,
       'id' => $activity['id'],
     ));
-    if ($activityget['count'] > 0) {
-      $this->assertNotEquals($contact2, $activityget['values'][$activityget['id']]['target_contact_id'][0]);
+    if ($activityGet['count'] > 0) {
+      $this->assertNotEquals($contact2, $activityGet['values'][$activityGet['id']]['target_contact_id'][0]);
     }
   }
 
@@ -713,11 +715,11 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $subject = 'test activity ' . __FUNCTION__ . mt_rand();
     $params = $this->_params;
     $params['subject'] = $subject;
-    $activity = $this->callAPISuccess('Activity', 'Create', $params);
-    $activityget = $this->callAPISuccess('activity', 'getsingle', array(
+    $this->callAPISuccess('Activity', 'Create', $params);
+    $activityGet = $this->callAPISuccess('activity', 'getsingle', array(
       'subject' => $subject,
     ));
-    $this->assertEquals($activityget['subject'], $subject);
+    $this->assertEquals($activityGet['subject'], $subject);
   }
 
   /**

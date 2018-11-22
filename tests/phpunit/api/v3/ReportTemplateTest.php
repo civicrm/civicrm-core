@@ -118,6 +118,76 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test api to get rows from reports.
+   *
+   * @dataProvider getReportTemplatesSupportingSelectWhere
+   *
+   * @param $reportID
+   *
+   * @throws \PHPUnit_Framework_IncompleteTestError
+   */
+  public function testReportTemplateSelectWhere($reportID) {
+    $this->hookClass->setHook('civicrm_selectWhereClause', array($this, 'hookSelectWhere'));
+    $result = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => $reportID,
+      'options' => ['metadata' => ['sql']],
+    ]);
+    $found = FALSE;
+    foreach ($result['metadata']['sql'] as $sql) {
+      if (strstr($sql, " =  'Organization' ")) {
+        $found = TRUE;
+      }
+    }
+    $this->assertTrue($found, $reportID);
+  }
+
+  /**
+   * Get templates suitable for SelectWhere test.
+   *
+   * @return array
+   */
+  public function getReportTemplatesSupportingSelectWhere() {
+    $allTemplates = $this->getReportTemplates();
+    // Exclude all that do not work as of test being written. I have not dug into why not.
+    $currentlyExcluded = [
+      'contribute/repeat',
+      'member/summary',
+      'event/summary',
+      'case/summary',
+      'case/timespent',
+      'case/demographics',
+      'contact/log',
+      'contribute/bookkeeping',
+      'grant/detail',
+      'event/incomesummary',
+      'case/detail',
+      'Mailing/bounce',
+      'Mailing/summary',
+      'grant/statistics',
+      'logging/contact/detail',
+      'logging/contact/summary',
+    ];
+    foreach ($allTemplates as $index => $template) {
+      $reportID = $template[0];
+      if (in_array($reportID, $currentlyExcluded) || stristr($reportID, 'has existing issues')) {
+        unset($allTemplates[$index]);
+      }
+    }
+    return $allTemplates;
+  }
+
+  /**
+   * @param \CRM_Core_DAO $entity
+   * @param array $clauses
+   */
+  public function hookSelectWhere($entity, &$clauses) {
+    // Restrict access to cases by type
+    if ($entity == 'Contact') {
+      $clauses['contact_type'][] = " =  'Organization' ";
+    }
+  }
+
+  /**
    * Test getrows on contact summary report.
    */
   public function testReportTemplateGetRowsContactSummary() {
@@ -454,6 +524,31 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       "<a href='/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=" . $contactID2 . "'>Anderson, Anthony</a> $ 5.00",
       $rows['values'][0]['civicrm_contribution_soft_credits']
     );
+  }
+
+  /**
+   * Test the amount column is populated on soft credit details.
+   */
+  public function testContributionDetailSoftCreditsOnly() {
+    $contactID = $this->individualCreate();
+    $contactID2 = $this->individualCreate();
+    $this->contributionCreate(['contact_id' => $contactID, 'api.ContributionSoft.create' => ['amount' => 5, 'contact_id' => $contactID2]]);
+    $template = 'contribute/detail';
+    $rows = $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => $template,
+      'contribution_or_soft_value' => 'soft_credits_only',
+      'fields' => [
+        'sort_name' => '1',
+        'email' => '1',
+        'financial_type_id' => '1',
+        'receive_date' => '1',
+        'total_amount' => '1',
+      ],
+      'options' => array('metadata' => ['sql', 'labels']),
+    ));
+    foreach (array_keys($rows['metadata']['labels']) as $header) {
+      $this->assertTrue(!empty($rows['values'][0][$header]));
+    }
   }
 
   /**
@@ -904,6 +999,31 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'target_contact_id' => array($this->contactIDs[0], $this->contactIDs[1]),
       'assignee_contact_id' => $this->contactIDs[1],
     ]);
+  }
+
+  /**
+   * Test the group filter works on the contribution summary.
+   */
+  public function testContributionDetailTotalHeader() {
+    $contactID = $this->individualCreate();
+    $contactID2 = $this->individualCreate();
+    $this->contributionCreate(['contact_id' => $contactID, 'api.ContributionSoft.create' => ['amount' => 5, 'contact_id' => $contactID2]]);
+    $template = 'contribute/detail';
+    $rows = $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => $template,
+      'contribution_or_soft_value' => 'contributions_only',
+      'fields' => [
+        'sort_name' => '1',
+        'age' => '1',
+        'email' => '1',
+        'phone' => '1',
+        'financial_type_id' => '1',
+        'receive_date' => '1',
+        'total_amount' => '1',
+       ],
+      'order_bys' => [['column' => 'sort_name', 'order' => 'ASC', 'section' => '1']],
+      'options' => array('metadata' => array('sql')),
+    ));
   }
 
 }

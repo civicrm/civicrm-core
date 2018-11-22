@@ -521,22 +521,6 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
         }
       }
 
-      // handle state province
-      if (array_key_exists('civicrm_address_state_province_id', $row)) {
-        if ($value = $row['civicrm_address_state_province_id']) {
-          $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($value, FALSE);
-        }
-        $entryFound = TRUE;
-      }
-
-      // handle country
-      if (array_key_exists('civicrm_address_country_id', $row)) {
-        if ($value = $row['civicrm_address_country_id']) {
-          $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
-        }
-        $entryFound = TRUE;
-      }
-
       if (!empty($row['civicrm_financial_trxn_card_type_id'])) {
         $rows[$rowNum]['civicrm_financial_trxn_card_type_id'] = $this->getLabels($row['civicrm_financial_trxn_card_type_id'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type_id');
         $entryFound = TRUE;
@@ -580,6 +564,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
         }
       }
 
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
       // skip looking further in rows, if first row itself doesn't
       if (!$entryFound) {
         break;

@@ -150,21 +150,17 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @param string $string
    *   String to be tested.
-   * @param bool $checkCharSet
+   *
    *   Bool to see if we should check charset.
    *
    * @throws \Exception
    */
-  public function testInternationalStrings($string, $checkCharSet = FALSE) {
+  public function testInternationalStrings($string) {
     $this->callAPISuccess('Contact', 'create', array_merge(
       $this->_params,
       array('first_name' => $string)
     ));
-    if ($checkCharSet) {
-      if (!CRM_Utils_SQL::supportStorageOfAccents()) {
-        $this->markTestIncomplete('Database is not Charset UTF8 therefore can not store accented strings properly');
-      }
-    }
+
     $result = $this->callAPISuccessGetSingle('Contact', array('first_name' => $string));
     $this->assertEquals($string, $result['first_name']);
 
@@ -183,8 +179,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function getInternationalStrings() {
     $invocations = array();
-    $invocations[] = array('Scarabée', TRUE);
-    $invocations[] = array('Iñtërnâtiônàlizætiøn', TRUE);
+    $invocations[] = array('Scarabée');
+    $invocations[] = array('Iñtërnâtiônàlizætiøn');
     $invocations[] = array('これは日本語のテキストです。読めますか');
     $invocations[] = array('देखें हिन्दी कैसी नजर आती है। अरे वाह ये तो नजर आती है।');
     return $invocations;
@@ -394,6 +390,22 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccess('contact', 'create', $params);
     $params['sort_name'] = 'abc1';
     $this->getAndCheck($params, $contact['id'], 'contact');
+  }
+
+  /**
+   * Test that name searches are case insensitive.
+   */
+  public function testGetNameVariantsCaseInsensitive() {
+    $this->callAPISuccess('contact', 'create', [
+      'display_name' => 'Abc1',
+      'contact_type' => 'Individual',
+    ]);
+    $this->callAPISuccessGetSingle('Contact', ['display_name' => 'aBc1']);
+    $this->callAPISuccessGetSingle('Contact', ['sort_name' => 'aBc1']);
+    Civi::settings()->set('includeNickNameInName', TRUE);
+    $this->callAPISuccessGetSingle('Contact', ['display_name' => 'aBc1']);
+    $this->callAPISuccessGetSingle('Contact', ['sort_name' => 'aBc1']);
+    Civi::settings()->set('includeNickNameInName', FALSE);
   }
 
   /**
@@ -3183,7 +3195,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * CRM-15443 - ensure getlist api does not return deleted contacts.
    */
   public function testGetlistExcludeConditions() {
-    $name = md5(time());
+    $name = 'Scarabée';
     $contact = $this->individualCreate(array('last_name' => $name));
     $this->individualCreate(array('last_name' => $name, 'is_deceased' => 1));
     $this->individualCreate(array('last_name' => $name, 'is_deleted' => 1));

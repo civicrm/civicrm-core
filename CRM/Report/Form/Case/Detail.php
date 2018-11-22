@@ -180,6 +180,12 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->rel_types,
           ),
+          'is_active' => array(
+            'title' => ts('Active Role?'),
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+            'default' => TRUE,
+            'options' => CRM_Core_SelectValues::boolean(),
+          ),
         ),
       ),
       'civicrm_email' => array(
@@ -572,8 +578,9 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
   }
 
   public function checkEnabledFields() {
-    if (isset($this->_params['case_role_value'])
-      && !empty($this->_params['case_role_value'])
+    if ((isset($this->_params['case_role_value'])
+        && !empty($this->_params['case_role_value'])) ||
+        (isset($this->_params['is_active_value']))
     ) {
       $this->_relField = TRUE;
     }
@@ -650,18 +657,6 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         }
         $entryFound = TRUE;
       }
-      if (array_key_exists('civicrm_address_country_id', $row)) {
-        if ($value = $row['civicrm_address_country_id']) {
-          $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
-        }
-        $entryFound = TRUE;
-      }
-      if (array_key_exists('civicrm_address_state_province_id', $row)) {
-        if ($value = $row['civicrm_address_state_province_id']) {
-          $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
-        }
-        $entryFound = TRUE;
-      }
       if (array_key_exists('civicrm_activity_last_last_activity_activity_subject', $row) &&
         empty($row['civicrm_activity_last_last_activity_activity_subject'])
       ) {
@@ -715,6 +710,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
       if (!$entryFound) {
         break;
       }

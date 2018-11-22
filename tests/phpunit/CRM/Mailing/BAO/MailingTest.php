@@ -399,6 +399,21 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
 
     // Tear down: delete mailing, groups, contacts
     $this->deleteMailing($mailing['id']);
+
+    // Create a New mailing, Testing contacts removed from smart group.
+    // In this case groupIDs6 will only pick up contacts[0] amd contacts[8] with it's
+    // criteria. However we are deliberly going to remove contactIds[8] from the group
+    // Which should mean the mainling only finds 1 contact that is contactIds[0]
+    $mailing = $this->callAPISuccess('Mailing', 'create', array());
+    $this->callAPISuccess('GroupContact', 'Create', array(
+      'group_id' => $groupIDs[6],
+      'contact_id' => $contactIDs[8],
+      'status' => 'Removed',
+    ));
+    $this->createMailingGroup($mailing['id'], $groupIDs[6]);
+    $this->assertRecipientsCorrect($mailing['id'], [$contactIDs[0]]);
+    // Tear down: delete mailing, groups, contacts
+    $this->deleteMailing($mailing['id']);
     foreach ($groupIDs as $groupID) {
       $this->groupDelete($groupID);
     }
@@ -413,6 +428,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   public function testgetRecipientsSMS() {
     // Tests for SMS bulk mailing recipients
     // +CRM-21320 Ensure primary mobile number is selected over non-primary
+    // +core/384 Ensure that a secondary mobile number is selected if the primary can not receive SMS
 
     // Setup
     $smartGroupParams = array(
@@ -441,6 +457,13 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     $this->callAPISuccess('GroupContact', 'Create', array(
       'group_id' => $group,
       'contact_id' => $contactID2,
+    ));
+
+    // Create contact 3 and add in group
+    $contactID3 = $this->individualCreate(array(), 2);
+    $this->callAPISuccess('GroupContact', 'Create', array(
+      'group_id' => $group,
+      'contact_id' => $contactID3,
     ));
 
     $contactIDPhoneRecords = array(
@@ -477,12 +500,30 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
           'is_primary' => 1,
         ))),
       ),
+      // Create primary that cant recieve SMS but a secondary that can, to test core/384
+      $contactID3 => array(
+        'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
+          'contact_id' => $contactID3,
+          'phone' => "03 01",
+          'location_type_id' => "Home",
+          'phone_type_id' => "Mobile",
+          'is_primary' => 0,
+        ))),
+        'primary_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
+          'contact_id' => $contactID3,
+          'phone' => "03 02",
+          'location_type_id' => "Work",
+          'phone_type_id' => "Phone",
+          'is_primary' => 1,
+        ))),
+      ),
     );
 
     // Prepare expected results
     $checkPhoneIDs = array(
       $contactID1 => $contactIDPhoneRecords[$contactID1]['primary_phone_id'],
       $contactID2 => $contactIDPhoneRecords[$contactID2]['primary_phone_id'],
+      $contactID3 => $contactIDPhoneRecords[$contactID3]['other_phone_id'],
     );
 
     // Create mailing
@@ -494,9 +535,9 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     $recipients = $this->callAPISuccess('MailingRecipients', 'get', array('mailing_id' => $mailing['id']));
 
     // Check the count is correct
-    $this->assertEquals(2, $recipients['count'], 'Check recipient count');
+    $this->assertEquals(3, $recipients['count'], 'Check recipient count');
 
-    // Check we got the 'primary' mobile for both contacts
+    // Check we got the 'primary' mobile for contacts or the other phone when the primary was no SMS capable.
     foreach ($recipients['values'] as $value) {
       $this->assertEquals($value['phone_id'], $checkPhoneIDs[$value['contact_id']], 'Check correct phone number for contact ' . $value['contact_id']);
     }
@@ -507,6 +548,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     $this->groupDelete($group);
     $this->contactDelete($contactID1);
     $this->contactDelete($contactID2);
+    $this->contactDelete($contactID3);
   }
 
   /**

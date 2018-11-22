@@ -79,9 +79,7 @@
     {if $action eq 8}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>&nbsp;
-      <span class="font-red bold">{ts}WARNING: Deleting this membership will also delete any related payment (contribution) records.{/ts} {ts}This action cannot be undone.{/ts}</span>
-      <p>{ts}Consider modifying the membership status instead if you want to maintain an audit trail and avoid losing payment data. You can set the status to Cancelled by editing the membership and clicking the Status Override checkbox.{/ts}</p>
-      <p>{ts}Click 'Delete' if you want to continue.{/ts}</p>
+      {$deleteMessage}
     </div>
     {else}
       <table class="form-layout-compressed">
@@ -133,10 +131,10 @@
         {include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
         campaignTrClass="crm-membership-form-block-campaign_id"}
 
-        <tr class="crm-membership-form-block-join_date"><td class="label">{$form.join_date.label}</td><td>{include file="CRM/common/jcalendar.tpl" elementName=join_date}
+        <tr class="crm-membership-form-block-join_date"><td class="label">{$form.join_date.label}</td><td>{$form.join_date.html}
           <br />
           <span class="description">{ts}When did this contact first become a member?{/ts}</span></td></tr>
-        <tr class="crm-membership-form-block-start_date"><td class="label">{$form.start_date.label}</td><td>{include file="CRM/common/jcalendar.tpl" elementName=start_date}
+        <tr class="crm-membership-form-block-start_date"><td class="label">{$form.start_date.label}</td><td>{$form.start_date.html}
           <br />
           <span class="description">{ts}First day of current continuous membership period. Start Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span></td></tr>
         <tr class="crm-membership-form-block-end_date"><td class="label">{$form.end_date.label}</td>
@@ -148,7 +146,7 @@
               {help id="override_end_date"}
           </td>
           <td id="end-date-editable">
-            {include file="CRM/common/jcalendar.tpl" elementName=end_date}
+            {$form.end_date.html}
             <br />
             <span class="description">{ts}Latest membership period expiration date. End Date will be automatically set based on Membership Type if you don't select a date.{/ts}</span>
           </td>
@@ -247,7 +245,6 @@
       {/if}
     {/if}
 
-    <div class="spacer"></div>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   </div> <!-- end form-block -->
 

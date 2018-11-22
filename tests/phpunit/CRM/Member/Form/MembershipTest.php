@@ -135,6 +135,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
         'civicrm_membership_type',
         'civicrm_membership',
         'civicrm_uf_match',
+        'civicrm_email',
       )
     );
     foreach (array(17, 18, 23, 32) as $contactID) {
@@ -464,6 +465,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @dataProvider getThousandSeparators
    */
   public function testSubmit($thousandSeparator) {
+    CRM_Core_Session::singleton()->getStatus(TRUE);
     $this->setCurrencySeparators($thousandSeparator);
     $form = $this->getForm();
     $form->preProcess();
@@ -472,7 +474,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     $params = array(
       'cid' => $this->_individualId,
-      'join_date' => date('m/d/Y', time()),
+      'join_date' => date('2/d/Y', time()),
       'start_date' => '',
       'end_date' => '',
       // This format reflects the 23 being the organisation & the 25 being the type.
@@ -545,6 +547,14 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'Receipt text',
     ));
     $this->mut->stop();
+    $this->assertEquals([
+      [
+        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been added. The new membership End Date is December 31st, ' . date('Y') . '. A membership confirmation and receipt has been sent to anthony_anderson@civicrm.org.',
+        'title' => 'Complete',
+        'type' => 'success',
+        'options' => NULL,
+      ],
+    ], CRM_Core_Session::singleton()->getStatus());
   }
 
   /**

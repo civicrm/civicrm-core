@@ -46,7 +46,7 @@ return array(
       'size' => 64,
       'maxlength' => 128,
     ),
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'default' => 'https://civicrm.org/extdir/ver={ver}|cms={uf}',
     'add' => '4.3',
     'title' => 'Extension Repo URL',

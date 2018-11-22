@@ -1469,7 +1469,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     $allRelationshipType = CRM_Core_PseudoConstant::relationshipType();
 
     foreach ($allRelationshipType as $key => $type) {
-      if ($type['contact_type_b'] == $targetContactType) {
+      if ($type['contact_type_b'] == $targetContactType || empty($type['contact_type_b'])) {
         $relationshipType[$key . '_a_b'] = $type['label_a_b'];
       }
     }

@@ -50,6 +50,7 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
     'smartGroupCacheTimeout' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'defaultSearchProfileID' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'searchPrimaryDetailsOnly' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'quicksearch_options' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
   );
 
   /**
@@ -68,6 +69,10 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
     // Autocomplete for Contact Reference (custom fields)
     $element = $this->getElement('contact_reference_options');
+    $element->_elements[0]->_flagFrozen = TRUE;
+
+    // Freeze first element of quicksearch options
+    $element = $this->getElement('quicksearch_options');
     $element->_elements[0]->_flagFrozen = TRUE;
   }
 

@@ -132,6 +132,14 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-star-o';
+  }
+
+  /**
+   * @inheritDoc
    * @return null
    */
   public function registerAdvancedSearchPane() {

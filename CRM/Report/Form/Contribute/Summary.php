@@ -74,7 +74,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
     if ($campaignEnabled) {
-      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
+      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, FALSE, FALSE, TRUE);
       $this->activeCampaigns = $getCampaigns['campaigns'];
       asort($this->activeCampaigns);
     }
@@ -525,15 +525,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           AND {$this->_aliases['civicrm_batch']}.entity_table = 'civicrm_financial_trxn')";
     }
 
-    // for credit card type
-    if ($this->isTableSelected('civicrm_financial_trxn')) {
-      $this->_from .= "
-        LEFT JOIN civicrm_entity_financial_trxn eftcc
-          ON ({$this->_aliases['civicrm_contribution']}.id = eftcc.entity_id AND
-            eftcc.entity_table = 'civicrm_contribution')
-        LEFT JOIN civicrm_financial_trxn {$this->_aliases['civicrm_financial_trxn']}
-          ON {$this->_aliases['civicrm_financial_trxn']}.id = eftcc.financial_trxn_id";
-    }
+    $this->addFinancialTrxnFromClause();
   }
 
   /**
@@ -648,6 +640,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as civicrm
 
     if ($softCredit) {
       $this->from();
+      $this->customDataFrom();
       $select = "
 COUNT({$this->_aliases['civicrm_contribution_soft']}.amount )        as civicrm_contribution_soft_soft_amount_count,
 SUM({$this->_aliases['civicrm_contribution_soft']}.amount )          as civicrm_contribution_soft_soft_amount_sum,
@@ -769,6 +762,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
     $softCredit = (!empty($this->_params['fields']['soft_amount']) && !empty($this->_params['fields']['total_amount'])) ? TRUE : FALSE;
     if ($softCredit) {
       $this->from('contribution');
+      $this->customDataFrom();
       $contriSQL = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
       $contriDAO = CRM_Core_DAO::executeQuery($contriSQL);
       $contriFields = array(

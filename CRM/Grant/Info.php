@@ -117,8 +117,16 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
     return array(
       'title' => ts('Grants'),
       'url' => 'grant',
-      'weight' => 50,
+      'weight' => 60,
     );
+  }
+
+  /**
+   * @inheritDoc
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-money';
   }
 
   /**

@@ -204,7 +204,7 @@
       {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="makeContribution"}
     </div>
 
-    {if $honoreeProfileFields|@count}
+    {if $honoreeProfileFields && $honoreeProfileFields|@count}
       <fieldset class="crm-public-form-item crm-group honor_block-group">
         {crmRegion name="contribution-soft-credit-block"}
           <legend>{$honor_block_title}</legend>

@@ -440,6 +440,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       if (CRM_Core_Permission::access('CiviEvent')) {
         $fields['Participant'] = CRM_Event_BAO_Participant::exportableFields();
         //get the component payment fields
+        // @todo - review this - inconsistent with other entities & hacky.
         if ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT) {
           $componentPaymentFields = array();
           foreach (CRM_Export_BAO_Export::componentPaymentFields() as $payField => $payTitle) {
@@ -997,9 +998,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       $customGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $customFieldId, 'custom_group_id');
       $customGroupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'title');
 
-      if (strlen($customGroupName) > 13) {
-        $customGroupName = substr($customGroupName, 0, 10) . '...';
-      }
+      $customGroupName = CRM_Utils_String::ellipsify($customGroupName, 13);
 
       return $customGroupName;
     }

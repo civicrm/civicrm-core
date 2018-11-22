@@ -61,7 +61,7 @@ class CRM_Contact_Page_AJAX {
     $cf = array();
     CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $cf, $returnProperties);
     if (!$cf['id'] || !$cf['is_active'] || $cf['data_type'] != 'ContactReference') {
-      CRM_Utils_System::civiExit('error');
+      CRM_Utils_System::civiExit(1);
     }
 
     if (!empty($cf['filter'])) {
@@ -70,7 +70,7 @@ class CRM_Contact_Page_AJAX {
 
       $action = CRM_Utils_Array::value('action', $filterParams);
       if (!empty($action) && !in_array($action, array('get', 'lookup'))) {
-        CRM_Utils_System::civiExit('error');
+        CRM_Utils_System::civiExit(1);
       }
 
       if (!empty($filterParams['group'])) {
@@ -136,7 +136,7 @@ class CRM_Contact_Page_AJAX {
     $contact = civicrm_api('Contact', 'Get', $params);
 
     if (!empty($contact['is_error'])) {
-      CRM_Utils_System::civiExit('error');
+      CRM_Utils_System::civiExit(1);
     }
 
     $contactList = array();
@@ -463,34 +463,28 @@ LIMIT {$offset}, {$rowCount}
   public static function getContactPhone() {
 
     $queryString = NULL;
+    $sqlParmas = [];
     //check for mobile type
     $phoneTypes = CRM_Core_OptionGroup::values('phone_type', TRUE, FALSE, FALSE, NULL, 'name');
     $mobileType = CRM_Utils_Array::value('Mobile', $phoneTypes);
 
-    $name = CRM_Utils_Array::value('name', $_GET);
+    $name = CRM_Utils_Request::retrieveValue('name', 'String', NULL, FALSE, 'GET');
     if ($name) {
-      $name = CRM_Utils_Type::escape($name, 'String');
-      $queryString = " ( cc.sort_name LIKE '%$name%' OR cp.phone LIKE '%$name%' ) ";
+      $key = (int) count(array_keys($sqlParmas)) + 1;
+      $queryString = " ( cc.sort_name LIKE %{$key} OR cp.phone LIKE %{$key} ) ";
+      $sqlParams[$key] = ['%' . $name . '%', 'String'];
     }
     else {
-      $cid = CRM_Utils_Array::value('cid', $_GET);
+      $cid = CRM_Utils_Request::retrieveValue('cid', 'CommaSeparatedIntegers', NULL, FALSE, 'GET');
       if ($cid) {
-        //check cid for integer
-        $contIDS = explode(',', $cid);
-        foreach ($contIDS as $contID) {
-          CRM_Utils_Type::escape($contID, 'Integer');
-        }
         $queryString = " cc.id IN ( $cid )";
       }
     }
 
     if ($queryString) {
       $result = array();
-      $offset = CRM_Utils_Array::value('offset', $_GET, 0);
-      $rowCount = CRM_Utils_Array::value('rowcount', $_GET, 20);
-
-      $offset = CRM_Utils_Type::escape($offset, 'Int');
-      $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
+      $offset = (int) CRM_Utils_Request::retrieveValue('offset', 'Integer', 0, FALSE, 'GET');
+      $rowCount = (int) CRM_Utils_Request::retrieveValue('rowcount', 'Integer', 20, FALSE, 'GET');
 
       // add acl clause here
       list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
@@ -514,7 +508,7 @@ LIMIT {$offset}, {$rowCount}
         CRM_Utils_Request::retrieve('cid', 'Positive')
       );
 
-      $dao = CRM_Core_DAO::executeQuery($query);
+      $dao = CRM_Core_DAO::executeQuery($query, $sqlParams);
 
       while ($dao->fetch()) {
         $result[] = array(

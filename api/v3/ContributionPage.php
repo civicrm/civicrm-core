@@ -104,6 +104,26 @@ function civicrm_api3_contribution_page_submit($params) {
   return civicrm_api3_create_success($result, $params, 'ContributionPage', 'submit');
 }
 
+/**
+ * Validate ContributionPage submission parameters.
+ *
+ * @param array $params
+ *   Array per getfields metadata.
+ *
+ * @return array
+ *   API result array
+ */
+function civicrm_api3_contribution_page_validate($params) {
+  $form = new CRM_Contribute_Form_Contribution_Main();
+  $form->controller = new CRM_Core_Controller();
+  $form->set('id', $params['id']);
+  $form->preProcess();
+  $errors = CRM_Contribute_Form_Contribution_Main::formRule($params, [], $form);
+  if ($errors === TRUE) {
+    $errors = [];
+  }
+  return civicrm_api3_create_success($errors, $params, 'ContributionPage', 'validate');
+}
 
 /**
  * Set default getlist parameters.

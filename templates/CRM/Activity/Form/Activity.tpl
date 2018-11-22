@@ -156,9 +156,13 @@
       <td class="view-value">
       {$form.details.html}
       </td>
-      {else}
+    {elseif $activityTypeName eq "Inbound Email"}
       <td class="view-value">
        {$form.details.html|crmStripAlternatives|nl2br}
+      </td>
+    {else}
+      <td class="view-value">
+       {$form.details.html|crmStripAlternatives}
       </td>
     {/if}
   </tr>

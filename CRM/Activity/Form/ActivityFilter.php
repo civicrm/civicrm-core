@@ -67,10 +67,8 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
   public function setDefaultValues() {
     // CRM-11761 retrieve user's activity filter preferences
     $defaults = array();
-    if (Civi::settings()->get('preserve_activity_tab_filter') && ($userID = CRM_Core_Session::getLoggedInContactID())) {
-      $defaults = Civi::service('settings_manager')
-        ->getBagByContact(NULL, $userID)
-        ->get('activity_tab_filter');
+    if (Civi::settings()->get('preserve_activity_tab_filter') && (CRM_Core_Session::getLoggedInContactID())) {
+      $defaults = Civi::contactSettings()->get('activity_tab_filter');
     }
     // set Activity status 'Scheduled' by default only for dashlet
     elseif (strstr(CRM_Utils_Array::value('q', $_GET), 'dashlet')) {

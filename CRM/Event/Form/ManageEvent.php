@@ -357,7 +357,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       switch ($className) {
         case 'Event':
           $attributes = $this->getVar('_attributes');
-          $subPage = strtolower(basename(CRM_Utils_Array::value('action', $attributes)));
+          $subPage = CRM_Utils_Request::retrieveComponent($attributes);
           break;
 
         case 'EventInfo':

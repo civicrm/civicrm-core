@@ -1149,7 +1149,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
         $statusMsg = ts('Image could not be uploaded due to invalid type extension.');
       }
       if ($opType == 'status') {
-        CRM_Core_Session::setStatus($statusMsg, 'Sorry', 'error');
+        CRM_Core_Session::setStatus($statusMsg, ts('Error'), 'error');
       }
       // FIXME: additional support for fatal, bounce etc could be added.
       return FALSE;
@@ -1448,7 +1448,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             'name' => 'tag',
           ),
           'note' => array(
-            'title' => ts('Note(s)'),
+            'title' => ts('Note'),
             'name' => 'note',
           ),
           'communication_style_id' => array(
@@ -2032,8 +2032,10 @@ ORDER BY civicrm_email.is_primary DESC";
       CRM_Contact_BAO_GroupContact::create($params['group'], $contactID, $visibility, $method);
     }
 
-    if (!empty($fields['tag'])) {
-      CRM_Core_BAO_EntityTag::create($params['tag'], 'civicrm_contact', $contactID);
+    if (!empty($fields['tag']) && array_key_exists('tag', $params)) {
+      // Convert comma separated form values from select2 v3
+      $tags = is_array($params['tag']) ? $params['tag'] : array_fill_keys(array_filter(explode(',', $params['tag'])), 1);
+      CRM_Core_BAO_EntityTag::create($tags, 'civicrm_contact', $contactID);
     }
 
     //to add profile in default group

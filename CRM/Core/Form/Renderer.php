@@ -123,6 +123,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       elseif ($element->getAttribute('type') == 'text' && $element->getAttribute('data-select-params')) {
         $this->renderFrozenSelect2($el, $element);
       }
+      elseif ($element->getAttribute('type') == 'text' && $element->getAttribute('data-crm-datepicker')) {
+        $this->renderFrozenDatepicker($el, $element);
+      }
       elseif ($element->getAttribute('type') == 'text' && $element->getAttribute('formatType')) {
         list($date, $time) = CRM_Utils_Date::setDateDefaults($element->getValue(), $element->getAttribute('formatType'), $element->getAttribute('format'), $element->getAttribute('timeformat'));
         $date .= ($element->getAttribute('timeformat')) ? " $time" : '';
@@ -257,6 +260,29 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     }
     // Convert array values back to a string
     $field->setValue(implode(',', $val));
+  }
+
+  /**
+   * Render datepicker as text.
+   *
+   * @param array $el
+   * @param HTML_QuickForm_element $field
+   */
+  public function renderFrozenDatepicker(&$el, $field) {
+    $settings = json_decode($field->getAttribute('data-crm-datepicker'), TRUE);
+    $settings += ['date' => TRUE, 'time' => TRUE];
+    $val = $field->getValue();
+    if ($val) {
+      $dateFormat = NULL;
+      if (!$settings['time']) {
+        $val = substr($val, 0, 10);
+      }
+      elseif (!$settings['date']) {
+        $dateFormat = Civi::settings()->get('dateformatTime');
+      }
+      $val = CRM_Utils_Date::customFormat($val, $dateFormat);
+    }
+    $el['html'] = $val . '<input type="hidden" value="' . $field->getValue() . '" name="' . $field->getAttribute('name') . '">';
   }
 
   /**

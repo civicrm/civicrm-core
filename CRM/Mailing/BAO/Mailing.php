@@ -160,7 +160,9 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         ->param('#groupIDs', $groupIDs)
         ->execute();
       while ($groupDAO->fetch()) {
-        if ($groupDAO->cache_date == NULL) {
+        // hidden smart groups always have a cache date and there is no other way
+        //  we can rebuilt the contact list from UI so consider such smart group
+        if ($groupDAO->cache_date == NULL || $groupDAO->is_hidden) {
           CRM_Contact_BAO_GroupContactCache::load($groupDAO);
         }
         if ($groupType == 'Include') {
@@ -235,10 +237,9 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         'location_filter' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.phone_type_id = " . CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_Phone', 'phone_type_id', 'Mobile')),
         'phone_not_null' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.phone IS NOT NULL"),
         'phone_not_empty' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.phone != ''"),
-        'is_primary' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.is_primary = 1"),
         'mailing_id' => CRM_Utils_SQL_Select::fragment()->where("mg.mailing_id = #mailingID"),
         'temp_contact_null' => CRM_Utils_SQL_Select::fragment()->where('temp.contact_id IS null'),
-        'order_by' => CRM_Utils_SQL_Select::fragment()->orderBy("$entityTable.is_primary = 1"),
+        'order_by' => CRM_Utils_SQL_Select::fragment()->orderBy("$entityTable.is_primary"),
       );
     }
     else {
@@ -296,9 +297,11 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         ->select("$contact.id as contact_id, $entityTable.id as $entityColumn")
         ->join($entityTable, " INNER JOIN $entityTable ON $entityTable.contact_id = $contact.id ")
         ->join('gc', " INNER JOIN civicrm_group_contact_cache gc ON $contact.id = gc.contact_id ")
+        ->join('gcr', " LEFT JOIN civicrm_group_contact gcr ON gc.group_id = gcr.group_id AND gc.contact_id = gcr.contact_id")
         ->join('mg', " INNER JOIN civicrm_mailing_group mg  ON  gc.group_id = mg.entity_id AND mg.search_id IS NULL ")
         ->join('temp', " LEFT JOIN $excludeTempTablename temp ON $contact.id = temp.contact_id ")
         ->where('gc.group_id IN (#groups)')
+        ->where('gcr.status IS NULL OR gcr.status != "Removed"')
         ->merge($criteria)
         ->replaceInto($includedTempTablename, array('contact_id', $entityColumn))
         ->param('#groups', $includeSmartGroupIDs)
@@ -825,14 +828,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    */
   private function getHeaderFooter() {
     if (!$this->header and $this->header_id) {
-      $this->header = new CRM_Mailing_BAO_Component();
+      $this->header = new CRM_Mailing_BAO_MailingComponent();
       $this->header->id = $this->header_id;
       $this->header->find(TRUE);
       $this->header->free();
     }
 
     if (!$this->footer and $this->footer_id) {
-      $this->footer = new CRM_Mailing_BAO_Component();
+      $this->footer = new CRM_Mailing_BAO_MailingComponent();
       $this->footer->id = $this->footer_id;
       $this->footer->find(TRUE);
       $this->footer->free();
@@ -1693,8 +1696,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     if (!Civi::settings()->get('disable_mandatory_tokens_check')) {
-      $header = $mailing->header_id && $mailing->header_id != 'null' ? CRM_Mailing_BAO_Component::findById($mailing->header_id) : NULL;
-      $footer = $mailing->footer_id && $mailing->footer_id != 'null' ? CRM_Mailing_BAO_Component::findById($mailing->footer_id) : NULL;
+      $header = $mailing->header_id && $mailing->header_id != 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->header_id) : NULL;
+      $footer = $mailing->footer_id && $mailing->footer_id != 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->footer_id) : NULL;
       foreach (array('body_html', 'body_text') as $field) {
         if (empty($mailing->{$field})) {
           continue;
@@ -1786,7 +1789,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'forward' => CRM_Mailing_Event_BAO_Forward::getTableName(),
       'url' => CRM_Mailing_BAO_TrackableURL::getTableName(),
       'urlopen' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTableName(),
-      'component' => CRM_Mailing_BAO_Component::getTableName(),
+      'component' => CRM_Mailing_BAO_MailingComponent::getTableName(),
       'spool' => CRM_Mailing_BAO_Spool::getTableName(),
     );
 
@@ -2720,7 +2723,7 @@ SELECT  $mailing.id as mailing_id
 
     if (!$isSMS) {
       if ($report['mailing']['header_id']) {
-        $header = new CRM_Mailing_BAO_Component();
+        $header = new CRM_Mailing_BAO_MailingComponent();
         $header->id = $report['mailing']['header_id'];
         $header->find(TRUE);
         $htmlHeader = $header->body_html;
@@ -2728,7 +2731,7 @@ SELECT  $mailing.id as mailing_id
       }
 
       if ($report['mailing']['footer_id']) {
-        $footer = new CRM_Mailing_BAO_Component();
+        $footer = new CRM_Mailing_BAO_MailingComponent();
         $footer->id = $report['mailing']['footer_id'];
         $footer->find(TRUE);
         $htmlFooter = $footer->body_html;

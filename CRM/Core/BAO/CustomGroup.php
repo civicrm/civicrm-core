@@ -1564,7 +1564,7 @@ ORDER BY civicrm_custom_group.weight,
 
           case 'File':
             if ($skipFile) {
-              continue;
+              break;
             }
 
             //store the file in d/b
@@ -1639,6 +1639,9 @@ ORDER BY civicrm_custom_group.weight,
         $fieldId = $field['id'];
         $elementName = $field['element_name'];
         CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, $required);
+        if ($form->getAction() == CRM_Core_Action::VIEW) {
+          $form->getElement($elementName)->freeze();
+        }
       }
     }
   }

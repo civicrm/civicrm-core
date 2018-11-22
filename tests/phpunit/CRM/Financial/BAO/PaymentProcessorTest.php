@@ -62,38 +62,4 @@ class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
     $this->assertEquals($cards, $expectedCards, 'Verify correct credit card types are returned');
   }
 
-  public function testCreditCardCSSName() {
-    $params = array(
-      'name' => 'API_Test_PP_Type',
-      'title' => 'API Test Payment Processor Type',
-      'class_name' => 'CRM_Core_Payment_APITest',
-      'billing_mode' => 'form',
-      'payment_processor_type_id' => 1,
-      'is_recur' => 0,
-      'domain_id' => 1,
-      'accepted_credit_cards' => json_encode(array(
-        'Visa' => 'Visa',
-        'Mastercard' => 'Mastercard',
-        'Amex' => 'Amex',
-      )),
-    );
-    $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($params);
-    $cards = CRM_Financial_BAO_PaymentProcessor::getCreditCards($paymentProcessor->id);
-    $CSSCards = CRM_Core_Payment_Form::getCreditCardCSSNames($cards);
-    $expectedCSSCards = array(
-      'visa' => 'Visa',
-      'mastercard' => 'Mastercard',
-      'amex' => 'Amex',
-    );
-    $this->assertEquals($CSSCards, $expectedCSSCards, 'Verify correct credit card types are returned');
-    $CSSCards2 = CRM_Core_Payment_Form::getCreditCardCSSNames(array());
-    $allCards = array(
-      'visa' => 'Visa',
-      'mastercard' => 'MasterCard',
-      'amex' => 'Amex',
-      'discover' => 'Discover',
-    );
-    $this->assertEquals($CSSCards2, $allCards, 'Verify correct credit card types are returned');
-  }
-
 }

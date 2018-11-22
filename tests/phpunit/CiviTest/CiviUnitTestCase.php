@@ -1302,8 +1302,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'financial_type_id' => 1,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 1,
     ), $params);
@@ -1796,7 +1794,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'location' => 'Baker Street',
       'details' => 'Lets schedule a meeting',
       'status_id' => 1,
-      'activity_name' => 'Meeting',
+      'activity_type_id' => 'Meeting',
     ), $params);
     if (!isset($params['source_contact_id'])) {
       $params['source_contact_id'] = $this->individualCreate();
@@ -1962,6 +1960,45 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     return array('custom_group_id' => $customGroup['id'], 'custom_field_id' => $customField['id']);
   }
+
+  /**
+   * Create a custom group with a single text custom field, multi-select widget, with a variety of option values including upper and lower case.
+   * See api_v3_SyntaxConformanceTest:testCustomDataGet for how to use this
+   *
+   * @param string $function
+   *   __FUNCTION__.
+   * @param string $filename
+   *   $file __FILE__.
+   *
+   * @return array
+   *   ids of created objects
+   */
+  public function entityCustomGroupWithSingleStringMultiSelectFieldCreate($function, $filename) {
+    $params = array('title' => $function);
+    $entity = substr(basename($filename), 0, strlen(basename($filename)) - 8);
+    $params['extends'] = $entity ? $entity : 'Contact';
+    $customGroup = $this->CustomGroupCreate($params);
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'label' => $function, 'html_type' => 'Multi-Select', 'default_value' => 1));
+    CRM_Core_PseudoConstant::flush();
+    $options = [
+      'defaultValue' => 'Default Value',
+      'lowercasevalue' => 'Lowercase Value',
+      1 => 'Integer Value',
+    ];
+    $custom_field_params = ['sequential' => 1, 'id' => $customField['id']];
+    $custom_field_api_result = $this->callAPISuccess('custom_field', 'get', $custom_field_params);
+    $this->assertNotEmpty($custom_field_api_result['values'][0]['option_group_id']);
+    $option_group_params = ['sequential' => 1, 'id' => $custom_field_api_result['values'][0]['option_group_id']];
+    $option_group_result = $this->callAPISuccess('OptionGroup', 'get', $option_group_params);
+    $this->assertNotEmpty($option_group_result['values'][0]['name']);
+    foreach ($options as $option_value => $option_label) {
+      $option_group_params = ['option_group_id' => $option_group_result['values'][0]['name'], 'value' => $option_value, 'label' => $option_label];
+      $option_value_result = $this->callAPISuccess('OptionValue', 'create', $option_group_params);
+    }
+
+    return array('custom_group_id' => $customGroup['id'], 'custom_field_id' => $customField['id'], 'custom_field_option_group_id' => $custom_field_api_result['values'][0]['option_group_id'], 'custom_field_group_options' => $options);
+  }
+
 
   /**
    * Delete custom group.
@@ -3343,6 +3380,37 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       )
     );
     return $this->callAPISuccess('FinancialType', 'create', $params);
+  }
+
+  /**
+   * Create Payment Instrument.
+   *
+   * @param array $params
+   * @param string $financialAccountName
+   *
+   * @return int
+   */
+  protected function createPaymentInstrument($params = array(), $financialAccountName = 'Donation') {
+    $params = array_merge(array(
+      'label' => 'Payment Instrument -' . substr(sha1(rand()), 0, 7),
+      'option_group_id' => 'payment_instrument',
+      'is_active' => 1,
+      ),
+      $params
+    );
+    $newPaymentInstrument = $this->callAPISuccess('OptionValue', 'create', $params);
+
+    $relationTypeID = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
+
+    $financialAccountParams = [
+      'entity_table' => 'civicrm_option_value',
+      'entity_id' => key($newPaymentInstrument),
+      'account_relationship' => $relationTypeID,
+      'financial_account_id' => $this->callAPISuccess('FinancialAccount', 'getValue', ['name' => $financialAccountName, 'return' => 'id']),
+    ];
+    CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
+
+    return CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $params['label']);
   }
 
   /**

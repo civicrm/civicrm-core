@@ -267,6 +267,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params = array_merge($params, array(
       'id' => $contributionID,
       'invoice_number' => CRM_Utils_Array::value('invoice_prefix', Civi::settings()->get('contribution_invoice_settings')) . "" . $contributionID,
+      'trxn_id' => 12345,
+      'invoice_id' => 6789,
     ));
     $contributionID = $this->contributionCreate($params);
 
@@ -300,6 +302,21 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       }
       $this->assertTrue((!empty($contribution[$returnField]) || $contribution[$returnField] === "0"), $returnField);
     }
+  }
+
+  /**
+   * Test cancel reason works as a filter.
+   */
+  public function testFilterCancelReason() {
+    $params = $this->_params;
+    $params['cancel_date'] = 'yesterday';
+    $params['cancel_reason'] = 'You lose sucker';
+    $this->callAPISuccess('Contribution', 'create', $params);
+    $params = $this->_params;
+    $params['cancel_date'] = 'yesterday';
+    $params['cancel_reason'] = 'You are a winner';
+    $this->callAPISuccess('Contribution', 'create', $params);
+    $this->callAPISuccessGetCount('Contribution', ['cancel_reason' => 'You are a winner'], 1);
   }
 
   /**

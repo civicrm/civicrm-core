@@ -111,6 +111,10 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'operator',
         'content', // CRM-20468
       );
+      $custom = CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_custom_field WHERE html_type = "RichTextEditor"');
+      while ($custom->fetch()) {
+        $this->skipFields[] = 'custom_' . $custom->id;
+      }
     }
     return $this->skipFields;
   }

@@ -1145,19 +1145,20 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * This function creates a table AND adds the details to the developer tab & $this->>temporary tables.
    *
-   * @todo improve presentation on the developer tab since CREATE TEMPORARY is removed.
-   *
    * @param string $identifier
    * @param $sql
-   * @param bool $isTrueTemporary
-   *   Is this a mysql temporary table or temporary in a less technical sense.
    *
    * @return string
    */
-  public function createTemporaryTable($identifier, $sql, $isTrueTemporary = TRUE) {
+  public function createTemporaryTable($identifier, $sql) {
+    $tempTable = CRM_Utils_SQL_TempTable::build()->setUtf8(TRUE)->createWithQuery($sql);
+    $name = $tempTable->getName();
+    // Developers may force tables to be durable to assist in debugging so lets check.
+    $isNotTrueTemporary = $tempTable->isDurable();
+    // The TempTable build routine adds the next line - we output it to help developers see what has happened.
+    $sql = 'CREATE ' . ($isNotTrueTemporary ? '' : 'TEMPORARY ') . "TABLE $name DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci " . $sql;
     $this->addToDeveloperTab($sql);
-    $name = CRM_Utils_SQL_TempTable::build()->setUtf8(TRUE)->setDurable($isTrueTemporary)->createWithQuery($sql)->getName();
-    $this->temporaryTables[$identifier] = ['temporary' => $isTrueTemporary, 'name' => $name];
+    $this->temporaryTables[$identifier] = ['temporary' => !$isNotTrueTemporary, 'name' => $name];
     return $name;
   }
 
@@ -2449,8 +2450,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * @return mixed
    */
   protected function alterLocationTypeID($value, &$row, $selectedfield, $criteriaFieldName) {
-    $values = $this->getLocationTypeOptions();
-    return CRM_Utils_Array::value($value, $values);
+    return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_Address', 'location_type_id', $value);
   }
 
   /**
@@ -3693,11 +3693,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         WHERE smartgroup_contact.group_id IN ({$smartGroups}) ";
     }
 
-    $this->groupTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('rptgrp')->setId(date('Ymd_') . uniqid())->getName();
-    $this->executeReportQuery("
-      CREATE TEMPORARY TABLE $this->groupTempTable $this->_databaseAttributes
-      $query
-    ");
+    $this->groupTempTable = $this->createTemporaryTable('rptgrp', $query);
     CRM_Core_DAO::executeQuery("ALTER TABLE $this->groupTempTable ADD INDEX i_id(id)");
   }
 
@@ -3936,7 +3932,7 @@ ORDER BY cg.weight, cf.weight";
           $curFilters[$fieldName]['type'] = CRM_Utils_Type::T_STRING;
 
           $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $customDAO->cf_id, array(), 'search');
-          if ($options !== FALSE) {
+          if ((is_array($options) && count($options) != 0) || (!is_array($options) && $options !== FALSE)) {
             $curFilters[$fieldName]['operatorType'] = CRM_Core_BAO_CustomField::isSerialized($customDAO) ? CRM_Report_Form::OP_MULTISELECT_SEPARATOR : CRM_Report_Form::OP_MULTISELECT;
             $curFilters[$fieldName]['options'] = $options;
           }
@@ -4499,6 +4495,18 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         $entryFound = TRUE;
       }
     }
+
+    // Handle employer id
+    if (array_key_exists('civicrm_contact_employer_id', $row)) {
+      $employerId = $row['civicrm_contact_employer_id'];
+      if ($employerId) {
+        $rows[$rowNum]['civicrm_contact_employer_id'] = CRM_Contact_BAO_Contact::displayName($employerId);
+        $rows[$rowNum]['civicrm_contact_employer_id_link'] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $employerId, $this->_absoluteUrl);
+        $rows[$rowNum]['civicrm_contact_employer_id_hover'] = ts('View Contact Summary for Employer.');
+        $entryFound = TRUE;
+      }
+    }
+
     return $entryFound;
   }
 
@@ -4766,6 +4774,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'is_opt_out' => array(),
       'is_deceased' => array(),
       'preferred_language' => array(),
+      'employer_id' => array(
+        'title' => ts('Current Employer'),
+      ),
     );
   }
 
@@ -5512,12 +5523,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'type' => 1,
         'is_order_bys' => TRUE,
         'is_filters' => TRUE,
-        'is_fields' => TRUE,
-      ),
-      $options['prefix'] . 'street_name' => array(
-        'name' => 'street_name',
-        'title' => ts($options['prefix_label'] . 'Street Name'),
-        'type' => 1,
         'is_fields' => TRUE,
       ),
       $options['prefix'] . 'street_unit' => array(

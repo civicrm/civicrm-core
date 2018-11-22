@@ -54,13 +54,13 @@
 <div id="preview-info">
  {* Summary Preview (record counts) *}
  <table id="preview-counts" class="report">
-    <tr><td class="label">{ts}Total Rows{/ts}</td>
+    <tr><td class="label crm-grid-cell">{ts}Total Rows{/ts}</td>
         <td class="data">{$totalRowCount}</td>
         <td class="explanation">{ts}Total number of rows in the imported data.{/ts}</td>
     </tr>
 
     {if $invalidRowCount}
-    <tr class="error"><td class="label">{ts}Rows with Errors{/ts}</td>
+    <tr class="error"><td class="label crm-grid-cell">{ts}Rows with Errors{/ts}</td>
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields (for example, invalid email address formatting). These rows will be skipped (not imported).{/ts}
             {if $invalidRowCount}
@@ -71,7 +71,7 @@
     {/if}
 
     {if $conflictRowCount}
-    <tr class="error"><td class="label">{ts}Conflicting Rows{/ts}</td>
+    <tr class="error"><td class="label crm-grid-cell">{ts}Conflicting Rows{/ts}</td>
         <td class="data">{$conflictRowCount}</td>
         <td class="explanation">{ts}Rows with conflicting email addresses within this file. These rows will be skipped (not imported).{/ts}
             {if $conflictRowCount}
@@ -82,7 +82,7 @@
     {/if}
 
     <tr>
-    <td class="label">{ts}Valid Rows{/ts}</td>
+    <td class="label crm-grid-cell">{ts}Valid Rows{/ts}</td>
         <td class="data">{$validRowCount}</td>
         <td class="explanation">{ts}Total rows to be imported.{/ts}</td>
     </tr>

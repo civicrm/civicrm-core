@@ -215,7 +215,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
                         WHERE $jobTable.id = $job");
     $dao->fetch();
 
-    $component = new CRM_Mailing_BAO_Component();
+    $component = new CRM_Mailing_BAO_MailingComponent();
     $component->id = $dao->resubscribe_id;
     $component->find(TRUE);
 

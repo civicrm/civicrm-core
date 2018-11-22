@@ -671,58 +671,21 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *    - caseId      int            case ID
    *    - context     string         page on which selector is build
    *    - activity_type_id int|string the activitiy types we want to restrict by
-   * @param bool $getCount
-   *    Get count of the activities
    *
-   * @return array|int
+   * @return array
    *   Relevant data object values of open activities
    * @throws \CiviCRM_API3_Exception
    */
-  public static function getActivities($params, $getCount = FALSE) {
+  public static function getActivities($params) {
     $activities = array();
 
     // Activity.Get API params
-    $activityParams = array(
-      'is_deleted' => 0,
-      'is_current_revision' => 1,
-      'is_test' => 0,
-      'contact_id' => CRM_Utils_Array::value('contact_id', $params),
-      'return' => array(
-        'activity_date_time',
-        'source_record_id',
-        'source_contact_id',
-        'source_contact_name',
-        'assignee_contact_id',
-        'target_contact_id',
-        'target_contact_name',
-        'assignee_contact_name',
-        'status_id',
-        'subject',
-        'activity_type_id',
-        'activity_type',
-        'case_id',
-        'campaign_id',
-      ),
-      'check_permissions' => 1,
-      'options' => array(
-        'offset' => CRM_Utils_Array::value('offset', $params, 0),
-      ),
-    );
-
-    if (!empty($params['activity_status_id'])) {
-      $activityParams['activity_status_id'] = array('IN' => explode(',', $params['activity_status_id']));
-    }
-
-    $activityParams['activity_type_id'] = self::filterActivityTypes($params);
+    $activityParams = self::getActivityParamsForDashboardFunctions($params);
 
     if (!empty($params['rowCount']) &&
       $params['rowCount'] > 0
     ) {
       $activityParams['options']['limit'] = $params['rowCount'];
-    }
-    // set limit = 0 if we need to fetch the activity count
-    elseif ($getCount) {
-      $activityParams['options']['limit'] = 0;
     }
 
     if (!empty($params['sort'])) {
@@ -736,13 +699,29 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     $activityParams['options']['sort'] = empty($order) ? "activity_date_time DESC" : str_replace('activity_type ', 'activity_type_id.label ', $order);
 
-    //TODO :
-    // 1. we should use Activity.Getcount for fetching count only, but  in order to check that
-    //    current logged in user has permission to view Case activities we are performing filtering out those activities from list (see below).
-    //    This logic need to be incorporated in Activity.get definition
+    $activityParams['return'] = [
+      'activity_date_time',
+      'source_record_id',
+      'source_contact_id',
+      'source_contact_name',
+      'assignee_contact_id',
+      'target_contact_id',
+      'target_contact_name',
+      'assignee_contact_name',
+      'status_id',
+      'subject',
+      'activity_type_id',
+      'activity_type',
+      'case_id',
+      'campaign_id',
+    ];
+    foreach (['case_id' => 'CiviCase', 'campaign_id' => 'CiviCampaign'] as $attr => $component) {
+      if (in_array($component, self::activityComponents())) {
+        $activityParams['return'][] = $attr;
+      }
+    }
     $result = civicrm_api3('Activity', 'Get', $activityParams);
 
-    $enabledComponents = self::activityComponents();
     $bulkActivityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Bulk Email');
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
 
@@ -768,19 +747,11 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     );
 
     foreach ($result['values'] as $id => $activity) {
-      // skip case activities if CiviCase is not enabled OR those actvities which are
-      if (!empty($activity['case_id']) && !in_array('CiviCase', $enabledComponents)) {
-        continue;
-      }
 
       $activities[$id] = array();
 
-      // if count is needed, no need to populate the array list with attributes
-      if ($getCount) {
-        continue;
-      }
-
       $isBulkActivity = (!$bulkActivityTypeID || ($bulkActivityTypeID === $activity['activity_type_id']));
+
       foreach ($mappingParams as $apiKey => $expectedName) {
         if (in_array($apiKey, array('assignee_contact_name', 'target_contact_name'))) {
           $activities[$id][$expectedName] = CRM_Utils_Array::value($apiKey, $activity, array());
@@ -826,7 +797,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $activities[$id]['is_recurring_activity'] = CRM_Core_BAO_RecurringEntity::getParentFor($id, 'civicrm_activity');
     }
 
-    return $getCount ? count($activities) : $activities;
+    return $activities;
   }
 
   /**
@@ -1198,7 +1169,8 @@ ORDER BY    fixed_sort_order
    *   count of activities
    */
   public static function getActivitiesCount($input) {
-    return self::getActivities($input, TRUE);
+    $activityParams = self::getActivityParamsForDashboardFunctions($input);
+    return civicrm_api3('Activity', 'getcount', $activityParams);
   }
 
   /**
@@ -2696,89 +2668,27 @@ AND cl.modified_id  = c.id
    * @return bool
    */
   public static function checkPermission($activityId, $action) {
-    $allow = FALSE;
+
     if (!$activityId ||
       !in_array($action, array(CRM_Core_Action::UPDATE, CRM_Core_Action::VIEW))
     ) {
-      return $allow;
+      return FALSE;
     }
 
     $activity = new CRM_Activity_DAO_Activity();
     $activity->id = $activityId;
     if (!$activity->find(TRUE)) {
-      return $allow;
+      return FALSE;
+    }
+
+    // Return early when it is case activity.
+    // Check for CiviCase related permission.
+    if (CRM_Case_BAO_Case::isCaseActivity($activityId)) {
+      return self::isContactPermittedAccessToCaseActivity($activityId, $action, $activity->activity_type_id);
     }
 
     // Component related permissions.
-    $compPermissions = array(
-      'CiviCase' => array(
-        'administer CiviCase',
-        'access my cases and activities',
-        'access all cases and activities',
-      ),
-      'CiviMail' => array('access CiviMail'),
-      'CiviEvent' => array('access CiviEvent'),
-      'CiviGrant' => array('access CiviGrant'),
-      'CiviPledge' => array('access CiviPledge'),
-      'CiviMember' => array('access CiviMember'),
-      'CiviReport' => array('access CiviReport'),
-      'CiviContribute' => array('access CiviContribute'),
-      'CiviCampaign' => array('administer CiviCampaign'),
-    );
-
-    // Return early when it is case activity.
-    $isCaseActivity = CRM_Case_BAO_Case::isCaseActivity($activityId);
-    // Check for civicase related permission.
-    if ($isCaseActivity) {
-      $allow = FALSE;
-      foreach ($compPermissions['CiviCase'] as $per) {
-        if (CRM_Core_Permission::check($per)) {
-          $allow = TRUE;
-          break;
-        }
-      }
-
-      // Check for case specific permissions.
-      if ($allow) {
-        $oper = 'view';
-        if ($action == CRM_Core_Action::UPDATE) {
-          $oper = 'edit';
-        }
-        $allow = CRM_Case_BAO_Case::checkPermission($activityId,
-          $oper,
-          $activity->activity_type_id
-        );
-      }
-
-      return $allow;
-    }
-
-    // First check the component permission.
-    $sql = "
-    SELECT  component_id
-      FROM  civicrm_option_value val
-INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.name = %1 )
-     WHERE  val.value = %2";
-    $params = array(
-      1 => array('activity_type', 'String'),
-      2 => array($activity->activity_type_id, 'Integer'),
-    );
-    $componentId = CRM_Core_DAO::singleValueQuery($sql, $params);
-
-    if ($componentId) {
-      $componentName = CRM_Core_Component::getComponentName($componentId);
-      $compPermission = CRM_Utils_Array::value($componentName, $compPermissions);
-
-      // Here we are interesting in any single permission.
-      if (is_array($compPermission)) {
-        foreach ($compPermission as $per) {
-          if (CRM_Core_Permission::check($per)) {
-            $allow = TRUE;
-            break;
-          }
-        }
-      }
-    }
+    $allow = self::hasPermissionForActivityType($activity->activity_type_id);
 
     // Check for this permission related to contact.
     $permission = CRM_Core_Permission::VIEW;
@@ -2792,7 +2702,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
     // Check for source contact.
-    if (!$componentId || $allow) {
+    if ($allow) {
       $sourceContactId = self::getActivityContact($activity->id, $sourceID);
       // Account for possibility of activity not having a source contact (as it may have been deleted).
       $allow = $sourceContactId ? CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission) : TRUE;
@@ -2833,6 +2743,125 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     }
 
     return $allow;
+  }
+
+  /**
+   * Check if the logged in user has permission for the given case activity.
+   *
+   * @param int $activityId
+   * @param int $action
+   * @param int $activityTypeID
+   *
+   * @return bool
+   */
+  protected static function isContactPermittedAccessToCaseActivity($activityId, $action, $activityTypeID) {
+    $allow = FALSE;
+    foreach (['administer CiviCase', 'access my cases and activities', 'access all cases and activities'] as $per) {
+      if (CRM_Core_Permission::check($per)) {
+        $allow = TRUE;
+        break;
+      }
+    }
+
+    // Check for case specific permissions.
+    if ($allow) {
+      $oper = 'view';
+      if ($action == CRM_Core_Action::UPDATE) {
+        $oper = 'edit';
+      }
+      $allow = CRM_Case_BAO_Case::checkPermission($activityId,
+        $oper,
+        $activityTypeID
+      );
+    }
+
+    return $allow;
+  }
+
+  /**
+   * @param int $activityTypeID
+   * @return bool
+   */
+  protected static function hasPermissionForActivityType($activityTypeID) {
+    $compPermissions = [
+      'CiviCase' => [
+        'administer CiviCase',
+        'access my cases and activities',
+        'access all cases and activities',
+      ],
+      'CiviMail' => ['access CiviMail'],
+      'CiviEvent' => ['access CiviEvent'],
+      'CiviGrant' => ['access CiviGrant'],
+      'CiviPledge' => ['access CiviPledge'],
+      'CiviMember' => ['access CiviMember'],
+      'CiviReport' => ['access CiviReport'],
+      'CiviContribute' => ['access CiviContribute'],
+      'CiviCampaign' => ['administer CiviCampaign'],
+    ];
+
+    // First check the component permission.
+    $sql = "
+    SELECT  component_id
+      FROM  civicrm_option_value val
+INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.name = %1 )
+     WHERE  val.value = %2";
+    $params = [
+      1 => ['activity_type', 'String'],
+      2 => [$activityTypeID, 'Integer'],
+    ];
+    $componentId = CRM_Core_DAO::singleValueQuery($sql, $params);
+
+    if ($componentId) {
+      $componentName = CRM_Core_Component::getComponentName($componentId);
+      $compPermission = CRM_Utils_Array::value($componentName, $compPermissions);
+
+      // Here we are interesting in any single permission.
+      if (is_array($compPermission)) {
+        foreach ($compPermission as $per) {
+          if (CRM_Core_Permission::check($per)) {
+            return TRUE;
+          }
+        }
+      }
+    }
+    else {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * @param $params
+   * @return array
+   */
+  protected static function getActivityParamsForDashboardFunctions($params) {
+    $activityParams = [
+      'is_deleted' => 0,
+      'is_current_revision' => 1,
+      'is_test' => 0,
+      'contact_id' => CRM_Utils_Array::value('contact_id', $params),
+      'check_permissions' => 1,
+      'options' => [
+        'offset' => CRM_Utils_Array::value('offset', $params, 0),
+      ],
+    ];
+
+    if (!empty($params['activity_status_id'])) {
+      $activityParams['activity_status_id'] = ['IN' => explode(',', $params['activity_status_id'])];
+    }
+
+    $activityParams['activity_type_id'] = self::filterActivityTypes($params);
+    $enabledComponents = self::activityComponents();
+    // @todo - should we move this to activity get api.
+    foreach ([
+               'case_id' => 'CiviCase',
+               'campaign_id' => 'CiviCampaign'
+             ] as $attr => $component) {
+      if (!in_array($component, $enabledComponents)) {
+        $activityParams[$attr] = ['IS NULL' => 1];
+      }
+    }
+    return $activityParams;
   }
 
   /**
@@ -2880,7 +2909,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     }
 
     // Get contact activities.
-    $activities = CRM_Activity_BAO_Activity::getActivities($params);
+    $activities = CRM_Activity_BAO_Activity::deprecatedGetActivities($params);
 
     // Add total.
     $params['total'] = CRM_Activity_BAO_Activity::deprecatedGetActivitiesCount($params);

@@ -46,12 +46,26 @@ class CRM_Admin_Page_AJAX {
     if ($contactID) {
       CRM_Core_Page_AJAX::setJsHeaders();
       $smarty = CRM_Core_Smarty::singleton();
-      $smarty->assign('includeEmail', civicrm_api3('setting', 'getvalue', array('name' => 'includeEmailInName', 'group' => 'Search Preferences')));
+      $smarty->assign('quicksearchOptions', self::getSearchOptions());
       print $smarty->fetchWith('CRM/common/navigation.js.tpl', array(
-        'navigation' => CRM_Core_BAO_Navigation::createNavigation($contactID),
+        'navigation' => CRM_Core_BAO_Navigation::createNavigation(),
       ));
     }
     CRM_Utils_System::civiExit();
+  }
+
+  public static function getSearchOptions() {
+    $searchOptions = Civi::settings()->get('quicksearch_options');
+    $searchOptions[] = 'sort_name';
+    $searchOptions = array_intersect_key(CRM_Core_SelectValues::quicksearchOptions(), array_flip($searchOptions));
+    foreach ($searchOptions as $key => $label) {
+      if (strpos($key, 'custom_') === 0) {
+        unset($searchOptions[$key]);
+        $id = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', substr($key, 7), 'id', 'name');
+        $searchOptions["custom_$id"] = $label;
+      }
+    }
+    return $searchOptions;
   }
 
   /**
@@ -165,7 +179,7 @@ class CRM_Admin_Page_AJAX {
           $ret['content'] = ts('Are you sure you want to disable this Participant Status?') . '<br/><br/> ' . ts('Users will no longer be able to select this value when adding or editing Participant Status.');
           break;
 
-        case 'CRM_Mailing_BAO_Component':
+        case 'CRM_Mailing_BAO_MailingComponent':
           $ret['content'] = ts('Are you sure you want to disable this component?');
           break;
 
@@ -203,6 +217,7 @@ class CRM_Admin_Page_AJAX {
 
         case 'CRM_Contact_BAO_Group':
           $ret['content'] = ts('Are you sure you want to disable this Group?');
+          $ret['content'] .= '<br /><br /><strong>' . ts('WARNING - Disabling this group will disable all the child groups associated if any.') . '</strong>';
           break;
 
         case 'CRM_Core_BAO_OptionGroup':

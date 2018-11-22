@@ -350,6 +350,20 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       CRM_Utils_Hook::pre('create', 'Group', NULL, $params);
     }
 
+    // dev/core#287 Disable child groups if all parents are disabled.
+    if (!empty($params['id'])) {
+      $allChildGroupIds = self::getChildGroupIds($params['id']);
+      foreach ($allChildGroupIds as $childKey => $childValue) {
+        $parentIds = CRM_Contact_BAO_GroupNesting::getParentGroupIds($childValue);
+        $activeParentsCount = civicrm_api3('Group', 'getcount', [
+          'id' => ['IN' => $parentIds],
+          'is_active' => 1,
+        ]);
+        if (count($parentIds) >= 1 && $activeParentsCount <= 1) {
+          $setDisable = self::setIsActive($childValue, CRM_Utils_Array::value('is_active', $params, 1));
+        }
+      }
+    }
     // form the name only if missing: CRM-627
     $nameParam = CRM_Utils_Array::value('name', $params, NULL);
     if (!$nameParam && empty($params['id'])) {
@@ -448,8 +462,11 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     }
 
     if (!empty($params['organization_id'])) {
-      $groupOrg = $params;
-      $groupOrg['group_id'] = $group->id;
+      // dev/core#382 Keeping the id here can cause db errors as it tries to update the wrong record in the Organization table
+      $groupOrg = [
+        'group_id' => $group->id,
+        'organization_id' => $params['organization_id'],
+      ];
       CRM_Contact_BAO_GroupOrganization::add($groupOrg);
     }
 
@@ -678,7 +695,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     //create/update saved search record.
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $savedSearch->id = $ssId;
-    $savedSearch->form_values = serialize($params['form_values']);
+    $savedSearch->form_values = serialize(CRM_Contact_BAO_Query::convertFormValues($params['form_values']));
     $savedSearch->mapping_id = $mappingId;
     $savedSearch->search_custom_id = CRM_Utils_Array::value('search_custom_id', $params);
     $savedSearch->save();

@@ -114,7 +114,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       }
     }
     if ($lineItem->financial_type_id) {
-      $params['financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount(
+      $params['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
         $lineItem->financial_type_id,
         $accountRelName
       );

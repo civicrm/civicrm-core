@@ -124,20 +124,30 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
             continue;
           }
         }
+        // Check for a date range field, which might be a standard date
+        // range or a relative date.
         if (strpos($id, '_date_low') !== FALSE || strpos($id, '_date_high') !== FALSE) {
           $entityName = strstr($id, '_date', TRUE);
-          if (!empty($result['relative_dates']) && array_key_exists($entityName, $result['relative_dates'])) {
-            $result[$id] = NULL;
-            $result["{$entityName}_date_relative"] = $result['relative_dates'][$entityName];
-          }
-          elseif (!empty($specialDateFields[$id])) {
-            $entityName = strstr($specialDateFields[$id], '_date', TRUE);
-            $result[$id] = NULL;
-            $result["{$entityName}_relative"] = $result['relative_dates'][$entityName];
-          }
-          else {
-            $result[$id] = $value;
-            $result["{$entityName}_date_relative"] = 0;
+
+          // This is the default, for non relative dates. We will overwrite
+          // it if we determine this is a relative date.
+          $result[$id] = $value;
+          $result["{$entityName}_date_relative"] = 0;
+
+          if (!empty($result['relative_dates'])) {
+            if (array_key_exists($entityName, $result['relative_dates'])) {
+              // We have a match from a regular field.
+              $result[$id] = NULL;
+              $result["{$entityName}_date_relative"] = $result['relative_dates'][$entityName];
+            }
+            elseif (!empty($specialDateFields[$id])) {
+              // We may have a match on a special date field.
+              $entityName = strstr($specialDateFields[$id], '_date', TRUE);
+              if (array_key_exists($entityName, $result['relative_dates'])) {
+                $result[$id] = NULL;
+                $result["{$entityName}_relative"] = $result['relative_dates'][$entityName];
+              }
+            }
           }
         }
         else {
@@ -429,7 +439,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     $relativeDates = array('relative_dates' => array());
     $specialDateFields = array('event_relative', 'case_from_relative', 'case_to_relative', 'participant_relative');
     foreach ($formValues as $id => $value) {
-      if ((preg_match('/_date_relative$/', $id) || in_array($id, $specialDateFields)) && !empty($value)) {
+      if ((preg_match('/(_date|custom_[0-9]+)_relative$/', $id) || in_array($id, $specialDateFields)) && !empty($value)) {
         $entityName = strstr($id, '_date', TRUE);
         if (empty($entityName)) {
           $entityName = strstr($id, '_relative', TRUE);
@@ -480,7 +490,12 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
 
     // select date range as default
     if ($isCustomDateField) {
-      $formValues[$fieldName . '_relative'] = 0;
+      if (array_key_exists('relative_dates', $formValues) && array_key_exists($fieldName, $formValues['relative_dates'])) {
+        $formValues[$fieldName . '_relative'] = $formValues['relative_dates'][$fieldName];
+      }
+      else {
+        $formValues[$fieldName . '_relative'] = 0;
+      }
     }
     switch ($op) {
       case 'BETWEEN':

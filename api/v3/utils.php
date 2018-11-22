@@ -332,10 +332,6 @@ function _civicrm_api3_get_DAO($name) {
   if ($name == 'MailingRecipients') {
     return 'CRM_Mailing_DAO_Recipients';
   }
-  // FIXME: DAO should be renamed CRM_Mailing_DAO_MailingComponent
-  if ($name == 'MailingComponent') {
-    return 'CRM_Mailing_DAO_Component';
-  }
   // FIXME: DAO should be renamed CRM_ACL_DAO_AclRole
   if ($name == 'AclRole') {
     return 'CRM_ACL_DAO_EntityRole';

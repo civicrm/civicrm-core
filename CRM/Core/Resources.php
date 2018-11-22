@@ -115,13 +115,7 @@ class CRM_Core_Resources {
       self::$_singleton = $instance;
     }
     if (self::$_singleton === NULL) {
-      $sys = CRM_Extension_System::singleton();
-      $cache = Civi::cache('js_strings');
-      self::$_singleton = new CRM_Core_Resources(
-        $sys->getMapper(),
-        $cache,
-        CRM_Core_Config::isUpgradeMode() ? NULL : 'resCacheCode'
-      );
+      self::$_singleton = Civi::service('resources');
     }
     return self::$_singleton;
   }
@@ -617,6 +611,10 @@ class CRM_Core_Resources {
           'isFrontend' => $config->userFrameworkFrontend,
         ),
       );
+      $contactID = CRM_Core_Session::getLoggedInContactID();
+      if ($contactID) {
+        $settings['config']['menuCacheCode'] = CRM_Core_BAO_Navigation::getCacheKey($contactID);
+      }
       // Disable profile creation if user lacks permission
       if (!CRM_Core_Permission::check('edit all contacts') && !CRM_Core_Permission::check('add contacts')) {
         $settings['config']['entityRef']['contactCreate'] = FALSE;
@@ -691,6 +689,7 @@ class CRM_Core_Resources {
       ),
       'ajaxPopupsEnabled' => self::singleton()->ajaxPopupsEnabled,
       'allowAlertAutodismissal' => (bool) Civi::settings()->get('allow_alert_autodismissal'),
+      'resourceCacheCode' => self::singleton()->getCacheCode(),
     );
     print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $vars);
     CRM_Utils_System::civiExit();
@@ -725,8 +724,8 @@ class CRM_Core_Resources {
       "bower_components/datatables/media/css/jquery.dataTables.min.css",
       "bower_components/jquery-validation/dist/jquery.validate.min.js",
       "packages/jquery/plugins/jquery.ui.datepicker.validation.min.js",
-      "js/crm.datepicker.js",
       "js/Common.js",
+      "js/crm.datepicker.js",
       "js/crm.ajax.js",
       "js/wysiwyg/crm.wysiwyg.js",
     );
@@ -794,7 +793,8 @@ class CRM_Core_Resources {
     ) {
       return TRUE;
     }
-    return strpos(CRM_Utils_System::getUrlPath(), 'civicrm/ajax') === 0;
+    $url = CRM_Utils_System::getUrlPath();
+    return (strpos($url, 'civicrm/ajax') === 0) || (strpos($url, 'civicrm/angular') === 0);
   }
 
   /**

@@ -139,18 +139,33 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testSubmit() {
     $this->setUpContributionPage();
-    $priceFieldID = reset($this->_ids['price_field']);
-    $priceFieldValueID = reset($this->_ids['price_field_value']);
-    $submitParams = array(
-      'price_' . $priceFieldID => $priceFieldValueID,
-      'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
-    );
+    $submitParams = $this->getBasicSubmitParams();
 
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
     //assert non-deductible amount
     $this->assertEquals(5.00, $contribution['non_deductible_amount']);
+  }
+
+  /**
+   * Test form submission with basic price set.
+   */
+  public function testSubmitZeroDollar() {
+    $this->setUpContributionPage();
+    $priceFieldID = reset($this->_ids['price_field']);
+    $submitParams = [
+      'price_' . $priceFieldID => $this->_ids['price_field_value']['cheapskate'],
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 0,
+      'priceSetId' => $this->_ids['price_set'][0],
+      'payment_processor_id' => '',
+    ];
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
+
+    $this->assertEquals($this->formatMoneyInput(0), $contribution['non_deductible_amount']);
+    $this->assertEquals($this->formatMoneyInput(0), $contribution['total_amount']);
   }
 
   /**
@@ -1505,6 +1520,16 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
         )
       );
       $this->_ids['price_field_value'] = array($priceFieldValue['id']);
+
+      $this->_ids['price_field_value']['cheapskate'] = $this->callAPISuccess('price_field_value', 'create', array(
+          'price_set_id' => $priceSetID,
+          'price_field_id' => $priceField['id'],
+          'label' => 'Stingy Goat',
+          'financial_type_id' => 'Donation',
+          'amount' => 0,
+          'non_deductible_amount' => 0,
+        )
+      )['id'];
     }
     $this->_ids['contribution_page'] = $contributionPageResult['id'];
   }
@@ -1887,6 +1912,21 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($lineItem_TaxAmount, round(180 * 16.95 * 0.10, 2), 'Wrong Sales Tax Amount is calculated and stored.');
   }
 
+
+  /**
+   * Test validating a contribution page submit.
+   */
+  public function testValidate() {
+    $this->setUpContributionPage();
+    $errors = $this->callAPISuccess('ContributionPage', 'validate', array_merge($this->getBasicSubmitParams(), ['action' => 'submit']))['values'];
+    $this->assertEmpty($errors);
+  }
+
+  /**
+   * Implements hook_civicrm_alterPaymentProcessorParams().
+   *
+   * @throws \Exception
+   */
   public function hook_civicrm_alterPaymentProcessorParams($paymentObj, &$rawParams, &$cookedParams) {
     // Ensure total_amount are the same if they're both given.
     $total_amount = CRM_Utils_Array::value('total_amount', $rawParams);
@@ -1905,6 +1945,24 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $message .= json_encode($log_params);
     $log = new CRM_Utils_SystemLogger();
     $log->debug($message, $_REQUEST);
+  }
+
+  /**
+   * Get the params for a basic simple submit.
+   *
+   * @return array
+   */
+  protected function getBasicSubmitParams() {
+    $priceFieldID = reset($this->_ids['price_field']);
+    $priceFieldValueID = reset($this->_ids['price_field_value']);
+    $submitParams = [
+      'price_' . $priceFieldID => $priceFieldValueID,
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'priceSetId' => $this->_ids['price_set'][0],
+      'payment_processor_id' => 0,
+    ];
+    return $submitParams;
   }
 
 }

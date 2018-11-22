@@ -319,15 +319,22 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $errors['entity'] = ts('Please select appropriate value');
     }
 
+    $mode = CRM_Utils_Array::value('mode', $fields, FALSE);
     if (!empty($fields['is_active']) &&
-      CRM_Utils_System::isNull($fields['subject'])
+      CRM_Utils_System::isNull($fields['subject']) && (!$mode || $mode != 'SMS')
     ) {
       $errors['subject'] = ts('Subject is a required field.');
     }
     if (!empty($fields['is_active']) &&
-      CRM_Utils_System::isNull(trim(strip_tags($fields['html_message'])))
+      CRM_Utils_System::isNull(trim(strip_tags($fields['html_message']))) && (!$mode || $mode != 'SMS')
     ) {
       $errors['html_message'] = ts('The HTML message is a required field.');
+    }
+
+    if (!empty($mode) && ($mode == 'SMS' || $mode == 'User_Preference') && !empty($fields['is_active']) &&
+     CRM_Utils_System::isNull(trim(strip_tags($fields['sms_text_message'])))
+    ) {
+      $errors['sms_text_message'] = ts('The SMS message is a required field.');
     }
 
     if (empty($self->getContext()) && CRM_Utils_System::isNull(CRM_Utils_Array::value(1, $fields['entity']))) {
@@ -339,7 +346,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         $errors['absolute_date'] = ts('Absolute date cannot be earlier than the current time.');
       }
     }
-    if (!CRM_Utils_Rule::email($fields['from_email'])) {
+    if (!CRM_Utils_Rule::email($fields['from_email']) && (!$mode || $mode != 'SMS')) {
       $errors['from_email'] = ts('Please enter a valid email address.');
     }
     $recipientKind = array(
@@ -363,10 +370,10 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $errors['is_repeat'] = ts('If you are enabling repetition you must indicate the frequency and ending term.');
     }
 
-    $actionSchedule = $self->parseActionSchedule($fields);
-    if ($actionSchedule->mapping_id) {
-      $mapping = CRM_Core_BAO_ActionSchedule::getMapping($actionSchedule->mapping_id);
-      CRM_Utils_Array::extend($errors, $mapping->validateSchedule($actionSchedule));
+    $self->_actionSchedule = $self->parseActionSchedule($fields);
+    if ($self->_actionSchedule->mapping_id) {
+      $mapping = CRM_Core_BAO_ActionSchedule::getMapping($self->_actionSchedule->mapping_id);
+      CRM_Utils_Array::extend($errors, $mapping->validateSchedule($self->_actionSchedule));
     }
 
     if (!empty($errors)) {
@@ -445,7 +452,12 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       return;
     }
     $values = $this->controller->exportValues($this->getName());
-    $bao = $this->parseActionSchedule($values)->save();
+    if (empty($this->_actionSchedule)) {
+      $bao = $this->parseActionSchedule($values)->save();
+    }
+    else {
+      $bao = $this->_actionSchedule->save();
+    }
 
     // we need to set this on the form so that hooks can identify the created entity
     $this->set('id', $bao->id);

@@ -72,7 +72,9 @@
 
     {* build search form *}
     {include file='CRM/Campaign/Form/Search/Common.tpl' context='gotv'}
-    <div id='voterList'></div>
+    <div class="crm-block crm-form-block crm-search-form-block">
+      <div id='voterList'></div>
+    </div>
 
 {/if} {* end of search form build *}
 

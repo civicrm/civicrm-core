@@ -405,7 +405,7 @@ WHERE ceft.entity_id = %1";
     else {
       $financialTypeId = $params['financial_type_id'];
     }
-    $financialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeId, 'Expense Account is');
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($financialTypeId, 'Expense Account is');
 
     $params['trxnParams']['from_financial_account_id'] = $params['to_financial_account_id'];
     $params['trxnParams']['to_financial_account_id'] = $financialAccount;

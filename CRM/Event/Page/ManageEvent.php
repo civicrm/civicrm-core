@@ -45,6 +45,12 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    */
   static $_actionLinks = NULL;
 
+  /**
+   * The event links to display for the browse screen.
+   * @var array
+   */
+  static $_eventLinks = NULL;
+
   static $_links = NULL;
 
   static $_tabLinks = NULL;
@@ -95,6 +101,41 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
       );
     }
     return self::$_actionLinks;
+  }
+
+  public function eventLinks() {
+    if (!(self::$_eventLinks)) {
+      self::$_eventLinks = [
+        'register_participant' => [
+          'name' => ts('Register Participant'),
+          'title' => ts('Register Participant'),
+          'url' => 'civicrm/participant/add',
+          'qs' => 'reset=1&action=add&context=standalone&eid=%%id%%',
+        ],
+        'event_info' => [
+          'name' => ts('Event Info'),
+          'title' => ts('Event Info'),
+          'url' => 'civicrm/event/info',
+          'qs' => 'reset=1&id=%%id%%',
+          'fe' => TRUE,
+        ],
+        'online_registration_test' => [
+          'name' => ts('Registration (Test-drive)'),
+          'title' => ts('Online Registration (Test-drive)'),
+          'url' => 'civicrm/event/register',
+          'qs' => 'reset=1&action=preview&id=%%id%%',
+          'fe' => TRUE,
+        ],
+        'online_registration_live' => [
+          'name' => ts('Registration (Live)'),
+          'title' => ts('Online Registration (Live)'),
+          'url' => 'civicrm/event/register',
+          'qs' => 'reset=1&id=%%id%%',
+          'fe' => TRUE,
+        ],
+      ];
+    }
+    return self::$_eventLinks;
   }
 
   /**
@@ -295,7 +336,7 @@ ORDER BY start_date desc
    LIMIT $offset, $rowCount";
 
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Event_DAO_Event');
-    $permissions = CRM_Event_BAO_Event::checkPermission();
+    $permittedEventsByAction = CRM_Event_BAO_Event::getAllPermissions();
 
     //get all campaigns.
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
@@ -318,7 +359,7 @@ ORDER BY start_date desc
     )));
     $eventType = CRM_Core_OptionGroup::values('event_type');
     while ($dao->fetch()) {
-      if (in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])) {
+      if (in_array($dao->id, $permittedEventsByAction[CRM_Core_Permission::VIEW])) {
         $manageEvent[$dao->id] = array();
         $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($dao->id, 'civicrm_event');
         $manageEvent[$dao->id]['repeat'] = '';
@@ -337,13 +378,27 @@ ORDER BY start_date desc
           $action -= CRM_Core_Action::DISABLE;
         }
 
-        if (!in_array($dao->id, $permissions[CRM_Core_Permission::DELETE])) {
+        if (!in_array($dao->id, $permittedEventsByAction[CRM_Core_Permission::DELETE])) {
           $action -= CRM_Core_Action::DELETE;
         }
-        if (!in_array($dao->id, $permissions[CRM_Core_Permission::EDIT])) {
+        if (!in_array($dao->id, $permittedEventsByAction[CRM_Core_Permission::EDIT])) {
           $action -= CRM_Core_Action::UPDATE;
         }
 
+        $eventLinks = self::eventLinks();
+        if (!CRM_Core_Permission::check('edit event participants')) {
+          unset($eventLinks['register_participant']);
+        }
+
+        $manageEvent[$dao->id]['eventlinks'] = CRM_Core_Action::formLink($eventLinks,
+          NULL,
+          array('id' => $dao->id),
+          ts('Event Links'),
+          TRUE,
+          'event.manage.eventlinks',
+          'Event',
+          $dao->id
+        );
         $manageEvent[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(),
           $action,
           array('id' => $dao->id),
@@ -397,6 +452,7 @@ ORDER BY start_date desc
    * all the fields in the event wizard
    *
    * @return void
+   * @throws \CRM_Core_Exception
    */
   public function copy() {
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE, 0, 'GET');

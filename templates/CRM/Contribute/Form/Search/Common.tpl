@@ -158,8 +158,8 @@
     {include file="CRM/Contribute/Form/PCP.js.tpl"}
   </td>
   <td>
-    {$form.contribution_cancel_reason.label}<br />
-    {$form.contribution_cancel_reason.html}
+    {$form.cancel_reason.label}<br />
+    {$form.cancel_reason.html}
   </td>
 </tr>
 <tr>

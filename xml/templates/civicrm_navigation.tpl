@@ -60,9 +60,9 @@ VALUES
  ( @domainID, '{ts escape="sql" skip="true"}Home{/ts}', 'Home', 'civicrm/dashboard?reset=1', NULL, '', NULL, 1, NULL, 0);
 
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, icon )
 VALUES
-    (  @domainID, NULL, '{ts escape="sql" skip="true"}Search{/ts}',  'Search...',    NULL, '',  NULL, '1', NULL, 10 );
+    (  @domainID, NULL, '{ts escape="sql" skip="true"}Search{/ts}',  'Search',    NULL, '',  NULL, '1', NULL, 10, 'crm-i fa-search' );
 
 SET @searchlastID:=LAST_INSERT_ID();
 
@@ -87,9 +87,9 @@ VALUES
     ( @domainID, 'civicrm/contact/search/custom/list?reset=1',              '{ts escape="sql" skip="true"}Custom Searches{/ts}', 'Custom Searches', NULL, '',                 @searchlastID, '1', NULL, 12 );
 
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, icon )
 VALUES
-    ( @domainID, NULL,  '{ts escape="sql" skip="true"}Contacts{/ts}', 'Contacts', NULL, '', NULL, '1', NULL, 20 );
+    ( @domainID, NULL,  '{ts escape="sql" skip="true"}Contacts{/ts}', 'Contacts', NULL, '', NULL, '1', NULL, 20, 'crm-i fa-address-book-o' );
 
 SET @contactlastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
@@ -115,9 +115,9 @@ VALUES
     ( @domainID, 'civicrm/contact/deduperules?reset=1',  '{ts escape="sql" skip="true"}Find and Merge Duplicate Contacts{/ts}', 'Find and Merge Duplicate Contacts', 'administer dedupe rules,merge duplicate contacts', 'OR', @contactlastID, '1', NULL, 13 );
 
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, icon )
 VALUES
-    ( @domainID, NULL,  '{ts escape="sql" skip="true"}Contributions{/ts}', 'Contributions', 'access CiviContribute', '',      NULL,           '1', NULL,  30 );
+    ( @domainID, NULL, '{ts escape="sql" skip="true"}Contributions{/ts}', 'Contributions', 'access CiviContribute', '', NULL, '1', NULL,  30, 'crm-i fa-credit-card' );
 
 SET @contributionlastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
@@ -164,9 +164,9 @@ VALUES
     ( @domainID, 'civicrm/financial/financialbatches?reset=1&batchStatus=5', '{ts escape="sql" skip="true"}Exported Batches{/ts}',          'Exported Batches',         'view own manual batches,view all manual batches', 'OR',  @financialTransactionID, '1', NULL, 4 );
 
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, icon )
 VALUES
-    ( @domainID, NULL, '{ts escape="sql" skip="true"}Events{/ts}',  'Events', 'access CiviEvent', '', NULL, '1', NULL, 40 );
+    ( @domainID, NULL, '{ts escape="sql" skip="true"}Events{/ts}',  'Events', 'access CiviEvent', '', NULL, '1', NULL, 40, 'crm-i fa-calendar' );
 
 SET @eventlastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
@@ -185,9 +185,9 @@ VALUES
     ( @domainID, 'civicrm/admin/price?reset=1',                             '{ts escape="sql" skip="true"}Manage Price Sets{/ts}',  'Manage Price Sets',    'access CiviEvent,edit all events', 'AND',    @eventlastID, '1', NULL, 11 );
 
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, icon )
 VALUES
-    ( @domainID, NULL, '{ts escape="sql" skip="true"}Mailings{/ts}', 'Mailings', 'access CiviMail,create mailings,approve mailings,schedule mailings,send SMS', 'OR', NULL, '1', NULL, 50 );
+    ( @domainID, NULL, '{ts escape="sql" skip="true"}Mailings{/ts}', 'Mailings', 'access CiviMail,create mailings,approve mailings,schedule mailings,send SMS', 'OR', NULL, '1', NULL, 50, 'crm-i fa-envelope-o' );
 
 SET @mailinglastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
@@ -207,9 +207,9 @@ VALUES
     ( @domainID, 'civicrm/a/#/abtest',                                      '{ts escape="sql" skip="true"}Manage A/B Tests{/ts}', 'Manage A/B Tests',                                'access CiviMail', '', @mailinglastID, '1', 1, 16 );
 
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, icon )
 VALUES
-    ( @domainID, NULL, '{ts escape="sql" skip="true"}Memberships{/ts}', 'Memberships', 'access CiviMember', '', NULL, '1', NULL, 60 );
+    ( @domainID, NULL, '{ts escape="sql" skip="true"}Memberships{/ts}', 'Memberships', 'access CiviMember', '', NULL, '1', NULL, 60, 'crm-i fa-id-badge' );
 
 SET @memberlastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
@@ -225,9 +225,9 @@ VALUES
     ( @domainID, 'civicrm/admin/price?reset=1',                         '{ts escape="sql" skip="true"}Manage Price Sets{/ts}',   'Manage Price Sets', 'access CiviMember,administer CiviCRM', 'AND',  @memberlastID, '1', NULL, 8 );
 
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, icon )
 VALUES
-    ( @domainID, NULL, '{ts escape="sql" skip="true"}Campaigns{/ts}', 'Campaigns', 'interview campaign contacts,release campaign contacts,reserve campaign contacts,manage campaign,administer CiviCampaign,gotv campaign contacts', 'OR', NULL, '1', NULL, 70 );
+    ( @domainID, NULL, '{ts escape="sql" skip="true"}Campaigns{/ts}', 'Campaigns', 'interview campaign contacts,release campaign contacts,reserve campaign contacts,manage campaign,administer CiviCampaign,gotv campaign contacts', 'OR', NULL, '1', NULL, 70, 'crm-i fa-bullhorn' );
 
 SET @campaignlastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
@@ -252,9 +252,9 @@ VALUES
     ( @domainID, 'civicrm/campaign/gotv?reset=1', '{ts escape="sql" skip="true"}GOTV (Voter Tracking){/ts}', 'Voter Listing', 'administer CiviCampaign,manage campaign,release campaign contacts,gotv campaign contacts', 'OR', @campaignlastID, '1', NULL, 10 );
 
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, icon )
 VALUES
-    ( @domainID, NULL, '{ts escape="sql" skip="true"}Cases{/ts}', 'Cases', 'access my cases and activities,access all cases and activities', 'OR', NULL, '1', NULL, 80 );
+    ( @domainID, NULL, '{ts escape="sql" skip="true"}Cases{/ts}', 'Cases', 'access my cases and activities,access all cases and activities', 'OR', NULL, '1', NULL, 80, 'crm-i fa-folder-open-o' );
 
 SET @caselastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
@@ -266,9 +266,9 @@ VALUES
     ( @domainID, 'civicrm/report/list?compid=7&reset=1', '{ts escape="sql" skip="true"}Case Reports{/ts}', 'Case Reports', 'access my cases and activities,access all cases and activities,administer CiviCase', 'OR', @caselastID, '1', 0,    4 );
 
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, icon )
 VALUES
-    ( @domainID, NULL, '{ts escape="sql" skip="true"}Grants{/ts}', 'Grants', 'access CiviGrant', '', NULL, '1', NULL, 90 );
+    ( @domainID, NULL, '{ts escape="sql" skip="true"}Grants{/ts}', 'Grants', 'access CiviGrant', '', NULL, '1', NULL, 90, 'crm-i fa-money' );
 
 SET @grantlastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
@@ -280,9 +280,9 @@ VALUES
     ( @domainID, 'civicrm/report/list?compid=5&reset=1', '{ts escape="sql" skip="true"}Grant Reports{/ts}', 'Grant Reports', 'access CiviGrant', '', @grantlastID, '1', 0,    4 );
 
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, icon )
 VALUES
-    ( @domainID, NULL, '{ts escape="sql" skip="true"}Administer{/ts}', 'Administer', 'administer CiviCRM', '', NULL, '1', NULL, 100 );
+    ( @domainID, NULL, '{ts escape="sql" skip="true"}Administer{/ts}', 'Administer', 'administer CiviCRM', '', NULL, '1', NULL, 100, 'crm-i fa-gears' );
 
 SET @adminlastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
@@ -549,9 +549,9 @@ VALUES
     ( @domainID, 'civicrm/admin/report/options/report_template?reset=1',   '{ts escape="sql" skip="true"}Manage Templates{/ts}', 'Manage Templates', 'administer Reports',  '', @adminReportlastID, '1', NULL, 3 ),
     ( @domainID, 'civicrm/admin/report/register?reset=1',                  '{ts escape="sql" skip="true"}Register Report{/ts}',  'Register Report',  'administer Reports',  '', @adminReportlastID, '1', NULL, 4 );
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, icon )
 VALUES
-    ( @domainID, NULL, '{ts escape="sql" skip="true"}Support{/ts}', 'Support', NULL, '',  NULL, '1', NULL, 110);
+    ( @domainID, NULL, '{ts escape="sql" skip="true"}Support{/ts}', 'Support', NULL, '',  NULL, '1', NULL, 110, 'crm-i fa-life-ring');
 
 SET @adminHelplastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
@@ -578,9 +578,9 @@ VALUES
 ( @domainID, 'https://civicrm.org/developer-documentation?src=iam', '{ts escape="sql" skip="true"}Developer Docs{/ts}', 'Developer Docs', 'administer CiviCRM', '', @devellastID, '1', NULL, 3 );
 
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, icon )
 VALUES
-    ( @domainID, NULL, '{ts escape="sql" skip="true"}Reports{/ts}', 'Reports', 'access CiviReport', '',  NULL, '1', NULL, 95 );
+    ( @domainID, NULL, '{ts escape="sql" skip="true"}Reports{/ts}', 'Reports', 'access CiviReport', '',  NULL, '1', NULL, 95, 'crm-i fa-bar-chart' );
 
 SET @reportlastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation

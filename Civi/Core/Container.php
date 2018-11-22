@@ -165,6 +165,7 @@ class Container {
       'community_messages' => 'community_messages',
       'checks' => 'checks',
       'session' => 'CiviCRM Session',
+      'long' => 'long',
     );
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $container->setDefinition("cache.{$cacheSvc}", new Definition(
@@ -200,7 +201,6 @@ class Container {
 
     // Expose legacy singletons as services in the container.
     $singletons = array(
-      'resources' => 'CRM_Core_Resources',
       'httpClient' => 'CRM_Utils_HttpClient',
       'cache.default' => 'CRM_Utils_Cache',
       'i18n' => 'CRM_Core_I18n',
@@ -213,6 +213,12 @@ class Container {
       ))
         ->setFactory(array($class, 'singleton'));
     }
+    $container->setAlias('cache.short', 'cache.default');
+
+    $container->setDefinition('resources', new Definition(
+      'CRM_Core_Resources',
+      [new Reference('service_container')]
+    ))->setFactory(array(new Reference(self::SELF), 'createResources'));
 
     $container->setDefinition('prevnext', new Definition(
       'CRM_Core_PrevNextCache_Interface',
@@ -407,6 +413,19 @@ class Container {
     ));
 
     return $kernel;
+  }
+
+  /**
+   * @param ContainerInterface $container
+   * @return \CRM_Core_Resources
+   */
+  public static function createResources($container) {
+    $sys = \CRM_Extension_System::singleton();
+    return new \CRM_Core_Resources(
+      $sys->getMapper(),
+      $container->get('cache.js_strings'),
+      \CRM_Core_Config::isUpgradeMode() ? NULL : 'resCacheCode'
+    );
   }
 
   /**

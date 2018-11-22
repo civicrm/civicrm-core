@@ -333,7 +333,7 @@ AND    reset_date IS NULL
         if (!empty($emailVal['is_primary'])) {
           $fromEmailHtml .= ' ' . ts('(preferred)');
         }
-        $contactFromEmails[$fromEmail] = $fromEmailHtml;
+        $contactFromEmails[$emailId] = $fromEmailHtml;
       }
     }
     return CRM_Utils_Array::crmArrayMerge($contactFromEmails, $fromEmailValues);

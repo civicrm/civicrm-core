@@ -30,10 +30,6 @@
  */
 
 /**
- * Include class definitions
- */
-
-/**
  *  Test APIv3 civicrm_case_* functions
  *
  * @package CiviCRM_APIv3
@@ -120,7 +116,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $params['subject'] = 'Test Case 2';
     $case2 = $this->callAPISuccess('case', 'create', $params);
     $params['subject'] = 'Test Case 3';
-    $case3 = $this->callAPISuccess('case', 'create', $params);
+    $this->callAPISuccess('case', 'create', $params);
 
     $getParams = array(
       'id' => array($case1['id']),
@@ -207,7 +203,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'return.custom_' . $ids['custom_field_id'] => 1,
       'id' => $result['id'],
     ));
-    $this->assertEquals("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+    $this->assertEquals("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
@@ -363,7 +359,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $activity = $this->callAPISuccess('Activity', 'get', array(
       'subject' => 'Test BA : Mr. First Last II',
     ));
-    $activityContact = $this->callAPISuccess('ActivityContact', 'get', array(
+    $this->callAPISuccess('ActivityContact', 'get', array(
       'contact_id' => $relContact,
       'activity_id' => $activity['id'],
     ));
@@ -433,7 +429,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    * Test get function based on wrong subject.
    */
   public function testCaseGetByWrongSubject() {
-    $result = $this->callAPISuccess('case', 'create', $this->_params);
+    $this->callAPISuccess('case', 'create', $this->_params);
 
     // Append 'wrong' to subject so that it is no longer the same.
     $result = $this->callAPISuccess('case', 'get', array(
@@ -481,15 +477,13 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $dao = new CRM_Case_DAO_CaseActivity();
     $dao->case_id = $case['id'];
     $dao->activity_id = $this->_caseActivityId;
-    $this->assertEquals($dao->find(), 1, 'case_activity table not populated correctly in line ' . __LINE__);
-    $dao->free();
+    $this->assertEquals($dao->find(), 1, 'case_activity table not populated correctly');
 
     $dao = new CRM_Activity_DAO_ActivityContact();
     $dao->activity_id = $this->_caseActivityId;
     $dao->contact_id = $this->_params['contact_id'];
     $dao->record_type_id = 3;
-    $this->assertEquals($dao->find(), 1, 'activity_contact table not populated correctly in line ' . __LINE__);
-    $dao->free();
+    $this->assertEquals($dao->find(), 1, 'activity_contact table not populated correctly');
 
     // Check that fetching an activity by case id works, as well as returning case_id
     $result = $this->callAPISuccessGetSingle('Activity', array(
@@ -522,14 +516,8 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertEquals($result['values'][$result['id']]['subject'], $params['subject']);
 
     // id should be one greater, since this is a new revision
-    $this->assertEquals($result['values'][$result['id']]['id'],
-      $this->_caseActivityId + 1,
-      'in line ' . __LINE__
-    );
-    $this->assertEquals($result['values'][$result['id']]['original_id'],
-      $this->_caseActivityId,
-      'in line ' . __LINE__
-    );
+    $this->assertEquals($result['values'][$result['id']]['id'], $this->_caseActivityId + 1);
+    $this->assertEquals($result['values'][$result['id']]['original_id'], $this->_caseActivityId);
 
     // Check revision is as expected
     $revParams = array(
@@ -541,8 +529,6 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertEquals($revActivity['values'][$this->_caseActivityId]['is_deleted'],
       0
     );
-
-    //TODO: check some more things
   }
 
   /**
@@ -854,7 +840,10 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    *
    * See the case.addtimeline api.
    *
+   * @param bool $enableRevisions
+   *
    * @dataProvider caseActivityRevisionExamples
+   *
    * @throws \Exception
    */
   public function testCaseAddtimeline($enableRevisions) {
@@ -902,11 +891,10 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     // Created case should only have 1 activity per the spec
     $result = $this->callAPISuccessGetSingle('Activity', array('case_id' => $case['id'], 'return' => 'activity_type_id.name'));
     $this->assertEquals('Open Case', $result['activity_type_id.name']);
-    // Add timeline
-    $timeline = civicrm_api('Case', 'addtimeline', array(
+    // Add timeline.
+    $this->callAPISuccess('Case', 'addtimeline', array(
       'case_id' => $case['id'],
       'timeline' => 'set2',
-      'version' => 3,
     ));
     $result = $this->callAPISuccess('Activity', 'get', array(
       'case_id' => $case['id'],
@@ -946,6 +934,11 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertEquals(1, $result['is_deleted']);
   }
 
+  /**
+   * Get case activity revision sample data.
+   *
+   * @return array
+   */
   public function caseActivityRevisionExamples() {
     $examples = array();
     $examples[] = array(FALSE);

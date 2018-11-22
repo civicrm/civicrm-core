@@ -568,26 +568,24 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
     elseif (!is_writable($basedir)) {
       $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
+        __FUNCTION__ . 'Writable',
         ts('Your extensions directory (%1) is read-only. If you would like to perform downloads or upgrades, then change the file permissions.',
           array(1 => $basedir)),
         ts('Read-Only Extensions'),
-        \Psr\Log\LogLevel::WARNING,
+        \Psr\Log\LogLevel::NOTICE,
         'fa-plug'
       );
-      return $messages;
     }
 
     if (empty($extensionSystem->getDefaultContainer()->baseUrl)) {
       $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
+        __FUNCTION__ . 'URL',
         ts('The extensions URL is not properly set. Please go to the <a href="%1">URL setting page</a> and correct it.',
           array(1 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1'))),
         ts('Extensions url missing'),
         \Psr\Log\LogLevel::ERROR,
         'fa-plug'
       );
-      return $messages;
     }
 
     if (!$extensionSystem->getBrowser()->isEnabled()) {
@@ -688,7 +686,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     if ($errors) {
       $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
+        __FUNCTION__ . 'Error',
         '<ul><li>' . implode('</li><li>', $errors) . '</li></ul>',
         ts('Extension Error'),
         \Psr\Log\LogLevel::ERROR,

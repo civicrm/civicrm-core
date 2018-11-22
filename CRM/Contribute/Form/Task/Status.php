@@ -305,11 +305,14 @@ AND    co.id IN ( $contribIDs )";
   }
 
   /**
-   * @param $contributionIDs
+   * @param string $contributionIDs
    *
    * @return array
    */
   public static function &getDetails($contributionIDs) {
+    if (empty($contributionIDs)) {
+      return [];
+    }
     $query = "
 SELECT    c.id              as contribution_id,
           c.contact_id      as contact_id     ,
@@ -326,7 +329,6 @@ WHERE     c.id IN ( $contributionIDs )";
     $dao = CRM_Core_DAO::executeQuery($query,
       CRM_Core_DAO::$_nullArray
     );
-    $rows = array();
 
     while ($dao->fetch()) {
       $rows[$dao->contribution_id]['component'] = $dao->participant_id ? 'event' : 'contribute';

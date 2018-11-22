@@ -142,7 +142,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
     }
     //call function to create labels
     CRM_Contact_Form_Task_LabelCommon::createLabel($labelRows, $labelName);
-    CRM_Utils_System::civiExit(1);
+    CRM_Utils_System::civiExit();
   }
 
 }

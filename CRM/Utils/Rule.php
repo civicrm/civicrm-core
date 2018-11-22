@@ -108,7 +108,7 @@ class CRM_Utils_Rule {
     //   * Composed of alphanumeric chars, underscore and hyphens.
     //   * Maximum length of 64 chars.
     //   * Optionally surrounded by backticks, in which case spaces also OK.
-    if (!preg_match('/^((`[\w- ]{1,64}`|[\w-]{1,64})\.)?(`[\w- ]{1,64}`|[\w-]{1,64})$/i', $str)) {
+    if (!preg_match('/^((`[-\w ]{1,64}`|[-\w]{1,64})\.)?(`[-\w ]{1,64}`|[-\w]{1,64})$/i', $str)) {
       return FALSE;
     }
 
@@ -229,6 +229,10 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function url($url) {
+    if (!$url) {
+      // If this is required then that should be checked elsewhere - here we are not assuming it is required.
+      return TRUE;
+    }
     if (preg_match('/^\//', $url)) {
       // allow relative URL's (CRM-15598)
       $url = 'http://' . $_SERVER['HTTP_HOST'] . $url;

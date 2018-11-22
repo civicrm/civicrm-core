@@ -101,20 +101,7 @@
     </script>
     {/literal}
 
-    {* Tab management *}
-    <script type="text/javascript">
-    var selectedTab  = 'summary';
-    {if $selectedChild}selectedTab = "{$selectedChild}";{/if}
-
-    {literal}
-
-    CRM.$(function($) {
-      var tabIndex = $('#tab_' + selectedTab).prevAll().length;
-      $("#mainTabContainer").tabs({active: tabIndex});
-      $(".crm-tab-button").addClass("ui-corner-bottom");
-    });
-    {/literal}
-    </script>
+    {include file="CRM/common/TabSelected.tpl" defaultTab="summary"}
 
     {* Refresh buttons *}
     {literal}

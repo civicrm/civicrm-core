@@ -1062,8 +1062,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $element = $qf->add('text', $elementName, $label, $attributes, $useRequired && !$search);
 
           $urlParams = "context=customfield&id={$field->id}";
-
-          $customUrls[$elementName] = CRM_Utils_System::url('civicrm/ajax/contactref',
+          $idOfelement = $elementName;
+          // dev/core#362 if in an onbehalf profile clean up the name to get rid of square brackets that break the select 2 js
+          if (strpos($elementName, '[') && strpos($elementName, ']')) {
+            $idOfelement = substr(substr($elementName, (strpos($elementName, '[') + 1)), 0, -1);
+          }
+          $customUrls[$idOfelement] = CRM_Utils_System::url('civicrm/ajax/contactref',
             $urlParams,
             FALSE, NULL, FALSE
           );
@@ -1662,7 +1666,7 @@ SELECT id
       $value = 0;
     }
 
-    $fileId = NULL;
+    $fileID = NULL;
 
     if ($customFields[$customFieldId]['data_type'] == 'File') {
       if (empty($value)) {
@@ -1701,20 +1705,20 @@ SELECT $columnName
   FROM $tableName
  WHERE id = %1";
         $params = array(1 => array($customValueId, 'Integer'));
-        $fileId = CRM_Core_DAO::singleValueQuery($query, $params);
+        $fileID = CRM_Core_DAO::singleValueQuery($query, $params);
       }
 
       $fileDAO = new CRM_Core_DAO_File();
 
-      if ($fileId) {
-        $fileDAO->id = $fileId;
+      if ($fileID) {
+        $fileDAO->id = $fileID;
       }
 
       $fileDAO->uri = $filename;
       $fileDAO->mime_type = $mimeType;
       $fileDAO->upload_date = date('YmdHis');
       $fileDAO->save();
-      $fileId = $fileDAO->id;
+      $fileID = $fileDAO->id;
       $value = $filename;
     }
 
@@ -1742,7 +1746,7 @@ SELECT $columnName
       'custom_group_id' => $groupID,
       'table_name' => $tableName,
       'column_name' => $columnName,
-      'file_id' => $fileId,
+      'file_id' => $fileID,
       'is_multiple' => $customFields[$customFieldId]['is_multiple'],
     );
 
@@ -2423,6 +2427,31 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
     }
 
     return $isMultipleWithGid;
+  }
+
+  /**
+   * Does this field type have any select options?
+   *
+   * @param array $field
+   *
+   * @return bool
+   */
+  public static function hasOptions($field) {
+    // Fields retrieved via api are an array, or from the dao are an object. We'll accept either.
+    $field = (array) $field;
+    // This will include boolean fields with Yes/No options.
+    if (in_array($field['html_type'], ['Radio', 'CheckBox'])) {
+      return TRUE;
+    }
+    // Do this before the "Select" string search because date fields have a "Select Date" html_type
+    // and contactRef fields have an "Autocomplete-Select" html_type - contacts are an FK not an option list.
+    if (in_array($field['data_type'], ['ContactReference', 'Date'])) {
+      return FALSE;
+    }
+    if (strpos($field['html_type'], 'Select') !== FALSE) {
+      return TRUE;
+    }
+    return !empty($field['option_group_id']);
   }
 
   /**

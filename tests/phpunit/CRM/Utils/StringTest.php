@@ -251,8 +251,11 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    */
   public function simplifyURLProvider() {
     $config = CRM_Core_Config::singleton();
-    $urlParts = parse_url($config->userFrameworkBaseURL);
-    $localDomain = $urlParts['host'];
+    $urlParts = CRM_Utils_String::simpleParseUrl($config->userFrameworkBaseURL);
+    $localDomain = $urlParts['host+port'];
+    if (empty($localDomain)) {
+      throw new \Exception("Failed to determine local base URL");
+    }
     $externalDomain = 'example.org';
 
     // Ensure that $externalDomain really is different from $localDomain
@@ -323,6 +326,13 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
         "https://example.com:8000/foo/bar/?id=1#fragment",
         array(
           'host+port' => "example.com:8000",
+          'path+query' => "/foo/bar/?id=1",
+        ),
+      ),
+      "default port example" => array(
+        "https://example.com/foo/bar/?id=1#fragment",
+        array(
+          'host+port' => "example.com",
           'path+query' => "/foo/bar/?id=1",
         ),
       ),
