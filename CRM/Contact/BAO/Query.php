@@ -2641,176 +2641,167 @@ class CRM_Contact_BAO_Query {
         continue;
       }
 
-      $limitToPrimaryClause = $primaryLocation ? "AND {$name}.is_primary = 1" : '';
-
-      switch ($name) {
-        case 'civicrm_address':
-          //CRM-14263 further handling of address joins further down...
-          $from .= " $side JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id {$limitToPrimaryClause} )";
-          continue;
-
-        case 'civicrm_phone':
-          $from .= " $side JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id {$limitToPrimaryClause}) ";
-          continue;
-
-        case 'civicrm_email':
-          $from .= " $side JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id {$limitToPrimaryClause})";
-          continue;
-
-        case 'civicrm_im':
-          $from .= " $side JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id {$limitToPrimaryClause}) ";
-          continue;
-
-        case 'im_provider':
-          $from .= " $side JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id) ";
-          $from .= " $side JOIN civicrm_option_group option_group_imProvider ON option_group_imProvider.name = 'instant_messenger_service'";
-          $from .= " $side JOIN civicrm_option_value im_provider ON (civicrm_im.provider_id = im_provider.value AND option_group_imProvider.id = im_provider.option_group_id)";
-          continue;
-
-        case 'civicrm_openid':
-          $from .= " $side JOIN civicrm_openid ON ( civicrm_openid.contact_id = contact_a.id {$limitToPrimaryClause} )";
-          continue;
-
-        case 'civicrm_worldregion':
-          $from .= " $side JOIN civicrm_country ON civicrm_address.country_id = civicrm_country.id ";
-          $from .= " $side JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ";
-          continue;
-
-        case 'civicrm_location_type':
-          $from .= " $side JOIN civicrm_location_type ON civicrm_address.location_type_id = civicrm_location_type.id ";
-          continue;
-
-        case 'civicrm_group':
-          $from .= " $side JOIN civicrm_group ON civicrm_group.id = civicrm_group_contact.group_id ";
-          continue;
-
-        case 'civicrm_group_contact':
-          $from .= " $side JOIN civicrm_group_contact ON contact_a.id = civicrm_group_contact.contact_id ";
-          continue;
-
-        case 'civicrm_group_contact_cache':
-          $from .= " $side JOIN civicrm_group_contact_cache ON contact_a.id = civicrm_group_contact_cache.contact_id ";
-          continue;
-
-        case 'civicrm_activity':
-        case 'civicrm_activity_tag':
-        case 'activity_type':
-        case 'activity_status':
-        case 'parent_id':
-        case 'civicrm_activity_contact':
-        case 'source_contact':
-        case 'activity_priority':
-          $from .= CRM_Activity_BAO_Query::from($name, $mode, $side);
-          continue;
-
-        case 'civicrm_entity_tag':
-          $from .= " $side JOIN civicrm_entity_tag ON ( civicrm_entity_tag.entity_table = 'civicrm_contact' AND
-                                                              civicrm_entity_tag.entity_id = contact_a.id ) ";
-          continue;
-
-        case 'civicrm_note':
-          $from .= " $side JOIN civicrm_note ON ( civicrm_note.entity_table = 'civicrm_contact' AND
-                                                        contact_a.id = civicrm_note.entity_id ) ";
-          continue;
-
-        case 'civicrm_subscription_history':
-          $from .= " $side JOIN civicrm_subscription_history
-                                   ON civicrm_group_contact.contact_id = civicrm_subscription_history.contact_id
-                                  AND civicrm_group_contact.group_id =  civicrm_subscription_history.group_id";
-          continue;
-
-        case 'civicrm_relationship':
-          if (self::$_relType == 'reciprocal') {
-            if (self::$_relationshipTempTable) {
-              // we have a temptable to join on
-              $tbl = self::$_relationshipTempTable;
-              $from .= " INNER JOIN {$tbl} civicrm_relationship ON civicrm_relationship.contact_id = contact_a.id";
-            }
-            else {
-              $from .= " $side JOIN civicrm_relationship ON (civicrm_relationship.contact_id_b = contact_a.id OR civicrm_relationship.contact_id_a = contact_a.id)";
-              $from .= " $side JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_a = contact_b.id OR civicrm_relationship.contact_id_b = contact_b.id)";
-            }
-          }
-          elseif (self::$_relType == 'b') {
-            $from .= " $side JOIN civicrm_relationship ON (civicrm_relationship.contact_id_b = contact_a.id )";
-            $from .= " $side JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_a = contact_b.id )";
-          }
-          else {
-            $from .= " $side JOIN civicrm_relationship ON (civicrm_relationship.contact_id_a = contact_a.id )";
-            $from .= " $side JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_b = contact_b.id )";
-          }
-          continue;
-
-        case 'civicrm_log':
-          $from .= " INNER JOIN civicrm_log ON (civicrm_log.entity_id = contact_a.id AND civicrm_log.entity_table = 'civicrm_contact')";
-          $from .= " INNER JOIN civicrm_contact contact_b_log ON (civicrm_log.modified_id = contact_b_log.id)";
-          continue;
-
-        case 'civicrm_tag':
-          $from .= " $side  JOIN civicrm_tag ON civicrm_entity_tag.tag_id = civicrm_tag.id ";
-          continue;
-
-        case 'civicrm_grant':
-          $from .= CRM_Grant_BAO_Query::from($name, $mode, $side);
-          continue;
-
-        case 'civicrm_campaign':
-          //Move to default case if not in either mode.
-          if ($mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
-            $from .= CRM_Contribute_BAO_Query::from($name, $mode, $side);
-            continue;
-          }
-          elseif ($mode & CRM_Contact_BAO_Query::MODE_MAILING) {
-            $from .= CRM_Mailing_BAO_Query::from($name, $mode, $side);
-            continue;
-          }
-          elseif ($mode & CRM_Contact_BAO_Query::MODE_CAMPAIGN) {
-            $from .= CRM_Campaign_BAO_Query::from($name, $mode, $side);
-            continue;
-          }
-
-        case 'civicrm_website':
-          $from .= " $side JOIN civicrm_website ON contact_a.id = civicrm_website.contact_id ";
-          continue;
-
-        default:
-          $locationTypeName = '';
-          if (strpos($name, '-address') != 0) {
-            $locationTypeName = 'address';
-          }
-          elseif (strpos($name, '-phone') != 0) {
-            $locationTypeName = 'phone';
-          }
-          elseif (strpos($name, '-email') != 0) {
-            $locationTypeName = 'email';
-          }
-          elseif (strpos($name, '-im') != 0) {
-            $locationTypeName = 'im';
-          }
-          elseif (strpos($name, '-openid') != 0) {
-            $locationTypeName = 'openid';
-          }
-
-          if ($locationTypeName) {
-            //we have a join on an location table - possibly in conjunction with search builder - CRM-14263
-            $parts = explode('-', $name);
-            $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id', 'validate');
-            foreach ($locationTypes as $locationTypeID => $locationType) {
-              if ($parts[0] == str_replace(' ', '_', $locationType)) {
-                $locationID = $locationTypeID;
-              }
-            }
-            $from .= " $side JOIN civicrm_{$locationTypeName} `{$name}` ON ( contact_a.id = `{$name}`.contact_id ) and `{$name}`.location_type_id = $locationID ";
-          }
-          else {
-            $from .= CRM_Core_Component::from($name, $mode, $side);
-          }
-          $from .= CRM_Contact_BAO_Query_Hook::singleton()->buildSearchfrom($name, $mode, $side);
-
-          continue;
-      }
+      $from .= self::getEntitySpecificJoins($name, $mode, $side, $primaryLocation);
     }
     return $from;
+  }
+
+  /**
+   * Get join statements for the from clause depending on entity type
+   *
+   * @param string $name
+   * @param int $mode
+   * @param string $side
+   * @param string $primaryLocation
+   * @return string
+   */
+  protected static function getEntitySpecificJoins($name, $mode, $side, $primaryLocation) {
+    $limitToPrimaryClause = $primaryLocation ? "AND {$name}.is_primary = 1" : '';
+    switch ($name) {
+      case 'civicrm_address':
+        //CRM-14263 further handling of address joins further down...
+        return " $side JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id {$limitToPrimaryClause} )";
+
+      case 'civicrm_phone':
+        return " $side JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id {$limitToPrimaryClause}) ";
+
+      case 'civicrm_email':
+        return " $side JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id {$limitToPrimaryClause})";
+
+      case 'civicrm_im':
+        return " $side JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id {$limitToPrimaryClause}) ";
+
+      case 'im_provider':
+        $from = " $side JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id) ";
+        $from .= " $side JOIN civicrm_option_group option_group_imProvider ON option_group_imProvider.name = 'instant_messenger_service'";
+        $from .= " $side JOIN civicrm_option_value im_provider ON (civicrm_im.provider_id = im_provider.value AND option_group_imProvider.id = im_provider.option_group_id)";
+        return $from;
+
+      case 'civicrm_openid':
+        return " $side JOIN civicrm_openid ON ( civicrm_openid.contact_id = contact_a.id {$limitToPrimaryClause} )";
+
+      case 'civicrm_worldregion':
+        $from = " $side JOIN civicrm_country ON civicrm_address.country_id = civicrm_country.id ";
+        return "$from $side JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ";
+
+      case 'civicrm_location_type':
+        return " $side JOIN civicrm_location_type ON civicrm_address.location_type_id = civicrm_location_type.id ";
+
+      case 'civicrm_group':
+        return " $side JOIN civicrm_group ON civicrm_group.id = civicrm_group_contact.group_id ";
+
+      case 'civicrm_group_contact':
+        return " $side JOIN civicrm_group_contact ON contact_a.id = civicrm_group_contact.contact_id ";
+
+      case 'civicrm_group_contact_cache':
+        return " $side JOIN civicrm_group_contact_cache ON contact_a.id = civicrm_group_contact_cache.contact_id ";
+
+      case 'civicrm_activity':
+      case 'civicrm_activity_tag':
+      case 'activity_type':
+      case 'activity_status':
+      case 'parent_id':
+      case 'civicrm_activity_contact':
+      case 'source_contact':
+      case 'activity_priority':
+        return CRM_Activity_BAO_Query::from($name, $mode, $side);
+
+      case 'civicrm_entity_tag':
+        $from = " $side JOIN civicrm_entity_tag ON ( civicrm_entity_tag.entity_table = 'civicrm_contact'";
+        return "$from AND civicrm_entity_tag.entity_id = contact_a.id ) ";
+
+      case 'civicrm_note':
+        $from = " $side JOIN civicrm_note ON ( civicrm_note.entity_table = 'civicrm_contact'";
+        return "$from AND contact_a.id = civicrm_note.entity_id ) ";
+
+      case 'civicrm_subscription_history':
+        $from = " $side JOIN civicrm_subscription_history";
+        $from .= " ON civicrm_group_contact.contact_id = civicrm_subscription_history.contact_id";
+        return "$from AND civicrm_group_contact.group_id =  civicrm_subscription_history.group_id";
+
+      case 'civicrm_relationship':
+        if (self::$_relType == 'reciprocal') {
+          if (self::$_relationshipTempTable) {
+            // we have a temptable to join on
+            $tbl = self::$_relationshipTempTable;
+            return " INNER JOIN {$tbl} civicrm_relationship ON civicrm_relationship.contact_id = contact_a.id";
+          }
+          else {
+            $from = " $side JOIN civicrm_relationship ON (civicrm_relationship.contact_id_b = contact_a.id OR civicrm_relationship.contact_id_a = contact_a.id)";
+            $from .= " $side JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_a = contact_b.id OR civicrm_relationship.contact_id_b = contact_b.id)";
+            return $from;
+          }
+        }
+        elseif (self::$_relType == 'b') {
+          $from = " $side JOIN civicrm_relationship ON (civicrm_relationship.contact_id_b = contact_a.id )";
+          return "$from $side JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_a = contact_b.id )";
+        }
+        else {
+          $from = " $side JOIN civicrm_relationship ON (civicrm_relationship.contact_id_a = contact_a.id )";
+          return "$from $side JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_b = contact_b.id )";
+        }
+
+      case 'civicrm_log':
+        $from = " INNER JOIN civicrm_log ON (civicrm_log.entity_id = contact_a.id AND civicrm_log.entity_table = 'civicrm_contact')";
+        return "$from INNER JOIN civicrm_contact contact_b_log ON (civicrm_log.modified_id = contact_b_log.id)";
+
+      case 'civicrm_tag':
+        return " $side  JOIN civicrm_tag ON civicrm_entity_tag.tag_id = civicrm_tag.id ";
+
+      case 'civicrm_grant':
+        return CRM_Grant_BAO_Query::from($name, $mode, $side);
+
+      case 'civicrm_website':
+        return " $side JOIN civicrm_website ON contact_a.id = civicrm_website.contact_id ";
+
+      case 'civicrm_campaign':
+        //Move to default case if not in either mode.
+        if ($mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
+          return CRM_Contribute_BAO_Query::from($name, $mode, $side);
+        }
+        elseif ($mode & CRM_Contact_BAO_Query::MODE_MAILING) {
+          return CRM_Mailing_BAO_Query::from($name, $mode, $side);
+        }
+        elseif ($mode & CRM_Contact_BAO_Query::MODE_CAMPAIGN) {
+          return CRM_Campaign_BAO_Query::from($name, $mode, $side);
+        }
+
+      default:
+        $locationTypeName = '';
+        if (strpos($name, '-address') != 0) {
+          $locationTypeName = 'address';
+        }
+        elseif (strpos($name, '-phone') != 0) {
+          $locationTypeName = 'phone';
+        }
+        elseif (strpos($name, '-email') != 0) {
+          $locationTypeName = 'email';
+        }
+        elseif (strpos($name, '-im') != 0) {
+          $locationTypeName = 'im';
+        }
+        elseif (strpos($name, '-openid') != 0) {
+          $locationTypeName = 'openid';
+        }
+
+        if ($locationTypeName) {
+          //we have a join on an location table - possibly in conjunction with search builder - CRM-14263
+          $parts = explode('-', $name);
+          $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id', 'validate');
+          foreach ($locationTypes as $locationTypeID => $locationType) {
+            if ($parts[0] == str_replace(' ', '_', $locationType)) {
+              $locationID = $locationTypeID;
+            }
+          }
+          $from = " $side JOIN civicrm_{$locationTypeName} `{$name}` ON ( contact_a.id = `{$name}`.contact_id ) and `{$name}`.location_type_id = $locationID ";
+        }
+        else {
+          $from = CRM_Core_Component::from($name, $mode, $side);
+        }
+        $from .= CRM_Contact_BAO_Query_Hook::singleton()->buildSearchfrom($name, $mode, $side);
+
+        return $from;
+    }
   }
 
   /**

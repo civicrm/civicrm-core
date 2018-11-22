@@ -1564,7 +1564,7 @@ ORDER BY civicrm_custom_group.weight,
 
           case 'File':
             if ($skipFile) {
-              continue;
+              break;
             }
 
             //store the file in d/b
