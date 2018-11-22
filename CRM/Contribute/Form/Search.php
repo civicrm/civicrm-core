@@ -173,10 +173,12 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * Build the form object.
    */
   public function buildQuickForm() {
-    parent::buildQuickForm();
-    $this->addContactSearchFields();
+    if ($this->isFormInViewOrEditMode()) {
+      parent::buildQuickForm();
+      $this->addContactSearchFields();
 
-    CRM_Contribute_BAO_Query::buildSearchForm($this);
+      CRM_Contribute_BAO_Query::buildSearchForm($this);
+    }
 
     $rows = $this->get('rows');
     if (is_array($rows)) {
