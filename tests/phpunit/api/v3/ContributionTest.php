@@ -267,6 +267,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params = array_merge($params, array(
       'id' => $contributionID,
       'invoice_number' => CRM_Utils_Array::value('invoice_prefix', Civi::settings()->get('contribution_invoice_settings')) . "" . $contributionID,
+      'trxn_id' => 12345,
+      'invoice_id' => 6789,
     ));
     $contributionID = $this->contributionCreate($params);
 
