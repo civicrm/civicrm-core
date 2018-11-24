@@ -38,7 +38,8 @@ trait CRMTraits_Financial_FinancialACLTrait {
   protected function enableFinancialACLs() {
     $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
     $this->callAPISuccess('Setting', 'create', [
-      'contribution_invoice_settings' => array_merge($contributeSettings, ['acl_financial_type' => TRUE])
+      'contribution_invoice_settings' => array_merge($contributeSettings, ['acl_financial_type' => TRUE]),
+      'acl_financial_type' => TRUE,
     ]);
     unset(\Civi::$statics['CRM_Financial_BAO_FinancialType']);
   }
@@ -49,7 +50,8 @@ trait CRMTraits_Financial_FinancialACLTrait {
   protected function disableFinancialACLs() {
     $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
     $this->callAPISuccess('Setting', 'create', [
-      'contribution_invoice_settings' => array_merge($contributeSettings, ['acl_financial_type' => FALSE])
+      'contribution_invoice_settings' => array_merge($contributeSettings, ['acl_financial_type' => FALSE]),
+      'acl_financial_type' => FALSE,
     ]);
     unset(\Civi::$statics['CRM_Financial_BAO_FinancialType']);
   }
