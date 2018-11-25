@@ -386,10 +386,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    CRM_Core_Resources::singleton()
-      // jsTree is needed for tags popup
-      ->addScriptFile('civicrm', 'bower_components/jstree/dist/jquery.jstree.min.js', 0, 'html-header', FALSE)
-      ->addStyleFile('civicrm', 'bower_components/jstree/dist/themes/default/style.min.css', 0, 'html-header');
 
     // some tasks.. what do we want to do with the selected contacts ?
     $this->_taskList = $this->buildTaskList();
