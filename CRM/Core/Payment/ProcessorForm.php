@@ -72,8 +72,7 @@ class CRM_Core_Payment_ProcessorForm {
 
     $form->assign('suppressSubmitButton', $form->_paymentObject->isSuppressSubmitButtons());
 
-    $currency = $form->getCurrency();
-    $form->assign('currency', $currency);
+    $form->assign('currency', $form->getCurrency());
 
     // also set cancel subscription url
     if (!empty($form->_paymentProcessor['is_recur']) && !empty($form->_values['is_recur'])) {
