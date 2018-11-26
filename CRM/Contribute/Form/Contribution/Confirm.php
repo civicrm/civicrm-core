@@ -719,6 +719,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public function postProcess() {
     $contactID = $this->getContactID();
+    if (!empty($this->_ccid)) {
+      $this->_membershipContactID = NULL;
+      $contactID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_ccid, 'contact_id');
+    }
     try {
       $result = $this->processFormSubmission($contactID);
     }
@@ -1942,7 +1946,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   public static function submit($params) {
     $form = new CRM_Contribute_Form_Contribution_Confirm();
     $form->_id = $params['id'];
-
     $form->_ccid = CRM_Utils_Array::value('contributionId', $params);
     $form->_isPartialPayment = CRM_Utils_Array::value('isPartialPayment', $params);
 
@@ -2482,16 +2485,36 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   protected function completeTransaction($result, $contributionID) {
     if (CRM_Utils_Array::value('payment_status_id', $result) == 1) {
       try {
-        civicrm_api3('contribution', 'completetransaction', array(
-          'id' => $contributionID,
-          'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
-          'payment_processor_id' => CRM_Utils_Array::value('payment_processor_id', $result, $this->_paymentProcessor['id']),
-          'is_transactional' => FALSE,
-          'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
-          'receive_date' => CRM_Utils_Array::value('receive_date', $result),
-          'card_type_id' => CRM_Utils_Array::value('card_type_id', $result),
-          'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $result),
-        ));
+        if (!empty($this->_isPartialPayment) && !empty($this->_ccid)) {
+          $amount = CRM_Utils_Array::value('amount', $result);
+          if (empty($amount)) {
+            $amount = CRM_Utils_Array::value('total_amount', $result);
+          }
+          $defaultInvoicePage = Civi::settings()->get('default_invoice_page');
+          $isEmailReceipt = FALSE;
+          if (!empty($defaultInvoicePage)) {
+            $isEmailReceipt = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $defaultInvoicePage, 'is_email_receipt');
+          }
+          civicrm_api3('Payment', 'create', [
+            'contribution_id' => $this->_ccid,
+            'total_amount' => $amount,
+            'is_email_receipt' => $isEmailReceipt,
+            'payment_processor_id' => CRM_Utils_Array::value('payment_processor_id', $result),
+            'payment_instrument_id' => CRM_Utils_Array::value('payment_instrument_id', $result),
+          ]);
+        }
+        else {
+          civicrm_api3('contribution', 'completetransaction', array(
+            'id' => $contributionID,
+            'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
+            'payment_processor_id' => CRM_Utils_Array::value('payment_processor_id', $result, $this->_paymentProcessor['id']),
+            'is_transactional' => FALSE,
+            'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
+            'receive_date' => CRM_Utils_Array::value('receive_date', $result),
+            'card_type_id' => CRM_Utils_Array::value('card_type_id', $result),
+            'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $result),
+          ));
+        }
       }
       catch (CiviCRM_API3_Exception $e) {
         if ($e->getErrorCode() != 'contribution_completed') {

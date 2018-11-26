@@ -99,19 +99,19 @@
       <div class="header-dark">
         {ts}Contribution Information{/ts}{if $display_name} &ndash; {$display_name}{/if}
       </div>
-      {assign var="totalAmount" value=$pendingAmount}
-      {if $totalAmountForPartialPayment}
-        {assign var="totalAmountForPartialPayment" value=$totalAmountForPartialPayment}
-        {include file="CRM/Price/Page/LineItem.tpl" context="PartialPayment"}
+      {if $contribution_total}
+        {include file="CRM/Price/Page/LineItem.tpl" context="PartialPayment" totalAmount=$contribution_total}
       {else}
-        {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
+        {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"  totalAmount=$pendingAmount}
       {/if}
-    {else}
-      <div class="display-block">
-        <td class="label">{$form.total_amount.label}</td>
-        <td><span>{$form.total_amount.html|crmMoney}&nbsp;&nbsp;{if $taxAmount}{ts 1=$taxTerm 2=$taxAmount|crmMoney}(includes %1 of %2){/ts}{/if}</span></td>
-      </div>
     {/if}
+    <div class="display-block">
+      <td class="label">{$form.total_amount.label}</td>
+      <td>
+        <span>{$form.total_amount.html|crmMoney}&nbsp;&nbsp;{if $taxAmount}{ts 1=$taxTerm 2=$taxAmount|crmMoney}(includes %1 of %2){/ts}{/if}</span>
+        <span class="status">Balance Owed:&nbsp; {$pendingAmount|crmMoney}</span>
+      </td>
+    </div>
   {else}
     <div id="priceset-div">
     {include file="CRM/Price/Form/PriceSet.tpl" extends="Contribution"}

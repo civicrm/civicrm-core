@@ -48,6 +48,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public $_useForMember;
 
   /**
+   * Contribution ID
+   */
+  public $_ccid;
+
+  /**
    * Array of payment related fields to potentially display on this form (generally credit card or debit card fields). This is rendered via billingBlock.tpl
    * @var array
    */
@@ -336,7 +341,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
     else {
       $this->addElement('hidden', "email-{$this->_bltID}", 1);
-      $this->add('text', 'total_amount', ts('Total Amount'), array('readonly' => TRUE), FALSE);
+      $this->add('text', 'total_amount', ts('Payment Amount'), NULL, TRUE);
     }
     $pps = array();
     //@todo - this should be replaced by a check as to whether billing fields are set
@@ -633,7 +638,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   public static function formRule($fields, $files, $self) {
     $errors = array();
-    $amount = self::computeAmount($fields, $self->_values);
+    $amount = self::computeAmount($fields, $self->_values, $self->_ccid);
+    if ($self->_ccid && !empty($self->_pendingAmount) && $amount > $self->_pendingAmount) {
+      $errors['total_amount'] = ts('Payment amount cannot be greater than owed amount.');
+    }
     if (CRM_Utils_Array::value('auto_renew', $fields) &&
       CRM_Utils_Array::value('payment_processor_id', $fields) == 0
     ) {
@@ -985,7 +993,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    * @return int|mixed|null|string
    */
-  public static function computeAmount($params, $formValues) {
+  public static function computeAmount($params, $formValues, $ccid = NULL) {
     $amount = 0;
     // First clean up the other amount field if present.
     if (isset($params['amount_other'])) {
@@ -999,6 +1007,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       foreach ($params['pledge_amount'] as $paymentId => $dontCare) {
         $amount += CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment', $paymentId, 'scheduled_amount');
       }
+    }
+    elseif ($ccid && !empty($params['total_amount'])) {
+      $amount = $params['total_amount'];
     }
     else {
       if (!empty($formValues['amount'])) {
@@ -1091,13 +1102,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
 
-    if (!empty($this->_ccid) && !empty($this->_pendingAmount)) {
-      $params['amount'] = $this->_pendingAmount;
-    }
-    else {
-      // from here on down, $params['amount'] holds a monetary value (or null) rather than an option ID
-      $params['amount'] = self::computeAmount($params, $this->_values);
-    }
+    // from here on down, $params['amount'] holds a monetary value (or null) rather than an option ID
+    $params['amount'] = self::computeAmount($params, $this->_values, $this->_ccid);
 
     $params['separate_amount'] = $params['amount'];
     $memFee = NULL;
@@ -1323,18 +1329,15 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       throw new CRM_Core_Exception(ts("Only Pending or Partially Paid contributions can be submitted."));
     }
 
-    $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_ccid, 'contribution');
-    $pendingAmount = CRM_Utils_Array::value('amount_owed', $paymentInfo);
-    if ($payment['contribution_status'] == 'Partially paid') {
+    if ($contribution['contribution_status'] == 'Partially paid') {
       $totalAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_ccid, 'total_amount');
-      $this->set('isPartialPayment', TRUE);
-      $this->assign('totalAmountForPartialPayment', $totalAmount);
+      $this->assign('contribution_total', $totalAmount);
     }
-
-    if (!empty($pendingAmount)) {
-      $this->_pendingAmount = $pendingAmount;
+    if (!empty($paymentBalance)) {
+      $this->_pendingAmount = $paymentBalance;
       $this->assign('pendingAmount', $this->_pendingAmount);
     }
+    $this->set('isPartialPayment', TRUE);
 
     $taxAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_ccid, 'tax_amount');
     if (!empty($taxAmount) && $taxAmount != 0.00) {
