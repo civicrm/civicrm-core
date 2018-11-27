@@ -148,7 +148,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     }
 
     $this->add('select', 'from_email_address', ts('From'), $this->_fromEmails, TRUE);
-    $this->add('select', 'to_email_address', ts('To'), $this->_toEmails, TRUE);
+    // @todo This should check if $this->_single is FALSE and act differently
+    $this->add('select', 'to_email_address', ts('To'), CRM_Core_BAO_Email::getToEmail($this->_contactIds[0]), TRUE);
     $this->add('text', 'cc_email_address', ts('CC'));
     $this->add('text', 'bcc_email_address', ts('BCC'));
     if ($this->_selectedOutput != 'email') {

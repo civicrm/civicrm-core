@@ -342,42 +342,45 @@ AND    reset_date IS NULL
   /**
    * Build "To Email" pulling data from Email entity
    *
+   * @param int $contactID
+   *   The contact ID to get emails for.
+   *
    * @return array
    *   an array of email
    * @throws \CiviCRM_API3_Exception
    */
-  public static function getToEmail() {
-    $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
+  public static function getToEmail($contactID) {
     $emails = [];
-    if ($contactID) {
-      $contactEntity = civicrm_api3('Contact', 'getsingle', [
-        'sequential' => 1,
-        'id' => $contactID,
-        'api.Email.get' => ['api.LocationType.getsingle' => []],
-      ]);
 
-      $contactName = $contactEntity['display_name'];
-      //Get mail entities from this contact
-      $mailEntities = $contactEntity['api.Email.get'];
-      foreach ($mailEntities['values'] as $mailEntity) {
-        $email = $mailEntity['email'];
-        //Get location type entity associated
-        $locationTypeEntity = $mailEntity['api.LocationType.getsingle'];
-        $locationName = $locationTypeEntity['display_name'];
+    $contactEntity = civicrm_api3('Contact', 'getsingle', [
+      'sequential' => 1,
+      'id' => $contactID,
+      'api.Email.get' => ['api.LocationType.getsingle' => []],
+    ]);
 
-        $toEmail = "$contactName <$email>";
-        $toEmailHtml = $locationName;
+    $contactName = $contactEntity['display_name'];
+    //Get mail entities from this contact
+    $mailEntities = $contactEntity['api.Email.get'];
+    foreach ($mailEntities['values'] as $mailEntity) {
+      $email = $mailEntity['email'];
+      //Get location type entity associated
+      $locationTypeEntity = $mailEntity['api.LocationType.getsingle'];
+      $locationName = $locationTypeEntity['display_name'];
 
-        if (!empty($mailEntity['is_primary'])) {
-          $toEmailHtml .= ' ' . ts('(preferred) ');
-        }
+      $toEmail = "$contactName <$email>";
+      $toEmailHtml = $locationName;
 
-        $toEmailHtml .= htmlspecialchars($toEmail);
-
-        //Add contact email to mails array
-        $emails[$toEmail] = $toEmailHtml;
+      if (!empty($mailEntity['is_primary'])) {
+        $toEmailHtml .= ' ' . ts('(preferred) ');
       }
+
+      $toEmailHtml .= htmlspecialchars($toEmail);
+
+      //Add contact email to mails array
+      $emails[$toEmail] = $toEmailHtml;
     }
+    //Add contact email to mails array
+    $emails[$toEmail] = $toEmailHtml;
 
     return $emails;
   }
