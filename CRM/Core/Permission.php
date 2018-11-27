@@ -1115,6 +1115,7 @@ class CRM_Core_Permission {
       ),
     );
     $permissions['line_item'] = $permissions['contribution'];
+    $permissions['financial_account'] = $permissions['contribution'];
 
     // Payment permissions
     $permissions['payment'] = array(
