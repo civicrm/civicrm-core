@@ -443,9 +443,11 @@ class Container {
   public static function createPrevNextCache($container) {
     $setting = \Civi::settings()->get('prevNextBackend');
     if ($setting === 'default') {
+      // For initial release (5.8.x), continue defaulting to SQL.
+      $isTransitional = version_compare(\CRM_Utils_System::version(), '5.9.alpha1', '<');
       $cacheDriver = \CRM_Utils_Cache::getCacheDriver();
       $service = 'prevnext.driver.' . strtolower($cacheDriver);
-      return $container->has($service)
+      return $container->has($service) && !$isTransitional
         ? $container->get($service)
         : $container->get('prevnext.driver.sql');
     }
