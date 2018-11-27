@@ -188,6 +188,14 @@ function civicrm_api3_profile_submit($params) {
     }
   }
 
+  // Add custom greeting fields
+  $greetingFields = ['email_greeting', 'postal_greeting', 'addressee'];
+  foreach ($greetingFields as $greetingField) {
+    if (isset($profileFields[$greetingField]) && !isset($profileFields["{$greetingField}_custom"])) {
+      $profileFields["{$greetingField}_custom"] = ['name' => "{$greetingField}_custom"];
+    }
+  }
+
   foreach ($profileFields as $fieldName => $field) {
     if (!isset($params[$fieldName])) {
       continue;
