@@ -155,7 +155,7 @@ class CRM_Core_Session {
       unset($this->_session[$this->_key]);
     }
     else {
-      $this->_session = array();
+      $this->_session['CiviCRM'] = array();
     }
 
   }
