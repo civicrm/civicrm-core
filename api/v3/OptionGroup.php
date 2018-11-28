@@ -53,7 +53,9 @@ function civicrm_api3_option_group_get($params) {
  * @return array
  */
 function civicrm_api3_option_group_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'OptionGroup');
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'OptionGroup');
+  civicrm_api('option_value', 'getfields', array('version' => 3, 'cache_clear' => 1));
+  return $result;
 }
 
 /**

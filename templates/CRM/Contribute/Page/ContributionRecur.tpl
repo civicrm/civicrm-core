@@ -28,6 +28,11 @@
 
 {if $action eq 4} {* when action is view *}
     {if $recur}
+        {if $recur.is_test}
+        <div class="help">
+          <strong>{ts}This is a TEST transaction{/ts}</strong>
+        </div>
+        {/if}
         <h3>{ts}View Recurring Payment{/ts}</h3>
         <div class="crm-block crm-content-block crm-recurcontrib-view-block">
           <table class="crm-info-panel">

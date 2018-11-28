@@ -87,31 +87,18 @@
               <span class="description">{ts}This applies to weekly, monthly and yearly payments.{/ts}</span>
             </td>
           </tr>
-        {if $form.create_date}
           <tr class="crm-pledge-form-block-create_date">
             <td class="label">{$form.create_date.label}</td>
-            <td>{include file="CRM/common/jcalendar.tpl" elementName=create_date}<br />
-        {/if}
-        {if $create_date}
-          <tr class="crm-pledge-form-block-create_date">
-            <td class="label"><label>{ts}Pledge Made{/ts}</label></td>
-            <td class="view-value">{$create_date|truncate:10:''|crmDate}
-        {/if}<br />
-            <span class="description">{ts}Date when pledge was made by the contributor.{/ts}</span>
+            <td>
+              {$form.create_date.html}<br />
+              <span class="description">{ts}Date when pledge was made by the contributor.{/ts}</span>
             </td>
           </tr>
 
-        {if $form.start_date}
           <tr class="crm-pledge-form-block-start_date">
             <td class="label">{$form.start_date.label}</td>
-            <td>{include file="CRM/common/jcalendar.tpl" elementName=start_date}<br />
-        {/if}
-        {if $start_date}
-          <tr class="crm-pledge-form-block-start_date">
-            <td class="label"><label>{ts}Payments Start{/ts}</label></td>
-            <td class="view-value">{$start_date|truncate:10:''|crmDate}
-        {/if}
-              <br />
+            <td>
+              {$form.start_date.html}<br />
               <span class="description">{ts}Date of first pledge payment.{/ts}</span>
             </td>
           </tr>
@@ -139,7 +126,8 @@
           </tr>
           <tr id="acknowledgeDate">
             <td class="label" class="crm-pledge-form-block-acknowledge_date">{$form.acknowledge_date.label}</td>
-            <td>{include file="CRM/common/jcalendar.tpl" elementName=acknowledge_date}<br />
+            <td>
+              {$form.acknowledge_date.html}<br />
               <span class="description">{ts}Date when an acknowledgment of the pledge was sent.{/ts}</span>
             </td>
           </tr>

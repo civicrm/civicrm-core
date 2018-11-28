@@ -229,6 +229,11 @@
                 page_num: rcpAjaxState.page_i,
                 params: filterParams,
               };
+
+              if('civicrm_mailing' === rcpAjaxState.entity) {
+                params["api.MailingRecipients.getcount"] = {};
+              }
+
               return params;
             },
             transport: function(params) {
@@ -246,12 +251,18 @@
             results: function(data) {
               results = {
                 children: $.map(data.values, function(obj) {
-                  return {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type,
-                             text: obj.label };
+                  if('civicrm_mailing' === rcpAjaxState.entity) {
+                    return obj["api.MailingRecipients.getcount"] > 0 ? {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type,
+                               text: obj.label } : '';
+                  }
+                  else {
+                    return {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type,
+                               text: obj.label };
+                  }
                 })
               };
 
-              if (rcpAjaxState.page_i == 1 && data.count) {
+              if (rcpAjaxState.page_i == 1 && data.count && results.children.length > 0) {
                 results.text = ts((rcpAjaxState.type == 'include'? 'Include ' : 'Exclude ') +
                   (rcpAjaxState.entity == 'civicrm_group'? 'Group' : 'Mailing'));
               }

@@ -44,7 +44,7 @@
     {/if}
   </div>
   {/if}
-  
+
   <div class="crm-block crm-form-block crm-contribution-form-block">
 
   {if !$email and $action neq 8 and $context neq 'standalone'}
@@ -52,7 +52,7 @@
     <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this contribution because there is no email address recorded for this contact. If you want a receipt to be sent when this contribution is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the contribution.{/ts}
   </div>
   {/if}
-  
+
   {if $action eq 8}
   <div class="messages status no-popup">
     <div class="icon inform-icon"></div>
@@ -589,15 +589,6 @@ function showStartDate( ) {
 {/literal}{/if}{literal}
 var thousandMarker = "{/literal}{$config->monetaryThousandSeparator}{literal}";
 var separator = "{/literal}{$config->monetaryDecimalPoint}{literal}";
-
-cj('#fee_amount').change( function() {
-  var totalAmount = cj('#total_amount').val().replace(thousandMarker,'').replace(separator,'.');
-  var feeAmount = cj('#fee_amount').val().replace(thousandMarker,'').replace(separator,'.');
-  var netAmount = totalAmount - feeAmount;
-  if (totalAmount) {
-    cj('#net_amount').val(CRM.formatMoney(netAmount, true));
-  }
-});
 
 cj("#financial_type_id").on("change",function(){
     cj('#total_amount').trigger("change");

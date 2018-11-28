@@ -4,15 +4,17 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitbbfe77676f41b60311acdd87c7a0fed6
+class ComposerStaticInit394e23a23dd6b1e8abe074c6696f65e9
 {
     public static $files = array (
+        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
         '3919eeb97e98d4648304477f8ef734ba' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/Crypt/Random.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
         'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         '5636a0a89fc28f9cfa8624493b142015' => __DIR__ . '/..' . '/civicrm/civicrm-setup/civicrm-setup-autoload.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -22,8 +24,20 @@ class ComposerStaticInitbbfe77676f41b60311acdd87c7a0fed6
             'Zend\\Stdlib\\' => 12,
             'Zend\\Escaper\\' => 13,
         ),
+        'S' => 
+        array (
+            'Symfony\\Polyfill\\Iconv\\' => 23,
+            'Symfony\\Polyfill\\Ctype\\' => 23,
+            'Symfony\\Component\\Process\\' => 26,
+            'Symfony\\Component\\Finder\\' => 25,
+            'Symfony\\Component\\Filesystem\\' => 29,
+            'Symfony\\Component\\EventDispatcher\\' => 34,
+            'Symfony\\Component\\DependencyInjection\\' => 38,
+            'Symfony\\Component\\Config\\' => 25,
+        ),
         'P' => 
         array (
+            'Psr\\SimpleCache\\' => 16,
             'Psr\\Http\\Message\\' => 17,
             'PhpOffice\\PhpWord\\' => 18,
             'PhpOffice\\Common\\' => 17,
@@ -65,6 +79,42 @@ class ComposerStaticInitbbfe77676f41b60311acdd87c7a0fed6
         'Zend\\Escaper\\' => 
         array (
             0 => __DIR__ . '/..' . '/zendframework/zend-escaper/src',
+        ),
+        'Symfony\\Polyfill\\Iconv\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-iconv',
+        ),
+        'Symfony\\Polyfill\\Ctype\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
+        ),
+        'Symfony\\Component\\Process\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/process',
+        ),
+        'Symfony\\Component\\Finder\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/finder',
+        ),
+        'Symfony\\Component\\Filesystem\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/filesystem',
+        ),
+        'Symfony\\Component\\EventDispatcher\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/event-dispatcher',
+        ),
+        'Symfony\\Component\\DependencyInjection\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/dependency-injection',
+        ),
+        'Symfony\\Component\\Config\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/config',
+        ),
+        'Psr\\SimpleCache\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/simple-cache/src',
         ),
         'Psr\\Http\\Message\\' => 
         array (
@@ -125,30 +175,6 @@ class ComposerStaticInitbbfe77676f41b60311acdd87c7a0fed6
             'System' => 
             array (
                 0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
-            ),
-            'Symfony\\Component\\Process\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/symfony/process',
-            ),
-            'Symfony\\Component\\Finder\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/symfony/finder',
-            ),
-            'Symfony\\Component\\Filesystem\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/symfony/filesystem',
-            ),
-            'Symfony\\Component\\EventDispatcher\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/symfony/event-dispatcher',
-            ),
-            'Symfony\\Component\\DependencyInjection\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/symfony/dependency-injection',
-            ),
-            'Symfony\\Component\\Config\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/symfony/config',
             ),
             'Svg\\' => 
             array (
@@ -371,10 +397,10 @@ class ComposerStaticInitbbfe77676f41b60311acdd87c7a0fed6
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitbbfe77676f41b60311acdd87c7a0fed6::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitbbfe77676f41b60311acdd87c7a0fed6::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitbbfe77676f41b60311acdd87c7a0fed6::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInitbbfe77676f41b60311acdd87c7a0fed6::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit394e23a23dd6b1e8abe074c6696f65e9::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit394e23a23dd6b1e8abe074c6696f65e9::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit394e23a23dd6b1e8abe074c6696f65e9::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit394e23a23dd6b1e8abe074c6696f65e9::$classMap;
 
         }, null, ClassLoader::class);
     }

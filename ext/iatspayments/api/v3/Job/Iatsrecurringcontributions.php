@@ -275,7 +275,7 @@ function civicrm_api3_job_iatsrecurringcontributions($params) {
       $contribution['financial_type_id'] = $dao->financial_type_id;
     }
     // if we have a created a pending contribution record due to a future start time, then recycle that CiviCRM contribution record now.
-    // Note that the date and amount both could have changed. 
+    // Note that the date and amount both could have changed.
     // The key is to only match if we find a single pending contribution, with a NULL transaction id, for this recurring schedule.
     // We'll need to pay attention later that we may or may not already have a contribution id.
     try {
@@ -285,7 +285,9 @@ function civicrm_api3_job_iatsrecurringcontributions($params) {
         'contribution_recur_id' => $contribution_recur_id,
         'contribution_status_id' => "Pending",
       ));
-      $contribution['id'] = $pending_contribution['id'];
+      if (!empty($pending_contribution['id'])) {
+        $contribution['id'] = $pending_contribution['id'];
+      }
     }
     catch (Exception $e) {
       // ignore, we'll proceed normally without a contribution id
@@ -331,7 +333,7 @@ function civicrm_api3_job_iatsrecurringcontributions($params) {
       }
       // So far so, good ... now create the pending contribution, and save its id
       // and then try to get the money, and do one of:
-      // update the contribution to failed, leave as pending for server failure, complete the transaction, 
+      // update the contribution to failed, leave as pending for server failure, complete the transaction,
       // or update a pending ach/eft with it's transaction id.
       $result = _iats_process_contribution_payment($contribution, $options, $original_contribution_id);
       if ($email_failure_report && !empty($contribution['iats_reject_code'])) {

@@ -769,6 +769,7 @@ SET    version = '$version'
     foreach ($revisions as $rev) {
       if (version_compare($currentVer, $rev) < 0) {
         $versionObject = $this->incrementalPhpObject($rev);
+        CRM_Upgrade_Incremental_General::updateMessageTemplate($preUpgradeMessage, $rev);
         if (is_callable(array($versionObject, 'setPreUpgradeMessage'))) {
           $versionObject->setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
         }

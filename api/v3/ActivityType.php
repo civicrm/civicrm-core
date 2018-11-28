@@ -72,13 +72,12 @@ function civicrm_api3_activity_type_get($params) {
 function civicrm_api3_activity_type_create($params) {
 
   $action = 1;
-  $groupParams = array('name' => 'activity_type');
 
   if ($optionValueID = CRM_Utils_Array::value('option_value_id', $params)) {
     $action = 2;
   }
 
-  $activityObject = CRM_Core_OptionValue::addOptionValue($params, $groupParams, $action, $optionValueID);
+  $activityObject = CRM_Core_OptionValue::addOptionValue($params, 'activity_type', $action, $optionValueID);
   $activityType = array();
   _civicrm_api3_object_to_array($activityObject, $activityType[$activityObject->id]);
   return civicrm_api3_create_success($activityType, $params, 'activity_type', 'create');

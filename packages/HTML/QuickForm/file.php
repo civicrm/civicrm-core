@@ -335,7 +335,7 @@ class HTML_QuickForm_file extends HTML_QuickForm_input
             $base = substr($elementName, 0, $pos);
             $idx = explode('][', str_replace(["['", "']", '["', '"]'], ['[', ']', '[', ']'], substr($elementName, $pos + 1, -1)));
             $idx = array_merge([$base, 'name'], $idx);
-            if (!CRM_Utils_Array::recursiveIsset($_FILES, $idx)) {
+            if (!CRM_Utils_Array::pathIsset($_FILES, $idx)) {
                 return NULL;
             }
             else {
@@ -343,7 +343,7 @@ class HTML_QuickForm_file extends HTML_QuickForm_input
                 $value = [];
                 foreach ($props as $prop) {
                     $idx[1] = $prop;
-                    $value[$prop] = CRM_Utils_Array::recursiveValue($_FILES, $idx);
+                    $value[$prop] = CRM_Utils_Array::pathGet($_FILES, $idx);
                 }
                 return $value;
             }

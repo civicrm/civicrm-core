@@ -59,7 +59,7 @@
         </td>
     {/if}
     <td class="crm-membership-type crm-membership-type_{$row.membership_type}">
-        {$row.membership_type}
+        {$row.membership_type}{if $row.is_test} ({ts}test{/ts}){/if}
         {if $row.owner_membership_id}<br />({ts}by relationship{/ts}){/if}
     </td>
     <td class="crm-membership-join_date">{$row.join_date|truncate:10:''|crmDate}</td>
@@ -90,7 +90,7 @@
 {/if}
 {if ($context EQ 'dashboard') AND $pager->_totalItems GT $limit}
   <tr class="even-row">
-    <td colspan="9"><a href="{crmURL p='civicrm/member/search' q='reset=1'}">&raquo; {ts}Find more members{/ts}...</a></td></tr>
+    <td colspan="10"><a href="{crmURL p='civicrm/member/search' q='reset=1'}">&raquo; {ts}Find more members{/ts}...</a></td></tr>
   </tr>
 {/if}
 </table>

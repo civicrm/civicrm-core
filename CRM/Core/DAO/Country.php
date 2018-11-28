@@ -227,6 +227,7 @@ class CRM_Core_DAO_Country extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Abbreviate Province?'),
           'description' => 'Should state/province be displayed as abbreviation for contacts from this country?',
+          'default' => '0',
           'table_name' => 'civicrm_country',
           'entity' => 'Country',
           'bao' => 'CRM_Core_BAO_Country',

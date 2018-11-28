@@ -24,6 +24,8 @@ Installation
 
 This extension follows the standard installation method - if you've got a supported CiviCRM version and you've set up your extensions directory, it'll appear in the Manage Extensions list as 'iATS Payments (com.iatspayments.civicrm)'. Hit Install.
 
+As of CiviCRM 5.x, the iATS extension is distributed with the CiviCRM download. This is generally the right version to install. See https://github.com/iATSPayments/com.iatspayments.civicrm/issues/242 for notes on converting from a previous manual install.
+
 If you need help with installing extensions, try: https://wiki.civicrm.org/confluence/display/CRMDOC/Extensions
 
 If you want to try out a particular version directly from github, you probably already know how to do that.

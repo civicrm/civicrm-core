@@ -867,6 +867,8 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
+
     }
   }
 

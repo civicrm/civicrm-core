@@ -81,7 +81,13 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    return $this->_values;
+    $defaults = $this->_values;
+    // Format money fields - localize for display
+    $moneyFields = ['total_amount', 'fee_amount', 'net_amount'];
+    foreach ($moneyFields as $field) {
+      $defaults[$field] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($this->_values[$field]);
+    }
+    return $defaults;
   }
 
   /**

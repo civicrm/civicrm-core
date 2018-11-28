@@ -92,5 +92,5 @@ function smarty_function_help($params, &$smarty) {
   foreach ($params as &$param) {
     $param = is_bool($param) || is_numeric($param) ? (int) $param : (string) $param;
   }
-  return '<a class="' . $class . '" title="' . $title . '" href="#" onclick=\'CRM.help(' . $name . ', ' . json_encode($params) . '); return false;\'>&nbsp;</a>';
+  return '<a class="' . $class . '" title="' . $title . '" aria-label="' . $title . '" href="#" onclick=\'CRM.help(' . $name . ', ' . json_encode($params) . '); return false;\'>&nbsp;</a>';
 }

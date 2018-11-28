@@ -178,10 +178,9 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
                 $atArray,
                 $this->_currentUserId
               );
-              $activities = array_keys($activities);
-              $activities = $activities[0];
+              $activityId = CRM_Utils_Array::first(array_keys($activities['data']));
               $editUrl = CRM_Utils_System::url('civicrm/case/activity',
-                "reset=1&cid={$this->_currentlyViewedContactId}&caseid={$caseId}&action=update&id={$activities}"
+                "reset=1&cid={$this->_currentlyViewedContactId}&caseid={$caseId}&action=update&id={$activityId}"
               );
             }
             CRM_Core_Error::statusBounce(ts("You can not add another '%1' activity to this case. %2",

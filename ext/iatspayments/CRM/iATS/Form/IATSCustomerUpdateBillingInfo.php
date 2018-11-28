@@ -11,6 +11,12 @@ class IATSCustomerUpdateBillingInfo extends CRM_iATS_Form_IATSCustomerLink {
   public function exportValues($elementList = NULL, $filterInternal = FALSE) {
 
     $ubi = $this->updatedBillingInfo;
+    // updatedBillingInfo array changed sometime after 4.7.27
+    $crid = !empty($ubi['crid']) ? $ubi['crid'] : $ubi['recur_id'];
+    if (empty($crid)) {
+      $alert = ts('This system is unable to perform self-service updates to credit cards. Please contact the administrator of this site.');
+      throw new Exception($alert);
+    } 
     $mop = array(
       'Visa' => 'VISA',
       'MasterCard' => 'MC',
@@ -21,7 +27,7 @@ class IATSCustomerUpdateBillingInfo extends CRM_iATS_Form_IATSCustomerLink {
     $dao = CRM_Core_DAO::executeQuery("SELECT cr.payment_processor_id, cc.customer_code, cc.cid
       FROM civicrm_contribution_recur cr
       LEFT JOIN civicrm_iats_customer_codes cc ON cr.id = cc.recur_id
-      WHERE cr.id=%1", array(1 => array($ubi['crid'], 'Int')));
+      WHERE cr.id=%1", array(1 => array($crid, 'Int')));
     $dao->fetch();
 
     $values = array(

@@ -390,9 +390,9 @@ CREATE TABLE `civicrm_option_group` (
      `title` varchar(255)    COMMENT 'Option Group title.',
      `description` varchar(255)    COMMENT 'Option group description.',
      `data_type` varchar(128)    COMMENT 'Option group description.',
-     `is_reserved` tinyint   DEFAULT 1 COMMENT 'Is this a predefined system option group (i.e. it can not be deleted)?',
-     `is_active` tinyint    COMMENT 'Is this option group active?',
-     `is_locked` tinyint    COMMENT 'A lock to remove the ability to add new options via the UI.' 
+     `is_reserved` tinyint NOT NULL  DEFAULT 1 COMMENT 'Is this a predefined system option group (i.e. it can not be deleted)?',
+     `is_active` tinyint NOT NULL  DEFAULT 1 COMMENT 'Is this option group active?',
+     `is_locked` tinyint NOT NULL  DEFAULT 0 COMMENT 'A lock to remove the ability to add new options via the UI.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -522,7 +522,7 @@ CREATE TABLE `civicrm_prevnext_cache` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  ,
      `entity_table` varchar(64)    COMMENT 'physical tablename for entity being joined to discount, e.g. civicrm_event',
      `entity_id1` int unsigned NOT NULL   COMMENT 'FK to entity table specified in entity_table column.',
-     `entity_id2` int unsigned NOT NULL   COMMENT 'FK to entity table specified in entity_table column.',
+     `entity_id2` int unsigned NULL   COMMENT 'FK to entity table specified in entity_table column.',
      `cacheKey` varchar(255)    COMMENT 'Unique path name for cache element of the searched item',
      `data` longtext    COMMENT 'cached snapshot of the serialized data',
      `is_selected` tinyint   DEFAULT 0  
@@ -850,7 +850,7 @@ CREATE TABLE `civicrm_saved_search` (
         PRIMARY KEY (`id`)
  
  
-,          CONSTRAINT FK_civicrm_saved_search_mapping_id FOREIGN KEY (`mapping_id`) REFERENCES `civicrm_mapping`(`id`)   
+,          CONSTRAINT FK_civicrm_saved_search_mapping_id FOREIGN KEY (`mapping_id`) REFERENCES `civicrm_mapping`(`id`) ON DELETE SET NULL  
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 -- /*******************************************************
@@ -1878,7 +1878,7 @@ CREATE TABLE `civicrm_custom_field` (
       , custom_group_id
   )
   
-,          CONSTRAINT FK_civicrm_custom_field_custom_group_id FOREIGN KEY (`custom_group_id`) REFERENCES `civicrm_custom_group`(`id`) ON DELETE CASCADE  
+,          CONSTRAINT FK_civicrm_custom_field_custom_group_id FOREIGN KEY (`custom_group_id`) REFERENCES `civicrm_custom_group`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_custom_field_option_group_id FOREIGN KEY (`option_group_id`) REFERENCES `civicrm_option_group`(`id`) ON DELETE SET NULL  
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
 
 -- /*******************************************************
@@ -3506,7 +3506,8 @@ CREATE TABLE `civicrm_uf_group` (
      `created_date` datetime    COMMENT 'Date and time this UF group was created.',
      `is_proximity_search` tinyint   DEFAULT 0 COMMENT 'Should we include proximity search feature in this profile search form?',
      `cancel_button_text` varchar(64)   DEFAULT NULL COMMENT 'Custom Text to display on the Cancel button when used in create or edit mode',
-     `submit_button_text` varchar(64)   DEFAULT NULL COMMENT 'Custom Text to display on the submit button on profile edit/create screens' 
+     `submit_button_text` varchar(64)   DEFAULT NULL COMMENT 'Custom Text to display on the submit button on profile edit/create screens',
+     `add_cancel_button` tinyint   DEFAULT 1 COMMENT 'Should a Cancel button be included in this Profile form.' 
 ,
         PRIMARY KEY (`id`)
  
@@ -3712,8 +3713,8 @@ CREATE TABLE `civicrm_relationship` (
      `end_date` date    COMMENT 'date when the relationship ended',
      `is_active` tinyint   DEFAULT 1 COMMENT 'is the relationship active ?',
      `description` varchar(255)    COMMENT 'Optional verbose description for the relationship.',
-     `is_permission_a_b` tinyint   DEFAULT 0 COMMENT 'is contact a has permission to view / edit contact and\n      related data for contact b ?\n    ',
-     `is_permission_b_a` tinyint   DEFAULT 0 COMMENT 'is contact b has permission to view / edit contact and\n      related data for contact a ?\n    ',
+     `is_permission_a_b` int unsigned NOT NULL  DEFAULT 0 COMMENT 'Permission that Contact A has to view/update Contact B',
+     `is_permission_b_a` int unsigned NOT NULL  DEFAULT 0 COMMENT 'Permission that Contact B has to view/update Contact A',
      `case_id` int unsigned   DEFAULT NULL COMMENT 'FK to civicrm_case' 
 ,
         PRIMARY KEY (`id`)

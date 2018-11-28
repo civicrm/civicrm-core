@@ -159,40 +159,48 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
                 $separator .= $sign;
             } else {
                 $loadSelect = true;
+                $ariaLabel = $this->getLabel() ?: '';
                 switch ($sign) {
                     case 'D':
                         // Sunday is 0 like with 'w' in date()
                         $options = $locale['weekdays_short'];
                         $emptyText = ts('-day of week-');
+                        $ariaLabel .= ts(' day of week');
                         break;
                     case 'l':
                         $options = $locale['weekdays_long'];
                         $emptyText = ts('-day of week-');
+                        $ariaLabel .= ts(' day of week');
                         break;
                     case 'd':
                         $options = $this->_createOptionList(1, 31);
                         $emptyText = ts('-day-');
+                        $ariaLabel .= ts(' day');
                         break;
                     case 'j':
                         // the no-zero-padding option (CRM-2793)
                         $options = $this->_createOptionList(1, 31, 1, false);
                         $emptyText = ts('-day-');
+                        $ariaLabel .= ts(' day');
                         break;
                     case 'M':
                         $options = $locale['months_short'];
                         array_unshift($options , '');
                         unset($options[0]);
                         $emptyText = ts('-month-');
+                        $ariaLabel .= ts(' month');
                         break;
                     case 'm':
                         $options = $this->_createOptionList(1, 12);
                         $emptyText = ts('-month-');
+                        $ariaLabel .= ts(' month');
                         break;
                     case 'F':
                         $options = $locale['months_long'];
                         array_unshift($options , '');
                         unset($options[0]);
                         $emptyText = ts('-month-');
+                        $ariaLabel .= ts(' month');
                         break;
                     case 'Y':
                         $options = $this->_createOptionList(
@@ -201,6 +209,7 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
                             $this->_options['minYear'] > $this->_options['maxYear']? -1: 1
                         );
                         $emptyText = ts('-year-');
+                        $ariaLabel .= ts(' year');
                         break;
                     case 'y':
                         $options = $this->_createOptionList(
@@ -210,10 +219,12 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
                         );
                         array_walk($options, create_function('&$v,$k','$v = substr($v,-2);'));
                         $emptyText = ts('-year-');
+                        $ariaLabel .= ts(' year');
                         break;
                     case 'h':
                         $options = $this->_createOptionList(1, 12);
                         $emptyText = ts('-hour-');
+                        $ariaLabel .= ts(' hour');
                         break;
                     case 'g':
                         $options = $this->_createOptionList(1, 12);
@@ -222,22 +233,27 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
                     case 'H':
                         $options = $this->_createOptionList(0, 23);
                         $emptyText = ts('-hour-');
+                        $ariaLabel .= ts(' hour');
                         break;
                     case 'i':
                         $options = $this->_createOptionList(0, 59, $this->_options['optionIncrement']['i']);
                         $emptyText = ts('-min-');
+                        $ariaLabel .= ts(' minute');
                         break;
                     case 's':
                         $options = $this->_createOptionList(0, 59, $this->_options['optionIncrement']['s']);
                         $emptyText = ts('-sec-');
+                        $ariaLabel .= ts(' second');
                         break;
                     case 'a':
                         $options = array('am' => 'am', 'pm' => 'pm');
                         $emptyText = '-am/pm-';
+                        $ariaLabel .= ts(' am or pm');
                         break;
                     case 'A':
                         $options = array('AM' => 'AM', 'PM' => 'PM');
                         $emptyText = '-AM/PM-';
+                        $ariaLabel .= ts(' AM or PM');
                         break;
                     case 'W':
                         $options = $this->_createOptionList(1, 53);
@@ -276,6 +292,9 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
                     $attribs = $this->getAttributes();
                     $elementName = $this->getName();
                     $attribs['id'] = $elementName.'['.$sign.']';
+                    if ($ariaLabel !== '') {
+                      $attribs['aria-label'] = $ariaLabel;
+                    }
 
                     $this->_elements[] = new HTML_QuickForm_select($sign, null, $options, $attribs);
                 }

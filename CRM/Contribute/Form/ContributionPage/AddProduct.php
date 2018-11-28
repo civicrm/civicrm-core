@@ -229,15 +229,12 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
 
     $urlParams = 'civicrm/admin/contribute/premium';
     if ($this->_action & CRM_Core_Action::PREVIEW) {
-      $session = CRM_Core_Session::singleton();
       $url = CRM_Utils_System::url($urlParams, 'reset=1&action=update&id=' . $this->_id);
-      $single = $session->get('singleForm');
       CRM_Utils_System::redirect($url);
       return;
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $session = CRM_Core_Session::singleton();
       $url = CRM_Utils_System::url($urlParams, 'reset=1&action=update&id=' . $this->_id);
       $dao = new CRM_Contribute_DAO_PremiumsProduct();
       $dao->id = $this->_pid;
@@ -246,7 +243,6 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
       CRM_Utils_System::redirect($url);
     }
     else {
-      $session = CRM_Core_Session::singleton();
       $url = CRM_Utils_System::url($urlParams, 'reset=1&action=update&id=' . $this->_id);
       if ($this->_pid) {
         $params['id'] = $this->_pid;

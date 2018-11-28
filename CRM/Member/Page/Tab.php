@@ -59,9 +59,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $membership = array();
     $dao = new CRM_Member_DAO_Membership();
     $dao->contact_id = $this->_contactId;
-    $dao->is_test = 0;
     $dao->whereAdd($addWhere);
-    //$dao->orderBy('name');
     $dao->find();
 
     //CRM--4418, check for view, edit, delete
@@ -110,9 +108,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         $paymentObject = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity(
           $membership[$dao->id]['membership_id'], 'membership', 'obj');
         if (!empty($paymentObject)) {
-          // @todo - get this working with syntax style $paymentObject->supports(array
-          //('updateSubscriptionBillingInfo'));
-          $isUpdateBilling = $paymentObject->isSupported('updateSubscriptionBillingInfo');
+          $isUpdateBilling = $paymentObject->supports('updateSubscriptionBillingInfo');
         }
 
         // @todo - get this working with syntax style $paymentObject->supports(array

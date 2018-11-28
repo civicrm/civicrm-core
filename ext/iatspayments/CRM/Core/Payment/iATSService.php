@@ -413,20 +413,21 @@ class CRM_Core_Payment_iATSService extends CRM_Core_Payment {
 
     $fakeForm = new IATSCustomerUpdateBillingInfo();
     $fakeForm->updatedBillingInfo = $params;
-    $fakeForm->postProcess();
-
-    $status = CRM_Core_Session::singleton()->getStatus(TRUE);
-    $matches = array();
-    preg_match('/\[AUTHORIZATIONRESULT\]\s*?=>\s(\d*)(.*)/', $status[0]['text'], $matches);
-
-    if ($matches[2] == 'OK') {
+    try {
+      $fakeForm->postProcess();
+    }
+    catch (Exception $error) { // what could go wrong? 
+      $message = $error->getMessage();
+      CRM_Core_Session::setStatus($message, ts('Warning'), 'alert');
+      $e = CRM_Core_Error::singleton();
+      return $e; 
+    }
+    if ('OK' == $fakeForm->getAuthorizationResult()) {
       return TRUE;
     }
-    $message = $matches[2];
-
+    $message = $fakeForm->getResultMessage();
+    CRM_Core_Session::setStatus($message, ts('Warning'), 'alert');
     $e = CRM_Core_Error::singleton();
-    $e->push($matches[1] ?: 0, 0, array(), $matches[2]);
-
     return $e;
   }
   

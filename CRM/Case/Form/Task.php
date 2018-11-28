@@ -49,4 +49,13 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
     );
   }
 
+  /**
+   * Get the query mode (eg. CRM_Core_BAO_Query::MODE_CASE)
+   *
+   * @return int
+   */
+  public function getQueryMode() {
+    return CRM_Contact_BAO_Query::MODE_CASE;
+  }
+
 }

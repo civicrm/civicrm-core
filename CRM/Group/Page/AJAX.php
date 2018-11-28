@@ -54,6 +54,7 @@ class CRM_Group_Page_AJAX {
         'created_by' => 'String',
         'group_type' => 'String',
         'visibility' => 'String',
+        'component_mode' => 'String',
         'status' => 'Integer',
         'parentsOnly' => 'Integer',
         'showOrgInfo' => 'Boolean',

@@ -46,5 +46,5 @@ questions and ideas in the [Developer Discussion room](https://chat.civicrm.org/
 
 Installing the latest developmental code requires some [special steps](http://wiki.civicrm.org/confluence/display/CRMDOC/Contributing+to+CiviCRM+using+GitHub). 
 
-Report all issues to CiviCRM via JIRA:
-https://issues.civicrm.org
+Report all issues to CiviCRM via GitLab:
+https://lab.civicrm.org

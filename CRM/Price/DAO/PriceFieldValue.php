@@ -382,6 +382,7 @@ class CRM_Price_DAO_PriceFieldValue extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is Default Price Field Option?'),
           'description' => 'Is this default price field option',
+          'default' => '0',
           'table_name' => 'civicrm_price_field_value',
           'entity' => 'PriceFieldValue',
           'bao' => 'CRM_Price_BAO_PriceFieldValue',

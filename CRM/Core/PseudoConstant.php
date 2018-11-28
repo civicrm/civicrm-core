@@ -170,7 +170,7 @@ class CRM_Core_PseudoConstant {
   /**
    * Low-level option getter, rarely accessed directly.
    * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
-   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Pseudoconstant+%28option+list%29+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/framework/pseudoconstant/
    *
    * NOTE: If someone undertakes a refactoring of this, please consider the use-case of
    * the Setting.getoptions API. There is no DAO/field, but it would be nice to use the
@@ -536,7 +536,7 @@ class CRM_Core_PseudoConstant {
     $key = 'id',
     $force = NULL
   ) {
-    $cacheKey = "CRM_PC_{$name}_{$all}_{$key}_{$retrieve}_{$filter}_{$condition}_{$orderby}";
+    $cacheKey = CRM_Core_BAO_Cache::cleanKey("CRM_PC_{$name}_{$all}_{$key}_{$retrieve}_{$filter}_{$condition}_{$orderby}");
     $cache = CRM_Utils_Cache::singleton();
     $var = $cache->get($cacheKey);
     if ($var && empty($force)) {

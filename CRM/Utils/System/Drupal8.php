@@ -422,7 +422,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     chdir($root);
 
     // Create a mock $request object
-    $autoloader = require_once $root . '/vendor/autoload.php';
+    $autoloader = require_once $root . '/autoload.php';
     if ($autoloader === TRUE) {
       $autoloader = ComposerAutoloaderInitDrupal8::getLoader();
     }
@@ -662,6 +662,15 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     }
 
     return \Drupal::languageManager()->getCurrentLanguage()->getId();
+  }
+
+  /**
+   * Append Drupal8 js to coreResourcesList.
+   *
+   * @param array $list
+   */
+  public function appendCoreResources(&$list) {
+    $list[] = 'js/crm.drupal8.js';
   }
 
 }

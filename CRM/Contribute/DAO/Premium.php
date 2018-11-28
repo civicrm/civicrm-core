@@ -169,6 +169,7 @@ class CRM_Contribute_DAO_Premium extends CRM_Core_DAO {
           'title' => ts('Is Premium Active?'),
           'description' => 'Is the Premiums feature enabled for this page?',
           'required' => TRUE,
+          'default' => '0',
           'table_name' => 'civicrm_premiums',
           'entity' => 'Premium',
           'bao' => 'CRM_Contribute_BAO_Premium',

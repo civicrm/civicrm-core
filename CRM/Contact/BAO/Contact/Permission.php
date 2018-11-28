@@ -116,7 +116,7 @@ WHERE contact_id IN ({$contact_id_list})
     if (count($result_set) < count($contact_ids)) {
       $rejected_contacts       = array_diff_key($contact_ids, $result_set);
       // @todo consider storing these to the acl cache for next time, since we have fetched.
-      $allowed_by_relationship = self::relationshipList($rejected_contacts);
+      $allowed_by_relationship = self::relationshipList($rejected_contacts, $type);
       foreach ($allowed_by_relationship as $contact_id) {
         $result_set[(int) $contact_id] = TRUE;
       }
@@ -161,7 +161,7 @@ WHERE contact_id IN ({$contact_id_list})
     }
 
     // check permission based on relationship, CRM-2963
-    if (self::relationshipList(array($id))) {
+    if (self::relationshipList(array($id), $type)) {
       return TRUE;
     }
 
@@ -330,10 +330,13 @@ AND ac.user_id IS NULL
    * @param array $contact_ids
    *   List of contact IDs to be filtered
    *
+   * @param int $type
+   *   access type CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT
+   *
    * @return array
    *   List of contact IDs that the user has permissions for
    */
-  public static function relationshipList($contact_ids) {
+  public static function relationshipList($contact_ids, $type) {
     $result_set = array();
 
     // no processing empty lists (avoid SQL errors as well)
@@ -351,8 +354,16 @@ AND ac.user_id IS NULL
     $queries = array();
     $contact_id_list = implode(',', $contact_ids);
 
-    // add a select statement for each direection
+    // add a select statement for each direction
     $directions = array(array('from' => 'a', 'to' => 'b'), array('from' => 'b', 'to' => 'a'));
+
+    // CRM_Core_Permission::VIEW is satisfied by either CRM_Contact_BAO_Relationship::VIEW or CRM_Contact_BAO_Relationship::EDIT
+    if ($type == CRM_Core_Permission::VIEW) {
+      $is_perm_condition = ' IN ( ' . CRM_Contact_BAO_Relationship::EDIT . ' , ' . CRM_Contact_BAO_Relationship::VIEW . ' ) ';
+    }
+    else {
+      $is_perm_condition = ' = ' . CRM_Contact_BAO_Relationship::EDIT;
+    }
 
     // NORMAL/SINGLE DEGREE RELATIONSHIPS
     foreach ($directions as $direction) {
@@ -373,7 +384,7 @@ SELECT civicrm_relationship.{$contact_id_column} AS contact_id
  WHERE civicrm_relationship.{$user_id_column} = {$contactID}
    AND civicrm_relationship.{$contact_id_column} IN ({$contact_id_list})
    AND civicrm_relationship.is_active = 1
-   AND civicrm_relationship.is_permission_{$direction['from']}_{$direction['to']} = 1
+   AND civicrm_relationship.is_permission_{$direction['from']}_{$direction['to']} {$is_perm_condition}
    $AND_CAN_ACCESS_DELETED";
     }
 
@@ -394,14 +405,14 @@ SELECT civicrm_relationship.{$contact_id_column} AS contact_id
           $queries[] = "
 SELECT second_degree_relationship.contact_id_{$second_direction['to']} AS contact_id
   FROM civicrm_relationship first_degree_relationship
-  LEFT JOIN civicrm_relationship second_degree_relationship ON first_degree_relationship.contact_id_{$first_direction['to']} = second_degree_relationship.contact_id_{$first_direction['from']}
+  LEFT JOIN civicrm_relationship second_degree_relationship ON first_degree_relationship.contact_id_{$first_direction['to']} = second_degree_relationship.contact_id_{$second_direction['from']}
   {$LEFT_JOIN_DELETED}
  WHERE first_degree_relationship.contact_id_{$first_direction['from']} = {$contactID}
    AND second_degree_relationship.contact_id_{$second_direction['to']} IN ({$contact_id_list})
    AND first_degree_relationship.is_active = 1
-   AND first_degree_relationship.is_permission_{$first_direction['from']}_{$first_direction['to']} = 1
+   AND first_degree_relationship.is_permission_{$first_direction['from']}_{$first_direction['to']} {$is_perm_condition}
    AND second_degree_relationship.is_active = 1
-   AND second_degree_relationship.is_permission_{$second_direction['from']}_{$second_direction['to']} = 1
+   AND second_degree_relationship.is_permission_{$second_direction['from']}_{$second_direction['to']} {$is_perm_condition}
    $AND_CAN_ACCESS_DELETED";
         }
       }

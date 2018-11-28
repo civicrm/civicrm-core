@@ -61,9 +61,9 @@ class CRM_Contact_Form_Edit_IM {
     $form->addField("im[$blockId][location_type_id]", array('entity' => 'im', 'class' => 'eight', 'placeholder' => NULL, 'option_url' => NULL));
 
     //IM box
-    $form->addField("im[$blockId][name]", array('entity' => 'im'));
+    $form->addField("im[$blockId][name]", array('entity' => 'im', 'aria-label' => ts('Instant Messenger %1', [1 => $blockId])));
     //is_Primary radio
-    $js = array('id' => 'IM_' . $blockId . '_IsPrimary');
+    $js = array('id' => 'IM_' . $blockId . '_IsPrimary', 'aria-label' => ts('Instant Messenger %1 is primary?', [1 => $blockId]));
     if (!$blockEdit) {
       $js['onClick'] = 'singleSelect( this.id );';
     }

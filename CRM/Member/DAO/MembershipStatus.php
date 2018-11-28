@@ -346,6 +346,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is Reserved'),
           'description' => 'Is this membership_status reserved.',
+          'default' => '0',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',

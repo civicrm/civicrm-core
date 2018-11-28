@@ -246,7 +246,7 @@ class Manager {
    *   Invalid partials configuration.
    */
   public function getPartials($name) {
-    $cacheKey = "angular-partials::$name";
+    $cacheKey = "angular-partials_$name";
     $cacheValue = $this->cache->get($cacheKey);
     if ($cacheValue === NULL) {
       $cacheValue = ChangeSet::applyResourceFilters($this->getChangeSets(), 'partials', $this->getRawPartials($name));

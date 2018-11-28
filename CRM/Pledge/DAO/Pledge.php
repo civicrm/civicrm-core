@@ -575,6 +575,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'headerPattern' => '',
           'dataPattern' => '',
           'export' => TRUE,
+          'default' => '0',
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',

@@ -88,17 +88,6 @@ function civicrm_api3_navigation_get($params) {
 }
 
 /**
- * Adjust metadata for navigation create action.
- *
- * @param array $params
- */
-function _civicrm_api3_navigation_create_spec(&$params) {
-  $params['domain_id']['api.default'] = CRM_Core_Config::domainID();
-  $params['domain_id']['type'] = CRM_Utils_Type::T_INT;
-  $params['domain_id']['title'] = 'Domain ID';
-}
-
-/**
  * Create navigation item.
  *
  * @param array $params

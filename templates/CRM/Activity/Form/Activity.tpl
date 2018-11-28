@@ -156,9 +156,13 @@
       <td class="view-value">
       {$form.details.html}
       </td>
-      {else}
+    {elseif $activityTypeName eq "Inbound Email"}
       <td class="view-value">
        {$form.details.html|crmStripAlternatives|nl2br}
+      </td>
+    {else}
+      <td class="view-value">
+       {$form.details.html|crmStripAlternatives}
       </td>
     {/if}
   </tr>
@@ -247,7 +251,7 @@
   {/if} {* End Delete vs. Add / Edit action *}
   </table>
   <div class="crm-submit-buttons">
-  {if $action eq 4 && $activityTName neq 'Inbound Email'}
+  {if $action eq 4 && ($activityTName neq 'Inbound Email' || $allow_edit_inbound_emails == 1)}
     {if !$context }
       {assign var="context" value='activity'}
     {/if}

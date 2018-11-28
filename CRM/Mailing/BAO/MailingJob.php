@@ -598,6 +598,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $returnProperties = $mailing->getReturnProperties();
     $params = $targetParams = $deliveredParams = array();
     $count = 0;
+    $retryGroup = FALSE;
 
     // CRM-15702: Sending bulk sms to contacts without e-mail address fails.
     // Solution is to skip checking for on hold
@@ -675,18 +676,17 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       if (is_a($result, 'PEAR_Error') && !$mailing->sms_provider_id) {
         // CRM-9191
         $message = $result->getMessage();
-        if (
-          strpos($message, 'Failed to write to socket') !== FALSE ||
-          strpos($message, 'Failed to set sender') !== FALSE
-        ) {
+        if ($this->isTemporaryError($message)) {
           // lets log this message and code
           $code = $result->getCode();
           CRM_Core_Error::debug_log_message("SMTP Socket Error or failed to set sender error. Message: $message, Code: $code");
 
           // these are socket write errors which most likely means smtp connection errors
-          // lets skip them
+          // lets skip them and reconnect.
           $smtpConnectionErrors++;
           if ($smtpConnectionErrors <= 5) {
+            $mailer->disconnect();
+            $retryGroup = TRUE;
             continue;
           }
 
@@ -776,7 +776,48 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $job_date
     );
 
+    if ($retryGroup) {
+      return FALSE;
+    }
+
     return $result;
+  }
+
+  /**
+   * Determine if an SMTP error is temporary or permanent.
+   *
+   * @param string $message
+   *   PEAR error message.
+   * @return bool
+   *   TRUE - Temporary/retriable error
+   *   FALSE - Permanent/non-retriable error
+   */
+  protected function isTemporaryError($message) {
+    // SMTP response code is buried in the message.
+    $code = preg_match('/ \(code: (.+), response: /', $message, $matches) ? $matches[1] : '';
+
+    if (strpos($message, 'Failed to write to socket') !== FALSE) {
+      return TRUE;
+    }
+
+    // Register 5xx SMTP response code (permanent failure) as bounce.
+    if (isset($code{0}) && $code{0} === '5') {
+      return FALSE;
+    }
+
+    if (strpos($message, 'Failed to set sender') !== FALSE) {
+      return TRUE;
+    }
+
+    if (strpos($message, 'Failed to add recipient') !== FALSE) {
+      return TRUE;
+    }
+
+    if (strpos($message, 'Failed to send data') !== FALSE) {
+      return TRUE;
+    }
+
+    return FALSE;
   }
 
   /**
@@ -817,9 +858,52 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
         2 => array(date('YmdHis'), 'Timestamp'),
       );
       CRM_Core_DAO::executeQuery($sql, $params);
-
-      CRM_Core_Session::setStatus(ts('The mailing has been canceled.'), ts('Canceled'), 'success');
     }
+  }
+
+  /**
+   * Pause a mailing
+   *
+   * @param int $mailingID
+   *   The id of the mailing to be paused.
+   */
+  public static function pause($mailingID) {
+    $sql = "
+      UPDATE civicrm_mailing_job
+      SET status = 'Paused'
+      WHERE mailing_id = %1
+      AND is_test = 0
+      AND status IN ('Scheduled', 'Running')
+    ";
+    CRM_Core_DAO::executeQuery($sql, array(1 => array($mailingID, 'Integer')));
+  }
+
+  /**
+   * Resume a mailing
+   *
+   * @param int $mailingID
+   *   The id of the mailing to be resumed.
+   */
+  public static function resume($mailingID) {
+    $sql = "
+      UPDATE civicrm_mailing_job
+      SET status = 'Scheduled'
+      WHERE mailing_id = %1
+      AND is_test = 0
+      AND start_date IS NULL
+      AND status = 'Paused'
+    ";
+    CRM_Core_DAO::executeQuery($sql, array(1 => array($mailingID, 'Integer')));
+
+    $sql = "
+      UPDATE civicrm_mailing_job
+      SET status = 'Running'
+      WHERE mailing_id = %1
+      AND is_test = 0
+      AND start_date IS NOT NULL
+      AND status = 'Paused'
+    ";
+    CRM_Core_DAO::executeQuery($sql, array(1 => array($mailingID, 'Integer')));
   }
 
   /**

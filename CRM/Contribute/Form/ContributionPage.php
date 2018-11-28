@@ -332,18 +332,13 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       if ($this->_priceSetID) {
         $defaults['price_set_id'] = $this->_priceSetID;
       }
-
-      if (!empty($defaults['end_date'])) {
-        list($defaults['end_date'], $defaults['end_date_time']) = CRM_Utils_Date::setDateDefaults($defaults['end_date']);
-      }
-
-      if (!empty($defaults['start_date'])) {
-        list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults($defaults['start_date']);
-      }
     }
     else {
       $defaults['is_active'] = 1;
       // set current date as start date
+      // @todo look to change to $defaults['start_date'] = date('Ymd His');
+      // main settings form overrides this to implement above but this is left here
+      // 'in case' another extending form uses start_date - for now
       list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults();
     }
 
@@ -353,7 +348,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       ), '1');
     }
     else {
-      # CRM 10860
+      // CRM-10860
       $defaults['recur_frequency_unit'] = array('month' => 1);
     }
 

@@ -1163,6 +1163,149 @@ function _civicrm_api3_contact_merge_spec(&$params) {
 }
 
 /**
+ * Get the ultimate contact a contact was merged to.
+ *
+ * @param array $params
+ *
+ * @return array
+ *   API Result Array
+ * @throws API_Exception
+ */
+function civicrm_api3_contact_getmergedto($params) {
+  $contactID = _civicrm_api3_contact_getmergedto($params);
+  if ($contactID) {
+    $values = [$contactID => ['id' => $contactID]];
+  }
+  else {
+    $values = [];
+  }
+  return civicrm_api3_create_success($values, $params);
+}
+
+/**
+ * Get the contact our contact was finally merged to.
+ *
+ * If the contact has been merged multiple times the crucial parent activity will have
+ * wound up on the ultimate contact so we can figure out the final resting place of the
+ * contact with only 2 activities even if 50 merges took place.
+ *
+ * @param array $params
+ *
+ * @return int|false
+ */
+function _civicrm_api3_contact_getmergedto($params) {
+  $contactID = FALSE;
+  $deleteActivity = civicrm_api3('ActivityContact', 'get', [
+    'contact_id' => $params['contact_id'],
+    'activity_id.activity_type_id' => 'Contact Deleted By Merge',
+    'is_deleted' => 0,
+    'is_test' => $params['is_test'],
+    'record_type_id' => 'Activity Targets',
+    'return' => ['activity_id.parent_id'],
+    'sequential' => 1,
+    'options' => [
+      'limit' => 1,
+      'sort' => 'activity_id.activity_date_time DESC'
+    ],
+  ])['values'];
+  if (!empty($deleteActivity)) {
+    $contactID = civicrm_api3('ActivityContact', 'getvalue', [
+      'activity_id' => $deleteActivity[0]['activity_id.parent_id'],
+      'record_type_id' => 'Activity Targets',
+      'return' => 'contact_id',
+    ]);
+  }
+  return $contactID;
+}
+
+/**
+ * Adjust metadata for contact_merge api function.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_contact_getmergedto_spec(&$params) {
+  $params['contact_id'] = [
+    'title' => ts('ID of contact to find ultimate contact for'),
+    'type' => CRM_Utils_Type::T_INT,
+    'api.required' => TRUE,
+  ];
+  $params['is_test'] = [
+    'title' => ts('Get test deletions rather than live?'),
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => 0,
+  ];
+}
+
+/**
+ * Get the ultimate contact a contact was merged to.
+ *
+ * @param array $params
+ *
+ * @return array
+ *   API Result Array
+ * @throws API_Exception
+ */
+function civicrm_api3_contact_getmergedfrom($params) {
+  $contacts = _civicrm_api3_contact_getmergedfrom($params);
+  return civicrm_api3_create_success($contacts, $params);
+}
+
+/**
+ * Get all the contacts merged into our contact.
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function _civicrm_api3_contact_getmergedfrom($params) {
+  $activities = [];
+  $deleteActivities = civicrm_api3('ActivityContact', 'get', [
+    'contact_id' => $params['contact_id'],
+    'activity_id.activity_type_id' => 'Contact Merged',
+    'is_deleted' => 0,
+    'is_test' => $params['is_test'],
+    'record_type_id' => 'Activity Targets',
+    'return' => 'activity_id',
+  ])['values'];
+
+  foreach ($deleteActivities as $deleteActivity) {
+    $activities[] = $deleteActivity['activity_id'];
+  }
+  if (empty($activities)) {
+    return [];
+  }
+
+  $activityContacts = civicrm_api3('ActivityContact', 'get', [
+    'activity_id.parent_id' => ['IN' => $activities],
+    'record_type_id' => 'Activity Targets',
+    'return' => 'contact_id',
+  ])['values'];
+  $contacts = [];
+  foreach ($activityContacts as $activityContact) {
+    $contacts[$activityContact['contact_id']] = ['id' => $activityContact['contact_id']];
+  }
+  return $contacts;
+}
+
+/**
+ * Adjust metadata for contact_merge api function.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_contact_getmergedfrom_spec(&$params) {
+  $params['contact_id'] = [
+    'title' => ts('ID of contact to find ultimate contact for'),
+    'type' => CRM_Utils_Type::T_INT,
+    'api.required' => TRUE,
+  ];
+  $params['is_test'] = [
+    'title' => ts('Get test deletions rather than live?'),
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => 0,
+  ];
+}
+
+/**
  * Adjust metadata for contact_proximity api function.
  *
  * @param array $params

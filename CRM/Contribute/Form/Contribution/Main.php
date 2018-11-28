@@ -563,7 +563,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $form->add('checkbox', 'is_recur', ts('I want to contribute this amount'), NULL);
 
     if (!empty($form->_values['is_recur_interval']) || $className == 'CRM_Contribute_Form_Contribution') {
-      $form->add('text', 'frequency_interval', ts('Every'), $attributes['frequency_interval']);
+      $form->add('text', 'frequency_interval', ts('Every'), $attributes['frequency_interval'] + ['aria-label' => ts('Every')]);
       $form->addRule('frequency_interval', ts('Frequency must be a whole number (EXAMPLE: Every 3 months).'), 'integer');
     }
     else {
@@ -604,7 +604,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           }
         }
       }
-      $frequencyUnit = &$form->add('select', 'frequency_unit', NULL, $units);
+      $frequencyUnit = &$form->addElement('select', 'frequency_unit', NULL, $units, ['aria-label' => ts('Frequency Unit')]);
     }
 
     // FIXME: Ideally we should freeze select box if there is only
@@ -1308,6 +1308,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public function assignFormVariablesByContributionID() {
     if (empty($this->_ccid)) {
       return;
+    }
+    if (!$this->getContactID()) {
+      CRM_Core_Error::statusBounce(ts("Returning since there is no contact attached to this contribution id."));
     }
 
     $payment = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_ccid, 'contribution');

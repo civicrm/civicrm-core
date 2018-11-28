@@ -157,7 +157,7 @@ class CRM_Utils_Rule {
     // at all, so we split and loop over.
     $parts = explode(',', $str);
     foreach ($parts as $part) {
-      if (!preg_match('/^((`[\w-]{1,64}`|[\w-]{1,64})\.)?(`[\w-]{1,64}`|[\w-]{1,64})( (asc|desc))?$/i', trim($part))) {
+      if (!preg_match('/^((`[\w-]{1,64}`|[\w-]{1,64})\.)*(`[\w-]{1,64}`|[\w-]{1,64})( (asc|desc))?$/i', trim($part))) {
         return FALSE;
       }
     }

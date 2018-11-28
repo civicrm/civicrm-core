@@ -321,6 +321,7 @@ class CRM_Financial_DAO_FinancialTrxn extends CRM_Core_DAO {
           'headerPattern' => '',
           'dataPattern' => '',
           'export' => TRUE,
+          'default' => '0',
           'table_name' => 'civicrm_financial_trxn',
           'entity' => 'FinancialTrxn',
           'bao' => 'CRM_Financial_DAO_FinancialTrxn',

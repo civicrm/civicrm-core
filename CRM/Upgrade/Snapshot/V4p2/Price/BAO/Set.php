@@ -82,8 +82,8 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set extends CRM_Upgrade_Snapshot_V4p2_
    * @param bool $isActive
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set', $id, 'is_active', $isActive);
@@ -1134,8 +1134,8 @@ GROUP BY     mt.member_of_contact_id";
    * @param bool $isQuickConfig we want to set the is_quick_config field.
    *   Value we want to set the is_quick_config field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsQuickConfig($id, $isQuickConfig) {
     return CRM_Core_DAO::setFieldValue('CRM_Upgrade_Snapshot_V4p2_Price_DAO_Set', $id, 'is_quick_config', $isQuickConfig);

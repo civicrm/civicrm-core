@@ -50,12 +50,17 @@
             <td>{$form.post_URL.html} {help id='id-post_URL' file="CRM/UF/Form/Group.hlp"}</td>
         </tr>
 
-        <tr class="crm-uf-advancesetting-form-block-cancel_URL">
+        <tr class="crm-uf-advancesetting-form-block-add_cancel_button">
+            <td class="label"></td>
+            <td>{$form.add_cancel_button.html} {$form.add_cancel_button.label} {help id='id-add_cancel_button' file="CRM/UF/Form/Group.hlp"}</td>
+        </tr>
+
+        <tr class="cancel_button_section crm-uf-advancesetting-form-block-cancel_URL">
             <td class="label">{$form.cancel_URL.label}</td>
             <td>{$form.cancel_URL.html} {help id='id-cancel_URL' file="CRM/UF/Form/Group.hlp"}</td>
         </tr>
 
-        <tr class="crm-uf-advancesetting-form-block-cancel_button_text">
+        <tr class="cancel_button_section crm-uf-advancesetting-form-block-cancel_button_text">
             <td class="label">{$form.cancel_button_text.label}</td>
             <td>{$form.cancel_button_text.html} {help id='id-cancel_button_text' file="CRM/UF/Form/Group.hlp"}</td>
         </tr>
@@ -102,3 +107,13 @@
     </div><!-- / .crm-block -->
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
+{literal}
+  <script type="text/javascript">
+  CRM.$(function($) {
+    $('.cancel_button_section').toggle($('#add_cancel_button').is(":checked"));
+    $('#add_cancel_button').click(function() {
+      $('.cancel_button_section').toggle($(this).is(":checked"));
+    });
+  });
+  </script>
+{/literal}

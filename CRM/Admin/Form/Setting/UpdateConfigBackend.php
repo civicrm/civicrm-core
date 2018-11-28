@@ -65,6 +65,7 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
 
       // clear all caches
       CRM_Core_Config::clearDBCache();
+      Civi::cache('session')->clear();
       CRM_Utils_System::flushCache();
 
       parent::rebuildMenu();
