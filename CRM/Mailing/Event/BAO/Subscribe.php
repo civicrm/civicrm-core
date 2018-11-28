@@ -215,7 +215,7 @@ SELECT     civicrm_email.id as email_id
     $group->id = $this->group_id;
     $group->find(TRUE);
 
-    $component = new CRM_Mailing_BAO_Component();
+    $component = new CRM_Mailing_BAO_MailingComponent();
     $component->is_default = 1;
     $component->is_active = 1;
     $component->component_type = 'Subscribe';
@@ -227,7 +227,7 @@ SELECT     civicrm_email.id as email_id
       'From' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
       'To' => $email,
       'Reply-To' => $confirm,
-      'Return-Path' => "do-not-reply@$emailDomain",
+      'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
     );
 
     $url = CRM_Utils_System::url('civicrm/mailing/confirm',

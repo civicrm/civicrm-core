@@ -182,6 +182,9 @@
     <type>int unsigned</type>
     <default>NULL</default>
     <add>2.2</add>
+    <pseudoconstant>
+      <optionGroupName>visibility</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>icon</name>

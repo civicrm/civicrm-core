@@ -215,7 +215,7 @@ class CRM_Mailing_Event_BAO_Resubscribe {
                         WHERE $jobTable.id = $job");
     $dao->fetch();
 
-    $component = new CRM_Mailing_BAO_Component();
+    $component = new CRM_Mailing_BAO_MailingComponent();
     $component->id = $dao->resubscribe_id;
     $component->find(TRUE);
 
@@ -267,14 +267,12 @@ class CRM_Mailing_Event_BAO_Resubscribe {
       $message->setTxtBody($text);
     }
 
-    $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
-
     $headers = array(
       'Subject' => $component->subject,
-      'From' => "\"$domainEmailName\" <do-not-reply@$emailDomain>",
+      'From' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
       'To' => $eq->email,
-      'Reply-To' => "do-not-reply@$emailDomain",
-      'Return-Path' => "do-not-reply@$emailDomain",
+      'Reply-To' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
     );
     CRM_Mailing_BAO_Mailing::addMessageIdHeader($headers, 'e', $job, $queue_id, $eq->hash);
     $b = CRM_Utils_Mail::setMimeParams($message);

@@ -1,0 +1,39 @@
+<legend>{{ data.label || data.op + ' group' }}<span class="crm-marker" ng-if="data.required"> *</span></legend>
+<div class="btn-group btn-group-xs" ng-if="data.groupParent">
+  <button class="btn btn-danger-outline" ng-click="removeGroup()" title="{{ ts('Remove group') }}">
+    <i class="crm-i fa-trash"></i>
+  </button>
+</div>
+<div class="api4-where-group-sortable" ng-model="data.where" ui-sortable="{axis: 'y', connectWith: '.api4-where-group-sortable', containment: '.api4-where-fieldset', over: onSortOver, start: onSort, stop: onSort}">
+  <div class="api4-input form-inline clearfix" ng-repeat="(index, clause) in data.where">
+    <div class="api4-clause-badge" title="{{ ts('Drag to reposition') }}">
+      <span class="badge badge-info">
+        <span ng-if="!index && !data.groupParent">Where</span>
+        <span ng-if="index || data.groupParent">{{ data.op }}</span>
+        <i class="crm-i fa-arrows"></i>
+      </span>
+    </div>
+    <div ng-if="clause[0] !== 'AND' && clause[0] !== 'OR' && clause[0] !== 'NOT'" class="api4-input-group">
+      <input class="collapsible-optgroups form-control" ng-model="clause[0]" crm-ui-select="{data: data.fields, allowClear: true, placeholder: 'Field'}" />
+      <input class="form-control api4-operator" ng-model="clause[1]" crm-ui-select="{data: data.operators}" />
+      <input class="form-control" ng-model="clause[2]" />
+    </div>
+    <fieldset class="clearfix" ng-if="clause[0] === 'AND' || clause[0] === 'OR' || clause[0] === 'NOT'" crm-api4-where-clause="{where: clause[1], op: clause[0], fields: data.fields, operators: data.operators, groupParent: data.where, groupIndex: index}">
+    </fieldset>
+  </div>
+</div>
+<div class="api4-input form-inline">
+  <div class="api4-clause-badge">
+    <div class="btn-group btn-group-xs" title="{{ data.groupParent ? ts('Add a subgroup of clauses') : ts('Add a group of clauses') }}">
+      <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{ data.op }} <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu api4-add-where-group-menu">
+        <li ng-repeat="con in conjunctions" ng-if="data.op !== con">
+          <a href ng-click="addGroup(con)">{{ con }}</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <input class="collapsible-optgroups form-control" ng-model="newClause" title="Add a single clause" crm-ui-select="{data: data.fields, placeholder: 'Add clause'}" />
+</div>

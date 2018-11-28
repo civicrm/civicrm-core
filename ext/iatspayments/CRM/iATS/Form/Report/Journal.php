@@ -79,6 +79,10 @@ class CRM_iATS_Form_Report_Journal extends CRM_Report_Form {
                  'options' => self::$transaction_types,
                  'type' => CRM_Utils_Type::T_STRING,
                ),
+               'agt' => array(
+                 'title' => 'Client/Agent code',
+                 'type' => CRM_Utils_Type::T_STRING,
+               ),
                'rst' => array(
                  'title' => 'Result string',
                  'type' => CRM_Utils_Type::T_STRING,

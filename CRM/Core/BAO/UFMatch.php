@@ -51,10 +51,12 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     }
     $dao = new CRM_Core_DAO_UFMatch();
     $dao->copyValues($params);
+    // Fixme: this function cannot update records
     if (!$dao->find(TRUE)) {
       $dao->save();
+      Civi::$statics[__CLASS__][$params['domain_id']][(int) $dao->contact_id] = (int) $dao->uf_id;
+      CRM_Utils_Hook::post($hook, 'UFMatch', $dao->id, $dao);
     }
-    CRM_Utils_Hook::post($hook, 'UFMatch', $dao->id, $dao);
     return $dao;
   }
 
@@ -468,8 +470,11 @@ AND    domain_id    = %4
     $ufmatch = new CRM_Core_DAO_UFMatch();
 
     $ufmatch->uf_id = $ufID;
-    $ufmatch->domain_id = CRM_Core_Config::domainID();
+    $ufmatch->domain_id = $domainId = CRM_Core_Config::domainID();
     $ufmatch->delete();
+
+    // Flush cache
+    Civi::$statics[__CLASS__][$domainId] = [];
   }
 
   /**
@@ -478,20 +483,29 @@ AND    domain_id    = %4
    * @param int $ufID
    *   Id of UF for which related contact_id is required.
    *
-   * @return int
+   * @return int|NULL
    *   contact_id on success, null otherwise
    */
   public static function getContactId($ufID) {
-    if (!isset($ufID)) {
+    if (!$ufID) {
       return NULL;
     }
+    $domainId = CRM_Core_Config::domainID();
 
+    if (!isset(Civi::$statics[__CLASS__][$domainId])) {
+      Civi::$statics[__CLASS__][$domainId] = [];
+    }
+    $contactId = array_search($ufID, Civi::$statics[__CLASS__][$domainId]);
+    if ($contactId) {
+      return $contactId;
+    }
     $ufmatch = new CRM_Core_DAO_UFMatch();
-
     $ufmatch->uf_id = $ufID;
-    $ufmatch->domain_id = CRM_Core_Config::domainID();
+    $ufmatch->domain_id = $domainId;
     if ($ufmatch->find(TRUE)) {
-      return (int ) $ufmatch->contact_id;
+      $contactId = (int) $ufmatch->contact_id;
+      Civi::$statics[__CLASS__][$domainId][$contactId] = (int) $ufID;
+      return $contactId;
     }
     return NULL;
   }
@@ -502,22 +516,26 @@ AND    domain_id    = %4
    * @param int $contactID
    *   ID of the contact for which related uf_id is required.
    *
-   * @return int
+   * @return int|NULL
    *   uf_id of the given contact_id on success, null otherwise
    */
   public static function getUFId($contactID) {
-    if (!isset($contactID)) {
+    if (!$contactID) {
       return NULL;
     }
-    $domain = CRM_Core_BAO_Domain::getDomain();
-    $ufmatch = new CRM_Core_DAO_UFMatch();
+    $domainId = CRM_Core_Config::domainID();
+    $contactID = (int) $contactID;
 
-    $ufmatch->contact_id = $contactID;
-    $ufmatch->domain_id = $domain->id;
-    if ($ufmatch->find(TRUE)) {
-      return $ufmatch->uf_id;
+    if (empty(Civi::$statics[__CLASS__][$domainId]) || !array_key_exists($contactID, Civi::$statics[__CLASS__][$domainId])) {
+      Civi::$statics[__CLASS__][$domainId][$contactID] = NULL;
+      $ufmatch = new CRM_Core_DAO_UFMatch();
+      $ufmatch->contact_id = $contactID;
+      $ufmatch->domain_id = $domainId;
+      if ($ufmatch->find(TRUE)) {
+        Civi::$statics[__CLASS__][$domainId][$contactID] = (int) $ufmatch->uf_id;
+      }
     }
-    return NULL;
+    return Civi::$statics[__CLASS__][$domainId][$contactID];
   }
 
   /**

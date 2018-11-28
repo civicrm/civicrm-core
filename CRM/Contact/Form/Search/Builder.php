@@ -95,18 +95,10 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     // This array contain list of available fields and their corresponding data type,
     //  later assigned as json string, to be used to filter list of mysql operators
     $fieldNameTypes = [];
-    $dataType = [
-      CRM_Utils_Type::T_STRING => 'String',
-      CRM_Utils_Type::T_TEXT => 'String',
-      CRM_Utils_Type::T_LONGTEXT => 'String',
-      CRM_Utils_Type::T_BOOLEAN => 'Boolean',
-      CRM_Utils_Type::T_DATE => 'Date',
-      CRM_Utils_Type::T_TIMESTAMP => 'Date',
-    ];
     foreach ($fields as $name => $field) {
       // Assign date type to respective field name, which will be later used to modify operator list
-      if (isset($field['type']) && array_key_exists($field['type'], $dataType)) {
-        $fieldNameTypes[$name] = $dataType[$field['type']];
+      if ($type = CRM_Utils_Array::key(CRM_Utils_Array::value('type', $field), CRM_Utils_Type::getValidTypes())) {
+        $fieldNameTypes[$name] = $type;
       }
       // it's necessary to know which of the fields are searchable by label
       if (isset($field['searchByLabel']) && $field['searchByLabel']) {
@@ -477,8 +469,10 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
             $options[substr($field, 0, -3)] = $entity;
           }
         }
-        elseif (!empty($info['data_type']) && in_array($info['data_type'], array('StateProvince', 'Country'))) {
-          $options[$field] = $entity;
+        elseif (!empty($info['data_type'])) {
+          if (in_array($info['data_type'], array('StateProvince', 'Country'))) {
+            $options[$field] = $entity;
+          }
         }
         elseif (in_array(substr($field, 0, 3), array(
               'is_',

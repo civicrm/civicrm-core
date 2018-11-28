@@ -67,7 +67,7 @@ class CRM_Case_Task extends CRM_Core_Task {
         self::TASK_EXPORT => array(
           'title' => ts('Export cases'),
           'class' => array(
-            'CRM_Export_Form_Select',
+            'CRM_Export_Form_Select_Case',
             'CRM_Export_Form_Map',
           ),
           'result' => FALSE,

@@ -59,8 +59,7 @@ function civicrm_api3_membership_type_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_membership_type_create_spec(&$params) {
-  // todo could set default here probably
-  $params['domain_id']['api.required'] = 1;
+  $params['domain_id']['api.default'] = CRM_Core_Config::domainID();
   $params['member_of_contact_id']['api.required'] = 1;
   $params['financial_type_id']['api.required'] = 1;
   $params['name']['api.required'] = 1;

@@ -180,6 +180,29 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public $urlPath = array();
 
   /**
+   * Context of the form being loaded.
+   *
+   * 'event' or null
+   *
+   * @var string
+   */
+  protected $context;
+
+  /**
+   * @return string
+   */
+  public function getContext() {
+    return $this->context;
+  }
+
+  /**
+   * Set context variable.
+   */
+  public function setContext() {
+    $this->context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
+  }
+
+  /**
    * @var CRM_Core_Controller
    */
   public $controller;
@@ -1846,7 +1869,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $setDefaultCurrency = TRUE
   ) {
     $currencies = CRM_Core_OptionGroup::values('currencies_enabled');
-    if (!array_key_exists($defaultCurrency, $currencies)) {
+    if (!empty($defaultCurrency) && !array_key_exists($defaultCurrency, $currencies)) {
       Civi::log()->warning('addCurrency: Currency ' . $defaultCurrency . ' is disabled but still in use!');
       $currencies[$defaultCurrency] = $defaultCurrency;
     }
@@ -2046,7 +2069,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($tempID, $userChecksum);
       if ($validUser) {
         CRM_Core_Resources::singleton()->addVars('coreForm', array('contact_id' => (int) $tempID));
-        CRM_Core_Resources::singleton()->addVars('coreForm', array('checksum' => (int) $tempID));
+        CRM_Core_Resources::singleton()->addVars('coreForm', array('checksum' => $userChecksum));
         return $tempID;
       }
     }

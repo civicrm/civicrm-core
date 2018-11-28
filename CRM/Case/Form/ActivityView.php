@@ -172,6 +172,38 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
       $recentContactDisplay,
       $recentOther
     );
+
+    // Set breadcrumb to take the user back to the case being viewed
+    $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $caseID, 'case_type_id');
+    $caseType = CRM_Core_PseudoConstant::getLabel('CRM_Case_BAO_Case', 'case_type_id', $caseTypeId);
+    $caseContact = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseContact', $caseID, 'contact_id', 'case_id');
+
+    CRM_Utils_System::resetBreadCrumb();
+    $breadcrumb = [
+      [
+        'title' => ts('Home'),
+        'url' => CRM_Utils_System::url(),
+      ],
+      [
+        'title' => ts('CiviCRM'),
+        'url' => CRM_Utils_System::url('civicrm', 'reset=1'),
+      ],
+      [
+        'title' => ts('CiviCase Dashboard'),
+        'url' => CRM_Utils_System::url('civicrm/case', 'reset=1'),
+      ],
+      [
+        'title' => $caseType,
+        'url' => CRM_Utils_System::url('civicrm/contact/view/case', [
+          'reset' => 1,
+          'id' => $caseID,
+          'context' => 'case',
+          'action' => 'view',
+          'cid' => $caseContact,
+        ]),
+      ],
+    ];
+    CRM_Utils_System::appendBreadCrumb($breadcrumb);
   }
 
 }

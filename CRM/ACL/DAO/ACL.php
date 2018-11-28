@@ -168,6 +168,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
           'title' => ts('Deny ACL?'),
           'description' => 'Is this ACL entry Allow  (0) or Deny (1) ?',
           'required' => TRUE,
+          'default' => '0',
           'table_name' => 'civicrm_acl',
           'entity' => 'ACL',
           'bao' => 'CRM_ACL_BAO_ACL',

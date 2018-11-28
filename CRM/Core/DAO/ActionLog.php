@@ -200,6 +200,7 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Error?'),
           'description' => 'Was there any error sending the reminder?',
+          'default' => '0',
           'table_name' => 'civicrm_action_log',
           'entity' => 'ActionLog',
           'bao' => 'CRM_Core_BAO_ActionLog',

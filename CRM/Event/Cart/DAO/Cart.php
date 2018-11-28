@@ -104,6 +104,7 @@ class CRM_Event_Cart_DAO_Cart extends CRM_Core_DAO {
           'name' => 'completed',
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Complete?'),
+          'default' => '0',
           'table_name' => 'civicrm_event_carts',
           'entity' => 'Cart',
           'bao' => 'CRM_Event_Cart_BAO_Cart',

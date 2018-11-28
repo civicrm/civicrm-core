@@ -91,6 +91,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $condition = " AND ( v.component_id IS NULL {$include} )";
     $this->activityTypes = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, $condition);
     asort($this->activityTypes);
+
+    // @todo split the 3 different contact tables into their own array items.
+    // this will massively simplify the needs of this report.
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -394,7 +397,12 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   /**
    * Build select clause.
    *
-   * @param null $recordType
+   * @todo get rid of $recordType param. It's only because 3 separate contact tables
+   * are mis-declared as one that we need it.
+   *
+   * @param null $recordType deprecated
+   *   Parameter to hack around the bad decision made in construct to misrepresent
+   *   different tables as the same table.
    */
   public function select($recordType = 'target') {
     if (!array_key_exists("contact_{$recordType}", $this->_params['fields']) &&
@@ -416,6 +424,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
     $removeKeys = array();
     if ($recordType == 'target') {
+      // @todo - fix up the way the tables are declared in construct & remove this.
       foreach ($this->_selectClauses as $key => $clause) {
         if (strstr($clause, 'civicrm_contact_assignee.') ||
           strstr($clause, 'civicrm_contact_source.') ||
@@ -430,13 +439,15 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       }
     }
     elseif ($recordType == 'assignee') {
+      // @todo - fix up the way the tables are declared in construct & remove this.
       foreach ($this->_selectClauses as $key => $clause) {
         if (strstr($clause, 'civicrm_contact_target.') ||
           strstr($clause, 'civicrm_contact_source.') ||
           strstr($clause, 'civicrm_email_target.') ||
           strstr($clause, 'civicrm_email_source.') ||
           strstr($clause, 'civicrm_phone_target.') ||
-          strstr($clause, 'civicrm_phone_source.')
+          strstr($clause, 'civicrm_phone_source.') ||
+          strstr($clause, 'civicrm_address_')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
@@ -444,13 +455,15 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       }
     }
     elseif ($recordType == 'source') {
+      // @todo - fix up the way the tables are declared in construct & remove this.
       foreach ($this->_selectClauses as $key => $clause) {
         if (strstr($clause, 'civicrm_contact_target.') ||
           strstr($clause, 'civicrm_contact_assignee.') ||
           strstr($clause, 'civicrm_email_target.') ||
           strstr($clause, 'civicrm_email_assignee.') ||
           strstr($clause, 'civicrm_phone_target.') ||
-          strstr($clause, 'civicrm_phone_assignee.')
+          strstr($clause, 'civicrm_phone_assignee.') ||
+          strstr($clause, 'civicrm_address_')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
@@ -460,6 +473,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     elseif ($recordType == 'final') {
       $this->_selectClauses = $this->_selectAliasesTotal;
       foreach ($this->_selectClauses as $key => $clause) {
+        // @todo - fix up the way the tables are declared in construct & remove this.
         if (strstr($clause, 'civicrm_contact_contact_target') ||
           strstr($clause, 'civicrm_contact_contact_assignee') ||
           strstr($clause, 'civicrm_contact_contact_source') ||
@@ -468,9 +482,10 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           strstr($clause, 'civicrm_email_contact_source_email') ||
           strstr($clause, 'civicrm_email_contact_assignee_email') ||
           strstr($clause, 'civicrm_email_contact_target_email') ||
-          strstr($clause, 'civicrm_phone_contact_target_phone')
+          strstr($clause, 'civicrm_phone_contact_target_phone') ||
+          strstr($clause, 'civicrm_address_')
         ) {
-          $this->_selectClauses[$key] = "GROUP_CONCAT($clause SEPARATOR ';') as $clause";
+          $this->_selectClauses[$key] = "GROUP_CONCAT(DISTINCT $clause SEPARATOR ';') as $clause";
         }
       }
     }
@@ -480,7 +495,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         unset($this->_selectAliases[$key]);
       }
 
-      if ($recordType != 'final') {
+      if ($recordType == 'target') {
         foreach ($this->_columns['civicrm_address']['order_bys'] as $fieldName => $field) {
           $orderByFld = $this->_columns['civicrm_address']['order_bys'][$fieldName];
           $fldInfo = $this->_columns['civicrm_address']['fields'][$fieldName];
@@ -496,97 +511,44 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
   /**
    * Build from clause.
-   *
-   * @param string $recordType
+   * @todo remove this function & declare the 3 contact tables separately
    */
-  public function from($recordType = 'target') {
+  public function from() {
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-    $activityTypeId = CRM_Core_DAO::getFieldValue("CRM_Core_DAO_OptionGroup", 'activity_type', 'id', 'name');
-    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
-    if ($recordType == 'target') {
-      $this->_from = "
-        FROM civicrm_activity {$this->_aliases['civicrm_activity']}
-             INNER JOIN civicrm_activity_contact  {$this->_aliases['civicrm_activity_contact']}
-                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_contact']}.activity_id AND
-                       {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$targetID}
-             INNER JOIN civicrm_contact civicrm_contact_target
-                    ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_contact_target.id
-             {$this->_aclFrom}";
+    $this->_from = "
+      FROM civicrm_activity {$this->_aliases['civicrm_activity']}
+           INNER JOIN civicrm_activity_contact  {$this->_aliases['civicrm_activity_contact']}
+                  ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_contact']}.activity_id AND
+                     {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$targetID}
+           INNER JOIN civicrm_contact civicrm_contact_target
+                  ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_contact_target.id
+           {$this->_aclFrom}";
 
-      if ($this->isTableSelected('civicrm_email')) {
-        $this->_from .= "
-            LEFT JOIN civicrm_email civicrm_email_target
-                   ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_email_target.contact_id AND
-                      civicrm_email_target.is_primary = 1";
-      }
-
-      if ($this->isTableSelected('civicrm_phone')) {
-        $this->_from .= "
-            LEFT JOIN civicrm_phone civicrm_phone_target
-                   ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_phone_target.contact_id AND
-                      civicrm_phone_target.is_primary = 1 ";
-      }
-      $this->_aliases['civicrm_contact'] = 'civicrm_contact_target';
+    if ($this->isTableSelected('civicrm_email')) {
+      $this->_from .= "
+          LEFT JOIN civicrm_email civicrm_email_target
+                 ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_email_target.contact_id AND
+                    civicrm_email_target.is_primary = 1";
     }
 
-    if ($recordType == 'assignee') {
-      $this->_from = "
-        FROM civicrm_activity {$this->_aliases['civicrm_activity']}
-             INNER JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_contact']}
-                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_contact']}.activity_id AND
-                       {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$assigneeID}
-             INNER JOIN civicrm_contact civicrm_contact_assignee
-                    ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_contact_assignee.id
-             {$this->_aclFrom}";
-
-      if ($this->isTableSelected('civicrm_email')) {
-        $this->_from .= "
-            LEFT JOIN civicrm_email civicrm_email_assignee
-                   ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_email_assignee.contact_id AND
-                      civicrm_email_assignee.is_primary = 1";
-      }
-      if ($this->isTableSelected('civicrm_phone')) {
-        $this->_from .= "
-            LEFT JOIN civicrm_phone civicrm_phone_assignee
-                   ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_phone_assignee.contact_id AND
-                      civicrm_phone_assignee.is_primary = 1 ";
-      }
-      $this->_aliases['civicrm_contact'] = 'civicrm_contact_assignee';
+    if ($this->isTableSelected('civicrm_phone')) {
+      $this->_from .= "
+          LEFT JOIN civicrm_phone civicrm_phone_target
+                 ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_phone_target.contact_id AND
+                    civicrm_phone_target.is_primary = 1 ";
     }
-
-    if ($recordType == 'source') {
-      $this->_from = "
-        FROM civicrm_activity {$this->_aliases['civicrm_activity']}
-             INNER JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_contact']}
-                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_contact']}.activity_id AND
-                       {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$sourceID}
-             INNER JOIN civicrm_contact civicrm_contact_source
-                    ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_contact_source.id
-             {$this->_aclFrom}";
-
-      if ($this->isTableSelected('civicrm_email')) {
-        $this->_from .= "
-            LEFT JOIN civicrm_email civicrm_email_source
-                   ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_email_source.contact_id AND
-                      civicrm_email_source.is_primary = 1";
-      }
-      if ($this->isTableSelected('civicrm_phone')) {
-        $this->_from .= "
-            LEFT JOIN civicrm_phone civicrm_phone_source
-                   ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_phone_source.contact_id AND
-                      civicrm_phone_source.is_primary = 1 ";
-      }
-      $this->_aliases['civicrm_contact'] = 'civicrm_contact_source';
-    }
+    $this->_aliases['civicrm_contact'] = 'civicrm_contact_target';
 
     $this->joinAddressFromContact();
   }
 
   /**
    * Build where clause.
+   *
+   * @todo get rid of $recordType param. It's only because 3 separate contact tables
+   * are mis-declared as one that we need it.
    *
    * @param string $recordType
    */
@@ -731,7 +693,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $new_having = ' addtogroup_contact_id';
     $having = str_ireplace(' civicrm_contact_contact_target_id', $new_having, $this->_having);
     $query = "$select
-FROM civireport_activity_temp_target tar
+FROM {$this->temporaryTables['activity_temp_table']['name']} tar
 GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $select = 'AS addtogroup_contact_id';
     $query = str_ireplace('AS civicrm_contact_contact_target_id', $select, $query);
@@ -805,21 +767,21 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       }
     }
 
+    // @todo - all this temp table stuff is here because pre 4.4 the activity contact
+    // form did not exist.
+    // Fixing the way the construct method declares them will make all this redundant.
     // 1. fill temp table with target results
     $this->buildACLClause(array('civicrm_contact_target'));
     $this->select('target');
-    $this->from('target');
+    $this->from();
     $this->customDataFrom();
     $this->where('target');
-    $insertCols = implode(',', $this->_selectAliases);
-    $tempQuery = "CREATE TEMPORARY TABLE civireport_activity_temp_target {$this->_databaseAttributes} AS
-{$this->_select} {$this->_from} {$this->_where} ";
-    $this->executeReportQuery($tempQuery);
+    $tempTableName = $this->createTemporaryTable('activity_temp_table', "{$this->_select} {$this->_from} {$this->_where}");
 
     // 2. add new columns to hold assignee and source results
     // fixme: add when required
     $tempQuery = "
-  ALTER TABLE  civireport_activity_temp_target
+  ALTER TABLE  $tempTableName
   MODIFY COLUMN civicrm_contact_contact_target_id VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_assignee VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_source VARCHAR(128),
@@ -834,11 +796,12 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     // 3. fill temp table with assignee results
     $this->buildACLClause(array('civicrm_contact_assignee'));
     $this->select('assignee');
-    $this->from('assignee');
+    $this->buildAssigneeFrom();
+
     $this->customDataFrom();
     $this->where('assignee');
     $insertCols = implode(',', $this->_selectAliases);
-    $tempQuery = "INSERT INTO civireport_activity_temp_target ({$insertCols})
+    $tempQuery = "INSERT INTO $tempTableName ({$insertCols})
 {$this->_select}
 {$this->_from} {$this->_where}";
     $this->executeReportQuery($tempQuery);
@@ -846,11 +809,11 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     // 4. fill temp table with source results
     $this->buildACLClause(array('civicrm_contact_source'));
     $this->select('source');
-    $this->from('source');
+    $this->buildSourceFrom();
     $this->customDataFrom();
     $this->where('source');
     $insertCols = implode(',', $this->_selectAliases);
-    $tempQuery = "INSERT INTO civireport_activity_temp_target ({$insertCols})
+    $tempQuery = "INSERT INTO $tempTableName ({$insertCols})
 {$this->_select}
 {$this->_from} {$this->_where}";
     $this->executeReportQuery($tempQuery);
@@ -865,7 +828,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $this->orderBy();
     foreach ($this->_sections as $alias => $section) {
       if (!empty($section) && $section['name'] == 'activity_date_time') {
-        $this->alterSectionHeaderForDateTime('civireport_activity_temp_target', $section['tplField']);
+        $this->alterSectionHeaderForDateTime($tempTableName, $section['tplField']);
       }
     }
 
@@ -882,7 +845,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     }
 
     $sql = "{$this->_select}
-      FROM civireport_activity_temp_target tar
+      FROM $tempTableName tar
       INNER JOIN civicrm_activity {$this->_aliases['civicrm_activity']} ON {$this->_aliases['civicrm_activity']}.id = tar.civicrm_activity_id
       INNER JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_contact']} ON {$this->_aliases['civicrm_activity_contact']}.activity_id = {$this->_aliases['civicrm_activity']}.id
       AND {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$sourceID}
@@ -930,7 +893,10 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
     $viewLinks = FALSE;
-    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'report');
+
+    // Would we ever want to retrieve from the form controller??
+    $form = $this->noController ? NULL : $this;
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $form, FALSE, 'report');
     $actUrl = '';
 
     if (CRM_Core_Permission::check('access CiviCRM')) {
@@ -1088,7 +1054,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
         }
       }
 
-      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'activity', 'List all activities for this ') ? TRUE : $entryFound;
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'activity', 'List all activities for this', ';') ? TRUE : $entryFound;
 
       if (!$entryFound) {
         break;
@@ -1114,7 +1080,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($ifnulls, $sectionAliases);
 
       $query = $this->_select .
-        ", count(DISTINCT civicrm_activity_id) as ct from civireport_activity_temp_target group by " .
+        ", count(DISTINCT civicrm_activity_id) as ct from {$this->temporaryTables['activity_temp_table']['name']} group by " .
         implode(", ", $sectionAliases);
 
       // initialize array of total counts
@@ -1145,6 +1111,74 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       }
       $this->assign('sectionTotals', $totals);
     }
+  }
+
+  /**
+   * @todo remove this function & declare the 3 contact tables separately
+   *
+   * (Currently the construct method incorrectly melds them - this is an interim
+   * refactor in order to get this under ReportTemplateTests)
+   */
+  protected function buildAssigneeFrom() {
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $this->_from = "
+        FROM civicrm_activity {$this->_aliases['civicrm_activity']}
+             INNER JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_contact']}
+                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_contact']}.activity_id AND
+                       {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$assigneeID}
+             INNER JOIN civicrm_contact civicrm_contact_assignee
+                    ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_contact_assignee.id
+             {$this->_aclFrom}";
+
+    if ($this->isTableSelected('civicrm_email')) {
+      $this->_from .= "
+            LEFT JOIN civicrm_email civicrm_email_assignee
+                   ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_email_assignee.contact_id AND
+                      civicrm_email_assignee.is_primary = 1";
+    }
+    if ($this->isTableSelected('civicrm_phone')) {
+      $this->_from .= "
+            LEFT JOIN civicrm_phone civicrm_phone_assignee
+                   ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_phone_assignee.contact_id AND
+                      civicrm_phone_assignee.is_primary = 1 ";
+    }
+    $this->_aliases['civicrm_contact'] = 'civicrm_contact_assignee';
+    $this->joinAddressFromContact();
+  }
+
+  /**
+   * @todo remove this function & declare the 3 contact tables separately
+   *
+   * (Currently the construct method incorrectly melds them - this is an interim
+   * refactor in order to get this under ReportTemplateTests)
+   */
+  protected function buildSourceFrom() {
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+    $this->_from = "
+        FROM civicrm_activity {$this->_aliases['civicrm_activity']}
+             INNER JOIN civicrm_activity_contact {$this->_aliases['civicrm_activity_contact']}
+                    ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_activity_contact']}.activity_id AND
+                       {$this->_aliases['civicrm_activity_contact']}.record_type_id = {$sourceID}
+             INNER JOIN civicrm_contact civicrm_contact_source
+                    ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_contact_source.id
+             {$this->_aclFrom}";
+
+    if ($this->isTableSelected('civicrm_email')) {
+      $this->_from .= "
+            LEFT JOIN civicrm_email civicrm_email_source
+                   ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_email_source.contact_id AND
+                      civicrm_email_source.is_primary = 1";
+    }
+    if ($this->isTableSelected('civicrm_phone')) {
+      $this->_from .= "
+            LEFT JOIN civicrm_phone civicrm_phone_source
+                   ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_phone_source.contact_id AND
+                      civicrm_phone_source.is_primary = 1 ";
+    }
+    $this->_aliases['civicrm_contact'] = 'civicrm_contact_source';
+    $this->joinAddressFromContact();
   }
 
 }

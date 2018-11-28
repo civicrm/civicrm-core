@@ -207,7 +207,7 @@ class CRM_Case_Page_AJAX {
       'recordsTotal' => $cases['total'],
     );
     unset($cases['total']);
-    $casesDT['data'] = $cases;
+    $casesDT['data'] = array_values($cases);
 
     CRM_Utils_JSON::output($casesDT);
   }

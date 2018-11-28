@@ -54,37 +54,31 @@
 {/strip}{/capture}// <script> Generated {$smarty.now|date_format:'%d %b %Y %H:%M:%S'}
 {literal}
 (function($) {
-  var menuMarkup = {/literal}{$menuMarkup|@json_encode};
-{if $config->userFramework neq 'Joomla'}{literal}
-  $('body').append(menuMarkup);
-
-  $('#civicrm-menu').css({position: "fixed", top: "0px"});
+  var menuMarkup = {/literal}{$menuMarkup|@json_encode}{literal};
 
   //Track Scrolling
-  $(window).scroll(function () {
-    $('div.sticky-header').css({top: "23px", position: "fixed"});
-  });
-
-  if ($('#edit-shortcuts').length > 0) {
-    $('#civicrm-menu').css({'width': '97%'});
+  if ($('div.sticky-header').length) {
+    $(window).scroll(function () {
+      $('div.sticky-header').css({top: $('#civicrm-menu').height() + "px", position: "fixed"});
+    });
   }
-{/literal}{else}{* Special menu hacks for Joomla *}{literal}
-  // below div is present in older version of joomla 2.5.x
-  var elementExists = $('div#toolbar-box div.m').length;
-  if (elementExists > 0) {
+
+  if ($('div#toolbar-box div.m').length) {
     $('div#toolbar-box div.m').html(menuMarkup);
   }
-  else {
+  else if ($("#crm-nav-menu-container").length) {
     $("#crm-nav-menu-container").html(menuMarkup).css({'padding-bottom': '10px'});
   }
-{/literal}{/if}{literal}
+  else {
+    $('body').append(menuMarkup);
+  }
+
   // CRM-15493 get the current qfKey
   $("input[name=qfKey]", "#quickSearch").val($('#civicrm-navigation-menu').data('qfkey'));
 
 $('#civicrm-menu').ready(function() {
   $('#root-menu-div .outerbox').css({'margin-top': '6px'});
   $('#root-menu-div .menu-ul li').css({'padding-bottom': '2px', 'margin-top': '2px'});
-  $('img.menu-item-arrow').css({top: '4px'});
   $("#civicrm-menu >li").each(function(i){
     $(this).attr("tabIndex",i+2);
   });
@@ -208,7 +202,7 @@ $('#civicrm-menu').ready(function() {
   // Close menu after selecting an item
   $('#root-menu-div').on('click', 'a', $.Menu.closeAll);
 });
-$('#civicrm-menu').menuBar({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
+$('#civicrm-menu').menuBar({arrowClass: 'crm-i fa-caret-right'});
 $(window).on("beforeunload", function() {
   $('.crm-logo-sm', '#civicrm-menu').addClass('crm-i fa-spin');
 });

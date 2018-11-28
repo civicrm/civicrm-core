@@ -1100,7 +1100,7 @@ function iats_civicrm_buildForm_CRM_Contribute_Form_UpdateSubscription(&$form) {
     return;
   }
   // Only mangle this form for recurring contributions using iATS, (and not the UKDD version)
-  $payment_processor_type = $form->_paymentProcessor['class_name'];
+  $payment_processor_type = empty($form->_paymentProcessor) ? substr(get_class($form->_paymentProcessorObj),9) : $form->_paymentProcessor['class_name'];
   if (0 !== strpos($payment_processor_type, 'Payment_iATSService')) {
     return;
   }
@@ -1131,6 +1131,12 @@ function iats_civicrm_buildForm_CRM_Contribute_Form_UpdateSubscription(&$form) {
   }
   catch (CiviCRM_API3_Exception $e) {
     return;
+  }
+  try {
+    $pp = civicrm_api3('PaymentProcessor', 'getsingle', array('id' => $recur['payment_processor_id']));
+  }
+  catch (CiviCRM_API3_Exception $e) {
+    $pp = array();
   }
   // Turn off default notification checkbox, because that's a better default.
   $defaults = array('is_notify' => 0);
@@ -1173,8 +1179,8 @@ function iats_civicrm_buildForm_CRM_Contribute_Form_UpdateSubscription(&$form) {
   // Now add some more fields for display only
   /* Add in the contact's name */
   $form->addElement('static', 'contact', $contact['display_name']);
-  // get my pp.
-  $pp_label = $form->_paymentProcessor['name'];
+  // get my pp, if available.
+  $pp_label = empty($pp['name']) ? $form->_paymentProcessor['name'] : $pp['name'];
   $form->addElement('static', 'payment_processor', $pp_label);
   $label = CRM_Contribute_Pseudoconstant::financialType($recur['financial_type_id']);
   $form->addElement('static', 'financial_type', $label);

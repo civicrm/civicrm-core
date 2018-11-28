@@ -253,8 +253,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     // reset the cache
@@ -1639,6 +1639,9 @@ ORDER BY civicrm_custom_group.weight,
         $fieldId = $field['id'];
         $elementName = $field['element_name'];
         CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, $required);
+        if ($form->getAction() == CRM_Core_Action::VIEW) {
+          $form->getElement($elementName)->freeze();
+        }
       }
     }
   }

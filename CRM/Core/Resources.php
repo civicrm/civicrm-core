@@ -726,6 +726,7 @@ class CRM_Core_Resources {
       "bower_components/jquery-validation/dist/jquery.validate.min.js",
       "packages/jquery/plugins/jquery.ui.datepicker.validation.min.js",
       "js/Common.js",
+      "js/crm.datepicker.js",
       "js/crm.ajax.js",
       "js/wysiwyg/crm.wysiwyg.js",
     );

@@ -235,6 +235,9 @@ trait Api3TestTrait {
       'debug' => 1,
     );
     $result = $this->civicrm_api($entity, 'getvalue', $params);
+    if (is_array($result) && (!empty($result['is_error']) || isset($result['values']))) {
+      throw new \Exception('Invalid getvalue result' . print_r($result, TRUE));
+    }
     if ($type) {
       if ($type == 'integer') {
         // api seems to return integers as strings

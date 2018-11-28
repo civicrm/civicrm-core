@@ -680,8 +680,8 @@ SELECT $acl.*
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     // note this also resets any ACL cache
@@ -777,7 +777,7 @@ SELECT g.*
         $staticGroupIDs = array();
         $cachedGroupIDs = array();
         while ($dao->fetch()) {
-          // currently operation is restrcited to VIEW/EDIT
+          // currently operation is restricted to VIEW/EDIT
           if ($dao->where_clause) {
             if ($dao->select_tables) {
               $tmpTables = array();
@@ -877,7 +877,7 @@ SELECT g.*
       $aclKeys = array_keys($acls);
       $aclKeys = implode(',', $aclKeys);
 
-      $cacheKey = "$tableName-$aclKeys";
+      $cacheKey = CRM_Core_BAO_Cache::cleanKey("$tableName-$aclKeys");
       $cache = CRM_Utils_Cache::singleton();
       $ids = $cache->get($cacheKey);
       if (!$ids) {

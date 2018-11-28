@@ -364,7 +364,7 @@ WHERE  title = %1
    * Process the form when submitted.
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache('CRM_Core_DAO_Group');
+    CRM_Utils_System::flushCache();
 
     $updateNestingCache = FALSE;
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -458,7 +458,7 @@ WHERE  title = %1
       $potentialParentGroupIds = array_keys($groupNames);
     }
 
-    $parentGroupSelectValues = array('' => '- ' . ts('select group') . ' -');
+    $parentGroupSelectValues = array();
     foreach ($potentialParentGroupIds as $potentialParentGroupId) {
       if (array_key_exists($potentialParentGroupId, $groupNames)) {
         $parentGroupSelectValues[$potentialParentGroupId] = $groupNames[$potentialParentGroupId];
@@ -472,7 +472,7 @@ WHERE  title = %1
       else {
         $required = FALSE;
       }
-      $form->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required, array('class' => 'crm-select2'));
+      $form->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required, array('class' => 'crm-select2', 'multiple' => TRUE));
     }
 
     return $parentGroups;

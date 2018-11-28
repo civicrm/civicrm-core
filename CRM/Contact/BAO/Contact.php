@@ -1013,7 +1013,10 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     CRM_Utils_Recent::delContact($id);
     self::updateContactCache($id, empty($restore));
 
-    // delete any dupe cache entry
+    // delete any prevnext/dupe cache entry
+    // These two calls are redundant in default deployments, but they're
+    // meaningful if "prevnext" is memory-backed.
+    Civi::service('prevnext')->deleteItem($id);
     CRM_Core_BAO_PrevNextCache::deleteItem($id);
 
     $transaction->commit();
@@ -1021,10 +1024,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     if ($skipUndelete) {
       CRM_Utils_Hook::post('delete', $contactType, $contact->id, $contact);
     }
-
-    // also reset the DB_DO global array so we can reuse the memory
-    // http://issues.civicrm.org/jira/browse/CRM-4387
-    CRM_Core_DAO::freeResult();
 
     return TRUE;
   }
@@ -1449,7 +1448,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
             'name' => 'tag',
           ),
           'note' => array(
-            'title' => ts('Note(s)'),
+            'title' => ts('Note'),
             'name' => 'note',
           ),
           'communication_style_id' => array(
@@ -2033,8 +2032,10 @@ ORDER BY civicrm_email.is_primary DESC";
       CRM_Contact_BAO_GroupContact::create($params['group'], $contactID, $visibility, $method);
     }
 
-    if (!empty($fields['tag'])) {
-      CRM_Core_BAO_EntityTag::create($params['tag'], 'civicrm_contact', $contactID);
+    if (!empty($fields['tag']) && array_key_exists('tag', $params)) {
+      // Convert comma separated form values from select2 v3
+      $tags = is_array($params['tag']) ? $params['tag'] : array_fill_keys(array_filter(explode(',', $params['tag'])), 1);
+      CRM_Core_BAO_EntityTag::create($tags, 'civicrm_contact', $contactID);
     }
 
     //to add profile in default group

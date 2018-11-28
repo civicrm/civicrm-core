@@ -192,10 +192,8 @@ ORDER BY   donation_amount desc
 ";
 
     if ($justIDs) {
-      CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS CustomSearch_SYBNT_temp");
-      $query = "CREATE TEMPORARY TABLE CustomSearch_SYBNT_temp AS ({$sql})";
-      CRM_Core_DAO::executeQuery($query);
-      $sql = "SELECT contact_a.id as contact_id FROM CustomSearch_SYBNT_temp as contact_a";
+      $tempTable = CRM_Utils_SQL_TempTable::build()->createWithQuery($sql);
+      $sql = "SELECT contact_a.id as contact_id FROM {$tempTable->getName()} as contact_a";
     }
     return $sql;
   }
@@ -406,7 +404,7 @@ AND      c.receive_date < {$this->start_date_1}
    * @param array $formValues
    *
    */
-  public static function formatSavedSearchFields(&$formValues) {
+  public static function formatSavedSearchFields($formValues) {
     $dateFields = array(
       'start_date_1',
       'end_date_1',
@@ -420,6 +418,8 @@ AND      c.receive_date < {$this->start_date_1}
         $formValues[$element] = date('Y-m-d', strtotime($value));
       }
     }
+
+    return $formValues;
   }
 
 }

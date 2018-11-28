@@ -52,7 +52,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    *   Classname of BAO.
    */
   public function getBAOName() {
-    return 'CRM_Contribute_BAO_ManagePremiums';
+    return 'CRM_Contribute_BAO_Product';
   }
 
   /**
@@ -150,10 +150,9 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
         'Premium',
         $dao->id
       );
-      //Financial Type
+      // Financial Type
       if (!empty($dao->financial_type_id)) {
-        require_once 'CRM/Core/DAO.php';
-        $premiums[$dao->id]['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name');
+        $premiums[$dao->id]['financial_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Financial_BAO_FinancialType', 'financial_type', $dao->financial_type_id);
       }
     }
     $this->assign('rows', $premiums);

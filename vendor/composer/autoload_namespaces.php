@@ -8,12 +8,6 @@ $baseDir = dirname($vendorDir);
 return array(
     'Validate' => array($vendorDir . '/pear/validate_finance_creditcard'),
     'System' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
-    'Symfony\\Component\\Process\\' => array($vendorDir . '/symfony/process'),
-    'Symfony\\Component\\Finder\\' => array($vendorDir . '/symfony/finder'),
-    'Symfony\\Component\\Filesystem\\' => array($vendorDir . '/symfony/filesystem'),
-    'Symfony\\Component\\EventDispatcher\\' => array($vendorDir . '/symfony/event-dispatcher'),
-    'Symfony\\Component\\DependencyInjection\\' => array($vendorDir . '/symfony/dependency-injection'),
-    'Symfony\\Component\\Config\\' => array($vendorDir . '/symfony/config'),
     'Svg\\' => array($vendorDir . '/phenx/php-svg-lib/src'),
     'Sabberworm\\CSS' => array($vendorDir . '/sabberworm/php-css-parser/lib'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log'),

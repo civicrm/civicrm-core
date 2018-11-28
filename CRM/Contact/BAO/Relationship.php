@@ -38,6 +38,12 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   const ALL = 0, PAST = 1, DISABLED = 2, CURRENT = 4, INACTIVE = 8;
 
   /**
+   * Constants for is_permission fields.
+   * Note: the slightly non-obvious ordering is due to history...
+   */
+  const NONE = 0, EDIT = 1, VIEW = 2;
+
+  /**
    * Create function - use the API instead.
    *
    * Note that the previous create function has been renamed 'legacyCreateMultiple'
@@ -470,8 +476,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   public static function getdefaults() {
     return array(
       'is_active' => 0,
-      'is_permission_a_b' => 0,
-      'is_permission_b_a' => 0,
+      'is_permission_a_b' => self::NONE,
+      'is_permission_b_a' => self::NONE,
       'description' => '',
       'start_date' => 'NULL',
       'case_id' => NULL,
@@ -656,7 +662,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       $relTypes = CRM_Utils_Array::index(array('name_a_b'), CRM_Core_PseudoConstant::relationshipType('name'));
       if (
         (isset($relTypes['Employee of']) && $relationship->relationship_type_id == $relTypes['Employee of']['id']) ||
-        (isset ($relTypes['Household Member of']) && $relationship->relationship_type_id == $relTypes['Household Member of']['id'])
+        (isset($relTypes['Household Member of']) && $relationship->relationship_type_id == $relTypes['Household Member of']['id'])
       ) {
         $sharedContact = new CRM_Contact_DAO_Contact();
         $sharedContact->id = $relationship->contact_id_a;
@@ -1715,10 +1721,10 @@ SELECT relationship_type_id, relationship_direction
               $membershipValues['skipStatusCal'] = TRUE;
             }
             foreach (array(
-                       'join_date',
-                       'start_date',
-                       'end_date',
-                     ) as $dateField) {
+              'join_date',
+              'start_date',
+              'end_date',
+            ) as $dateField) {
               if (!empty($membershipValues[$dateField])) {
                 $membershipValues[$dateField] = CRM_Utils_Date::processDate($membershipValues[$dateField]);
               }
@@ -2087,6 +2093,8 @@ AND cc.sort_name LIKE '%$name%'";
     unset($relationships['total_relationships']);
     if (!empty($relationships)) {
 
+      $displayName = CRM_Contact_BAO_Contact::displayName($params['contact_id']);
+
       // format params
       foreach ($relationships as $relationshipId => $values) {
         $relationship = array();
@@ -2117,22 +2125,42 @@ AND cc.sort_name LIKE '%$name%'";
           'civicrm/contact/view/rel',
           "action=view&reset=1&cid={$values['cid']}&id={$values['id']}&rtype={$values['rtype']}");
 
-        if ($params['context'] == 'current') {
-          if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
-            ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
-          ) {
-            $relationship['sort_name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> *</span>';
-          }
-
-          if (($values['cid'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
-            ($values['cid'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
-          ) {
-            $relationship['relation'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> *</span>';
-          }
-        }
-
         if (!empty($values['description'])) {
           $relationship['relation'] .= "<p class='description'>{$values['description']}</p>";
+        }
+
+        if ($params['context'] == 'current') {
+          $smarty = CRM_Core_Smarty::singleton();
+
+          $contactCombos = [
+            [
+              'permContact' => $params['contact_id'],
+              'permDisplayName' => $displayName,
+              'otherContact' => $values['cid'],
+              'otherDisplayName' => $values['display_name'],
+              'columnKey' => 'sort_name',
+            ],
+            [
+              'permContact' => $values['cid'],
+              'permDisplayName' => $values['display_name'],
+              'otherContact' => $params['contact_id'],
+              'otherDisplayName' => $displayName,
+              'columnKey' => 'relation',
+            ],
+          ];
+
+          foreach ($contactCombos as $combo) {
+            foreach ([CRM_Contact_BAO_Relationship::EDIT, CRM_Contact_BAO_Relationship::VIEW] as $permType) {
+              $smarty->assign('permType', $permType);
+              if (($combo['permContact'] == $values['contact_id_a'] and $values['is_permission_a_b'] == $permType)
+                || ($combo['permContact'] == $values['contact_id_b'] and $values['is_permission_b_a'] == $permType)
+              ) {
+                $smarty->assign('permDisplayName', $combo['permDisplayName']);
+                $smarty->assign('otherDisplayName', $combo['otherDisplayName']);
+                $relationship[$combo['columnKey']] .= $smarty->fetch('CRM/Contact/Page/View/RelationshipPerm.tpl');
+              }
+            }
+          }
         }
 
         $relationship['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);

@@ -32,30 +32,10 @@
  */
 
 /**
- * This class generates form components for relationship.
+ * Class for contribute form task actions.
+ * FIXME: This needs refactoring to properly inherit from CRM_Core_Form_Task and share more functions.
  */
-class CRM_Contribute_Form_Task extends CRM_Core_Form {
-
-  /**
-   * The task being performed.
-   *
-   * @var int
-   */
-  protected $_task;
-
-  /**
-   * The additional clause that we restrict the search with.
-   *
-   * @var string
-   */
-  protected $_componentClause = NULL;
-
-  /**
-   * The array that holds all the component ids.
-   *
-   * @var array
-   */
-  protected $_componentIds;
+class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
 
   /**
    * The array that holds all the contribution ids.
@@ -63,13 +43,6 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
    * @var array
    */
   protected $_contributionIds;
-
-  /**
-   * The array that holds all the contact ids.
-   *
-   * @var array
-   */
-  public $_contactIds;
 
   /**
    * The array that holds all the mapping contribution and contact ids.
@@ -94,9 +67,8 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
 
   /**
    * @param CRM_Core_Form $form
-   * @param bool $useTable
    */
-  public static function preProcessCommon(&$form, $useTable = FALSE) {
+  public static function preProcessCommon(&$form) {
     $form->_contributionIds = array();
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
@@ -217,7 +189,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
    */
   public function setContactIDs() {
     if (!$this->_includesSoftCredits) {
-      $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent(
+      $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent(
         $this->_contributionIds,
         'civicrm_contribution'
       );

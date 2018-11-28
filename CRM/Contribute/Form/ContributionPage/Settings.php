@@ -44,6 +44,11 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
+    // @todo handle properly on parent.
+    if (!$this->_id) {
+      $defaults['start_date'] = date('Y-m-d H:i:s');
+      unset($defaults['start_time']);
+    }
     $soft_credit_types = CRM_Core_OptionGroup::values('soft_credit_type', TRUE, FALSE, FALSE, NULL, 'name');
 
     if ($this->_id) {
@@ -223,8 +228,8 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     }
 
     // add optional start and end dates
-    $this->addDateTime('start_date', ts('Start Date'));
-    $this->addDateTime('end_date', ts('End Date'));
+    $this->add('datepicker', 'start_date', ts('Start Date'));
+    $this->add('datepicker', 'end_date', ts('End Date'));
 
     $this->addFormRule(array('CRM_Contribute_Form_ContributionPage_Settings', 'formRule'), $this);
 
@@ -334,10 +339,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $params['is_credit_card_only'] = CRM_Utils_Array::value('is_credit_card_only', $params, FALSE);
     $params['honor_block_is_active'] = CRM_Utils_Array::value('honor_block_is_active', $params, FALSE);
     $params['is_for_organization'] = !empty($params['is_organization']) ? CRM_Utils_Array::value('is_for_organization', $params, FALSE) : 0;
-
-    $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time'], TRUE);
-    $params['end_date'] = CRM_Utils_Date::processDate($params['end_date'], $params['end_date_time'], TRUE);
-
     $params['goal_amount'] = CRM_Utils_Rule::cleanMoney($params['goal_amount']);
 
     if (!$params['honor_block_is_active']) {

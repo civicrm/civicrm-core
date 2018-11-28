@@ -77,7 +77,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         // processor id & the handleNotification function (which should call the completetransaction api & by-pass this
         // entirely). The only thing the IPN class should really do is extract data from the request, validate it
         // & call completetransaction or call fail? (which may not exist yet).
-        Civi::log()->warning('Unreliable method used for AuthNet IPN - this will cause problems if you have more than one instance');
+        Civi::log()->warning('Unreliable method used to get payment_processor_id for AuthNet IPN - this will cause problems if you have more than one instance');
         $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
           'AuthNet', 'id', 'name'
         );

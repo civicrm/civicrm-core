@@ -1,0 +1,156 @@
+/* Style rules for Api4 Explorer */
+
+#bootstrap-theme.api4-explorer-page .panel-heading {
+  height: 50px;
+}
+#bootstrap-theme.api4-explorer-page .explorer-params-panel .panel-heading {
+  padding-top: 12px;
+}
+#bootstrap-theme.api4-explorer-page .explorer-params-panel .panel-heading button {
+  position: relative;
+  top: -5px;
+}
+#bootstrap-theme.api4-explorer-page .row .panel-body {
+  min-height: 400px;
+  overflow-x: auto;
+}
+#bootstrap-theme.api4-explorer-page .row .explorer-help-panel .panel-body {
+  max-height: 400px;
+  overflow: auto;
+}
+/* Fix weird shorditch style */
+#bootstrap-theme.api4-explorer-page .row .panel-heading {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-bottom: 0;
+}
+#bootstrap-theme.api4-explorer-page .explorer-code-panel table td:first-child {
+  width: 5em;
+}
+
+#bootstrap-theme.api4-explorer-page .explorer-params-panel > .panel-body > div.api4-input {
+  margin-bottom: 10px;
+}
+
+#bootstrap-theme.api4-explorer-page form label {
+  text-transform: capitalize;
+}
+
+#bootstrap-theme.api4-explorer-page fieldset {
+  padding: 6px;
+  border: 1px solid lightgrey;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+#bootstrap-theme.api4-explorer-page fieldset legend {
+  background-color: white;
+  font-size: 13px;
+  margin: 0;
+  width: auto;
+  border: 0 none;
+  padding: 2px 5px;
+  text-transform: capitalize;
+}
+#bootstrap-theme.api4-explorer-page fieldset > .btn-group {
+  position: absolute;
+  right: 0;
+  top: 11px;
+}
+#bootstrap-theme.api4-explorer-page fieldset > .btn-group .btn {
+  border: 0 none;
+}
+
+#bootstrap-theme.api4-explorer-page fieldset div.api4-input {
+  margin-bottom: 10px;
+}
+
+#bootstrap-theme.api4-explorer-page fieldset div.api4-input.ui-sortable-helper {
+  background-color: rgba(255, 255, 255, .9);
+}
+
+#bootstrap-theme.api4-explorer-page fieldset div.api4-input.ui-sortable-helper {
+  background-color: rgba(255, 255, 255, .9);
+}
+
+#bootstrap-theme.api4-explorer-page div.api4-input.form-inline .form-control {
+  margin-right: 6px;
+}
+
+#bootstrap-theme.api4-explorer-page div.api4-input.form-inline .form-control:not(.api4-option-selected) {
+  transition: none;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+}
+
+#bootstrap-theme.api4-explorer-page div.api4-input.form-inline .form-control label {
+  font-weight: normal;
+  position: relative;
+  top: -2px;
+}
+
+#bootstrap-theme.api4-explorer-page .api4-where-fieldset fieldset {
+  float: right;
+  width: calc(100% - 58px);
+  margin-top: -8px;
+}
+
+#bootstrap-theme.api4-explorer-page .api4-where-fieldset.api4-sorting fieldset .api4-where-group-sortable {
+  min-height: 3.5em;
+}
+
+#bootstrap-theme.api4-explorer-page .api4-input-group {
+  display: inline-block;
+}
+
+#bootstrap-theme.api4-explorer-page .api4-clause-badge {
+  width: 55px;
+  display: inline-block;
+  cursor: move;
+}
+#bootstrap-theme.api4-explorer-page .api4-clause-badge .badge {
+  opacity: .5;
+  position: relative;
+}
+#bootstrap-theme.api4-explorer-page .api4-clause-badge .caret {
+  margin: 0;
+}
+#bootstrap-theme.api4-explorer-page .api4-clause-badge .crm-i {
+  display: none;
+  padding: 0 6px;
+}
+#bootstrap-theme.api4-explorer-page .ui-sortable-helper .api4-clause-badge .badge span {
+  display: none;
+}
+#bootstrap-theme.api4-explorer-page .ui-sortable-helper .api4-clause-badge .crm-i {
+  display: inline-block;
+}
+
+#bootstrap-theme.api4-explorer-page .api4-operator {
+  width: 70px;
+}
+
+#bootstrap-theme.api4-explorer-page .api4-add-where-group-menu {
+  min-width: 80px;
+  background-color: rgba(186, 225, 251, 0.94);
+}
+#bootstrap-theme.api4-explorer-page .api4-add-where-group-menu a {
+  padding: 5px 10px;
+}
+
+/* Collapsible optgroups for select2 */
+div.select2-drop.collapsible-optgroups-enabled .select2-result-with-children:not(.optgroup-expanded) > .select2-result-sub > li.select2-result {
+  display: none;
+}
+div.select2-drop.collapsible-optgroups-enabled .select2-result-with-children > .select2-result-label:before {
+  font-family: FontAwesome;
+  content: "\f0da";
+  display: inline-block;
+  padding-right: 3px;
+  vertical-align: middle;
+  font-weight: normal;
+}
+div.select2-drop.collapsible-optgroups-enabled .select2-result-with-children.optgroup-expanded > .select2-result-label:before {
+  content: "\f0d7";
+}

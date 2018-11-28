@@ -281,6 +281,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is Required'),
           'description' => 'Is membership sign up optional',
+          'default' => '0',
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',

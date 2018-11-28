@@ -7,21 +7,21 @@
     <url desc="Support">https://github.com/iATSPayments/com.iatspayments.civicrm/issues?state=open</url>
     <url desc="Installation Instructions">https://github.com/iATSPayments/com.iatspayments.civicrm</url>
     <url desc="Documentation">https://github.com/iATSPayments/com.iatspayments.civicrm</url>
-    <url desc="Release Notes">https://github.com/iATSPayments/com.iatspayments.civicrm/blob/master/release-notes/1.6.1.md</url>
+    <url desc="Release Notes">https://github.com/iATSPayments/com.iatspayments.civicrm/blob/master/release-notes/1.6.2.md</url>
     <url desc="Getting Started">https://www.semper-it.com/civicamp-iats-payments-slides</url>
   </urls>
-  <license>AGPL</license>
+  <license>AGPL-3.0</license>
   <maintainer>
     <author>Alan Dixon</author>
     <email>iats@blackflysolutions.ca</email>
   </maintainer>
-  <releaseDate>2017-10-17</releaseDate>
-  <version>1.6.1</version>
+  <releaseDate>2018-08-15</releaseDate>
+  <version>1.6.2</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>4.7</ver>
+    <ver>5.0</ver>
   </compatibility>
-  <comments>This is a CiviCRM 4.7-only release. Please see the current release notes linked above for details.
+  <comments>This release resolves some 5.x compatibility issues, but should continue to work on 4.7.x. Please see the current release notes linked above for details.
 </comments>
   <civix>
     <namespace>CRM/iATS</namespace>

@@ -262,7 +262,19 @@
     <title>Field Option Group</title>
     <comment>For elements with options, the option group id that is used</comment>
     <add>1.4</add>
+    <pseudoconstant>
+      <table>civicrm_option_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
   </field>
+  <foreignKey>
+    <name>option_group_id</name>
+    <table>civicrm_option_group</table>
+    <key>id</key>
+    <add>5.6</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
   <field>
     <name>filter</name>
     <type>varchar</type>

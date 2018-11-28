@@ -141,12 +141,15 @@ class CRM_Core_JobManager {
       $params = $job->apiParams;
     }
 
+    CRM_Utils_Hook::preJob($job, $params);
     try {
       $result = civicrm_api($job->api_entity, $job->api_action, $params);
     }
     catch (Exception$e) {
       $this->logEntry('Error while executing ' . $job->name . ': ' . $e->getMessage());
+      $result = $e;
     }
+    CRM_Utils_Hook::postJob($job, $params, $result);
     $this->logEntry('Finished execution of ' . $job->name . ' with result: ' . $this->_apiResultToMessage($result));
     $this->currentJob = FALSE;
 

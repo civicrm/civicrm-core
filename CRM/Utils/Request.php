@@ -126,8 +126,10 @@ class CRM_Utils_Request {
     }
 
     // minor hack for action
-    if ($name == 'action' && is_string($value)) {
-      $value = CRM_Core_Action::resolve($value);
+    if ($name == 'action') {
+      if (!is_numeric($value) && is_string($value)) {
+        $value = CRM_Core_Action::resolve($value);
+      }
     }
 
     if (isset($value) && $store) {

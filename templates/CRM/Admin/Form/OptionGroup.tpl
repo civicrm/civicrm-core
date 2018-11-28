@@ -52,6 +52,10 @@
               <td class="label">{$form.is_active.label}</td>
               <td>{$form.is_active.html}</td>
           </tr>
+        <tr class="crm-admin-optiongroup-form-block-is_reserved">
+          <td class="label">{$form.is_reserved.label}</td>
+          <td>{$form.is_reserved.html}</td>
+        </tr>
       </table>
      {/if}
      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

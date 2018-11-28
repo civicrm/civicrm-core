@@ -228,35 +228,38 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     );
 
     if ($isSMSmode) {
-      $includeFilters = array(
-        "mg.group_type = 'Include'",
-        'mg.search_id IS NULL',
-        "$contact.is_opt_out = 0",
-        "$contact.do_not_sms = 0",
-        "$contact.is_deceased <> 1",
-        "$entityTable.phone_type_id = " . CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_Phone', 'phone_type_id', 'Mobile'),
-        "$entityTable.phone IS NOT NULL",
-        "$entityTable.phone != ''",
-        "$entityTable.is_primary = 1",
-        "mg.mailing_id = #mailingID",
-        'temp.contact_id IS null',
+      $criteria = array(
+        'is_opt_out' => CRM_Utils_SQL_Select::fragment()->where("$contact.is_opt_out = 0"),
+        'is_deceased' => CRM_Utils_SQL_Select::fragment()->where("$contact.is_deceased <> 1"),
+        'do_not_sms' => CRM_Utils_SQL_Select::fragment()->where("$contact.do_not_sms = 0"),
+        'location_filter' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.phone_type_id = " . CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_Phone', 'phone_type_id', 'Mobile')),
+        'phone_not_null' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.phone IS NOT NULL"),
+        'phone_not_empty' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.phone != ''"),
+        'is_primary' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.is_primary = 1"),
+        'mailing_id' => CRM_Utils_SQL_Select::fragment()->where("mg.mailing_id = #mailingID"),
+        'temp_contact_null' => CRM_Utils_SQL_Select::fragment()->where('temp.contact_id IS null'),
+        'order_by' => CRM_Utils_SQL_Select::fragment()->orderBy("$entityTable.is_primary = 1"),
       );
-      $order_by = array("$entityTable.is_primary = 1");
     }
     else {
       // Criterias to filter recipients that need to be included
-      $includeFilters = array(
-        "$contact.do_not_email = 0",
-        "$contact.is_opt_out = 0",
-        "$contact.is_deceased <> 1",
-        $location_filter,
-        "$entityTable.email IS NOT NULL",
-        "$entityTable.email != ''",
-        "$entityTable.on_hold = 0",
-        "mg.mailing_id = #mailingID",
-        'temp.contact_id IS NULL',
+      $criteria = array(
+        'do_not_email' => CRM_Utils_SQL_Select::fragment()->where("$contact.do_not_email = 0"),
+        'is_opt_out' => CRM_Utils_SQL_Select::fragment()->where("$contact.is_opt_out = 0"),
+        'is_deceased' => CRM_Utils_SQL_Select::fragment()->where("$contact.is_deceased <> 1"),
+        'location_filter' => CRM_Utils_SQL_Select::fragment()->where($location_filter),
+        'email_not_null' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.email IS NOT NULL"),
+        'email_not_empty' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.email != ''"),
+        'email_not_on_hold' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.on_hold = 0"),
+        'mailing_id' => CRM_Utils_SQL_Select::fragment()->where("mg.mailing_id = #mailingID"),
+        'temp_contact_null' => CRM_Utils_SQL_Select::fragment()->where('temp.contact_id IS NULL'),
+        'order_by' => CRM_Utils_SQL_Select::fragment()->orderBy($order_by),
       );
     }
+
+    // Allow user to alter query responsible to fetch mailing recipients before build,
+    //   by changing the mail filters identified $params
+    CRM_Utils_Hook::alterMailingRecipients($mailingObj, $criteria, 'pre');
 
     // Get the group contacts, but only those which are not in the
     // exclusion temp table.
@@ -268,7 +271,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         ->join('mg', " INNER JOIN civicrm_mailing_group mg  ON  gc.group_id = mg.entity_id AND mg.search_id IS NULL ")
         ->join('temp', " LEFT JOIN $excludeTempTablename temp ON $contact.id = temp.contact_id ")
         ->where('gc.group_id IN (#groups) AND gc.status = "Added"')
-        ->where($includeFilters)
+        ->merge($criteria)
         ->groupBy(array("$contact.id", "$entityTable.id"))
         ->replaceInto($includedTempTablename, array('contact_id', $entityColumn))
         ->param('#groups', $recipientsGroup['Include'])
@@ -298,8 +301,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         ->join('temp', " LEFT JOIN $excludeTempTablename temp ON $contact.id = temp.contact_id ")
         ->where('gc.group_id IN (#groups)')
         ->where('gcr.status IS NULL OR gcr.status != "Removed"')
-        ->where($includeFilters)
-        ->orderBy($order_by)
+        ->merge($criteria)
         ->replaceInto($includedTempTablename, array('contact_id', $entityColumn))
         ->param('#groups', $includeSmartGroupIDs)
         ->param('#mailingID', $mailingID)
@@ -375,6 +377,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $mailingGroup->reset();
     $mailingGroup->query(" DROP TEMPORARY TABLE $excludeTempTablename ");
     $mailingGroup->query(" DROP TEMPORARY TABLE $includedTempTablename ");
+
+    CRM_Utils_Hook::alterMailingRecipients($mailingObj, $criteria, 'post');
   }
 
   /**
@@ -823,14 +827,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    */
   private function getHeaderFooter() {
     if (!$this->header and $this->header_id) {
-      $this->header = new CRM_Mailing_BAO_Component();
+      $this->header = new CRM_Mailing_BAO_MailingComponent();
       $this->header->id = $this->header_id;
       $this->header->find(TRUE);
       $this->header->free();
     }
 
     if (!$this->footer and $this->footer_id) {
-      $this->footer = new CRM_Mailing_BAO_Component();
+      $this->footer = new CRM_Mailing_BAO_MailingComponent();
       $this->footer->id = $this->footer_id;
       $this->footer->find(TRUE);
       $this->footer->free();
@@ -1458,7 +1462,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
     $mailing->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
 
-    if (!isset($params['replyto_email']) &&
+    if (((!$id && empty($params['replyto_email'])) || !isset($params['replyto_email'])) &&
       isset($params['from_email'])
     ) {
       $params['replyto_email'] = $params['from_email'];
@@ -1691,8 +1695,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     if (!Civi::settings()->get('disable_mandatory_tokens_check')) {
-      $header = $mailing->header_id && $mailing->header_id != 'null' ? CRM_Mailing_BAO_Component::findById($mailing->header_id) : NULL;
-      $footer = $mailing->footer_id && $mailing->footer_id != 'null' ? CRM_Mailing_BAO_Component::findById($mailing->footer_id) : NULL;
+      $header = $mailing->header_id && $mailing->header_id != 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->header_id) : NULL;
+      $footer = $mailing->footer_id && $mailing->footer_id != 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->footer_id) : NULL;
       foreach (array('body_html', 'body_text') as $field) {
         if (empty($mailing->{$field})) {
           continue;
@@ -1784,7 +1788,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'forward' => CRM_Mailing_Event_BAO_Forward::getTableName(),
       'url' => CRM_Mailing_BAO_TrackableURL::getTableName(),
       'urlopen' => CRM_Mailing_Event_BAO_TrackableURLOpen::getTableName(),
-      'component' => CRM_Mailing_BAO_Component::getTableName(),
+      'component' => CRM_Mailing_BAO_MailingComponent::getTableName(),
       'spool' => CRM_Mailing_BAO_Spool::getTableName(),
     );
 
@@ -2718,7 +2722,7 @@ SELECT  $mailing.id as mailing_id
 
     if (!$isSMS) {
       if ($report['mailing']['header_id']) {
-        $header = new CRM_Mailing_BAO_Component();
+        $header = new CRM_Mailing_BAO_MailingComponent();
         $header->id = $report['mailing']['header_id'];
         $header->find(TRUE);
         $htmlHeader = $header->body_html;
@@ -2726,7 +2730,7 @@ SELECT  $mailing.id as mailing_id
       }
 
       if ($report['mailing']['footer_id']) {
-        $footer = new CRM_Mailing_BAO_Component();
+        $footer = new CRM_Mailing_BAO_MailingComponent();
         $footer->id = $report['mailing']['footer_id'];
         $footer->find(TRUE);
         $htmlFooter = $footer->body_html;

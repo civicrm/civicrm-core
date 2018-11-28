@@ -66,7 +66,7 @@
           value = fmt.decode($route.current.params[options.param]);
         }
         else {
-          value = _.isObject(options.default) ? angular.extend({}, options.default) : options.default;
+          value = _.cloneDeep(options.default);
           ignorable[options.param] = fmt.encode(options.default);
         }
         $parse(options.expr).assign(_scope, value);

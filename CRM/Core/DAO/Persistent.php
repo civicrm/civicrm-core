@@ -132,6 +132,7 @@ class CRM_Core_DAO_Persistent extends CRM_Core_DAO {
           'title' => ts('Is Configuration?'),
           'description' => 'Config Settings',
           'required' => TRUE,
+          'default' => '0',
           'table_name' => 'civicrm_persistent',
           'entity' => 'Persistent',
           'bao' => 'CRM_Core_BAO_Persistent',

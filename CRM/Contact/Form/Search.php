@@ -386,10 +386,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    CRM_Core_Resources::singleton()
-      // jsTree is needed for tags popup
-      ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
-      ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
 
     // some tasks.. what do we want to do with the selected contacts ?
     $this->_taskList = $this->buildTaskList();
@@ -497,7 +493,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     if ($qfKeyParam && ($this->get('component_mode') <= CRM_Contact_BAO_Query::MODE_CONTACTS || $this->get('component_mode') == CRM_Contact_BAO_Query::MODE_CONTACTSRELATED)) {
       $this->addClass('crm-ajax-selection-form');
       $qfKeyParam = "civicrm search {$qfKeyParam}";
-      $selectedContactIdsArr = CRM_Core_BAO_PrevNextCache::getSelection($qfKeyParam);
+      $selectedContactIdsArr = Civi::service('prevnext')->getSelection($qfKeyParam);
       $selectedContactIds = array_keys($selectedContactIdsArr[$qfKeyParam]);
     }
 
@@ -782,7 +778,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     ) {
       //reset the cache table for new search
       $cacheKey = "civicrm search {$this->controller->_key}";
-      CRM_Core_BAO_PrevNextCache::deleteItem(NULL, $cacheKey);
+      Civi::service('prevnext')->deleteItem(NULL, $cacheKey);
     }
 
     //get the button name

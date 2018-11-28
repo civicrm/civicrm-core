@@ -111,14 +111,12 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $group->id = $se->group_id;
     $group->find(TRUE);
 
-    $component = new CRM_Mailing_BAO_Component();
+    $component = new CRM_Mailing_BAO_MailingComponent();
     $component->is_default = 1;
     $component->is_active = 1;
     $component->component_type = 'Welcome';
 
     $component->find(TRUE);
-
-    $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
 
     $html = $component->body_html;
 
@@ -143,11 +141,11 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $mailParams = array(
       'groupName' => 'Mailing Event ' . $component->component_type,
       'subject' => $component->subject,
-      'from' => "\"$domainEmailName\" <do-not-reply@$emailDomain>",
+      'from' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
       'toEmail' => $email,
       'toName' => $display_name,
-      'replyTo' => "do-not-reply@$emailDomain",
-      'returnPath' => "do-not-reply@$emailDomain",
+      'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'html' => $html,
       'text' => $text,
     );

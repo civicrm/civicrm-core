@@ -9,8 +9,6 @@
  *
  * @param array $params
  *
- * @return array
- *
  * Record an entry from iATSPayments into the journal table
  */
 function _civicrm_api3_iats_payments_journal_spec(&$params) {
@@ -36,13 +34,13 @@ function civicrm_api3_iats_payments_journal($params) {
   //return civicrm_api3_create_success(TRUE, array('test' => TRUE));
   try {
     $data = $params['data'];
-    $dtm = date('YmdHis',$params['receive_date']);
+    $dtm = date('YmdHis', $params['receive_date']);
     $defaults = array(
-      'Client Code' => '', 
+      'Client Code' => '',
       'Method of Payment' => '',
-      'Comment' => ''
+      'Comment' => '',
     );
-    foreach($defaults as $key => $default) {
+    foreach ($defaults as $key => $default) {
       $data[$key] = empty($data[$key]) ? $default : $data[$key];
     }
     // There are unique keys on tnid (transaction) and iats_id (journal)
@@ -67,13 +65,12 @@ function civicrm_api3_iats_payments_journal($params) {
       10 => array($data['Comment'], 'String'),
       11 => array($params['status_id'], 'Integer'),
     );
-    $result = CRM_Core_DAO::executeQuery($sql_action ." civicrm_iats_journal
+    $result = CRM_Core_DAO::executeQuery($sql_action . " civicrm_iats_journal
         (tnid, iats_id, dtm, agt, cstc, inv, amt, rst, tntyp, cm, status_id) VALUES (%1, $iats_journal_id, %3, %4, %5, %6, %7, %8, %9, %10, %11)", $query_params);
   }
   catch (Exception $e) {
-    CRM_Core_Error::debug_var('params',$params);
-    // throw CiviCRM_API3_Exception('iATS Payments journalling failed: '. $e->getMessage());
+    CRM_Core_Error::debug_var('params', $params);
+    // throw CiviCRM_API3_Exception('iATS Payments journalling failed: ' . $e->getMessage());
   }
   return civicrm_api3_create_success();
 }
-

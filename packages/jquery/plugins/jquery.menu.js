@@ -22,7 +22,6 @@
 		menuDIVElement = $('<div class="menu-div outerbox" style="position:absolute;top:0;left:0;display:none;"><div class="shadowbox1"></div><div class="shadowbox2"></div><div class="shadowbox3"></div></div>')[0],
 		menuULElement = $('<ul class="menu-ul innerbox"></ul>')[0],
 		menuItemElement = $('<li style="position:relative;"><div class="menu-item"></div></li>')[0],
-		arrowElement = $('<img class="menu-item-arrow" />')[0],
 		$rootDiv = $('<div id="root-menu-div" style="position:absolute;top:0;left:0;"></div>'), //create main menu div
 		defaults = {
 			// $.Menu options
@@ -37,7 +36,7 @@
 
 			// $.MenuItem options
 			onClick: null,
-			arrowSrc: null,
+			arrowClass: null,
 			addExpando: false,
 			
 			// $.fn.menuFromElement options
@@ -132,7 +131,7 @@
 				t = t.parentNode;
 
 			//is the found node one of the visible menu elements?
-			if ( !$(visibleMenus).filter(function(){ return this.$eDIV[0] == t }).length )
+			if ( !$(visibleMenus).filter(function(){ return this.$eDIV[0] == t; }).length )
 			{
 				$.Menu.closeAll();
 			}
@@ -795,11 +794,9 @@
 				this.subMenu = menu;
 				if ( this.parentMenu && $.inArray(menu, this.parentMenu.subMenus) == -1 )
 					this.parentMenu.subMenus.push(menu);
-				if ( this.settings.arrowSrc )
-				{
-					var a = arrowElement.cloneNode(0);
-					a.setAttribute('src', this.settings.arrowSrc);
-					this.$eLI[0].firstChild.appendChild(a);
+				if ( this.settings.arrowClass ) {
+					var a = $('<i class="menu-item-arrow"></i>').addClass(this.settings.arrowClass);
+					this.$eLI[0].firstChild.appendChild(a[0]);
 				}
 			}
 		}

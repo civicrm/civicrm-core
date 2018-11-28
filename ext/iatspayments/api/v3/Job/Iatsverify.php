@@ -51,6 +51,12 @@ function _civicrm_api3_job_iatsverify_spec(&$spec) {
 /**
  * Job.IatsVerify API.
  *
+ * Look up all incomplete or pending (status = 2) contributions and see if they've been received approved or rejected payments
+ * at iATS, looked up via the Journal
+ * Update the corresponding recurring contribution record to status = 1 (or 4)
+ * This works for both the initial contribution and subsequent contributions of recurring contributions, as well as one offs.
+ * TODO: what kind of alerts should be provided if it fails?
+ *
  * @param array $params
  *
  * @return array API result descriptor
@@ -59,12 +65,6 @@ function _civicrm_api3_job_iatsverify_spec(&$spec) {
  * @see civicrm_api3_create_error
  *
  * @throws API_Exception
- *  * Look up all incomplete or pending (status = 2) contributions and see if they've been received approved or rejected payments 
- * at iATS, looked up via the Journal
- * Update the corresponding recurring contribution record to status = 1 (or 4)
- * This works for both the initial contribution and subsequent contributions of recurring contributions, as well as one offs.
- * TODO: what kind of alerts should be provided if it fails?
- *
  */
 function civicrm_api3_job_iatsverify($params) {
 
@@ -80,12 +80,11 @@ function civicrm_api3_job_iatsverify($params) {
   $processed = array(1 => 0, 4 => 0);
   // Save all my api error result messages.
   $error_log = array();
-  //
   $select_params = array(
     'sequential' => 1,
     'receive_date' => array('>' => "now - $verify_days day"),
     'options' => array('limit' => 0),
-    'contribution_status_id' => array('NOT IN' => array('Completed', 'Failed')),
+    'contribution_status_id' => array('IN' => array('Pending')),
     'invoice_id' => array('IS NOT NULL' => 1),
     'contribution_test' => 0,
     'return' => array('trxn_id', 'invoice_id', 'contribution_recur_id', 'contact_id', 'source'),
@@ -146,7 +145,7 @@ function civicrm_api3_job_iatsverify($params) {
                 }
                 catch (CiviCRM_API3_Exception $e) {
                   $is_email_receipt = 0;
-                  $error_log[] = $e->getMessage() ."\n";
+                  $error_log[] = $e->getMessage() . "\n";
                 }
               }
               $complete['is_email_receipt'] = $is_email_receipt;
@@ -155,19 +154,19 @@ function civicrm_api3_job_iatsverify($params) {
               $contributionResult = civicrm_api3('contribution', 'completetransaction', $complete);
             }
             catch (CiviCRM_API3_Exception $e) {
-              $error_log[] = 'Failed to complete transaction: '. $e->getMessage() ."\n";
+              $error_log[] = 'Failed to complete transaction: ' . $e->getMessage() . "\n";
             }
 
             // Restore source field and trxn_id that completetransaction overwrites
             civicrm_api3('contribution', 'create', array(
-              'id' => $contribution['id'], 
+              'id' => $contribution['id'],
               'source' => $contribution['source'],
-              'trxn_id' => $trxn_id
+              'trxn_id' => $trxn_id,
             ));
           case 4: // failed, just update the contribution status.
             civicrm_api3('Contribution', 'create', array(
               'id' => $contribution['id'],
-              'contribution_status_id' => $contribution_status_id
+              'contribution_status_id' => $contribution_status_id,
             ));
         }
         // Always log these requests in my cutom civicrm table for auditing type purposes
@@ -192,14 +191,14 @@ function civicrm_api3_job_iatsverify($params) {
     }
   }
   catch (CiviCRM_API3_Exception $e) {
-    $error_log[] = $e->getMessage() ."\n";
+    $error_log[] = $e->getMessage() . "\n";
   }
   $message .= '<br />' . ts('Completed with %1 errors.',
     array(
       1 => count($error_log),
     )
   );
-  $message .= '<br />' . ts('Processed %1 approvals and %2 rejection records from the previous ' . IATS_VERIFY_DAYS . ' days.', 
+  $message .= '<br />' . ts('Processed %1 approvals and %2 rejection records from the previous ' . IATS_VERIFY_DAYS . ' days.',
     array(
       1 => $processed[1],
       2 => $processed[4],

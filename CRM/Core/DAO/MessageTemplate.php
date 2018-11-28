@@ -224,6 +224,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Message Template is used for SMS?'),
           'description' => 'Is this message template used for sms?',
+          'default' => '0',
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',

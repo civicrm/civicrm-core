@@ -154,17 +154,27 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    * @return null|int
    */
   public static function getInstrumentFinancialAccount($paymentInstrumentValue) {
-    $paymentInstrument = civicrm_api3('OptionValue', 'getsingle', array(
-      'return' => array("id"),
-      'value' => $paymentInstrumentValue,
-      'option_group_id' => "payment_instrument",
-    ));
-    $financialAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount(
-      $paymentInstrument['id'],
-      NULL,
-      'civicrm_option_value'
-    );
-    return $financialAccountId;
+    if (!isset(\Civi::$statics[__CLASS__]['instrument_financial_accounts'][$paymentInstrumentValue])) {
+      $paymentInstrumentID = civicrm_api3('OptionValue', 'getvalue', array(
+        'return' => 'id',
+        'value' => $paymentInstrumentValue,
+        'option_group_id' => "payment_instrument",
+      ));
+      $accounts = civicrm_api3('EntityFinancialAccount', 'get', [
+        'return' => 'financial_account_id',
+        'entity_table' => 'civicrm_option_value',
+        'entity_id' => $paymentInstrumentID,
+        'options' => ['limit' => 1],
+        'sequential' => 1,
+      ])['values'];
+      if (empty($accounts)) {
+        \Civi::$statics[__CLASS__]['instrument_financial_accounts'][$paymentInstrumentValue] = NULL;
+      }
+      else {
+        \Civi::$statics[__CLASS__]['instrument_financial_accounts'][$paymentInstrumentValue] = $accounts[0]['financial_account_id'];
+      }
+    }
+    return \Civi::$statics[__CLASS__]['instrument_financial_accounts'][$paymentInstrumentValue];
   }
 
   /**

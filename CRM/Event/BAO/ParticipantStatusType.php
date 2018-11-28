@@ -125,7 +125,6 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
 
     $returnMessages = array();
 
-    $participantRole = CRM_Event_PseudoConstant::participantRole();
     $pendingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Pending'");
     $expiredStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'");
     $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
@@ -137,8 +136,6 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
     $expiredParticipantCount = $waitingConfirmCount = $waitingApprovalCount = 0;
 
     //get all participant who's status in class pending and waiting
-    $query = "SELECT * FROM civicrm_participant WHERE status_id IN {$statusIds} ORDER BY register_date";
-
     $query = "
    SELECT  participant.id,
            participant.contact_id,

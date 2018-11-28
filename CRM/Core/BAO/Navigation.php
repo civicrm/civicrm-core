@@ -50,8 +50,8 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return CRM_Core_DAO_Navigation|NULL
-   *   DAO object on success, NULL otherwise
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_Navigation', $id, 'is_active', $is_active);
@@ -70,6 +70,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
     if (empty($params['id'])) {
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
       $params['has_separator'] = CRM_Utils_Array::value('has_separator', $params, FALSE);
+      $params['domain_id'] = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
     }
 
     if (!isset($params['id']) ||
@@ -92,8 +93,6 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
     }
 
     $navigation->copyValues($params);
-
-    $navigation->domain_id = CRM_Core_Config::domainID();
 
     $navigation->save();
     return $navigation;
@@ -483,7 +482,6 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     $parentID = CRM_Utils_Array::value('parentID', $value['attributes']);
     $navID = CRM_Utils_Array::value('navID', $value['attributes']);
     $active = CRM_Utils_Array::value('active', $value['attributes']);
-    $menuName = CRM_Utils_Array::value('name', $value['attributes']);
     $target = CRM_Utils_Array::value('target', $value['attributes']);
 
     if (in_array($parentID, $skipMenuItems) || !$active) {
@@ -494,8 +492,9 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     $config = CRM_Core_Config::singleton();
 
     $makeLink = FALSE;
-    if (isset($url) && $url) {
-      if (substr($url, 0, 4) !== 'http') {
+    if (!empty($url)) {
+      // Skip processing fully-formed urls
+      if (substr($url, 0, 4) !== 'http' && $url[0] !== '/' && $url[0] !== '#') {
         //CRM-7656 --make sure to separate out url path from url params,
         //as we'r going to validate url path across cross-site scripting.
         $parsedUrl = parse_url($url);

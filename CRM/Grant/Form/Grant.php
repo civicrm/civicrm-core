@@ -141,22 +141,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       if (isset($defaults['amount_granted'])) {
         $defaults['amount_granted'] = CRM_Utils_Money::format($defaults['amount_granted'], NULL, '%a');
       }
-
-      $dates = array(
-        'application_received_date',
-        'decision_date',
-        'money_transfer_date',
-        'grant_due_date',
-      );
-
-      foreach ($dates as $key) {
-        if (!empty($defaults[$key])) {
-          list($defaults[$key]) = CRM_Utils_Date::setDateDefaults($defaults[$key]);
-        }
-      }
-    }
-    else {
-      list($defaults['application_received_date']) = CRM_Utils_Date::setDateDefaults();
     }
 
     return $defaults;
@@ -196,10 +180,10 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
 
     $this->addSelect('status_id', array(), TRUE);
 
-    $this->addDate('application_received_date', ts('Application Received'), FALSE, array('formatType' => 'custom'));
-    $this->addDate('decision_date', ts('Grant Decision'), FALSE, array('formatType' => 'custom'));
-    $this->addDate('money_transfer_date', ts('Money Transferred'), FALSE, array('formatType' => 'custom'));
-    $this->addDate('grant_due_date', ts('Grant Report Due'), FALSE, array('formatType' => 'custom'));
+    $this->add('datepicker', 'application_received_date', ts('Application Received'), [], FALSE, ['time' => FALSE]);
+    $this->add('datepicker', 'decision_date', ts('Grant Decision'), [], FALSE, ['time' => FALSE]);
+    $this->add('datepicker', 'money_transfer_date', ts('Money Transferred'), [], FALSE, ['time' => FALSE]);
+    $this->add('datepicker', 'grant_due_date', ts('Grant Report Due'), [], FALSE, ['time' => FALSE]);
 
     $this->addElement('checkbox', 'grant_report_received', ts('Grant Report Received?'), NULL);
     $this->add('textarea', 'rationale', ts('Rationale'), $attributes['rationale']);

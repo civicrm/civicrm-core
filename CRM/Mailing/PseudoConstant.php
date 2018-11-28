@@ -158,13 +158,13 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
       }
       if (!$type) {
         self::$component[$name] = NULL;
-        CRM_Core_PseudoConstant::populate(self::$component[$name], 'CRM_Mailing_DAO_Component');
+        CRM_Core_PseudoConstant::populate(self::$component[$name], 'CRM_Mailing_BAO_MailingComponent');
       }
       else {
         // we need to add an additional filter for $type
         self::$component[$name] = array();
 
-        $object = new CRM_Mailing_DAO_Component();
+        $object = new CRM_Mailing_BAO_MailingComponent();
         $object->component_type = $type;
         $object->selectAdd();
         $object->selectAdd("id, name");

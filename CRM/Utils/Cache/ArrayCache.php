@@ -36,10 +36,17 @@
  */
 class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
 
+  use CRM_Utils_Cache_NaiveMultipleTrait;
+  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+
+  const DEFAULT_TIMEOUT = 3600;
+
   /**
    * The cache storage container, an in memory array by default
    */
   protected $_cache;
+
+  protected $_expires;
 
   /**
    * Constructor.
@@ -51,35 +58,67 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
    */
   public function __construct($config) {
     $this->_cache = array();
+    $this->_expires = array();
   }
 
   /**
    * @param string $key
    * @param mixed $value
+   * @param null|int|\DateInterval $ttl
+   * @return bool
+   * @throws \Psr\SimpleCache\InvalidArgumentException
    */
-  public function set($key, &$value) {
-    $this->_cache[$key] = $value;
+  public function set($key, $value, $ttl = NULL) {
+    CRM_Utils_Cache::assertValidKey($key);
+    $this->_cache[$key] = $this->reobjectify($value);
+    $this->_expires[$key] = CRM_Utils_Date::convertCacheTtlToExpires($ttl, self::DEFAULT_TIMEOUT);
+    return TRUE;
   }
 
   /**
    * @param string $key
+   * @param mixed $default
    *
    * @return mixed
+   * @throws \Psr\SimpleCache\InvalidArgumentException
    */
-  public function get($key) {
-    return CRM_Utils_Array::value($key, $this->_cache);
+  public function get($key, $default = NULL) {
+    CRM_Utils_Cache::assertValidKey($key);
+    if (isset($this->_expires[$key]) && is_numeric($this->_expires[$key]) && $this->_expires[$key] <= time()) {
+      return $default;
+    }
+    if (array_key_exists($key, $this->_cache)) {
+      return $this->reobjectify($this->_cache[$key]);
+    }
+    return $default;
   }
 
   /**
    * @param string $key
+   * @return bool
+   * @throws \Psr\SimpleCache\InvalidArgumentException
    */
   public function delete($key) {
+    CRM_Utils_Cache::assertValidKey($key);
+
     unset($this->_cache[$key]);
+    unset($this->_expires[$key]);
+    return TRUE;
   }
 
   public function flush() {
     unset($this->_cache);
+    unset($this->_expires);
     $this->_cache = array();
+    return TRUE;
+  }
+
+  public function clear() {
+    return $this->flush();
+  }
+
+  private function reobjectify($value) {
+    return is_object($value) ? unserialize(serialize($value)) : $value;
   }
 
 }

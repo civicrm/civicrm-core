@@ -57,6 +57,11 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
   protected $_componentIds;
 
   /**
+   * @var int
+   */
+  protected $queryMode;
+
+  /**
    * The array that holds all the case ids
    *
    * @var array
@@ -70,9 +75,18 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    */
   public $_contactIds;
 
-  // Must be set to entity table name (eg. civicrm_participant) by child class
+  /**
+   * Must be set to entity table name (eg. civicrm_participant) by child class
+   *
+   * @var string
+   */
   static $tableName = NULL;
-  // Must be set to entity shortname (eg. event)
+
+  /**
+   * Must be set to entity shortname (eg. event)
+   *
+   * @var string
+   */
   static $entityShortname = NULL;
 
   /**
@@ -87,26 +101,25 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
   /**
    * Common pre-processing function.
    *
-   * @param CRM_Core_Form $form
-   * @param bool $useTable FIXME This parameter could probably be deprecated as it's not used here
+   * @param CRM_Core_Form_Task $form
    *
    * @throws \CRM_Core_Exception
    */
-  public static function preProcessCommon(&$form, $useTable = FALSE) {
+  public static function preProcessCommon(&$form) {
     $form->_entityIds = array();
 
-    $values = $form->controller->exportValues($form->get('searchFormName'));
+    $searchFormValues = $form->controller->exportValues($form->get('searchFormName'));
 
-    $form->_task = $values['task'];
+    $form->_task = $searchFormValues['task'];
     $className = 'CRM_' . ucfirst($form::$entityShortname) . '_Task';
     $entityTasks = $className::tasks();
     $form->assign('taskName', $entityTasks[$form->_task]);
 
-    $ids = array();
-    if ($values['radio_ts'] == 'ts_sel') {
-      foreach ($values as $name => $value) {
+    $entityIds = array();
+    if ($searchFormValues['radio_ts'] == 'ts_sel') {
+      foreach ($searchFormValues as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
-          $ids[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
+          $entityIds[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
         }
       }
     }
@@ -117,24 +130,22 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
         $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
       }
 
-      $query = new CRM_Contact_BAO_Query($queryParams, NULL, NULL, FALSE, FALSE,
-        CRM_Contact_BAO_Query::MODE_CASE
-      );
+      $query = new CRM_Contact_BAO_Query($queryParams, NULL, NULL, FALSE, FALSE, $form->getQueryMode());
       $query->_distinctComponentClause = " ( " . $form::$tableName . ".id )";
       $query->_groupByComponentClause = " GROUP BY " . $form::$tableName . ".id ";
       $result = $query->searchQuery(0, 0, $sortOrder);
       $selector = $form::$entityShortname . '_id';
       while ($result->fetch()) {
-        $ids[] = $result->$selector;
+        $entityIds[] = $result->$selector;
       }
     }
 
-    if (!empty($ids)) {
-      $form->_componentClause = ' ' . $form::$tableName . '.id IN ( ' . implode(',', $ids) . ' ) ';
-      $form->assign('totalSelected' . ucfirst($form::$entityShortname) . 's', count($ids));
+    if (!empty($entityIds)) {
+      $form->_componentClause = ' ' . $form::$tableName . '.id IN ( ' . implode(',', $entityIds) . ' ) ';
+      $form->assign('totalSelected' . ucfirst($form::$entityShortname) . 's', count($entityIds));
     }
 
-    $form->_entityIds = $form->_componentIds = $ids;
+    $form->_entityIds = $form->_componentIds = $entityIds;
 
     // Some functions (eg. PDF letter tokens) rely on Ids being in specific fields rather than the generic $form->_entityIds
     // So we set that specific field here (eg. for cases $form->_caseIds = $form->_entityIds).
@@ -195,6 +206,16 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
         ),
       )
     );
+  }
+
+  /**
+   * Get the query mode (eg. CRM_Core_BAO_Query::MODE_CASE)
+   * Should be overridden by child classes in most cases
+   *
+   * @return int
+   */
+  public function getQueryMode() {
+    return $this->queryMode ?: CRM_Contact_BAO_Query::MODE_CONTACTS;
   }
 
 }

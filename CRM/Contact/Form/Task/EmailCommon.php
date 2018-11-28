@@ -89,7 +89,11 @@ class CRM_Contact_Form_Task_EmailCommon {
     }
 
     $form->_emails = $fromEmailValues;
+    $defaults = array();
     $form->_fromEmails = $fromEmailValues;
+    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
+    }
     if (is_numeric(key($form->_fromEmails))) {
       // Add signature
       $defaultEmail = civicrm_api3('email', 'getsingle', array('id' => key($form->_fromEmails)));
@@ -100,8 +104,8 @@ class CRM_Contact_Form_Task_EmailCommon {
       if (!empty($defaultEmail['signature_text'])) {
         $defaults['text_message'] = "\n\n--\n" . $defaultEmail['signature_text'];
       }
-      $form->setDefaults($defaults);
     }
+    $form->setDefaults($defaults);
   }
 
   /**

@@ -384,6 +384,10 @@ input.crm-form-entityref {
   text-align: right;
 }
 
+.crm-container .crm-section .label label{
+  white-space: normal;
+}
+
 .crm-container .label-left .label {
   text-align: left;
 }
@@ -2116,6 +2120,10 @@ a.crm-i:hover {
 
 .crm-i.crm-i-blue {
   color: #6177D5;
+}
+
+.crm-i.crm-i-green {
+  color: #86c661;
 }
 
 .crm-i-button {

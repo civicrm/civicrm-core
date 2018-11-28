@@ -13,6 +13,8 @@ require_once 'CRM/Core/Form.php';
  */
 class CRM_iATS_Form_IATSCustomerLink extends CRM_Core_Form {
 
+  private $iats_result = array();
+
   /**
    * Get the field names and labels expected by iATS CustomerLink,
    * and the corresponding fields in CiviCRM.
@@ -108,8 +110,26 @@ class CRM_iATS_Form_IATSCustomerLink extends CRM_Core_Form {
     // Make the soap request.
     $response = $iats->request($credentials, $params);
     // note: don't log this to the iats_response table.
-    $result = $iats->result($response, TRUE);
-    return $result;
+    $this->iats_result = $iats->result($response, TRUE);
+    return $this->iats_result;
+  }
+
+  /**
+   *  Get an appropriate message for the user after an update is attempted.
+   */
+  protected function getResultMessage() {
+    $message = array();
+    foreach($this->iats_result as $key => $value) {
+      $message[] = strtolower($key).": $value";
+    }
+    return '<pre>'.implode('<br />',$message).'</pre>';
+  }
+
+  /**
+   *  Test whether the update was successful
+   */
+  public function getAuthorizationResult() {
+    return $this->iats_result['AUTHORIZATIONRESULT'];
   }
 
   /**
@@ -175,12 +195,9 @@ class CRM_iATS_Form_IATSCustomerLink extends CRM_Core_Form {
   public function postProcess() {
     $values = $this->exportValues();
     // Send update to iATS
-    // print_r($values); die();
-    $result = $this->updateCreditCardCustomer($values);
-    $message = '<pre>' . print_r($result, TRUE) . '</pre>';
-    // , $type, $options);.
-    CRM_Core_Session::setStatus($message, 'Customer Updated');
-    if ($result['AUTHORIZATIONRESULT'] == 'OK') {
+    $this->updateCreditCardCustomer($values);
+    CRM_Core_Session::setStatus($this->getResultMessage(), 'Card Update Result');
+    if ('OK' == $this->getAuthorizationResult()) {
       // Update my copy of the expiry date.
       list($month, $year) = explode('/', $values['creditCardExpiry']);
       $exp = sprintf('%02d%02d', $year, $month);

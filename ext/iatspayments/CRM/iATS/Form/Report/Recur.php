@@ -208,6 +208,10 @@ class CRM_iATS_Form_Report_Recur extends CRM_Report_Form {
             'title' => ts('Amount'),
             'default' => TRUE,
           ),
+	  'financial_type_id' => array(
+	    'title' => ts('Financial Type'),
+	    'default' => TRUE,
+	  ),
           'contribution_status_id' => array(
             'title' => ts('Donation Status'),
           ),
@@ -454,6 +458,10 @@ class CRM_iATS_Form_Report_Recur extends CRM_Report_Form {
       // Handle contribution status id.
       if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_contribution_status_id', $row)) {
         $rows[$rowNum]['civicrm_contribution_recur_contribution_status_id'] = self::$contributionStatus[$value];
+      }
+      // handle financial type id
+      if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_financial_type_id', $row)) {
+        $rows[$rowNum]['civicrm_contribution_recur_financial_type_id'] = self::$financial_types[$value];
       }
       // Handle processor id.
       if ($value = CRM_Utils_Array::value('civicrm_contribution_recur_payment_processor_id', $row)) {
