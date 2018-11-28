@@ -208,7 +208,7 @@ return array(
       //'class' => 'crm-select2',
     ),
     'default' => 'default',
-    'add' => '5.6',
+    'add' => '5.9',
     'title' => 'PrevNext Cache',
     'is_domain' => 1,
     'is_contact' => 0,
