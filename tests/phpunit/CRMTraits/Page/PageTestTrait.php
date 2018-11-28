@@ -40,11 +40,23 @@ trait CRMTraits_Page_PageTestTrait {
   protected $pageContent;
 
   /**
+   * @var \CRM_Core_Page
+   */
+  protected $page;
+
+  /**
+   * @var string
+   */
+  protected $tplName;
+
+  /**
    * Variables assigned to smarty.
    *
    * @var array
    */
   protected $smartyVariables = [];
+
+  protected $context;
 
   /**
    * @param string $content
@@ -54,6 +66,9 @@ trait CRMTraits_Page_PageTestTrait {
    */
   public function checkPageContent(&$content, $context, $tplName, &$object) {
     $this->pageContent = $content;
+    $this->tplName = $tplName;
+    $this->page = $object;
+    $this->context = $context;
     // Ideally we would validate $content as valid html here.
     // Suppress console output.
     $content = '';
@@ -66,8 +81,10 @@ trait CRMTraits_Page_PageTestTrait {
    * @param $expectedStrings
    */
   protected function assertPageContains($expectedStrings) {
+    unset($this->smartyVariables['config']);
+    unset($this->smartyVariables['session']);
     foreach ($expectedStrings as $expectedString) {
-      $this->assertContains($expectedString, $this->pageContent);
+      $this->assertContains($expectedString, $this->pageContent, print_r($this->contributions, TRUE) . print_r($this->smartyVariables, TRUE));
     }
   }
 
@@ -79,6 +96,23 @@ trait CRMTraits_Page_PageTestTrait {
   protected function assertSmartyVariables($expectedVariables) {
     foreach ($expectedVariables as $variableName => $expectedValue) {
       $this->assertEquals($expectedValue, $this->smartyVariables[$variableName]);
+    }
+  }
+
+  /**
+   * Check an array assigned to smarty for the inclusion of the expected variables.
+   *
+   * @param string $variableName
+   * @param $index
+   * @param $expected
+   */
+  protected function assertSmartyVariableArrayIncludes($variableName, $index, $expected) {
+    $smartyVariable = $this->smartyVariables[$variableName];
+    if ($index !== NULL) {
+      $smartyVariable = $smartyVariable[$index];
+    }
+    foreach ($expected as $key => $value) {
+      $this->assertEquals($value, $smartyVariable[$key], 'Checking ' . $key);
     }
   }
 
