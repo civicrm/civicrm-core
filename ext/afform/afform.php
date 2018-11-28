@@ -212,7 +212,8 @@ function afform_civicrm_alterMenu(&$items) {
         'page_callback' => 'CRM_Afform_Page_AfformBase',
         'page_arguments' => 'afform=' . urlencode($name),
         'title' => CRM_Utils_Array::value('title', $meta, ''),
-        'access_arguments' => [['access CiviCRM'], 'and'] // FIXME
+        'access_arguments' => [['access CiviCRM'], 'and'], // FIXME
+        'is_public' => $meta['is_public'],
       ];
     }
   }

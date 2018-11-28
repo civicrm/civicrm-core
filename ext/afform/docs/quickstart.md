@@ -14,7 +14,7 @@ $ cv flush
 
 A few things to note:
 
-* We defined a route `civicrm/hello-world`. This is defined in the same routing system used by CiviCRM forms.
+* We defined a route `civicrm/hello-world`. This is defined in the same routing system used by CiviCRM forms. It also supports properties such as `title` (page title) and `is_public` (defaults to `false`).
 * The file `layout.html` is an AngularJS HTML document. It has access to all the general features of Angular HTML (discussed more later).
 * After creating a new form or file, we should flush the cache.
 * If you're going to actively edit/revise the content of the file, then you should navigate
