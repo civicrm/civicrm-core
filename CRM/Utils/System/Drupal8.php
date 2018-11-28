@@ -300,22 +300,18 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   ) {
     $query = html_entity_decode($query);
 
-    $url = \Drupal\civicrm\CivicrmHelper::parseURL("{$path}?{$query}");
-
     $config = CRM_Core_Config::singleton();
-    $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
+    $base = $absolute ? $config->userFrameworkBaseURL : 'internal:/';
+
+    $url = \Drupal\civicrm\CivicrmHelper::parseURL("{$path}?{$query}");
 
     // Not all links that CiviCRM generates are Drupal routes, so we use the weaker ::fromUri method.
     try {
-      // @todo currently there is no way to pass formatted $baseUrl as a parameter or in url,
-      //  so for now to bypass URI validation we are passing dummy string here and later replacing it with D8 base URL w/o language prefix
-      $url = str_replace('//dummy-link',
-        "{$base}{$url['path']}",
-        \Drupal\Core\Url::fromUri('//dummy-link', [
-          'query' => $url['query'],
-          'fragment' => $fragment,
-        ])->toString()
-      );
+      $url = \Drupal\Core\Url::fromUri("{$base}{$url['path']}", array(
+        'query' => $url['query'],
+        'fragment' => $fragment,
+        'absolute' => $absolute,
+      ))->toString();
     }
     catch (Exception $e) {
       \Drupal::logger('civicrm')->error($e->getMessage());
@@ -739,7 +735,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
         if ($urlType == \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::CONFIG_DOMAIN) {
           if (isset($language->domain) && $language->domain) {
             if ($addLanguagePart) {
-              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' .  $config['domains'][$language] . base_path();
+              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $config['domains'][$language] . base_path();
             }
             if ($removeLanguagePart && defined('CIVICRM_UF_BASEURL')) {
               $url = str_replace('\\', '/', $url);
