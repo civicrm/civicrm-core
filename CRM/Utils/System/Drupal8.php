@@ -300,11 +300,13 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   ) {
     $query = html_entity_decode($query);
 
+    $config = CRM_Core_Config::singleton();
+    $base = $absolute ? $config->userFrameworkBaseURL : 'base:';
     $url = \Drupal\civicrm\CivicrmHelper::parseURL("{$path}?{$query}");
 
     // Not all links that CiviCRM generates are Drupal routes, so we use the weaker ::fromUri method.
     try {
-      $url = \Drupal\Core\Url::fromUri("base:{$url['path']}", array(
+      $url = \Drupal\Core\Url::fromUri("{$base}{$url['path']}", array(
         'query' => $url['query'],
         'fragment' => $fragment,
         'absolute' => $absolute,
