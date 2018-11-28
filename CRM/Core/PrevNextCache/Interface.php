@@ -114,4 +114,15 @@ interface CRM_Core_PrevNextCache_Interface {
    */
   public function getCount($cacheKey);
 
+  /**
+   * Fetch a list of contacts from the prev/next cache for displaying a search results page
+   *
+   * @param string $cacheKey
+   * @param int $offset
+   * @param int $rowCount
+   * @return array
+   *   List of contact IDs (entity_id1).
+   */
+  public function fetch($cacheKey, $offset, $rowCount);
+
 }

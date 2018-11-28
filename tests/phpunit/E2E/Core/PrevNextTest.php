@@ -93,6 +93,19 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     $this->assertSelections([]);
   }
 
+  public function testFetch() {
+    $this->testFillArray();
+
+    $cids = $this->prevNext->fetch($this->cacheKey, 0, 2);
+    $this->assertEquals([100, 400], $cids);
+
+    $cids = $this->prevNext->fetch($this->cacheKey, 0, 4);
+    $this->assertEquals([100, 400, 200, 300], $cids);
+
+    $cids = $this->prevNext->fetch($this->cacheKey, 2, 2);
+    $this->assertEquals([200, 300], $cids);
+  }
+
   public function getFillFunctions() {
     return [
       ['testFillSql'],

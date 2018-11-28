@@ -197,6 +197,27 @@ return array(
     'description' => 'If set, this will be the default profile used for contact search.',
     'help_text' => NULL,
   ),
+  'prevNextBackend' => array(
+    'group_name' => 'Search Preferences',
+    'group' => 'Search Preferences',
+    'name' => 'prevNextBackend',
+    'type' => 'String',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => array(
+      //'class' => 'crm-select2',
+    ),
+    'default' => 'default',
+    'add' => '5.6',
+    'title' => 'PrevNext Cache',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Core_BAO_PrevNextCache::getPrevNextBackends',
+    ),
+    'description' => 'When performing a search, how should the search-results be cached?',
+    'help_text' => '',
+  ),
   'searchPrimaryDetailsOnly' => array(
     'group_name' => 'Search Preferences',
     'group' => 'Search Preferences',
