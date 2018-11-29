@@ -350,6 +350,8 @@
   {literal}
   <script type="text/javascript">
     CRM.$(function($) {
+      // trigger change event on financial type select list.
+      $('#financial_type_id').trigger('change');
     {/literal}
       {if $buildPriceSet}{literal}buildAmount();{/literal}{/if}
     {literal}
