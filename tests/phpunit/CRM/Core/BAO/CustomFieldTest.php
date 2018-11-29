@@ -179,6 +179,26 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->customGroupDelete($customGroup['id']);
   }
 
+  public function testGetDisplayedValuesContactRef() {
+    $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
+    $params = [
+      'data_type' => 'ContactReference',
+      'html_type' => 'Autocomplete-Select',
+      'label' => 'test ref',
+      'custom_group_id' => $customGroup['id'],
+    ];
+    $createdField = $this->callAPISuccess('customField', 'create', $params);
+    $contact1 = $this->individualCreate();
+    $contact2 = $this->individualCreate(['custom_' . $createdField['id'] => $contact1['id']]);
+
+    $this->assertEquals($contact1['display_name'], CRM_Core_BAO_CustomField::displayValue($contact2['id'], $createdField['id']));
+    $this->assertEquals("Bob", CRM_Core_BAO_CustomField::displayValue("Bob", $createdField['id']));
+
+    $this->contactDelete($contact2['id']);
+    $this->contactDelete($contact1['id']);
+    $this->customGroupDelete($customGroup['id']);
+  }
+
   public function testDeleteCustomField() {
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual'));
     $fields = array(
