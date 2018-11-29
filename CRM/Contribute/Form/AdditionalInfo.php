@@ -115,13 +115,6 @@ class CRM_Contribute_Form_AdditionalInfo {
       $feeAmount->freeze();
     }
 
-    $netAmount = &$form->add('text', 'net_amount', ts('Net Amount'),
-      $attributes['net_amount']
-    );
-    $form->addRule('net_amount', ts('Please enter a valid monetary value for Net Amount.'), 'money');
-    if ($form->_online) {
-      $netAmount->freeze();
-    }
     $element = &$form->add('text', 'invoice_id', ts('Invoice ID'),
       $attributes['invoice_id']
     );
@@ -285,7 +278,6 @@ class CRM_Contribute_Form_AdditionalInfo {
       'non_deductible_amount',
       'total_amount',
       'fee_amount',
-      'net_amount',
       'trxn_id',
       'invoice_id',
       'creditnote_id',
