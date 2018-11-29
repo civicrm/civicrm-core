@@ -687,6 +687,18 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * @param $expected
    * @param $actual
+   */
+  public function assertArrayValuesEqual($array1, $array2) {
+    $array1 = array_values($array1);
+    $array2 = array_values($array2);
+    sort($array1);
+    sort($array2);
+    $this->assertEquals($array1, $array2);
+  }
+
+  /**
+   * @param $expected
+   * @param $actual
    * @param string $message
    */
   public function assertType($expected, $actual, $message = '') {
