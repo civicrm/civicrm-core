@@ -58,6 +58,11 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $this->assertEquals(count($foundDupes), 3, 'Check Individual-Fuzzy dupe rule for dupesInGroup().');
   }
 
+  /**
+   * Test that a rule set to is_reserved = 0 works.
+   *
+   * There is a different search used dependent on this variable.
+   */
   public function testCustomRule() {
     $this->setupForGroupDedupe();
 
@@ -69,8 +74,9 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       'title' => 'TestRule',
       'is_reserved' => 0,
     ));
-    foreach (array('first_name', 'last_name') as $field) {
-      $this->callAPISuccess('Rule', 'create', [
+    $rules = [];
+    foreach (array('birth_date', 'first_name', 'last_name') as $field) {
+      $rules[$field] = $this->callAPISuccess('Rule', 'create', [
         'dedupe_rule_group_id' => $ruleGroup['id'],
         'rule_table' => 'civicrm_contact',
         'rule_weight' => 4,
@@ -79,6 +85,9 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     }
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
     $this->assertEquals(count($foundDupes), 4);
+    $this->markTestIncomplete('This currenctly fails - see https://lab.civicrm.org/dev/core/issues/397');
+    CRM_Dedupe_Finder::dupes($ruleGroup['id']);
+
   }
 
   /**
@@ -216,12 +225,14 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'last_name' => 'hood',
         'email' => 'robin@example.com',
         'contact_type' => 'Individual',
+        'birth_date' => '2016-01-01',
       ),
       array(
         'first_name' => 'robin',
         'last_name' => 'hood',
         'email' => 'hood@example.com',
         'contact_type' => 'Individual',
+        'birth_date' => '2016-01-01',
       ),
       array(
         'first_name' => 'robin',

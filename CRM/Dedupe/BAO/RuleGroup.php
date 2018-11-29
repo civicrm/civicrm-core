@@ -282,7 +282,6 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
         if ($dao->affectedRows() >= 1) {
           $exclWeightSum[] = substr($fieldWeight, strrpos($fieldWeight, '.') + 1);
         }
-        $dao->free();
       }
       else {
         // its a die situation
