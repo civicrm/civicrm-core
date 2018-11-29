@@ -336,12 +336,13 @@ class CRM_Core_CodeGen_Specification {
         break;
 
       default:
-        $field['sqlType'] = $field['phpType'] = $type;
+        $field['phpType'] = $this->value('phpType', $fieldXML, $type);
+        $field['sqlType'] = $type;
         if ($type == 'int unsigned') {
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }
         else {
-          $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
+          $field['crmType'] = $this->value('crmType', $fieldXML, 'CRM_Utils_Type::T_' . strtoupper($type));
         }
         break;
     }
