@@ -297,9 +297,9 @@
 
       {/literal}
       {if $customDataSubType}
-        CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
+        CRM.buildCustomData( '{$customDataType}', {$customDataSubType} {if $contactId}, {$contactId}{/if});
         {else}
-        CRM.buildCustomData( '{$customDataType}' );
+        CRM.buildCustomData( '{$customDataType}' {if $contactId}, null, {$contactId}{/if});
       {/if}
       {literal}
     });

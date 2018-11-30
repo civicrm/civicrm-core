@@ -663,10 +663,13 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     // Enable form element (ActivityLinks sets this true).
     $this->assign('suppressForm', FALSE);
 
+    // Send cid parameter to custom group url if _currentlyViewedContactId exists
+    $cid = ($this->_currentlyViewedContactId) ?: "null";
+
     $element = &$this->add('select', 'activity_type_id', ts('Activity Type'),
       array('' => '- ' . ts('select') . ' -') + $this->_fields['followup_activity_type_id']['attributes'],
       FALSE, array(
-        'onchange' => "CRM.buildCustomData( 'Activity', this.value );",
+        'onchange' => "CRM.buildCustomData( 'Activity', this.value, {$cid} );",
         'class' => 'crm-select2 required',
       )
     );
