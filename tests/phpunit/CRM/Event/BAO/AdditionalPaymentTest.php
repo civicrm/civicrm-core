@@ -207,8 +207,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $amtPaid = 60;
     $balance = $feeAmt - $amtPaid;
     $result = $this->addParticipantWithPayment($feeAmt, $amtPaid);
-    extract($result);
-    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participant['id'], 'event');
+    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($result['participant']['id'], 'event');
 
     // amount checking
     $this->assertEquals(round($paymentInfo['total']), $feeAmt, 'Total amount recorded is not proper');
@@ -216,7 +215,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->assertEquals(round($paymentInfo['balance']), $balance, 'Balance amount is not proper');
 
     // status checking
-    $this->assertEquals($participant['participant_status_id'], 14, 'Status record is not proper for participant');
+    $this->assertEquals($result['participant']['participant_status_id'], 14, 'Status record is not proper for participant');
     $this->assertEquals($result['contribution']['contribution_status_id'], 8, 'Status record is not proper for contribution');
   }
 
