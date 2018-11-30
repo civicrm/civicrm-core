@@ -351,8 +351,8 @@
           $('#campaign_id', $form).select2('val', info.campaign_id);
 
           // Event and event-type custom data
-          CRM.buildCustomData('Participant', eventId, {/literal}{$eventNameCustomDataTypeID}{literal}, null, null, null, true);
-          CRM.buildCustomData('Participant', info.event_type_id, {/literal}{$eventTypeCustomDataTypeID}{literal}, null, null, null, true);
+          CRM.buildCustomData('Participant', eventId, {/literal}{$eventNameCustomDataTypeID}{literal}, null, null, null, null, true);
+          CRM.buildCustomData('Participant', info.event_type_id, {/literal}{$eventTypeCustomDataTypeID}{literal}, null, null, null, null, true);
 
           buildFeeBlock();
         });
@@ -375,7 +375,7 @@
 
         function buildRoleCustomData() {
           var roleId = $('select[name^=role_id]', $form).val() || [];
-          CRM.buildCustomData('Participant', roleId.join(), {/literal}{$roleCustomDataTypeID}{literal});
+          CRM.buildCustomData('Participant', roleId.join(), null, {/literal}{$roleCustomDataTypeID}{literal});
         }
 
         //build fee block
@@ -424,12 +424,12 @@
         }
 
         {/literal}
-        CRM.buildCustomData( '{$customDataType}', null, null );
+        CRM.buildCustomData( '{$customDataType}', null, null, null );
         {if $eventID}
-          CRM.buildCustomData( '{$customDataType}', {$eventID}, {$eventNameCustomDataTypeID} );
+          CRM.buildCustomData( '{$customDataType}', {$eventID}, null, {$eventNameCustomDataTypeID} );
         {/if}
         {if $eventTypeID}
-          CRM.buildCustomData( '{$customDataType}', {$eventTypeID}, {$eventTypeCustomDataTypeID} );
+          CRM.buildCustomData( '{$customDataType}', {$eventTypeID}, null, {$eventTypeCustomDataTypeID} );
         {/if}
         {literal}
 

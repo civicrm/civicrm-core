@@ -51,7 +51,7 @@
         // Building the complete form in php with no ajax would be way more efficient.
         function loadNextRecord() {
           if (i < customValueCount) {
-            CRM.buildCustomData(contact_type, contact_subtype, null, i++, groupID, true).one('crmLoad', loadNextRecord);
+            CRM.buildCustomData(contact_type, contact_subtype, null, null, i++, groupID, true).one('crmLoad', loadNextRecord);
           }
         }
         CRM.buildCustomData(contact_type, contact_subtype).one('crmLoad', loadNextRecord);

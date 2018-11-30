@@ -26,7 +26,7 @@
 {literal}
 <script type="text/javascript">
   (function($) {
-    CRM.buildCustomData = function (type, subType, subName, cgCount, groupID, isMultiple, onlySubtype) {
+    CRM.buildCustomData = function (type, subType, cid, subName, cgCount, groupID, isMultiple, onlySubtype) {
       var dataUrl = CRM.url('civicrm/custom', {type: type}),
         prevCount = 1,
         fname = '#customData',
@@ -34,6 +34,10 @@
 
       if (subType) {
         dataUrl += '&subType=' + subType;
+      }
+
+      if (cid) {
+        dataUrl += '&cid=' + cid;
       }
 
       if (onlySubtype) {

@@ -209,7 +209,7 @@
       }
       function loadNextRecord(i, groupValue, groupCount) {
         if (i < groupCount) {
-          CRM.buildCustomData({/literal}"{$contactType}"{literal}, subTypeValues, null, i, groupValue, true).one('crmLoad', function() {
+          CRM.buildCustomData({/literal}"{$contactType}"{literal}, subTypeValues, null, null, i, groupValue, true).one('crmLoad', function() {
             highlightTabs(this);
             loadNextRecord(i+1, groupValue, groupCount);
           });
