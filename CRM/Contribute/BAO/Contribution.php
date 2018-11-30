@@ -388,7 +388,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           // net_amount may need adjusting.
           $contribution = civicrm_api3('Contribution', 'getsingle', array(
             'id' => $contributionID,
-            'return' => array('total_amount', 'net_amount'),
+            'return' => array('total_amount', 'net_amount', 'fee_amount'),
           ));
           $totalAmount = isset($params['total_amount']) ? $params['total_amount'] : CRM_Utils_Array::value('total_amount', $contribution);
           $feeAmount = isset($params['fee_amount']) ? $params['fee_amount'] : CRM_Utils_Array::value('fee_amount', $contribution);

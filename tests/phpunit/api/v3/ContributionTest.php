@@ -1646,6 +1646,65 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check that net_amount is updated when a contribution is updated.
+   *
+   * Update fee amount AND total amount, just fee amount, just total amount
+   * and neither to check that net_amount is keep updated.
+   */
+  public function testUpdateContributionNetAmountVariants() {
+    $contributionID = $this->contributionCreate(['contact_id' => $this->individualCreate()]);
+
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $contributionID,
+      'total_amount' => 90,
+      'fee_amount' => 6,
+    ]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'id' => $contributionID,
+      'return' => ['net_amount', 'fee_amount', 'total_amount'],
+    ]);
+    $this->assertEquals(6, $contribution['fee_amount']);
+    $this->assertEquals(90, $contribution['total_amount']);
+    $this->assertEquals(84, $contribution['net_amount']);
+
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $contributionID,
+      'fee_amount' => 3,
+    ]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'id' => $contributionID,
+      'return' => ['net_amount', 'fee_amount', 'total_amount'],
+    ]);
+    $this->assertEquals(3, $contribution['fee_amount']);
+    $this->assertEquals(90, $contribution['total_amount']);
+    $this->assertEquals(87, $contribution['net_amount']);
+
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $contributionID,
+      'total_amount' => 200,
+    ]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'id' => $contributionID,
+      'return' => ['net_amount', 'fee_amount', 'total_amount'],
+    ]);
+    $this->assertEquals(3, $contribution['fee_amount']);
+    $this->assertEquals(200, $contribution['total_amount']);
+    $this->assertEquals(197, $contribution['net_amount']);
+
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $contributionID,
+      'payment_instrument' => 'Cash'
+    ]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'id' => $contributionID,
+      'return' => ['net_amount', 'fee_amount', 'total_amount'],
+    ]);
+    $this->assertEquals(3, $contribution['fee_amount']);
+    $this->assertEquals(200, $contribution['total_amount']);
+    $this->assertEquals(197, $contribution['net_amount']);
+  }
+
+  /**
    * Attempt (but fail) to delete a contribution without parameters.
    */
   public function testDeleteEmptyParamsContribution() {
