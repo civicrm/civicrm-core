@@ -72,6 +72,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    */
   public function preProcess() {
     parent::preProcess();
+    $this->assign('selectedChild', 'location');
 
     $this->_values = $this->get('values');
     if ($this->_id && empty($this->_values)) {

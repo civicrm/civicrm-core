@@ -49,6 +49,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
 
   public function preProcess() {
     parent::preProcess();
+    $this->assign('selectedChild', 'pcp');
   }
 
   /**
