@@ -125,6 +125,8 @@ class CRM_Dedupe_Finder {
     if (!$params) {
       return array();
     }
+    // This may no longer be required - see https://github.com/civicrm/civicrm-core/pull/13176
+    $params = array_filter($params);
 
     $foundByID = FALSE;
     if ($ruleGroupID) {

@@ -238,9 +238,7 @@ class CRM_Utils_Array {
         self::flatten($value, $flat, $newPrefix, $seperator);
       }
       else {
-        if (!empty($value)) {
-          $flat[$newPrefix] = $value;
-        }
+        $flat[$newPrefix] = $value;
       }
     }
   }
