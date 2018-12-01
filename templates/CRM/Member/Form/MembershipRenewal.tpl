@@ -84,7 +84,7 @@
       </tr>
       <tr class="crm-member-membershiprenew-form-block-renewal_date">
         <td class="label">{$form.renewal_date.label}</td>
-        <td>{include file="CRM/common/jcalendar.tpl" elementName=renewal_date}</td>
+        <td>{$form.renewal_date.html}</td>
       </tr>
       <tr id="defaultNumTerms" class="crm-member-membershiprenew-form-block-default-num_terms">
         <td colspan="2" class="description">
