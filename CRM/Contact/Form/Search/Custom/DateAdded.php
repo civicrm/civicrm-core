@@ -44,7 +44,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
    * @param array $formValues
    */
   public function __construct(&$formValues) {
-    parent::__construct($formValues);
+    $this->_formValues = self::formatSavedSearchFields($formValues);
 
     $this->_includeGroups = CRM_Utils_Array::value('includeGroups', $formValues, array());
     $this->_excludeGroups = CRM_Utils_Array::value('excludeGroups', $formValues, array());
@@ -456,6 +456,29 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
    */
   public function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+  /**
+   * Format saved search fields for this custom group.
+   *
+   * Note this is a function to facilitate the transition to jcalendar for
+   * saved search groups. In time it can be stripped out again.
+   *
+   * @param array $formValues
+   *
+   * @return array
+   */
+  public static function formatSavedSearchFields($formValues) {
+    $dateFields = array(
+      'start_date',
+      'end_date',
+    );
+    foreach ($formValues as $element => $value) {
+      if (in_array($element, $dateFields) && !empty($value)) {
+        $formValues[$element] = date('Y-m-d', strtotime($value));
+      }
+    }
+    return $formValues;
   }
 
 }
