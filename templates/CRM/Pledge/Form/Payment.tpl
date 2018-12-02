@@ -32,7 +32,7 @@
     </tr>
     <tr>
       <td class="label">{$form.scheduled_date.label}</td>
-      <td>{include file="CRM/common/jcalendar.tpl" elementName=scheduled_date}</td>
+      <td>{$form.scheduled_date.html}</td>
     </tr>
     <tr>
       <td class="label">{$form.scheduled_amount.label}</td>

@@ -66,7 +66,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
     if ($this->_id) {
       $params['id'] = $this->_id;
       CRM_Pledge_BAO_PledgePayment::retrieve($params, $defaults);
-      list($defaults['scheduled_date']) = CRM_Utils_Date::setDateDefaults($defaults['scheduled_date']);
       if (isset($defaults['contribution_id'])) {
         $this->assign('pledgePayment', TRUE);
       }
@@ -82,7 +81,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     // add various dates
-    $this->addDate('scheduled_date', ts('Scheduled Date'), TRUE);
+    $this->add('datepicker', 'scheduled_date', ts('Scheduled Date'), [], TRUE, ['time' => FALSE]);
 
     $this->addMoney('scheduled_amount',
       ts('Scheduled Amount'), TRUE,
@@ -125,8 +124,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
     // get the submitted form values.
     $formValues = $this->controller->exportValues($this->_name);
     $params = array();
-    $formValues['scheduled_date'] = CRM_Utils_Date::processDate($formValues['scheduled_date']);
-    $params['scheduled_date'] = CRM_Utils_Date::format($formValues['scheduled_date']);
+    $params['scheduled_date'] = CRM_Utils_Array::value('schedule_date', $formValues);
     $params['currency'] = CRM_Utils_Array::value('currency', $formValues);
     $now = date('Ymd');
 
