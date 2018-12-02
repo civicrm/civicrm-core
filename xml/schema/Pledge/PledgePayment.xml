@@ -101,6 +101,10 @@
     <required>true</required>
     <comment>The date the pledge payment is supposed to happen.</comment>
     <add>2.1</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDate</formatType>
+    </html>
   </field>
   <field>
     <name>reminder_date</name>
