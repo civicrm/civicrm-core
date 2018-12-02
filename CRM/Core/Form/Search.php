@@ -154,7 +154,14 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     $this->_action = CRM_Core_Action::ADVANCED;
     foreach ($this->getSearchFieldMetadata() as $entity => $fields) {
       foreach ($fields as $fieldName => $fieldSpec) {
-        $this->addField($fieldName, ['entity' => $entity]);
+        if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE) {
+          // Assuming time is false for now as we are not checking for date-time fields as yet.
+          $this->add('datepicker', $fieldName . '_low', $fieldSpec['title'], [], FALSE, ['time' => FALSE]);
+          $this->add('datepicker', $fieldName . '_high', $fieldSpec['title'], [], FALSE, ['time' => FALSE]);
+        }
+        else {
+          $this->addField($fieldName, ['entity' => $entity]);
+        }
       }
     }
   }

@@ -123,9 +123,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
    * @param $query
    */
   public static function whereClauseSingle(&$values, &$query) {
-    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     list($name, $op, $value, $grouping, $wildcard) = $values;
-    $val = $names = array();
     switch ($name) {
       case 'grant_money_transfer_date_low':
       case 'grant_money_transfer_date_high':
@@ -298,16 +296,33 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
+   * Get the metadata for fields to be included on the activity search form.
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = [
+      'grant_report_received',
+      'grant_application_received_date',
+      'grant_decision_date',
+      'grant_money_transfer_date',
+      'grant_due_date',
+    ];
+    $metadata = civicrm_api3('Grant', 'getfields', [])['values'];
+    return array_intersect_key($metadata, array_flip($fields));
+  }
+
+  /**
    * Add all the elements shared between grant search and advanaced search.
    *
    *
-   * @param CRM_Core_Form $form
+   * @param \CRM_Grant_Form_Search $form
    *
    * @return void
    */
   public static function buildSearchForm(&$form) {
 
     $grantType = CRM_Core_OptionGroup::values('grant_type');
+    $form->addSearchFieldMetadata(['Grant' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
     $form->add('select', 'grant_type_id', ts('Grant Type'), $grantType, FALSE,
       array('id' => 'grant_type_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
     );
@@ -316,28 +331,10 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
     $form->add('select', 'grant_status_id', ts('Grant Status'), $grantStatus, FALSE,
       array('id' => 'grant_status_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
     );
-
-    $form->addDate('grant_application_received_date_low', ts('App. Received Date - From'), FALSE, array('formatType' => 'searchDate'));
-    $form->addDate('grant_application_received_date_high', ts('To'), FALSE, array('formatType' => 'searchDate'));
-
     $form->addElement('checkbox', 'grant_application_received_notset', ts('Date is not set'), NULL);
-
-    $form->addDate('grant_money_transfer_date_low', ts('Money Sent Date - From'), FALSE, array('formatType' => 'searchDate'));
-    $form->addDate('grant_money_transfer_date_high', ts('To'), FALSE, array('formatType' => 'searchDate'));
-
     $form->addElement('checkbox', 'grant_money_transfer_date_notset', ts('Date is not set'), NULL);
-
-    $form->addDate('grant_due_date_low', ts('Report Due Date - From'), FALSE, array('formatType' => 'searchDate'));
-    $form->addDate('grant_due_date_high', ts('To'), FALSE, array('formatType' => 'searchDate'));
-
     $form->addElement('checkbox', 'grant_due_date_notset', ts('Date is not set'), NULL);
-
-    $form->addDate('grant_decision_date_low', ts('Grant Decision Date - From'), FALSE, array('formatType' => 'searchDate'));
-    $form->addDate('grant_decision_date_high', ts('To'), FALSE, array('formatType' => 'searchDate'));
-
     $form->addElement('checkbox', 'grant_decision_date_notset', ts('Date is not set'), NULL);
-
-    $form->addYesNo('grant_report_received', ts('Grant report received?'), TRUE);
 
     $form->add('text', 'grant_amount_low', ts('Minimum Amount'), array('size' => 8, 'maxlength' => 8));
     $form->addRule('grant_amount_low', ts('Please enter a valid money value (e.g. %1).', array(1 => CRM_Utils_Money::format('9.99', ' '))), 'money');
