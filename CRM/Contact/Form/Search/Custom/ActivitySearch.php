@@ -42,7 +42,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
    * @param array $formValues
    */
   public function __construct(&$formValues) {
-    $this->_formValues = $formValues;
+    $this->_formValues = self::formatSavedSearchFields($formValues);
 
     /**
      * Define the columns for search result rows
@@ -417,6 +417,30 @@ ORDER BY contact_a.sort_name';
    */
   public function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+  /**
+   * Format saved search fields for this custom group.
+   *
+   * Note this is a function to facilitate the transition to jcalendar for
+   * saved search groups. In time it can be stripped out again.
+   *
+   * @param array $formValues
+   *
+   * @return array
+   */
+  public static function formatSavedSearchFields($formValues) {
+    $dateFields = array(
+      'start_date',
+      'end_date',
+    );
+    foreach ($formValues as $element => $value) {
+      if (in_array($element, $dateFields) && !empty($value)) {
+        $formValues[$element] = date('Y-m-d', strtotime($value));
+      }
+    }
+
+    return $formValues;
   }
 
 }
