@@ -73,8 +73,8 @@ class CRM_Contact_Form_Search_Custom_TagContributions extends CRM_Contact_Form_S
      * Define the search form fields here
      */
 
-    $form->addDate('start_date', ts('Contribution Date From'), FALSE, array('formatType' => 'custom'));
-    $form->addDate('end_date', ts('...through'), FALSE, array('formatType' => 'custom'));
+    $form->add('datepicker', 'start_date', ts('Contribution Date From'), [], FALSE, array('time' => FALSE));
+    $form->add('datepicker', 'end_date', ts('...through'), [], FALSE, array('time' => FALSE));
     $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
     $form->addElement('select', 'tag', ts('Tagged'), $tag);
 
@@ -180,14 +180,12 @@ WHERE  $where
     $clauses[] = "contact_a.contact_type = 'Individual'";
     $clauses[] = "civicrm_contribution.contact_id = contact_a.id";
 
-    $startDate = CRM_Utils_Date::processDate($this->_formValues['start_date']);
-    if ($startDate) {
-      $clauses[] = "civicrm_contribution.receive_date >= $startDate";
+    if ($this->_formValues['start_date']) {
+      $clauses[] = "civicrm_contribution.receive_date >= '{$this->_formValues['start_date']} 00:00:00'";
     }
 
-    $endDate = CRM_Utils_Date::processDate($this->_formValues['end_date']);
-    if ($endDate) {
-      $clauses[] = "civicrm_contribution.receive_date <= $endDate";
+    if ($this->_formValues['end_date']) {
+      $clauses[] = "civicrm_contribution.receive_date <= '{$this->_formValues['end_date']} 23:59:59'";
     }
 
     $tag = CRM_Utils_Array::value('tag', $this->_formValues);

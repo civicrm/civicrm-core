@@ -61,8 +61,8 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
    * @param CRM_Core_Form $form
    */
   public function buildForm(&$form) {
-    $form->addDate('start_date', ts('Start Date'), FALSE, array('formatType' => 'custom'));
-    $form->addDate('end_date', ts('End Date'), FALSE, array('formatType' => 'custom'));
+    $form->add('datepicker', 'start_date', ts('Start Date'), [], FALSE, array('time' => FALSE));
+    $form->add('datepicker', 'end_date', ts('End Date'), [], FALSE, array('time' => FALSE));
 
     $groups = CRM_Core_PseudoConstant::nestedGroup();
 
@@ -192,12 +192,11 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     }
     CRM_Core_DAO::executeQuery($sql);
 
-    $startDate = CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::processDate($this->_formValues['start_date']));
+    $startDate = !empty($this->_formValues['start_date']) ? $this->_formValues['start_date'] : date('Y-m-d');
     $endDateFix = NULL;
     if (!empty($this->_formValues['end_date'])) {
-      $endDate = CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::processDate($this->_formValues['end_date']));
       # tack 11:59pm on to make search inclusive of the end date
-      $endDateFix = "AND date_added <= '" . substr($endDate, 0, 10) . " 23:59:00'";
+      $endDateFix = "AND date_added <= '{$this->_formValues['end_date']} 23:59:00'";
     }
 
     $dateRange = "INSERT INTO {$this->_datesTable} ( id, date_added )
@@ -211,7 +210,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
           GROUP BY
               civicrm_contact.id
           HAVING
-              date_added >= '$startDate'
+              date_added >= '$startDate 00:00:00'
               $endDateFix";
 
     if ($this->_debug > 0) {
