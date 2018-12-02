@@ -124,6 +124,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     if (count($form->_contactIds) > 1) {
       $form->_single = FALSE;
     }
+    CRM_Contact_Form_Task_EmailCommon::bounceIfSimpleMailLimitExceeded(count($form->_contactIds));
 
     $emailAttributes = array(
       'class' => 'huge',
