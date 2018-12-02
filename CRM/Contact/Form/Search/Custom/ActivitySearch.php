@@ -123,8 +123,8 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
     );
 
     // Activity Date range
-    $form->addDate('start_date', ts('Activity Date From'), FALSE, array('formatType' => 'custom'));
-    $form->addDate('end_date', ts('...through'), FALSE, array('formatType' => 'custom'));
+    $form->add('datepicker', 'start_date', ts('Activity Date From'), [], FALSE, array('time' => FALSE));
+    $form->add('datepicker', 'end_date', ts('...through'), [], FALSE, array('time' => FALSE));
 
     // Contact Name field
     $form->add('text', 'sort_name', ts('Contact Name'));
@@ -328,22 +328,12 @@ ORDER BY contact_a.sort_name';
       $clauses[] = "activity.activity_type_id = {$this->_formValues['activity_type_id']}";
     }
 
-    $startDate = $this->_formValues['start_date'];
-    if (!empty($startDate)) {
-      $startDate .= '00:00:00';
-      $startDateFormatted = CRM_Utils_Date::processDate($startDate);
-      if ($startDateFormatted) {
-        $clauses[] = "activity.activity_date_time >= $startDateFormatted";
-      }
+    if (!empty($this->_formValues['start_date'])) {
+      $clauses[] = "activity.activity_date_time >= '{$this->_formValues['start_date']} 00:00:00'";
     }
 
-    $endDate = $this->_formValues['end_date'];
-    if (!empty($endDate)) {
-      $endDate .= '23:59:59';
-      $endDateFormatted = CRM_Utils_Date::processDate($endDate);
-      if ($endDateFormatted) {
-        $clauses[] = "activity.activity_date_time <= $endDateFormatted";
-      }
+    if (!empty($this->_formValues['end_date'])) {
+      $clauses[] = "activity.activity_date_time <= '{$this->_formValues['end_date']} 23:59:59'";
     }
 
     if ($includeContactIDs) {
