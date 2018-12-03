@@ -219,7 +219,12 @@ class CRM_Export_BAO_Export {
     $queryOperator = 'AND'
   ) {
 
-    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator, $mergeSameHousehold);
+    $isPostalOnly = (
+      isset($exportParams['postal_mailing_export']['postal_mailing_export']) &&
+      $exportParams['postal_mailing_export']['postal_mailing_export'] == 1
+    );
+
+    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator, $mergeSameHousehold, $isPostalOnly);
     $returnProperties = array();
     self::$relationshipTypes = $processor->getRelationshipTypes();
 
@@ -489,14 +494,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     if ($exportTempTable) {
       self::writeDetailsToTable($exportTempTable, $componentDetails, $sqlColumns);
-
-      // if postalMailing option is checked, exclude contacts who are deceased, have
-      // "Do not mail" privacy setting, or have no street address
-      if (isset($exportParams['postal_mailing_export']['postal_mailing_export']) &&
-        $exportParams['postal_mailing_export']['postal_mailing_export'] == 1
-      ) {
-        self::postalMailingFormat($exportTempTable, $sqlColumns, $exportMode);
-      }
 
       // do merge same address and merge same household processing
       if ($mergeSameAddress) {
@@ -1117,62 +1114,6 @@ LIMIT $offset, $limit
 
       $writeHeader = FALSE;
       $offset += $limit;
-    }
-  }
-
-  /**
-   * Exclude contacts who are deceased, have "Do not mail" privacy setting,
-   * or have no street address
-   * @param $exportTempTable
-   * @param $sqlColumns
-   * @param $exportParams
-   */
-  public static function postalMailingFormat($exportTempTable, &$sqlColumns, $exportParams) {
-    $whereClause = array();
-
-    if (array_key_exists('is_deceased', $sqlColumns)) {
-      $whereClause[] = 'is_deceased = 1';
-    }
-
-    if (array_key_exists('do_not_mail', $sqlColumns)) {
-      $whereClause[] = 'do_not_mail = 1';
-    }
-
-    if (array_key_exists('street_address', $sqlColumns)) {
-      $addressWhereClause = " ( (street_address IS NULL) OR (street_address = '') ) ";
-
-      // check for supplemental_address_1
-      if (array_key_exists('supplemental_address_1', $sqlColumns)) {
-        $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-          'address_options', TRUE, NULL, TRUE
-        );
-        if (!empty($addressOptions['supplemental_address_1'])) {
-          $addressWhereClause .= " AND ( (supplemental_address_1 IS NULL) OR (supplemental_address_1 = '') ) ";
-          // enclose it again, since we are doing an AND in between a set of ORs
-          $addressWhereClause = "( $addressWhereClause )";
-        }
-      }
-
-      $whereClause[] = $addressWhereClause;
-    }
-
-    if (!empty($whereClause)) {
-      $whereClause = implode(' OR ', $whereClause);
-      $query = "
-DELETE
-FROM   $exportTempTable
-WHERE  {$whereClause}";
-      CRM_Core_DAO::singleValueQuery($query);
-    }
-
-    // unset temporary columns that were added for postal mailing format
-    if (!empty($exportParams['postal_mailing_export']['temp_columns'])) {
-      $unsetKeys = array_keys($sqlColumns);
-      foreach ($unsetKeys as $headerKey => $sqlColKey) {
-        if (array_key_exists($sqlColKey, $exportParams['postal_mailing_export']['temp_columns'])) {
-          unset($sqlColumns[$sqlColKey]);
-        }
-      }
     }
   }
 

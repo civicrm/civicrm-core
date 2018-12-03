@@ -983,23 +983,27 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Test that deceased and do not mail contacts are removed from contacts before
+   *
+   * @dataProvider getReasonsNotToMail
+   *
+   * @param array $reason
+   * @param array $addressReason
    */
-  public function testExportDeceasedDoNotMail() {
+  public function testExportDeceasedDoNotMail($reason, $addressReason) {
     $contactA = $this->callAPISuccess('contact', 'create', array(
       'first_name' => 'John',
       'last_name' => 'Doe',
       'contact_type' => 'Individual',
     ));
 
-    $contactB = $this->callAPISuccess('contact', 'create', array(
+    $contactB = $this->callAPISuccess('contact', 'create', array_merge([
       'first_name' => 'Jane',
       'last_name' => 'Doe',
       'contact_type' => 'Individual',
-      'is_deceased' => 1,
-    ));
+    ], $reason));
 
     //create address for contact A
-    $this->callAPISuccess('address', 'create', array(
+    $this->callAPISuccess('address', 'create', [
       'contact_id' => $contactA['id'],
       'location_type_id' => 'Home',
       'street_address' => 'ABC 12',
@@ -1007,10 +1011,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'country_id' => '1152',
       'city' => 'ABC',
       'is_primary' => 1,
-    ));
+    ]);
 
     //create address for contact B
-    $this->callAPISuccess('address', 'create', array(
+    $this->callAPISuccess('address', 'create', array_merge([
       'contact_id' => $contactB['id'],
       'location_type_id' => 'Home',
       'street_address' => 'ABC 12',
@@ -1018,7 +1022,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'country_id' => '1152',
       'city' => 'ABC',
       'is_primary' => 1,
-    ));
+    ], $addressReason));
 
     //export and merge contacts with same address
     list($tableName, $sqlColumns, $headerRows, $processor) = CRM_Export_BAO_Export::exportComponents(
@@ -1054,6 +1058,17 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery($sql);
   }
 
+  /**
+   * Get reasons that a contact is not postalable.
+   * @return array
+   */
+  public function getReasonsNotToMail() {
+    return [
+      [['is_deceased' => 1], []],
+      [['do_not_mail' => 1], []],
+      [[], ['street_address' => '']],
+    ];
+  }
   /**
    * @return array
    */
