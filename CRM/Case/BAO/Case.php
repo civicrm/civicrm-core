@@ -396,7 +396,6 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       $caseArray[] = $dao->id;
     }
 
-    $dao->free();
     return $caseArray;
   }
 
@@ -894,7 +893,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       $values[$rid]['relationship_direction'] = $dao->relationship_direction;
     }
 
-    $dao->free();
     return $values;
   }
 
@@ -1218,7 +1216,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
       $caseActivities[$caseActivityId]['links'] = $url;
     }
-    $dao->free();
 
     $caseActivitiesDT = array();
     $caseActivitiesDT['data'] = array_values($caseActivities);
@@ -1318,7 +1315,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         $values[] = $details;
       }
     }
-    $dao->free();
 
     return $values;
   }
@@ -1802,7 +1798,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       $values[$dao->id]['id'] = $dao->id;
       $values[$dao->id]['activity_date'] = $dao->activity_date;
     }
-    $dao->free();
     return $values;
   }
 
@@ -2007,7 +2002,6 @@ SELECT civicrm_contact.id as casemanager_id,
     while ($dao->fetch()) {
       $relatedCaseIds[$dao->case_id] = $dao->case_id;
     }
-    $dao->free();
 
     return array_values($relatedCaseIds);
   }
@@ -2080,7 +2074,6 @@ SELECT civicrm_contact.id as casemanager_id,
         'links' => $caseView,
       );
     }
-    $dao->free();
 
     return $relatedCases;
   }
@@ -2254,7 +2247,6 @@ SELECT  id
           while ($dao->fetch()) {
             $singletonActivityIds[] = $dao->id;
           }
-          $dao->free();
         }
       }
 

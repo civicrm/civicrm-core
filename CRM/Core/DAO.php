@@ -890,7 +890,6 @@ class CRM_Core_DAO extends DB_DataObject {
     while ($dao->fetch()) {
       $values[] = $dao->TABLE_NAME;
     }
-    $dao->free();
     return $values;
   }
 
@@ -941,7 +940,6 @@ class CRM_Core_DAO extends DB_DataObject {
         CRM_Core_Error::fatal();
       }
 
-      $dao->free();
       $show[$tableName] = $dao->Create_Table;
     }
 
@@ -969,7 +967,6 @@ class CRM_Core_DAO extends DB_DataObject {
           CRM_Core_Error::fatal();
         }
 
-        $dao->free();
         $show[$tableName] = $dao->Create_Table;
       }
 
@@ -1005,7 +1002,6 @@ class CRM_Core_DAO extends DB_DataObject {
         CRM_Core_Error::fatal();
       }
 
-      $dao->free();
       $show[$tableName] = $dao->Create_Table;
     }
     $constraint = "`FK_{$tableName}_{$columnName}`";
@@ -1027,7 +1023,6 @@ class CRM_Core_DAO extends DB_DataObject {
     $query = "SELECT * FROM $tableName WHERE $columnName != '$columnValue'";
     $dao = CRM_Core_DAO::executeQuery($query);
     $result = $dao->fetch() ? FALSE : TRUE;
-    $dao->free();
     return $result;
   }
 
@@ -1044,7 +1039,6 @@ class CRM_Core_DAO extends DB_DataObject {
     $query = "SELECT * FROM $tableName WHERE $columnName IS NOT NULL";
     $dao = CRM_Core_DAO::executeQuery($query);
     $result = $dao->fetch() ? FALSE : TRUE;
-    $dao->free();
     return $result;
   }
 
@@ -1065,7 +1059,6 @@ LIKE %1
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $result = $dao->fetch() ? TRUE : FALSE;
-    $dao->free();
     return $result;
   }
 
@@ -1432,7 +1425,6 @@ FROM   civicrm_domain
     ) {
       // we typically do this for insert/update/delete statements OR if explicitly asked to
       // free the dao
-      $dao->free();
     }
     return $dao;
   }

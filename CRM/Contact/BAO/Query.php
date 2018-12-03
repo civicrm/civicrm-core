@@ -4525,7 +4525,6 @@ civicrm_relationship.start_date > {$today}
     while ($dao->fetch()) {
       if ($count) {
         $noRows = $dao->rowCount;
-        $dao->free();
         return array($noRows, NULL);
       }
       $val = $query->store($dao);
@@ -4536,7 +4535,6 @@ civicrm_relationship.start_date > {$today}
       }
       $values[$dao->$entityIDField] = $val;
     }
-    $dao->free();
     return array($values, $options);
   }
 
@@ -4941,7 +4939,6 @@ civicrm_relationship.start_date > {$today}
       while ($dao->fetch()) {
         $ids[] = $dao->id;
       }
-      $dao->free();
       return implode(',', $ids);
     }
 

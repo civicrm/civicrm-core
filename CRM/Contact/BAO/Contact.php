@@ -2553,7 +2553,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
     if ($dao->fetch()) {
       $email = $dao->email;
     }
-    $dao->free();
     return $email;
   }
 
@@ -2581,7 +2580,6 @@ AND       civicrm_openid.is_primary = 1";
     if ($dao->fetch()) {
       $openId = $dao->openid;
     }
-    $dao->free();
     return $openId;
   }
 
@@ -3559,7 +3557,6 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
           $dao->save();
         }
       }
-      $dao->free();
     }
     CRM_Utils_Hook::post('delete', $type, $id, $obj);
     $obj->free();
