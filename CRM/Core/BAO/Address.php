@@ -1349,7 +1349,7 @@ SELECT is_primary,
       case 'world_region':
       case 'worldregion':
       case 'worldregion_id':
-        return CRM_Core_PseudoConstant::worldRegion();
+        return CRM_Core_BAO_Country::buildOptions('region_id', $context);
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
