@@ -292,6 +292,12 @@ class CRM_Export_BAO_ExportProcessor {
    * @param array $queryFields
    */
   public function setQueryFields($queryFields) {
+    // legacy hacks - we add these to queryFields because this
+    // pseudometadata is currently required.
+    $queryFields['im_provider']['pseudoconstant']['var'] = 'imProviders';
+    $queryFields['country']['context'] = 'country';
+    $queryFields['world_region']['context'] = 'country';
+    $queryFields['state_province']['context'] = 'province';
     $this->queryFields = $queryFields;
   }
 
@@ -450,32 +456,54 @@ class CRM_Export_BAO_ExportProcessor {
    * @param int $entityTypeID phone_type_id or provider_id for phone or im fields.
    */
   public function addOutputSpecification($key, $relationshipType = NULL, $locationType = NULL, $entityTypeID = NULL) {
-    $label = $this->getHeaderForRow($key);
-    $labelPrefix = $fieldPrefix = [];
-    if ($relationshipType) {
-      $labelPrefix[] = $this->getRelationshipTypes()[$relationshipType];
-      $fieldPrefix[] = $relationshipType;
-    }
-    if ($locationType) {
-      $labelPrefix[] = $fieldPrefix[] = $locationType;
-    }
+    $entityLabel = '';
     if ($entityTypeID) {
       if ($key === 'phone') {
-        $labelPrefix[] = $fieldPrefix[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id', $entityTypeID);
+        $entityLabel = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id', $entityTypeID);
       }
       if ($key === 'im') {
-        $labelPrefix[] = $fieldPrefix[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $entityTypeID);
+        $entityLabel = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $entityTypeID);
       }
     }
-    $index = $this->getMungedFieldName(($fieldPrefix ? (implode('-', $fieldPrefix)  . '-') : '') . $key);
-    $this->outputSpecification[$index]['header'] = ($labelPrefix ? (implode('-', $labelPrefix) . '-') : '') . $label;
+
+    // These oddly constructed keys are for legacy reasons. Altering them will affect test success
+    // but in time it may be good to rationalise them.
+    $label = $this->getOutputSpecificationLabel($key, $relationshipType, $locationType, $entityLabel);
+    $index = $this->getOutputSpecificationIndex($key, $relationshipType, $locationType, $entityLabel);
+    $fieldKey = $this->getOutputSpecificationFieldKey($key, $relationshipType, $locationType, $entityLabel);
+
+    $this->outputSpecification[$index]['header'] = $label;
+    $this->outputSpecification[$index]['sql_columns'] = $this->getSqlColumnDefinition($fieldKey, $key);
+
+    if ($relationshipType && $this->isHouseholdMergeRelationshipTypeKey($relationshipType)) {
+      $this->setColumnAsCalculationOnly($index);
+    }
+    $this->outputSpecification[$index]['metadata'] = $this->getMetaDataForField($key);
+  }
+
+  /**
+   * Get the metadata for the given field.
+   *
+   * @param $key
+   *
+   * @return array
+   */
+  public function getMetaDataForField($key) {
+    $mappings = ['contact_id' => 'id'];
+    if (isset($this->getQueryFields()[$key])) {
+      return $this->getQueryFields()[$key];
+    }
+    if (isset($mappings[$key])) {
+      return $this->getQueryFields()[$mappings[$key]];
+    }
+    return [];
   }
 
   /**
    * @param $key
    */
   public function setSqlColumnDefn($key) {
-    $this->outputSpecification[$this->getMungedFieldName($key)]['sql_columns'] = $this->getSqlColumnDefinition($key);
+    $this->outputSpecification[$this->getMungedFieldName($key)]['sql_columns'] = $this->getSqlColumnDefinition($key, $this->getMungedFieldName($key));
   }
 
   /**
@@ -515,6 +543,16 @@ class CRM_Export_BAO_ExportProcessor {
     return $sqlColumns;
   }
 
+  /**
+   * @return array
+   */
+  public function getMetadata() {
+    $metadata = [];
+    foreach ($this->outputSpecification as $key => $spec) {
+      $metadata[$key] = $spec['metadata'];
+    }
+    return $metadata;
+  }
 
   /**
    * Build the row for output.
@@ -973,17 +1011,17 @@ class CRM_Export_BAO_ExportProcessor {
   /**
    * Get the sql column definition for the given field.
    *
-   * @param $field
+   * @param string $fieldName
+   * @param string $columnName
    *
    * @return mixed
    */
-  public function getSqlColumnDefinition($field) {
-    $fieldName = $this->getMungedFieldName($field);
+  public function getSqlColumnDefinition($fieldName, $columnName) {
 
     // early exit for master_id, CRM-12100
     // in the DB it is an ID, but in the export, we retrive the display_name of the master record
     // also for current_employer, CRM-16939
-    if ($fieldName == 'master_id' || $fieldName == 'current_employer') {
+    if ($columnName == 'master_id' || $columnName == 'current_employer') {
       return "$fieldName varchar(128)";
     }
 
@@ -995,11 +1033,11 @@ class CRM_Export_BAO_ExportProcessor {
     $queryFields = $this->getQueryFields();
     $lookUp = ['prefix_id', 'suffix_id'];
     // set the sql columns
-    if (isset($queryFields[$field]['type'])) {
-      switch ($queryFields[$field]['type']) {
+    if (isset($queryFields[$columnName]['type'])) {
+      switch ($queryFields[$columnName]['type']) {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
-          if (in_array($field, $lookUp)) {
+          if (in_array($columnName, $lookUp)) {
             return "$fieldName varchar(255)";
           }
           else {
@@ -1007,8 +1045,8 @@ class CRM_Export_BAO_ExportProcessor {
           }
 
         case CRM_Utils_Type::T_STRING:
-          if (isset($queryFields[$field]['maxlength'])) {
-            return "$fieldName varchar({$queryFields[$field]['maxlength']})";
+          if (isset($queryFields[$columnName]['maxlength'])) {
+            return "$fieldName varchar({$queryFields[$columnName]['maxlength']})";
           }
           else {
             return "$fieldName varchar(255)";
@@ -1052,12 +1090,12 @@ class CRM_Export_BAO_ExportProcessor {
         }
         else {
           // set the sql columns for custom data
-          if (isset($queryFields[$field]['data_type'])) {
+          if (isset($queryFields[$columnName]['data_type'])) {
 
-            switch ($queryFields[$field]['data_type']) {
+            switch ($queryFields[$columnName]['data_type']) {
               case 'String':
                 // May be option labels, which could be up to 512 characters
-                $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$field]));
+                $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$columnName]));
                 return "$fieldName varchar($length)";
 
               case 'Country':
@@ -1092,6 +1130,91 @@ class CRM_Export_BAO_ExportProcessor {
       $fieldName = 'civicrm_primary_id';
     }
     return $fieldName;
+  }
+
+  /**
+   * In order to respect the history of this class we need to index kinda illogically.
+   *
+   * On the bright side - this stuff is tested within a nano-byte of it's life.
+   *
+   * e.g '2-a-b_Home-City'
+   *
+   * @param string $key
+   * @param string $relationshipType
+   * @param string $locationType
+   * @param $entityLabel
+   *
+   * @return string
+   */
+  protected function getOutputSpecificationIndex($key, $relationshipType, $locationType, $entityLabel) {
+    if ($locationType || $entityLabel || $key === 'im') {
+      // Just cos that's the history...
+      if ($key !== 'master_id') {
+        $key = $this->getHeaderForRow($key);
+      }
+    }
+    if (!$relationshipType || $key !== 'id') {
+      $key = $this->getMungedFieldName($key);
+    }
+    return $this->getMungedFieldName(
+      ($relationshipType ? ($relationshipType . '_') : '')
+      . ($locationType ? ($locationType . '_') : '')
+      . $key
+      . ($entityLabel ? ('_' . $entityLabel) : '')
+    );
+  }
+
+  /**
+   * Get the compiled label for the column.
+   *
+   * e.g 'Gender', 'Employee Of-Home-city'
+   *
+   * @param string $key
+   * @param string $relationshipType
+   * @param string $locationType
+   * @param string $entityLabel
+   *
+   * @return string
+   */
+  protected function getOutputSpecificationLabel($key, $relationshipType, $locationType, $entityLabel) {
+    return ($relationshipType ? $this->getRelationshipTypes()[$relationshipType] . '-' : '')
+      . ($locationType ? $locationType . '-' : '')
+      . $this->getHeaderForRow($key)
+      . ($entityLabel ? '-' . $entityLabel : '');
+  }
+
+  /**
+   * Get the mysql field name key.
+   *
+   * This key is locked in by tests but the reasons for the specific conventions -
+   * ie. headings are used for keying fields in some cases, are likely
+   * accidental rather than deliberate.
+   *
+   * This key is used for the output sql array.
+   *
+   * @param string $key
+   * @param $relationshipType
+   * @param $locationType
+   * @param $entityLabel
+   *
+   * @return string
+   */
+  protected function getOutputSpecificationFieldKey($key, $relationshipType, $locationType, $entityLabel) {
+    if ($relationshipType || $entityLabel || $key === 'im') {
+      if ($key !== 'state_province' && $key !== 'id') {
+        $key = $this->getHeaderForRow($key);
+      }
+    }
+    if (!$relationshipType || $key !== 'id') {
+      $key = $this->getMungedFieldName($key);
+    }
+    $fieldKey = $this->getMungedFieldName(
+      ($relationshipType ? ($relationshipType . '_') : '')
+      . ($locationType ? ($locationType . '_') : '')
+      . $key
+      . ($entityLabel ? ('_' . $entityLabel) : '')
+    );
+    return $fieldKey;
   }
 
 }
