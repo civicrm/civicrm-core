@@ -467,9 +467,15 @@ class CRM_Export_BAO_ExportProcessor {
         $labelPrefix[] = $fieldPrefix[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $entityTypeID);
       }
     }
-    $index = ($fieldPrefix ? (implode('-', $fieldPrefix)  . '-') : '') . $key;
+    $index = $this->getMungedFieldName(($fieldPrefix ? (implode('-', $fieldPrefix)  . '-') : '') . $key);
     $this->outputSpecification[$index]['header'] = ($labelPrefix ? (implode('-', $labelPrefix) . '-') : '') . $label;
+  }
 
+  /**
+   * @param $key
+   */
+  public function setSqlColumnDefn($key) {
+    $this->outputSpecification[$this->getMungedFieldName($key)]['sql_columns'] = $this->getSqlColumnDefinition($key);
   }
 
   /**
@@ -495,6 +501,20 @@ class CRM_Export_BAO_ExportProcessor {
     }
     return $headerRows;
   }
+
+  /**
+   * @return array
+   */
+  public function getSQLColumns() {
+    $sqlColumns = [];
+    foreach ($this->outputSpecification as $key => $spec) {
+      if (empty($spec['do_not_output_to_sql'])) {
+        $sqlColumns[$key] = $spec['sql_columns'];
+      }
+    }
+    return $sqlColumns;
+  }
+
 
   /**
    * Build the row for output.

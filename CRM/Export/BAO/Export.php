@@ -441,8 +441,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $count = -1;
 
-    list($outputColumns, $sqlColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
+    list($outputColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
     $headerRows = $processor->getHeaderRows();
+
 
     // add payment headers if required
     if ($addPaymentHeader && $processor->isExportPaymentFields()) {
@@ -450,10 +451,10 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       // where other header definitions take place.
       $headerRows = array_merge($headerRows, $processor->getPaymentHeaders());
       foreach (array_keys($processor->getPaymentHeaders()) as $paymentHdr) {
-        self::sqlColumnDefn($processor, $sqlColumns, $paymentHdr);
+        $processor->setSqlColumnDefn($paymentHdr);
       }
     }
-
+    $sqlColumns = $processor->getSQLColumns();
     $exportTempTable = self::createTempTable($sqlColumns);
     $limitReached = FALSE;
 
@@ -623,15 +624,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     CRM_Core_Report_Excel::writeCSVFile(ts('CiviCRM Contact Search'), $header, $rows);
     CRM_Utils_System::civiExit();
-  }
-
-  /**
-   * @param \CRM_Export_BAO_ExportProcessor $processor
-   * @param $sqlColumns
-   * @param $field
-   */
-  public static function sqlColumnDefn($processor, &$sqlColumns, $field) {
-    $sqlColumns[$processor->getMungedFieldName($field)] = $processor->getSqlColumnDefinition($field);
   }
 
   /**
@@ -1236,7 +1228,7 @@ WHERE  {$whereClause}";
    *       yet find a way to comment them for posterity.
    */
   public static function getExportStructureArrays($returnProperties, $processor) {
-    $metadata = $outputColumns = $sqlColumns = array();
+    $metadata = $outputColumns = array();
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
     $queryFields = $processor->getQueryFields();
@@ -1244,7 +1236,7 @@ WHERE  {$whereClause}";
       if (($key != 'location' || !is_array($value)) && !$processor->isRelationshipTypeKey($key)) {
         $outputColumns[$key] = $value;
         $processor->addOutputSpecification($key);
-        self::sqlColumnDefn($processor, $sqlColumns, $key);
+        $processor->setSqlColumnDefn($key);
       }
       elseif ($processor->isRelationshipTypeKey($key)) {
         $outputColumns[$key] = $value;
@@ -1256,7 +1248,7 @@ WHERE  {$whereClause}";
               // Do not add to header row if we are only generating for merge reasons.
               $processor->addOutputSpecification($relationField, $key);
             }
-            self::sqlColumnDefn($processor, $sqlColumns, $field . '-' . $relationField);
+            $processor->setSqlColumnDefn($field . '-' . $relationField);
           }
           elseif (is_array($relationValue) && $relationField == 'location') {
             // fix header for location type case
@@ -1275,7 +1267,7 @@ WHERE  {$whereClause}";
                   }
                 }
                 $processor->addOutputSpecification($field, $key, $ltype, CRM_Utils_Array::value(1, $type));
-                self::sqlColumnDefn($processor, $sqlColumns, $field . '-' . $hdr);
+                $processor->setSqlColumnDefn($field . '-' . $hdr);
               }
             }
           }
@@ -1303,9 +1295,9 @@ WHERE  {$whereClause}";
               // Warning: shame inducing hack.
               $metadata[$daoFieldName]['pseudoconstant']['var'] = 'imProviders';
             }
-            self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
+
             $processor->addOutputSpecification($outputFieldName, NULL, $locationType, CRM_Utils_Array::value(1, $type));
-            self::sqlColumnDefn($processor, $sqlColumns, $outputFieldName);
+            $processor->setSqlColumnDefn($outputFieldName);
             if ($actualDBFieldName == 'country' || $actualDBFieldName == 'world_region') {
               $metadata[$daoFieldName] = array('context' => 'country');
             }
@@ -1317,7 +1309,7 @@ WHERE  {$whereClause}";
         }
       }
     }
-    return array($outputColumns, $sqlColumns, $metadata);
+    return array($outputColumns, $metadata);
   }
 
   /**
