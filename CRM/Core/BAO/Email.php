@@ -386,6 +386,60 @@ AND    reset_date IS NULL
   }
 
   /**
+   * Get Email from multiple contacts to send contributions
+   *
+   * @param array $contactIDs
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getMultiEmails($contactIDs) {
+    $locations = [];
+    $contactsData = [];
+
+    $contactsEntity = civicrm_api3('Contact', 'get', [
+      'sequential' => 1,
+      'id' => ['IN' => $contactIDs],
+      'api.Email.get' => ['api.LocationType.getsingle' => []],
+    ]);
+
+    foreach ($contactsEntity['values'] as $contactEntity) {
+      //Get all available locations
+      $mailEntities = $contactEntity['api.Email.get'];
+      $contactID = $contactEntity['contact_id'];
+      foreach ($mailEntities['values'] as $mailEntity) {
+        $email = $mailEntity['email'];
+        $emailID = $mailEntity['id'];
+        //Get location type entity associated
+        $locationTypeEntity = $mailEntity['api.LocationType.getsingle'];
+        $locationName = $locationTypeEntity['display_name'];
+        $locations[] = $locationName;
+        $contactsData[$contactID][$emailID]['email'] = $email;
+        $contactsData[$contactID][$emailID]['is_preferred'] = $mailEntity['is_primary'];
+        $contactsData[$contactID][$emailID]['locationName'] = $locationName;
+      }
+    }
+
+    $locations = array_unique($locations);
+    $toEmails = [];
+
+    //Get mails for each location
+    foreach ($locations as $location) {
+      $emails = [];
+      foreach ($contactsData as $contactData){
+        $emails = array_merge(
+          static::getLocationOrPreferredMail($location, $contactData),
+          $emails
+        );
+      }
+      $emails = implode(", ", $emails);
+      $toEmails[$emails] = $location;
+    }
+
+    return $locations;
+  }
+
+  /**
    * @return object
    */
   public static function isMultipleBulkMail() {
@@ -401,6 +455,35 @@ AND    reset_date IS NULL
    */
   public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Email', $id);
+  }
+
+  /**
+   * Helper method to get mails from location or preferred
+   *
+   * @param string $location
+   * @param array $mails
+   *
+   * @return array
+   */
+  private function getLocationOrPreferredMail($location, $mails) {
+    $preferred = '';
+    $emails = [];
+
+    foreach ($mails as $mail) {
+      if ($mail['is_preferred'] == 1) {
+        $preferred = $mail['email'];
+      }
+
+      if ($mail['locationName'] == $location){
+        $emails[] = $mail['email'];
+      }
+    }
+
+    if (empty($emails) && !empty($preferred)) {
+      $emails[] = $preferred;
+    }
+
+    return $emails;
   }
 
 }

@@ -149,7 +149,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
     $this->add('select', 'from_email_address', ts('From'), $this->_fromEmails, TRUE);
     // @todo This should check if $this->_single is FALSE and act differently
-    $this->add('select', 'to_email_address', ts('To'), CRM_Core_BAO_Email::getToEmail($this->_contactIds[0]), TRUE);
+    $this->add('select', 'to_email_address', ts('To'), static::getToEmails(), TRUE);
     $this->add('text', 'cc_email_address', ts('CC'));
     $this->add('text', 'bcc_email_address', ts('BCC'));
     if ($this->_selectedOutput != 'email') {
@@ -645,4 +645,22 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     CRM_Contribute_Form_Task_Invoice::printPDF($contributionIDs, $params, $contactId);
   }
 
+  /**
+   * Helper function to get mails to send the invoice
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getToEmails() {
+    $emails = [];
+
+    // sending to multiple contacts
+    if (count($this->_contactIds) > 1) {
+      $emails = CRM_Core_BAO_Email::getMultiEmails($this->_contactIds);
+    } elseif (!empty($this->_contactIds)) { // sending to a single contact
+      $emails = CRM_Core_BAO_Email::getToEmail($this->_contactIds);
+    }
+
+    return $emails;
+  }
 }
