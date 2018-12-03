@@ -75,7 +75,7 @@
   </field>
   <field>
     <name>region_id</name>
-    <title>Region</title>
+    <title>World Region ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to civicrm_worldregion.id.</comment>
