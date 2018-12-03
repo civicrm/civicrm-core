@@ -37,11 +37,13 @@
          <p>{ts 1=$recur_frequency_interval 2=$recur_frequency_unit}This membership will be automatically renewed every %1 %2(s). {/ts}</p>
         </td>
        </tr>
+       {if $cancelSubscriptionUrl}
        <tr>
-        <td {$labelStyle}>
-         {ts 1=$cancelSubscriptionUrl}This membership will be renewed automatically. You can cancel the auto-renewal option by <a href="%1">visiting this web page</a>.{/ts}
-        </td>
+         <td {$labelStyle}>
+           {ts 1=$cancelSubscriptionUrl}You can cancel the auto-renewal option by <a href="%1">visiting this web page</a>.{/ts}
+         </td>
        </tr>
+       {/if}
        {if $updateSubscriptionBillingUrl}
          <tr>
           <td {$labelStyle}>
@@ -57,23 +59,27 @@
         <p>{ts}Start Date{/ts}: {$recur_start_date|crmDate}</p>
        </td>
       </tr>
+      {if $cancelSubscriptionUrl}
       <tr>
         <td {$labelStyle}>
-         {ts 1=$cancelSubscriptionUrl} You can cancel the recurring contribution option by <a href="%1">visiting this web page</a>.{/ts}
+          {ts 1=$cancelSubscriptionUrl} You can cancel the recurring contribution option by <a href="%1">visiting this web page</a>.{/ts}
         </td>
       </tr>
+      {/if}
       {if $updateSubscriptionBillingUrl}
         <tr>
           <td {$labelStyle}>
-           {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
+            {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
           </td>
         </tr>
       {/if}
+      {if $updateSubscriptionUrl}
       <tr>
         <td {$labelStyle}>
-   {ts 1=$updateSubscriptionUrl}You can update recurring contribution amount or change the number of installments details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
+          {ts 1=$updateSubscriptionUrl}You can update recurring contribution amount or change the number of installments details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
         </td>
-       </tr>
+      </tr>
+      {/if}
      {/if}
 
     {elseif $recur_txnType eq 'END'}
