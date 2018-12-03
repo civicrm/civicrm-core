@@ -169,6 +169,29 @@ class TokenProcessor {
   }
 
   /**
+   * Get a list of all unique values for a given context field,
+   * whether defined at the processor or row level.
+   *
+   * @param string $field
+   *   Ex: 'contactId'.
+   * @return array
+   *   Ex: [12, 34, 56].
+   */
+  public function getContextValues($field) {
+    $values = [];
+    if (isset($this->context[$field])) {
+      $values[] = $this->context[$field];
+    }
+    foreach ($this->getRows() as $row) {
+      if (isset($row->context[$field])) {
+        $values[] = $row->context[$field];
+      }
+    }
+    $values = array_unique($values);
+    return $values;
+  }
+
+  /**
    * Get the list of available tokens.
    *
    * @return array
