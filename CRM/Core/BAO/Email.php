@@ -407,6 +407,7 @@ AND    reset_date IS NULL
       //Get all available locations
       $mailEntities = $contactEntity['api.Email.get'];
       $contactID = $contactEntity['contact_id'];
+      $contactName = $contactEntity['display_name'];
       foreach ($mailEntities['values'] as $mailEntity) {
         $email = $mailEntity['email'];
         $emailID = $mailEntity['id'];
@@ -416,7 +417,8 @@ AND    reset_date IS NULL
         $locations[] = $locationName;
         $contactsData[$contactID][$emailID]['email'] = $email;
         $contactsData[$contactID][$emailID]['is_preferred'] = $mailEntity['is_primary'];
-        $contactsData[$contactID][$emailID]['locationName'] = $locationName;
+        $contactsData[$contactID][$emailID]['location_name'] = $locationName;
+        $contactsData[$contactID][$emailID]['contact_name'] = $contactName;
       }
     }
 
@@ -436,7 +438,7 @@ AND    reset_date IS NULL
       $toEmails[$emails] = $location;
     }
 
-    return $locations;
+    return $toEmails;
   }
 
   /**
@@ -471,11 +473,11 @@ AND    reset_date IS NULL
 
     foreach ($mails as $mail) {
       if ($mail['is_preferred'] == 1) {
-        $preferred = $mail['email'];
+        $preferred = $mail['contact_name'] . ' <' . $mail['email'] . '>';
       }
 
-      if ($mail['locationName'] == $location){
-        $emails[] = $mail['email'];
+      if ($mail['location_name'] == $location){
+        $emails[] = $mail['contact_name'] . ' <' . $mail['email'] . '>';
       }
     }
 
@@ -485,5 +487,4 @@ AND    reset_date IS NULL
 
     return $emails;
   }
-
 }
