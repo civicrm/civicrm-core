@@ -102,6 +102,27 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   }
 
   /**
+   * Metadata for fields on the search form.
+   *
+   * @var array
+   */
+  protected $searchFieldMetadata = [];
+
+  /**
+   * @return array
+   */
+  public function getSearchFieldMetadata() {
+    return $this->searchFieldMetadata;
+  }
+
+  /**
+   * @param array $searchFieldMetadata
+   */
+  public function addSearchFieldMetadata($searchFieldMetadata) {
+    $this->searchFieldMetadata = array_merge($this->searchFieldMetadata, $searchFieldMetadata);
+  }
+
+  /**
    * Common buildForm tasks required by all searches.
    */
   public function buildQuickform() {
@@ -121,6 +142,65 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
 
     $tasks = $this->buildTaskList();
     $this->addTaskMenu($tasks);
+  }
+
+  /**
+   * Add any fields described in metadata to the form.
+   *
+   * The goal is to describe all fields in metadata and handle from metadata rather
+   * than existing ad hoc handling.
+   */
+  public function addFormFieldsFromMetadata() {
+    $this->_action = CRM_Core_Action::ADVANCED;
+    foreach ($this->getSearchFieldMetadata() as $entity => $fields) {
+      foreach ($fields as $fieldName => $fieldSpec) {
+        $this->addField($fieldName, ['entity' => $entity]);
+      }
+    }
+  }
+
+  /**
+   * Get the validation rule to apply to a function.
+   *
+   * Alphanumeric is designed to always be safe & for now we just return
+   * that but in future we can use tighter rules for types like int, bool etc.
+   *
+   * @param string $entity
+   * @param string $fieldName
+   *
+   * @return string
+   */
+  protected function getValidationTypeForField($entity, $fieldName) {
+    switch ($this->getSearchFieldMetadata()[$entity][$fieldName]['type']) {
+      case CRM_Utils_Type::T_BOOLEAN:
+        return 'Boolean';
+
+      case CRM_Utils_Type::T_INT:
+        return 'CommaSeparatedIntegers';
+
+      default:
+        return 'Alphanumeric';
+    }
+  }
+
+  /**
+   * Get the defaults for the entity for any fields described in metadata.
+   *
+   * @param string $entity
+   *
+   * @return array
+   */
+  protected function getEntityDefaults($entity) {
+    $defaults = [];
+    foreach ($this->getSearchFieldMetadata()[$entity] as $fieldSpec) {
+      if (empty($_POST[$fieldSpec['name']])) {
+        $value = CRM_Utils_Request::retrieveValue($fieldSpec['name'], $this->getValidationTypeForField($entity, $fieldSpec['name']), FALSE, NULL, 'GET');
+        if ($value !== FALSE) {
+          $defaults[$fieldSpec['name']] = $value;
+        }
+      }
+    }
+    return $defaults;
   }
 
   /**
