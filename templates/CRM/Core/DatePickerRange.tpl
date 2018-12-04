@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,46 +23,36 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<tr>
-    <td>
-        {$form.grant_report_received.label}<br />
-        {$form.grant_report_received.html}
-    </td>
-    <td>
-        <label>{ts}Grant Status(s){/ts}</label>
-        <br>
-        {$form.grant_status_id.html}
-    </td>
-    <td>
-        <label>{ts}Grant Type(s){/ts}</label>
-        <br>
-        {$form.grant_type_id.html}
-    </td>
-</tr>
-<tr>
-    <td>
-        {$form.grant_amount_low.label}<br />
-        {$form.grant_amount_low.html}
-    </td>
-    <td colspan="2">
-        {$form.grant_amount_high.label}<br />
-        {$form.grant_amount_high.html}
-    </td>
-</tr>
-{foreach from=$grantSearchFields key=fieldName item=fieldSpec}
-  {assign var=notSetFieldName value=$fieldName|cat:'_notset'}
-<tr>
-  <td>
-    {include file="CRM/Core/DatePickerRange.tpl" from='_low' to='_high'}
-  </td>
-  <td>
-    &nbsp;{$form.$notSetFieldName.html}&nbsp;&nbsp;{$form.$notSetFieldName.label}
-  </td>
-</tr>
-{/foreach}
-{if $grantGroupTree}
-<tr>
-    <td colspan="3">
-    {include file="CRM/Custom/Form/Search.tpl" groupTree=$grantGroupTree showHideLinks=false}</td>
-</tr>
-{/if}
+{*this is included inside a table row*}
+{assign var=relativeName   value=$fieldName|cat:"_relative"}
+
+  {$form.$relativeName.label}<br />
+  {$form.$relativeName.html}<br />
+  <span class="crm-absolute-date-range">
+    <span class="crm-absolute-date-from">
+      {assign var=fromName value=$fieldName|cat:$from}
+      {$form.$fromName.label}
+      {$form.$fromName.html}
+    </span>
+    <span class="crm-absolute-date-to">
+      {assign var=toName   value=$fieldName|cat:$to}
+      {$form.$toName.label}
+      {$form.$toName.html}
+    </span>
+  </span>
+  {literal}
+    <script type="text/javascript">
+      CRM.$(function($) {
+        $("#{/literal}{$relativeName}{literal}").change(function() {
+          var n = cj(this).parent().parent();
+          if ($(this).val() == "0") {
+            $(".crm-absolute-date-range", n).show();
+          } else {
+            $(".crm-absolute-date-range", n).hide();
+            $(':text', n).val('');
+          }
+        }).change();
+      });
+    </script>
+  {/literal}
+

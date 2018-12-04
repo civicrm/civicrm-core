@@ -120,7 +120,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
 
   /**
    * @param $values
-   * @param $query
+   * @param \CRM_Contact_BAO_Query $query
    */
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -147,7 +147,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
         );
         return;
 
-      case 'grant_application_received_notset':
+      case 'grant_application_received_date_notset':
         $query->_where[$grouping][] = "civicrm_grant.application_received_date IS NULL";
         $query->_qill[$grouping][] = ts("Grant Application Received Date is NULL");
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
@@ -311,6 +311,13 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
+   * Transitional function for specifying which fields the tpl can iterate through.
+   */
+  public static function getTemplateHandlableSearchFields() {
+    return array_diff_key(self::getSearchFieldMetadata(), ['grant_report_received' => 1]);
+  }
+
+  /**
    * Add all the elements shared between grant search and advanaced search.
    *
    *
@@ -323,6 +330,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
     $grantType = CRM_Core_OptionGroup::values('grant_type');
     $form->addSearchFieldMetadata(['Grant' => self::getSearchFieldMetadata()]);
     $form->addFormFieldsFromMetadata();
+    $form->assign('grantSearchFields', self::getTemplateHandlableSearchFields());
     $form->add('select', 'grant_type_id', ts('Grant Type'), $grantType, FALSE,
       array('id' => 'grant_type_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
     );
@@ -331,7 +339,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
     $form->add('select', 'grant_status_id', ts('Grant Status'), $grantStatus, FALSE,
       array('id' => 'grant_status_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
     );
-    $form->addElement('checkbox', 'grant_application_received_notset', ts('Date is not set'), NULL);
+    $form->addElement('checkbox', 'grant_application_received_date_notset', ts('Date is not set'), NULL);
     $form->addElement('checkbox', 'grant_money_transfer_date_notset', ts('Date is not set'), NULL);
     $form->addElement('checkbox', 'grant_due_date_notset', ts('Date is not set'), NULL);
     $form->addElement('checkbox', 'grant_decision_date_notset', ts('Date is not set'), NULL);
