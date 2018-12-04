@@ -51,6 +51,10 @@
                 <td class="label">{$form.inheritLocale.label} {help id='inheritLocale' title=$form.inheritLocale.label}</td>
                 <td>{$form.inheritLocale.html}</td>
             </tr>
+            <tr class="crm-localization-form-block-uiLanguages">
+                <td class="label">{$form.uiLanguages.label}</td>
+                <td>{$form.uiLanguages.html}</td>
+            </tr>
           <tr class="crm-localization-form-contact_default_language">
             <td class="label">{$form.contact_default_language.label}</td>
             <td>{$form.contact_default_language.html}<br />
