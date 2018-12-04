@@ -321,7 +321,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * we allow the controller to set force/reset externally, useful when we are being
    * driven by the wizard framework
    */
-  protected function getUrlVariables() {
+  protected function loadStandardSearchOptionsFromUrl() {
     $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
     $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
@@ -335,7 +335,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    *
    * Get it from controller only if form has been submitted, else preProcess has set this
    */
-  protected function getFormVariables() {
+  protected function loadFormValues() {
     if (!empty($_POST)  && !$this->controller->isModal()) {
       $this->_formValues = $this->controller->exportValues($this->_name);
     }

@@ -90,8 +90,8 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     $this->_done = FALSE;
     $this->defaults = array();
 
-    $this->getUrlVariables();
-    $this->getFormVariables();
+    $this->loadStandardSearchOptionsFromUrl();
+    $this->loadFormValues();
 
     if ($this->_force) {
       $this->postProcess();

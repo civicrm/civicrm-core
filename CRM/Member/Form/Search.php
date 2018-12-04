@@ -84,7 +84,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
     $this->defaults = array();
 
-    $this->getUrlVariables();
+    $this->loadStandardSearchOptionsFromUrl();
 
     // get user submitted values
     // get it from controller only if form has been submitted, else preProcess has set this
