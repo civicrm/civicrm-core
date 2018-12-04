@@ -3648,4 +3648,37 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
     return FALSE;
   }
 
+  /**
+   * Get emails of the contact for a given location.
+   *
+   * @param int $contactID
+   *   Contact id.
+   *
+   * @param int $locationID
+   *   Location id.
+   *
+   * @return array
+   *   Email addresses if present else null
+   */
+  public static function getEmailsFromLocation($contactID, $locationID) {
+    $query = "
+   SELECT civicrm_email.email as email
+     FROM civicrm_contact
+LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
+    WHERE civicrm_contact.id = %1
+      AND civicrm_email.location_type_id = %2";
+    $p = array(
+      1 => array($contactID, 'Integer'),
+      2 => array($locationID, 'Integer')
+    );
+    $dao = CRM_Core_DAO::executeQuery($query, $p);
+
+    $email = NULL;
+    while ($dao->fetch()) {
+      $email[] = $dao->email;
+    }
+    $dao->free();
+    return $email;
+  }
+
 }

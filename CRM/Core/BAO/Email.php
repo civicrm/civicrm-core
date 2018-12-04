@@ -386,16 +386,15 @@ AND    reset_date IS NULL
   }
 
   /**
-   * Get Email from multiple contacts to send contributions
+   * Get available locations for a given set of contacts
    *
    * @param array $contactIDs
    *
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  public static function getMultiEmails($contactIDs) {
+  public static function getAvailableLocations($contactIDs) {
     $locations = [];
-    $contactsData = [];
 
     $contactsEntity = civicrm_api3('Contact', 'get', [
       'sequential' => 1,
@@ -404,41 +403,18 @@ AND    reset_date IS NULL
     ]);
 
     foreach ($contactsEntity['values'] as $contactEntity) {
-      //Get all available locations
+      //Get mail entitiy
       $mailEntities = $contactEntity['api.Email.get'];
-      $contactID = $contactEntity['contact_id'];
-      $contactName = $contactEntity['display_name'];
       foreach ($mailEntities['values'] as $mailEntity) {
-        $email = $mailEntity['email'];
-        $emailID = $mailEntity['id'];
         //Get location type entity associated
         $locationTypeEntity = $mailEntity['api.LocationType.getsingle'];
         $locationName = $locationTypeEntity['display_name'];
-        $locations[] = $locationName;
-        $contactsData[$contactID][$emailID]['email'] = $email;
-        $contactsData[$contactID][$emailID]['is_preferred'] = $mailEntity['is_primary'];
-        $contactsData[$contactID][$emailID]['location_name'] = $locationName;
-        $contactsData[$contactID][$emailID]['contact_name'] = $contactName;
+        $locationID = $locationTypeEntity['id'];
+        $locations[$locationID] = $locationName;
       }
     }
 
-    $locations = array_unique($locations);
-    $toEmails = [];
-
-    //Get mails for each location
-    foreach ($locations as $location) {
-      $emails = [];
-      foreach ($contactsData as $contactData){
-        $emails = array_merge(
-          static::getLocationOrPreferredMail($location, $contactData),
-          $emails
-        );
-      }
-      $emails = implode(", ", $emails);
-      $toEmails[$emails] = $location;
-    }
-
-    return $toEmails;
+    return $locations;
   }
 
   /**
@@ -459,32 +435,4 @@ AND    reset_date IS NULL
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Email', $id);
   }
 
-  /**
-   * Helper method to get mails from location or preferred
-   *
-   * @param string $location
-   * @param array $mails
-   *
-   * @return array
-   */
-  private function getLocationOrPreferredMail($location, $mails) {
-    $preferred = '';
-    $emails = [];
-
-    foreach ($mails as $mail) {
-      if ($mail['is_preferred'] == 1) {
-        $preferred = $mail['contact_name'] . ' <' . $mail['email'] . '>';
-      }
-
-      if ($mail['location_name'] == $location){
-        $emails[] = $mail['contact_name'] . ' <' . $mail['email'] . '>';
-      }
-    }
-
-    if (empty($emails) && !empty($preferred)) {
-      $emails[] = $preferred;
-    }
-
-    return $emails;
-  }
 }
