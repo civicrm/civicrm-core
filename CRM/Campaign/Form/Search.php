@@ -77,7 +77,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     $this->_printButtonName = $this->getButtonName('next', 'print');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
-    $this->getUrlVariables();
+    $this->loadStandardSearchOptionsFromUrl();
 
     //operation for state machine.
     $this->_operation = CRM_Utils_Request::retrieve('op', 'String', $this, FALSE, 'reserve');
