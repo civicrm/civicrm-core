@@ -1474,7 +1474,11 @@ class CRM_Utils_System {
       $params = array();
     }
     $config = CRM_Core_Config::singleton();
-    return $config->userSystem->loadBootStrap($params, $loadUser, $throwError, $realPath);
+    $result = $config->userSystem->loadBootStrap($params, $loadUser, $throwError, $realPath);
+    if (is_callable([$config->userSystem, 'setMySQLTimeZone'])) {
+      $config->userSystem->setMySQLTimeZone();
+    }
+    return $result;
   }
 
   /**
