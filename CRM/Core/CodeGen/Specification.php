@@ -403,7 +403,9 @@ class CRM_Core_CodeGen_Specification {
         $field['widget']['required'] = $this->value('required', $fieldXML);
       }
     }
-
+    if (isset($fieldXML->localize_context)) {
+      $field['localize_context'] = $fieldXML->localize_context;
+    }
     $field['pseudoconstant'] = $this->value('pseudoconstant', $fieldXML);
     if (!empty($field['pseudoconstant'])) {
       //ok this is a bit long-winded but it gets there & is consistent with above approach
