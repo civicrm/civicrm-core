@@ -73,9 +73,8 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   public function testPaymentProcessorCreate() {
     $params = $this->_params;
     $result = $this->callAPIAndDocument('payment_processor', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['id']);
-    $this->assertDBState('CRM_Financial_DAO_PaymentProcessor', $result['id'], $params);
-    return $result['id'];
+    $this->callAPISuccessGetSingle('EntityFinancialAccount', ['entity_table' => 'civicrm_payment_processor', 'entity_id' => $result['id']]);
+    $this->getAndCheck($params, $result['id'], 'PaymentProcessor');
   }
 
   /**
@@ -124,9 +123,9 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
    * Check payment processor delete.
    */
   public function testPaymentProcessorDelete() {
-    $id = $this->testPaymentProcessorCreate();
+    $result = $this->callAPISuccess('payment_processor', 'create', $this->_params);
     $params = array(
-      'id' => $id,
+      'id' => $result['id'],
     );
 
     $this->callAPIAndDocument('payment_processor', 'delete', $params, __FUNCTION__, __FILE__);

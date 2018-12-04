@@ -327,6 +327,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       if ($this->_paymentProcessorType) {
         $defaults['payment_processor_type_id'] = $this->_paymentProcessorType;
       }
+      $defaults['financial_account_id'] = CRM_Financial_BAO_PaymentProcessor::getDefaultFinancialAccountID();
       return $defaults;
     }
     $domainID = CRM_Core_Config::domainID();

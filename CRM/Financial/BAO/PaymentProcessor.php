@@ -597,4 +597,16 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
     }
   }
 
+  /**
+   * Get the default financial account id for payment processor accounts.
+   *
+   * Note that there is only a 'name' field & no label field. If people customise
+   * name then this won't work. This is new best-effort functionality so that's non-regressive.
+   *
+   * The fix for that is to add a label value to the financial account table.
+   */
+  public static function getDefaultFinancialAccountID() {
+    return CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_EntityFinancialAccount', 'financial_account_id', 'Payment Processor Account');
+  }
+
 }
