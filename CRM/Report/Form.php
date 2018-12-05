@@ -4253,7 +4253,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    * @param bool $groupBy
    *   Add GroupBy? Not appropriate for detail report.
    * @param bool $orderBy
-   *   Add GroupBy? Not appropriate for detail report.
+   *   Add OrderBy? Not appropriate for detail report.
    * @param bool $filters
    *
    */
