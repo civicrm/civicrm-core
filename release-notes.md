@@ -36,6 +36,15 @@ Released November 7, 2018
 - **[Credits](release-notes/5.7.0.md#credits)**
 - **[Feedback](release-notes/5.7.0.md#feedback)**
 
+## CiviCRM 5.6.1
+
+Released October 23, 2018
+
+- **[Synopsis](release-notes/5.6.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.6.1.md#bugs)**
+- **[Credits](release-notes/5.6.1.md#credits)**
+- **[Feedback](release-notes/5.6.1.md#feedback)**
+
 ## CiviCRM 5.6.0
 
 Released October 3, 2018
