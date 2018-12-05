@@ -71,14 +71,22 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
 
   /**
    * @var array
-   *   Ex: array('viewUrl', 'editUrl').
+   *   List of tokens provided by this class
+   *   Array(string $fieldName => string $label).
    */
   public $tokenNames;
 
   /**
+   * @var array
+   *   List of active tokens - tokens provided by this class and used in the message
+   *   Array(string $tokenName);
+   */
+  public $activeTokens;
+
+  /**
    * @param $entity
    * @param array $tokenNames
-   *   Array(string $fieldName => string $label).
+   *   Array(string $tokenName => string $label).
    */
   public function __construct($entity, $tokenNames = array()) {
     $this->entity = $entity;
@@ -143,14 +151,14 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $activeTokens = $this->getActiveTokens($e);
-    if (!$activeTokens) {
+    $this->activeTokens = $this->getActiveTokens($e);
+    if (!$this->activeTokens) {
       return;
     }
     $prefetch = $this->prefetch($e);
 
     foreach ($e->getRows() as $row) {
-      foreach ((array) $activeTokens as $field) {
+      foreach ($this->activeTokens as $field) {
         $this->evaluateToken($row, $this->entity, $field, $prefetch);
       }
     }
