@@ -126,9 +126,8 @@ CRM.$(function($) {
       {include file="CRM/Contact/Form/Search/Criteria/Basic.tpl"}
     </div>
   </div>
-
   {foreach from=$allPanes key=paneName item=paneValue}
-    <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' and $openedPanes.$paneName} {else}collapsed{/if}">
+    <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' || $openedPanes.$paneName} {else}collapsed{/if}">
       <div class="crm-accordion-header" id="{$paneValue.id}">
         {$paneName}
       </div>
