@@ -247,13 +247,22 @@ class CRM_Contact_Page_AJAX {
     // Loop through multiple case clients
     foreach ($clientList as $i => $sourceContactID) {
       try {
-        $result = civicrm_api3('relationship', 'create', array(
+        $params = [
           'case_id' => $caseID,
           'relationship_type_id' => $relTypeId,
           "contact_id_$a" => $relContactID,
           "contact_id_$b" => $sourceContactID,
+          'sequential' => TRUE,
+        ];
+        // first check if there is any existing relationship present with same parameters.
+        // If yes then update the relationship by setting active and start date to current time
+        $relationship = civicrm_api3('Relationship', 'get', $params)['values'];
+        $params = array_merge(CRM_Utils_Array::value(0, $relationship, $params), [
           'start_date' => 'now',
-        ));
+          'is_active' => TRUE,
+          'end_date' => '',
+        ]);
+        $result = civicrm_api3('relationship', 'create', $params);
       }
       catch (CiviCRM_API3_Exception $e) {
         $ret['is_error'] = 1;
