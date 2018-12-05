@@ -221,7 +221,7 @@ class CRM_Core_Page_AJAX_Location {
 
       $result = [];
       $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'address_options', true, NULL, true
+        'address_options', TRUE, NULL, TRUE
       );
       // lets output only required fields.
       foreach ($addressOptions as $element => $isSet) {
@@ -277,4 +277,5 @@ class CRM_Core_Page_AJAX_Location {
       CRM_Utils_JSON::output($result);
     }
   }
+
 }
