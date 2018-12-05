@@ -99,7 +99,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $contactID = $form->getContactID();
     }
     if (!$contactID && is_array($fields) && $fields) {
-      $contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($fields, 'Individual', 'Unsupervised', array(), FALSE, CRM_Utils_Array::value('dedupe_rule_group_id', $form->_values['event']));
+      $contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($fields, 'Individual', 'Unsupervised', [], FALSE, CRM_Utils_Array::value('dedupe_rule_group_id', $form->_values['event']), ['event_id' => CRM_Utils_Array::value('id', $form->_values['event'])]);
     }
     return $contactID;
   }
