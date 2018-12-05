@@ -4248,6 +4248,42 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
+   * Add campaign fields.
+   *
+   * @param bool $groupBy
+   *   Add GroupBy? Not appropriate for detail report.
+   * @param bool $orderBy
+   *   Add OrderBy? Not appropriate for detail report.
+   * @param bool $filters
+   *
+   */
+  public function addCampaignFields($entityTable = 'civicrm_contribution', $groupBy = FALSE, $orderBy = FALSE, $filters = TRUE) {
+    // Check if CiviCampaign is a) enabled and b) has active campaigns
+    $config = CRM_Core_Config::singleton();
+    $campaignEnabled = in_array('CiviCampaign', $config->enableComponents);
+    if ($campaignEnabled) {
+      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, FALSE, FALSE, TRUE);
+      // If we have a campaign, build out the relevant elements
+      if (!empty($getCampaigns['campaigns'])) {
+        $campaigns = $getCampaigns['campaigns'];
+        asort($campaigns);
+        $this->_columns[$entityTable]['fields']['campaign_id'] = array('title' => ts('Campaign'), 'default' => 'false');
+        if ($filters) {
+          $this->_columns[$entityTable]['filters']['campaign_id'] = array(
+            'title' => ts('Campaign'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => $campaigns,
+            'type' => CRM_Utils_Type::T_INT,
+          );
+        }
+        if ($groupBy) {
+          $this->_columns[$entityTable]['group_bys']['campaign_id'] = array('title' => ts('Campaign'));
+        }
+      }
+    }
+  }
+
+  /**
    * Add address fields.
    *
    * @deprecated - use getAddressColumns which is a more accurate description
