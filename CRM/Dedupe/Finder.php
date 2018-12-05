@@ -97,7 +97,7 @@ class CRM_Dedupe_Finder {
    *
    * check_permission is a boolean flag to indicate if permission should be considered.
    * default is to always check permissioning but public pages for example might not want
-   * permission to be checked for anonymous users. Refer CRM-6211. We might be beaking
+   * permission to be checked for anonymous users. Refer CRM-6211. We might be breaking
    * Multi-Site dedupe for public pages.
    *
    * @param array $params
