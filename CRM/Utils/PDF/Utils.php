@@ -95,21 +95,20 @@ class CRM_Utils_PDF_Utils {
     <div id=\"crm-container\">\n";
 
     // Strip <html>, <header>, and <body> tags from each page
+
     $htmlElementstoStrip = [
-      '@<head[^>]*?>.*?</head>@siu',
-      '@<script[^>]*?>.*?</script>@siu',
-      '@<body>@siu',
-      '@</body>@siu',
-      '@<html[^>]*?>@siu',
-      '@</html>@siu',
-      '@<!DOCTYPE[^>]*?>@siu',
+      '<head[^>]*?>.*?</head>',
+      '<script[^>]*?>.*?</script>',
+      '<body>',
+      '</body>',
+      '<html[^>]*?>',
+      '</html>',
+      '<!DOCTYPE[^>]*?>',
     ];
-    $htmlElementsInstead = ['', '', '', '', '', ''];
     foreach ($pages as & $page) {
-      $page = preg_replace($htmlElementstoStrip,
-        $htmlElementsInstead,
-        $page
-      );
+      foreach ($htmlElementstoStrip as $pattern) {
+        $page = mb_eregi_replace($pattern, '', $page);
+      }
     }
     // Glue the pages together
     $html .= implode("\n<div style=\"page-break-after: always\"></div>\n", $pages);
