@@ -115,6 +115,7 @@ class CRM_Core_Payment_Form {
   protected static function addCommonFields(&$form, $paymentFields) {
     $requiredPaymentFields = $paymentFieldsMetadata = [];
     foreach ($paymentFields as $name => $field) {
+      $field['extra'] = isset($field['extra']) ? $field['extra'] : NULL;
       if ($field['htmlType'] == 'chainSelect') {
         $form->addChainSelect($field['name'], array('required' => FALSE));
       }
@@ -123,7 +124,8 @@ class CRM_Core_Payment_Form {
           $field['name'],
           $field['title'],
           $field['attributes'],
-          FALSE
+          FALSE,
+          $field['extra']
         );
       }
       // This will cause the fields to be marked as required - but it is up to the payment processor to

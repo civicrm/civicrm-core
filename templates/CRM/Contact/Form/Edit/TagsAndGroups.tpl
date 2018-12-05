@@ -33,7 +33,7 @@
         {if !$type || $type eq 'tag'}
           <td>
             <div class="crm-section tag-section">
-              {if $title}{$form.tag.label}{/if}
+              {if $title}{$form.tag.label}<br>{/if}
               {$form.tag.html}
             </div>
             {if $context NEQ 'profile'}

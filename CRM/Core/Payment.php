@@ -734,6 +734,7 @@ abstract class CRM_Core_Payment {
             'rule_parameters' => TRUE,
           ),
         ),
+        'extra' => ['class' => 'crm-form-select'],
       ),
       'credit_card_type' => array(
         'htmlType' => 'select',
