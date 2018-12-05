@@ -375,6 +375,10 @@ function _civicrm_api3_contact_get_spec(&$params) {
       'table' => 'civicrm_tag',
     ),
   );
+  $params['uf_user'] = array(
+    'title' => 'CMS User',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
   $params['birth_date_low'] = array('name' => 'birth_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or greater than'));
   $params['birth_date_high'] = array('name' => 'birth_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or less than'));
   $params['deceased_date_low'] = array('name' => 'deceased_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Deceased Date is equal to or greater than'));
