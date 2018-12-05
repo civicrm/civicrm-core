@@ -364,9 +364,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       $this->_from .= " ON {$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_contact']}.id
          AND {$this->_aliases['civicrm_contribution']}.is_test = 0
          AND " . $this->whereClauseLastYear("{$this->_aliases['civicrm_contribution']}.receive_date") . "
-       {$this->_aclFrom}
-       LEFT JOIN civicrm_contribution cont_exclude ON cont_exclude.contact_id = {$this->_aliases['civicrm_contact']}.id
-         AND " . $this->whereClauseThisYear('cont_exclude.receive_date');
+       {$this->_aclFrom} ";
       $this->selectivelyAddLocationTablesJoinsToFilterQuery();
     }
 
@@ -399,7 +397,11 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     if ($field['name'] == 'receive_date') {
       $clause = 1;
       if (empty($this->contactTempTable)) {
-        $this->_whereClauses[] = "cont_exclude.id IS NULL";
+        $clause = "{$this->_aliases['civicrm_contact']}.id NOT IN (
+          SELECT cont_exclude.contact_id
+          FROM civicrm_contribution cont_exclude
+          WHERE " . $this->whereClauseThisYear('cont_exclude.receive_date')
+        . ")";
       }
     }
     // Group filtering is already done so skip.
