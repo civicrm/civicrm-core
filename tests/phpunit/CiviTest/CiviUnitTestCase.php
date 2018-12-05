@@ -140,7 +140,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public $setupIDs = array();
 
   /**
-   * PHPUnit Mock Mecthod to use.
+   * PHPUnit Mock Method to use.
    *
    * @var string
    */

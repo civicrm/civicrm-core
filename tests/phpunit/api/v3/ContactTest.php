@@ -2061,6 +2061,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'id' => '@user:exampleUser',
     ));
     $this->assertEquals('testGetByUsername', $result['values'][$cid]['first_name']);
+
+    // Check search of contacts with & without uf records
+    $result = $this->callAPISuccess('Contact', 'get', ['uf_user' => 1]);
+    $this->assertArrayHasKey($cid, $result['values']);
+
+    $result = $this->callAPISuccess('Contact', 'get', ['uf_user' => 0]);
+    $this->assertArrayNotHasKey($cid, $result['values']);
   }
 
   /**
