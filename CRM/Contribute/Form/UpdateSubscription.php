@@ -124,8 +124,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
     }
 
     if (!CRM_Core_Permission::check('edit contributions')) {
-      $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE);
-      if (!CRM_Contact_BAO_Contact_Utils::validChecksum($this->_subscriptionDetails->contact_id, $userChecksum)) {
+      if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to update subscription.'));
       }
       $this->_selfService = TRUE;
