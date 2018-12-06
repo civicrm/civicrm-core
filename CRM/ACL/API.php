@@ -65,6 +65,10 @@ class CRM_ACL_API {
       $contactID = 0;
     }
 
+    if ($allGroups == NULL) {
+      $allGroups = CRM_Core_PseudoConstant::allGroup();
+    }
+
     return CRM_ACL_BAO_ACL::check($str, $contactID);
   }
 
