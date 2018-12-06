@@ -175,7 +175,7 @@ class CRM_Case_Form_Activity_OpenCase {
       $csElement->freeze();
     }
 
-    $form->add('text', 'duration', ts('Activity Duration'), array('size' => 4, 'maxlength' => 8));
+    $form->add('number', 'duration', ts('Activity Duration'), ['class' => 'four', 'min' => 1]);
     $form->addRule('duration', ts('Please enter the duration as number of minutes (integers only).'), 'positiveInteger');
 
     if ($form->_currentlyViewedContactId) {

@@ -163,9 +163,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         ),
       ),
       'duration' => array(
-        'type' => 'text',
+        'type' => 'number',
         'label' => ts('Duration'),
-        'attributes' => array('size' => 4, 'maxlength' => 8),
+        'attributes' => array('class' => 'four', 'min' => 1),
         'required' => FALSE,
       ),
       'location' => array(
