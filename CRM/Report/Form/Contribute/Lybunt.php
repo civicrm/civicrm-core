@@ -697,7 +697,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       // convert campaign_id to campaign title
       if (array_key_exists('civicrm_contribution_campaign_id', $row)) {
         if ($value = $row['civicrm_contribution_campaign_id']) {
-          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->activeCampaigns[$value];
+          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->campaigns[$value];
           $entryFound = TRUE;
         }
       }

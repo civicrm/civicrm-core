@@ -4265,14 +4265,14 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, FALSE, FALSE, TRUE);
       // If we have a campaign, build out the relevant elements
       if (!empty($getCampaigns['campaigns'])) {
-        $campaigns = $getCampaigns['campaigns'];
-        asort($campaigns);
+        $this->campaigns = $getCampaigns['campaigns'];
+        asort($this->campaigns);
         $this->_columns[$entityTable]['fields']['campaign_id'] = array('title' => ts('Campaign'), 'default' => 'false');
         if ($filters) {
           $this->_columns[$entityTable]['filters']['campaign_id'] = array(
             'title' => ts('Campaign'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $campaigns,
+            'options' => $this->campaigns,
             'type' => CRM_Utils_Type::T_INT,
           );
         }
