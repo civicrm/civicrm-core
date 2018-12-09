@@ -64,12 +64,12 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
     $fields = array_keys($contactImportValues);
     $values = array_values($contactImportValues);
-    $parser = new CRM_Contact_Import_Parser_Contact($fields, NULL);
+    $parser = new CRM_Contact_Import_Parser_Contact($fields, []);
     $parser->_contactType = 'Individual';
     $parser->init();
     $this->mapRelationshipFields($fields, $parser->getAllFields());
 
-    $parser = new CRM_Contact_Import_Parser_Contact($fields, NULL, NULL, NULL, array(
+    $parser = new CRM_Contact_Import_Parser_Contact($fields, [], [], [], array(
       NULL,
       NULL,
       $fields[2],
@@ -81,7 +81,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       NULL,
       NULL,
       "organization_name",
-    ), NULL, NULL, NULL, NULL, NULL);
+    ), [], [], [], [], []);
 
     $parser->_contactType = 'Individual';
     $parser->_onDuplicate = CRM_Import_Parser::DUPLICATE_UPDATE;
