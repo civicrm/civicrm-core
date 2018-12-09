@@ -660,14 +660,15 @@ class CRM_Core_I18n {
    * @return CRM_Core_I18n
    */
   public static function &singleton() {
-    static $singleton = array();
-
+    if (!isset(Civi::$statics[__CLASS__]['singleton'])) {
+      Civi::$statics[__CLASS__]['singleton'] = array();
+    }
     $tsLocale = CRM_Core_I18n::getLocale();
-    if (!isset($singleton[$tsLocale])) {
-      $singleton[$tsLocale] = new CRM_Core_I18n($tsLocale);
+    if (!isset(Civi::$statics[__CLASS__]['singleton'][$tsLocale])) {
+      Civi::$statics[__CLASS__]['singleton'][$tsLocale] = new CRM_Core_I18n($tsLocale);
     }
 
-    return $singleton[$tsLocale];
+    return Civi::$statics[__CLASS__]['singleton'][$tsLocale];
   }
 
   /**

@@ -50,6 +50,8 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
     $locale = CRM_Core_I18n::getLocale();
 
     $this->assertEquals($locale, 'fr_CA');
+    CRM_Core_I18n::singleton()->setLocale('en_US');
+    Civi::$statics['CRM_Core_I18n']['singleton'] = [];
   }
 
 }
