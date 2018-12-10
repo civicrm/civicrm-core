@@ -193,8 +193,8 @@
     if (!datePickerOp) {
       removeDate(row);
     }
-    else if (!input.hasClass('hasDatepicker')) {
-      input.addClass('dateplugin').datepicker({
+    else if (!input.hasClass('crm-form-date')) {
+      input.addClass('crm-form-date').attr({placeholder: '\uF073'}).datepicker({
         dateFormat: 'yymmdd',
         changeMonth: true,
         changeYear: true,
@@ -209,8 +209,8 @@
    */
   function removeDate(row) {
     var input = $('.crm-search-value input', row);
-    if (input.hasClass('hasDatepicker')) {
-      input.removeClass('dateplugin').val('').datepicker('destroy');
+    if (input.hasClass('crm-form-date')) {
+      input.removeClass('crm-form-date').val('').attr('placeholder', '').datepicker('destroy');
     }
   }
 
