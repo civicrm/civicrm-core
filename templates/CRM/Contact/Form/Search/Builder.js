@@ -48,10 +48,8 @@
       buildSelect(row, field, op, false);
     }
 
-    if ((field in CRM.searchBuilder.fieldTypes) === true &&
-      CRM.searchBuilder.fieldTypes[field] == 'Date'
-    ) {
-      buildDate(row, op);
+    if (CRM.searchBuilder.fieldTypes[field] === 'Date' || CRM.searchBuilder.fieldTypes[field] === 'Timestamp') {
+      buildDate(row, op, CRM.searchBuilder.fieldTypes[field] === 'Timestamp');
     }
     else {
       removeDate(row);
@@ -178,7 +176,7 @@
    * @param row: jQuery object
    */
   function removeSelect(row) {
-    $('.crm-search-value input', row).show();
+    $('.crm-search-value input', row).not('.crm-hidden-date').show();
     $('.crm-search-value select', row).remove();
   }
 
@@ -186,7 +184,7 @@
    * Add a datepicker if appropriate for this operation
    * @param row: jQuery object
    */
-  function buildDate(row, op) {
+  function buildDate(row, op, time) {
     var input = $('.crm-search-value input', row);
     // These are operations that should not get a datepicker
     var datePickerOp = ($.inArray(op, ['IN', 'NOT IN', 'LIKE', 'RLIKE']) < 0);
@@ -198,18 +196,20 @@
       var val = input.val();
       if (val && val.length === 8) {
         input.val(val.substr(0, 4) + '-' + val.substr(4, 2) + '-' + val.substr(6, 2));
+      } else if (val && val.length === 14) {
+        input.val(val.substr(0, 4) + '-' + val.substr(4, 2) + '-' + val.substr(6, 2) + ' ' + val.substr(8, 2) + ':' + val.substr(10, 2) + ':' + val.substr(12, 2));
       }
       input
         .on('change.searchBuilder', function() {
           if ($(this).val()) {
-            $(this).val($(this).val().replace(/-/g, ''));
+            $(this).val($(this).val().replace(/[: -]/g, ''));
           }
         })
         .crmDatepicker({
-          time: false,
+          time: time,
           yearRange: '-100:+20'
         })
-        .trigger('change', ['userInput']);
+        .triggerHandler('change', ['userInput']);
     }
   }
 
