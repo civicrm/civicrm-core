@@ -193,13 +193,23 @@
     if (!datePickerOp) {
       removeDate(row);
     }
-    else if (!input.hasClass('crm-form-date')) {
-      input.addClass('crm-form-date').attr({placeholder: '\uF073'}).datepicker({
-        dateFormat: 'yymmdd',
-        changeMonth: true,
-        changeYear: true,
-        yearRange: '-100:+20'
-      });
+    else if (!$('input.crm-hidden-date', row).length) {
+      // Unfortunately the search builder form expects yyyymmdd and crmDatepicker gives yyyy-mm-dd so we have to fudge it
+      var val = input.val();
+      if (val && val.length === 8) {
+        input.val(val.substr(0, 4) + '-' + val.substr(4, 2) + '-' + val.substr(6, 2));
+      }
+      input
+        .on('change.searchBuilder', function() {
+          if ($(this).val()) {
+            $(this).val($(this).val().replace(/-/g, ''));
+          }
+        })
+        .crmDatepicker({
+          time: false,
+          yearRange: '-100:+20'
+        })
+        .trigger('change', ['userInput']);
     }
   }
 
@@ -208,10 +218,7 @@
    * @param row: jQuery object
    */
   function removeDate(row) {
-    var input = $('.crm-search-value input', row);
-    if (input.hasClass('crm-form-date')) {
-      input.removeClass('crm-form-date').val('').attr('placeholder', '').datepicker('destroy');
-    }
+    $('.crm-search-value input.crm-hidden-date', row).off('.searchBuilder').crmDatepicker('destroy');
   }
 
   /**
