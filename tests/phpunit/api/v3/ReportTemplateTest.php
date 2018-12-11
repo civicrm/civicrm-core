@@ -35,6 +35,7 @@
 class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   use CRMTraits_ACL_PermissionTrait;
+  use CRMTraits_PCP_PCPTestTrait;
 
   protected $_apiversion = 3;
 
@@ -1031,6 +1032,127 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'order_bys' => [['column' => 'sort_name', 'order' => 'ASC', 'section' => '1']],
       'options' => array('metadata' => array('sql')),
     ));
+  }
+
+  /**
+   * Test PCP report to ensure total donors and total committed is accurate.
+   */
+  public function testPcpReportTotals() {
+    $donor1ContactId = $this->individualCreate();
+    $donor2ContactId = $this->individualCreate();
+    $donor3ContactId = $this->individualCreate();
+
+    // We are going to create two PCP pages. We will create two contributions
+    // on the first PCP page and one contribution on the second PCP page.
+    //
+    // Then, we will ensure that the first PCP page reports a total of both
+    // contributions (but not the contribution made on the second PCP page).
+
+    // A PCP page requires three components:
+    // 1. A contribution page
+    // 2. A PCP Block
+    // 3. A PCP page
+
+    // pcpBLockParams creates a contribution page and returns the parameters
+    // necessary to create a PBP Block.
+    $blockParams = $this->pcpBlockParams();
+    $pcpBlock = CRM_PCP_BAO_PCPBlock::create($blockParams);
+
+    // Keep track of the contribution page id created. We will use this
+    // contribution page id for all the PCP pages.
+    $contribution_page_id = $pcpBlock->entity_id;
+
+    // pcpParams returns the parameters needed to create a PCP page.
+    $pcpParams = $this->pcpParams();
+    // Keep track of the owner of the page so we can properly apply the
+    // soft credit.
+    $pcpOwnerContact1Id = $pcpParams['contact_id'];
+    $pcpParams['pcp_block_id'] = $pcpBlock->id;
+    $pcpParams['page_id'] = $contribution_page_id;
+    $pcpParams['page_type'] = 'contribute';
+    $pcp1 = CRM_PCP_BAO_PCP::create($pcpParams);
+
+    // Nice work. Now, let's create a second PCP page.
+    $pcpParams = $this->pcpParams();
+    // Keep track of the owner of the page.
+    $pcpOwnerContact2Id = $pcpParams['contact_id'];
+    // We're using the same pcpBlock id and contribution page that we created above.
+    $pcpParams['pcp_block_id'] = $pcpBlock->id;
+    $pcpParams['page_id'] = $contribution_page_id;
+    $pcpParams['page_type'] = 'contribute';
+    $pcp2 = CRM_PCP_BAO_PCP::create($pcpParams);
+
+    // Get soft credit types, with the name column as the key.
+    $soft_credit_types = CRM_Contribute_BAO_ContributionSoft::buildOptions("soft_credit_type_id", NULL, array("flip" => TRUE, 'labelColumn' => 'name'));
+    $pcp_soft_credit_type_id = $soft_credit_types['pcp'];
+
+    // Create two contributions assigned to this contribution page and
+    // assign soft credits appropriately.
+    // FIRST...
+    $contribution1params = array(
+      'contact_id' => $donor1ContactId,
+      'contribution_page_id' => $contribution_page_id,
+      'total_amount' => '75.00',
+    );
+    $c1 = $this->contributionCreate($contribution1params);
+    // Now the soft contribution.
+    $p = array(
+      'contribution_id' => $c1,
+      'pcp_id' => $pcp1->id,
+      'contact_id' => $pcpOwnerContact1Id,
+      'amount' => 75.00,
+      'currency' => 'USD',
+      'soft_credit_type_id' => $pcp_soft_credit_type_id,
+    );
+    $this->callAPISuccess('contribution_soft', 'create', $p);
+    // SECOND...
+    $contribution2params = array(
+      'contact_id' => $donor2ContactId,
+      'contribution_page_id' => $contribution_page_id,
+      'total_amount' => '25.00',
+    );
+    $c2 = $this->contributionCreate($contribution2params);
+    // Now the soft contribution.
+    $p = array(
+      'contribution_id' => $c2,
+      'pcp_id' => $pcp1->id,
+      'contact_id' => $pcpOwnerContact1Id,
+      'amount' => 25.00,
+      'currency' => 'USD',
+      'soft_credit_type_id' => $pcp_soft_credit_type_id,
+    );
+    $this->callAPISuccess('contribution_soft', 'create', $p);
+
+    // Create one contributions assigned to the second PCP page
+    $contribution3params = array(
+      'contact_id' => $donor3ContactId,
+      'contribution_page_id' => $contribution_page_id,
+      'total_amount' => '200.00',
+    );
+    $c3 = $this->contributionCreate($contribution3params);
+    // Now the soft contribution.
+    $p = array(
+      'contribution_id' => $c3,
+      'pcp_id' => $pcp2->id,
+      'contact_id' => $pcpOwnerContact2Id,
+      'amount' => 200.00,
+      'currency' => 'USD',
+      'soft_credit_type_id' => $pcp_soft_credit_type_id,
+    );
+    $this->callAPISuccess('contribution_soft', 'create', $p);
+
+    $template = 'contribute/pcp';
+    $rows = $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => $template,
+      'title' => 'My PCP',
+      'fields' => [
+        'amount_1' => '1',
+        'soft_id' => '1',
+       ],
+    ));
+    $values = $rows['values'][0];
+    $this->assertEquals(100.00, $values['civicrm_contribution_soft_amount_1_sum'], "Total commited should be $100");
+    $this->assertEquals(2, $values['civicrm_contribution_soft_soft_id_count'], "Total donors should be 2");
   }
 
 }
