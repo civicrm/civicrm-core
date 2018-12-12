@@ -32,6 +32,9 @@ http://dmaster.localhost/civicrm/hello-world/#/?cid=123
 How do we use the `cid` to get information about the contact? Update `layout.html` to include data from APIv3:
 
 ```html
+<div ng-if="!routeParams.cid">
+  {{ts('Please provide the "cid"')}}
+</div>
 <div ng-if="routeParams.cid"
   afform-api3="['Contact', 'get', {id: routeParams.cid}]"
   afform-api3-ctrl="apiData">
