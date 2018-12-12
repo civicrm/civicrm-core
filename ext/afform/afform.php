@@ -4,7 +4,7 @@ require_once 'afform.civix.php';
 use CRM_Afform_ExtensionUtil as E;
 
 function _afform_fields() {
-  return ['name', 'title', 'description', 'requires', 'layout', 'server_route', 'client_route'];
+  return ['name', 'title', 'description', 'requires', 'layout', 'server_route', 'client_route', 'is_public'];
 }
 
 /**
@@ -18,6 +18,15 @@ function _afform_fields_filter($params) {
   foreach (_afform_fields() as $field) {
     if (isset($params[$field])) {
       $result[$field] = $params[$field];
+    }
+
+    if (isset($result[$field])) {
+      switch ($field) {
+        case 'is_public':
+          $result[$field] = CRM_Utils_String::strtobool($result[$field]);
+          break;
+
+      }
     }
   }
   return $result;
