@@ -454,11 +454,11 @@ return array(
     ),
     'default' => NULL,
     'add' => '5.9',
-    'title' => 'UI Languages',
+    'title' => 'Available Languages',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => '',
-    'help_text' => ts('User Interface lanaguages available to users'),
+    'help_text' => ts('User Interface languages available to users'),
     'pseudoconstant' => array(
       'callback' => 'CRM_Core_I18n::languages',
     ),
