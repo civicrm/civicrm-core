@@ -48,10 +48,8 @@
       buildSelect(row, field, op, false);
     }
 
-    if ((field in CRM.searchBuilder.fieldTypes) === true &&
-      CRM.searchBuilder.fieldTypes[field] == 'Date'
-    ) {
-      buildDate(row, op);
+    if (CRM.searchBuilder.fieldTypes[field] === 'Date' || CRM.searchBuilder.fieldTypes[field] === 'Timestamp') {
+      buildDate(row, op, CRM.searchBuilder.fieldTypes[field] === 'Timestamp');
     }
     else {
       removeDate(row);
@@ -178,7 +176,7 @@
    * @param row: jQuery object
    */
   function removeSelect(row) {
-    $('.crm-search-value input', row).show();
+    $('.crm-search-value input', row).not('.crm-hidden-date').show();
     $('.crm-search-value select', row).remove();
   }
 
@@ -186,20 +184,32 @@
    * Add a datepicker if appropriate for this operation
    * @param row: jQuery object
    */
-  function buildDate(row, op) {
+  function buildDate(row, op, time) {
     var input = $('.crm-search-value input', row);
     // These are operations that should not get a datepicker
     var datePickerOp = ($.inArray(op, ['IN', 'NOT IN', 'LIKE', 'RLIKE']) < 0);
     if (!datePickerOp) {
       removeDate(row);
     }
-    else if (!input.hasClass('hasDatepicker')) {
-      input.addClass('dateplugin').datepicker({
-        dateFormat: 'yymmdd',
-        changeMonth: true,
-        changeYear: true,
-        yearRange: '-100:+20'
-      });
+    else if (!$('input.crm-hidden-date', row).length) {
+      // Unfortunately the search builder form expects yyyymmdd and crmDatepicker gives yyyy-mm-dd so we have to fudge it
+      var val = input.val();
+      if (val && val.length === 8) {
+        input.val(val.substr(0, 4) + '-' + val.substr(4, 2) + '-' + val.substr(6, 2));
+      } else if (val && val.length === 14) {
+        input.val(val.substr(0, 4) + '-' + val.substr(4, 2) + '-' + val.substr(6, 2) + ' ' + val.substr(8, 2) + ':' + val.substr(10, 2) + ':' + val.substr(12, 2));
+      }
+      input
+        .on('change.searchBuilder', function() {
+          if ($(this).val()) {
+            $(this).val($(this).val().replace(/[: -]/g, ''));
+          }
+        })
+        .crmDatepicker({
+          time: time,
+          yearRange: '-100:+20'
+        })
+        .triggerHandler('change', ['userInput']);
     }
   }
 
@@ -208,10 +218,7 @@
    * @param row: jQuery object
    */
   function removeDate(row) {
-    var input = $('.crm-search-value input', row);
-    if (input.hasClass('hasDatepicker')) {
-      input.removeClass('dateplugin').val('').datepicker('destroy');
-    }
+    $('.crm-search-value input.crm-hidden-date', row).off('.searchBuilder').crmDatepicker('destroy');
   }
 
   /**
