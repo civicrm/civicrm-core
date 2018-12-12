@@ -29,7 +29,8 @@ would request a URL like:
 http://dmaster.localhost/civicrm/hello-world/#/?cid=123
 ```
 
-How do we use the `cid` to get information about the contact? Update `layout.html` to include data from APIv3:
+How do we use the `cid` to get information about the contact?  Update `layout.html` to fetch data with
+`Contact.get` API and the [afform-api3](https://github.com/totten/afform/blob/master/ang/afformCore/Api3Ctrl.md) utility:
 
 ```html
 <div ng-if="!routeParams.cid">
