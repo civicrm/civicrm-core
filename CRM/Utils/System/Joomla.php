@@ -49,6 +49,51 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
+   * Determine the location of the CiviCRM source tree.
+   *
+   * @return array
+   *   - url: string. ex: "http://example.com/administrator/components/com_civicrm/civicrm/"
+   *   - path: string. ex: "/var/www/administrator/components/com_civicrm/civicrm/"
+   * 
+   * @link https://api.joomla.org/cms-3/classes/Joomla.CMS.Uri.Uri.html#method_root
+   * @link https://docs.joomla.org/Constants
+   */
+  public function getCiviSourceStorage() {
+    if (!defined('JPATH_COMPONENT_ADMINISTRATOR')) {
+      throw new RuntimeException('Undefined constant: JPATH_COMPONENT_ADMINISTRATOR');
+    }
+    if (!defined('JPATH_SITE')) {
+      throw new RuntimeException('Undefined constant: JPATH_SITE');
+    }
+
+    // Get the file path of the CiviCRM component from Joomla's
+    // JPATH_COMPONENT_ADMINISTRATOR constant. This will be something like
+    // '/var/www/administrator/components/com_civicrm'. 
+    // It includes 'administrator' but excludes 'civicrm'
+    $civiPath = JPATH_COMPONENT_ADMINISTRATOR;
+
+    // Get the file path to the Joomla site from Joomla's JPATH_SITE
+    // constant. Note: JPATH_SITE does not include 'administrator'.
+    $cmsPath = JPATH_SITE;
+
+    // Get the Joomla site URL using the Joomla API.
+    // Note: JUri::root() always excludes 'administrator'
+    $cmsUrl = JUri::root();
+
+    // Obtain the relative file path to CiviCRM
+    $civiRelPath = CRM_Utils_File::relativize(realpath($civiPath), realpath($cmsPath));
+
+    // Get the URL to CiviCRM component's root by appending the relative path
+    // to the CMS URL.
+    $civiUrl = rtrim($cmsUrl, '/') . '/' . ltrim($civiRelPath, ' /') . '/civicrm';
+
+    return array(
+      'url' => CRM_Utils_File::addTrailingSlash($civiUrl, '/'),
+      'path' => CRM_Utils_File::addTrailingSlash($civiPath),
+    );
+  }
+
+  /**
    * @inheritDoc
    */
   public function createUser(&$params, $mail) {
