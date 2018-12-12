@@ -223,7 +223,7 @@ class CRM_Core_I18n {
         }
       }
 
-      ksort($all);
+      asort($all);
     }
 
     if ($enabled === NULL) {
@@ -239,6 +239,28 @@ class CRM_Core_I18n {
     }
 
     return $justEnabled ? $enabled : $all;
+  }
+
+  /**
+   * Return the available UI languages
+   * @return array(string languageCode) if $justCodes
+   *         array(string languageCode => string languageName) if !$justCodes
+   */
+  public static function uiLanguages($justCodes = FALSE) {
+    // In multilang we only allow the languages that are configured in db
+    // Otherwise, the languages configured in uiLanguages
+    $settings = Civi::settings();
+    if (CRM_Core_I18n::isMultiLingual()) {
+      $codes = array_keys((array) $settings->get('languageLimit'));
+    }
+    else {
+      $codes = $settings->get('uiLanguages');
+      if (!$codes) {
+        $codes = [$settings->get('lcMessages')];
+      }
+    }
+    return $justCodes ? $codes
+        : CRM_Utils_Array::subset(CRM_Core_I18n::languages(), $codes);
   }
 
   /**

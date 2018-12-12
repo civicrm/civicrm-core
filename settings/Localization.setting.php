@@ -441,6 +441,28 @@ return array(
       'callback' => 'CRM_Core_I18n::languages',
     ),
   ),
+  'uiLanguages' => array(
+    'group_name' => 'Localization Preferences',
+    'group' => 'localization',
+    'name' => 'uiLanguages',
+    'type' => 'Array',
+    'quick_form_type' => 'Select',
+    'html_type' => 'select',
+    'html_attributes' => array(
+      'multiple' => 1,
+      'class' => 'crm-select2',
+    ),
+    'default' => NULL,
+    'add' => '5.9',
+    'title' => 'Available Languages',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => '',
+    'help_text' => ts('User Interface languages available to users'),
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Core_I18n::languages',
+    ),
+  ),
   'lcMessages' => array(
     'group_name' => 'Localization Preferences',
     'group' => 'localization',
