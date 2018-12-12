@@ -131,7 +131,7 @@ class CRM_Afform_AfformScanner {
       'requires' => explode(',', self::DEFAULT_REQUIRES),
       'title' => '',
       'description' => '',
-      'is_public' => false,
+      'is_public' => FALSE,
     ];
 
     return array_merge($defaults, json_decode(file_get_contents($metaFile), 1));
