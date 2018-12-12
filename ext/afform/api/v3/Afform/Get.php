@@ -24,6 +24,12 @@ function _civicrm_api3_afform_get_spec(&$spec) {
     'title' => ts('Description'),
     'description' => 'Description',
   );
+  $spec['is_public'] = array(
+    'name' => 'is_public',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'title' => ts('Is public'),
+    'description' => 'Display with public theming?',
+  );
 
   // FIXME: title, requires, layout, server_route, client_route
 }
