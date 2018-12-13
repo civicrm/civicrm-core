@@ -1018,7 +1018,6 @@ WHERE  id IN ( $deleteIDString )
     $mappingFields = array(
       'civicrm_primary_id' => 'id',
       'provider_id' => 'im_service_provider',
-      'phone_type_id' => 'phone_type',
     );
 
     //figure out which columns are to be replaced by which ones

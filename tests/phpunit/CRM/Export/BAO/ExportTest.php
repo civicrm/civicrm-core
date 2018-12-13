@@ -288,7 +288,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'membership_id' => $this->membershipIDs[0],
     ));
     $this->callAPISuccess('LineItem', 'get', [
-      'entity_table' =>'civicrm_membership',
+      'entity_table' => 'civicrm_membership',
       'membership_id' => $this->membershipIDs[0],
       'api.LineItem.create' => ['contribution_id' => $this->contributionIDs[0]],
     ]);
