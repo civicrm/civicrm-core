@@ -114,9 +114,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   private $tx = NULL;
 
   /**
-   * @var CRM_Utils_Hook_UnitTests hookClass
-   * example of setting a method for a hook
+   * Class used for hooks during tests.
+   *
+   * This can be used to test hooks within tests. For example in the ACL_PermissionTrait:
+   *
    * $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+   *
+   * @var CRM_Utils_Hook_UnitTests hookClass
    */
   public $hookClass = NULL;
 
@@ -3573,20 +3577,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->_ids['price_field'] = array($priceField['id']);
 
     $this->_ids['membership_type'] = $membershipTypeID;
-  }
-
-  /**
-   * No results returned.
-   *
-   * @implements CRM_Utils_Hook::aclWhereClause
-   *
-   * @param string $type
-   * @param array $tables
-   * @param array $whereTables
-   * @param int $contactID
-   * @param string $where
-   */
-  public function aclWhereHookNoResults($type, &$tables, &$whereTables, &$contactID, &$where) {
   }
 
   /**
