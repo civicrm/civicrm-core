@@ -133,6 +133,41 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   /**
    * Basic test to ensure the exportComponents function can export selected fields for contribution.
    */
+  public function testExportComponentsMembership() {
+    $this->setUpMembershipExportData();
+    list($tableName) = CRM_Export_BAO_Export::exportComponents(
+      TRUE,
+      $this->membershipIDs,
+      [],
+      NULL,
+      NULL,
+      NULL,
+      CRM_Export_Form_Select::MEMBER_EXPORT,
+      'civicrm_membership.id IN ( ' . implode(',', $this->membershipIDs) . ')',
+      NULL,
+      FALSE,
+      FALSE,
+      array(
+        'exportOption' => CRM_Export_Form_Select::MEMBER_EXPORT,
+        'suppress_csv_for_testing' => TRUE,
+      )
+    );
+
+    $dao = CRM_Core_DAO::executeQuery('SELECT * from ' . $tableName);
+    $dao->fetch();
+    $this->assertEquals('100.00', $dao->componentpaymentfield_total_amount);
+    $this->assertEquals('Completed', $dao->componentpaymentfield_contribution_status);
+    $this->assertEquals('Credit Card', $dao->componentpaymentfield_payment_instrument);
+    $this->assertEquals(1, $dao->N);
+
+    // delete the export temp table and component table
+    $sql = "DROP TABLE IF EXISTS {$tableName}";
+    CRM_Core_DAO::executeQuery($sql);
+  }
+
+  /**
+   * Basic test to ensure the exportComponents function can export selected fields for contribution.
+   */
   public function testExportComponentsActivity() {
     $this->setUpActivityExportData();
     $selectedFields = array(
@@ -244,7 +279,19 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function setUpMembershipExportData() {
     $this->setUpContactExportData();
+    // Create an extra so we don't get false passes due to 1
+    $this->contactMembershipCreate(['contact_id' => $this->contactIDs[0]]);
     $this->membershipIDs[] = $this->contactMembershipCreate(['contact_id' => $this->contactIDs[0]]);
+    $this->setUpContributionExportData();
+    $this->callAPISuccess('membership_payment', 'create', array(
+      'contribution_id' => $this->contributionIDs[0],
+      'membership_id' => $this->membershipIDs[0],
+    ));
+    $this->callAPISuccess('LineItem', 'get', [
+      'entity_table' =>'civicrm_membership',
+      'membership_id' => $this->membershipIDs[0],
+      'api.LineItem.create' => ['contribution_id' => $this->contributionIDs[0]],
+    ]);
   }
 
   /**
