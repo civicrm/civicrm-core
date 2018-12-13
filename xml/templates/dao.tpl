@@ -1,7 +1,7 @@
 <?php
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  *
  * Generated from {$table.sourceFile}
  * {$generated}
