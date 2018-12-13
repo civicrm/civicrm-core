@@ -414,9 +414,6 @@
           }
         });
 
-        // clearly indicates that it's a draft mailing
-        params.subject = ts('[CiviMail Draft]') + ' ' + params.subject;
-
         // WORKAROUND: Mailing.create (aka CRM_Mailing_BAO_Mailing::create()) interprets scheduled_date
         // as an *intent* to schedule and creates tertiary records. Saving a draft with a scheduled_date
         // is therefore not allowed. Remove this after fixing Mailing.create's contract.
