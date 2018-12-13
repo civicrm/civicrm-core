@@ -416,7 +416,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $addPaymentHeader = FALSE;
 
-    $paymentDetails = array();
+    list($outputColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
+
+    $paymentDetails = [];
     if ($processor->isExportPaymentFields()) {
       // get payment related in for event and members
       $paymentDetails = CRM_Contribute_BAO_Contribution::getContributionDetails($exportMode, $ids);
@@ -426,6 +428,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       if (!$processor->isExportSpecifiedPaymentFields()) {
         if (!empty($paymentDetails)) {
           $addPaymentHeader = TRUE;
+          foreach (array_keys($processor->getPaymentHeaders()) as $paymentField) {
+            $processor->addOutputSpecification($paymentField);
+          }
         }
       }
     }
@@ -439,16 +444,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $count = -1;
 
-    list($outputColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
     $headerRows = $processor->getHeaderRows();
-
-    // add payment headers if required
-    if ($addPaymentHeader && $processor->isExportPaymentFields()) {
-      $headerRows = array_merge($headerRows, $processor->getPaymentHeaders());
-      foreach (array_keys($processor->getPaymentHeaders()) as $paymentHdr) {
-        $processor->setSqlColumnDefn($paymentHdr);
-      }
-    }
     $sqlColumns = $processor->getSQLColumns();
     $exportTempTable = self::createTempTable($sqlColumns);
     $limitReached = FALSE;
