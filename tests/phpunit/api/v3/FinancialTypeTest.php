@@ -73,12 +73,13 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
 
       // create financial type with custom field
       $financialType = $this->callAPISuccess('FinancialType', 'create', array_merge($params, $customFields));
+      $this->callAPISuccessGetSingle('FinancialType', ['name' => $financialTypeName]);
 
       // get financial type to check custom field value
       $expectedResult = array_filter(array_merge($params, $customFields), function($var) {
         return (!is_null($var) && $var != '');
       });
-      $result = $this->callAPISuccessGetSingle('FinancialType', [
+      $this->callAPISuccessGetSingle('FinancialType', [
         'id' => $financialType['id'],
       ], $expectedResult);
 
@@ -98,7 +99,7 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
       $expectedResult = array_filter(array_merge($params, $customFields), function($var) {
         return (!is_null($var) && $var != '');
       });
-      $result = $this->callAPISuccessGetSingle('FinancialType', [
+      $this->callAPISuccessGetSingle('FinancialType', [
         'id' => $financialType['id'],
       ], $expectedResult);
     }
