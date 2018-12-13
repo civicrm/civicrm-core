@@ -907,6 +907,7 @@ class CRM_Core_DAO extends DB_DataObject {
          AND TABLE_NAME LIKE 'civicrm_%'
          AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
          AND TABLE_NAME NOT LIKE '%_temp%'
+         AND TABLE_NAME NOT LIKE 'civicrm_tmp_%'
       ");
   }
 
