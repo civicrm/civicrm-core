@@ -689,8 +689,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * @param $expected
-   * @param $actual
+   * Assert the 2 arrays have the same values.
+   *
+   * @param array $array1
+   * @param array $array2
    */
   public function assertArrayValuesEqual($array1, $array2) {
     $array1 = array_values($array1);
