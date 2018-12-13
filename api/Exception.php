@@ -5,7 +5,7 @@
  *
  * @package CiviCRM_APIv3
  *
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
