@@ -1021,7 +1021,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ));
 
     //export and merge contacts with same address
-    list($tableName) = CRM_Export_BAO_Export::exportComponents(
+    list($tableName, $sqlColumns, $headerRows, $processor) = CRM_Export_BAO_Export::exportComponents(
       TRUE,
       array($contactA['id'], $contactB['id']),
       array(),
@@ -1043,6 +1043,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       )
     );
 
+    $this->assertTrue(!in_array('state_province_id', $processor->getHeaderRows()));
     $greeting = CRM_Core_DAO::singleValueQuery("SELECT email_greeting FROM {$tableName}");
 
     //Assert email_greeting is not merged

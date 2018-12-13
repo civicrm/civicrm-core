@@ -418,6 +418,14 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     list($outputColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
 
+    if (!empty($exportParams['merge_same_address']['temp_columns'])) {
+      // @todo - this is a temp fix  - ideally later we don't set stuff only to unset it.
+      // test exists covering this...
+      foreach (array_keys($exportParams['merge_same_address']['temp_columns']) as $field) {
+        $processor->setColumnAsCalculationOnly($field);
+      }
+    }
+
     $paymentDetails = [];
     if ($processor->isExportPaymentFields()) {
       // get payment related in for event and members
@@ -512,7 +520,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
       else {
         // return tableName sqlColumns headerRows in test context
-        return array($exportTempTable, $sqlColumns, $headerRows);
+        return array($exportTempTable, $sqlColumns, $headerRows, $processor);
       }
 
       // delete the export temp table and component table
@@ -807,6 +815,7 @@ WHERE  id IN ( $deleteIDString )
     }
 
     // unset temporary columns that were added for postal mailing format
+    // @todo - this part is pretty close to ready to be removed....
     if (!empty($exportParams['merge_same_address']['temp_columns'])) {
       $unsetKeys = array_keys($sqlColumns);
       foreach ($unsetKeys as $headerKey => $sqlColKey) {
