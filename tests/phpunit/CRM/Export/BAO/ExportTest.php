@@ -833,14 +833,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         'contact_id' => $contactID,
         'location_type_id' => 'Billing',
         'phone_type_id' => 'Mobile',
-        'phone' =>  'Billing' . 'Mobile' . $contactID,
+        'phone' => 'Billing' . 'Mobile' . $contactID,
         'is_primary' => 1,
       ]);
       $this->callAPISuccess('Phone', 'create', [
         'contact_id' => $contactID,
         'location_type_id' => 'Home',
         'phone_type_id' => 'Phone',
-        'phone' =>  'Home' . 'Phone' . $contactID,
+        'phone' => 'Home' . 'Phone' . $contactID,
       ]);
     }
 

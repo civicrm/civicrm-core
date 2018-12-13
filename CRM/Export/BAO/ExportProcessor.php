@@ -718,6 +718,9 @@ class CRM_Export_BAO_ExportProcessor {
                 return $i18n->crm_translate($fieldValue, $metadata[$field]);
               }
               if (!empty($metadata[$field]['pseudoconstant'])) {
+                if (!empty($metadata[$field]['bao'])) {
+                  return CRM_Core_PseudoConstant::getLabel($metadata[$field]['bao'], $metadata[$field]['name'], $fieldValue);
+                }
                 // This is not our normal syntax for pseudoconstants but I am a bit loath to
                 // call an external function until sure it is not increasing php processing given this
                 // may be iterated 100,000 times & we already have the $imProvider var loaded.
@@ -1147,7 +1150,7 @@ class CRM_Export_BAO_ExportProcessor {
    * @return string
    */
   protected function getOutputSpecificationIndex($key, $relationshipType, $locationType, $entityLabel) {
-    if ($locationType || $entityLabel || $key === 'im') {
+    if ($entityLabel || $key === 'im') {
       // Just cos that's the history...
       if ($key !== 'master_id') {
         $key = $this->getHeaderForRow($key);
@@ -1200,8 +1203,9 @@ class CRM_Export_BAO_ExportProcessor {
    * @return string
    */
   protected function getOutputSpecificationFieldKey($key, $relationshipType, $locationType, $entityLabel) {
-    if ($relationshipType || $entityLabel || $key === 'im') {
+    if ($entityLabel || $key === 'im') {
       if ($key !== 'state_province' && $key !== 'id') {
+        // @todo - test removing this - indexing by $key should be fine...
         $key = $this->getHeaderForRow($key);
       }
     }
