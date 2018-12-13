@@ -133,6 +133,41 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   /**
    * Basic test to ensure the exportComponents function can export selected fields for contribution.
    */
+  public function testExportComponentsMembership() {
+    $this->setUpMembershipExportData();
+    list($tableName) = CRM_Export_BAO_Export::exportComponents(
+      TRUE,
+      $this->membershipIDs,
+      [],
+      NULL,
+      NULL,
+      NULL,
+      CRM_Export_Form_Select::MEMBER_EXPORT,
+      'civicrm_membership.id IN ( ' . implode(',', $this->membershipIDs) . ')',
+      NULL,
+      FALSE,
+      FALSE,
+      array(
+        'exportOption' => CRM_Export_Form_Select::MEMBER_EXPORT,
+        'suppress_csv_for_testing' => TRUE,
+      )
+    );
+
+    $dao = CRM_Core_DAO::executeQuery('SELECT * from ' . $tableName);
+    $dao->fetch();
+    $this->assertEquals('100.00', $dao->componentpaymentfield_total_amount);
+    $this->assertEquals('Completed', $dao->componentpaymentfield_contribution_status);
+    $this->assertEquals('Credit Card', $dao->componentpaymentfield_payment_instrument);
+    $this->assertEquals(1, $dao->N);
+
+    // delete the export temp table and component table
+    $sql = "DROP TABLE IF EXISTS {$tableName}";
+    CRM_Core_DAO::executeQuery($sql);
+  }
+
+  /**
+   * Basic test to ensure the exportComponents function can export selected fields for contribution.
+   */
   public function testExportComponentsActivity() {
     $this->setUpActivityExportData();
     $selectedFields = array(
@@ -244,7 +279,19 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function setUpMembershipExportData() {
     $this->setUpContactExportData();
+    // Create an extra so we don't get false passes due to 1
+    $this->contactMembershipCreate(['contact_id' => $this->contactIDs[0]]);
     $this->membershipIDs[] = $this->contactMembershipCreate(['contact_id' => $this->contactIDs[0]]);
+    $this->setUpContributionExportData();
+    $this->callAPISuccess('membership_payment', 'create', array(
+      'contribution_id' => $this->contributionIDs[0],
+      'membership_id' => $this->membershipIDs[0],
+    ));
+    $this->callAPISuccess('LineItem', 'get', [
+      'entity_table' => 'civicrm_membership',
+      'membership_id' => $this->membershipIDs[0],
+      'api.LineItem.create' => ['contribution_id' => $this->contributionIDs[0]],
+    ]);
   }
 
   /**
@@ -581,7 +628,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     list($tableName, $sqlColumns) = $this->doExport($selectedFields, $this->contactIDs[1]);
     $this->assertEquals([
-      'billing_city' => 'billing_city text',
+      'billing_city' => 'billing_city varchar(64)',
       'custom_1' => 'custom_1 varchar(255)',
     ], $sqlColumns);
 
@@ -689,99 +736,99 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     $this->assertEquals([
       'billing_im_provider' => 'billing_im_provider text',
-      'billing_im_screen_name' => 'billing_im_screen_name text',
-      'billing_im_screen_name_jabber' => 'billing_im_screen_name_jabber text',
-      'billing_im_screen_name_skype' => 'billing_im_screen_name_skype text',
-      'billing_im_screen_name_yahoo' => 'billing_im_screen_name_yahoo text',
+      'billing_im_screen_name' => 'billing_im_screen_name varchar(64)',
+      'billing_im_screen_name_jabber' => 'billing_im_screen_name_jabber varchar(64)',
+      'billing_im_screen_name_skype' => 'billing_im_screen_name_skype varchar(64)',
+      'billing_im_screen_name_yahoo' => 'billing_im_screen_name_yahoo varchar(64)',
       'home_im_provider' => 'home_im_provider text',
-      'home_im_screen_name' => 'home_im_screen_name text',
-      'home_im_screen_name_jabber' => 'home_im_screen_name_jabber text',
-      'home_im_screen_name_skype' => 'home_im_screen_name_skype text',
-      'home_im_screen_name_yahoo' => 'home_im_screen_name_yahoo text',
+      'home_im_screen_name' => 'home_im_screen_name varchar(64)',
+      'home_im_screen_name_jabber' => 'home_im_screen_name_jabber varchar(64)',
+      'home_im_screen_name_skype' => 'home_im_screen_name_skype varchar(64)',
+      'home_im_screen_name_yahoo' => 'home_im_screen_name_yahoo varchar(64)',
       'main_im_provider' => 'main_im_provider text',
-      'main_im_screen_name' => 'main_im_screen_name text',
-      'main_im_screen_name_jabber' => 'main_im_screen_name_jabber text',
-      'main_im_screen_name_skype' => 'main_im_screen_name_skype text',
-      'main_im_screen_name_yahoo' => 'main_im_screen_name_yahoo text',
+      'main_im_screen_name' => 'main_im_screen_name varchar(64)',
+      'main_im_screen_name_jabber' => 'main_im_screen_name_jabber varchar(64)',
+      'main_im_screen_name_skype' => 'main_im_screen_name_skype varchar(64)',
+      'main_im_screen_name_yahoo' => 'main_im_screen_name_yahoo varchar(64)',
       'other_im_provider' => 'other_im_provider text',
-      'other_im_screen_name' => 'other_im_screen_name text',
-      'other_im_screen_name_jabber' => 'other_im_screen_name_jabber text',
-      'other_im_screen_name_skype' => 'other_im_screen_name_skype text',
-      'other_im_screen_name_yahoo' => 'other_im_screen_name_yahoo text',
+      'other_im_screen_name' => 'other_im_screen_name varchar(64)',
+      'other_im_screen_name_jabber' => 'other_im_screen_name_jabber varchar(64)',
+      'other_im_screen_name_skype' => 'other_im_screen_name_skype varchar(64)',
+      'other_im_screen_name_yahoo' => 'other_im_screen_name_yahoo varchar(64)',
       'im_provider' => 'im_provider text',
-      'im' => 'im varchar(64)',
+      'im_screen_name' => 'im_screen_name varchar(64)',
       'contact_id' => 'contact_id varchar(255)',
       '2_a_b_im_provider' => '2_a_b_im_provider text',
-      '2_a_b_billing_im_screen_name' => '2_a_b_billing_im_screen_name text',
-      '2_a_b_billing_im_screen_name_jabber' => '2_a_b_billing_im_screen_name_jabber text',
-      '2_a_b_billing_im_screen_name_skype' => '2_a_b_billing_im_screen_name_skype text',
-      '2_a_b_billing_im_screen_name_yahoo' => '2_a_b_billing_im_screen_name_yahoo text',
-      '2_a_b_home_im_screen_name' => '2_a_b_home_im_screen_name text',
-      '2_a_b_home_im_screen_name_jabber' => '2_a_b_home_im_screen_name_jabber text',
-      '2_a_b_home_im_screen_name_skype' => '2_a_b_home_im_screen_name_skype text',
-      '2_a_b_home_im_screen_name_yahoo' => '2_a_b_home_im_screen_name_yahoo text',
-      '2_a_b_main_im_screen_name' => '2_a_b_main_im_screen_name text',
-      '2_a_b_main_im_screen_name_jabber' => '2_a_b_main_im_screen_name_jabber text',
-      '2_a_b_main_im_screen_name_skype' => '2_a_b_main_im_screen_name_skype text',
-      '2_a_b_main_im_screen_name_yahoo' => '2_a_b_main_im_screen_name_yahoo text',
-      '2_a_b_other_im_screen_name' => '2_a_b_other_im_screen_name text',
-      '2_a_b_other_im_screen_name_jabber' => '2_a_b_other_im_screen_name_jabber text',
-      '2_a_b_other_im_screen_name_skype' => '2_a_b_other_im_screen_name_skype text',
-      '2_a_b_other_im_screen_name_yahoo' => '2_a_b_other_im_screen_name_yahoo text',
-      '2_a_b_im' => '2_a_b_im text',
+      '2_a_b_billing_im_screen_name' => '2_a_b_billing_im_screen_name varchar(64)',
+      '2_a_b_billing_im_screen_name_jabber' => '2_a_b_billing_im_screen_name_jabber varchar(64)',
+      '2_a_b_billing_im_screen_name_skype' => '2_a_b_billing_im_screen_name_skype varchar(64)',
+      '2_a_b_billing_im_screen_name_yahoo' => '2_a_b_billing_im_screen_name_yahoo varchar(64)',
+      '2_a_b_home_im_screen_name' => '2_a_b_home_im_screen_name varchar(64)',
+      '2_a_b_home_im_screen_name_jabber' => '2_a_b_home_im_screen_name_jabber varchar(64)',
+      '2_a_b_home_im_screen_name_skype' => '2_a_b_home_im_screen_name_skype varchar(64)',
+      '2_a_b_home_im_screen_name_yahoo' => '2_a_b_home_im_screen_name_yahoo varchar(64)',
+      '2_a_b_main_im_screen_name' => '2_a_b_main_im_screen_name varchar(64)',
+      '2_a_b_main_im_screen_name_jabber' => '2_a_b_main_im_screen_name_jabber varchar(64)',
+      '2_a_b_main_im_screen_name_skype' => '2_a_b_main_im_screen_name_skype varchar(64)',
+      '2_a_b_main_im_screen_name_yahoo' => '2_a_b_main_im_screen_name_yahoo varchar(64)',
+      '2_a_b_other_im_screen_name' => '2_a_b_other_im_screen_name varchar(64)',
+      '2_a_b_other_im_screen_name_jabber' => '2_a_b_other_im_screen_name_jabber varchar(64)',
+      '2_a_b_other_im_screen_name_skype' => '2_a_b_other_im_screen_name_skype varchar(64)',
+      '2_a_b_other_im_screen_name_yahoo' => '2_a_b_other_im_screen_name_yahoo varchar(64)',
+      '2_a_b_im_screen_name' => '2_a_b_im_screen_name varchar(64)',
       '8_a_b_im_provider' => '8_a_b_im_provider text',
-      '8_a_b_billing_im_screen_name' => '8_a_b_billing_im_screen_name text',
-      '8_a_b_billing_im_screen_name_jabber' => '8_a_b_billing_im_screen_name_jabber text',
-      '8_a_b_billing_im_screen_name_skype' => '8_a_b_billing_im_screen_name_skype text',
-      '8_a_b_billing_im_screen_name_yahoo' => '8_a_b_billing_im_screen_name_yahoo text',
-      '8_a_b_home_im_screen_name' => '8_a_b_home_im_screen_name text',
-      '8_a_b_home_im_screen_name_jabber' => '8_a_b_home_im_screen_name_jabber text',
-      '8_a_b_home_im_screen_name_skype' => '8_a_b_home_im_screen_name_skype text',
-      '8_a_b_home_im_screen_name_yahoo' => '8_a_b_home_im_screen_name_yahoo text',
-      '8_a_b_main_im_screen_name' => '8_a_b_main_im_screen_name text',
-      '8_a_b_main_im_screen_name_jabber' => '8_a_b_main_im_screen_name_jabber text',
-      '8_a_b_main_im_screen_name_skype' => '8_a_b_main_im_screen_name_skype text',
-      '8_a_b_main_im_screen_name_yahoo' => '8_a_b_main_im_screen_name_yahoo text',
-      '8_a_b_other_im_screen_name' => '8_a_b_other_im_screen_name text',
-      '8_a_b_other_im_screen_name_jabber' => '8_a_b_other_im_screen_name_jabber text',
-      '8_a_b_other_im_screen_name_skype' => '8_a_b_other_im_screen_name_skype text',
-      '8_a_b_other_im_screen_name_yahoo' => '8_a_b_other_im_screen_name_yahoo text',
-      '8_a_b_im' => '8_a_b_im text',
+      '8_a_b_billing_im_screen_name' => '8_a_b_billing_im_screen_name varchar(64)',
+      '8_a_b_billing_im_screen_name_jabber' => '8_a_b_billing_im_screen_name_jabber varchar(64)',
+      '8_a_b_billing_im_screen_name_skype' => '8_a_b_billing_im_screen_name_skype varchar(64)',
+      '8_a_b_billing_im_screen_name_yahoo' => '8_a_b_billing_im_screen_name_yahoo varchar(64)',
+      '8_a_b_home_im_screen_name' => '8_a_b_home_im_screen_name varchar(64)',
+      '8_a_b_home_im_screen_name_jabber' => '8_a_b_home_im_screen_name_jabber varchar(64)',
+      '8_a_b_home_im_screen_name_skype' => '8_a_b_home_im_screen_name_skype varchar(64)',
+      '8_a_b_home_im_screen_name_yahoo' => '8_a_b_home_im_screen_name_yahoo varchar(64)',
+      '8_a_b_main_im_screen_name' => '8_a_b_main_im_screen_name varchar(64)',
+      '8_a_b_main_im_screen_name_jabber' => '8_a_b_main_im_screen_name_jabber varchar(64)',
+      '8_a_b_main_im_screen_name_skype' => '8_a_b_main_im_screen_name_skype varchar(64)',
+      '8_a_b_main_im_screen_name_yahoo' => '8_a_b_main_im_screen_name_yahoo varchar(64)',
+      '8_a_b_other_im_screen_name' => '8_a_b_other_im_screen_name varchar(64)',
+      '8_a_b_other_im_screen_name_jabber' => '8_a_b_other_im_screen_name_jabber varchar(64)',
+      '8_a_b_other_im_screen_name_skype' => '8_a_b_other_im_screen_name_skype varchar(64)',
+      '8_a_b_other_im_screen_name_yahoo' => '8_a_b_other_im_screen_name_yahoo varchar(64)',
+      '8_a_b_im_screen_name' => '8_a_b_im_screen_name varchar(64)',
       '5_a_b_im_provider' => '5_a_b_im_provider text',
-      '5_a_b_billing_im_screen_name' => '5_a_b_billing_im_screen_name text',
-      '5_a_b_billing_im_screen_name_jabber' => '5_a_b_billing_im_screen_name_jabber text',
-      '5_a_b_billing_im_screen_name_skype' => '5_a_b_billing_im_screen_name_skype text',
-      '5_a_b_billing_im_screen_name_yahoo' => '5_a_b_billing_im_screen_name_yahoo text',
-      '5_a_b_home_im_screen_name' => '5_a_b_home_im_screen_name text',
-      '5_a_b_home_im_screen_name_jabber' => '5_a_b_home_im_screen_name_jabber text',
-      '5_a_b_home_im_screen_name_skype' => '5_a_b_home_im_screen_name_skype text',
-      '5_a_b_home_im_screen_name_yahoo' => '5_a_b_home_im_screen_name_yahoo text',
-      '5_a_b_main_im_screen_name' => '5_a_b_main_im_screen_name text',
-      '5_a_b_main_im_screen_name_jabber' => '5_a_b_main_im_screen_name_jabber text',
-      '5_a_b_main_im_screen_name_skype' => '5_a_b_main_im_screen_name_skype text',
-      '5_a_b_main_im_screen_name_yahoo' => '5_a_b_main_im_screen_name_yahoo text',
-      '5_a_b_other_im_screen_name' => '5_a_b_other_im_screen_name text',
-      '5_a_b_other_im_screen_name_jabber' => '5_a_b_other_im_screen_name_jabber text',
-      '5_a_b_other_im_screen_name_skype' => '5_a_b_other_im_screen_name_skype text',
-      '5_a_b_other_im_screen_name_yahoo' => '5_a_b_other_im_screen_name_yahoo text',
-      '5_a_b_im' => '5_a_b_im text',
+      '5_a_b_billing_im_screen_name' => '5_a_b_billing_im_screen_name varchar(64)',
+      '5_a_b_billing_im_screen_name_jabber' => '5_a_b_billing_im_screen_name_jabber varchar(64)',
+      '5_a_b_billing_im_screen_name_skype' => '5_a_b_billing_im_screen_name_skype varchar(64)',
+      '5_a_b_billing_im_screen_name_yahoo' => '5_a_b_billing_im_screen_name_yahoo varchar(64)',
+      '5_a_b_home_im_screen_name' => '5_a_b_home_im_screen_name varchar(64)',
+      '5_a_b_home_im_screen_name_jabber' => '5_a_b_home_im_screen_name_jabber varchar(64)',
+      '5_a_b_home_im_screen_name_skype' => '5_a_b_home_im_screen_name_skype varchar(64)',
+      '5_a_b_home_im_screen_name_yahoo' => '5_a_b_home_im_screen_name_yahoo varchar(64)',
+      '5_a_b_main_im_screen_name' => '5_a_b_main_im_screen_name varchar(64)',
+      '5_a_b_main_im_screen_name_jabber' => '5_a_b_main_im_screen_name_jabber varchar(64)',
+      '5_a_b_main_im_screen_name_skype' => '5_a_b_main_im_screen_name_skype varchar(64)',
+      '5_a_b_main_im_screen_name_yahoo' => '5_a_b_main_im_screen_name_yahoo varchar(64)',
+      '5_a_b_other_im_screen_name' => '5_a_b_other_im_screen_name varchar(64)',
+      '5_a_b_other_im_screen_name_jabber' => '5_a_b_other_im_screen_name_jabber varchar(64)',
+      '5_a_b_other_im_screen_name_skype' => '5_a_b_other_im_screen_name_skype varchar(64)',
+      '5_a_b_other_im_screen_name_yahoo' => '5_a_b_other_im_screen_name_yahoo varchar(64)',
+      '5_a_b_im_screen_name' => '5_a_b_im_screen_name varchar(64)',
       'whare_kai_im_provider' => 'whare_kai_im_provider text',
-      'whare_kai_im_screen_name' => 'whare_kai_im_screen_name text',
-      'whare_kai_im_screen_name_jabber' => 'whare_kai_im_screen_name_jabber text',
-      'whare_kai_im_screen_name_skype' => 'whare_kai_im_screen_name_skype text',
-      'whare_kai_im_screen_name_yahoo' => 'whare_kai_im_screen_name_yahoo text',
-      '2_a_b_whare_kai_im_screen_name' => '2_a_b_whare_kai_im_screen_name text',
-      '2_a_b_whare_kai_im_screen_name_jabber' => '2_a_b_whare_kai_im_screen_name_jabber text',
-      '2_a_b_whare_kai_im_screen_name_skype' => '2_a_b_whare_kai_im_screen_name_skype text',
-      '2_a_b_whare_kai_im_screen_name_yahoo' => '2_a_b_whare_kai_im_screen_name_yahoo text',
-      '8_a_b_whare_kai_im_screen_name' => '8_a_b_whare_kai_im_screen_name text',
-      '8_a_b_whare_kai_im_screen_name_jabber' => '8_a_b_whare_kai_im_screen_name_jabber text',
-      '8_a_b_whare_kai_im_screen_name_skype' => '8_a_b_whare_kai_im_screen_name_skype text',
-      '8_a_b_whare_kai_im_screen_name_yahoo' => '8_a_b_whare_kai_im_screen_name_yahoo text',
-      '5_a_b_whare_kai_im_screen_name' => '5_a_b_whare_kai_im_screen_name text',
-      '5_a_b_whare_kai_im_screen_name_jabber' => '5_a_b_whare_kai_im_screen_name_jabber text',
-      '5_a_b_whare_kai_im_screen_name_skype' => '5_a_b_whare_kai_im_screen_name_skype text',
-      '5_a_b_whare_kai_im_screen_name_yahoo' => '5_a_b_whare_kai_im_screen_name_yahoo text',
+      'whare_kai_im_screen_name' => 'whare_kai_im_screen_name varchar(64)',
+      'whare_kai_im_screen_name_jabber' => 'whare_kai_im_screen_name_jabber varchar(64)',
+      'whare_kai_im_screen_name_skype' => 'whare_kai_im_screen_name_skype varchar(64)',
+      'whare_kai_im_screen_name_yahoo' => 'whare_kai_im_screen_name_yahoo varchar(64)',
+      '2_a_b_whare_kai_im_screen_name' => '2_a_b_whare_kai_im_screen_name varchar(64)',
+      '2_a_b_whare_kai_im_screen_name_jabber' => '2_a_b_whare_kai_im_screen_name_jabber varchar(64)',
+      '2_a_b_whare_kai_im_screen_name_skype' => '2_a_b_whare_kai_im_screen_name_skype varchar(64)',
+      '2_a_b_whare_kai_im_screen_name_yahoo' => '2_a_b_whare_kai_im_screen_name_yahoo varchar(64)',
+      '8_a_b_whare_kai_im_screen_name' => '8_a_b_whare_kai_im_screen_name varchar(64)',
+      '8_a_b_whare_kai_im_screen_name_jabber' => '8_a_b_whare_kai_im_screen_name_jabber varchar(64)',
+      '8_a_b_whare_kai_im_screen_name_skype' => '8_a_b_whare_kai_im_screen_name_skype varchar(64)',
+      '8_a_b_whare_kai_im_screen_name_yahoo' => '8_a_b_whare_kai_im_screen_name_yahoo varchar(64)',
+      '5_a_b_whare_kai_im_screen_name' => '5_a_b_whare_kai_im_screen_name varchar(64)',
+      '5_a_b_whare_kai_im_screen_name_jabber' => '5_a_b_whare_kai_im_screen_name_jabber varchar(64)',
+      '5_a_b_whare_kai_im_screen_name_skype' => '5_a_b_whare_kai_im_screen_name_skype varchar(64)',
+      '5_a_b_whare_kai_im_screen_name_yahoo' => '5_a_b_whare_kai_im_screen_name_yahoo varchar(64)',
     ], $sqlColumns);
 
   }
@@ -859,39 +906,39 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     $this->assertEquals([
       'contact_id' => 'contact_id varchar(255)',
-      'billing_city' => 'billing_city text',
-      'billing_street_address' => 'billing_street_address text',
-      'billing_postal_code' => 'billing_postal_code text',
-      'home_city' => 'home_city text',
-      'home_street_address' => 'home_street_address text',
-      'home_postal_code' => 'home_postal_code text',
-      'main_city' => 'main_city text',
-      'main_street_address' => 'main_street_address text',
-      'main_postal_code' => 'main_postal_code text',
-      'other_city' => 'other_city text',
-      'other_street_address' => 'other_street_address text',
-      'other_postal_code' => 'other_postal_code text',
-      'whare_kai_city' => 'whare_kai_city text',
-      'whare_kai_street_address' => 'whare_kai_street_address text',
-      'whare_kai_postal_code' => 'whare_kai_postal_code text',
-      '2_a_b_billing_city' => '2_a_b_billing_city text',
-      '2_a_b_home_city' => '2_a_b_home_city text',
-      '2_a_b_main_city' => '2_a_b_main_city text',
-      '2_a_b_other_city' => '2_a_b_other_city text',
-      '2_a_b_whare_kai_city' => '2_a_b_whare_kai_city text',
-      '2_a_b_city' => '2_a_b_city text',
-      '8_a_b_billing_city' => '8_a_b_billing_city text',
-      '8_a_b_home_city' => '8_a_b_home_city text',
-      '8_a_b_main_city' => '8_a_b_main_city text',
-      '8_a_b_other_city' => '8_a_b_other_city text',
-      '8_a_b_whare_kai_city' => '8_a_b_whare_kai_city text',
-      '8_a_b_city' => '8_a_b_city text',
-      '5_a_b_billing_city' => '5_a_b_billing_city text',
-      '5_a_b_home_city' => '5_a_b_home_city text',
-      '5_a_b_main_city' => '5_a_b_main_city text',
-      '5_a_b_other_city' => '5_a_b_other_city text',
-      '5_a_b_whare_kai_city' => '5_a_b_whare_kai_city text',
-      '5_a_b_city' => '5_a_b_city text',
+      'billing_city' => 'billing_city varchar(64)',
+      'billing_street_address' => 'billing_street_address varchar(96)',
+      'billing_postal_code' => 'billing_postal_code varchar(64)',
+      'home_city' => 'home_city varchar(64)',
+      'home_street_address' => 'home_street_address varchar(96)',
+      'home_postal_code' => 'home_postal_code varchar(64)',
+      'main_city' => 'main_city varchar(64)',
+      'main_street_address' => 'main_street_address varchar(96)',
+      'main_postal_code' => 'main_postal_code varchar(64)',
+      'other_city' => 'other_city varchar(64)',
+      'other_street_address' => 'other_street_address varchar(96)',
+      'other_postal_code' => 'other_postal_code varchar(64)',
+      'whare_kai_city' => 'whare_kai_city varchar(64)',
+      'whare_kai_street_address' => 'whare_kai_street_address varchar(96)',
+      'whare_kai_postal_code' => 'whare_kai_postal_code varchar(64)',
+      '2_a_b_billing_city' => '2_a_b_billing_city varchar(64)',
+      '2_a_b_home_city' => '2_a_b_home_city varchar(64)',
+      '2_a_b_main_city' => '2_a_b_main_city varchar(64)',
+      '2_a_b_other_city' => '2_a_b_other_city varchar(64)',
+      '2_a_b_whare_kai_city' => '2_a_b_whare_kai_city varchar(64)',
+      '2_a_b_city' => '2_a_b_city varchar(64)',
+      '8_a_b_billing_city' => '8_a_b_billing_city varchar(64)',
+      '8_a_b_home_city' => '8_a_b_home_city varchar(64)',
+      '8_a_b_main_city' => '8_a_b_main_city varchar(64)',
+      '8_a_b_other_city' => '8_a_b_other_city varchar(64)',
+      '8_a_b_whare_kai_city' => '8_a_b_whare_kai_city varchar(64)',
+      '8_a_b_city' => '8_a_b_city varchar(64)',
+      '5_a_b_billing_city' => '5_a_b_billing_city varchar(64)',
+      '5_a_b_home_city' => '5_a_b_home_city varchar(64)',
+      '5_a_b_main_city' => '5_a_b_main_city varchar(64)',
+      '5_a_b_other_city' => '5_a_b_other_city varchar(64)',
+      '5_a_b_whare_kai_city' => '5_a_b_whare_kai_city varchar(64)',
+      '5_a_b_city' => '5_a_b_city varchar(64)',
     ], $sqlColumns);
   }
 
@@ -974,7 +1021,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ));
 
     //export and merge contacts with same address
-    list($tableName) = CRM_Export_BAO_Export::exportComponents(
+    list($tableName, $sqlColumns, $headerRows, $processor) = CRM_Export_BAO_Export::exportComponents(
       TRUE,
       array($contactA['id'], $contactB['id']),
       array(),
@@ -996,6 +1043,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       )
     );
 
+    $this->assertTrue(!in_array('state_province_id', $processor->getHeaderRows()));
     $greeting = CRM_Core_DAO::singleValueQuery("SELECT email_greeting FROM {$tableName}");
 
     //Assert email_greeting is not merged
@@ -2260,7 +2308,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'signature_text' => 'signature_text longtext',
       'signature_html' => 'signature_html longtext',
       'im_provider' => 'im_provider text',
-      'im' => 'im varchar(64)',
+      'im_screen_name' => 'im_screen_name varchar(64)',
       'openid' => 'openid varchar(255)',
       'world_region' => 'world_region varchar(128)',
       'url' => 'url varchar(128)',
@@ -2445,7 +2493,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'signature_text' => 'signature_text longtext',
       'signature_html' => 'signature_html longtext',
       'im_provider' => 'im_provider text',
-      'im' => 'im varchar(64)',
+      'im_screen_name' => 'im_screen_name varchar(64)',
       'openid' => 'openid varchar(255)',
       'world_region' => 'world_region varchar(128)',
       'url' => 'url varchar(128)',
