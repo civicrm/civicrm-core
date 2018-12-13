@@ -146,7 +146,7 @@ trait CRM_Core_Form_EntityFormTrait {
     }
     foreach ($this->entityFields as $fieldSpec) {
       $value = CRM_Utils_Request::retrieveValue($fieldSpec['name'], $this->getValidationTypeForField($fieldSpec['name']));
-      if ($value !== FALSE) {
+      if ($value !== FALSE && $value !== NULL) {
         $defaults[$fieldSpec['name']] = $value;
       }
     }
