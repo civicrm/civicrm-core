@@ -1731,27 +1731,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * Delete a UF Join Entry.
-   *
-   * @param array $params
-   *   with missing uf_group_id
-   */
-  public function ufjoinDelete($params = NULL) {
-    if ($params === NULL) {
-      $params = array(
-        'is_active' => 1,
-        'module' => 'CiviEvent',
-        'entity_table' => 'civicrm_event',
-        'entity_id' => 3,
-        'weight' => 1,
-        'uf_group_id' => '',
-      );
-    }
-
-    crm_add_uf_join($params);
-  }
-
-  /**
    * @param array $params
    *   Optional parameters.
    * @param bool $reloadConfig
