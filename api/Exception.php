@@ -106,7 +106,7 @@ class CiviCRM_API3_Exception extends Exception {
    * @param Exception|NULL $previous
    *   A previous exception which caused this new exception.
    */
-  public function __construct($message, $error_code, $extraParams = array(), Exception $previous = NULL) {
+  public function __construct($message, $error_code = 0, $extraParams = array(), Exception $previous = NULL) {
     parent::__construct(ts($message));
     $this->extraParams = $extraParams + array('error_code' => $error_code);
   }
