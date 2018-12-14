@@ -39,15 +39,40 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
 
   protected $_userContext = NULL;
 
-  protected $_mode = NULL;
-
+  /**
+   * @var int Membership ID
+   */
   protected $_mid = NULL;
 
-  protected $_coid = NULL;
-
+  /**
+   * @var int Contribution Recur ID
+   */
   protected $_crid = NULL;
 
+  /**
+   * @var int Contribution ID
+   */
+  protected $_coid = NULL;
+
+  protected $_mode = NULL;
+
   protected $_selfService = FALSE;
+
+  /**
+   * @var \CRM_Contribute_DAO_ContributionRecur Recurring contribution details
+   */
+  protected $_subscriptionDetails = NULL;
+
+  /**
+   * @var string Display name of recurring contribution contact ID
+   */
+  protected $_donorDisplayName = NULL;
+
+  /**
+   * @var string Email address for recurring contribution contact ID
+   */
+  protected $_donorEmail = NULL;
+
 
   /**
    * Set variables up before form is built.
@@ -121,8 +146,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
     $this->assign('mode', $this->_mode);
 
     if ($this->_subscriptionDetails->contact_id) {
-      list($this->_donorDisplayName, $this->_donorEmail)
-        = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
+      list($this->_donorDisplayName, $this->_donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
     }
   }
 
@@ -209,7 +233,9 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
     }
 
     if (CRM_Utils_Array::value('send_cancel_request', $params) == 1) {
-      $cancelParams = array('subscriptionId' => $this->_subscriptionDetails->subscription_id);
+      $cancelParams = [
+        'subscriptionId' => $this->_subscriptionDetails->subscription_id,
+      ];
       $cancelSubscription = $this->_paymentProcessorObj->cancelSubscription($message, $cancelParams);
     }
 

@@ -48,8 +48,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
 
   protected $_coid = NULL;
 
-  protected $_subscriptionDetails = NULL;
-
   protected $_selfService = FALSE;
 
   public $_paymentProcessor = NULL;
@@ -61,14 +59,22 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    *
    * @var array
    */
-  protected $editableScheduleFields = array();
+  protected $editableScheduleFields = [];
 
   /**
-   * The id of the contact associated with this recurring contribution.
-   *
-   * @var int
+   * @var \CRM_Contribute_DAO_ContributionRecur Recurring contribution details
    */
-  public $_contactID;
+  protected $_subscriptionDetails = NULL;
+
+  /**
+   * @var string Display name of recurring contribution contact ID
+   */
+  protected $_donorDisplayName = NULL;
+
+  /**
+   * @var string Email address for recurring contribution contact ID
+   */
+  protected $_donorEmail = NULL;
 
   /**
    * Pre-processing for the form.
@@ -158,14 +164,14 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
 
     $this->assign('editableScheduleFields', array_diff($this->editableScheduleFields, $alreadyHardCodedFields));
 
-    if ($this->_subscriptionDetails->contact_id) {
-      list($this->_donorDisplayName, $this->_donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
-    }
+    // Handle context redirection.
+    CRM_Contribute_BAO_ContributionRecur::setSubscriptionContext();
 
     CRM_Utils_System::setTitle(ts('Update Recurring Contribution'));
 
-    // Handle context redirection.
-    CRM_Contribute_BAO_ContributionRecur::setSubscriptionContext();
+    if ($this->_subscriptionDetails->contact_id) {
+      list($this->_donorDisplayName, $this->_donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
+    }
   }
 
   /**
@@ -283,7 +289,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       $msgTitle = ts('Update Success');
       $msgType = 'success';
       $msg = ts('Recurring Contribution Updated');
-      $contactID = $this->_subscriptionDetails->contact_id;
 
       if ($this->_subscriptionDetails->amount != $params['amount']) {
         $message .= "<br /> " . ts("Recurring contribution amount has been updated from %1 to %2 for this subscription.",
@@ -307,7 +312,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       }
 
       $activityParams = array(
-        'source_contact_id' => $contactID,
+        'source_contact_id' => $this->_subscriptionDetails->contact_id,
         'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Update Recurring Contribution'),
         'subject' => $msg,
         'details' => $message,
@@ -324,7 +329,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
       }
       CRM_Activity_BAO_Activity::create($activityParams);
 
-      if (!empty($params['is_notify'])) {
+      if (CRM_Utils_Array::value('is_notify', $params) == 1) {
         // send notification
         if ($this->_subscriptionDetails->contribution_page_id) {
           CRM_Core_DAO::commonRetrieveAll('CRM_Contribute_DAO_ContributionPage', 'id',
@@ -341,8 +346,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
           $receiptFrom = "$domainValues[0] <$domainValues[1]>";
         }
 
-        list($donorDisplayName, $donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($contactID);
-
         $tplParams = array(
           'recur_frequency_interval' => $this->_subscriptionDetails->frequency_interval,
           'recur_frequency_unit' => $this->_subscriptionDetails->frequency_unit,
@@ -350,21 +353,21 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
           'installments' => $params['installments'],
         );
 
-        $tplParams['contact'] = array('display_name' => $donorDisplayName);
+        $tplParams['contact'] = array('display_name' => $this->_donorDisplayName);
         $tplParams['receipt_from_email'] = $receiptFrom;
 
         $sendTemplateParams = array(
           'groupName' => 'msg_tpl_workflow_contribution',
           'valueName' => 'contribution_recurring_edit',
-          'contactId' => $contactID,
+          'contactId' => $this->_subscriptionDetails->contact_id,
           'tplParams' => $tplParams,
           'isTest' => $this->_subscriptionDetails->is_test,
           'PDFFilename' => 'receipt.pdf',
           'from' => $receiptFrom,
-          'toName' => $donorDisplayName,
-          'toEmail' => $donorEmail,
+          'toName' => $this->_donorDisplayName,
+          'toEmail' => $this->_donorEmail,
         );
-        list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       }
     }
 

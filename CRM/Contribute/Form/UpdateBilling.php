@@ -35,11 +35,17 @@
  * This class generates form components for processing a contribution.
  */
 class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
+  /**
+   * @var int Contribution Recur ID
+   */
   protected $_crid = NULL;
-  protected $_coid = NULL;
-  protected $_mode = NULL;
 
-  protected $_subscriptionDetails = NULL;
+  /**
+   * @var int Contribution ID
+   */
+  protected $_coid = NULL;
+
+  protected $_mode = NULL;
 
   protected $_selfService = FALSE;
 
@@ -49,6 +55,21 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    * @var array current payment processor including a copy of the object in 'object' key
    */
   public $_paymentProcessor = array();
+
+  /**
+   * @var \CRM_Contribute_DAO_ContributionRecur Recurring contribution details
+   */
+  protected $_subscriptionDetails = NULL;
+
+  /**
+   * @var string Display name of recurring contribution contact ID
+   */
+  protected $_donorDisplayName = NULL;
+
+  /**
+   * @var string Email address for recurring contribution contact ID
+   */
+  protected $_donorEmail = NULL;
 
   /**
    * Set variables up before form is built.
@@ -112,6 +133,12 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
     // handle context redirection
     CRM_Contribute_BAO_ContributionRecur::setSubscriptionContext();
+
+    CRM_Utils_System::setTitle(ts('Update Billing Details'));
+
+    if ($this->_subscriptionDetails->contact_id) {
+      list($this->_donorDisplayName, $this->_donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
+    }
   }
 
   /**
@@ -368,8 +395,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
         $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
         $receiptFrom = "$domainValues[0] <$domainValues[1]>";
       }
-      list($donorDisplayName, $donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
-      $tplParams['contact'] = array('display_name' => $donorDisplayName);
+
+      $tplParams['contact'] = array('display_name' => $this->_donorDisplayName);
 
       $date = CRM_Utils_Date::format($processorParams['credit_card_exp_date']);
       $tplParams['credit_card_exp_date'] = CRM_Utils_Date::mysqlToIso($date);
@@ -384,10 +411,10 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
         'isTest' => $this->_subscriptionDetails->is_test,
         'PDFFilename' => 'receipt.pdf',
         'from' => $receiptFrom,
-        'toName' => $donorDisplayName,
-        'toEmail' => $donorEmail,
+        'toName' => $this->_donorDisplayName,
+        'toEmail' => $this->_donorEmail,
       );
-      list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+      CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     }
     else {
       $status = ts('There was some problem updating the billing details.');
