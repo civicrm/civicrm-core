@@ -31,12 +31,12 @@
   <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
     <tr>
       <td class="crm-contact-form-block-contact1">
-        <label for="contact1">{ts}Contact 1{/ts}</label><br />
-        <input class="crm-form-text" type="text" placeholder="Search Contact1" search-column="0" />
+        <label for="search-contact1">{ts}Contact 1{/ts}</label><br />
+        <input class="crm-form-text" type="text" placeholder="Search Contact1" value="{$searchcontact1}" id="search-contact1" search-column="0" />
       </td>
       <td class="crm-contact-form-block-contact2">
-        <label for="contact2">{ts}Contact 2{/ts}</label><br />
-        <input class="crm-form-text" type="text" placeholder="Search Contact2" search-column="1" />
+        <label for="search-contact2">{ts}Contact 2{/ts}</label><br />
+        <input type="text" placeholder="Search Contact2" value="{$searchcontact2}" id="search-contact2" search-column="1" />
       </td>
     </tr>
   </table>
@@ -53,7 +53,6 @@
       <tr>
         <th>{ts}Contact 1{/ts}</th>
         <th>{ts}Contact 2 (Duplicate){/ts}</th>
-        <th data-orderable="false"></th>
       </tr>
       </thead>
       <tbody>
@@ -112,8 +111,7 @@
         var timer = null;
 
       // apply the search
-      $('.filtercontacts').on( 'click', function (e) {
-        e.preventDefault();
+      $('#searchOptions input').on( 'keydown', function () {
         clearTimeout(timer);
         timer = setTimeout(updateTable, 500)
       });
@@ -121,6 +119,7 @@
       function updateTable() {
 
         var contact1term = $('#search-contact1').val();
+        var contact2term = $('#search-contact2').val();
 
         currentLocation = currentLocation.replace(/crmPID=\d+/, 'crmPID=' + 0);
 
@@ -129,6 +128,13 @@
         }
         else {
           currentLocation += '&crmContact1Q='+contact1term;
+        }
+
+        if (currentLocation.indexOf('crmContact2Q') !== -1) {
+          currentLocation = currentLocation.replace(/crmContact2Q=\w*/, 'crmContact2Q=' + contact2term);
+        }
+        else {
+          currentLocation += '&crmContact2Q='+contact2term;
         }
 
         refresh(currentLocation);
