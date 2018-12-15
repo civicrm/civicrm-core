@@ -51,6 +51,20 @@ trait CRMTraits_ACL_PermissionTrait {
   }
 
   /**
+   * No results returned.
+   *
+   * @implements CRM_Utils_Hook::aclWhereClause
+   *
+   * @param string $type
+   * @param array $tables
+   * @param array $whereTables
+   * @param int $contactID
+   * @param string $where
+   */
+  public function aclWhereHookNoResults($type, &$tables, &$whereTables, &$contactID, &$where) {
+  }
+
+  /**
    * All but first results returned.
    *
    * @implements CRM_Utils_Hook::aclWhereClause

@@ -114,9 +114,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   private $tx = NULL;
 
   /**
-   * @var CRM_Utils_Hook_UnitTests hookClass
-   * example of setting a method for a hook
+   * Class used for hooks during tests.
+   *
+   * This can be used to test hooks within tests. For example in the ACL_PermissionTrait:
+   *
    * $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+   *
+   * @var CRM_Utils_Hook_UnitTests hookClass
    */
   public $hookClass = NULL;
 
@@ -685,8 +689,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
-   * @param $expected
-   * @param $actual
+   * Assert the 2 arrays have the same values.
+   *
+   * @param array $array1
+   * @param array $array2
    */
   public function assertArrayValuesEqual($array1, $array2) {
     $array1 = array_values($array1);
@@ -1722,27 +1728,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
     $result = $this->callAPISuccess('uf_join', 'create', $params);
     return $result;
-  }
-
-  /**
-   * Delete a UF Join Entry.
-   *
-   * @param array $params
-   *   with missing uf_group_id
-   */
-  public function ufjoinDelete($params = NULL) {
-    if ($params === NULL) {
-      $params = array(
-        'is_active' => 1,
-        'module' => 'CiviEvent',
-        'entity_table' => 'civicrm_event',
-        'entity_id' => 3,
-        'weight' => 1,
-        'uf_group_id' => '',
-      );
-    }
-
-    crm_add_uf_join($params);
   }
 
   /**
@@ -3573,20 +3558,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->_ids['price_field'] = array($priceField['id']);
 
     $this->_ids['membership_type'] = $membershipTypeID;
-  }
-
-  /**
-   * No results returned.
-   *
-   * @implements CRM_Utils_Hook::aclWhereClause
-   *
-   * @param string $type
-   * @param array $tables
-   * @param array $whereTables
-   * @param int $contactID
-   * @param string $where
-   */
-  public function aclWhereHookNoResults($type, &$tables, &$whereTables, &$contactID, &$where) {
   }
 
   /**

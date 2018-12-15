@@ -33,11 +33,12 @@
  * @group headless
  */
 class api_v3_ACLPermissionTest extends CiviUnitTestCase {
+
+  use CRMTraits_ACL_PermissionTrait;
+
   protected $_apiversion = 3;
   public $DBResetRequired = FALSE;
   protected $_entity;
-  protected $allowedContactId = 0;
-  protected $allowedContacts = array();
 
   public function setUp() {
     parent::setUp();
@@ -440,47 +441,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'access CiviEvent',
       'view event participants',
     );
-  }
-
-  /**
-   * All results returned.
-   *
-   * @implements CRM_Utils_Hook::aclWhereClause
-   *
-   * @param string $type
-   * @param array $tables
-   * @param array $whereTables
-   * @param int $contactID
-   * @param string $where
-   */
-  public function aclWhereHookAllResults($type, &$tables, &$whereTables, &$contactID, &$where) {
-    $where = " (1) ";
-  }
-
-  /**
-   * All but first results returned.
-   * @implements CRM_Utils_Hook::aclWhereClause
-   * @param $type
-   * @param $tables
-   * @param $whereTables
-   * @param $contactID
-   * @param $where
-   */
-  public function aclWhereOnlySecond($type, &$tables, &$whereTables, &$contactID, &$where) {
-    $where = " contact_a.id > 1";
-  }
-
-  /**
-   * Only specified contact returned.
-   * @implements CRM_Utils_Hook::aclWhereClause
-   * @param $type
-   * @param $tables
-   * @param $whereTables
-   * @param $contactID
-   * @param $where
-   */
-  public function aclWhereOnlyOne($type, &$tables, &$whereTables, &$contactID, &$where) {
-    $where = " contact_a.id = " . $this->allowedContactId;
   }
 
   /**
