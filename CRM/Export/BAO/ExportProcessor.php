@@ -80,6 +80,15 @@ class CRM_Export_BAO_ExportProcessor {
   protected $isMergeSameHousehold;
 
   /**
+   * Only export contacts that can receive postal mail.
+   *
+   * Includes being alive, having an address & not having do_not_mail.
+   *
+   * @var bool
+   */
+  protected $isPostalableOnly;
+
+  /**
    * Key representing the head of household in the relationship array.
    *
    * e.g. ['8_b_a' => 'Household Member Is', '8_a_b = 'Household Member Of'.....]
@@ -127,16 +136,31 @@ class CRM_Export_BAO_ExportProcessor {
    * @param array|NULL $requestedFields
    * @param string $queryOperator
    * @param bool $isMergeSameHousehold
+   * @param bool $isPostalableOnly
    */
-  public function __construct($exportMode, $requestedFields, $queryOperator, $isMergeSameHousehold = FALSE) {
+  public function __construct($exportMode, $requestedFields, $queryOperator, $isMergeSameHousehold = FALSE, $isPostalableOnly = FALSE) {
     $this->setExportMode($exportMode);
     $this->setQueryMode();
     $this->setQueryOperator($queryOperator);
     $this->setRequestedFields($requestedFields);
     $this->setRelationshipTypes();
     $this->setIsMergeSameHousehold($isMergeSameHousehold);
+    $this->setisPostalableOnly($isPostalableOnly);
   }
 
+  /**
+   * @return bool
+   */
+  public function isPostalableOnly() {
+    return $this->isPostalableOnly;
+  }
+
+  /**
+   * @param bool $isPostalableOnly
+   */
+  public function setIsPostalableOnly($isPostalableOnly) {
+    $this->isPostalableOnly = $isPostalableOnly;
+  }
   /**
    * @return array|null
    */
@@ -434,6 +458,23 @@ class CRM_Export_BAO_ExportProcessor {
    * @return array
    */
   public function runQuery($params, $order, $returnProperties) {
+    $addressWhere = '';
+    $params = array_merge($params, $this->getWhereParams());
+    if ($this->isPostalableOnly) {
+      if (array_key_exists('street_address', $returnProperties)) {
+        $addressWhere = " civicrm_address.street_address <> ''";
+        if (array_key_exists('supplemental_address_1', $returnProperties)) {
+          // We need this to be an OR rather than AND on the street_address so, hack it in.
+          $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+            'address_options', TRUE, NULL, TRUE
+          );
+          if (!empty($addressOptions['supplemental_address_1'])) {
+            $addressWhere .= " OR civicrm_address.supplemental_address_1 <> ''";
+          }
+        }
+        $addressWhere = ' AND (' . $addressWhere . ')';
+      }
+    }
     $query = new CRM_Contact_BAO_Query($params, $returnProperties, NULL,
       FALSE, FALSE, $this->getQueryMode(),
       FALSE, TRUE, TRUE, NULL, $this->getQueryOperator()
@@ -444,7 +485,7 @@ class CRM_Export_BAO_ExportProcessor {
     $query->_sort = $order;
     list($select, $from, $where, $having) = $query->query();
     $this->setQueryFields($query->_fields);
-    return array($query, $select, $from, $where, $having);
+    return array($query, $select, $from, $where . $addressWhere, $having);
   }
 
   /**
@@ -1215,6 +1256,20 @@ class CRM_Export_BAO_ExportProcessor {
       . ($entityLabel ? ('_' . $entityLabel) : '')
     );
     return $fieldKey;
+  }
+
+  /**
+   * Get params for the where criteria.
+   *
+   * @return mixed
+   */
+  public function getWhereParams() {
+    if (!$this->isPostalableOnly()) {
+      return [];
+    }
+    $params['is_deceased'] = ['is_deceased', '=', 0, CRM_Contact_BAO_Query::MODE_CONTACTS];
+    $params['do_not_mail'] = ['do_not_mail', '=', 0, CRM_Contact_BAO_Query::MODE_CONTACTS];
+    return $params;
   }
 
 }

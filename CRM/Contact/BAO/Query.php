@@ -3528,7 +3528,7 @@ WHERE  $smartGroupClause
    * @param array $values
    */
   public function street_address(&$values) {
-    list($name, $op, $value, $grouping, $wildcard) = $values;
+    list($name, $op, $value, $grouping) = $values;
 
     if (!$op) {
       $op = 'LIKE';
@@ -3921,7 +3921,7 @@ WHERE  $smartGroupClause
    * @param $values
    */
   public function privacy(&$values) {
-    list($name, $op, $value, $grouping, $wildcard) = $values;
+    list($name, $op, $value, $grouping) = $values;
     //fixed for profile search listing CRM-4633
     if (strpbrk($value, "[")) {
       $value = "'{$value}'";
