@@ -666,7 +666,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $params['option_weight'] = array(1 => $params['weight']);
       $params['option_financial_type_id'] = array(1 => $params['financial_type_id']);
       $params['option_visibility_id'] = array(1 => CRM_Utils_Array::value('visibility_id', $params));
-      $params['is_active'] = array(1 => 1);
     }
 
     if ($this->_fid) {
