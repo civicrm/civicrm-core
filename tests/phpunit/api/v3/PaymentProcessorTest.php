@@ -105,6 +105,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
       'is_recur' => $params['is_recur'],
       'payment_type' => 1,
       'payment_instrument_id' => 1,
+      'is_active' => 1,
     );
     $this->checkArrayEquals($expectedResult, $result['values'][$result['id']]);
   }
