@@ -858,8 +858,8 @@ return array(
       'size' => '32',
       'maxlength' => '64',
     ),
-    'default' => NULL,
-    'title' => ts('Drupal Users Table Name'),
+    'default' => 'users',
+    'title' => ts('CMS Users Table Name'),
     'description' => '',
   ),
   'wpLoadPhp' => array(
