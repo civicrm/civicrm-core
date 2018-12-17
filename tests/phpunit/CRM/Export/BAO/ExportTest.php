@@ -416,23 +416,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   public function testExportPseudoField() {
     $this->setUpContactExportData();
     $selectedFields = [['Individual', 'gender_id']];
-    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
-      TRUE,
-      $this->contactIDs[1],
-      array(),
-      NULL,
-      $selectedFields,
-      NULL,
-      CRM_Export_Form_Select::CONTACT_EXPORT,
-      "contact_a.id IN (" . implode(",", $this->contactIDs) . ")",
-      NULL,
-      FALSE,
-      FALSE,
-      array(
-        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
-        'suppress_csv_for_testing' => TRUE,
-      )
-    );
+    list($tableName, $sqlColumns) = $this->doExport($selectedFields, $this->contactIDs);
     $this->assertEquals('Female,', CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(gender_id) FROM {$tableName}"));
   }
 
@@ -833,6 +817,101 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   }
 
+
+  /**
+   * Test phone data export.
+   *
+   * Less over the top complete than the im test.
+   */
+  public function testExportPhoneData() {
+    $this->contactIDs[] = $this->individualCreate();
+    $this->contactIDs[] = $this->individualCreate();
+    $locationTypes = ['Billing' => 'Billing', 'Home' => 'Home'];
+    $phoneTypes = ['Mobile', 'Phone'];
+    foreach ($this->contactIDs as $contactID) {
+      $this->callAPISuccess('Phone', 'create', [
+        'contact_id' => $contactID,
+        'location_type_id' => 'Billing',
+        'phone_type_id' => 'Mobile',
+        'phone' => 'Billing' . 'Mobile' . $contactID,
+        'is_primary' => 1,
+      ]);
+      $this->callAPISuccess('Phone', 'create', [
+        'contact_id' => $contactID,
+        'location_type_id' => 'Home',
+        'phone_type_id' => 'Phone',
+        'phone' => 'Home' . 'Phone' . $contactID,
+      ]);
+    }
+
+    $relationships = [
+      $this->contactIDs[1] => ['label' => 'Spouse of']
+    ];
+
+    foreach ($relationships as $contactID => $relationshipType) {
+      $relationshipTypeID = $this->callAPISuccess('RelationshipType', 'getvalue', ['label_a_b' => $relationshipType['label'], 'return' => 'id']);
+      $result = $this->callAPISuccess('Relationship', 'create', [
+        'contact_id_a' => $this->contactIDs[0],
+        'relationship_type_id' => $relationshipTypeID,
+        'contact_id_b' => $contactID
+      ]);
+      $relationships[$contactID]['id'] = $result['id'];
+      $relationships[$contactID]['relationship_type_id'] = $relationshipTypeID;
+    }
+
+    $fields = [['Individual', 'contact_id']];
+    // ' ' denotes primary location type.
+    foreach (array_keys(array_merge($locationTypes, [' ' => ['Primary']])) as $locationType) {
+      $fields[] = [
+        'Individual',
+        'phone',
+        CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
+      ];
+      $fields[] = [
+        'Individual',
+        'phone_type_id',
+        CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
+      ];
+      foreach ($relationships as $contactID => $relationship) {
+        $fields[] = [
+          'Individual',
+          $relationship['relationship_type_id'] . '_a_b',
+          'phone_type_id',
+          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
+        ];
+      }
+      foreach ($phoneTypes as $phoneType) {
+        $fields[] = [
+          'Individual',
+          'phone',
+          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
+          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', $phoneType),
+        ];
+        foreach ($relationships as $contactID => $relationship) {
+          $fields[] = [
+            'Individual',
+            $relationship['relationship_type_id'] . '_a_b',
+            'phone_type_id',
+            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
+            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', $phoneType),
+          ];
+        }
+      }
+    }
+    list($tableName) = $this->doExport($fields, $this->contactIDs[0]);
+
+    $dao = CRM_Core_DAO::executeQuery('SELECT * FROM ' . $tableName);
+    while ($dao->fetch()) {
+      // note there is some chance these might be random on some mysql co
+      $this->assertEquals('BillingMobile3', $dao->billing_phone_mobile);
+      $this->assertEquals('', $dao->billing_phone_phone);
+      $relField = '2_a_b_phone_type_id';
+      $this->assertEquals('Phone', $dao->$relField);
+      $this->assertEquals('Mobile', $dao->phone_type_id);
+      $this->assertEquals('Mobile', $dao->billing_phone_type_id);
+    }
+  }
+
   /**
    * Export City against multiple location types.
    */
@@ -1114,15 +1193,16 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @return array
    */
   protected function doExport($selectedFields, $id, $exportMode = CRM_Export_Form_Select::CONTACT_EXPORT) {
+    $ids = (array) $id;
     list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
       TRUE,
-      array($id),
+      $ids,
       array(),
       NULL,
       $selectedFields,
       NULL,
       $exportMode,
-      "contact_a.id IN ({$id})",
+      "contact_a.id IN (" . implode(',', $ids) . ")",
       NULL,
       FALSE,
       FALSE,
