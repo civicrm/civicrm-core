@@ -120,7 +120,7 @@ class CRM_Grant_Form_Task extends CRM_Core_Form_Task {
    * since its used for things like send email
    */
   public function setContactIDs() {
-    $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent($this->_grantIds,
+    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_grantIds,
       'civicrm_grant'
     );
   }

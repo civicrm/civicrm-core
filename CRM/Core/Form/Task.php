@@ -177,7 +177,7 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    * For example, for cases we need to override this function as the table name is civicrm_case_contact
    */
   public function setContactIDs() {
-    $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent($this->_entityIds,
+    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_entityIds,
       $this::$tableName
     );
   }
