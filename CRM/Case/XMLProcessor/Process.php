@@ -99,7 +99,6 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   public function process($xml, &$params) {
     $standardTimeline = CRM_Utils_Array::value('standardTimeline', $params);
     $activitySetName = CRM_Utils_Array::value('activitySetName', $params);
-    $activityTypeName = CRM_Utils_Array::value('activityTypeName', $params);
 
     if ('Open Case' == CRM_Utils_Array::value('activityTypeName', $params)) {
       // create relationships for the ones that are required
