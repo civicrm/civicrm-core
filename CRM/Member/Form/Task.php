@@ -130,7 +130,7 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
    * since its used for things like send email
    */
   public function setContactIDs() {
-    $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent($this->_memberIds,
+    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_memberIds,
       'civicrm_membership'
     );
   }
