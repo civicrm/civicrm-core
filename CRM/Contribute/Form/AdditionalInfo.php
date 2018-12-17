@@ -154,7 +154,6 @@ class CRM_Contribute_Form_AdditionalInfo {
 
     $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     if ($form->_id && $form->_values['contribution_status_id'] == array_search('Cancelled', $statusName)) {
-      $netAmount->freeze();
       $feeAmount->freeze();
     }
 
