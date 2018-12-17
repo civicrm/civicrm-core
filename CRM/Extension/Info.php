@@ -169,15 +169,30 @@ class CRM_Extension_Info {
         }
       }
       elseif ($attr === 'requires') {
-        $this->requires = array();
-        foreach ($val->ext as $ext) {
-          $this->requires[] = (string) $ext;
-        }
+        $this->requires = $this->filterRequirements($val);
       }
       else {
         $this->$attr = CRM_Utils_XML::xmlObjToArray($val);
       }
     }
+  }
+
+  /**
+   * Filter out invalid requirements, e.g. extensions that have been moved to core.
+   *
+   * @param SimpleXMLElement $requirements
+   * @return array
+   */
+  public function filterRequirements($requirements) {
+    $filtered = [];
+    $compatInfo = CRM_Extension_System::getCompatibilityInfo();
+    foreach ($requirements->ext as $ext) {
+      $ext = (string) $ext;
+      if (empty($compatInfo[$ext]['obsolete'])) {
+        $filtered[] = $ext;
+      }
+    }
+    return $filtered;
   }
 
 }

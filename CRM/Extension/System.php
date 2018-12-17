@@ -287,6 +287,18 @@ class CRM_Extension_System {
   }
 
   /**
+   * Returns a list keyed by extension key
+   *
+   * @return array
+   */
+  public static function getCompatibilityInfo() {
+    if (!isset(Civi::$statics[__CLASS__]['compatibility'])) {
+      Civi::$statics[__CLASS__]['compatibility'] = json_decode(file_get_contents(Civi::paths()->getPath('[civicrm.root]/extension-compatibility.json')), TRUE);
+    }
+    return Civi::$statics[__CLASS__]['compatibility'];
+  }
+
+  /**
    * Take an extension's raw XML info and add information about the
    * extension's status on the local system.
    *

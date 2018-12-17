@@ -70,7 +70,7 @@ function dm_install_core() {
   done
 
   dm_install_files "$repo" "$to" {agpl-3.0,agpl-3.0.exception,gpl,CONTRIBUTORS}.txt
-  dm_install_files "$repo" "$to" composer.json composer.lock bower.json package.json Civi.php README.md release-notes.md
+  dm_install_files "$repo" "$to" composer.json composer.lock bower.json package.json Civi.php README.md release-notes.md extension-compatibility.json
 
   mkdir -p "$to/sql"
   pushd "$repo" >> /dev/null
