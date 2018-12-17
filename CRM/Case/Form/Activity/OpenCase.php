@@ -98,7 +98,7 @@ class CRM_Case_Form_Activity_OpenCase {
       return $defaults;
     }
 
-    list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+    $defaults['start_date'] = date('Y-m-d H:i:s');
 
     // set default case status, case type, encounter medium, location type and phone type defaults are set in DB
     if ($form->_caseStatusId) {
@@ -183,7 +183,7 @@ class CRM_Case_Form_Activity_OpenCase {
       $form->assign('clientName', $displayName);
     }
 
-    $form->addDate('start_date', ts('Case Start Date'), TRUE, array('formatType' => 'activityDateTime'));
+    $form->add('datepicker', 'start_date', ts('Case Start Date'), [], TRUE);
 
     $form->addField('medium_id', array('entity' => 'activity', 'context' => 'create'), TRUE);
 
@@ -226,9 +226,6 @@ class CRM_Case_Form_Activity_OpenCase {
       $params['client_id'] = explode(',', $params['client_id']);
       $form->_currentlyViewedContactId = $params['client_id'][0];
     }
-
-    // for open case start date should be set to current date
-    $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
 
     // rename activity_location param to the correct column name for activity DAO
     $params['location'] = CRM_Utils_Array::value('activity_location', $params);
