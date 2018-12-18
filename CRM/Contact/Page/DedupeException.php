@@ -53,7 +53,20 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
    * @access protected
    */
   protected function initializePager() {
-    $totalitems = civicrm_api3('Exception', "getcount", array());
+    $params = array();
+
+    $contactOneQ = CRM_Utils_Request::retrieve('crmContact1Q', 'String');
+    $contactTwoQ = CRM_Utils_Request::retrieve('crmContact2Q', 'String');
+
+    if ($contactOneQ) {
+      $params['contact_id1.display_name'] = array('LIKE' => '%' . $contactOneQ . '%');
+    }
+
+    if ($contactTwoQ) {
+      $params['contact_id2.display_name'] = array('LIKE' => '%' . $contactTwoQ . '%');
+    }
+
+    $totalitems = civicrm_api3('Exception', "getcount", $params);
     $params           = array(
       'total' => $totalitems,
       'rowCount' => CRM_Utils_Pager::ROWCOUNT,
