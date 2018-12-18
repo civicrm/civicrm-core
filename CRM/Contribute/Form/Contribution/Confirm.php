@@ -1798,6 +1798,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $tempParams['trxn_id'] = $membershipContribution->trxn_id;
     $tempParams['contributionID'] = $membershipContribution->id;
 
+    // set recurring contribution id for separate membership payment, otherwise IPN will not get processed
+    if ($membershipContribution->contribution_recur_id) {
+      $tempParams['contributionRecurID'] = $membershipContribution->contribution_recur_id;
+    }
+
+    if ($membershipContribution->contribution_page_id) {
+      $tempParams['contributionPageID'] = $membershipContribution->contribution_page_id;
+    }
+
     if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
       // At the moment our tests are calling this form in a way that leaves 'object' empty. For
       // now we compensate here.
