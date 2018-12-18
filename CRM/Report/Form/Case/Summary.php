@@ -185,8 +185,9 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
           'is_active' => array(
             'title' => ts('Active Relationship?'),
             'type' => CRM_Utils_Type::T_BOOLEAN,
-            'default' => TRUE,
-            'options' => CRM_Core_SelectValues::boolean(),
+            //MV dev/core#603, not set default values Yes/No, this cause issue when relationship fields are not selected
+            // 'default' => TRUE,
+            'options' => array('' => ts('- Select -')) + CRM_Core_SelectValues::boolean(),
           ),
         ),
       ),
