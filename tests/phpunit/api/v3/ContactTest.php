@@ -1792,6 +1792,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('contact', 'getquick', $params);
     $this->assertEquals(17, $result['values'][0]['id']);
+    $params = array(
+      'name' => "TestContact@example.com",
+      'field_name' => 'sort_name',
+    );
+    $result = $this->callAPISuccess('contact', 'getquick', $params);
+    $this->assertEquals(17, $result['values'][0]['id']);
   }
 
   /**
