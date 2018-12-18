@@ -953,7 +953,7 @@ function civicrm_api3_contact_getquick($params) {
     $customOptionsWhere = $customOptionsWhere ?: [0];
     $whereClause = " WHERE (" . implode(' OR ', $customOptionsWhere) . ") $where";
   }
-  elseif (!empty($params['field_name']) && !empty($params['table_name'])) {
+  elseif (!empty($params['field_name']) && !empty($params['table_name']) && $params['field_name'] != 'sort_name') {
     $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch') {$where}";
     // Search by id should be exact
     if ($field_name == 'id' || $field_name == 'external_identifier') {
