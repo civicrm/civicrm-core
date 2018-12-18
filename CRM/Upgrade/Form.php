@@ -50,7 +50,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * Minimum php version required to run (equal to or lower than the minimum install version)
    */
-  const MINIMUM_PHP_VERSION = '5.5';
+  const MINIMUM_PHP_VERSION = '5.6';
 
   protected $_config;
 
