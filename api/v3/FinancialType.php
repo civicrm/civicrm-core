@@ -44,8 +44,6 @@ function civicrm_api3_financial_type_create($params) {
 
 function _civicrm_api3_financial_type_create_spec(&$params) {
   $params['name']['api.required'] = 1;
-  $params['name']['type'] = CRM_Utils_Type::T_STRING;
-  unset($params['name']['pseudoconstant']);
 }
 
 /**
