@@ -34,6 +34,13 @@
 trait CRM_Core_Form_EntityFormTrait {
 
   /**
+   * The entity subtype ID (eg. for Relationship / Activity)
+   *
+   * @var int
+   */
+  protected $_entitySubTypeId;
+
+  /**
    * Get entity fields for the entity to be added to the form.
    *
    * @return array
@@ -66,6 +73,21 @@ trait CRM_Core_Form_EntityFormTrait {
   public function getEntityId() {
     return $this->_id;
   }
+
+  /**
+   * Get the entity subtype ID being edited
+   *
+   * @param $subTypeId
+   *
+   * @return int|null
+   */
+  public function getEntitySubTypeId($subTypeId) {
+    if ($subTypeId) {
+      return $subTypeId;
+    }
+    return $this->_entitySubTypeId;
+  }
+
   /**
    * If the custom data is in the submitted data (eg. added via ajax loaded form) add to form.
    */
