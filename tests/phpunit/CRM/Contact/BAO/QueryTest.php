@@ -235,9 +235,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       ],
     ];
 
-    /* update with the api does not work because it updates both the name and the
-       the display_name. Plain SQL however does the job
-    */
+    // update with the api does not work because it updates both the name and the
+    // the display_name. Plain SQL however does the job
     CRM_Core_DAO::executeQuery('update civicrm_location_type set name=%2 where id=%1',
       [
         1 => [4, 'Integer'],
