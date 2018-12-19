@@ -1118,21 +1118,33 @@ ORDER BY    fixed_sort_order
   }
 
   /**
-   * Get the component id and name if those are enabled and allowed.
+   * Get an array of components that are accessible by the currenct user.
    *
-   * Checks whether logged in user has permission.
-   * To decide whether we are going to include
-   * component related activities with core activity retrieve process.
-   * (what did that just mean?)
+   * This means checking if they are enabled and if the user has appropriate permission.
    *
-   * @return array
+   * For most components the permission is access component (e.g 'access CiviContribute').
+   * Exceptions as CiviCampaign (administer CiviCampaign) and CiviCase
+   * (accesses a case function which enforces edit all cases or edit my cases. Case
+   * permissions are also handled on a per activity basis).
+   *
+   * Checks whether logged in user has permission to the component.
+   *
+   * @param bool $excludeComponentHandledActivities
+   *   Should we exclude components whose display is handled in the components.
+   *   In practice this means should we include CiviCase in the results. Presumbaly
+   *   at the time it was decided case activities should be shown in the case framework and
+   *   that this concept might be extended later. In practice most places that
+   *   call this then re-add CiviCase in some way so it's all a bit... odd.
+   *
+   * @return array Array of component id and name.
    *   Array of component id and name.
    */
-  public static function activityComponents() {
+  public static function activityComponents($excludeComponentHandledActivities = TRUE) {
     $components = array();
     $compInfo = CRM_Core_Component::getEnabledComponents();
     foreach ($compInfo as $compObj) {
-      if (!empty($compObj->info['showActivitiesInCore'])) {
+      $includeComponent = !$excludeComponentHandledActivities || !empty($compObj->info['showActivitiesInCore']);
+      if ($includeComponent) {
         if ($compObj->info['name'] == 'CiviCampaign') {
           $componentPermission = "administer {$compObj->name}";
         }
@@ -2756,7 +2768,7 @@ AND cl.modified_id  = c.id
    */
   protected static function isContactPermittedAccessToCaseActivity($activityId, $action, $activityTypeID) {
     $allow = FALSE;
-    foreach (['administer CiviCase', 'access my cases and activities', 'access all cases and activities'] as $per) {
+    foreach (['access my cases and activities', 'access all cases and activities'] as $per) {
       if (CRM_Core_Permission::check($per)) {
         $allow = TRUE;
         break;
@@ -2783,21 +2795,7 @@ AND cl.modified_id  = c.id
    * @return bool
    */
   protected static function hasPermissionForActivityType($activityTypeID) {
-    $compPermissions = [
-      'CiviCase' => [
-        'administer CiviCase',
-        'access my cases and activities',
-        'access all cases and activities',
-      ],
-      'CiviMail' => ['access CiviMail'],
-      'CiviEvent' => ['access CiviEvent'],
-      'CiviGrant' => ['access CiviGrant'],
-      'CiviPledge' => ['access CiviPledge'],
-      'CiviMember' => ['access CiviMember'],
-      'CiviReport' => ['access CiviReport'],
-      'CiviContribute' => ['access CiviContribute'],
-      'CiviCampaign' => ['administer CiviCampaign'],
-    ];
+    $components = self::activityComponents(FALSE);
 
     // First check the component permission.
     $sql = "
@@ -2812,16 +2810,8 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     $componentId = CRM_Core_DAO::singleValueQuery($sql, $params);
 
     if ($componentId) {
-      $componentName = CRM_Core_Component::getComponentName($componentId);
-      $compPermission = CRM_Utils_Array::value($componentName, $compPermissions);
-
-      // Here we are interesting in any single permission.
-      if (is_array($compPermission)) {
-        foreach ($compPermission as $per) {
-          if (CRM_Core_Permission::check($per)) {
-            return TRUE;
-          }
-        }
+      if (!empty($components[$componentId])) {
+        return TRUE;
       }
     }
     else {
