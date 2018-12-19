@@ -430,7 +430,7 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
   }
   if (isset($params['group'])) {
     $groups = $params['group'];
-    $allGroups = CRM_Core_PseudoConstant::group();
+    $allGroups = CRM_Contact_BAO_GroupContact::buildOptions('group_id', 'validate');
     if (is_array($groups) && in_array(key($groups), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
       // Get the groups array.
       $groupsArray = $groups[key($groups)];
