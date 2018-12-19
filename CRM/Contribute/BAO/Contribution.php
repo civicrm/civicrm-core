@@ -5590,13 +5590,19 @@ LIMIT 1;";
       $liWhere = " AND i.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ")";
     }
     $whereClauses = [
-      'b.contact_id IN (' . $contactIDs . ')',
-      'b.contribution_status_id = ' . (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
-      'b.is_test = 0',
-      'b.receive_date >= ' . $startDate,
-      'b.receive_date <  ' . $endDate,
+      'contact_id' => 'IN (' . $contactIDs . ')',
+      'contribution_status_id' => '= ' . (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'is_test' => ' = 0',
+      'receive_date' => ['>=' . $startDate, '<  ' . $endDate],
     ];
-    CRM_Financial_BAO_FinancialType::buildPermissionedClause($whereClauses, NULL, 'b');
+    CRM_Financial_BAO_FinancialType::addACLClausesToWhereClauses($whereClauses);
+
+    $clauses = [];
+    foreach ($whereClauses as $key => $clause) {
+      $clauses[] = 'b.' . $key . " "  . implode(' AND b.' . $key, (array) $clause);
+    }
+    $whereClauseString = implode(' AND ', $clauses);
+
     $query = "
       SELECT COUNT(*) as count,
              SUM(total_amount) as amount,
@@ -5604,7 +5610,7 @@ LIMIT 1;";
              currency
       FROM civicrm_contribution b
       LEFT JOIN civicrm_line_item i ON i.contribution_id = b.id AND i.entity_table = 'civicrm_contribution' $liWhere
-      WHERE " . implode(' AND ', $whereClauses) . "
+      WHERE " . $whereClauseString . "
       GROUP BY currency
       ";
     return $query;

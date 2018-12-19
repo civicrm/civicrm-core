@@ -346,6 +346,44 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
+   * This function adds the Financial ACL clauses to the where clause.
+   *
+   * This is currently somewhat mocking the native hook implementation
+   * for the acls that are in core. If the financialaclreport extension is installed
+   * core acls are not applied as that would result in them being applied twice.
+   *
+   * Long term we should either consolidate the financial acls in core or use only the extension.
+   * Both require substantial clean up before implementing and by the time the code is clean enough to
+   * take the final step we should
+   * be able to implement by removing one half of the other of this function.
+   *
+   * @param array $whereClauses
+   */
+  public static function addACLClausesToWhereClauses(&$whereClauses) {
+    $originalWhereClauses = $whereClauses;
+    CRM_Utils_Hook::selectWhereClause('Contribution', $whereClauses);
+    if ($whereClauses !== $originalWhereClauses) {
+      // In this case permisssions have been applied & we assume the
+      // financialaclreport is applying these
+      // https://github.com/JMAConsulting/biz.jmaconsulting.financialaclreport/blob/master/financialaclreport.php#L107
+      return;
+    }
+
+    if (!self::isACLFinancialTypeStatus()) {
+      return;
+    }
+    $types = self::getAllEnabledAvailableFinancialTypes();
+    if (empty($types)) {
+      $whereClauses['financial_type_id'] = 'IN (0)';
+    }
+    else {
+      $whereClauses['financial_type_id'] = [
+        'IN (' . implode(',', array_keys($types)) . ')'
+      ];
+    }
+  }
+
+  /**
    * Function to build a permissioned sql where clause based on available financial types.
    *
    * @param array $whereClauses
