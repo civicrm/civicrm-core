@@ -376,6 +376,11 @@ function _civicrm_api3_get_BAO($name) {
   if ($name == 'PrintLabel') {
     return 'CRM_Badge_BAO_Layout';
   }
+  if ($name === 'Order') {
+    // Order basically maps to contribution at the top level but
+    // has enhanced access to other entities.
+    $name = 'Contribution';
+  }
   $dao = _civicrm_api3_get_DAO($name);
   if (!$dao) {
     return NULL;
