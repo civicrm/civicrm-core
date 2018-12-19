@@ -424,15 +424,18 @@ else {
  *  $description[2] - The test error to show, if it goes wrong
  */
 class InstallRequirements {
-  var $errors, $warnings, $tests, $conn;
+  protected $errors = [];
+  protected $warnings = [];
+  var $tests, $conn;
 
   // @see CRM_Upgrade_Form::MINIMUM_THREAD_STACK
   const MINIMUM_THREAD_STACK = 192;
 
   /**
    * Just check that the database configuration is okay.
-   * @param $databaseConfig
-   * @param $dbName
+   *
+   * @param array $databaseConfig
+   * @param string $dbName
    */
   public function checkdatabase($databaseConfig, $dbName) {
     if ($this->requireFunction('mysqli_connect',
@@ -485,7 +488,7 @@ class InstallRequirements {
         );
         if (!CRM_Core_DAO::requireSafeDBName($databaseConfig['database'])) {
           $this->error($testDetails);
-          return FALSE;
+          return;
         }
         else {
           $this->testing($testDetails);
