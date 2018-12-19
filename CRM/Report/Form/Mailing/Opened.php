@@ -299,7 +299,6 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
       }
     }
     if (!empty($groupBys)) {
-      $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, $groupBys);
       $this->_groupBy = "GROUP BY " . implode(', ', $groupBys);
     }
   }
