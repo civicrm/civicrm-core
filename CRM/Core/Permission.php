@@ -1642,8 +1642,11 @@ class CRM_Core_Permission {
    */
   public static function checkDownloadInvoice() {
     $cid = CRM_Core_Session::getLoggedInContactID();
+    $cidOther = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullArray);
+    // allow permissioned contact to download the invoice
     if (CRM_Core_Permission::check('access CiviContribute') ||
-      (CRM_Core_Permission::check('view my invoices') && $_GET['cid'] == $cid)
+      (CRM_Core_Permission::check('view my invoices') && $_GET['cid'] == $cid) ||
+      CRM_Contact_BAO_Contact_Permission::relationshipList(array($cidOther))
     ) {
       return TRUE;
     }
