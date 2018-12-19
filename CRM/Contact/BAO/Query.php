@@ -2130,7 +2130,7 @@ class CRM_Contact_BAO_Query {
 
     $setTables = TRUE;
 
-    $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationType = CRM_Core_DAO_Address::buildOptions('location_type_id', 'validate');
     if (isset($locType[1]) && is_numeric($locType[1])) {
       $lType = $locationType[$locType[1]];
     }
