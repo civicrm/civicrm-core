@@ -209,6 +209,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
    * Test owed/refund info is listed on view payments.
    */
   public function testTransactionInfo() {
+    $mut = new CiviMailUtils($this, TRUE);
     $feeAmt = 100;
     $amtPaid = 80;
     $result = $this->addParticipantWithPayment($feeAmt, $amtPaid);
@@ -218,17 +219,28 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $submittedValues = array(
       'total_amount' => 20,
       'payment_instrument_id' => 3,
+      'payment_type' => 'owed',
+      'participant_id' => $participant['id'],
+      'contribution_id' => $contributionID,
+      'is_email_receipt' => TRUE,
     );
-    CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionID, $submittedValues, 'owed', $result['participant']['id']);
+
+    $this->callAPISuccess('payment', 'create', $submittedValues);
+    $priceField = $this->callAPISuccess('PriceField', 'get', [
+      'sequential' => 1,
+      'price_set_id' => $priceSetId,
+      'html_type' => 'Text'
+    ]);
 
     //Change selection to a lower amount.
-    $params['price_2'] = 50;
-    CRM_Price_BAO_LineItem::changeFeeSelections($params, $result['participant']['id'], 'participant', $contributionID, $result['feeBlock'], $result['lineItem']);
+    $params["price_{$priceField['id']}"] = 50;
+    CRM_Price_BAO_LineItem::changeFeeSelections($params, $participant['id'], 'participant', $contributionID, $feeBlock, $lineItem, $feeAmt);
 
     //Record a refund of the remaining amount.
     $submittedValues['total_amount'] = 50;
-    CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionID, $submittedValues, 'refund', $result['participant']['id']);
-    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($result['participant']['id'], 'event', TRUE);
+    $submittedValues['payment_type'] = 'refund';
+    $this->callAPISuccess('payment', 'create', $submittedValues);
+    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($participant['id'], 'event', TRUE);
     $transaction = $paymentInfo['transaction'];
 
     //Assert all transaction(owed and refund) are listed on view payments.
@@ -241,6 +253,18 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $this->assertEquals($transaction[2]['total_amount'], -50.00);
     $this->assertEquals($transaction[2]['status'], 'Refunded');
+
+    //Test email receipt for refund payment.
+    $mut->assertSubjects(array('Payment Receipt - Annual CiviCRM meet', 'Refund Notification - Annual CiviCRM meet'));
+    $mut->checkMailLog(array(
+      'Dear Mr. Anthony Anderson II',
+      'A refund has been issued based on changes in your registration selections',
+      'Total Fees: $ 50.00',
+      'You Paid: $ 50.00',
+      'Refund Amount: $ 50.00',
+      'Event Information and Location',
+    ));
+    $mut->stop();
   }
 
 }

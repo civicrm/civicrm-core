@@ -169,6 +169,16 @@ function _civicrm_api3_payment_create_spec(&$params) {
       'type' => CRM_Utils_Type::T_INT,
       'api.aliases' => array('payment_id'),
     ),
+    'payment_type' => array(
+      'title' => 'Payment Type',
+      'type' => CRM_Utils_Type::T_STRING,
+      'description' => ts("Type of payment - 'owed' or 'refund'."),
+    ),
+    'is_email_receipt' => array(
+      'title' => 'Send Email Receipt',
+      'type' => CRM_Utils_Type::T_BOOLEAN,
+      'description' => ts('If true, receipt is automatically emailed to contact after payment.'),
+    ),
   );
 }
 

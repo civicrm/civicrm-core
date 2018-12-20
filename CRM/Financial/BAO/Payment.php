@@ -118,123 +118,114 @@ class CRM_Financial_BAO_Payment {
   }
 
   /**
-   * Send an email confirming a payment that has been received.
+   * Function to send email receipt.
    *
+   * @param array $params
+   *
+   * @return bool
+   */
+  public static function sendConfirmation($params) {
+    if (empty($params['is_email_receipt'])) {
+      return;
+    }
+    $templateVars = array();
+    self::assignVariablesToTemplate($templateVars, $params);
+    // send message template
+    $fromEmails = CRM_Core_BAO_Email::getFromEmail();
+    $sendTemplateParams = array(
+      'groupName' => 'msg_tpl_workflow_contribution',
+      'valueName' => 'payment_or_refund_notification',
+      'contactId' => CRM_Utils_Array::value('contactId', $templateVars),
+      'PDFFilename' => ts('notification') . '.pdf',
+    );
+    $doNotEmail = NULL;
+    if (!empty($templateVars['contactId'])) {
+      $doNotEmail = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $templateVars['contactId'], 'do_not_email');
+    }
+    // try to send emails only if email id is present
+    // and the do-not-email option is not checked for that contact
+    if (!empty($templateVars['contributorEmail']) && empty($doNotEmail)) {
+      list($userName, $receiptFrom) = CRM_Core_BAO_Domain::getDefaultReceiptFrom();
+      if (!empty($params['from_email_address']) && array_key_exists($params['from_email_address'], $fromEmails)) {
+        $receiptFrom = $params['from_email_address'];
+      }
+      $sendTemplateParams['from'] = $receiptFrom;
+      $sendTemplateParams['toName'] = CRM_Utils_Array::value('contributorDisplayName', $templateVars);
+      $sendTemplateParams['toEmail'] = $templateVars['contributorEmail'];
+    }
+    list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+    return $mailSent;
+  }
+
+  /**
+   * Assign template variables.
+   *
+   * @param array $templateVars
    * @param array $params
    *
    * @return array
    */
-  public static function sendConfirmation($params) {
-
-    $entities = self::loadRelatedEntities($params['id']);
-    $sendTemplateParams = array(
-      'groupName' => 'msg_tpl_workflow_contribution',
-      'valueName' => 'payment_or_refund_notification',
-      'PDFFilename' => ts('notification') . '.pdf',
-      'contactId' => $entities['contact']['id'],
-      'toName' => $entities['contact']['display_name'],
-      'toEmail' => $entities['contact']['email'],
-      'tplParams' => self::getConfirmationTemplateParameters($entities),
-    );
-    return CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
-  }
-
-  /**
-   * Load entities related to the current payment id.
-   *
-   * This gives us all the data we need to send an email confirmation but avoiding
-   * getting anything not tested for the confirmations. We retrieve the 'full' event as
-   * it has been traditionally assigned in full.
-   *
-   * @param int $id
-   *
-   * @return array
-   *   - contact = ['id' => x, 'display_name' => y, 'email' => z]
-   *   - event = [.... full event details......]
-   *   - contribution = ['id' => x],
-   *   - payment = [payment info + payment summary info]
-   */
-  protected static function loadRelatedEntities($id) {
-    $entities = [];
-    $contributionID = (int) civicrm_api3('EntityFinancialTrxn', 'getvalue', [
-      'financial_trxn_id' => $id,
-      'entity_table' => 'civicrm_contribution',
-      'return' => 'entity_id',
-    ]);
-    $entities['contribution'] = ['id' => $contributionID];
-    $entities['payment'] = array_merge(civicrm_api3('FinancialTrxn', 'getsingle', ['id' => $id]),
-      CRM_Contribute_BAO_Contribution::getPaymentInfo($contributionID)
-    );
-
-    $contactID = self::getPaymentContactID($contributionID);
-    list($displayName, $email)  = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
-    $entities['contact'] = ['id' => $contactID, 'display_name' => $displayName, 'email' => $email];
-
-    $participantRecords = civicrm_api3('ParticipantPayment', 'get', [
-      'contribution_id' => $contributionID,
-      'api.Participant.get' => ['return' => 'event_id'],
-      'sequential' => 1,
-    ])['values'];
-    if (!empty($participantRecords)) {
-      $entities['event'] = civicrm_api3('Event', 'getsingle', ['id' => $participantRecords[0]['api.Participant.get']['values'][0]['event_id']]);
-      if (!empty($entities['event']['is_show_location'])) {
-        $locationParams = [
-          'entity_id' => $entities['event']['id'],
+  public static function assignVariablesToTemplate(&$templateVars, $params) {
+    $templateVars = self::getTemplateVars($params);
+    $template = CRM_Core_Smarty::singleton();
+    if (CRM_Utils_Array::value('component', $templateVars) == 'event') {
+      // fetch event information from participant ID using API
+      $eventId = civicrm_api3('Participant', 'getvalue', array(
+        'return' => "event_id",
+        'id' => $templateVars['id'],
+      ));
+      $event = civicrm_api3('Event', 'getsingle', array('id' => $eventId));
+      $template->assign('event', $event);
+      $template->assign('isShowLocation', $event['is_show_location']);
+      if (CRM_Utils_Array::value('is_show_location', $event) == 1) {
+        $locationParams = array(
+          'entity_id' => $eventId,
           'entity_table' => 'civicrm_event',
-        ];
-        $entities['location'] = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
+        );
+        $location = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
+        $template->assign('location', $location);
       }
+      // assign payment info here
+      $paymentConfig['confirm_email_text'] = CRM_Utils_Array::value('confirm_email_text', $event);
+      $template->assign('paymentConfig', $paymentConfig);
     }
-
-    return $entities;
+    $template->assign('component', CRM_Utils_Array::value('component', $templateVars));
+    $template->assign('totalAmount', CRM_Utils_Array::value('amtTotal', $templateVars));
+    $isRefund = ($templateVars['paymentType'] == 'refund') ? TRUE : FALSE;
+    $template->assign('isRefund', $isRefund);
+    if ($isRefund) {
+      $template->assign('totalPaid', CRM_Utils_Array::value('amtPaid', $templateVars));
+      $template->assign('refundAmount', $params['total_amount']);
+    }
+    else {
+      $balance = CRM_Contribute_BAO_Contribution::getContributionBalance($params['contribution_id']);
+      $paymentsComplete = ($balance == 0) ? 1 : 0;
+      $template->assign('amountOwed', $balance);
+      $template->assign('paymentAmount', $params['total_amount']);
+      $template->assign('paymentsComplete', $paymentsComplete);
+    }
+    $template->assign('contactDisplayName', CRM_Utils_Array::value('contributorDisplayName', $templateVars));
+    // assign trxn details
+    $template->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $params));
+    $template->assign('receive_date', CRM_Utils_Array::value('trxn_date', $params));
+    if (!empty($params['payment_instrument_id'])) {
+      $template->assign('paidBy', CRM_Core_PseudoConstant::getLabel(
+        'CRM_Contribute_BAO_Contribution',
+        'payment_instrument_id',
+        $params['payment_instrument_id']
+      ));
+    }
+    $template->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
+    if (!empty($params['mode'])) {
+      $template->assign('contributeMode', 'direct');
+      $template->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
+        $params,
+        CRM_Core_BAO_LocationType::getBilling()
+      ));
+    }
   }
-
   /**
-   * @param int $contributionID
-   *
-   * @return int
-   */
-  public static function getPaymentContactID($contributionID) {
-    $contribution = civicrm_api3('Contribution', 'getsingle', [
-      'id' => $contributionID ,
-      'return' => ['contact_id'],
-    ]);
-    return (int) $contribution['contact_id'];
-  }
-  /**
-   * @param array $entities
-   *   Related entities as an array keyed by the various entities.
-   *
-   * @return array
-   *   Values required for the notification
-   *   - contact_id
-   *   - template_variables
-   *     - event (DAO of event if relevant)
-   */
-  public static function getConfirmationTemplateParameters($entities) {
-    $templateVariables = [
-      'contactDisplayName' => $entities['contact']['display_name'],
-      'totalAmount' => $entities['payment']['total'],
-      'amountOwed' => $entities['payment']['balance'],
-      'paymentAmount' => $entities['payment']['total_amount'],
-      'checkNumber' => CRM_Utils_Array::value('check_number', $entities['payment']),
-      'receive_date' => $entities['payment']['trxn_date'],
-      'paidBy' => CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $entities['payment']['payment_instrument_id']),
-      'isShowLocation' => (!empty($entities['event']) ? $entities['event']['is_show_location'] : FALSE),
-      'location' => CRM_Utils_Array::value('location', $entities),
-      'event' => CRM_Utils_Array::value('event', $entities),
-      'component' => (!empty($entities['event']) ? 'event' : 'contribution'),
-    ];
-
-    return self::filterUntestedTemplateVariables($templateVariables);
-  }
-
-  /**
-   * Filter out any untested variables.
-   *
-   * This just serves to highlight if any variables are added without a unit test also being added.
-   *
-   * (if hit then add a unit test for the param & add to this array).
+   * Function to form template variables.
    *
    * @param array $params
    *
