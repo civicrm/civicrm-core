@@ -112,8 +112,8 @@ class CRM_Case_ManagedEntities {
 
     if (!isset(Civi::$statics[__CLASS__]['reltypes'])) {
       $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE, NULL);
-      $label_a_bs = CRM_Utils_Array::collect(CRM_Case_XMLProcessor::label_a_b, $relationshipInfo);
-      $label_b_as = CRM_Utils_Array::collect(CRM_Case_XMLProcessor::label_b_a, $relationshipInfo);
+      $label_a_bs = CRM_Utils_Array::collect('label_a_b', $relationshipInfo);
+      $label_b_as = CRM_Utils_Array::collect('label_b_a', $relationshipInfo);
       $labelsBidrectional = array_merge($label_a_bs, $label_b_as);
       Civi::$statics[__CLASS__]['reltypes'] = $labelsBidrectional;
     }
