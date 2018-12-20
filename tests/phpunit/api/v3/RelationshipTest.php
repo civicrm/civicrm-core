@@ -85,7 +85,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'start_date' => '2008-12-20',
       'is_active' => 1,
     );
-
   }
 
   /**
@@ -122,8 +121,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'contact_id_b' => $this->_cId_b,
       'relationship_type_id' => $employerRelationshipID,
     ));
-    $params = array($this->_cId_a => $this->_cId_b);
-    CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($params);
 
     //Check if current employer is correctly set.
     $employer = $this->callAPISuccessGetValue('Contact', array(
@@ -440,6 +437,51 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $params['id'] = $result['id'];
     $this->callAPISuccess('relationship', 'delete', $params);
     $this->relationshipTypeDelete($this->_relTypeID);
+  }
+
+  /**
+   * Check employee relationship creation using backend form
+   */
+  public function testRelationshipCreateWithEmployerData() {
+    // CASE A: Create a current employee relationship without setting end date, ensure that employer field is set
+    $params = [
+      'relationship_type_id' => '5_a_b',
+      'related_contact_id' => $this->_cId_b,
+      'start_date' => '2008-12-20',
+      'end_date' => NULL,
+      'is_active' => 1,
+      'is_current_employer' => 1,
+      'is_permission_a_b' => 0,
+      'is_permission_b_a' => 0,
+    ];
+    $reln = new CRM_Contact_Form_Relationship();
+    $reln->_action = CRM_Core_Action::ADD;
+    $reln->_contactId = $this->_cId_a;
+    list ($params, $relationshipIds) = $reln->submit($params);
+
+    $this->assertEquals(
+      $this->_cId_b,
+      $this->callAPISuccess('Contact', 'getvalue', [
+        'id' => $this->_cId_a,
+        'return' => 'current_employer_id',
+    ]));
+
+    // CASE B: Create a past employee relationship by setting end date of past, ensure that employer field is cleared
+    $params = [
+      'relationship_type_id' => '5_a_b',
+      'related_contact_id' => $this->_cId_b,
+      'end_date' => '2010-12-20', // set date to past date
+    ];
+    $reln->_action = CRM_Core_Action::UPDATE;
+    $reln->_relationshipId = $relationshipIds[0];
+    list ($params, $relationshipIds) = $reln->submit($params);
+
+    $this->assertEmpty($this->callAPISuccess('Contact', 'getvalue', [
+      'id' => $this->_cId_a,
+      'return' => 'current_employer_id',
+    ]));
+
+    $this->callAPISuccess('relationship', 'delete', ['id' => $relationshipIds[0]]);
   }
 
   /**
