@@ -930,11 +930,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testBatchMergeCustomDataZeroValueField() {
     $customGroup = $this->CustomGroupCreate();
     $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'default_value' => NULL));
-    $customField2 = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'label' => 'field2', 'default_value' => NULL));
 
     $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email' => 'tha_mouse@mouse.com'];
+    $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => '']));
     $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 0]));
-    $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField2['id'] => 0]));
 
     $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
     $this->assertEquals(1, count($result['values']['merged']));
@@ -942,8 +941,14 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
     $this->assertEquals(0, $mouse['custom_' . $customField['id']]);
 
+    $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => NULL]));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $this->assertEquals(1, count($result['values']['merged']));
+    $mouseParams['return'] = 'custom_' . $customField['id'];
+    $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
+    $this->assertEquals(0, $mouse['custom_' . $customField['id']]);
+
     $this->customFieldDelete($customField['id']);
-    $this->customFieldDelete($customField2['id']);
     $this->customGroupDelete($customGroup['id']);
   }
 
