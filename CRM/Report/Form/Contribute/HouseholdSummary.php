@@ -42,14 +42,6 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
   public function __construct() {
     self::validRelationships();
 
-    $config = CRM_Core_Config::singleton();
-    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
-    if ($campaignEnabled) {
-      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
-      $this->activeCampaigns = $getCampaigns['campaigns'];
-      asort($this->activeCampaigns);
-    }
-
     $this->_columns = array(
       'civicrm_contact_household' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -210,18 +202,9 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
       ),
     );
 
-    if ($campaignEnabled && !empty($this->activeCampaigns)) {
-      $this->_columns['civicrm_contribution']['fields']['campaign_id'] = array(
-        'title' => ts('Campaign'),
-        'default' => 'false',
-      );
-      $this->_columns['civicrm_contribution']['filters']['campaign_id'] = array(
-        'title' => ts('Campaign'),
-        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-        'options' => $this->activeCampaigns,
-        'type' => CRM_Utils_Type::T_INT,
-      );
-    }
+    // If we have a campaign, build out the relevant elements
+    $this->addCampaignFields('civicrm_contribution');
+
     $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
   }
@@ -560,7 +543,7 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
       // convert campaign_id to campaign title
       if (array_key_exists('civicrm_contribution_campaign_id', $row)) {
         if ($value = $row['civicrm_contribution_campaign_id']) {
-          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->activeCampaigns[$value];
+          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->campaigns[$value];
           $entryFound = TRUE;
         }
       }
