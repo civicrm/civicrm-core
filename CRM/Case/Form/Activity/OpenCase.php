@@ -44,7 +44,9 @@ class CRM_Case_Form_Activity_OpenCase {
   public $_contactID;
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function preProcess(&$form) {
     //get multi client case configuration
@@ -86,8 +88,9 @@ class CRM_Case_Form_Activity_OpenCase {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
+   * @param CRM_Case_Form_Case $form
    *
-   * @param CRM_Core_Form $form
+   * @return array $defaults
    */
   public static function setDefaultValues(&$form) {
     $defaults = array();
@@ -211,8 +214,7 @@ class CRM_Case_Form_Activity_OpenCase {
   /**
    * Process the form submission.
    *
-   *
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    * @param array $params
    */
   public static function beginPostProcess(&$form, &$params) {
@@ -246,7 +248,7 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @param $fields
    * @param $files
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -263,8 +265,10 @@ class CRM_Case_Form_Activity_OpenCase {
   /**
    * Process the form submission.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    * @param array $params
+   *
+   * @throws \Exception
    */
   public static function endPostProcess(&$form, &$params) {
     if ($form->_context == 'caseActivity') {
