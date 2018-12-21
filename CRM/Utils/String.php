@@ -120,8 +120,12 @@ class CRM_Utils_String {
     $fragments = explode('_', $string);
     foreach ($fragments as & $fragment) {
       $fragment = ucfirst($fragment);
+      // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in without underscores)
+      if (strpos($fragment, 'Uf') === 0 && strlen($string) > 2) {
+        $fragment = 'UF' . ucfirst(substr($fragment, 2));
+      }
     }
-    // Special case: UFGroup, UFJoin, UFMatch, UFField
+    // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in underscore-separated)
     if ($fragments[0] === 'Uf') {
       $fragments[0] = 'UF';
     }
