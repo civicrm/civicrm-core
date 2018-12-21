@@ -345,8 +345,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $this->_columns['civicrm_contact']['fields']['sort_name']['title'] = ts('Donor Name');
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
-
-   // If we have campaigns enabled, add those elements to both the fields, filters and sorting
+    // If we have campaigns enabled, add those elements to both the fields, filters and sorting
     $this->addCampaignFields('civicrm_contribution', FALSE, TRUE);
 
     $this->_currencyColumn = 'civicrm_contribution_currency';
