@@ -330,7 +330,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     // Set title.
     if (isset($activityTName)) {
       $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
-      $this->assign('pageTitle', ts('%1 Activity', array(1 => $activityName)));
 
       if ($this->_currentlyViewedContactId) {
         $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
