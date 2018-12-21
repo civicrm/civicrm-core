@@ -2791,33 +2791,45 @@ AND cl.modified_id  = c.id
   }
 
   /**
+   * Check if the logged in user has permission to access the given activity type.
+   *
    * @param int $activityTypeID
+   *
    * @return bool
    */
   protected static function hasPermissionForActivityType($activityTypeID) {
-    $components = self::activityComponents(FALSE);
+    $permittedActivityTypes = self::getPermittedActivityTypes();
+    return isset($permittedActivityTypes[$activityTypeID]);
+  }
 
-    // First check the component permission.
-    $sql = "
-    SELECT  component_id
-      FROM  civicrm_option_value val
-INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.name = %1 )
-     WHERE  val.value = %2";
-    $params = [
-      1 => ['activity_type', 'String'],
-      2 => [$activityTypeID, 'Integer'],
-    ];
-    $componentId = CRM_Core_DAO::singleValueQuery($sql, $params);
+  /**
+   * Get the activity types the user is permitted to access.
+   *
+   * The types are filtered by the components they have access to. ie. a user
+   * with access CiviContribute but not CiviMember will see contribution related
+   * activities and activities with no component (e.g meetings) but not member related ones.
+   *
+   * @return array
+   */
+  public static function getPermittedActivityTypes() {
+    $userID = (int) CRM_Core_Session::getLoggedInContactID();
+    if (!isset(Civi::$statics[__CLASS__]['permitted_activity_types'][$userID])) {
+      $permittedActivityTypes = [];
+      $components = self::activityComponents(FALSE);
+      $componentClause = empty($components) ? '' : (' OR component_id IN (' . implode(', ', array_keys($components)) . ')');
 
-    if ($componentId) {
-      if (!empty($components[$componentId])) {
-        return TRUE;
+      $types = CRM_Core_DAO::executeQuery(
+        "
+    SELECT  option_value.value activity_type_id
+      FROM  civicrm_option_value option_value
+INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name = 'activity_type')
+     WHERE  component_id IS NULL $componentClause")->fetchAll();
+      foreach ($types as $type) {
+        $permittedActivityTypes[$type['activity_type_id']] = $type['activity_type_id'];
       }
+      Civi::$statics[__CLASS__]['permitted_activity_types'][$userID] = $permittedActivityTypes;
     }
-    else {
-      return TRUE;
-    }
-    return FALSE;
+    return Civi::$statics[__CLASS__]['permitted_activity_types'][$userID];
   }
 
   /**
