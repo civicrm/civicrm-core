@@ -150,6 +150,83 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   }
 
   /**
+   * See https://lab.civicrm.org/dev/core/issues/470
+   */
+  public function testDisableExpiredRelationships() {
+    // Step 1: Create a current employer relationship with Org A
+    $params = [
+      'relationship_type_id' => '5_a_b',
+      'related_contact_id' => $this->_cId_b,
+      'start_date' => '2008-12-20',
+      'end_date' => NULL,
+      'is_active' => 1,
+      'is_current_employer' => 1,
+      'is_permission_a_b' => 0,
+      'is_permission_b_a' => 0,
+    ];
+    $reln = new CRM_Contact_Form_Relationship();
+    $reln->_action = CRM_Core_Action::ADD;
+    $reln->_contactId = $this->_cId_a;
+    $reln->_allRelationshipNames[5]["name_a_b"] = 'Employee of';
+    list ($params, $relationshipIds) = $reln->submit($params);
+    $privateMethodGetter = new ReflectionMethod($reln, 'setEmploymentRelationship');
+    $privateMethodGetter->setAccessible(TRUE);
+    $privateMethodGetter->invoke($reln, $params, $relationshipIds);
+    // ensure that the employer_id field is sucessfully set
+    $this->assertEquals(
+      $this->_cId_b,
+      $this->callAPISuccess('Contact', 'getvalue', [
+        'id' => $this->_cId_a,
+        'return' => 'current_employer_id',
+    ]));
+
+    // Step 2: Create a PAST employer relationship with Org B, and setting is_current_employer = FALSE
+    $orgID2 = $this->organizationCreate();
+    $params = [
+      'relationship_type_id' => '5_a_b',
+      'related_contact_id' => $orgID2,
+      'start_date' => '2008-12-20',
+      'end_date' => '2008-12-22',
+      'is_active' => 1,
+      'is_current_employer' => 0,
+      'is_permission_a_b' => 0,
+      'is_permission_b_a' => 0,
+    ];
+    $reln = new CRM_Contact_Form_Relationship();
+    $reln->_action = CRM_Core_Action::ADD;
+    $reln->_contactId = $this->_cId_a;
+    $reln->_allRelationshipNames[5]["name_a_b"] = 'Employee of';
+    list ($params, $relationshipIds) = $reln->submit($params);
+    $privateMethodGetter->invoke($reln, $params, $relationshipIds);
+    // Ensure that employer field is not changed
+    $this->assertEquals(
+      $this->_cId_b,
+      $this->callAPISuccess('Contact', 'getvalue', [
+        'id' => $this->_cId_a,
+        'return' => 'current_employer_id',
+    ]));
+
+    // Step 3: Call schedule job disable_expired_relationships
+    CRM_Contact_BAO_Relationship::disableExpiredRelationships();
+
+    // Result A: Ensure that employer field is not cleared
+    $this->assertEquals(
+      $this->_cId_b,
+      $this->callAPISuccess('Contact', 'getvalue', [
+        'id' => $this->_cId_a,
+        'return' => 'current_employer_id',
+    ]));
+
+    // Result B: Ensure that the previous employer relationship with Org B is successfully disabled
+    $this->assertEquals(
+      FALSE,
+      (bool) $this->callAPISuccess('Relationship', 'getvalue', [
+        'id' => $relationshipIds[0],
+        'return' => 'is_active',
+    ]));
+  }
+
+  /**
    * Check if required fields are not passed.
    */
   public function testRelationshipCreateWithoutRequired() {
