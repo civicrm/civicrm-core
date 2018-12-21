@@ -218,7 +218,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           continue;
         }
 
-        $singleInstanceParams = array_merge($params, $contactFields);
+        $singleInstanceParams = array_merge($params, $contactFields, ['skip_employer_check' => TRUE]);
         $relationship = self::add($singleInstanceParams);
         $relationshipIds[] = $relationship->id;
         $relationships[$relationship->id] = $relationship;
@@ -342,11 +342,21 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_relationship', $relationship->id);
     }
 
-    if (!self::isCurrentEmployerNeedingToBeCleared($params, $relationship->relationship_type_id, $type)) {
-      CRM_Contact_BAO_Contact_Utils::setCurrentEmployer([$relationship->contact_id_a => $relationship->contact_id_b]);
-    }
-    else {
-      CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($relationship->contact_id_a);
+    // special parameter set for Contact::create() to bypass this code to set/unset employer ID as it already handles it
+    if (empty($params['skip_employer_check'])) {
+      $oldEmployerID = NULL;
+      $isCurrentEmployerNeedingToBeCleared = self::isCurrentEmployerNeedingToBeCleared($params, $relationship->relationship_type_id, $type);
+      // before setting current employer, ensure that there is no old relationship exists.
+      // If it does then disable the previous relationship and also clear the employer field before setting new employer ID
+      if (!empty(self::getRelationship($relationship->contact_id_a, self::CURRENT, 0, 0, 0, NULL, NULL, FALSE, array('relationship_type_id' => $relationship->relationship_type_id)))) {
+        $oldEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $relationship->contact_id_a, 'employer_id');
+      }
+      if ($isCurrentEmployerNeedingToBeCleared || !empty($employerID)) {
+        CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($relationship->contact_id_a, $oldEmployerID);
+      }
+      if (!$isCurrentEmployerNeedingToBeCleared) {
+        CRM_Contact_BAO_Contact_Utils::setCurrentEmployer([$relationship->contact_id_a => $relationship->contact_id_b]);
+      }
     }
 
     $relationship->free();

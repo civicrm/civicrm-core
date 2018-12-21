@@ -451,7 +451,10 @@ WHERE id={$contactId}; ";
         $relationship->relationship_type_id = $relTypeId;
 
         if ($relationship->find(TRUE)) {
-          CRM_Contact_BAO_Relationship::setIsActive($relationship->id, FALSE);
+          // We only want to disable the relationship here so there is no need to call CRM_Contact_BAO_Relationship::setIsActive()
+          // as it execute Relationship API which not only disable the relationship but also clear the employer field of contact.
+          $relationship->is_active = FALSE;
+          $relationship->save();
           CRM_Contact_BAO_Relationship::relatedMemberships($contactId, $relMembershipParams,
             $ids = array(),
             CRM_Core_Action::DELETE
