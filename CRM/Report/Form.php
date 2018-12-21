@@ -4276,9 +4276,14 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
             'type' => CRM_Utils_Type::T_INT,
           );
         }
+
         if ($groupBy) {
           $this->_columns[$entityTable]['group_bys']['campaign_id'] = array('title' => ts('Campaign'));
         }
+
+        if ($orderBy) {
+          $this->_columns[$entityTable]['order_bys']['campaign_id'] = array('title' => ts('Campaign'));
+	}
       }
     }
   }
