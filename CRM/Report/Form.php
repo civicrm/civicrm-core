@@ -4283,7 +4283,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
 
         if ($orderBy) {
           $this->_columns[$entityTable]['order_bys']['campaign_id'] = array('title' => ts('Campaign'));
-	}
+        }
       }
     }
   }
