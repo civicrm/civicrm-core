@@ -73,6 +73,11 @@ class CRM_Utils_Type {
   const BLOB_SIZE = 65535;
 
   /**
+   * Maximum value of a MySQL signed INT column.
+   */
+  const INT_MAX = 2147483647;
+
+  /**
    * Gets the string representation for a data type.
    *
    * @param int $type
