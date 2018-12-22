@@ -68,6 +68,11 @@ class CRM_Utils_Type {
     HUGE = 45;
 
   /**
+   * Maximum size of a MySQL BLOB or TEXT column in bytes.
+   */
+  const BLOB_SIZE = 65535;
+
+  /**
    * Gets the string representation for a data type.
    *
    * @param int $type
