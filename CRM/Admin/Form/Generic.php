@@ -61,18 +61,19 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
     $this->setDefaultsForMetadataDefinedFields();
     return $this->_defaults;
   }
+
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
-    $filter = array_pop($this->urlPath);
+    $filter = $this->getSettingPageFilter();
     $settings = civicrm_api3('Setting', 'getfields', [])['values'];
     foreach ($settings as $key => $setting) {
       if (isset($setting['settings_pages'][$filter])) {
         $this->_settings[$key] = $setting;
       }
     }
-    // @todo sort settings by weight.
+
     $this->addFieldsDefinedInSettingsMetadata();
 
     // @todo look at sharing the code below in the settings trait.

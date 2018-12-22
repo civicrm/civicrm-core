@@ -39,6 +39,13 @@
 trait CRM_Admin_Form_SettingTrait {
 
   /**
+   * The setting page filter.
+   *
+   * @var string
+   */
+  private $_filter;
+
+  /**
    * @var array
    */
   protected $settingsMetadata;
@@ -116,6 +123,44 @@ trait CRM_Admin_Form_SettingTrait {
    */
   protected function getSettingMetadataItem($setting, $item) {
     return CRM_Utils_Array::value($item, $this->getSettingsMetaData()[$setting]);
+  }
+
+  /**
+   * @return string
+   */
+  protected function getSettingPageFilter() {
+    if (!isset($this->_filter)) {
+      // Get the last URL component without modifying the urlPath property.
+      $urlPath = array_values($this->urlPath);
+      $this->_filter = end($urlPath);
+    }
+    return $this->_filter;
+  }
+
+  /**
+   * Returns a re-keyed copy of the settings, ordered by weight.
+   *
+   * @return array
+   */
+  protected function getSettingsOrderedByWeight() {
+    $settingMetaData = $this->getSettingsMetaData();
+    $filter = $this->getSettingPageFilter();
+
+    usort($settingMetaData, function ($a, $b) use ($filter) {
+      // Handle cases in which a comparison is impossible. Such will be considered ties.
+      if (
+        // A comparison can't be made unless both setting weights are declared.
+        !isset($a['settings_pages'][$filter]['weight'], $b['settings_pages'][$filter]['weight'])
+        // A pair of settings might actually have the same weight.
+        || $a['settings_pages'][$filter]['weight'] === $b['settings_pages'][$filter]['weight']
+      ) {
+        return 0;
+      }
+
+      return $a['settings_pages'][$filter]['weight'] > $b['settings_pages'][$filter]['weight'] ? 1 : -1;
+    });
+
+    return $settingMetaData;
   }
 
   /**
@@ -207,7 +252,7 @@ trait CRM_Admin_Form_SettingTrait {
     // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
     $this->assign('setting_descriptions', $descriptions);
     $this->assign('settings_fields', $settingMetaData);
-    $this->assign('fields', $settingMetaData);
+    $this->assign('fields', $this->getSettingsOrderedByWeight());
   }
 
   /**
