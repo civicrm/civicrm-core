@@ -657,18 +657,10 @@ class CRM_Utils_String {
    * @return string
    */
   public static function ellipsify($string, $maxLen) {
-    $len = mb_strlen($string, 'UTF-8');
-    if ($len <= $maxLen) {
+    if (mb_strlen($string, 'UTF-8') <= $maxLen) {
       return $string;
     }
-    else {
-      $end = $maxLen - 3;
-      while (mb_strlen($string, 'UTF-8') > $maxLen - 3) {
-        $string = mb_substr($string, 0, $end, 'UTF-8');
-        $end = $end - 1;
-      }
-      return $string . '...';
-    }
+    return mb_substr($string, 0, $maxLen - 3, 'UTF-8') . '...';
   }
 
   /**
