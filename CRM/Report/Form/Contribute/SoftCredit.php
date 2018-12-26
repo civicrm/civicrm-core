@@ -69,14 +69,6 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
    */
   public function __construct() {
     $this->optimisedForOnlyFullGroupBy = FALSE;
-    // Check if CiviCampaign is a) enabled and b) has active campaigns
-    $config = CRM_Core_Config::singleton();
-    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
-    if ($campaignEnabled) {
-      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
-      $this->activeCampaigns = $getCampaigns['campaigns'];
-      asort($this->activeCampaigns);
-    }
 
     $this->_columns = array(
       'civicrm_contact' => array(
@@ -323,18 +315,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
     );
 
     // If we have a campaign, build out the relevant elements
-    if ($campaignEnabled && !empty($this->activeCampaigns)) {
-      $this->_columns['civicrm_contribution']['fields']['campaign_id'] = array(
-        'title' => ts('Campaign'),
-        'default' => 'false',
-      );
-      $this->_columns['civicrm_contribution']['filters']['campaign_id'] = array(
-        'title' => ts('Campaign'),
-        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-        'options' => $this->activeCampaigns,
-        'type' => CRM_Utils_Type::T_INT,
-      );
-    }
+    $this->addCampaignFields('civicrm_contribution');
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -629,7 +610,7 @@ GROUP BY   {$this->_aliases['civicrm_contribution']}.currency
       // convert campaign_id to campaign title
       if (array_key_exists('civicrm_contribution_campaign_id', $row)) {
         if ($value = $row['civicrm_contribution_campaign_id']) {
-          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->activeCampaigns[$value];
+          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->campaigns[$value];
           $entryFound = TRUE;
         }
       }
