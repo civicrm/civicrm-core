@@ -223,7 +223,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
           'name' => ts('Edit Contact Information'),
           'url' => 'civicrm/contact/relatedcontact',
           'qs' => 'action=update&reset=1&cid=%%cbid%%&rcid=%%cid%%',
-          'title' => ts('Edit Relationship'),
+          'title' => ts('Edit Contact Information'),
         ),
         CRM_Core_Action::VIEW => array(
           'name' => ts('Dashboard'),
