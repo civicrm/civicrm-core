@@ -53,6 +53,13 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   protected $_oid;
 
   /**
+   * Array of Money fields
+   *
+   * @var array
+   */
+  protected $_moneyFields = ['amount', 'non_deductible_amount'];
+
+  /**
    * Set variables up before form is built.
    *
    * @return void
@@ -85,7 +92,9 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       CRM_Price_BAO_PriceFieldValue::retrieve($params, $defaults);
 
       // fix the display of the monetary value, CRM-4038
-      $defaults['value'] = CRM_Utils_Money::format(CRM_Utils_Array::value('value', $defaults), NULL, '%a');
+      foreach ($this->_moneyFields as $field) {
+        $defaults[$field] = CRM_Utils_Money::format(CRM_Utils_Array::value($field, $defaults), NULL, '%a');
+      }
     }
 
     $memberComponentId = CRM_Core_Component::getComponentID('CiviMember');
@@ -339,7 +348,9 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       $params = $this->controller->exportValues('Option');
       $fieldLabel = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'label');
 
-      $params['amount'] = CRM_Utils_Rule::cleanMoney(trim($params['amount']));
+      foreach ($this->_moneyFields as $field) {
+        $params[$field] = CRM_Utils_Rule::cleanMoney(trim($params[$field]));
+      }
       $params['price_field_id'] = $this->_fid;
       $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
