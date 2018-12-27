@@ -33,10 +33,12 @@
 class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_eventID = NULL;
+  protected $_participantStatus = NULL;
   protected $_aclFrom = NULL;
   protected $_aclWhere = NULL;
   protected $_tableName = NULL;
   public $_permissionedComponent;
+  protected $_activePriceSetValue;
 
   /**
    * Class constructor.
@@ -49,7 +51,18 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
     $this->_eventID = CRM_Utils_Array::value('event_id',
       $this->_formValues
     );
-
+    $participantStatus = CRM_Utils_Array::value('status_id',
+      $this->_formValues
+    );
+    if (!empty($participantStatus)) {
+      $this->_participantStatus = implode(', ', $participantStatus);
+    }
+    if (!isset($this->_formValues['event_id'])) {
+      $this->_eventID = CRM_Utils_Request::retrieve('event_id', 'Integer');
+      if ($this->_eventID) {
+        $this->_formValues['event_id'] = $this->_eventID;
+      }
+    }
     $this->setColumns();
 
     if ($this->_eventID) {
@@ -78,6 +91,7 @@ CREATE TEMPORARY TABLE {$this->_tableName} (
   id int unsigned NOT NULL AUTO_INCREMENT,
   contact_id int unsigned NOT NULL,
   participant_id int unsigned NOT NULL,
+  status_id int unsigned NOT NULL,
 ";
 
     foreach ($this->_columns as $dontCare => $fieldName) {
@@ -85,6 +99,7 @@ CREATE TEMPORARY TABLE {$this->_tableName} (
         'contact_id',
         'participant_id',
         'display_name',
+        'status_id',
       ))) {
         continue;
       }
@@ -103,34 +118,40 @@ UNIQUE INDEX unique_participant_id ( participant_id )
   public function fillTable() {
     $sql = "
 REPLACE INTO {$this->_tableName}
-( contact_id, participant_id )
-SELECT c.id, p.id
+( contact_id, participant_id, status_id )
+SELECT c.id, p.id, p.status_id
 FROM   civicrm_contact c,
        civicrm_participant p
 WHERE  p.contact_id = c.id
   AND  p.is_test    = 0
-  AND  p.event_id = {$this->_eventID}
+  AND  p.event_id = %1
   AND  p.status_id NOT IN (4,11,12)
   AND  ( c.is_deleted = 0 OR c.is_deleted IS NULL )
 ";
-    CRM_Core_DAO::executeQuery($sql);
+    if ($this->_participantStatus) {
+      $sql .= " AND p.status_id IN({$this->_participantStatus})";
+    }
+    CRM_Core_DAO::executeQuery($sql, array(1 => array($this->_eventID, 'Integer')));
 
     $sql = "
 SELECT c.id as contact_id,
        p.id as participant_id,
+       p.status_id as status_id,
        l.price_field_value_id as price_field_value_id,
        l.qty
 FROM   civicrm_contact c,
        civicrm_participant  p,
        civicrm_line_item    l
 WHERE  c.id = p.contact_id
-AND    p.event_id = {$this->_eventID}
+AND    p.event_id = %1
 AND    p.id = l.entity_id
-AND    l.entity_table ='civicrm_participant'
-ORDER BY c.id, l.price_field_value_id;
-";
+AND    l.entity_table ='civicrm_participant'";
+    if ($this->_participantStatus) {
+      $sql .= " AND p.status_id IN({$this->_participantStatus})";
+    }
+    $sql .= "ORDER BY c.id, l.price_field_value_id ";
 
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($this->_eventID, 'Integer')));
 
     // first store all the information by option value id
     $rows = array();
@@ -140,8 +161,10 @@ ORDER BY c.id, l.price_field_value_id;
       if (!isset($rows[$participantID])) {
         $rows[$participantID] = array();
       }
-
-      $rows[$participantID][] = "price_field_{$dao->price_field_value_id} = {$dao->qty}";
+      // build query only for active price field options
+      if (in_array($dao->price_field_value_id, $this->_activePriceSetValue)) {
+        $rows[$participantID][] = "price_field_{$dao->price_field_value_id} = {$dao->qty}";
+      }
     }
 
     foreach (array_keys($rows) as $participantID) {
@@ -212,6 +235,16 @@ AND    p.entity_id    = e.id
       TRUE
     );
 
+    $form->addSelect('status_id',
+      array(
+        'entity' => 'participant',
+        'label' => ts('Participant Status'),
+        'multiple' => 'multiple',
+        'option_url' => NULL,
+        'placeholder' => ts('- any -'),
+      )
+    );
+
     /**
      * You can define a custom title for the search form
      */
@@ -221,7 +254,7 @@ AND    p.entity_id    = e.id
      * if you are using the standard template, this array tells the template what elements
      * are part of the search criteria
      */
-    $form->assign('elements', array('event_id'));
+    $form->assign('elements', array('event_id', 'status_id'));
   }
 
   public function setColumns() {
@@ -229,6 +262,7 @@ AND    p.entity_id    = e.id
       ts('Contact ID') => 'contact_id',
       ts('Participant ID') => 'participant_id',
       ts('Name') => 'display_name',
+      ts('Status') => 'status_label',
     );
 
     if (!$this->_eventID) {
@@ -255,7 +289,9 @@ AND    p.entity_id    = e.id
             if (CRM_Utils_Array::value('html_type', $value) != 'Text') {
               $columnHeader .= ' - ' . $oValue['label'];
             }
-
+            if (!empty($oValue['id'])) {
+              $this->_activePriceSetValue[$oValue['id']] = $oValue['id'];
+            }
             $this->_columns[$columnHeader] = "price_field_{$oValue['id']}";
           }
         }
@@ -289,12 +325,14 @@ AND    p.entity_id    = e.id
     else {
       $selectClause = "
 contact_a.id             as contact_id  ,
-contact_a.display_name   as display_name";
+contact_a.display_name   as display_name,
+participant_status.label as status_label";
 
       foreach ($this->_columns as $dontCare => $fieldName) {
         if (in_array($fieldName, array(
           'contact_id',
           'display_name',
+          'status_label',
         ))) {
           continue;
         }
@@ -316,6 +354,7 @@ contact_a.display_name   as display_name";
     $from = "
 FROM       civicrm_contact contact_a
 INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.id ) {$this->_aclFrom}
+INNER JOIN civicrm_participant_status_type participant_status ON (tempTable.status_id = participant_status.id)
 ";
     return $from;
   }
