@@ -74,7 +74,7 @@
     </div><!-- /.crm-accordion-wrapper -->
 {/if}
 
-    <table id="case_id_{$caseid}"  class="nestedActivitySelector crm-ajax-table" data-order='[[0,"desc"]]' data-page-length="10">
+    <table id="case_id_{$caseid}"  class="nestedActivitySelector crm-ajax-table" data-page-length="10">
       <thead><tr>
         <th data-data="activity_date_time" class="crm-case-activities-date">{ts}Date{/ts}</th>
         <th data-data="subject" cell-class="crmf-subject crm-editable" class="crm-case-activities-subject">{ts}Subject{/ts}</th>
