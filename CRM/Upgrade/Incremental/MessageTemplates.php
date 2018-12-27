@@ -89,6 +89,19 @@ class CRM_Upgrade_Incremental_MessageTemplates {
         'templates' => [
           ['name' => 'contribution_invoice_receipt', 'type' => 'html'],
         ]
+      ],
+      [
+        'version' => '5.10.alpha1',
+        'upgrade_descriptor' => ts('Show recurring cancel/update URLs in receipt based on payment processor capabilities'),
+        'label' => ts('Receipts - cancel/update subscription URLs'),
+        'templates' => [
+          ['name' => 'contribution_online_receipt', 'type' => 'text'],
+          ['name' => 'contribution_online_receipt', 'type' => 'html'],
+          ['name' => 'contribution_recurring_notify', 'type' => 'text'],
+          ['name' => 'contribution_recurring_notify', 'type' => 'html'],
+          ['name' => 'membership_online_receipt', 'type' => 'text'],
+          ['name' => 'membership_online_receipt', 'type' => 'html'],
+        ]
       ]
     ];
   }
