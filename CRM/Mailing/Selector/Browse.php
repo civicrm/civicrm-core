@@ -441,13 +441,14 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
 
         $validLinks = $actionLinks;
         if (($mailingUrl = CRM_Mailing_BAO_Mailing::getPublicViewUrl($row['id'])) != FALSE) {
-          $validLinks[] = array(
+          $validLinks[CRM_Core_Action::BROWSE] = array(
             'name' => ts('Public View'),
             'url' => 'civicrm/mailing/view',
             'qs' => 'id=%%mid%%&reset=1',
             'title' => ts('Public View'),
             'fe' => TRUE,
           );
+          $actionMask |= CRM_Core_Action::BROWSE;
         }
 
         $rows[$key]['action'] = CRM_Core_Action::formLink(
