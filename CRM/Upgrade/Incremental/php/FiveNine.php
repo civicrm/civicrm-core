@@ -60,7 +60,8 @@ class CRM_Upgrade_Incremental_php_FiveNine extends CRM_Upgrade_Incremental_Base 
         1 => ts('Enable multiple bulk email address for a contact'),
         2 => ts('Email on Hold'),
       );
-      $postUpgradeMessage .= '<p>' . ts('If the setting "%1" is enabled, you should update any smart groups based on the "%2" field.', $args) . '</p>';
+      $postUpgradeMessage .= '<p>' . ts('If the setting "%1" is enabled, you should update any smart groups based on the "%2" field.', $args) . '</p>' .
+        '<p>' . ts('If you were previously on version 5.8 and you altered your WYSIWYG editor setting you should visit the <a %1>Display Preferences</a> page and check the editor setting', array(1 => 'href="' . CRM_Utils_System::url('civicrm/admin/setting/preferences/display', 'reset=1') . '"')) . '</p>';
     }
 
     // Example: Generate a post-upgrade message.
