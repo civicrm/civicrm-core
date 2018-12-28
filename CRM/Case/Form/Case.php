@@ -87,6 +87,9 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    * Build the form object.
    */
   public function preProcess() {
+    if (empty($this->_action)) {
+      $this->_action = CRM_Core_Action::ADD;
+    }
 
     $this->_caseId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
