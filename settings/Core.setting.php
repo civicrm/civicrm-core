@@ -220,6 +220,7 @@ return array(
     'title' => ts('Wysiwig Editor'),
     'pseudoconstant' => array(
       'optionGroupName' => 'wysiwyg_editor',
+      'keyColumn' => 'name',
     ),
     'is_domain' => 1,
     'is_contact' => 0,
