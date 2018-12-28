@@ -132,6 +132,7 @@ class Analyzer {
 
   /**
    * Get a single activity record by type.
+   * This function is only used by SequenceListenerTest
    *
    * @param string $type
    * @throws \Civi\CCase\Exception\MultipleActivityException
@@ -139,7 +140,7 @@ class Analyzer {
    */
   public function getSingleActivity($type) {
     $idx = $this->getActivityIndex(array('activity_type_id', 'id'));
-    $actTypes = array_flip(\CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name'));
+    $actTypes = array_flip(\CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate'));
     $typeId = $actTypes[$type];
     $count = isset($idx[$typeId]) ? count($idx[$typeId]) : 0;
 

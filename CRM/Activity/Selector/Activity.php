@@ -112,8 +112,8 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
     $activityId = NULL,
     $key = NULL,
     $compContext = NULL) {
-    static $activityActTypes = NULL;
-    //CRM-14277 added addtitional param to handle activity search
+
+    //CRM-14277 added additional param to handle activity search
     $extraParams = "&searchContext=activity";
 
     $extraParams .= ($key) ? "&key={$key}" : NULL;
@@ -124,11 +124,10 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
     $showView = TRUE;
     $showUpdate = $showDelete = FALSE;
     $qsUpdate = NULL;
+    $url = NULL;
+    $qsView = NULL;
 
-    if (!$activityActTypes) {
-      $activeActTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name', TRUE);
-    }
-    $activityTypeName = CRM_Utils_Array::value($activityTypeId, $activeActTypes);
+    $activityTypeName = CRM_Core_PseudoConstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $activityTypeId);
 
     // CRM-7607
     // Lets allow to have normal operation for only activity types.
