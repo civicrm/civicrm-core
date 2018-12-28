@@ -272,17 +272,14 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     $this->assign('urlPath', 'civicrm/case/activity');
 
     $encounterMediums = CRM_Case_PseudoConstant::encounterMedium();
-    // Fixme: what's the justification for this? It seems like it is just re-adding an option in case it is the default and disabled.
-    // Is that really a big problem?
-    if ($this->_activityTypeFile == 'OpenCase') {
-      $this->_encounterMedium = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_activityId,
-        'medium_id'
-      );
+    if ($this->_activityTypeFile == 'OpenCase' && $this->_action == CRM_Core_Action::UPDATE) {
+      $this->getElement('activity_date_time')->freeze();
+
+      // Fixme: what's the justification for this? It seems like it is just re-adding an option in case it is the default and disabled.
+      // Is that really a big problem?
+      $this->_encounterMedium = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $this->_activityId, 'medium_id');
       if (!array_key_exists($this->_encounterMedium, $encounterMediums)) {
-        $encounterMediums[$this->_encounterMedium] = CRM_Core_OptionGroup::getLabel('encounter_medium',
-          $this->_encounterMedium,
-          FALSE
-        );
+        $encounterMediums[$this->_encounterMedium] = CRM_Core_OptionGroup::getLabel('encounter_medium', $this->_encounterMedium, FALSE);
       }
     }
 
@@ -404,8 +401,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $params['parent_id'] = $parentId;
     }
 
-    // store the dates with proper format
-    $params['activity_date_time'] = CRM_Utils_Date::processDate($params['activity_date_time'], $params['activity_date_time_time']);
     $params['activity_type_id'] = $this->_activityTypeId;
 
     // format with contact (target contact) values
