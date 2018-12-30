@@ -361,19 +361,11 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   public static function postProcess(&$form) {
     $formValues = $form->controller->exportValues($form->getName());
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($formValues);
-    $buttonName = $form->controller->getButtonName();
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
     $html = $activityIds = array();
 
-    // CRM-21255 - Hrm, CiviCase 4+5 seem to report buttons differently...
-    $c = $form->controller->container();
-    $isLiveMode = ($buttonName == '_qf_PDF_upload') || isset($c['values']['PDF']['buttons']['_qf_PDF_upload']);
-
-    // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
-    if ($isLiveMode) {
-      $activityIds = self::createActivities($form, $html_message, $form->_contactIds, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
-    }
+    $activityIds = self::createActivities($form, $html_message, $form->_contactIds, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
 
     if (!empty($formValues['document_file_path'])) {
       list($html_message, $zip) = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
@@ -484,6 +476,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    * @throws CRM_Core_Exception
    */
   public static function createActivities($form, $html_message, $contactIds, $subject, $campaign_id, $perContactHtml = array()) {
+    // If the user clicked the Preview button then do not create activities
+    if (!self::isLiveMode($form)) {
+      return array();
+    }
 
     $activityParams = array(
       'subject' => $subject,
@@ -624,6 +620,34 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       Civi::$statics[__CLASS__]['token_categories'] = array_keys($tokens);
     }
     return Civi::$statics[__CLASS__]['token_categories'];
+  }
+
+  /**
+   * Returns true if the user has clicked the Download Document button on a
+   * Print/Merge Document (PDF Letter) search task form, or false if the Preview
+   * button was clicked.
+   *
+   * @param CRM_Core_Form $form
+   *
+   * @return bool
+   *   TRUE if the Download Document button was clicked (also defaults to TRUE
+   *     if the form controller does not exist), else FALSE
+   */
+  public static function isLiveMode($form) {
+    if (!isset($form) || (!isset($form->controller))) {
+      return TRUE;
+    }
+    $buttonName = $form->controller->getButtonName();
+    $c = $form->controller->container();
+
+    // There are two different Download Document button names in use on the
+    // Print/Merge Document forms so we need to test for both:
+    //   _qf_PDF_upload - Contact, Case
+    //   _qf_PDFLetter_upload - Membership, Contribution thankyou letter
+    $isLiveMode = ($buttonName == '_qf_PDF_upload') || isset($c['values']['PDF']['buttons']['_qf_PDF_upload'])
+      || ($buttonName == '_qf_PDFLetter_upload') || isset($c['values']['PDF']['buttons']['_qf_PDFLetter_upload']);
+
+    return $isLiveMode;
   }
 
 }

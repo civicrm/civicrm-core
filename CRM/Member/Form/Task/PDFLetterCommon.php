@@ -41,7 +41,7 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
   }
 
   /**
-   * Generate htmlfor pdf letters.
+   * Generate html for pdf letters.
    *
    * @param array $membershipIDs
    * @param array $returnProperties
