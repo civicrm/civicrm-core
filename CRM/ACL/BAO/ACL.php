@@ -870,6 +870,10 @@ SELECT g.*
       return Civi::$statics[__CLASS__]['permissioned_groups'][$userCacheKey];
     }
 
+    if ($allGroups == NULL) {
+      $allGroups = CRM_Core_PseudoConstant::allGroup();
+    }
+
     $acls = CRM_ACL_BAO_Cache::build($contactID);
 
     $ids = array();
