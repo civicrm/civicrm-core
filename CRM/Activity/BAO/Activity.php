@@ -2700,7 +2700,9 @@ AND cl.modified_id  = c.id
     }
 
     // Component related permissions.
-    $allow = self::hasPermissionForActivityType($activity->activity_type_id);
+    if (!self::hasPermissionForActivityType($activity->activity_type_id)) {
+      return FALSE;
+    }
 
     // Check for this permission related to contact.
     $permission = CRM_Core_Permission::VIEW;
@@ -2714,41 +2716,40 @@ AND cl.modified_id  = c.id
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
     // Check for source contact.
-    if ($allow) {
-      $sourceContactId = self::getActivityContact($activity->id, $sourceID);
-      // Account for possibility of activity not having a source contact (as it may have been deleted).
-      $allow = $sourceContactId ? CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission) : TRUE;
+    $sourceContactId = self::getActivityContact($activity->id, $sourceID);
+    // Account for possibility of activity not having a source contact (as it may have been deleted).
+    $allow = $sourceContactId ? CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission) : TRUE;
+    if (!$allow) {
+      return FALSE;
     }
 
     // Check for target and assignee contacts.
-    if ($allow) {
-      // First check for supper permission.
-      $supPermission = 'view all contacts';
-      if ($action == CRM_Core_Action::UPDATE) {
-        $supPermission = 'edit all contacts';
-      }
-      $allow = CRM_Core_Permission::check($supPermission);
+    // First check for supper permission.
+    $supPermission = 'view all contacts';
+    if ($action == CRM_Core_Action::UPDATE) {
+      $supPermission = 'edit all contacts';
+    }
+    $allow = CRM_Core_Permission::check($supPermission);
 
-      // User might have sufficient permission, through acls.
-      if (!$allow) {
-        $allow = TRUE;
-        // Get the target contacts.
-        $targetContacts = CRM_Activity_BAO_ActivityContact::retrieveContactIdsByActivityId($activity->id, $targetID);
-        foreach ($targetContacts as $cnt => $contactId) {
+    // User might have sufficient permission, through acls.
+    if (!$allow) {
+      $allow = TRUE;
+      // Get the target contacts.
+      $targetContacts = CRM_Activity_BAO_ActivityContact::retrieveContactIdsByActivityId($activity->id, $targetID);
+      foreach ($targetContacts as $cnt => $contactId) {
+        if (!CRM_Contact_BAO_Contact_Permission::allow($contactId, $permission)) {
+          $allow = FALSE;
+          break;
+        }
+      }
+
+      // Get the assignee contacts.
+      if ($allow) {
+        $assigneeContacts = CRM_Activity_BAO_ActivityContact::retrieveContactIdsByActivityId($activity->id, $assigneeID);
+        foreach ($assigneeContacts as $cnt => $contactId) {
           if (!CRM_Contact_BAO_Contact_Permission::allow($contactId, $permission)) {
             $allow = FALSE;
             break;
-          }
-        }
-
-        // Get the assignee contacts.
-        if ($allow) {
-          $assigneeContacts = CRM_Activity_BAO_ActivityContact::retrieveContactIdsByActivityId($activity->id, $assigneeID);
-          foreach ($assigneeContacts as $cnt => $contactId) {
-            if (!CRM_Contact_BAO_Contact_Permission::allow($contactId, $permission)) {
-              $allow = FALSE;
-              break;
-            }
           }
         }
       }

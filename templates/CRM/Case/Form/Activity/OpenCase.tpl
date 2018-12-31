@@ -34,9 +34,7 @@
   </tr>
   <tr class="crm-case-opencase-form-block-start_date">
     <td class="label">{$form.start_date.label}</td>
-    <td>
-    {include file="CRM/common/jcalendar.tpl" elementName=start_date}
-    </td>
+    <td>{$form.start_date.html}</td>
   </tr>
 
 {* Add fields for attachments *}
