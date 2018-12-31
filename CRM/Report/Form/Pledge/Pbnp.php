@@ -46,10 +46,6 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
-
-    // Check if CiviCampaign is a) enabled and b) has active campaigns
-    $config = CRM_Core_Config::singleton();
-
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
