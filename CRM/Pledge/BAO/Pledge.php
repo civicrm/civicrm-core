@@ -1145,7 +1145,7 @@ SELECT  pledge.contact_id              as contact_id,
 
     return civicrm_api3('pledge_payment', 'getcount', array(
       'pledge_id' => $pledgeID,
-      'contribution_id' => array('NOT NULL' => TRUE),
+      'contribution_id' => array('IS NOT NULL' => TRUE),
     ));
   }
 
