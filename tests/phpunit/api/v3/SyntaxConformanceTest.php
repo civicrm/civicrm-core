@@ -930,6 +930,44 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test getlist works
+   * @dataProvider entities_get
+   * @param $Entity
+   */
+  public function testGetList($Entity) {
+    if (in_array($Entity, $this->toBeImplemented['get'])
+      || in_array($Entity, $this->toBeSkipped_getByID())
+    ) {
+      return;
+    }
+    if (in_array($Entity, ['ActivityType', 'SurveyRespondant'])) {
+      $this->markTestSkipped();
+    }
+    $this->callAPISuccess($Entity, 'getlist', ['label_field' => 'id']);
+  }
+
+
+  /**
+   * Test getlist works when entity is lowercase
+   * @dataProvider entities_get
+   * @param $Entity
+   */
+  public function testGetListLowerCaseEntity($Entity) {
+    if (in_array($Entity, $this->toBeImplemented['get'])
+      || in_array($Entity, $this->toBeSkipped_getByID())
+    ) {
+      return;
+    }
+    if (in_array($Entity, ['ActivityType', 'SurveyRespondant'])) {
+      $this->markTestSkipped();
+    }
+    if ($Entity == 'UFGroup') {
+      $Entity = 'ufgroup';
+    }
+    $this->callAPISuccess($Entity, 'getlist', ['label_field' => 'id']);
+  }
+
+  /**
    * Create two entities and make sure we can fetch them individually by ID.
    *
    * @dataProvider entities_get
