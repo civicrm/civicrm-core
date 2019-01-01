@@ -2693,15 +2693,13 @@ AND cl.modified_id  = c.id
       return FALSE;
     }
 
+    if (!self::hasPermissionForActivityType($activity->activity_type_id)) {
+      return FALSE;
+    }
     // Return early when it is case activity.
     // Check for CiviCase related permission.
     if (CRM_Case_BAO_Case::isCaseActivity($activityId)) {
       return self::isContactPermittedAccessToCaseActivity($activityId, $action, $activity->activity_type_id);
-    }
-
-    // Component related permissions.
-    if (!self::hasPermissionForActivityType($activity->activity_type_id)) {
-      return FALSE;
     }
 
     // Check for this permission related to contact.
@@ -2768,25 +2766,14 @@ AND cl.modified_id  = c.id
    * @return bool
    */
   protected static function isContactPermittedAccessToCaseActivity($activityId, $action, $activityTypeID) {
-    $allow = FALSE;
-    foreach (['access my cases and activities', 'access all cases and activities'] as $per) {
-      if (CRM_Core_Permission::check($per)) {
-        $allow = TRUE;
-        break;
-      }
+    $oper = 'view';
+    if ($action == CRM_Core_Action::UPDATE) {
+      $oper = 'edit';
     }
-
-    // Check for case specific permissions.
-    if ($allow) {
-      $oper = 'view';
-      if ($action == CRM_Core_Action::UPDATE) {
-        $oper = 'edit';
-      }
-      $allow = CRM_Case_BAO_Case::checkPermission($activityId,
-        $oper,
-        $activityTypeID
-      );
-    }
+    $allow = CRM_Case_BAO_Case::checkPermission($activityId,
+      $oper,
+      $activityTypeID
+    );
 
     return $allow;
   }
