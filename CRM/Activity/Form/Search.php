@@ -413,7 +413,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    *   reference to the array of default values
    */
   public function setDefaultValues() {
-    return array_merge($this->getEntityDefaults($this->getDefaultEntity()), $this->_formValues);
+    return array_merge($this->getEntityDefaults($this->getDefaultEntity()), (array) $this->_formValues);
   }
 
   /**
