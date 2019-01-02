@@ -55,10 +55,11 @@ class CRM_Upgrade_Incremental_php_FiveThirteen extends CRM_Upgrade_Incremental_B
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    // Example: Generate a post-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
-    // }
+    $config = CRM_Core_Config::singleton();
+    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
+    if ($rev == '5.13.alpha1' && $campaignEnabled) {
+      $postUpgradeMessage .= '<br /><br />' . ts("If you have created a report based on the Mailing Summary Report template and it outputs or filters on campaigns, You will need to go back to that report and re-save the report after selecting and or setting the campaign filters up again");
+    }
   }
 
   /*
