@@ -105,6 +105,13 @@ class CRM_Export_BAO_ExportProcessor {
   protected $relationshipReturnProperties = [];
 
   /**
+   * IDs of households that have already been exported.
+   *
+   * @var array
+   */
+  protected $exportedHouseholds = [];
+
+  /**
    * Get return properties by relationship.
    * @return array
    */
@@ -243,6 +250,30 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function getRelationshipValue($relationshipType, $contactID, $field) {
     return isset($this->relatedContactValues[$relationshipType][$contactID][$field]) ? $this->relatedContactValues[$relationshipType][$contactID][$field] : '';
+  }
+
+  /**
+   * Get the id of the related household.
+   *
+   * @param int $contactID
+   * @param string $relationshipType
+   *
+   * @return int
+   */
+  public function getRelatedHouseholdID($contactID, $relationshipType) {
+    return $this->relatedContactValues[$relationshipType][$contactID]['id'];
+  }
+
+  /**
+   * Has the household already been exported.
+   *
+   * @param int $housholdContactID
+   *
+   * @return bool
+   */
+  public function isHouseholdExported($housholdContactID) {
+    return isset($this->exportedHouseholds[$housholdContactID]);
+
   }
 
   /**
@@ -606,18 +637,30 @@ class CRM_Export_BAO_ExportProcessor {
    * @param $addPaymentHeader
    * @param $paymentTableId
    *
-   * @return array
+   * @return array|bool
    */
   public function buildRow($query, $iterationDAO, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader, $paymentTableId) {
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
 
     $row = [];
+    $householdMergeRelationshipType = $this->getHouseholdMergeTypeForRow($iterationDAO->contact_id);
+    if ($householdMergeRelationshipType) {
+      $householdID = $this->getRelatedHouseholdID($iterationDAO->contact_id, $householdMergeRelationshipType);
+      if ($this->isHouseholdExported($householdID)) {
+        return FALSE;
+      }
+      foreach (array_keys($outputColumns) as $column) {
+        $row[$column] = $this->getRelationshipValue($householdMergeRelationshipType, $iterationDAO->contact_id, $column);
+      }
+      $this->markHouseholdExported($householdID);
+      return $row;
+    }
+
     $query->convertToPseudoNames($iterationDAO);
 
     //first loop through output columns so that we return what is required, and in same order.
     foreach ($outputColumns as $field => $value) {
-
       // add im_provider to $dao object
       if ($field == 'im_provider' && property_exists($iterationDAO, 'provider_id')) {
         $iterationDAO->im_provider = $iterationDAO->provider_id;
@@ -645,20 +688,7 @@ class CRM_Export_BAO_ExportProcessor {
       }
 
       if ($this->isRelationshipTypeKey($field)) {
-        foreach (array_keys($value) as $property) {
-          if ($property === 'location') {
-            // @todo just undo all this nasty location wrangling!
-            foreach ($value['location'] as $locationKey => $locationFields) {
-              foreach (array_keys($locationFields) as $locationField) {
-                $fieldKey = str_replace(' ', '_', $locationKey . '-' . $locationField);
-                $row[$field . '_' . $fieldKey] = $this->getRelationshipValue($field, $iterationDAO->contact_id, $fieldKey);
-              }
-            }
-          }
-          else {
-            $row[$field . '_' . $property] = $this->getRelationshipValue($field, $iterationDAO->contact_id, $property);
-          }
-        }
+        $this->buildRelationshipFieldsForRow($row, $iterationDAO->contact_id, $value, $field);
       }
       else {
         $row[$field] = $this->getTransformedFieldValue($field, $iterationDAO, $fieldValue, $metadata, $paymentDetails);
@@ -690,6 +720,33 @@ class CRM_Export_BAO_ExportProcessor {
       $row['organization_name'] = '';
     }
     return $row;
+  }
+
+  /**
+   * If this row has a household whose details we should use get the relationship type key.
+   *
+   * @param $contactID
+   *
+   * @return bool
+   */
+  public function getHouseholdMergeTypeForRow($contactID) {
+    if (!$this->isMergeSameHousehold()) {
+      return FALSE;
+    }
+    foreach ($this->getHouseholdRelationshipTypes() as $relationshipType) {
+      if (isset($this->relatedContactValues[$relationshipType][$contactID])) {
+        return $relationshipType;
+      }
+    }
+  }
+
+  /**
+   * Mark the given household as already exported.
+   *
+   * @param $householdID
+   */
+  public function markHouseholdExported($householdID) {
+    $this->exportedHouseholds[$householdID] = $householdID;
   }
 
   /**
@@ -1274,6 +1331,29 @@ class CRM_Export_BAO_ExportProcessor {
     $params['is_deceased'] = ['is_deceased', '=', 0, CRM_Contact_BAO_Query::MODE_CONTACTS];
     $params['do_not_mail'] = ['do_not_mail', '=', 0, CRM_Contact_BAO_Query::MODE_CONTACTS];
     return $params;
+  }
+
+  /**
+   * @param $row
+   * @param $contactID
+   * @param $value
+   * @param $field
+   */
+  protected function buildRelationshipFieldsForRow(&$row, $contactID, $value, $field) {
+    foreach (array_keys($value) as $property) {
+      if ($property === 'location') {
+        // @todo just undo all this nasty location wrangling!
+        foreach ($value['location'] as $locationKey => $locationFields) {
+          foreach (array_keys($locationFields) as $locationField) {
+            $fieldKey = str_replace(' ', '_', $locationKey . '-' . $locationField);
+            $row[$field . '_' . $fieldKey] = $this->getRelationshipValue($field, $contactID, $fieldKey);
+          }
+        }
+      }
+      else {
+        $row[$field . '_' . $property] = $this->getRelationshipValue($field, $contactID, $property);
+      }
+    }
   }
 
 }

@@ -42,15 +42,6 @@ class CRM_Export_BAO_Export {
   const EXPORT_ROW_COUNT = 100000;
 
   /**
-   * Key representing the head of household in the relationship array.
-   *
-   * e.g. ['8_b_a' => 'Household Member Is', '8_a_b = 'Household Member Of'.....]
-   *
-   * @var
-   */
-  protected static $relationshipTypes = [];
-
-  /**
    * Get default return property for export based on mode
    *
    * @param int $exportMode
@@ -226,12 +217,11 @@ class CRM_Export_BAO_Export {
 
     $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator, $mergeSameHousehold, $isPostalOnly);
     $returnProperties = array();
-    self::$relationshipTypes = $processor->getRelationshipTypes();
 
     if ($fields) {
       foreach ($fields as $key => $value) {
         $fieldName = CRM_Utils_Array::value(1, $value);
-        if (!$fieldName) {
+        if (!$fieldName || $processor->isHouseholdMergeRelationshipTypeKey($fieldName)) {
           continue;
         }
 
@@ -341,17 +331,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $returnProperties['id'] = 1;
       }
 
-      foreach ($returnProperties as $key => $value) {
-        if (!$processor->isRelationshipTypeKey($key)) {
-          foreach ($processor->getHouseholdRelationshipTypes() as $householdRelationshipType) {
-            if (!in_array($key, ['location_type', 'im_provider'])) {
-              $returnProperties[$householdRelationshipType][$key] = $value;
-            }
-          }
-          // @todo - don't use returnProperties above.
-          $processor->setHouseholdMergeReturnProperties($returnProperties[$householdRelationshipType]);
-        }
-      }
+      $processor->setHouseholdMergeReturnProperties(array_diff_key($returnProperties, array_fill_keys(['location_type', 'im_provider'], 1)));
     }
 
     self::buildRelatedContactArray($selectAll, $ids, $processor, $componentTable);
@@ -475,6 +455,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $count++;
         $rowsThisIteration++;
         $row = $processor->buildRow($query, $iterationDAO, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader, $paymentTableId);
+        if ($row === FALSE) {
+          continue;
+        }
 
         // add component info
         // write the row to a file
@@ -498,13 +481,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       // do merge same address and merge same household processing
       if ($mergeSameAddress) {
         self::mergeSameAddress($exportTempTable, $sqlColumns, $exportParams);
-      }
-
-      // merge the records if they have corresponding households
-      if ($mergeSameHousehold) {
-        foreach ($processor->getHouseholdRelationshipTypes() as $householdRelationshipType) {
-          self::mergeSameHousehold($exportTempTable, $sqlColumns, $householdRelationshipType);
-        }
       }
 
       // call export hook
@@ -994,82 +970,6 @@ WHERE  id IN ( $deleteIDString )
     }
 
     return $merge;
-  }
-
-  /**
-   * Merge household record into the individual record
-   * if exists
-   *
-   * @param string $exportTempTable
-   *   Temporary temp table that stores the records.
-   * @param array $sqlColumns
-   *   Array of names of the table columns of the temp table.
-   * @param string $prefix
-   *   Name of the relationship type that is prefixed to the table columns.
-   */
-  public static function mergeSameHousehold($exportTempTable, &$sqlColumns, $prefix) {
-    $prefixColumn = $prefix . '_';
-    $replaced = array();
-
-    // name map of the non standard fields in header rows & sql columns
-    $mappingFields = array(
-      'civicrm_primary_id' => 'id',
-      'provider_id' => 'im_service_provider',
-    );
-
-    //figure out which columns are to be replaced by which ones
-    foreach ($sqlColumns as $columnNames => $dontCare) {
-      if ($rep = CRM_Utils_Array::value($columnNames, $mappingFields)) {
-        $replaced[$columnNames] = CRM_Utils_String::munge($prefixColumn . $rep, '_', 64);
-      }
-      else {
-        $householdColName = CRM_Utils_String::munge($prefixColumn . $columnNames, '_', 64);
-
-        if (!empty($sqlColumns[$householdColName])) {
-          $replaced[$columnNames] = $householdColName;
-        }
-      }
-    }
-    $query = "UPDATE $exportTempTable SET ";
-
-    $clause = array();
-    foreach ($replaced as $from => $to) {
-      $clause[] = "$from = $to ";
-      unset($sqlColumns[$to]);
-    }
-    $query .= implode(",\n", $clause);
-    $query .= " WHERE {$replaced['civicrm_primary_id']} != ''";
-
-    CRM_Core_DAO::executeQuery($query);
-
-    //drop the table columns that store redundant household info
-    $dropQuery = "ALTER TABLE $exportTempTable ";
-    foreach ($replaced as $householdColumns) {
-      $dropClause[] = " DROP $householdColumns ";
-    }
-    $dropQuery .= implode(",\n", $dropClause);
-
-    CRM_Core_DAO::executeQuery($dropQuery);
-
-    // also drop the temp table if exists
-    $sql = "DROP TABLE IF EXISTS {$exportTempTable}_temp";
-    CRM_Core_DAO::executeQuery($sql);
-
-    // clean up duplicate records
-    $query = "
-CREATE TABLE {$exportTempTable}_temp SELECT *
-FROM {$exportTempTable}
-GROUP BY civicrm_primary_id ";
-
-    CRM_Core_DAO::disableFullGroupByMode();
-    CRM_Core_DAO::executeQuery($query);
-    CRM_Core_DAO::reenableFullGroupByMode();
-
-    $query = "DROP TABLE $exportTempTable";
-    CRM_Core_DAO::executeQuery($query);
-
-    $query = "ALTER TABLE {$exportTempTable}_temp RENAME TO {$exportTempTable}";
-    CRM_Core_DAO::executeQuery($query);
   }
 
   /**

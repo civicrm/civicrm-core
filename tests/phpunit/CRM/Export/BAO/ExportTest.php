@@ -562,7 +562,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Test exporting relationships.
    */
   public function testExportRelationshipsMergeToHouseholdAllFields() {
-    $this->markTestIncomplete('Does not yet work under CI due to mysql limitation (number of columns in table). Works on some boxes');
     list($householdID) = $this->setUpHousehold();
     list($tableName) = CRM_Export_BAO_Export::exportComponents(
       FALSE,
@@ -583,12 +582,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     );
     $dao = CRM_Core_DAO::executeQuery("SELECT * FROM {$tableName}");
     while ($dao->fetch()) {
+      $this->assertEquals('Unit Test household', $dao->display_name);
       $this->assertEquals('Portland', $dao->city);
       $this->assertEquals('ME', $dao->state_province);
       $this->assertEquals($householdID, $dao->civicrm_primary_id);
       $this->assertEquals($householdID, $dao->civicrm_primary_id);
-      $this->assertEquals('Unit Test Household', $dao->addressee);
-      $this->assertEquals('Unit Test Household', $dao->display_name);
+      $this->assertEquals('Unit Test household', $dao->addressee);
+      $this->assertEquals(1, $dao->N);
     }
   }
 
