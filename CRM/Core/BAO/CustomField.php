@@ -1064,7 +1064,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $urlParams = "context=customfield&id={$field->id}";
           $idOfelement = $elementName;
           // dev/core#362 if in an onbehalf profile clean up the name to get rid of square brackets that break the select 2 js
-          if (strpos($elementName, '[') && strpos($elementName, ']')) {
+          // However this caused regression https://lab.civicrm.org/dev/core/issues/619 so it has been hacked back to
+          // only affecting on behalf - next time someone looks at this code it should be with a view to overhauling it
+          // rather than layering on more hacks.
+          if (substr($elementName, 0, 8) === 'onbehalf' && strpos($elementName, '[') && strpos($elementName, ']')) {
             $idOfelement = substr(substr($elementName, (strpos($elementName, '[') + 1)), 0, -1);
           }
           $customUrls[$idOfelement] = CRM_Utils_System::url('civicrm/ajax/contactref',
