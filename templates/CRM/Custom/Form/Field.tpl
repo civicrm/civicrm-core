@@ -190,7 +190,7 @@
       var htmlType = $("[name='data_type[1]']", $form).val(),
        dataType = dataTypes[$("[name='data_type[0]']", $form).val()];
 
-      if (((dataType === 'Int' || dataType === 'Float' || dataType === 'Money') && (htmlType === "Text")) || dataType === 'Date') {
+      if (dataType === 'Int' || dataType === 'Float' || dataType === 'Money' || dataType === 'Date') {
         if ($('#is_searchable', $form).is(':checked')) {
           $("#searchByRange", $form).show();
         } else {
@@ -200,8 +200,6 @@
         $("#searchByRange", $form).hide();
       }
     }
-    $('#is_searchable, [name^="data_type"]', $form).change(showSearchRange);
-    showSearchRange();
 
     function toggleContactRefFilter(e) {
       var setSelected = $(this).attr('href');
@@ -284,6 +282,8 @@
 
     $('[name^="data_type"]', $form).change(customOptionHtmlType);
     customOptionHtmlType();
+    $('#is_searchable, [name^="data_type"]', $form).change(showSearchRange);
+    showSearchRange();
   });
 </script>
 {/literal}

@@ -881,6 +881,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       }
     }
 
+    $rangeDataTypes = ['Int', 'Float', 'Money'];
+
     if (!isset($label)) {
       $label = $field->label;
     }
@@ -890,7 +892,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     switch ($widget) {
       case 'Text':
       case 'Link':
-        if ($field->is_search_range && $search) {
+        if ($field->is_search_range && $search && in_array($field->data_type, $rangeDataTypes)) {
           $qf->add('text', $elementName . '_from', $label . ' ' . ts('From'), $field->attributes);
           $qf->add('text', $elementName . '_to', ts('To'), $field->attributes);
         }
@@ -956,43 +958,55 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'Radio':
-        $choice = array();
-        parse_str($field->attributes, $radioAttributes);
-        $radioAttributes = array_merge($radioAttributes, $customFieldAttributes);
-
-        foreach ($options as $v => $l) {
-          $choice[] = $qf->createElement('radio', NULL, '', $l, (string) $v, $radioAttributes);
-        }
-        $element = $qf->addGroup($choice, $elementName, $label);
-        $optionEditKey = 'data-option-edit-path';
-        if (isset($selectAttributes[$optionEditKey])) {
-          $element->setAttribute($optionEditKey, $selectAttributes[$optionEditKey]);
-        }
-
-        if ($useRequired && !$search) {
-          $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
+        if ($field->is_search_range && $search && in_array($field->data_type, $rangeDataTypes)) {
+          $qf->add('text', $elementName . '_from', $label . ' ' . ts('From'), $field->attributes);
+          $qf->add('text', $elementName . '_to', ts('To'), $field->attributes);
         }
         else {
-          $element->setAttribute('allowClear', TRUE);
+          $choice = array();
+          parse_str($field->attributes, $radioAttributes);
+          $radioAttributes = array_merge($radioAttributes, $customFieldAttributes);
+
+          foreach ($options as $v => $l) {
+            $choice[] = $qf->createElement('radio', NULL, '', $l, (string) $v, $radioAttributes);
+          }
+          $element = $qf->addGroup($choice, $elementName, $label);
+          $optionEditKey = 'data-option-edit-path';
+          if (isset($selectAttributes[$optionEditKey])) {
+            $element->setAttribute($optionEditKey, $selectAttributes[$optionEditKey]);
+          }
+
+          if ($useRequired && !$search) {
+            $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
+          }
+          else {
+            $element->setAttribute('allowClear', TRUE);
+          }
         }
         break;
 
       // For all select elements
       case 'Select':
-        if (empty($selectAttributes['multiple'])) {
-          $options = array('' => $placeholder) + $options;
+        if ($field->is_search_range && $search && in_array($field->data_type, $rangeDataTypes)) {
+          $qf->add('text', $elementName . '_from', $label . ' ' . ts('From'), $field->attributes);
+          $qf->add('text', $elementName . '_to', ts('To'), $field->attributes);
         }
-        $element = $qf->add('select', $elementName, $label, $options, $useRequired && !$search, $selectAttributes);
+        else {
+          if (empty($selectAttributes['multiple'])) {
+            $options = array('' => $placeholder) + $options;
+          }
+          $element = $qf->add('select', $elementName, $label, $options, $useRequired && !$search, $selectAttributes);
 
-        // Add and/or option for fields that store multiple values
-        if ($search && self::isSerialized($field)) {
+          // Add and/or option for fields that store multiple values
+          if ($search && self::isSerialized($field)) {
 
-          $operators = array(
-            $qf->createElement('radio', NULL, '', ts('Any'), 'or', array('title' => ts('Results may contain any of the selected options'))),
-            $qf->createElement('radio', NULL, '', ts('All'), 'and', array('title' => ts('Results must have all of the selected options'))),
-          );
-          $qf->addGroup($operators, $elementName . '_operator');
-          $qf->setDefaults(array($elementName . '_operator' => 'or'));
+            $operators = array(
+              $qf->createElement('radio', NULL, '', ts('Any'), 'or', array('title' => ts('Results may contain any of the selected options'))),
+              $qf->createElement('radio', NULL, '', ts('All'), 'and', array('title' => ts('Results must have all of the selected options'))),
+            );
+            $qf->addGroup($operators, $elementName . '_operator');
+            $qf->setDefaults(array($elementName . '_operator' => 'or'));
+          }
         }
         break;
 
