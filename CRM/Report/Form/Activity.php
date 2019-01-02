@@ -66,9 +66,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
     $caseEnabled = in_array("CiviCase", $config->enableComponents);
     if ($campaignEnabled) {
-      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
-      $this->activeCampaigns = $getCampaigns['campaigns'];
-      asort($this->activeCampaigns);
       $this->engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
     }
 
@@ -345,18 +342,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         'operator' => 'like',
         'type' => CRM_Utils_Type::T_STRING,
       );
-      if (!empty($this->activeCampaigns)) {
-        $this->_columns['civicrm_activity']['fields']['campaign_id'] = array(
-          'title' => ts('Campaign'),
-          'default' => 'false',
-        );
-        $this->_columns['civicrm_activity']['filters']['campaign_id'] = array(
-          'title' => ts('Campaign'),
-          'type' => CRM_Utils_Type::T_INT,
-          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-          'options' => $this->activeCampaigns,
-        );
-      }
+      // If we have campaigns enabled, add those elements to both the fields, filters.
+      $this->addCampaignFields('civicrm_activity');
+
       if (!empty($this->engagementLevels)) {
         $this->_columns['civicrm_activity']['fields']['engagement_level'] = array(
           'title' => ts('Engagement Index'),
@@ -1033,7 +1021,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
 
       if (array_key_exists('civicrm_activity_campaign_id', $row)) {
         if ($value = $row['civicrm_activity_campaign_id']) {
-          $rows[$rowNum]['civicrm_activity_campaign_id'] = $this->activeCampaigns[$value];
+          $rows[$rowNum]['civicrm_activity_campaign_id'] = $this->campaigns[$value];
           $entryFound = TRUE;
         }
       }
