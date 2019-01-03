@@ -25,7 +25,7 @@ This extension is expected to be the base for a suite of related extensions:
 Within this extension, there are things which need updating/addressing:
 
 * There are several `FIXME`/`TODO` declarations in the code for checking pre-conditions, reporting errors, handling edge-cases, etc.
-* Although afforms are can be used in AngularJS, they don't fully support tooling like `cv ang:html:list`
+* Although afforms can be used in AngularJS, they don't fully support tooling like `cv ang:html:list`
   and `hook_civicrm_alterAngular` changesets. We'll need a core patch to allow that. (Ex: Define partials via callback.)
 * We generally need to provide more services for managing/accessing data (e.g. `crm-api3`).
 * We need a formal way to enumerate the library of available tags/directives/attributes. This, in turn, will drive the
