@@ -25,6 +25,10 @@ class TokenProcessor {
    *     automatically from contactId.)
    *   - actionSchedule: DAO, the rule which triggered the mailing
    *     [for CRM_Core_BAO_ActionScheduler].
+   *   - schema: array, a list of fields that will be provided for each row.
+   *     This is automatically populated with any general context
+   *     keys, but you may need to add extra keys for token-row data.
+   *     ex: ['contactId', 'activityId'].
    */
   public $context;
 
@@ -82,6 +86,9 @@ class TokenProcessor {
    * @param array $context
    */
   public function __construct($dispatcher, $context) {
+    $context['schema'] = isset($context['schema'])
+      ? array_unique(array_merge($context['schema'], array_keys($context)))
+      : array_keys($context);
     $this->dispatcher = $dispatcher;
     $this->context = $context;
   }
