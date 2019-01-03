@@ -113,6 +113,14 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals($expected, $p->getMessageTokens());
   }
 
+  public function testListTokens() {
+    $p = new TokenProcessor($this->dispatcher, array(
+      'controller' => __CLASS__,
+    ));
+    $p->addToken(array('entity' => 'MyEntity', 'field' => 'myField', 'label' => 'My Label'));
+    $this->assertEquals(array('{MyEntity.myField}' => 'My Label'), $p->listTokens());
+  }
+
   /**
    * Perform a full mail-merge, substituting multiple tokens for multiple
    * contacts in multiple messages.
