@@ -61,7 +61,8 @@ class CRM_Upgrade_Incremental_php_FiveNine extends CRM_Upgrade_Incremental_Base 
         2 => ts('Email on Hold'),
       );
       $postUpgradeMessage .= '<p>' . ts('If the setting "%1" is enabled, you should update any smart groups based on the "%2" field.', $args) . '</p>' .
-        '<p>' . ts('If you were previously on version 5.8 and altered the WYSIWYG editor setting, you should visit the <a %1>Display Preferences</a> page and re-save the WYSIWYG editor setting.', array(1 => 'href="' . CRM_Utils_System::url('civicrm/admin/setting/preferences/display', 'reset=1') . '"')) . '</p><p>' . ts('If you have any custom fields of type Money, Int or Float, The search by range checkbox has been unchecked for these fields. If you wish to search by range on those fields you must re-set the checkbox') . '</p>';
+        '<p>' . ts('If you were previously on version 5.8 and altered the WYSIWYG editor setting, you should visit the <a %1>Display Preferences</a> page and re-save the WYSIWYG editor setting.', array(1 => 'href="' . CRM_Utils_System::url('civicrm/admin/setting/preferences/display', 'reset=1') . '"')) . '</p>' .
+        '<p>' . ts('If you have any custom fields of type Money, Int or Float, The search by range checkbox has been unchecked for these fields. If you wish to search by range on those fields you must re-set the checkbox') . '</p>';
     }
 
     // Example: Generate a post-upgrade message.
