@@ -536,11 +536,11 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   public function getTotalCount($action) {
     // Use count from cache during paging/sorting
     if (!empty($_GET['crmPID']) || !empty($_GET['crmSID'])) {
-      $count = CRM_Core_BAO_Cache::getItem('Search Results Count', $this->_key);
+      $count = Civi::cache('long')->get("Search Results Count $this->_key");
     }
     if (empty($count)) {
       $count = $this->_query->searchQuery(0, 0, NULL, TRUE);
-      CRM_Core_BAO_Cache::setItem($count, 'Search Results Count', $this->_key);
+      Civi::cache('long')->set("Search Results Count $this->_key", $count);
     }
     return $count;
   }
