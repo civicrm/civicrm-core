@@ -3842,6 +3842,31 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(array('external_identifier'), $result['values']['UI_external_identifier']);
   }
 
+  /**
+   * API test to retrieve contact from group having different group title and name.
+   */
+  public function testContactGetFromGroup() {
+    $groupId = $this->groupCreate([
+      'name' => 'Test_Group',
+      'domain_id' => 1,
+      'title' => 'New Test Group Created',
+      'description' => 'New Test Group Created',
+      'is_active' => 1,
+      'visibility' => 'User and User Admin Only',
+    ]);
+    $contact = $this->callAPISuccess('contact', 'create', $this->_params);
+    $groupContactCreateParams = array(
+      'contact_id' => $contact['id'],
+      'group_id' => $groupId,
+      'status' => 'Pending',
+    );
+    $groupContact = $this->callAPISuccess('groupContact', 'create', $groupContactCreateParams);
+    $groupGetContact = $this->CallAPISuccess('groupContact', 'get', $groupContactCreateParams);
+    $this->CallAPISuccess('Contact', 'getcount', [
+      'group' => "Test_Group",
+    ]);
+  }
+
   public function testSmartGroupsForRelatedContacts() {
     $rtype1 = $this->callAPISuccess('relationship_type', 'create', array(
       "name_a_b" => uniqid() . " Child of",
