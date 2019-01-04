@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class CRM_Utils_EmailProcessorTest
+ * Class CRM_Utils_Mail_EmailProcessorTest
  * @group headless
  */
 
-class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
+class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
 
   /**
    * Event queue record.
