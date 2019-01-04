@@ -57,13 +57,6 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
-    $config = CRM_Core_Config::singleton();
-    $campaignEnabled = in_array('CiviCampaign', $config->enableComponents);
-    if ($campaignEnabled) {
-      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
-      $this->activeCampaigns = $getCampaigns['campaigns'];
-      asort($this->activeCampaigns);
-    }
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -376,19 +369,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
-    if ($campaignEnabled && !empty($this->activeCampaigns)) {
-      $this->_columns['civicrm_contribution']['fields']['campaign_id'] = array(
-        'title' => ts('Campaign'),
-        'default' => 'false',
-      );
-      $this->_columns['civicrm_contribution']['filters']['campaign_id'] = array(
-        'title' => ts('Campaign'),
-        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-        'options' => $this->activeCampaigns,
-        'type' => CRM_Utils_Type::T_INT,
-      );
-      $this->_columns['civicrm_contribution']['order_bys']['campaign_id'] = array('title' => ts('Campaign'));
-    }
+    // If we have campaigns enabled, add those elements to both the fields, filters and sorting
+    $this->addCampaignFields('civicrm_contribution', FALSE, TRUE);
 
     $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
@@ -780,7 +762,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
       // convert campaign_id to campaign title
       if (array_key_exists('civicrm_contribution_campaign_id', $row)) {
         if ($value = $row['civicrm_contribution_campaign_id']) {
-          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->activeCampaigns[$value];
+          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->campaigns[$value];
           $entryFound = TRUE;
         }
       }

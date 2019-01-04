@@ -637,7 +637,7 @@ function civicrm_api3_mailing_send_test($params) {
     $query = CRM_Utils_SQL_Select::from('civicrm_email e')
         ->select(array('e.id', 'e.contact_id', 'e.email'))
         ->join('c', 'INNER JOIN civicrm_contact c ON e.contact_id = c.id')
-        ->where('LOWER(e.email) IN (@emails)', array('@emails' => $testEmailParams['emails']))
+        ->where('e.email IN (@emails)', array('@emails' => $testEmailParams['emails']))
         ->where('e.on_hold = 0')
         ->where('c.is_opt_out = 0')
         ->where('c.do_not_email = 0')
