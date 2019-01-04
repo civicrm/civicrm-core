@@ -77,6 +77,9 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
       }
     }
 
+    // replace any invalid unicode characters with replacement characters
+    $params['bounce_reason'] = mb_convert_encoding($params['bounce_reason'], 'UTF-8', 'UTF-8');
+
     // CRM-11989
     $params['bounce_reason'] = mb_strcut($params['bounce_reason'], 0, 254);
 
