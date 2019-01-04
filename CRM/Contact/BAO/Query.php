@@ -1259,7 +1259,7 @@ class CRM_Contact_BAO_Query {
                   $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['table'] = $tName;
                   $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['join']
                     = "\nLEFT JOIN $tableName `$tName` ON `$tName`.id = $aName.state_province_id";
-                  if ($addWhere) {
+                  if ($addAddress) {
                     $this->_whereTables["{$name}-address"] = $addressJoin;
                   }
                   break;
@@ -1268,7 +1268,7 @@ class CRM_Contact_BAO_Query {
                   $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['table'] = $newName;
                   $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['join']
                     = "\nLEFT JOIN $tableName `$tName` ON `$tName`.id = $aName.country_id";
-                  if ($addWhere) {
+                  if ($addAddress) {
                     $this->_whereTables["{$name}-address"] = $addressJoin;
                   }
                   break;
@@ -1277,13 +1277,13 @@ class CRM_Contact_BAO_Query {
                   $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['table'] = $newName;
                   $this->_pseudoConstantsSelect["{$name}-{$elementFullName}"]['join']
                     = "\nLEFT JOIN $tableName `$tName` ON `$tName`.id = $aName.county_id";
-                  if ($addWhere) {
+                  if ($addAddress) {
                     $this->_whereTables["{$name}-address"] = $addressJoin;
                   }
                   break;
 
                 default:
-                  if ($addWhere) {
+                  if ($addAddress) {
                     $this->_whereTables["{$name}-address"] = $addressJoin;
                   }
                   break;
@@ -1302,7 +1302,7 @@ class CRM_Contact_BAO_Query {
       if ($addWhereCount) {
         $locClause = array();
         foreach ($this->_whereTables as $tableName => $clause) {
-          if (!empty($locationTypeJoin[$tableName])) {
+          if (!empty($clause) && !empty($locationTypeJoin[$tableName])) {
             $locClause[] = $locationTypeJoin[$tableName];
           }
         }
