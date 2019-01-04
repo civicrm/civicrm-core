@@ -55,6 +55,19 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the job processing function can handle invalid characters.
+   */
+  public function testBounceProcessingInvalidCharacter() {
+    $this->setUpMailing();
+    $mail = 'test_invalid_character.eml';
+
+    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' .   $mail);
+    $this->callAPISuccess('job', 'fetch_bounces', array());
+    $this->assertFalse(file_exists(__DIR__ . '/data/mail/' . $mail));
+    $this->checkMailingBounces(1);
+  }
+
+  /**
    * Tests that a multipart related email does not cause pain & misery & fatal errors.
    *
    * Sample taken from https://www.phpclasses.org/browse/file/14672.html
