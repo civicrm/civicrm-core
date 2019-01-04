@@ -975,6 +975,9 @@ class CRM_Core_Permission {
       'getquick' => array(
         array('access CiviCRM', 'access AJAX API'),
       ),
+      'duplicatecheck' => array(
+        'access CiviCRM',
+      ),
     );
 
     // CRM-16963 - Permissions for country.
