@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Class CRM_Utils_EmailProcessorTest
+ * Class CRM_Utils_Mail_EmailProcessorTest
  * @group headless
  */
 
-class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
+class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
 
   /**
    * Event queue record.
@@ -51,6 +51,19 @@ class CRM_Utils_EmailProcessorTest extends CiviUnitTestCase {
     $this->assertTrue(file_exists(__DIR__ . '/data/mail/bounce_no_verp.txt'));
     $this->callAPISuccess('job', 'fetch_bounces', array());
     $this->assertFalse(file_exists(__DIR__ . '/data/mail/bounce_no_verp.txt'));
+    $this->checkMailingBounces(1);
+  }
+
+  /**
+   * Test the job processing function can handle invalid characters.
+   */
+  public function testBounceProcessingInvalidCharacter() {
+    $this->setUpMailing();
+    $mail = 'test_invalid_character.eml';
+
+    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' .   $mail);
+    $this->callAPISuccess('job', 'fetch_bounces', array());
+    $this->assertFalse(file_exists(__DIR__ . '/data/mail/' . $mail));
     $this->checkMailingBounces(1);
   }
 
