@@ -1062,8 +1062,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       }
     }
 
-    // also record an entry in the cache key table, so we can delete it periodically
-    CRM_Core_BAO_Cache::setItem($cacheKey, 'CiviCRM Search PrevNextCache', $cacheKey);
+    if (Civi::service('prevnext') instanceof CRM_Core_PrevNextCache_Sql) {
+      // SQL-backed prevnext cache uses an extra record for pruning the cache.
+      CRM_Core_BAO_Cache::setItem($cacheKey, 'CiviCRM Search PrevNextCache', $cacheKey);
+    }
   }
 
   /**
