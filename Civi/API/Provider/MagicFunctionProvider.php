@@ -83,7 +83,18 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
       // Unlike normal API implementations, generic implementations require explicit
       // knowledge of the entity and action (as well as $params). Bundle up these bits
       // into a convenient data structure.
+      if ($apiRequest['action'] === 'getsingle') {
+        // strip any api nested parts here as otherwise chaining may happen twice
+        // see https://lab.civicrm.org/dev/core/issues/643
+        // testCreateBAODefaults fails without this.
+        foreach ($apiRequest['params'] as $key => $param) {
+          if ($key !== 'api.has_parent' && substr($key, 0, 4) === 'api.' || substr($key, 0, 4) === 'api_') {
+            unset($apiRequest['params'][$key]);
+          }
+        }
+      }
       $result = $function($apiRequest);
+
     }
     elseif ($apiRequest['function'] && !$apiRequest['is_generic']) {
       $result = $function($apiRequest['params']);
