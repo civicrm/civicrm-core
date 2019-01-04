@@ -196,6 +196,20 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Do any relevant smart group updates.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $version
+   *
+   * @return bool
+   */
+  public function updateSmartGroups($ctx, $version) {
+    $groupUpdateObject = new CRM_Upgrade_Incremental_SmartGroups($version);
+    $groupUpdateObject->updateGroups();
+    return TRUE;
+  }
+
+  /**
    * Drop a column from a table if it exist.
    *
    * @param CRM_Queue_TaskContext $ctx
