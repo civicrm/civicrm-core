@@ -661,7 +661,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     if (!empty($this->_params['send_receipt'])) {
 
-      $receiptFrom = $this->_params['from_email_address'];
+      $receiptFrom = CRM_Utils_Mail::mailboxHeader($this->_params['from_email_address']);
 
       if (!empty($this->_params['payment_instrument_id'])) {
         $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();

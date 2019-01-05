@@ -577,4 +577,25 @@ class CRM_Utils_Mail {
     return $formattedEmail;
   }
 
+  /**
+   * When passed a value, returns the value if it's non-numeric.
+   * If it's numeric, look up the display name and email of the corresponding
+   * contact ID in RFC822 format.
+   *
+   * @param string $header
+   * @return string
+   *   The RFC822-formatted email header (display name + address)
+   */
+  public static function mailboxHeader($header) {
+    if (is_numeric($header)) {
+      $result = civicrm_api3('Email', 'get', [
+        'id' => $header,
+        'return' => ['contact_id.display_name', 'email'],
+        'sequential' => 1,
+      ])['values'][0];
+      $header = '"' . $result['contact_id.display_name'] . '" <' . $result['email'] . '>';
+    }
+    return $header;
+  }
+
 }
