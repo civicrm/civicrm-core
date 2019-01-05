@@ -234,7 +234,7 @@ function civicrm_api3_contribution_delete($params) {
     return civicrm_api3_create_success(array($contributionID => 1));
   }
   else {
-    return civicrm_api3_create_error('Could not delete contribution');
+    throw new API_Exception('Could not delete contribution');
   }
 }
 
