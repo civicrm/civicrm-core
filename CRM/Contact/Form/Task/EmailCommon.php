@@ -400,7 +400,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     // dev/core#357 User Emails are keyed by their id so that the Signature is able to be added
     // If we have had a contact email used here the value returned from the line above will be the
     // numerical key where as $from for use in the sendEmail in Activity needs to be of format of "To Name" <toemailaddress>
-    $from = CRM_Utils_Mail::mailboxHeader($from);
+    $from = CRM_Utils_Mail::formatFromAddress($from);
     $subject = $formValues['subject'];
 
     // CRM-13378: Append CC and BCC information at the end of Activity Details and format cc and bcc fields

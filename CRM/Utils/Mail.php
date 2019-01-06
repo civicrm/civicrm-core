@@ -582,20 +582,21 @@ class CRM_Utils_Mail {
    * If it's numeric, look up the display name and email of the corresponding
    * contact ID in RFC822 format.
    *
-   * @param string $header
+   * @param string $from
+   *   contact ID or formatted "From address", eg. 12 or "Fred Bloggs" <fred@example.org>
    * @return string
    *   The RFC822-formatted email header (display name + address)
    */
-  public static function mailboxHeader($header) {
-    if (is_numeric($header)) {
+  public static function formatFromAddress($from) {
+    if (is_numeric($from)) {
       $result = civicrm_api3('Email', 'get', [
-        'id' => $header,
+        'id' => $from,
         'return' => ['contact_id.display_name', 'email'],
         'sequential' => 1,
       ])['values'][0];
-      $header = '"' . $result['contact_id.display_name'] . '" <' . $result['email'] . '>';
+      $from = '"' . $result['contact_id.display_name'] . '" <' . $result['email'] . '>';
     }
-    return $header;
+    return $from;
   }
 
 }
