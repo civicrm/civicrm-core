@@ -413,7 +413,7 @@ class CRM_Contact_Form_Edit_Address {
       // since we change element name for address custom data, we need to format the setdefault values
       $addressDefaults = array();
       foreach ($defaults as $key => $val) {
-        if (empty($val)) {
+        if (!isset($val)) {
           continue;
         }
 
