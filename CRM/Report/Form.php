@@ -1633,6 +1633,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           )),
         ),
       );
+      unset($actions['report_instance.delete']);
     }
 
     if (!$this->_csvSupported) {
