@@ -3175,16 +3175,14 @@ WHERE  $smartGroupClause
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     $op = "LIKE";
-    // security/core#28: hashed value serves as a unique, SQLi-safe table alias
-    $alias = hash('sha256', $value);
     $value = "%{$value}%";
     $escapedValue = CRM_Utils_Type::escape("%{$value}%", 'String');
 
     $useAllTagTypes = $this->getWhereValues('all_tag_types', $grouping);
     $tagTypesText = $this->getWhereValues('tag_types_text', $grouping);
 
-    $etTable = "`civicrm_entity_tag-" . $alias . "`";
-    $tTable = "`civicrm_tag-" . $alias . "`";
+    $etTable = "`civicrm_entity_tag-" . uniqid() . "`";
+    $tTable = "`civicrm_tag-" . uniqid() . "`";
 
     if ($useAllTagTypes[2]) {
       $this->_tables[$etTable] = $this->_whereTables[$etTable]
@@ -3192,8 +3190,8 @@ WHERE  $smartGroupClause
             LEFT JOIN civicrm_tag {$tTable} ON ( {$etTable}.tag_id = {$tTable}.id  )";
 
       // search tag in cases
-      $etCaseTable = "`civicrm_entity_case_tag-" . $alias . "`";
-      $tCaseTable = "`civicrm_case_tag-" . $alias . "`";
+      $etCaseTable = "`civicrm_entity_case_tag-" . uniqid() . "`";
+      $tCaseTable = "`civicrm_case_tag-" . uniqid() . "`";
       $this->_tables[$etCaseTable] = $this->_whereTables[$etCaseTable]
         = " LEFT JOIN civicrm_case_contact ON civicrm_case_contact.contact_id = contact_a.id
             LEFT JOIN civicrm_case
@@ -3202,8 +3200,8 @@ WHERE  $smartGroupClause
             LEFT JOIN civicrm_entity_tag {$etCaseTable} ON ( {$etCaseTable}.entity_table = 'civicrm_case' AND {$etCaseTable}.entity_id = civicrm_case.id )
             LEFT JOIN civicrm_tag {$tCaseTable} ON ( {$etCaseTable}.tag_id = {$tCaseTable}.id  )";
       // search tag in activities
-      $etActTable = "`civicrm_entity_act_tag-" . $alias . "`";
-      $tActTable = "`civicrm_act_tag-" . $alias . "`";
+      $etActTable = "`civicrm_entity_act_tag-" . uniqid() . "`";
+      $tActTable = "`civicrm_act_tag-" . uniqid() . "`";
       $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
@@ -3220,8 +3218,8 @@ WHERE  $smartGroupClause
       $this->_qill[$grouping][] = ts('Tag %1 %2', array(1 => $tagTypesText[2], 2 => $op)) . ' ' . $value;
     }
     else {
-      $etTable = "`civicrm_entity_tag-" . $alias . "`";
-      $tTable = "`civicrm_tag-" . $alias . "`";
+      $etTable = "`civicrm_entity_tag-" . uniqid() . "`";
+      $tTable = "`civicrm_tag-" . uniqid() . "`";
       $this->_tables[$etTable] = $this->_whereTables[$etTable] = " LEFT JOIN civicrm_entity_tag {$etTable} ON ( {$etTable}.entity_id = contact_a.id  AND
       {$etTable}.entity_table = 'civicrm_contact' )
                 LEFT JOIN civicrm_tag {$tTable} ON ( {$etTable}.tag_id = {$tTable}.id  ) ";
@@ -3260,20 +3258,14 @@ WHERE  $smartGroupClause
     $useAllTagTypes = $this->getWhereValues('all_tag_types', $grouping);
     $tagTypesText = $this->getWhereValues('tag_types_text', $grouping);
 
-    $etTable = CRM_Utils_Type::escape(
-      str_replace(',', '-', "`civicrm_entity_tag-" . $value . "`"),
-      'MysqlColumnNameOrAlias'
-    );
+    $etTable = "`civicrm_entity_tag-" . uniqid() . "`";
 
     if ($useAllTagTypes[2]) {
       $this->_tables[$etTable] = $this->_whereTables[$etTable]
         = " LEFT JOIN civicrm_entity_tag {$etTable} ON ( {$etTable}.entity_id = contact_a.id  AND {$etTable}.entity_table = 'civicrm_contact') ";
 
       // search tag in cases
-      $etCaseTable = CRM_Utils_Type::escape(
-        str_replace(',', '-', "`civicrm_entity_case_tag-" . $value . "`"),
-        'MysqlColumnNameOrAlias'
-      );
+      $etCaseTable = "`civicrm_entity_case_tag-" . uniqid() . "`";
       $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
@@ -3284,10 +3276,7 @@ WHERE  $smartGroupClause
                 AND civicrm_case.is_deleted = 0 )
             LEFT JOIN civicrm_entity_tag {$etCaseTable} ON ( {$etCaseTable}.entity_table = 'civicrm_case' AND {$etCaseTable}.entity_id = civicrm_case.id ) ";
       // search tag in activities
-      $etActTable = CRM_Utils_Type::escape(
-        str_replace(',', '-', "`civicrm_entity_act_tag-" . $value . "`"),
-          'MysqlColumnNameOrAlias'
-      );
+      $etActTable = "`civicrm_entity_act_tag-" . uniqid() . "`";
       $this->_tables[$etActTable] = $this->_whereTables[$etActTable]
         = " LEFT JOIN civicrm_activity_contact
             ON ( civicrm_activity_contact.contact_id = contact_a.id AND civicrm_activity_contact.record_type_id = {$targetID} )
