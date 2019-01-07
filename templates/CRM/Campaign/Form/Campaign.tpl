@@ -95,26 +95,10 @@
   </tr>
   </table>
 
-  <div id="customData"></div>
+  {include file="CRM/common/customDataBlock.tpl"}
 
 {/if}
 <div class="crm-submit-buttons">
      {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
 </div>
-
-{* include custom data js *}
-{include file="CRM/common/customData.tpl"}
-
-{literal}
-<script type="text/javascript">
-  CRM.$(function($) {
-    {/literal}{if $customDataSubType}
-      CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-    {else}
-      CRM.buildCustomData( '{$customDataType}' );
-    {/if}
-    {literal}
-  });
-</script>
-{/literal}
