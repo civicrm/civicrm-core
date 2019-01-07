@@ -803,6 +803,65 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   }
 
   /**
+   * Ensure contact is added to group
+   */
+  public function testSubmitAddToGroup() {
+    // Create a group.
+    $group = civicrm_api3('Group', 'create', array('title' => 'Test Group'));
+    $group_id = $group['id'];
+    $group_name = $group['values'][$group_id]['name'];
+
+    // Create a profile that updates the group.
+    $ufGroupParams = array(
+      'group_type' => 'Individual,Contact',
+      'name' => 'test_individual_contact_profile_sparkle',
+      'title' => 'Sparkle and Shine',
+      'group_type' => 'Profile',
+      // Why isn't this called add_to_group_id like the field name??
+      'add_contact_to_group' => $group_id,
+      'api.uf_field.create' => array(
+        array(
+          'field_name' => 'first_name',
+          'is_required' => 1,
+          'visibility' => 'Public Pages and Listings',
+          'field_type' => 'Individual',
+          'label' => 'First Name',
+        ),
+        array(
+          'field_name' => 'last_name',
+          'is_required' => 1,
+          'visibility' => 'Public Pages and Listings',
+          'field_type' => 'Individual',
+          'label' => 'Last Name',
+        ),
+        array(
+          'field_name' => 'email',
+          'is_required' => 1,
+          'visibility' => 'Public Pages and Listings',
+          'field_type' => 'Contact',
+          'label' => 'Email',
+        ),
+      ),
+    );
+    $profile = $this->callAPISuccess('uf_group', 'create', $ufGroupParams);
+    $profile_id = $profile['id'];
+
+    // Submit the profile.
+    $params = array(
+      'profile_id' => $profile_id,
+      'first_name' => 'Shiny',
+      'last_name' => 'Shine',
+      'email' => 'shine@example.net',
+    );
+    $result = $this->callAPISuccess('profile', 'submit', $params);
+    $contact_id = $result['id'];
+
+    // Ensure this contact has been added to the group.
+    $params = array('contact_id' => $contact_id, 'group_id' => $group_id);
+    $this->callAPISuccess('GroupContact', 'getsingle', $params);
+  }
+
+  /**
    * Helper function to create an Individual with address/email/phone info. Import UF Group and UF Fields
    * @param array $params
    *

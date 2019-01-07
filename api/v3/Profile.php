@@ -274,7 +274,27 @@ function civicrm_api3_profile_submit($params) {
     $profileParams['api.activity.create'] = $activityParams;
   }
 
-  return civicrm_api3('contact', 'create', $profileParams);
+  $ret = civicrm_api3('contact', 'create', $profileParams);
+  $contact_id = $ret['id'];
+
+  // Get notify and add to group for this profile.
+  $profile_actions_params = array(
+    'id' => $profileID,
+    'return' => array('add_to_group_id', 'notify')
+  );
+  $profile_actions = civicrm_api3('UFGroup', 'getsingle', $profile_actions_params);
+
+  if (isset($profile_actions['add_to_group_id'])) {
+    $method = 'Web';
+    CRM_Contact_BAO_GroupContact::addContactsToGroup(array($contact_id), $profile_actions['add_to_group_id'], $method);
+  }
+  if (isset($profile_actions['notify'])) {
+    $val = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($profileID, $contact_id, NULL);
+    CRM_Core_BAO_UFGroup::commonSendMail($contact_id, $val);
+
+  }
+
+  return $ret;
 }
 
 /**
