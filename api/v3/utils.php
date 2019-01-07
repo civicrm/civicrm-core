@@ -218,9 +218,6 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
       $result['undefined_fields'] = array_merge($undefined);
     }
   }
-  if (is_object($dao)) {
-    $dao->free();
-  }
 
   $result['version'] = 3;
   if (is_array($values)) {

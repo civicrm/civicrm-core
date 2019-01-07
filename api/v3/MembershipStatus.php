@@ -173,10 +173,8 @@ SELECT start_date, end_date, join_date, membership_type_id
     }
   }
   else {
-    $dao->free();
     throw new API_Exception('did not find a membership record');
   }
-  $dao->free();
   return $result;
 }
 

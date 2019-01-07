@@ -655,7 +655,6 @@ function civicrm_api3_mailing_send_test($params) {
         'email_id' => $dao->id,
       );
     }
-    $dao->free();
     foreach ($testEmailParams['emails'] as $key => $email) {
       $email = trim($email);
       $contactId = $emailId = NULL;
