@@ -15,6 +15,9 @@ class Data {
     \Civi\Test::schema()->truncateAll();
 
     \Civi\Test::schema()->setStrict(FALSE);
+
+    // Ensure that when we populate the database it is done in utf8 mode
+    \Civi\Test::execute('SET NAMES utf8');
     $sqlDir = dirname(dirname(__DIR__)) . "/sql";
 
     $query2 = file_get_contents("$sqlDir/civicrm_data.mysql");
