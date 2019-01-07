@@ -280,7 +280,7 @@ function civicrm_api3_profile_submit($params) {
   // Get notify and add to group for this profile.
   $profile_actions_params = array(
     'id' => $profileID,
-    'return' => array('add_to_group_id', 'notify')
+    'return' => array('add_to_group_id', 'notify'),
   );
   $profile_actions = civicrm_api3('UFGroup', 'getsingle', $profile_actions_params);
 
