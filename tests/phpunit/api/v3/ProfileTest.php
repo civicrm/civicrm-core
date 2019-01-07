@@ -810,8 +810,19 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $group = civicrm_api3('Group', 'create', array('title' => 'Test Group'));
     $group_id = $group['id'];
     $group_name = $group['values'][$group_id]['name'];
+    $notify = 'sparkler@sparkles.org';
+    $sender = '"Email sender" <sender@sirsendsalot.org>';
 
-    // Create a profile that updates the group.
+    // Add a default from address so the profile notification can be sent.
+    $this->callApiSuccess('optionValue', 'create', array(
+      'label' => '"Bright Shiny" <sender@ofnotifications.org>',
+      'option_group_id' => 'from_email_address',
+      'is_default' => 1,
+    ));
+
+    $this->mut = new CiviMailUtils($this);
+
+    // Create a profile that updates the group and sends notification email.
     $ufGroupParams = array(
       'group_type' => 'Individual,Contact',
       'name' => 'test_individual_contact_profile_sparkle',
@@ -819,6 +830,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'group_type' => 'Profile',
       // Why isn't this called add_to_group_id like the field name??
       'add_contact_to_group' => $group_id,
+      'notify' => $notify,
       'api.uf_field.create' => array(
         array(
           'field_name' => 'first_name',
@@ -859,6 +871,11 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     // Ensure this contact has been added to the group.
     $params = array('contact_id' => $contact_id, 'group_id' => $group_id);
     $this->callAPISuccess('GroupContact', 'getsingle', $params);
+
+    // Check if email was sent.
+    $this->mut->assertRecipients(array(array($notify)));
+    $this->mut->stop();
+
   }
 
   /**
