@@ -871,7 +871,7 @@ SELECT g.*
     }
 
     if ($allGroups == NULL) {
-      $allGroups = CRM_Core_PseudoConstant::allGroup();
+      $allGroups = CRM_Contact_BAO_Contact::buildOptions('group_id', NULL, ['onlyActive' => FALSE]);
     }
 
     $acls = CRM_ACL_BAO_Cache::build($contactID);
