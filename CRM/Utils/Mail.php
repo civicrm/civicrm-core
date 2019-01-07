@@ -577,4 +577,26 @@ class CRM_Utils_Mail {
     return $formattedEmail;
   }
 
+  /**
+   * When passed a value, returns the value if it's non-numeric.
+   * If it's numeric, look up the display name and email of the corresponding
+   * contact ID in RFC822 format.
+   *
+   * @param string $from
+   *   contact ID or formatted "From address", eg. 12 or "Fred Bloggs" <fred@example.org>
+   * @return string
+   *   The RFC822-formatted email header (display name + address)
+   */
+  public static function formatFromAddress($from) {
+    if (is_numeric($from)) {
+      $result = civicrm_api3('Email', 'get', [
+        'id' => $from,
+        'return' => ['contact_id.display_name', 'email'],
+        'sequential' => 1,
+      ])['values'][0];
+      $from = '"' . $result['contact_id.display_name'] . '" <' . $result['email'] . '>';
+    }
+    return $from;
+  }
+
 }
