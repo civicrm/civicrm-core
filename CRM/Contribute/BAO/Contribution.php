@@ -2789,24 +2789,27 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contribution', NULL, $this->id);
+    // dev/core#519 Avoid adding Contribution custom fields in event receipt.
+    if ($this->_component == 'contribute') {
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contribution', NULL, $this->id);
 
-    $customGroup = array();
-    foreach ($groupTree as $key => $group) {
-      if ($key === 'info') {
-        continue;
-      }
+      $customGroup = array();
+      foreach ($groupTree as $key => $group) {
+        if ($key === 'info') {
+          continue;
+        }
 
-      foreach ($group['fields'] as $k => $customField) {
-        $groupLabel = $group['title'];
-        if (!empty($customField['customValue'])) {
-          foreach ($customField['customValue'] as $customFieldValues) {
-            $customGroup[$groupLabel][$customField['label']] = CRM_Utils_Array::value('data', $customFieldValues);
+        foreach ($group['fields'] as $k => $customField) {
+          $groupLabel = $group['title'];
+          if (!empty($customField['customValue'])) {
+            foreach ($customField['customValue'] as $customFieldValues) {
+              $customGroup[$groupLabel][$customField['label']] = CRM_Utils_Array::value('data', $customFieldValues);
+            }
           }
         }
       }
+      $values['customGroup'] = $customGroup;
     }
-    $values['customGroup'] = $customGroup;
 
     $values['is_pay_later'] = $this->is_pay_later;
 
