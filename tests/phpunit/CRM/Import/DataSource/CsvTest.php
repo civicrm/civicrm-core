@@ -28,7 +28,7 @@
 /**
  * Tests for the CRM_Import_Datasource_Csv class.
  */
-class CRM_Import_Datasource_CsvTest extends CiviUnitTestCase {
+class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
 
   /**
    * Test the to csv function.
