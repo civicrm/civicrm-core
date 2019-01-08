@@ -80,6 +80,10 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
     // replace any invalid unicode characters with replacement characters
     $params['bounce_reason'] = mb_convert_encoding($params['bounce_reason'], 'UTF-8', 'UTF-8');
 
+    // dev/mail#37 Replace 4-byte utf8 characaters with the unicode replacement character
+    // while CiviCRM does not support utf8mb4 for MySQL
+    $params['bounce_reason'] = preg_replace('/[\x{10000}-\x{10FFFF}]/u', "\xEF\xBF\xBD", $params['bounce_reason']);
+
     // CRM-11989
     $params['bounce_reason'] = mb_strcut($params['bounce_reason'], 0, 254);
 
