@@ -1,0 +1,15 @@
+Delivered-To: my@example.com
+Received: by 10.2.13.84 with SMTP id 1234567890;
+        Wed, 19 Dec 2018 10:01:11 +0100 (CET)
+Return-Path: <>
+From: my@example.com
+To: b.2.1.aaaaaaaaaaaaaaaa@example.com
+Subject: Vacation
+Message-ID: <abc.def.fhi@example.com>
+Date: Wed, 19 Dec 2018 10:01:07 +0100
+MIME-Version: 1.0
+Auto-Submitted: auto-replied (vacation)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+
+SSBhbSBvbiB2YWNhdGlvbiDwn4y0
