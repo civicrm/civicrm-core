@@ -58,12 +58,11 @@
   </tr>
   <tr class="crm-campaign-form-block-start_date">
       <td class="label">{$form.start_date.label}</td>
-      <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=start_date}
-      </td>
+      <td class="view-value">{$form.start_date.html}</td>
   </tr>
   <tr class="crm-campaign-form-block-end_date">
       <td class="label">{$form.end_date.label}</td>
-      <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=end_date}</td>
+      <td class="view-value">{$form.end_date.html}</td>
   </tr>
   <tr class="crm-campaign-form-block-status_id">
       <td class="label">{$form.status_id.label}</td>
