@@ -536,11 +536,11 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   public function getTotalCount($action) {
     // Use count from cache during paging/sorting
     if (!empty($_GET['crmPID']) || !empty($_GET['crmSID'])) {
-      $count = CRM_Core_BAO_Cache::getItem('Search Results Count', $this->_key);
+      $count = Civi::cache('long')->get("Search Results Count $this->_key");
     }
     if (empty($count)) {
       $count = $this->_query->searchQuery(0, 0, NULL, TRUE);
-      CRM_Core_BAO_Cache::setItem($count, 'Search Results Count', $this->_key);
+      Civi::cache('long')->set("Search Results Count $this->_key", $count);
     }
     return $count;
   }
@@ -1062,8 +1062,10 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       }
     }
 
-    // also record an entry in the cache key table, so we can delete it periodically
-    CRM_Core_BAO_Cache::setItem($cacheKey, 'CiviCRM Search PrevNextCache', $cacheKey);
+    if (Civi::service('prevnext') instanceof CRM_Core_PrevNextCache_Sql) {
+      // SQL-backed prevnext cache uses an extra record for pruning the cache.
+      CRM_Core_BAO_Cache::setItem($cacheKey, 'CiviCRM Search PrevNextCache', $cacheKey);
+    }
   }
 
   /**
