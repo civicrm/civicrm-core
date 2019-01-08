@@ -316,7 +316,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     );
 
     //add followup date
-    $form->addDateTime('followup_date', ts('in'), FALSE, array('formatType' => 'activityDateTime'));
+    $form->add('datepicker', 'followup_date', ts('in'));
 
     foreach ($fields as $field => $values) {
       if (!empty($fields[$field])) {
@@ -502,7 +502,6 @@ class CRM_Contact_Form_Task_EmailCommon {
         $params['followup_activity_type_id'] = $formValues['followup_activity_type_id'];
         $params['followup_activity_subject'] = $formValues['followup_activity_subject'];
         $params['followup_date'] = $formValues['followup_date'];
-        $params['followup_date_time'] = $formValues['followup_date_time'];
         $params['target_contact_id'] = $form->_contactIds;
         $params['followup_assignee_contact_id'] = explode(',', $formValues['followup_assignee_contact_id']);
         $followupActivity = CRM_Activity_BAO_Activity::createFollowupActivity($activityId, $params);

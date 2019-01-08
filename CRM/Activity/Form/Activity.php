@@ -757,7 +757,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     );
 
     // Add followup date.
-    $this->addDateTime('followup_date', ts('in'), FALSE, array('formatType' => 'activityDateTime'));
+    $this->add('datepicker', 'followup_date', ts('in'));
 
     // Only admins and case-workers can change the activity source
     if (!CRM_Core_Permission::check('administer CiviCRM') && $this->_context != 'caseActivity') {
@@ -872,7 +872,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     if (!empty($fields['followup_activity_type_id']) && empty($fields['followup_date'])) {
-      $errors['followup_date_time'] = ts('Followup date is a required field.');
+      $errors['followup_date'] = ts('Followup date is a required field.');
     }
     // Activity type is mandatory if subject or follow-up date is specified for an Follow-up activity, CRM-4515.
     if ((!empty($fields['followup_activity_subject']) || !empty($fields['followup_date'])) && empty($fields['followup_activity_type_id'])) {
