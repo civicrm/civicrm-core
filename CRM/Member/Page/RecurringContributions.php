@@ -111,7 +111,7 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
    * @param array $recurringContribution
    */
   private function setActionsForRecurringContribution($recurID, &$recurringContribution) {
-    $action = array_sum(array_keys($this->recurLinks($recurID)));
+    $action = array_sum(array_keys(CRM_Contribute_Page_Tab::recurLinks($recurID, 'contribution')));
 
     // no action allowed if it's not active
     $recurringContribution['is_active'] = ($recurringContribution['contribution_status_id'] != 3);
@@ -125,7 +125,7 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
       }
 
       $recurringContribution['action'] = CRM_Core_Action::formLink(
-        $this->recurLinks($recurID),
+        CRM_Contribute_Page_Tab::recurLinks($recurID, 'contribution'),
         $action,
         array(
           'cid' => $this->contactID,
@@ -139,21 +139,6 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
         $recurID
       );
     }
-  }
-
-  /**
-   * This method returns the links that are given for recur search row.
-   * currently the links added for each row are:
-   * - View
-   * - Edit
-   * - Cancel
-   *
-   * @param bool $id
-   *
-   * @return array
-   */
-  private function recurLinks($id) {
-    return CRM_Contribute_Page_Tab::recurLinks($id, 'contribution');
   }
 
 }
