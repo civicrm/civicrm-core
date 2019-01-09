@@ -3109,7 +3109,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
             $fileValues = CRM_Core_BAO_File::path($value, $params['activityID']);
             $customParams["custom_{$key}_-1"] = array(
               'name' => $fileValues[0],
-              'path' => $fileValues[1],
+              'type' => $fileValues[1],
             );
           }
           else {
