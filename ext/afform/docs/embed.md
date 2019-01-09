@@ -50,8 +50,12 @@ Next, we should create an overall `afform/contact/layout.html` which uses these 
 ```
 
 And we should create a `afform/contact/meta.json` looking like
-```
-{"server_route": "civicrm/contact", "requires" : ["afformContactName", "afformContactEmails", "afformContactAddresses"]}
+
+```json
+{
+  "server_route": "civicrm/contact", 
+  "requires" : ["afformContactName", "afformContactEmails", "afformContactAddresses"]
+}
 ```
 > *(FIXME: In the parent form's `meta.json`, we need to manually add `afformContactName`, `afformContactAddresses`, `afformContactEmails` to the `requires` list. We should autodetect these instead.)*
 
