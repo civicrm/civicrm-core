@@ -29,7 +29,7 @@
  * Class CRM_Event_Form_RegistrationTest
  * @group headless
  */
-class CRM_Event_Form_RegistrationTest extends CiviUnitTestCase {
+class CRM_Event_Form_Registration_RegistrationTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();

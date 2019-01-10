@@ -28,7 +28,7 @@
 /**
  * Class CRM_Contribute_Form_Tasktest
  */
-class CRM_Contribute_Form_Tasktest extends CiviUnitTestCase {
+class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
   /**
    * Assume empty database with just civicrm_data.
    */
