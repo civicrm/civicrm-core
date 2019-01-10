@@ -960,7 +960,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);
       if (version_compare($version, '5.0.9', '<')) {
         $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__,
+          __FUNCTION__ . 'mysqlnd',
           ts('It is recommended, though not yet required, to upgrade your PHP MySQL driver (mysqlnd) to >= 5.0.9 for utf8mb4 support.'),
           ts('PHP MySQL Driver (mysqlnd)'),
           \Psr\Log\LogLevel::WARNING,
@@ -972,7 +972,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       // The libmysqlclient driver supports utf8mb4 starting at version 5.5.3.
       if (version_compare($version, '5.5.3', '<')) {
         $messages[] = new CRM_Utils_Check_Message(
-          __FUNCTION__,
+          __FUNCTION__ . 'libmysqlclient',
           ts('It is recommended, though not yet required, to upgrade your PHP MySQL driver (libmysqlclient) to >= 5.5.3 for utf8mb4 support.'),
           ts('PHP MySQL Driver (libmysqlclient)'),
           \Psr\Log\LogLevel::WARNING,
