@@ -973,7 +973,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       if (version_compare($version, '5.5.3', '<')) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts('It is recommended, though not yet required, to upgrade your PHP MySQL driver (libmysqlclient) to >= 5.0.9 for utf8mb4 support.'),
+          ts('It is recommended, though not yet required, to upgrade your PHP MySQL driver (libmysqlclient) to >= 5.5.3 for utf8mb4 support.'),
           ts('PHP MySQL Driver (libmysqlclient)'),
           \Psr\Log\LogLevel::WARNING,
           'fa-server'
