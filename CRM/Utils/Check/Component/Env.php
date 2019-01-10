@@ -943,7 +943,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       CRM_Core_DAO::executeQuery('CREATE TABLE civicrm_utf8mb4_test (id VARCHAR(255), PRIMARY KEY(id(255))) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC ENGINE=INNODB');
       CRM_Core_DAO::executeQuery('DROP table civicrm_utf8mb4_test');
     }
-    catch (Exception $e) {
+    catch (PEAR_Exception $e) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('Future versions of CiviCRM may require MySQL utf8mb4 support. It is recommended, though not yet required, to configure your MySQL server for utf8mb4 support. You will need the following MySQL server configuration: innodb_large_prefix=true innodb_file_format=barracuda innodb_file_per_table=true'),
