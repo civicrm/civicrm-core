@@ -940,8 +940,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
 
     try {
-      CRM_Core_DAO::executeQuery('CREATE TABLE civicrm_utf8mb4_test (id VARCHAR(255), PRIMARY KEY(id(255))) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC ENGINE=INNODB');
-      CRM_Core_DAO::executeQuery('DROP table civicrm_utf8mb4_test');
+      // Create a temporary table to avoid implicit commit.
+      CRM_Core_DAO::executeQuery('CREATE TEMPORARY TABLE civicrm_utf8mb4_test (id VARCHAR(255), PRIMARY KEY(id(255))) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC ENGINE=INNODB');
+      CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE civicrm_utf8mb4_test');
     }
     catch (PEAR_Exception $e) {
       $messages[] = new CRM_Utils_Check_Message(
