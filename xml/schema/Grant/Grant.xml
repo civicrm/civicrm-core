@@ -43,6 +43,7 @@
   <field>
     <name>application_received_date</name>
     <title>Application received date</title>
+    <uniqueName>grant_application_received_date</uniqueName>
     <type>date</type>
     <export>true</export>
     <import>true</import>
@@ -56,6 +57,7 @@
   <field>
     <name>decision_date</name>
     <title>Decision date</title>
+    <uniqueName>grant_decision_date</uniqueName>
     <type>date</type>
     <comment>Date on which grant decision was made.</comment>
     <import>true</import>
@@ -81,7 +83,7 @@
   <field>
     <name>grant_due_date</name>
     <type>date</type>
-    <title>Grant Due Date</title>
+    <title>Grant Report Due Date</title>
     <comment>Date on which grant report is due.</comment>
     <add>1.8</add>
     <import>true</import>
