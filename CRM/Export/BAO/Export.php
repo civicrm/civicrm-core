@@ -600,7 +600,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
 
       // call export hook
-      CRM_Utils_Hook::export($exportTempTable, $headerRows, $sqlColumns, $exportMode);
+      CRM_Utils_Hook::export($exportTempTable, $headerRows, $sqlColumns, $exportMode, $componentTable, $ids);
 
       // In order to be able to write a unit test against this function we need to suppress
       // the csv writing. In future hopefully the csv writing & the main processing will be in separate functions.
