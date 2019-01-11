@@ -53,12 +53,11 @@ class CRM_Financial_BAO_Payment {
    * @throws \CRM_Core_Exception
    */
   public static function create($params) {
+    $paymentType = CRM_Utils_Array::value('payment_type', $params, 'owed');
     $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $params['contribution_id']]);
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($contribution['contribution_status_id'], 'name');
-
     // Check if pending contribution
     $fullyPaidPayLater = FALSE;
-    if ($contributionStatus == 'Pending') {
+    if ($contribution['contribution_status'] == 'Pending') {
       $cmp = bccomp($contribution['total_amount'], $params['total_amount'], 5);
       // Total payment amount is the whole amount paid against pending contribution
       if ($cmp == 0 || $cmp == -1) {
@@ -74,12 +73,14 @@ class CRM_Financial_BAO_Payment {
           [
             'id' => $contribution['id'],
             'contribution_status_id' => 'Partially paid',
+            'is_pay_later' => 0,
           ]
         );
       }
     }
     if (!$fullyPaidPayLater) {
-      $trxn = CRM_Core_BAO_FinancialTrxn::getPartialPaymentTrxn($contribution, $params);
+      unset($params['id']);
+      $trxn = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($params['contribution_id'], $params, $paymentType, CRM_Utils_Array::value('participant_id', $params));
       if (CRM_Utils_Array::value('line_item', $params) && !empty($trxn)) {
         foreach ($params['line_item'] as $values) {
           foreach ($values as $id => $amount) {
@@ -110,10 +111,15 @@ class CRM_Financial_BAO_Payment {
         }
       }
       elseif (!empty($trxn)) {
-        CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution['total_amount']);
+        $defaults = [];
+        $fetchParams = ['id' => $params['contribution_id']];
+        $contributionDAO = CRM_Contribute_BAO_Contribution::retrieve($fetchParams, $defaults, $fetchParams);
+        CRM_Contribute_BAO_Contribution::addPayments(array($contributionDAO), $contribution['contribution_status_id']);
       }
     }
-
+    if (!empty($params['is_email_receipt'])) {
+      self::sendConfirmation($params);
+    }
     return $trxn;
   }
 
@@ -125,13 +131,11 @@ class CRM_Financial_BAO_Payment {
    * @return bool
    */
   public static function sendConfirmation($params) {
-    if (empty($params['is_email_receipt'])) {
-      return;
-    }
     $templateVars = array();
     self::assignVariablesToTemplate($templateVars, $params);
     // send message template
     $fromEmails = CRM_Core_BAO_Email::getFromEmail();
+
     $sendTemplateParams = array(
       'groupName' => 'msg_tpl_workflow_contribution',
       'valueName' => 'payment_or_refund_notification',
@@ -149,6 +153,7 @@ class CRM_Financial_BAO_Payment {
       if (!empty($params['from_email_address']) && array_key_exists($params['from_email_address'], $fromEmails)) {
         $receiptFrom = $params['from_email_address'];
       }
+
       $sendTemplateParams['from'] = $receiptFrom;
       $sendTemplateParams['toName'] = CRM_Utils_Array::value('contributorDisplayName', $templateVars);
       $sendTemplateParams['toEmail'] = $templateVars['contributorEmail'];
@@ -162,11 +167,10 @@ class CRM_Financial_BAO_Payment {
    *
    * @param array $templateVars
    * @param array $params
-   *
-   * @return array
    */
   public static function assignVariablesToTemplate(&$templateVars, $params) {
-    $templateVars = self::getTemplateVars($params);
+    $templateVars = self::filterUntestedTemplateVariables($params);
+
     $template = CRM_Core_Smarty::singleton();
     if (CRM_Utils_Array::value('component', $templateVars) == 'event') {
       // fetch event information from participant ID using API
@@ -175,6 +179,7 @@ class CRM_Financial_BAO_Payment {
         'id' => $templateVars['id'],
       ));
       $event = civicrm_api3('Event', 'getsingle', array('id' => $eventId));
+
       $template->assign('event', $event);
       $template->assign('isShowLocation', $event['is_show_location']);
       if (CRM_Utils_Array::value('is_show_location', $event) == 1) {
@@ -189,6 +194,7 @@ class CRM_Financial_BAO_Payment {
       $paymentConfig['confirm_email_text'] = CRM_Utils_Array::value('confirm_email_text', $event);
       $template->assign('paymentConfig', $paymentConfig);
     }
+
     $template->assign('component', CRM_Utils_Array::value('component', $templateVars));
     $template->assign('totalAmount', CRM_Utils_Array::value('amtTotal', $templateVars));
     $isRefund = ($templateVars['paymentType'] == 'refund') ? TRUE : FALSE;
@@ -205,6 +211,7 @@ class CRM_Financial_BAO_Payment {
       $template->assign('paymentsComplete', $paymentsComplete);
     }
     $template->assign('contactDisplayName', CRM_Utils_Array::value('contributorDisplayName', $templateVars));
+
     // assign trxn details
     $template->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $params));
     $template->assign('receive_date', CRM_Utils_Array::value('trxn_date', $params));
@@ -224,6 +231,7 @@ class CRM_Financial_BAO_Payment {
       ));
     }
   }
+
   /**
    * Function to form template variables.
    *

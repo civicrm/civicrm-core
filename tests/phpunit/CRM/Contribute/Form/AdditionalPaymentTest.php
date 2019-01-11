@@ -137,7 +137,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->checkResults(array(30, 70), 2);
     $mut->assertSubjects(['Payment Receipt -']);
     $mut->checkMailLog([
-      'Dear Anthony Anderson',
+      'Dear ' . CRM_Contact_BAO_Contact::displayName($this->_individualId),
       'Payment Details',
       'Total Fees: $ 100.00',
       'This Payment Amount: $ 70.00',
