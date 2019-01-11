@@ -57,6 +57,22 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
    */
   protected $_surveyTitle;
 
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Survey';
+  }
+
+  /**
+   * Get the entity id being edited.
+   *
+   * @return int|null
+   */
+  public function getEntityId() {
+    return $this->_surveyId;
+  }
+
   public function preProcess() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();
@@ -78,14 +94,8 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
     $this->assign('action', $this->_action);
     $this->assign('surveyId', $this->_surveyId);
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      $this->set('type', 'Survey');
-      $this->set('entityId', $this->_surveyId);
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Survey', $this->_surveyId);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
+    // Add custom data to form
+    CRM_Custom_Form_CustomData::addToForm($this);
 
     // CRM-11480, CRM-11682
     // Preload libraries required by the "Questions" tab

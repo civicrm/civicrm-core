@@ -55,7 +55,13 @@ class CRM_Custom_Form_CustomData {
   public static function addToForm(&$form, $subType = NULL, $subName = NULL, $groupCount = 1) {
     $entityName = $form->getDefaultEntity();
     $entityID = $form->getEntityId();
-    $entitySubType = $form->getEntitySubTypeId($subType);
+    // FIXME: If the form has been converted to use entityFormTrait then getEntitySubTypeId() will exist.
+    // However, if it is only partially converted (ie. we've switched customdata to use CRM_Custom_Form_CustomData)
+    // it won't, so we check if we have a subtype before calling the function.
+    $entitySubType = NULL;
+    if ($subType) {
+      $entitySubType = $form->getEntitySubTypeId($subType);
+    }
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {

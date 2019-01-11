@@ -79,22 +79,10 @@
    </tr>
    <tr class="crm-campaign-form-block-custom_data">
        <td colspan="2">
-           <div id="customData"></div>
+         {include file="CRM/common/customDataBlock.tpl"}
        </td>
    </tr>
   </table>
-  <div id="customData"></div>
-  {*include custom data js file*}
-  {include file="CRM/common/customData.tpl"}
-  {literal}
-    <script type="text/javascript">
-      CRM.$(function($) {
-        {/literal}
-        CRM.buildCustomData( 'Survey' );
-        {literal}
-      });
-    </script>
-  {/literal}
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 
@@ -115,13 +103,4 @@
         buildLinks( profileField, profileField.val());
     });
 </script>
-{/literal}
-{literal}
-  <script type="text/javascript">
-    CRM.$(function($) {
-      {/literal}
-        CRM.buildCustomData( 'Survey' );
-      {literal}
-    });
-  </script>
 {/literal}

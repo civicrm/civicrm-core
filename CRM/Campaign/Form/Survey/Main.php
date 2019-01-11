@@ -50,13 +50,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
    */
   protected $_context;
 
-  /**
-   * Explicitly declare the entity api name.
-   */
-  public function getDefaultEntity() {
-    return 'Survey';
-  }
-
   public function preProcess() {
     parent::preProcess();
 
@@ -70,11 +63,8 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
       CRM_Utils_System::setTitle(ts('Configure Survey') . ' - ' . $this->_surveyTitle);
     }
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      CRM_Custom_Form_CustomData::preProcess($this);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
+    // Add custom data to form
+    CRM_Custom_Form_CustomData::addToForm($this);
 
     if ($this->_name != 'Petition') {
       $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
@@ -93,8 +83,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     $this->assign('action', $this->_action);
     $this->assign('surveyId', $this->_surveyId);
-    // for custom data
-    $this->assign('entityID', $this->_surveyId);
   }
 
   /**
@@ -195,10 +183,8 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, 0);
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, 0);
 
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $this->_surveyId,
-      'Survey'
-    );
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->getEntityId(), $this->getDefaultEntity());
+
     $survey = CRM_Campaign_BAO_Survey::create($params);
     $this->_surveyId = $survey->id;
 
