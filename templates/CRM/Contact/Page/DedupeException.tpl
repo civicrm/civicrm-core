@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{include file="CRM/common/dedupe.tpl"}
 <div class="crm-accordion-header">
   {ts}Filter Contacts{/ts}
 </div>
@@ -32,7 +33,7 @@
       <tr>
         <td class="crm-contact-form-block-contact1">
           <label for="search-contact1">{ts}Contact Name{/ts}</label><br />
-          <input type="text" size="50" placeholder="Search Contacts" value="{$searchcontact1}" id="search-contact1" search-column="0" />
+          <input class="crm-form-text" type="text" size="50" placeholder="Search Contacts" value="{$searchcontact1}" id="search-contact1" search-column="0" />
         </td>
         <td class="crm-contact-form-block-search">
           <label>&nbsp;</label><br />
@@ -51,16 +52,17 @@
   <div id="claim_level-wrapper" class="dataTables_wrapper">
     <table id="claim_level-table" class="display">
       <thead>
-      <tr>
-        <th>{ts}Contact 1{/ts}</th>
-        <th>{ts}Contact 2 (Duplicate){/ts}</th>
-      </tr>
+        <tr>
+          <th>{ts}Contact 1{/ts}</th>
+          <th>{ts}Contact 2 (Duplicate){/ts}</th>
+          <th data-orderable="false"></th>
+        </tr>
       </thead>
       <tbody>
-      {assign var="rowClass" value="odd-row"}
-      {assign var="rowCount" value=0}
+        {assign var="rowClass" value="odd-row"}
+        {assign var="rowCount" value=0}
 
-      {foreach from=$exceptions key=errorId item=exception}
+        {foreach from=$exceptions key=errorId item=exception}
         {assign var="rowCount" value=$rowCount+1}
 
         <tr id="row{$rowCount}" class="{cycle values="odd,even"}">
@@ -73,7 +75,9 @@
             {assign var="contact2name" value="contact_id2.display_name"}
             <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.contact_id2`"}" target="_blank">{ $exception.$contact2name }</a>
           </td>
-
+          <td>
+            <a id='duplicateContacts' href="#" title={ts}Remove Exception{/ts} onClick="processDupes( {$exception.contact_id1}, {$exception.contact_id2}, 'nondupe-dupe', 'dedupe-exception' );return false;">&raquo; {ts}Remove Exception{/ts}</a>
+          </td>
         </tr>
 
         {if $rowClass eq "odd-row"}
