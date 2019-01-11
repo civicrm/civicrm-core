@@ -725,7 +725,7 @@ class HTML_QuickForm_advmultiselect extends HTML_QuickForm_select
             $attrHidden = $this->_getAttrString($this->_attributesHidden);
 
             // prepare option tables to be displayed as in POST order
-            $append = count($this->_values);
+            $append = ($this->_values === NULL ? 0 : count($this->_values));
             if ($append > 0) {
                 $arrHtmlSelected = array_fill(0, $append, ' ');
             } else {

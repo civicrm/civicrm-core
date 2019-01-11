@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -145,15 +145,12 @@
               </tr>
               <tr class="crm-case-activity-form-block-activity_date_time">
                 <td class="label">{$form.activity_date_time.label}</td>
-                {if $action eq 2 && $activityTypeFile eq 'OpenCase'}
-                  <td class="view-value">{$current_activity_date_time|crmDate}
-                    <div class="description">Use a <a href="{$changeStartURL}">Change Start Date</a> activity to change the date</div>
-                    {* avoid errors about missing field *}
-                    <div style="display: none;">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</div>
-                  </td>
-                {else}
-                  <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</td>
-                {/if}
+                <td class="view-value">
+                  {$form.activity_date_time.html}
+                  {if $action eq 2 && $activityTypeFile eq 'OpenCase'}
+                    <div class="description">Use a <a class="open-inline" href="{$changeStartURL}">Change Start Date</a> activity to change the date</div>
+                  {/if}
+                </td>
               </tr>
               {if $action eq 2 && $activityTypeFile eq 'OpenCase'}
               <tr class="crm-case-activity-form-block-details">

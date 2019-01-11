@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 <div class="crm-contact-relationship-{$context}">
   <table
     class="crm-contact-relationship-selector-{$context} crm-ajax-table"
-    data-ajax="{crmURL p="civicrm/ajax/contactrelationships" q="context=$context&cid=$contactId"}">
+    data-ajax="{crmURL p="civicrm/ajax/contactrelationships" q="context=$context&cid=$contactId"}" style="width: 100%;">
     <thead>
     <tr>
       <th data-data="relation" class='crm-contact-relationship-type'>{ts}Relationship{/ts}</th>

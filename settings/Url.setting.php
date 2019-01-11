@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -43,7 +43,7 @@ return array(
     'name' => 'userFrameworkResourceURL',
     'title' => 'CiviCRM Resource URL',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
@@ -60,7 +60,7 @@ return array(
     'title' => 'Image Upload URL',
     'name' => 'imageUploadURL',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
@@ -77,7 +77,7 @@ return array(
     'name' => 'customCSSURL',
     'title' => 'Custom CSS URL',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
@@ -94,7 +94,7 @@ return array(
     'title' => 'Extension Resource URL',
     'name' => 'extensionsURL',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',

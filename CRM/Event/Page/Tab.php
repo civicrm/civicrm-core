@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -118,6 +118,19 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     return $controller->run();
   }
 
+  public function delete() {
+    $controller = new CRM_Core_Controller_Simple(
+      'CRM_Event_Form_Participant',
+      ts('Delete Participant'),
+      $this->_action
+    );
+
+    $controller->setEmbedded(TRUE);
+    $controller->set('id', $this->_id);
+    $controller->set('cid', $this->_contactId);
+    $controller->run();
+  }
+
   public function preProcess() {
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
@@ -167,12 +180,11 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->view();
     }
-    elseif ($this->_action & (CRM_Core_Action::UPDATE |
-        CRM_Core_Action::ADD |
-        CRM_Core_Action::DELETE
-      )
-    ) {
+    elseif ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
       $this->edit();
+    }
+    elseif ($this->_action & (CRM_Core_Action::DELETE | CRM_Core_Action::DETACH)) {
+      $this->delete();
     }
     else {
       $this->browse();

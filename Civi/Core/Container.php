@@ -165,6 +165,7 @@ class Container {
       'community_messages' => 'community_messages',
       'checks' => 'checks',
       'session' => 'CiviCRM Session',
+      'long' => 'long',
     );
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $container->setDefinition("cache.{$cacheSvc}", new Definition(
@@ -200,7 +201,6 @@ class Container {
 
     // Expose legacy singletons as services in the container.
     $singletons = array(
-      'resources' => 'CRM_Core_Resources',
       'httpClient' => 'CRM_Utils_HttpClient',
       'cache.default' => 'CRM_Utils_Cache',
       'i18n' => 'CRM_Core_I18n',
@@ -213,6 +213,12 @@ class Container {
       ))
         ->setFactory(array($class, 'singleton'));
     }
+    $container->setAlias('cache.short', 'cache.default');
+
+    $container->setDefinition('resources', new Definition(
+      'CRM_Core_Resources',
+      [new Reference('service_container')]
+    ))->setFactory(array(new Reference(self::SELF), 'createResources'));
 
     $container->setDefinition('prevnext', new Definition(
       'CRM_Core_PrevNextCache_Interface',
@@ -223,6 +229,14 @@ class Container {
       'CRM_Core_PrevNextCache_Sql',
       []
     ));
+
+    $container->setDefinition('prevnext.driver.redis', new Definition(
+      'CRM_Core_PrevNextCache_Redis',
+      [new Reference('cache_config')]
+    ));
+
+    $container->setDefinition('cache_config', new Definition('ArrayObject'))
+      ->setFactory(array(new Reference(self::SELF), 'createCacheConfig'));
 
     $container->setDefinition('civi.mailing.triggers', new Definition(
       'Civi\Core\SqlTrigger\TimestampTriggers',
@@ -411,14 +425,42 @@ class Container {
 
   /**
    * @param ContainerInterface $container
+   * @return \CRM_Core_Resources
+   */
+  public static function createResources($container) {
+    $sys = \CRM_Extension_System::singleton();
+    return new \CRM_Core_Resources(
+      $sys->getMapper(),
+      $container->get('cache.js_strings'),
+      \CRM_Core_Config::isUpgradeMode() ? NULL : 'resCacheCode'
+    );
+  }
+
+  /**
+   * @param ContainerInterface $container
    * @return \CRM_Core_PrevNextCache_Interface
    */
   public static function createPrevNextCache($container) {
-    $cacheDriver = \CRM_Utils_Cache::getCacheDriver();
-    $service = 'prevnext.driver.' . strtolower($cacheDriver);
-    return $container->has($service)
-      ? $container->get($service)
-      : $container->get('prevnext.driver.sql');
+    $setting = \Civi::settings()->get('prevNextBackend');
+    if ($setting === 'default') {
+      // For initial release (5.8.x), continue defaulting to SQL.
+      $isTransitional = version_compare(\CRM_Utils_System::version(), '5.9.alpha1', '<');
+      $cacheDriver = \CRM_Utils_Cache::getCacheDriver();
+      $service = 'prevnext.driver.' . strtolower($cacheDriver);
+      return $container->has($service) && !$isTransitional
+        ? $container->get($service)
+        : $container->get('prevnext.driver.sql');
+    }
+    else {
+      return $container->get('prevnext.driver.' . $setting);
+    }
+  }
+
+  public static function createCacheConfig() {
+    $driver = \CRM_Utils_Cache::getCacheDriver();
+    $settings = \CRM_Utils_Cache::getCacheSettings($driver);
+    $settings['driver'] = $driver;
+    return new \ArrayObject($settings);
   }
 
   /**

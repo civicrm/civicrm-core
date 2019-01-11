@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -66,7 +66,7 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
     CRM_Core_BAO_CustomField::retrieve($params, $defaults);
 
     $this->_title = CRM_Utils_Array::value('label', $defaults);
-
+    $this->assign('title', $this->_title);
     CRM_Utils_System::setTitle(ts('Delete %1', array(1 => $this->_title)));
   }
 

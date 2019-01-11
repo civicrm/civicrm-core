@@ -1,8 +1,9 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,21 +23,65 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-{htxt id="sending-title"}
-  {ts}Scheduling and Sending Mailings{/ts}
-{/htxt}
-{htxt id="sending"}
-<p>
-    {ts}You can schedule mailings to be sent starting at a specific date and time, OR you can request that they be sent as soon as possible by checking &quot;Send Immediately&quot;.{/ts}
-</p>
-<p>
-    {ts}Click <strong>Submit Mailing</strong> to add this mailing to the mailing queue. An automated task which runs periodically on your server processes mailings in the queue, and starts actually sending out your mail.{/ts}
-</p>
-<p>
-    {ts}Click <strong>Continue Later</strong> if you're not ready to schedule or send this mailing. Click the <strong>Continue</strong> link from Unscheduled and Draft Mailings when you are ready to schedule or send it.{/ts}
-</p>
-<p>
-    {ts}<strong>Trouble-shooting Tip</strong> - If you find that your mailings are not being sent, ask the system administrator or technical support contact for your site to verify that the automated task (&quot;cron job&quot;) is running - and how frequently.{/ts} {docURL page="user/advanced-configuration/email-system-configuration"}
-</p>
-{/htxt}
+ */
+
+/**
+ * This api exposes CiviCRM (dedupe) rules.
+ *
+ * Rules dedupe critieria assigned to RuleGroups.
+ *
+ * @package CiviCRM_APIv3
+ */
+
+/**
+ * Create or update a rule.
+ *
+ * @param array $params
+ *   Array per getfields metadata.
+ *
+ * @return array
+ *   API result array
+ */
+function civicrm_api3_rule_create($params) {
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Rule');
+}
+
+/**
+ * Specify Meta data for create.
+ *
+ * Note that this data is retrievable via the getfields function
+ * and is used for pre-filling defaults and ensuring mandatory requirements are met.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_rule_create_spec(&$params) {
+  $params['dedupe_rule_group_id']['api.required'] = TRUE;
+  $params['rule_table']['api.default'] = 'civicrm_contact';
+  $params['rule_field']['api.required'] = TRUE;
+  $params['rule_weight']['api.required'] = TRUE;
+}
+
+/**
+ * Delete an existing Rule.
+ *
+ * @param array $params
+ *
+ * @return array
+ *   API result array
+ */
+function civicrm_api3_rule_delete($params) {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+/**
+ * Get a Rule.
+ *
+ * @param array $params
+ *   Array per getfields metadata.
+ *
+ * @return array
+ *   API result array
+ */
+function civicrm_api3_rule_get($params) {
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Rule');
+}

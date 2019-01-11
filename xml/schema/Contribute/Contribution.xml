@@ -286,10 +286,13 @@
   <field>
     <name>cancel_reason</name>
     <type>text</type>
+    <title>Cancellation / Refund Reason</title>
     <import>true</import>
+    <export>true</export>
     <headerPattern>/(cancel.?)?reason/i</headerPattern>
     <html>
       <type>Text</type>
+      <size>40</size>
     </html>
     <add>1.3</add>
   </field>

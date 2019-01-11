@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,91 +28,23 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
  * This class generates form components for Address Section.
  */
 class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
-  public function preProcess() {
 
-    CRM_Utils_System::setTitle(ts('Settings - Addresses'));
-
-    // Address Standardization
-    $addrProviders = array(
-      '' => '- select -',
-    ) + CRM_Core_SelectValues::addressProvider();
-
-    $this->_varNames = array(
-      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => array(
-        'address_options' => array(
-          'html_type' => 'checkboxes',
-          'title' => ts('Address Fields'),
-          'weight' => 1,
-        ),
-        'address_format' => array(
-          'html_type' => 'textarea',
-          'title' => ts('Display Format'),
-          'description' => NULL,
-          'weight' => 2,
-        ),
-        'mailing_format' => array(
-          'html_type' => 'textarea',
-          'title' => ts('Mailing Label Format'),
-          'description' => NULL,
-          'weight' => 3,
-        ),
-        'hideCountryMailingLabels' => array(
-          'html_type' => 'YesNo',
-          'title' => ts('Hide Country in Mailing Labels when same as domain country'),
-          'weight' => 4,
-        ),
-      ),
-      CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME => array(
-        'address_standardization_provider' => array(
-          'html_type' => 'select',
-          'title' => ts('Provider'),
-          'option_values' => $addrProviders,
-          'weight' => 5,
-        ),
-        'address_standardization_userid' => array(
-          'html_type' => 'text',
-          'title' => ts('User ID'),
-          'description' => NULL,
-          'weight' => 6,
-        ),
-        'address_standardization_url' => array(
-          'html_type' => 'text',
-          'title' => ts('Web Service URL'),
-          'description' => NULL,
-          'weight' => 7,
-        ),
-      ),
-    );
-
-    parent::preProcess();
-  }
-
-  /**
-   * @return array
-   */
-  public function setDefaultValues() {
-    $defaults = array();
-    $defaults['address_standardization_provider'] = $this->_config->address_standardization_provider;
-    $defaults['address_standardization_userid'] = $this->_config->address_standardization_userid;
-    $defaults['address_standardization_url'] = $this->_config->address_standardization_url;
-
-    $this->addressSequence = isset($newSequence) ? $newSequence : "";
-
-    $defaults['address_format'] = $this->_config->address_format;
-    $defaults['mailing_format'] = $this->_config->mailing_format;
-    $defaults['hideCountryMailingLabels'] = $this->_config->hideCountryMailingLabels;
-
-    parent::cbsDefaultValues($defaults);
-
-    return $defaults;
-  }
+  protected $_settings = [
+    'address_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'address_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'mailing_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'hideCountryMailingLabels' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'address_standardization_provider' => CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME,
+    'address_standardization_userid' => CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME,
+    'address_standardization_url' => CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME,
+  ];
 
   /**
    * Build the form object.
@@ -142,13 +74,9 @@ class CRM_Admin_Form_Preferences_Address extends CRM_Admin_Form_Preferences {
     // make sure that there is a value for all of them
     // if any of them are set
     if ($p || $u || $w) {
-      if (!CRM_Utils_System::checkPHPVersion(5, FALSE)) {
-        $errors['_qf_default'] = ts('Address Standardization features require PHP version 5 or greater.');
-        return $errors;
-      }
 
       if (!($p && $u && $w)) {
-        $errors['_qf_default'] = ts('You must provide values for all three Address Standarization fields.');
+        $errors['_qf_default'] = ts('You must provide values for all three Address Standardization fields.');
         return $errors;
       }
     }

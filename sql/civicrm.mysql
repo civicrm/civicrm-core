@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
 -- | CiviCRM version 5                                                  |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2018                                |
+-- | Copyright CiviCRM LLC (c) 2004-2019                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -30,7 +30,7 @@
 -- +--------------------------------------------------------------------+
 -- | CiviCRM version 5                                                  |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2018                                |
+-- | Copyright CiviCRM LLC (c) 2004-2019                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -1925,7 +1925,7 @@ CREATE TABLE `civicrm_email` (
      `email` varchar(254)    COMMENT 'Email address',
      `is_primary` tinyint   DEFAULT 0 COMMENT 'Is this the primary?',
      `is_billing` tinyint   DEFAULT 0 COMMENT 'Is this the billing?',
-     `on_hold` tinyint NOT NULL  DEFAULT 0 COMMENT 'Is this address on bounce hold?',
+     `on_hold` int unsigned NOT NULL  DEFAULT 0 COMMENT 'Implicit FK to civicrm_option_value where option_group = email_on_hold.',
      `is_bulkmail` tinyint NOT NULL  DEFAULT 0 COMMENT 'Is this address for bulk mail ?',
      `hold_date` datetime    COMMENT 'When the address went on bounce hold',
      `reset_date` datetime    COMMENT 'When the address bounce status was last reset',
@@ -3436,7 +3436,7 @@ CREATE TABLE `civicrm_entity_file` (
         entity_table
       , entity_id
   )
-  ,     INDEX `index_entity_file_id`(
+  ,     UNIQUE INDEX `UI_entity_table_entity_id_file_id`(
         entity_table
       , entity_id
       , file_id

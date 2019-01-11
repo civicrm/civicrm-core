@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -745,19 +745,31 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
           $values['contribution_date_low'] = $date['from'];
           $values['contribution_date_high'] = $date['to'];
         }
-        $searchParams = CRM_Contact_BAO_Query::convertFormValues($values);
-        // @todo the use of defaultReturnProperties means the search will be inefficient
-        // as slow-unneeded properties are included.
-        $query = new CRM_Contact_BAO_Query($searchParams,
-          CRM_Contribute_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_CONTRIBUTE,
-            FALSE
-          ), NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTRIBUTE
-        );
-        if ($field == 'contribution_date_high' || $field == 'contribution_date_low') {
-          $query->dateQueryBuilder($params[$field], 'civicrm_contribution', 'contribution_date', 'receive_date', 'Contribution Date');
-        }
       }
     }
+
+    $searchParams = CRM_Contact_BAO_Query::convertFormValues(
+      $values,
+      0,
+      FALSE,
+      NULL,
+      [
+        'financial_type_id',
+        'contribution_soft_credit_type_id',
+        'contribution_status_id',
+        'contribution_page_id',
+        'financial_trxn_card_type_id',
+        'contribution_payment_instrument_id',
+      ]
+    );
+    // @todo the use of defaultReturnProperties means the search will be inefficient
+    // as slow-unneeded properties are included.
+    $query = new CRM_Contact_BAO_Query($searchParams,
+      CRM_Contribute_BAO_Query::defaultReturnProperties(CRM_Contact_BAO_Query::MODE_CONTRIBUTE,
+        FALSE
+      ), NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTRIBUTE
+    );
+
     if (!empty($query->_where[0])) {
       $where = implode(' AND ', $query->_where[0]) .
         " AND civicrm_entity_batch.batch_id IS NULL ";

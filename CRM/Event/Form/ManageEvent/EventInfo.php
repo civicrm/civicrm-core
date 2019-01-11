@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -45,6 +45,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
    */
   public function preProcess() {
     parent::preProcess();
+    $this->assign('selectedChild', 'settings');
 
     if ($this->_id) {
       $this->assign('entityID', $this->_id);
@@ -173,7 +174,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $this->addElement('checkbox', 'is_share', ts('Allow sharing through social media?'));
     $this->addElement('checkbox', 'is_map', ts('Include Map to Event Location'));
 
-    $this->add('datepicker', 'start_date', ts('Start'), [], FALSE, ['time' => TRUE]);
+    $this->add('datepicker', 'start_date', ts('Start'), [], !$this->_isTemplate, ['time' => TRUE]);
     $this->add('datepicker', 'end_date', ts('End'), [], FALSE, ['time' => TRUE]);
 
     $this->add('text', 'max_participants', ts('Max Number of Participants'),
@@ -210,15 +211,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
   public static function formRule($values) {
     $errors = array();
 
-    if (!$values['is_template']) {
-      if (empty($values['start_date'])) {
-        $errors['start_date'] = ts('Start Date and Time are required fields');
-      }
-      else {
-        if (($values['end_date'] < $values['start_date']) && !empty($values['end_date'])) {
-          $errors['end_date'] = ts('End date should be after Start date.');
-        }
-      }
+    if (!empty($values['end_date']) && ($values['end_date'] < $values['start_date'])) {
+      $errors['end_date'] = ts('End date should be after Start date.');
     }
 
     //CRM-4286
@@ -259,11 +253,12 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
       $params = array_merge(CRM_Event_BAO_Event::getTemplateDefaultValues($params['template_id']), $params);
     }
 
-    $event = CRM_Event_BAO_Event::create($params);
-
     // now that we have the event’s id, do some more template-based stuff
     if (!empty($params['template_id'])) {
-      CRM_Event_BAO_Event::copy($params['template_id'], $event, TRUE);
+      $event = CRM_Event_BAO_Event::copy($params['template_id']);
+    }
+    else {
+      $event = CRM_Event_BAO_Event::create($params);
     }
 
     $this->set('id', $event->id);

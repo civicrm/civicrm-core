@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
 
@@ -171,10 +171,13 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    *
    * @return int
    *   The ID if present, or 0.
+   * @throws \CRM_Core_Exception
    */
   public function getIdAndAction() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->assign('action', $this->_action);
+
+    $this->assign('selectedChild', CRM_Utils_Request::retrieve('selectedChild', 'Alphanumeric', $this));
 
     // get 'id' if present
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);

@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,16 +23,27 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{htxt id="test-intro-title"}
-  {ts}Test Message{/ts}
-{/htxt}
-{htxt id="test-intro"}
-<p>{ts}It's a good idea to test your mailing by sending it to yourself and/or a selected group of people in your organization. You can also view your content in the preview panel below.{/ts}</p>
-<p>{ts}Enter a single email address or select an existing group and click "Send a Test Mailing." Once you receive the test mailing:{/ts}</p>
-<ul>
-<li>{ts}Verify the content and formatting.{/ts}</li>
-<li>{ts}If you are using mail-merge tokens, check that they have been replaced with expected values.{/ts}</li>
-<li>{ts}Click on each included link to make sure they go to the expected web pages.{/ts}</li>
-</ul>
-<p>{ts}If you need to make changes, you can click <strong>Previous</strong> to return to the content step, make your changes, and send another test.{/ts}</p>
-{/htxt}
+{strip}
+  <table class="selector row-highlight">
+    <tr class="columnheader">
+      <th scope="col">{ts}Amount{/ts}</th>
+      <th scope="col">{ts}Frequency{/ts}</th>
+      <th scope="col">{ts}Start Date{/ts}</th>
+      <th scope="col">{ts}Installments{/ts}</th>
+      <th scope="col">{ts}Status{/ts}</th>
+      <th scope="col"></th>
+    </tr>
+
+    {foreach from=$recurRows item=row}
+      {assign var=id value=$row.id}
+      <tr id="contribution_recur-{$row.id}" data-action="cancel" class="crm-entity {cycle values="even-row,odd-row"}{if NOT $row.is_active} disabled{/if}">
+        <td>{$row.amount|crmMoney:$row.currency}{if $row.is_test} ({ts}test{/ts}){/if}</td>
+        <td>{ts}Every{/ts} {$row.frequency_interval} {$row.frequency_unit} </td>
+        <td>{$row.start_date|crmDate}</td>
+        <td>{$row.installments}</td>
+        <td>{$row.contribution_status}</td>
+        <td>{$row.action|replace:'xx':$row.recurId}</td>
+      </tr>
+    {/foreach}
+  </table>
+{/strip}

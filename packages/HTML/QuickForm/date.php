@@ -15,9 +15,9 @@
  * @category    HTML
  * @package     HTML_QuickForm
  * @author      Alexey Borzov <avb@php.net>
- * @copyright   2001-2009 The PHP Group
+ * @copyright   2001-2011 The PHP Group
  * @license     http://www.php.net/license/3_01.txt PHP License 3.01
- * @version     CVS: $Id: date.php,v 1.62 2009/04/04 21:34:02 avb Exp $
+ * @version     CVS: $Id$
  * @link        http://pear.php.net/package/HTML_QuickForm
  */
 
@@ -39,7 +39,7 @@ require_once 'HTML/QuickForm/select.php';
  * @category    HTML
  * @package     HTML_QuickForm
  * @author      Alexey Borzov <avb@php.net>
- * @version     Release: 3.2.11
+ * @version     Release: 3.2.16
  * @since       3.1
  */
 class HTML_QuickForm_date extends HTML_QuickForm_group
@@ -55,7 +55,7 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
     var $_options = array(
         'format'           => 'dMY',
         'minYear'          => 2001,
-        'maxYear'          => 2012,
+        'maxYear'          => null, // set in the constructor
         'addEmptyOption'   => false,
         'emptyOptionValue' => '',
         'emptyOptionText'  => '&nbsp;',
@@ -129,6 +129,10 @@ class HTML_QuickForm_date extends HTML_QuickForm_group
         $this->_persistantFreeze = true;
         $this->_appendName = true;
         $this->_type = 'date';
+
+        // http://pear.php.net/bugs/bug.php?id=18171
+        $this->_options['maxYear'] = date('Y');
+
         // set the options, do not bother setting bogus ones
         if (is_array($options)) {
             foreach ($options as $name => $value) {

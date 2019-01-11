@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  *
  */
 
@@ -92,15 +92,18 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       ],
       'duration_interval' => [
         'name' => 'duration_interval',
+        'required' => TRUE,
       ],
       'duration_unit' => [
         'name' => 'duration_unit',
         'description' => ts('Duration of this membership (e.g. 30 days, 2 months, 5 years, 1 lifetime)'),
+        'required' => TRUE,
       ],
       'period_type' => [
         'name' => 'period_type',
         'description' => ts("Select 'rolling' if membership periods begin at date of signup. Select 'fixed' if membership periods begin on a set calendar date."),
         'help' => ['id' => 'period-type', 'file' => "CRM/Member/Page/MembershipType.hlp"],
+        'required' => TRUE,
       ],
       'fixed_period_start_day' => [
         'name' => 'fixed_period_start_day',

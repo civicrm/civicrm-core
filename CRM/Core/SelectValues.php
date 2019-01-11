@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * smart caching scheme on a per domain basis
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -466,7 +466,7 @@ class CRM_Core_SelectValues {
   public static function addressProvider() {
     static $addr = NULL;
     if (!$addr) {
-      $addr = CRM_Utils_System::getPluginList('CRM/Utils/Address', '.php', array('BatchUpdate'));
+      $addr = array_merge(['' => '- select -'], CRM_Utils_System::getPluginList('CRM/Utils/Address', '.php', array('BatchUpdate')));
     }
     return $addr;
   }
@@ -1107,6 +1107,56 @@ class CRM_Core_SelectValues {
       CRM_Contact_BAO_Relationship::VIEW => ts('View only'),
       CRM_Contact_BAO_Relationship::EDIT => ts('View and update'),
     );
+  }
+
+  /**
+   * Get option values for dashboard entries (used for 'how many events to display on dashboard').
+   *
+   * @return array
+   *   Dashboard entries options - in practice [-1 => 'Show All', 10 => 10, 20 => 20, ... 100 => 100].
+   */
+  public static function getDashboardEntriesCount() {
+    $optionValues = [];
+    $optionValues[-1] = ts('show all');
+    for ($i = 10; $i <= 100; $i += 10) {
+      $optionValues[$i] = $i;
+    }
+    return $optionValues;
+  }
+
+  /**
+   * Dropdown options for quicksearch in the menu
+   *
+   * @return array
+   */
+  public static function quicksearchOptions() {
+    $includeEmail = civicrm_api3('setting', 'getvalue', array('name' => 'includeEmailInName', 'group' => 'Search Preferences'));
+    $options = [
+      'sort_name' => $includeEmail ? ts('Name/Email') : ts('Name'),
+      'contact_id' => ts('Contact ID'),
+      'external_identifier' => ts('External ID'),
+      'first_name' => ts('First Name'),
+      'last_name' => ts('Last Name'),
+      'email' => ts('Email'),
+      'phone_numeric' => ts('Phone'),
+      'street_address' => ts('Street Address'),
+      'city' => ts('City'),
+      'postal_code' => ts('Postal Code'),
+      'job_title' => ts('Job Title'),
+    ];
+    $custom = civicrm_api3('CustomField', 'get', [
+      'return' => ['name', 'label', 'custom_group_id.title'],
+      'custom_group_id.extends' => ['IN' => ['Contact', 'Individual', 'Organization', 'Household']],
+      'data_type' => ['NOT IN' => ['ContactReference', 'Date', 'File']],
+      'custom_group_id.is_active' => 1,
+      'is_active' => 1,
+      'is_searchable' => 1,
+      'options' => ['sort' => ['custom_group_id.weight', 'weight'], 'limit' => 0],
+    ]);
+    foreach ($custom['values'] as $field) {
+      $options['custom_' . $field['name']] = $field['custom_group_id.title'] . ': ' . $field['label'];
+    }
+    return $options;
   }
 
 }

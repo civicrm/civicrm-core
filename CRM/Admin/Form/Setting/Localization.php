@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -52,7 +52,15 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     'moneyformat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'moneyvalueformat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'provinceLimit' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'uiLanguages' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
   );
+
+  public function preProcess() {
+    if (!CRM_Core_I18n::isMultiLingual()) {
+      CRM_Core_Resources::singleton()
+        ->addScriptFile('civicrm', 'templates/CRM/Admin/Form/Setting/Localization.js', 1, 'html-header');
+    }
+  }
 
   /**
    * Build the form object.
@@ -65,10 +73,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     $warningTitle = json_encode(ts("Warning"));
     $defaultLocaleOptions = CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions();
 
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-
-    if ($domain->locales) {
+    if (CRM_Core_I18n::isMultiLingual()) {
       // add language limiter and language adder
       $this->addCheckBox('languageLimit', ts('Available Languages'), array_flip($defaultLocaleOptions), NULL, NULL, NULL, NULL, ' &nbsp; ');
       $this->addElement('select', 'addLanguage', ts('Add Language'), array_merge(array('' => ts('- select -')), array_diff(CRM_Core_I18n::languages(), $defaultLocaleOptions)));
@@ -224,6 +229,11 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
         CRM_Core_I18n_Schema::addLocale($values['addLanguage'], $values['lcMessages']);
       }
       $values['languageLimit'][$values['addLanguage']] = 1;
+    }
+
+    // current language should be in the ui list
+    if (!in_array($values['lcMessages'], $values['uiLanguages'])) {
+      $values['uiLanguages'][] = $values['lcMessages'];
     }
 
     // if we manipulated the language list, return to the localization admin screen

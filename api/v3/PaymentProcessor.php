@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -61,7 +61,11 @@ function _civicrm_api3_payment_processor_create_spec(&$params) {
   $params['payment_processor_type_id']['api.required'] = 1;
   $params['is_default']['api.default'] = 0;
   $params['is_test']['api.default'] = 0;
+  $params['is_active']['api.default'] = TRUE;
   $params['domain_id']['api.default'] = CRM_Core_Config::domainID();
+  $params['financial_account_id']['api.default'] = CRM_Financial_BAO_PaymentProcessor::getDefaultFinancialAccountID();
+  $params['financial_account_id']['api.required'] = TRUE;
+  $params['financial_account_id']['title'] = ts('Financial Account for Processor');
 }
 
 /**

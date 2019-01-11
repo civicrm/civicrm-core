@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,20 +28,23 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
  * Base class for settings forms.
  */
 class CRM_Admin_Form_Preferences extends CRM_Core_Form {
+
+  use CRM_Admin_Form_SettingTrait;
+
   protected $_system = FALSE;
   protected $_contactID = NULL;
   public $_action = NULL;
 
   protected $_checkbox = NULL;
 
-  protected $_varNames = NULL;
+  protected $_varNames = [];
 
   protected $_config = NULL;
 
@@ -85,8 +88,11 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
       $this->_config->contact_id = $this->_contactID;
     }
 
+    $this->addFieldsDefinedInSettingsMetadata();
     $settings = Civi::settings();
+    // @todo replace this by defining all in settings.
     foreach ($this->_varNames as $groupName => $settingNames) {
+      CRM_Core_Error::deprecatedFunctionWarning('deprecated use of preferences form. This will be removed from core soon');
       foreach ($settingNames as $settingName => $options) {
         $this->_config->$settingName = $settings->get($settingName);
       }
@@ -98,23 +104,28 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $this->_defaults = array();
 
+    $this->setDefaultsForMetadataDefinedFields();
     foreach ($this->_varNames as $groupName => $settings) {
+      CRM_Core_Error::deprecatedFunctionWarning('deprecated use of preferences form. This will be removed from core soon');
       foreach ($settings as $settingName => $settingDetails) {
-        $defaults[$settingName] = isset($this->_config->$settingName) ? $this->_config->$settingName : CRM_Utils_Array::value('default', $settingDetails, NULL);
+        $this->_defaults[$settingName] = isset($this->_config->$settingName) ? $this->_config->$settingName : CRM_Utils_Array::value('default', $settingDetails, NULL);
       }
     }
 
-    return $defaults;
+    return $this->_defaults;
   }
 
   /**
+   * @todo deprecate in favour of setting using metadata.
+   *
    * @param $defaults
    */
   public function cbsDefaultValues(&$defaults) {
 
     foreach ($this->_varNames as $groupName => $groupValues) {
+      CRM_Core_Error::deprecatedFunctionWarning('deprecated use of preferences form. This will be removed from core soon');
       foreach ($groupValues as $settingName => $fieldValue) {
         if ($fieldValue['html_type'] == 'checkboxes') {
           if (isset($this->_config->$settingName) &&
@@ -142,6 +153,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
     parent::buildQuickForm();
 
     if (!empty($this->_varNames)) {
+      CRM_Core_Error::deprecatedFunctionWarning('deprecated use of preferences form. This will be removed from core soon');
       foreach ($this->_varNames as $groupName => $groupValues) {
         $formName = CRM_Utils_String::titleToVar($groupName);
         $this->assign('formName', $formName);
@@ -251,6 +263,14 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    * Process the form submission.
    */
   public function postProcessCommon() {
+    try {
+      $this->saveMetadataDefinedSettings($this->_params);
+      $this->filterParamsSetByMetadata($this->_params);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      CRM_Core_Session::setStatus($e->getMessage(), ts('Save Failed'), 'error');
+    }
+
     foreach ($this->_varNames as $groupName => $groupValues) {
       foreach ($groupValues as $settingName => $fieldValue) {
         switch ($fieldValue['html_type']) {

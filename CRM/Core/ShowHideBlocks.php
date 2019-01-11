@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_ShowHideBlocks {
 
@@ -178,8 +178,8 @@ class CRM_Core_ShowHideBlocks {
    * @return array
    */
   public static function links(&$form, $prefix, $showLinkText, $hideLinkText, $assign = TRUE) {
-    $showCode = "cj('#id_{$prefix}').show(); cj('#id_{$prefix}_show').hide();";
-    $hideCode = "cj('#id_{$prefix}').hide(); cj('#id_{$prefix}_show').show(); return false;";
+    $showCode = "if(event.preventDefault) event.preventDefault(); else event.returnValue = false; cj('#id_{$prefix}').show(); cj('#id_{$prefix}_show').hide();";
+    $hideCode = "if(event.preventDefault) event.preventDefault(); else event.returnValue = false; cj('#id_{$prefix}').hide(); cj('#id_{$prefix}_show').show();";
 
     self::setIcons();
     $values = array();

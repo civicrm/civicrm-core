@@ -56,6 +56,7 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
       case 'drupal8':
         $candidates[] = "../../modules/civicrm/civicrm.config.php.drupal";
         $candidates[] = "../../../modules/civicrm/civicrm.config.php.drupal";
+        $candidates[] = "../../../modules/civicrm-drupal/civicrm.config.php.drupal";
         break;
 
       case 'wordpress':

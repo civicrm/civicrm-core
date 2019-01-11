@@ -594,6 +594,7 @@ function civicrm_views_get_filter($data_type, $html_type = NULL, $option_group_i
 
     case "Float":
     case "Int":
+    case "Money":
       return array('handler' => 'views_handler_filter_numeric', 'allow empty' => TRUE);
 
     case "Date":

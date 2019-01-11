@@ -3767,15 +3767,13 @@ class DB_DataObject extends DB_DataObject_Overload
             // at this point if you have set something to an object, and it's not expected
             // the Validate will probably break!!... - rightly so! (your design is broken,
             // so issuing a runtime error like PEAR_Error is probably not appropriate..
-
-            switch (true) {
-                // todo: date time.....
-                case  ($val & DB_DATAOBJECT_STR):
-                    $ret[$key] = Validate::string($this->$key, VALIDATE_PUNCTUATION . VALIDATE_NAME);
-                    continue;
-                case  ($val & DB_DATAOBJECT_INT):
-                    $ret[$key] = Validate::number($this->$key, array('decimal'=>'.'));
-                    continue;
+            if ($val & DB_DATAOBJECT_STR) {
+              $ret[$key] = Validate::string($this->$key, VALIDATE_PUNCTUATION . VALIDATE_NAME);
+              continue;
+            }
+            if ($val & DB_DATAOBJECT_INT) {
+              $ret[$key] = Validate::number($this->$key, array('decimal' => '.'));
+              continue;
             }
         }
         // if any of the results are false or an object (eg. PEAR_Error).. then return the array..

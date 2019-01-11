@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -185,6 +185,14 @@ function civicrm_api3_profile_submit($params) {
     );
     if (!empty($errors)) {
       throw new API_Exception(array_pop($errors));
+    }
+  }
+
+  // Add custom greeting fields
+  $greetingFields = ['email_greeting', 'postal_greeting', 'addressee'];
+  foreach ($greetingFields as $greetingField) {
+    if (isset($profileFields[$greetingField]) && !isset($profileFields["{$greetingField}_custom"])) {
+      $profileFields["{$greetingField}_custom"] = ['name' => "{$greetingField}_custom"];
     }
   }
 

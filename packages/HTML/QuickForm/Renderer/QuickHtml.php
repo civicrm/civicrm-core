@@ -15,9 +15,9 @@
  * @category    HTML
  * @package     HTML_QuickForm
  * @author      Jason Rust <jrust@rustyparts.com>
- * @copyright   2001-2009 The PHP Group
+ * @copyright   2001-2011 The PHP Group
  * @license     http://www.php.net/license/3_01.txt PHP License 3.01
- * @version     CVS: $Id: QuickHtml.php,v 1.3 2009/04/04 21:34:04 avb Exp $
+ * @version     CVS: $Id$
  * @link        http://pear.php.net/package/HTML_QuickForm
  */
 
@@ -38,7 +38,7 @@ require_once 'HTML/QuickForm/Renderer/Default.php';
  * @category    HTML
  * @package     HTML_QuickForm
  * @author      Jason Rust <jrust@rustyparts.com>
- * @version     Release: 3.2.11
+ * @version     Release: 3.2.16
  * @since       3.1.1
  */
 class HTML_QuickForm_Renderer_QuickHtml extends HTML_QuickForm_Renderer_Default {

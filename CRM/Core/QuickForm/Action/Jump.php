@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Redefine the jump action.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -74,6 +74,9 @@ class CRM_Core_QuickForm_Action_Jump extends CRM_Core_QuickForm_Action {
     }
     // generate the URL for the page 'display' event and redirect to it
     $action = $current->getAttribute('action');
+    // prevent URLs that end in ? from causing redirects
+    $action = rtrim($action, '?');
+    // FIXME: this should be passed through CRM_Utils_System::url()
     $url = $action . (FALSE === strpos($action, '?') ? '?' : '&') . $current->getButtonName('display') . '=true' . '&qfKey=' . $page->get('qfKey');
 
     CRM_Utils_System::redirect($url);

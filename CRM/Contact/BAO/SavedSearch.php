@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -439,7 +439,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     $relativeDates = array('relative_dates' => array());
     $specialDateFields = array('event_relative', 'case_from_relative', 'case_to_relative', 'participant_relative');
     foreach ($formValues as $id => $value) {
-      if ((preg_match('/_date_relative$/', $id) || in_array($id, $specialDateFields)) && !empty($value)) {
+      if ((preg_match('/(_date|custom_[0-9]+)_relative$/', $id) || in_array($id, $specialDateFields)) && !empty($value)) {
         $entityName = strstr($id, '_date', TRUE);
         if (empty($entityName)) {
           $entityName = strstr($id, '_relative', TRUE);
@@ -490,7 +490,12 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
 
     // select date range as default
     if ($isCustomDateField) {
-      $formValues[$fieldName . '_relative'] = 0;
+      if (array_key_exists('relative_dates', $formValues) && array_key_exists($fieldName, $formValues['relative_dates'])) {
+        $formValues[$fieldName . '_relative'] = $formValues['relative_dates'][$fieldName];
+      }
+      else {
+        $formValues[$fieldName . '_relative'] = 0;
+      }
     }
     switch ($op) {
       case 'BETWEEN':

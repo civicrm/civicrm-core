@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -43,7 +43,7 @@ return array(
     'group' => 'directory',
     'name' => 'uploadDir',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
@@ -59,7 +59,7 @@ return array(
     'group' => 'directory',
     'name' => 'imageUploadDir',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
@@ -75,7 +75,7 @@ return array(
     'group' => 'directory',
     'name' => 'customFileUploadDir',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
@@ -91,7 +91,7 @@ return array(
     'group' => 'directory',
     'name' => 'customTemplateDir',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
@@ -107,7 +107,7 @@ return array(
     'group' => 'directory',
     'name' => 'customPHPPathDir',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',
@@ -123,7 +123,7 @@ return array(
     'group' => 'directory',
     'name' => 'extensionsDir',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'quick_form_type' => 'Element',
     'default' => NULL,
     'add' => '4.1',

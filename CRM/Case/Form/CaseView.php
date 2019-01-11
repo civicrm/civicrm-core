@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -208,8 +208,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     $aTypes = $xmlProcessor->get($this->_caseType, 'ActivityTypes', TRUE);
 
-    $allActTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name');
-
+    $allActTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
     $emailActivityType = array_search('Email', $allActTypes);
     $pdfActivityType = array_search('Print PDF Letter', $allActTypes);
 

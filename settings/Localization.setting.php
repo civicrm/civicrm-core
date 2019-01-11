@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -437,6 +437,28 @@ return array(
     'is_contact' => 0,
     'description' => '',
     'help_text' => NULL,
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Core_I18n::languages',
+    ),
+  ),
+  'uiLanguages' => array(
+    'group_name' => 'Localization Preferences',
+    'group' => 'localization',
+    'name' => 'uiLanguages',
+    'type' => 'Array',
+    'quick_form_type' => 'Select',
+    'html_type' => 'select',
+    'html_attributes' => array(
+      'multiple' => 1,
+      'class' => 'crm-select2',
+    ),
+    'default' => NULL,
+    'add' => '5.9',
+    'title' => 'Available Languages',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => '',
+    'help_text' => ts('User Interface languages available to users'),
     'pseudoconstant' => array(
       'callback' => 'CRM_Core_I18n::languages',
     ),

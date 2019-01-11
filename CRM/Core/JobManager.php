@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * by every scheduled job (cron task) in CiviCRM.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_JobManager {
 
@@ -229,10 +229,21 @@ class CRM_Core_JobManager {
     $dao = new CRM_Core_DAO_JobLog();
 
     $dao->domain_id = $domainID;
-    $dao->description = substr($message, 0, 235);
-    if (strlen($message) > 235) {
-      $dao->description .= " (...)";
+
+    /*
+     * The description is a summary of the message.
+     * HTML tags are stripped from the message.
+     * The description is limited to 240 characters
+     * and has an ellipsis added if it is truncated.
+     */
+    $maxDescription = 240;
+    $ellipsis = " (...)";
+    $description = strip_tags($message);
+    if (strlen($description) > $maxDescription) {
+      $description = substr($description, 0, $maxDescription - strlen($ellipsis)) . $ellipsis;
     }
+    $dao->description = $description;
+
     if ($this->currentJob) {
       $dao->job_id = $this->currentJob->id;
       $dao->name = $this->currentJob->name;

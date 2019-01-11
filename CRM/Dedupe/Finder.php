@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -97,7 +97,7 @@ class CRM_Dedupe_Finder {
    *
    * check_permission is a boolean flag to indicate if permission should be considered.
    * default is to always check permissioning but public pages for example might not want
-   * permission to be checked for anonymous users. Refer CRM-6211. We might be beaking
+   * permission to be checked for anonymous users. Refer CRM-6211. We might be breaking
    * Multi-Site dedupe for public pages.
    *
    * @param array $params
@@ -125,6 +125,8 @@ class CRM_Dedupe_Finder {
     if (!$params) {
       return array();
     }
+    // This may no longer be required - see https://github.com/civicrm/civicrm-core/pull/13176
+    $params = array_filter($params);
 
     $foundByID = FALSE;
     if ($ruleGroupID) {
@@ -170,7 +172,7 @@ class CRM_Dedupe_Finder {
    * @param int $rgid
    *   Rule group id.
    * @param int $gid
-   *   Contact group id (currently, works only with non-smart groups).
+   *   Contact group id.
    *
    * @param int $searchLimit
    *  Limit for the number of contacts to be used for comparison.

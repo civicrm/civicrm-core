@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,36 +28,17 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
- * $Id: Display.php 36505 2011-10-03 14:19:56Z lobo $
- *
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
- * This class generates form components for the display preferences
- *
+ * This class displays campaign preferences.
  */
 class CRM_Admin_Form_Preferences_Campaign extends CRM_Admin_Form_Preferences {
-  public function preProcess() {
-    CRM_Utils_System::setTitle(ts('CiviCampaign Component Settings'));
-    $this->_varNames = array(
-      CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME => array(
-        'tag_unconfirmed' => array(
-          'html_type' => 'text',
-          'title' => ts('Tag for Unconfirmed Petition Signers'),
-          'weight' => 1,
-          'description' => ts('If set, new contacts that are created when signing a petition are assigned a tag of this name.'),
-        ),
-        'petition_contacts' => array(
-          'html_type' => 'text',
-          'title' => ts('Petition Signers Group'),
-          'weight' => 2,
-          'description' => ts('All contacts that have signed a CiviCampaign petition will be added to this group. The group will be created if it does not exist (it is required for email verification).'),
-        ),
-      ),
-    );
 
-    parent::preProcess();
-  }
+  protected $_settings = [
+    'tag_unconfirmed' => CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME,
+    'petition_contacts' => CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME,
+  ];
 
 }

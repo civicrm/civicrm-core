@@ -7,5 +7,8 @@ return array(
   'ext' => 'civicrm',
   'js' => array('ang/crmUi.js'),
   'partials' => array('ang/crmUi'),
-  'requires' => array('crmResource'),
+  'requires' => array(
+    'crmResource',
+    'ui.utils',
+  ),
 );

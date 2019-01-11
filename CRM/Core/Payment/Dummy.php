@@ -198,4 +198,14 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     return array('amount', 'next_sched_contribution_date');
   }
 
+  /**
+   * @param string $message
+   * @param array $params
+   *
+   * @return bool|object
+   */
+  public function cancelSubscription(&$message = '', $params = array()) {
+    return TRUE;
+  }
+
 }

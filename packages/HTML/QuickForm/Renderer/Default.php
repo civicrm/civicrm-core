@@ -17,7 +17,7 @@
  * @author      Alexey Borzov <avb@php.net>
  * @author      Adam Daniel <adaniel1@eesus.jnj.com>
  * @author      Bertrand Mansion <bmansion@mamasam.com>
- * @copyright   2001-2009 The PHP Group
+ * @copyright   2001-2011 The PHP Group
  * @license     http://www.php.net/license/3_01.txt PHP License 3.01
  * @version     CVS: $Id$
  * @link        http://pear.php.net/package/HTML_QuickForm
@@ -36,7 +36,7 @@ require_once 'HTML/QuickForm/Renderer.php';
  * @author      Alexey Borzov <avb@php.net>
  * @author      Adam Daniel <adaniel1@eesus.jnj.com>
  * @author      Bertrand Mansion <bmansion@mamasam.com>
- * @version     Release: 3.2.11
+ * @version     Release: 3.2.16
  * @since       3.0
  */
 class HTML_QuickForm_Renderer_Default extends HTML_QuickForm_Renderer

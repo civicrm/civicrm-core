@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -212,18 +212,13 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-
     $defaults = array();
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       if (!empty($this->_values)) {
         $defaults['relationship_type_id'] = $this->_rtypeId;
-        if (!empty($this->_values['start_date'])) {
-          list($defaults['start_date']) = CRM_Utils_Date::setDateDefaults($this->_values['start_date']);
-        }
-        if (!empty($this->_values['end_date'])) {
-          list($defaults['end_date']) = CRM_Utils_Date::setDateDefaults($this->_values['end_date']);
-        }
+        $defaults['start_date'] = CRM_Utils_Array::value('start_date', $this->_values);
+        $defaults['end_date'] = CRM_Utils_Array::value('end_date', $this->_values);
         $defaults['description'] = CRM_Utils_Array::value('description', $this->_values);
         $defaults['is_active'] = CRM_Utils_Array::value('is_active', $this->_values);
 
@@ -271,7 +266,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * Add the rules for form.
    */
   public function addRules() {
-
     if (!($this->_action & CRM_Core_Action::DELETE)) {
       $this->addFormRule(array('CRM_Contact_Form_Relationship', 'dateRule'));
     }
@@ -335,8 +329,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     $this->add('advcheckbox', 'is_current_employer', $this->_contactType == 'Organization' ? ts('Current Employee') : ts('Current Employer'));
 
-    $this->addField('start_date', array('label' => ts('Start Date'), 'formatType' => 'searchDate'));
-    $this->addField('end_date', array('label' => ts('End Date'), 'formatType' => 'searchDate'));
+    $this->addField('start_date', array('label' => ts('Start Date')), FALSE, FALSE);
+    $this->addField('end_date', array('label' => ts('End Date')), FALSE, FALSE);
 
     $this->addField('is_active', array('label' => ts('Enabled?'), 'type' => 'advcheckbox'));
 
@@ -373,9 +367,11 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
   /**
    * This function is called when the form is submitted and also from unit test.
+   *
    * @param array $params
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public function submit($params) {
     switch ($this->getAction()) {
@@ -425,7 +421,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         '#tab_contribute' => CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId),
       ),
     );
-
   }
 
   /**
@@ -442,9 +437,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     // check start and end date
     if (!empty($params['start_date']) && !empty($params['end_date'])) {
-      $start_date = CRM_Utils_Date::format(CRM_Utils_Array::value('start_date', $params));
-      $end_date = CRM_Utils_Date::format(CRM_Utils_Array::value('end_date', $params));
-      if ($start_date && $end_date && (int ) $end_date < (int ) $start_date) {
+      if ($params['end_date'] < $params['start_date']) {
         $errors['end_date'] = ts('The relationship end date cannot be prior to the start date.');
       }
     }
@@ -494,6 +487,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
   /**
    * @param $relationshipList
+   *
    * @return array
    */
   public static function getRelationshipTypeMetadata($relationshipList) {
@@ -539,11 +533,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @param array $params
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   private function updateAction($params) {
-    $params = $this->preparePostProcessParameters($params);
-    $params = $params[0];
-
+    list($params, $_) = $this->preparePostProcessParameters($params);
     try {
       civicrm_api3('relationship', 'create', $params);
     }
@@ -561,6 +554,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @param array $params
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   private function createAction($params) {
     list($params, $primaryContactLetter) = $this->preparePostProcessParameters($params);
@@ -595,12 +589,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     else {
       $params['id'] = $this->_relationshipId;
       $params['contact_id_' . $b] = $params['related_contact_id'];
-
-      foreach (array('start_date', 'end_date') as $dateParam) {
-        if (!empty($params[$dateParam])) {
-          $params[$dateParam] = CRM_Utils_Date::processDate($params[$dateParam]);
-        }
-      }
     }
 
     // If this is a b_a relationship these form elements are flipped
@@ -615,6 +603,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    *
    * @param array $relationshipIds
    * @param string $note
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   private function saveRelationshipNotes($relationshipIds, $note) {
     foreach ($relationshipIds as $id) {

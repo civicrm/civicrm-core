@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,18 +31,8 @@
     <div class="contact-summary-contribute-tab view-content">
 
       <div id="secondaryTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
-        {* Tab management *}
-        <script type="text/javascript">
-          var selectedTab  = 'contributions';
+        {include file="CRM/common/TabSelected.tpl" defaultTab="contributions" tabContainer="#secondaryTabContainer"}
 
-          {literal}
-          CRM.$(function($) {
-            var tabIndex = $('#tab_' + selectedTab).prevAll().length;
-            $("#secondaryTabContainer").tabs({active: tabIndex});
-            $(".crm-tab-button").addClass("ui-corner-bottom");
-          });
-          {/literal}
-        </script>
         <ul class="ui-tabs-nav ui-corner-all ui-helper-reset ui-helper-clearfix ui-widget-header">
           <li id="tab_contributions" class="crm-tab-button ui-corner-all ui-tabs-tab ui-corner-top ui-state-default ui-tab ui-tabs-active ui-state-active">
             <a href="#contributions-subtab" title="{ts}Contributions{/ts}">

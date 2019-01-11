@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -42,16 +42,17 @@ return array(
     'group' => 'member',
     'name' => 'default_renewal_contribution_page',
     'type' => 'Integer',
-    'html_type' => 'Select',
+    'html_type' => 'select',
     'default' => NULL,
     'pseudoconstant' => array(
-      'name' => 'contributionPage',
+      // @todo - handle table style pseudoconstants for settings & avoid deprecated function.
+      'callback' => 'CRM_Contribute_PseudoConstant::contributionPage',
     ),
     'add' => '4.1',
     'title' => 'Default online membership renewal page',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'If you select a default online contribution page for self-service membership renewals, a "renew" link pointing to that page will be displayed on the Contact Dashboard for memberships which were entered offline. You will need to ensure that the membership block for the selected online contribution page includes any currently available memberships.',
+    'description' => ts('If you select a default online contribution page for self-service membership renewals, a "renew" link pointing to that page will be displayed on the Contact Dashboard for memberships which were entered offline. You will need to ensure that the membership block for the selected online contribution page includes any currently available memberships.'),
     'help_text' => NULL,
   ),
 );

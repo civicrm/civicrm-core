@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,20 +28,18 @@
   {ts}Filter Contacts{/ts}
 </div>
 <div class="crm-accordion-body">
-  <form method="get">
-    <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
-      <tr>
-        <td class="crm-contact-form-block-contact1">
-          <label for="search-contact1">{ts}Contact Name{/ts}</label><br />
-          <input type="text" size="50" placeholder="Search Contacts" value="{$searchcontact1}" id="search-contact1" search-column="0" />
-        </td>
-        <td class="crm-contact-form-block-search">
-          <label>&nbsp;</label><br />
-          <button type="submit" class="button crm-button filtercontacts"><span><i class="crm-i fa-search"></i> Find Contacts</span></button>
-        </td>
-      </tr>
-    </table>
-  </form>
+  <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
+    <tr>
+      <td class="crm-contact-form-block-contact1">
+        <label for="contact1">{ts}Contact 1{/ts}</label><br />
+        <input class="crm-form-text" type="text" placeholder="Search Contact1" search-column="0" />
+      </td>
+      <td class="crm-contact-form-block-contact2">
+        <label for="contact2">{ts}Contact 2{/ts}</label><br />
+        <input class="crm-form-text" type="text" placeholder="Search Contact2" search-column="1" />
+      </td>
+    </tr>
+  </table>
 </div>
 
 

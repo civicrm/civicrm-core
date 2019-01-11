@@ -156,7 +156,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     }
     if (!empty($html)) {
       // ie. we have only sent emails - lets no show a white screen
-      CRM_Utils_System::civiExit(1);
+      CRM_Utils_System::civiExit();
     }
   }
 

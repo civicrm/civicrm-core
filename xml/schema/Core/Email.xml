@@ -109,14 +109,18 @@
   </index>
   <field>
     <name>on_hold</name>
+    <title>On Hold</title>
     <export>true</export>
-    <type>boolean</type>
+    <type>int unsigned</type>
     <default>0</default>
     <required>true</required>
-    <comment>Is this address on bounce hold?</comment>
+    <comment>Implicit FK to civicrm_option_value where option_group = email_on_hold.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_PseudoConstant::emailOnHoldOptions</callback>
+    </pseudoconstant>
     <add>1.1</add>
     <html>
-      <type>CheckBox</type>
+      <type>Select</type>
     </html>
   </field>
   <field>

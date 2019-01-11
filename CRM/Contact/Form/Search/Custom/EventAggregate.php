@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -43,7 +43,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
    * @param array $formValues
    */
   public function __construct(&$formValues) {
-    $this->_formValues = $formValues;
+    $this->_formValues = self::formatSavedSearchFields($formValues);
     $this->_permissionedComponent = array('CiviContribute', 'CiviEvent');
 
     /**
@@ -85,8 +85,8 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
     $events = CRM_Event_BAO_Event::getEvents(1);
     $form->add('select', 'event_id', ts('Event Name'), array('' => ts('- select -')) + $events);
 
-    $form->addDate('start_date', ts('Payments Date From'), FALSE, array('formatType' => 'custom'));
-    $form->addDate('end_date', ts('...through'), FALSE, array('formatType' => 'custom'));
+    $form->add('datepicker', 'start_date', ts('Payments Date From'), [], FALSE, ['time' => FALSE]);
+    $form->add('datepicker', 'end_date', ts('...through'), [], FALSE, ['time' => FALSE]);
 
     /**
      * If you are using the sample template, this array tells the template fields to render
@@ -237,14 +237,13 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
       $clauses[] = "civicrm_contribution.payment_instrument_id <> 0";
     }
 
-    $startDate = CRM_Utils_Date::processDate($this->_formValues['start_date']);
-    if ($startDate) {
-      $clauses[] = "civicrm_contribution.receive_date >= $startDate";
+    // As we only allow date to be submitted we need to set default times so midnight for start time and just before midnight for end time.
+    if ($this->_formValues['start_date']) {
+      $clauses[] = "civicrm_contribution.receive_date >= '{$this->_formValues['start_date']} 00:00:00'";
     }
 
-    $endDate = CRM_Utils_Date::processDate($this->_formValues['end_date']);
-    if ($endDate) {
-      $clauses[] = "civicrm_contribution.receive_date <= {$endDate}235959";
+    if ($this->_formValues['end_date']) {
+      $clauses[] = "civicrm_contribution.receive_date <= '{$this->_formValues['end_date']} 23:59:59'";
     }
 
     if (!empty($this->_formValues['event_id'])) {
@@ -372,6 +371,30 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
    */
   public function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+  /**
+   * Format saved search fields for this custom group.
+   *
+   * Note this is a function to facilitate the transition to jcalendar for
+   * saved search groups. In time it can be stripped out again.
+   *
+   * @param array $formValues
+   *
+   * @return array
+   */
+  public static function formatSavedSearchFields($formValues) {
+    $dateFields = array(
+      'start_date',
+      'end_date',
+    );
+    foreach ($formValues as $element => $value) {
+      if (in_array($element, $dateFields) && !empty($value)) {
+        $formValues[$element] = date('Y-m-d', strtotime($value));
+      }
+    }
+
+    return $formValues;
   }
 
 }

@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -80,7 +80,7 @@
 
         {elseif call_user_func(array('CRM_Core_Permission','check'), 'delete contacts')}
           <li class="crm-delete-action crm-contact-delete">
-            {crmButton p='civicrm/contact/view/delete' q="&reset=1&delete=1&cid=$contactId" class="delete" icon="trash"}
+            {crmButton p='civicrm/contact/view/delete' q="reset=1&delete=1&cid=$contactId" class="delete" icon="trash"}
               {ts}Delete Contact{/ts}
             {/crmButton}
           </li>
@@ -126,7 +126,8 @@
         {foreach from=$allTabs key=tabName item=tabValue}
           <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all crm-count-{$tabValue.count}{if isset($tabValue.class)} {$tabValue.class}{/if}">
             <a href="{$tabValue.url}" title="{$tabValue.title|escape}">
-              {$tabValue.title}
+              <i class="{if $tabValue.icon}{$tabValue.icon}{else}crm-i fa-puzzle-piece{/if}"></i>
+              <span>{$tabValue.title}</span>
               {if empty($tabValue.hideCount)}<em>{$tabValue.count}</em>{/if}
             </a>
           </li>

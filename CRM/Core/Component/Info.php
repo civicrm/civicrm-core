@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * for a component to introduce itself to the system.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -197,6 +197,15 @@ abstract class CRM_Core_Component_Info {
    *                    null if no element offered
    */
   abstract public function registerTab();
+
+  /**
+   * Get icon font class representing this component.
+   *
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-puzzle-piece';
+  }
 
   /**
    * Provides information about advanced search pane

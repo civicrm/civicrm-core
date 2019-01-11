@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
 
@@ -348,7 +348,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
    * buildNavigationTree retreives items in order. We call this function to
    * ensure that any items added by the hook are also in the correct order.
    */
-  private static function orderByWeight(&$navigations) {
+  public static function orderByWeight(&$navigations) {
     // sort each item in navigations by weight
     usort($navigations, function($a, $b) {
 
@@ -463,7 +463,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
   }
 
   /**
-   * Get Menu name.
+   * Check permissions and format menu item as html.
    *
    * @param $value
    * @param array $skipMenuItems
@@ -477,87 +477,20 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
 
     $name = $i18n->crm_translate($value['attributes']['label'], array('context' => 'menu'));
     $url = CRM_Utils_Array::value('url', $value['attributes']);
-    $permission = CRM_Utils_Array::value('permission', $value['attributes']);
-    $operator = CRM_Utils_Array::value('operator', $value['attributes']);
     $parentID = CRM_Utils_Array::value('parentID', $value['attributes']);
     $navID = CRM_Utils_Array::value('navID', $value['attributes']);
     $active = CRM_Utils_Array::value('active', $value['attributes']);
     $target = CRM_Utils_Array::value('target', $value['attributes']);
 
-    if (in_array($parentID, $skipMenuItems) || !$active) {
+    if (in_array($parentID, $skipMenuItems) || !$active || !self::checkPermission($value['attributes'])) {
       $skipMenuItems[] = $navID;
       return FALSE;
     }
 
-    $config = CRM_Core_Config::singleton();
-
     $makeLink = FALSE;
     if (!empty($url)) {
-      // Skip processing fully-formed urls
-      if (substr($url, 0, 4) !== 'http' && $url[0] !== '/' && $url[0] !== '#') {
-        //CRM-7656 --make sure to separate out url path from url params,
-        //as we'r going to validate url path across cross-site scripting.
-        $parsedUrl = parse_url($url);
-        if (empty($parsedUrl['query'])) {
-          $parsedUrl['query'] = NULL;
-        }
-        if (empty($parsedUrl['fragment'])) {
-          $parsedUrl['fragment'] = NULL;
-        }
-        $url = CRM_Utils_System::url($parsedUrl['path'], $parsedUrl['query'], FALSE, $parsedUrl['fragment'], TRUE);
-      }
-      elseif (strpos($url, '&amp;') === FALSE) {
-        $url = htmlspecialchars($url);
-      }
+      $url = self::makeFullyFormedUrl($url);
       $makeLink = TRUE;
-    }
-
-    static $allComponents;
-    if (!$allComponents) {
-      $allComponents = CRM_Core_Component::getNames();
-    }
-
-    if (isset($permission) && $permission) {
-      $permissions = explode(',', $permission);
-
-      $hasPermission = FALSE;
-      foreach ($permissions as $key) {
-        $key = trim($key);
-        $showItem = TRUE;
-
-        //get the component name from permission.
-        $componentName = CRM_Core_Permission::getComponentName($key);
-
-        if ($componentName) {
-          if (!in_array($componentName, $config->enableComponents) ||
-            !CRM_Core_Permission::check($key)
-          ) {
-            $showItem = FALSE;
-            if ($operator == 'AND') {
-              $skipMenuItems[] = $navID;
-              return $showItem;
-            }
-          }
-          else {
-            $hasPermission = TRUE;
-          }
-        }
-        elseif (!CRM_Core_Permission::check($key)) {
-          $showItem = FALSE;
-          if ($operator == 'AND') {
-            $skipMenuItems[] = $navID;
-            return $showItem;
-          }
-        }
-        else {
-          $hasPermission = TRUE;
-        }
-      }
-
-      if (!$showItem && !$hasPermission) {
-        $skipMenuItems[] = $navID;
-        return FALSE;
-      }
     }
 
     if (!empty($value['attributes']['icon'])) {
@@ -579,17 +512,61 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
   }
 
   /**
-   * Create navigation for CiviCRM Admin Menu.
+   * Check if a menu item should be visible based on permissions and component.
    *
-   * @param int $contactID
-   *   Contact id.
+   * @param $item
+   * @return bool
+   */
+  public static function checkPermission($item) {
+    if (!empty($item['permission'])) {
+      $permissions = explode(',', $item['permission']);
+      $operator = CRM_Utils_Array::value('operator', $item);
+      $hasPermission = FALSE;
+      foreach ($permissions as $key) {
+        $key = trim($key);
+        $showItem = TRUE;
+
+        //get the component name from permission.
+        $componentName = CRM_Core_Permission::getComponentName($key);
+
+        if ($componentName) {
+          if (!in_array($componentName, CRM_Core_Config::singleton()->enableComponents) ||
+            !CRM_Core_Permission::check($key)
+          ) {
+            $showItem = FALSE;
+            if ($operator == 'AND') {
+              return FALSE;
+            }
+          }
+          else {
+            $hasPermission = TRUE;
+          }
+        }
+        elseif (!CRM_Core_Permission::check($key)) {
+          $showItem = FALSE;
+          if ($operator == 'AND') {
+            return FALSE;
+          }
+        }
+        else {
+          $hasPermission = TRUE;
+        }
+      }
+
+      if (empty($showItem) && !$hasPermission) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * Create navigation for CiviCRM Admin Menu.
    *
    * @return string
    *   returns navigation html
    */
-  public static function createNavigation($contactID) {
-    $config = CRM_Core_Config::singleton();
-
+  public static function createNavigation() {
     $navigation = self::buildNavigation();
 
     if ($navigation) {
@@ -603,8 +580,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       $homeIcon = '<span class="crm-logo-sm" ></span>';
       self::retrieve($homeParams, $homeNav);
       if ($homeNav) {
-        list($path, $q) = explode('?', $homeNav['url']);
-        $homeURL = CRM_Utils_System::url($path, $q);
+        $homeURL = self::makeFullyFormedUrl($homeNav['url']);
         $homeLabel = $homeNav['label'];
         // CRM-6804 (we need to special-case this as we don’t ts()-tag variables)
         if ($homeLabel == 'Home') {
@@ -628,6 +604,44 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       // <li> tag doesn't need to be closed
     }
     return $prepandString . $navigation;
+  }
+
+  /**
+   * Turns relative URLs (like civicrm/foo/bar) into fully-formed
+   * ones (i.e. example.com/wp-admin?q=civicrm/dashboard).
+   *
+   * If the URL is already fully-formed, nothing will be done.
+   *
+   * @param string $url
+   *
+   * @return string
+   */
+  public static function makeFullyFormedUrl($url) {
+    if (self::isNotFullyFormedUrl($url)) {
+      //CRM-7656 --make sure to separate out url path from url params,
+      //as we'r going to validate url path across cross-site scripting.
+      $path = parse_url($url, PHP_URL_PATH);
+      $q = parse_url($url, PHP_URL_QUERY);
+      $fragment = parse_url($url, PHP_URL_FRAGMENT);
+      return CRM_Utils_System::url($path, $q, FALSE, $fragment);
+    }
+
+    if (strpos($url, '&amp;') === FALSE) {
+      return htmlspecialchars($url);
+    }
+
+    return $url;
+  }
+
+  /**
+   * Checks if the given URL is not fully-formed
+   *
+   * @param string $url
+   *
+   * @return bool
+   */
+  private static function isNotFullyFormedUrl($url) {
+    return substr($url, 0, 4) !== 'http' && $url[0] !== '/' && $url[0] !== '#';
   }
 
   /**

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -42,6 +42,20 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
    * @var int
    */
   public $_id;
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'PledgePayment';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
 
   /**
    * Set variables up before form is built.
@@ -66,7 +80,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
     if ($this->_id) {
       $params['id'] = $this->_id;
       CRM_Pledge_BAO_PledgePayment::retrieve($params, $defaults);
-      list($defaults['scheduled_date']) = CRM_Utils_Date::setDateDefaults($defaults['scheduled_date']);
       if (isset($defaults['contribution_id'])) {
         $this->assign('pledgePayment', TRUE);
       }
@@ -82,7 +95,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     // add various dates
-    $this->addDate('scheduled_date', ts('Scheduled Date'), TRUE);
+    $this->addField('scheduled_date', [], TRUE, FALSE);
 
     $this->addMoney('scheduled_amount',
       ts('Scheduled Amount'), TRUE,
@@ -122,29 +135,24 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
    * Process the form submission.
    */
   public function postProcess() {
-    // get the submitted form values.
     $formValues = $this->controller->exportValues($this->_name);
-    $params = array();
-    $formValues['scheduled_date'] = CRM_Utils_Date::processDate($formValues['scheduled_date']);
-    $params['scheduled_date'] = CRM_Utils_Date::format($formValues['scheduled_date']);
-    $params['currency'] = CRM_Utils_Array::value('currency', $formValues);
-    $now = date('Ymd');
+    $params = [
+      'id' => $this->_id,
+      'scheduled_date' => $formValues['scheduled_date'],
+      'currency' => $formValues['currency'],
+    ];
 
-    if (CRM_Utils_Date::overdue(CRM_Utils_Date::customFormat($params['scheduled_date'], '%Y%m%d'), $now)) {
+    if (CRM_Utils_Date::overdue($params['scheduled_date'])) {
       $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Overdue');
     }
     else {
       $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Pending');
     }
 
-    $params['id'] = $this->_id;
     $pledgeId = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment', $params['id'], 'pledge_id');
 
     CRM_Pledge_BAO_PledgePayment::add($params);
-    $adjustTotalAmount = FALSE;
-    if (CRM_Utils_Array::value('option_type', $formValues) == 2) {
-      $adjustTotalAmount = TRUE;
-    }
+    $adjustTotalAmount = (CRM_Utils_Array::value('option_type', $formValues) == 2);
 
     $pledgeScheduledAmount = CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment',
       $params['id'],

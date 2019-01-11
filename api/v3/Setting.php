@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -161,8 +161,12 @@ function civicrm_api3_setting_getoptions($params) {
     return civicrm_api3_create_success($values, $params, 'Setting', 'getoptions');
   }
   elseif (!empty($pseudoconstant['optionGroupName'])) {
+    $keyColumn = 'value';
+    if (!empty($pseudoconstant['keyColumn'])) {
+      $keyColumn = $pseudoconstant['keyColumn'];
+    }
     return civicrm_api3_create_success(
-      CRM_Core_OptionGroup::values($pseudoconstant['optionGroupName'], FALSE, FALSE, TRUE),
+      CRM_Core_OptionGroup::values($pseudoconstant['optionGroupName'], FALSE, FALSE, TRUE, NULL, 'label', TRUE, FALSE, $keyColumn),
       $params, 'Setting', 'getoptions'
     );
   }

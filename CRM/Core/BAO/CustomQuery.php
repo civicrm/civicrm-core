@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_BAO_CustomQuery {
   const PREFIX = 'custom_value_';
@@ -295,8 +295,6 @@ SELECT f.id, f.label, f.data_type,
         continue;
       }
 
-      $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-
       foreach ($values as $tuple) {
         list($name, $op, $value, $grouping, $wildcard) = $tuple;
 
@@ -335,7 +333,7 @@ SELECT f.id, f.label, f.data_type,
               // fix $value here to escape sql injection attacks
               if (!is_array($value)) {
                 if ($field['data_type'] == 'String') {
-                  $value = CRM_Utils_Type::escape($strtolower($value), 'String');
+                  $value = CRM_Utils_Type::escape($value, 'String');
                 }
                 elseif ($value) {
                   $value = CRM_Utils_Type::escape($value, 'Integer');
@@ -420,10 +418,16 @@ SELECT f.id, f.label, f.data_type,
             $value = CRM_Utils_Array::value($op, (array) $value, $value);
             if (is_array($value)) {
               foreach ($value as $key => $val) {
-                $value[$key] = CRM_Utils_Rule::cleanMoney($value[$key]);
+                // @todo - this clean money should be in the form layer - it's highly likely to be doing more harm than good here
+                // Note the only place I can find that this code is reached by is searching a custom money field in advanced search.
+                // with euro style comma separators this doesn't work - with or without this cleanMoney.
+                // So this should be removed but is not increasing the brokeness IMHO
+                $value[$op][$key] = CRM_Utils_Rule::cleanMoney($value[$key]);
               }
             }
             else {
+              // @todo - this clean money should be in the form layer - it's highly likely to be doing more harm than good here
+              // comments per above apply. cleanMoney
               $value = CRM_Utils_Rule::cleanMoney($value);
             }
 

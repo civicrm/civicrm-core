@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -42,8 +42,11 @@ class CRM_Event_Form_ManageEvent_TabHeader {
    * @param CRM_Event_Form_ManageEvent $form
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public static function build(&$form) {
+    $form->assign('selectedChild', CRM_Utils_Request::retrieve('selectedChild', 'Alphanumeric', $form));
+
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
       $tabs = self::process($form);
@@ -165,7 +168,7 @@ WHERE      e.id = %1
     switch ($className) {
       case 'Event':
         $attributes = $form->getVar('_attributes');
-        $class = strtolower(basename(CRM_Utils_Array::value('action', $attributes)));
+        $class = CRM_Utils_Request::retrieveComponent($attributes);
         break;
 
       case 'EventInfo':
@@ -235,7 +238,7 @@ WHERE      e.id = %1
 
     if (is_array($tabs)) {
       foreach ($tabs as $subPage => $pageVal) {
-        if ($pageVal['current'] === TRUE) {
+        if (CRM_Utils_Array::value('current', $pageVal) === TRUE) {
           $current = $subPage;
           break;
         }

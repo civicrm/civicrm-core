@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -135,13 +135,13 @@
     </div>
     {/if}
 
-    {if $onbehalfProfile|@count}
+    {if $onbehalfProfile && $onbehalfProfile|@count}
       <div class="crm-group onBehalf_display-group label-left crm-profile-view">
          {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
       </div>
     {/if}
 
-    {if $honoreeProfileFields|@count}
+    {if $honoreeProfileFields && $honoreeProfileFields|@count}
         <div class="crm-group honor_block-group">
             <div class="header-dark">
                 {$soft_credit_type}
@@ -247,8 +247,8 @@
                 {/if}
             {else}
                 <div class="crm-section no-label credit_card_details-section">
-                  <div class="content">{$credit_card_type}</div>
-                  <div class="content">{$credit_card_number}</div>
+                  <div class="content">{$credit_card_type|escape}</div>
+                  <div class="content">{$credit_card_number|escape}</div>
                   <div class="content">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
                   <div class="clear"></div>
                 </div>

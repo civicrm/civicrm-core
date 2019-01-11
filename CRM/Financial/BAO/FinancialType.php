@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
 
@@ -455,9 +455,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   public static function isACLFinancialTypeStatus() {
     if (!isset(\Civi::$statics[__CLASS__]['is_acl_enabled'])) {
       \Civi::$statics[__CLASS__]['is_acl_enabled'] = FALSE;
-      $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
-      if (CRM_Utils_Array::value('acl_financial_type', $contributeSettings)) {
-        \Civi::$statics[__CLASS__]['is_acl_enabled'] = TRUE;
+      $realSetting = \Civi::$statics[__CLASS__]['is_acl_enabled'] = Civi::settings()->get('acl_financial_type');
+      if (!$realSetting) {
+        $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
+        if (CRM_Utils_Array::value('acl_financial_type', $contributeSettings)) {
+          \Civi::$statics[__CLASS__]['is_acl_enabled'] = TRUE;
+        }
       }
     }
     return \Civi::$statics[__CLASS__]['is_acl_enabled'];

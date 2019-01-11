@@ -8,7 +8,7 @@ CRM.$(function($) {
 
    $('#toolbar-bar').hide();
 
-   $('.crm-hidemenu').click(function(e) {
+   $('body').on('click', '.crm-hidemenu', function() {
      $('#toolbar-bar').slideDown();
    });
    $('#crm-notification-container').on('click', '#crm-restore-menu', function() {

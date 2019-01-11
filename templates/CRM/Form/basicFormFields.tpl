@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,4 +23,13 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{include file="CRM/Form/basicForm.tpl"}
+{* @todo with a small amount of tinkering most of this can be replaced by re-using the foreach loop in CRM_Core_EntityForm.tpl *}
+<table class="form-layout">
+
+  {foreach from=$fields item=fieldSpec}
+    {assign var=fieldName value=$fieldSpec.name}
+    <tr class="crm-{$entityInClassFormat}-form-block-{$fieldName}">
+      {include file="CRM/Core/Form/Field.tpl"}
+    </tr>
+  {/foreach}
+</table>

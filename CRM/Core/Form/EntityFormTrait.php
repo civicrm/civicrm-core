@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,14 +28,22 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 trait CRM_Core_Form_EntityFormTrait {
+
+  /**
+   * The entity subtype ID (eg. for Relationship / Activity)
+   *
+   * @var int
+   */
+  protected $_entitySubTypeId;
+
   /**
    * Get entity fields for the entity to be added to the form.
    *
-   * @var array
+   * @return array
    */
   public function getEntityFields() {
     return $this->entityFields;
@@ -51,7 +59,7 @@ trait CRM_Core_Form_EntityFormTrait {
   /**
    * Get entity fields for the entity to be added to the form.
    *
-   * @var array
+   * @return string
    */
   public function getDeleteMessage() {
     return $this->deleteMessage;
@@ -65,6 +73,21 @@ trait CRM_Core_Form_EntityFormTrait {
   public function getEntityId() {
     return $this->_id;
   }
+
+  /**
+   * Get the entity subtype ID being edited
+   *
+   * @param $subTypeId
+   *
+   * @return int|null
+   */
+  public function getEntitySubTypeId($subTypeId) {
+    if ($subTypeId) {
+      return $subTypeId;
+    }
+    return $this->_entitySubTypeId;
+  }
+
   /**
    * If the custom data is in the submitted data (eg. added via ajax loaded form) add to form.
    */
@@ -145,7 +168,7 @@ trait CRM_Core_Form_EntityFormTrait {
     }
     foreach ($this->entityFields as $fieldSpec) {
       $value = CRM_Utils_Request::retrieveValue($fieldSpec['name'], $this->getValidationTypeForField($fieldSpec['name']));
-      if ($value !== FALSE) {
+      if ($value !== FALSE && $value !== NULL) {
         $defaults[$fieldSpec['name']] = $value;
       }
     }
@@ -219,6 +242,24 @@ trait CRM_Core_Form_EntityFormTrait {
    */
   protected function isDeleteContext() {
     return ($this->_action & CRM_Core_Action::DELETE);
+  }
+
+  protected function setEntityFieldsMetadata() {
+    foreach ($this->entityFields as $field => &$props) {
+      if (!empty($props['not-auto-addable'])) {
+        // We can't load this field using metadata
+        continue;
+      }
+      // Resolve action.
+      if (empty($props['action'])) {
+        $props['action'] = $this->getApiAction();
+      }
+      $fieldSpec = civicrm_api3($this->getDefaultEntity(), 'getfield', $props);
+      $fieldSpec = $fieldSpec['values'];
+      if (!isset($props['description']) && isset($fieldSpec['description'])) {
+        $props['description'] = $fieldSpec['description'];
+      }
+    }
   }
 
 }

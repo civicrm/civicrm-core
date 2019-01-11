@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -87,6 +87,9 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    * Build the form object.
    */
   public function preProcess() {
+    if (empty($this->_action)) {
+      $this->_action = CRM_Core_Action::ADD;
+    }
 
     $this->_caseId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 

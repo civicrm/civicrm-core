@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -78,7 +78,7 @@ class CRM_Case_Task extends CRM_Core_Task {
           'result' => FALSE,
         ),
         self::PDF_LETTER => array(
-          'title' => ts('Print/merge Document'),
+          'title' => ts('Print/merge document'),
           'class' => 'CRM_Case_Form_Task_PDF',
           'result' => FALSE,
         ),

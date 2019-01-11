@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,10 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
-/*
+
+/**
  * Settings metadata file
  */
 
@@ -42,28 +41,28 @@ return array(
     'group' => 'campaign',
     'name' => 'tag_unconfirmed',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'default' => 'Unconfirmed',
     'add' => '4.1',
-    'title' => 'Tag for Unconfirmed Petition Signers',
+    'title' => ts('Tag for Unconfirmed Petition Signers'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
-    'help_text' => 'If set, new contacts that are created when signing a petition are assigned a tag of this name.',
+    'description' => ts('If set, new contacts that are created when signing a petition are assigned a tag of this name.'),
+    'help_text' => '',
   ),
   'petition_contacts' => array(
     'group_name' => 'Campaign Preferences',
     'group' => 'campaign',
     'name' => 'petition_contacts',
     'type' => 'String',
-    'html_type' => 'Text',
+    'html_type' => 'text',
     'default' => 'Petition Contacts',
     'add' => '4.1',
-    'title' => 'Petition Signers Group',
+    'title' => ts('Petition Signers Group'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
-    'help_text' => 'If set, new contacts that are created when signing a petition are assigned a tag of this name.',
+    'description' => ts('All contacts that have signed a CiviCampaign petition will be added to this group. The group will be created if it does not exist (it is required for email verification).'),
+    'help_text' => '',
   ),
 
 );

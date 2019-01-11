@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -60,8 +60,7 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
   /**
    * Build the form object.
    *
-   *
-   * @return void
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     $this->add('text', 'title', ts('Event Name'),
@@ -72,10 +71,10 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
 
     $eventsByDates = array();
     $searchOption = array(ts('Show Current and Upcoming Events'), ts('Search All or by Date Range'));
-    $this->addRadio('eventsByDates', ts('Events by Dates'), $searchOption, array('onclick' => "return showHideByValue('eventsByDates','1','id_fromToDates','block','radio',true);"), "<br />");
+    $this->addRadio('eventsByDates', ts('Events by Dates'), $searchOption, array('onclick' => "return showHideByValue('eventsByDates','1','id_fromToDates','block','radio',true);"), '&nbsp;');
 
-    $this->addDate('start_date', ts('From'), FALSE, array('formatType' => 'searchDate'));
-    $this->addDate('end_date', ts('To'), FALSE, array('formatType' => 'searchDate'));
+    $this->add('datepicker', 'start_date', ts('From'), [], FALSE, ['time' => FALSE]);
+    $this->add('datepicker', 'end_date', ts('To'), [], FALSE, ['time' => FALSE]);
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($this);
 
@@ -98,9 +97,8 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
         if (isset($params[$field]) &&
           !CRM_Utils_System::isNull($params[$field])
         ) {
-          if (substr($field, -4) == 'date') {
-            $time = ($field == 'end_date') ? '235959' : NULL;
-            $parent->set($field, CRM_Utils_Date::processDate($params[$field], $time));
+          if ($field === 'end_date') {
+            $parent->set($field, $params[$field] . ' 23:59:59');
           }
           else {
             $parent->set($field, $params[$field]);

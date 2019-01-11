@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -428,7 +428,7 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
 
     $this->assign('membershipSummary', $membershipSummary);
     $this->assign('totalCount', $totalCount);
-    $this->assign('month', CRM_Utils_Date::customFormat($monthStartTs, '%B'));
+    $this->assign('month', CRM_Utils_Date::customFormatTs($monthStartTs, '%B'));
     $this->assign('year', date('Y', $monthStartTs));
     $this->assign('premonth', CRM_Utils_Date::customFormat($preMonth, '%B'));
     $this->assign('currentMonth', date('F'));

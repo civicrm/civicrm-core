@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -97,9 +97,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     $fieldNameTypes = [];
     foreach ($fields as $name => $field) {
       // Assign date type to respective field name, which will be later used to modify operator list
-      if ($type = CRM_Utils_Array::key(CRM_Utils_Array::value('type', $field), CRM_Utils_Type::getValidTypes())) {
-        $fieldNameTypes[$name] = $type;
-      }
+      $fieldNameTypes[$name] = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $field));
       // it's necessary to know which of the fields are searchable by label
       if (isset($field['searchByLabel']) && $field['searchByLabel']) {
         $searchByLabelFields[] = $name;
@@ -278,6 +276,12 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
             }
             elseif (trim($v[2])) {
               //else check value for rest of the Operators
+              if ($type == 'Date' || $type == 'Timestamp') {
+                $v[2] = CRM_Utils_Date::processDate($v[2]);
+                if ($type == 'Date') {
+                  $v[2] = substr($v[2], 0, 8);
+                }
+              }
               $error = CRM_Utils_Type::validate($v[2], $type, FALSE);
               if ($error != $v[2]) {
                 $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter a valid value.");

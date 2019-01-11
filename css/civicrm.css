@@ -19,6 +19,10 @@ div.crm-container fieldset label{
   float: none;
 }
 
+input.crm-form-radio + label, input.crm-form-checkbox + label{
+  margin-left: 7px;
+}
+
 .crm-container .crm-quickSearchField {
   font-weight: normal;
 }
@@ -2683,10 +2687,13 @@ div.crm-container form {
 /* Date plugin */
 .crm-container input.dateplugin,
 .crm-container input.crm-form-date {
-  background: white url(../i/cal.gif) no-repeat scroll right center;
-  padding-right: 16px;
-  /* so that text doesn't flow on top of icon */
   width: 9em;
+}
+
+.crm-container input.dateplugin::placeholder,
+.crm-container input.crm-form-date::placeholder {
+  font-family: "FontAwesome";
+  text-align: right;
 }
 
 .crm-container div.batch-update {
@@ -3591,6 +3598,7 @@ span.crm-status-icon {
 }
 .crm-container.crm-public .select2-container .select2-choice {
   padding: 5px 5px 5px 8px;
+  height: auto;
 }
 .crm-container.crm-public .select2-container-multi .select2-choices {
   padding: 4px;

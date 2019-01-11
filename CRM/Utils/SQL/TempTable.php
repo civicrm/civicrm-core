@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  *
  * Table naming rules:
  *   - MySQL imposes a 64 char limit.
@@ -233,6 +233,7 @@ class CRM_Utils_SQL_TempTable {
 
   /**
    * @param string|NULL $category
+   *
    * @return CRM_Utils_SQL_TempTable
    */
   public function setCategory($category) {
@@ -244,7 +245,12 @@ class CRM_Utils_SQL_TempTable {
   }
 
   /**
-   * @parma bool $value
+   * Set whether the table should be durable.
+   *
+   * Durable tables are not TEMPORARY in the mysql sense.
+   *
+   * @param bool $durable
+   *
    * @return CRM_Utils_SQL_TempTable
    */
   public function setDurable($durable = TRUE) {
@@ -253,7 +259,10 @@ class CRM_Utils_SQL_TempTable {
   }
 
   /**
+   * Setter for id
+   *
    * @param mixed $id
+   *
    * @return CRM_Utils_SQL_TempTable
    */
   public function setId($id) {
@@ -264,6 +273,15 @@ class CRM_Utils_SQL_TempTable {
     return $this;
   }
 
+  /**
+   * Set table collation to UTF8.
+   *
+   * This would make sense as a default but cautiousness during phasing in has made it opt-in.
+   *
+   * @param bool $value
+   *
+   * @return $this
+   */
   public function setUtf8($value = TRUE) {
     $this->utf8 = $value;
     return $this;
