@@ -654,7 +654,6 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->setupEditAllGroupsACL();
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
-    print_r($groups);
     $this->assertNotEmpty($groups, 'If Edit All Groups is granted, at least one group should be visible');
   }
 
