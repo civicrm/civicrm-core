@@ -154,20 +154,14 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
       $domainEmail = $domainValues['values'][0]['from_email'];
       $parsed->setHeader('Resent-From', $domainEmail);
       $parsed->setHeader('Resent-Date', date('r'));
+      // Rewrite any invalid Return-Path headers.
+      $parsed->setHeader('Return-Path', $fromEmail);
 
       // $h must be an array, so we can't use generateHeaders()'s result,
       // but we have to regenerate the headers because we changed To
       $parsed->generateHeaders();
       $h = $parsed->headers->getCaseSensitiveArray();
       $b = $parsed->generateBody();
-
-      // Rewrite any invalid Return-Path headers.
-      if (!empty($h['Return-Path'])) {
-        $h['Return-Path'] = $fromEmail;
-      }
-      if (!empty($h['Return-path'])) {
-        $h['Return-path'] = $fromEmail;
-      }
 
       // FIXME: ugly hack - find the first MIME boundary in
       // the body and make the boundary in the header match it
