@@ -1114,13 +1114,6 @@ class CRM_Utils_Date {
     switch ($unit) {
       case 'year':
         switch ($relativeTerm) {
-          case 'this':
-            $from['d'] = $from['M'] = 1;
-            $to['d'] = 31;
-            $to['M'] = 12;
-            $to['Y'] = $from['Y'] = $now['year'];
-            break;
-
           case 'previous':
             $from['M'] = $from['d'] = 1;
             $to['d'] = 31;
@@ -1227,15 +1220,29 @@ class CRM_Utils_Date {
             break;
 
           default:
-            if ($relativeTermPrefix === 'ending') {
-              $to['d'] = $now['mday'];
-              $to['M'] = $now['mon'];
-              $to['Y'] = $now['year'];
-              $to['H'] = 23;
-              $to['i'] = $to['s'] = 59;
-              $from = self::intervalAdd('year', -$relativeTermSuffix, $to);
-              $from = self::intervalAdd('second', 1, $from);
+            switch ($relativeTermPrefix) {
+
+              case 'ending':
+                $to['d'] = $now['mday'];
+                $to['M'] = $now['mon'];
+                $to['Y'] = $now['year'];
+                $to['H'] = 23;
+                $to['i'] = $to['s'] = 59;
+                $from = self::intervalAdd('year', -$relativeTermSuffix, $to);
+                $from = self::intervalAdd('second', 1, $from);
+                break;
+
+              case 'this':
+                $from['d'] = $from['M'] = 1;
+                $to['d'] = 31;
+                $to['M'] = 12;
+                $to['Y'] = $from['Y'] = $now['year'];
+                if (is_numeric($relativeTermSuffix)) {
+                  $from['Y'] -= ($relativeTermSuffix - 1);
+                }
+                break;
             }
+            break;
         }
         break;
 
@@ -1249,10 +1256,15 @@ class CRM_Utils_Date {
             $from['Y'] = $fYear;
             $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
             $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
-
             $to['d'] = $fiscalEnd['2'];
             $to['M'] = $fiscalEnd['1'];
             $to['Y'] = $fiscalEnd['0'];
+            $to['H'] = 23;
+            $to['i'] = $to['s'] = 59;
+            if (is_numeric($relativeTermSuffix)) {
+              $from = self::intervalAdd('year', (-$relativeTermSuffix), $to);
+              $from = self::intervalAdd('second', 1, $from);
+            }
             break;
 
           case 'previous':
@@ -1263,6 +1275,8 @@ class CRM_Utils_Date {
               $to['d'] = $fiscalEnd['2'];
               $to['M'] = $fiscalEnd['1'];
               $to['Y'] = $fiscalEnd['0'];
+              $to['H'] = 23;
+              $to['i'] = $to['s'] = 59;
             }
             else {
               $from['Y'] = $fYear - $relativeTermSuffix;
@@ -1271,6 +1285,8 @@ class CRM_Utils_Date {
               $to['d'] = $fiscalEnd['2'];
               $to['M'] = $fiscalEnd['1'];
               $to['Y'] = $fYear;
+              $to['H'] = 23;
+              $to['i'] = $to['s'] = 59;
             }
             break;
 
@@ -1856,17 +1872,8 @@ class CRM_Utils_Date {
         break;
     }
 
-    foreach ([
-      'from',
-      'to',
-    ] as $item) {
-      if (!empty($$item)) {
-        $dateRange[$item] = self::format($$item);
-      }
-      else {
-        $dateRange[$item] = NULL;
-      }
-    }
+    $dateRange['from'] = empty($from) ? NULL : self::format($from);
+    $dateRange['to'] = empty($to) ? NULL : self::format($to);
     return $dateRange;
   }
 
