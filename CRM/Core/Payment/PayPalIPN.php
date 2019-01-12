@@ -394,6 +394,8 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $paymentDate = $this->retrieve('payment_date', 'String', FALSE);
     if (!empty($paymentDate)) {
       $receiveDateTime = new DateTime($paymentDate);
+      $systemTimeZone = new DateTimeZone(date_default_timezone_get());
+      $receiveDateTime->setTimezone($systemTimeZone);
       $input['receive_date'] = $receiveDateTime->format('YmdHis');
     }
   }
