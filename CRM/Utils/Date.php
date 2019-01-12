@@ -1247,13 +1247,19 @@ class CRM_Utils_Date {
         $fYear = self::calculateFiscalYear($from['d'], $from['M']);
         switch ($relativeTermPrefix) {
           case 'this':
+            if (!is_numeric($relativeTermSuffix)) {
+              $relativeTermSuffix = 0;
+            };
             $from['Y'] = $fYear;
             $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
             $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
-
             $to['d'] = $fiscalEnd['2'];
             $to['M'] = $fiscalEnd['1'];
             $to['Y'] = $fiscalEnd['0'];
+            $to['H'] = 23;
+            $to['i'] = $to['s'] = 59;
+            $from = self::intervalAdd('year', (-1 -$relativeTermSuffix), $to);
+            $from = self::intervalAdd('second', 1, $from);
             break;
 
           case 'previous':
