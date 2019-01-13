@@ -16,6 +16,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $schema->disableLogging();
     $schema->dropAllLogTables();
     CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS civicrm_test_table");
+    CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS civicrm_test_column_info");
   }
 
   public function queryExamples() {
@@ -121,6 +122,47 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
         );
       }
     }
+  }
+
+  public function testColumnInfo() {
+    CRM_Core_DAO::executeQuery("CREATE TABLE `civicrm_test_column_info` (
+      test_id  int(10) unsigned NOT NULL AUTO_INCREMENT,
+      test_varchar varchar(42) NOT NULL,
+      test_integer int(8) NULL,
+      test_integer_default int(8) DEFAULT 42,
+      test_date date DEFAULT NULL,
+      PRIMARY KEY (`test_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+    $schema->updateLogTableSchema();
+    $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs']['civicrm_test_column_info'];
+
+    $this->assertEquals('test_id', $ci['test_id']['COLUMN_NAME']);
+    $this->assertEquals('int', $ci['test_id']['DATA_TYPE']);
+    $this->assertEquals('NO', $ci['test_id']['IS_NULLABLE']);
+    $this->assertEquals('auto_increment', $ci['test_id']['EXTRA']);
+    $this->assertEquals('10', $ci['test_id']['LENGTH']);
+
+    $this->assertEquals('varchar', $ci['test_varchar']['DATA_TYPE']);
+    $this->assertEquals('42', $ci['test_varchar']['LENGTH']);
+
+    $this->assertEquals('int', $ci['test_integer']['DATA_TYPE']);
+    $this->assertEquals('8', $ci['test_integer']['LENGTH']);
+    $this->assertEquals('YES', $ci['test_integer']['IS_NULLABLE']);
+
+    $this->assertEquals('42', $ci['test_integer_default']['COLUMN_DEFAULT']);
+
+    $this->assertEquals('date', $ci['test_date']['DATA_TYPE']);
+  }
+
+  public function testIndexes() {
+    $schema = new CRM_Logging_Schema();
+    $indexes = $schema->getIndexesForTable('civicrm_contact');
+    $this->assertContains('PRIMARY', $indexes);
+    $this->assertContains('UI_external_identifier', $indexes);
+    $this->assertContains('FK_civicrm_contact_employer_id', $indexes);
+    $this->assertContains('index_sort_name', $indexes);
   }
 
 }

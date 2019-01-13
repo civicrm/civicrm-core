@@ -363,12 +363,22 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    * @return array
    */
   public function getIndexesForTable($table) {
-    return CRM_Core_DAO::executeQuery("
-      SELECT constraint_name
-      FROM information_schema.key_column_usage
-      WHERE table_schema = %2 AND table_name = %1",
+    $indexes = [];
+    $result = CRM_Core_DAO::executeQuery("
+        SELECT constraint_name AS index_name
+        FROM information_schema.key_column_usage
+        WHERE table_schema = %2 AND table_name = %1
+      UNION
+        SELECT index_name AS index_name
+        FROM information_schema.statistics
+        WHERE table_schema = %2 AND table_name = %1
+      ",
       array(1 => array($table, 'String'), 2 => array($this->db, 'String'))
-    )->fetchAll();
+    );
+    while ($result->fetch()) {
+      $indexes[] = $result->index_name;
+    }
+    return $indexes;
   }
 
   /**
@@ -598,7 +608,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
         );
         if (($first = strpos($dao->COLUMN_TYPE, '(')) != 0) {
           \Civi::$statics[__CLASS__]['columnSpecs'][$dao->TABLE_NAME][$dao->COLUMN_NAME]['LENGTH'] = substr(
-            $dao->COLUMN_TYPE, $first, strpos($dao->COLUMN_TYPE, ')')
+            $dao->COLUMN_TYPE, $first + 1, strpos($dao->COLUMN_TYPE, ')') - $first - 1
           );
         }
       }
