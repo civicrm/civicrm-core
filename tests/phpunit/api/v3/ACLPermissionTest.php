@@ -664,4 +664,15 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     return $contacts;
   }
 
+  /**
+   * Test that the 'everyone' group can be given access to a contact.
+   */
+  public function testGetACLEveryonePermittedEntity() {
+    $this->setupScenarioCoreACLEveryonePermittedToGroup();
+    $this->callAPISuccess('Contact', 'getsingle', [
+      'id' => $this->scenarioIDs['Contact']['permitted_contact'],
+      'check_permissions' => 1,
+    ]);
+  }
+
 }
