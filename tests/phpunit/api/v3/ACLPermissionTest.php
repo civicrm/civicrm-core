@@ -669,10 +669,15 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    */
   public function testGetACLEveryonePermittedEntity() {
     $this->setupScenarioCoreACLEveryonePermittedToGroup();
-    $this->callAPISuccess('Contact', 'getsingle', [
+    $this->callAPISuccessGetCount('Contact', [
       'id' => $this->scenarioIDs['Contact']['permitted_contact'],
       'check_permissions' => 1,
-    ]);
+    ], 1);
+
+    $this->callAPISuccessGetCount('Contact', [
+      'id' => $this->scenarioIDs['Contact']['non_permitted_contact'],
+      'check_permissions' => 1,
+    ], 0);
   }
 
 }
