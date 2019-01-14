@@ -44,6 +44,16 @@ function civicrm_api3_acl_create($params) {
 }
 
 /**
+ * Acl create metadata.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_acl_create_spec(&$params) {
+  $params['is_active']['api.default'] = 1;
+  $params['entity_table']['api.default'] = 'civicrm_acl_role';
+}
+
+/**
  * Get an Acl.
  *
  * @param array $params
