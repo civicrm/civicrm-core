@@ -36,7 +36,7 @@
         CRM.utils.copyAttributes($dataField, $timeField, ['class', 'disabled']);
         $timeField
           .addClass('crm-form-text crm-form-time')
-          .attr('placeholder', $dataField.attr('time-placeholder') === undefined ? ts('Time') : $dataField.attr('time-placeholder'))
+          .attr('placeholder', $dataField.attr('time-placeholder') === undefined ? '\uf017' : $dataField.attr('time-placeholder'))
           .attr('aria-label', $dataField.attr('time-placeholder') === undefined ? ts('Time') : $dataField.attr('time-placeholder'))
           .change(updateDataField)
           .timeEntry({

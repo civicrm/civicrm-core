@@ -2691,7 +2691,8 @@ div.crm-container form {
 }
 
 .crm-container input.dateplugin::placeholder,
-.crm-container input.crm-form-date::placeholder {
+.crm-container input.crm-form-date::placeholder,
+.crm-container input.crm-form-time::placeholder {
   font-family: "FontAwesome";
   text-align: right;
 }
