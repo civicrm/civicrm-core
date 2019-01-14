@@ -132,7 +132,7 @@ function civicrm_api3_payment_create(&$params) {
     civicrm_api3('Payment', 'cancel', $params);
     $params['total_amount'] = $amount;
   }
-  $trxn = CRM_Contribute_BAO_Contribution::addPayment($params);
+  $trxn = CRM_Financial_BAO_Payment::create($params);
 
   $values = array();
   _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);
