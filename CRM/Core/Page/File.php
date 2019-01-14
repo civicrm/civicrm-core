@@ -38,21 +38,16 @@ class CRM_Core_Page_File extends CRM_Core_Page {
    * Run page.
    */
   public function run() {
-    $fileName = CRM_Utils_Request::retrieve('filename', 'String', $this);
-    $path = CRM_Core_Config::singleton()->customFileUploadDir . $fileName;
-    $mimeType = CRM_Utils_Request::retrieve('mime-type', 'String', $this);
     $action = CRM_Utils_Request::retrieve('action', 'String', $this);
     $download = CRM_Utils_Request::retrieve('download', 'Integer', $this, FALSE, 1);
     $disposition = $download == 0 ? 'inline' : 'download';
 
-    // if we are not providing essential parameter needed for file preview then
-    if (empty($fileName) && empty($mimeType)) {
-      $eid = CRM_Utils_Request::retrieve('eid', 'Positive', $this, TRUE);
-      $fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE);
-      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $eid = CRM_Utils_Request::retrieve('eid', 'Positive', $this, TRUE);
+    $fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE);
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
-      list($path, $mimeType) = CRM_Core_BAO_File::path($id, $eid);
-    }
+    list($path, $mimeType) = CRM_Core_BAO_File::path($id, $eid);
+    $mimeType = CRM_Utils_Request::retrieveValue('mime-type', 'String', $mimeType, FALSE);
 
     if (!$path) {
       CRM_Core_Error::statusBounce('Could not retrieve the file');
