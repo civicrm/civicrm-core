@@ -483,9 +483,9 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $form->add('select', 'status_id', ts('Status'), array("" => ts(' - any status - ')) + $activityStatus, FALSE, array('id' => 'status_id_' . $form->_caseID));
 
-    // activity dates
-    $form->addDate('activity_date_low_' . $form->_caseID, ts('Activity Dates - From'), FALSE, array('formatType' => 'searchDate'));
-    $form->addDate('activity_date_high_' . $form->_caseID, ts('To'), FALSE, array('formatType' => 'searchDate'));
+    // activity date search filters
+    $form->add('datepicker', 'activity_date_low_' . $form->_caseID, ts('Activity Dates - From'), [], FALSE, ['time' => FALSE]);
+    $form->add('datepicker', 'activity_date_high_' . $form->_caseID, ts('To'), [], FALSE, ['time' => FALSE]);
 
     if (CRM_Core_Permission::check('administer CiviCRM')) {
       $form->add('checkbox', 'activity_deleted', ts('Deleted Activities'), '', FALSE, array('id' => 'activity_deleted_' . $form->_caseID));
