@@ -44,7 +44,7 @@ interface CRM_Core_PrevNextCache_Interface {
    *   An array of SQLParams to be used with the $sql
    * @return bool
    */
-  public function fillWithSql($cacheKey, $sql, $sqlParams);
+  public function fillWithSql($cacheKey, $sql, $sqlParams = []);
 
   /**
    * Store the contents of an array in the cache.
