@@ -1494,7 +1494,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             'entity_id',
             'file_id'
           );
-          list($path) = CRM_Core_BAO_File::path($fileID, $entityId, NULL, NULL);
+          list($path) = CRM_Core_BAO_File::path($fileID, $entityId);
           $url = CRM_Utils_System::url('civicrm/file',
             "reset=1&id=$fileID&eid=$contactID",
             $absolute, NULL, TRUE, TRUE
