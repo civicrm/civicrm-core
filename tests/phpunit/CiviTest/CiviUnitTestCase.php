@@ -2727,7 +2727,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     if (!$isProfile) {
       //flush cache
       CRM_ACL_BAO_Cache::resetCache();
-      CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL, TRUE);
+      CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL);
     }
   }
 
