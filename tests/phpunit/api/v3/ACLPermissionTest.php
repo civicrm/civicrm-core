@@ -692,9 +692,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       ],
       'check_permissions' => 0,
     ]);
-    // Actually this should be 2 but there is a line of array_filter in dupesByParams that causes
-    // check_permissions to be dropped at that point. I am working aginst rc now - that should possibly be removed against master.
-    $this->assertEquals(1, $dupes['count']);
+    $this->assertEquals(2, $dupes['count']);
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM'];
 
     $dupes = $this->callAPISuccess('Contact', 'duplicatecheck', [
