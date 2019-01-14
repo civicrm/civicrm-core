@@ -94,6 +94,8 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Construct a WHERE clause to handle permissions to $object_*
    *
+   * @deprecated
+   *
    * @param array $tables
    *   Any tables that may be needed in the FROM.
    * @param string $operation
@@ -115,6 +117,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     $object_table = NULL, $object_id = NULL,
     $acl_id = NULL, $acl_role = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('unknown - this is really old & not used in core');
     $dao = new CRM_ACL_DAO_ACL();
 
     $t = array(
