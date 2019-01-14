@@ -48,8 +48,9 @@ class CRM_Activity_Page_AJAX {
       'status_id' => 'Integer',
       'activity_deleted' => 'Boolean',
       'activity_type_id' => 'Integer',
-      'activity_date_low' => 'Date',
-      'activity_date_high' => 'Date',
+      // "Date" validation fails because it expects only numbers with no hyphens
+      'activity_date_low' => 'Alphanumeric',
+      'activity_date_high' => 'Alphanumeric',
     );
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
