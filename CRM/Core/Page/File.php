@@ -50,9 +50,8 @@ class CRM_Core_Page_File extends CRM_Core_Page {
       $eid = CRM_Utils_Request::retrieve('eid', 'Positive', $this, TRUE);
       $fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE);
       $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
-      $quest = CRM_Utils_Request::retrieve('quest', 'String', $this);
 
-      list($path, $mimeType) = CRM_Core_BAO_File::path($id, $eid, NULL, $quest);
+      list($path, $mimeType) = CRM_Core_BAO_File::path($id, $eid);
     }
 
     if (!$path) {

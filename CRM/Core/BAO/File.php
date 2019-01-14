@@ -71,15 +71,11 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   /**
    * @param int $fileID
    * @param int $entityID
-   * @param null $entityTable
    *
    * @return array
    */
-  public static function path($fileID, $entityID, $entityTable = NULL) {
+  public static function path($fileID, $entityID) {
     $entityFileDAO = new CRM_Core_DAO_EntityFile();
-    if ($entityTable) {
-      $entityFileDAO->entity_table = $entityTable;
-    }
     $entityFileDAO->entity_id = $entityID;
     $entityFileDAO->file_id = $fileID;
 
