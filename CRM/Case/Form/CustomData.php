@@ -129,7 +129,6 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/case', "reset=1&id={$this->_entityID}&cid={$this->_contactID}&action=view"));
 
-    $session = CRM_Core_Session::singleton();
     $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Custom Data');
     $activityParams = array(
       'activity_type_id' => $activityTypeID,
