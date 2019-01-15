@@ -105,10 +105,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
 
     foreach ($form->_defaultCaseStatus as $keydefault => $valdefault) {
       if (!array_key_exists($valdefault, $form->_caseStatus)) {
-        $form->_caseStatus[$valdefault] = CRM_Core_OptionGroup::getLabel('case_status',
-          $valdefault,
-          FALSE
-        );
+        $form->_caseStatus[$valdefault] = CRM_Core_PseudoConstant::getLabel('CRM_Case_BAO_Case', 'status_id', $valdefault);
       }
     }
     $element = $form->add('select', 'case_status_id', ts('Case Status'),
