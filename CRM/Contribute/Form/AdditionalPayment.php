@@ -507,6 +507,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * @return bool
    */
   public function emailReceipt(&$params) {
+    $templateEngine = CRM_Core_Smarty::singleton();
     // email receipt sending
     // send message template
     if ($this->_component == 'event') {
@@ -518,48 +519,48 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       ));
       $event = civicrm_api3('Event', 'getsingle', array('id' => $eventId));
 
-      $this->assign('event', $event);
-      $this->assign('isShowLocation', $event['is_show_location']);
+      $templateEngine->assign('event', $event);
+      $templateEngine->assign('isShowLocation', $event['is_show_location']);
       if (CRM_Utils_Array::value('is_show_location', $event) == 1) {
         $locationParams = array(
           'entity_id' => $eventId,
           'entity_table' => 'civicrm_event',
         );
         $location = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
-        $this->assign('location', $location);
+        $templateEngine->assign('location', $location);
       }
     }
 
     // assign payment info here
     $paymentConfig['confirm_email_text'] = CRM_Utils_Array::value('confirm_email_text', $params);
-    $this->assign('paymentConfig', $paymentConfig);
+    $templateEngine->assign('paymentConfig', $paymentConfig);
 
-    $this->assign('totalAmount', $this->_amtTotal);
+    $templateEngine->assign('totalAmount', $this->_amtTotal);
 
     $isRefund = ($this->_paymentType == 'refund') ? TRUE : FALSE;
-    $this->assign('isRefund', $isRefund);
+    $templateEngine->assign('isRefund', $isRefund);
     if ($isRefund) {
-      $this->assign('totalPaid', $this->_amtPaid);
-      $this->assign('refundAmount', $params['total_amount']);
+      $templateEngine->assign('totalPaid', $this->_amtPaid);
+      $templateEngine->assign('refundAmount', $params['total_amount']);
     }
     else {
       $balance = $this->_amtTotal - ($this->_amtPaid + $params['total_amount']);
       $paymentsComplete = ($balance == 0) ? 1 : 0;
-      $this->assign('amountOwed', $balance);
-      $this->assign('paymentAmount', $params['total_amount']);
-      $this->assign('paymentsComplete', $paymentsComplete);
+      $templateEngine->assign('amountOwed', $balance);
+      $templateEngine->assign('paymentAmount', $params['total_amount']);
+      $templateEngine->assign('paymentsComplete', $paymentsComplete);
     }
-    $this->assign('contactDisplayName', $this->_contributorDisplayName);
+    $templateEngine->assign('contactDisplayName', $this->_contributorDisplayName);
 
     // assign trxn details
-    $this->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $params));
-    $this->assign('receive_date', CRM_Utils_Array::value('trxn_date', $params));
-    $this->assign('paidBy', CRM_Core_PseudoConstant::getLabel(
+    $templateEngine->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $params));
+    $templateEngine->assign('receive_date', CRM_Utils_Array::value('trxn_date', $params));
+    $templateEngine->assign('paidBy', CRM_Core_PseudoConstant::getLabel(
       'CRM_Contribute_BAO_Contribution',
       'payment_instrument_id',
       $params['payment_instrument_id']
     ));
-    $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
+    $templateEngine->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
 
     $sendTemplateParams = array(
       'groupName' => 'msg_tpl_workflow_contribution',
