@@ -889,7 +889,7 @@ if (!CRM.vars) CRM.vars = {};
           });
         }
       });
-      if ($("input:radio[name=radio_ts]").size() == 1) {
+      if ($("input:radio[name=radio_ts]").length == 1) {
         $("input:radio[name=radio_ts]").prop("checked", true);
       }
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();

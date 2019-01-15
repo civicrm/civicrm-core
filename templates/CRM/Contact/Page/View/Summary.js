@@ -192,7 +192,7 @@
       document.title = $('title').html().replace(oldName, contactName);
       oldName = contactName;
     }
-    $('#contactname-block').load(refreshTitle);
+    $('#contactname-block').on('load', refreshTitle);
     refreshTitle();
 
     var clicking;
@@ -370,7 +370,7 @@
           var nitem = $(this);
           var parent = $(this).parent();
           $(this).parent().prev().append(nitem);
-          if (parent.children().size() === 0) {
+          if (parent.children().length === 0) {
             parent.remove();
           }
         });
