@@ -129,11 +129,22 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    * Test the submit function that completes the partially paid Contribution using Credit Card.
    */
   public function testAddPaymentUsingCreditCardForPartialyPaidContribution() {
+    $mut = new CiviMailUtils($this, TRUE);
     $this->createContribution('Partially paid');
 
     // pay additional amount by using Credit Card
-    $this->submitPayment(70, 'live');
+    $this->submitPayment(70, 'live', TRUE);
     $this->checkResults(array(30, 70), 2);
+    $mut->assertSubjects(['Payment Receipt -']);
+    $mut->checkMailLog([
+      'Dear Anthony Anderson',
+      'Payment Details',
+      'Total Fees: $ 100.00',
+      'This Payment Amount: $ 70.00',
+      'Balance Owed: $ 0.00 ',
+    ]);
+
+    $mut->stop();
   }
 
   /**
@@ -332,9 +343,9 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    *  Payment Amount
    * @param string $mode
    *  Mode of Payment
-   *
+   * @param bool $isEmailReceipt
    */
-  public function submitPayment($amount, $mode = NULL) {
+  public function submitPayment($amount, $mode = NULL, $isEmailReceipt = FALSE) {
     $form = new CRM_Contribute_Form_AdditionalPayment();
 
     $submitParams = array(
@@ -347,10 +358,12 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'receive_date_time' => '11:27PM',
       'trxn_date' => '2017-04-11 13:05:11',
       'payment_processor_id' => 0,
+      'is_email_receipt' => $isEmailReceipt,
+      'from_email_address' => 'site@something.com',
     );
     if ($mode) {
       $submitParams += array(
-        'payment_instrument_id' => array_search('Credit card', $this->paymentInstruments),
+        'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
         'payment_processor_id' => $this->paymentProcessorID,
         'credit_card_exp_date' => array('M' => 5, 'Y' => 2025),
         'credit_card_number' => '411111111111111',
