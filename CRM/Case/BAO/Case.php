@@ -1940,6 +1940,59 @@ SELECT civicrm_contact.id as casemanager_id,
     return $caseManagerName;
   }
 
+  // Get Case direction as defined on the type
+  function getCaseRoleDirection($caseId, $roleTypeId = NULL) {
+    try {
+      $case = civicrm_api3('Case', 'getsingle', array('id' => $caseId));
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      // Lack of permissions will throw an exception
+      return 0;
+    }
+    if (!empty($case['case_type_id'])) {
+      try {
+        $caseType = civicrm_api3('CaseType', 'getsingle', array('id' => $case['case_type_id'], 'return' => array('definition')));
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        // Lack of permissions will throw an exception
+        return 'no case type found';
+      }
+      if (!empty($caseType['definition']['caseRoles'])) {
+        $caseRoles = array();
+        foreach ($caseType['definition']['caseRoles'] as $key => $roleDetails) {
+          // Check if its an a_b label
+          try {
+            $relType = civicrm_api3('RelationshipType', 'getsingle', array('label_a_b' => $roleDetails['name']));
+          }
+          catch (CiviCRM_API3_Exception $e) {
+          }
+          if (!empty($relType['id'])) {
+            $roleDetails['id'] = $relType['id'];
+            $roleDetails['direction'] = 'a_b';
+          }
+          // Check if its a b_a label
+          try {
+            $relTypeBa = civicrm_api3('RelationshipType', 'getsingle', array('label_b_a' => $roleDetails['name']));
+          }
+          catch (CiviCRM_API3_Exception $e) {
+          }
+          if (!empty($relTypeBa['id'])) {
+            if (!empty($roleDetails['direction'])) {
+              $roleDetails['direction'] = 'bidrectional';
+            }
+            else {
+              $roleDetails['id'] = $relTypeBa['id'];
+              $roleDetails['direction'] = 'b_a';
+            }
+          }
+          $caseRoles[$roleDetails['id']] = $roleDetails;
+        }
+      }
+      return $caseRoles;
+    }
+  }
+
+
   /**
    * @param int $contactId
    * @param bool $excludeDeleted
