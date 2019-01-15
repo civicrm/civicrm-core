@@ -250,8 +250,15 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
         break;
 
       case 'contribution_status_id':
-        require_once 'CRM/Core/PseudoConstant.php';
-        if (!$values['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $value)) {
+        require_once 'CRM/Contribute/PseudoConstant.php';
+        $contriStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+        foreach ($contriStatus as $val => $status) {
+          if (strtolower($value) == strtolower($status)) {
+            $values['contribution_status_id'] = $val;
+            break;
+          }
+        }
+        if (empty($values['contribution_status_id'])) {
           return civicrm_api3_create_error("Contribution Status is not valid: $value");
         }
         break;
