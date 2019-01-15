@@ -379,9 +379,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       }
       else {
         $contactId = $contact->id;
-        if (isset($note['contact_id'])) {
-          $contactId = $note['contact_id'];
-        }
         //if logged in user, overwrite contactId
         if ($userID) {
           $contactId = $userID;
