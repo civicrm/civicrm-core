@@ -386,8 +386,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if (!empty($result) && !empty($this->_params['is_email_receipt'])) {
       $this->_params['contact_id'] = $this->_contactId;
       $this->_params['contribution_id'] = $this->_contributionId;
-      // to get 'from email id' for send receipt
-      $this->fromEmailId = $this->_params['from_email_address'];
+
       $sendReceipt = $this->emailReceipt($this->_params);
       if ($sendReceipt) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
@@ -509,6 +508,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   public function emailReceipt(&$params) {
     $templateEngine = CRM_Core_Smarty::singleton();
     // email receipt sending
+    list($contributorDisplayName, $contributorEmail, $doNotMail) = CRM_Contact_BAO_Contact::getContactDetails($params['contact_id']);
+    if (!$contributorEmail || $doNotMail) {
+      return FALSE;
+    }
+    $templateEngine->assign('contactDisplayName', $contributorDisplayName);
     // send message template
     if ($this->_component == 'event') {
 
@@ -550,7 +554,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $templateEngine->assign('paymentAmount', $params['total_amount']);
       $templateEngine->assign('paymentsComplete', $paymentsComplete);
     }
-    $templateEngine->assign('contactDisplayName', $this->_contributorDisplayName);
 
     // assign trxn details
     $templateEngine->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $params));
@@ -565,22 +568,15 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $sendTemplateParams = array(
       'groupName' => 'msg_tpl_workflow_contribution',
       'valueName' => 'payment_or_refund_notification',
-      'contactId' => $this->_contactId,
+      'contactId' => $params['contact_id'],
       'PDFFilename' => ts('notification') . '.pdf',
     );
 
-    // try to send emails only if email id is present
-    // and the do-not-email option is not checked for that contact
-    if ($this->_contributorEmail && !$this->_toDoNotEmail) {
-      if (array_key_exists($params['from_email_address'], $this->_fromEmails['from_email_id'])) {
-        $receiptFrom = $params['from_email_address'];
-      }
+    $sendTemplateParams['from'] = $params['from_email_address'];
+    $sendTemplateParams['toName'] = $contributorDisplayName;
+    $sendTemplateParams['toEmail'] = $contributorEmail;
 
-      $sendTemplateParams['from'] = $receiptFrom;
-      $sendTemplateParams['toName'] = $this->_contributorDisplayName;
-      $sendTemplateParams['toEmail'] = $this->_contributorEmail;
-    }
-    list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+    list($mailSent) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     return $mailSent;
   }
 
