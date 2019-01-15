@@ -667,9 +667,12 @@ class CRM_Core_I18n {
       $this->setPhpGettextLocale($locale);
     }
 
-    // for sql queries
+    // For sql queries, if running in DB multi-lingual mode.
     global $dbLocale;
-    $dbLocale = "_{$locale}";
+
+    if ($dbLocale) {
+      $dbLocale = "_{$locale}";
+    }
 
     // For self::getLocale()
     global $tsLocale;
