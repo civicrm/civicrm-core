@@ -53,7 +53,7 @@ else {
 }
 try {
   //CRM-18245
-  if ($config->userFramework == 'Joomla') {
+  if (in_array($config->userFramework, array('Drupal8', 'Joomla'))) {
     CRM_Utils_System::loadBootStrap();
   }
   $paypalIPN->main();
