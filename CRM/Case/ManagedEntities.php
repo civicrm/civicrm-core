@@ -110,14 +110,14 @@ class CRM_Case_ManagedEntities {
   public static function createManagedRelationshipTypes(CRM_Case_XMLRepository $xmlRepo, CRM_Core_ManagedEntities $me) {
     $result = array();
 
-    if (!isset(Civi::$statics[__CLASS__]['reltypes'])) {
-      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE, NULL);
-      $label_a_bs = CRM_Utils_Array::collect(CRM_Case_XMLProcessor::label_a_b, $relationshipInfo);
-      $label_b_as = CRM_Utils_Array::collect(CRM_Case_XMLProcessor::label_b_a, $relationshipInfo);
-      $labelsBidrectional = array_merge($label_a_bs, $label_b_as);
-      Civi::$statics[__CLASS__]['reltypes'] = $labelsBidrectional;
-    }
-    $validRelTypes = Civi::$statics[__CLASS__]['reltypes'];
+    // if (!isset(Civi::$statics[__CLASS__]['reltypes'])) {
+    //   $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE, NULL);
+    //   $label_a_bs = CRM_Utils_Array::collect(CRM_Case_XMLProcessor::label_a_b, $relationshipInfo);
+    //   $label_b_as = CRM_Utils_Array::collect(CRM_Case_XMLProcessor::label_b_a, $relationshipInfo);
+    //   $labelsBidrectional = array_merge($label_a_bs, $label_b_as);
+    //   Civi::$statics[__CLASS__]['reltypes'] = $labelsBidrectional;
+    // }
+    // $validRelTypes = Civi::$statics[__CLASS__]['reltypes'];
 
     $relTypes = $xmlRepo->getAllDeclaredRelationshipTypes();
     foreach ($relTypes as $relType) {
@@ -143,10 +143,10 @@ class CRM_Case_ManagedEntities {
 
       // We'll create managed-entity if this record doesn't exist yet
       // or if we previously decided to manage this record.
-      if (!in_array($relType, $validRelTypes)) {
-        $result[] = $managed;
-      }
-      elseif ($me->get($managed['module'], $managed['name'])) {
+      // if (!in_array($relType, $validRelTypes)) {
+      //   $result[] = $managed;
+      // }
+      if ($me->get($managed['module'], $managed['name'])) {
         $result[] = $managed;
       }
     }
