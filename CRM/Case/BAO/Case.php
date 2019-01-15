@@ -1912,6 +1912,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
 
     $managerRoleId = $xmlProcessor->getCaseManagerRoleId($caseType);
+    $managerRoleId = preg_replace(array('/_b_a/', '/_a_b/'), '', $managerRoleId);
 
     if (!empty($managerRoleId)) {
       $managerRoleQuery = "
