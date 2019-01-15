@@ -41,8 +41,11 @@ interface CRM_Core_PrevNextCache_Interface {
    *   A SQL query. The query *MUST* be a SELECT statement which yields
    *   the following columns (in order): cacheKey, entity_id1, data
    * @param array $sqlParams
-   *   An array of SQLParams to be used with the $sql
+   *   An array of parameters to be used with $sql.
+   *   Use the same interpolation format as CRM_Core_DAO (composeQuery/executeQuery).
+   *   Ex: [1 => ['foo', 'String']]
    * @return bool
+   * @see CRM_Core_DAO::composeQuery
    */
   public function fillWithSql($cacheKey, $sql, $sqlParams = []);
 
