@@ -355,6 +355,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    * @param $params
    */
   public function submit(&$params) {
+    $transaction = new CRM_Core_Transaction();
     $params['now'] = date("Ymd");
 
     // 1. call begin post process
@@ -425,6 +426,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     if ($this->_activityTypeFile) {
       $className::endPostProcess($this, $params);
     }
+    $transaction->commit();
 
     return $caseObj;
   }
@@ -433,8 +435,6 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    * Process the form submission.
    */
   public function postProcess() {
-    $transaction = new CRM_Core_Transaction();
-
     // check if dedupe button, if so return.
     $buttonName = $this->controller->getButtonName();
     if (isset($this->_dedupeButtonName) && $buttonName == $this->_dedupeButtonName) {
