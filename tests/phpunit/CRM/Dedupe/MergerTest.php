@@ -795,8 +795,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         0 => 'contact_id',
       ),
       'civicrm_acl_contact_cache' => array(
-        0 => 'user_id',
-        1 => 'contact_id',
+        0 => 'contact_id',
       ),
       'civicrm_action_log' => array(
         0 => 'contact_id',
@@ -1002,8 +1001,7 @@ WHERE
     // There might be cleverer ways to do this but it shouldn't change much.
     $cidRefs['civicrm_contact'][0] = 'primary_contact_id';
     $cidRefs['civicrm_contact'][1] = 'employer_id';
-    $cidRefs['civicrm_acl_contact_cache'][0] = 'user_id';
-    $cidRefs['civicrm_acl_contact_cache'][1] = 'contact_id';
+    $cidRefs['civicrm_acl_contact_cache'][0] = 'contact_id';
     $cidRefs['civicrm_mailing'][0] = 'created_id';
     $cidRefs['civicrm_mailing'][1] = 'scheduled_id';
     $cidRefs['civicrm_mailing'][2] = 'approver_id';
