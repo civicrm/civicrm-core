@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{include file="CRM/common/dedupe.tpl"}
 <div class="crm-accordion-header">
   {ts}Filter Contacts{/ts}
 </div>
@@ -54,6 +55,7 @@
       <tr>
         <th>{ts}Contact 1{/ts}</th>
         <th>{ts}Contact 2 (Duplicate){/ts}</th>
+        <th data-orderable="false"></th>
       </tr>
       </thead>
       <tbody>
@@ -73,7 +75,9 @@
             {assign var="contact2name" value="contact_id2.display_name"}
             <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.contact_id2`"}" target="_blank">{ $exception.$contact2name }</a>
           </td>
-
+          <td>
+            <a id='duplicateContacts' href="#" title={ts}Remove Exception{/ts} onClick="processDupes( {$exception.contact_id1}, {$exception.contact_id2}, 'nondupe-dupe', 'dedupe-exception' );return false;">&raquo; {ts}Remove Exception{/ts}</a>
+          </td>
         </tr>
 
         {if $rowClass eq "odd-row"}
