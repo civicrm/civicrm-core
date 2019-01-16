@@ -520,7 +520,7 @@ WHERE      a.id = %1
 
     $activity['fields'][] = array(
       'label' => ts('Priority'),
-      'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'priority',
+      'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'priority_id',
         $activityDAO->priority_id
       ),
       'type' => 'String',
