@@ -1269,33 +1269,28 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    */
   public function testCreateProportionalFinancialEntriesZeroAmount($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
-    list($contribution, $financialAccount) = $this->createContributionWithTax();
-    $this->callAPISuccess('Contribution', 'create', [
-      'id' => $contribution['id'],
+    list($contribution, $financialAccount) = $this->createContributionWithTax(array('total_amount' => 0));
+    $params = [
+      'to_financial_account_id' => $financialAccount->financial_account_id,
       'total_amount' => 0,
-    ]);
-    // Retrieve the created financial trxn ID from EntityFinancialTrxn mapping
-    $financialTrxnID = $this->callAPISuccess('EntityFinancialTrxn', 'getvalue', [
-      'entity_table' => 'civicrm_contribution',
+      'payment_instrument_id' => 1,
+      'trxn_date' => date('Ymd'),
+      'status_id' => 1,
       'entity_id' => $contribution['id'],
-      'return' => 'financial_trxn_id',
-      'options' => [
-        'sort' => 'id desc',
-        'limit' => 1
-      ],
-    ]);
+    ];
+    $financialTrxnID = $this->callAPISuccess('FinancialTrxn', 'create', $params)['id'];
     $totalAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $contribution['id'], 'total_amount');
-
     CRM_Contribute_BAO_Contribution::assignProportionalLineItems(['contribution_id' => $contribution['id']], $financialTrxnID, $totalAmount, 'Completed');
 
-    list($financialItems, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItems($contribution['id']);
+    list($financialItems, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItems($contribution['id'], FALSE, $financialTrxnID);
+
     $eftParams = array(
       'entity_table' => 'civicrm_financial_item',
       'entity_id' => $financialItems[1]['financial_item_id'],
       'financial_trxn_id' => $financialTrxnID,
     );
     $trxnTestArray = array_merge($eftParams, array(
-      'amount' => '-100.00',
+      'amount' => '0.00',
     ));
     $this->callAPISuccessGetSingle('EntityFinancialTrxn', $eftParams, $trxnTestArray);
   }

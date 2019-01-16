@@ -4826,7 +4826,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($trxnParams['contribution_id']);
     if (!empty($lineItems)) {
       // get financial item
-      list($financialItems, $taxItems) = self::getLastFinancialItems($trxnParams['contribution_id'], (in_array($contributionStatus, ['Pending refund', 'Partially paid'])));
+      list($financialItems, $taxItems) = self::getLastFinancialItems($trxnParams['contribution_id'], (in_array($contributionStatus, ['Pending refund', 'Partially paid'])), $trxnId);
       self::createProportionalFinancialEntries($trxnId, $contributionTotalAmount, $contributionStatus, $lineItems, $financialItems, $taxItems);
     }
   }
@@ -5612,13 +5612,16 @@ LIMIT 1;";
    *
    * @param int $contributionId
    * @param bool $excludeProcessedFinancialItem
+   * @param int $financialTrxnID
    *
    * @return array
    */
-  public static function getLastFinancialItems($contributionId, $excludeProcessedFinancialItem = FALSE) {
-    $sql = "SELECT fi.id, fi.amount, li.price_field_value_id, li.tax_amount, fi.financial_account_id
+  public static function getLastFinancialItems($contributionId, $excludeProcessedFinancialItem = FALSE, $financialTrxnID = NULL) {
+    $sql = "SELECT fi.id, fi.amount, li.price_field_value_id, li.tax_amount, fi.financial_account_id, ps.is_quick_config
       FROM civicrm_financial_item fi
       INNER JOIN civicrm_line_item li ON li.id = fi.entity_id and fi.entity_table = 'civicrm_line_item'
+      INNER JOIN civicrm_price_field pf ON pf.id = li.price_field_id
+      INNER JOIN civicrm_price_set ps ON ps.id = pf.price_set_id
       WHERE li.contribution_id = %1
       ORDER BY fi.id ASC
       ";
@@ -5639,12 +5642,16 @@ LIMIT 1;";
           'amount' => $dao->amount,
         ];
         // exclude those items which were already recorded in EntityFinancialTrxn table
-        if ($excludeProcessedFinancialItem && civicrm_api3('EntityFinancialTrxn', 'getcount', [
-            'entity_table' => 'civicrm_financial_item',
-            'entity_id' => $dao->id,
-            'financial_trxn_id.status_id' => 'Completed',
-            'financial_trxn_id.is_payment' => TRUE
-          ]) > 0) {
+        $params = [
+          'entity_table' => 'civicrm_financial_item',
+          'entity_id' => $dao->id,
+          'financial_trxn_id.status_id' => 'Completed',
+          'financial_trxn_id.is_payment' => TRUE
+        ];
+        if ($dao->is_quick_config && $financialTrxnID) {
+          $params['financial_trxn_id'] = $financialTrxnID;
+        }
+        if ($excludeProcessedFinancialItem && civicrm_api3('EntityFinancialTrxn', 'getcount', $params) > 0) {
           unset($ftIds[$dao->price_field_value_id]);
         }
       }
@@ -5702,9 +5709,11 @@ LIMIT 1;";
       }
       else {
         if ($contributionTotalAmount == 0) {
-          continue;
+          $eftParams['amount'] = 0;
         }
-        $eftParams['amount'] = CRM_Contribute_BAO_Contribution_Utils::formatAmount($value['line_total'] * ($financialTxnAmount / $contributionTotalAmount));
+        else {
+          $eftParams['amount'] = CRM_Contribute_BAO_Contribution_Utils::formatAmount($value['line_total'] * ($financialTxnAmount / $contributionTotalAmount));
+        }
       }
 
       civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);

@@ -323,28 +323,7 @@ class CRM_Financial_BAO_Payment {
     if ($updateStatus) {
       CRM_Core_DAO::setFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'contribution_status_id', $completedStatusId);
     }
-    // add financial item entry
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionDAO->id);
-    if (!empty($lineItems)) {
-      foreach ($lineItems as $lineItemId => $lineItemValue) {
-        // don't record financial item for cancelled line-item
-        if ($lineItemValue['qty'] == 0) {
-          continue;
-        }
-        $paid = $lineItemValue['line_total'] * ($financialTrxn->total_amount / $contributionDAO->total_amount);
-        $addFinancialEntry = [
-          'transaction_date' => $financialTrxn->trxn_date,
-          'contact_id' => $contributionDAO->contact_id,
-          'amount' => round($paid, 2),
-          'currency' => $contributionDAO->currency,
-          'status_id' => $paidStatus,
-          'entity_id' => $lineItemId,
-          'entity_table' => 'civicrm_line_item',
-        ];
-        $trxnIds = ['id' => $financialTrxn->id];
-        CRM_Financial_BAO_FinancialItem::create($addFinancialEntry, NULL, $trxnIds);
-      }
-    }
+
     return $financialTrxn;
   }
 

@@ -726,7 +726,7 @@ WHERE ceft.entity_id = %1";
       $trxnParams = [
         'total_amount' => $trxn->total_amount,
         'contribution_id' => $currentContribution->id,
-      );
+      ];
       CRM_Contribute_BAO_Contribution::assignProportionalLineItems($trxnParams, $trxn->id, $prevContribution->total_amount, CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $prevContribution->contribution_status_id));
     }
 

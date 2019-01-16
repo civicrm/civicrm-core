@@ -214,7 +214,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
         $trxnParams = [
           'total_amount' => $financialTrxnParams['total_amount'],
           'contribution_id' => $this->_contributionID,
-        );
+        ];
         $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $this->_contributionID]);
         CRM_Contribute_BAO_Contribution::assignProportionalLineItems($trxnParams, $financialTrxn['id'], $contribution['total_amount'], $contribution['contribution_status']);
       }
