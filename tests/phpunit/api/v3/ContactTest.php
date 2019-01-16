@@ -3902,4 +3902,31 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertTrue($g3Contacts['count'] == 1);
   }
 
+  /**
+   * Test creating a note from the contact.create API call when only passing the note as a string.
+   */
+  public function testCreateNoteinCreate() {
+    $loggedInContactID = $this->createLoggedInUser();
+    $this->_params['note'] = "Test note created by API Call as a String";
+    $contact = $this->callAPISuccess('Contact', 'create', $this->_params);
+    $note = $this->callAPISuccess('Note', 'get', ['contact_id' => $loggedInContactID]);
+    $this->assertEquals($note['values'][$note['id']]['note'], "Test note created by API Call as a String");
+    $note = $this->callAPISuccess('Note', 'get', ['entity_id' => $contact['id']]);
+    $this->assertEquals($note['values'][$note['id']]['note'], "Test note created by API Call as a String");
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contact['id'], 'skip_undelete' => TRUE]);
+  }
+
+  /**
+   * Test Creating a note from the contact.create api call when passing the note params as an array.
+   */
+  public function testCreateNoteinCreateArrayFormat() {
+    $contact1 = $this->callAPISuccess('Contact', 'create', array('first_name' => 'Alan', 'last_name' => 'MouseMouse', 'contact_type' => 'Individual'));
+    $this->_params['note'] = [['note' => "Test note created by API Call as array", 'contact_id' => $contact1['id']]];
+    $contact2 = $this->callAPISuccess('Contact', 'create', $this->_params);
+    $note = $this->callAPISuccess('Note', 'get', ['contact_id' => $contact1['id']]);
+    $this->assertEquals($note['values'][$note['id']]['note'], "Test note created by API Call as array");
+    $note = $this->callAPISuccess('Note', 'get', ['entity_id' => $contact2['id']]);
+    $this->assertEquals($note['values'][$note['id']]['note'], "Test note created by API Call as array");
+  }
+
 }
