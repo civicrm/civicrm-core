@@ -1665,9 +1665,7 @@ FROM   civicrm_domain
         }
 
         if ($newData) {
-          foreach ($newData as $k => $v) {
-            $newObject->$k = $v;
-          }
+          $newObject->copyValues($newData);
         }
       }
       $newObject->save();
