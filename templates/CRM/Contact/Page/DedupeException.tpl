@@ -28,18 +28,20 @@
   {ts}Filter Contacts{/ts}
 </div>
 <div class="crm-accordion-body">
-  <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
-    <tr>
-      <td class="crm-contact-form-block-contact1">
-        <label for="search-contact1">{ts}Contact 1{/ts}</label><br />
-        <input class="crm-form-text" type="text" placeholder="Search Contact1" value="{$searchcontact1}" id="search-contact1" search-column="0" />
-      </td>
-      <td class="crm-contact-form-block-contact2">
-        <label for="search-contact2">{ts}Contact 2{/ts}</label><br />
-        <input type="text" placeholder="Search Contact2" value="{$searchcontact2}" id="search-contact2" search-column="1" />
-      </td>
-    </tr>
-  </table>
+  <form method="get">
+    <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
+      <tr>
+        <td class="crm-contact-form-block-contact1">
+          <label for="search-contact1">{ts}Contact Name{/ts}</label><br />
+          <input class="crm-form-text" type="text" size="50" placeholder="Search Contacts" value="{$searchcontact1}" id="search-contact1" search-column="0" />
+        </td>
+        <td class="crm-contact-form-block-search">
+          <label>&nbsp;</label><br />
+          <button type="submit" class="button crm-button filtercontacts"><span><i class="crm-i fa-search"></i> Find Contacts</span></button>
+        </td>
+      </tr>
+    </table>
+  </form>
 </div>
 
 
@@ -111,7 +113,8 @@
         var timer = null;
 
       // apply the search
-      $('#searchOptions input').on( 'keydown', function () {
+      $('.filtercontacts').on( 'click', function (e) {
+        e.preventDefault();
         clearTimeout(timer);
         timer = setTimeout(updateTable, 500)
       });
@@ -119,7 +122,6 @@
       function updateTable() {
 
         var contact1term = $('#search-contact1').val();
-        var contact2term = $('#search-contact2').val();
 
         currentLocation = currentLocation.replace(/crmPID=\d+/, 'crmPID=' + 0);
 
@@ -128,13 +130,6 @@
         }
         else {
           currentLocation += '&crmContact1Q='+contact1term;
-        }
-
-        if (currentLocation.indexOf('crmContact2Q') !== -1) {
-          currentLocation = currentLocation.replace(/crmContact2Q=\w*/, 'crmContact2Q=' + contact2term);
-        }
-        else {
-          currentLocation += '&crmContact2Q='+contact2term;
         }
 
         refresh(currentLocation);
