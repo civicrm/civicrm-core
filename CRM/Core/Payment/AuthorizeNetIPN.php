@@ -164,8 +164,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     $objects['contribution']->total_amount = $input['amount'];
     $objects['contribution']->trxn_id = $input['trxn_id'];
 
-    $this->checkMD5($paymentProcessorObject, $input);
-
     $isFirstOrLastRecurringPayment = FALSE;
     if ($input['response_code'] == 1) {
       // Approved
@@ -357,27 +355,6 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       throw new CRM_Core_Exception("Could not find an entry for $name");
     }
     return $value;
-  }
-
-  /**
-   * Check and validate gateway MD5 response if present.
-   *
-   * @param CRM_Core_Payment_AuthorizeNet $paymentObject
-   * @param array $input
-   *
-   * @throws CRM_Core_Exception
-   */
-  public function checkMD5($paymentObject, $input) {
-    if (empty($input['trxn_id'])) {
-      // For decline we have nothing to check against.
-      return;
-    }
-    if (!$paymentObject->checkMD5($input['MD5_Hash'], $input['trxn_id'], $input['amount'], TRUE)) {
-      $message = "Failure: Security verification failed";
-      $log = new CRM_Utils_SystemLogger();
-      $log->error('payment_notification', array('message' => $message, 'input' => $input));
-      throw new CRM_Core_Exception($message);
-    }
   }
 
 }
