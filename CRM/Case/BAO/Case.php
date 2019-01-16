@@ -1426,7 +1426,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         )
       );
 
-      $activityParams['subject'] = $activitySubject . ' - copy sent to ' . $displayName;
+      $activityParams['subject'] = ts('%1 - copy sent to %2', [1 => $activitySubject, 2 => $displayName]);
       $activityParams['details'] = $message;
 
       if (!empty($result[$info['contact_id']])) {
