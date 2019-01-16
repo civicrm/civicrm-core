@@ -1125,15 +1125,20 @@ ORDER BY    fixed_sort_order
    * @inheritDoc
    */
   public function addSelectWhereClause() {
-    $clauses = parent::addSelectWhereClause();
-    if (!CRM_Core_Permission::check('view all activities')) {
-      $permittedActivityTypeIDs = self::getPermittedActivityTypes();
-      if (empty($permittedActivityTypeIDs)) {
-        // This just prevents a mysql fail if they have no access - should be extremely edge case.
-        $permittedActivityTypeIDs = [0];
-      }
-      $clauses['activity_type_id'] = ('IN (' . implode(', ', $permittedActivityTypeIDs) . ')');
+    $clauses = [];
+    $permittedActivityTypeIDs = self::getPermittedActivityTypes();
+    if (empty($permittedActivityTypeIDs)) {
+      // This just prevents a mysql fail if they have no access - should be extremely edge case.
+      $permittedActivityTypeIDs = [0];
     }
+    $clauses['activity_type_id'] = ('IN (' . implode(', ', $permittedActivityTypeIDs) . ')');
+
+    $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
+    if ($contactClause) {
+      $contactClause = implode(' AND contact_id ', $contactClause);
+      $clauses['id'][] = "IN (SELECT activity_id FROM civicrm_activity_contact WHERE contact_id $contactClause)";
+    }
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
     return $clauses;
   }
 

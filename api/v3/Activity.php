@@ -302,16 +302,6 @@ function civicrm_api3_activity_get($params) {
   $options = _civicrm_api3_get_options_from_params($params, FALSE, 'Activity', 'get');
   $sql = CRM_Utils_SQL_Select::fragment();
 
-  if (empty($params['target_contact_id']) && empty($params['source_contact_id'])
-    && empty($params['assignee_contact_id']) &&
-    !empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')
-    && !CRM_Core_Permission::check('view all contacts')
-  ) {
-    // Force join on the activity contact table.
-    // @todo get this & other acl filters to work, remove check further down.
-    //$params['contact_id'] = array('IS NOT NULL' => TRUE);
-  }
-
   _civicrm_api3_activity_get_extraFilters($params, $sql);
 
   // Handle is_overdue sort
@@ -340,15 +330,6 @@ function civicrm_api3_activity_get($params) {
   $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $sql);
   if ($options['is_count']) {
     return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
-  }
-
-  if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')) {
-    // @todo get this to work at the query level - see contact_id join above.
-    foreach ($activities as $activity) {
-      if (!CRM_Activity_BAO_Activity::checkPermission($activity['id'], CRM_Core_Action::VIEW)) {
-        unset($activities[$activity['id']]);
-      }
-    }
   }
 
   $activities = _civicrm_api3_activity_get_formatResult($params, $activities, $options);
@@ -452,6 +433,8 @@ function _civicrm_api3_activity_get_extraFilters(&$params, &$sql) {
  * @param array $params
  *   API request parameters.
  * @param array $activities
+ * @param array $options
+ *   Options array (pre-processed to extract 'return' from params).
  *
  * @return array
  *   new activities list
@@ -463,19 +446,14 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
 
   $returns = $options['return'];
   foreach ($params as $n => $v) {
+    // @todo - the per-parsing on options should have already done this.
     if (substr($n, 0, 7) == 'return.') {
       $returnkey = substr($n, 7);
       $returns[$returnkey] = $v;
     }
   }
 
-  $returns['source_contact_id'] = 1;
-  if (!empty($returns['target_contact_name'])) {
-    $returns['target_contact_id'] = 1;
-  }
-  if (!empty($returns['assignee_contact_name'])) {
-    $returns['assignee_contact_id'] = 1;
-  }
+  _civicrm_api3_activity_fill_activity_contact_names($activities, $params, $returns);
 
   $tagGet = array('tag_id', 'entity_id');
   $caseGet = $caseIds = array();
@@ -493,34 +471,14 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
   foreach ($returns as $n => $v) {
     switch ($n) {
       case 'assignee_contact_id':
-        foreach ($activities as $key => $activityArray) {
-          $cids = $activities[$key]['assignee_contact_id'] = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($activityArray['id']);
-          if ($cids && !empty($returns['assignee_contact_name'])) {
-            foreach ($cids as $cid) {
-              $activities[$key]['assignee_contact_name'][$cid] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name');
-            }
-          }
-        }
-        break;
-
       case 'target_contact_id':
-        foreach ($activities as $key => $activityArray) {
-          $cids = $activities[$key]['target_contact_id'] = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId($activityArray['id']);
-          if ($cids && !empty($returns['target_contact_name'])) {
-            foreach ($cids as $cid) {
-              $activities[$key]['target_contact_name'][$cid] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name');
-            }
+        foreach ($activities as &$activity) {
+          if (!isset($activity[$n])) {
+            $activity[$n] = [];
           }
         }
-        break;
 
       case 'source_contact_id':
-        foreach ($activities as $key => $activityArray) {
-          $cid = $activities[$key]['source_contact_id'] = CRM_Activity_BAO_Activity::getSourceContactID($activityArray['id']);
-          if ($cid && !empty($returns['source_contact_name'])) {
-            $activities[$key]['source_contact_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name');
-          }
-        }
         break;
 
       case 'tag_id':
@@ -611,6 +569,66 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
     }
   }
   return $activities;
+}
+
+/**
+ * Append activity contact details to activity results.
+ *
+ * Adds id & name of activity contacts to results array if check_permissions
+ * does not block access to them.
+ *
+ * For historical reasons source_contact_id is always added & is not an array.
+ * The others are added depending on requested return params.
+ *
+ * @param array $activities
+ * @param array $params
+ * @param array $returns
+ */
+function _civicrm_api3_activity_fill_activity_contact_names(&$activities, $params, $returns) {
+  $contactTypes = array_flip(CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate'));
+  $assigneeType = $contactTypes['Activity Assignees'];
+  $targetType = $contactTypes['Activity Targets'];
+  $sourceType = $contactTypes['Activity Source'];
+  $typeMap = [
+    $assigneeType => 'assignee',
+    $sourceType => 'source',
+    $targetType => 'target'
+  ];
+
+  $activityContactTypes = [$sourceType];
+
+  if (!empty($returns['target_contact_name']) || !empty($returns['target_contact_id'])) {
+    $activityContactTypes[] = $targetType;
+  }
+  if (!empty($returns['assignee_contact_name']) || (!empty($returns['assignee_contact_id']))) {
+    $activityContactTypes[] = $assigneeType;
+  }
+  $activityContactParams = [
+    'activity_id' => ['IN' => array_keys($activities)],
+    'return' => [
+      'activity_id',
+      'record_type_id',
+      'contact_id.display_name',
+      'contact_id'
+    ],
+    'check_permissions' => !empty($params['check_permissions']),
+  ];
+  if (count($activityContactTypes) < 3) {
+    $activityContactParams['record_type_id'] = ['IN' => $activityContactTypes];
+  }
+  $activityContacts = civicrm_api3('ActivityContact', 'get', $activityContactParams)['values'];
+  foreach ($activityContacts as $activityContact) {
+    $contactID = $activityContact['contact_id'];
+    $recordType = $typeMap[$activityContact['record_type_id']];
+    if (in_array($recordType, ['target', 'assignee'])) {
+      $activities[$activityContact['activity_id']][$recordType . '_contact_id'][] = $contactID;
+      $activities[$activityContact['activity_id']][$recordType . '_contact_name'][$contactID] = isset($activityContact['contact_id.display_name']) ? $activityContact['contact_id.display_name'] : '';
+    }
+    else {
+      $activities[$activityContact['activity_id']]['source_contact_id'] = $contactID;
+      $activities[$activityContact['activity_id']]['source_contact_name'] = isset($activityContact['contact_id.display_name']) ? $activityContact['contact_id.display_name'] : '';
+    }
+  }
 }
 
 

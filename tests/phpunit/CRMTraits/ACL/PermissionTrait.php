@@ -156,4 +156,14 @@ trait CRMTraits_ACL_PermissionTrait {
     $this->setupCoreACLPermittedToGroup([$this->scenarioIDs['Group']['permitted_group']]);
   }
 
+  /**
+   * Clean up places where permissions get cached.
+   */
+  protected function cleanupCachedPermissions() {
+    if (isset(Civi::$statics['CRM_Contact_BAO_Contact_Permission'])) {
+      unset(Civi::$statics['CRM_Contact_BAO_Contact_Permission']);
+    }
+    CRM_Core_DAO::executeQuery('TRUNCATE civicrm_acl_contact_cache');
+  }
+
 }
