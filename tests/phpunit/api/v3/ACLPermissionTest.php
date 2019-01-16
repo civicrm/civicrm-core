@@ -678,6 +678,34 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'id' => $this->scenarioIDs['Contact']['non_permitted_contact'],
       'check_permissions' => 1,
     ], 0);
+
+    // Also check that we can access ACLs through a path that uses the acl_contact_cache table.
+    // historically this has caused errors due to the key_constraint on that table.
+    // This is a bit of an artificial check as we have to amp up permissions to access this api.
+    // However, the lower level function is more directly accessed through the Contribution & Event & Profile
+    $dupes = $this->callAPISuccess('Contact', 'duplicatecheck', [
+      'match' => [
+        'first_name' => 'Anthony',
+        'last_name' => 'Anderson',
+        'contact_type' => 'Individual',
+        'email' => 'anthony_anderson@civicrm.org',
+      ],
+      'check_permissions' => 0,
+    ]);
+    $this->assertEquals(2, $dupes['count']);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM'];
+
+    $dupes = $this->callAPISuccess('Contact', 'duplicatecheck', [
+      'match' => [
+        'first_name' => 'Anthony',
+        'last_name' => 'Anderson',
+        'contact_type' => 'Individual',
+        'email' => 'anthony_anderson@civicrm.org',
+      ],
+      'check_permissions' => 1,
+    ]);
+    $this->assertEquals(1, $dupes['count']);
+
   }
 
 }
