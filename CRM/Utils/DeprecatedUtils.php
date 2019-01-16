@@ -243,7 +243,18 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
 
       case 'payment_instrument':
         require_once 'CRM/Core/PseudoConstant.php';
-        $values['payment_instrument_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $value);
+        $key = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $value);
+        if (!$key && ($key !== 0)) {
+          $pii_options = CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'create');
+          $lower_val = mb_strtolower($value);
+          foreach ($pii_options as $pik => $piv) {
+            if ($lower_val == mb_strtolower($piv)) {
+              $key = $pik;
+              break;
+            }
+          }
+        }
+        $values['payment_instrument_id'] = $key;
         if (empty($values['payment_instrument_id'])) {
           return civicrm_api3_create_error("Payment Instrument is not valid: $value");
         }
