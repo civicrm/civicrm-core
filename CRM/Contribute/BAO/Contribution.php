@@ -5581,14 +5581,7 @@ LIMIT 1;";
     }
     $startDate = "$year$monthDay";
     $endDate = "$nextYear$monthDay";
-    $financialTypes = [];
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-    // this is a clumsy way of saying never return anything
-    // @todo improve!
-    $liWhere = " AND i.financial_type_id IN (0)";
-    if (!empty($financialTypes)) {
-      $liWhere = " AND i.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ")";
-    }
+
     $whereClauses = [
       'contact_id' => 'IN (' . $contactIDs . ')',
       'contribution_status_id' => '= ' . (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
@@ -5609,7 +5602,6 @@ LIMIT 1;";
              AVG(total_amount) as average,
              currency
       FROM civicrm_contribution b
-      LEFT JOIN civicrm_line_item i ON i.contribution_id = b.id AND i.entity_table = 'civicrm_contribution' $liWhere
       WHERE " . $whereClauseString . "
       GROUP BY currency
       ";
