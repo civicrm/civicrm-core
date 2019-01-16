@@ -282,24 +282,26 @@ WHERE cft.id = %1
     $params = array('labelColumn' => 'name');
     $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
     $accountRelationships = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', $params);
-    $Links = array(
-      'Expense Account is' => 'Expenses',
-      'Accounts Receivable Account is' => 'Asset',
-      'Income Account is' => 'Revenue',
-      'Asset Account is' => 'Asset',
-      'Cost of Sales Account is' => 'Cost of Sales',
-      'Premiums Inventory Account is' => 'Asset',
-      'Discounts Account is' => 'Revenue',
-      'Sales Tax Account is' => 'Liability',
-      'Deferred Revenue Account is' => 'Liability',
-    );
+    if (!isset(Civi::$statics[__CLASS__]['account_relationships'])) {
+      Civi::$statics[__CLASS__]['account_relationships'] = array(
+        'Expense Account is' => 'Expenses',
+        'Accounts Receivable Account is' => 'Asset',
+        'Income Account is' => 'Revenue',
+        'Asset Account is' => 'Asset',
+        'Cost of Sales Account is' => 'Cost of Sales',
+        'Premiums Inventory Account is' => 'Asset',
+        'Discounts Account is' => 'Revenue',
+        'Sales Tax Account is' => 'Liability',
+        'Deferred Revenue Account is' => 'Liability',
+      );
+    }
     if (!$flip) {
-      foreach ($Links as $accountRelation => $accountType) {
+      foreach (Civi::$statics[__CLASS__]['account_relationships'] as $accountRelation => $accountType) {
         $financialAccountLinks[array_search($accountRelation, $accountRelationships)] = array_search($accountType, $financialAccountType);
       }
     }
     else {
-      foreach ($Links as $accountRelation => $accountType) {
+      foreach (Civi::$statics[__CLASS__]['account_relationships'] as $accountRelation => $accountType) {
         $financialAccountLinks[array_search($accountType, $financialAccountType)][] = array_search($accountRelation, $accountRelationships);
       }
     }
