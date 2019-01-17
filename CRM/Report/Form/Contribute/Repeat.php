@@ -134,6 +134,11 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
             'name' => 'percentage_change',
             'dbAlias' => '( ( contribution_civireport2.total_amount_sum - contribution_civireport1.total_amount_sum ) * 100 / contribution_civireport1.total_amount_sum )',
           ),
+          'is_deleted' => array(
+             'title' => ts('Is Deleted'),
+             'default' => 0,
+             'type' => CRM_Utils_Type::T_BOOLEAN,
+          ),
         ),
         'group_bys' => array(
           'id' => array(
