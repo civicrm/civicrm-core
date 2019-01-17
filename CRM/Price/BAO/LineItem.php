@@ -178,7 +178,7 @@ WHERE li.contribution_id = %1";
    * @return array
    */
   public static function getLineItemsByContributionID($contributionID) {
-    return self::getLineItems($contributionID, 'contribution', NULL, TRUE, TRUE, " WHERE contribution_id = " . (int) $contributionID);
+    return self::getLineItems($contributionID, 'contribution', NULL, TRUE, TRUE);
   }
 
   /**
