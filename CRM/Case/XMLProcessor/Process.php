@@ -191,6 +191,10 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
         $relationshipTypeID = array_search($relationshipTypeName,
           $relationshipTypes
         );
+
+        // Remove _a_b or _b_a from the end of the id
+        $relationshipTypeID = substr($relationshipTypeID, 0, -4);
+
         if ($relationshipTypeID === FALSE) {
           continue;
         }
