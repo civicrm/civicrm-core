@@ -310,6 +310,15 @@
     <component>CiviContribute</component>
   </item>
   <item>
+    <path>civicrm/contribute/receipt</path>
+    <title>PDF Receipt</title>
+    <page_callback>CRM_Contribute_BAO_Contribution_Utils::getPrintReceiptPDF</page_callback>
+    <access_callback>CRM_Core_Permission::checkDownloadReceipt</access_callback>
+    <page_type>1</page_type>
+    <weight>640</weight>
+    <component>CiviContribute</component>
+  </item>
+  <item>
     <path>civicrm/contribute/invoice/email</path>
     <title>Email Invoice</title>
     <page_callback>CRM_Contribute_Form_Task_Invoice</page_callback>

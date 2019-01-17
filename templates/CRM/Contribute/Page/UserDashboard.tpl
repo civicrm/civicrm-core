@@ -85,6 +85,17 @@
                             <a class="button" href="{$payNowLink}"><span class='nowrap'>{ts}Pay Now{/ts}</span></a>
                           </td>
                         {/if}
+                        {if $row.contribution_status_name == 'Completed' }
+                          <td>
+                            {assign var='id' value=$row.contribution_id}
+                            {assign var='cid' value=$row.contact_id}
+                            {capture assign=printReceipt}{crmURL p='civicrm/contribute/receipt' q="reset=1&id=`$id`&cid=`$cid`"}{/capture}
+                            <a class="button no-popup nowrap" href="{$printReceipt}">
+                              <i class="crm-i fa-print"></i>
+                              <span class='nowrap'>{ts}Print Receipt{/ts}</span>
+                            </a>
+                          </td>
+                        {/if}
                     </tr>
                 {/foreach}
             </table>

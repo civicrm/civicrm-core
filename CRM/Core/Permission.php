@@ -904,6 +904,10 @@ class CRM_Core_Permission {
         $prefix . ts('view my invoices'),
         ts('Allow users to view/ download their own invoices'),
       ),
+      'view my receipts' => array(
+        $prefix . ts('view my receipts'),
+        ts('Allow users to view/ download their own receipts'),
+      ),
       'edit api keys' => array(
         $prefix . ts('edit api keys'),
         ts('Edit API keys'),
@@ -1644,6 +1648,26 @@ class CRM_Core_Permission {
     $cid = CRM_Core_Session::getLoggedInContactID();
     if (CRM_Core_Permission::check('access CiviContribute') ||
       (CRM_Core_Permission::check('view my invoices') && $_GET['cid'] == $cid)
+    ) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Verify if the user has permission to get the receipt.
+   *
+   * @return bool
+   *   TRUE if the user has download all receipts permission or download my
+   *   receipts permission and the receipt author is the current user.
+   */
+  public static function checkDownloadReceipt() {
+    $cid = CRM_Core_Session::getLoggedInContactID();
+    $cidOther = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullArray);
+    // allow permissioned contact to download the receipt
+    if (CRM_Core_Permission::check('access CiviContribute') ||
+      (CRM_Core_Permission::check('view my receipts') && $cidOther == $cid) ||
+      CRM_Contact_BAO_Contact_Permission::relationshipList(array($cidOther))
     ) {
       return TRUE;
     }
