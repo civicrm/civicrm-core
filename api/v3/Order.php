@@ -62,6 +62,19 @@ function civicrm_api3_order_get($params) {
 }
 
 /**
+ * Adjust Metadata for Get action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_order_get_spec(&$params) {
+  $params['id']['api.aliases'] = ['order_id'];
+  $params['id']['title'] = ts('Contribution / Order ID');
+}
+
+/**
  * Add or update a Order.
  *
  * @param array $params
@@ -72,7 +85,7 @@ function civicrm_api3_order_get($params) {
  *   Api result array
  */
 function civicrm_api3_order_create(&$params) {
-  $contribution = array();
+
   $entity = NULL;
   $entityIds = array();
   if (CRM_Utils_Array::value('line_items', $params) && is_array($params['line_items'])) {
@@ -202,12 +215,20 @@ function _civicrm_api3_order_create_spec(&$params) {
     'title' => 'Total Amount',
     'api.required' => TRUE,
   );
-  $params['financial_type_id'] = array(
+  $params['financial_type_id'] = [
     'name' => 'financial_type_id',
     'title' => 'Financial Type',
     'type' => CRM_Utils_Type::T_INT,
     'api.required' => TRUE,
-  );
+    'table_name' => 'civicrm_contribution',
+    'entity' => 'Contribution',
+    'bao' => 'CRM_Contribute_BAO_Contribution',
+    'pseudoconstant' => [
+      'table' => 'civicrm_financial_type',
+      'keyColumn' => 'id',
+      'labelColumn' => 'name',
+    ],
+  ];
 }
 
 /**
