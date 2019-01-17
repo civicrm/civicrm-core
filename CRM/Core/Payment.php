@@ -1146,7 +1146,8 @@ abstract class CRM_Core_Payment {
       array(),
       TRUE,
       NULL,
-      FALSE
+      FALSE,
+      TRUE
     );
     return (stristr($url, '.')) ? $url : '';
   }
