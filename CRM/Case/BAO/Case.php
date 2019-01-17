@@ -1276,9 +1276,27 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         $caseRoles = CRM_Utils_Array::rekey($caseInfo['case_type_id.definition']['caseRoles'], 'name');
       }
     }
+
+    $caseRoleLabels = implode(', ', array_keys($caseRoles));
     $values = array();
     $query = '
-      SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, crt.name_b_a, ce.email, cp.phone
+      SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, crt.name_b_a as role_name, ce.email, cp.phone
+      FROM civicrm_relationship cr
+      LEFT JOIN civicrm_relationship_type crt
+        ON crt.id = cr.relationship_type_id
+      LEFT JOIN civicrm_contact cc
+        ON cc.id = cr.contact_id_a
+      LEFT JOIN civicrm_email ce
+        ON ce.contact_id = cc.id
+        AND ce.is_primary= 1
+      LEFT JOIN civicrm_phone cp
+        ON cp.contact_id = cc.id
+        AND cp.is_primary= 1
+      WHERE cr.case_id =  %1 AND
+        crt.label_b_a IN(%2) AND
+      cr.is_active AND cc.is_deleted <> 1
+      UNION
+      SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_a_b as role, crt.name_a_b as role_name, ce.email, cp.phone
       FROM civicrm_relationship cr
       LEFT JOIN civicrm_relationship_type crt
         ON crt.id = cr.relationship_type_id
@@ -1290,9 +1308,14 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       LEFT JOIN civicrm_phone cp
         ON cp.contact_id = cc.id
         AND cp.is_primary= 1
-      WHERE cr.case_id =  %1 AND cr.is_active AND cc.is_deleted <> 1';
-
-    $params = array(1 => array($caseID, 'Integer'));
+      WHERE cr.case_id =  %1 AND
+        crt.label_a_b IN(%2) AND
+      cr.is_active AND cc.is_deleted <> 1
+      ';
+    $params = array(
+      1 => array($caseID, 'Integer'),
+      2 => array($caseRoleLabels, 'String'),
+    );
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     while ($dao->fetch()) {
@@ -1310,7 +1333,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
           'phone' => $dao->phone,
         );
         // Add more info about the role (creator, manager)
-        $role = CRM_Utils_Array::value($dao->name_b_a, $caseRoles);
+        $role = CRM_Utils_Array::value($dao->role_name, $caseRoles);
         if ($role) {
           unset($role['name']);
           $details += $role;
