@@ -1276,8 +1276,14 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         $caseRoles = CRM_Utils_Array::rekey($caseInfo['case_type_id.definition']['caseRoles'], 'name');
       }
     }
-
-    $caseRoleLabels = implode(', ', array_keys($caseRoles));
+    $caseRoleNames = array();
+    foreach ($caseRoles as $key => $value) {
+      $caseRoleNames[] = '"' . $value['name'] . '"';
+    }
+    // print_r($caseRoleNames); die();
+    $caseRoleLabels = implode(', ', $caseRoleNames);
+    // print_r($caseRoleLabels); die();
+    // $caseRoleLabels = '"Case Coordinator", "Benefits Specialist is", "Sibling of"';
     $values = array();
     $query = '
       SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, crt.name_b_a as role_name, ce.email, cp.phone
@@ -1293,7 +1299,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         ON cp.contact_id = cc.id
         AND cp.is_primary= 1
       WHERE cr.case_id =  %1 AND
-        crt.label_b_a IN(%2) AND
+        crt.label_b_a IN(' . $caseRoleLabels . ') AND
       cr.is_active AND cc.is_deleted <> 1
       UNION
       SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_a_b as role, crt.name_a_b as role_name, ce.email, cp.phone
@@ -1309,7 +1315,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         ON cp.contact_id = cc.id
         AND cp.is_primary= 1
       WHERE cr.case_id =  %1 AND
-        crt.label_a_b IN(%2) AND
+        crt.label_a_b IN(' . $caseRoleLabels . ') AND
       cr.is_active AND cc.is_deleted <> 1
       ';
     $params = array(
