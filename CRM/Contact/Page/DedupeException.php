@@ -53,7 +53,18 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
    * @access protected
    */
   protected function initializePager() {
-    $totalitems = civicrm_api3('Exception', "getcount", array());
+    $params = array();
+
+    $contactOneQ = CRM_Utils_Request::retrieve('crmContact1Q', 'String');
+
+    if ($contactOneQ) {
+      $params['contact_id1.display_name'] = array('LIKE' => '%' . $contactOneQ . '%');
+      $params['contact_id2.display_name'] = array('LIKE' => '%' . $contactOneQ . '%');
+
+      $params['options']['or'] = [["contact_id1.display_name", "contact_id2.display_name"]];
+    }
+
+    $totalitems = civicrm_api3('Exception', "getcount", $params);
     $params           = array(
       'total' => $totalitems,
       'rowCount' => CRM_Utils_Pager::ROWCOUNT,
@@ -75,17 +86,12 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
   protected function getExceptions() {
     list($offset, $limit) = $this->_pager->getOffsetAndRowCount();
     $contactOneQ = CRM_Utils_Request::retrieve('crmContact1Q', 'String');
-    $contactTwoQ = CRM_Utils_Request::retrieve('crmContact2Q', 'String');
 
     if (!$contactOneQ) {
       $contactOneQ = '';
     }
-    if (!$contactTwoQ) {
-      $contactTwoQ = '';
-    }
 
     $this->assign('searchcontact1', $contactOneQ);
-    $this->assign('searchcontact2', $contactTwoQ);
 
     $params = array(
       "options"     => array('limit' => $limit, 'offset' => $offset),
@@ -94,10 +100,9 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
 
     if ($contactOneQ != '') {
       $params['contact_id1.display_name'] = array('LIKE' => '%' . $contactOneQ . '%');
-    }
+      $params['contact_id2.display_name'] = array('LIKE' => '%' . $contactOneQ . '%');
 
-    if ($contactTwoQ != '') {
-      $params['contact_id2.display_name'] = array('LIKE' => '%' . $contactTwoQ . '%');
+      $params['options']['or'] = [["contact_id1.display_name", "contact_id2.display_name"]];
     }
 
     $exceptions = civicrm_api3("Exception", "get", $params);

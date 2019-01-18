@@ -23,22 +23,25 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{include file="CRM/common/dedupe.tpl"}
 <div class="crm-accordion-header">
   {ts}Filter Contacts{/ts}
 </div>
 <div class="crm-accordion-body">
-  <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
-    <tr>
-      <td class="crm-contact-form-block-contact1">
-        <label for="search-contact1">{ts}Contact 1{/ts}</label><br />
-        <input type="text" placeholder="Search Contact1" value="{$searchcontact1}" id="search-contact1" search-column="0" />
-      </td>
-      <td class="crm-contact-form-block-contact2">
-        <label for="search-contact2">{ts}Contact 2{/ts}</label><br />
-        <input type="text" placeholder="Search Contact2" value="{$searchcontact2}" id="search-contact2" search-column="1" />
-      </td>
-    </tr>
-  </table>
+  <form method="get">
+    <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
+      <tr>
+        <td class="crm-contact-form-block-contact1">
+          <label for="search-contact1">{ts}Contact Name{/ts}</label><br />
+          <input type="text" size="50" placeholder="Search Contacts" value="{$searchcontact1}" id="search-contact1" search-column="0" />
+        </td>
+        <td class="crm-contact-form-block-search">
+          <label>&nbsp;</label><br />
+          <button type="submit" class="button crm-button filtercontacts"><span><i class="crm-i fa-search"></i> Find Contacts</span></button>
+        </td>
+      </tr>
+    </table>
+  </form>
 </div>
 
 
@@ -52,6 +55,7 @@
       <tr>
         <th>{ts}Contact 1{/ts}</th>
         <th>{ts}Contact 2 (Duplicate){/ts}</th>
+        <th data-orderable="false"></th>
       </tr>
       </thead>
       <tbody>
@@ -71,7 +75,9 @@
             {assign var="contact2name" value="contact_id2.display_name"}
             <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.contact_id2`"}" target="_blank">{ $exception.$contact2name }</a>
           </td>
-
+          <td>
+            <a id='duplicateContacts' href="#" title={ts}Remove Exception{/ts} onClick="processDupes( {$exception.contact_id1}, {$exception.contact_id2}, 'nondupe-dupe', 'dedupe-exception' );return false;">&raquo; {ts}Remove Exception{/ts}</a>
+          </td>
         </tr>
 
         {if $rowClass eq "odd-row"}
@@ -108,7 +114,8 @@
         var timer = null;
 
       // apply the search
-      $('#searchOptions input').on( 'keydown', function () {
+      $('.filtercontacts').on( 'click', function (e) {
+        e.preventDefault();
         clearTimeout(timer);
         timer = setTimeout(updateTable, 500)
       });
@@ -116,7 +123,6 @@
       function updateTable() {
 
         var contact1term = $('#search-contact1').val();
-        var contact2term = $('#search-contact2').val();
 
         currentLocation = currentLocation.replace(/crmPID=\d+/, 'crmPID=' + 0);
 
@@ -125,13 +131,6 @@
         }
         else {
           currentLocation += '&crmContact1Q='+contact1term;
-        }
-
-        if (currentLocation.indexOf('crmContact2Q') !== -1) {
-          currentLocation = currentLocation.replace(/crmContact2Q=\w*/, 'crmContact2Q=' + contact2term);
-        }
-        else {
-          currentLocation += '&crmContact2Q='+contact2term;
         }
 
         refresh(currentLocation);
