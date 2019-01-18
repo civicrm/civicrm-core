@@ -333,6 +333,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     $results = array();
     while ($dao->fetch()) {
+      $fileHash = self::generateFileHash($dao->entity_id, $dao->cfID);
       $result['fileID'] = $dao->cfID;
       $result['entityID'] = $dao->cefID;
       $result['mime_type'] = $dao->mime_type;
@@ -340,7 +341,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
       $result['description'] = $dao->description;
       $result['cleanName'] = CRM_Utils_File::cleanFileName($dao->uri);
       $result['fullPath'] = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $dao->uri;
-      $result['url'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$dao->cfID}&eid={$dao->entity_id}");
+      $result['url'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$dao->cfID}&eid={$dao->entity_id}&fcs={$fileHash}");
       $result['href'] = "<a href=\"{$result['url']}\">{$result['cleanName']}</a>";
       $result['tag'] = CRM_Core_BAO_EntityTag::getTag($dao->cfID, 'civicrm_file');
       $result['icon'] = CRM_Utils_File::getIconFromMimeType($dao->mime_type);
@@ -764,6 +765,20 @@ AND       CEF.entity_id    = %2";
       return $fileSearch;
     }
     return NULL;
+  }
+
+  /**
+   * Generates a MD5 Hash to be appended to file URLS to be checked when trying to download the file.
+   * @param int $eid entity id the file is attached to
+   * @param int $fid file ID
+   * @return string
+   */
+  public static function generateFileHash($eid = NULL, $fid = NULL) {
+    // Use multiple (but stable) inputs for hash information.
+    $siteKey = defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : 'NO_SITE_KEY';
+    // Trim 8 chars off the string, make it slightly easier to find
+    // but reveals less information from the hash.
+    return substr(md5("{$siteKey}_{$eid}_{$fid}"), 8);
   }
 
 }

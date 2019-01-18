@@ -874,18 +874,19 @@ ORDER BY civicrm_custom_group.weight,
         $fileDAO->id = $dao->$fieldName;
 
         if ($fileDAO->find(TRUE)) {
+          $fileHash = CRM_Core_BAO_File::generateFileHash($dao->$entityIDName, $fileDAO->id);
           $entityIDName = "{$table}_entity_id";
           $customValue['id'] = $dao->$idName;
           $customValue['data'] = $fileDAO->uri;
           $customValue['fid'] = $fileDAO->id;
-          $customValue['fileURL'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$fileDAO->id}&eid={$dao->$entityIDName}");
+          $customValue['fileURL'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$fileDAO->id}&eid={$dao->$entityIDName}&fcs=$fileHash");
           $customValue['displayURL'] = NULL;
           $deleteExtra = ts('Are you sure you want to delete attached file.');
           $deleteURL = array(
             CRM_Core_Action::DELETE => array(
               'name' => ts('Delete Attached File'),
               'url' => 'civicrm/file',
-              'qs' => 'reset=1&id=%%id%%&eid=%%eid%%&fid=%%fid%%&action=delete',
+              'qs' => 'reset=1&id=%%id%%&eid=%%eid%%&fid=%%fid%%&action=delete&fcs=%%fcs%%',
               'extra' => 'onclick = "if (confirm( \'' . $deleteExtra
               . '\' ) ) this.href+=\'&amp;confirmed=1\'; else return false;"',
             ),
@@ -896,6 +897,7 @@ ORDER BY civicrm_custom_group.weight,
               'id' => $fileDAO->id,
               'eid' => $dao->$entityIDName,
               'fid' => $fieldID,
+              'fcs' => $fileHash,
             ),
             ts('more'),
             FALSE,
