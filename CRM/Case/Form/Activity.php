@@ -543,9 +543,11 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         // add tags if exists
         $tagParams = array();
         if (!empty($params['tag'])) {
-          foreach ($params['tag'] as $tag) {
-            $tagParams[$tag] = 1;
+          if (!is_array($params['tag'])) {
+            $params['tag'] = explode(',', $params['tag']);
           }
+
+          $tagParams = array_fill_keys($params['tag'], 1);
         }
 
         //save static tags
