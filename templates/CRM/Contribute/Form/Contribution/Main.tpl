@@ -293,10 +293,7 @@
   </fieldset>
   {/if}
 
-  <div id="billing-payment-block">
-    {include file="CRM/Financial/Form/Payment.tpl" snippet=4}
-  </div>
-  {include file="CRM/common/paymentBlock.tpl"}
+  {include file="CRM/Core/BillingBlockWrapper.tpl"}
 
   <div class="crm-public-form-item crm-group custom_post_profile-group">
   {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
