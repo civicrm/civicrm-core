@@ -48,8 +48,8 @@
  *   the string, translated by gettext
  */
 function smarty_block_htxt($params, $text, &$smarty) {
-  $id = $params['id'];
-  if ($id == $smarty->_tpl_vars['id']) {
+  if ($params['id'] == $smarty->_tpl_vars['id']) {
+    $smarty->assign('override_help_text', !empty($params['override']));
     return $text;
   }
   else {

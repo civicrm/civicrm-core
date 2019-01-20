@@ -49,14 +49,19 @@ class CRM_Core_Page_Inline_Help {
       }
       $smarty->assign('params', $args);
 
+      $output = $smarty->fetch($file);
       $extraoutput = '';
       if ($smarty->template_exists($additionalTPLFile)) {
         //@todo hook has been put here as a conservative approach
         // but probably should always run. It doesn't run otherwise because of the exit
         CRM_Utils_Hook::pageRun($this);
         $extraoutput .= trim($smarty->fetch($additionalTPLFile));
+        // Allow override param to replace default text e.g. {hlp id='foo' override=1}
+        if ($smarty->get_template_vars('override_help_text')) {
+          $output = '';
+        }
       }
-      exit($smarty->fetch($file) . $extraoutput);
+      exit($output . $extraoutput);
     }
   }
 
