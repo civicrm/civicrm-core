@@ -165,6 +165,16 @@ class CRM_Utils_Cache {
    *     should function correctly, but it can be harder to inspect/debug.
    *   - type: array|string, list of acceptable cache types, in order of preference.
    *   - prefetch: bool, whether to prefetch all data in cache (if possible).
+   *   - withArray: bool|null|'fast', whether to setup a thread-local array-cache in front of the cache driver.
+   *     Note that cache-values may be passed to the underlying driver with extra metadata,
+   *     so this will slightly change/enlarge the on-disk format.
+   *     Support varies by driver:
+   *       - For most memory backed caches, this option is meaningful.
+   *       - For SqlGroup, this option is ignored. SqlGroup has equivalent behavior built-in.
+   *       - For Arraycache, this option is ignored. It's redundant.
+   *      If this is a short-lived process in which TTL's don't matter, you might
+   *      use 'fast' mode. It sacrifices some PSR-16 compliance and cache-coherency
+   *      protections to improve performance.
    * @return CRM_Utils_Cache_Interface
    * @throws CRM_Core_Exception
    * @see Civi::cache()
@@ -183,7 +193,11 @@ class CRM_Utils_Cache {
             $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
             $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
             $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . $params['name'] . self::DELIMITER;
-            return new $dbCacheClass($settings);
+            $cache = new $dbCacheClass($settings);
+            if (!empty($params['withArray'])) {
+              $cache = $params['withArray'] === 'fast' ? new CRM_Utils_Cache_FastArrayDecorator($cache) : new CRM_Utils_Cache_ArrayDecorator($cache);
+            }
+            return $cache;
           }
           break;
 
