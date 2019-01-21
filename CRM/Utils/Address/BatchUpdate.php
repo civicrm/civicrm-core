@@ -158,6 +158,7 @@ class CRM_Utils_Address_BatchUpdate {
                a.street_address,
                a.city,
                a.postal_code,
+               a.country_id,
                s.name as state,
                o.name as country
     FROM       civicrm_contact  c
@@ -181,6 +182,7 @@ class CRM_Utils_Address_BatchUpdate {
         'city' => $dao->city,
         'state_province' => $dao->state,
         'country' => $dao->country,
+        'country_id' => $dao->country_id,
       );
 
       $addressParams = array();
