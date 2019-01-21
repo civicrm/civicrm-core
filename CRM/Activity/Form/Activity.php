@@ -1066,9 +1066,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       if (!is_array($params['tag'])) {
         $params['tag'] = explode(',', $params['tag']);
       }
-      foreach ($params['tag'] as $tag) {
-        $tagParams[$tag] = 1;
-      }
+
+      $tagParams = array_fill_keys($params['tag'], 1);
     }
 
     // Save static tags.
