@@ -707,4 +707,22 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
     $form->assign('campaignInfo', $campaignInfo);
   }
 
+  /**
+   * Links to create new campaigns from entityRef widget
+   *
+   * @return array|bool
+   */
+  public static function entityRefCreateLinks() {
+    if (CRM_Core_Permission::check([['administer CiviCampaign', 'manage campaign']])) {
+      return [
+        [
+          'label' => ts('New Campaign'),
+          'url' => CRM_Utils_System::url('civicrm/campaign/add', "reset=1",
+            NULL, NULL, FALSE, FALSE, TRUE),
+          'type' => 'Campaign',
+        ]];
+    }
+    return FALSE;
+  }
+
 }

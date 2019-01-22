@@ -578,11 +578,13 @@ if (!CRM.vars) CRM.vars = {};
                 formUrl = $(this).attr('href') + '&returnExtra=display_name,sort_name' + (extra ? (',' + extra) : '');
               $el.select2('close');
               CRM.loadForm(formUrl, {
-                dialog: {width: 500, height: 220}
+                dialog: {width: '50%', height: 220}
               }).on('crmFormSuccess', function(e, data) {
                 if (data.status === 'success' && data.id) {
-                  data.label = data.extra.sort_name;
-                  CRM.status(ts('%1 Created', {1: data.extra.display_name}));
+                  if (!data.crmMessages) {
+                    CRM.status(ts('%1 Created', {1: data.label || data.extra.display_name}));
+                  }
+                  data.label = data.label || data.extra.sort_name;
                   if ($el.select2('container').hasClass('select2-container-multi')) {
                     var selection = $el.select2('data');
                     selection.push(data);
@@ -684,32 +686,16 @@ if (!CRM.vars) CRM.vars = {};
       createLinks = $el.data('create-links'),
       params = getEntityRefApiParams($el).params,
       markup = '<div class="crm-entityref-links">';
-    if (!createLinks || $el.data('api-entity').toLowerCase() !== 'contact') {
+    if (!createLinks || (createLinks === true && $el.data('api-entity').toLowerCase() !== 'contact')) {
       return '';
     }
     if (createLinks === true) {
       createLinks = params.contact_type ? _.where(CRM.config.entityRef.contactCreate, {type: params.contact_type}) : CRM.config.entityRef.contactCreate;
     }
     _.each(createLinks, function(link) {
-      var icon;
-      switch (link.type) {
-        case 'Individual':
-          icon = 'fa-user';
-          break;
-
-        case 'Organization':
-          icon = 'fa-building';
-          break;
-
-        case 'Household':
-          icon = 'fa-home';
-          break;
-      }
-      markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">';
-      if (icon) {
-        markup += '<i class="crm-i ' + icon + '"></i> ';
-      }
-      markup += _.escape(link.label) + '</a>';
+      markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">' +
+        '<i class="crm-i ' + (link.icon || 'fa-plus-circle') + '"></i> ' +
+        _.escape(link.label) + '</a>';
     });
     markup += '</div>';
     return markup;

@@ -88,3 +88,56 @@ function civicrm_api3_campaign_get($params) {
 function civicrm_api3_campaign_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
+
+/**
+ * Get campaign list parameters.
+ *
+ * @see _civicrm_api3_generic_getlist_params
+ *
+ * @param array $request
+ */
+function _civicrm_api3_campaign_getlist_params(&$request) {
+  $fieldsToReturn = ['title', 'campaign_type_id', 'start_date', 'end_date'];
+  $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
+  if (empty($request['params']['id'])) {
+    $request['params'] += [
+      'is_active' => 1,
+    ];
+  }
+}
+
+/**
+ * Get campaign list output.
+ *
+ * @see _civicrm_api3_generic_getlist_output
+ *
+ * @param array $result
+ * @param array $request
+ *
+ * @return array
+ */
+function _civicrm_api3_campaign_getlist_output($result, $request) {
+  $output = [];
+  if (!empty($result['values'])) {
+    foreach ($result['values'] as $row) {
+      $data = [
+        'id' => $row[$request['id_field']],
+        'label' => $row[$request['label_field']],
+        'description' => [
+          CRM_Core_Pseudoconstant::getLabel(
+            'CRM_Campaign_BAO_Campaign',
+            'campaign_type_id',
+            $row['campaign_type_id']
+          ),
+        ],
+      ];
+      $config = CRM_Core_Config::singleton();
+      $data['description'][0] .= ': ' . CRM_Utils_Date::customFormat($row['start_date'], $config->dateformatFull) . ' - ';
+      if (!empty($row['end_date'])) {
+        $data['description'][0] .= CRM_Utils_Date::customFormat($row['end_date'], $config->dateformatFull);
+      }
+      $output[] = $data;
+    }
+  }
+  return $output;
+}

@@ -3340,6 +3340,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     ));
     $links = $append = array();
     if (!empty($retrieved['values'])) {
+      $icons = [
+        'individual' => 'fa-user',
+        'organization' => 'fa-building',
+        'household' => 'fa-home',
+      ];
       foreach ($retrieved['values'] as $id => $profile) {
         if (in_array($profile['name'], $profiles)) {
           $links[] = array(
@@ -3347,6 +3352,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             'url' => CRM_Utils_System::url('civicrm/profile/create', "reset=1&context=dialog&gid=$id",
               NULL, NULL, FALSE, FALSE, TRUE),
             'type' => ucfirst(str_replace('new_', '', $profile['name'])),
+            'icon' => CRM_Utils_Array::value(str_replace('new_', '', $profile['name']), $icons),
           );
         }
         else {
