@@ -318,4 +318,82 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $this->assertDBCompareValues('CRM_Friend_DAO_Friend', $searchActParams, $compareActParams);
   }
 
+  /**
+   * Testing Activity Generation through Entity Recursion with Custom Data and Tags.
+   */
+  public function testRecurringEntityGenerationWithCustomDataAndTags() {
+
+    // Create custom group and field
+    $customGroup = $this->customGroupCreate(array(
+      'extends' => 'Activity',
+    ));
+    $customField = $this->customFieldCreate(array(
+      'custom_group_id' => $customGroup['id'],
+      'default_value'   => '',
+      )
+    );
+
+    // Create activity Tag
+    $tag = $this->tagCreate(array(
+      'used_for' => 'Activities',
+    ));
+
+    // Create original activity
+    $customFieldValue = 'Custom Value';
+    $activityDateTime = date('YmdHis');
+    $activityId = $this->activityCreate(array(
+      'activity_date_time' => $activityDateTime,
+      'custom_' . $customField['id'] => $customFieldValue,
+    ));
+
+    $activityId = $activityId['id'];
+
+    // Assign tag to a activity.
+    $this->callAPISuccess('EntityTag', 'create', array(
+      'entity_table' => 'civicrm_activity',
+      'entity_id'    => $activityId,
+      'tag_id'       => $tag['id'],
+    ));
+
+    // Create recurring activities.
+    $recursion = new CRM_Core_BAO_RecurringEntity();
+    $recursion->entity_id = $activityId;
+    $recursion->entity_table = 'civicrm_activity';
+    $recursion->dateColumns = array('activity_date_time');
+    $recursion->schedule = array(
+      'entity_value' => $activityId,
+      'start_action_date' => $activityDateTime,
+      'entity_status' => 'fourth saturday',
+      'repetition_frequency_unit' => 'month',
+      'repetition_frequency_interval' => 3,
+      'start_action_offset' => 3,
+      'used_for' => 'activity',
+    );
+
+    $generatedEntities = $recursion->generate();
+    $generatedActivities = $generatedEntities['civicrm_activity'];
+
+    $this->assertEquals(3, count($generatedActivities), "Check if number of iterations are 3");
+
+    foreach ($generatedActivities as $generatedActivityId) {
+
+      // Validate tag in recurring activity
+      $this->callAPISuccess('EntityTag', 'getsingle', array(
+        'entity_table' => 'civicrm_activity',
+        'entity_id'    => $generatedActivityId,
+      ));
+
+      // Validate custom data in recurring activity
+      $activity = $this->callAPISuccess('activity', 'getsingle', array(
+        'return' => array(
+          'custom_' . $customField['id'],
+        ),
+        'id' => $generatedActivityId,
+      ));
+
+      $this->assertEquals($customFieldValue, $activity['custom_' . $customField['id']], 'Custom field value should be ' . $customFieldValue);
+
+    }
+  }
+
 }
