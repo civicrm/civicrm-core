@@ -279,7 +279,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
     if ($this->_relField) {
       $this->_from = "
             FROM civicrm_contact $c
-inner join civicrm_relationship $cr on {$c}.id = ${cr}.contact_id_b
+inner join civicrm_relationship $cr on {$c}.id = ${cr}.contact_id_b OR {$c}.id = ${cr}.contact_id_a
 inner join civicrm_case $cc on ${cc}.id = ${cr}.case_id
 inner join civicrm_relationship_type $crt on ${crt}.id=${cr}.relationship_type_id
 inner join civicrm_case_contact $ccc on ${ccc}.case_id = ${cc}.id
