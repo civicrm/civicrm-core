@@ -92,9 +92,6 @@ class CRM_Core_Page_File extends CRM_Core_Page {
    * @return bool
    */
   public static function validateFileHash($hash, $eid, $fid) {
-    if (empty($hash)) {
-      return TRUE;
-    }
     $testHash = CRM_Core_BAO_File::generateFileHash($eid, $fid);
     if ($testHash == $hash) {
       return TRUE;
