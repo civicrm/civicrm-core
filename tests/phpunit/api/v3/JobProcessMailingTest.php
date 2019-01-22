@@ -337,7 +337,6 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    *    The total number of contacts for whom messages should have
    *    been sent.
    * @dataProvider concurrencyExamples
-   * @group ornery
    */
   public function testConcurrency($settings, $expectedTallies, $expectedTotal) {
     $settings = array_merge($this->defaultSettings, $settings);
