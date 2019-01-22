@@ -1276,51 +1276,46 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         $caseRoles = CRM_Utils_Array::rekey($caseInfo['case_type_id.definition']['caseRoles'], 'name');
       }
     }
-    $caseRoleNames = array();
-    foreach ($caseRoles as $key => $value) {
-      $caseRoleNames[] = '"' . $value['name'] . '"';
-    }
-    // print_r($caseRoleNames); die();
-    $caseRoleLabels = implode(', ', $caseRoleNames);
-    // print_r($caseRoleLabels); die();
-    // $caseRoleLabels = '"Case Coordinator", "Benefits Specialist is", "Sibling of"';
+
     $values = array();
     $query = '
       SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, crt.name_b_a as role_name, ce.email, cp.phone
       FROM civicrm_relationship cr
-      LEFT JOIN civicrm_relationship_type crt
+      JOIN civicrm_relationship_type crt
         ON crt.id = cr.relationship_type_id
-      LEFT JOIN civicrm_contact cc
+        AND crt.label_b_a IN (%2)
+      JOIN civicrm_contact cc
         ON cc.id = cr.contact_id_a
+        AND cc.is_deleted <> 1
       LEFT JOIN civicrm_email ce
         ON ce.contact_id = cc.id
         AND ce.is_primary= 1
       LEFT JOIN civicrm_phone cp
         ON cp.contact_id = cc.id
         AND cp.is_primary= 1
-      WHERE cr.case_id =  %1 AND
-        crt.label_b_a IN(' . $caseRoleLabels . ') AND
-      cr.is_active AND cc.is_deleted <> 1
+      WHERE cr.case_id =  %1
+        AND cr.is_active
       UNION
       SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_a_b as role, crt.name_a_b as role_name, ce.email, cp.phone
       FROM civicrm_relationship cr
-      LEFT JOIN civicrm_relationship_type crt
+      JOIN civicrm_relationship_type crt
         ON crt.id = cr.relationship_type_id
-      LEFT JOIN civicrm_contact cc
+        AND crt.label_a_b IN (%2)
+      JOIN civicrm_contact cc
         ON cc.id = cr.contact_id_b
+        AND cc.is_deleted <> 1
       LEFT JOIN civicrm_email ce
         ON ce.contact_id = cc.id
         AND ce.is_primary= 1
       LEFT JOIN civicrm_phone cp
         ON cp.contact_id = cc.id
         AND cp.is_primary= 1
-      WHERE cr.case_id =  %1 AND
-        crt.label_a_b IN(' . $caseRoleLabels . ') AND
-      cr.is_active AND cc.is_deleted <> 1
+      WHERE cr.case_id =  %1
+        AND cr.is_active
       ';
     $params = array(
       1 => array($caseID, 'Integer'),
-      2 => array($caseRoleLabels, 'String'),
+      2 => array(CRM_Utils_Array::collect('name', $caseRoles), 'String'),
     );
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
