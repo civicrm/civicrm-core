@@ -1936,19 +1936,30 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
 
     $managerRoleId = $xmlProcessor->getCaseManagerRoleId($caseType);
-    $managerRoleId = preg_replace(array('/_b_a/', '/_a_b/'), '', $managerRoleId);
 
     if (!empty($managerRoleId)) {
-      $managerRoleQuery = "
-SELECT civicrm_contact.id as casemanager_id,
-       civicrm_contact.sort_name as casemanager
- FROM civicrm_contact
- LEFT JOIN civicrm_relationship ON (civicrm_relationship.contact_id_b = civicrm_contact.id AND civicrm_relationship.relationship_type_id = %1)
- LEFT JOIN civicrm_case ON civicrm_case.id = civicrm_relationship.case_id
- WHERE civicrm_case.id = %2 AND is_active = 1";
+      if (substr($managerRoleId, -4) == '_b_a') {
+        $managerRoleQuery = "
+          SELECT civicrm_contact.id as casemanager_id,
+                 civicrm_contact.sort_name as casemanager
+           FROM civicrm_contact
+           LEFT JOIN civicrm_relationship ON (civicrm_relationship.contact_id_b = civicrm_contact.id AND civicrm_relationship.relationship_type_id = %1)
+           LEFT JOIN civicrm_case ON civicrm_case.id = civicrm_relationship.case_id
+           WHERE civicrm_case.id = %2 AND is_active = 1";
+      }
+      if (substr($managerRoleId, -4) == '_a_b') {
+        $managerRoleQuery = "
+          SELECT civicrm_contact.id as casemanager_id,
+                 civicrm_contact.sort_name as casemanager
+           FROM civicrm_contact
+           LEFT JOIN civicrm_relationship ON (civicrm_relationship.contact_id_a = civicrm_contact.id AND civicrm_relationship.relationship_type_id = %1)
+           LEFT JOIN civicrm_case ON civicrm_case.id = civicrm_relationship.case_id
+           WHERE civicrm_case.id = %2 AND is_active = 1";
+      }
+
 
       $managerRoleParams = array(
-        1 => array($managerRoleId, 'Integer'),
+        1 => array(substr($managerRoleId, 0, -4), 'Integer'),
         2 => array($caseId, 'Integer'),
       );
 
