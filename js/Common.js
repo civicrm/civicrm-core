@@ -725,6 +725,10 @@ if (!CRM.vars) CRM.vars = {};
       var filter = $.extend({type: 'select', 'attributes': {}, entity: entity}, this);
       $.extend(this, filter);
       if (!params[filter.key]) {
+        // Filter out options if params don't match its condition
+        if (filter.condition && !_.isMatch(params, _.pick(filter.condition, _.keys(params)))) {
+          return;
+        }
         result.push(filter);
       }
       else if (filter.key == 'contact_type' && typeof params.contact_sub_type === 'undefined') {
