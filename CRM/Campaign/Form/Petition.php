@@ -190,9 +190,10 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     // script / instructions / description of petition purpose
     $this->add('wysiwyg', 'instructions', ts('Introduction'), $attributes['instructions']);
 
-    // Campaign id
-    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value('campaign_id', $this->_values));
-    $this->add('select', 'campaign_id', ts('Campaign'), array('' => ts('- select -')) + $campaigns);
+    $this->addEntityRef('campaign_id', ts('Campaign'), [
+      'entity' => 'campaign',
+      'create' => TRUE,
+    ]);
 
     $customContactProfiles = CRM_Core_BAO_UFGroup::getProfiles(array('Individual'));
     // custom group id
