@@ -13,6 +13,10 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
+  /**
+   * Test the format returned by Google GeoCoding
+   * @group ornery
+   */
   public function testStateProvinceFormat() {
     $params = array('state_province_id' => 1022, 'country' => 'U.S.A');
     $formatted = CRM_Utils_Geocode_Google::format($params);
@@ -24,6 +28,10 @@ class CRM_Utils_GeocodeTest extends CiviUnitTestCase {
     $this->assertApproxEquals('-94.68', $params['geo_code_2'], 1);
   }
 
+  /**
+   * Test Geoging Method off
+   * @group ornery
+   */
   public function testGeocodeMethodOff() {
     // Set a geocoding provider.
     $result = civicrm_api3('Setting', 'create', array(
