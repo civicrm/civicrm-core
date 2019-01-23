@@ -33,17 +33,14 @@
  * The traditional CRM_Utils_Cache_Interface did not support has().
  * To get drop-in compliance with PSR-16, we use a naive adapter.
  *
- * Ideally, these should be replaced with more performant/native versions.
+ * There may be opportunities to replace/optimize in specific drivers.
  */
 trait CRM_Utils_Cache_NaiveHasTrait {
 
   public function has($key) {
-    // This is crazy-talk. If you've got an environment setup where you might
-    // be investigating this, fix your preferred cache driver by
-    // replacing `NaiveHasTrait` with a decent function.
-    $hasDefaultA = ($this->get($key, NULL) === NULL);
-    $hasDefaultB = ($this->get($key, 123) === 123);
-    return !($hasDefaultA && $hasDefaultB);
+    $nack = CRM_Utils_Cache::nack() . 'ht';
+    $value = $this->get($key, $nack);
+    return ($value !== $nack);
   }
 
 }
