@@ -329,12 +329,16 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   public static function getModeSelect() {
     self::setModeValues();
 
+    $enabledComponents = CRM_Core_Component::getEnabledComponents();
     $componentModes = array();
     foreach (self::$_modeValues as $id => & $value) {
+      if (strpos($value['component'], 'Civi') !== FALSE
+        && !array_key_exists($value['component'], $enabledComponents)
+      ) {
+        continue;
+      }
       $componentModes[$id] = $value['selectorLabel'];
     }
-
-    $enabledComponents = CRM_Core_Component::getEnabledComponents();
 
     // unset disabled components
     if (!array_key_exists('CiviMail', $enabledComponents)) {
