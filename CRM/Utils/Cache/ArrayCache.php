@@ -121,4 +121,12 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
     return is_object($value) ? unserialize(serialize($value)) : $value;
   }
 
+  /**
+   * @param string $key
+   * @return int|null
+   */
+  public function getExpires($key) {
+    return $this->_expires[$key] ?: NULL;
+  }
+
 }
