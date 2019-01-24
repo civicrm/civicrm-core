@@ -284,7 +284,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @return CRM_Contact_BAO_Relationship
    */
-  public static function add(&$params, $ids = array(), $contactId = NULL) {
+  public static function add($params, $ids = array(), $contactId = NULL) {
     $params['id'] = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
 
     $hook = 'create';
