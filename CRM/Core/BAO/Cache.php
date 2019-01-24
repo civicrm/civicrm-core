@@ -64,6 +64,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *
    * @return object
    *   The data if present in cache, else null
+   * @deprecated
    */
   public static function &getItem($group, $path, $componentID = NULL) {
     if ($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) {
@@ -105,6 +106,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *
    * @return object
    *   The data if present in cache, else null
+   * @deprecated
    */
   public static function &getItems($group, $componentID = NULL) {
     if ($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) {
@@ -150,6 +152,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *   (required) The path under which this item is stored.
    * @param int $componentID
    *   The optional component ID (so componenets can share the same name space).
+   * @deprecated
    */
   public static function setItem(&$data, $group, $path, $componentID = NULL) {
     if ($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) {
@@ -221,6 +224,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @param string $path
    *   Path of the item that needs to be deleted.
    * @param bool $clearAll clear all caches
+   * @deprecated
    */
   public static function deleteGroup($group = NULL, $path = NULL, $clearAll = TRUE) {
     if ($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) {
