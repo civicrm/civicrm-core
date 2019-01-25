@@ -157,6 +157,11 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->assertEquals(array(), $spec['civicrm_contact']);
     $this->callAPISuccess('System', 'updatelogtables', array());
     $this->checkINNODBLogTableCreated();
+    // Check if API creates new indexes when they're added by hook
+    $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'innodbLogTableSpecNewIndex']);
+    $this->callAPISuccess('System', 'updatelogtables', array());
+    $this->checkINNODBLogTableCreated();
+    $this->assertContains('KEY `index_log_user_id` (`log_user_id`)', $this->checkLogTableCreated());
   }
 
   /**
@@ -196,6 +201,24 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
         'index_id' => 'id',
         'index_log_conn_id' => 'log_conn_id',
         'index_log_date' => 'log_date',
+      ),
+    );
+  }
+
+  /**
+   * Set log engine to InnoDB and add one index
+   *
+   * @param array $logTableSpec
+   */
+  public function innodbLogTableSpecNewIndex(&$logTableSpec) {
+    $logTableSpec['civicrm_contact'] = array(
+      'engine' => 'InnoDB',
+      'engine_config' => 'ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4',
+      'indexes' => array(
+        'index_id' => 'id',
+        'index_log_conn_id' => 'log_conn_id',
+        'index_log_date' => 'log_date',
+        'index_log_user_id' => 'log_user_id', // new index
       ),
     );
   }

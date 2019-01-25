@@ -299,7 +299,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    * Update log tables structure.
    *
    * This function updates log tables to have the log_conn_id type of varchar
-   * and also implements any engine change to INNODB defined by the hooks.
+   * and also implements the engine change defined by the hook (i.e. INNODB).
    *
    * Note changing engine & adding hook-defined indexes, but not changing back
    * to ARCHIVE if engine has not been deliberately set (by hook) and not dropping
@@ -312,15 +312,15 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       $tableSpec = $this->logTableSpec[$mainTable];
       if (isset($tableSpec['engine']) && strtoupper($tableSpec['engine']) != $this->getEngineForLogTable($logTable)) {
         $alterSql[] = "ENGINE=" . $tableSpec['engine'] . " " . CRM_Utils_Array::value('engine_config', $tableSpec);
-        if (!empty($tableSpec['indexes'])) {
-          $indexes = $this->getIndexesForTable($logTable);
-          foreach ($tableSpec['indexes'] as $indexName => $indexSpec) {
-            if (!in_array($indexName, $indexes)) {
-              if (is_array($indexSpec)) {
-                $indexSpec = implode(" , ", $indexSpec);
-              }
-              $alterSql[] = "ADD INDEX {$indexName}($indexSpec)";
+      }
+      if (!empty($tableSpec['indexes'])) {
+        $indexes = $this->getIndexesForTable($logTable);
+        foreach ($tableSpec['indexes'] as $indexName => $indexSpec) {
+          if (!in_array($indexName, $indexes)) {
+            if (is_array($indexSpec)) {
+              $indexSpec = implode(" , ", $indexSpec);
             }
+            $alterSql[] = "ADD INDEX {$indexName}($indexSpec)";
           }
         }
       }
