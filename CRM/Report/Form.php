@@ -4834,9 +4834,11 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   /**
    * Get a standard set of contact filters.
    *
+   * @param array $defaults
+   *
    * @return array
    */
-  public function getBasicContactFilters() {
+  public function getBasicContactFilters($defaults = array()) {
     return array(
       'sort_name' => array(
         'title' => ts('Contact Name'),
@@ -4872,7 +4874,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'is_deceased' => array(
         'title' => ts('Deceased'),
         'type' => CRM_Utils_Type::T_BOOLEAN,
-        'default' => 0,
+        'default' => CRM_Utils_Array::value('deceased', $defaults, 0),
       ),
       'do_not_email' => array(
         'title' => ts('Do not email'),

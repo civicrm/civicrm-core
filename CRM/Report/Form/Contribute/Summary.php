@@ -81,6 +81,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             ),
           )
         ),
+        'filters' => $this->getBasicContactFilters(array('deceased' => NULL)),
         'grouping' => 'contact-fields',
         'group_bys' => array(
           'id' => array('title' => ts('Contact ID')),
