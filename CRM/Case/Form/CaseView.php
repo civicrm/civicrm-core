@@ -74,7 +74,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     // Access check.
     if (!CRM_Case_BAO_Case::accessCase($this->_caseID, FALSE)) {
-      CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this case.'));
     }
 
     $fulltext = CRM_Utils_Request::retrieve('context', 'Alphanumeric');
