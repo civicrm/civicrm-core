@@ -4984,7 +4984,7 @@ civicrm_relationship.start_date > {$today}
     $select .= sprintf(", (%s) AS _wgt", $this->createSqlCase('contact_a.id', $cids));
     $where .= sprintf(' AND contact_a.id IN (%s)', implode(',', $cids));
     $order = 'ORDER BY _wgt';
-    $groupBy = '';
+    $groupBy = ($this->_useGroupBy) ? 'GROUP BY contact_a.id' : '';
     $limit = '';
     $query = "$select $from $where $groupBy $order $limit";
 
