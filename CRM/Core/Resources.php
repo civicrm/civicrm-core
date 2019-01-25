@@ -837,18 +837,18 @@ class CRM_Core_Resources {
       array('key' => 'status_id', 'value' => ts('Activity Status')),
     );
 
-    $filters['contact'] = array(
-      array('key' => 'contact_type', 'value' => ts('Contact Type')),
-      array('key' => 'group', 'value' => ts('Group'), 'entity' => 'group_contact'),
-      array('key' => 'tag', 'value' => ts('Tag'), 'entity' => 'entity_tag'),
-      array('key' => 'state_province', 'value' => ts('State/Province'), 'entity' => 'address'),
-      array('key' => 'country', 'value' => ts('Country'), 'entity' => 'address'),
-      array('key' => 'gender_id', 'value' => ts('Gender')),
-      array('key' => 'is_deceased', 'value' => ts('Deceased')),
-      array('key' => 'contact_id', 'value' => ts('Contact ID'), 'type' => 'text'),
-      array('key' => 'external_identifier', 'value' => ts('External ID'), 'type' => 'text'),
-      array('key' => 'source', 'value' => ts('Contact Source'), 'type' => 'text'),
-    );
+    $filters['contact'] = [
+      ['key' => 'contact_type', 'value' => ts('Contact Type')],
+      ['key' => 'group', 'value' => ts('Group'), 'entity' => 'group_contact'],
+      ['key' => 'tag', 'value' => ts('Tag'), 'entity' => 'entity_tag'],
+      ['key' => 'state_province', 'value' => ts('State/Province'), 'entity' => 'address'],
+      ['key' => 'country', 'value' => ts('Country'), 'entity' => 'address'],
+      ['key' => 'gender_id', 'value' => ts('Gender'), 'condition' => ['contact_type' => 'Individual']],
+      ['key' => 'is_deceased', 'value' => ts('Deceased'), 'condition' => ['contact_type' => 'Individual']],
+      ['key' => 'contact_id', 'value' => ts('Contact ID'), 'type' => 'text'],
+      ['key' => 'external_identifier', 'value' => ts('External ID'), 'type' => 'text'],
+      ['key' => 'source', 'value' => ts('Contact Source'), 'type' => 'text'],
+    ];
 
     if (in_array('CiviCase', $config->enableComponents)) {
       $filters['case'] = array(
