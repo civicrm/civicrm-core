@@ -67,7 +67,7 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
     $this->addElement('text', 'amount_granted', ts('Amount Granted'));
     $this->addRule('amount_granted', ts('Please enter a valid amount.'), 'money');
 
-    $this->addDate('decision_date', ts('Grant Decision'), FALSE, array('formatType' => 'custom'));
+    $this->add('datepicker', 'decision_date', ts('Grant Decision'), [], FALSE, ['time' => FALSE]);
 
     $this->assign('elements', array('status_id', 'amount_granted', 'decision_date'));
     $this->assign('totalSelectedGrants', count($this->_grantIds));
