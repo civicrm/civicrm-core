@@ -607,9 +607,20 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
           'EXTRA' => $dao->EXTRA,
         );
         if (($first = strpos($dao->COLUMN_TYPE, '(')) != 0) {
-          \Civi::$statics[__CLASS__]['columnSpecs'][$dao->TABLE_NAME][$dao->COLUMN_NAME]['LENGTH'] = substr(
+          // this extracts the value between parentheses after the column type.
+          // it could be the column length, i.e. "int(8)", "decimal(20,2)")
+          // or the permitted values of an enum (e.g. "enum('A','B')")
+          $parValue = substr(
             $dao->COLUMN_TYPE, $first + 1, strpos($dao->COLUMN_TYPE, ')') - $first - 1
           );
+          if (strpos($parValue, "'") === FALSE) {
+            // no quote in value means column length
+            \Civi::$statics[__CLASS__]['columnSpecs'][$dao->TABLE_NAME][$dao->COLUMN_NAME]['LENGTH'] = $parValue;
+          }
+          else {
+            // single quote means enum permitted values
+            \Civi::$statics[__CLASS__]['columnSpecs'][$dao->TABLE_NAME][$dao->COLUMN_NAME]['ENUM_VALUES'] = $parValue;
+          }
         }
       }
     }
@@ -647,6 +658,12 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
           || CRM_Utils_Array::value('LENGTH', $civiTableSpecs[$col]) > CRM_Utils_Array::value('LENGTH', $logTableSpecs[$col])
           ) {
             // if data-type is different, surely consider the column
+            $diff['MODIFY'][] = $col;
+          }
+          elseif ($civiTableSpecs[$col]['DATA_TYPE'] == 'enum' &&
+            CRM_Utils_Array::value('ENUM_VALUES', $civiTableSpecs[$col]) != CRM_Utils_Array::value('ENUM_VALUES', $logTableSpecs[$col])
+          ) {
+            // column is enum and the permitted values have changed
             $diff['MODIFY'][] = $col;
           }
           elseif ($civiTableSpecs[$col]['IS_NULLABLE'] != CRM_Utils_Array::value('IS_NULLABLE', $logTableSpecs[$col]) &&
