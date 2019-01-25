@@ -3328,6 +3328,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @return array
    */
   public static function getCreateLinks($profiles = '', $appendProfiles = array()) {
+    if (!CRM_Contact_BAO_Contact::entityRefCreateLinks()) {
+      return [];
+    }
     // Default to contact profiles
     if (!$profiles) {
       $profiles = array('new_individual', 'new_organization', 'new_household');
