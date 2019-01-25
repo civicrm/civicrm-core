@@ -3642,4 +3642,16 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
     return FALSE;
   }
 
+  /**
+   * Checks permission to create new contacts from entityRef widget
+   *
+   * Note: other components must return an array of links from this function,
+   * but Contacts are given special treatment - the links are in javascript already.
+   *
+   * @return bool
+   */
+  public static function entityRefCreateLinks() {
+    return CRM_Core_Permission::check([['edit all contacts', 'add contacts']]);
+  }
+
 }

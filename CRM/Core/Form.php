@@ -1951,7 +1951,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $props['entity'] = _civicrm_api_get_entity_name_from_camel(CRM_Utils_Array::value('entity', $props, 'contact'));
     $props['class'] = ltrim(CRM_Utils_Array::value('class', $props, '') . ' crm-form-entityref');
 
-    if ($props['entity'] == 'contact' && isset($props['create']) && !(CRM_Core_Permission::check('edit all contacts') || CRM_Core_Permission::check('add contacts'))) {
+    if (isset($props['create']) && $props['create'] === TRUE) {
+      require_once "api/v3/utils.php";
+      $baoClass = _civicrm_api3_get_BAO($props['entity']);
+      $props['create'] = $baoClass && is_callable([$baoClass, 'entityRefCreateLinks']) ? $baoClass::entityRefCreateLinks() : FALSE;
+    }
+    if (array_key_exists('create', $props) && empty($props['create'])) {
       unset($props['create']);
     }
 

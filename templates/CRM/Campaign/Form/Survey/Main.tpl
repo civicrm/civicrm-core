@@ -39,7 +39,7 @@
    </tr>
    <tr class="crm-campaign-survey-main-form-block-campaign_id">
      <td class="label">{$form.campaign_id.label}</td>
-     <td class="view-value">{$form.campaign_id.html} &nbsp; <span class="action-link crm-campaign-survey-new_campaign_link"><a href="{crmURL p='civicrm/campaign/add' q='reset=1'}" target="_blank" title="{ts}Opens New Campaign form in a separate window{/ts}">{ts}new campaign{/ts}</a></span>
+     <td class="view-value">{$form.campaign_id.html}
         <div class="description">{ts}Select the campaign for which survey is created.{/ts}</div>
       </td>
    </tr>

@@ -244,23 +244,27 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     // is this Campaign active
     $this->addElement('checkbox', 'is_active', ts('Is Active?'));
 
-    $this->addButtons(array(
-        array(
-          'type' => 'upload',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'upload',
-          'name' => ts('Save and New'),
-          'subName' => 'new',
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $buttons = [
+      [
+        'type' => 'upload',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+    ];
+    // Skip this button when adding a new campaign from an entityRef
+    if (empty($_GET['snippet']) || empty($_GET['returnExtra'])) {
+      $buttons[] = [
+        'type' => 'upload',
+        'name' => ts('Save and New'),
+        'subName' => 'new',
+      ];
+    }
+    $buttons[] = [
+      'type' => 'cancel',
+      'name' => ts('Cancel'),
+    ];
+
+    $this->addButtons($buttons);
   }
 
   /**
@@ -340,6 +344,8 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     if ($result) {
       CRM_Core_Session::setStatus(ts('Campaign %1 has been saved.', array(1 => $result->title)), ts('Saved'), 'success');
       $session->pushUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
+      $this->ajaxResponse['id'] = $result->id;
+      $this->ajaxResponse['label'] = $result->title;
     }
 
     $buttonName = $this->controller->getButtonName();

@@ -596,66 +596,24 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
       $$fld = CRM_Utils_Array::value($fld, $campaignDetails);
     }
 
-    //lets see do we have past campaigns.
-    $hasPastCampaigns = FALSE;
-    $allActiveCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, TRUE, FALSE);
-    if (count($allActiveCampaigns) > count($campaigns)) {
-      $hasPastCampaigns = TRUE;
-    }
-    $hasCampaigns = FALSE;
-    if (!empty($campaigns)) {
-      $hasCampaigns = TRUE;
-    }
-    if ($hasPastCampaigns) {
-      $hasCampaigns = TRUE;
-      $form->add('hidden', 'included_past_campaigns');
-    }
-
     $showAddCampaign = FALSE;
-    $alreadyIncludedPastCampaigns = FALSE;
     if ($connectedCampaignId || ($isCampaignEnabled && $hasAccessCampaign)) {
       $showAddCampaign = TRUE;
-      //lets add past campaigns as options to quick-form element.
-      if ($hasPastCampaigns && $form->getElementValue('included_past_campaigns')) {
-        $campaigns = $allActiveCampaigns;
-        $alreadyIncludedPastCampaigns = TRUE;
-      }
-      $campaign = &$form->add('select',
-        'campaign_id',
-        ts('Campaign'),
-        array('' => ts('- select -')) + $campaigns,
-        FALSE,
-        array('class' => 'crm-select2')
-      );
+      $campaign = $form->addEntityRef('campaign_id', ts('Campaign'), [
+        'entity' => 'campaign',
+        'create' => TRUE,
+      ]);
       //lets freeze when user does not has access or campaign is disabled.
       if (!$isCampaignEnabled || !$hasAccessCampaign) {
         $campaign->freeze();
       }
     }
 
-    $addCampaignURL = NULL;
-    if (empty($campaigns) && $hasAccessCampaign && $isCampaignEnabled) {
-      $addCampaignURL = CRM_Utils_System::url('civicrm/campaign/add', 'reset=1');
-    }
-
-    $includePastCampaignURL = NULL;
-    if ($hasPastCampaigns && $isCampaignEnabled && $hasAccessCampaign) {
-      $includePastCampaignURL = CRM_Utils_System::url('civicrm/ajax/rest',
-        'className=CRM_Campaign_Page_AJAX&fnName=allActiveCampaigns',
-        FALSE, NULL, FALSE
-      );
-    }
-
     //carry this info to templates.
     $infoFields = array(
-      'hasCampaigns',
-      'addCampaignURL',
       'showAddCampaign',
-      'hasPastCampaigns',
       'hasAccessCampaign',
       'isCampaignEnabled',
-      'includePastCampaignURL',
-      'alreadyIncludedPastCampaigns',
     );
     foreach ($infoFields as $fld) {
       $campaignInfo[$fld] = $$fld;
@@ -705,6 +663,24 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
       $campaignInfo[$fld] = $$fld;
     }
     $form->assign('campaignInfo', $campaignInfo);
+  }
+
+  /**
+   * Links to create new campaigns from entityRef widget
+   *
+   * @return array|bool
+   */
+  public static function entityRefCreateLinks() {
+    if (CRM_Core_Permission::check([['administer CiviCampaign', 'manage campaign']])) {
+      return [
+        [
+          'label' => ts('New Campaign'),
+          'url' => CRM_Utils_System::url('civicrm/campaign/add', "reset=1",
+            NULL, NULL, FALSE, FALSE, TRUE),
+          'type' => 'Campaign',
+        ]];
+    }
+    return FALSE;
   }
 
 }

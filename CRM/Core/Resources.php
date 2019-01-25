@@ -870,6 +870,41 @@ class CRM_Core_Resources {
       }
     }
 
+    if (in_array('CiviCampaign', $config->enableComponents)) {
+      $filters['campaign'] = [
+        ['key' => 'campaign_type_id', 'value' => ts('Campaign Type')],
+        ['key' => 'status_id', 'value' => ts('Status')],
+        [
+          'key' => 'start_date',
+          'value' => ts('Start Date'),
+          'options' => [
+            ['key' => '{">":"now"}', 'value' => ts('Upcoming')],
+            [
+              'key' => '{"BETWEEN":["now - 3 month","now"]}',
+              'value' => ts('Past 3 Months'),
+            ],
+            [
+              'key' => '{"BETWEEN":["now - 6 month","now"]}',
+              'value' => ts('Past 6 Months'),
+            ],
+            [
+              'key' => '{"BETWEEN":["now - 1 year","now"]}',
+              'value' => ts('Past Year'),
+            ],
+          ],
+        ],
+        [
+          'key' => 'end_date',
+          'value' => ts('End Date'),
+          'options' => [
+            ['key' => '{">":"now"}', 'value' => ts('In the future')],
+            ['key' => '{"<":"now"}', 'value' => ts('In the past')],
+            ['key' => '{"IS NULL":"1"}', 'value' => ts('Not set')],
+          ],
+        ],
+      ];
+    }
+
     CRM_Utils_Hook::entityRefFilters($filters);
 
     return $filters;
