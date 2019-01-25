@@ -146,7 +146,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
           ),
           'total_amount' => array(
             'title' => ts('Amount Statistics'),
-            'required' => TRUE,
+            'default' => TRUE,
             'statistics' => array(
               'sum' => ts('Total Payments Made'),
               'count' => ts('Contribution Count'),
