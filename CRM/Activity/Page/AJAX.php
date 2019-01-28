@@ -160,7 +160,7 @@ class CRM_Activity_Page_AJAX {
 
     foreach ($caseRelationships as $key => $value) {
       // This role has been filled
-      unset($caseRoles[$value['relation_type']]);
+      unset($caseRoles[$value['relation_type'] . '_'. $value['relationship_direction']]);
       // mark original case relationships record to use on setting edit links below
       $caseRelationships[$key]['source'] = 'caseRel';
     }
@@ -208,7 +208,8 @@ class CRM_Activity_Page_AJAX {
     foreach ($caseRelationships as $key => &$row) {
       $typeLabel = $row['relation'];
       // Add "<br />(Case Manager)" to label
-      if (!empty($row['relation_type']) && $row['relation_type'] == $managerRoleId) {
+      if (!empty($row['relation_type']) && !empty($row['relationship_direction']) &&
+      $row['relation_type'] . '_' . $row['relationship_direction'] == $managerRoleId) {
         $row['relation'] .= '<br />' . '(' . ts('Case Manager') . ')';
       }
       // view user links
