@@ -291,7 +291,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     foreach ($caseRelationships as $key => & $value) {
       if (!empty($managerRoleId)) {
-        if (substr($managerRoleId, 0, -4) == $value['relation_type'] && substr($managerRoleId, -3) == $value['relation_direction']) {
+        if (substr($managerRoleId, 0, -4) == $value['relation_type'] && substr($managerRoleId, -3) == $value['relationship_direction']) {
           $value['relation'] = $managerLabel;
         }
       }
