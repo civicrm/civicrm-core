@@ -1281,7 +1281,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $query = '
       SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, crt.name_b_a as role_name, ce.email, cp.phone
       FROM civicrm_relationship cr
-      JOIN civicrm_relationship_type crt
+      LEFT JOIN civicrm_relationship_type crt
         ON crt.id = cr.relationship_type_id
         AND crt.label_b_a IN (%2)
       JOIN civicrm_contact cc
@@ -1298,7 +1298,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       UNION
       SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_a_b as role, crt.name_a_b as role_name, ce.email, cp.phone
       FROM civicrm_relationship cr
-      JOIN civicrm_relationship_type crt
+      LEFT JOIN civicrm_relationship_type crt
         ON crt.id = cr.relationship_type_id
         AND crt.label_a_b IN (%2)
       JOIN civicrm_contact cc

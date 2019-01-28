@@ -202,6 +202,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     //adding case manager.CRM-4510.
     $managerRoleId = $xmlProcessor->getCaseManagerRoleId($this->_caseType);
+
     if (!empty($managerRoleId)) {
       $caseRoles[$managerRoleId] = $caseRoles[$managerRoleId] . '<br />' . '(' . ts('Case Manager') . ')';
     }
@@ -290,7 +291,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     foreach ($caseRelationships as $key => & $value) {
       if (!empty($managerRoleId)) {
-        if ($managerRoleId == $value['relation_type']) {
+        if (substr($managerRoleId, 0, -4) == $value['relation_type'] && substr($managerRoleId, -3) == $value['relation_direction']) {
           $value['relation'] = $managerLabel;
         }
       }
