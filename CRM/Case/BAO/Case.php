@@ -1938,7 +1938,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $managerRoleId = $xmlProcessor->getCaseManagerRoleId($caseType);
 
     if (!empty($managerRoleId)) {
-      if (substr($managerRoleId, -4) == '_b_a') {
+      if (substr($managerRoleId, -4) == '_a_b') {
         $managerRoleQuery = "
           SELECT civicrm_contact.id as casemanager_id,
                  civicrm_contact.sort_name as casemanager
@@ -1947,7 +1947,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
            LEFT JOIN civicrm_case ON civicrm_case.id = civicrm_relationship.case_id
            WHERE civicrm_case.id = %2 AND is_active = 1";
       }
-      if (substr($managerRoleId, -4) == '_a_b') {
+      if (substr($managerRoleId, -4) == '_b_a') {
         $managerRoleQuery = "
           SELECT civicrm_contact.id as casemanager_id,
                  civicrm_contact.sort_name as casemanager
