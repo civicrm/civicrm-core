@@ -107,7 +107,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       'case_start_date' => $values['case_start_date'],
       'status_class' => $statusClass['grouping'];,
     );
-    
+
     $this->_caseType = $caseTypeName;
     $this->assign('caseDetails', $this->_caseDetails);
 
