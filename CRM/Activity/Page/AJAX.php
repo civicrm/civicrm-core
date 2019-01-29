@@ -236,7 +236,7 @@ class CRM_Activity_Page_AJAX {
       // view end date if set
       if (!empty($row['end_date'])) {
         $row['end_date'] = date("F d, Y", strtotime($row['end_date']));
-      } 
+      }
       else {
         $row['end_date'] = '';
       }
