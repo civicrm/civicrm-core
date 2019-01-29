@@ -5584,10 +5584,10 @@ LIMIT 1;";
 
     $whereClauses = [
       'contact_id' => 'IN (' . $contactIDs . ')',
-      'contribution_status_id' => '= ' . (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       'is_test' => ' = 0',
       'receive_date' => ['>=' . $startDate, '<  ' . $endDate],
     ];
+    $havingClause = 'contribution_status_id = ' . (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     CRM_Financial_BAO_FinancialType::addACLClausesToWhereClauses($whereClauses);
 
     $clauses = [];
@@ -5596,6 +5596,8 @@ LIMIT 1;";
     }
     $whereClauseString = implode(' AND ', $clauses);
 
+    // See https://github.com/civicrm/civicrm-core/pull/13512 for discussion of how
+    // this group by + having on contribution_status_id improves performance
     $query = "
       SELECT COUNT(*) as count,
              SUM(total_amount) as amount,
@@ -5603,7 +5605,8 @@ LIMIT 1;";
              currency
       FROM civicrm_contribution b
       WHERE " . $whereClauseString . "
-      GROUP BY currency
+      GROUP BY currency, contribution_status_id
+      HAVING $havingClause
       ";
     return $query;
   }
