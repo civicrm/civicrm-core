@@ -110,7 +110,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
     }
 
     if (!empty($query->_returnProperties['case_role'])) {
-      $query->_select['case_role'] = "case_relation_type.label_b_a as case_role";
+      $query->_select['case_role'] = "IF(case_relationship.contact_id_b = contact_a.id, case_relation_type.label_b_a, case_relation_type.label_a_b) as case_role";
       $query->_element['case_role'] = 1;
       $query->_tables['case_relationship'] = $query->_whereTables['case_relationship'] = 1;
       $query->_tables['case_relation_type'] = $query->_whereTables['case_relation_type'] = 1;
@@ -434,7 +434,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
       // adding where clause for case_role
 
       case 'case_role':
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("case_relation_type.name_b_a", $op, $value, 'String');
+        // $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("case_relation_type.name_b_a", $op, $value, 'String');
         $query->_qill[$grouping][] = ts("Role in Case  %1 '%2'", array(1 => $op, 2 => $value));
         $query->_tables['case_relation_type'] = $query->_whereTables['case_relationship_type'] = 1;
         $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
@@ -549,7 +549,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
       case 'case_relationship':
         $session = CRM_Core_Session::singleton();
         $userID = $session->get('userID');
-        $from .= " $side JOIN civicrm_relationship case_relationship ON ( case_relationship.contact_id_a = civicrm_case_contact.contact_id AND case_relationship.contact_id_b = {$userID} AND case_relationship.case_id = civicrm_case.id )";
+        $from .= " $side JOIN civicrm_relationship case_relationship ON ( case_relationship.contact_id_a = civicrm_case_contact.contact_id AND case_relationship.contact_id_b = {$userID} AND case_relationship.case_id = civicrm_case.id OR case_relationship.contact_id_b = civicrm_case_contact.contact_id AND case_relationship.contact_id_a = {$userID} AND case_relationship.case_id = civicrm_case.id )";
         break;
 
       case 'case_relation_type':
