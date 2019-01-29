@@ -4743,7 +4743,7 @@ WHERE ft.is_payment = 1
   public static function createCreditNoteId() {
     $prefixValue = Civi::settings()->get('contribution_invoice_settings');
 
-    $creditNoteNum = CRM_Core_DAO::singleValueQuery("SELECT count(creditnote_id) as creditnote_number FROM civicrm_contribution");
+    $creditNoteNum = CRM_Core_DAO::singleValueQuery("SELECT count(creditnote_id) as creditnote_number FROM civicrm_contribution WHERE creditnote_id IS NOT NULL");
     $creditNoteId = NULL;
 
     do {
