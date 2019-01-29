@@ -101,6 +101,12 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       'case_subject' => CRM_Utils_Array::value('subject', $values),
       'case_start_date' => $values['case_start_date'],
     );
+      $statusClass = civicrm_api3('OptionValue', 'getsingle', [
+      'option_group_id' => "case_status",
+      'value' => $values['case_status_id'],
+      'return' => 'grouping',
+    ]);
+    $this->_caseDetails['status_class'] = $statusClass['grouping'];
     $this->_caseType = $caseTypeName;
     $this->assign('caseDetails', $this->_caseDetails);
 
