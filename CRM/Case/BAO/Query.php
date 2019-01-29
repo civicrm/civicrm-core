@@ -296,7 +296,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
           if ($value == 2) {
             $session = CRM_Core_Session::singleton();
             $userID = $session->get('userID');
-            $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("case_relationship.contact_id_b", $op, $userID, 'Int');
+            $query->_where[$grouping][] = "(case_relationship.contact_id_a = $userID AND civicrm_case.is_deleted = 0) OR (case_relationship.contact_id_b = $userID AND civicrm_case.is_deleted = 0)";
             $query->_qill[$grouping][] = ts('Case %1 My Cases', array(1 => $op));
             $query->_tables['case_relationship'] = $query->_whereTables['case_relationship'] = 1;
           }

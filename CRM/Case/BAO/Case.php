@@ -435,7 +435,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       'cov_status.label as case_status_name',
       't_act.status_id',
       'civicrm_case.start_date as case_start_date',
-      'case_relation_type.label_b_a as case_role',
+      "IF(case_relationship.contact_id_b = $userID, case_relation_type.label_a_b, case_relation_type.label_b_a) as case_role",
     );
 
     if ($type == 'upcoming') {
@@ -528,8 +528,8 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
         ON t_act.case_id = civicrm_case.id
  LEFT JOIN civicrm_phone ON (civicrm_phone.contact_id = civicrm_contact.id AND civicrm_phone.is_primary=1)
  LEFT JOIN civicrm_relationship case_relationship
- ON ( case_relationship.contact_id_a = civicrm_case_contact.contact_id AND case_relationship.contact_id_b = {$userID}
-      AND case_relationship.case_id = civicrm_case.id )
+ ON ( case_relationship.contact_id_a = civicrm_case_contact.contact_id AND case_relationship.contact_id_b = {$userID} OR case_relationship.contact_id_b = civicrm_case_contact.contact_id AND case_relationship.contact_id_a = {$userID})
+      AND case_relationship.case_id = civicrm_case.id
 
  LEFT JOIN civicrm_relationship_type case_relation_type
  ON ( case_relation_type.id = case_relationship.relationship_type_id
@@ -619,7 +619,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
     $whereClauses = array('civicrm_case.is_deleted = 0 AND civicrm_contact.is_deleted <> 1');
 
     if (!$allCases) {
-      $whereClauses[] .= " case_relationship.contact_id_b = {$userID} ";
+      $whereClauses[] .= " case_relationship.contact_id_b = {$userID} OR case_relationship.contact_id_a = {$userID}";
     }
     if (empty($params['status_id']) && ($type == 'upcoming' || $type == 'any')) {
       $whereClauses[] = " civicrm_case.status_id != " . CRM_Core_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_status_id', 'Closed');
