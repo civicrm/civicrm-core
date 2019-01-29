@@ -150,7 +150,7 @@ class CRM_Activity_Page_AJAX {
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
 
-    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($contactID, $caseID);
+    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($contactID, $caseID, NULL, FALSE);
     $caseTypeName = CRM_Case_BAO_Case::getCaseType($caseID, 'name');
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $caseRoles = $xmlProcessor->get($caseTypeName, 'CaseRoles');
@@ -179,6 +179,8 @@ class CRM_Activity_Page_AJAX {
         $rel['name'] = '(not assigned)';
         $rel['phone'] = '';
         $rel['email'] = '';
+        $rel['is_active'] = ''; 
+        $rel['end_date'] = ''; 
         $rel['source'] = 'caseRoles';
         $caseRelationships[] = $rel;
       }
@@ -198,15 +200,25 @@ class CRM_Activity_Page_AJAX {
 
     // sort clientRelationships array using jquery call params
     foreach ($caseRelationships as $key => $row) {
-      $sortArray[$key] = $row[$params['_raw_values']['sort'][0]];
+      if (isset($row[$params['_raw_values']['sort'][0]])) {
+        $sortArray[$key] = $row[$params['_raw_values']['sort'][0]]; // FIXME: this line is throwing php notices (undefined index). I added an isset above and while it throws less erros - they are still present.
+      }
     }
-    $sort_type = "SORT_" . strtoupper($params['_raw_values']['order'][0]);
-    array_multisort($sortArray, constant($sort_type), $caseRelationships);
+    if (!empty($row[$params['_raw_values']['sort'][0]])) {
+      $sort_type = "SORT_" . strtoupper($params['_raw_values']['order'][0]);
+      array_multisort($sortArray, constant($sort_type), $caseRelationships); // FIXME: this line is throwing php notices (undefined index). I added an isset above and while it throws less erros - they are still present.
+    }
 
     $relationships = array();
 
     // set user name, email and edit columns links
     foreach ($caseRelationships as $key => &$row) {
+      // add disabled class if role is inactive
+      if (isset($row['is_active'])) { 
+        if ($row['is_active'] == '0') { 
+          $row['DT_RowClass'] = 'disabled';
+        }
+      }
       $typeLabel = $row['relation'];
       // Add "<br />(Case Manager)" to label
       if (!empty($row['relation_type']) && $row['relation_type'] == $managerRoleId) {
@@ -221,6 +233,12 @@ class CRM_Activity_Page_AJAX {
       if ($row['email']) {
         $row['email'] = '<a class="crm-hover-button crm-popup" href="' . CRM_Utils_System::url('civicrm/activity/email/add', 'reset=1&action=add&atype=3&cid=' . $row['cid']) . '&caseid=' . $caseID . '" title="' . ts('Send an Email') . '"><i class="crm-i fa-envelope"></i></a>';
       }
+      // view end date if set
+      if (!empty($row['end_date'])) {
+        $row['end_date'] = date("F d, Y", strtotime($row['end_date']));
+      } else {
+        $row['end_date'] = '';
+      }
       // edit links
       $row['actions'] = '';
       if ($hasAccessToAllCases) {
@@ -228,12 +246,14 @@ class CRM_Activity_Page_AJAX {
         $contactType = $contactType == 'Contact' ? '' : $contactType;
         switch ($row['source']) {
           case 'caseRel':
-            $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
-              '<i class="crm-i fa-pencil"></i>' .
-              '</a>' .
-              '<a href="#deleteCaseRoleDialog" title="' . ts('Remove %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/delcaserole') . '">' .
-              '<span class="icon delete-icon"></span>' .
-              '</a>';
+            if (empty($row['end_date'])) { 
+              $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
+                '<i class="crm-i fa-pencil"></i>' .
+                '</a>' .
+                '<a href="#deleteCaseRoleDialog" title="' . ts('Expire %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/delcaserole') . '">' .
+                '<span class="crm-i fa-ban"></span>' .
+                '</a>';
+              }
             break;
 
           case 'caseRoles':
