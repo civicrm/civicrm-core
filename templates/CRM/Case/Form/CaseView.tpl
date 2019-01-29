@@ -167,6 +167,24 @@
         <div><input name="edit_role_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" /></div>
       </div>
 
+    <div id="caseRoles-selector-show-inactive">
+      {assign var=check value='Show inactive relationships'} <!-- label for check box -->
+                {if $caseDetails.status_class eq 'Opened'}{assign var=statusclass value='1'}{else}{assign var=statusclass value='0'}{/if} <!-- assign the 0 if the case is closed, this will preselect the checkbox as desired -->
+      {html_checkboxes name='inactive'  options=$check selected=$statusclass}
+    </div>
+          {literal}
+            <script type="text/javascript">
+              (function($) {
+                $('input[type=checkbox][name*=inactive]').change(function() {
+                   if (this.checked == true) {
+                     CRM.$('[id^=caseRoles-selector] tr.disabled').css('display','');
+                   } else if (this.checked == false) {
+                     CRM.$('[id^=caseRoles-selector] tr.disabled').css('display','none');
+                   }
+                });
+              })(CRM.$);
+            </script>
+          {/literal}
       <table id="caseRoles-selector-{$caseID}"  class="report-layout crm-ajax-table" data-page-length="10">
         <thead>
           <tr>
@@ -174,6 +192,7 @@
             <th data-data="name">{ts}Name{/ts}</th>
             <th data-data="phone">{ts}Phone{/ts}</th>
             <th data-data="email">{ts}Email{/ts}</th>
+            <th data-data="end_date">{ts}End Date{/ts}</th>
             {if $relId neq 'client' and $hasAccessToAllCases}
               <th data-data="actions" data-orderable="false">{ts}Actions{/ts}</th>
             {/if}
@@ -184,9 +203,19 @@
         <script type="text/javascript">
           (function($) {
             var caseId = {/literal}{$caseID}{literal};
+            var statusClass = {/literal}{$statusclass}{literal}; 
             CRM.$('table#caseRoles-selector-' + caseId).data({
               "ajax": {
                 "url": {/literal}'{crmURL p="civicrm/ajax/caseroles" h=0 q="snippet=4&caseID=$caseId&cid=$contactID&userID=$userID"}'{literal}
+                "complete" : function(){
+                    if (statusClass == 1) {
+                      CRM.$('[id^=caseRoles-selector] tr.disabled').css('display','none');
+                    }
+                    if (!$('[id^=caseRoles-selector] tr').hasClass("disabled")) {
+                      $('#show-inactive label').addClass('disabled');
+                      $('input[type=checkbox][name*=inactive]').prop('disabled', true);
+                    }
+                }
               }
             });
           })(CRM.$);
@@ -194,7 +223,7 @@
       {/literal}
 
       <div id="deleteCaseRoleDialog" class="hiddenElement">
-        {ts}Are you sure you want to end this relationship?{/ts}
+        {ts}Are you sure you want to expire this relationship?{/ts}
       </div>
 
    </div><!-- /.crm-accordion-body -->
