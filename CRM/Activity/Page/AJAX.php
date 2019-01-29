@@ -179,8 +179,8 @@ class CRM_Activity_Page_AJAX {
         $rel['name'] = '(not assigned)';
         $rel['phone'] = '';
         $rel['email'] = '';
-        $rel['is_active'] = ''; 
-        $rel['end_date'] = ''; 
+        $rel['is_active'] = '';
+        $rel['end_date'] = '';
         $rel['source'] = 'caseRoles';
         $caseRelationships[] = $rel;
       }
@@ -214,8 +214,8 @@ class CRM_Activity_Page_AJAX {
     // set user name, email and edit columns links
     foreach ($caseRelationships as $key => &$row) {
       // add disabled class if role is inactive
-      if (isset($row['is_active'])) { 
-        if ($row['is_active'] == '0') { 
+      if (isset($row['is_active'])) {
+        if ($row['is_active'] == '0') {
           $row['DT_RowClass'] = 'disabled';
         }
       }
@@ -236,7 +236,8 @@ class CRM_Activity_Page_AJAX {
       // view end date if set
       if (!empty($row['end_date'])) {
         $row['end_date'] = date("F d, Y", strtotime($row['end_date']));
-      } else {
+      } 
+      else {
         $row['end_date'] = '';
       }
       // edit links
@@ -246,14 +247,14 @@ class CRM_Activity_Page_AJAX {
         $contactType = $contactType == 'Contact' ? '' : $contactType;
         switch ($row['source']) {
           case 'caseRel':
-            if (empty($row['end_date'])) { 
+            if (empty($row['end_date'])) {
               $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
                 '<i class="crm-i fa-pencil"></i>' .
                 '</a>' .
                 '<a href="#deleteCaseRoleDialog" title="' . ts('Expire %1', array(1 => $typeLabel)) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/delcaserole') . '">' .
                 '<span class="crm-i fa-ban"></span>' .
                 '</a>';
-              }
+            }
             break;
 
           case 'caseRoles':
