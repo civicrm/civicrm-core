@@ -794,15 +794,17 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
     else {
       $all = 0;
       $case_owner = 2;
-      $myCaseWhereClause = " AND case_relationship.contact_id_b = {$userID}";
-      $myGroupByClause = " GROUP BY CONCAT(case_relationship.case_id,'-',case_relationship.contact_id_b)";
+      $myCaseWhereClauseA = " AND case_relationship.contact_id_a = {$userID}";
+      $myGroupByClauseA = " GROUP BY CONCAT(case_relationship.case_id,'-',case_relationship.contact_id_a)";
+      $myCaseWhereClauseB = " AND case_relationship.contact_id_b = {$userID}";
+      $myGroupByClauseB = " GROUP BY CONCAT(case_relationship.case_id,'-',case_relationship.contact_id_b)";
     }
     $myGroupByClause .= ", case_status.label, status_id, case_type_id";
 
     // FIXME: This query could be a lot more efficient if it used COUNT() instead of returning all rows and then counting them with php
     $query = "
 SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS case_type,
- case_type_id, case_relationship.contact_id_b
+ case_type_id, case_relationship.contact_id_b as case_contact
  FROM civicrm_case
  INNER JOIN civicrm_case_contact cc on cc.case_id = civicrm_case.id
  LEFT JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
@@ -812,8 +814,20 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
  LEFT JOIN civicrm_relationship case_relationship ON ( case_relationship.case_id  = civicrm_case.id
  AND case_relationship.contact_id_b = {$userID})
  WHERE is_deleted = 0 AND cc.contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted <> 1)
-{$myCaseWhereClause} {$myGroupByClause}";
-
+{$myCaseWhereClauseB} {$myGroupByClauseB}
+UNION
+SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS case_type,
+ case_type_id, case_relationship.contact_id_a as case_contact
+ FROM civicrm_case
+ INNER JOIN civicrm_case_contact cc on cc.case_id = civicrm_case.id
+ LEFT JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
+ LEFT JOIN civicrm_option_group option_group_case_status ON ( option_group_case_status.name = 'case_status' )
+ LEFT JOIN civicrm_option_value case_status ON ( civicrm_case.status_id = case_status.value
+ AND option_group_case_status.id = case_status.option_group_id )
+ LEFT JOIN civicrm_relationship case_relationship ON ( case_relationship.case_id  = civicrm_case.id
+ AND case_relationship.contact_id_a = {$userID})
+ WHERE is_deleted = 0 AND cc.contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted <> 1)
+{$myCaseWhereClauseA} {$myGroupByClauseA}";
     $res = CRM_Core_DAO::executeQuery($query);
     while ($res->fetch()) {
       if (!empty($rows[$res->case_type]) && !empty($rows[$res->case_type][$res->case_status])) {
