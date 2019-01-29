@@ -892,7 +892,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       $values[$rid]['name'] = $dao->sort_name;
       $values[$rid]['email'] = $dao->email;
       $values[$rid]['phone'] = $dao->phone;
-        $values[$rid]['is_active'] = $dao->is_active;
+      $values[$rid]['is_active'] = $dao->is_active;
       $values[$rid]['end_date'] = $dao->end_date;
       $values[$rid]['relation_type'] = $dao->relation_type;
       $values[$rid]['rel_id'] = $dao->civicrm_relationship_id;
@@ -1943,11 +1943,12 @@ SELECT civicrm_contact.id as casemanager_id,
       // Look for an active case manager, when no active case manager (like a closed case) show the most recently expired case manager.
       // Get the index of the manager if set to active
       $activekey = array_search(1, array_combine(array_keys($caseManagerNameArray), array_column($caseManagerNameArray, 'is_active')));
-      if (!empty ($activekey)){
+      if (!empty ($activekey)) {
         $caseManagerName = sprintf('<a href="%s">%s</a>',
           CRM_Utils_System::url('civicrm/contact/view', array('cid' => $activekey)), $caseManagerNameArray[$activekey]['casemanager']
         );
-      } else {
+      }
+      else {
         // if there is no active case manager, get the index of the most recent end_date
         $max = array_search(max(array_combine(array_keys($caseManagerNameArray), array_column($caseManagerNameArray, 'end_date'))), array_combine(array_keys($caseManagerNameArray), array_column($caseManagerNameArray, 'end_date')));
         $caseManagerName = sprintf('<a href="%s">%s</a>',
