@@ -228,6 +228,9 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
             if ($fieldName == 'duration') {
               $select[] = "IF({$table['fields']['end_date']['dbAlias']} Is Null, '', DATEDIFF({$table['fields']['end_date']['dbAlias']}, {$table['fields']['start_date']['dbAlias']})) as {$tableName}_{$fieldName}";
             }
+            elseif ($tableName == 'civicrm_relationship_type') {
+              $select[] = "  IF(contact_civireport.id = relationship_civireport.contact_id_a, relationship_type_civireport.label_b_a, relationship_type_civireport.label_a_b) as civicrm_relationship_type_label_b_a";
+            }
             else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
             }
@@ -297,6 +300,9 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
 
   public function where() {
     $clauses = array();
+    if ($this->_params['fields']['label_b_a'] == 1) {
+      $clauses[] = 'contact_civireport.sort_name !=  c2_civireport.sort_name';
+    }
     $this->_having = '';
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
