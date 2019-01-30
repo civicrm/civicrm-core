@@ -1207,6 +1207,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             }
           }
         }
+
+        // Loop through each membership type on the contribution page and assign details to the form
         foreach ($membershipTypeIds as $value) {
           $memType = $membershipTypeValues[$value];
           if ($selectedMembershipTypeID != NULL) {
@@ -1232,8 +1234,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
             if ($allowAutoRenewOpt) {
               $javascriptMethod = array('onclick' => "return showHideAutoRenew( this.value );");
-              $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = (int) $memType['auto_renew'] * CRM_Utils_Array::value($value, CRM_Utils_Array::value('auto_renew', $this->_membershipBlock));
               $allowAutoRenewMembership = TRUE;
+              $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = $memType['auto_renew'];
             }
             else {
               $javascriptMethod = NULL;
