@@ -285,8 +285,7 @@ class CRM_Utils_Cache {
    *   $value = $cache->get('foo', $nack);
    *   echo ($value === $nack) ? "Cache has a value, and we got it" : "Cache has no value".
    *
-   * The value should be unique to avoid accidental matches. As a performance
-   * tweak, we may reuse the NACK a few times within the current page-view.
+   * The value should be unique to avoid accidental matches.
    *
    * @return string
    *   Unique nonce value indicating a "negative acknowledgement" (failed read).
@@ -294,10 +293,12 @@ class CRM_Utils_Cache {
    *   use `get($key,$nack)`.
    */
   public static function nack() {
-    if (!isset(Civi::$statics[__CLASS__]['nack'])) {
-      Civi::$statics[__CLASS__]['nack'] = 'NACK:' . md5(CRM_Utils_Request::id() . CIVICRM_SITE_KEY . CIVICRM_DSN . mt_rand(0, 10000));
+    $st =& Civi::$statics[__CLASS__];
+    if (!isset($st['nack-c'])) {
+      $st['nack-c'] = md5(CRM_Utils_Request::id() . CIVICRM_SITE_KEY . CIVICRM_DSN . mt_rand(0, 10000));
+      $st['nack-i'] = 0;
     }
-    return Civi::$statics[__CLASS__];
+    return 'NACK:' . $st['nack-c'] . $st['nack-i']++;
   }
 
 }
