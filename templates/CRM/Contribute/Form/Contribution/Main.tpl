@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -204,7 +204,7 @@
       {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="makeContribution"}
     </div>
 
-    {if $honoreeProfileFields|@count}
+    {if $honoreeProfileFields && $honoreeProfileFields|@count}
       <fieldset class="crm-public-form-item crm-group honor_block-group">
         {crmRegion name="contribution-soft-credit-block"}
           <legend>{$honor_block_title}</legend>
@@ -293,10 +293,7 @@
   </fieldset>
   {/if}
 
-  <div id="billing-payment-block">
-    {include file="CRM/Financial/Form/Payment.tpl" snippet=4}
-  </div>
-  {include file="CRM/common/paymentBlock.tpl"}
+  {include file="CRM/Core/BillingBlockWrapper.tpl"}
 
   <div class="crm-public-form-item crm-group custom_post_profile-group">
   {include file="CRM/UF/Form/Block.tpl" fields=$customPost}

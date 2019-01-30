@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,7 +43,7 @@
  * This provides greater consistency/predictability after flushing.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_PseudoConstant {
 
@@ -201,10 +201,14 @@ class CRM_Core_PseudoConstant {
   public static function get($daoName, $fieldName, $params = array(), $context = NULL) {
     CRM_Core_DAO::buildOptionsContext($context);
     $flip = !empty($params['flip']);
+    // Historically this was 'false' but according to the notes in
+    // CRM_Core_DAO::buildOptionsContext it should be context dependent.
+    // timidly changing for 'search' only to fix world_region in search options.
+    $localizeDefault = in_array($context, ['search']) ? TRUE : FALSE;
     // Merge params with defaults
     $params += array(
       'grouping' => FALSE,
-      'localize' => FALSE,
+      'localize' => $localizeDefault,
       'onlyActive' => ($context == 'validate' || $context == 'get') ? FALSE : TRUE,
       'fresh' => FALSE,
       'context' => $context,
@@ -378,11 +382,8 @@ class CRM_Core_PseudoConstant {
           // Localize results
           if (!empty($params['localize']) || $pseudoconstant['table'] == 'civicrm_country' || $pseudoconstant['table'] == 'civicrm_state_province') {
             $I18nParams = array();
-            if ($pseudoconstant['table'] == 'civicrm_country') {
-              $I18nParams['context'] = 'country';
-            }
-            if ($pseudoconstant['table'] == 'civicrm_state_province') {
-              $I18nParams['context'] = 'province';
+            if (isset($fieldSpec['localize_context'])) {
+              $I18nParams['context'] = $fieldSpec['localize_context'];
             }
             $i18n = CRM_Core_I18n::singleton();
             $i18n->localizeArray($output, $I18nParams);

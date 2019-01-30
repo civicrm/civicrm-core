@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
 | CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2018                                |
+| Copyright CiviCRM LLC (c) 2004-2019                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -767,6 +767,39 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
     $note = $this->callAPISuccessGetSingle('note', ['entity_id' => $contactId]);
     $this->assertEquals("Hello 123", $note['note']);
+  }
+
+  /**
+   * Check handling a custom greeting.
+   */
+  public function testSubmitGreetingFields() {
+    $profileFieldValues = $this->_createIndividualContact();
+    $params = reset($profileFieldValues);
+    $contactId = key($profileFieldValues);
+    $params['profile_id'] = $this->_profileID;
+    $params['contact_id'] = $contactId;
+
+    $this->callAPISuccess('ufField', 'create', array(
+      'uf_group_id' => $this->_profileID,
+      'field_name' => 'email_greeting',
+      'visibility' => 'Public Pages and Listings',
+      'field_type' => 'Contact',
+      'label' => 'Email Greeting',
+    ));
+
+    $emailGreetings = array_column(civicrm_api3('OptionValue', 'get', ['option_group_id' => "email_greeting"])['values'], NULL, 'name');
+
+    $params['email_greeting'] = $emailGreetings['Customized']['value'];
+    // Custom greeting should be required
+    $this->callAPIFailure('profile', 'submit', $params);
+
+    $params['email_greeting_custom'] = 'Hello fool!';
+    $this->callAPISuccess('profile', 'submit', $params);
+
+    // Api3 will not return custom greeting field so resorting to this
+    $greeting = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'email_greeting_custom');
+
+    $this->assertEquals("Hello fool!", $greeting);
   }
 
   /**

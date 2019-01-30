@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -484,8 +484,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->_defaults = array();
 
     $this->_amount = $this->get('amount');
+    // Assigning this to the template means it will be passed through to the payment form.
+    // This can, for example, by used by payment processors using client side encryption
+    $this->assign('currency', $this->getCurrency());
 
     //CRM-6907
+    // these lines exist to support a non-default currenty on the form but are probably
+    // obsolete & meddling wth the defaultCurrency is not the right approach....
     $config = CRM_Core_Config::singleton();
     $config->defaultCurrency = CRM_Utils_Array::value('currency',
       $this->_values,

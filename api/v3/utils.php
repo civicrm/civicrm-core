@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -218,9 +218,6 @@ function civicrm_api3_create_success($values = 1, $params = array(), $entity = N
       $result['undefined_fields'] = array_merge($undefined);
     }
   }
-  if (is_object($dao)) {
-    $dao->free();
-  }
 
   $result['version'] = 3;
   if (is_array($values)) {
@@ -378,6 +375,11 @@ function _civicrm_api3_get_BAO($name) {
   // FIXME: DAO should be renamed CRM_Badge_DAO_BadgeLayout
   if ($name == 'PrintLabel') {
     return 'CRM_Badge_BAO_Layout';
+  }
+  if ($name === 'Order') {
+    // Order basically maps to contribution at the top level but
+    // has enhanced access to other entities.
+    $name = 'Contribution';
   }
   $dao = _civicrm_api3_get_DAO($name);
   if (!$dao) {

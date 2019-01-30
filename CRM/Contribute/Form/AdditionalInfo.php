@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contribute_Form_AdditionalInfo {
 
@@ -115,13 +115,6 @@ class CRM_Contribute_Form_AdditionalInfo {
       $feeAmount->freeze();
     }
 
-    $netAmount = &$form->add('text', 'net_amount', ts('Net Amount'),
-      $attributes['net_amount']
-    );
-    $form->addRule('net_amount', ts('Please enter a valid monetary value for Net Amount.'), 'money');
-    if ($form->_online) {
-      $netAmount->freeze();
-    }
     $element = &$form->add('text', 'invoice_id', ts('Invoice ID'),
       $attributes['invoice_id']
     );
@@ -161,7 +154,6 @@ class CRM_Contribute_Form_AdditionalInfo {
 
     $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     if ($form->_id && $form->_values['contribution_status_id'] == array_search('Cancelled', $statusName)) {
-      $netAmount->freeze();
       $feeAmount->freeze();
     }
 
@@ -285,7 +277,6 @@ class CRM_Contribute_Form_AdditionalInfo {
       'non_deductible_amount',
       'total_amount',
       'fee_amount',
-      'net_amount',
       'trxn_id',
       'invoice_id',
       'creditnote_id',

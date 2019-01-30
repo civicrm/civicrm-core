@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -105,9 +105,6 @@ function civicrm_api3_activity_create($params) {
         $activityDAO->id = $params['id'];
         $activityDAO->is_current_revision = 0;
         if (!$activityDAO->save()) {
-          if (is_object($activityDAO)) {
-            $activityDAO->free();
-          }
           throw new API_Exception(ts("Unable to revision existing case activity."));
         }
         $createRevision = TRUE;

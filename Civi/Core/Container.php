@@ -230,6 +230,14 @@ class Container {
       []
     ));
 
+    $container->setDefinition('prevnext.driver.redis', new Definition(
+      'CRM_Core_PrevNextCache_Redis',
+      [new Reference('cache_config')]
+    ));
+
+    $container->setDefinition('cache_config', new Definition('ArrayObject'))
+      ->setFactory(array(new Reference(self::SELF), 'createCacheConfig'));
+
     $container->setDefinition('civi.mailing.triggers', new Definition(
       'Civi\Core\SqlTrigger\TimestampTriggers',
       array('civicrm_mailing', 'Mailing')
@@ -433,11 +441,26 @@ class Container {
    * @return \CRM_Core_PrevNextCache_Interface
    */
   public static function createPrevNextCache($container) {
-    $cacheDriver = \CRM_Utils_Cache::getCacheDriver();
-    $service = 'prevnext.driver.' . strtolower($cacheDriver);
-    return $container->has($service)
-      ? $container->get($service)
-      : $container->get('prevnext.driver.sql');
+    $setting = \Civi::settings()->get('prevNextBackend');
+    if ($setting === 'default') {
+      // For initial release (5.8.x), continue defaulting to SQL.
+      $isTransitional = version_compare(\CRM_Utils_System::version(), '5.9.alpha1', '<');
+      $cacheDriver = \CRM_Utils_Cache::getCacheDriver();
+      $service = 'prevnext.driver.' . strtolower($cacheDriver);
+      return $container->has($service) && !$isTransitional
+        ? $container->get($service)
+        : $container->get('prevnext.driver.sql');
+    }
+    else {
+      return $container->get('prevnext.driver.' . $setting);
+    }
+  }
+
+  public static function createCacheConfig() {
+    $driver = \CRM_Utils_Cache::getCacheDriver();
+    $settings = \CRM_Utils_Cache::getCacheSettings($driver);
+    $settings['driver'] = $driver;
+    return new \ArrayObject($settings);
   }
 
   /**

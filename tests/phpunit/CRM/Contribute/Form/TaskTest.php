@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  * Class CRM_Contribute_Form_Tasktest
  */
-class CRM_Contribute_Form_Tasktest extends CiviUnitTestCase {
+class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
   /**
    * Assume empty database with just civicrm_data.
    */

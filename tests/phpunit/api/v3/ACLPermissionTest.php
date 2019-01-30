@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,11 +33,12 @@
  * @group headless
  */
 class api_v3_ACLPermissionTest extends CiviUnitTestCase {
+
+  use CRMTraits_ACL_PermissionTrait;
+
   protected $_apiversion = 3;
   public $DBResetRequired = FALSE;
   protected $_entity;
-  protected $allowedContactId = 0;
-  protected $allowedContacts = array();
 
   public function setUp() {
     parent::setUp();
@@ -443,47 +444,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * All results returned.
-   *
-   * @implements CRM_Utils_Hook::aclWhereClause
-   *
-   * @param string $type
-   * @param array $tables
-   * @param array $whereTables
-   * @param int $contactID
-   * @param string $where
-   */
-  public function aclWhereHookAllResults($type, &$tables, &$whereTables, &$contactID, &$where) {
-    $where = " (1) ";
-  }
-
-  /**
-   * All but first results returned.
-   * @implements CRM_Utils_Hook::aclWhereClause
-   * @param $type
-   * @param $tables
-   * @param $whereTables
-   * @param $contactID
-   * @param $where
-   */
-  public function aclWhereOnlySecond($type, &$tables, &$whereTables, &$contactID, &$where) {
-    $where = " contact_a.id > 1";
-  }
-
-  /**
-   * Only specified contact returned.
-   * @implements CRM_Utils_Hook::aclWhereClause
-   * @param $type
-   * @param $tables
-   * @param $whereTables
-   * @param $contactID
-   * @param $where
-   */
-  public function aclWhereOnlyOne($type, &$tables, &$whereTables, &$contactID, &$where) {
-    $where = " contact_a.id = " . $this->allowedContactId;
-  }
-
-  /**
    * Basic check that an unpermissioned call keeps working and permissioned call fails.
    */
   public function testGetActivityNoPermissions() {
@@ -543,6 +503,21 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
     $this->setPermissions(['access CiviCRM', 'access CiviContribute']);
     $this->callAPISuccessGetSingle('Activity', ['check_permissions' => 1, 'id' => ['IN' => [$activity['id'], $activity2['id']]]]);
+    $this->callAPISuccessGetCount('Activity', ['check_permissions' => 1, 'id' => ['IN' => [$activity['id'], $activity2['id']]]], 1);
+
+  }
+
+  /**
+   * Check that component related activity filtering works for CiviCase.
+   */
+  public function testGetActivityCheckPermissionsByCaseComponent() {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    $activity = $this->activityCreate(['activity_type_id' => 'Open Case']);
+    $activity2 = $this->activityCreate(['activity_type_id' => 'Pledge Reminder']);
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'access all cases and activities']);
+    $this->callAPISuccessGetSingle('Activity', ['check_permissions' => 1, 'id' => ['IN' => [$activity['id'], $activity2['id']]]]);
+    $this->callAPISuccessGetCount('Activity', ['check_permissions' => 1, 'id' => ['IN' => [$activity['id'], $activity2['id']]]], 1);
   }
 
   /**
@@ -690,6 +665,50 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       }
     }
     return $contacts;
+  }
+
+  /**
+   * Test that the 'everyone' group can be given access to a contact.
+   */
+  public function testGetACLEveryonePermittedEntity() {
+    $this->setupScenarioCoreACLEveryonePermittedToGroup();
+    $this->callAPISuccessGetCount('Contact', [
+      'id' => $this->scenarioIDs['Contact']['permitted_contact'],
+      'check_permissions' => 1,
+    ], 1);
+
+    $this->callAPISuccessGetCount('Contact', [
+      'id' => $this->scenarioIDs['Contact']['non_permitted_contact'],
+      'check_permissions' => 1,
+    ], 0);
+
+    // Also check that we can access ACLs through a path that uses the acl_contact_cache table.
+    // historically this has caused errors due to the key_constraint on that table.
+    // This is a bit of an artificial check as we have to amp up permissions to access this api.
+    // However, the lower level function is more directly accessed through the Contribution & Event & Profile
+    $dupes = $this->callAPISuccess('Contact', 'duplicatecheck', [
+      'match' => [
+        'first_name' => 'Anthony',
+        'last_name' => 'Anderson',
+        'contact_type' => 'Individual',
+        'email' => 'anthony_anderson@civicrm.org',
+      ],
+      'check_permissions' => 0,
+    ]);
+    $this->assertEquals(2, $dupes['count']);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM'];
+
+    $dupes = $this->callAPISuccess('Contact', 'duplicatecheck', [
+      'match' => [
+        'first_name' => 'Anthony',
+        'last_name' => 'Anderson',
+        'contact_type' => 'Individual',
+        'email' => 'anthony_anderson@civicrm.org',
+      ],
+      'check_permissions' => 1,
+    ]);
+    $this->assertEquals(1, $dupes['count']);
+
   }
 
 }

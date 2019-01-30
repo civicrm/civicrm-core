@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -927,6 +927,44 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     if (!in_array($Entity, $this->onlyIDNonZeroCount['get'])) {
       $this->assertEquals(0, $result['count']);
     }
+  }
+
+  /**
+   * Test getlist works
+   * @dataProvider entities_get
+   * @param $Entity
+   */
+  public function testGetList($Entity) {
+    if (in_array($Entity, $this->toBeImplemented['get'])
+      || in_array($Entity, $this->toBeSkipped_getByID())
+    ) {
+      return;
+    }
+    if (in_array($Entity, ['ActivityType', 'SurveyRespondant'])) {
+      $this->markTestSkipped();
+    }
+    $this->callAPISuccess($Entity, 'getlist', ['label_field' => 'id']);
+  }
+
+
+  /**
+   * Test getlist works when entity is lowercase
+   * @dataProvider entities_get
+   * @param $Entity
+   */
+  public function testGetListLowerCaseEntity($Entity) {
+    if (in_array($Entity, $this->toBeImplemented['get'])
+      || in_array($Entity, $this->toBeSkipped_getByID())
+    ) {
+      return;
+    }
+    if (in_array($Entity, ['ActivityType', 'SurveyRespondant'])) {
+      $this->markTestSkipped();
+    }
+    if ($Entity == 'UFGroup') {
+      $Entity = 'ufgroup';
+    }
+    $this->callAPISuccess($Entity, 'getlist', ['label_field' => 'id']);
   }
 
   /**

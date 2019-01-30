@@ -209,6 +209,51 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
+   *  Test created to prove failure of search on state when location
+   *  display name is different form location name (issue 607)
+   */
+  public function testSearchOtherLocationUpperLower() {
+
+    $params = [
+      0 => [
+        0 => 'state_province-4',
+        1 => 'IS NOT EMPTY',
+        2 => '',
+        3 => 1,
+        4 => 0,
+      ],
+    ];
+    $returnProperties = [
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'sort_name' => 1,
+      'location' => [
+        'other' => [
+          'location_type' => 4,
+          'state_province' => 1,
+        ],
+      ],
+    ];
+
+    // update with the api does not work because it updates both the name and the
+    // the display_name. Plain SQL however does the job
+    CRM_Core_DAO::executeQuery('update civicrm_location_type set name=%2 where id=%1',
+      [
+        1 => [4, 'Integer'],
+        2 => ['other', 'String'],
+      ]);
+
+    $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
+
+    $resultDAO = $queryObj->searchQuery(0, 0, NULL,
+      FALSE, FALSE,
+      FALSE, FALSE,
+      FALSE);
+    $resultDAO->fetch();
+  }
+
+
+  /**
    * CRM-14263 search builder failure with search profile & address in criteria.
    *
    * We are retrieving primary here - checking the actual sql seems super prescriptive - but since the massive query object has
@@ -508,6 +553,12 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     );
     $sql = CRM_Contact_BAO_Query::getQuery($params);
     $this->assertContains('INNER JOIN civicrm_rel_temp_', $sql, "Query appears to use temporary table of compiled relationships?", TRUE);
+  }
+
+  public function testRelationshipPermissionClause() {
+    $params = [['relation_type_id', 'IN', ['1_b_a'], 0, 0], ['relation_permission', 'IN', [2], 0, 0]];
+    $sql = CRM_Contact_BAO_Query::getQuery($params);
+    $this->assertContains('(civicrm_relationship.is_permission_a_b IN (2))', $sql);
   }
 
   /**

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -125,6 +125,14 @@ class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
           ),
         ),
+        'group_bys' => array(
+          'pcp_id' => array(
+            'name' => 'id',
+            'required' => TRUE,
+            'default' => TRUE,
+            'title' => ts('Personal Campaign Page'),
+          ),
+        ),
         'grouping' => 'pcp-fields',
       ),
       'civicrm_contribution_soft' => array(
@@ -204,6 +212,7 @@ class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
     );
 
     parent::__construct();
+    $this->optimisedForOnlyFullGroupBy = FALSE;
   }
 
   public function from() {
@@ -234,10 +243,6 @@ LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']}
 
     // for credit card type
     $this->addFinancialTrxnFromClause();
-  }
-
-  public function groupBy() {
-    $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, "{$this->_aliases['civicrm_pcp']}.id");
   }
 
   public function orderBy() {

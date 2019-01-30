@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Upgrade_Incremental_MessageTemplates {
 
@@ -88,6 +88,19 @@ class CRM_Upgrade_Incremental_MessageTemplates {
         'label' => ts('Contributions - Invoice'),
         'templates' => [
           ['name' => 'contribution_invoice_receipt', 'type' => 'html'],
+        ]
+      ],
+      [
+        'version' => '5.10.alpha1',
+        'upgrade_descriptor' => ts('Show recurring cancel/update URLs in receipt based on payment processor capabilities'),
+        'label' => ts('Receipts - cancel/update subscription URLs'),
+        'templates' => [
+          ['name' => 'contribution_online_receipt', 'type' => 'text'],
+          ['name' => 'contribution_online_receipt', 'type' => 'html'],
+          ['name' => 'contribution_recurring_notify', 'type' => 'text'],
+          ['name' => 'contribution_recurring_notify', 'type' => 'html'],
+          ['name' => 'membership_online_receipt', 'type' => 'text'],
+          ['name' => 'membership_online_receipt', 'type' => 'html'],
         ]
       ]
     ];

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
@@ -795,6 +795,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       'return' => ["id", "name", 'is_test'],
     ];
     $paymentProcessors = civicrm_api3('PaymentProcessor', 'get', $paymentProcessorParams);
+    $paymentProcessorOpts = [];
     foreach ($paymentProcessors['values'] as $key => $value) {
       $paymentProcessorOpts[$key] = $value['name'] . ($value['is_test'] ? ' (Test)' : '');
     }

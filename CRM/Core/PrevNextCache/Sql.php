@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -78,19 +78,19 @@ INSERT INTO civicrm_prevnext_cache (cacheKey, entity_id1, data)
    * @param string $cacheKey
    * @param string $action
    *   Ex: 'select', 'unselect'.
-   * @param array|int|NULL $cIds
+   * @param array|int|NULL $ids
    *   A list of contact IDs to (un)select.
    *   To unselect all contact IDs, use NULL.
    */
-  public function markSelection($cacheKey, $action, $cIds = NULL) {
+  public function markSelection($cacheKey, $action, $ids = NULL) {
     if (!$cacheKey) {
       return;
     }
     $params = array();
 
-    if ($cIds && $cacheKey && $action) {
-      if (is_array($cIds)) {
-        $cIdFilter = "(" . implode(',', $cIds) . ")";
+    if ($ids && $cacheKey && $action) {
+      if (is_array($ids)) {
+        $cIdFilter = "(" . implode(',', $ids) . ")";
         $whereClause = "
 WHERE cacheKey = %1
 AND (entity_id1 IN {$cIdFilter} OR entity_id2 IN {$cIdFilter})
@@ -101,7 +101,7 @@ AND (entity_id1 IN {$cIdFilter} OR entity_id2 IN {$cIdFilter})
 WHERE cacheKey = %1
 AND (entity_id1 = %2 OR entity_id2 = %2)
 ";
-        $params[2] = array("{$cIds}", 'Integer');
+        $params[2] = array("{$ids}", 'Integer');
       }
       if ($action == 'select') {
         $whereClause .= "AND is_selected = 0";
@@ -115,7 +115,7 @@ AND (entity_id1 = %2 OR entity_id2 = %2)
       }
       // default action is reseting
     }
-    elseif (!$cIds && $cacheKey && $action == 'unselect') {
+    elseif (!$ids && $cacheKey && $action == 'unselect') {
       $sql = "
 UPDATE civicrm_prevnext_cache
 SET    is_selected = 0
@@ -242,6 +242,29 @@ ORDER BY id
     $query = "SELECT COUNT(*) FROM civicrm_prevnext_cache pn WHERE pn.cacheKey = %1";
     $params = [1 => [$cacheKey, 'String']];
     return (int) CRM_Core_DAO::singleValueQuery($query, $params, TRUE, FALSE);
+  }
+
+  /**
+   * Fetch a list of contacts from the prev/next cache for displaying a search results page
+   *
+   * @param string $cacheKey
+   * @param int $offset
+   * @param int $rowCount
+   * @return array
+   *   List of contact IDs.
+   */
+  public function fetch($cacheKey, $offset, $rowCount) {
+    $cids = array();
+    $dao = CRM_Utils_SQL_Select::from('civicrm_prevnext_cache pnc')
+      ->where('pnc.cacheKey = @cacheKey', ['cacheKey' => $cacheKey])
+      ->select('pnc.entity_id1 as cid')
+      ->orderBy('pnc.id')
+      ->limit($rowCount, $offset)
+      ->execute();
+    while ($dao->fetch()) {
+      $cids[] = $dao->cid;
+    }
+    return $cids;
   }
 
 }

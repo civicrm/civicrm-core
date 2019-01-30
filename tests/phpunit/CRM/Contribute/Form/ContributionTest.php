@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -45,6 +45,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   protected $_params;
   protected $_ids = array();
   protected $_pageParams = array();
+  protected $_userId;
 
   /**
    * Parameters to create payment processor.
@@ -94,7 +95,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
-    $this->createLoggedInUser();
+    $this->_userId = $this->createLoggedInUser();
 
     $this->_individualId = $this->individualCreate();
     $this->_params = array(
@@ -620,6 +621,33 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
     $mut->checkMailLog(array(
         '<p>Please print this receipt for your records.</p>',
+      )
+    );
+    $mut->stop();
+  }
+
+  /**
+   * Test the submit function on the contribution page using numerical from email address.
+   */
+  public function testSubmitEmailReceiptUserEmailFromAddress() {
+    $form = new CRM_Contribute_Form_Contribution();
+    $mut = new CiviMailUtils($this, TRUE);
+    $email = $this->callAPISuccess('Email', 'create', [
+      'contact_id' => $this->_userId,
+      'email' => 'testLoggedIn@example.com',
+    ]);
+    $form->testSubmit(array(
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'contact_id' => $this->_individualId,
+      'is_email_receipt' => TRUE,
+      'from_email_address' => $email['id'],
+      'contribution_status_id' => 1,
+    ), CRM_Core_Action::ADD);
+    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
+    $mut->checkMailLog(array(
+        '<p>Please print this receipt for your records.</p>',
+        '<testloggedin@example.com>',
       )
     );
     $mut->stop();

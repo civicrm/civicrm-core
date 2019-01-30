@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -45,6 +45,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *   3. Implement the evaluateToken() method.
  *   4. Optionally, override others:
  *      + checkActive()
+ *      + getActiveTokens()
  *      + prefetch()
  *      + alterActionScheduleMailing()
  *   5. Register the new class with the event-dispatcher.
@@ -70,14 +71,22 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
 
   /**
    * @var array
-   *   Ex: array('viewUrl', 'editUrl').
+   *   List of tokens provided by this class
+   *   Array(string $fieldName => string $label).
    */
   public $tokenNames;
 
   /**
+   * @var array
+   *   List of active tokens - tokens provided by this class and used in the message
+   *   Array(string $tokenName);
+   */
+  public $activeTokens;
+
+  /**
    * @param $entity
    * @param array $tokenNames
-   *   Array(string $fieldName => string $label).
+   *   Array(string $tokenName => string $label).
    */
   public function __construct($entity, $tokenNames = array()) {
     $this->entity = $entity;
@@ -142,20 +151,32 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $messageTokens = $e->getTokenProcessor()->getMessageTokens();
-    if (!isset($messageTokens[$this->entity])) {
+    $this->activeTokens = $this->getActiveTokens($e);
+    if (!$this->activeTokens) {
       return;
     }
-
-    $activeTokens = array_intersect($messageTokens[$this->entity], array_keys($this->tokenNames));
-
     $prefetch = $this->prefetch($e);
 
     foreach ($e->getRows() as $row) {
-      foreach ((array) $activeTokens as $field) {
+      foreach ($this->activeTokens as $field) {
         $this->evaluateToken($row, $this->entity, $field, $prefetch);
       }
     }
+  }
+
+  /**
+   * To handle variable tokens, override this function and return the active tokens.
+   *
+   * @param \Civi\Token\Event\TokenValueEvent $e
+   *
+   * @return mixed
+   */
+  public function getActiveTokens(TokenValueEvent $e) {
+    $messageTokens = $e->getTokenProcessor()->getMessageTokens();
+    if (!isset($messageTokens[$this->entity])) {
+      return FALSE;
+    }
+    return array_intersect($messageTokens[$this->entity], array_keys($this->tokenNames));
   }
 
   /**

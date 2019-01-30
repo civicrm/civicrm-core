@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,10 +28,17 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 trait CRM_Core_Form_EntityFormTrait {
+
+  /**
+   * The entity subtype ID (eg. for Relationship / Activity)
+   *
+   * @var int
+   */
+  protected $_entitySubTypeId;
 
   /**
    * Get entity fields for the entity to be added to the form.
@@ -66,6 +73,21 @@ trait CRM_Core_Form_EntityFormTrait {
   public function getEntityId() {
     return $this->_id;
   }
+
+  /**
+   * Get the entity subtype ID being edited
+   *
+   * @param $subTypeId
+   *
+   * @return int|null
+   */
+  public function getEntitySubTypeId($subTypeId) {
+    if ($subTypeId) {
+      return $subTypeId;
+    }
+    return $this->_entitySubTypeId;
+  }
+
   /**
    * If the custom data is in the submitted data (eg. added via ajax loaded form) add to form.
    */
@@ -146,7 +168,7 @@ trait CRM_Core_Form_EntityFormTrait {
     }
     foreach ($this->entityFields as $fieldSpec) {
       $value = CRM_Utils_Request::retrieveValue($fieldSpec['name'], $this->getValidationTypeForField($fieldSpec['name']));
-      if ($value !== FALSE) {
+      if ($value !== FALSE && $value !== NULL) {
         $defaults[$fieldSpec['name']] = $value;
       }
     }

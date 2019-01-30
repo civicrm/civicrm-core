@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -407,6 +407,96 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $afterGroup = $this->callAPISuccessGetSingle('Group', array('id' => $group->id));
     $this->assertTrue(empty($afterGroup['cache_date']), 'refresh date should not be set as the cache is not built');
     $this->assertTrue(empty($afterGroup['refresh_date']), 'refresh date should not be set as the cache is not built');
+  }
+
+  /**
+   * Test Smart group search
+   */
+  public function testSmartGroupSearchBuilder() {
+    $returnProperties = array(
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'sort_name' => 1,
+      'group' => 1,
+    );
+    list($group, $living, $deceased) = $this->setupSmartGroup();
+
+    $params = array(
+      'name' => 'Living Contacts',
+      'title' => 'Living Contacts',
+      'is_active' => 1,
+      'formValues' => array('is_deceased' => 0),
+    );
+    $group2 = CRM_Contact_BAO_Group::createSmartGroup($params);
+
+    //Filter on smart group with =, !=, IN and NOT IN operator.
+    $params = array(array('group', '=', $group2->id, 1, 0));
+    $query = new CRM_Contact_BAO_Query(
+      $params, $returnProperties,
+      NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS,
+      FALSE,
+      FALSE, FALSE
+    );
+    $ids = $query->searchQuery(0, 0, NULL,
+      FALSE, FALSE, FALSE,
+      TRUE, FALSE
+    );
+    $expectedWhere = "civicrm_group_contact_cache.group_id IN (\"{$group2->id}\")";
+    $this->assertContains($expectedWhere, $query->_whereClause);
+    $this->_assertContactIds($query, "group_id = {$group2->id}");
+
+    $params = array(array('group', '!=', $group->id, 1, 0));
+    $query = new CRM_Contact_BAO_Query(
+      $params, $returnProperties,
+      NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS,
+      FALSE,
+      FALSE, FALSE
+    );
+    //Assert if proper where clause is present.
+    $expectedWhere = "civicrm_group_contact.group_id != {$group->id} AND civicrm_group_contact_cache.group_id IS NULL OR  ( civicrm_group_contact_cache.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact_cache cgcc WHERE cgcc.group_id IN ( {$group->id} ) ) )";
+    $this->assertContains($expectedWhere, $query->_whereClause);
+    $this->_assertContactIds($query, "group_id != {$group->id}");
+
+    $params = array(array('group', 'IN', array($group->id, $group2->id), 1, 0));
+    $query = new CRM_Contact_BAO_Query(
+      $params, $returnProperties,
+      NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS,
+      FALSE,
+      FALSE, FALSE
+    );
+    $expectedWhere = "civicrm_group_contact_cache.group_id IN (\"{$group->id}\", \"{$group2->id}\")";
+    $this->assertContains($expectedWhere, $query->_whereClause);
+    $this->_assertContactIds($query, "group_id IN ({$group->id}, {$group2->id})");
+
+    $params = array(array('group', 'NOT IN', array($group->id), 1, 0));
+    $query = new CRM_Contact_BAO_Query(
+      $params, $returnProperties,
+      NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS,
+      FALSE,
+      FALSE, FALSE
+    );
+    $expectedWhere = "civicrm_group_contact.group_id NOT IN ( {$group->id} ) AND civicrm_group_contact_cache.group_id IS NULL OR  ( civicrm_group_contact_cache.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact_cache cgcc WHERE cgcc.group_id IN ( {$group->id} ) ) )";
+    $this->assertContains($expectedWhere, $query->_whereClause);
+    $this->_assertContactIds($query, "group_id NOT IN ({$group->id})");
+  }
+
+  /**
+   * Check if contact ids are fetched correctly.
+   *
+   * @param object $query
+   * @param string $groupWhereClause
+   */
+  public function _assertContactIds($query, $groupWhereClause) {
+    $contactIds = explode(',', $query->searchQuery(0, 0, NULL,
+      FALSE, FALSE, FALSE,
+      TRUE, FALSE
+    ));
+    $expectedContactIds = array();
+    $groupDAO = CRM_Core_DAO::executeQuery("SELECT contact_id FROM civicrm_group_contact_cache WHERE {$groupWhereClause}");
+    while ($groupDAO->fetch()) {
+      $expectedContactIds[] = $groupDAO->contact_id;
+    }
+    $this->assertEquals(sort($expectedContactIds), sort($contactIds));
   }
 
 }

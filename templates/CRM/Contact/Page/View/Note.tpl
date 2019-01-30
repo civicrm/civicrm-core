@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -216,7 +216,7 @@
         </thead>
 
         {foreach from=$notes item=note}
-        <tr id="cnote_{$note.id}" class="{cycle values="odd-row,even-row"} crm-note">
+        <tr id="Note-{$note.id}" data-action="setvalue" class="{cycle values="odd-row,even-row"} crm-note crm-entity">
             <td class="crm-note-comment">
                 {if $note.comment_count}
                     <span id="{$note.id}_show" style="display:block" class="icon_comments_show">
@@ -237,7 +237,7 @@
                   <a class="crm-popup" href="{crmURL p='civicrm/contact/view/note' q="action=view&selectedChild=note&reset=1&cid=`$contactId`&id=`$note.id`"}">{ts}(more){/ts}</a>
                 {/if}
             </td>
-            <td class="crm-note-subject">{$note.subject}</td>
+            <td class="crm-note-subject crmf-subject crm-editable">{$note.subject}</td>
             <td class="crm-note-modified_date" data-order="{$note.modified_date}">{$note.modified_date|crmDate}</td>
             <td class="crm-note-createdBy">
                 <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$note.contact_id`"}">{$note.createdBy}</a>

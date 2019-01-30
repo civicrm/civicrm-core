@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Job
  *
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -77,6 +77,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     // The membershipType create breaks transactions so this extra cleanup is needed.
     $this->membershipTypeDelete(array('id' => $this->membershipTypeID));
     $this->cleanUpSetUpIDs();
+    $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_website', 'civicrm_phone'], TRUE);
   }
 
   /**
@@ -916,7 +917,62 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
     $this->assertEquals('blah', $mouse['custom_' . $customField['id']]);
 
-    $this->customFieldDelete($customGroup['id']);
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
+  }
+
+  /**
+   * Test the batch merge retains 0 as a valid custom field value.
+   *
+   * Note that we set 0 on 2 fields with one on each contact to ensure that
+   * both merged & mergee fields are respected.
+   */
+  public function testBatchMergeCustomDataZeroValueField() {
+    $customGroup = $this->CustomGroupCreate();
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'default_value' => NULL));
+
+    $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email' => 'tha_mouse@mouse.com'];
+    $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => '']));
+    $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 0]));
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $this->assertEquals(1, count($result['values']['merged']));
+    $mouseParams['return'] = 'custom_' . $customField['id'];
+    $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
+    $this->assertEquals(0, $mouse['custom_' . $customField['id']]);
+
+    $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => NULL]));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $this->assertEquals(1, count($result['values']['merged']));
+    $mouseParams['return'] = 'custom_' . $customField['id'];
+    $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
+    $this->assertEquals(0, $mouse['custom_' . $customField['id']]);
+
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
+  }
+
+  /**
+   * Test the batch merge treats 0 vs 1 as a conflict.
+   */
+  public function testBatchMergeCustomDataZeroValueFieldWithConflict() {
+    $customGroup = $this->CustomGroupCreate();
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'default_value' => NULL));
+
+    $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email' => 'tha_mouse@mouse.com'];
+    $mouse1 = $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 0]));
+    $mouse2 = $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 1]));
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $this->assertEquals(0, count($result['values']['merged']));
+
+    // Reverse which mouse has the zero to test we still get a conflict.
+    $this->individualCreate(array_merge($mouseParams, ['id' => $mouse1, 'custom_' . $customField['id'] => 1]));
+    $this->individualCreate(array_merge($mouseParams, ['id' => $mouse2, 'custom_' . $customField['id'] => 0]));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $this->assertEquals(0, count($result['values']['merged']));
+
+    $this->customFieldDelete($customField['id']);
     $this->customGroupDelete($customGroup['id']);
   }
 

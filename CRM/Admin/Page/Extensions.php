@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * This is a part of CiviCRM extension management functionality.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -221,7 +221,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get the list of local extensions and format them as a table with
+   * Get the list of remote extensions and format them as a table with
    * status and action data.
    *
    * @param array $localExtensionRows
@@ -238,7 +238,12 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
     // build list of available downloads
     $remoteExtensionRows = array();
+    $compat = CRM_Extension_System::getCompatibilityInfo();
+
     foreach ($remoteExtensions as $info) {
+      if (!empty($compat[$info->key]['obsolete'])) {
+        continue;
+      }
       $row = (array) $info;
       $row['id'] = $info->key;
       $action = CRM_Core_Action::UPDATE;

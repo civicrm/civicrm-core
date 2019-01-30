@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Dedupe_Merger {
 
@@ -619,8 +619,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
       $key1 = CRM_Utils_Array::value($key, $mainEvs);
       $key2 = CRM_Utils_Array::value($key, $otherEvs);
-      // CRM-17556 Get all non-empty fields, to make comparison easier
-      if (!empty($key1) || !empty($key2)) {
+      // We wish to retain '0' as it has a different meaning than NULL on a checkbox.
+      // However I can't think of a case where an empty string is more meaningful than null
+      // or where it would be FALSE or something else nullish.
+      $valuesToIgnore = [NULL, '', []];
+      if (!in_array($key1, $valuesToIgnore, TRUE) || !in_array($key2, $valuesToIgnore, TRUE)) {
         $result['custom'][] = $key;
       }
     }

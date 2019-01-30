@@ -180,6 +180,10 @@
   name        : Bob Silvern
   jira        : bobs0
 
+- github      : calbasi
+  name        : Joan Cervan Andreu
+  organization: calbasi.net
+
 - name        : Cath O'Connell
   jira        : cath
 
@@ -191,6 +195,9 @@
 - github      : chamilwijesooriya
   name        : Chamil Wijesooriya
   organization: MillerTech
+
+- name        : Chandana Bandara
+  jira        : chandana
 
 - name        : Charles Register
   organization: Hemophilia of North Carolina
@@ -209,6 +216,9 @@
 
 - name        : Christophe Golle
   jira        : christophe.golle@gmail.com
+
+- github      : marsh-circle
+  name        : Clare Marsh
 
 - github      : clnlf
   name        : Carlos Loeza
@@ -298,6 +308,9 @@
 - github      : demeritcowboy
   name        : Dave D
   jira        : demeritcowboy
+
+- github      : dereklewis123
+  name        : Derek Lewis
 
 - github      : detsieber
   name        : Detlev Sieber
@@ -483,6 +496,9 @@
 - github      : ginkgomzd
   name        : Michael Z Daryabeygi
   organization: Ginkgo Street Labs
+
+- github      : giovannidalmas1967
+  name        : Giovanni Dalmas
 
 - github      : jmcheung
   name        : Jon-Man Cheung
@@ -703,7 +719,8 @@
 - github      : kerasai
   name        : Will Long
 
-- name        : Kirk Jackson
+- github      : kirk-jackson
+  name        : Kirk Jackson
   organization: Campaign Against Arms Trade
   jira        : kirk
 
@@ -855,6 +872,9 @@
 - name        : Maureen Parks
   organization: Minnesota Association of Veterinary Technicians
   jira        : membership
+
+- github      : mecachisenros
+  name        : Andrei Mondoc
 
 - github      : mepps
   name        : Maggie Epps
@@ -1051,6 +1071,9 @@
   organization: Redfin Solutions
   jira        : pcorbett
 
+- name        : Paul Barmak
+  jira        : pbarmak
+
 - github      : pbatroff
   name        : Philipp Batroff
   organization: Systopia
@@ -1099,6 +1122,9 @@
 
 - name        : Rareș Pamfil
   jira        : rares
+
+- github      : ray-wright
+  name        : Ray Wright
 
 - name        : Renaee Churches
   organization: Play Australia
@@ -1285,10 +1311,17 @@
   organization: Third Sun
   jira        : thirdsun
 
+- github      : thomst
+  name        : Thomas Leichtfuss
+  organization: Systopia
+
 - github      : thoni56
   name        : Thomas Nilefalk
   organization: Responsive Development Technologies
   jira        : thoni56
+
+- github      : tiotsop01
+  name        : Tiotsop Gerest
 
 - github      : tobiaslounsbury
   name        : Tobias Lounsbury

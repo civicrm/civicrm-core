@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,11 +31,11 @@
     <tr>
       <td class="crm-contact-form-block-contact1">
         <label for="contact1">{ts}Contact 1{/ts}</label><br />
-        <input type="text" placeholder="Search Contact1" search-column="0" />
+        <input class="crm-form-text" type="text" placeholder="Search Contact1" search-column="0" />
       </td>
       <td class="crm-contact-form-block-contact2">
         <label for="contact2">{ts}Contact 2{/ts}</label><br />
-        <input type="text" placeholder="Search Contact2" search-column="1" />
+        <input class="crm-form-text" type="text" placeholder="Search Contact2" search-column="1" />
       </td>
     </tr>
   </table>

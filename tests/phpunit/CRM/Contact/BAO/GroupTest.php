@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -252,9 +252,11 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
 
     $contactID = $this->individualCreate(['custom_' . $customFieldID => 'abc']);
 
+    $formValues = ['custom_' . $customFieldID => ['LIKE' => '%a%']];
+
     $hiddenSmartParams = [
       'group_type' => ['2' => 1],
-      'form_values' => ['custom_' . $customFieldID => ['LIKE' => '%a%']],
+      'form_values' => CRM_Contact_BAO_Query::convertFormValues($formValues),
       'saved_search_id' => NULL,
       'search_custom_id' => NULL,
       'search_context' => 'advanced',

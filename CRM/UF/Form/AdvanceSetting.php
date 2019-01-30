@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
 
@@ -38,6 +38,12 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
    * @param CRM_Core_Form $form
    */
   public static function buildAdvanceSetting(&$form) {
+    $entityFields = [
+      'cancel_button_text',
+      'submit_button_text',
+    ];
+    $form->assign('advancedFieldsConverted', $entityFields);
+
     // should mapping be enabled for this group
     $form->addElement('checkbox', 'is_map', ts('Enable mapping for this profile?'));
 
@@ -53,8 +59,6 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
 
     $form->add('advcheckbox', 'add_cancel_button', ts('Include Cancel Button?'));
     $form->addElement('text', 'cancel_URL', ts('Cancel Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_URL'));
-    $form->addElement('text', 'cancel_button_text', ts('Cancel Button Text'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_button_text'));
-    $form->addElement('text', 'submit_button_text', ts('Submit Button Text'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'submit_button_text'));
 
     // add select for groups
     $group = array('' => ts('- select -')) + $form->_group;

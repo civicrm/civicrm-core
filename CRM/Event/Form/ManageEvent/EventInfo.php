@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -45,6 +45,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
    */
   public function preProcess() {
     parent::preProcess();
+    $this->assign('selectedChild', 'settings');
 
     if ($this->_id) {
       $this->assign('entityID', $this->_id);
@@ -254,7 +255,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     // now that we have the event’s id, do some more template-based stuff
     if (!empty($params['template_id'])) {
-      $event = CRM_Event_BAO_Event::copy($params['template_id']);
+      $event = CRM_Event_BAO_Event::copy($params['template_id'], $params);
     }
     else {
       $event = CRM_Event_BAO_Event::create($params);

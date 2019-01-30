@@ -328,4 +328,43 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $source);
   }
 
+  /**
+   * Test the flatten function
+   */
+  public function testFlatten() {
+    $data = [
+      'my_array' => [
+        '0' => 'bar',
+        '1' => 'baz',
+        '2' => 'boz',
+      ],
+      'my_complex' => [
+         'dog' => 'woof',
+         'asdf' => [
+           'my_zero' => 0,
+           'my_int' => 1,
+           'my_null' => NULL,
+           'my_empty' => '',
+         ],
+      ],
+      'my_simple' => 999,
+    ];
+
+    $expected = [
+      'my_array.0' => 'bar',
+      'my_array.1' => 'baz',
+      'my_array.2' => 'boz',
+      'my_complex.dog' => 'woof',
+      'my_complex.asdf.my_zero' => 0,
+      'my_complex.asdf.my_int' => 1,
+      'my_complex.asdf.my_null' => NULL,
+      'my_complex.asdf.my_empty' => '',
+      'my_simple' => 999,
+    ];
+
+    $flat = [];
+    CRM_Utils_Array::flatten($data, $flat);
+    $this->assertEquals($flat, $expected);
+  }
+
 }

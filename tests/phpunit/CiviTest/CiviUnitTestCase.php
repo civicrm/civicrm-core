@@ -114,9 +114,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   private $tx = NULL;
 
   /**
-   * @var CRM_Utils_Hook_UnitTests hookClass
-   * example of setting a method for a hook
+   * Class used for hooks during tests.
+   *
+   * This can be used to test hooks within tests. For example in the ACL_PermissionTrait:
+   *
    * $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+   *
+   * @var CRM_Utils_Hook_UnitTests hookClass
    */
   public $hookClass = NULL;
 
@@ -140,7 +144,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public $setupIDs = array();
 
   /**
-   * PHPUnit Mock Mecthod to use.
+   * PHPUnit Mock Method to use.
    *
    * @var string
    */
@@ -682,6 +686,20 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         array(1 => $key)
       )
     );
+  }
+
+  /**
+   * Assert the 2 arrays have the same values.
+   *
+   * @param array $array1
+   * @param array $array2
+   */
+  public function assertArrayValuesEqual($array1, $array2) {
+    $array1 = array_values($array1);
+    $array2 = array_values($array2);
+    sort($array1);
+    sort($array2);
+    $this->assertEquals($array1, $array2);
   }
 
   /**
@@ -1302,8 +1320,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'financial_type_id' => 1,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 1,
     ), $params);
@@ -1712,27 +1728,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
     $result = $this->callAPISuccess('uf_join', 'create', $params);
     return $result;
-  }
-
-  /**
-   * Delete a UF Join Entry.
-   *
-   * @param array $params
-   *   with missing uf_group_id
-   */
-  public function ufjoinDelete($params = NULL) {
-    if ($params === NULL) {
-      $params = array(
-        'is_active' => 1,
-        'module' => 'CiviEvent',
-        'entity_table' => 'civicrm_event',
-        'entity_id' => 3,
-        'weight' => 1,
-        'uf_group_id' => '',
-      );
-    }
-
-    crm_add_uf_join($params);
   }
 
   /**
@@ -2732,7 +2727,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     if (!$isProfile) {
       //flush cache
       CRM_ACL_BAO_Cache::resetCache();
-      CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL, TRUE);
+      CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL);
     }
   }
 
@@ -3385,6 +3380,37 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
+   * Create Payment Instrument.
+   *
+   * @param array $params
+   * @param string $financialAccountName
+   *
+   * @return int
+   */
+  protected function createPaymentInstrument($params = array(), $financialAccountName = 'Donation') {
+    $params = array_merge(array(
+      'label' => 'Payment Instrument -' . substr(sha1(rand()), 0, 7),
+      'option_group_id' => 'payment_instrument',
+      'is_active' => 1,
+      ),
+      $params
+    );
+    $newPaymentInstrument = $this->callAPISuccess('OptionValue', 'create', $params);
+
+    $relationTypeID = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
+
+    $financialAccountParams = [
+      'entity_table' => 'civicrm_option_value',
+      'entity_id' => key($newPaymentInstrument),
+      'account_relationship' => $relationTypeID,
+      'financial_account_id' => $this->callAPISuccess('FinancialAccount', 'getValue', ['name' => $financialAccountName, 'return' => 'id']),
+    ];
+    CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
+
+    return CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $params['label']);
+  }
+
+  /**
    * Enable Tax and Invoicing
    */
   protected function enableTaxAndInvoicing($params = array()) {
@@ -3532,20 +3558,6 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->_ids['price_field'] = array($priceField['id']);
 
     $this->_ids['membership_type'] = $membershipTypeID;
-  }
-
-  /**
-   * No results returned.
-   *
-   * @implements CRM_Utils_Hook::aclWhereClause
-   *
-   * @param string $type
-   * @param array $tables
-   * @param array $whereTables
-   * @param int $contactID
-   * @param string $where
-   */
-  public function aclWhereHookNoResults($type, &$tables, &$whereTables, &$contactID, &$where) {
   }
 
   /**

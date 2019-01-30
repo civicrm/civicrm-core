@@ -58,6 +58,11 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $this->assertEquals(count($foundDupes), 3, 'Check Individual-Fuzzy dupe rule for dupesInGroup().');
   }
 
+  /**
+   * Test that a rule set to is_reserved = 0 works.
+   *
+   * There is a different search used dependent on this variable.
+   */
   public function testCustomRule() {
     $this->setupForGroupDedupe();
 
@@ -69,18 +74,20 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       'title' => 'TestRule',
       'is_reserved' => 0,
     ));
-    foreach (array('first_name', 'last_name') as $field) {
-      $ruleDao = new CRM_Dedupe_DAO_Rule();
-      $ruleDao->dedupe_rule_group_id = $ruleGroup['id'];
-      $ruleDao->rule_table = 'civicrm_contact';
-      $ruleDao->rule_field = $field;
-      $ruleDao->rule_length = NULL;
-      $ruleDao->rule_weight = 4;
-      $ruleDao->save();
-      $ruleDao->free();
+    $rules = [];
+    foreach (array('birth_date', 'first_name', 'last_name') as $field) {
+      $rules[$field] = $this->callAPISuccess('Rule', 'create', [
+        'dedupe_rule_group_id' => $ruleGroup['id'],
+        'rule_table' => 'civicrm_contact',
+        'rule_weight' => 4,
+        'rule_field' => $field,
+      ]);
     }
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
     $this->assertEquals(count($foundDupes), 4);
+    $this->markTestIncomplete('This currenctly fails - see https://lab.civicrm.org/dev/core/issues/397');
+    CRM_Dedupe_Finder::dupes($ruleGroup['id']);
+
   }
 
   /**
@@ -179,12 +186,6 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     // verify that all contacts have been created separately
     $this->assertEquals(count($contactIds), 7, 'Check for number of contacts.');
 
-    $dao = new CRM_Dedupe_DAO_RuleGroup();
-    $dao->contact_type = 'Individual';
-    $dao->used = 'General';
-    $dao->is_default = 1;
-    $dao->find(TRUE);
-
     $fields = array(
       'first_name' => 'robin',
       'last_name' => 'hood',
@@ -224,12 +225,14 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'last_name' => 'hood',
         'email' => 'robin@example.com',
         'contact_type' => 'Individual',
+        'birth_date' => '2016-01-01',
       ),
       array(
         'first_name' => 'robin',
         'last_name' => 'hood',
         'email' => 'hood@example.com',
         'contact_type' => 'Individual',
+        'birth_date' => '2016-01-01',
       ),
       array(
         'first_name' => 'robin',

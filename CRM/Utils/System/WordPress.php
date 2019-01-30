@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -257,11 +257,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     $queryParts = array();
 
-    // CRM_Core_Payment::getReturnSuccessUrl() passes $query as an array
-    if (isset($query) && is_array($query)) {
-      $query = implode($separator, $query);
-    }
-
     if (
       // not using clean URLs
       !$config->cleanURL
@@ -283,7 +278,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       if ($wpPageParam) {
         $queryParts[] = $wpPageParam;
       }
-      if (isset($query)) {
+      if (!empty($query)) {
         $queryParts[] = $query;
       }
 

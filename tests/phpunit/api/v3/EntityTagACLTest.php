@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,6 +41,8 @@
  * @group headless
  */
 class api_v3_EntityTagACLTest extends CiviUnitTestCase {
+
+  use CRMTraits_ACL_PermissionTrait;
 
   /**
    * API Version in use.
@@ -210,21 +212,6 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
       'entity_id' => 1,
       'entity_table' => $this->getTableForTag($entity),
     ), ($entity == 'Contacts' ? 1 : 0));
-  }
-
-  /**
-   * All results returned.
-   *
-   * @implements CRM_Utils_Hook::aclWhereClause
-   *
-   * @param string $type
-   * @param array $tables
-   * @param array $whereTables
-   * @param int $contactID
-   * @param string $where
-   */
-  public function aclWhereHookAllResults($type, &$tables, &$whereTables, &$contactID, &$where) {
-    $where = " (1) ";
   }
 
 }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -37,6 +37,13 @@
  * It is intended mostly as part of a refactoring process to get rid of having 2.
  */
 trait CRM_Admin_Form_SettingTrait {
+
+  /**
+   * The setting page filter.
+   *
+   * @var string
+   */
+  private $_filter;
 
   /**
    * @var array
@@ -119,6 +126,44 @@ trait CRM_Admin_Form_SettingTrait {
   }
 
   /**
+   * @return string
+   */
+  protected function getSettingPageFilter() {
+    if (!isset($this->_filter)) {
+      // Get the last URL component without modifying the urlPath property.
+      $urlPath = array_values($this->urlPath);
+      $this->_filter = end($urlPath);
+    }
+    return $this->_filter;
+  }
+
+  /**
+   * Returns a re-keyed copy of the settings, ordered by weight.
+   *
+   * @return array
+   */
+  protected function getSettingsOrderedByWeight() {
+    $settingMetaData = $this->getSettingsMetaData();
+    $filter = $this->getSettingPageFilter();
+
+    usort($settingMetaData, function ($a, $b) use ($filter) {
+      // Handle cases in which a comparison is impossible. Such will be considered ties.
+      if (
+        // A comparison can't be made unless both setting weights are declared.
+        !isset($a['settings_pages'][$filter]['weight'], $b['settings_pages'][$filter]['weight'])
+        // A pair of settings might actually have the same weight.
+        || $a['settings_pages'][$filter]['weight'] === $b['settings_pages'][$filter]['weight']
+      ) {
+        return 0;
+      }
+
+      return $a['settings_pages'][$filter]['weight'] > $b['settings_pages'][$filter]['weight'] ? 1 : -1;
+    });
+
+    return $settingMetaData;
+  }
+
+  /**
    * Add fields in the metadata to the template.
    */
   protected function addFieldsDefinedInSettingsMetadata() {
@@ -190,8 +235,9 @@ trait CRM_Admin_Form_SettingTrait {
           $this->$add($setting, ts($props['title']), $options);
         }
         // Migrate to using an array as easier in smart...
-        $descriptions[$setting] = ts($props['description']);
-        $this->assign("{$setting}_description", ts($props['description']));
+        $description = CRM_Utils_Array::value('description', $props);
+        $descriptions[$setting] = $description;
+        $this->assign("{$setting}_description", $description);
         if ($setting == 'max_attachments') {
           //temp hack @todo fix to get from metadata
           $this->addRule('max_attachments', ts('Value should be a positive number'), 'positiveInteger');
@@ -206,7 +252,7 @@ trait CRM_Admin_Form_SettingTrait {
     // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
     $this->assign('setting_descriptions', $descriptions);
     $this->assign('settings_fields', $settingMetaData);
-    $this->assign('fields', $settingMetaData);
+    $this->assign('fields', $this->getSettingsOrderedByWeight());
   }
 
   /**

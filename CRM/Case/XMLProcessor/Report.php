@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
 
@@ -129,20 +129,9 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
       $case['subject'] = $dao->subject;
       $case['start_date'] = $dao->start_date;
       $case['end_date'] = $dao->end_date;
-      // FIXME: when we resolve if case_type_is single or multi-select
-      if (strpos($dao->case_type_id, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
-        $caseTypeID = substr($dao->case_type_id, 1, -1);
-      }
-      else {
-        $caseTypeID = $dao->case_type_id;
-      }
-      $caseTypeIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        $dao->case_type_id
-      );
-
       $case['caseType'] = CRM_Case_BAO_Case::getCaseType($caseID);
       $case['caseTypeName'] = CRM_Case_BAO_Case::getCaseType($caseID, 'name');
-      $case['status'] = CRM_Core_OptionGroup::getLabel('case_status', $dao->status_id, FALSE);
+      $case['status'] = CRM_Core_PseudoConstant::getLabel('CRM_Case_BAO_Case', 'status_id', $dao->status_id);
     }
     return $case;
   }
@@ -477,9 +466,7 @@ WHERE      a.id = %1
     if ($activityDAO->medium_id) {
       $activity['fields'][] = array(
         'label' => ts('Medium'),
-        'value' => CRM_Core_OptionGroup::getLabel('encounter_medium',
-          $activityDAO->medium_id, FALSE
-        ),
+        'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'medium_id', $activityDAO->medium_id),
         'type' => 'String',
       );
     }
@@ -520,7 +507,7 @@ WHERE      a.id = %1
 
     $activity['fields'][] = array(
       'label' => ts('Priority'),
-      'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'priority',
+      'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'priority_id',
         $activityDAO->priority_id
       ),
       'type' => 'String',

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
 
@@ -87,15 +87,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     while ($date['minYear'] <= $count) {
       $optionYear[$date['minYear']] = $date['minYear'];
       $date['minYear']++;
-    }
-
-    // Check if CiviCampaign is a) enabled and b) has active campaigns
-    $config = CRM_Core_Config::singleton();
-    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
-    if ($campaignEnabled) {
-      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
-      $this->activeCampaigns = $getCampaigns['campaigns'];
-      asort($this->activeCampaigns);
     }
 
     $this->_columns = array(
@@ -271,19 +262,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     );
 
     // If we have a campaign, build out the relevant elements
-    if ($campaignEnabled && !empty($this->activeCampaigns)) {
-      $this->_columns['civicrm_contribution']['fields']['campaign_id'] = array(
-        'title' => ts('Campaign'),
-        'default' => 'false',
-        'type' => CRM_Utils_Type::T_INT,
-      );
-      $this->_columns['civicrm_contribution']['filters']['campaign_id'] = array(
-        'title' => ts('Campaign'),
-        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-        'options' => $this->activeCampaigns,
-        'type' => CRM_Utils_Type::T_INT,
-      );
-    }
+    $this->addCampaignFields('civicrm_contribution');
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -364,9 +343,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       $this->_from .= " ON {$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_contact']}.id
          AND {$this->_aliases['civicrm_contribution']}.is_test = 0
          AND " . $this->whereClauseLastYear("{$this->_aliases['civicrm_contribution']}.receive_date") . "
-       {$this->_aclFrom}
-       LEFT JOIN civicrm_contribution cont_exclude ON cont_exclude.contact_id = {$this->_aliases['civicrm_contact']}.id
-         AND " . $this->whereClauseThisYear('cont_exclude.receive_date');
+       {$this->_aclFrom} ";
       $this->selectivelyAddLocationTablesJoinsToFilterQuery();
     }
 
@@ -399,7 +376,11 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     if ($field['name'] == 'receive_date') {
       $clause = 1;
       if (empty($this->contactTempTable)) {
-        $this->_whereClauses[] = "cont_exclude.id IS NULL";
+        $clause = "{$this->_aliases['civicrm_contact']}.id NOT IN (
+          SELECT cont_exclude.contact_id
+          FROM civicrm_contribution cont_exclude
+          WHERE " . $this->whereClauseThisYear('cont_exclude.receive_date')
+        . ")";
       }
     }
     // Group filtering is already done so skip.
@@ -567,13 +548,12 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     // @todo this acl has no test coverage and is very hard to test manually so could be fragile.
     $this->resetFormSqlAndWhereHavingClauses();
 
-    $this->contactTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('rptlybunt')->setId(date('Ymd_') . uniqid())->getName();
+    $this->contactTempTable = $this->createTemporaryTable('rptlybunt', "
+      SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from}
+      {$this->_where}
+      GROUP BY {$this->_aliases['civicrm_contact']}.id"
+    );
     $this->limit();
-    $getContacts = "
-      CREATE TEMPORARY TABLE $this->contactTempTable {$this->_databaseAttributes}
-      SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where}
-      GROUP BY {$this->_aliases['civicrm_contact']}.id";
-    $this->executeReportQuery($getContacts);
     if (empty($this->_params['charts'])) {
       $this->setPager();
     }
@@ -717,7 +697,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       // convert campaign_id to campaign title
       if (array_key_exists('civicrm_contribution_campaign_id', $row)) {
         if ($value = $row['civicrm_contribution_campaign_id']) {
-          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->activeCampaigns[$value];
+          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->campaigns[$value];
           $entryFound = TRUE;
         }
       }

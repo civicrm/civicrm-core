@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -58,9 +58,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       $this->setDefaultsForMetadataDefinedFields();
 
-      // @todo thise should be retrievable from the above function.
-      $this->_defaults['contact_autocomplete_options'] = self::getAutocompleteContactSearch();
-      $this->_defaults['contact_reference_options'] = self::getAutocompleteContactReference();
+      // @todo these should be retrievable from the above function.
       $this->_defaults['enableSSL'] = Civi::settings()->get('enableSSL');
       $this->_defaults['verifySSL'] = Civi::settings()->get('verifySSL');
       $this->_defaults['environment'] = CRM_Core_Config::environment();
@@ -115,20 +113,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    */
   public function commonProcess(&$params) {
 
-    // save autocomplete search options
-    if (!empty($params['contact_autocomplete_options'])) {
-      Civi::settings()->set('contact_autocomplete_options',
-        CRM_Utils_Array::implodePadded(array_keys($params['contact_autocomplete_options'])));
-      unset($params['contact_autocomplete_options']);
-    }
-
-    // save autocomplete contact reference options
-    if (!empty($params['contact_reference_options'])) {
-      Civi::settings()->set('contact_reference_options',
-        CRM_Utils_Array::implodePadded(array_keys($params['contact_reference_options'])));
-      unset($params['contact_reference_options']);
-    }
-
     // save components to be enabled
     if (array_key_exists('enableComponents', $params)) {
       civicrm_api3('setting', 'create', array(
@@ -176,53 +160,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     // also delete the IDS file so we can write a new correct one on next load
     $configFile = $config->uploadDir . 'Config.IDS.ini';
     @unlink($configFile);
-  }
-
-  /**
-   * Ugh, this shouldn't exist.
-   *
-   * Get the selected values of "contact_reference_options" formatted for checkboxes.
-   *
-   * @return array
-   */
-  public static function getAutocompleteContactReference() {
-    $cRlist = array_flip(CRM_Core_OptionGroup::values('contact_reference_options',
-      FALSE, FALSE, TRUE, NULL, 'name'
-    ));
-    $cRlistEnabled = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'contact_reference_options'
-    );
-    $cRSearchFields = array();
-    if (!empty($cRlist) && !empty($cRlistEnabled)) {
-      $cRSearchFields = array_combine($cRlist, $cRlistEnabled);
-    }
-    return array(
-      '1' => 1,
-    ) + $cRSearchFields;
-  }
-
-  /**
-   * Ugh, this shouldn't exist.
-   *
-   * Get the selected values of "contact_autocomplete_options" formatted for checkboxes.
-   *
-   * @return array
-   */
-  public static function getAutocompleteContactSearch() {
-    $list = array_flip(CRM_Core_OptionGroup::values('contact_autocomplete_options',
-      FALSE, FALSE, TRUE, NULL, 'name'
-    ));
-    $listEnabled = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'contact_autocomplete_options'
-    );
-    $autoSearchFields = array();
-    if (!empty($list) && !empty($listEnabled)) {
-      $autoSearchFields = array_combine($list, $listEnabled);
-    }
-    //Set defaults for autocomplete and contact reference options
-    return array(
-      '1' => 1,
-    ) + $autoSearchFields;
   }
 
 }

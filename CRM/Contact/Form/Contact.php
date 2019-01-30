@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -615,6 +615,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $blocks['Address'] = $otherEditOptions['Address'];
     }
 
+    $website_types = array();
     $openIds = array();
     $primaryID = FALSE;
     foreach ($blocks as $name => $label) {
@@ -629,8 +630,17 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           }
 
           if ($dataExists) {
-            // skip remaining checks for website
             if ($name == 'website') {
+              if (!empty($blockValues['website_type_id'])) {
+                if (empty($website_types[$blockValues['website_type_id']])) {
+                  $website_types[$blockValues['website_type_id']] = $blockValues['website_type_id'];
+                }
+                else {
+                  $errors["{$name}[1][website_type_id]"] = ts('Contacts may only have one website of each type at most.');
+                }
+              }
+
+              // skip remaining checks for website
               continue;
             }
 

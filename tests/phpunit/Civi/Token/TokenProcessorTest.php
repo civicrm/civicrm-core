@@ -59,6 +59,22 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   }
 
   /**
+   * Check that getContextValues() returns the correct data
+   */
+  public function testGetContextValues() {
+    $p = new TokenProcessor($this->dispatcher, array(
+      'controller' => __CLASS__,
+      'omega' => '99',
+    ));
+    $p->addRow()->context('id', 10)->context('omega', '98');
+    $p->addRow()->context('id', 10)->context('contact', (object) ['cid' => 10]);
+    $p->addRow()->context('id', 11)->context('contact', (object) ['cid' => 11]);
+    $this->assertArrayValuesEqual([10, 11], $p->getContextValues('id'));
+    $this->assertArrayValuesEqual(['99', '98'], $p->getContextValues('omega'));
+    $this->assertArrayValuesEqual([10, 11], $p->getContextValues('contact', 'cid'));
+  }
+
+  /**
    * Check that the TokenRow helper can correctly read/update token
    * values.
    */
@@ -95,6 +111,14 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       'custom' => array('foobar', 'whizbang'),
     );
     $this->assertEquals($expected, $p->getMessageTokens());
+  }
+
+  public function testListTokens() {
+    $p = new TokenProcessor($this->dispatcher, array(
+      'controller' => __CLASS__,
+    ));
+    $p->addToken(array('entity' => 'MyEntity', 'field' => 'myField', 'label' => 'My Label'));
+    $this->assertEquals(array('{MyEntity.myField}' => 'My Label'), $p->listTokens());
   }
 
   /**

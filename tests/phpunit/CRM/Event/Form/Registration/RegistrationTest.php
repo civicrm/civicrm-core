@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Class CRM_Event_Form_RegistrationTest
  * @group headless
  */
-class CRM_Event_Form_RegistrationTest extends CiviUnitTestCase {
+class CRM_Event_Form_Registration_RegistrationTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();

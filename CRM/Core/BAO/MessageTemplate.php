@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 require_once 'Mail/mime.php';
@@ -388,6 +388,11 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $params = array_merge($defaults, $params);
 
     CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
+
+    // Core#644 - handle contact ID passed as "From".
+    if (isset($params['from'])) {
+      $params['from'] = CRM_Utils_Mail::formatFromAddress($params['from']);
+    }
 
     if ((!$params['groupName'] ||
         !$params['valueName']

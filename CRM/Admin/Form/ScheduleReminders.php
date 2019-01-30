@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -194,7 +194,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $freqUnitsDisplay[$val] = ts('%1(s)', array(1 => $label));
     }
 
-    $this->addDate('absolute_date', ts('Start Date'), FALSE, array('formatType' => 'mailing'));
+    $this->add('datepicker', 'absolute_date', ts('Start Date'), [], FALSE, array('time' => FALSE));
 
     //reminder_frequency
     $this->add('select', 'start_action_unit', ts('Frequency'), $freqUnitsDisplay, TRUE);
@@ -342,8 +342,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
 
     if (!CRM_Utils_System::isNull($fields['absolute_date'])) {
-      if (CRM_Utils_Date::format(CRM_Utils_Date::processDate($fields['absolute_date'], NULL)) < CRM_Utils_Date::format(date('Ymd'))) {
+      if ($fields['absolute_date'] < date('Y-m-d')) {
         $errors['absolute_date'] = ts('Absolute date cannot be earlier than the current time.');
+      }
+    }
+    else {
+      if (CRM_Utils_System::isNull($fields['start_action_offset'])) {
+        $errors['start_action_offset'] = ts('Start Action Offset must be filled in or Absolute Date set');
       }
     }
     if (!CRM_Utils_Rule::email($fields['from_email']) && (!$mode || $mode != 'SMS')) {
@@ -403,10 +408,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       }
       else {
         $defaults['entity'] = $entityStatus;
-      }
-      if ($absoluteDate = CRM_Utils_Array::value('absolute_date', $defaults)) {
-        list($date, $time) = CRM_Utils_Date::setDateDefaults($absoluteDate);
-        $defaults['absolute_date'] = $date;
       }
 
       if ($recipientListing = CRM_Utils_Array::value('recipient_listing', $defaults)) {
@@ -522,10 +523,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'end_date',
     );
 
-    if ($absoluteDate = CRM_Utils_Array::value('absolute_date', $params)) {
-      $params['absolute_date'] = CRM_Utils_Date::processDate($absoluteDate);
-    }
-    else {
+    if (!CRM_Utils_Array::value('absolute_date', $params)) {
       $params['absolute_date'] = 'null';
     }
     foreach ($moreKeys as $mkey) {

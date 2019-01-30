@@ -136,13 +136,14 @@ class TokenRow {
    */
   public function customToken($entity, $customFieldID, $entityID) {
     $customFieldName = "custom_" . $customFieldID;
-    $fieldValue = civicrm_api3($entity, 'getvalue', array(
+    $record = civicrm_api3($entity, "getSingle", [
       'return' => $customFieldName,
-      'id' => $entityID,
-    ));
+       'id' => $entityID,
+    ]);
+    $fieldValue = \CRM_Utils_Array::value($customFieldName, $record, '');
 
     // format the raw custom field value into proper display value
-    if ($fieldValue) {
+    if (isset($fieldValue)) {
       $fieldValue = \CRM_Core_BAO_CustomField::displayValue($fieldValue, $customFieldID);
     }
 

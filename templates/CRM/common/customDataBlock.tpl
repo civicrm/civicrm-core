@@ -6,9 +6,10 @@
   <script type="text/javascript">
     CRM.$(function($) {
       {/literal}
-      CRM.buildCustomData( '{$customDataType}' );
       {if $customDataSubType}
-      CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
+        CRM.buildCustomData('{$customDataType}', {$customDataSubType});
+      {else}
+        CRM.buildCustomData('{$customDataType}');
       {/if}
       {literal}
     });

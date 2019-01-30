@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -220,6 +220,7 @@ return array(
     'title' => ts('Wysiwig Editor'),
     'pseudoconstant' => array(
       'optionGroupName' => 'wysiwyg_editor',
+      'keyColumn' => 'name',
     ),
     'is_domain' => 1,
     'is_contact' => 0,
@@ -288,7 +289,8 @@ return array(
     'group' => 'core',
     'name' => 'contact_autocomplete_options',
     'type' => 'String',
-    'quick_form_type' => 'CheckBox',
+    'quick_form_type' => 'CheckBoxes',
+    'html_type' => 'checkboxes',
     'pseudoconstant' => array(
       'callback' => 'CRM_Admin_Form_Setting_Search::getContactAutocompleteOptions',
     ),
@@ -299,13 +301,15 @@ return array(
     'is_contact' => 0,
     'description' => ts("Selected fields will be displayed in back-office autocomplete dropdown search results (Quick Search, etc.). Contact Name is always included."),
     'help_text' => NULL,
+    'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
   ),
   'contact_reference_options' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'contact_reference_options',
     'type' => 'String',
-    'quick_form_type' => 'CheckBox',
+    'quick_form_type' => 'CheckBoxes',
+    'html_type' => 'checkboxes',
     'pseudoconstant' => array(
       'callback' => 'CRM_Admin_Form_Setting_Search::getContactReferenceOptions',
     ),
@@ -316,6 +320,7 @@ return array(
     'is_contact' => 0,
     'description' => ts("Selected fields will be displayed in autocomplete dropdown search results for 'Contact Reference' custom fields. Contact Name is always included. NOTE: You must assign 'access contact reference fields' permission to the anonymous role if you want to use custom contact reference fields in profiles on public pages. For most situations, you should use the 'Limit List to Group' setting when configuring a contact reference field which will be used in public forms to prevent exposing your entire contact list."),
     'help_text' => NULL,
+    'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
   ),
   'contact_smart_group_display' => array(
     'group_name' => 'CiviCRM Preferences',
@@ -854,8 +859,8 @@ return array(
       'size' => '32',
       'maxlength' => '64',
     ),
-    'default' => NULL,
-    'title' => ts('Drupal Users Table Name'),
+    'default' => 'users',
+    'title' => ts('CMS Users Table Name'),
     'description' => '',
   ),
   'wpLoadPhp' => array(

@@ -23,16 +23,36 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{htxt id="test-intro-title"}
-  {ts}Test Message{/ts}
-{/htxt}
-{htxt id="test-intro"}
-<p>{ts}It's a good idea to test your mailing by sending it to yourself and/or a selected group of people in your organization. You can also view your content in the preview panel below.{/ts}</p>
-<p>{ts}Enter a single email address or select an existing group and click "Send a Test Mailing." Once you receive the test mailing:{/ts}</p>
-<ul>
-<li>{ts}Verify the content and formatting.{/ts}</li>
-<li>{ts}If you are using mail-merge tokens, check that they have been replaced with expected values.{/ts}</li>
-<li>{ts}Click on each included link to make sure they go to the expected web pages.{/ts}</li>
-</ul>
-<p>{ts}If you need to make changes, you can click <strong>Previous</strong> to return to the content step, make your changes, and send another test.{/ts}</p>
-{/htxt}
+{*this is included inside a table row*}
+{assign var=relativeName   value=$fieldName|cat:"_relative"}
+
+  {$form.$relativeName.label}<br />
+  {$form.$relativeName.html}<br />
+  <span class="crm-absolute-date-range">
+    <span class="crm-absolute-date-from">
+      {assign var=fromName value=$fieldName|cat:$from}
+      {$form.$fromName.label}
+      {$form.$fromName.html}
+    </span>
+    <span class="crm-absolute-date-to">
+      {assign var=toName   value=$fieldName|cat:$to}
+      {$form.$toName.label}
+      {$form.$toName.html}
+    </span>
+  </span>
+  {literal}
+    <script type="text/javascript">
+      CRM.$(function($) {
+        $("#{/literal}{$relativeName}{literal}").change(function() {
+          var n = cj(this).parent().parent();
+          if ($(this).val() == "0") {
+            $(".crm-absolute-date-range", n).show();
+          } else {
+            $(".crm-absolute-date-range", n).hide();
+            $(':text', n).val('');
+          }
+        }).change();
+      });
+    </script>
+  {/literal}
+

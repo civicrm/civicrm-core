@@ -4,7 +4,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM
  * @group headless
  */
-class CRM_Contact_Form_Search_CriteraTest extends CiviUnitTestCase {
+class CRM_Contact_Form_Search_CriteriaTest extends CiviUnitTestCase {
 
   /**
    * Test that the 'multiple bulk email' setting correctly affects the type of

@@ -80,4 +80,23 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     ], $messages);
   }
 
+  /**
+   * Test converting a datepicker field.
+   */
+  public function testSmartGroupDatePickerConversion() {
+    $this->callAPISuccess('SavedSearch', 'create', [
+       'form_values' => [
+         ['grant_application_received_date_high', '=', '01/20/2019'],
+         ['grant_due_date_low', '=', '01/22/2019'],
+       ]
+    ]);
+    $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups('5.11.alpha1');
+    $smartGroupConversionObject->updateGroups();
+    $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', []);
+    $this->assertEquals('grant_application_received_date_high', $savedSearch['form_values'][0][0]);
+    $this->assertEquals('2019-01-20 00:00:00', $savedSearch['form_values'][0][2]);
+    $this->assertEquals('grant_due_date_low', $savedSearch['form_values'][1][0]);
+    $this->assertEquals('2019-01-22 00:00:00', $savedSearch['form_values'][1][2]);
+  }
+
 }

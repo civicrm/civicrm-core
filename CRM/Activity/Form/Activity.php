@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -163,9 +163,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         ),
       ),
       'duration' => array(
-        'type' => 'text',
+        'type' => 'number',
         'label' => ts('Duration'),
-        'attributes' => array('size' => 4, 'maxlength' => 8),
+        'attributes' => array('class' => 'four', 'min' => 1),
         'required' => FALSE,
       ),
       'location' => array(
@@ -206,6 +206,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           'create' => TRUE,
           'api' => array('params' => array('is_deceased' => 0)),
         ),
+      ),
+      'activity_date_time' => array(
+        'type' => 'datepicker',
+        'label' => ts('Date'),
+        'required' => TRUE,
       ),
       'followup_assignee_contact_id' => array(
         'type' => 'entityRef',
@@ -330,7 +335,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     // Set title.
     if (isset($activityTName)) {
       $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
-      $this->assign('pageTitle', ts('%1 Activity', array(1 => $activityName)));
 
       if ($this->_currentlyViewedContactId) {
         $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
@@ -538,7 +542,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $url = CRM_Utils_System::url(implode("/", $this->urlPath), "reset=1&id={$this->_activityId}&action=view&cid={$this->_values['source_contact_id']}");
-      CRM_Utils_Recent::add($this->_values['subject'],
+      CRM_Utils_Recent::add(CRM_Utils_Array::value('subject', $this->_values, ts('(no subject)')),
         $url,
         $this->_values['id'],
         'Activity',
@@ -560,16 +564,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $defaults = $this->_values + CRM_Core_Form_RecurringEntity::setDefaultValues();
     // if we're editing...
     if (isset($this->_activityId)) {
-      if (empty($defaults['activity_date_time'])) {
-        list($defaults['activity_date_time'], $defaults['activity_date_time_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
-      }
-      elseif ($this->_action & CRM_Core_Action::UPDATE) {
-        $this->assign('current_activity_date_time', $defaults['activity_date_time']);
-        list($defaults['activity_date_time'],
-          $defaults['activity_date_time_time']
-          ) = CRM_Utils_Date::setDateDefaults($defaults['activity_date_time'], 'activityDateTime');
-        list($defaults['repetition_start_date'], $defaults['repetition_start_date_time']) = CRM_Utils_Date::setDateDefaults($defaults['activity_date_time'], 'activityDateTime');
-      }
 
       if ($this->_context != 'standalone') {
         $this->assign('target_contact_value',
@@ -594,9 +588,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
       $defaults['source_contact_id'] = $this->_sourceContactId;
       $defaults['target_contact_id'] = $this->_targetContactId;
+    }
 
-      list($defaults['activity_date_time'], $defaults['activity_date_time_time'])
-        = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+    if (empty($defaults['activity_date_time'])) {
+      $defaults['activity_date_time'] = date('Y-m-d H:i:s');
     }
 
     if ($this->_activityTypeId) {
@@ -760,10 +755,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->addRule('duration',
       ts('Please enter the duration as number of minutes (integers only).'), 'positiveInteger'
     );
-    $this->addDateTime('activity_date_time', ts('Date'), TRUE, array('formatType' => 'activityDateTime'));
 
     // Add followup date.
-    $this->addDateTime('followup_date', ts('in'), FALSE, array('formatType' => 'activityDateTime'));
+    $this->add('datepicker', 'followup_date', ts('in'));
 
     // Only admins and case-workers can change the activity source
     if (!CRM_Core_Permission::check('administer CiviCRM') && $this->_context != 'caseActivity') {
@@ -878,7 +872,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     if (!empty($fields['followup_activity_type_id']) && empty($fields['followup_date'])) {
-      $errors['followup_date_time'] = ts('Followup date is a required field.');
+      $errors['followup_date'] = ts('Followup date is a required field.');
     }
     // Activity type is mandatory if subject or follow-up date is specified for an Follow-up activity, CRM-4515.
     if ((!empty($fields['followup_activity_subject']) || !empty($fields['followup_date'])) && empty($fields['followup_activity_type_id'])) {
@@ -948,9 +942,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         'Activity'
       );
     }
-
-    // store the date with proper format
-    $params['activity_date_time'] = CRM_Utils_Date::processDate($params['activity_date_time'], $params['activity_date_time_time']);
 
     // format params as arrays
     foreach (array('target', 'assignee', 'followup_assignee') as $name) {
@@ -1075,9 +1066,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       if (!is_array($params['tag'])) {
         $params['tag'] = explode(',', $params['tag']);
       }
-      foreach ($params['tag'] as $tag) {
-        $tagParams[$tag] = 1;
-      }
+
+      $tagParams = array_fill_keys($params['tag'], 1);
     }
 
     // Save static tags.

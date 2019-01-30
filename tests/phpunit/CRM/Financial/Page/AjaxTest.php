@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,7 +38,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
    */
   public function testGetFinancialTransactionsList() {
     $individualID = $this->individualCreate();
-    $this->contributionCreate(array('contact_id' => $individualID));
+    $this->contributionCreate(array('contact_id' => $individualID, 'trxn_id' => 12345));
     $batch = $this->callAPISuccess('Batch', 'create', array('title' => 'test', 'status_id' => 'Open'));
     CRM_Core_DAO::executeQuery("
      INSERT INTO civicrm_entity_batch (entity_table, entity_id, batch_id)

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,15 +30,15 @@ require_once 'api/v3/utils.php';
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
  * class to parse contact csv files
  */
 class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
-  protected $_mapperKeys;
-  protected $_mapperLocType;
+  protected $_mapperKeys = [];
+  protected $_mapperLocType = [];
   protected $_mapperPhoneType;
   protected $_mapperImProvider;
   protected $_mapperWebsiteType;
@@ -109,21 +109,21 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * Class constructor.
    *
    * @param array $mapperKeys
-   * @param int $mapperLocType
-   * @param int $mapperPhoneType
-   * @param int $mapperImProvider
-   * @param int $mapperRelated
-   * @param int $mapperRelatedContactType
+   * @param array $mapperLocType
+   * @param array $mapperPhoneType
+   * @param array $mapperImProvider
+   * @param array $mapperRelated
+   * @param array $mapperRelatedContactType
    * @param array $mapperRelatedContactDetails
-   * @param int $mapperRelatedContactLocType
-   * @param int $mapperRelatedContactPhoneType
-   * @param int $mapperRelatedContactImProvider
-   * @param int $mapperWebsiteType
-   * @param int $mapperRelatedContactWebsiteType
+   * @param array $mapperRelatedContactLocType
+   * @param array $mapperRelatedContactPhoneType
+   * @param array $mapperRelatedContactImProvider
+   * @param array $mapperWebsiteType
+   * @param array $mapperRelatedContactWebsiteType
    */
   public function __construct(
-    &$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL, $mapperImProvider = NULL, $mapperRelated = NULL, $mapperRelatedContactType = NULL, $mapperRelatedContactDetails = NULL, $mapperRelatedContactLocType = NULL, $mapperRelatedContactPhoneType = NULL, $mapperRelatedContactImProvider = NULL,
-    $mapperWebsiteType = NULL, $mapperRelatedContactWebsiteType = NULL
+    &$mapperKeys, $mapperLocType = [], $mapperPhoneType = [], $mapperImProvider = [], $mapperRelated = [], $mapperRelatedContactType = [], $mapperRelatedContactDetails = [], $mapperRelatedContactLocType = [], $mapperRelatedContactPhoneType = [], $mapperRelatedContactImProvider = [],
+    $mapperWebsiteType = [], $mapperRelatedContactWebsiteType = []
   ) {
     parent::__construct();
     $this->_mapperKeys = &$mapperKeys;

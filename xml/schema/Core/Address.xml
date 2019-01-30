@@ -284,6 +284,7 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <localize_context>province</localize_context>
     <html>
       <type>ChainSelect</type>
     </html>
@@ -350,6 +351,7 @@
       <labelColumn>name</labelColumn>
       <nameColumn>iso_code</nameColumn>
     </pseudoconstant>
+    <localize_context>country</localize_context>
     <html>
       <type>Select</type>
     </html>

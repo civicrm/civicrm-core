@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -44,7 +44,9 @@ class CRM_Case_Form_Activity_OpenCase {
   public $_contactID;
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function preProcess(&$form) {
     //get multi client case configuration
@@ -86,8 +88,9 @@ class CRM_Case_Form_Activity_OpenCase {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
+   * @param CRM_Case_Form_Case $form
    *
-   * @param CRM_Core_Form $form
+   * @return array $defaults
    */
   public static function setDefaultValues(&$form) {
     $defaults = array();
@@ -95,7 +98,7 @@ class CRM_Case_Form_Activity_OpenCase {
       return $defaults;
     }
 
-    list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+    $defaults['start_date'] = date('Y-m-d H:i:s');
 
     // set default case status, case type, encounter medium, location type and phone type defaults are set in DB
     if ($form->_caseStatusId) {
@@ -172,7 +175,7 @@ class CRM_Case_Form_Activity_OpenCase {
       $csElement->freeze();
     }
 
-    $form->add('text', 'duration', ts('Activity Duration'), array('size' => 4, 'maxlength' => 8));
+    $form->add('number', 'duration', ts('Activity Duration'), ['class' => 'four', 'min' => 1]);
     $form->addRule('duration', ts('Please enter the duration as number of minutes (integers only).'), 'positiveInteger');
 
     if ($form->_currentlyViewedContactId) {
@@ -180,7 +183,7 @@ class CRM_Case_Form_Activity_OpenCase {
       $form->assign('clientName', $displayName);
     }
 
-    $form->addDate('start_date', ts('Case Start Date'), TRUE, array('formatType' => 'activityDateTime'));
+    $form->add('datepicker', 'start_date', ts('Case Start Date'), [], TRUE);
 
     $form->addField('medium_id', array('entity' => 'activity', 'context' => 'create'), TRUE);
 
@@ -211,8 +214,7 @@ class CRM_Case_Form_Activity_OpenCase {
   /**
    * Process the form submission.
    *
-   *
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    * @param array $params
    */
   public static function beginPostProcess(&$form, &$params) {
@@ -224,9 +226,6 @@ class CRM_Case_Form_Activity_OpenCase {
       $params['client_id'] = explode(',', $params['client_id']);
       $form->_currentlyViewedContactId = $params['client_id'][0];
     }
-
-    // for open case start date should be set to current date
-    $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
 
     // rename activity_location param to the correct column name for activity DAO
     $params['location'] = CRM_Utils_Array::value('activity_location', $params);
@@ -246,7 +245,7 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @param $fields
    * @param $files
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -263,8 +262,10 @@ class CRM_Case_Form_Activity_OpenCase {
   /**
    * Process the form submission.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    * @param array $params
+   *
+   * @throws \Exception
    */
   public static function endPostProcess(&$form, &$params) {
     if ($form->_context == 'caseActivity') {

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
 
@@ -924,7 +924,7 @@ WHERE civicrm_event.is_active = 1
    * @return CRM_Event_DAO_Event
    * @throws \CRM_Core_Exception
    */
-  public static function copy($id) {
+  public static function copy($id, $params = []) {
     $eventValues = array();
 
     //get the require event values.
@@ -947,7 +947,7 @@ WHERE civicrm_event.is_active = 1
     $copyEvent = CRM_Core_DAO::copyGeneric('CRM_Event_DAO_Event',
       array('id' => $id),
       // since the location is sharable, lets use the same loc_block_id.
-      array('loc_block_id' => CRM_Utils_Array::value('loc_block_id', $eventValues)),
+      array('loc_block_id' => CRM_Utils_Array::value('loc_block_id', $eventValues)) + $params,
       $fieldsFix
     );
     CRM_Price_BAO_PriceSet::copyPriceSet('civicrm_event', $id, $copyEvent->id);

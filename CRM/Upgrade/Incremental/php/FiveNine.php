@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -60,7 +60,9 @@ class CRM_Upgrade_Incremental_php_FiveNine extends CRM_Upgrade_Incremental_Base 
         1 => ts('Enable multiple bulk email address for a contact'),
         2 => ts('Email on Hold'),
       );
-      $postUpgradeMessage .= '<p>' . ts('If the setting "%1" is enabled, you should update any smart groups based on the "%2" field.', $args) . '</p>';
+      $postUpgradeMessage .= '<p>' . ts('If the setting "%1" is enabled, you should update any smart groups based on the "%2" field.', $args) . '</p>' .
+        '<p>' . ts('If you were previously on version 5.8 and altered the WYSIWYG editor setting, you should visit the <a %1>Display Preferences</a> page and re-save the WYSIWYG editor setting.', array(1 => 'href="' . CRM_Utils_System::url('civicrm/admin/setting/preferences/display', 'reset=1') . '"')) . '</p>' .
+        '<p>' . ts('CiviCRM v5.9+ adds a new search preference for certain custom-fields ("Money", "Integer", or "Float" data displayed as "Select" or "Radio" fields). For continuity, any old fields have been set to continue the old user-experience. However, you may want to review these settings. (You should especially review if this site used v5.9-alpha or v5.9-beta.)') . '</p>';
     }
 
     // Example: Generate a post-upgrade message.

@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -614,7 +614,7 @@
         var fname = '#priceset';
         if ( !priceSetId ) {
         cj('#membership_type_id_1').val(0);
-        CRM.buildCustomData(customDataType, null );
+        CRM.buildCustomData(customDataType, null);
 
         // hide price set fields.
         cj( fname ).hide( );
@@ -797,7 +797,7 @@
         subTypeNames = null;
       }
 
-      CRM.buildCustomData( customDataType, subTypeNames );
+      CRM.buildCustomData(customDataType, subTypeNames);
     }
 
   function enableAmountSection( setContributionType ) {

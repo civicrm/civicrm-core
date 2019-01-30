@@ -78,6 +78,7 @@
               sequential: 1,
               field: 'relationship_type_id',
               context: 'create',
+              is_active: 1,
               options: {
                 limit: 0
               }
@@ -87,6 +88,7 @@
               field: 'relationship_type_id',
               context: 'create',
               isForm: 1,
+              is_active: 1,
               options: {
                 limit: 0
               }
@@ -302,7 +304,8 @@
       _.each($scope.caseType.definition.activitySets, function (set) {
         _.each(set.activityTypes, function (type, name) {
           var isDefaultAssigneeTypeUndefined = _.isUndefined(type.default_assignee_type);
-          type.label = $scope.activityTypes[type.name].label;
+          var typeDefinition = $scope.activityTypes[type.name];
+          type.label = (typeDefinition && typeDefinition.label) || type.name;
 
           if (isDefaultAssigneeTypeUndefined) {
             type.default_assignee_type = defaultAssigneeDefaultValue.value;

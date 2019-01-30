@@ -1118,7 +1118,7 @@ function setting_getfields_expectedresult() {
           'maxlength' => '64',
         ),
         'default' => '',
-        'title' => 'Drupal Users Table Name',
+        'title' => 'CMS Users Table Name',
         'description' => '',
       ),
       'wpLoadPhp' => array(

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -734,6 +734,7 @@ abstract class CRM_Core_Payment {
             'rule_parameters' => TRUE,
           ),
         ),
+        'extra' => ['class' => 'crm-form-select'],
       ),
       'credit_card_type' => array(
         'htmlType' => 'select',
@@ -1145,7 +1146,8 @@ abstract class CRM_Core_Payment {
       array(),
       TRUE,
       NULL,
-      FALSE
+      FALSE,
+      TRUE
     );
     return (stristr($url, '.')) ? $url : '';
   }
@@ -1464,6 +1466,9 @@ abstract class CRM_Core_Payment {
     // Set URL
     switch ($action) {
       case 'cancel':
+        if (!$this->supports('cancelRecurring')) {
+          return NULL;
+        }
         $url = 'civicrm/contribute/unsubscribe';
         break;
 
@@ -1476,6 +1481,9 @@ abstract class CRM_Core_Payment {
         break;
 
       case 'update':
+        if (!$this->supports('changeSubscriptionAmount') && !$this->supports('editRecurringContribution')) {
+          return NULL;
+        }
         $url = 'civicrm/contribute/updaterecur';
         break;
     }

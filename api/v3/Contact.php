@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -374,6 +374,10 @@ function _civicrm_api3_contact_get_spec(&$params) {
     'pseudoconstant' => array(
       'table' => 'civicrm_tag',
     ),
+  );
+  $params['uf_user'] = array(
+    'title' => 'CMS User',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
   );
   $params['birth_date_low'] = array('name' => 'birth_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or greater than'));
   $params['birth_date_high'] = array('name' => 'birth_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or less than'));
@@ -953,7 +957,7 @@ function civicrm_api3_contact_getquick($params) {
     $customOptionsWhere = $customOptionsWhere ?: [0];
     $whereClause = " WHERE (" . implode(' OR ', $customOptionsWhere) . ") $where";
   }
-  elseif (!empty($params['field_name']) && !empty($params['table_name'])) {
+  elseif (!empty($params['field_name']) && !empty($params['table_name']) && $params['field_name'] != 'sort_name') {
     $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch') {$where}";
     // Search by id should be exact
     if ($field_name == 'id' || $field_name == 'external_identifier') {

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -157,6 +157,9 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
     $query['casEntityIdField'] = 'e.id';
     $query['casContactTableAlias'] = NULL;
     $query['casDateField'] = str_replace('event_', 'r.', $schedule->start_action_date);
+    if (empty($query['casDateField']) && $schedule->absolute_date) {
+      $query['casDateField'] = $schedule->absolute_date;
+    }
 
     $query->join('r', 'INNER JOIN civicrm_event r ON e.event_id = r.id');
     if ($schedule->recipient_listing && $schedule->limit_to) {

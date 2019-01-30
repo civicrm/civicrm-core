@@ -156,6 +156,7 @@ class WhitelistSubscriberTest extends \CiviUnitTestCase {
           'id' => 2,
           'title' => 'second widget',
           'api.Sprocket.get' => array(
+            'is_error' => 0,
             'count' => 2,
             'version' => 3,
             'values' => array(

@@ -5,10 +5,24 @@
  */
 class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
 
+  /**
+   * Original $_REQUEST
+   *
+   * We are messing with globals so fix afterwards.
+   *
+   * @var array
+   */
+  protected $originalRequest = [];
 
   public function setUp() {
     $this->useTransaction(TRUE);
     parent::setUp();
+    $this->originalRequest = $_REQUEST;
+  }
+
+  public function tearDown() {
+    $_REQUEST = $this->originalRequest;
+    parent::tearDown();
   }
 
   /**

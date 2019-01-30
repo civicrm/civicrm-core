@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -165,11 +165,7 @@ class CRM_Contact_Form_Edit_Address {
       $form->addElement('checkbox', "address[$blockId][use_shared_address]", NULL, ts('Use another contact\'s address'));
 
       // Override the default profile links to add address form
-      $profileLinks = CRM_Core_BAO_UFGroup::getCreateLinks(array(
-          'new_individual',
-          'new_organization',
-          'new_household',
-        ), 'shared_address');
+      $profileLinks = CRM_Contact_BAO_Contact::entityRefCreateLinks() ? CRM_Core_BAO_UFGroup::getCreateLinks('', 'shared_address') : FALSE;
       $form->addEntityRef("address[$blockId][master_contact_id]", ts('Share With'), array('create' => $profileLinks));
     }
   }
@@ -413,7 +409,7 @@ class CRM_Contact_Form_Edit_Address {
       // since we change element name for address custom data, we need to format the setdefault values
       $addressDefaults = array();
       foreach ($defaults as $key => $val) {
-        if (empty($val)) {
+        if (!isset($val)) {
           continue;
         }
 

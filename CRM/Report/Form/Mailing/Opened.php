@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
 
@@ -289,13 +289,18 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $groupBys = empty($this->_params['charts']) ? array("civicrm_mailing_event_queue.email_id") : array("{$this->_aliases['civicrm_mailing']}.id");
-
-    if (!empty($this->_params['unique_opens_value'])) {
-      $groupBys[] = "civicrm_mailing_event_queue.id";
+    $groupBys = array();
+    // Do not use group by clause if distinct = 0 mentioned in url params. flag is used in mailing report screen, default value is TRUE
+    // this report is used to show total opened and unique opened
+    if (CRM_Utils_Request::retrieve('distinct', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, TRUE)) {
+      $groupBys = empty($this->_params['charts']) ? array("civicrm_mailing_event_queue.email_id") : array("{$this->_aliases['civicrm_mailing']}.id");
+      if (!empty($this->_params['unique_opens_value'])) {
+        $groupBys[] = "civicrm_mailing_event_queue.id";
+      }
     }
-    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, $groupBys);
-    $this->_groupBy = "GROUP BY " . implode(', ', $groupBys);
+    if (!empty($groupBys)) {
+      $this->_groupBy = "GROUP BY " . implode(', ', $groupBys);
+    }
   }
 
   public function postProcess() {
