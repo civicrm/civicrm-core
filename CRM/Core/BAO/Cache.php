@@ -67,7 +67,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @deprecated
    */
   public static function &getItem($group, $path, $componentID = NULL) {
-    if ($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) {
+    if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
       return $adapter::getItem($group, $path, $componentID);
     }
 
@@ -109,7 +109,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @deprecated
    */
   public static function &getItems($group, $componentID = NULL) {
-    if ($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) {
+    if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
       return $adapter::getItems($group, $componentID);
     }
 
@@ -155,7 +155,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @deprecated
    */
   public static function setItem(&$data, $group, $path, $componentID = NULL) {
-    if ($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) {
+    if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
       return $adapter::setItem($data, $group, $path, $componentID);
     }
 
@@ -227,7 +227,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @deprecated
    */
   public static function deleteGroup($group = NULL, $path = NULL, $clearAll = TRUE) {
-    if ($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) {
+    if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
       return $adapter::deleteGroup($group, $path);
     }
     else {
