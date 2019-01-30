@@ -38,7 +38,7 @@
 trait CRM_Utils_Cache_NaiveHasTrait {
 
   public function has($key) {
-    $nack = CRM_Utils_Cache::nack() . 'ht';
+    $nack = CRM_Utils_Cache::nack();
     $value = $this->get($key, $nack);
     return ($value !== $nack);
   }
