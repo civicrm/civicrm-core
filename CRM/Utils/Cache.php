@@ -258,4 +258,32 @@ class CRM_Utils_Cache {
     return $className;
   }
 
+  /**
+   * Generate a unique negative-acknowledgement token (NACK).
+   *
+   * When using PSR-16 to read a value, the `$cahce->get()` will a return a default
+   * value on cache-miss, so it's hard to know if you've gotten a geniune value
+   * from the cache or just a default. If you're in an edge-case where it matters
+   * (and you want to do has()+get() in a single roundtrip), use the nack() as
+   * the default:
+   *
+   *   $nack = CRM_Utils_Cache::nack();
+   *   $value = $cache->get('foo', $nack);
+   *   echo ($value === $nack) ? "Cache has a value, and we got it" : "Cache has no value".
+   *
+   * The value should be unique to avoid accidental matches. As a performance
+   * tweak, we may reuse the NACK a few times within the current page-view.
+   *
+   * @return string
+   *   Unique nonce value indicating a "negative acknowledgement" (failed read).
+   *   If we need to accurately perform has($key)+get($key), we can
+   *   use `get($key,$nack)`.
+   */
+  public static function nack() {
+    if (!isset(Civi::$statics[__CLASS__]['nack'])) {
+      Civi::$statics[__CLASS__]['nack'] = 'NACK:' . md5(CRM_Utils_Request::id() . CIVICRM_SITE_KEY . CIVICRM_DSN . mt_rand(0, 10000));
+    }
+    return Civi::$statics[__CLASS__];
+  }
+
 }
