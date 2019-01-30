@@ -1284,8 +1284,9 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       $caseInfo = civicrm_api3('Case', 'getsingle', array(
         'id' => $caseID,
         // Most efficient way of retrieving definition is to also include case type id and name so the api doesn't have to look it up separately
-        'return' => array('case_type_id', 'case_type_id.name', 'case_type_id.definition'),
+        'return' => array('case_type_id', 'case_type_id.name', 'case_type_id.definition', 'contact_id'),
       ));
+      // print_r($caseInfo['client_id']); die();
       if (!empty($caseInfo['case_type_id.definition']['caseRoles'])) {
         $caseRoles = CRM_Utils_Array::rekey($caseInfo['case_type_id.definition']['caseRoles'], 'name');
       }
@@ -1295,7 +1296,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $query = '
       SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, crt.name_b_a as role_name, ce.email, cp.phone
       FROM civicrm_relationship cr
-      LEFT JOIN civicrm_relationship_type crt
+      JOIN civicrm_relationship_type crt
         ON crt.id = cr.relationship_type_id
         AND crt.label_b_a IN (%2)
       JOIN civicrm_contact cc
@@ -1309,12 +1310,12 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         AND cp.is_primary= 1
       WHERE cr.case_id =  %1
         AND cr.is_active
+        AND cc.id NOT IN (%3)
       UNION
       SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_a_b as role, crt.name_a_b as role_name, ce.email, cp.phone
       FROM civicrm_relationship cr
-      LEFT JOIN civicrm_relationship_type crt
+      JOIN civicrm_relationship_type crt
         ON crt.id = cr.relationship_type_id
-        AND crt.label_a_b IN (%2)
       JOIN civicrm_contact cc
         ON cc.id = cr.contact_id_b
         AND cc.is_deleted <> 1
@@ -1326,10 +1327,13 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         AND cp.is_primary= 1
       WHERE cr.case_id =  %1
         AND cr.is_active
+        AND crt.label_b_a IN (%2)
+        AND cc.id NOT IN (%3)
       ';
     $params = array(
       1 => array($caseID, 'Integer'),
-      2 => array(CRM_Utils_Array::collect('name', $caseRoles), 'String'),
+      2 => array(implode(',', CRM_Utils_Array::collect('name', $caseRoles)), 'String'),
+      3 => array(implode(',', $caseInfo['client_id']), 'String')
     );
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
