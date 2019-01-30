@@ -1497,7 +1497,7 @@ if (!CRM.vars) CRM.vars = {};
   // Determine if a user has a given permission.
   // @see CRM_Core_Resources::addPermissions
   CRM.checkPerm = function(perm) {
-    return CRM.permissions[perm];
+    return CRM.permissions && CRM.permissions[perm];
   };
 
   // Round while preserving sigfigs
