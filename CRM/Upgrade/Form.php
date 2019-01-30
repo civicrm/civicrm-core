@@ -547,6 +547,13 @@ SET    version = '$version'
     );
     $queue->createItem($task);
 
+    $task = new CRM_Queue_Task(
+      array('CRM_Upgrade_Form', 'disableOldExtensions'),
+      array($postUpgradeMessageFile),
+      "Checking extensions"
+    );
+    $queue->createItem($task);
+
     $revisions = $upgrade->getRevisionSequence();
     foreach ($revisions as $rev) {
       // proceed only if $currentVer < $rev
@@ -617,6 +624,33 @@ SET    version = '$version'
       file_put_contents($postUpgradeMessageFile,
         '<br/><br/>' . ts('Some old files could not be removed. Please remove them.')
         . '<ul>' . implode("\n", $errors) . '</ul>',
+        FILE_APPEND
+      );
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * Disable any extensions not compatible with this new version.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string $postUpgradeMessageFile
+   * @return bool
+   */
+  public static function disableOldExtensions(CRM_Queue_TaskContext $ctx, $postUpgradeMessageFile) {
+    $compatInfo = CRM_Extension_System::getCompatibilityInfo();
+    $disabled = [];
+    $manager = CRM_Extension_System::singleton()->getManager();
+    foreach ($compatInfo as $key => $ext) {
+      if (!empty($ext['obsolete']) && $manager->getStatus($key) == $manager::STATUS_INSTALLED) {
+        $disabled[$key] = sprintf("<li>%s</li>", ts('The extension %1 is now obsolete and has been disabled.', [1 => $key]));
+      }
+    }
+    if ($disabled) {
+      $manager->disable(array_keys($disabled));
+      file_put_contents($postUpgradeMessageFile,
+        '<br/><br/><ul>' . implode("\n", $disabled) . '</ul>',
         FILE_APPEND
       );
     }
