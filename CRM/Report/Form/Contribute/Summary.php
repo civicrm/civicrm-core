@@ -88,6 +88,11 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'title' => ts('Contact Name'),
           ),
         ),
+        'filters' => array(
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+          ),
+        ),
       ),
       'civicrm_email' => array(
         'dao' => 'CRM_Core_DAO_Email',
