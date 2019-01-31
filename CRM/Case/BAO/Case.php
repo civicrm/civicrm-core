@@ -434,7 +434,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       'civicrm_case.status_id as case_status_id',
       't_act.status_id as status_id',
       'civicrm_case.start_date as case_start_date',
-      'case_relation_type.label_b_a as case_role',
+      "GROUP_CONCAT(DISTINCT IF(case_relationship.contact_id_b = $userID, case_relation_type.label_a_b, case_relation_type.label_b_a) SEPARATOR ', ') as case_role",
       't_act.activity_date_time as activity_date_time',
       't_act.id as activity_id',
     );
@@ -475,8 +475,8 @@ HERESQL;
           ON civicrm_phone.contact_id = civicrm_contact.id
             AND civicrm_phone.is_primary = 1
         LEFT JOIN civicrm_relationship case_relationship
-          ON case_relationship.contact_id_a = civicrm_case_contact.contact_id
-            AND case_relationship.contact_id_b = {$userID}
+          ON ((case_relationship.contact_id_a = civicrm_case_contact.contact_id AND case_relationship.contact_id_b = {$userID})
+          OR (case_relationship.contact_id_b = civicrm_case_contact.contact_id AND case_relationship.contact_id_a = {$userID}))
             AND case_relationship.is_active
             AND case_relationship.case_id = civicrm_case.id
         LEFT JOIN civicrm_relationship_type case_relation_type
@@ -535,10 +535,11 @@ HERESQL;
     $whereClauses = array('civicrm_case.is_deleted = 0 AND civicrm_contact.is_deleted <> 1');
 
     if (!$allCases) {
-      $whereClauses[] .= " case_relationship.contact_id_b = {$userID} AND case_relationship.is_active ";
+      $whereClauses[] = "(case_relationship.contact_id_b = {$userID} OR case_relationship.contact_id_a = {$userID})";
+      $whereClauses[] = 'case_relationship.is_active';
     }
     if (empty($params['status_id']) && ($type == 'upcoming' || $type == 'any')) {
-      $whereClauses[] = " civicrm_case.status_id != " . CRM_Core_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_status_id', 'Closed');
+      $whereClauses[] = "civicrm_case.status_id != " . CRM_Core_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_status_id', 'Closed');
     }
 
     foreach (array('case_type_id', 'status_id') as $column) {
@@ -703,26 +704,28 @@ HERESQL;
 
     // build rows with actual data
     $rows = array();
-    $myGroupByClause = $mySelectClause = $myCaseFromClause = $myCaseWhereClause = '';
+    $myGroupByClause = $mySelectClause = $myCaseFromClause = $myCaseWhereClauseA = $myCaseWhereClauseB = '';
 
     if ($allCases) {
       $userID = 'null';
       $all = 1;
       $case_owner = 1;
-      $myGroupByClause = ' GROUP BY civicrm_case.id';
+      $myGroupByClauseB = ' GROUP BY civicrm_case.id';
     }
     else {
       $all = 0;
       $case_owner = 2;
-      $myCaseWhereClause = " AND case_relationship.contact_id_b = {$userID} AND case_relationship.is_active ";
-      $myGroupByClause = " GROUP BY CONCAT(case_relationship.case_id,'-',case_relationship.contact_id_b)";
+      $myCaseWhereClauseA = " AND case_relationship.contact_id_a = {$userID} AND case_relationship.is_active ";
+      $myGroupByClauseA = " GROUP BY CONCAT(civicrm_case.id,'-',case_relationship.contact_id_a)";
+      $myCaseWhereClauseB = " AND case_relationship.contact_id_b = {$userID} AND case_relationship.is_active ";
+      $myGroupByClauseB = " GROUP BY CONCAT(civicrm_case.id,'-',case_relationship.contact_id_b)";
     }
-    $myGroupByClause .= ", case_status.label, status_id, case_type_id";
-
+    $myGroupByClauseB .= ", case_status.label, status_id, case_type_id, civicrm_case.id";
+    $myGroupByClauseA = $myGroupByClauseB;
     // FIXME: This query could be a lot more efficient if it used COUNT() instead of returning all rows and then counting them with php
     $query = "
 SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS case_type,
- case_type_id, case_relationship.contact_id_b
+ case_type_id, case_relationship.contact_id_b as case_contact
  FROM civicrm_case
  INNER JOIN civicrm_case_contact cc on cc.case_id = civicrm_case.id
  LEFT JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
@@ -732,7 +735,20 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
  LEFT JOIN civicrm_relationship case_relationship ON ( case_relationship.case_id  = civicrm_case.id
  AND case_relationship.contact_id_b = {$userID} AND case_relationship.is_active )
  WHERE is_deleted = 0 AND cc.contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted <> 1)
-{$myCaseWhereClause} {$myGroupByClause}";
+{$myCaseWhereClauseB} {$myGroupByClauseB}
+UNION
+SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS case_type,
+ case_type_id, case_relationship.contact_id_a as case_contact
+ FROM civicrm_case
+ INNER JOIN civicrm_case_contact cc on cc.case_id = civicrm_case.id
+ LEFT JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
+ LEFT JOIN civicrm_option_group option_group_case_status ON ( option_group_case_status.name = 'case_status' )
+ LEFT JOIN civicrm_option_value case_status ON ( civicrm_case.status_id = case_status.value
+ AND option_group_case_status.id = case_status.option_group_id )
+ LEFT JOIN civicrm_relationship case_relationship ON ( case_relationship.case_id  = civicrm_case.id
+ AND case_relationship.contact_id_a = {$userID})
+ WHERE is_deleted = 0 AND cc.contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted <> 1)
+{$myCaseWhereClauseA} {$myGroupByClauseA}";
 
     $res = CRM_Core_DAO::executeQuery($query);
     while ($res->fetch()) {
@@ -1204,29 +1220,53 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       $caseInfo = civicrm_api3('Case', 'getsingle', array(
         'id' => $caseID,
         // Most efficient way of retrieving definition is to also include case type id and name so the api doesn't have to look it up separately
-        'return' => array('case_type_id', 'case_type_id.name', 'case_type_id.definition'),
+        'return' => array('case_type_id', 'case_type_id.name', 'case_type_id.definition', 'contact_id'),
       ));
       if (!empty($caseInfo['case_type_id.definition']['caseRoles'])) {
         $caseRoles = CRM_Utils_Array::rekey($caseInfo['case_type_id.definition']['caseRoles'], 'name');
       }
     }
-    $values = array();
-    $query = '
-      SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, crt.name_b_a, ce.email, cp.phone
-      FROM civicrm_relationship cr
-      LEFT JOIN civicrm_relationship_type crt
-        ON crt.id = cr.relationship_type_id
-      LEFT JOIN civicrm_contact cc
-        ON cc.id = cr.contact_id_b
-      LEFT JOIN civicrm_email ce
-        ON ce.contact_id = cc.id
-        AND ce.is_primary= 1
-      LEFT JOIN civicrm_phone cp
-        ON cp.contact_id = cc.id
-        AND cp.is_primary= 1
-      WHERE cr.case_id =  %1 AND cr.is_active AND cc.is_deleted <> 1';
 
-    $params = array(1 => array($caseID, 'Integer'));
+    $values = array();
+    $query = <<<HERESQL
+    SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, crt.name_b_a as role_name, ce.email, cp.phone
+    FROM civicrm_relationship cr
+    JOIN civicrm_relationship_type crt
+     ON crt.id = cr.relationship_type_id
+    JOIN civicrm_contact cc
+     ON cc.id = cr.contact_id_a
+     AND cc.is_deleted <> 1
+    LEFT JOIN civicrm_email ce
+     ON ce.contact_id = cc.id
+     AND ce.is_primary= 1
+    LEFT JOIN civicrm_phone cp
+     ON cp.contact_id = cc.id
+     AND cp.is_primary= 1
+    WHERE cr.case_id =  %1
+     AND cr.is_active
+     AND cc.id NOT IN (%2)
+    UNION
+    SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_a_b as role, crt.name_a_b as role_name, ce.email, cp.phone
+    FROM civicrm_relationship cr
+    JOIN civicrm_relationship_type crt
+     ON crt.id = cr.relationship_type_id
+    JOIN civicrm_contact cc
+     ON cc.id = cr.contact_id_b
+     AND cc.is_deleted <> 1
+    LEFT JOIN civicrm_email ce
+     ON ce.contact_id = cc.id
+     AND ce.is_primary= 1
+    LEFT JOIN civicrm_phone cp
+     ON cp.contact_id = cc.id
+     AND cp.is_primary= 1
+    WHERE cr.case_id =  %1
+     AND cr.is_active
+     AND cc.id NOT IN (%2)
+HERESQL;
+    $params = array(
+      1 => array($caseID, 'Integer'),
+      2 => array(implode(',', $caseInfo['client_id']), 'String'),
+    );
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     while ($dao->fetch()) {
@@ -1244,7 +1284,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
           'phone' => $dao->phone,
         );
         // Add more info about the role (creator, manager)
-        $role = CRM_Utils_Array::value($dao->name_b_a, $caseRoles);
+        $role = CRM_Utils_Array::value($dao->role_name, $caseRoles);
         if ($role) {
           unset($role['name']);
           $details += $role;
@@ -1848,16 +1888,27 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $managerRoleId = $xmlProcessor->getCaseManagerRoleId($caseType);
 
     if (!empty($managerRoleId)) {
-      $managerRoleQuery = "
-SELECT civicrm_contact.id as casemanager_id,
-       civicrm_contact.sort_name as casemanager
- FROM civicrm_contact
- LEFT JOIN civicrm_relationship ON (civicrm_relationship.contact_id_b = civicrm_contact.id AND civicrm_relationship.relationship_type_id = %1) AND civicrm_relationship.is_active
- LEFT JOIN civicrm_case ON civicrm_case.id = civicrm_relationship.case_id
- WHERE civicrm_case.id = %2 AND is_active = 1";
+      if (substr($managerRoleId, -4) == '_a_b') {
+        $managerRoleQuery = "
+          SELECT civicrm_contact.id as casemanager_id,
+                 civicrm_contact.sort_name as casemanager
+           FROM civicrm_contact
+           LEFT JOIN civicrm_relationship ON (civicrm_relationship.contact_id_b = civicrm_contact.id AND civicrm_relationship.relationship_type_id = %1) AND civicrm_relationship.is_active
+           LEFT JOIN civicrm_case ON civicrm_case.id = civicrm_relationship.case_id
+           WHERE civicrm_case.id = %2 AND is_active = 1";
+      }
+      if (substr($managerRoleId, -4) == '_b_a') {
+        $managerRoleQuery = "
+          SELECT civicrm_contact.id as casemanager_id,
+                 civicrm_contact.sort_name as casemanager
+           FROM civicrm_contact
+           LEFT JOIN civicrm_relationship ON (civicrm_relationship.contact_id_a = civicrm_contact.id AND civicrm_relationship.relationship_type_id = %1) AND civicrm_relationship.is_active
+           LEFT JOIN civicrm_case ON civicrm_case.id = civicrm_relationship.case_id
+           WHERE civicrm_case.id = %2 AND is_active = 1";
+      }
 
       $managerRoleParams = array(
-        1 => array($managerRoleId, 'Integer'),
+        1 => array(substr($managerRoleId, 0, -4), 'Integer'),
         2 => array($caseId, 'Integer'),
       );
 
@@ -3212,6 +3263,60 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       $filters[] = $filter;
     }
     return $filters;
+  }
+
+  /**
+   * Fetch Case Role direction from Case Type
+   */
+  public static function getCaseRoleDirection($caseId, $roleTypeId = NULL) {
+    try {
+      $case = civicrm_api3('Case', 'getsingle', array('id' => $caseId));
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      // Lack of permissions will throw an exception
+      return 0;
+    }
+    if (!empty($case['case_type_id'])) {
+      try {
+        $caseType = civicrm_api3('CaseType', 'getsingle', array('id' => $case['case_type_id'], 'return' => array('definition')));
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        // Lack of permissions will throw an exception
+        return 'no case type found';
+      }
+      if (!empty($caseType['definition']['caseRoles'])) {
+        $caseRoles = array();
+        foreach ($caseType['definition']['caseRoles'] as $key => $roleDetails) {
+          // Check if its an a_b label
+          try {
+            $relType = civicrm_api3('RelationshipType', 'getsingle', array('label_a_b' => $roleDetails['name']));
+          }
+          catch (CiviCRM_API3_Exception $e) {
+          }
+          if (!empty($relType['id'])) {
+            $roleDetails['id'] = $relType['id'];
+            $roleDetails['direction'] = 'a_b';
+          }
+          // Check if its a b_a label
+          try {
+            $relTypeBa = civicrm_api3('RelationshipType', 'getsingle', array('label_b_a' => $roleDetails['name']));
+          }
+          catch (CiviCRM_API3_Exception $e) {
+          }
+          if (!empty($relTypeBa['id'])) {
+            if (!empty($roleDetails['direction'])) {
+              $roleDetails['direction'] = 'bidrectional';
+            }
+            else {
+              $roleDetails['id'] = $relTypeBa['id'];
+              $roleDetails['direction'] = 'b_a';
+            }
+          }
+          $caseRoles[$roleDetails['id']] = $roleDetails;
+        }
+      }
+      return $caseRoles;
+    }
   }
 
 }
