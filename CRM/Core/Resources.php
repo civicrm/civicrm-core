@@ -603,7 +603,11 @@ class CRM_Core_Resources {
 
       $tsLocale = CRM_Core_I18n::getLocale();
       // Dynamic localization script
-      $this->addScriptUrl(CRM_Utils_System::url('civicrm/ajax/l10n-js/' . $tsLocale, array('r' => $this->getCacheCode())), $jsWeight++, $region);
+      $args = [
+        'r' => $this->getCacheCode(),
+        'cid' => CRM_Core_Session::getLoggedInContactID(),
+      ];
+      $this->addScriptUrl(CRM_Utils_System::url('civicrm/ajax/l10n-js/' . $tsLocale, $args, FALSE, NULL, FALSE), $jsWeight++, $region);
 
       // Add global settings
       $settings = array(
