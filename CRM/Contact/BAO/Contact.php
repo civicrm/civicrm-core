@@ -3651,7 +3651,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * @return bool
    */
   public static function entityRefCreateLinks() {
-    return CRM_Core_Permission::check([['edit all contacts', 'add contacts']]);
+    return CRM_Core_Permission::check([['profile create', 'profile listings and forms']]);
   }
 
 }
