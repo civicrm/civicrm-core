@@ -74,11 +74,22 @@
                 limit: 0
               }
             }];
-            reqs.relTypes = ['RelationshipType', 'get', {
+            reqs.relTypes = ['Relationship', 'getoptions', {
               sequential: 1,
+              field: 'relationship_type_id',
+              context: 'create',
               is_active: 1,
               options: {
-                sort: CRM.crmCaseType.REL_TYPE_CNAME,
+                limit: 0
+              }
+            }];
+            reqs.relTypesForm = ['Relationship', 'getoptions', {
+              sequential: 1,
+              field: 'relationship_type_id',
+              context: 'create',
+              isForm: 1,
+              is_active: 1,
+              options: {
                 limit: 0
               }
             }];
@@ -238,11 +249,9 @@
   });
 
   crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls) {
-    var REL_TYPE_CNAME, defaultAssigneeDefaultValue, ts;
+    var defaultAssigneeDefaultValue, ts;
 
     (function init () {
-      // CRM_Case_XMLProcessor::REL_TYPE_CNAME
-      REL_TYPE_CNAME = CRM.crmCaseType.REL_TYPE_CNAME;
 
       ts = $scope.ts = CRM.ts(null);
       $scope.locks = { caseTypeName: true, activitySetName: true };
@@ -263,34 +272,14 @@
       $scope.activityTypeOptions = _.map(apiCalls.actTypes.values, formatActivityTypeOption);
       $scope.defaultAssigneeTypes = apiCalls.defaultAssigneeTypes.values;
       $scope.relationshipTypeOptions = _.map(apiCalls.relTypes.values, function(type) {
-        return {id: type[REL_TYPE_CNAME], text: type.label_b_a};
+         return {id: type.key, text: type.value};
       });
-      $scope.defaultRelationshipTypeOptions = getDefaultRelationshipTypeOptions();
+      $scope.defaultRelationshipTypeOptions = _.map(apiCalls.relTypesForm.values, function(type) {
+        return {value: type.key, label: type.value};
+      });
       // stores the default assignee values indexed by their option name:
       $scope.defaultAssigneeTypeValues = _.chain($scope.defaultAssigneeTypes)
         .indexBy('name').mapValues('value').value();
-    }
-
-    /// Returns the default relationship type options. If the relationship is
-    /// bidirectional (Ex: Spouse of) it adds a single option otherwise it adds
-    /// two options representing the relationship type directions
-    /// (Ex: Employee of, Employer is)
-    function getDefaultRelationshipTypeOptions() {
-      return _.transform(apiCalls.relTypes.values, function(result, relType) {
-        var isBidirectionalRelationship = relType.label_a_b === relType.label_b_a;
-
-        result.push({
-          label: relType.label_b_a,
-          value: relType.id + '_b_a'
-        });
-
-        if (!isBidirectionalRelationship) {
-          result.push({
-            label: relType.label_a_b,
-            value: relType.id + '_a_b'
-          });
-        }
-      }, []);
     }
 
     /// initializes the case type object
@@ -431,10 +420,14 @@
         if (_.where($scope.relationshipTypeOptions, {id: roleName}).length) {
           roles.push({name: roleName});
         } else {
-          CRM.loadForm(CRM.url('civicrm/admin/reltype', {action: 'add', reset: 1, label_a_b: roleName, label_b_a: roleName}))
+           CRM.loadForm(CRM.url('civicrm/admin/reltype', {action: 'add', reset: 1, label_a_b: roleName}))
             .on('crmFormSuccess', function(e, data) {
-              roles.push({name: data.relationshipType[REL_TYPE_CNAME]});
-              $scope.relationshipTypeOptions.push({id: data.relationshipType[REL_TYPE_CNAME], text: data.relationshipType.label_b_a});
+              // Assume that the case role should be A-B but add both directions as options.
+              roles.push({name: data.relationshipType[Object.keys(data.relationshipType)[0]].label_a_b});
+              $scope.relationshipTypeOptions.push({id: data.relationshipType.label_a_b, text: data.relationshipType.label_a_b});
+              if (data.relationshipType.label_a_b != data.relationshipType.label_b_a) {
+                $scope.relationshipTypeOptions.push({id: data.relationshipType.label_b_a, text: data.relationshipType.label_b_a});
+              }
               $scope.$digest();
             });
         }

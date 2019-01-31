@@ -214,10 +214,10 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    */
   public function createRelationships($relationshipTypeName, &$params) {
     $relationshipTypes = &$this->allRelationshipTypes();
-    // get the relationship id
-    $relationshipTypeID = array_search($relationshipTypeName, $relationshipTypes);
+    // get the relationship
+    $relationshipType = array_search($relationshipTypeName, $relationshipTypes);
 
-    if ($relationshipTypeID === FALSE) {
+    if ($relationshipType === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
       CRM_Core_Error::fatal(ts('Relationship type %1, found in case configuration file, is not present in the database %2',
         array(1 => $relationshipTypeName, 2 => $docLink)
@@ -232,14 +232,21 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
     foreach ($client as $key => $clientId) {
       $relationshipParams = array(
-        'relationship_type_id' => $relationshipTypeID,
-        'contact_id_a' => $clientId,
-        'contact_id_b' => $params['creatorID'],
+        'relationship_type_id' => substr($relationshipType, 0, -4),
         'is_active' => 1,
         'case_id' => $params['caseID'],
         'start_date' => date("Ymd"),
         'end_date' => CRM_Utils_Array::value('relationship_end_date', $params),
       );
+      
+      if (substr($relationshipType, -4) == '_b_a') {
+        $relationshipParams['contact_id_b'] = $clientId;
+        $relationshipParams['contact_id_a'] = $params['creatorID'];
+      }
+      if (substr($relationshipType, -4) == '_a_b') {
+        $relationshipParams['contact_id_a'] = $clientId;
+        $relationshipParams['contact_id_b'] = $params['creatorID'];
+      }
 
       if (!$this->createRelationship($relationshipParams)) {
         CRM_Core_Error::fatal();
