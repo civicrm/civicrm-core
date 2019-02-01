@@ -650,7 +650,7 @@ function civicrm_api3_mailing_send_test($params) {
     $emailDetail = array();
     // fetch contact_id and email id for all existing emails
     while ($dao->fetch()) {
-      $emailDetail[$dao->email] = array(
+      $emailDetail[strtolower($dao->email)] = array(
         'contact_id' => $dao->contact_id,
         'email_id' => $dao->id,
       );
