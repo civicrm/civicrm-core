@@ -232,7 +232,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       $this->add('textarea', 'help_post', ts('Post Option Help'));
 
       // weight
-      $this->add('text', 'weight', ts('Order'), NULL, TRUE);
+      $this->add('number', 'weight', ts('Order'), NULL, TRUE);
       $this->addRule('weight', ts('is a numeric field'), 'numeric');
 
       // is active ?

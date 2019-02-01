@@ -128,7 +128,7 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     $this->add('text', 'SpaceY', ts('Vertical Spacing'), array('size' => 8, 'maxlength' => 8) + $disabled, $required);
     $this->add('text', 'lPadding', ts('Left Padding'), array('size' => 8, 'maxlength' => 8), $required);
     $this->add('text', 'tPadding', ts('Top Padding'), array('size' => 8, 'maxlength' => 8), $required);
-    $this->add('text', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Core_BAO_LabelFormat', 'weight'), TRUE);
+    $this->add('number', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Core_BAO_LabelFormat', 'weight'), TRUE);
 
     $this->addRule('label', ts('Name already exists in Database.'), 'objectExists', array(
       'CRM_Core_BAO_LabelFormat',

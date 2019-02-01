@@ -101,7 +101,7 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
     $this->add('text', 'label', ts('Title'), array('size' => 40), TRUE);
     $this->add('text', 'value', ts('URL'), array('size' => 40), TRUE);
     $this->add('text', 'name', ts('Class'), array('size' => 40), TRUE);
-    $element = $this->add('text', 'weight', ts('Order'), array('size' => 4), TRUE);
+    $element = $this->add('number', 'weight', ts('Order'), array('size' => 4), TRUE);
     // $element->freeze( );
     $this->add('text', 'description', ts('Description'), array('size' => 40), TRUE);
 

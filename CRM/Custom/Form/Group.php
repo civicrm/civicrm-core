@@ -307,7 +307,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $this->add('wysiwyg', 'help_post', ts('Post-form Help'), $attributes['help_post']);
 
     // weight
-    $this->add('text', 'weight', ts('Order'), $attributes['weight'], TRUE);
+    $this->add('number', 'weight', ts('Order'), $attributes['weight'], TRUE);
     $this->addRule('weight', ts('is a numeric field'), 'numeric');
 
     // display style
