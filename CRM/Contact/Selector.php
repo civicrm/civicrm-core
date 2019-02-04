@@ -1043,7 +1043,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
     $selectSQL = "SELECT DISTINCT '$cacheKey', contact_a.id, contact_a.sort_name";
 
-    $sql = str_replace(array("SELECT contact_a.id as contact_id", "SELECT contact_a.id as id"), $selectSQL, $sql);
+    $sql = str_ireplace(array("SELECT contact_a.id as contact_id", "SELECT contact_a.id as id"), $selectSQL, $sql);
     try {
       Civi::service('prevnext')->fillWithSql($cacheKey, $sql);
     }
