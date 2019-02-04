@@ -86,7 +86,7 @@ class CRM_Core_BAO_Cache_Psr16 {
    * @return object
    *   The data if present in cache, else null
    */
-  public static function &getItem($group, $path, $componentID = NULL) {
+  public static function getItem($group, $path, $componentID = NULL) {
     // TODO: Generate a general deprecation notice.
     if ($componentID) {
       Civi::log()
@@ -95,8 +95,7 @@ class CRM_Core_BAO_Cache_Psr16 {
           'path' => $path,
         ]);
     }
-    $value = self::getGroup($group)->get(CRM_Core_BAO_Cache::cleanKey($path));
-    return $value;
+    return self::getGroup($group)->get(CRM_Core_BAO_Cache::cleanKey($path));
   }
 
   /**

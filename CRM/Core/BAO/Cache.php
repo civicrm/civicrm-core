@@ -68,7 +68,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    */
   public static function &getItem($group, $path, $componentID = NULL) {
     if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
-      return $adapter::getItem($group, $path, $componentID);
+      $value = $adapter::getItem($group, $path, $componentID);
+      return $value;
     }
 
     if (self::$_cache === NULL) {
