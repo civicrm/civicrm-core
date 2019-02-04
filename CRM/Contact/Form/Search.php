@@ -526,18 +526,14 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
      * we allow the controller to set force/reset externally, useful when we are being
      * driven by the wizard framework
      */
-
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
-
-    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean');
     $this->_groupID = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
     $this->_amtgID = CRM_Utils_Request::retrieve('amtgID', 'Positive', $this);
-    $this->_ssID = CRM_Utils_Request::retrieve('ssID', 'Positive', $this);
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
     $this->_ufGroupID = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_componentMode = CRM_Utils_Request::retrieve('component_mode', 'Positive', $this, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS, $_REQUEST);
     $this->_operator = CRM_Utils_Request::retrieve('operator', 'String', $this, FALSE, CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND, 'REQUEST');
 
+    $this->loadStandardSearchOptionsFromUrl();
     /**
      * set the button names
      */
@@ -555,7 +551,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
 
     // assign context to drive the template display, make sure context is valid
-    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'search');
     if (!CRM_Utils_Array::value($this->_context, self::validContext())) {
       $this->_context = 'search';
     }
@@ -754,6 +749,32 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
+   * Responsible to set search params found as url arguments
+   */
+  public static function setSearchParamFromUrl(&$form) {
+    if (!CRM_Utils_Request::retrieve('force', 'Boolean', $form, FALSE) && empty($form->_ssID)) {
+      return;
+    }
+
+    $searchFields = array_merge(
+      CRM_Utils_Array::collect('data_type', CRM_Contact_Form_Search_Criteria::getBasicSearchFields()),
+      CRM_Utils_Array::collect('data_type', CRM_Contact_Form_Search_Criteria::getDemographicsSearchFields()),
+      CRM_Utils_Array::collect('data_type', CRM_Contact_Form_Search_Criteria::getLocationSearchFields()),
+      CRM_Utils_Array::collect('data_type', CRM_Contact_Form_Search_Criteria::getChangeLogSearchFields()),
+      CRM_Utils_Array::collect('data_type', CRM_Contact_Form_Search_Criteria::getCustomSearchFields())
+    );
+    foreach ($searchFields as $name => $type) {
+      if ($value = CRM_Utils_Request::retrieve($name, $type)) {
+        $form->_formValues[$name] = $value;
+      }
+    }
+
+    $form->_params = CRM_Contact_BAO_Query::convertFormValues($form->_formValues);
+    $form->set('formValues', $form->_formValues);
+    $form->set('queryParams', $form->_params);
+  }
+
+  /**
    * @return array
    */
   public function &getFormValues() {
@@ -807,6 +828,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     if (!CRM_Core_Permission::check('access deleted contacts')) {
       unset($this->_formValues['deleted_contacts']);
     }
+
+    $this->loadSearchParamsFromUrl();
 
     $this->set('type', $this->_action);
     $this->set('formValues', $this->_formValues);
