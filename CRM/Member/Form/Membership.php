@@ -600,7 +600,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
-      $this->add('text', 'num_terms', ts('Number of Terms'), array('size' => 6));
+      $this->add('number', 'num_terms', ts('Number of Terms'), array('size' => 6));
     }
 
     $this->add('text', 'source', ts('Source'),
