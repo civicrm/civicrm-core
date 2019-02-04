@@ -585,6 +585,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     foreach (array($activitiesDep, CRM_Activity_BAO_Activity::getActivities($params)) as $activities) {
       //verify target count
       $this->assertEquals($targetCount, $activities[1]['target_contact_counter']);
+      $this->assertEquals([$targetContactIDs[0] => 'Anderson, Anthony'], $activities[1]['target_contact_name']);
     }
 
   }

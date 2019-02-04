@@ -706,7 +706,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       'source_contact_name',
       'assignee_contact_id',
       'target_contact_id',
-      'target_contact_name',
       'assignee_contact_name',
       'status_id',
       'subject',
@@ -740,7 +739,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       'subject' => 'subject',
       'campaign_id' => 'campaign_id',
       'assignee_contact_name' => 'assignee_contact_name',
-      'target_contact_name' => 'target_contact_name',
       'source_contact_id' => 'source_contact_id',
       'source_contact_name' => 'source_contact_name',
       'case_id' => 'case_id',
@@ -751,13 +749,19 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $activities[$id] = array();
 
       $isBulkActivity = (!$bulkActivityTypeID || ($bulkActivityTypeID === $activity['activity_type_id']));
-
+      $activities[$id]['target_contact_counter'] = count($activity['target_contact_id']);
+      if ($activities[$id]['target_contact_counter']) {
+        try {
+          $activities[$id]['target_contact_name'][$activity['target_contact_id'][0]] = civicrm_api3('Contact', 'getvalue', ['id' => $activity['target_contact_id'][0], 'return' => 'sort_name']);
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          // Really they should have names but a fatal here feels wrong.
+          $activities[$id]['target_contact_name'] = '';
+        }
+      }
       foreach ($mappingParams as $apiKey => $expectedName) {
         if (in_array($apiKey, array('assignee_contact_name', 'target_contact_name'))) {
           $activities[$id][$expectedName] = CRM_Utils_Array::value($apiKey, $activity, array());
-          if ($apiKey == 'target_contact_name' && count($activity['target_contact_name'])) {
-            $activities[$id]['target_contact_counter'] = count($activity['target_contact_name']);
-          }
 
           if ($isBulkActivity) {
             $activities[$id]['recipients'] = ts('(%1 recipients)', array(1 => count($activity['target_contact_name'])));
