@@ -288,68 +288,149 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * Return list of basic contact fields that can be displayed for the basic search section.
    *
+   * @param array
    */
   public static function getBasicSearchFields() {
-    $userFramework = CRM_Core_Config::singleton()->userFramework;
     return [
-      // For now an empty array is still left in place for ordering.
-      'sort_name' => [],
-      'email' => ['name' => 'email'],
-      'contact_type' => ['name' => 'contact_type'],
+      'sort_name' => ['name' => 'sort_name', 'data_type' => 'String'],
+      'email' => ['name' => 'email', 'data_type' => 'String'],
+      'email_on_hold' => ['name' => 'email_on_hold', 'data_type' => 'CommaSeparatedIntegers'],
+      'contact_type' => ['name' => 'contact_type', 'data_type' => 'String'],
       'group' => [
         'name' => 'group',
         'template' => 'CRM/Contact/Form/Search/Criteria/Fields/group.tpl',
+        'data_type' => 'CommaSeparatedIntegers',
       ],
-      'contact_tags' => ['name' => 'contact_tags'],
-      'tag_types_text' => ['name' => 'tag_types_text'],
+      'contact_tags' => ['name' => 'contact_tags', 'data_type' => 'CommaSeparatedIntegers'],
+      'tag_types_text' => ['name' => 'tag_types_text', 'data_type' => 'String'],
       'tag_search' => [
         'name' => 'tag_search',
         'help' => ['id' => 'id-all-tags'],
+        'data_type' => 'String',
       ],
       'tag_set' => [
         'name' => 'tag_set',
         'is_custom' => TRUE,
         'template' => 'CRM/Contact/Form/Search/Criteria/Fields/tag_set.tpl',
+        'data_type' => 'CommaSeparatedIntegers',
       ],
       'all_tag_types' => [
         'name' => 'all_tag_types',
         'class' => 'search-field__span-3 search-field__checkbox',
         'help' => ['id' => 'id-all-tag-types'],
+        'data_type' => 'String',
       ],
       'phone_numeric' => [
         'name' => 'phone_numeric',
         'description' => ts('Punctuation and spaces are ignored.'),
+        'data_type' => 'String',
       ],
-      'phone_location_type_id' => ['name' => 'phone_location_type_id'],
-      'phone_phone_type_id' => ['name' => 'phone_phone_type_id'],
+      'phone_location_type_id' => ['name' => 'phone_location_type_id', 'data_type' => 'Integer'],
+      'phone_phone_type_id' => ['name' => 'phone_phone_type_id', 'data_type' => 'Integer'],
       'privacy_toggle' => [
         'name' => 'privacy_toggle',
         'class' => 'search-field__span-2',
         'template' => 'CRM/Contact/Form/Search/Criteria/Fields/privacy_toggle.tpl',
+        'data_type' => 'Integer',
       ],
       'preferred_communication_method' => [
         'name' => 'preferred_communication_method',
         'template' => 'CRM/Contact/Form/Search/Criteria/Fields/preferred_communication_method.tpl',
+        'data_type' => 'String',
       ],
       'contact_source' => [
         'name' => 'contact_source',
         'help' => ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact'],
+        'data_type' => 'String',
       ],
-      'job_title' => ['name' => 'job_title'],
-      'preferred_language' => ['name' => 'preferred_language'],
+      'job_title' => ['name' => 'job_title', 'data_type' => 'String'],
+      'preferred_language' => ['name' => 'preferred_language', 'data_type' => 'String'],
       'contact_id' => [
         'name' => 'contact_id',
         'help' => ['id' => 'id-contact-id', 'file' => 'CRM/Contact/Form/Contact'],
+        'data_type' => 'Integer',
       ],
       'external_identifier' => [
         'name' => 'external_identifier',
         'help' => ['id' => 'id-external-id', 'file' => 'CRM/Contact/Form/Contact'],
+        'data_type' => 'String',
       ],
       'uf_user' => [
         'name' => 'uf_user',
-        'description' => ts('Does the contact have a %1 Account?', [$userFramework]),
+        'description' => ts('Does the contact have a %1 Account?', [CRM_Core_Config::singleton()->userFramework]),
+        'data_type' => 'Positive',
       ],
     ];
+  }
+
+  /**
+   * Return list of location fields that can be displayed for the Address search section.
+   *
+   * @param array
+   */
+  public static function getLocationSearchFields() {
+    return array(
+      'street_address' => ['title' => ts('Street Address'), 'data_type' => 'String'],
+      'supplemental_address_1' => ['title' => ts('Supplemental Address 1'), 'data_type' => 'String'],
+      'supplemental_address_2' => ['title' => ts('Supplemental Address 2'), 'data_type' => 'String'],
+      'supplemental_address_3' => ['title' => ts('Supplemental Address 3'), 'data_type' => 'String'],
+      'city' => ['title' => ts('City'), 'data_type' => 'String'],
+      'postal_code' => ['title' => ts('Postal Code'), 'data_type' => 'String'],
+      'country' => ['title' => ts('Country'), 'data_type' => 'Integer', 'select' => 'country'],
+      'state_province' => ['title' => ts('State/Province'), 'data_type' => 'Integer', 'select' => 'stateProvince'],
+      'county' => ['title' => ts('County'), 'data_type' => 'Integer', 'select' => 'county'],
+      'address_name' => ['title' => ts('Address Name'), 'data_type' => 'String'],
+      'street_number' => ['title' => ts('Street Number'), 'data_type' => 'String'],
+      'street_name' => ['title' => ts('Street Name'), 'data_type' => 'String'],
+      'street_unit' => ['title' => ts('Apt/Unit/Suite'), 'data_type' => 'String'],
+    );
+  }
+
+  /**
+   * Return list of demographic fields that can be displayed for the Demographics search section.
+   *
+   * @param array
+   */
+  public static function getDemographicsSearchFields() {
+    return [
+      'gender_id' => ['title' => ts('Gender'), 'data_type' => 'String'],
+      'age_low' => ['title' => ts('Min Age'), 'data_type' => 'String'],
+      'age_high' => ['title' => ts('Max Age'), 'data_type' => 'String'],
+      'birth_date' => ['data_type' => 'String'],
+      'deceased_date' => ['data_type' => 'String'],
+      'is_deceased' => ['title' => ts('Deceased'), 'data_type' => 'Positive'],
+    ];
+  }
+
+  public static function getChangeLogSearchFields() {
+    return [
+      'changed_by' => ['title' => ts('Modified By'), 'data_type' => 'String'],
+      'log_date' => ['title' => NULL, 'data_type' => 'Positive'],
+      'log_date_relative' => ['data_type' => 'String'],
+    ];
+  }
+
+  /**
+   * Return list of custom fields that can be displayed for the Custom Fields search section.
+   *
+   * @param array
+   */
+  public static function getCustomSearchFields() {
+    $extends = array_merge(array('Contact', 'Individual', 'Household', 'Organization', 'Address'),
+      CRM_Contact_BAO_ContactType::subTypes()
+    );
+    $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE,
+      $extends
+    );
+
+    $customFields = [];
+    foreach ($groupDetails as $key => $group) {
+      foreach ($group['fields'] as $field) {
+        $customFields['custom_' . $field['id']] = ['data_type' => $field['data_type']];
+      }
+    }
+
+    return $customFields;
   }
 
   /**
@@ -371,28 +452,19 @@ class CRM_Contact_Form_Search_Criteria {
       'address_options', TRUE, NULL, TRUE
     );
 
-    $attributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Address');
-
-    $elements = [
-      'street_address' => [ts('Street Address'), $attributes['street_address'], NULL, NULL],
-      'supplemental_address_1' => [ts('Supplemental Address 1'), $attributes['supplemental_address_1'], NULL, NULL],
-      'supplemental_address_2' => [ts('Supplemental Address 2'), $attributes['supplemental_address_2'], NULL, NULL],
-      'supplemental_address_3' => [ts('Supplemental Address 3'), $attributes['supplemental_address_3'], NULL, NULL],
-      'city' => [ts('City'), $attributes['city'], NULL, NULL],
-      'postal_code' => [ts('Postal Code'), $attributes['postal_code'], NULL, NULL],
-      'country' => [ts('Country'), $attributes['country_id'], 'country', FALSE],
-      'state_province' => [ts('State/Province'), $attributes['state_province_id'], 'stateProvince', TRUE],
-      'county' => [ts('County'), $attributes['county_id'], 'county', TRUE],
-      'address_name' => [ts('Address Name'), $attributes['address_name'], NULL, NULL],
-      'street_number' => [ts('Street Number'), $attributes['street_number'], NULL, NULL],
-      'street_name' => [ts('Street Name'), $attributes['street_name'], NULL, NULL],
-      'street_unit' => [ts('Apt/Unit/Suite'), $attributes['street_unit'], NULL, NULL],
-    ];
-
     $parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', $addressOptions, 0);
     $form->assign('parseStreetAddress', $parseStreetAddress);
-    foreach ($elements as $name => $v) {
-      list($title, $attributes, $select, $multiSelect) = $v;
+
+    $addressAttributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Address');
+    foreach (self::getLocationSearchFields() as $name => $v) {
+      if (in_array($name, ['state_province', 'country'])) {
+        $attributes = $addressAttributes[$name . '_id'];
+      }
+      else {
+        $attributes = $addressAttributes[$name];
+      }
+      $title = $v['title'];
+      $select = CRM_Utils_Array::value('select', $v);
 
       if (in_array($name,
         ['street_number', 'street_name', 'street_unit']
@@ -417,7 +489,7 @@ class CRM_Contact_Form_Search_Criteria {
           $selectElements = ['' => ts('- any -')] + CRM_Core_PseudoConstant::$select();
           $element = $form->add('select', $name, $title, $selectElements, FALSE, ['class' => 'crm-select2']);
         }
-        if ($multiSelect) {
+        if (in_array($name, ['state_province', 'county'])) {
           $element->setMultiple(TRUE);
         }
       }
@@ -528,29 +600,33 @@ class CRM_Contact_Form_Search_Criteria {
    */
   public static function demographics(&$form) {
     $form->add('hidden', 'hidden_demographics', 1);
-    // radio button for gender
-    $genderOptions = [];
-    $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-    foreach ($gender as $key => $var) {
-      $genderOptions[$key] = $form->createElement('radio', NULL,
-        ts('Gender'), $var, $key,
-        ['id' => "civicrm_gender_{$var}_{$key}"]
-      );
+
+    foreach (self::getDemographicsSearchFields() as $name => $attributes) {
+      if ($name == 'gender_id') {
+        // radio button for gender
+        $genderOptions = array();
+        $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+        foreach ($gender as $key => $var) {
+          $genderOptions[$key] = $form->createElement('radio', NULL,
+            ts('Gender'), $var, $key,
+            array('id' => "civicrm_gender_{$var}_{$key}")
+          );
+        }
+        $form->addGroup($genderOptions, 'gender_id', $attributes['title'])->setAttribute('allowClear', TRUE);
+      }
+      elseif (strstr($name, 'age_')) {
+        $form->add('text', $name, $attributes['title'], array('size' => 6));
+        $form->addRule($name, ts('Please enter a positive integer'), 'positiveInteger');
+        $form->addDate('age_asof_date', ts('Age as of Date'), FALSE, array('formatType' => 'searchDate'));
+      }
+      elseif (in_array($name, ['birth_date', 'deceased_date'])) {
+        CRM_Core_Form_Date::buildDateRange($form, $name, 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
+      }
+      elseif ($name == 'is_deceased') {
+        // radio button for is_deceased
+        $form->addYesNo($name, $attributes['title'], TRUE);
+      }
     }
-    $form->addGroup($genderOptions, 'gender_id', ts('Gender'))->setAttribute('allowClear', TRUE);
-
-    $form->add('number', 'age_low', ts('Min Age'), ['class' => 'four', 'min' => 0]);
-    $form->addRule('age_low', ts('Please enter a positive integer'), 'positiveInteger');
-    $form->add('number', 'age_high', ts('Max Age'), ['class' => 'four', 'min' => 0]);
-    $form->addRule('age_high', ts('Please enter a positive integer'), 'positiveInteger');
-    $form->add('datepicker', 'age_asof_date', ts('As of'), NULL, FALSE, ['time' => FALSE]);
-
-    CRM_Core_Form_Date::buildDateRange($form, 'birth_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-
-    CRM_Core_Form_Date::buildDateRange($form, 'deceased_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
-
-    // radio button for is_deceased
-    $form->addYesNo('is_deceased', ts('Deceased'), TRUE);
   }
 
   /**

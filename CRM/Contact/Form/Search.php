@@ -758,6 +758,32 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
+   * Responsible to set search params found as url arguments
+   */
+  public static function setSearchParamFromUrl(&$form) {
+    if (!CRM_Utils_Request::retrieve('force', 'Boolean', $form, FALSE) && empty($form->_ssID)) {
+      return;
+    }
+
+    $searchFields = array_merge(
+      CRM_Utils_Array::collect('data_type', CRM_Contact_Form_Search_Criteria::getBasicSearchFields()),
+      CRM_Utils_Array::collect('data_type', CRM_Contact_Form_Search_Criteria::getDemographicsSearchFields()),
+      CRM_Utils_Array::collect('data_type', CRM_Contact_Form_Search_Criteria::getLocationSearchFields()),
+      CRM_Utils_Array::collect('data_type', CRM_Contact_Form_Search_Criteria::getChangeLogSearchFields()),
+      CRM_Utils_Array::collect('data_type', CRM_Contact_Form_Search_Criteria::getCustomSearchFields())
+    );
+    foreach ($searchFields as $name => $type) {
+      if ($value = CRM_Utils_Request::retrieve($name, $type)) {
+        $form->_formValues[$name] = $value;
+      }
+    }
+
+    $form->_params = CRM_Contact_BAO_Query::convertFormValues($form->_formValues);
+    $form->set('formValues', $form->_formValues);
+    $form->set('queryParams', $form->_params);
+  }
+
+  /**
    * @return array
    */
   public function &getFormValues() {
@@ -803,6 +829,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     if (!CRM_Core_Permission::check('access deleted contacts')) {
       unset($this->_formValues['deleted_contacts']);
     }
+
+    $this->loadSearchParamsFromUrl();
 
     $this->set('type', $this->_action);
     $this->set('formValues', $this->_formValues);
