@@ -391,7 +391,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
 
     $form->addElement('checkbox', 'is_tellfriend_enabled', ts("Allow 'Tell a friend' functionality"), NULL, array('onclick' => "return showHideByValue('is_tellfriend_enabled',true,'tflimit','table-row','radio',false);"));
 
-    $form->add('text',
+    $form->add('number',
       'tellfriend_limit',
       ts("'Tell a friend' maximum recipients limit"),
       CRM_Core_DAO::getAttribute('CRM_PCP_DAO_PCPBlock', 'tellfriend_limit')

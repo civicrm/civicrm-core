@@ -345,7 +345,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
     );
 
-    $this->add('text', 'num_terms', ts('Extend Membership by'), array('onchange' => "setPaymentBlock();"), TRUE);
+    $this->add('number', 'num_terms', ts('Extend Membership by'), array('onchange' => "setPaymentBlock();"), TRUE);
     $this->addRule('num_terms', ts('Please enter a whole number for how many periods to renew.'), 'integer');
 
     if (CRM_Core_Permission::access('CiviContribute') && !$this->_mode) {

@@ -273,7 +273,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     );
     $this->addRule('installments', ts('Please enter a valid number of installments.'), 'positiveInteger');
 
-    $frequencyInterval = $this->add('text', 'frequency_interval', ts('every'),
+    $frequencyInterval = $this->add('number', 'frequency_interval', ts('every'),
       $attributes['pledge_frequency_interval'], TRUE
     );
     $this->addRule('frequency_interval', ts('Please enter a number for frequency (e.g. every "3" months).'), 'positiveInteger');
@@ -289,7 +289,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       TRUE
     );
 
-    $frequencyDay = $this->add('text', 'frequency_day', ts('Payments are due on the'), $attributes['frequency_day'], TRUE);
+    $frequencyDay = $this->add('number', 'frequency_day', ts('Payments are due on the'), $attributes['frequency_day'], TRUE);
     $this->addRule('frequency_day', ts('Please enter a valid payment due day.'), 'positiveInteger');
 
     $this->add('text', 'eachPaymentAmount', ts('each'), array(
