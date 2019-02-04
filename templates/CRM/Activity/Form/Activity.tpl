@@ -114,7 +114,7 @@
   {/if}
 
   <tr class="crm-activity-form-block-subject">
-    <td class="label">{$form.subject.label}</td><td class="view-value">{$form.subject.html|crmAddClass:huge}</td>
+    <td class="label">{$form.subject.label}</td><td class="view-value">{$form.subject.html}</td>
   </tr>
 
   {* CRM-7362 --add campaign to activities *}
