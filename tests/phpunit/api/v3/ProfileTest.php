@@ -198,7 +198,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Get Billing empty contact - this will return generic defaults
    */
   public function testProfileGetBillingEmptyContact() {
-
+    $this->callAPISuccess('Setting', 'create', ['defaultContactCountry' => 1228]);
     $params = array(
       'profile_id' => array('Billing'),
     );

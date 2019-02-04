@@ -177,6 +177,12 @@ trait CRM_Admin_Form_SettingTrait {
           $options = civicrm_api3('Setting', 'getoptions', [
             'field' => $setting,
           ])['values'];
+          if ($props['html_type'] === 'Select' && isset($props['is_required']) && $props['is_required'] === FALSE && !isset($options[''])) {
+            // If the spec specifies the field is not required add a null option.
+            // Why not if empty($props['is_required']) - basically this has been added to the spec & might not be set to TRUE
+            // when it is true.
+            $options = ['' => ts('None')] + $options;
+          }
         }
         if ($props['type'] === 'Boolean') {
           $options = [$props['title'] => $props['name']];
