@@ -159,7 +159,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         'type' => 'text',
         'label' => ts('Subject'),
         'attributes' => CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity',
-          'subject'
+          'activity_subject'
         ),
       ),
       'duration' => array(
