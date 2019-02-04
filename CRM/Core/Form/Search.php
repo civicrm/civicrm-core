@@ -90,6 +90,13 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   protected $entityReferenceFields = [];
 
   /**
+   * Indicates the Civi component overriden by respective search classes
+   *
+   * @var string
+   */
+  protected $_component;
+
+  /**
    * Builds the list of tasks or actions that a searcher can perform on a result set.
    *
    * To modify the task list, child classes should alter $this->_taskList,
@@ -396,6 +403,35 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'search');
     $this->_ssID = CRM_Utils_Request::retrieve('ssID', 'Positive', $this);
     $this->assign("context", $this->_context);
+  }
+
+  /**
+   * This function call setSearchParamFromUrl() of respective component's Search form and
+   *  is responsible to set search params found as url arguments
+   */
+  protected function loadSearchParamsFromUrl() {
+    if (!$this->_force && (!empty($_POST) || !empty($form->_ssID))) {
+      return;
+    }
+
+    $enabledComponents = CRM_Core_Component::getEnabledComponents();
+    if (!$this->_component) {
+      if (method_exists('CRM_Contact_Form_Search', 'setSearchParamFromUrl')) {
+        CRM_Contact_Form_Search::setSearchParamFromUrl($this);
+      }
+      foreach ($enabledComponents as $component) {
+        $searchClass = $component->namespace . '_Form_Search';
+        if (method_exists($searchClass, 'setSearchParamFromUrl')) {
+          $searchClass::setSearchParamFromUrl($this);
+        }
+      }
+    }
+    elseif (array_key_exists($this->_component, $enabledComponents)) {
+      $searchClass = $enabledComponents[$this->_component]->namespace . '_Form_Search';
+      if (method_exists($searchClass, 'setSearchParamFromUrl')) {
+        $searchClass::setSearchParamFromUrl($this);
+      }
+    }
   }
 
   /**
