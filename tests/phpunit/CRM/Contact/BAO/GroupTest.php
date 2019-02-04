@@ -252,11 +252,9 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
 
     $contactID = $this->individualCreate(['custom_' . $customFieldID => 'abc']);
 
-    $formValues = ['custom_' . $customFieldID => ['LIKE' => '%a%']];
-
     $hiddenSmartParams = [
       'group_type' => ['2' => 1],
-      'form_values' => CRM_Contact_BAO_Query::convertFormValues($formValues),
+      'form_values' => ['custom_' . $customFieldID => ['LIKE' => '%a%']],
       'saved_search_id' => NULL,
       'search_custom_id' => NULL,
       'search_context' => 'advanced',
