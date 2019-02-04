@@ -197,7 +197,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
         if (!$isCaseManager) {
           $result[$relationshipTypeID] = $relationshipTypeName;
         }
-        elseif ($relationshipTypeXML->manager) {
+        elseif ($relationshipTypeXML->manager == 1) {
           return $relationshipTypeID;
         }
       }
