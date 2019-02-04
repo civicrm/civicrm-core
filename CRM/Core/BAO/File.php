@@ -773,12 +773,20 @@ AND       CEF.entity_id    = %2";
    * @param int $fid file ID
    * @return string
    */
-  public static function generateFileHash($eid = NULL, $fid = NULL) {
+  public static function generateFileHash($eid = NULL, $fid = NULL, $genTs = NULL, $life = NULL) {
     // Use multiple (but stable) inputs for hash information.
     $siteKey = defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : 'NO_SITE_KEY';
+
+    if (!$genTs) {
+      $genTs = time();
+    }
+    if (!$life) {
+      $life = 24 * 2;
+    }
     // Trim 8 chars off the string, make it slightly easier to find
     // but reveals less information from the hash.
-    return substr(md5("{$siteKey}_{$eid}_{$fid}"), 8);
+    $cs = hash_hmac('sha256', "{$fid}_{$life}", $siteKey);
+    return "{$cs}_{$genTs}_{$life}";
   }
 
 }
