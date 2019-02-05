@@ -917,7 +917,8 @@ HTACCESS;
     else {
       $path = $url = $imageURL;
     }
-    $mimeType = 'image/' . strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    $fileExtension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    $mimeType = 'image/' . ($fileExtension == 'jpg' ? 'jpeg' : $fileExtension);
 
     return self::getFileURL($path, $mimeType, $url);
   }
