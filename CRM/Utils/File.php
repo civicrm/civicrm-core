@@ -918,7 +918,18 @@ HTACCESS;
       $path = $url = $imageURL;
     }
     $fileExtension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-    $mimeType = 'image/' . ($fileExtension == 'jpg' ? 'jpeg' : $fileExtension);
+    //According to (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types),
+    // there are some extensions that would need translating.:
+    $translateMimeTypes = [
+      'tif' => 'tiff',
+      'jpg' => 'jpeg',
+      'svg' => 'svg+xml',
+    ];
+    $mimeType = 'image/' . CRM_Utils_Array::value(
+      $fileExtension,
+      $translateMimeTypes,
+      $fileExtension
+    );
 
     return self::getFileURL($path, $mimeType, $url);
   }
