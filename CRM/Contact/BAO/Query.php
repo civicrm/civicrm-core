@@ -4904,7 +4904,7 @@ civicrm_relationship.start_date > {$today}
     //      MySQL expect the columns present in GROUP BY, must be present in SELECT clause and that results into error, needless to have other columns.
     //   2. When GROUP BY columns are present then disable FGB otherwise it demands to add ORDER BY columns in GROUP BY and eventually in SELECT
     //     clause. This will impact the search query output.
-    $disableFullGroupByMode = ($sortByChar || !empty($groupByCols));
+    $disableFullGroupByMode = ($sortByChar || !empty($groupByCols) || $groupContacts);
 
     if ($disableFullGroupByMode) {
       CRM_Core_DAO::disableFullGroupByMode();
