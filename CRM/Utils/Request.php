@@ -111,7 +111,9 @@ class CRM_Utils_Request {
     }
 
     if (!isset($value) && $store) {
-      $value = $store->get($name);
+      if(is_string($name)) {
+        $value = $store->get($name);
+      }
     }
 
     if (!isset($value) && $abort) {
