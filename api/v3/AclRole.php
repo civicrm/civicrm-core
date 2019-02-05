@@ -43,6 +43,16 @@ function civicrm_api3_acl_role_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'EntityRole');
 }
 
+
+/**
+ * AclRole create metadata.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_acl_role_create_spec(&$params) {
+  $params['is_active']['api.default'] = 1;
+}
+
 /**
  * Get an AclRole.
  *
