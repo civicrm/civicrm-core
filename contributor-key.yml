@@ -856,6 +856,10 @@
   organization: Circle Interactive
   jira        : marshCircle
 
+- github      : mathavanveda
+  name        : Mathavan Veeramuthu
+  organization: Veda Consulting
+
 - name        : Matt Allard
   organization: City of Winnipeg, Manitoba
   jira        : mattallard
