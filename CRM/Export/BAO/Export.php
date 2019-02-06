@@ -124,7 +124,7 @@ class CRM_Export_BAO_Export {
    *   Group By Clause
    */
   public static function getGroupBy($processor, $returnProperties, $query) {
-    $groupBy = '';
+    $groupBy = NULL;
     $exportMode = $processor->getExportMode();
     $queryMode = $processor->getQueryMode();
     if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
@@ -140,7 +140,7 @@ class CRM_Export_BAO_Export {
         $groupBy = 'civicrm_contribution.id';
         if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
           // especial group by  when soft credit columns are included
-          $groupBy = array('contribution_search_scredit_combined.id', 'contribution_search_scredit_combined.scredit_id');
+          $groupBy = ['contribution_search_scredit_combined.id', 'contribution_search_scredit_combined.scredit_id'];
         }
         break;
 
@@ -157,7 +157,7 @@ class CRM_Export_BAO_Export {
       $groupBy = "civicrm_activity.id ";
     }
 
-    return $groupBy ? ' GROUP BY ' . $groupBy : '';
+    return $groupBy ? ' GROUP BY ' . implode(', ', (array) $groupBy) : '';
   }
 
   /**
