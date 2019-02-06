@@ -275,9 +275,9 @@ class CRM_Extension_Mapper {
    *   array(array('prefix' => $, 'file' => $))
    */
   public function getActiveModuleFiles($fresh = FALSE) {
-    $config = CRM_Core_Config::singleton();
-    if ($config->isUpgradeMode() || !defined('CIVICRM_DSN')) {
-      return []; // hmm, ok
+    if (!defined('CIVICRM_DSN')) {
+      // hmm, ok
+      return [];
     }
 
     $moduleExtensions = NULL;

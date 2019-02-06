@@ -161,6 +161,17 @@ abstract class CRM_Utils_Hook {
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix
   ) {
+    // Per https://github.com/civicrm/civicrm-core/pull/13551 we have had ongoing significant problems where hooks from modules are
+    // invoked during upgrade but not those from extensions. The issues are both that an incorrect module list & settings are cached and that
+    // some hooks REALLY need to run during upgrade - the loss of triggers during upgrade causes significant loss of data
+    // whereas loss of logTable hooks means that log tables are created for tables specifically excluded - e.g due to large
+    // quantities of low-importance data or the table not having an id field, which could cause a fatal error.
+    // Instead of not calling any hooks we only call those we know to be frequently important - if a particular extension wanted
+    // to avoid this they could do an early return on CRM_Core_Config::singleton()->isUpgradeMode
+    $upgradeFriendlyHooks = ['civicrm_alterSettingsFolders', 'civicrm_alterSettingsMetaData', 'civicrm_triggerInfo', 'civicrm_alterLogTables', 'civicrm_container'];
+    if (CRM_Core_Config::singleton()->isUpgradeMode() && !in_array($fnSuffix, $upgradeFriendlyHooks)) {
+      return;
+    }
     if (is_array($names) && !defined('CIVICRM_FORCE_LEGACY_HOOK') && \Civi\Core\Container::isContainerBooted()) {
       $event = \Civi\Core\Event\GenericHookEvent::createOrdered(
         $names,
