@@ -641,6 +641,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public function addButtons($params) {
     $prevnext = $spacing = array();
     foreach ($params as $button) {
+      if (!empty($button['submitOnce'])) {
+        $button['js']['onclick'] = "return submitOnce(this,'{$this->_name}','" . ts('Processing') . "');";
+      }
+
       $attrs = array('class' => 'crm-form-submit') + (array) CRM_Utils_Array::value('js', $button);
 
       if (!empty($button['class'])) {
