@@ -160,6 +160,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
         'mime_type' => 'text/plain',
         'description' => 'My test description',
         'content' => 'My test content',
+        'check_permissions' => 1,
       ),
       "/Unrecognized target entity/",
     );
