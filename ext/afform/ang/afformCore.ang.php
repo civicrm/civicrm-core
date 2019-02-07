@@ -10,7 +10,7 @@ return array(
     2 => 'ang/afformCore/*/*.js',
   ),
   'css' => array(),
-  'requires' => array('crmUi', 'crmUtil'),
+  'requires' => array('crmUi', 'crmUtil', 'api4'),
   'partials' => array('ang/afformCore'),
   'settings' => array(),
   'basePages' => [],
