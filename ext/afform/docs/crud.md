@@ -4,33 +4,33 @@ Now that we've defined a baseline form, it's possible for administrators and
 GUI applications to inspect the form using the API:
 
 ```
-$ cv api afform.getsingle name=helloworld
+$ cv api4 afform.get +w name=helloworld
 {
-    "name": "helloworld",
-    "requires": [
-        "afformCore"
-    ],
-    "title": "",
-    "description": "",
-    "layout": {
-        "#tag": "div",
-        "#children": [
-            "Hello {{routeParams.name}}"
-        ]
-    },
-    "id": "helloworld"
+    "0": {
+        "name": "helloworld",
+        "requires": [
+            "afformCore"
+        ],
+        "title": "",
+        "description": "",
+        "is_public": false,
+        "server_route": "civicrm/hello-world",
+        "layout": {
+            "#tag": "div",
+            "#children": [
+                "Hello {{routeParams.name}}"
+            ]
+        },
+    }
 }
 ```
 
 Additionally, you can also update the forms:
 
 ```
-$ cv api afform.create name=helloworld title="The Foo Bar Screen"
+$ cv api4 afform.update +w name=helloworld +v title="The Foo Bar Screen"
 {
-    "is_error": 0,
-    "version": 3,
-    "count": 2,
-    "values": {
+    "0": {
         "name": "helloworld",
         "title": "The Foo Bar Screen"
     }
