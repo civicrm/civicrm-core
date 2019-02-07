@@ -20,8 +20,14 @@
   <compatibility>
     <ver>5.3</ver>
   </compatibility>
+  <requires>
+    <ext>org.civicrm.api4</ext>
+  </requires>
   <comments>This is a new, undeveloped module</comments>
   <civix>
     <namespace>CRM/Afform</namespace>
   </civix>
+  <classloader>
+    <psr4 prefix="Civi\" path="Civi" />
+  </classloader>
 </extension>
