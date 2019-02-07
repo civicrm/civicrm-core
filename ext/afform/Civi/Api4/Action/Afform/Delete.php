@@ -13,7 +13,7 @@ class Delete extends \Civi\Api4\Action\Delete {
   protected $select = ['name'];
 
   public function _run(Result $result) {
-    throw new NotImplementedException("Not support: Afform.delete");
+    throw new NotImplementedException("Not supported: Afform.delete"); // FIXME
   }
 
 }
