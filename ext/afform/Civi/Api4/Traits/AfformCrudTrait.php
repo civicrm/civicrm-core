@@ -1,6 +1,6 @@
 <?php
 
-namespace Civi\Api4;
+namespace Civi\Api4\Traits;
 
 use Civi\Api4\Generic\ArrayRetrievalTrait;
 
