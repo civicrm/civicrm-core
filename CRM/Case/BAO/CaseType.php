@@ -190,7 +190,20 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       $xmlFile .= "</CaseRoles>\n";
     }
 
+    if (array_key_exists('restrictActivityAsgmtToCmsUser', $definition)) {
+      $xmlFile .= "<RestrictActivityAsgmtToCmsUser>" . $definition['restrictActivityAsgmtToCmsUser'] . "</RestrictActivityAsgmtToCmsUser>\n";
+    }
+
+    if (!empty($definition['activityAsgmtGrps'])) {
+      $xmlFile .= "<ActivityAsgmtGrps>\n";
+      foreach ($definition['activityAsgmtGrps'] as $value) {
+        $xmlFile .= "<Group>$value</Group>\n";
+      }
+      $xmlFile .= "</ActivityAsgmtGrps>\n";
+    }
+
     $xmlFile .= '</CaseType>';
+
     return $xmlFile;
   }
 
@@ -224,6 +237,14 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
     if (isset($xml->forkable)) {
       $definition['forkable'] = (int) $xml->forkable;
+    }
+
+    if (isset($xml->RestrictActivityAsgmtToCmsUser)) {
+      $definition['restrictActivityAsgmtToCmsUser'] = (int) $xml->RestrictActivityAsgmtToCmsUser;
+    }
+
+    if (isset($xml->ActivityAsgmtGrps)) {
+      $definition['activityAsgmtGrps'] = (array) $xml->ActivityAsgmtGrps->Group;
     }
 
     // set activity types

@@ -312,6 +312,8 @@
       $scope.caseType.definition.caseRoles = $scope.caseType.definition.caseRoles || [];
       $scope.caseType.definition.statuses = $scope.caseType.definition.statuses || [];
       $scope.caseType.definition.timelineActivityTypes = $scope.caseType.definition.timelineActivityTypes || [];
+      $scope.caseType.definition.restrictActivityAsgmtToCmsUser = $scope.caseType.definition.restrictActivityAsgmtToCmsUser || 0;
+      $scope.caseType.definition.activityAsgmtGrps = $scope.caseType.definition.activityAsgmtGrps || [];
 
       _.each($scope.caseType.definition.activitySets, function (set) {
         _.each(set.activityTypes, function (type, name) {
@@ -525,6 +527,11 @@
       });
       // Ignore if ALL or NONE selected
       $scope.caseType.definition.statuses = selectedStatuses.length == _.size($scope.selectedStatuses) ? [] : selectedStatuses;
+
+      if ($scope.caseType.definition.activityAsgmtGrps) {
+        $scope.caseType.definition.activityAsgmtGrps = $scope.caseType.definition.activityAsgmtGrps.toString().split(",");
+      }
+
       var result = crmApi('CaseType', 'create', $scope.caseType, true);
       result.then(function(data) {
         if (data.is_error === 0 || data.is_error == '0') {
