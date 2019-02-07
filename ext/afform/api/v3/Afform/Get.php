@@ -44,7 +44,7 @@ function _civicrm_api3_afform_get_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_afform_get($params) {
-  $scanner = new CRM_Afform_AfformScanner();
+  $scanner = Civi::service('afform_scanner');
   $converter = new CRM_Afform_ArrayHtml();
   $records = [];
 

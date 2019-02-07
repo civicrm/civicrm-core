@@ -33,6 +33,16 @@ function _afform_fields_filter($params) {
 }
 
 /**
+ * @param ContainerBuilder $container
+ */
+function afform_civicrm_container($container) {
+  $container->setDefinition('afform_scanner', new \Symfony\Component\DependencyInjection\Definition(
+    'CRM_Afform_AfformScanner',
+    array()
+  ));
+}
+
+/**
  * Implements hook_civicrm_config().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
@@ -142,7 +152,7 @@ function afform_civicrm_caseTypes(&$caseTypes) {
 function afform_civicrm_angularModules(&$angularModules) {
   _afform_civix_civicrm_angularModules($angularModules);
 
-  $scanner = new CRM_Afform_AfformScanner();
+  $scanner = Civi::service('afform_scanner');
   $names = array_keys($scanner->findFilePaths());
   foreach ($names as $name) {
     $meta = $scanner->getMeta($name);
@@ -195,9 +205,11 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   }
 
   $name = $params['name'];
-  $scanner = new CRM_Afform_AfformScanner();
+  // Hmm?? $scanner = new CRM_Afform_AfformScanner();
+  // Hmm?? afform_scanner
+  $scanner = Civi::service('afform_scanner');
   $meta = $scanner->getMeta($name);
-  $scanner = new CRM_Afform_AfformScanner();
+  // Hmm?? $scanner = new CRM_Afform_AfformScanner();
 
   $smarty = CRM_Core_Smarty::singleton();
   $smarty->assign('afform', [
@@ -214,7 +226,13 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
  * Implements hook_civicrm_alterMenu().
  */
 function afform_civicrm_alterMenu(&$items) {
-  $scanner = new CRM_Afform_AfformScanner();
+  if (Civi::container()->has('afform_scanner')) {
+    $scanner = Civi::service('afform_scanner');
+  }
+  else {
+    // During installation...
+    $scanner = new CRM_Afform_AfformScanner();
+  }
   foreach ($scanner->getMetas() as $name => $meta) {
     if (!empty($meta['server_route'])) {
       $items[$meta['server_route']] = [

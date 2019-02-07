@@ -24,7 +24,7 @@ function _civicrm_api3_afform_create_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_afform_create($params) {
-  $scanner = new CRM_Afform_AfformScanner();
+  $scanner = Civi::service('afform_scanner');
   $converter = new CRM_Afform_ArrayHtml();
 
   if (empty($params['name']) || !preg_match('/^[a-zA-Z][a-zA-Z0-9\-]*$/', $params['name'])) {

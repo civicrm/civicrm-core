@@ -26,7 +26,7 @@ function _civicrm_api3_afform_revert_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_afform_revert($params) {
-  $scanner = new CRM_Afform_AfformScanner();
+  $scanner = Civi::service('afform_scanner');
 
   if (empty($params['name']) || !preg_match('/^[a-zA-Z][a-zA-Z0-9\-]*$/', $params['name'])) {
     throw new \API_Exception("Afform.revert: name is a mandatory field. It should use alphanumerics and dashes.");
