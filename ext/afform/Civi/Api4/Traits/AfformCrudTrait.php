@@ -65,7 +65,10 @@ trait AfformCrudTrait {
     }
 
     // Create or update meta.json.
-    $orig = \Civi\Api4\Afform::get()->addWhere('name', '=', $name)->execute();
+    $orig = \Civi\Api4\Afform::get()
+      ->setCheckPermissions($this->getCheckPermissions())
+      ->addWhere('name', '=', $name)
+      ->execute();
 
     if (isset($orig[0])) {
       $meta = _afform_fields_filter(array_merge($orig[0], $updates));
