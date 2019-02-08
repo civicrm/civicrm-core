@@ -2039,6 +2039,18 @@ class CRM_Contact_BAO_Query {
         // check for both id and contact_id
         if ($this->_params[$id][0] == 'id' || $this->_params[$id][0] == 'contact_id') {
           $this->_where[0][] = self::buildClause("contact_a.id", $this->_params[$id][1], $this->_params[$id][2]);
+          $field = CRM_Utils_Array::value('id', $this->_fields);
+          list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(
+            'CRM_Contact_BAO_Contact',
+            "contact_a.id",
+            $this->_params[$id][2],
+            $this->_params[$id][1]
+          );
+          $this->_qill[0][] = ts("%1 %2 %3", [
+            1 => $field['title'],
+            2 => $qillop,
+            3 => $qillVal
+          ]);
         }
         else {
           $this->whereClauseSingle($this->_params[$id], $apiEntity);
