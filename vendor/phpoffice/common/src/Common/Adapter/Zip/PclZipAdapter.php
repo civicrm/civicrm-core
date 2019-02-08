@@ -15,10 +15,6 @@ class PclZipAdapter implements ZipInterface
      */
     protected $tmpDir;
 
-    /**
-     * @param $filename
-     * @return $this
-     */
     public function open($filename)
     {
         $this->oPclZip = new PclZip($filename);
@@ -26,20 +22,11 @@ class PclZipAdapter implements ZipInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function close()
     {
         return $this;
     }
 
-    /**
-     * @param $localname
-     * @param $contents
-     * @return $this
-     * @throws \Exception
-     */
     public function addFromString($localname, $contents)
     {
         $pathData = pathinfo($localname);

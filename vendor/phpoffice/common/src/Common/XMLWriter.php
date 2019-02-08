@@ -27,7 +27,6 @@ namespace PhpOffice\Common;
  * @method bool startDocument(string $version = 1.0, string $encoding = null, string $standalone = null)
  * @method bool startElement(string $name)
  * @method bool text(string $content)
- * @method bool writeAttribute(string $name, mixed $value)
  * @method bool writeCData(string $content)
  * @method bool writeComment(string $content)
  * @method bool writeElement(string $name, string $content = null)
@@ -100,10 +99,10 @@ class XMLWriter extends \XMLWriter
     {
         if ($this->tempFileName == '') {
             return $this->outputMemory(true);
-        } else {
-            $this->flush();
-            return file_get_contents($this->tempFileName);
         }
+
+        $this->flush();
+        return file_get_contents($this->tempFileName);
     }
 
 
@@ -166,5 +165,18 @@ class XMLWriter extends \XMLWriter
         if ($condition == true) {
             $this->writeAttribute($attribute, $value);
         }
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     * @return bool
+     */
+    public function writeAttribute($name, $value)
+    {
+        if (is_float($value)) {
+            $value = json_encode($value);
+        }
+        return parent::writeAttribute($name, $value);
     }
 }

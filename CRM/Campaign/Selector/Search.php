@@ -282,12 +282,12 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
       );
       list($select, $from) = explode(' FROM ', $sql);
       $selectSQL = "
-      SELECT '$cacheKey', contact_a.id, contact_a.display_name
+      SELECT %1, contact_a.id, contact_a.display_name
 FROM {$from}
 ";
 
       try {
-        Civi::service('prevnext')->fillWithSql($cacheKey, $selectSQL);
+        Civi::service('prevnext')->fillWithSql($cacheKey, $selectSQL, [1 => [$cacheKey, 'String']]);
       }
       catch (CRM_Core_Exception $e) {
         // Heavy handed, no? Seems like this merits an explanation.

@@ -186,26 +186,26 @@ class OLERead
             }
 
             return $streamData;
-        } else {
-            $numBlocks = $this->props[$stream]['size'] / self::BIG_BLOCK_SIZE;
-            if ($this->props[$stream]['size'] % self::BIG_BLOCK_SIZE != 0) {
-                ++$numBlocks;
-            }
-
-            if ($numBlocks == 0) {
-                return '';
-            }
-
-            $block = $this->props[$stream]['startBlock'];
-
-            while ($block != -2) {
-                $pos = ($block + 1) * self::BIG_BLOCK_SIZE;
-                $streamData .= substr($this->data, $pos, self::BIG_BLOCK_SIZE);
-                $block = self::getInt4d($this->bigBlockChain, $block*4);
-            }
-
-            return $streamData;
         }
+
+        $numBlocks = $this->props[$stream]['size'] / self::BIG_BLOCK_SIZE;
+        if ($this->props[$stream]['size'] % self::BIG_BLOCK_SIZE != 0) {
+            ++$numBlocks;
+        }
+
+        if ($numBlocks == 0) {
+            return '';
+        }
+
+        $block = $this->props[$stream]['startBlock'];
+
+        while ($block != -2) {
+            $pos = ($block + 1) * self::BIG_BLOCK_SIZE;
+            $streamData .= substr($this->data, $pos, self::BIG_BLOCK_SIZE);
+            $block = self::getInt4d($this->bigBlockChain, $block*4);
+        }
+
+        return $streamData;
     }
 
     /**
@@ -259,10 +259,10 @@ class OLERead
                         'type' => $type,
                         'startBlock' => $startBlock,
                         'size' => $size);
-                
+
                 // tmp helper to simplify checks
                 $upName = strtoupper($name);
-                
+
                 switch ($upName) {
                     case 'ROOT ENTRY':
                     case 'R':

@@ -16,11 +16,6 @@ class ZipArchiveAdapter implements ZipInterface
      */
     protected $filename;
 
-    /**
-     * @param string $filename
-     * @throws \Exception Could not open $this->filename for writing.
-     * @return mixed
-     */
     public function open($filename)
     {
         $this->filename = $filename;
@@ -35,10 +30,6 @@ class ZipArchiveAdapter implements ZipInterface
         throw new \Exception("Could not open $this->filename for writing.");
     }
 
-    /**
-     * @return $this
-     * @throws \Exception Could not close zip file $this->filename.
-     */
     public function close()
     {
         if ($this->oZipArchive->close() === false) {
@@ -47,13 +38,12 @@ class ZipArchiveAdapter implements ZipInterface
         return $this;
     }
 
-    /**
-     * @param $localname
-     * @param $contents
-     * @return bool
-     */
     public function addFromString($localname, $contents)
     {
-        return $this->oZipArchive->addFromString($localname, $contents);
+        if ($this->oZipArchive->addFromString($localname, $contents) === false) {
+            throw new \Exception("Error zipping files : " . $localname);
+        }
+
+        return $this;
     }
 }

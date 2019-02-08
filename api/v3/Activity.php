@@ -345,7 +345,7 @@ function civicrm_api3_activity_get($params) {
     return civicrm_api3_create_success($activities, $params, 'Activity', 'get');
   }
 
-  if (!empty($params['check_permissions']) && !CRM_Core_Permission::check('view all activities')) {
+  if (!empty($params['check_permissions'])) {
     // @todo get this to work at the query level - see contact_id join above.
     foreach ($activities as $activity) {
       if (!CRM_Activity_BAO_Activity::checkPermission($activity['id'], CRM_Core_Action::VIEW)) {
