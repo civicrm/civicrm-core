@@ -1,5 +1,10 @@
 # org.civicrm.afform (Early Proof of Concept)
 
+> You are looking at the `master` branch of a proof-of-concept module.  It
+> may change radically (without full curation of docs, etc).  For previous
+> iterations with more stable/cogent materials, check other branches (e.g.
+> `0.1`).
+
 <!-- ![Screenshot](/images/screenshot.png) -->
 
 The Affable Administrative Angular Form Framework (`afform`) is a system for administering AngularJS-based forms
