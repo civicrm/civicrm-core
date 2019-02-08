@@ -24,6 +24,7 @@ if you already have a basic understanding of CiviCRM API and AngularJS.  It is l
 * PHP v5.6+
 * CiviCRM v5.7+
 
+<!--
 ## Installation (Web UI)
 
 This extension has not yet been published for installation via the web UI.
@@ -37,6 +38,7 @@ install it with the command-line tool [cv](https://github.com/civicrm/cv).
 cd <extension-dir>
 cv dl org.civicrm.afform@https://github.com/totten/afform/archive/master.zip
 ```
+-->
 
 ## Installation (CLI, Git)
 
