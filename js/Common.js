@@ -256,7 +256,7 @@ if (!CRM.vars) CRM.vars = {};
         CRM.CMSjQuery = window.jQuery;
         window.jQuery = CRM.$;
       }
-      script.src = url;
+      script.src = url + (_.includes(url, '?') ? '&r=' : '?r=') + CRM.config.resourceCacheCode;
       document.getElementsByTagName("head")[0].appendChild(script);
     }
     return scriptsLoaded[url];
