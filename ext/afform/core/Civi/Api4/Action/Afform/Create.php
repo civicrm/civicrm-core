@@ -1,6 +1,6 @@
 <?php
 
-namespace civi\Api4\Action\Afform;
+namespace Civi\Api4\Action\Afform;
 
 use Civi\API\Exception\NotImplementedException;
 use Civi\Api4\Traits\AfformCrudTrait;
