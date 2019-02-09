@@ -5,7 +5,7 @@
 > iterations with more stable/cogent materials, check other branches (e.g.
 > `0.1`).
 
-<!-- ![Screenshot](/images/screenshot.png) -->
+![Screenshot](docs/sandbox/4-Repeatable-Entity-Blocks-Parent.png)
 
 The Affable Administrative Angular Form Framework (`afform`) is a system for administering AngularJS-based forms
 in CiviCRM which:
