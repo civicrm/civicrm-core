@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="org.civicrm.afform-gui" type="module">
   <file>afform_gui</file>
-  <name>FIXME</name>
+  <name>Civi Form Builder</name>
   <description>FIXME</description>
   <license>AGPL-3.0</license>
   <maintainer>
@@ -21,6 +21,10 @@
     <ver>5.0</ver>
   </compatibility>
   <comments>This is a new, undeveloped module</comments>
+  <requires>
+    <ext>org.civicrm.afform</ext>
+    <ext>org.civicrm.api4</ext>
+  </requires>
   <civix>
     <namespace>CRM/AfformGui</namespace>
   </civix>
