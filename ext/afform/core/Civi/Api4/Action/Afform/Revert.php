@@ -13,7 +13,7 @@ class Revert extends Get {
 
     parent::_run($result);
 
-    $files = [\CRM_Afform_AfformScanner::METADATA_FILE, 'aff.html'];
+    $files = [\CRM_Afform_AfformScanner::METADATA_FILE, \CRM_Afform_AfformScanner::LAYOUT_FILE];
 
     foreach ($result as $afform) {
       foreach ($files as $file) {

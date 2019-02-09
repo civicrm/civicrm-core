@@ -12,6 +12,10 @@ class CRM_Afform_AfformScanner {
 
   const METADATA_FILE = 'aff.json';
 
+  const LAYOUT_FILE = 'aff.html';
+
+  const FILE_REGEXP = '/\.aff\.(json|html)$/';
+
   const DEFAULT_REQUIRES = 'afformCore';
 
   /**
@@ -122,10 +126,6 @@ class CRM_Afform_AfformScanner {
    */
   public function getMeta($name) {
     // FIXME error checking
-    $metaFile = $this->findFilePath($name, self::METADATA_FILE);
-    if (!$metaFile) {
-      return NULL;
-    }
 
     $defaults = [
       'name' => $name,
@@ -135,7 +135,16 @@ class CRM_Afform_AfformScanner {
       'is_public' => FALSE,
     ];
 
-    return array_merge($defaults, json_decode(file_get_contents($metaFile), 1));
+    $metaFile = $this->findFilePath($name, self::METADATA_FILE);
+    if ($metaFile !== NULL) {
+      return array_merge($defaults, json_decode(file_get_contents($metaFile), 1));
+    }
+    elseif ($this->findFilePath($name, self::LAYOUT_FILE)) {
+      return $defaults;
+    }
+    else {
+      return NULL;
+    }
   }
 
   /**
@@ -164,10 +173,12 @@ class CRM_Afform_AfformScanner {
    *   Lower priority files override higher priority files.
    */
   private function appendFilePaths(&$formPaths, $parent, $priority) {
-    $files = (array) glob("$parent/*." . self::METADATA_FILE);
+    $files = preg_grep(self::FILE_REGEXP, (array) glob("$parent/*"));
+
     foreach ($files as $file) {
-      $name = _afform_angular_module_name(preg_replace('/\.aff\.json$/', '', basename($file)));
-      $formPaths[$name][$priority] = preg_replace('/\.aff\.json$/', '', $file);
+      $fileBase = preg_replace(self::FILE_REGEXP, '', $file);
+      $name = _afform_angular_module_name(basename($fileBase));
+      $formPaths[$name][$priority] = $fileBase;
       ksort($formPaths[$name]);
     }
   }
@@ -182,6 +193,17 @@ class CRM_Afform_AfformScanner {
     // TODO Allow a setting override.
     // return Civi::paths()->getPath(Civi::settings()->get('afformPath'));
     return Civi::paths()->getPath('[civicrm.files]/ang');
+  }
+
+  /**
+   * @return string
+   */
+  private function getMarkerRegexp() {
+    static $v;
+    if ($v === NULL) {
+      $v = '/\.(' . preg_quote(self::LAYOUT_FILE, '/') . '|' . preg_quote(self::METADATA_FILE, '/') . ')$/';
+    }
+    return $v;
   }
 
 }
