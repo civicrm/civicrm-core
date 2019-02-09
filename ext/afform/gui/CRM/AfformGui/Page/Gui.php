@@ -8,7 +8,7 @@ class CRM_AfformGui_Page_Gui extends CRM_Core_Page {
     $loader->setModules(['afformGui']);
     $loader->setPageName('civicrm/admin/afform');
     $loader->useApp([
-      'defaultRoute' => '/build',
+      'defaultRoute' => '/list',
     ]);
     $loader->load();
     CRM_Utils_System::setTitle('CiviCRM');
