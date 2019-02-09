@@ -16,8 +16,7 @@ class api_v4_AfformTest extends \PHPUnit_Framework_TestCase implements HeadlessI
    */
   public function setUpHeadless() {
     return \Civi\Test::headless()
-      ->installMe(__DIR__)
-      ->install(['org.civicrm.api4'])
+      ->install(['org.civicrm.api4', 'org.civicrm.afform', 'org.civicrm.afform-mock'])
       ->apply();
   }
 
@@ -42,37 +41,38 @@ class api_v4_AfformTest extends \PHPUnit_Framework_TestCase implements HeadlessI
    * This takes the bundled `examplepage` and performs some API calls on it.
    */
   public function testGetUpdateRevert() {
-    Civi\Api4\Afform::revert()->addWhere('name', '=', 'examplepage')->execute();
+    Civi\Api4\Afform::revert()->addWhere('name', '=', 'afformExamplepage')->execute();
 
     $message = 'The initial Afform.get should return default data';
-    $result = Civi\Api4\Afform::get()->addWhere('name', '=', 'examplepage')->execute();
+    $result = Civi\Api4\Afform::get()->addWhere('name', '=', 'afformExamplepage')->execute();
     $result->indexBy('name');
-    $this->assertEquals('examplepage', $result['examplepage']['name'], $message);
-    $this->assertEquals('', $result['examplepage']['title'], $message);
-    $this->assertEquals('', $result['examplepage']['description'], $message);
-    $this->assertEquals('civicrm/example-page', $result['examplepage']['server_route'], $message);
-    $this->assertTrue(is_array($result['examplepage']['layout']), $message);
+    $b = (array) $result;
+    $this->assertEquals('afformExamplepage', $result['afformExamplepage']['name'], $message);
+    $this->assertEquals('', $result['afformExamplepage']['title'], $message);
+    $this->assertEquals('', $result['afformExamplepage']['description'], $message);
+    $this->assertEquals('civicrm/example-page', $result['afformExamplepage']['server_route'], $message);
+    $this->assertTrue(is_array($result['afformExamplepage']['layout']), $message);
 
     $message = 'After updating with Afform.create, the revised data should be returned';
     $result = Civi\Api4\Afform::update()
-      ->addWhere('name', '=', 'examplepage')
+      ->addWhere('name', '=', 'afformExamplepage')
       ->addValue('description', 'The temporary description')
       ->execute();
-    $this->assertEquals('examplepage', $result[0]['name'], $message);
+    $this->assertEquals('afformExamplepage', $result[0]['name'], $message);
     $this->assertEquals('The temporary description', $result[0]['description'], $message);
 
     $message = 'After updating, the Afform.get API should return blended data';
-    $result = Civi\Api4\Afform::get()->addWhere('name', '=', 'examplepage')->execute();
-    $this->assertEquals('examplepage', $result[0]['name'], $message);
+    $result = Civi\Api4\Afform::get()->addWhere('name', '=', 'afformExamplepage')->execute();
+    $this->assertEquals('afformExamplepage', $result[0]['name'], $message);
     $this->assertEquals('', $result[0]['title'], $message);
     $this->assertEquals('The temporary description', $result[0]['description'], $message);
     $this->assertEquals('civicrm/example-page', $result[0]['server_route'], $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
 
-    Civi\Api4\Afform::revert()->addWhere('name', '=', 'examplepage')->execute();
+    Civi\Api4\Afform::revert()->addWhere('name', '=', 'afformExamplepage')->execute();
     $message = 'After reverting, te final Afform.get should return default data';
-    $result = Civi\Api4\Afform::get()->addWhere('name', '=', 'examplepage')->execute();
-    $this->assertEquals('examplepage', $result[0]['name'], $message);
+    $result = Civi\Api4\Afform::get()->addWhere('name', '=', 'afformExamplepage')->execute();
+    $this->assertEquals('afformExamplepage', $result[0]['name'], $message);
     $this->assertEquals('', $result[0]['title'], $message);
     $this->assertEquals('', $result[0]['description'], $message);
     $this->assertEquals('civicrm/example-page', $result[0]['server_route'], $message);
