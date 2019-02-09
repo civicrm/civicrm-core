@@ -9,6 +9,10 @@ class Revert extends Get {
   protected $select = ['name'];
 
   public function _run(Result $result) {
+    if (empty($this->where)) {
+      throw new \API_Exception('Cannot revert with no "where" paramater specified');
+    }
+
     $scanner = \Civi::service('afform_scanner');
 
     parent::_run($result);
