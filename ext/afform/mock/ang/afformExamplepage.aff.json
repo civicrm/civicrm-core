@@ -1,1 +1,1 @@
-{"server_route": "civicrm/example-page"}
+{"server_route": "civicrm/example-page", "requires":["fakelibFoo"]}
