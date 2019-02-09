@@ -60,7 +60,7 @@ $afformPalette = [
 ];
 ```
 
-## Form Metadata: meta.json
+## Form Metadata: *.aff.json
 
 ```json
 {
@@ -75,7 +75,7 @@ $afformPalette = [
 }
 ```
 
-## Form Layout: layout.html
+## Form Layout: *.aff.html
 
 ```html
 <afl-form>
@@ -135,7 +135,7 @@ the `afform-` prefix.
 However, we still want to preserve the strong symmetries in the filesystem where:
 
 * The symbol in HTML (e.g.  `afform-email`) should match the file-name (e.g. 
-  `afform/Email/layout.html` or `afform-email.html`)
+  `afform/Email/layout.html` or `afform-email.aff.html`)
 * The file name in the base-code provided by an extension should match
   the file-name in the local override folder.
 

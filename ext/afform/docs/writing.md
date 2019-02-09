@@ -1,6 +1,6 @@
 # Writing Forms: Afform as basic AngularJS templates
 
-In AngularJS, the primary language for orchestrating a screen is HTML. You can do interesting things in Angular
+In AngularJS, the primary language for composing a screen is HTML. You can do interesting things in Angular
 HTML, such as displaying variables and applying directives.
 
 One key concept is *scope* -- the *scope* determines the list of variables which you can access.  By default, `afform`
@@ -8,10 +8,10 @@ creates a scope with these variables:
 
 * `routeParams`: This is a reference to the [$routeParams](https://docs.angularjs.org/api/ngRoute/service/$routeParams)
   service. In the example, we used `routeParams` to get a reference to a `name` from the URL.
-* `meta`: The stored meta data (`meta.json`) for this form.
+* `meta`: The stored meta data (`*.aff.json`) for this form.
 * `ts`: This is a utility function which translates strings, as in `{{ts('Hello world')}}`.
 
-Additionally, AngularJS allows *directives* -- these are extra HTML attributes which create behavior. For example:
+Additionally, AngularJS allows *directives* -- these are extensions to HTML (custom tags and attributes) which create behavior. For example:
 
 * `ng-if` will conditionally create or destroy elements in the page.
 * `ng-repeat` will loop through data.
@@ -22,15 +22,15 @@ AngularJS markup.
 
 ## Example: Contact record
 
-Let's say we want `helloworld` to become a basic "View Contact" page. A user
+Let's say we want `civicrm/hello-world` to become a basic "View Contact" page. A user
 would request a URL like:
 
 ```
 http://dmaster.localhost/civicrm/hello-world/#/?cid=123
 ```
 
-How do we use the `cid` to get information about the contact?  Update `layout.html` to fetch data with
-`Contact.get` API and the [afform-api3](https://github.com/totten/afform/blob/master/ang/afformCore/Api3Ctrl.md) utility:
+How do we use the `cid` to get information about the contact?  Update `helloWorld.aff.html` to fetch data with
+`Contact.get` API and call the [afform-api3](https://github.com/totten/afform/blob/master/ang/afformCore/Api3Ctrl.md) utility:
 
 ```html
 <div ng-if="!routeParams.cid">
@@ -58,6 +58,7 @@ How do we use the `cid` to get information about the contact?  Update `layout.ht
 </div>
 ```
 
-This example is useful pedagogically and may be useful in a crunch -- but in the longer term,
-we should have a richer library of directives so that typical user-managed forms don't drill-down
-at this level of detail.
+This example is useful pedagogically and may be useful in a crunch -- but
+for typical user-managed forms, it would be better to use more high-level
+directives.  You can create such directives by [embedding forms](embed.md)
+or creating [conventional AngularJS directives](angular.md).
