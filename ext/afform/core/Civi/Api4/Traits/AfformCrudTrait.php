@@ -23,7 +23,7 @@ trait AfformCrudTrait {
     $values = [];
     foreach ($names as $name) {
       $record = $scanner->getMeta($name);
-      $layout = $scanner->findFilePath($name, 'layout.html');
+      $layout = $scanner->findFilePath($name, 'aff.html');
       if ($layout) {
         // FIXME check for file existence+substance+validity
         $record['layout'] = $converter->convertHtmlToArray(file_get_contents($layout));
@@ -56,15 +56,15 @@ trait AfformCrudTrait {
     // FIXME validate all field data.
     $updates = _afform_fields_filter($record);
 
-    // Create or update layout.html.
+    // Create or update aff.html.
     if (isset($updates['layout'])) {
-      $layoutPath = $scanner->createSiteLocalPath($name, 'layout.html');
+      $layoutPath = $scanner->createSiteLocalPath($name, 'aff.html');
       \ CRM_Utils_File::createDir(dirname($layoutPath));
       file_put_contents($layoutPath, $converter->convertArrayToHtml($updates['layout']));
       // FIXME check for writability then success. Report errors.
     }
 
-    // Create or update meta.json.
+    // Create or update *.aff.json.
     $orig = \Civi\Api4\Afform::get()
       ->setCheckPermissions($this->getCheckPermissions())
       ->addWhere('name', '=', $name)

@@ -156,7 +156,7 @@ function afform_civicrm_angularModules(&$angularModules) {
   $names = array_keys($scanner->findFilePaths());
   foreach ($names as $name) {
     $meta = $scanner->getMeta($name);
-    $angularModules[_afform_angular_module_name($name)] = [
+    $angularModules[_afform_angular_module_name($name, 'camel')] = [
       'ext' => E::LONG_NAME,
       'js' => ['assetBuilder://afform.js?name=' . urlencode($name)],
       'requires' => $meta['requires'],
@@ -213,10 +213,10 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
 
   $smarty = CRM_Core_Smarty::singleton();
   $smarty->assign('afform', [
-    'camel' => _afform_angular_module_name($name),
+    'camel' => _afform_angular_module_name($name, 'camel'),
     'meta' => $meta,
     'metaJson' => json_encode($meta),
-    'layout' => file_get_contents($scanner->findFilePath($name, 'layout.html'))
+    'layout' => file_get_contents($scanner->findFilePath($name, 'aff.html'))
   ]);
   $mimeType = 'text/javascript';
   $content = $smarty->fetch('afform/AfformAngularModule.tpl');
@@ -247,21 +247,24 @@ function afform_civicrm_alterMenu(&$items) {
 }
 
 /**
- * @param string $name
- *   Ex: fooBar
+ * @param string $fileBaseName
+ *   Ex: foo-bar
  * @param string $format
  *   'camel' or 'dash'.
  * @return string
  *   Ex: 'FooBar' or 'foo-bar'.
  */
-function _afform_angular_module_name($name, $format = 'camel') {
+function _afform_angular_module_name($fileBaseName, $format = 'camel') {
   switch ($format) {
     case 'camel':
-      return 'afform' . strtoupper($name{0}) . substr($name, 1);
+      $camelCase = '';
+      foreach (explode('-', $fileBaseName) as $shortNamePart) {
+        $camelCase .= ucfirst($shortNamePart);
+      }
+      return strtolower($camelCase{0}) . substr($camelCase, 1);
 
     case 'dash':
-      $camel = _afform_angular_module_name($name, 'camel');
-      return strtolower(implode('-', array_filter(preg_split('/(?=[A-Z])/', $camel))));
+      return strtolower(implode('-', array_filter(preg_split('/(?=[A-Z])/', $fileBaseName))));
 
     default:
       throw new \Exception("Unrecognized format");

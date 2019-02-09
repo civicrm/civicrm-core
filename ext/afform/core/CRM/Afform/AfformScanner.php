@@ -10,7 +10,7 @@
  */
 class CRM_Afform_AfformScanner {
 
-  const METADATA_FILE = 'meta.json';
+  const METADATA_FILE = 'aff.json';
 
   const DEFAULT_REQUIRES = 'afformCore';
 
@@ -28,6 +28,7 @@ class CRM_Afform_AfformScanner {
       'group' => md5('afform_' . CRM_Core_Config_Runtime::getId() . $this->getSiteLocalPath()),
       'prefetch' => FALSE,
     ]);
+    // $this->cache = new CRM_Utils_Cache_Arraycache([]);
   }
 
   /**
@@ -51,7 +52,7 @@ class CRM_Afform_AfformScanner {
     foreach ($mapper->getModules() as $module) {
       /** @var $module CRM_Core_Module */
       if ($module->is_active) {
-        $this->appendFilePaths($paths, dirname($mapper->keyToPath($module->name)) . DIRECTORY_SEPARATOR . 'afform', 20);
+        $this->appendFilePaths($paths, dirname($mapper->keyToPath($module->name)) . DIRECTORY_SEPARATOR . 'ang', 20);
       }
     }
 
@@ -66,18 +67,18 @@ class CRM_Afform_AfformScanner {
    *
    * @param string $formName
    *   Ex: 'view-individual'
-   * @param string $subFile
-   *   Ex: 'meta.json'
+   * @param string $suffix
+   *   Ex: 'aff.json'
    * @return string|NULL
-   *   Ex: '/var/www/sites/default/files/civicrm/afform/view-individual'
+   *   Ex: '/var/www/sites/default/files/civicrm/afform/view-individual.aff.json'
    */
-  public function findFilePath($formName, $subFile) {
+  public function findFilePath($formName, $suffix) {
     $paths = $this->findFilePaths();
 
     if (isset($paths[$formName])) {
       foreach ($paths[$formName] as $path) {
-        if (file_exists($path . DIRECTORY_SEPARATOR . $subFile)) {
-          return $path . DIRECTORY_SEPARATOR . $subFile;
+        if (file_exists($path . '.' . $suffix)) {
+          return $path . '.' . $suffix;
         }
       }
     }
@@ -92,12 +93,12 @@ class CRM_Afform_AfformScanner {
    * @param string $formName
    *   Ex: 'view-individual'
    * @param string $file
-   *   Ex: 'meta.json'
+   *   Ex: 'aff.json'
    * @return string|NULL
-   *   Ex: '/var/www/sites/default/files/civicrm/afform/view-individual'
+   *   Ex: '/var/www/sites/default/files/civicrm/afform/view-individual.aff.json'
    */
   public function createSiteLocalPath($formName, $file) {
-    return $this->getSiteLocalPath() . DIRECTORY_SEPARATOR . $formName . DIRECTORY_SEPARATOR . $file;
+    return $this->getSiteLocalPath() . DIRECTORY_SEPARATOR . $formName . '.' . $file;
   }
 
   public function clear() {
@@ -111,7 +112,7 @@ class CRM_Afform_AfformScanner {
    *   Ex: 'view-individual'
    * @return array
    *   An array with some mix of the following keys: name, title, description, client_route, server_route, requires.
-   *   NOTE: This is only data available in meta.json. It does *NOT* include layout.
+   *   NOTE: This is only data available in *.aff.json. It does *NOT* include layout.
    *   Ex: [
    *     'name' => 'view-individual',
    *     'title' => 'View an individual contact',
@@ -142,7 +143,7 @@ class CRM_Afform_AfformScanner {
    *
    * @return array
    *   A list of all forms, keyed by form name.
-   *   NOTE: This is only data available in meta.json. It does *NOT* include layout.
+   *   NOTE: This is only data available in *.aff.json. It does *NOT* include layout.
    *   Ex: ['view-individual' => ['title' => 'View an individual contact', ...]]
    */
   public function getMetas() {
@@ -156,21 +157,18 @@ class CRM_Afform_AfformScanner {
   /**
    * @param array $formPaths
    *   List of all form paths.
-   *   Ex: ['foo' => [0 => '/var/www/org.example.foobar/afform//foo']]
+   *   Ex: ['foo' => [0 => '/var/www/org.example.foobar/ang']]
    * @param string $parent
    *   Ex: '/var/www/org.example.foobar/afform/'
    * @param int $priority
    *   Lower priority files override higher priority files.
    */
   private function appendFilePaths(&$formPaths, $parent, $priority) {
-    $parent = CRM_Utils_File::addTrailingSlash($parent);
-    if (is_dir($parent) && $handle = opendir($parent)) {
-      while (FALSE !== ($entry = readdir($handle))) {
-        if ($entry{0} !== '.' && is_dir($parent . $entry)) {
-          $formPaths[$entry][$priority] = $parent . $entry;
-          ksort($formPaths[$entry]);
-        }
-      }
+    $files = (array) glob("$parent/*." . self::METADATA_FILE);
+    foreach ($files as $file) {
+      $name = _afform_angular_module_name(preg_replace('/\.aff\.json$/', '', basename($file)));
+      $formPaths[$name][$priority] = preg_replace('/\.aff\.json$/', '', $file);
+      ksort($formPaths[$name]);
     }
   }
 
@@ -183,7 +181,7 @@ class CRM_Afform_AfformScanner {
   private function getSiteLocalPath() {
     // TODO Allow a setting override.
     // return Civi::paths()->getPath(Civi::settings()->get('afformPath'));
-    return Civi::paths()->getPath('[civicrm.files]/afform');
+    return Civi::paths()->getPath('[civicrm.files]/ang');
   }
 
 }
