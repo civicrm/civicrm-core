@@ -297,7 +297,8 @@ class CRM_Financial_Page_AJAX {
       'civicrm_financial_trxn.pan_truncation',
     );
 
-    $columnHeader = array(
+    $columnHeader = [
+      'check' => '',
       'contact_type' => '',
       'sort_name' => ts('Contact Name'),
       'amount' => ts('Amount'),
@@ -307,7 +308,8 @@ class CRM_Financial_Page_AJAX {
       'payment_method' => ts('Payment Method'),
       'status' => ts('Status'),
       'name' => ts('Type'),
-    );
+      'action' => ''
+    ];
 
     if ($sort && $sortOrder) {
       $params['sortBy'] = $sort . ' ' . $sortOrder;
@@ -344,121 +346,116 @@ class CRM_Financial_Page_AJAX {
       $params['total'] = $transactionsCount->count;
     }
 
-    $financialitems = array();
+    $financialitems = [];
     if ($statusID) {
-      $batchStatuses = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name', 'condition' => " v.value={$statusID}"));
-      $batchStatus = $batchStatuses[$statusID];
+      $batchStatus = CRM_Core_PseudoConstant::getLabel(
+        'CRM_Batch_DAO_Batch',
+        'status_id',
+        $statusID
+      );
     }
+    if (isset($notPresent)) {
+      $transactionLinks = CRM_Financial_Form_BatchTransaction::links();
+      $js = "enableActions('x')";
+    }
+    else {
+      $transactionLinks = CRM_Financial_Page_BatchTransaction::links();
+      $js = "enableActions('y')";
+    }
+    if (isset($batchStatus) && !in_array($batchStatus, ['Open', 'Reopened'])) {
+      unset($transactionLinks['remove']);
+    }
+
     while ($financialItem->fetch()) {
-      $row[$financialItem->id] = array();
+      $row[$financialItem->id] = [];
       foreach ($columnHeader as $columnKey => $columnValue) {
-        if ($financialItem->contact_sub_type && $columnKey == 'contact_type') {
-          $row[$financialItem->id][$columnKey] = $financialItem->contact_sub_type;
+        // Ignore action and check since its build later
+        if (in_array($columnKey, ['check', 'action'])) {
           continue;
         }
         $row[$financialItem->id][$columnKey] = $financialItem->$columnKey;
-        if ($columnKey == 'sort_name' && $financialItem->$columnKey && $financialItem->contact_id) {
+        if ($financialItem->contact_sub_type && $columnKey == 'contact_type') {
+          $row[$financialItem->id][$columnKey] = $financialItem->contact_sub_type;
+        }
+        elseif ($columnKey == 'sort_name' && $financialItem->$columnKey && $financialItem->contact_id) {
           $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=" . $financialItem->contact_id);
           $row[$financialItem->id][$columnKey] = '<a href=' . $url . '>' . $financialItem->$columnKey . '</a>';
         }
         elseif ($columnKey == 'payment_method' && $financialItem->$columnKey) {
-          $row[$financialItem->id][$columnKey] = CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $financialItem->$columnKey);
-          if ($row[$financialItem->id][$columnKey] == 'Check') {
+          $row[$financialItem->id][$columnKey] = CRM_Core_PseudoConstant::getLabel(
+            'CRM_Batch_BAO_Batch',
+            'payment_instrument_id',
+            $financialItem->$columnKey
+          );
+          if (CRM_Core_PseudoConstant::getName(
+              'CRM_Batch_BAO_Batch',
+              'payment_instrument_id',
+              $financialItem->$columnKey
+            ) == 'Check'
+          ) {
             $checkNumber = $financialItem->check_number ? ' (' . $financialItem->check_number . ')' : '';
             $row[$financialItem->id][$columnKey] = $row[$financialItem->id][$columnKey] . $checkNumber;
           }
         }
         elseif ($columnKey == 'amount' && $financialItem->$columnKey) {
-          $row[$financialItem->id][$columnKey] = CRM_Utils_Money::format($financialItem->$columnKey, $financialItem->currency);
+          $row[$financialItem->id][$columnKey] = CRM_Utils_Money::format(
+            $financialItem->$columnKey,
+            $financialItem->currency
+          );
         }
-        elseif ($columnKey == 'transaction_date' && $financialItem->$columnKey) {
-          $row[$financialItem->id][$columnKey] = CRM_Utils_Date::customFormat($financialItem->$columnKey);
-        }
-        elseif ($columnKey == 'receive_date' && $financialItem->$columnKey) {
-          $row[$financialItem->id][$columnKey] = CRM_Utils_Date::customFormat($financialItem->$columnKey);
+        elseif (in_array($columnKey, ['transaction_date', 'receive_date'])
+          && $financialItem->$columnKey
+        ) {
+          $row[$financialItem->id][$columnKey] = CRM_Utils_Date::customFormat(
+            $financialItem->$columnKey
+          );
         }
         elseif ($columnKey == 'status' && $financialItem->$columnKey) {
-          $row[$financialItem->id][$columnKey] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $financialItem->$columnKey);
-        }
-      }
-      if (isset($batchStatus) && in_array($batchStatus, array('Open', 'Reopened'))) {
-        if (isset($notPresent)) {
-          $js = "enableActions('x')";
-          $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_x_" . $financialItem->id . "' name='mark_x_" . $financialItem->id . "' value='1' onclick={$js}></input>";
-          $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
-            CRM_Financial_Form_BatchTransaction::links(),
-            NULL,
-            array(
-              'id' => $financialItem->id,
-              'contid' => $financialItem->contributionID,
-              'cid' => $financialItem->contact_id,
-            ),
-            ts('more'),
-            FALSE,
-            'financialItem.batch.row',
-            'FinancialItem',
-            $financialItem->id
-          );
-        }
-        else {
-          $js = "enableActions('y')";
-          $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_y_" . $financialItem->id . "' name='mark_y_" . $financialItem->id . "' value='1' onclick={$js}></input>";
-          $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
-            CRM_Financial_Page_BatchTransaction::links(),
-            NULL,
-            array(
-              'id' => $financialItem->id,
-              'contid' => $financialItem->contributionID,
-              'cid' => $financialItem->contact_id,
-            ),
-            ts('more'),
-            FALSE,
-            'financialItem.batch.row',
-            'FinancialItem',
-            $financialItem->id
+          $row[$financialItem->id][$columnKey] = CRM_Core_PseudoConstant::getLabel(
+            'CRM_Contribute_BAO_Contribution',
+            'contribution_status_id',
+            $financialItem->$columnKey
           );
         }
       }
-      else {
-        $row[$financialItem->id]['check'] = NULL;
-        $tempBAO = new CRM_Financial_Page_BatchTransaction();
-        $links = $tempBAO->links();
-        unset($links['remove']);
-        $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
-          $links,
-          NULL,
-          array(
-            'id' => $financialItem->id,
-            'contid' => $financialItem->contributionID,
-            'cid' => $financialItem->contact_id,
-          ),
-          ts('more'),
-          FALSE,
-          'financialItem.batch.row',
-          'FinancialItem',
-          $financialItem->id
-        );
+      $row[$financialItem->id]['check'] = NULL;
+      if (isset($batchStatus) && in_array($batchStatus, ['Open', 'Reopened'])) {
+        $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_x_" . $financialItem->id . "' name='mark_x_" . $financialItem->id . "' value='1' onclick={$js}></input>";
       }
+      $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
+        $transactionLinks,
+        NULL,
+        [
+          'id' => $financialItem->id,
+          'contid' => $financialItem->contributionID,
+          'cid' => $financialItem->contact_id,
+        ],
+        ts('more'),
+        FALSE,
+        'financialItem.batch.row',
+        'FinancialItem',
+        $financialItem->id
+      );
       if ($financialItem->contact_id) {
-        $row[$financialItem->id]['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage(CRM_Utils_Array::value('contact_sub_type', $row[$financialItem->id]) ? $row[$financialItem->id]['contact_sub_type'] : CRM_Utils_Array::value('contact_type', $row[$financialItem->id]), FALSE, $financialItem->contact_id);
+        $contactType = CRM_Utils_Array::value(
+          'contact_sub_type',
+          $row[$financialItem->id],
+          CRM_Utils_Array::value(
+            'contact_type',
+            $row[$financialItem->id]
+          )
+        );
+        $row[$financialItem->id]['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage(
+          $contactType,
+          FALSE,
+          $financialItem->contact_id
+        );
       }
       $financialitems = $row;
     }
 
     $iFilteredTotal = $iTotal = $params['total'];
-    $selectorElements = array(
-      'check',
-      'contact_type',
-      'sort_name',
-      'amount',
-      'trxn_id',
-      'transaction_date',
-      'receive_date',
-      'payment_method',
-      'status',
-      'name',
-      'action',
-    );
+    $selectorElements = array_keys($columnHeader);
 
     if ($return) {
       return CRM_Utils_JSON::encodeDataTableSelector($financialitems, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
