@@ -323,32 +323,27 @@ class CRM_Financial_Page_AJAX {
     $params['total'] = 0;
 
     // get batch list
+    $financialItem = CRM_Batch_BAO_Batch::getBatchFinancialItems(
+      $entityID,
+      $returnvalues,
+      $notPresent,
+      $params
+    );
+    $countSearchParams = NULL;
     if (isset($notPresent)) {
-      $financialItem = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityID, $returnvalues, $notPresent, $params);
-      if ($search) {
-        $unassignedTransactions = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityID, $returnvalues, $notPresent, $params, TRUE);
-      }
-      else {
-        $unassignedTransactions = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityID, $returnvalues, $notPresent, NULL, TRUE);
-      }
-      while ($unassignedTransactions->fetch()) {
-        $unassignedTransactionsCount[] = $unassignedTransactions->id;
-      }
-      if (!empty($unassignedTransactionsCount)) {
-        $params['total'] = count($unassignedTransactionsCount);
-      }
+      $countSearchParams = $params;
+    }
+    $transactionsCount = CRM_Batch_BAO_Batch::getBatchFinancialItems(
+      $entityID,
+      $returnvalues,
+      $notPresent,
+      $countSearchParams,
+      TRUE
+    );
+    if ($transactionsCount->fetch()) {
+      $params['total'] = $transactionsCount->count;
+    }
 
-    }
-    else {
-      $financialItem = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityID, $returnvalues, NULL, $params);
-      $assignedTransactions = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityID, $returnvalues);
-      while ($assignedTransactions->fetch()) {
-        $assignedTransactionsCount[] = $assignedTransactions->id;
-      }
-      if (!empty($assignedTransactionsCount)) {
-        $params['total'] = count($assignedTransactionsCount);
-      }
-    }
     $financialitems = array();
     if ($statusID) {
       $batchStatuses = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name', 'condition' => " v.value={$statusID}"));
