@@ -390,6 +390,9 @@ body.admin.com_civicrm .container-fluid.container-main {
 	padding: 0;
 	border-top: 1px solid #787878;
 }
+body.admin.com_civicrm.task-civicrmupgrade .container-fluid.container-main {
+	padding: 0 20px 20px;
+}
 body.admin.com_civicrm #crm-nav-menu-container {
 	padding-bottom: 0 !important;
 }
