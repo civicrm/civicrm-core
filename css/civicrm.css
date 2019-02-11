@@ -3874,21 +3874,21 @@ span.crm-status-icon {
   border: 1px solid grey;
 }
 
-ul.crm-search-setting-form-block-quicksearch_options-list {
+ul.crm-list {
   list-style: none;
   margin: 0 !important;
   padding-left: 0 !important;
   display: inline-block;
 }
 
-ul.crm-search-setting-form-block-quicksearch_options-list li {
+ul.crm-checkbox-list li {
   margin: 0 2px 2px 2px;
   padding: 0.4em;
   height: 14px;
   vertical-align: middle;
 }
 
-ul.crm-sortable *:hover {
+ul.crm-checkbox-sortable *:hover {
   cursor: move;
 }
 

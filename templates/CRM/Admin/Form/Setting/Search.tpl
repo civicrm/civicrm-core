@@ -78,16 +78,7 @@
         <tr class="crm-search-setting-form-block-quicksearch_options">
             <td class="label">{$form.quicksearch_options.label}</td>
             <td>
-                <ul class="crm-search-setting-form-block-quicksearch_options-list{if $quicksearch_options_sortable} crm-sortable{/if}">
-                {foreach from=$form.quicksearch_options item=quicksearch_option}
-                    {if is_array($quicksearch_option) && array_key_exists('html', $quicksearch_option)}
-                    <li class="ui-state-default">
-                        <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
-                        {$quicksearch_option.html}
-                    </li>
-                    {/if}
-                {/foreach}
-                </ul>
+                {include file="CRM/Core/SortableCheckboxes.tpl" checkboxes=$form.quicksearch_options jsUpdateHandler='handleCheckboxUpdate'}
                 <p class="description">{$setting_descriptions.quicksearch_options}</p>
                 {$form.sorted_quicksearch_options.html}
             </td>
@@ -121,18 +112,8 @@
 </div>
 {literal}
 <script type="text/javascript">
-CRM.$(function($) {
-    $('.crm-sortable').sortable({
-        update: function( event, ui ) {
-            var qsCheckboxes = $(event.target).find('input'),
-                sortedOptions = [];
-            for (var i = 0; i < qsCheckboxes.length; i++) {
-                sortedOptions.push(qsCheckboxes[i].name.split(/[\[\]]/)[1]);
-            }
-            $('#sortedQuicksearchOptions').val(sortedOptions);
-        }
-    });
-    $('.crm-sortable').disableSelection();
-});
+function handleCheckboxUpdate(sortedCheckboxes) {
+    CRM.$('#sortedQuicksearchOptions').val(sortedCheckboxes);
+}
 </script>
 {/literal}
