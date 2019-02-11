@@ -3873,3 +3873,27 @@ span.crm-status-icon {
   border-radius: 3px;
   border: 1px solid grey;
 }
+
+ul.crm-search-setting-form-block-quicksearch_options-list {
+  list-style: none;
+  margin: 0 !important;
+  padding-left: 0 !important;
+  /* width: 60%; */
+  display: inline-block;
+}
+
+ul.crm-search-setting-form-block-quicksearch_options-list li {
+  margin: 0 2px 2px 2px;
+  padding: 0.4em;
+  height: 14px;
+  vertical-align: middle;
+}
+
+ul.crm-sortable *:hover {
+  cursor: move;
+}
+
+ul.crm-sortable li input,
+ul.crm-sortable li tt {
+  cursor: default !important;
+}

@@ -240,10 +240,11 @@ return array(
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
     'quick_form_type' => 'CheckBoxes',
     'html_type' => 'checkboxes',
+    'sortable' => TRUE,
     'pseudoconstant' => array(
       'callback' => 'CRM_Core_SelectValues::quicksearchOptions',
     ),
-    'default' => array('sort_name', 'contact_id', 'external_identifier', 'first_name', 'last_name', 'email', 'phone_numeric', 'street_address', 'city', 'postal_code', 'job_title'),
+    'default' => NULL,
     'add' => '5.8',
     'title' => ts('Quicksearch options'),
     'is_domain' => '1',

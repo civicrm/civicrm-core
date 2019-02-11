@@ -234,6 +234,10 @@ trait CRM_Admin_Form_SettingTrait {
         else {
           $this->$add($setting, ts($props['title']), $options);
         }
+
+        $sortable = CRM_Utils_Array::value('sortable', $props, FALSE);
+        $this->assign("{$setting}_sortable", $sortable);
+
         // Migrate to using an array as easier in smart...
         $description = CRM_Utils_Array::value('description', $props);
         $descriptions[$setting] = $description;
