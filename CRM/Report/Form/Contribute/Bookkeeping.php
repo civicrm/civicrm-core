@@ -354,7 +354,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'trxn_date' => array(
             'title' => ts('Transaction Date'),
             'default' => TRUE,
-            'type' => CRM_Utils_Type::T_DATE,
+            'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           ),
           'trxn_id' => array(
             'title' => ts('Trans #'),
@@ -381,7 +381,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'trxn_date' => array(
             'title' => ts('Transaction Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_DATE,
+            'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           ),
           'status_id' => array(
             'title' => ts('Financial Transaction Status'),
