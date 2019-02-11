@@ -112,3 +112,21 @@
             <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 
 </div>
+{literal}
+<script type="text/javascript">
+CRM.$(function($) {
+    console.log($('.crm-sortable').sortable);
+    $('.crm-sortable').sortable({
+        update: function( event, ui ) {
+            var qsCheckboxes = $(event.target).find('input'),
+                sortedOptions = [];
+            for (var i = 0; i < qsCheckboxes.length; i++) {
+                sortedOptions.push(qsCheckboxes[i].name.split(/[\[\]]/)[1]);
+            }
+            $('#sortedQuicksearchOptions').val(sortedOptions);
+        }
+    });
+    $('.crm-sortable').disableSelection();
+});
+</script>
+{/literal}
