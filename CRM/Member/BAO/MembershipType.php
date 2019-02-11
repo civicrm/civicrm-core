@@ -281,7 +281,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     while ($membershipType->fetch()) {
       $membershipTypes[$membershipType->id] = $membershipType->name;
     }
-    $membershipType->free();
     return $membershipTypes;
   }
 
@@ -300,7 +299,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     $membershipType->id = $membershipTypeId;
     if ($membershipType->find(TRUE)) {
       CRM_Core_DAO::storeValues($membershipType, $membershipTypeDetails);
-      $membershipType->free();
       return $membershipTypeDetails;
     }
     else {

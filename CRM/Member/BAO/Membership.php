@@ -94,7 +94,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     $membership->id = $id;
 
     $membership->save();
-    $membership->free();
 
     if (empty($membership->contact_id) || empty($membership->status_id)) {
       // this means we are in renewal mode and are just updating the membership
@@ -545,8 +544,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         $defaults['active'] = TRUE;
       }
 
-      $membership->free();
-
       return $membership;
     }
 
@@ -702,7 +699,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       self::deleteRelatedMemberships($membership->id);
       self::deleteMembership($membership->id);
     }
-    $membership->free();
   }
 
   /**
@@ -1184,7 +1180,6 @@ AND civicrm_membership.is_test = %2";
       $memberDAO->end_date = CRM_Utils_Date::isoToMysql($memberDAO->end_date);
       $memberDAO->save();
       CRM_Core_DAO::storeValues($memberDAO, $currentMembership);
-      $memberDAO->free();
 
       $currentMembership['is_current_member'] = CRM_Core_DAO::getFieldValue(
         'CRM_Member_DAO_MembershipStatus',
@@ -1277,10 +1272,8 @@ SELECT c.contribution_page_id as pageID
       $relatedMembership->id = $membership->id;
       $relatedMembership->copyValues($params);
       $relatedMembership->save();
-      $relatedMembership->free();
     }
 
-    $membership->free();
   }
 
   /**
@@ -1407,7 +1400,6 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
           $nestedRelMembership->id = $membership->owner_membership_id;
           $nestedRelMembership->contact_id = $cid;
           $nestedRelationship = $nestedRelMembership->find(TRUE);
-          $nestedRelMembership->free();
         }
         if (!$nestedRelationship) {
           $relatedContacts[$cid] = $status;
@@ -1610,7 +1602,6 @@ FROM   civicrm_membership_type
         $membershipTypeValues[$dao->id][$mtField] = $dao->$mtField;
       }
     }
-    $dao->free();
 
     CRM_Utils_Hook::membershipTypeValues($form, $membershipTypeValues);
 
@@ -2168,7 +2159,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       ]);
       $count++;
     }
-    $deceasedDAO->free();
     return $count;
   }
 
@@ -2279,7 +2269,6 @@ WHERE      civicrm_membership.is_test = 0
     while ($dao1->fetch()) {
       self::processOverriddenUntilDateMembership($dao1);
     }
-    $dao1->free();
 
     $query = $baseQuery . " AND civicrm_membership.is_override IS NULL
      AND civicrm_membership.status_id NOT IN (%1, %2, %3, %4)
@@ -2351,7 +2340,6 @@ WHERE      civicrm_membership.is_test = 0
         $updateCount++;
       }
     }
-    $dao2->free();
     $result['is_error'] = 0;
     $result['messages'] = ts('Processed %1 membership records. Updated %2 records.', array(
       1 => $processCount,
