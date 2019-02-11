@@ -270,7 +270,7 @@ return array(
     'title' => ts('Default quicksearch option'),
     'is_domain' => '1',
     'is_contact' => 0,
-    'description' => ts("If set, this will be the default search field in the menubar quicksearch boxWhich fields can be searched on in the menubar quicksearch box."),
+    'description' => ts("If set, this will be the default search field in the menubar quicksearch box."),
     'help_text' => NULL,
   ),
 );
