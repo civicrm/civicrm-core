@@ -252,4 +252,25 @@ return array(
     'description' => ts("Which fields can be searched on in the menubar quicksearch box? Don't see your custom field here? Make sure it is marked as Searchable."),
     'help_text' => NULL,
   ),
+  'default_quicksearch_option' => array(
+    'group_name' => 'Search Preferences',
+    'group' => 'Search Preferences',
+    'name' => 'default_quicksearch_option',
+    'type' => 'string',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => array(
+      'class' => 'crm-select2',
+    ),
+    'pseudoconstant' => array(
+      'callback' => 'CRM_Core_SelectValues::quicksearchOptions',
+    ),
+    'default' => NULL,
+    'add' => '5.11',
+    'title' => ts('Default quicksearch option'),
+    'is_domain' => '1',
+    'is_contact' => 0,
+    'description' => ts("If set, this will be the default search field in the menubar quicksearch boxWhich fields can be searched on in the menubar quicksearch box."),
+    'help_text' => NULL,
+  ),
 );

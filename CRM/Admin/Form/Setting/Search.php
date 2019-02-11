@@ -50,6 +50,7 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
     'smartGroupCacheTimeout' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'defaultSearchProfileID' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'searchPrimaryDetailsOnly' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'default_quicksearch_option' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'quicksearch_options' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
   );
 
