@@ -769,14 +769,13 @@ WHERE li.contribution_id = %1";
           ));
           unset($updateFinancialItemInfoValues['financialTrxn']);
         }
-        elseif (!empty($updateFinancialItemInfoValues['link-financial-trxn']) && $newFinancialItem->amount != 0) {
+        elseif (empty($updateFinancialItemInfoValues['id']) && $newFinancialItem->amount != 0 && $trxn) {
           civicrm_api3('EntityFinancialTrxn', 'create', array(
             'entity_id' => $newFinancialItem->id,
             'entity_table' => 'civicrm_financial_item',
             'financial_trxn_id' => $trxn->id,
             'amount' => $newFinancialItem->amount,
           ));
-          unset($updateFinancialItemInfoValues['link-financial-trxn']);
         }
       }
     }
@@ -838,8 +837,6 @@ WHERE li.contribution_id = %1";
       ) {
         // calculate the amount difference, considered as financial item amount
         $updateFinancialItemInfoValues['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['line_total'] - $totalFinancialAmount;
-        // add a flag, later used to link financial trxn and this new financial item
-        $updateFinancialItemInfoValues['link-financial-trxn'] = TRUE;
         if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
           $updateFinancialItemInfoValues['tax']['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['entity_id']]['tax_amount'] - $previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount'];
           $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
