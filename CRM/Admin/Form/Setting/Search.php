@@ -72,9 +72,14 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
     $element = $this->getElement('contact_reference_options');
     $element->_elements[0]->_flagFrozen = TRUE;
 
-    // Freeze first element of quicksearch options
+    // Freeze the sort_name element of quicksearch options
     $element = $this->getElement('quicksearch_options');
-    $element->_elements[0]->_flagFrozen = TRUE;
+    foreach ($element->_elements as $e) {
+      if ($e->_attributes['id'] === 'sort_name') {
+        $e->_flagFrozen = TRUE;
+        break;
+      }
+    }
   }
 
   /**
