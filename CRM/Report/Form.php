@@ -1577,7 +1577,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     // CRM-16274 Determine if user has 'edit all contacts' or equivalent
     $permission = CRM_Core_Permission::getPermission();
-    if ($permission == CRM_Core_Permission::EDIT &&
+    if ($this->_instanceForm && $permission == CRM_Core_Permission::EDIT &&
       $this->_add2groupSupported
     ) {
       $this->addElement('select', 'groups', ts('Group'),
