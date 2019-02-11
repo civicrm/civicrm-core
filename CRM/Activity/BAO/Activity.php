@@ -2361,7 +2361,6 @@ AND cl.modified_id  = c.id
           $priorActivities[$index][$dao->activityID]['name'] = $dao->name;
           $priorActivities[$index][$dao->activityID]['date'] = $dao->date;
         }
-        $dao->free();
       }
     }
     return $priorActivities[$index];
@@ -2678,10 +2677,8 @@ AND cl.modified_id  = c.id
         $result = self::deleteActivity($activityParams);
       }
 
-      $activityContactOther->free();
     }
 
-    $activityContact->free();
     $transaction->commit();
 
     return $result;

@@ -309,7 +309,6 @@ class CRM_Activity_Page_AJAX {
     $mainActivity->save();
     $mainActivityId = $mainActivity->id;
     CRM_Activity_BAO_Activity::logActivityAction($mainActivity);
-    $mainActivity->free();
 
     // Mark previous activity as deleted. If it was a non-case activity
     // then just change the subject.
@@ -330,9 +329,7 @@ class CRM_Activity_Page_AJAX {
       }
       $otherActivity->save();
 
-      $caseActivity->free();
     }
-    $otherActivity->free();
 
     $targetContacts = array();
     if (!empty($params['targetContactIds'])) {
@@ -385,7 +382,6 @@ class CRM_Activity_Page_AJAX {
     $params['mainActivityId'] = $mainActivityId;
     CRM_Activity_BAO_Activity::copyExtendedActivityData($params);
     CRM_Utils_Hook::post('create', 'CaseActivity', $caseActivity->id, $caseActivity);
-    $caseActivity->free();
 
     return (array('error_msg' => $error_msg, 'newId' => $mainActivity->id));
   }
