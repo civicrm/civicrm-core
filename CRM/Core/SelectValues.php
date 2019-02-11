@@ -1131,7 +1131,7 @@ class CRM_Core_SelectValues {
    */
   public static function quicksearchOptions() {
     $includeEmail = civicrm_api3('setting', 'getvalue', array('name' => 'includeEmailInName', 'group' => 'Search Preferences'));
-    $options = [
+    $optionNames = [
       'sort_name' => $includeEmail ? ts('Name/Email') : ts('Name'),
       'contact_id' => ts('Contact ID'),
       'external_identifier' => ts('External ID'),
@@ -1144,6 +1144,11 @@ class CRM_Core_SelectValues {
       'postal_code' => ts('Postal Code'),
       'job_title' => ts('Job Title'),
     ];
+    $settings = civicrm_api3('Setting', 'getValue', array('name' => 'quicksearch_options'));
+    $options = [];
+    foreach($settings as $key => $setting) {
+      $options[$setting] = $optionNames[$setting];
+    }
     $custom = civicrm_api3('CustomField', 'get', [
       'return' => ['name', 'label', 'custom_group_id.title'],
       'custom_group_id.extends' => ['IN' => ['Contact', 'Individual', 'Organization', 'Household']],
