@@ -430,13 +430,15 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
   }
   if (isset($params['group'])) {
     $groups = $params['group'];
-    $allGroups = CRM_Core_PseudoConstant::group();
+    $groupsByTitle = CRM_Core_PseudoConstant::group();
+    $groupsByName = CRM_Contact_BAO_GroupContact::buildOptions('group_id', 'validate');
+    $allGroups = array_merge(array_flip($groupsByTitle), array_flip($groupsByName));
     if (is_array($groups) && in_array(key($groups), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
       // Get the groups array.
       $groupsArray = $groups[key($groups)];
       foreach ($groupsArray as &$group) {
-        if (!is_numeric($group) && array_search($group, $allGroups)) {
-          $group = array_search($group, $allGroups);
+        if (!is_numeric($group) && !empty($allGroups[$group])) {
+          $group = $allGroups[$group];
         }
       }
       // Now reset the $groups array with the ids not the titles.
@@ -445,17 +447,17 @@ function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
     // handle format like 'group' => array('title1', 'title2').
     elseif (is_array($groups)) {
       foreach ($groups as $k => &$group) {
-        if (!is_numeric($group) && array_search($group, $allGroups)) {
-          $group = array_search($group, $allGroups);
+        if (!is_numeric($group) && !empty($allGroups[$group])) {
+          $group = $allGroups[$group];
         }
-        if (!is_numeric($k) && array_search($k, $allGroups)) {
+        if (!is_numeric($k) && !empty($allGroups[$k])) {
           unset($groups[$k]);
-          $groups[array_search($k, $allGroups)] = $group;
+          $groups[$allGroups[$k]] = $group;
         }
       }
     }
-    elseif (!is_numeric($groups) &&  array_search($groups, $allGroups)) {
-      $groups = array_search($groups, $allGroups);
+    elseif (!is_numeric($groups) &&  !empty($allGroups[$groups])) {
+      $groups = $allGroups[$groups];
     }
     $params['group'] = $groups;
   }
