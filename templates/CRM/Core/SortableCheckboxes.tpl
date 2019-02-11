@@ -2,7 +2,7 @@
 {foreach from=$checkboxes item=checkbox}
     {if is_array($checkbox) && array_key_exists('html', $checkbox)}
     <li class="ui-state-default">
-        <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+        {if $sortable}<span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{/if}
         {$checkbox.html}
     </li>
     {/if}
