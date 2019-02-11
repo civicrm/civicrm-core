@@ -122,7 +122,6 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
-    console.log($('.crm-sortable').sortable);
     $('.crm-sortable').sortable({
         update: function( event, ui ) {
             var qsCheckboxes = $(event.target).find('input'),
