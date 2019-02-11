@@ -12,14 +12,7 @@
 <script type="text/javascript">
 CRM.$(function($) {
     $('.crm-sortable').sortable({
-        update: function( event, ui ) {
-            var checkboxes = $(event.target).find('input'),
-                sortedCheckboxes = [];
-            for (var i = 0; i < checkboxes.length; i++) {
-                sortedCheckboxes.push(checkboxes[i].name.split(/[\[\]]/)[1]);
-            }
-            {/literal}{if isset($jsUpdateHandler)}{$jsUpdateHandler}(sortedCheckboxes);{/if}{literal}
-        }
+        {/literal}{if isset($jsUpdateHandler)}update: {$jsUpdateHandler}{/if}{literal},
     });
     $('.crm-sortable').disableSelection();
 });

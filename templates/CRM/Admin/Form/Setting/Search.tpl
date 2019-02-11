@@ -112,7 +112,12 @@
 </div>
 {literal}
 <script type="text/javascript">
-function handleCheckboxUpdate(sortedCheckboxes) {
+function handleCheckboxUpdate(event) {
+    var checkboxes = $(event.target).find('input'),
+        sortedCheckboxes = [];
+    for (var i = 0; i < checkboxes.length; i++) {
+        sortedCheckboxes.push(checkboxes[i].name.split(/[\[\]]/)[1]);
+    }
     CRM.$('#sortedQuicksearchOptions').val(sortedCheckboxes);
 }
 </script>
