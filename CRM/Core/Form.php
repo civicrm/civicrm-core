@@ -603,6 +603,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->addElement('hidden', 'entryURL', $this->controller->_entryURL);
     }
 
+    // Hidden field to hold re-sorted quicksearch options
+    $this->addElement('hidden', 'sorted_quicksearch_options', '', [
+      'id' => 'sortedQuicksearchOptions',
+    ]);
+
     $this->buildQuickForm();
 
     $defaults = $this->setDefaultValues();

@@ -82,6 +82,7 @@
                 {/foreach}
                 </ul>
                 <p class="description">{$setting_descriptions.quicksearch_options}</p>
+                {$form.sorted_quicksearch_options.html}
             </td>
         </tr>
         <tr class="crm-search-setting-form-block-autocompleteContactSearch">
