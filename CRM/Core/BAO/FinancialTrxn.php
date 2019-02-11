@@ -454,6 +454,7 @@ WHERE ceft.entity_id = %1";
       return $value;
     }
 
+    // @todo - deprecate passing in entity & type - just figure out contribution id FIRST
     if ($entityName == 'participant') {
       $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $entityId, 'contribution_id', 'participant_id');
     }

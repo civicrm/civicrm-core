@@ -4000,7 +4000,8 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    *
    * @return mixed
    */
-  public static function getPaymentInfo($id, $component, $getTrxnInfo = FALSE, $usingLineTotal = FALSE) {
+  public static function getPaymentInfo($id, $component = 'contribution', $getTrxnInfo = FALSE, $usingLineTotal = FALSE) {
+    // @todo deprecate passing in component - always call with contribution.
     if ($component == 'event') {
       $entity = 'participant';
       $entityTable = 'civicrm_participant';

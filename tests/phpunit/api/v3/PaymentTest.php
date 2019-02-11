@@ -105,6 +105,39 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test email receipt for partial payment.
+   */
+  public function testPaymentEmailReceipt() {
+    $mut = new CiviMailUtils($this);
+    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+    $params = array(
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 50,
+    );
+    $payment = $this->callAPISuccess('payment', 'create', $params);
+    $this->checkPaymentResult($payment, [
+      $payment['id'] => [
+        'from_financial_account_id' => 7,
+        'to_financial_account_id' => 6,
+        'total_amount' => 50,
+        'status_id' => 1,
+        'is_payment' => 1,
+      ],
+    ]);
+
+    $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
+    $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet']);
+    $mut->checkMailLog(array(
+      'Dear Mr. Anthony Anderson II',
+      'Total Fees: $ 300.00',
+      'This Payment Amount: $ 50.00',
+      'Balance Owed: $ 100.00', //150 was paid in the 1st payment.
+      'Event Information and Location',
+    ));
+    $mut->stop();
+  }
+
+  /**
    * Test create payment api with no line item in params
    */
   public function testCreatePaymentNoLineItems() {
