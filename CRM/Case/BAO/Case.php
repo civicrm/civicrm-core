@@ -2195,8 +2195,6 @@ SELECT civicrm_contact.id as casemanager_id,
           }
         }
 
-        $mainCase->free();
-
         $mainCaseIds[] = $mainCaseId;
         //insert record for case contact.
         $otherCaseContact = new CRM_Case_DAO_CaseContact();
@@ -2213,9 +2211,7 @@ SELECT civicrm_contact.id as casemanager_id,
           if (!$mainCaseContact->find(TRUE)) {
             $mainCaseContact->save();
           }
-          $mainCaseContact->free();
         }
-        $otherCaseContact->free();
       }
       elseif (!$otherContactId) {
         $otherContactId = $mainContactId;
@@ -2299,8 +2295,6 @@ SELECT  id
         // insert log of all activities
         CRM_Activity_BAO_Activity::logActivityAction($mainActivity);
 
-        $otherActivity->free();
-        $mainActivity->free();
         $copiedActivityIds[] = $otherActivityId;
 
         //create case activity record.
@@ -2308,7 +2302,6 @@ SELECT  id
         $mainCaseActivity->case_id = $mainCaseId;
         $mainCaseActivity->activity_id = $mainActivityId;
         $mainCaseActivity->save();
-        $mainCaseActivity->free();
 
         //migrate source activity.
         $otherSourceActivity = new CRM_Activity_DAO_ActivityContact();
@@ -2327,9 +2320,7 @@ SELECT  id
           if (!$mainActivitySource->find(TRUE)) {
             $mainActivitySource->save();
           }
-          $mainActivitySource->free();
         }
-        $otherSourceActivity->free();
 
         //migrate target activities.
         $otherTargetActivity = new CRM_Activity_DAO_ActivityContact();
@@ -2348,9 +2339,7 @@ SELECT  id
           if (!$mainActivityTarget->find(TRUE)) {
             $mainActivityTarget->save();
           }
-          $mainActivityTarget->free();
         }
-        $otherTargetActivity->free();
 
         //migrate assignee activities.
         $otherAssigneeActivity = new CRM_Activity_DAO_ActivityContact();
@@ -2369,9 +2358,7 @@ SELECT  id
           if (!$mainAssigneeActivity->find(TRUE)) {
             $mainAssigneeActivity->save();
           }
-          $mainAssigneeActivity->free();
         }
-        $otherAssigneeActivity->free();
 
         // copy custom fields and attachments
         $aparams = array(
@@ -2417,14 +2404,12 @@ SELECT  id
           if (!$mainRelationship->find(TRUE)) {
             $mainRelationship->save();
           }
-          $mainRelationship->free();
 
           //get the other relationship ids to update end date.
           if ($updateOtherRel) {
             $otherRelationshipIds[$otherRelationship->id] = $otherRelationship->id;
           }
         }
-        $otherRelationship->free();
 
         //update other relationships end dates
         if (!empty($otherRelationshipIds)) {
@@ -2501,7 +2486,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       if (!$mergeActivityId) {
         continue;
       }
-      $mergeActivity->free();
 
       //connect merge activity to case.
       $mergeCaseAct = array(
@@ -3116,7 +3100,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       if (!$newRelationship->find(TRUE)) {
         $newRelationship->save();
       }
-      $newRelationship->free();
 
       // store relationship type of newly created relationship
       $relationshipTypes[] = $caseRelationships->relationship_type_id;
