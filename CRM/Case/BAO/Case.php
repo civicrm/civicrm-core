@@ -434,7 +434,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       'cov_status.label as case_status_name',
       't_act.status_id',
       'civicrm_case.start_date as case_start_date',
-      'IF(case_relationship.contact_id_b = $userID, case_relation_type.label_a_b, case_relation_type.label_b_a) as case_role',
+      "IF(case_relationship.contact_id_b = $userID, case_relation_type.label_a_b, case_relation_type.label_b_a) as case_role",
     );
 
     if ($type == 'upcoming') {
