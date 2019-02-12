@@ -3881,14 +3881,14 @@ ul.crm-list {
   display: inline-block;
 }
 
-ul.crm-checkbox-list li {
+ul.crm-list li {
   margin: 0 2px 2px 2px;
   padding: 0.4em;
   height: 14px;
   vertical-align: middle;
 }
 
-ul.crm-checkbox-sortable *:hover {
+ul.crm-sortable *:hover {
   cursor: move;
 }
 

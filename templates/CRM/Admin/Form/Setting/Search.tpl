@@ -78,7 +78,7 @@
         <tr class="crm-search-setting-form-block-quicksearch_options">
             <td class="label">{$form.quicksearch_options.label}</td>
             <td>
-                {include file="CRM/Core/SortableCheckboxes.tpl" checkboxes=$form.quicksearch_options jsUpdateHandler='handleCheckboxUpdate'}
+                {include file="CRM/Core/SortableList.tpl" list=$form.quicksearch_options jsUpdateHandler='handleCheckboxUpdate'}
                 <p class="description">{$setting_descriptions.quicksearch_options}</p>
                 {$form.sorted_quicksearch_options.html}
             </td>
