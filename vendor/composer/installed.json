@@ -109,6 +109,9 @@
         "extra": {
             "branch-alias": {
                 "dev-develop": "0.7-dev"
+            },
+            "patches_applied": {
+                "Fix Fatal error: Uncaught Dompdf Exception: No block-level parent found.": "tools/scripts/composer/patches/dompdf_no_block_level_parent_fix.patch"
             }
         },
         "installation-source": "dist",
@@ -541,6 +544,14 @@
         },
         "time": "2015-08-02T17:20:17+00:00",
         "type": "library",
+        "extra": {
+            "patches_applied": {
+                "CRM-8744 Display CiviCRM Specific error message": "tools/scripts/composer/patches/net-smtp-patch.patch",
+                "Fix PHP7 Compliance": "tools/scripts/composer/patches/net-smtp-php7-patch.patch",
+                "Fix Pass by reference issues": "tools/scripts/composer/patches/net-smtp-ref-patch.patch",
+                "Fix TLS support issue in PHP5.6": "tools/scripts/composer/patches/net-smtp-tls-patch.patch"
+            }
+        },
         "installation-source": "dist",
         "autoload": {
             "psr-0": {

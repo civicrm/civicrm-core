@@ -557,7 +557,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       define('DS', DIRECTORY_SEPARATOR);
       define('JPATH_BASE', $joomlaBase . '/administrator');
       require $joomlaBase . '/administrator/includes/defines.php';
-      require $joomlaBase . '/administrator/includes/framework.php';
     }
 
     // Get the framework.

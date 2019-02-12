@@ -1,6 +1,6 @@
 name = CiviCRM Theme
 description =  Define alternate themes for CiviCRM.
-version = 7.x-5.10.1
+version = 7.x-5.10.2
 core = 7.x
 package = CiviCRM
 project = civicrm

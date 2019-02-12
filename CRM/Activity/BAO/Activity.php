@@ -1821,7 +1821,6 @@ LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND 
     if ($smsProviderParams['To']) {
       // If phone number is specified use it
       $toPhoneNumber = trim($smsProviderParams['To']);
-      $doNotSms = FALSE;
     }
     elseif ($toID) {
       // No phone number specified, so find a suitable one for the contact
