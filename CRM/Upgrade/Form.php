@@ -45,7 +45,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * Minimum previous CiviCRM version we can directly upgrade from
    */
-  const MINIMUM_UPGRADABLE_VERSION = '4.1.3';
+  const MINIMUM_UPGRADABLE_VERSION = '4.2.9';
 
   /**
    * Minimum php version required to run (equal to or lower than the minimum install version)
