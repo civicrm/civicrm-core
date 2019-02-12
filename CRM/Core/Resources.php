@@ -609,10 +609,6 @@ class CRM_Core_Resources {
           'isFrontend' => $config->userFrameworkFrontend,
         ),
       );
-      $contactID = CRM_Core_Session::getLoggedInContactID();
-      if ($contactID) {
-        $settings['config']['menuCacheCode'] = CRM_Core_BAO_Navigation::getCacheKey($contactID);
-      }
       // Disable profile creation if user lacks permission
       if (!CRM_Core_Permission::check('edit all contacts') && !CRM_Core_Permission::check('add contacts')) {
         $settings['config']['entityRef']['contactCreate'] = FALSE;
@@ -685,6 +681,8 @@ class CRM_Core_Resources {
       'ajaxPopupsEnabled' => self::singleton()->ajaxPopupsEnabled,
       'allowAlertAutodismissal' => (bool) Civi::settings()->get('allow_alert_autodismissal'),
       'resourceCacheCode' => self::singleton()->getCacheCode(),
+      'locale' => CRM_Core_I18n::getLocale(),
+      'cid' => (int) CRM_Core_Session::getLoggedInContactID(),
     );
     print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $vars);
     CRM_Utils_System::civiExit();
@@ -746,9 +744,29 @@ class CRM_Core_Resources {
     // These scripts are only needed by back-office users
     if (CRM_Core_Permission::check('access CiviCRM')) {
       $items[] = "packages/jquery/plugins/jquery.tableHeader.js";
-      $items[] = "packages/jquery/plugins/jquery.menu.min.js";
-      $items[] = "css/civicrmNavigation.css";
       $items[] = "packages/jquery/plugins/jquery.notify.min.js";
+    }
+
+    $contactID = CRM_Core_Session::getLoggedInContactID();
+
+    // Menubar
+    $position = $contactID && CRM_Core_Permission::check('access CiviCRM') ? Civi::settings()->get('menubar_position') : 'none';
+    if ($position !== 'none' && !@constant('CIVICRM_DISABLE_DEFAULT_MENU') && !CRM_Core_Config::isUpgradeMode()) {
+      $cms = strtolower(CRM_Core_Config::singleton()->userFramework);
+      $cms = $cms === 'drupal' ? 'drupal7' : $cms;
+      $items[] = 'bower_components/smartmenus/dist/jquery.smartmenus.min.js';
+      $items[] = 'bower_components/smartmenus/dist/addons/keyboard/jquery.smartmenus.keyboard.min.js';
+      $items[] = 'js/crm.menubar.js';
+      $items[] = 'bower_components/smartmenus/dist/css/sm-core-css.css';
+      $items[] = 'css/crm-menubar.css';
+      $items[] = "css/menubar-$cms.css";
+      $items[] = [
+        'menubar' => [
+          'position' => $position ?: 'over-cms-menu',
+          'qfKey' => CRM_Core_Key::get('CRM_Contact_Controller_Search', TRUE),
+          'cacheCode' => CRM_Core_BAO_Navigation::getCacheKey($contactID),
+        ],
+      ];
     }
 
     // JS for multilingual installations

@@ -5,8 +5,7 @@
  * Other civi blocks outside the main container also have the class crm-container (but not the id)
  * All styles should start with .crm-container unless they are specific to the main div only
  */
-.crm-container input,
-#civicrm-menu input {
+.crm-container input {
   box-sizing: content-box;
 }
 
@@ -2922,7 +2921,6 @@ tbody.scrollContent tr.alternateRow {
 
 
 .crm-container div.status,
-div.m ul#civicrm-menu,
 .crm-container #help,
 .crm-container .help,
 .crm-container .ui-tabs-panel,

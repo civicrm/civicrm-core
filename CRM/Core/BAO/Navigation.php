@@ -300,51 +300,6 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
   }
 
   /**
-   * Build menu.
-   *
-   * @return string
-   */
-  public static function buildNavigation() {
-    $navigations = self::buildNavigationTree();
-    $navigationString = '';
-
-    // run the Navigation  through a hook so users can modify it
-    CRM_Utils_Hook::navigationMenu($navigations);
-    self::fixNavigationMenu($navigations);
-
-    // Hooks have added menu items in an arbitrary order. We need to order by
-    // weight again. I would put this function directly after
-    // CRM_Utils_Hook::navigationMenu but for some reason, fixNavigationMenu is
-    // moving items added by hooks on the end of the menu. Hence I do it
-    // afterwards
-    self::orderByWeight($navigations);
-
-    //skip children menu item if user don't have access to parent menu item
-    $skipMenuItems = array();
-    foreach ($navigations as $key => $value) {
-      // Home is a special case
-      if ($value['attributes']['name'] != 'Home') {
-        $name = self::getMenuName($value, $skipMenuItems);
-        if ($name) {
-          //separator before
-          if (isset($value['attributes']['separator']) && $value['attributes']['separator'] == 2) {
-            $navigationString .= '<li class="menu-separator"></li>';
-          }
-          $removeCharacters = array('/', '!', '&', '*', ' ', '(', ')', '.');
-          $navigationString .= '<li class="menumain crm-' . str_replace($removeCharacters, '_', $value['attributes']['label']) . '">' . $name;
-        }
-      }
-      self::recurseNavigation($value, $navigationString, $skipMenuItems);
-    }
-
-    // clean up - Need to remove empty <ul>'s, this happens when user don't have
-    // permission to access parent
-    $navigationString = str_replace('<ul></ul></li>', '', $navigationString);
-
-    return $navigationString;
-  }
-
-  /**
    * buildNavigationTree retreives items in order. We call this function to
    * ensure that any items added by the hook are also in the correct order.
    */
@@ -558,52 +513,6 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       }
     }
     return TRUE;
-  }
-
-  /**
-   * Create navigation for CiviCRM Admin Menu.
-   *
-   * @return string
-   *   returns navigation html
-   */
-  public static function createNavigation() {
-    $navigation = self::buildNavigation();
-
-    if ($navigation) {
-
-      //add additional navigation items
-      $logoutURL = CRM_Utils_System::url('civicrm/logout', 'reset=1');
-
-      // get home menu from db
-      $homeParams = array('name' => 'Home');
-      $homeNav = array();
-      $homeIcon = '<span class="crm-logo-sm" ></span>';
-      self::retrieve($homeParams, $homeNav);
-      if ($homeNav) {
-        $homeURL = self::makeFullyFormedUrl($homeNav['url']);
-        $homeLabel = $homeNav['label'];
-        // CRM-6804 (we need to special-case this as we don’t ts()-tag variables)
-        if ($homeLabel == 'Home') {
-          $homeLabel = ts('CiviCRM Home');
-        }
-      }
-      else {
-        $homeURL = CRM_Utils_System::url('civicrm/dashboard', 'reset=1');
-        $homeLabel = ts('CiviCRM Home');
-      }
-      // Link to hide the menubar
-      $hideLabel = ts('Hide Menu');
-
-      $prepandString = "
-        <li class='menumain crm-link-home'>$homeIcon
-          <ul id='civicrm-home'>
-            <li><a href='$homeURL'>$homeLabel</a></li>
-            <li><a href='#' class='crm-hidemenu'>$hideLabel</a></li>
-            <li><a href='$logoutURL' class='crm-logout-link'>" . ts('Log out') . "</a></li>
-          </ul>";
-      // <li> tag doesn't need to be closed
-    }
-    return $prepandString . $navigation;
   }
 
   /**
@@ -1049,6 +958,66 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       $key = self::resetNavigation($cid);
     }
     return $key;
+  }
+
+  /**
+   * Unset menu items for disabled components and non-permissioned users
+   *
+   * @param $menu
+   */
+  public static function filterByPermission(&$menu) {
+    foreach ($menu as $key => $item) {
+      if (
+        (array_key_exists('active', $item['attributes']) && !$item['attributes']['active']) ||
+        !CRM_Core_BAO_Navigation::checkPermission($item['attributes'])
+      ) {
+        unset($menu[$key]);
+        continue;
+      }
+      if (!empty($item['child'])) {
+        self::filterByPermission($menu[$key]['child']);
+      }
+    }
+  }
+
+  /**
+   * @param array $menu
+   */
+  public static function buildHomeMenu(&$menu) {
+    foreach ($menu as &$item) {
+      if (CRM_Utils_Array::value('name', $item['attributes']) === 'Home') {
+        unset($item['attributes']['label'], $item['attributes']['url']);
+        $item['attributes']['icon'] = 'crm-logo-sm';
+        $item['attributes']['attr']['accesskey'] = 'm';
+        $item['child'] = [
+          [
+            'attributes' => [
+              'label' => 'CiviCRM Home',
+              'name' => 'CiviCRM Home',
+              'url' => 'civicrm/dashboard?reset=1',
+              'weight' => 1,
+            ]
+          ],
+          [
+            'attributes' => [
+              'label' => 'Hide Menu',
+              'name' => 'Hide Menu',
+              'url' => '#hidemenu',
+              'weight' => 2,
+            ]
+          ],
+          [
+            'attributes' => [
+              'label' => 'Log out',
+              'name' => 'Log out',
+              'url' => 'civicrm/logout?reset=1',
+              'weight' => 3,
+            ]
+          ],
+        ];
+        return;
+      }
+    }
   }
 
 }

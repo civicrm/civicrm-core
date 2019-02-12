@@ -29,8 +29,6 @@
 
 <div id="crm-container" class="crm-container{if $urlIsPublic} crm-public{/if}" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 
-{crmNavigationMenu is_default=1}
-
 {if $breadcrumb}
   <div class="breadcrumb">
     {foreach from=$breadcrumb item=crumb key=key}
