@@ -954,7 +954,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
 
   /**
    * Returns array with statuses that are considered to make a recurring
-   * contribution inacteve.
+   * contribution inactive.
    *
    * @return array
    */
