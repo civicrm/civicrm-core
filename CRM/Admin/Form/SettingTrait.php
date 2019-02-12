@@ -321,10 +321,14 @@ trait CRM_Admin_Form_SettingTrait {
   protected function saveMetadataDefinedSettings($params) {
     $settings = $this->getSettingsToSetByMetadata($params);
     foreach ($settings as $setting => $settingValue) {
-      if ($this->getQuickFormType($this->getSettingMetadata($setting)) === 'CheckBoxes') {
+      $settingMetaData = $this->getSettingMetadata($setting);
+      if (isset($settingMetaData['sortable']) && $settingMetaData['sortable']) {
+        $settingValue = CRM_Utils_Request::retrieve($setting, 'String');
+      }
+      if ($this->getQuickFormType($settingMetaData) === 'CheckBoxes') {
         $settings[$setting] = array_keys($settingValue);
       }
-      if ($this->getQuickFormType($this->getSettingMetadata($setting)) === 'CheckBox') {
+      if ($this->getQuickFormType($settingMetaData) === 'CheckBox') {
         // This will be an array with one value.
         $settings[$setting] = (int) reset($settings[$setting]);
       }

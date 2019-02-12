@@ -19,7 +19,7 @@
 <script type="text/javascript">
 CRM.$(function($) {
   $('.crm-sortable').sortable({
-    {/literal}{if isset($jsUpdateHandler)}update: {$jsUpdateHandler}{/if}{literal},
+    {/literal}{if isset($jsUpdateHandler)}update: {$jsUpdateHandler},{/if}{literal}
   });
   $('.crm-sortable').disableSelection();
 });

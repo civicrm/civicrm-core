@@ -78,9 +78,8 @@
         <tr class="crm-search-setting-form-block-quicksearch_options">
             <td class="label">{$form.quicksearch_options.label}</td>
             <td>
-                {include file="CRM/Core/SortableList.tpl" list=$form.quicksearch_options jsUpdateHandler='handleCheckboxUpdate'}
+                {include file="CRM/Core/SortableList.tpl" list=$form.quicksearch_options}
                 <p class="description">{$setting_descriptions.quicksearch_options}</p>
-                {$form.sorted_quicksearch_options.html}
             </td>
         </tr>
         <tr class="crm-search-setting-form-block-autocompleteContactSearch">
@@ -110,15 +109,3 @@
             <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 
 </div>
-{literal}
-<script type="text/javascript">
-function handleCheckboxUpdate(event) {
-    var checkboxes = $(event.target).find('input'),
-        sortedCheckboxes = [];
-    for (var i = 0; i < checkboxes.length; i++) {
-        sortedCheckboxes.push(checkboxes[i].name.split(/[\[\]]/)[1]);
-    }
-    CRM.$('#sortedQuicksearchOptions').val(sortedCheckboxes);
-}
-</script>
-{/literal}

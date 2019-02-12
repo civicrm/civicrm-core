@@ -100,28 +100,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
 
-    self::enforceSorting($params);
     self::commonProcess($params);
-  }
-
-  /**
-   * Enforces quicksearch options to be saved in the sorting order done on the front end.
-   * 
-   * @param array $params
-   */
-  public function enforceSorting(&$params) {
-    if (strlen($params['sorted_quicksearch_options']) > 0) {
-      $qsOptions = $params['quicksearch_options'];
-      $sortedQSOptionsKeys = explode(',', $params['sorted_quicksearch_options']);
-      $sortedQSOptions = [];
-      foreach($sortedQSOptionsKeys as $sortedQSOptionsKey) {
-        if (isset($qsOptions[$sortedQSOptionsKey])) {
-          $sortedQSOptions[$sortedQSOptionsKey] = $qsOptions[$sortedQSOptionsKey];
-        }
-      }
-      $params['quicksearch_options'] = $sortedQSOptions;
-      unset($params['sorted_quicksearch_options']);
-    }
   }
 
   /**
