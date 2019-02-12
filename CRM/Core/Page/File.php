@@ -46,7 +46,7 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     $fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE);
     $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $hash = CRM_Utils_Request::retrieve('fcs', 'Alphanumeric', $this);
-    if (!self::validateFileHash($hash, $eid, $fid)) {
+    if (!CRM_Core_BAO_File::validateFileHash($hash, $eid, $fid)) {
       CRM_Core_Error::statusBounce('URL for file is not valid');
     }
 
@@ -82,30 +82,6 @@ class CRM_Core_Page_File extends CRM_Core_Page {
         $disposition
       );
     }
-  }
-
-  /**
-   * Validate a file Hash
-   * @param string $hash
-   * @param int $eid Entity Id the file is attached to
-   * @param int $fid File Id
-   * @return bool
-   */
-  public static function validateFileHash($hash, $eid, $fid) {
-    $input = CRM_Utils_System::explode('_', $hash, 3);
-    $inputTs = CRM_Utils_Array::value(1, $input);
-    $inputLF = CRM_Utils_Array::value(2, $input);
-    $testHash = CRM_Core_BAO_File::generateFileHash($eid, $fid, $inputTs, $inputLF);
-    if (hash_equals($testHash, $hash)) {
-      $now = time();
-      if ($inputTs + ($inputLF * 60 * 60) >= $now) {
-        return TRUE;
-      }
-      else {
-        return FALSE;
-      }
-    }
-    return FALSE;
   }
 
 }

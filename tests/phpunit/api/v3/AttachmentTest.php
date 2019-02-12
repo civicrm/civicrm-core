@@ -510,7 +510,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
       $queryResult = [];
       $parsedURl = parse_url($result['url']);
       $parsedQuery = parse_str($parsedURl['query'], $queryResult);
-      $this->assertTrue(CRM_Core_Page_File::validateFileHash($queryResult['fcs'], $queryResult['eid'], $queryResult['id']));
+      $this->assertTrue(CRM_Core_BAO_File::validateFileHash($queryResult['fcs'], $queryResult['eid'], $queryResult['id']));
     }
 
     sort($actualNames);
