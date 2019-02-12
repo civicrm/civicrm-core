@@ -55,6 +55,7 @@
       <tr>
         <th>{ts}Contact 1{/ts}</th>
         <th>{ts}Contact 2 (Duplicate){/ts}</th>
+        <th data-orderable="false"></th>
       </tr>
       </thead>
       <tbody>
