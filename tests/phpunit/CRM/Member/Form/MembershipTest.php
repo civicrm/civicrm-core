@@ -145,14 +145,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test CRM_Member_Form_Membership::buildQuickForm()
-   */
-  //function testCRMMemberFormMembershipBuildQuickForm()
-  //{
-  //    throw new PHPUnit_Framework_IncompleteTestError( "not implemented" );
-  //}
-
-  /**
    *  Test CRM_Member_Form_Membership::formRule() with a parameter
    *  that has an empty contact_select_id value
    */
@@ -1112,6 +1104,9 @@ Expires: ',
    * @return \CRM_Member_Form_Membership
    */
   protected function getForm() {
+    if (isset($_REQUEST['cid'])) {
+      unset($_REQUEST['cid']);
+    }
     $form = new CRM_Member_Form_Membership();
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Core_Controller();

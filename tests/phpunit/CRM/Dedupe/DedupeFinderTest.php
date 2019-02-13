@@ -85,7 +85,6 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     }
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
     $this->assertEquals(count($foundDupes), 4);
-    $this->markTestIncomplete('This currenctly fails - see https://lab.civicrm.org/dev/core/issues/397');
     CRM_Dedupe_Finder::dupes($ruleGroup['id']);
 
   }
