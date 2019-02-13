@@ -5102,14 +5102,13 @@ SELECT COUNT( conts.total_amount ) as total_count,
     if ($context == 'search') {
       $where .= " AND contact_a.is_deleted = 0 ";
     }
-
-    $query = $this->appendFinancialTypeWhereAndFromToQueryStrings($where, $from);
+    $r = $i;
+    $this->appendFinancialTypeWhereAndFromToQueryStrings($where, $from);
 
     // make sure contribution is completed - CRM-4989
     $completedWhere = $where . " AND civicrm_contribution.contribution_status_id = 1 ";
 
-    $summary = array();
-    $summary['total'] = array();
+    $summary = ['total' => []];
     $summary['total']['count'] = $summary['total']['amount'] = $summary['total']['avg'] = "n/a";
     $innerQuery = "SELECT civicrm_contribution.total_amount, COUNT(civicrm_contribution.total_amount) as civicrm_contribution_total_amount_count,
       civicrm_contribution.currency $from $completedWhere";
