@@ -769,11 +769,11 @@ AND       CEF.entity_id    = %2";
 
   /**
    * Generates a MD5 Hash to be appended to file URLS to be checked when trying to download the file.
-   * @param int $eid entity id the file is attached to
-   * @param int $fid file ID
+   * @param int $entityId entity id the file is attached to
+   * @param int $fileId file ID
    * @return string
    */
-  public static function generateFileHash($eid = NULL, $fid = NULL, $genTs = NULL, $life = NULL) {
+  public static function generateFileHash($entityId = NULL, $fileId = NULL, $genTs = NULL, $life = NULL) {
     // Use multiple (but stable) inputs for hash information.
     $siteKey = CRM_Utils_Constant::value('CIVICRM_SITE_KEY');
     if (!$siteKey) {
@@ -785,11 +785,11 @@ AND       CEF.entity_id    = %2";
     }
     if (!$life) {
       $days = Civi::settings()->get('checksum_timeout');
-      $live = 24 * $days;
+      $life = 24 * $days;
     }
     // Trim 8 chars off the string, make it slightly easier to find
     // but reveals less information from the hash.
-    $cs = hash_hmac('sha256', "{$fid}_{$life}", $siteKey);
+    $cs = hash_hmac('sha256', "entity={$entityId}&file={$fileId}&life={$life}", $siteKey);
     return "{$cs}_{$genTs}_{$life}";
   }
 

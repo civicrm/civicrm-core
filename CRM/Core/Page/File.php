@@ -42,11 +42,11 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     $download = CRM_Utils_Request::retrieve('download', 'Integer', $this, FALSE, 1);
     $disposition = $download == 0 ? 'inline' : 'download';
 
-    $eid = CRM_Utils_Request::retrieve('eid', 'Positive', $this, TRUE);
-    $fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $eid = CRM_Utils_Request::retrieve('eid', 'Positive', $this, TRUE); // Entity ID (e.g. Contact ID)
+    $fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE); // Field ID
+    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE); // File ID
     $hash = CRM_Utils_Request::retrieve('fcs', 'Alphanumeric', $this);
-    if (!CRM_Core_BAO_File::validateFileHash($hash, $eid, $fid)) {
+    if (!CRM_Core_BAO_File::validateFileHash($hash, $eid, $id)) {
       CRM_Core_Error::statusBounce('URL for file is not valid');
     }
 
