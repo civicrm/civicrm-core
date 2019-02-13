@@ -250,6 +250,10 @@ trait CRM_Core_Form_EntityFormTrait {
         // We can't load this field using metadata
         continue;
       }
+      if ($field != 'id' && $this->isDeleteContext()) {
+        // Delete forms don't generally present any fields to edit
+        continue;
+      }
       // Resolve action.
       if (empty($props['action'])) {
         $props['action'] = $this->getApiAction();
