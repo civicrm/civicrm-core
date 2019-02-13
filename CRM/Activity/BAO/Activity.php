@@ -3084,6 +3084,11 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
           $values['activity_id']
         );
 
+        $attachments = CRM_Core_BAO_File::paperIconAttachment('civicrm_activity', $values['activity_id']);
+        if (!empty($attachments)) {
+          $activity['links'] .= "<br />" . implode(' ', $attachments);
+        }
+
         if ($values['is_recurring_activity']) {
           $activity['is_recurring_activity'] = CRM_Core_BAO_RecurringEntity::getPositionAndCount($values['activity_id'], 'civicrm_activity');
         }
