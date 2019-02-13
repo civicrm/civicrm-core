@@ -1433,7 +1433,16 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         }
       }
       if ($name == 'rel_table_memberships') {
-        $elements[] = array('checkbox', "operation[move_{$name}][add]", NULL, ts('add new'));
+        //Enable 'add new' checkbox if main contact does not contain any membership similar to duplicate contact.
+        $attributes = ['checked' => 'checked'];
+        $otherContactMemberships = CRM_Member_BAO_Membership::getAllContactMembership($otherId);
+        foreach ($otherContactMemberships as $membership) {
+          $mainMembership = CRM_Member_BAO_Membership::getContactMembership($mainId, $membership['membership_type_id'], FALSE);
+          if ($mainMembership) {
+            $attributes = [];
+          }
+        }
+        $elements[] = array('checkbox', "operation[move_{$name}][add]", NULL, ts('add new'), $attributes);
         $migrationInfo["operation"]["move_{$name}"]['add'] = 1;
       }
     }
