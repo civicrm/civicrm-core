@@ -874,8 +874,8 @@ ORDER BY civicrm_custom_group.weight,
         $fileDAO->id = $dao->$fieldName;
 
         if ($fileDAO->find(TRUE)) {
-          $fileHash = CRM_Core_BAO_File::generateFileHash($dao->$entityIDName, $fileDAO->id);
           $entityIDName = "{$table}_entity_id";
+          $fileHash = CRM_Core_BAO_File::generateFileHash($dao->$entityIDName, $fileDAO->id);
           $customValue['id'] = $dao->$idName;
           $customValue['data'] = $fileDAO->uri;
           $customValue['fid'] = $fileDAO->id;
