@@ -58,16 +58,12 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   public function __construct() {
     parent::__construct();
 
-    $check = CRM_Core_Permission::check('access Contact Dashboard');
-
-    if (!$check) {
+    if (!CRM_Core_Permission::check('access Contact Dashboard')) {
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/dashboard', 'reset=1'));
     }
 
     $this->_contactId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
+    $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
 
     $userChecksum = $this->getUserChecksum();
     $validUser = FALSE;
