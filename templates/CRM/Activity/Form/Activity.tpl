@@ -32,8 +32,6 @@
     {/if}
     <div class="crm-block crm-form-block crm-activity-form-block">
   {/if}
-  {* added onload javascript for source contact*}
-  {include file="CRM/Activity/Form/ActivityJs.tpl" tokenContext="activity"}
   {if !$action or ( $action eq 1 ) or ( $action eq 2 ) }
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {/if}
