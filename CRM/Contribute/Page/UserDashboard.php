@@ -36,20 +36,33 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
    * called when action is browse.
    */
   public function listContribution() {
-    $controller = new CRM_Core_Controller_Simple(
-      'CRM_Contribute_Form_Search',
-      ts('Contributions'),
-      NULL,
-      FALSE, FALSE, TRUE, FALSE
-    );
-    $controller->setEmbedded(TRUE);
-    $controller->reset();
-    $controller->set('limit', 12);
-    $controller->set('cid', $this->_contactId);
-    $controller->set('context', 'user');
-    $controller->set('force', 1);
-    $controller->process();
-    $controller->run();
+    $rows = civicrm_api3('Contribution', 'get', [
+      'options' => ['limit' => 12],
+      'sequential' => 1,
+      'contact_id' => $this->_contactId,
+      'return' => [
+        'total_amount',
+        'contribution_recur_id',
+        'financial_type',
+        'receive_date',
+        'receipt_date',
+        'contribution_status',
+        'currency',
+        'amount_level',
+        'contact_id,',
+        'contribution_source',
+      ],
+    ])['values'];
+
+    foreach ($rows as $index => $row) {
+      // This is required for tpl logic. We should move away from hard-code this to adding an array of actions to the row
+      // which the tpl can iterate through - this should allow us to cope with competing attempts to add new buttons
+      // and allow extensions to assign new ones through the pageRun hook
+      $row[0]['contribution_status_name'] = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $row['contribution_status_id']);;
+    }
+
+    $this->assign('contribute_rows', $rows);
+    $this->assign('contributionSummary', ['total_amount' => civicrm_api3('Contribution', 'getcount', ['contact_id' => $this->_contactId])]);
 
     //add honor block
     $params = CRM_Contribute_BAO_Contribution::getHonorContacts($this->_contactId);
@@ -64,8 +77,6 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
     $recur->contact_id = $this->_contactId;
     $recur->is_test = 0;
     $recur->find();
-
-    $config = CRM_Core_Config::singleton();
 
     $recurStatus = CRM_Contribute_PseudoConstant::contributionStatus();
 
