@@ -1148,8 +1148,10 @@ class CRM_Core_SelectValues {
     $settings = civicrm_api3('Setting', 'getValue', array('name' => 'quicksearch_options'));
     $options = [];
     foreach($settings as $key => $setting) {
-      $options[$setting] = $optionNames[$setting];
-      unset($optionNames[$setting]);
+      if (isset($optionNames[$setting])) {
+        $options[$setting] = $optionNames[$setting];
+        unset($optionNames[$setting]);
+      }
     }
     // Not all options will be enabled so append the disabled options back into the array
     $options = array_merge($options, $optionNames);
