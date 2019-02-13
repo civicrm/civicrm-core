@@ -156,11 +156,11 @@ return array(
     'html_attributes' => array(
       //'class' => 'crm-select2',
     ),
-    'default' => '1228',
     'add' => '4.4',
     'title' => 'Default Country',
     'is_domain' => 1,
     'is_contact' => 0,
+    'is_required' => FALSE,
     'description' => 'This value is selected by default when adding a new contact address.',
     'help_text' => NULL,
     'pseudoconstant' => array(
