@@ -768,7 +768,8 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
-   * Generates a MD5 Hash to be appended to file URLS to be checked when trying to download the file.
+   * Generates an access-token for downloading a specific file.
+   *
    * @param int $entityId entity id the file is attached to
    * @param int $fileId file ID
    * @return string
@@ -794,17 +795,18 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
-   * Validate a file Hash
+   * Validate a file access token.
+   *
    * @param string $hash
-   * @param int $eid Entity Id the file is attached to
-   * @param int $fid File Id
+   * @param int $entityId Entity Id the file is attached to
+   * @param int $fileId File Id
    * @return bool
    */
-  public static function validateFileHash($hash, $eid, $fid) {
+  public static function validateFileHash($hash, $entityId, $fileId) {
     $input = CRM_Utils_System::explode('_', $hash, 3);
     $inputTs = CRM_Utils_Array::value(1, $input);
     $inputLF = CRM_Utils_Array::value(2, $input);
-    $testHash = CRM_Core_BAO_File::generateFileHash($eid, $fid, $inputTs, $inputLF);
+    $testHash = CRM_Core_BAO_File::generateFileHash($entityId, $fileId, $inputTs, $inputLF);
     if (hash_equals($testHash, $hash)) {
       $now = time();
       if ($inputTs + ($inputLF * 60 * 60) >= $now) {
