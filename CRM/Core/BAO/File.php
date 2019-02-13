@@ -784,7 +784,8 @@ AND       CEF.entity_id    = %2";
       $genTs = time();
     }
     if (!$life) {
-      $life = 24 * 2;
+      $days = Civi::settings()->get('checksum_timeout');
+      $live = 24 * $days;
     }
     // Trim 8 chars off the string, make it slightly easier to find
     // but reveals less information from the hash.
