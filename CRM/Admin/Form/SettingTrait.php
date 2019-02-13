@@ -323,17 +323,30 @@ trait CRM_Admin_Form_SettingTrait {
     foreach ($settings as $setting => $settingValue) {
       $settingMetaData = $this->getSettingMetadata($setting);
       if (isset($settingMetaData['sortable']) && $settingMetaData['sortable']) {
-        $settingValue = CRM_Utils_Request::retrieve($setting, 'String');
-      }
-      if ($this->getQuickFormType($settingMetaData) === 'CheckBoxes') {
+        $settings[$setting] = $this->getReorderedSettingData($setting, $settingValue);
+      } elseif ($this->getQuickFormType($settingMetaData) === 'CheckBoxes') {
         $settings[$setting] = array_keys($settingValue);
-      }
-      if ($this->getQuickFormType($settingMetaData) === 'CheckBox') {
+      } elseif ($this->getQuickFormType($settingMetaData) === 'CheckBox') {
         // This will be an array with one value.
         $settings[$setting] = (int) reset($settings[$setting]);
       }
     }
     civicrm_api3('setting', 'create', $settings);
+  }
+
+  /**
+   * @param string $setting
+   * @param array $settingValue
+   * 
+   * @return array
+   */
+  private function getReorderedSettingData($setting, $settingValue) {
+    // Get order from $_POST as $_POST maintains the order the sorted setting
+    // options were sent. You can simply assign data from $_POST directly to
+    // $settings[] but preference has to be given to data from Quickform.
+    $order = array_keys(\CRM_Utils_Request::retrieve($setting, 'String'));
+    $settingValueKeys = array_keys($settingValue);
+    return array_intersect($order, $settingValueKeys);
   }
 
 }
