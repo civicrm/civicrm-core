@@ -66,7 +66,7 @@ trait CRMTraits_Financial_FinancialACLTrait {
    * @return int Contact ID
    */
   protected function createLoggedInUserWithFinancialACL($aclPermissions = [['view', 'Donation']]) {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts'];
     $contactID = $this->createLoggedInUser();
     $this->addFinancialAclPermissions($aclPermissions);
     return $contactID;

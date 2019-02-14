@@ -714,18 +714,17 @@ civicrm_relationship.is_active = 1 AND
    * Test the summary query does not add an acl clause when acls not enabled..
    */
   public function testGetSummaryQueryWithFinancialACLDisabled() {
+    $this->createContributionsForSummaryQueryTests();
+
+    // Test the function directly
     $where = $from = NULL;
     $queryObject = new CRM_Contact_BAO_Query();
-    $query = $queryObject->appendFinancialTypeWhereAndFromToQueryStrings($where,
+    $queryObject->appendFinancialTypeWhereAndFromToQueryStrings($where,
       $from);
-    $this->assertEquals($where, $query[0]);
-    $this->assertEquals($from, $query[1]);
+    $this->assertEquals(NULL, $where);
+    $this->assertEquals(NULL, $from);
 
-    $contactID = $this->individualCreate();
-    $this->contributionCreate(['contact_id' => $contactID]);
-    $this->contributionCreate(['contact_id' => $contactID, 'total_amount' => 50]);
-    $this->contributionCreate(['contact_id' => $contactID, 'total_amount' => 50]);
-    $this->contributionCreate(['contact_id' => $contactID, 'total_amount' => 50, 'contribution_status_id' => 'Cancelled', 'cancel_date' => 'yesterday']);
+    // Test the function in action
     $queryObject = new CRM_Contact_BAO_Query([['contribution_source', '=', 'SSF', '', '']]);
     $summary = $queryObject->summaryContribution();
     $this->assertEquals([
@@ -738,8 +737,8 @@ civicrm_relationship.is_active = 1 AND
         'currencyCount' => 1,
         ],
       'cancel' => [
-        'count' => 1,
-        'amount' => '$ 50.00',
+        'count' => 2,
+        'amount' => '$ 100.00',
         'avg' => '$ 50.00',
       ],
     ], $summary);
@@ -750,16 +749,37 @@ civicrm_relationship.is_active = 1 AND
    */
   public function testGetSummaryQueryWithFinancialACLEnabled() {
     $where = $from = NULL;
+    $this->createContributionsForSummaryQueryTests();
     $this->enableFinancialACLs();
     $this->createLoggedInUserWithFinancialACL();
+
+    // Test the function directly
     $queryObject = new CRM_Contact_BAO_Query();
-    $query = $queryObject->appendFinancialTypeWhereAndFromToQueryStrings($where,
+    $queryObject->appendFinancialTypeWhereAndFromToQueryStrings($where,
       $from);
     $donationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation');
     $this->assertEquals(
       " LEFT JOIN civicrm_line_item li
                   ON civicrm_contribution.id = li.contribution_id AND
                      li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN ({$donationTypeID}) ", $from);
+
+    // Test the function in action
+    $queryObject = new CRM_Contact_BAO_Query([['contribution_source', '=', 'SSF', '', '']]);
+    $summary = $queryObject->summaryContribution();$this->assertEquals([
+      'total' => [
+        'avg' => '$ 75.00',
+        'amount' => '$ 150.00',
+        'count' => 2,
+        'mode' => 'N/A',
+        'median' => '$ 75.00',
+        'currencyCount' => 1,
+      ],
+      'cancel' => [
+        'count' => 1,
+        'amount' => '$ 50.00',
+        'avg' => '$ 50.00',
+      ],
+    ], $summary);
     $this->disableFinancialACLs();
   }
 
@@ -799,6 +819,33 @@ civicrm_relationship.is_active = 1 AND
     // Check other fv values are in params
     $this->assertEquals($modparams['membership_is_current_member'][2], $fv_orig['membership_is_current_member']);
     $this->assertEquals($modparams['member_is_primary'][2], $fv_orig['member_is_primary']);
+  }
+
+  protected function createContributionsForSummaryQueryTests() {
+    $contactID = $this->individualCreate();
+    $this->contributionCreate(['contact_id' => $contactID]);
+    $this->contributionCreate([
+      'contact_id' => $contactID,
+      'total_amount' => 50,
+      'financial_type_id' => 'Member Dues',
+    ]);
+    $this->contributionCreate([
+      'contact_id' => $contactID,
+      'total_amount' => 50
+    ]);
+    $this->contributionCreate([
+      'contact_id' => $contactID,
+      'total_amount' => 50,
+      'contribution_status_id' => 'Cancelled',
+      'cancel_date' => 'yesterday',
+    ]);
+    $this->contributionCreate([
+      'contact_id' => $contactID,
+      'total_amount' => 50,
+      'contribution_status_id' => 'Cancelled',
+      'cancel_date' => 'yesterday',
+      'financial_type_id' => 'Member Dues',
+    ]);
   }
 
 }
