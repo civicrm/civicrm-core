@@ -235,3 +235,49 @@ function _civicrm_api3_payment_cancel_spec(&$params) {
     ),
   );
 }
+
+/**
+ * Send a payment confirmation.
+ *
+ * @param array $params
+ *   Input parameters.
+ *
+ * @return array
+ * @throws Exception
+ */
+function civicrm_api3_payment_sendconfirmation($params) {
+  $allowedParams = [
+    'receipt_from_email',
+    'receipt_from_name',
+    'cc_receipt',
+    'bcc_receipt',
+    'receipt_text',
+    'id',
+  ];
+  $input = array_intersect_key($params, array_flip($allowedParams));
+  // use either the contribution or membership receipt, based on whether it’s a membership-related contrib or not
+  $result = CRM_Financial_BAO_Payment::sendConfirmation($input);
+  return civicrm_api3_create_success([
+    $params['id'] => [
+      'is_sent' => $result[0],
+      'subject' => $result[1],
+      'message_txt' => $result[2],
+      'message_html' => $result[3],
+  ]]);
+}
+
+/**
+ * Adjust Metadata for sendconfirmation action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_payment_sendconfirmation_spec(&$params) {
+  $params['id'] = array(
+    'api.required' => 1,
+    'title' => ts('Payment ID'),
+    'type' => CRM_Utils_Type::T_INT,
+  );
+}

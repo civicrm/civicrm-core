@@ -117,4 +117,158 @@ class CRM_Financial_BAO_Payment {
     return $trxn;
   }
 
+  /**
+   * Send an email confirming a payment that has been received.
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  public static function sendConfirmation($params) {
+
+    $entities = self::loadRelatedEntities($params['id']);
+    $sendTemplateParams = array(
+      'groupName' => 'msg_tpl_workflow_contribution',
+      'valueName' => 'payment_or_refund_notification',
+      'PDFFilename' => ts('notification') . '.pdf',
+      'contactId' => $entities['contact']['id'],
+      'toName' => $entities['contact']['display_name'],
+      'toEmail' => $entities['contact']['email'],
+      'tplParams' => self::getConfirmationTemplateParameters($entities),
+    );
+    return CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+  }
+
+  /**
+   * Load entities related to the current payment id.
+   *
+   * This gives us all the data we need to send an email confirmation but avoiding
+   * getting anything not tested for the confirmations. We retrieve the 'full' event as
+   * it has been traditionally assigned in full.
+   *
+   * @param int $id
+   *
+   * @return array
+   *   - contact = ['id' => x, 'display_name' => y, 'email' => z]
+   *   - event = [.... full event details......]
+   *   - contribution = ['id' => x],
+   *   - payment = [payment info + payment summary info]
+   */
+  protected static function loadRelatedEntities($id) {
+    $entities = [];
+    $contributionID = (int) civicrm_api3('EntityFinancialTrxn', 'getvalue', [
+      'financial_trxn_id' => $id,
+      'entity_table' => 'civicrm_contribution',
+      'return' => 'entity_id',
+    ]);
+    $entities['contribution'] = ['id' => $contributionID];
+    $entities['payment'] = array_merge(civicrm_api3('FinancialTrxn', 'getsingle', ['id' => $id]),
+      CRM_Contribute_BAO_Contribution::getPaymentInfo($contributionID)
+    );
+
+    $contactID = self::getPaymentContactID($contributionID);
+    list($displayName, $email)  = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
+    $entities['contact'] = ['id' => $contactID, 'display_name' => $displayName, 'email' => $email];
+
+    $participantRecords = civicrm_api3('ParticipantPayment', 'get', [
+      'contribution_id' => $contributionID,
+      'api.Participant.get' => ['return' => 'event_id'],
+      'sequential' => 1,
+    ])['values'];
+    if (!empty($participantRecords)) {
+      $entities['event'] = civicrm_api3('Event', 'getsingle', ['id' => $participantRecords[0]['api.Participant.get']['values'][0]['event_id']]);
+    }
+
+    return $entities;
+  }
+
+  /**
+   * @param int $contributionID
+   *
+   * @return int
+   */
+  public static function getPaymentContactID($contributionID) {
+    $contribution = civicrm_api3('Contribution', 'getsingle', [
+      'id' => $contributionID ,
+      'return' => ['contact_id'],
+    ]);
+    return (int) $contribution['contact_id'];
+  }
+  /**
+   * @param array $entities
+   *   Related entities as an array keyed by the various entities.
+   *
+   * @return array
+   *   Values required for the notification
+   *   - contact_id
+   *   - template_variables
+   *     - event (DAO of event if relevant)
+   */
+  public static function getConfirmationTemplateParameters($entities) {
+    $templateVariables = [
+      'contactDisplayName' => $entities['contact']['display_name'],
+      'totalAmount' => $entities['payment']['total'],
+      'amountOwed' => $entities['payment']['balance'],
+      'paymentAmount' => $entities['payment']['total_amount'],
+      'event' => NULL,
+      'component' => 'contribution',
+    ];
+    if (!empty($entities['event'])) {
+      $templateVariables['component'] = 'event';
+      $templateVariables['event'] = $entities['event'];
+    }
+
+    return self::filterUntestedTemplateVariables($templateVariables);
+  }
+
+  /**
+   * Filter out any untested variables.
+   *
+   * This just serves to highlight if any variables are added without a unit test also being added.
+   *
+   * (if hit then add a unit test for the param & add to this array).
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  public static function filterUntestedTemplateVariables($params) {
+    $testedTemplateVariables = [
+      'contactDisplayName',
+      'totalAmount',
+      'amountOwed',
+      'paymentAmount',
+      'event',
+      'component',
+    ];
+    // Need to do these before switching the form over...
+    $todoParams = [
+      'isRefund',
+      'totalPaid',
+      'refundAmount',
+      'paymentsComplete',
+      'receive_date',
+      'paidBy',
+      'checkNumber',
+      'contributeMode',
+      'isAmountzero',
+      'billingName',
+      'address',
+      'credit_card_type',
+      'credit_card_number',
+      'credit_card_exp_date',
+      'isShowLocation',
+      'location',
+      'eventEmail',
+      '$event.participant_role',
+    ];
+    $filteredParams = [];
+    foreach ($testedTemplateVariables as $templateVariable) {
+      // This will cause an a-notice if any are NOT set - by design. Ensuring
+      // they are set prevents leakage.
+      $filteredParams[$templateVariable] = $params[$templateVariable];
+    }
+    return $filteredParams;
+  }
+
 }
