@@ -779,10 +779,10 @@ SELECT g.*
         while ($dao->fetch()) {
           $groupIDs[] = $dao->id;
 
-          if (($dao->saved_search_id || $dao->children || $dao->parents) &&
-            $dao->cache_date == NULL
-          ) {
-            CRM_Contact_BAO_GroupContactCache::load($dao);
+          if (($dao->saved_search_id || $dao->children || $dao->parents)) {
+            if ($dao->cache_date == NULL) {
+              CRM_Contact_BAO_GroupContactCache::load($dao);
+            }
             $groupContactCacheClause = " UNION SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id IN (" . implode(', ', $groupIDs) . ")";
           }
 
