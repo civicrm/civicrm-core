@@ -180,6 +180,106 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_session = NULL;
 
   /**
+   * Check for any duplicates.
+   *
+   * Depending on form settings & usage scenario we potentially use the found id,
+   * create links to found ids or add an error.
+   *
+   * @param array $errors
+   * @param array $fields
+   * @param CRM_Profile_Form $form
+   *
+   * @return array
+   */
+  protected static function handleDuplicateChecking(&$errors, $fields, $form) {
+    if ($form->_mode == CRM_Profile_Form::MODE_CREATE) {
+      // fix for CRM-2888
+      $exceptions = [];
+    }
+    else {
+      // for edit mode we need to allow our own record to be a dupe match!
+      $exceptions = [$form->_session->get('userID')];
+    }
+    $contactType = CRM_Core_BAO_UFGroup::getContactType($form->_gid);
+    // If all profile fields is of Contact Type then consider
+    // profile is of Individual type(default).
+    if (!$contactType) {
+      $contactType = 'Individual';
+    }
+
+    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts(
+      $fields, $contactType,
+      ($form->_context === 'dialog' ? 'Supervised' : 'Unsupervised'),
+      $exceptions,
+      FALSE,
+      $form->_ruleGroupID
+    );
+    if ($ids) {
+      if ($form->_isUpdateDupe == 2) {
+        CRM_Core_Session::setStatus(ts('Note: this contact may be a duplicate of an existing record.'), ts('Possible Duplicate Detected'), 'alert');
+      }
+      elseif ($form->_isUpdateDupe == 1) {
+        if (!$form->_id) {
+          $form->_id = $ids[0];
+        }
+      }
+      else {
+        if ($form->_context == 'dialog') {
+          $contactLinks = CRM_Contact_BAO_Contact_Utils::formatContactIDSToLinks($ids, TRUE, TRUE);
+
+          $duplicateContactsLinks = '<div class="matching-contacts-found">';
+          $duplicateContactsLinks .= ts('One matching contact was found. ', [
+            'count' => count($contactLinks['rows']),
+            'plural' => '%count matching contacts were found.<br />',
+          ]);
+          if ($contactLinks['msg'] == 'view') {
+            $duplicateContactsLinks .= ts('You can View the existing contact.', [
+              'count' => count($contactLinks['rows']),
+              'plural' => 'You can View the existing contacts.',
+            ]);
+          }
+          else {
+            $duplicateContactsLinks .= ts('You can View or Edit the existing contact.', [
+              'count' => count($contactLinks['rows']),
+              'plural' => 'You can View or Edit the existing contacts.',
+            ]);
+          }
+          $duplicateContactsLinks .= '</div>';
+          $duplicateContactsLinks .= '<table class="matching-contacts-actions">';
+          $row = '';
+          for ($i = 0; $i < count($contactLinks['rows']); $i++) {
+            $row .= '  <tr>   ';
+            $row .= '    <td class="matching-contacts-name"> ';
+            $row .= $contactLinks['rows'][$i]['display_name'];
+            $row .= '    </td>';
+            $row .= '    <td class="matching-contacts-email"> ';
+            $row .= $contactLinks['rows'][$i]['primary_email'];
+            $row .= '    </td>';
+            $row .= '    <td class="action-items"> ';
+            $row .= $contactLinks['rows'][$i]['view'] . ' ';
+            $row .= $contactLinks['rows'][$i]['edit'];
+            $row .= '    </td>';
+            $row .= '  </tr>   ';
+          }
+
+          $duplicateContactsLinks .= $row . '</table>';
+          $duplicateContactsLinks .= "If you're sure this record is not a duplicate, click the 'Save Matching Contact' button below.";
+
+          $errors['_qf_default'] = $duplicateContactsLinks;
+
+          // let smarty know that there are duplicates
+          $template = CRM_Core_Smarty::singleton();
+          $template->assign('isDuplicate', 1);
+        }
+        else {
+          $errors['_qf_default'] = ts('A record already exists with the same information.');
+        }
+      }
+    }
+    return $errors;
+  }
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -893,12 +993,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
   public static function formRule($fields, $files, $form) {
     CRM_Utils_Hook::validateProfile($form->_ufGroup['name']);
 
-    $errors = array();
     // if no values, return
     if (empty($fields)) {
       return TRUE;
     }
 
+    $errors = [];
     $register = NULL;
 
     // hack we use a -1 in options to indicate that its registration
@@ -922,91 +1022,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $fields['phone-Primary'] = $fields['phone-Primary-1'];
       }
 
-      $ctype = CRM_Core_BAO_UFGroup::getContactType($form->_gid);
-      // If all profile fields is of Contact Type then consider
-      // profile is of Individual type(default).
-      if (!$ctype) {
-        $ctype = 'Individual';
-      }
-
-      if ($form->_mode == CRM_Profile_Form::MODE_CREATE) {
-        // fix for CRM-2888
-        $exceptions = array();
-      }
-      else {
-        // for edit mode we need to allow our own record to be a dupe match!
-        $exceptions = array($form->_session->get('userID'));
-      }
-
-      $ids = CRM_Contact_BAO_Contact::getDuplicateContacts(
-        $fields, $ctype,
-        ($form->_context === 'dialog' ? 'Supervised' : 'Unsupervised'),
-        $exceptions,
-        FALSE,
-        $form->_ruleGroupID
-      );
-      if ($ids) {
-        if ($form->_isUpdateDupe == 2) {
-          CRM_Core_Session::setStatus(ts('Note: this contact may be a duplicate of an existing record.'), ts('Possible Duplicate Detected'), 'alert');
-        }
-        elseif ($form->_isUpdateDupe == 1) {
-          if (!$form->_id) {
-            $form->_id = $ids[0];
-          }
-        }
-        else {
-          if ($form->_context == 'dialog') {
-            $contactLinks = CRM_Contact_BAO_Contact_Utils::formatContactIDSToLinks($ids, TRUE, TRUE);
-
-            $duplicateContactsLinks = '<div class="matching-contacts-found">';
-            $duplicateContactsLinks .= ts('One matching contact was found. ', array(
-              'count' => count($contactLinks['rows']),
-              'plural' => '%count matching contacts were found.<br />',
-            ));
-            if ($contactLinks['msg'] == 'view') {
-              $duplicateContactsLinks .= ts('You can View the existing contact.', array(
-                'count' => count($contactLinks['rows']),
-                'plural' => 'You can View the existing contacts.',
-              ));
-            }
-            else {
-              $duplicateContactsLinks .= ts('You can View or Edit the existing contact.', array(
-                'count' => count($contactLinks['rows']),
-                'plural' => 'You can View or Edit the existing contacts.',
-              ));
-            }
-            $duplicateContactsLinks .= '</div>';
-            $duplicateContactsLinks .= '<table class="matching-contacts-actions">';
-            $row = '';
-            for ($i = 0; $i < count($contactLinks['rows']); $i++) {
-              $row .= '  <tr>   ';
-              $row .= '    <td class="matching-contacts-name"> ';
-              $row .= $contactLinks['rows'][$i]['display_name'];
-              $row .= '    </td>';
-              $row .= '    <td class="matching-contacts-email"> ';
-              $row .= $contactLinks['rows'][$i]['primary_email'];
-              $row .= '    </td>';
-              $row .= '    <td class="action-items"> ';
-              $row .= $contactLinks['rows'][$i]['view'] . ' ';
-              $row .= $contactLinks['rows'][$i]['edit'];
-              $row .= '    </td>';
-              $row .= '  </tr>   ';
-            }
-
-            $duplicateContactsLinks .= $row . '</table>';
-            $duplicateContactsLinks .= "If you're sure this record is not a duplicate, click the 'Save Matching Contact' button below.";
-
-            $errors['_qf_default'] = $duplicateContactsLinks;
-
-            // let smarty know that there are duplicates
-            $template = CRM_Core_Smarty::singleton();
-            $template->assign('isDuplicate', 1);
-          }
-          else {
-            $errors['_qf_default'] = ts('A record already exists with the same information.');
-          }
-        }
-      }
+      self::handleDuplicateChecking($errors, $fields, $form);
     }
 
     foreach ($fields as $key => $value) {
