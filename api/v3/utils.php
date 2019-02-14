@@ -2069,7 +2069,11 @@ function _civicrm_api3_validate_integer(&$params, $fieldName, &$fieldInfo, $enti
       }
     }
     if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
-      _civicrm_api3_api_match_pseudoconstant($fieldValue, $entity, $fieldName, $fieldInfo, $op);
+      $additional_lookup_params = array();
+      if (strtolower($entity) == 'address' && $fieldName == 'state_province_id' && !empty($params['country_id'])) {
+        $additional_lookup_params = ['country_id' => $params['country_id']];
+      }
+      _civicrm_api3_api_match_pseudoconstant($fieldValue, $entity, $fieldName, $fieldInfo, $op, $additional_lookup_params);
     }
 
     // After swapping options, ensure we have an integer(s)
@@ -2213,10 +2217,11 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
  * @param string $fieldName : field name used in api call (not necessarily the canonical name)
  * @param array $fieldInfo : getfields meta-data
  * @param string $op
+ * @param array $additional_lookup_params
  *
  * @throws \API_Exception
  */
-function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldName, $fieldInfo, $op = '=') {
+function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldName, $fieldInfo, $op = '=', $additional_lookup_params = array()) {
   if (in_array($op, array('>', '<', '>=', '<=', 'LIKE', 'NOT LIKE'))) {
     return;
   }
@@ -2228,11 +2233,16 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
       // We need to get the options from the entity the field relates to.
       $entity = $fieldInfo['entity'];
     }
-    $options = civicrm_api($entity, 'getoptions', array(
+    $options_lookup_params = [
       'version' => 3,
       'field' => $fieldInfo['name'],
       'context' => 'validate',
-    ));
+    ];
+    if (!empty($additional_lookup_params)) {
+      $options_lookup_params = array_merge($additional_lookup_params, $options_lookup_params);
+    }
+    $options = civicrm_api($entity, 'getoptions', $options_lookup_params);
+
     $options = CRM_Utils_Array::value('values', $options, array());
   }
 

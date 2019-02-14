@@ -390,4 +390,24 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->assertEquals('Individual', $result['contact_id.contact_type']);
   }
 
+  /**
+   * Test Address create with a state name that at least two countries have, e.g. Maryland, United States vs. Maryland, Liberia
+   *
+   * @see https://lab.civicrm.org/dev/core/issues/725
+   */
+  public function testCreateAddressStateProvinceIDCorrectForCountry() {
+    $params = $this->_params;
+    $params['sequential'] = 1;
+    $params['country_id'] = '1228'; // United States country id
+    $params['state_province_id'] = 'Maryland';
+    $params['city'] = 'Baltimore';
+    $params['street_address'] = '600 N Charles St.';
+    $params['postal_code'] = '21201';
+    unset($params['street_name']);
+    unset($params['street_number']);
+    $address1 = $this->callAPISuccess('address', 'create', $params);
+    // should find state_province_id of 1019, Maryland, United States ... NOT 3497, Maryland, Liberia
+    $this->assertEquals('1019', $address1['values'][0]['state_province_id']);
+  }
+
 }
