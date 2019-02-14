@@ -98,11 +98,10 @@ class CRM_Utils_ReCAPTCHA {
       require_once 'packages/recaptcha/recaptchalib.php';
     }
 
-    // See if we are using SSL
-    if (CRM_Utils_System::isSSL()) {
-      $useSSL = TRUE;
-    }
-    $html = recaptcha_get_html($config->recaptchaPublicKey, $error, $useSSL);
+    // Load the Recaptcha api.js over HTTPS
+    $useHTTPS = TRUE;
+
+    $html = recaptcha_get_html($config->recaptchaPublicKey, $error, $useHTTPS);
 
     $form->assign('recaptchaHTML', $html);
     $form->assign('recaptchaOptions', $config->recaptchaOptions);
