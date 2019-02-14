@@ -3018,6 +3018,10 @@ class CRM_Contact_BAO_Query {
         $regularGroupIDs = array_merge($regularGroupIDs, $childGroupIds);
       }
 
+      if (empty($regularGroupIDs)) {
+        $regularGroupIDs = [0];
+      }
+
       // if $regularGroupIDs is populated with regular child group IDs
       //   then change the mysql operator to desired
       if (count($regularGroupIDs) > 1) {
