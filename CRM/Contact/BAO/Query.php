@@ -3909,7 +3909,7 @@ WHERE  $smartGroupClause
       }
     }
     list($qillop, $qillVal) = self::buildQillForFieldValue(NULL, 'changed_by', $name, 'LIKE');
-    $this->_qill[$grouping][] = ts("%1 %2 %3", [
+    $this->_qill[$grouping][] = ts("%1 %2 '%3'", [
       1 => $fieldTitle,
       2 => $qillop,
       3 => $qillVal,
