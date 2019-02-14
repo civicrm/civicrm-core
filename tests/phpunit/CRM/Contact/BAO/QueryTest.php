@@ -720,6 +720,29 @@ civicrm_relationship.is_active = 1 AND
       $from);
     $this->assertEquals($where, $query[0]);
     $this->assertEquals($from, $query[1]);
+
+    $contactID = $this->individualCreate();
+    $this->contributionCreate(['contact_id' => $contactID]);
+    $this->contributionCreate(['contact_id' => $contactID, 'total_amount' => 50]);
+    $this->contributionCreate(['contact_id' => $contactID, 'total_amount' => 50]);
+    $this->contributionCreate(['contact_id' => $contactID, 'total_amount' => 50, 'contribution_status_id' => 'Cancelled', 'cancel_date' => 'yesterday']);
+    $queryObject = new CRM_Contact_BAO_Query([['contribution_source', '=', 'SSF', '', '']]);
+    $summary = $queryObject->summaryContribution();
+    $this->assertEquals([
+      'total' => [
+        'avg' => '$ 66.67',
+        'amount' => '$ 200.00',
+        'count' => 3,
+        'mode' => '$ 50.00',
+        'median' => '$ 50.00',
+        'currencyCount' => 1,
+        ],
+      'cancel' => [
+        'count' => 1,
+        'amount' => '$ 50.00',
+        'avg' => '$ 50.00',
+      ],
+    ], $summary);
   }
 
   /**
