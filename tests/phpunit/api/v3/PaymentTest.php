@@ -113,6 +113,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $params = array(
       'contribution_id' => $contribution['id'],
       'total_amount' => 50,
+      'check_number' => '345',
+      'trxn_date' => '2018-08-13 17:57:56',
     );
     $payment = $this->callAPISuccess('payment', 'create', $params);
     $this->checkPaymentResult($payment, [
@@ -133,6 +135,9 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'This Payment Amount: $ 50.00',
       'Balance Owed: $ 100.00', //150 was paid in the 1st payment.
       'Event Information and Location',
+      'Paid By: Check',
+      'Check Number: 345',
+      'Transaction Date: August 13th, 2018  5:57 PM',
     ));
     $mut->stop();
   }

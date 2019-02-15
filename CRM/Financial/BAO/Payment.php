@@ -212,6 +212,9 @@ class CRM_Financial_BAO_Payment {
       'paymentAmount' => $entities['payment']['total_amount'],
       'event' => NULL,
       'component' => 'contribution',
+      'checkNumber' => CRM_Utils_Array::value('check_number', $entities['payment']),
+      'receive_date' => $entities['payment']['trxn_date'],
+      'paidBy' => CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $entities['payment']['payment_instrument_id']),
     ];
     if (!empty($entities['event'])) {
       $templateVariables['component'] = 'event';
@@ -240,6 +243,9 @@ class CRM_Financial_BAO_Payment {
       'paymentAmount',
       'event',
       'component',
+      'checkNumber',
+      'receive_date',
+      'paidBy',
     ];
     // Need to do these before switching the form over...
     $todoParams = [
@@ -247,9 +253,6 @@ class CRM_Financial_BAO_Payment {
       'totalPaid',
       'refundAmount',
       'paymentsComplete',
-      'receive_date',
-      'paidBy',
-      'checkNumber',
       'contributeMode',
       'isAmountzero',
       'billingName',
