@@ -264,9 +264,6 @@ class CRM_Financial_BAO_Payment {
     ];
     // Need to do these before switching the form over...
     $todoParams = [
-
-
-
       'paymentsComplete',
       'contributeMode',
       'billingName',

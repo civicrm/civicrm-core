@@ -144,12 +144,19 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'streety street',
     ));
     $mut->stop();
+    $mut->clearMessages();
   }
 
   /**
    * Test email receipt for partial payment.
+   *
+   * @dataProvider getThousandSeparators
+   *
+   * @param string $thousandSeparator
    */
-  public function testRefundEmailReceipt() {
+  public function testRefundEmailReceipt($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
+    $decimalSeparator = ($thousandSeparator === ',' ? '.' : ',');
     $mut = new CiviMailUtils($this);
     list($lineItems, $contribution) = $this->createParticipantWithContribution();
     $this->callAPISuccess('payment', 'create', [
@@ -179,14 +186,15 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $mut->assertSubjects(['Refund Notification - Annual CiviCRM meet']);
     $mut->checkMailLog(array(
       'Dear Mr. Anthony Anderson II',
-      'Total Fees: $ 300.00',
-      'Refund Amount: $ -30.00',
+      'Total Fees: $ 300' . $decimalSeparator . '00',
+      'Refund Amount: $ -30' . $decimalSeparator . '00',
       'Event Information and Location',
       'Paid By: Check',
       'Transaction Date: November 13th, 2018 12:01 PM',
-      'You Paid: $ 170.00',
+      'You Paid: $ 170' . $decimalSeparator . '00',
     ));
     $mut->stop();
+    $mut->clearMessages();
   }
 
   /**
