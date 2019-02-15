@@ -264,7 +264,10 @@ class CRM_Financial_BAO_Payment {
       'totalPaid',
       'paymentsComplete',
     ];
-    // Need to do these before switching the form over...
+    // These are assigned by the payment form - they still 'get through' from the
+    // form for now without being in here but we should ideally load
+    // and assign. Note we should update the tpl to use {if $billingName}
+    // and ditch contributeMode - although it might need to be deprecated rather than removed.
     $todoParams = [
       'contributeMode',
       'billingName',
@@ -272,8 +275,6 @@ class CRM_Financial_BAO_Payment {
       'credit_card_type',
       'credit_card_number',
       'credit_card_exp_date',
-      'eventEmail',
-      '$event.participant_role',
     ];
     $filteredParams = [];
     foreach ($testedTemplateVariables as $templateVariable) {
