@@ -6544,7 +6544,8 @@ AND   displayRelType.is_active = 1
    * @return array
    */
   protected function addBasicStatsToSummary(&$summary, $where, $from) {
-    $summary['total']['count'] = $summary['total']['amount'] = $summary['total']['avg'] = "n/a";
+    $summary['total']['count'] = 0;
+    $summary['total']['amount'] = $summary['total']['avg'] = [];
 
     $query = "
       SELECT COUNT( conts.total_amount ) as total_count,
@@ -6562,8 +6563,6 @@ AND   displayRelType.is_active = 1
 
     $dao = CRM_Core_DAO::executeQuery($query);
 
-    $summary['total']['count'] = 0;
-    $summary['total']['amount'] = $summary['total']['avg'] = [];
     while ($dao->fetch()) {
       $summary['total']['count'] += $dao->total_count;
       $summary['total']['amount'][] = CRM_Utils_Money::format($dao->total_amount, $dao->currency);
