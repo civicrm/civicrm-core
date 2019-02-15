@@ -5096,23 +5096,13 @@ civicrm_relationship.start_date > {$today}
       $where .= " AND contact_a.is_deleted = 0 ";
     }
 
-    // hack $select
-    $select = "
-SELECT COUNT( conts.total_amount ) as total_count,
-       SUM(   conts.total_amount ) as total_amount,
-       AVG(   conts.total_amount ) as total_avg,
-       conts.currency              as currency";
-
     $this->appendFinancialTypeWhereAndFromToQueryStrings($where, $from);
 
     $summary = ['total' => []];
     $this->addBasicStatsToSummary($summary, $where, $from);
     $this->addModeToStats($summary, $from, $where);
+    $this->addMedianToStats($summary, $where, $from);
 
-    // make sure contribution is completed - CRM-4989
-    $completedWhere = $where . " AND civicrm_contribution.contribution_status_id = 1 ";
-    $medianSQL = "{$from} {$completedWhere}";
-    $summary['total']['median'] = CRM_Contribute_BAO_Contribution::computeStats('median', $medianSQL, 'civicrm_contribution');
     $summary['total']['currencyCount'] = count($summary['total']['median']);
 
     if (!empty($summary['total']['amount'])) {
@@ -5127,9 +5117,13 @@ SELECT COUNT( conts.total_amount ) as total_count,
 
     // soft credit summary
     if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
-      $softCreditWhere = "{$completedWhere} AND civicrm_contribution_soft.id IS NOT NULL";
+      $softCreditWhere = "$where AND civicrm_contribution.contribution_status_id = 1 AND civicrm_contribution_soft.id IS NOT NULL";
       $query = "
-        $select FROM (
+        SELECT COUNT( conts.total_amount ) as total_count,
+          SUM(   conts.total_amount ) as total_amount,
+          AVG(   conts.total_amount ) as total_avg,
+          conts.currency              as currency
+        FROM (
           SELECT civicrm_contribution_soft.amount as total_amount, civicrm_contribution_soft.currency $from $softCreditWhere
           GROUP BY civicrm_contribution_soft.id
         ) as conts
@@ -6686,6 +6680,24 @@ AND   displayRelType.is_active = 1
       GROUP BY currency";
 
     $summary['total']['mode'] = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
+  }
+
+  /**
+   * Add the median to the stats.
+   *
+   * Note that is can be a very slow query - taking many many minutes and even on a small
+   * data set it's likely to take longer than all the other queries combined by a significant
+   * multiple
+   *
+   * see https://lab.civicrm.org/dev/core/issues/720
+   *
+   * @param array $summary
+   * @param string $where
+   * @param string $from
+   */
+  protected function addMedianToStats(&$summary, $where, $from) {
+    $medianSQL = "{$from} {$where} AND civicrm_contribution.contribution_status_id = 1 ";
+    $summary['total']['median'] = CRM_Contribute_BAO_Contribution::computeStats('median', $medianSQL, 'civicrm_contribution');
   }
 
 }
