@@ -216,6 +216,7 @@ class CRM_Financial_BAO_Payment {
       'contactDisplayName' => $entities['contact']['display_name'],
       'totalAmount' => $entities['payment']['total'],
       'amountOwed' => $entities['payment']['balance'],
+      'totalPaid' => $entities['payment']['paid'],
       'paymentAmount' => $entities['payment']['total_amount'],
       'checkNumber' => CRM_Utils_Array::value('check_number', $entities['payment']),
       'receive_date' => $entities['payment']['trxn_date'],
@@ -224,6 +225,9 @@ class CRM_Financial_BAO_Payment {
       'location' => CRM_Utils_Array::value('location', $entities),
       'event' => CRM_Utils_Array::value('event', $entities),
       'component' => (!empty($entities['event']) ? 'event' : 'contribution'),
+      'isRefund' => $entities['payment']['total_amount'] < 0,
+      'isAmountzero' => $entities['payment']['total_amount'] === 0,
+      'refundAmount' => ($entities['payment']['total_amount'] < 0 ? $entities['payment']['total_amount'] : NULL),
     ];
 
     return self::filterUntestedTemplateVariables($templateVariables);
@@ -253,15 +257,18 @@ class CRM_Financial_BAO_Payment {
       'paidBy',
       'isShowLocation',
       'location',
+      'isRefund',
+      'isAmountzero',
+      'refundAmount',
+      'totalPaid',
     ];
     // Need to do these before switching the form over...
     $todoParams = [
-      'isRefund',
-      'totalPaid',
-      'refundAmount',
+
+
+
       'paymentsComplete',
       'contributeMode',
-      'isAmountzero',
       'billingName',
       'address',
       'credit_card_type',
