@@ -1,6 +1,6 @@
 name = CiviCRM
 description = Constituent relationship management system. Allows sites to manage contacts, relationships and groups, and track contact activities, contributions, memberships and events. See the <a href="https://civicrm.org/">CiviCRM website</a> for more information.
-version = 7.x-5.10.2
+version = 7.x-5.10.3
 package = CiviCRM
 core = 7.x
 project = civicrm

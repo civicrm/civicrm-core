@@ -42,15 +42,15 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     $download = CRM_Utils_Request::retrieve('download', 'Integer', $this, FALSE, 1);
     $disposition = $download == 0 ? 'inline' : 'download';
 
-    $eid = CRM_Utils_Request::retrieve('eid', 'Positive', $this, TRUE);
-    $fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $entityId = CRM_Utils_Request::retrieve('eid', 'Positive', $this, TRUE); // Entity ID (e.g. Contact ID)
+    $fieldId = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE); // Field ID
+    $fileId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE); // File ID
     $hash = CRM_Utils_Request::retrieve('fcs', 'Alphanumeric', $this);
-    if (!self::validateFileHash($hash, $eid, $fid)) {
+    if (!CRM_Core_BAO_File::validateFileHash($hash, $entityId, $fileId)) {
       CRM_Core_Error::statusBounce('URL for file is not valid');
     }
 
-    list($path, $mimeType) = CRM_Core_BAO_File::path($id, $eid);
+    list($path, $mimeType) = CRM_Core_BAO_File::path($fileId, $entityId);
     $mimeType = CRM_Utils_Request::retrieveValue('mime-type', 'String', $mimeType, FALSE);
 
     if (!$path) {
@@ -64,7 +64,7 @@ class CRM_Core_Page_File extends CRM_Core_Page {
 
     if ($action & CRM_Core_Action::DELETE) {
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
-        CRM_Core_BAO_File::deleteFileReferences($id, $eid, $fid);
+        CRM_Core_BAO_File::deleteFileReferences($fileId, $entityId, $fieldId);
         CRM_Core_Session::setStatus(ts('The attached file has been deleted.'), ts('Complete'), 'success');
 
         $session = CRM_Core_Session::singleton();
@@ -82,30 +82,6 @@ class CRM_Core_Page_File extends CRM_Core_Page {
         $disposition
       );
     }
-  }
-
-  /**
-   * Validate a file Hash
-   * @param string $hash
-   * @param int $eid Entity Id the file is attached to
-   * @param int $fid File Id
-   * @return bool
-   */
-  public static function validateFileHash($hash, $eid, $fid) {
-    $input = CRM_Utils_System::explode('_', $hash, 3);
-    $inputTs = CRM_Utils_Array::value(1, $input);
-    $inputLF = CRM_Utils_Array::value(2, $input);
-    $testHash = CRM_Core_BAO_File::generateFileHash($eid, $fid, $inputTs, $inputLF);
-    if (hash_equals($testHash, $hash)) {
-      $now = time();
-      if ($inputTs + ($inputLF * 60 * 60) >= $now) {
-        return TRUE;
-      }
-      else {
-        return FALSE;
-      }
-    }
-    return FALSE;
   }
 
 }

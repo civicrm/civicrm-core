@@ -1118,6 +1118,27 @@ ORDER BY    fixed_sort_order
   }
 
   /**
+   * @inheritDoc
+   */
+  public function addSelectWhereClause() {
+    $clauses = [];
+    $permittedActivityTypeIDs = self::getPermittedActivityTypes();
+    if (empty($permittedActivityTypeIDs)) {
+      // This just prevents a mysql fail if they have no access - should be extremely edge case.
+      $permittedActivityTypeIDs = [0];
+    }
+    $clauses['activity_type_id'] = ('IN (' . implode(', ', $permittedActivityTypeIDs) . ')');
+
+    $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
+    if ($contactClause) {
+      $contactClause = implode(' AND contact_id ', $contactClause);
+      $clauses['id'][] = "IN (SELECT activity_id FROM civicrm_activity_contact WHERE contact_id $contactClause)";
+    }
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
+  }
+
+  /**
    * Get an array of components that are accessible by the currenct user.
    *
    * This means checking if they are enabled and if the user has appropriate permission.
@@ -2694,6 +2715,8 @@ AND cl.modified_id  = c.id
     }
 
     if (!self::hasPermissionForActivityType($activity->activity_type_id)) {
+      // this check is redundant for api access / anything that calls the selectWhereClause
+      // to determine ACLs.
       return FALSE;
     }
     // Return early when it is case activity.
@@ -2799,7 +2822,7 @@ AND cl.modified_id  = c.id
    *
    * @return array
    */
-  public static function getPermittedActivityTypes() {
+  protected static function getPermittedActivityTypes() {
     $userID = (int) CRM_Core_Session::getLoggedInContactID();
     if (!isset(Civi::$statics[__CLASS__]['permitted_activity_types'][$userID])) {
       $permittedActivityTypes = [];
@@ -2813,7 +2836,7 @@ AND cl.modified_id  = c.id
 INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name = 'activity_type')
      WHERE  component_id IS NULL $componentClause")->fetchAll();
       foreach ($types as $type) {
-        $permittedActivityTypes[$type['activity_type_id']] = $type['activity_type_id'];
+        $permittedActivityTypes[$type['activity_type_id']] = (int) $type['activity_type_id'];
       }
       Civi::$statics[__CLASS__]['permitted_activity_types'][$userID] = $permittedActivityTypes;
     }

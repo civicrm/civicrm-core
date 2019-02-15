@@ -1,6 +1,6 @@
 name = CiviCRM Rules Integration
 description = Integrate CiviCRM and Drupal Rules Module. Expose Contact, Contribution and other Objects along with Form / Page Operations.
-version = 7.x-5.10.2
+version = 7.x-5.10.3
 core = 7.x
 package = CiviCRM
 project = civicrm

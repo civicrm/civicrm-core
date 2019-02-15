@@ -768,25 +768,55 @@ AND       CEF.entity_id    = %2";
   }
 
   /**
-   * Generates a MD5 Hash to be appended to file URLS to be checked when trying to download the file.
-   * @param int $eid entity id the file is attached to
-   * @param int $fid file ID
+   * Generates an access-token for downloading a specific file.
+   *
+   * @param int $entityId entity id the file is attached to
+   * @param int $fileId file ID
    * @return string
    */
-  public static function generateFileHash($eid = NULL, $fid = NULL, $genTs = NULL, $life = NULL) {
+  public static function generateFileHash($entityId = NULL, $fileId = NULL, $genTs = NULL, $life = NULL) {
     // Use multiple (but stable) inputs for hash information.
-    $siteKey = defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : 'NO_SITE_KEY';
+    $siteKey = CRM_Utils_Constant::value('CIVICRM_SITE_KEY');
+    if (!$siteKey) {
+      throw new \CRM_Core_Exception("Cannot generate file access token. Please set CIVICRM_SITE_KEY.");
+    }
 
     if (!$genTs) {
       $genTs = time();
     }
     if (!$life) {
-      $life = 24 * 2;
+      $days = Civi::settings()->get('checksum_timeout');
+      $life = 24 * $days;
     }
     // Trim 8 chars off the string, make it slightly easier to find
     // but reveals less information from the hash.
-    $cs = hash_hmac('sha256', "{$fid}_{$life}", $siteKey);
+    $cs = hash_hmac('sha256', "entity={$entityId}&file={$fileId}&life={$life}", $siteKey);
     return "{$cs}_{$genTs}_{$life}";
+  }
+
+  /**
+   * Validate a file access token.
+   *
+   * @param string $hash
+   * @param int $entityId Entity Id the file is attached to
+   * @param int $fileId File Id
+   * @return bool
+   */
+  public static function validateFileHash($hash, $entityId, $fileId) {
+    $input = CRM_Utils_System::explode('_', $hash, 3);
+    $inputTs = CRM_Utils_Array::value(1, $input);
+    $inputLF = CRM_Utils_Array::value(2, $input);
+    $testHash = CRM_Core_BAO_File::generateFileHash($entityId, $fileId, $inputTs, $inputLF);
+    if (hash_equals($testHash, $hash)) {
+      $now = time();
+      if ($inputTs + ($inputLF * 60 * 60) >= $now) {
+        return TRUE;
+      }
+      else {
+        return FALSE;
+      }
+    }
+    return FALSE;
   }
 
 }
