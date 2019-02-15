@@ -5107,20 +5107,7 @@ SELECT COUNT( conts.total_amount ) as total_count,
 
     $summary = ['total' => []];
     $this->addBasicStatsToSummary($summary, $where, $from);
-
-    $innerQuery = "SELECT civicrm_contribution.total_amount, COUNT(civicrm_contribution.total_amount) as civicrm_contribution_total_amount_count,
-      civicrm_contribution.currency $from $where AND civicrm_contribution.contribution_status_id = 1 ";
-
-    $orderBy = 'ORDER BY civicrm_contribution_total_amount_count DESC';
-    $groupBy = 'GROUP BY currency, civicrm_contribution.total_amount';
-    $modeSQL = "$select, SUBSTRING_INDEX(GROUP_CONCAT(conts.total_amount
-      ORDER BY conts.civicrm_contribution_total_amount_count DESC SEPARATOR ';'), ';', 1) as amount,
-      MAX(conts.civicrm_contribution_total_amount_count) as civicrm_contribution_total_amount_count
-      FROM ($innerQuery
-      $groupBy $orderBy) as conts
-      GROUP BY currency";
-
-    $summary['total']['mode'] = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
+    $this->addModeToStats($summary, $from, $where);
 
     // make sure contribution is completed - CRM-4989
     $completedWhere = $where . " AND civicrm_contribution.contribution_status_id = 1 ";
@@ -6665,6 +6652,40 @@ AND   displayRelType.is_active = 1
       $summary['total']['avg'][] = CRM_Utils_Money::format($dao->total_avg, $dao->currency);
     }
     return $summary;
+  }
+
+  /**
+   * Add the mode to stats.
+   *
+   * Note that his is a slow query when performed on more than a handful or results - often taking many minutes
+   *
+   * See https://lab.civicrm.org/dev/core/issues/720
+   *
+   * @param array $summary
+   * @param string $from
+   * @param string $where
+   */
+  protected function addModeToStats(&$summary, $from, $where) {
+    $modeSQL = "
+      SELECT COUNT( conts.total_amount ) as total_count,
+       SUM(   conts.total_amount ) as total_amount,
+       AVG(   conts.total_amount ) as total_avg,
+       conts.currency              as currency,
+       SUBSTRING_INDEX(GROUP_CONCAT(conts.total_amount
+      ORDER BY conts.civicrm_contribution_total_amount_count DESC SEPARATOR ';'), ';', 1) as amount,
+      MAX(conts.civicrm_contribution_total_amount_count) as civicrm_contribution_total_amount_count
+      FROM (
+        SELECT civicrm_contribution.total_amount,
+        COUNT(civicrm_contribution.total_amount) as civicrm_contribution_total_amount_count,
+        civicrm_contribution.currency
+        $from
+        $where AND civicrm_contribution.contribution_status_id = 1
+      GROUP BY currency, civicrm_contribution.total_amount
+      ORDER BY civicrm_contribution_total_amount_count DESC
+      ) as conts
+      GROUP BY currency";
+
+    $summary['total']['mode'] = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
   }
 
 }
