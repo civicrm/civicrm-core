@@ -38,11 +38,14 @@ trait CRMTraits_Financial_PriceSetTrait {
    * This also involves creating t
    *
    * @param $params
+   * @param array $lineItemFinancialTypes
+   *   Financial Types, if an override is intended.
    */
-  protected function createContributionWithTwoLineItemsAgainstPriceSet($params) {
+  protected function createContributionWithTwoLineItemsAgainstPriceSet($params, $lineItemFinancialTypes = []) {
     $params = array_merge(['total_amount' => 300, 'financial_type_id' => 'Donation'], $params);
     $priceFields = $this->createPriceSet('contribution');
     foreach ($priceFields['values'] as $key => $priceField) {
+      $financialTypeID = (!empty($lineItemFinancialTypes) ? array_shift($lineItemFinancialTypes) : $priceField['financial_type_id']);
       $params['line_items'][]['line_item'][$key] = [
         'price_field_id' => $priceField['price_field_id'],
         'price_field_value_id' => $priceField['id'],
@@ -51,7 +54,7 @@ trait CRMTraits_Financial_PriceSetTrait {
         'qty' => 1,
         'unit_price' => $priceField['amount'],
         'line_total' => $priceField['amount'],
-        'financial_type_id' => $priceField['financial_type_id'],
+        'financial_type_id' => $financialTypeID,
         'entity_table' => 'civicrm_contribution',
       ];
     }

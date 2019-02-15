@@ -5087,7 +5087,7 @@ civicrm_relationship.start_date > {$today}
    *
    * @return array
    */
-  public function &summaryContribution($context = NULL) {
+  public function summaryContribution($context = NULL) {
     list($innerselect, $from, $where, $having) = $this->query(TRUE);
 
     // hack $select
