@@ -219,9 +219,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         CRM_Core_Session::setStatus(ts('Note: this contact may be a duplicate of an existing record.'), ts('Possible Duplicate Detected'), 'alert');
       }
       elseif ($form->_isUpdateDupe == 1) {
-        if (!$form->_id) {
-          $form->_id = $ids[0];
-        }
+        $form->_id = $ids[0];
       }
       else {
         if ($form->_context == 'dialog') {
@@ -1002,7 +1000,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $register = NULL;
 
     // hack we use a -1 in options to indicate that its registration
+    // ... and I can't remove that comment because even though it's clear as mud
+    // perhaps someone will find it helpful in the absence of ANY OTHER EXPLANATION
+    // as to what it means....
     if ($form->_id) {
+      // @todo - wonder if it ever occurred to someone that if they didn't document this param
+      // it might not be crystal clear why we have it....
       $form->_isUpdateDupe = 1;
     }
 
@@ -1022,7 +1025,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $fields['phone-Primary'] = $fields['phone-Primary-1'];
       }
 
-      self::handleDuplicateChecking($errors, $fields, $form);
+      if (!$form->_id) {
+        self::handleDuplicateChecking($errors, $fields, $form);
+      }
     }
 
     foreach ($fields as $key => $value) {
