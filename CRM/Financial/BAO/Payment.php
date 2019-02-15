@@ -228,6 +228,7 @@ class CRM_Financial_BAO_Payment {
       'isRefund' => $entities['payment']['total_amount'] < 0,
       'isAmountzero' => $entities['payment']['total_amount'] === 0,
       'refundAmount' => ($entities['payment']['total_amount'] < 0 ? $entities['payment']['total_amount'] : NULL),
+      'paymentsComplete' => ($entities['payment']['balance'] == 0),
     ];
 
     return self::filterUntestedTemplateVariables($templateVariables);
@@ -261,10 +262,10 @@ class CRM_Financial_BAO_Payment {
       'isAmountzero',
       'refundAmount',
       'totalPaid',
+      'paymentsComplete',
     ];
     // Need to do these before switching the form over...
     $todoParams = [
-      'paymentsComplete',
       'contributeMode',
       'billingName',
       'address',

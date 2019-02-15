@@ -149,6 +149,33 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test email receipt for partial payment.
+   */
+  public function testPaymentEmailReceiptFullyPaid() {
+    $mut = new CiviMailUtils($this);
+    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+
+    $params = [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 150,
+    ];
+    $payment = $this->callAPISuccess('payment', 'create', $params);
+
+    $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
+    $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet']);
+    $mut->checkMailLog(array(
+      'Dear Mr. Anthony Anderson II',
+      'A payment has been received.',
+      'Total Fees: $ 300.00',
+      'This Payment Amount: $ 150.00',
+      'Balance Owed: $ 0.00',
+      'Thank you for completing payment.',
+    ));
+    $mut->stop();
+    $mut->clearMessages();
+  }
+
+  /**
+   * Test email receipt for partial payment.
    *
    * @dataProvider getThousandSeparators
    *
@@ -186,6 +213,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $mut->assertSubjects(['Refund Notification - Annual CiviCRM meet']);
     $mut->checkMailLog(array(
       'Dear Mr. Anthony Anderson II',
+      'A refund has been issued based on changes in your registration selections.',
       'Total Fees: $ 300' . $decimalSeparator . '00',
       'Refund Amount: $ -30' . $decimalSeparator . '00',
       'Event Information and Location',
