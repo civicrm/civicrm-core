@@ -100,6 +100,7 @@ function _civicrm_api3_campaign_getlist_params(&$request) {
   $fieldsToReturn = ['title', 'campaign_type_id', 'status_id', 'start_date', 'end_date'];
   $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
   if (empty($request['params']['id'])) {
+    $request['params']['options']['sort'] = 'start_date DESC, title';
     $request['params'] += [
       'is_active' => 1,
     ];
