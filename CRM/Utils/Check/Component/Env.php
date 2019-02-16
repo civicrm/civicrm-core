@@ -927,4 +927,61 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     return $messages;
   }
 
+  /**
+   * Check for utf8mb4 support by MySQL.
+   *
+   * @return array<CRM_Utils_Check_Message> an empty array, or a list of warnings
+   */
+  public function checkMysqlUtf8mb4() {
+    $messages = array();
+
+    if (CRM_Core_DAO::getConnection()->phptype != 'mysqli') {
+      return $messages;
+    }
+
+    try {
+      // Create a temporary table to avoid implicit commit.
+      CRM_Core_DAO::executeQuery('CREATE TEMPORARY TABLE civicrm_utf8mb4_test (id VARCHAR(255), PRIMARY KEY(id(255))) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC ENGINE=INNODB');
+      CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE civicrm_utf8mb4_test');
+    }
+    catch (PEAR_Exception $e) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('Future versions of CiviCRM may require MySQL utf8mb4 support. It is recommended, though not yet required, to configure your MySQL server for utf8mb4 support. You will need the following MySQL server configuration: innodb_large_prefix=true innodb_file_format=barracuda innodb_file_per_table=true'),
+        ts('MySQL utf8mb4 Support'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-database'
+      );
+    }
+    // Ensure that the MySQL driver supports utf8mb4 encoding.
+    $version = mysqli_get_client_info(CRM_Core_DAO::getConnection()->connection);
+    if (strpos($version, 'mysqlnd') !== FALSE) {
+      // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
+      $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);
+      if (version_compare($version, '5.0.9', '<')) {
+        $messages[] = new CRM_Utils_Check_Message(
+          __FUNCTION__ . 'mysqlnd',
+          ts('It is recommended, though not yet required, to upgrade your PHP MySQL driver (mysqlnd) to >= 5.0.9 for utf8mb4 support.'),
+          ts('PHP MySQL Driver (mysqlnd)'),
+          \Psr\Log\LogLevel::WARNING,
+          'fa-server'
+        );
+      }
+    }
+    else {
+      // The libmysqlclient driver supports utf8mb4 starting at version 5.5.3.
+      if (version_compare($version, '5.5.3', '<')) {
+        $messages[] = new CRM_Utils_Check_Message(
+          __FUNCTION__ . 'libmysqlclient',
+          ts('It is recommended, though not yet required, to upgrade your PHP MySQL driver (libmysqlclient) to >= 5.5.3 for utf8mb4 support.'),
+          ts('PHP MySQL Driver (libmysqlclient)'),
+          \Psr\Log\LogLevel::WARNING,
+          'fa-server'
+        );
+      }
+    }
+
+    return $messages;
+  }
+
 }

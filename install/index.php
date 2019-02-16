@@ -557,6 +557,16 @@ class InstallRequirements {
             ts('Unable to create triggers. This MySQL user is missing the CREATE TRIGGERS  privilege.'),
           )
         );
+        $this->requireMySQLUtf8mb4($databaseConfig['server'],
+          $databaseConfig['username'],
+          $databaseConfig['password'],
+          $databaseConfig['database'],
+          array(
+            ts("MySQL %1 Configuration", array(1 => $dbName)),
+            ts('Is the <code>utf8mb4</code> character set supported?'),
+            ts('This MySQL server does not support the <code>utf8mb4</code> character set.'),
+          )
+        );
       }
     }
   }
@@ -1330,6 +1340,57 @@ class InstallRequirements {
     else {
       $testDetails[2] = " (" . ts('the following PHP variables are missing: %1', array(1 => implode(", ", $missing))) . ")";
       $this->error($testDetails);
+    }
+  }
+
+  /**
+   * @param $server
+   * @param string $username
+   * @param $password
+   * @param $database
+   * @param $testDetails
+   */
+  public function requireMysqlUtf8mb4($server, $username, $password, $database, $testDetails) {
+    $this->testing($testDetails);
+    $conn = $this->connect($server, $username, $password);
+    if (!$conn) {
+      $testDetails[2] = ts('Could not connect to the database server.');
+      $this->error($testDetails);
+      return;
+    }
+
+    if (!@mysqli_select_db($conn, $database)) {
+      $testDetails[2] = ts('Could not select the database.');
+      $this->error($testDetails);
+      return;
+    }
+
+    $result = mysqli_query($conn, 'CREATE TABLE civicrm_utf8mb4_test (id VARCHAR(255), PRIMARY KEY(id(255))) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC ENGINE=INNODB');
+    if (!$result) {
+      $testDetails[2] = ts('It is recommended, though not yet required, to configure your MySQL server for utf8mb4 support. You will need the following MySQL server configuration: innodb_large_prefix=true innodb_file_format=barracuda innodb_file_per_table=true');
+      $this->warning($testDetails);
+      return;
+    }
+    $result = mysqli_query($conn, 'DROP TABLE civicrm_utf8mb4_test');
+
+    // Ensure that the MySQL driver supports utf8mb4 encoding.
+    $version = mysqli_get_client_info($conn);
+    if (strpos($version, 'mysqlnd') !== FALSE) {
+      // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
+      $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);
+      if (version_compare($version, '5.0.9', '<')) {
+        $testDetails[2] = 'It is recommended, though not yet required, to upgrade your PHP MySQL driver (mysqlnd) to >= 5.0.9 for utf8mb4 support.';
+        $this->warning($testDetails);
+        return;
+      }
+    }
+    else {
+      // The libmysqlclient driver supports utf8mb4 starting at version 5.5.3.
+      if (version_compare($version, '5.5.3', '<')) {
+        $testDetails[2] = 'It is recommended, though not yet required, to upgrade your PHP MySQL driver (libmysqlclient) to >= 5.5.3 for utf8mb4 support.';
+        $this->warning($testDetails);
+        return;
+      }
     }
   }
 
