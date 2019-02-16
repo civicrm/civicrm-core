@@ -5089,13 +5089,6 @@ civicrm_relationship.start_date > {$today}
    */
   public function summaryContribution($context = NULL) {
     list($innerselect, $from, $where, $having) = $this->query(TRUE);
-
-    // hack $select
-    $select = "
-SELECT COUNT( conts.total_amount ) as total_count,
-       SUM(   conts.total_amount ) as total_amount,
-       AVG(   conts.total_amount ) as total_avg,
-       conts.currency              as currency";
     if ($this->_permissionWhereClause) {
       $where .= " AND " . $this->_permissionWhereClause;
     }
@@ -5103,30 +5096,20 @@ SELECT COUNT( conts.total_amount ) as total_count,
       $where .= " AND contact_a.is_deleted = 0 ";
     }
 
-    $query = $this->appendFinancialTypeWhereAndFromToQueryStrings($where, $from);
+    // hack $select
+    $select = "
+SELECT COUNT( conts.total_amount ) as total_count,
+       SUM(   conts.total_amount ) as total_amount,
+       AVG(   conts.total_amount ) as total_avg,
+       conts.currency              as currency";
 
-    // make sure contribution is completed - CRM-4989
-    $completedWhere = $where . " AND civicrm_contribution.contribution_status_id = 1 ";
+    $this->appendFinancialTypeWhereAndFromToQueryStrings($where, $from);
 
-    $summary = array();
-    $summary['total'] = array();
-    $summary['total']['count'] = $summary['total']['amount'] = $summary['total']['avg'] = "n/a";
+    $summary = ['total' => []];
+    $this->addBasicStatsToSummary($summary, $where, $from);
+
     $innerQuery = "SELECT civicrm_contribution.total_amount, COUNT(civicrm_contribution.total_amount) as civicrm_contribution_total_amount_count,
-      civicrm_contribution.currency $from $completedWhere";
-    $query = "$select FROM (
-      $innerQuery GROUP BY civicrm_contribution.id
-    ) as conts
-    GROUP BY currency";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-
-    $summary['total']['count'] = 0;
-    $summary['total']['amount'] = $summary['total']['avg'] = array();
-    while ($dao->fetch()) {
-      $summary['total']['count'] += $dao->total_count;
-      $summary['total']['amount'][] = CRM_Utils_Money::format($dao->total_amount, $dao->currency);
-      $summary['total']['avg'][] = CRM_Utils_Money::format($dao->total_avg, $dao->currency);
-    }
+      civicrm_contribution.currency $from $where AND civicrm_contribution.contribution_status_id = 1 ";
 
     $orderBy = 'ORDER BY civicrm_contribution_total_amount_count DESC';
     $groupBy = 'GROUP BY currency, civicrm_contribution.total_amount';
@@ -5139,6 +5122,8 @@ SELECT COUNT( conts.total_amount ) as total_count,
 
     $summary['total']['mode'] = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
 
+    // make sure contribution is completed - CRM-4989
+    $completedWhere = $where . " AND civicrm_contribution.contribution_status_id = 1 ";
     $medianSQL = "{$from} {$completedWhere}";
     $summary['total']['median'] = CRM_Contribute_BAO_Contribution::computeStats('median', $medianSQL, 'civicrm_contribution');
     $summary['total']['currencyCount'] = count($summary['total']['median']);
@@ -6642,6 +6627,44 @@ AND   displayRelType.is_active = 1
     }
     $select .= implode(', ', $this->_select);
     return $select;
+  }
+
+  /**
+   * Add basic statistics to the summary.
+   *
+   * @param array $summary
+   * @param string $where
+   * @param string $from
+   *
+   * @return array
+   */
+  protected function addBasicStatsToSummary(&$summary, $where, $from) {
+    $summary['total']['count'] = $summary['total']['amount'] = $summary['total']['avg'] = "n/a";
+
+    $query = "
+      SELECT COUNT( conts.total_amount ) as total_count,
+        SUM(   conts.total_amount ) as total_amount,
+        AVG(   conts.total_amount ) as total_avg,
+        conts.currency              as currency
+      FROM (
+        SELECT civicrm_contribution.total_amount, COUNT(civicrm_contribution.total_amount) as civicrm_contribution_total_amount_count,
+        civicrm_contribution.currency
+        $from
+        $where AND civicrm_contribution.contribution_status_id = 1
+      GROUP BY civicrm_contribution.id
+    ) as conts
+    GROUP BY currency";
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+
+    $summary['total']['count'] = 0;
+    $summary['total']['amount'] = $summary['total']['avg'] = [];
+    while ($dao->fetch()) {
+      $summary['total']['count'] += $dao->total_count;
+      $summary['total']['amount'][] = CRM_Utils_Money::format($dao->total_amount, $dao->currency);
+      $summary['total']['avg'][] = CRM_Utils_Money::format($dao->total_avg, $dao->currency);
+    }
+    return $summary;
   }
 
 }
