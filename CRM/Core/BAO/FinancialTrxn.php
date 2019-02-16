@@ -437,18 +437,21 @@ WHERE ceft.entity_id = %1";
   }
 
   /**
-   * get partial payment amount and type of it.
+   * get partial payment amount.
+   *
+   * @deprecated
+   *
+   * This function basically calls CRM_Contribute_BAO_Contribution::getContributionBalance
+   * - just do that. If need be we could have a fn to get the contribution id but
+   * chances are the calling functions already know it anyway.
    *
    * @param int $entityId
    * @param string $entityName
-   * @param bool $returnType
    * @param int $lineItemTotal
    *
-   * @return array|int|NULL|string
-   *   [payment type => amount]
-   *   payment type: 'amount_owed' or 'refund_due'
+   * @return array
    */
-  public static function getPartialPaymentWithType($entityId, $entityName = 'participant', $returnType = TRUE, $lineItemTotal = NULL) {
+  public static function getPartialPaymentWithType($entityId, $entityName = 'participant', $lineItemTotal = NULL) {
     $value = NULL;
     if (empty($entityName)) {
       return $value;
@@ -468,17 +471,13 @@ WHERE ceft.entity_id = %1";
 
     if ($contributionId && $financialTypeId) {
 
-      $value = CRM_Contribute_BAO_Contribution::getContributionBalance($contributionId, $lineItemTotal);
-
-      $paymentVal = $value;
-      if ($returnType) {
-        $value = array();
-        if ($paymentVal < 0) {
-          $value['refund_due'] = $paymentVal;
-        }
-        elseif ($paymentVal > 0) {
-          $value['amount_owed'] = $paymentVal;
-        }
+      $paymentVal = CRM_Contribute_BAO_Contribution::getContributionBalance($contributionId, $lineItemTotal);
+      $value = [];
+      if ($paymentVal < 0) {
+        $value['refund_due'] = $paymentVal;
+      }
+      elseif ($paymentVal > 0) {
+        $value['amount_owed'] = $paymentVal;
       }
     }
     return $value;
