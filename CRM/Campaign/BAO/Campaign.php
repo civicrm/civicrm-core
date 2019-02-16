@@ -601,6 +601,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
       $campaign = $form->addEntityRef('campaign_id', ts('Campaign'), [
         'entity' => 'campaign',
         'create' => TRUE,
+        'select' => ['minimumInputLength' => 0],
       ]);
       //lets freeze when user does not has access or campaign is disabled.
       if (!$isCampaignEnabled || !$hasAccessCampaign) {

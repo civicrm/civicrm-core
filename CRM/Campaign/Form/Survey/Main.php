@@ -132,6 +132,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     $this->addEntityRef('campaign_id', ts('Campaign'), [
       'entity' => 'campaign',
       'create' => TRUE,
+      'select' => ['minimumInputLength' => 0],
     ]);
 
     // script / instructions

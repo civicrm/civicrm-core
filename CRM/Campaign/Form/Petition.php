@@ -193,6 +193,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     $this->addEntityRef('campaign_id', ts('Campaign'), [
       'entity' => 'campaign',
       'create' => TRUE,
+      'select' => ['minimumInputLength' => 0],
     ]);
 
     $customContactProfiles = CRM_Core_BAO_UFGroup::getProfiles(array('Individual'));
