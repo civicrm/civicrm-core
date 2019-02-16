@@ -360,27 +360,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @param array $whereClauses
    */
   public static function addACLClausesToWhereClauses(&$whereClauses) {
-    $originalWhereClauses = $whereClauses;
-    CRM_Utils_Hook::selectWhereClause('Contribution', $whereClauses);
-    if ($whereClauses !== $originalWhereClauses) {
-      // In this case permisssions have been applied & we assume the
-      // financialaclreport is applying these
-      // https://github.com/JMAConsulting/biz.jmaconsulting.financialaclreport/blob/master/financialaclreport.php#L107
-      return;
-    }
+    $contributionBAO = new CRM_Contribute_BAO_Contribution();
+    $whereClauses = array_merge($whereClauses, $contributionBAO->addSelectWhereClause());
 
-    if (!self::isACLFinancialTypeStatus()) {
-      return;
-    }
-    $types = self::getAllEnabledAvailableFinancialTypes();
-    if (empty($types)) {
-      $whereClauses['financial_type_id'] = 'IN (0)';
-    }
-    else {
-      $whereClauses['financial_type_id'] = [
-        'IN (' . implode(',', array_keys($types)) . ')'
-      ];
-    }
   }
 
   /**
