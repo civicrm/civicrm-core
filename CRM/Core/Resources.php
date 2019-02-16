@@ -591,24 +591,18 @@ class CRM_Core_Resources {
         if (is_array($item)) {
           $this->addSetting($item);
         }
-        elseif (substr($item, -2) == 'js') {
+        elseif (strpos($item, '.css')) {
+          $this->isFullyFormedUrl($item) ? $this->addStyleUrl($item, -100, $region) : $this->addStyleFile('civicrm', $item, -100, $region);
+        }
+        elseif ($this->isFullyFormedUrl($item)) {
+          $this->addScriptUrl($item, $jsWeight++, $region);
+        }
+        else {
           // Don't bother  looking for ts() calls in packages, there aren't any
           $translate = (substr($item, 0, 3) == 'js/');
           $this->addScriptFile('civicrm', $item, $jsWeight++, $region, $translate);
         }
-        else {
-          $this->addStyleFile('civicrm', $item, -100, $region);
-        }
       }
-
-      $tsLocale = CRM_Core_I18n::getLocale();
-      // Dynamic localization script
-      $args = [
-        'r' => $this->getCacheCode(),
-        'cid' => CRM_Core_Session::getLoggedInContactID(),
-      ];
-      $this->addScriptUrl(CRM_Utils_System::url('civicrm/ajax/l10n-js/' . $tsLocale, $args, FALSE, NULL, FALSE), $jsWeight++, $region);
-
       // Add global settings
       $settings = array(
         'config' => array(
@@ -733,6 +727,13 @@ class CRM_Core_Resources {
       "js/crm.ajax.js",
       "js/wysiwyg/crm.wysiwyg.js",
     );
+
+    // Dynamic localization script
+    $items[] = $this->addCacheCode(
+      CRM_Utils_System::url('civicrm/ajax/l10n-js/' . CRM_Core_I18n::getLocale(),
+        ['cid' => CRM_Core_Session::getLoggedInContactID()], FALSE, NULL, FALSE)
+    );
+
     // add wysiwyg editor
     $editor = Civi::settings()->get('editor_id');
     if ($editor == "CKEditor") {
@@ -938,6 +939,17 @@ class CRM_Core_Resources {
     $operator = $hasQuery ? '&' : '?';
 
     return $url . $operator . 'r=' . $this->cacheCode;
+  }
+
+  /**
+   * Checks if the given URL is fully-formed
+   *
+   * @param string $url
+   *
+   * @return bool
+   */
+  public static function isFullyFormedUrl($url) {
+    return (substr($url, 0, 4) === 'http') || (substr($url, 0, 1) === '/');
   }
 
 }
