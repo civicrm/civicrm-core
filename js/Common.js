@@ -685,12 +685,13 @@ if (!CRM.vars) CRM.vars = {};
     var
       createLinks = $el.data('create-links'),
       params = getEntityRefApiParams($el).params,
+      entity = $el.data('api-entity').toLowerCase(),
       markup = '<div class="crm-entityref-links">';
-    if (!createLinks || (createLinks === true && $el.data('api-entity').toLowerCase() !== 'contact')) {
+    if (!createLinks || (createLinks === true && !CRM.config.entityRef.links[entity])) {
       return '';
     }
     if (createLinks === true) {
-      createLinks = params.contact_type ? _.where(CRM.config.entityRef.contactCreate, {type: params.contact_type}) : CRM.config.entityRef.contactCreate;
+      createLinks = params.contact_type ? _.where(CRM.config.entityRef.links[entity], {type: params.contact_type}) : CRM.config.entityRef.links[entity];
     }
     _.each(createLinks, function(link) {
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">' +

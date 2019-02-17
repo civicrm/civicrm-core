@@ -3649,15 +3649,53 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
   }
 
   /**
-   * Checks permission to create new contacts from entityRef widget
+   * @param array $appendProfiles
+   *   Name of profile(s) to append to each link.
    *
-   * Note: other components must return an array of links from this function,
-   * but Contacts are given special treatment - the links are in javascript already.
-   *
-   * @return bool
+   * @return array
    */
-  public static function entityRefCreateLinks() {
-    return CRM_Core_Permission::check([['profile create', 'profile listings and forms']]);
+  public static function getEntityRefCreateLinks($appendProfiles = []) {
+    // You'd think that "create contacts" would be the permission to check,
+    // But new contact popups are profile forms and those use their own permissions.
+    if (!CRM_Core_Permission::check([['profile create', 'profile listings and forms']])) {
+      return FALSE;
+    }
+    $profiles = [];
+    foreach (CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
+      $profiles[] = 'new_' . strtolower($contactType);
+    }
+    $retrieved = civicrm_api3('uf_group', 'get', [
+      'name' => ['IN' => array_merge($profiles, (array) $appendProfiles)],
+      'is_active' => 1,
+    ]);
+    $links = $append = [];
+    if (!empty($retrieved['values'])) {
+      $icons = [
+        'individual' => 'fa-user',
+        'organization' => 'fa-building',
+        'household' => 'fa-home',
+      ];
+      foreach ($retrieved['values'] as $id => $profile) {
+        if (in_array($profile['name'], $profiles)) {
+          $links[] = array(
+            'label' => $profile['title'],
+            'url' => CRM_Utils_System::url('civicrm/profile/create', "reset=1&context=dialog&gid=$id",
+              NULL, NULL, FALSE, FALSE, TRUE),
+            'type' => ucfirst(str_replace('new_', '', $profile['name'])),
+            'icon' => CRM_Utils_Array::value(str_replace('new_', '', $profile['name']), $icons),
+          );
+        }
+        else {
+          $append[] = $id;
+        }
+      }
+      foreach ($append as $id) {
+        foreach ($links as &$link) {
+          $link['url'] .= ",$id";
+        }
+      }
+    }
+    return $links;
   }
 
   /**

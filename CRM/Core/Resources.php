@@ -681,10 +681,7 @@ class CRM_Core_Resources {
       'moneyFormat' => json_encode(CRM_Utils_Money::format(1234.56)),
       'contactSearch' => json_encode($config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...')),
       'otherSearch' => json_encode(ts('Enter search term...')),
-      'entityRef' => array(
-        'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
-        'filters' => self::getEntityRefFilters(),
-      ),
+      'entityRef' => self::getEntityRefMetadata(),
       'ajaxPopupsEnabled' => self::singleton()->ajaxPopupsEnabled,
       'allowAlertAutodismissal' => (bool) Civi::settings()->get('allow_alert_autodismissal'),
       'resourceCacheCode' => self::singleton()->getCacheCode(),
@@ -807,8 +804,11 @@ class CRM_Core_Resources {
    *
    * @return array
    */
-  public static function getEntityRefFilters() {
-    $filters = array();
+  public static function getEntityRefMetadata() {
+    $data = [
+      'filters' => [],
+      'links' => [],
+    ];
     $config = CRM_Core_Config::singleton();
 
     $disabledComponents = [];
@@ -828,16 +828,22 @@ class CRM_Core_Resources {
       }
       $baoName = str_replace('_DAO_', '_BAO_', $daoName);
       if (class_exists($baoName)) {
-        $entityFilters = $baoName::getEntityRefFilters();
-        if ($entityFilters) {
-          $filters[_civicrm_api_get_entity_name_from_camel($entity)] = $entityFilters;
+        $filters = $baoName::getEntityRefFilters();
+        if ($filters) {
+          $data['filters'][_civicrm_api_get_entity_name_from_camel($entity)] = $filters;
+        }
+        if (is_callable([$baoName, 'getEntityRefCreateLinks'])) {
+          $createLinks = $baoName::getEntityRefCreateLinks();
+          if ($createLinks) {
+            $data['links'][_civicrm_api_get_entity_name_from_camel($entity)] = $createLinks;
+          }
         }
       }
     }
 
-    CRM_Utils_Hook::entityRefFilters($filters);
+    CRM_Utils_Hook::entityRefFilters($data['filters']);
 
-    return $filters;
+    return $data;
   }
 
   /**
