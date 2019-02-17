@@ -2811,6 +2811,13 @@ SELECT contact_id
   }
 
   /**
+   * @return array
+   */
+  public static function getEntityRefFilters() {
+    return [];
+  }
+
+  /**
    * Get exportable fields with pseudoconstants rendered as an extra field.
    *
    * @param string $baoClass

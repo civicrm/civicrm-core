@@ -3228,4 +3228,14 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
     return FALSE;
   }
 
+  /**
+   * @return array
+   */
+  public static function getEntityRefFilters() {
+    return [
+      ['key' => 'activity_type_id', 'value' => ts('Activity Type')],
+      ['key' => 'status_id', 'value' => ts('Activity Status')],
+    ];
+  }
+
 }

@@ -804,7 +804,6 @@ class CRM_Core_Resources {
 
   /**
    * Provide a list of available entityRef filters.
-   * @todo: move component filters into their respective components (e.g. CiviEvent)
    *
    * @return array
    */
@@ -812,102 +811,28 @@ class CRM_Core_Resources {
     $filters = array();
     $config = CRM_Core_Config::singleton();
 
-    if (in_array('CiviEvent', $config->enableComponents)) {
-      $filters['event'] = array(
-        array('key' => 'event_type_id', 'value' => ts('Event Type')),
-        array(
-          'key' => 'start_date',
-          'value' => ts('Start Date'),
-          'options' => array(
-            array('key' => '{">":"now"}', 'value' => ts('Upcoming')),
-            array(
-              'key' => '{"BETWEEN":["now - 3 month","now"]}',
-              'value' => ts('Past 3 Months'),
-            ),
-            array(
-              'key' => '{"BETWEEN":["now - 6 month","now"]}',
-              'value' => ts('Past 6 Months'),
-            ),
-            array(
-              'key' => '{"BETWEEN":["now - 1 year","now"]}',
-              'value' => ts('Past Year'),
-            ),
-          ),
-        ),
-      );
-    }
-
-    $filters['activity'] = array(
-      array('key' => 'activity_type_id', 'value' => ts('Activity Type')),
-      array('key' => 'status_id', 'value' => ts('Activity Status')),
-    );
-
-    $filters['contact'] = [
-      ['key' => 'contact_type', 'value' => ts('Contact Type')],
-      ['key' => 'group', 'value' => ts('Group'), 'entity' => 'group_contact'],
-      ['key' => 'tag', 'value' => ts('Tag'), 'entity' => 'entity_tag'],
-      ['key' => 'state_province', 'value' => ts('State/Province'), 'entity' => 'address'],
-      ['key' => 'country', 'value' => ts('Country'), 'entity' => 'address'],
-      ['key' => 'gender_id', 'value' => ts('Gender'), 'condition' => ['contact_type' => 'Individual']],
-      ['key' => 'is_deceased', 'value' => ts('Deceased'), 'condition' => ['contact_type' => 'Individual']],
-      ['key' => 'contact_id', 'value' => ts('Contact ID'), 'type' => 'text'],
-      ['key' => 'external_identifier', 'value' => ts('External ID'), 'type' => 'text'],
-      ['key' => 'source', 'value' => ts('Contact Source'), 'type' => 'text'],
-    ];
-
-    if (in_array('CiviCase', $config->enableComponents)) {
-      $filters['case'] = array(
-        array(
-          'key' => 'case_id.case_type_id',
-          'value' => ts('Case Type'),
-          'entity' => 'Case',
-        ),
-        array(
-          'key' => 'case_id.status_id',
-          'value' => ts('Case Status'),
-          'entity' => 'Case',
-        ),
-      );
-      foreach ($filters['contact'] as $filter) {
-        $filter += array('entity' => 'contact');
-        $filter['key'] = 'contact_id.' . $filter['key'];
-        $filters['case'][] = $filter;
+    $disabledComponents = [];
+    $dao = CRM_Core_DAO::executeQuery("SELECT name, namespace FROM civicrm_component");
+    while ($dao->fetch()) {
+      if (!in_array($dao->name, $config->enableComponents)) {
+        $disabledComponents[$dao->name] = $dao->namespace;
       }
     }
 
-    if (in_array('CiviCampaign', $config->enableComponents)) {
-      $filters['campaign'] = [
-        ['key' => 'campaign_type_id', 'value' => ts('Campaign Type')],
-        ['key' => 'status_id', 'value' => ts('Status')],
-        [
-          'key' => 'start_date',
-          'value' => ts('Start Date'),
-          'options' => [
-            ['key' => '{">":"now"}', 'value' => ts('Upcoming')],
-            [
-              'key' => '{"BETWEEN":["now - 3 month","now"]}',
-              'value' => ts('Past 3 Months'),
-            ],
-            [
-              'key' => '{"BETWEEN":["now - 6 month","now"]}',
-              'value' => ts('Past 6 Months'),
-            ],
-            [
-              'key' => '{"BETWEEN":["now - 1 year","now"]}',
-              'value' => ts('Past Year'),
-            ],
-          ],
-        ],
-        [
-          'key' => 'end_date',
-          'value' => ts('End Date'),
-          'options' => [
-            ['key' => '{">":"now"}', 'value' => ts('In the future')],
-            ['key' => '{"<":"now"}', 'value' => ts('In the past')],
-            ['key' => '{"IS NULL":"1"}', 'value' => ts('Not set')],
-          ],
-        ],
-      ];
+    foreach (CRM_Core_DAO_AllCoreTables::daoToClass() as $entity => $daoName) {
+      // Skip DAOs of disabled components
+      foreach ($disabledComponents as $nameSpace) {
+        if (strpos($daoName, $nameSpace) === 0) {
+          continue 2;
+        }
+      }
+      $baoName = str_replace('_DAO_', '_BAO_', $daoName);
+      if (class_exists($baoName)) {
+        $entityFilters = $baoName::getEntityRefFilters();
+        if ($entityFilters) {
+          $filters[_civicrm_api_get_entity_name_from_camel($entity)] = $entityFilters;
+        }
+      }
     }
 
     CRM_Utils_Hook::entityRefFilters($filters);

@@ -2370,4 +2370,32 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
+  /**
+   * @return array
+   */
+  public static function getEntityRefFilters() {
+    return [
+      ['key' => 'event_type_id', 'value' => ts('Event Type')],
+      [
+        'key' => 'start_date',
+        'value' => ts('Start Date'),
+        'options' => [
+          ['key' => '{">":"now"}', 'value' => ts('Upcoming')],
+          [
+            'key' => '{"BETWEEN":["now - 3 month","now"]}',
+            'value' => ts('Past 3 Months'),
+          ],
+          [
+            'key' => '{"BETWEEN":["now - 6 month","now"]}',
+            'value' => ts('Past 6 Months'),
+          ],
+          [
+            'key' => '{"BETWEEN":["now - 1 year","now"]}',
+            'value' => ts('Past Year'),
+          ],
+        ],
+      ],
+    ];
+  }
+
 }

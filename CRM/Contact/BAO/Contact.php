@@ -3660,4 +3660,22 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
     return CRM_Core_Permission::check([['profile create', 'profile listings and forms']]);
   }
 
+  /**
+   * @return array
+   */
+  public static function getEntityRefFilters() {
+    return [
+      ['key' => 'contact_type', 'value' => ts('Contact Type')],
+      ['key' => 'group', 'value' => ts('Group'), 'entity' => 'group_contact'],
+      ['key' => 'tag', 'value' => ts('Tag'), 'entity' => 'entity_tag'],
+      ['key' => 'state_province', 'value' => ts('State/Province'), 'entity' => 'address'],
+      ['key' => 'country', 'value' => ts('Country'), 'entity' => 'address'],
+      ['key' => 'gender_id', 'value' => ts('Gender'), 'condition' => ['contact_type' => 'Individual']],
+      ['key' => 'is_deceased', 'value' => ts('Deceased'), 'condition' => ['contact_type' => 'Individual']],
+      ['key' => 'contact_id', 'value' => ts('Contact ID'), 'type' => 'text'],
+      ['key' => 'external_identifier', 'value' => ts('External ID'), 'type' => 'text'],
+      ['key' => 'source', 'value' => ts('Contact Source'), 'type' => 'text'],
+    ];
+  }
+
 }
