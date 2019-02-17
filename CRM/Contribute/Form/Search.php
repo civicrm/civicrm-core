@@ -80,8 +80,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
-    // @todo - is this an error - $this->_defaults is used.
-    $this->defaults = array();
 
     $this->loadStandardSearchOptionsFromUrl();
 
