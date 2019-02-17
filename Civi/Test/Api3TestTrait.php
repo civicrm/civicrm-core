@@ -202,7 +202,12 @@ trait Api3TestTrait {
     );
     $result = $this->civicrm_api($entity, 'getsingle', $params);
     if (!is_array($result) || !empty($result['is_error']) || isset($result['values'])) {
-      throw new \Exception('Invalid getsingle result' . print_r($result, TRUE));
+      $unfilteredResult = $this->civicrm_api($entity, 'get', $params);
+      throw new \Exception(
+        'Invalid getsingle result' . print_r($result, TRUE)
+        . "\n entity: $entity . \n params \n " . print_r($params, TRUE)
+        . "\n entities retrieved with blank params \n" .  print_r($unfilteredResult, TRUE)
+      );
     }
     if ($checkAgainst) {
       // @todo - have gone with the fn that unsets id? should we check id?
