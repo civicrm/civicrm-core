@@ -3261,4 +3261,28 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     return "$name <$address>";
   }
 
+  /**
+   * @return array
+   */
+  public static function getEntityRefFilters() {
+    $filters = [
+      [
+        'key' => 'case_id.case_type_id',
+        'value' => ts('Case Type'),
+        'entity' => 'Case',
+      ],
+      [
+        'key' => 'case_id.status_id',
+        'value' => ts('Case Status'),
+        'entity' => 'Case',
+      ],
+    ];
+    foreach (CRM_Contact_BAO_Contact::getEntityRefFilters() as $filter) {
+      $filter += ['entity' => 'contact'];
+      $filter['key'] = 'contact_id.' . $filter['key'];
+      $filters[] = $filter;
+    }
+    return $filters;
+  }
+
 }
