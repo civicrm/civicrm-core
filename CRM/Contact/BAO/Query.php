@@ -5119,39 +5119,7 @@ civicrm_relationship.start_date > {$today}
       $summary['total']['amount'] = $summary['total']['avg'] = $summary['total']['median'] = 0;
     }
 
-    $query = "
-     SELECT COUNT( conts.total_amount ) as cancel_count,
-       SUM(   conts.total_amount ) as cancel_amount,
-       AVG(   conts.total_amount ) as cancel_avg,
-       conts.currency              as currency
-     FROM (
-      SELECT civicrm_contribution.total_amount, civicrm_contribution.currency 
-      $from
-      $where  AND civicrm_contribution.cancel_date IS NOT NULL
-      GROUP BY civicrm_contribution.id
-    ) as conts
-    GROUP BY currency";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-
-    if ($dao->N <= 1) {
-      if ($dao->fetch()) {
-        $summary['cancel']['count'] = $dao->cancel_count;
-        $summary['cancel']['amount'] = CRM_Utils_Money::format($dao->cancel_amount, $dao->currency);
-        $summary['cancel']['avg'] = CRM_Utils_Money::format($dao->cancel_avg, $dao->currency);
-      }
-    }
-    else {
-      $summary['cancel']['count'] = 0;
-      $summary['cancel']['amount'] = $summary['cancel']['avg'] = array();
-      while ($dao->fetch()) {
-        $summary['cancel']['count'] += $dao->cancel_count;
-        $summary['cancel']['amount'][] = CRM_Utils_Money::format($dao->cancel_amount, $dao->currency);
-        $summary['cancel']['avg'][] = CRM_Utils_Money::format($dao->cancel_avg, $dao->currency);
-      }
-      $summary['cancel']['amount'] = implode(',&nbsp;', $summary['cancel']['amount']);
-      $summary['cancel']['avg'] = implode(',&nbsp;', $summary['cancel']['avg']);
-    }
+    $this->addBasicCancelStatsToSummary($summary, $where, $from);
 
     return $summary;
   }
@@ -6691,6 +6659,49 @@ AND   displayRelType.is_active = 1
     }
     else {
       $summary['soft_credit']['amount'] = $summary['soft_credit']['avg'] = 0;
+    }
+  }
+
+  /**
+   * Add basic stats about cancelled contributions to the summary.
+   *
+   * @param array $summary
+   * @param string $where
+   * @param string $from
+   */
+  protected function addBasicCancelStatsToSummary(&$summary, $where, $from) {
+    $query = "
+      SELECT COUNT( conts.total_amount ) as cancel_count,
+       SUM(   conts.total_amount ) as cancel_amount,
+       AVG(   conts.total_amount ) as cancel_avg,
+       conts.currency              as currency
+        FROM (
+      SELECT civicrm_contribution.total_amount, civicrm_contribution.currency
+      $from
+      $where  AND civicrm_contribution.cancel_date IS NOT NULL 
+      GROUP BY civicrm_contribution.id
+    ) as conts
+    GROUP BY currency";
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+
+    if ($dao->N <= 1) {
+      if ($dao->fetch()) {
+        $summary['cancel']['count'] = $dao->cancel_count;
+        $summary['cancel']['amount'] = CRM_Utils_Money::format($dao->cancel_amount, $dao->currency);
+        $summary['cancel']['avg'] = CRM_Utils_Money::format($dao->cancel_avg, $dao->currency);
+      }
+    }
+    else {
+      $summary['cancel']['count'] = 0;
+      $summary['cancel']['amount'] = $summary['cancel']['avg'] = [];
+      while ($dao->fetch()) {
+        $summary['cancel']['count'] += $dao->cancel_count;
+        $summary['cancel']['amount'][] = CRM_Utils_Money::format($dao->cancel_amount, $dao->currency);
+        $summary['cancel']['avg'][] = CRM_Utils_Money::format($dao->cancel_avg, $dao->currency);
+      }
+      $summary['cancel']['amount'] = implode(',&nbsp;', $summary['cancel']['amount']);
+      $summary['cancel']['avg'] = implode(',&nbsp;', $summary['cancel']['avg']);
     }
   }
 
