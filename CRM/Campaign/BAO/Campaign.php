@@ -708,7 +708,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    *
    * @return array|bool
    */
-  public static function entityRefCreateLinks() {
+  public static function getEntityRefCreateLinks() {
     if (CRM_Core_Permission::check([['administer CiviCampaign', 'manage campaign']])) {
       return [
         [
