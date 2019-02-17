@@ -73,6 +73,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     $jobDAO->copyValues($params, TRUE);
     $jobDAO->save();
     if (!empty($params['mailing_id'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('call getRecipients from calling function');
       CRM_Mailing_BAO_Mailing::getRecipients($params['mailing_id']);
     }
     CRM_Utils_Hook::post($op, 'MailingJob', $jobDAO->id, $jobDAO);
