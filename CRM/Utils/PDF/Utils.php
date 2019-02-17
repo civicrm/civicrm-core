@@ -48,7 +48,7 @@ class CRM_Utils_PDF_Utils {
    *
    * @return string|void
    */
-  public static function html2pdf(&$text, $fileName = 'civicrm.pdf', $output = FALSE, $pdfFormat = NULL) {
+  public static function html2pdf($text, $fileName = 'civicrm.pdf', $output = FALSE, $pdfFormat = NULL) {
     if (is_array($text)) {
       $pages = &$text;
     }
@@ -77,17 +77,7 @@ class CRM_Utils_PDF_Utils {
     $b = CRM_Core_BAO_PdfFormat::getValue('margin_bottom', $format);
     $l = CRM_Core_BAO_PdfFormat::getValue('margin_left', $format);
 
-    $stationery_path_partial = CRM_Core_BAO_PdfFormat::getValue('stationery', $format);
-
-    $stationery_path = NULL;
-    if (strlen($stationery_path_partial)) {
-      $doc_root = $_SERVER['DOCUMENT_ROOT'];
-      $stationery_path = $doc_root . "/" . $stationery_path_partial;
-    }
-
     $margins = array($metric, $t, $r, $b, $l);
-
-    $config = CRM_Core_Config::singleton();
 
     // Add a special region for the HTML header of PDF files:
     $pdfHeaderRegion = CRM_Core_Region::instance('export-document-header', FALSE);
@@ -98,14 +88,14 @@ class CRM_Utils_PDF_Utils {
   <head>
     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
     <style>@page { margin: {$t}{$metric} {$r}{$metric} {$b}{$metric} {$l}{$metric}; }</style>
-    <style type=\"text/css\">@import url({$config->userFrameworkResourceURL}css/print.css);</style>
+    <style type=\"text/css\">@import url(" . CRM_Core_Config::singleton()->userFrameworkResourceURL . "css/print.css);</style>
     {$htmlHeader}
   </head>
   <body>
     <div id=\"crm-container\">\n";
 
     // Strip <html>, <header>, and <body> tags from each page
-    $htmlElementstoStrip = array(
+    $htmlElementstoStrip = [
       '@<head[^>]*?>.*?</head>@siu',
       '@<script[^>]*?>.*?</script>@siu',
       '@<body>@siu',
@@ -113,8 +103,8 @@ class CRM_Utils_PDF_Utils {
       '@<html[^>]*?>@siu',
       '@</html>@siu',
       '@<!DOCTYPE[^>]*?>@siu',
-    );
-    $htmlElementsInstead = array('', '', '', '', '', '');
+    ];
+    $htmlElementsInstead = ['', '', '', '', '', ''];
     foreach ($pages as & $page) {
       $page = preg_replace($htmlElementstoStrip,
         $htmlElementsInstead,
@@ -127,12 +117,11 @@ class CRM_Utils_PDF_Utils {
     </div>
   </body>
 </html>";
-    if ($config->wkhtmltopdfPath) {
+    if (CRM_Core_Config::singleton()->wkhtmltopdfPath) {
       return self::_html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName);
     }
     else {
       return self::_html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName);
-      //return self::_html2pdf_tcpdf($paper_size, $orientation, $margins, $html, $output, $fileName,  $stationery_path);
     }
   }
 
