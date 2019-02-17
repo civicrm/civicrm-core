@@ -36,35 +36,37 @@
  *
  * @ingroup civicrm_field_handlers
  */
-class civicrm_handler_field_custom_file extends views_handler_field {
+class civicrm_handler_field_file extends views_handler_field {
   public function construct() {
     parent::construct();
     civicrm_initialize();
-    $this->additional_fields['entity_id'] = 'entity_id';
   }
 
   public function render($values) {
     $value = $values->{$this->field_alias};
-    if (!is_null($value)) {
+    $fileId = CRM_Core_DAO::singleValueQuery("SELECT file_id FROM civicrm_entity_file WHERE entity_id = %1 AND entity_table = %2", [
+      1 => [$value, 'Positive'],
+      2 => [$this->table_alias, 'String'],
+    ]);
+    if (!is_null($fileId)) {
       $path = 'civicrm/file';
       $fileType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File',
-        $value,
+        $fileId,
         'mime_type'
       );
 
       if ($fileType && in_array($fileType, array(
         "image/jpeg", "image/pjpeg", "image/gif", "image/x-png", "image/png"))) {
         $uri = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File',
-          $value,
+          $fileId,
           'uri'
         );
 
         $path = sprintf('%s/imagefile', $path);
       }
-      $entityField = $this->aliases['entity_id'];
-      $fileHash = CRM_Core_BAO_File::generateFileHash($values->$entityField, $value);
+      $fileHash = CRM_Core_BAO_File::generateFileHash($value, $fileId);
       return CRM_Utils_System::url($path,
-        "id={$value}&eid={$values->$entityField}&fcs={$fileHash}",
+        "id={$fileId}&eid={$value}&fcs={$fileHash}",
         TRUE, FALSE, FALSE, TRUE
       );
     }
