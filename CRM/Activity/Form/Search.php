@@ -323,34 +323,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       }
     }
 
-    // Added for membership search
-
-    $signupType = CRM_Utils_Request::retrieve('signupType', 'Positive');
-
-    if ($signupType) {
-      $this->_formValues['activity_role'] = 1;
-      $this->_defaults['activity_role'] = 1;
-      $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
-
-      $renew = CRM_Utils_Array::key('Membership Renewal', $activityTypes);
-      $signup = CRM_Utils_Array::key('Membership Signup', $activityTypes);
-
-      switch ($signupType) {
-        case 3: // signups and renewals
-          $this->_formValues['activity_type_id'][$renew] = 1;
-          $this->_defaults['activity_type_id'][$renew] = 1;
-        case 1: // signups only
-          $this->_formValues['activity_type_id'][$signup] = 1;
-          $this->_defaults['activity_type_id'][$signup] = 1;
-          break;
-
-        case 2: // renewals only
-          $this->_formValues['activity_type_id'][$renew] = 1;
-          $this->_defaults['activity_type_id'][$renew] = 1;
-          break;
-      }
-    }
-
     $dateLow = CRM_Utils_Request::retrieve('dateLow', 'String');
 
     if ($dateLow) {
