@@ -599,7 +599,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
     if ($connectedCampaignId || ($isCampaignEnabled && $hasAccessCampaign)) {
       $showAddCampaign = TRUE;
       $campaign = $form->addEntityRef('campaign_id', ts('Campaign'), [
-        'entity' => 'campaign',
+        'entity' => 'Campaign',
         'create' => TRUE,
         'select' => ['minimumInputLength' => 0],
       ]);

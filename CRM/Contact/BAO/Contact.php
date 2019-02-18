@@ -3704,10 +3704,10 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
   public static function getEntityRefFilters() {
     return [
       ['key' => 'contact_type', 'value' => ts('Contact Type')],
-      ['key' => 'group', 'value' => ts('Group'), 'entity' => 'group_contact'],
-      ['key' => 'tag', 'value' => ts('Tag'), 'entity' => 'entity_tag'],
-      ['key' => 'state_province', 'value' => ts('State/Province'), 'entity' => 'address'],
-      ['key' => 'country', 'value' => ts('Country'), 'entity' => 'address'],
+      ['key' => 'group', 'value' => ts('Group'), 'entity' => 'GroupContact'],
+      ['key' => 'tag', 'value' => ts('Tag'), 'entity' => 'EntityTag'],
+      ['key' => 'state_province', 'value' => ts('State/Province'), 'entity' => 'Address'],
+      ['key' => 'country', 'value' => ts('Country'), 'entity' => 'Address'],
       ['key' => 'gender_id', 'value' => ts('Gender'), 'condition' => ['contact_type' => 'Individual']],
       ['key' => 'is_deceased', 'value' => ts('Deceased'), 'condition' => ['contact_type' => 'Individual']],
       ['key' => 'contact_id', 'value' => ts('Contact ID'), 'type' => 'text'],

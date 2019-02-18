@@ -466,7 +466,7 @@ if (!CRM.vars) CRM.vars = {};
         var entity = $(this).data('api-entity') || '';
         $(this)
           .off('.crmEntity')
-          .removeClass('crm-form-entityref crm-' + entity.toLowerCase() + '-ref')
+          .removeClass('crm-form-entityref crm-' + _.kebabCase(entity) + '-ref')
           .crmSelect2('destroy');
       });
     }
@@ -475,13 +475,17 @@ if (!CRM.vars) CRM.vars = {};
     return $(this).each(function() {
       var
         $el = $(this).off('.crmEntity'),
-        entity = options.entity || $el.data('api-entity') || 'contact',
+        entity = options.entity || $el.data('api-entity') || 'Contact',
         selectParams = {};
+      // Legacy: fix entity name if passed in as snake case
+      if (entity.charAt(0).toUpperCase() !== entity.charAt(0)) {
+        entity = _.capitalize(_.camelCase(entity));
+      }
       $el.data('api-entity', entity);
       $el.data('select-params', $.extend({}, $el.data('select-params') || {}, options.select));
       $el.data('api-params', $.extend(true, {}, $el.data('api-params') || {}, options.api));
       $el.data('create-links', options.create || $el.data('create-links'));
-      $el.addClass('crm-form-entityref crm-' + entity.toLowerCase() + '-ref');
+      $el.addClass('crm-form-entityref crm-' + _.kebabCase(entity) + '-ref');
       var settings = {
         // Use select2 ajax helper instead of CRM.api3 because it provides more value
         ajax: {
@@ -527,7 +531,7 @@ if (!CRM.vars) CRM.vars = {};
         }
       };
       // Create new items inline - works for tags
-      if ($el.data('create-links') && entity.toLowerCase() === 'tag') {
+      if ($el.data('create-links') && entity === 'Tag') {
         selectParams.createSearchChoice = function(term, data) {
           if (!_.findKey(data, {label: term})) {
             return {id: "0", term: term, label: term + ' (' + ts('new tag') + ')'};
@@ -685,7 +689,7 @@ if (!CRM.vars) CRM.vars = {};
     var
       createLinks = $el.data('create-links'),
       params = getEntityRefApiParams($el).params,
-      entity = $el.data('api-entity').toLowerCase(),
+      entity = $el.data('api-entity'),
       markup = '<div class="crm-entityref-links">';
     if (!createLinks || (createLinks === true && !CRM.config.entityRef.links[entity])) {
       return '';
@@ -704,13 +708,12 @@ if (!CRM.vars) CRM.vars = {};
 
   function getEntityRefFilters($el) {
     var
-      entity = $el.data('api-entity').toLowerCase(),
+      entity = $el.data('api-entity'),
       filters = CRM.config.entityRef.filters[entity] || [],
       params = $.extend({params: {}}, $el.data('api-params') || {}).params,
       result = [];
-    $.each(filters, function() {
-      var filter = $.extend({type: 'select', 'attributes': {}, entity: entity}, this);
-      $.extend(this, filter);
+    _.each(filters, function(filter) {
+      _.defaults(filter, {type: 'select', 'attributes': {}, entity: entity});
       if (!params[filter.key]) {
         // Filter out options if params don't match its condition
         if (filter.condition && !_.isMatch(params, _.pick(filter.condition, _.keys(params)))) {
@@ -774,7 +777,6 @@ if (!CRM.vars) CRM.vars = {};
    */
   function renderEntityRefFilterValue($el) {
     var
-      entity = $el.data('api-entity').toLowerCase(),
       filter = $el.data('user-filter') || {},
       filterSpec = filter.key ? _.find(getEntityRefFilters($el), {key: filter.key}) : null,
       $keyField = $('.crm-entityref-filter-key', '#select2-drop'),

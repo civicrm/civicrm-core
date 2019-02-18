@@ -581,14 +581,14 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
     $form->assign('dataURLEventFee', $dataURLEventFee);
 
     $form->addEntityRef('event_id', ts('Event Name'), array(
-        'entity' => 'event',
+        'entity' => 'Event',
         'placeholder' => ts('- any -'),
         'multiple' => 1,
         'select' => array('minimumInputLength' => 0),
       )
     );
     $form->addEntityRef('event_type_id', ts('Event Type'), array(
-        'entity' => 'option_value',
+        'entity' => 'OptionValue',
         'placeholder' => ts('- any -'),
         'select' => array('minimumInputLength' => 0),
         'api' => array(

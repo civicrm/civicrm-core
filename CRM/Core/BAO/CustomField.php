@@ -1093,7 +1093,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         else {
           // FIXME: This won't work with customFieldOptions hook
           $attributes += array(
-            'entity' => 'option_value',
+            'entity' => 'OptionValue',
             'placeholder' => $placeholder,
             'multiple' => $search,
             'api' => array(

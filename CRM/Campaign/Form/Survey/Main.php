@@ -130,7 +130,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     $this->addSelect('activity_type_id', array('option_url' => 'civicrm/admin/campaign/surveyType'), TRUE);
 
     $this->addEntityRef('campaign_id', ts('Campaign'), [
-      'entity' => 'campaign',
+      'entity' => 'Campaign',
       'create' => TRUE,
       'select' => ['minimumInputLength' => 0],
     ]);

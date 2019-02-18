@@ -191,7 +191,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     $this->add('wysiwyg', 'instructions', ts('Introduction'), $attributes['instructions']);
 
     $this->addEntityRef('campaign_id', ts('Campaign'), [
-      'entity' => 'campaign',
+      'entity' => 'Campaign',
       'create' => TRUE,
       'select' => ['minimumInputLength' => 0],
     ]);
