@@ -93,14 +93,14 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
     $notPresent = TRUE;
     $params['contribution_payment_instrument_id']
       = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
-    $result = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityId, $returnvalues, $notPresent, $params, TRUE)->fetchAll();
+    $result = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityId, $returnvalues, $notPresent, $params)->fetchAll();
     $this->assertEquals(count($result), 1, 'In line' . __LINE__);
     $this->assertEquals($result[0]['payment_method'], CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'), 'In line' . __LINE__);
     $params['financial_type_id'] = implode(',', [
       CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
       CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Member Dues'),
     ]);
-    $result = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityId, $returnvalues, $notPresent, $params, TRUE)->fetchAll();
+    $result = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityId, $returnvalues, $notPresent, $params)->fetchAll();
     $this->assertEquals(count($result), 1, 'In line' . __LINE__);
   }
 
