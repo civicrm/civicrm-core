@@ -5100,14 +5100,10 @@ civicrm_relationship.start_date > {$today}
 
     $summary = ['total' => []];
     $this->addBasicStatsToSummary($summary, $where, $from);
-    $this->addModeToStats($summary, $from, $where);
-    $this->addMedianToStats($summary, $where, $from);
 
     if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
       $this->addBasicSoftCreditStatsToStats($summary, $where, $from);
     }
-
-    $summary['total']['currencyCount'] = count($summary['total']['median']);
 
     $this->addBasicCancelStatsToSummary($summary, $where, $from);
 
@@ -6558,68 +6554,15 @@ AND   displayRelType.is_active = 1
       $summary['total']['amount'][] = CRM_Utils_Money::format($dao->total_amount, $dao->currency);
       $summary['total']['avg'][] = CRM_Utils_Money::format($dao->total_avg, $dao->currency);
     }
+    $summary['total']['currencyCount'] = count($summary['total']['amount']);
     if (!empty($summary['total']['amount'])) {
       $summary['total']['amount'] = implode(',&nbsp;', $summary['total']['amount']);
       $summary['total']['avg'] = implode(',&nbsp;', $summary['total']['avg']);
     }
     else {
-      $summary['total']['amount'] = $summary['total']['avg'] = $summary['total']['median'] = 0;
+      $summary['total']['amount'] = $summary['total']['avg'] = 0;
     }
     return $summary;
-  }
-
-  /**
-   * Add the mode to stats.
-   *
-   * Note that his is a slow query when performed on more than a handful or results - often taking many minutes
-   *
-   * See https://lab.civicrm.org/dev/core/issues/720
-   *
-   * @param array $summary
-   * @param string $from
-   * @param string $where
-   */
-  protected function addModeToStats(&$summary, $from, $where) {
-    $modeSQL = "
-      SELECT COUNT( conts.total_amount ) as total_count,
-       SUM(   conts.total_amount ) as total_amount,
-       AVG(   conts.total_amount ) as total_avg,
-       conts.currency              as currency,
-       SUBSTRING_INDEX(GROUP_CONCAT(conts.total_amount
-      ORDER BY conts.civicrm_contribution_total_amount_count DESC SEPARATOR ';'), ';', 1) as amount,
-      MAX(conts.civicrm_contribution_total_amount_count) as civicrm_contribution_total_amount_count
-      FROM (
-        SELECT civicrm_contribution.total_amount,
-        COUNT(civicrm_contribution.total_amount) as civicrm_contribution_total_amount_count,
-        civicrm_contribution.currency
-        $from
-        $where AND civicrm_contribution.contribution_status_id = 1
-      GROUP BY currency, civicrm_contribution.total_amount
-      ORDER BY civicrm_contribution_total_amount_count DESC
-      ) as conts
-      GROUP BY currency";
-
-    $mode = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
-    $summary['total']['mode'] = implode(',&nbsp;', (array) $mode);
-  }
-
-  /**
-   * Add the median to the stats.
-   *
-   * Note that is can be a very slow query - taking many many minutes and even on a small
-   * data set it's likely to take longer than all the other queries combined by a significant
-   * multiple
-   *
-   * see https://lab.civicrm.org/dev/core/issues/720
-   *
-   * @param array $summary
-   * @param string $where
-   * @param string $from
-   */
-  protected function addMedianToStats(&$summary, $where, $from) {
-    $medianSQL = "{$from} {$where} AND civicrm_contribution.contribution_status_id = 1 ";
-    $median = CRM_Contribute_BAO_Contribution::computeStats('median', $medianSQL, 'civicrm_contribution');
-    $summary['total']['median'] = implode(',&nbsp;', (array) $median);
   }
 
   /**
