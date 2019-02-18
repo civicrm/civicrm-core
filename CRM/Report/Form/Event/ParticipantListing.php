@@ -180,7 +180,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'operatorType' => CRM_Report_Form::OP_ENTITYREF,
             'type' => CRM_Utils_Type::T_INT,
             'attributes' => array(
-              'entity' => 'event',
+              'entity' => 'Event',
               'select' => array('minimumInputLength' => 0),
             ),
           ),

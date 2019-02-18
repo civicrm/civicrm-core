@@ -78,7 +78,7 @@ class CRM_Core_Form_Tag {
         $tagset[$tagsetItem]['tagsetElementName'] = $tagsetElementName;
 
         $form->addEntityRef("{$tagsetElementName}[{$parentId}]", $parentNameItem, array(
-          'entity' => 'tag',
+          'entity' => 'Tag',
           'multiple' => TRUE,
           'create' => !$skipTagCreate,
           'api' => array('params' => array('parent_id' => $parentId)),
