@@ -830,12 +830,12 @@ class CRM_Core_Resources {
       if (class_exists($baoName)) {
         $filters = $baoName::getEntityRefFilters();
         if ($filters) {
-          $data['filters'][_civicrm_api_get_entity_name_from_camel($entity)] = $filters;
+          $data['filters'][$entity] = $filters;
         }
         if (is_callable([$baoName, 'getEntityRefCreateLinks'])) {
           $createLinks = $baoName::getEntityRefCreateLinks();
           if ($createLinks) {
-            $data['links'][_civicrm_api_get_entity_name_from_camel($entity)] = $createLinks;
+            $data['links'][$entity] = $createLinks;
           }
         }
       }

@@ -1936,10 +1936,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $props
    *   Mix of html and widget properties, including:.
    *   - select - params to give to select2 widget
-   *   - entity - defaults to contact
+   *   - entity - defaults to Contact
    *   - create - can the user create a new entity on-the-fly?
    *             Set to TRUE if entity is contact and you want the default profiles,
-   *             or pass in your own set of links. @see CRM_Core_BAO_UFGroup::getCreateLinks for format
+   *             or pass in your own set of links. @see CRM_Campaign_BAO_Campaign::getEntityRefCreateLinks for format
    *             note that permissions are checked automatically
    *   - api - array of settings for the getlist api wrapper
    *          note that it accepts a 'params' setting which will be passed to the underlying api
@@ -1951,11 +1951,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return HTML_QuickForm_Element
    */
   public function addEntityRef($name, $label = '', $props = array(), $required = FALSE) {
-    require_once "api/api.php";
-    $config = CRM_Core_Config::singleton();
     // Default properties
     $props['api'] = CRM_Utils_Array::value('api', $props, array());
-    $props['entity'] = _civicrm_api_get_entity_name_from_camel(CRM_Utils_Array::value('entity', $props, 'contact'));
+    $props['entity'] = CRM_Utils_String::convertStringToCamel(CRM_Utils_Array::value('entity', $props, 'Contact'));
     $props['class'] = ltrim(CRM_Utils_Array::value('class', $props, '') . ' crm-form-entityref');
 
     if (array_key_exists('create', $props) && empty($props['create'])) {

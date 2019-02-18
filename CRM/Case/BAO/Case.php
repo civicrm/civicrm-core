@@ -3278,7 +3278,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       ],
     ];
     foreach (CRM_Contact_BAO_Contact::getEntityRefFilters() as $filter) {
-      $filter += ['entity' => 'contact'];
+      $filter += ['entity' => 'Contact'];
       $filter['key'] = 'contact_id.' . $filter['key'];
       $filters[] = $filter;
     }
