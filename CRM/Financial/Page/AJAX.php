@@ -355,13 +355,14 @@ class CRM_Financial_Page_AJAX {
       );
     }
     if (isset($notPresent)) {
-      $transactionLinks = CRM_Financial_Form_BatchTransaction::links();
+      $batchTransaction = new CRM_Financial_Form_BatchTransaction();
       $js = "enableActions('x')";
     }
     else {
-      $transactionLinks = CRM_Financial_Page_BatchTransaction::links();
+      $batchTransaction = new CRM_Financial_Page_BatchTransaction();
       $js = "enableActions('y')";
     }
+    $transactionLinks = $batchTransaction->links();
     if (isset($batchStatus) && !in_array($batchStatus, ['Open', 'Reopened'])) {
       unset($transactionLinks['remove']);
     }
