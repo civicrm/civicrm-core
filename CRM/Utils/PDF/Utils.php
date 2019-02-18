@@ -61,7 +61,7 @@ class CRM_Utils_PDF_Utils {
       // PDF Page Format parameters passed in
       $format = array_merge($format, $pdfFormat);
     }
-    else {
+    elseif (!empty($pdfFormat)) {
       // PDF Page Format ID passed in
       $format = CRM_Core_BAO_PdfFormat::getById($pdfFormat);
     }
