@@ -30,7 +30,7 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2019
  */
-class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
+class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form {
 
   protected $_summary = NULL;
   protected $_groupFilter = TRUE;
