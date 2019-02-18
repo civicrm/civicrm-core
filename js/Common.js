@@ -712,9 +712,8 @@ if (!CRM.vars) CRM.vars = {};
       filters = CRM.config.entityRef.filters[entity] || [],
       params = $.extend({params: {}}, $el.data('api-params') || {}).params,
       result = [];
-    $.each(filters, function() {
-      var filter = $.extend({type: 'select', 'attributes': {}, entity: entity}, this);
-      $.extend(this, filter);
+    _.each(filters, function(filter) {
+      _.defaults(filter, {type: 'select', 'attributes': {}, entity: entity});
       if (!params[filter.key]) {
         // Filter out options if params don't match its condition
         if (filter.condition && !_.isMatch(params, _.pick(filter.condition, _.keys(params)))) {
