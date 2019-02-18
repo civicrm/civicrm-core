@@ -32,7 +32,7 @@ class CRM_Core_CodeGen_Main {
 
   /**
    * @var array
-   *   Ex: $database['tableAttributes_modern'] = "ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
+   *   Ex: $database['tableAttributes_modern'] = "ENGINE=InnoDB ROW_FORMAT=Dynamic DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
    */
   public $database;
 

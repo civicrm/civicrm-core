@@ -704,7 +704,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     ]);
     $dao = CRM_Core_DAO::executeQuery(('SHOW CREATE TABLE ' . $customGroup['values'][$customGroup['id']]['table_name']));
     $dao->fetch();
-    $this->assertContains('`test_link_2` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL', $dao->Create_Table);
+    $this->assertContains('`test_link_2` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL', $dao->Create_Table);
     $this->assertContains('KEY `INDEX_my_text` (`my_text`)', $dao->Create_Table);
   }
 

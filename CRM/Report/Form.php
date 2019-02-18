@@ -460,8 +460,10 @@ class CRM_Report_Form extends CRM_Core_Form {
    * Database attributes - character set and collation.
    *
    * @var string
+   *
+   * @deprecated Use the createTemporaryTable() method to define tables.
    */
-  protected $_databaseAttributes = ' DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci';
+  protected $_databaseAttributes = ' DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci';
 
   /**
    * SQL being run in this report.

@@ -159,7 +159,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery("CREATE TABLE `civicrm_test_table` (
       test_id  int(10) unsigned NOT NULL AUTO_INCREMENT,
       PRIMARY KEY (`test_id`)
-    )  ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+    )  ENGINE=InnoDB ROW_FORMAT=Dynamic DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     $schema = new CRM_Logging_Schema();
     $schema->enableLogging();
     $diffs = $schema->columnsWithDiffSpecs("civicrm_test_table", "log_civicrm_test_table");

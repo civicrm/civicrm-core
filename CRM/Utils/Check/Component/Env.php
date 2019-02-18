@@ -898,9 +898,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     else {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts("Future versions of CiviCRM may require MySQL to support utf8mb4 encoding. It is recommended, though not yet required. Please discuss with your server administrator about configuring your MySQL server for utf8mb4. CiviCRM's recommended configurations are in the <a href='%1' title='System Administrator Guide'>System Administrator Guide</a>", [1 => CRM_Utils_System::docURL2("sysadmin/requirements/#mysql-configuration", TRUE)]),
+        ts('Please configure your MySQL server to support utf8mb4 encoding. You will need the following MySQL server configuration: innodb_large_prefix=true innodb_file_format=barracuda innodb_file_per_table=true'),
         ts('MySQL Emoji Support (utf8mb4)'),
-        \Psr\Log\LogLevel::WARNING,
+        \Psr\Log\LogLevel::ERROR,
         'fa-database'
       );
     }
@@ -912,9 +912,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       if (version_compare($version, '5.0.9', '<')) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__ . 'mysqlnd',
-          ts('It is recommended, though not yet required, to upgrade your PHP MySQL driver (mysqlnd) to >= 5.0.9 for utf8mb4 support.'),
+          ts('Please upgrade your PHP MySQL driver (mysqlnd) to >= 5.0.9 for utf8mb4 support.'),
           ts('PHP MySQL Driver (mysqlnd)'),
-          \Psr\Log\LogLevel::WARNING,
+          \Psr\Log\LogLevel::ERROR,
           'fa-server'
         );
       }
@@ -924,9 +924,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       if (version_compare($version, '5.5.3', '<')) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__ . 'libmysqlclient',
-          ts('It is recommended, though not yet required, to upgrade your PHP MySQL driver (libmysqlclient) to >= 5.5.3 for utf8mb4 support.'),
+          ts('Please upgrade your PHP MySQL driver (libmysqlclient) to >= 5.5.3 for utf8mb4 support.'),
           ts('PHP MySQL Driver (libmysqlclient)'),
-          \Psr\Log\LogLevel::WARNING,
+          \Psr\Log\LogLevel::ERROR,
           'fa-server'
         );
       }

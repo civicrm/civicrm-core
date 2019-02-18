@@ -51,13 +51,13 @@
  */
 class CRM_Utils_SQL_TempTable {
 
-  const UTF8 = 'DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci';
+  const UTF8 = 'DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci';
   const CATEGORY_LENGTH = 12;
   const CATEGORY_REGEXP = ';^[a-zA-Z0-9]+$;';
   // MAX{64} - CATEGORY_LENGTH{12} - CONST_LENGHTH{15} = 37
   const ID_LENGTH = 37;
   const ID_REGEXP = ';^[a-zA-Z0-9_]+$;';
-  const INNODB = 'ENGINE=InnoDB';
+  const INNODB = 'ENGINE=InnoDB ROW_FORMAT=Dynamic';
   const MEMORY = 'ENGINE=MEMORY';
 
   /**

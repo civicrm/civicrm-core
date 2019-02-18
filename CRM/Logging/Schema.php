@@ -806,6 +806,10 @@ COLS;
     $query = preg_replace("/^  [^`].*$/m", '', $query);
     $engine = strtoupper(CRM_Utils_Array::value('engine', $this->logTableSpec[$table], self::ENGINE));
     $engine .= " " . CRM_Utils_Array::value('engine_config', $this->logTableSpec[$table]);
+    // Ignore original ROW_FORMAT if ARCHIVE engine or ROW_FORMAT is specified.
+    if (preg_match('/ARCHIVE|ROW_FORMAT/i', $engine)) {
+      $query = preg_replace('/ROW_FORMAT *= *[a-z]+/i', '', $query);
+    }
     $query = preg_replace("/^\) ENGINE=[^ ]+ /im", ') ENGINE=' . $engine . ' ', $query);
 
     // log_civicrm_contact.modified_date for example would always be copied from civicrm_contact.modified_date,

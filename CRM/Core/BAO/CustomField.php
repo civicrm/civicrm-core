@@ -1657,7 +1657,7 @@ SELECT $columnName
     $table = [
       'name' => $params['name'],
       'is_multiple' => $params['is_multiple'],
-      'attributes' => "ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci",
+      'attributes' => "ENGINE=InnoDB ROW_FORMAT=Dynamic DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci",
       'fields' => [
         [
           'name' => 'id',

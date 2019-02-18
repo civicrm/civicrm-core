@@ -77,7 +77,7 @@ class CRM_Core_CodeGen_Specification {
     $tableAttributes_modern = $tableAttributes_simple = '';
     $this->checkAndAppend($tableAttributes_modern, $dbXML, 'table_type', 'ENGINE=', '');
     $this->checkAndAppend($tableAttributes_simple, $dbXML, 'table_type', 'TYPE=', '');
-    $database['tableAttributes_modern'] = trim($tableAttributes_modern . ' ' . $attributes);
+    $database['tableAttributes_modern'] = trim($tableAttributes_modern . ' ROW_FORMAT=Dynamic ' . $attributes);
     $database['tableAttributes_simple'] = trim($tableAttributes_simple);
 
     $database['comment'] = $this->value('comment', $dbXML, '');

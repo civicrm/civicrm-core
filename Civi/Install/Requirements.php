@@ -616,8 +616,8 @@ class Requirements {
     mysqli_query($conn, 'DROP TABLE IF EXISTS civicrm_utf8mb4_test');
     $r = mysqli_query($conn, 'CREATE TABLE civicrm_utf8mb4_test (id VARCHAR(255), PRIMARY KEY(id(255))) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC ENGINE=INNODB');
     if (!$r) {
-      $results['severity'] = $this::REQUIREMENT_WARNING;
-      $results['details'] = 'It is recommended, though not yet required, to configure your MySQL server for utf8mb4 support. You will need the following MySQL server configuration: innodb_large_prefix=true innodb_file_format=barracuda innodb_file_per_table=true';
+      $results['severity'] = $this::REQUIREMENT_ERROR;
+      $results['details'] = 'Please configure your MySQL server for utf8mb4 support. You will need the following MySQL server configuration: innodb_large_prefix=true innodb_file_format=barracuda innodb_file_per_table=true';
       mysqli_close($conn);
       return $results;
     }
@@ -629,8 +629,8 @@ class Requirements {
       // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
       $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);
       if (version_compare($version, '5.0.9', '<')) {
-        $results['severity'] = $this::REQUIREMENT_WARNING;
-        $results['details'] = 'It is recommended, though not yet required, to upgrade your PHP MySQL driver (mysqlnd) to >= 5.0.9 for utf8mb4 support.';
+        $results['severity'] = $this::REQUIREMENT_ERROR;
+        $results['details'] = 'Please upgrade your PHP MySQL driver (mysqlnd) to >= 5.0.9 for utf8mb4 support.';
         mysqli_close($conn);
         return $results;
       }
@@ -638,8 +638,8 @@ class Requirements {
     else {
       // The libmysqlclient driver supports utf8mb4 starting at version 5.5.3.
       if (version_compare($version, '5.5.3', '<')) {
-        $results['severity'] = $this::REQUIREMENT_WARNING;
-        $results['details'] = 'It is recommended, though not yet required, to upgrade your PHP MySQL driver (libmysqlclient) to >= 5.5.3 for utf8mb4 support.';
+        $results['severity'] = $this::REQUIREMENT_ERROR;
+        $results['details'] = 'Please upgrade your PHP MySQL driver (libmysqlclient) to >= 5.5.3 for utf8mb4 support.';
         mysqli_close($conn);
         return $results;
       }

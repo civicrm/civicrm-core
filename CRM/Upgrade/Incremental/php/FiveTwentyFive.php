@@ -25,10 +25,13 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFive extends CRM_Upgrade_Incremental
    * @param null $currentVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-    // Example: Generate a pre-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
-    // }
+    if ($rev == '5.25.alpha1') {
+      $requirements = new CRM_Utils_Check_Component_Env();
+      $messages = $requirements->checkMysqlUtf8mb4();
+      foreach ($messages as $message) {
+        $preUpgradeMessage .= '<br /><br />' . $message->getMessage();
+      }
+    }
   }
 
   /**
@@ -44,6 +47,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFive extends CRM_Upgrade_Incremental
     // if ($rev == '5.12.34') {
     //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
     // }
+    $postUpgradeMessage .= '<br /><br />' . ts('CiviCRM now supports the utf8mb4 character set. 🐱');
   }
 
   /*
@@ -64,6 +68,26 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFive extends CRM_Upgrade_Incremental
   //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
   //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
   //  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_25_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Migrate to utf8mb4', 'migrateUtf8mb4');
+    // Additional tasks here...
+    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
+    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
+  }
+
+  /**
+   * Performs the utf8mb4 migration.
+   */
+  public static function migrateUtf8mb4(CRM_Queue_TaskContext $ctx) {
+    return CRM_Core_BAO_SchemaHandler::migrateUtf8mb4();
+  }
 
   // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
   //   return TRUE;

@@ -9,7 +9,7 @@
 -- Generated from {$smarty.template}
 -- {$generated}
 --
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 /*******************************************************
 *

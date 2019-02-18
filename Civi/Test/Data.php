@@ -18,7 +18,7 @@ class Data {
       \Civi\Test::schema()->setStrict(FALSE);
 
       // Ensure that when we populate the database it is done in utf8 mode
-      \Civi\Test::execute('SET NAMES utf8');
+      \Civi\Test::execute('SET NAMES utf8mb4');
       $sqlDir = dirname(dirname(__DIR__)) . "/sql";
 
       if (!isset(\Civi\Test::$statics['locale_data'])) {

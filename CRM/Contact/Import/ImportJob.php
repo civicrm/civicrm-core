@@ -68,7 +68,7 @@ class CRM_Contact_Import_ImportJob {
         $tableName = 'civicrm_import_job_' . md5(uniqid(rand(), TRUE));
       }
       $db->query("DROP TABLE IF EXISTS $tableName");
-      $db->query("CREATE TABLE $tableName ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci $createSql");
+      $db->query("CREATE TABLE $tableName ENGINE=InnoDB ROW_FORMAT=Dynamic DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci $createSql");
     }
 
     if (!$tableName) {

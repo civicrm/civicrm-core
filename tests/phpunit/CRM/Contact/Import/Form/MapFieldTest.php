@@ -47,7 +47,8 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testSubmit($params, $mapper, $expecteds = []) {
-    CRM_Core_DAO::executeQuery('CREATE TABLE IF NOT EXISTS civicrm_import_job_xxx (`nada` text, `first_name` text, `last_name` text, `address` text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci');
+
+    CRM_Core_DAO::executeQuery('CREATE TABLE IF NOT EXISTS civicrm_import_job_xxx (`nada` text, `first_name` text, `last_name` text, `address` text) ENGINE=InnoDB ROW_FORMAT=Dynamic DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
     $form = $this->getFormObject('CRM_Contact_Import_Form_MapField');
     /* @var CRM_Contact_Import_Form_MapField $form */
     $form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);

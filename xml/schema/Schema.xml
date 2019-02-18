@@ -2,8 +2,8 @@
 
 <database xmlns:xi="http://www.w3.org/2001/XInclude">
 <name>civicrm</name>
-<character_set>utf8</character_set>
-<collate>utf8_unicode_ci</collate>
+<character_set>utf8mb4</character_set>
+<collate>utf8mb4_unicode_ci</collate>
 <table_type>InnoDB</table_type>
 <comment>Schema for CiviCRM</comment>
 

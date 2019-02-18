@@ -23,7 +23,7 @@
     <title>Replaced Word</title>
     <type>varchar</type>
     <length>255</length>
-    <collate>utf8_bin</collate>
+    <collate>utf8mb4_bin</collate>
     <comment>Word which need to be replaced</comment>
     <add>4.4</add>
   </field>
@@ -32,7 +32,7 @@
     <title>Replacement Word</title>
     <type>varchar</type>
     <length>255</length>
-    <collate>utf8_bin</collate>
+    <collate>utf8mb4_bin</collate>
     <comment>Word which will replace the word in find</comment>
     <add>4.4</add>
   </field>

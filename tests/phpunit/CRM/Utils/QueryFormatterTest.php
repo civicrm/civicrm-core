@@ -13,7 +13,7 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery('
       CREATE TABLE civicrm_fts_example (
         id int(10) unsigned NOT NULL AUTO_INCREMENT,
-        name varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL,
+        name varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
         PRIMARY KEY (id)
       )
     ');
