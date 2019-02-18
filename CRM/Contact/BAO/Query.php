@@ -5109,16 +5109,6 @@ civicrm_relationship.start_date > {$today}
 
     $summary['total']['currencyCount'] = count($summary['total']['median']);
 
-    if (!empty($summary['total']['amount'])) {
-      $summary['total']['amount'] = implode(',&nbsp;', $summary['total']['amount']);
-      $summary['total']['avg'] = implode(',&nbsp;', $summary['total']['avg']);
-      $summary['total']['mode'] = implode(',&nbsp;', $summary['total']['mode']);
-      $summary['total']['median'] = implode(',&nbsp;', $summary['total']['median']);
-    }
-    else {
-      $summary['total']['amount'] = $summary['total']['avg'] = $summary['total']['median'] = 0;
-    }
-
     $this->addBasicCancelStatsToSummary($summary, $where, $from);
 
     return $summary;
@@ -6544,7 +6534,8 @@ AND   displayRelType.is_active = 1
    * @return array
    */
   protected function addBasicStatsToSummary(&$summary, $where, $from) {
-    $summary['total']['count'] = $summary['total']['amount'] = $summary['total']['avg'] = "n/a";
+    $summary['total']['count'] = 0;
+    $summary['total']['amount'] = $summary['total']['avg'] = [];
 
     $query = "
       SELECT COUNT( conts.total_amount ) as total_count,
@@ -6562,12 +6553,17 @@ AND   displayRelType.is_active = 1
 
     $dao = CRM_Core_DAO::executeQuery($query);
 
-    $summary['total']['count'] = 0;
-    $summary['total']['amount'] = $summary['total']['avg'] = [];
     while ($dao->fetch()) {
       $summary['total']['count'] += $dao->total_count;
       $summary['total']['amount'][] = CRM_Utils_Money::format($dao->total_amount, $dao->currency);
       $summary['total']['avg'][] = CRM_Utils_Money::format($dao->total_avg, $dao->currency);
+    }
+    if (!empty($summary['total']['amount'])) {
+      $summary['total']['amount'] = implode(',&nbsp;', $summary['total']['amount']);
+      $summary['total']['avg'] = implode(',&nbsp;', $summary['total']['avg']);
+    }
+    else {
+      $summary['total']['amount'] = $summary['total']['avg'] = $summary['total']['median'] = 0;
     }
     return $summary;
   }
@@ -6603,7 +6599,8 @@ AND   displayRelType.is_active = 1
       ) as conts
       GROUP BY currency";
 
-    $summary['total']['mode'] = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
+    $mode = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
+    $summary['total']['mode'] = implode(',&nbsp;', (array) $mode);
   }
 
   /**
@@ -6621,7 +6618,8 @@ AND   displayRelType.is_active = 1
    */
   protected function addMedianToStats(&$summary, $where, $from) {
     $medianSQL = "{$from} {$where} AND civicrm_contribution.contribution_status_id = 1 ";
-    $summary['total']['median'] = CRM_Contribute_BAO_Contribution::computeStats('median', $medianSQL, 'civicrm_contribution');
+    $median = CRM_Contribute_BAO_Contribution::computeStats('median', $medianSQL, 'civicrm_contribution');
+    $summary['total']['median'] = implode(',&nbsp;', (array) $median);
   }
 
   /**
