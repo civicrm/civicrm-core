@@ -41,16 +41,9 @@
     {if $contributionSummary }
       <tr>
           {if $contributionSummary.total.amount}
-            {if $contributionSummary.total.currencyCount gt 1}
-              <th class="contriTotalLeft right">{ts}Total{/ts} &ndash; {$contributionSummary.total.amount}</th>
-              <th class="left contriTotalRight"> &nbsp; {ts}# Completed{/ts} &ndash; {$contributionSummary.total.count}</th>
-            </tr><tr>
-              <th class="contriTotalLeft">{ts}Avg{/ts} &ndash; {$contributionSummary.total.avg}</th>
-            {else}
-              <th class="contriTotalLeft right">{ts}Total{/ts} &ndash; {$contributionSummary.total.amount}</th>
-              <th class="right"> &nbsp; {ts}# Completed{/ts} &ndash; {$contributionSummary.total.count}</th>
-              <th class="right contriTotalRight"> &nbsp; {ts}Avg{/ts} &ndash; {$contributionSummary.total.avg}</th>
-            {/if}
+            <th class="contriTotalLeft right">{ts}Total{/ts} &ndash; {$contributionSummary.total.amount}</th>
+            <th class="right"> &nbsp; {ts}# Completed{/ts} &ndash; {$contributionSummary.total.count}</th>
+            <th class="right contriTotalRight"> &nbsp; {ts}Avg{/ts} &ndash; {$contributionSummary.total.avg}</th>
           {/if}
           {if $contributionSummary.cancel.amount}
             <th class="disabled right contriTotalRight"> &nbsp; {ts}Cancelled/Refunded{/ts} &ndash; {$contributionSummary.cancel.amount}</th>

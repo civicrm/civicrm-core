@@ -6554,7 +6554,7 @@ AND   displayRelType.is_active = 1
       $summary['total']['amount'][] = CRM_Utils_Money::format($dao->total_amount, $dao->currency);
       $summary['total']['avg'][] = CRM_Utils_Money::format($dao->total_avg, $dao->currency);
     }
-    $summary['total']['currencyCount'] = count($summary['total']['amount']);
+
     if (!empty($summary['total']['amount'])) {
       $summary['total']['amount'] = implode(',&nbsp;', $summary['total']['amount']);
       $summary['total']['avg'] = implode(',&nbsp;', $summary['total']['avg']);

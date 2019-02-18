@@ -734,7 +734,6 @@ civicrm_relationship.is_active = 1 AND
         'avg' => '$ 233.33',
         'amount' => '$ 1,400.00',
         'count' => 6,
-        'currencyCount' => 1,
         ],
       'cancel' => [
         'count' => 2,
