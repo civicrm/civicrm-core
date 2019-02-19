@@ -6729,16 +6729,19 @@ AND   displayRelType.is_active = 1
    * @return bool
    */
   private function pseudoConstantIsIDField($field) {
-      // Are we looking at a field that ends in '_id' where the variant without '_id'
-      // has been requested.
-      // (this limitation is about cautious expansion - not a logical limit)
-      if (substr($field['name'], -3, 3) === '_id'
-        && (CRM_Utils_Array::value($field['name'], $this->_returnProperties)
-          || CRM_Utils_Array::value(str_replace('_id', '', $field['name']), $this->_returnProperties)
-        )) {
-        return TRUE;
+    // Are we looking at a field that ends in '_id' where the variant without '_id'
+    // has been requested.
+    // (this limitation is about cautious expansion - not a logical limit)
+    if (substr($field['name'], -3, 3) === '_id'
+      && (CRM_Utils_Array::value($field['name'], $this->_returnProperties)
+        || CRM_Utils_Array::value(str_replace('_id', '', $field['name']), $this->_returnProperties)
+      )) {
+      if ($field['name'] !== 'financial_type_id') {
+        throw new CRM_Core_Exception('Eileen wants to know what fields hit this' . $field['name']);
       }
-      return FALSE;
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }
