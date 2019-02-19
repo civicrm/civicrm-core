@@ -871,14 +871,28 @@ class CRM_Contact_BAO_Query {
                 // (which is an unindexed join) we render the option value on output.
                 // @todo - extend this to other pseudoconstants.
                 if ($this->pseudoConstantNameIsInReturnProperties($field, $name)) {
-                  $pseudoFieldName = $field['pseudoconstant']['optionGroupName'];
-                  $this->_pseudoConstantsSelect[$pseudoFieldName] = array(
-                    'pseudoField' => $field['name'],
-                    'idCol' => $name,
-                    'field_name' => $field['name'],
-                    'bao' => $field['bao'],
-                    'pseudoconstant' => $field['pseudoconstant'],
-                  );
+                  $pseudoFieldSpec = $field['pseudoconstant'];
+
+                  if (isset($pseudoFieldSpec['optionGroupName'])) {
+                    $pseudoFieldName = $pseudoFieldSpec['optionGroupName'];
+                    $this->_pseudoConstantsSelect[$pseudoFieldName] = [
+                      'pseudoField' => $field['name'],
+                      'idCol' => $name,
+                      'field_name' => $field['name'],
+                      'bao' => $field['bao'],
+                      'pseudoconstant' => $pseudoFieldSpec,
+                    ];
+                  }
+                  else {
+                    $pseudoFieldName = str_replace('_id', '', $field['name']);
+                    $this->_pseudoConstantsSelect[$pseudoFieldName] = [
+                      'pseudoField' => str_replace('_id', '', $field['name']),
+                      'idCol' => $name,
+                      'field_name' => $field['name'],
+                      'bao' => $field['bao'],
+                      'pseudoconstant' => $pseudoFieldSpec,
+                    ];
+                  }
                   $this->_tables[$tableName] = 1;
                   $this->_element[$pseudoFieldName] = 1;
                 }
@@ -6492,8 +6506,11 @@ AND   displayRelType.is_active = 1
    * @return bool
    */
   private function pseudoConstantNameIsInReturnProperties($field, $fieldName = NULL) {
-    if (!isset($field['pseudoconstant']['optionGroupName'])) {
+    if (!isset($field['pseudoconstant'])) {
       return FALSE;
+    }
+    if (!isset($field['pseudoconstant']['optionGroupName'])) {
+      return $this->pseudoConstantIsIDField($field);
     }
 
     if (CRM_Utils_Array::value($field['pseudoconstant']['optionGroupName'], $this->_returnProperties)) {
@@ -6503,7 +6520,7 @@ AND   displayRelType.is_active = 1
       return TRUE;
     }
     // Is this still required - the above goes off the unique name. Test with things like
-    // communication_prefferences & prefix_id.
+    // communication_preferences & prefix_id.
     if (CRM_Utils_Array::value($field['name'], $this->_returnProperties)) {
       return TRUE;
     }
@@ -6701,6 +6718,27 @@ AND   displayRelType.is_active = 1
       $summary['cancel']['amount'] = implode(',&nbsp;', $summary['cancel']['amount']);
       $summary['cancel']['avg'] = implode(',&nbsp;', $summary['cancel']['avg']);
     }
+  }
+
+  /**
+   * Is this a field where the id can be transformed to a name or label based on the
+   * pseudoconstant.
+   *
+   * @param array $field
+   *
+   * @return bool
+   */
+  private function pseudoConstantIsIDField($field) {
+      // Are we looking at a field that ends in '_id' where the variant without '_id'
+      // has been requested.
+      // (this limitation is about cautious expansion - not a logical limit)
+      if (substr($field['name'], -3, 3) === '_id'
+        && (CRM_Utils_Array::value($field['name'], $this->_returnProperties)
+          || CRM_Utils_Array::value(str_replace('_id', '', $field['name']), $this->_returnProperties)
+        )) {
+        return TRUE;
+      }
+      return FALSE;
   }
 
 }

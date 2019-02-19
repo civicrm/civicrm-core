@@ -68,14 +68,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
     }
 
-    // get financial_type
-    if (!empty($query->_returnProperties['financial_type'])) {
-      $query->_select['financial_type'] = "civicrm_financial_type.name as financial_type";
-      $query->_element['financial_type'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['civicrm_financial_type'] = 1;
-    }
-
     // get accounting code
     if (!empty($query->_returnProperties['accounting_code'])) {
       $query->_select['accounting_code'] = "civicrm_financial_account.accounting_code as accounting_code";
@@ -167,7 +159,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     // These are legacy names.
     // @todo enotices when these are hit so we can start to elimnate them.
     $fieldAliases = array(
-      'financial_type' => 'financial_type_id',
       'contribution_page' => 'contribution_page_id',
       'payment_instrument' => 'payment_instrument_id',
       // or payment_instrument_id?
@@ -565,6 +556,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         break;
 
       case 'civicrm_financial_type':
+        CRM_Core_Error::deprecatedFunctionWarning('this join should not be needed');
         if ($mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
           $from = " INNER JOIN civicrm_financial_type ON civicrm_contribution.financial_type_id = civicrm_financial_type.id ";
         }
@@ -765,7 +757,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       'contact_type' => 1,
       'contact_sub_type' => 1,
       'sort_name' => 1,
-      'financial_type' => 1,
+      'financial_type_id' => 1,
       'contribution_source' => 1,
       'is_test' => 1,
       'receive_date' => 1,
@@ -821,7 +813,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         //this
         'display_name' => 1,
         // array
-        'financial_type' => 1,
+        'financial_type_id' => 1,
         // to
         'contribution_source' => 1,
         // strangle
