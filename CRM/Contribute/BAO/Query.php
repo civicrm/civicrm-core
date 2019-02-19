@@ -155,8 +155,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $quoteValue = "\"$value\"";
     }
 
-    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-
     $recurrringFields = CRM_Contribute_BAO_ContributionRecur::getRecurringFields();
     unset($recurrringFields['contribution_recur_payment_made']);
     foreach ($recurrringFields as $dateField => $dateFieldTitle) {
@@ -418,14 +416,12 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'contribution_note':
-        $value = $strtolower(CRM_Core_DAO::escapeString($value));
+        $value = CRM_Core_DAO::escapeString($value);
         if ($wildcard) {
           $value = "%$value%";
           $op = 'LIKE';
         }
-        // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-        $wc = ($op != 'LIKE') ? "LOWER(civicrm_note.note)" : "civicrm_note.note";
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($wc, $op, $value, "String");
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_note.note', $op, $value, "String");
         $query->_qill[$grouping][] = ts('Contribution Note %1 %2', array(1 => $op, 2 => $quoteValue));
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = $query->_whereTables['contribution_note'] = 1;
         return;
