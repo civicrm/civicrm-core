@@ -4400,6 +4400,8 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
   /**
    * Compute the stats values
    *
+   * @deprecated
+   *
    * @param string $stat either 'mode' or 'median'
    * @param string $sql
    * @param string $alias of civicrm_contribution
@@ -4407,58 +4409,8 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
    * @return array|null
    */
   public static function computeStats($stat, $sql, $alias = NULL) {
-    $mode = $median = array();
-    switch ($stat) {
-      case 'mode':
-        $modeDAO = CRM_Core_DAO::executeQuery($sql);
-        while ($modeDAO->fetch()) {
-          if ($modeDAO->civicrm_contribution_total_amount_count > 1) {
-            $mode[] = CRM_Utils_Money::format($modeDAO->amount, $modeDAO->currency);
-          }
-          else {
-            $mode[] = 'N/A';
-          }
-        }
-        return $mode;
-
-      case 'median':
-        $currencies = CRM_Core_OptionGroup::values('currencies_enabled');
-        foreach ($currencies as $currency => $val) {
-          $midValue = 0;
-          $where = "AND {$alias}.currency = '{$currency}'";
-          $rowCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) as count {$sql} {$where}");
-
-          $even = FALSE;
-          $offset = 1;
-          $medianRow = floor($rowCount / 2);
-          if ($rowCount % 2 == 0 && !empty($medianRow)) {
-            $even = TRUE;
-            $offset++;
-            $medianRow--;
-          }
-
-          $medianValue = "SELECT {$alias}.total_amount as median
-             {$sql} {$where}
-             ORDER BY median LIMIT {$medianRow},{$offset}";
-          $medianValDAO = CRM_Core_DAO::executeQuery($medianValue);
-          while ($medianValDAO->fetch()) {
-            if ($even) {
-              $midValue = $midValue + $medianValDAO->median;
-            }
-            else {
-              $median[] = CRM_Utils_Money::format($medianValDAO->median, $currency);
-            }
-          }
-          if ($even) {
-            $midValue = $midValue / 2;
-            $median[] = CRM_Utils_Money::format($midValue, $currency);
-          }
-        }
-        return $median;
-
-      default:
-        return NULL;
-    }
+    CRM_Core_Error::deprecatedFunctionWarning('computeStats is now deprecated');
+    return [];
   }
 
   /**
