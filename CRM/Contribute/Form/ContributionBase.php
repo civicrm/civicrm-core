@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -210,6 +210,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @var int
    */
   public $paymentInstrumentID;
+
+  /**
+   * Is the price set quick config.
+   * @return bool
+   */
+  public function isQuickConfig() {
+    return isset(self::$_quickConfig) ? self::$_quickConfig : FALSE;
+  }
 
   /**
    * Set variables up before form is built.
@@ -476,8 +484,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->_defaults = array();
 
     $this->_amount = $this->get('amount');
+    // Assigning this to the template means it will be passed through to the payment form.
+    // This can, for example, by used by payment processors using client side encryption
+    $this->assign('currency', $this->getCurrency());
 
     //CRM-6907
+    // these lines exist to support a non-default currenty on the form but are probably
+    // obsolete & meddling wth the defaultCurrency is not the right approach....
     $config = CRM_Core_Config::singleton();
     $config->defaultCurrency = CRM_Utils_Array::value('currency',
       $this->_values,
@@ -609,6 +622,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           $this->assign('credit_card_number',
             CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $this->_params))
           );
+        }
+        elseif ($paymentField === 'credit_card_type') {
+          $this->assign('credit_card_type', CRM_Core_PseudoConstant::getLabel(
+            'CRM_Core_BAO_FinancialTrxn',
+            'card_type_id',
+            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->_params['credit_card_type'])
+          ));
         }
         else {
           $this->assign($paymentField, $this->_params[$paymentField]);

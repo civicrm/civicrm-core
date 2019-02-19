@@ -575,7 +575,16 @@ function _civicrm_member_roles_sync($ext_uid = NULL, $cid = NULL, $sync_type = N
         $inactive[] = $value['id'];
       }
       foreach ($memberships['values'] as $key => $membership) {
-        if (in_array($membership['status_id'], $inactive)) {
+        //Do not unset if inactive membership status is chosen as an option for synchronization.
+        $inactiveStatusSync = FALSE;
+        if (!empty($memberroles[$membership['membership_type_id']])) {
+          foreach ($memberroles[$membership['membership_type_id']] as $rolerule) {
+            if (in_array($membership['status_id'], $rolerule['codes']['current'])) {
+              $inactiveStatusSync = TRUE;
+            }
+          }
+        }
+        if (in_array($membership['status_id'], $inactive) && !$inactiveStatusSync) {
           unset($memberships['values'][$key]);
         }
       }

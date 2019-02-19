@@ -94,11 +94,11 @@ class CRM_Core_CodeGen_Specification {
     $tables = array();
     foreach ($dbXML->tables as $tablesXML) {
       foreach ($tablesXML->table as $tableXML) {
-        if ($this->value('drop', $tableXML, 0) > 0 and $this->value('drop', $tableXML, 0) <= $this->buildVersion) {
+        if ($this->value('drop', $tableXML, 0) > 0 && version_compare($this->value('drop', $tableXML, 0), $this->buildVersion, '<=')) {
           continue;
         }
 
-        if ($this->value('add', $tableXML, 0) <= $this->buildVersion) {
+        if (version_compare($this->value('add', $tableXML, 0), $this->buildVersion, '<=')) {
           $this->getTable($tableXML, $database, $tables);
         }
       }
@@ -222,11 +222,11 @@ class CRM_Core_CodeGen_Specification {
 
     $fields = array();
     foreach ($tableXML->field as $fieldXML) {
-      if ($this->value('drop', $fieldXML, 0) > 0 and $this->value('drop', $fieldXML, 0) <= $this->buildVersion) {
+      if ($this->value('drop', $fieldXML, 0) > 0 && version_compare($this->value('drop', $fieldXML, 0), $this->buildVersion, '<=')) {
         continue;
       }
 
-      if ($this->value('add', $fieldXML, 0) <= $this->buildVersion) {
+      if (version_compare($this->value('add', $fieldXML, 0), $this->buildVersion, '<=')) {
         $this->getField($fieldXML, $fields);
       }
     }
@@ -240,7 +240,7 @@ class CRM_Core_CodeGen_Specification {
     if ($this->value('index', $tableXML)) {
       $index = array();
       foreach ($tableXML->index as $indexXML) {
-        if ($this->value('drop', $indexXML, 0) > 0 and $this->value('drop', $indexXML, 0) <= $this->buildVersion) {
+        if ($this->value('drop', $indexXML, 0) > 0 && version_compare($this->value('drop', $indexXML, 0), $this->buildVersion, '<=')) {
           continue;
         }
 
@@ -254,10 +254,10 @@ class CRM_Core_CodeGen_Specification {
       $foreign = array();
       foreach ($tableXML->foreignKey as $foreignXML) {
 
-        if ($this->value('drop', $foreignXML, 0) > 0 and $this->value('drop', $foreignXML, 0) <= $this->buildVersion) {
+        if ($this->value('drop', $foreignXML, 0) > 0 && version_compare($this->value('drop', $foreignXML, 0), $this->buildVersion, '<=')) {
           continue;
         }
-        if ($this->value('add', $foreignXML, 0) <= $this->buildVersion) {
+        if (version_compare($this->value('add', $foreignXML, 0), $this->buildVersion, '<=')) {
           $this->getForeignKey($foreignXML, $fields, $foreign, $name);
         }
       }
@@ -267,10 +267,10 @@ class CRM_Core_CodeGen_Specification {
     if ($this->value('dynamicForeignKey', $tableXML)) {
       $dynamicForeign = array();
       foreach ($tableXML->dynamicForeignKey as $foreignXML) {
-        if ($this->value('drop', $foreignXML, 0) > 0 and $this->value('drop', $foreignXML, 0) <= $this->buildVersion) {
+        if ($this->value('drop', $foreignXML, 0) > 0 && version_compare($this->value('drop', $foreignXML, 0), $this->buildVersion, '<=')) {
           continue;
         }
-        if ($this->value('add', $foreignXML, 0) <= $this->buildVersion) {
+        if (version_compare($this->value('add', $foreignXML, 0), $this->buildVersion, '<=')) {
           $this->getDynamicForeignKey($foreignXML, $dynamicForeign, $name);
         }
       }
@@ -336,12 +336,13 @@ class CRM_Core_CodeGen_Specification {
         break;
 
       default:
-        $field['sqlType'] = $field['phpType'] = $type;
+        $field['phpType'] = $this->value('phpType', $fieldXML, $type);
+        $field['sqlType'] = $type;
         if ($type == 'int unsigned') {
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }
         else {
-          $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
+          $field['crmType'] = $this->value('crmType', $fieldXML, 'CRM_Utils_Type::T_' . strtoupper($type));
         }
         break;
     }
@@ -402,7 +403,9 @@ class CRM_Core_CodeGen_Specification {
         $field['widget']['required'] = $this->value('required', $fieldXML);
       }
     }
-
+    if (isset($fieldXML->localize_context)) {
+      $field['localize_context'] = $fieldXML->localize_context;
+    }
     $field['pseudoconstant'] = $this->value('pseudoconstant', $fieldXML);
     if (!empty($field['pseudoconstant'])) {
       //ok this is a bit long-winded but it gets there & is consistent with above approach

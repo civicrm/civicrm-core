@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,10 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
-/*
+
+/**
  * Settings metadata file
  */
 
@@ -41,26 +40,30 @@ return array(
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
     'name' => 'is_enabled',
-    'title' => 'Multisite Is enabled',
-    'type' => 'Integer',
+    'title' => ts('Enable Multi Site Configuration'),
+    'html_type' => 'checkbox',
+    'type' => 'Boolean',
     'default' => '0',
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Multisite is enabled',
+    'description' => ts('Make CiviCRM aware of multiple domains. You should configure a domain group if enabled'),
+    'documentation_link' => ['page' => 'Multi Site Installation', 'resource' => 'wiki'],
     'help_text' => NULL,
   ),
   'domain_group_id' => array(
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
     'name' => 'domain_group_id',
-    'title' => 'Multisite Domain Group',
+    'title' => ts('Multisite Domain Group'),
     'type' => 'Integer',
+    'html_type' => 'entity_reference',
+    'entity_reference_options' => ['entity' => 'group', 'select' => array('minimumInputLength' => 0)],
     'default' => '0',
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
+    'description' => ts('Contacts created on this site are added to this group'),
     'help_text' => NULL,
   ),
   'event_price_set_domain_id' => array(

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -595,6 +595,18 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
     else {
       parent::assignTestValue($fieldName, $fieldDef, $counter);
     }
+  }
+
+  /**
+   * Get the default financial account id for payment processor accounts.
+   *
+   * Note that there is only a 'name' field & no label field. If people customise
+   * name then this won't work. This is new best-effort functionality so that's non-regressive.
+   *
+   * The fix for that is to add a label value to the financial account table.
+   */
+  public static function getDefaultFinancialAccountID() {
+    return CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_EntityFinancialAccount', 'financial_account_id', 'Payment Processor Account');
   }
 
 }

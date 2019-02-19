@@ -58,7 +58,9 @@
           if (!settings.yearRange && settings.minDate !== null && settings.maxDate !== null) {
             settings.yearRange = '' + CRM.utils.formatDate(settings.minDate, 'yy') + ':' + CRM.utils.formatDate(settings.maxDate, 'yy');
           }
-          $dateField.addClass('crm-form-date').datepicker(settings);
+          // Set placeholder as calendar icon (`fa-calendar` is Unicode f073)
+          // and add datepicker
+          $dateField.addClass('crm-form-date').attr({placeholder: '\uF073'}).datepicker(settings);
         } else {
           $dateField.attr('min', settings.minDate ? CRM.utils.formatDate(settings.minDate, 'yy') : '1000');
           $dateField.attr('max', settings.maxDate ? CRM.utils.formatDate(settings.maxDate, 'yy') : '4000');

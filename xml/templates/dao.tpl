@@ -1,7 +1,7 @@
 <?php
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  *
  * Generated from {$table.sourceFile}
  * {$generated}
@@ -90,10 +90,10 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                  'name'      => '{$field.name}',
                                                                       'type'      => {$field.crmType},
 {if $field.title}
-                                                                      'title'     => ts('{$field.title}'),
+                                                                      'title'     => {$tsFunctionName}('{$field.title}'),
 {/if}
 {if $field.comment}
-                                                                      'description'     => '{$field.comment|replace:"'":"\'"}',
+                                                                      'description'     => {$tsFunctionName}('{$field.comment|replace:"'":"\'"}'),
 {/if}
 {if $field.required}
                                         'required'  => {$field.required|strtoupper},
@@ -138,6 +138,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
   'entity' => '{$table.entity}',
   'bao' => '{$table.bao}',
   'localizable' => {if $field.localizable}1{else}0{/if},
+  {if $field.localize_context}'localize_context' => '{$field.localize_context}',{/if}
 
 {if $field.FKClassName}
                       'FKClassName' => '{$field.FKClassName}',
@@ -148,7 +149,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if $field.html}
   'html' => array(
   {foreach from=$field.html item=val key=key}
-    '{$key}' => {if $key eq 'label'}ts("{$val}"){else}'{$val}'{/if},
+    '{$key}' => {if $key eq 'label'}{$tsFunctionName}("{$val}"){else}'{$val}'{/if},
   {/foreach}
   ),
 {/if}

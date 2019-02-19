@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -55,16 +55,17 @@ class CRM_Custom_Form_CustomData {
   public static function addToForm(&$form, $subType = NULL, $subName = NULL, $groupCount = 1) {
     $entityName = $form->getDefaultEntity();
     $entityID = $form->getEntityId();
+    $entitySubType = $form->getEntitySubTypeId($subType);
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
-      self::preProcess($form, $subName, $subType, $groupCount, $entityName, $entityID);
+      self::preProcess($form, $subName, $entitySubType, $groupCount, $entityName, $entityID);
       self::buildQuickForm($form);
       self::setDefaultValues($form);
     }
     // need to assign custom data type and subtype to the template
     $form->assign('customDataType', $entityName);
-    $form->assign('customDataSubType', $subType);
+    $form->assign('customDataSubType', $entitySubType);
     $form->assign('entityID', $entityID);
   }
 

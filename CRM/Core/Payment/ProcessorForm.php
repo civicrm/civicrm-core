@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@ use Civi\Payment\System;
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 
@@ -72,8 +72,7 @@ class CRM_Core_Payment_ProcessorForm {
 
     $form->assign('suppressSubmitButton', $form->_paymentObject->isSuppressSubmitButtons());
 
-    $currency = $form->getCurrency();
-    $form->assign('currency', $currency);
+    $form->assign('currency', $form->getCurrency());
 
     // also set cancel subscription url
     if (!empty($form->_paymentProcessor['is_recur']) && !empty($form->_values['is_recur'])) {

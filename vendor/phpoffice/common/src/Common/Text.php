@@ -64,7 +64,7 @@ class Text
 
         return str_replace(array_values(self::$controlCharacters), array_keys(self::$controlCharacters), $value);
     }
-    
+
     /**
      * Return a number formatted for being integrated in xml files
      * @param float $number
@@ -74,7 +74,7 @@ class Text
     {
         return number_format($number, $decimals, '.', '');
     }
-    
+
     /**
      * @param int $dec
      * @link http://stackoverflow.com/a/7153133/2235790
@@ -115,14 +115,12 @@ class Text
     /**
      * Check if a string contains UTF-8 data
      *
-     * @deprecated 0.2.4 Use `Zend\Stdlib\StringUtils::isValidUtf8` instead.
-     *
      * @param string $value
      * @return boolean
      */
     public static function isUTF8($value = '')
     {
-        return $value === '' || preg_match('/^./su', $value) === 1;
+        return is_string($value) && ($value === '' || preg_match('/^./su', $value) == 1);
     }
 
     /**

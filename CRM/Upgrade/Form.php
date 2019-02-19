@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -50,7 +50,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * Minimum php version required to run (equal to or lower than the minimum install version)
    */
-  const MINIMUM_PHP_VERSION = '5.5';
+  const MINIMUM_PHP_VERSION = '5.6';
 
   protected $_config;
 

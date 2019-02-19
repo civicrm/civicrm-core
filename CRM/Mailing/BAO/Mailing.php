@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 require_once 'Mail/mime.php';
 
@@ -160,7 +160,9 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         ->param('#groupIDs', $groupIDs)
         ->execute();
       while ($groupDAO->fetch()) {
-        if ($groupDAO->cache_date == NULL) {
+        // hidden smart groups always have a cache date and there is no other way
+        //  we can rebuilt the contact list from UI so consider such smart group
+        if ($groupDAO->cache_date == NULL || $groupDAO->is_hidden) {
           CRM_Contact_BAO_GroupContactCache::load($groupDAO);
         }
         if ($groupType == 'Include') {
@@ -235,10 +237,9 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         'location_filter' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.phone_type_id = " . CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_Phone', 'phone_type_id', 'Mobile')),
         'phone_not_null' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.phone IS NOT NULL"),
         'phone_not_empty' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.phone != ''"),
-        'is_primary' => CRM_Utils_SQL_Select::fragment()->where("$entityTable.is_primary = 1"),
         'mailing_id' => CRM_Utils_SQL_Select::fragment()->where("mg.mailing_id = #mailingID"),
         'temp_contact_null' => CRM_Utils_SQL_Select::fragment()->where('temp.contact_id IS null'),
-        'order_by' => CRM_Utils_SQL_Select::fragment()->orderBy("$entityTable.is_primary = 1"),
+        'order_by' => CRM_Utils_SQL_Select::fragment()->orderBy("$entityTable.is_primary"),
       );
     }
     else {
@@ -1812,6 +1813,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $report['mailing'] = array();
     foreach (array_keys(self::fields()) as $field) {
+      if ($field == 'mailing_modified_date') {
+        $field = 'modified_date';
+      }
       $report['mailing'][$field] = $mailing->$field;
     }
 
@@ -2194,6 +2198,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
                'forward',
                'reply',
                'opened',
+               'opened_unique',
                'optout',
              ) as $key) {
       $url = 'mailing/detail';
@@ -2231,6 +2236,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
           break;
 
         case 'opened':
+          $reportFilter .= "&distinct=0"; // do not use group by clause in report, because same report used for total and unique open
+        case 'opened_unique':
           $url = "mailing/opened";
           $searchFilter .= "&mailing_open_status=Y";
           break;

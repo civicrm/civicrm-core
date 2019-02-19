@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Address Utilities
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_Address {
 
@@ -331,7 +331,6 @@ class CRM_Utils_Address {
       "city" => "billing_city-{$billingLocationTypeID}",
       "postal_code" => "billing_postal_code-{$billingLocationTypeID}",
       "state_province" => "state_province-{$billingLocationTypeID}",
-      "state_province_name" => "state_province-{$billingLocationTypeID}",
       "country" => "country-{$billingLocationTypeID}",
     );
 
@@ -349,13 +348,10 @@ class CRM_Utils_Address {
           $value = $params[$alternateName];
         }
       }
-      if (is_numeric($value) && ($name == 'state_province' || $name == 'state_province_name' || $name == 'country')) {
+      if (is_numeric($value) && ($name == 'state_province' || $name == 'country')) {
         if ($name == 'state_province') {
           $addressFields[$name] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($value);
           $addressFields[$name . '_name'] = CRM_Core_PseudoConstant::stateProvince($value);
-        }
-        if ($name == 'state_province_name') {
-          $addressFields[$name] = CRM_Core_PseudoConstant::stateProvince($value);
         }
         if ($name == 'country') {
           $addressFields[$name] = CRM_Core_PseudoConstant::countryIsoCode($value);

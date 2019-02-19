@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 require_once 'packages/When/When.php';
@@ -350,7 +350,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           // skip the recursion-start-date from the list we going to generate
           $skip = TRUE;
         }
-        $baseDate = CRM_Utils_Date::processDate($result->format('Y-m-d H:i:s'));
+        $baseDate = $result->format('YmdHis');
 
         foreach ($this->dateColumns as $col) {
           $recursionDates[$count][$col] = $baseDate;
@@ -358,7 +358,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         foreach ($this->intervalDateColumns as $col => $interval) {
           $newDate = new DateTime($baseDate);
           $newDate->add($interval);
-          $recursionDates[$count][$col] = CRM_Utils_Date::processDate($newDate->format('Y-m-d H:i:s'));
+          $recursionDates[$count][$col] = $newDate->format('YmdHis');
         }
         if ($exRangeStart) {
           $exRangeStartDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value($exRangeStart, $recursionDates[$count]), NULL, FALSE, 'Ymd');
@@ -889,7 +889,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         $repetitionStartDate = $repetitionStartDate . " " . $formParams['repetition_start_date_time'];
       }
       $repetition_start_date = new DateTime($repetitionStartDate);
-      $dbParams['start_action_date'] = CRM_Utils_Date::processDate($repetition_start_date->format('Y-m-d H:i:s'));
+      $dbParams['start_action_date'] = $repetition_start_date->format('YmdHis');
     }
 
     if (!empty($formParams['repetition_frequency_unit'])) {

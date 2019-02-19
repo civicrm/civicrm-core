@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -168,7 +168,7 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
         );
         // Financial Type
         if (!empty($premiumsProductDao->financial_type_id)) {
-          $premiums[$productDAO->id]['financial_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Financial_BAO_FinancialType', 'financial_type', $premiumsProductDao->financial_type_id);
+          $premiums[$productDAO->id]['financial_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Product', 'financial_type_id', $premiumsProductDao->financial_type_id);
         }
       }
     }

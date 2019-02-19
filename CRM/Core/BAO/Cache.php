@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -75,14 +75,17 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       $cache = CRM_Utils_Cache::singleton();
       $cleanKey = self::cleanKey($argString);
       self::$_cache[$argString] = $cache->get($cleanKey);
-      if (!self::$_cache[$argString]) {
+      if (self::$_cache[$argString] === NULL) {
         $table = self::getTableName();
         $where = self::whereCache($group, $path, $componentID);
         $rawData = CRM_Core_DAO::singleValueQuery("SELECT data FROM $table WHERE $where");
         $data = $rawData ? self::decode($rawData) : NULL;
 
         self::$_cache[$argString] = $data;
-        $cache->set($cleanKey, self::$_cache[$argString]);
+        if ($data !== NULL) {
+          // Do not cache 'null' as that is most likely a cache miss & we shouldn't then cache it.
+          $cache->set($cleanKey, self::$_cache[$argString]);
+        }
       }
     }
     return self::$_cache[$argString];

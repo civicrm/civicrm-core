@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Report_Form_Case_Demographics extends CRM_Report_Form {
 
@@ -422,20 +422,6 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
         $entryFound = TRUE;
       }
 
-      // handle country
-      if (array_key_exists('civicrm_address_country_id', $row)) {
-        if ($value = $row['civicrm_address_country_id']) {
-          $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
-        }
-        $entryFound = TRUE;
-      }
-      if (array_key_exists('civicrm_address_state_province_id', $row)) {
-        if ($value = $row['civicrm_address_state_province_id']) {
-          $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
-        }
-        $entryFound = TRUE;
-      }
-
       // handle custom fields
       foreach ($row as $k => $r) {
         if (substr($k, 0, 13) == 'civicrm_value' ||
@@ -449,6 +435,8 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
           $entryFound = TRUE;
         }
       }
+
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
 
       // skip looking further in rows, if first row itself doesn't
       // have the column we need

@@ -77,7 +77,7 @@ trait Api3DocTrait {
     if (empty($exampleName)) {
       // Attempt to convert lowercase action name to CamelCase.
       // This is clunky/imperfect due to the convention of all lowercase actions.
-      $exampleName = CRM_Utils_String::convertStringToCamel($action);
+      $exampleName = \CRM_Utils_String::convertStringToCamel($action);
       $knownPrefixes = array(
         'Get',
         'Set',
@@ -103,7 +103,7 @@ trait Api3DocTrait {
         $desc[] = trim($line);
       }
     }
-    $smarty = CRM_Core_Smarty::singleton();
+    $smarty = \CRM_Core_Smarty::singleton();
     $smarty->assign('testFunction', $testFunction);
     $smarty->assign('function', _civicrm_api_get_entity_name_from_camel($entity) . "_$action");
     foreach ($params as $index => $param) {

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -83,15 +83,10 @@ class CRM_Contact_Form_Edit_Email {
       //Bulkmail checkbox
       $form->assign('multipleBulk', $multipleBulk);
       $js = array('id' => "Email_" . $blockId . "_IsBulkmail" , 'aria-label' => ts('Bulk Mailing for Email %1?', [1 => $blockId]));
-      if ($multipleBulk) {
-        $form->addElement('advcheckbox', "email[$blockId][is_bulkmail]", NULL, '', $js);
+      if (!$blockEdit) {
+        $js['onClick'] = 'singleSelect( this.id );';
       }
-      else {
-        if (!$blockEdit) {
-          $js['onClick'] = 'singleSelect( this.id );';
-        }
-        $form->addElement('radio', "email[$blockId][is_bulkmail]", '', '', '1', $js);
-      }
+      $form->addElement('advcheckbox', "email[$blockId][is_bulkmail]", NULL, '', $js);
 
       //is_Primary radio
       $js = array('id' => "Email_" . $blockId . "_IsPrimary", 'aria-label' => ts('Email %1 is primary?', [1 => $blockId]));

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Provides a collection of static methods for array manipulation.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_Array {
 
@@ -238,9 +238,7 @@ class CRM_Utils_Array {
         self::flatten($value, $flat, $newPrefix, $seperator);
       }
       else {
-        if (!empty($value)) {
-          $flat[$newPrefix] = $value;
-        }
+        $flat[$newPrefix] = $value;
       }
     }
   }

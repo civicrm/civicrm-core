@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -83,6 +83,17 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $contributionRecur['id']);
 
     $this->assign('recur', $contributionRecur);
+
+    $displayName = CRM_Contact_BAO_Contact::displayName($contributionRecur['contact_id']);
+    $this->assign('displayName', $displayName);
+
+    // Check if this is default domain contact CRM-10482
+    if (CRM_Contact_BAO_Contact::checkDomainContact($contributionRecur['contact_id'])) {
+      $displayName .= ' (' . ts('default organization') . ')';
+    }
+
+    // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
+    CRM_Utils_System::setTitle(ts('View Recurring Contribution from') . ' ' . $displayName);
   }
 
   public function preProcess() {

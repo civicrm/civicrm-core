@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -301,7 +301,8 @@
           var params = {
             title: data.count == 1 ? {/literal}"{ts escape='js'}Similar Contact Found{/ts}" : "{ts escape='js'}Similar Contacts Found{/ts}"{literal},
             info: "{/literal}{ts escape='js'}If the contact you were trying to add is listed below, click their name to view or edit their record{/ts}{literal}:",
-            contacts: data.values
+            contacts: data.values,
+            cid: cid
           };
           if (data.count) {
             openDupeAlert(params);
@@ -389,7 +390,8 @@
           info: data.count ?
             "{/literal}{ts escape='js'}If the contact you were trying to add is listed below, click their name to view or edit their record{/ts}{literal}:" :
             "{/literal}{ts escape='js'}No matches found using the default Supervised deduping rule.{/ts}{literal}",
-          contacts: data.values
+          contacts: data.values,
+          cid: cid
         };
         updateDupeAlert(params, data.count ? 'alert' : 'success');
       });
@@ -408,6 +410,10 @@
           <%- contact.display_name %>
         </a>
         <%- contact.email %>
+        <% if (cid) { %>
+          <% var params = {reset: 1, action: 'update', oid: contact.id > cid ? contact.id : cid, cid: contact.id > cid ? cid : contact.id }; %>
+          (<a href="<%= CRM.url('civicrm/contact/merge', params) %>">{/literal}{ts}Merge{/ts}{literal}</a>)
+        <% } %>
       </li>
     <% }); %>
   </ul>

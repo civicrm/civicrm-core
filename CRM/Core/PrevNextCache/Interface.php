@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,9 +40,14 @@ interface CRM_Core_PrevNextCache_Interface {
    * @param string $sql
    *   A SQL query. The query *MUST* be a SELECT statement which yields
    *   the following columns (in order): cacheKey, entity_id1, data
+   * @param array $sqlParams
+   *   An array of parameters to be used with $sql.
+   *   Use the same interpolation format as CRM_Core_DAO (composeQuery/executeQuery).
+   *   Ex: [1 => ['foo', 'String']]
    * @return bool
+   * @see CRM_Core_DAO::composeQuery
    */
-  public function fillWithSql($cacheKey, $sql);
+  public function fillWithSql($cacheKey, $sql, $sqlParams = []);
 
   /**
    * Store the contents of an array in the cache.
@@ -113,5 +118,16 @@ interface CRM_Core_PrevNextCache_Interface {
    * @return int
    */
   public function getCount($cacheKey);
+
+  /**
+   * Fetch a list of contacts from the prev/next cache for displaying a search results page
+   *
+   * @param string $cacheKey
+   * @param int $offset
+   * @param int $rowCount
+   * @return array
+   *   List of contact IDs (entity_id1).
+   */
+  public function fetch($cacheKey, $offset, $rowCount);
 
 }

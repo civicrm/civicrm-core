@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -268,13 +268,7 @@
           </tr>
           <tr class="crm-participant-form-block-register_date">
             <td class="label">{$form.register_date.label}</td>
-            <td>
-              {if $hideCalendar neq true}
-                    {include file="CRM/common/jcalendar.tpl" elementName=register_date}
-                  {else}
-                    {$form.register_date.value|crmDate}
-                  {/if}
-            </td>
+            <td>{$form.register_date.html}</td>
           </tr>
           <tr class="crm-participant-form-block-status_id">
             <td class="label">{$form.status_id.label}</td>

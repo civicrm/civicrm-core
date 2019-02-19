@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_OptionGroup {
   static $_values = array();
@@ -129,9 +129,9 @@ class CRM_Core_OptionGroup {
         return self::$_cache[$cacheKey];
       }
       // Fetch from main cache
-      $var = $cache->get($cacheKey);
-      if ($var) {
-        return $var;
+      self::$_cache[$cacheKey] = $cache->get($cacheKey);
+      if (self::$_cache[$cacheKey] !== NULL) {
+        return self::$_cache[$cacheKey];
       }
     }
 
@@ -234,9 +234,9 @@ WHERE  v.option_group_id = g.id
 
     $cache = CRM_Utils_Cache::singleton();
     if (!$fresh) {
-      $var = $cache->get($cacheKey);
-      if ($var) {
-        return $var;
+      self::$_cache[$cacheKey] = $cache->get($cacheKey);
+      if (self::$_cache[$cacheKey] !== NULL) {
+        return self::$_cache[$cacheKey];
       }
     }
     $query = "

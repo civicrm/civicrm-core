@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -50,7 +50,7 @@
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">
-        {ts}Controls display of the smart groups that a contact is part of in each contact's "Groups" tab. "Show on Demand" provides the best performance, and is recommended for most sites.{/ts}
+        {$settings_fields.contact_smart_group_display.description}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-contact_edit_options">
@@ -125,7 +125,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-activity_assignee_notification">
       <td class="label"></td>
-      <td>{$form.activity_assignee_notification.html} {$form.activity_assignee_notification.label}</td>
+      <td>{$form.activity_assignee_notification.html}</td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
@@ -145,7 +145,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-activity_assignee_notification_ics">
       <td class="label"></td>
-      <td>{$form.activity_assignee_notification_ics.html} {$form.activity_assignee_notification_ics.label}</td>
+      <td>{$form.activity_assignee_notification_ics.html}</td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
@@ -155,12 +155,11 @@
 
     <tr class="crm-preferences-display-form-block-preserve_activity_tab_filter">
       <td class="label"></td>
-      <td>{$form.preserve_activity_tab_filter.html} {$form.preserve_activity_tab_filter.label}</td>
+      <td>{$form.preserve_activity_tab_filter.html}</td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
-      <td class="description">{ts}When enabled, any filter settings a user selects on the contact's Activity tab will be remembered as they visit other contacts.{/ts}
-      </td>
+      <td class="description">{$settings_fields.preserve_activity_tab_filter.description}</td>
     </tr>
 
     <tr class="crm-preferences-display-form-block-user_dashboard_options">
@@ -170,7 +169,7 @@
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
       <td class="description">
-        {ts}Select the sections that should be included in the Contact Dashboard. EXAMPLE: If you don't want constituents to view their own contribution history, un-check that option.{/ts}
+        {$settings_fields.user_dashboard_options.description}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-editor_id">
@@ -200,7 +199,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
-      <td class="description">{ts}Display name format for individual contact display names.{/ts}</td>
+      <td class="description">{$settings_fields.display_name_format.description}</td>
     </tr>
     <tr class="crm-preferences-display-form-block-sort_name_format">
       <td class="label">{$form.sort_name_format.label}</td>
@@ -208,7 +207,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
-      <td class="description">{ts}Sort name format for individual contact display names.{/ts}</td>
+      <td class="description">{$settings_fields.sort_name_format.description}</td>
     </tr>
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
@@ -239,8 +238,8 @@
         }
 
         // show/hide activity types based on checkbox value
-        $('.crm-preferences-display-form-activity_types').toggle($('#activity_assignee_notification').is(":checked"));
-        $('#activity_assignee_notification').click(function() {
+        $('.crm-preferences-display-form-activity_types').toggle($('#activity_assignee_notification_activity_assignee_notification').is(":checked"));
+        $('#activity_assignee_notification_activity_assignee_notification').click(function() {
           $('.crm-preferences-display-form-activity_types').toggle($(this).is(":checked"));
         });
 

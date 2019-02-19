@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * of all fields (except for some black-listed skip-fields).
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 require_once 'api/Wrapper.php';
@@ -62,6 +62,11 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
     $skipFields = $this->getSkipFields();
     if ($skipFields === NULL) {
       return FALSE;
+    }
+    // Strip extra numbers from custom fields e.g. custom_32_1 should be custom_32
+    if (strpos($fldName, 'custom_') === 0) {
+      list($fldName, $customId) = explode('_', $fldName);
+      $fldName .= '_' . $customId;
     }
 
     // Field should be skipped

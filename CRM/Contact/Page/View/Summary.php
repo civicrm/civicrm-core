@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -122,7 +122,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting(array(
         'summaryPrint' => array('mode' => $this->_print),
-        'tabSettings' => array('active' => CRM_Utils_Request::retrieve('selectedChild', 'String', $this, FALSE, 'summary')),
+        'tabSettings' => array('active' => CRM_Utils_Request::retrieve('selectedChild', 'Alphanumeric', $this, FALSE, 'summary')),
       ));
     $this->assign('summaryPrint', $this->_print);
     $session = CRM_Core_Session::singleton();
@@ -316,40 +316,47 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'url' => '#contact-summary',
         'title' => ts('Summary'),
         'weight' => 0,
+        'icon' => 'crm-i fa-address-card-o'
       ],
       [
         'id' => 'activity',
         'title' => ts('Activities'),
         'class' => 'livePage',
         'weight' => 70,
+        'icon' => 'crm-i fa-tasks',
       ],
       [
         'id' => 'rel',
         'title' => ts('Relationships'),
         'class' => 'livePage',
         'weight' => 80,
+        'icon' => 'crm-i fa-handshake-o',
       ],
       [
         'id' => 'group',
         'title' => ts('Groups'),
         'class' => 'ajaxForm',
         'weight' => 90,
+        'icon' => 'crm-i fa-users',
       ],
       [
         'id' => 'note',
         'title' => ts('Notes'),
         'class' => 'livePage',
         'weight' => 100,
+        'icon' => 'crm-i fa-sticky-note-o',
       ],
       [
         'id' => 'tag',
         'title' => ts('Tags'),
         'weight' => 110,
+        'icon' => 'crm-i fa-tags',
       ],
       [
         'id' => 'log',
         'title' => ts('Change Log'),
         'weight' => 120,
+        'icon' => 'crm-i fa-history',
       ],
     ];
   }
@@ -391,6 +398,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
           'weight' => $elem['weight'],
           'count' => CRM_Contact_BAO_Contact::getCountComponent($u, $this->_contactId),
           'class' => 'livePage',
+          'icon' => $component->getIcon(),
         ];
       }
     }
@@ -431,6 +439,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'count' => CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $group['table_name']),
         'hideCount' => !$group['is_multiple'],
         'class' => 'livePage',
+        'icon' => 'crm-i fa-gear',
       ];
       $weight += 10;
     }

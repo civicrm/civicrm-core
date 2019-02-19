@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -374,6 +374,10 @@ function _civicrm_api3_contact_get_spec(&$params) {
     'pseudoconstant' => array(
       'table' => 'civicrm_tag',
     ),
+  );
+  $params['uf_user'] = array(
+    'title' => 'CMS User',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
   );
   $params['birth_date_low'] = array('name' => 'birth_date_low', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or greater than'));
   $params['birth_date_high'] = array('name' => 'birth_date_high', 'type' => CRM_Utils_Type::T_DATE, 'title' => ts('Birth Date is equal to or less than'));
@@ -758,10 +762,18 @@ function civicrm_api3_contact_getquick($params) {
     )
   );
 
+  $table_names = [
+    'email' => 'eml',
+    'phone_numeric' => 'phe',
+    'street_address' => 'sts',
+    'city' => 'sts',
+    'postal_code' => 'sts',
+  ];
+
   // get the option values for contact autocomplete
   $acOptions = CRM_Core_OptionGroup::values('contact_autocomplete_options', FALSE, FALSE, FALSE, NULL, 'name');
 
-  $list = array();
+  $list = $from = array();
   foreach ($acpref as $value) {
     if ($value && !empty($acOptions[$value])) {
       $list[$value] = $acOptions[$value];
@@ -773,6 +785,29 @@ function civicrm_api3_contact_getquick($params) {
     // Unique name contact_id = id
     if ($field_name == 'contact_id') {
       $field_name = 'id';
+    }
+    if (isset($table_names[$field_name])) {
+      $table_name = $table_names[$field_name];
+    }
+    elseif (strpos($field_name, 'custom_') === 0) {
+      $customField = civicrm_api3('CustomField', 'getsingle', [
+        'id' => substr($field_name, 7),
+        'return' => ['custom_group_id.table_name', 'column_name', 'data_type', 'option_group_id', 'html_type'],
+      ]);
+      $field_name = $customField['column_name'];
+      $table_name = CRM_Utils_String::munge($customField['custom_group_id.table_name']);
+      $from[$field_name] = "LEFT JOIN `$table_name` ON cc.id = `$table_name`.entity_id";
+      if (CRM_Core_BAO_CustomField::hasOptions($customField)) {
+        $customOptionsWhere = [];
+        $customFieldOptions = CRM_Contact_BAO_Contact::buildOptions('custom_' . $customField['id'], 'search');
+        $isMultivalueField = CRM_Core_BAO_CustomField::isSerialized($customField);
+        $sep = CRM_Core_DAO::VALUE_SEPARATOR;
+        foreach ($customFieldOptions as $optionKey => $optionLabel) {
+          if (mb_stripos($optionLabel, $name) !== FALSE) {
+            $customOptionsWhere[$optionKey] = "$table_name.$field_name " . ($isMultivalueField ? "LIKE '%{$sep}{$optionKey}{$sep}%'" : "= '$optionKey'");
+          }
+        }
+      }
     }
     // phone_numeric should be phone
     $searchField = str_replace('_numeric', '', $field_name);
@@ -787,7 +822,6 @@ function civicrm_api3_contact_getquick($params) {
 
   $select = $actualSelectElements = array('sort_name');
   $where  = '';
-  $from   = array();
   foreach ($list as $value) {
     $suffix = substr($value, 0, 2) . substr($value, -1);
     switch ($value) {
@@ -817,10 +851,13 @@ function civicrm_api3_contact_getquick($params) {
         break;
 
       default:
-        if ($value != 'id') {
+        if ($value == 'id') {
+          $actualSelectElements[] = 'cc.id';
+        }
+        elseif ($value != 'sort_name') {
           $suffix = 'cc';
-          if (!empty($params['field_name']) && $params['field_name'] == 'value') {
-            $suffix = CRM_Utils_String::munge(CRM_Utils_Array::value('table_name', $params, 'cc'));
+          if ($field_name == $value) {
+            $suffix = $table_name;
           }
           $actualSelectElements[] = $select[] = $suffix . '.' . $value;
         }
@@ -835,12 +872,6 @@ function civicrm_api3_contact_getquick($params) {
     $select = ", $select";
   }
   $actualSelectElements = implode(', ', $actualSelectElements);
-  $selectAliases = $from;
-  unset($selectAliases['address']);
-  $selectAliases = implode(', ', array_keys($selectAliases));
-  if (!empty($selectAliases)) {
-    $selectAliases = ", $selectAliases";
-  }
   $from = implode(' ', $from);
   $limit = (int) CRM_Utils_Array::value('limit', $params);
   $limit = $limit > 0 ? $limit : Civi::settings()->get('search_autocomplete_count');
@@ -917,14 +948,16 @@ function civicrm_api3_contact_getquick($params) {
   else {
     $strSearch = "$name%";
   }
-  $includeEmailFrom = $includeNickName = $exactIncludeNickName = '';
+  $includeEmailFrom = $includeNickName = '';
   if ($config->includeNickNameInName) {
     $includeNickName = " OR nick_name LIKE '$strSearch'";
-    $exactIncludeNickName = " OR nick_name LIKE '$name'";
   }
 
-  //CRM-10687
-  if (!empty($params['field_name']) && !empty($params['table_name'])) {
+  if (isset($customOptionsWhere)) {
+    $customOptionsWhere = $customOptionsWhere ?: [0];
+    $whereClause = " WHERE (" . implode(' OR ', $customOptionsWhere) . ") $where";
+  }
+  elseif (!empty($params['field_name']) && !empty($params['table_name']) && $params['field_name'] != 'sort_name') {
     $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch') {$where}";
     // Search by id should be exact
     if ($field_name == 'id' || $field_name == 'external_identifier') {
@@ -961,7 +994,7 @@ function civicrm_api3_contact_getquick($params) {
 
   //CRM-5954
   $query = "
-        SELECT DISTINCT(id), data, sort_name {$selectAliases}, exactFirst
+        SELECT DISTINCT(id), data, sort_name, exactFirst
         FROM   (
             ( SELECT IF($table_name.$field_name = '{$name}', 0, 1) as exactFirst, cc.id as id, CONCAT_WS( ' :: ',
             {$actualSelectElements} )
@@ -1013,6 +1046,14 @@ function civicrm_api3_contact_getquick($params) {
       $t[$k] = isset($dao->$k) ? $dao->$k : '';
     }
     $t['data'] = $dao->data;
+    // Replace keys with values when displaying fields from an option list
+    if (!empty($customOptionsWhere)) {
+      $data = explode(' :: ', $dao->data);
+      $pos = count($data) - 1;
+      $customValue = array_intersect(CRM_Utils_Array::explodePadded($data[$pos]), array_keys($customOptionsWhere));
+      $data[$pos] = implode(', ', array_intersect_key($customFieldOptions, array_flip($customValue)));
+      $t['data'] = implode(' :: ', $data);
+    }
     $contactList[] = $t;
     if (!empty($params['org']) &&
       !empty($currEmpDetails) &&

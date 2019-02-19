@@ -189,27 +189,30 @@
       </tr>
      {/if}
 
-     {if $is_recur}
-      {if $contributeMode eq 'notify' or $contributeMode eq 'directIPN'}
-       <tr>
+    {if $is_recur}
+      <tr>
         <td  colspan="2" {$labelStyle}>
-         {ts 1=$cancelSubscriptionUrl}This is a recurring contribution. You can cancel future contributions by <a href="%1">visiting this web page</a>.{/ts}
+          {ts}This is a recurring contribution.{/ts}
+          {if $cancelSubscriptionUrl}
+            {ts 1=$cancelSubscriptionUrl}You can cancel future contributions by <a href="%1">visiting this web page</a>.{/ts}
+          {/if}
         </td>
-        {if $updateSubscriptionBillingUrl}
-         </tr>
-         <tr>
-         <td colspan="2" {$labelStyle}>
-          {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
-         </td>
-        {/if}
-       </tr>
-       <tr>
-        <td colspan="2" {$labelStyle}>
-         {ts 1=$updateSubscriptionUrl}You can update recurring contribution amount or change the number of installments for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
-        </td>
-       </tr>
+      </tr>
+      {if $updateSubscriptionBillingUrl}
+        <tr>
+          <td colspan="2" {$labelStyle}>
+            {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
+          </td>
+        </tr>
       {/if}
-     {/if}
+      {if $updateSubscriptionUrl}
+        <tr>
+          <td colspan="2" {$labelStyle}>
+            {ts 1=$updateSubscriptionUrl}You can update recurring contribution amount or change the number of installments for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
+          </td>
+        </tr>
+      {/if}
+    {/if}
 
      {if $honor_block_is_active}
       <tr>

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -151,7 +151,7 @@ class CRM_Core_Smarty extends Smarty {
 
     // CRM-7163 hack: we don’t display langSwitch on upgrades anyway
     if (!CRM_Core_Config::isUpgradeMode()) {
-      $this->assign('langSwitch', CRM_Core_I18n::languages(TRUE));
+      $this->assign('langSwitch', CRM_Core_I18n::uiLanguages());
     }
 
     $this->register_function('crmURL', array('CRM_Utils_System', 'crmURL'));

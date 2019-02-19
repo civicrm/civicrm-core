@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
 
@@ -182,6 +182,13 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->rel_types,
           ),
+          'is_active' => array(
+            'title' => ts('Active Relationship?'),
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+            //MV dev/core#603, not set default values Yes/No, this cause issue when relationship fields are not selected
+            // 'default' => TRUE,
+            'options' => array('' => ts('- Select -')) + CRM_Core_SelectValues::boolean(),
+          ),
         ),
       ),
       'civicrm_relationship_type' => array(
@@ -269,6 +276,13 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
     $cr = $this->_aliases['civicrm_relationship'];
     $crt = $this->_aliases['civicrm_relationship_type'];
     $ccc = $this->_aliases['civicrm_case_contact'];
+
+    foreach ($this->_columns['civicrm_relationship']['filters'] as $fieldName => $field) {
+      if (!empty($this->_params[$fieldName . '_op']) && isset($this->_params[$fieldName . '_value'])) {
+        $this->_relField = TRUE;
+        break;
+      }
+    }
 
     if ($this->_relField) {
       $this->_from = "

@@ -62,12 +62,9 @@ class civicrm_handler_field_custom_file extends views_handler_field {
         $path = sprintf('%s/imagefile', $path);
       }
       $entityField = $this->aliases['entity_id'];
-      $url = CRM_Utils_System::url($path,
-        "id={$value}&eid={$values->$entityField}",
-        TRUE, FALSE, FALSE, TRUE
-      );
+      $fileHash = CRM_Core_BAO_File::generateFileHash($values->$entityField, $value);
       return CRM_Utils_System::url($path,
-        "id={$value}&eid={$values->$entityField}",
+        "id={$value}&eid={$values->$entityField}&fcs={$fileHash}",
         TRUE, FALSE, FALSE, TRUE
       );
     }

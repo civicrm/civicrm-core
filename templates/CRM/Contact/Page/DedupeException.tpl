@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,7 @@
       <tr>
         <td class="crm-contact-form-block-contact1">
           <label for="search-contact1">{ts}Contact Name{/ts}</label><br />
-          <input type="text" size="50" placeholder="Search Contacts" value="{$searchcontact1}" id="search-contact1" search-column="0" />
+          <input class="crm-form-text" type="text" size="50" placeholder="Search Contacts" value="{$searchcontact1}" id="search-contact1" search-column="0" />
         </td>
         <td class="crm-contact-form-block-search">
           <label>&nbsp;</label><br />

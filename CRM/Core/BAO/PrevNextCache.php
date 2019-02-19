@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -481,6 +481,20 @@ AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
         $dao->save();
       }
     }
+  }
+
+  /**
+   * Get a list of available backend services.
+   *
+   * @return array
+   *   Array(string $id => string $label).
+   */
+  public static function getPrevNextBackends() {
+    return [
+      'default' => ts('Default (Auto-detect)'),
+      'sql' => ts('SQL'),
+      'redis' => ts('Redis'),
+    ];
   }
 
 }

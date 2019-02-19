@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -119,6 +119,14 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
       'url' => 'grant',
       'weight' => 60,
     );
+  }
+
+  /**
+   * @inheritDoc
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-money';
   }
 
   /**

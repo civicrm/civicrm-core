@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -547,13 +547,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $value['participant_status_id'] = $value['participant_status'] = array_search('Awaiting approval', $waitingStatuses);
         }
 
-        //there might be case user seleted pay later and
+        //there might be case user selected pay later and
         //now becomes part of run time waiting list.
         $value['is_pay_later'] = FALSE;
       }
-
-      // required only if paid event
-      if ($this->_values['event']['is_monetary'] && !($this->_allowWaitlist || $this->_requireApproval)) {
+      elseif ($this->_values['event']['is_monetary']) {
+        // required only if paid event
         if (is_array($this->_paymentProcessor)) {
           $payment = $this->_paymentProcessor['object'];
         }
@@ -799,7 +798,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
                 if ($participantNum === NULL) {
                   break;
                 }
-                //unset current particpant so we don't check them again
+                //unset current participant so we don't check them again
                 unset($copyParticipantCountLines[$participantNum]);
               }
             }
@@ -832,7 +831,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
           // call postprocess hook before leaving
           $this->postProcessHook();
-          // this does not return
 
           $this->processPayment($payment, $primaryParticipant);
         }
@@ -850,14 +848,14 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         NULL, $primaryContactId, $isTest,
         TRUE
       );
-      //lets send  mails to all with meaningful text, CRM-4320.
+      //let's send mails to all with meaningful text, CRM-4320.
       $this->assign('isOnWaitlist', $this->_allowWaitlist);
       $this->assign('isRequireApproval', $this->_requireApproval);
 
       //need to copy, since we are unsetting on the way.
       $copyParticipantCount = $participantCount;
 
-      //lets carry all paticipant params w/ values.
+      //let's carry all participant params w/ values.
       foreach ($additionalIDs as $participantID => $contactId) {
         $participantNum = NULL;
         if ($participantID == $registerByID) {
@@ -952,8 +950,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @param int $contactID
    * @param bool $pending
    * @param bool $isAdditionalAmount
+   * @param array $paymentProcessor
    *
    * @return \CRM_Contribute_BAO_Contribution
+   * @throws \CRM_Core_Exception
    */
   public static function processContribution(
     &$form, $params, $result, $contactID,

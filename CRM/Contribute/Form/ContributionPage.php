@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -391,8 +391,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       switch ($className) {
         case 'Contribute':
           $attributes = $this->getVar('_attributes');
-          $subPage = strtolower(basename(CRM_Utils_Array::value('action', $attributes)));
-          $subPageName = ucfirst($subPage);
+          $subPage = CRM_Utils_Request::retrieveComponent($attributes);
           if ($subPage == 'friend') {
             $nextPage = 'custom';
           }
@@ -403,13 +402,11 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
         case 'MembershipBlock':
           $subPage = 'membership';
-          $subPageName = 'MembershipBlock';
           $nextPage = 'thankyou';
           break;
 
         default:
           $subPage = strtolower($className);
-          $subPageName = $className;
           $nextPage = strtolower($nextPage);
 
           if ($subPage == 'amount') {
@@ -422,7 +419,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       }
 
       CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
-        array(1 => $subPageName)
+        array(1 => CRM_Utils_Array::value('title', CRM_Utils_Array::value($subPage, $this->get('tabHeader')), $className))
       ), ts('Saved'), 'success');
 
       $this->postProcessHook();

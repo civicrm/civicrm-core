@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -626,7 +626,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param CRM_Core_Form $self
+   * @param \CRM_Contribute_Form_Contribution_Main $self
    *
    * @return bool|array
    *   true if no errors, else array of errors
@@ -670,7 +670,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $previousId = $otherAmount = FALSE;
       while ($priceField->fetch()) {
 
-        if ($self->_quickConfig && ($priceField->name == 'contribution_amount' || $priceField->name == 'membership_amount')) {
+        if ($self->isQuickConfig() && ($priceField->name == 'contribution_amount' || $priceField->name == 'membership_amount')) {
           $previousId = $priceField->id;
           if ($priceField->name == 'membership_amount' && !$priceField->is_active) {
             $membershipIsActive = FALSE;
@@ -951,7 +951,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       return $errors;
     }
 
-    if (CRM_Utils_Array::value('payment_processor_id', $fields) == NULL) {
+    if (CRM_Utils_Array::value('payment_processor_id', $fields) === NULL) {
       $errors['payment_processor_id'] = ts('Payment Method is a required field.');
     }
     else {
@@ -1313,13 +1313,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       CRM_Core_Error::statusBounce(ts("Returning since there is no contact attached to this contribution id."));
     }
 
-    $payment = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_ccid, 'contribution');
+    $paymentBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_ccid);
     //bounce if the contribution is not pending.
-    if (empty($payment['balance'])) {
+    if ((int) $paymentBalance <= 0) {
       CRM_Core_Error::statusBounce(ts("Returning since contribution has already been handled."));
     }
-    if (!empty($payment['total'])) {
-      $this->_pendingAmount = $payment['total'];
+    if (!empty($paymentBalance)) {
+      $this->_pendingAmount = $paymentBalance;
       $this->assign('pendingAmount', $this->_pendingAmount);
     }
 

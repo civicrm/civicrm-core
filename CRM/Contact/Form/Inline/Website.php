@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -87,6 +87,8 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
       CRM_Contact_Form_Edit_Website::buildQuickForm($this, $blockId, TRUE);
     }
 
+    $this->addFormRule(array('CRM_Contact_Form_Inline_Website', 'formRule'), $this);
+
   }
 
   /**
@@ -126,6 +128,40 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
 
     $this->log();
     $this->response();
+  }
+
+  /**
+   * Global validation rules for the form.
+   *
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $errors
+   *   List of errors to be posted back to the form.
+   * @param CRM_Contact_Form_Inline_Website $form
+   *
+   * @return array
+   */
+  public static function formRule($fields, $errors, $form) {
+    $hasData = $errors = array();
+    if (!empty($fields['website']) && is_array($fields['website'])) {
+      $types = array();
+      foreach ($fields['website'] as $instance => $blockValues) {
+        $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
+
+        if ($dataExists) {
+          $hasData[] = $instance;
+          if (!empty($blockValues['website_type_id'])) {
+            if (empty($types[$blockValues['website_type_id']])) {
+              $types[$blockValues['website_type_id']] = $blockValues['website_type_id'];
+            }
+            else {
+              $errors["website[" . $instance . "][website_type_id]"] = ts('Contacts may only have one website of each type at most.');
+            }
+          }
+        }
+      }
+    }
+    return $errors;
   }
 
 }

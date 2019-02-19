@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -187,22 +187,13 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
    * @throws Exception
    */
   public function run($args = NULL, $pageArgs = NULL, $sort = NULL) {
+    $id = $this->getIdAndAction();
     // handle the revert action and offload the rest to parent
-    if (CRM_Utils_Request::retrieve('action', 'String', $this) & CRM_Core_Action::REVERT) {
-
-      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-      if (!$this->checkPermission($id, NULL)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to revert this template.'));
-      }
-
+    if ($this->_action & CRM_Core_Action::REVERT) {
       $this->_revertedId = $id;
-
       CRM_Core_BAO_MessageTemplate::revert($id);
     }
-    $selectedChild = CRM_Utils_Request::retrieve('selectedChild', 'String', $this);
-    if (in_array($selectedChild, array('user', 'workflow'))) {
-      $this->assign('selectedChild', $selectedChild);
-    }
+
     return parent::run($args, $pageArgs, $sort);
   }
 

@@ -5,6 +5,7 @@
     "jquery-ui.js"
   ],
   "ignore": [],
+  "license": "MIT",
   "dependencies": {
     "jquery": ">=1.6"
   },
@@ -13,7 +14,7 @@
   "_resolution": {
     "type": "version",
     "tag": "1.12.1",
-    "commit": "dec4c50123193d4f7c8ae6cd0bff45478e1ad276"
+    "commit": "44ecf3794cc56b65954cc19737234a3119d036cc"
   },
   "_source": "https://github.com/components/jqueryui.git",
   "_target": ">=1.9",

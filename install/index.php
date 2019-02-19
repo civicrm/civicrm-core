@@ -1400,14 +1400,14 @@ class InstallRequirements {
    * @return int
    */
   public function hasErrors() {
-    return count($this->errors);
+    return !empty($this->errors);
   }
 
   /**
    * @return int
    */
   public function hasWarnings() {
-    return count($this->warnings);
+    return !empty($this->warnings);
   }
 
 }

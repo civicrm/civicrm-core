@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -396,7 +396,6 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       $caseArray[] = $dao->id;
     }
 
-    $dao->free();
     return $caseArray;
   }
 
@@ -589,9 +588,14 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
     $condition = NULL;
     $casesList = array();
 
-    //validate access for own cases.
+    // validate access for own cases.
     if (!self::accessCiviCase()) {
       return $getCount ? 0 : $casesList;
+    }
+
+    // Return cached value instead of re-running query
+    if (isset(Civi::$statics[__CLASS__]['totalCount']) && $getCount) {
+      return Civi::$statics[__CLASS__]['totalCount'];
     }
 
     $type = CRM_Utils_Array::value('type', $params, 'upcoming');
@@ -611,7 +615,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
       $caseActivityIDColumn = 'case_recent_activity_id';
     }
 
-    //validate access for all cases.
+    // validate access for all cases.
     if ($allCases && !CRM_Core_Permission::check('access all cases and activities')) {
       $allCases = FALSE;
     }
@@ -632,7 +636,7 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
     }
     $condition = implode(' AND ', $whereClauses);
 
-    $totalCount = CRM_Core_DAO::singleValueQuery(self::getCaseActivityCountQuery($type, $userID, $condition));
+    Civi::$statics[__CLASS__]['totalCount'] = $totalCount = CRM_Core_DAO::singleValueQuery(self::getCaseActivityCountQuery($type, $userID, $condition));
     if ($getCount) {
       return $totalCount;
     }
@@ -894,7 +898,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       $values[$rid]['relationship_direction'] = $dao->relationship_direction;
     }
 
-    $dao->free();
     return $values;
   }
 
@@ -1218,7 +1221,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
       $caseActivities[$caseActivityId]['links'] = $url;
     }
-    $dao->free();
 
     $caseActivitiesDT = array();
     $caseActivitiesDT['data'] = array_values($caseActivities);
@@ -1318,7 +1320,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         $values[] = $details;
       }
     }
-    $dao->free();
 
     return $values;
   }
@@ -1802,7 +1803,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       $values[$dao->id]['id'] = $dao->id;
       $values[$dao->id]['activity_date'] = $dao->activity_date;
     }
-    $dao->free();
     return $values;
   }
 
@@ -2007,7 +2007,6 @@ SELECT civicrm_contact.id as casemanager_id,
     while ($dao->fetch()) {
       $relatedCaseIds[$dao->case_id] = $dao->case_id;
     }
-    $dao->free();
 
     return array_values($relatedCaseIds);
   }
@@ -2080,7 +2079,6 @@ SELECT civicrm_contact.id as casemanager_id,
         'links' => $caseView,
       );
     }
-    $dao->free();
 
     return $relatedCases;
   }
@@ -2254,7 +2252,6 @@ SELECT  id
           while ($dao->fetch()) {
             $singletonActivityIds[] = $dao->id;
           }
-          $dao->free();
         }
       }
 

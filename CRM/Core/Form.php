@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * machine. Each form can also operate in various modes
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 require_once 'HTML/QuickForm/Page.php';
@@ -1292,13 +1292,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * Return string
    */
-  private function getApiAction() {
+  protected function getApiAction() {
     $action = $this->getAction();
     if ($action & (CRM_Core_Action::UPDATE + CRM_Core_Action::ADD)) {
       return 'create';
     }
     if ($action & (CRM_Core_Action::VIEW + CRM_Core_Action::BROWSE + CRM_Core_Action::BASIC + CRM_Core_Action::ADVANCED + CRM_Core_Action::PREVIEW)) {
       return 'get';
+    }
+    if ($action & (CRM_Core_Action::DELETE)) {
+      return 'delete';
     }
     // If you get this exception try adding more cases above.
     throw new Exception("Cannot determine api action for " . get_class($this) . '.' . 'CRM_Core_Action "' . CRM_Core_Action::description($action) . '" not recognized.');

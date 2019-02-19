@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -41,6 +41,8 @@ class CRM_Event_Form_EventFees {
    * Set variables up before form is built.
    *
    * @param CRM_Core_Form $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function preProcess(&$form) {
     //as when call come from register.php
@@ -111,7 +113,7 @@ class CRM_Event_Form_EventFees {
         $defaults[$form->_pId]['receipt_text'] = $details[$form->_eventId]['confirm_email_text'];
       }
 
-      list($defaults[$form->_pId]['receive_date'], $defaults[$form->_pId]['receive_date_time']) = CRM_Utils_Date::setDateDefaults();
+      $defaults[$form->_pId]['receive_date'] = date('Y-m-d H:i:s');
     }
 
     //CRM-11601 we should keep the record contribution
@@ -137,12 +139,6 @@ class CRM_Event_Form_EventFees {
 
       $billingDefaults = $form->getProfileDefaults('Billing', $form->_contactId);
       $defaults[$form->_pId] = array_merge($defaults[$form->_pId], $billingDefaults);
-
-      //             // hack to simplify credit card entry for testing
-      //             $defaults[$form->_pId]['credit_card_type']     = 'Visa';
-      //             $defaults[$form->_pId]['credit_card_number']   = '4807731747657838';
-      //             $defaults[$form->_pId]['cvv2']                 = '000';
-      //             $defaults[$form->_pId]['credit_card_exp_date'] = array( 'Y' => '2012', 'M' => '05' );
     }
 
     // if user has selected discount use that to set default
@@ -235,12 +231,7 @@ class CRM_Event_Form_EventFees {
                  'receive_date',
                  'total_amount',
                ) as $f) {
-        if ($f == 'receive_date') {
-          list($defaults[$form->_pId]['receive_date']) = CRM_Utils_Date::setDateDefaults($contribution->$f);
-        }
-        else {
-          $defaults[$form->_pId][$f] = $contribution->$f;
-        }
+        $defaults[$form->_pId][$f] = $contribution->$f;
       }
     }
     return $defaults[$form->_pId];
@@ -428,7 +419,7 @@ SELECT  id, html_type
           array('' => ts('- select -')) + $financialTypes
         );
 
-        $form->addDateTime('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
+        $form->add('datepicker', 'receive_date', ts('Received'), array(), FALSE, array('time' => TRUE));
 
         $form->add('select', 'payment_instrument_id',
           ts('Payment Method'),

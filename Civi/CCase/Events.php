@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -46,11 +46,12 @@ class Events {
    * @throws \CRM_Core_Exception
    */
   public static function fireCaseChange(\Civi\Core\Event\PostEvent $event) {
-    $caseId = NULL;
+    // Activities can be linked to multiple cases, so $caseIds might be an array or an int
+    $caseIds = NULL;
     switch ($event->entity) {
       case 'Activity':
         if (!empty($event->object->case_id)) {
-          $caseId = $event->object->case_id;
+          $caseIds = $event->object->case_id;
         }
         break;
 
@@ -58,7 +59,7 @@ class Events {
         // by the time we get the post-delete event, the record is gone, so
         // there's nothing to analyze
         if ($event->action != 'delete') {
-          $caseId = $event->id;
+          $caseIds = $event->id;
         }
         break;
 
@@ -66,15 +67,17 @@ class Events {
         throw new \CRM_Core_Exception("CRM_Case_Listener does not support entity {$event->entity}");
     }
 
-    if ($caseId) {
-      if (!isset(self::$isActive[$caseId])) {
-        $tx = new \CRM_Core_Transaction();
-        \CRM_Core_Transaction::addCallback(
-          \CRM_Core_Transaction::PHASE_POST_COMMIT,
-          array(__CLASS__, 'fireCaseChangeForRealz'),
-          array($caseId),
-          "Civi_CCase_Events::fire::{$caseId}"
-        );
+    if ($caseIds) {
+      foreach ((array) $caseIds as $caseId) {
+        if (!isset(self::$isActive[$caseId])) {
+          $tx = new \CRM_Core_Transaction();
+          \CRM_Core_Transaction::addCallback(
+            \CRM_Core_Transaction::PHASE_POST_COMMIT,
+            array(__CLASS__, 'fireCaseChangeForRealz'),
+            array($caseId),
+            "Civi_CCase_Events::fire::{$caseId}"
+          );
+        }
       }
     }
   }

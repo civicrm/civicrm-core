@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -145,10 +145,6 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    * Finally it calls the parent's run method.
-   *
-   * @param
-   *
-   * @return void
    */
   public function run() {
     // get the requested action
@@ -160,7 +156,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
 
     // assign vars to templates
     $this->assign('action', $action);
-    $this->assign('selectedChild', CRM_Utils_Request::retrieve('selectedChild', 'String', $this));
+    $this->assign('selectedChild', CRM_Utils_Request::retrieve('selectedChild', 'Alphanumeric', $this));
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0
     );

@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_SMS_Form_Schedule extends CRM_Core_Form {
 
@@ -53,7 +53,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     $count = $this->get('count');
 
     $this->assign('count', $count);
-    $defaults['now'] = 1;
+    $defaults['send_option'] = 'send_immediate';
     return $defaults;
   }
 
@@ -61,9 +61,18 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
    * Build the form object for the last step of the sms wizard.
    */
   public function buildQuickform() {
-    $this->addDateTime('start_date', ts('Schedule SMS'), FALSE, array('formatType' => 'mailing'));
 
-    $this->addElement('checkbox', 'now', ts('Send Immediately'));
+    // Fix Firefox issue where the non-default field is displayed as checked
+    // on page refresh.
+    $this->setAttribute('autocomplete', 'off');
+
+    $sendOptions = [
+      $this->createElement('radio', NULL, NULL, 'Send immediately', 'send_immediate', ['id' => 'send_immediate', 'style' => 'margin-bottom: 10px;']),
+      $this->createElement('radio', NULL, NULL, 'Send at:', 'send_later', ['id' => 'send_later']),
+    ];
+    $this->addGroup($sendOptions, 'send_option', '', '<br>');
+
+    $this->add('datepicker', 'start_date', '', NULL, FALSE, ['minDate' => time()]);
 
     $this->addFormRule(array('CRM_SMS_Form_Schedule', 'formRule'), $this);
 
@@ -111,29 +120,28 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
    *   set.
    */
   public static function formRule($params, $files, $self) {
-    if (!empty($params['_qf_Schedule_submit'])) {
 
+    if (!empty($params['_qf_Schedule_submit'])) {
       CRM_Core_Session::setStatus(ts("Your Mass SMS has been saved. Click the 'Continue' action to resume working on it."), ts('Saved'), 'success');
       $url = CRM_Utils_System::url('civicrm/mailing/browse/unscheduled', 'scheduled=false&reset=1&sms=1');
       CRM_Utils_System::redirect($url);
     }
-    if (isset($params['now']) || CRM_Utils_Array::value('_qf_Schedule_back', $params) == ts('Previous')) {
+
+    if ((isset($params['send_option']) && $params['send_option'] == 'send_immediate') || CRM_Utils_Array::value('_qf_Schedule_back', $params) == ts('Previous')) {
       return TRUE;
     }
 
-    if (CRM_Utils_Date::format(CRM_Utils_Date::processDate($params['start_date'],
-        $params['start_date_time']
-      )) < CRM_Utils_Date::format(date('YmdHi00'))
-    ) {
+    if (strtotime($params['start_date']) < time()) {
       return array(
         'start_date' => ts('Start date cannot be earlier than the current time.'),
       );
     }
+
     return TRUE;
   }
 
   /**
-   * Process the posted form values.  Create and schedule a Mass SMS.
+   * Process the posted form values. Create and schedule a Mass SMS.
    */
   public function postProcess() {
     $params = array();
@@ -144,34 +152,23 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('Could not find a mailing id'));
     }
 
-    foreach (array('now', 'start_date', 'start_date_time') as $parameter) {
-      $params[$parameter] = $this->controller->exportValue($this->_name, $parameter);
-    }
-
-    if ($params['now']) {
+    $params['send_option'] = $this->controller->exportValue($this->_name, 'send_option');
+    if (isset($params['send_option']) && $params['send_option'] == 'send_immediate') {
       $params['scheduled_date'] = date('YmdHis');
     }
     else {
-      $params['scheduled_date'] = CRM_Utils_Date::processDate($params['start_date'] . ' ' . $params['start_date_time']);
+      $params['scheduled_date'] = $this->controller->exportValue($this->_name, 'start_date');
     }
 
     $session = CRM_Core_Session::singleton();
     // set the scheduled_id
     $params['scheduled_id'] = $session->get('userID');
-    $params['scheduled_date'] = date('YmdHis');
 
     // set approval details if workflow is not enabled
     if (!CRM_Mailing_Info::workflowEnabled()) {
       $params['approver_id'] = $session->get('userID');
       $params['approval_date'] = date('YmdHis');
       $params['approval_status_id'] = 1;
-    }
-
-    if ($params['now']) {
-      $params['scheduled_date'] = date('YmdHis');
-    }
-    else {
-      $params['scheduled_date'] = CRM_Utils_Date::processDate($params['start_date'] . ' ' . $params['start_date_time']);
     }
 
     // Build the mailing object.

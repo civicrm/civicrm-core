@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -135,7 +135,7 @@
   <tr class="crm-activity-form-block-activity_date_time">
     <td class="label">{$form.activity_date_time.label}</td>
     {if $action neq 4}
-      <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</td>
+      <td class="view-value">{$form.activity_date_time.html}</td>
       {else}
       <td class="view-value">{$form.activity_date_time.value|crmDate}</td>
     {/if}

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * information about it. It needs to extend CRM_Core_Component_Info
  * abstract class.
  *
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -162,6 +162,14 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
   public function registerTab() {
     // this component doesn't use contact record tabs
     return NULL;
+  }
+
+  /**
+   * @inheritDoc
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-table';
   }
 
   /**

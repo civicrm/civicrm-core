@@ -15,9 +15,9 @@
  * @category    HTML
  * @package     HTML_QuickForm
  * @author      Bertrand Mansion <bmansion@mamasam.com>
- * @copyright   2001-2009 The PHP Group
+ * @copyright   2001-2011 The PHP Group
  * @license     http://www.php.net/license/3_01.txt PHP License 3.01
- * @version     CVS: $Id: Range.php,v 1.8 2009/04/04 21:34:04 avb Exp $
+ * @version     CVS: $Id$
  * @link        http://pear.php.net/package/HTML_QuickForm
  */
 
@@ -32,7 +32,7 @@ require_once 'HTML/QuickForm/Rule.php';
  * @category    HTML
  * @package     HTML_QuickForm
  * @author      Bertrand Mansion <bmansion@mamasam.com>
- * @version     Release: 3.2.11
+ * @version     Release: 3.2.16
  * @since       3.2
  */
 class HTML_QuickForm_Rule_Range extends HTML_QuickForm_Rule
@@ -45,7 +45,7 @@ class HTML_QuickForm_Rule_Range extends HTML_QuickForm_Rule
      * @access    public
      * @return    boolean   true if value is valid
      */
-    function validate($value, $options)
+    function validate($value, $options = null)
     {
         $length = strlen($value);
         switch ($this->name) {

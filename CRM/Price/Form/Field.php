@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -115,17 +115,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         $defaults['is_active'] = $isActive;
       }
 
-      if (!empty($defaults['active_on'])) {
-        list($defaults['active_on'],
-          $defaults['active_on_time']
-          ) = CRM_Utils_Date::setDateDefaults($defaults['active_on'], 'activityDateTime');
-      }
-
-      if (!empty($defaults['expire_on'])) {
-        list($defaults['expire_on'],
-          $defaults['expire_on_time']
-          ) = CRM_Utils_Date::setDateDefaults($defaults['expire_on'], 'activityDateTime');
-      }
     }
     else {
       $defaults['is_active'] = 1;
@@ -338,10 +327,10 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceField', 'help_post')
     );
 
-    $this->addDateTime('active_on', ts('Active On'), FALSE, array('formatType' => 'activityDateTime'));
+    $this->add('datepicker', 'active_on', ts('Active On'), [], FALSE, array('time' => TRUE));
 
     // expire_on
-    $this->addDateTime('expire_on', ts('Expire On'), FALSE, array('formatType' => 'activityDateTime'));
+    $this->add('datepicker', 'expire_on', ts('Expire On'), [], FALSE, array('time' => TRUE));
 
     // is required ?
     $this->add('checkbox', 'is_required', ts('Required?'));
@@ -643,18 +632,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $params['is_required'] = CRM_Utils_Array::value('is_required', $params, FALSE);
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     $params['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params, FALSE);
-    if (isset($params['active_on'])) {
-      $params['active_on'] = CRM_Utils_Date::processDate($params['active_on'],
-        CRM_Utils_Array::value('active_on_time', $params),
-        TRUE
-      );
-    }
-    if (isset($params['expire_on'])) {
-      $params['expire_on'] = CRM_Utils_Date::processDate($params['expire_on'],
-        CRM_Utils_Array::value('expire_on_time', $params),
-        TRUE
-      );
-    }
     $params['visibility_id'] = CRM_Utils_Array::value('visibility_id', $params, FALSE);
     $params['count'] = CRM_Utils_Array::value('count', $params, FALSE);
 
@@ -689,7 +666,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $params['option_weight'] = array(1 => $params['weight']);
       $params['option_financial_type_id'] = array(1 => $params['financial_type_id']);
       $params['option_visibility_id'] = array(1 => CRM_Utils_Array::value('visibility_id', $params));
-      $params['is_active'] = array(1 => 1);
     }
 
     if ($this->_fid) {

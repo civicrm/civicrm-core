@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -95,6 +95,13 @@ class CRM_Utils_Money {
     if (!$currency) {
       $currency = $config->defaultCurrency;
     }
+
+    // ensure $currency is a valid currency code
+    // for backwards-compatibility, also accept one space instead of a currency
+    if ($currency != ' ' && !array_key_exists($currency, self::$_currencySymbols)) {
+      throw new CRM_Core_Exception("Invalid currency \"{$currency}\"");
+    }
+
     $amount = self::formatNumericByFormat($amount, $valueFormat);
     // If it contains tags, means that HTML was passed and the
     // amount is already converted properly,

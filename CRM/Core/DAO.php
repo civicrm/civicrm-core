@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -31,7 +31,7 @@
  * All DAO classes should inherit from this class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 if (!defined('DB_DSN_MODE')) {
@@ -696,6 +696,14 @@ class CRM_Core_DAO extends DB_DataObject {
           if (!$serializeArrays && is_array($pValue) && !empty($value['serialize'])) {
             Civi::log()->warning(ts('use copyParams to serialize arrays (' . __CLASS__ . '.' . $name . ')'), ['civi.tag' => 'deprecated']);
           }
+          $maxLength = CRM_Utils_Array::value('maxlength', $value);
+          if (!is_array($pValue) && $maxLength && mb_strlen($pValue) > $maxLength
+            && empty($value['pseudoconstant'])
+          ) {
+            Civi::log()->warning(ts('A string for field $dbName has been truncated. The original string was %1', [CRM_Utils_Type::escape($pValue, 'String')]));
+            // The string is too long - what to do what to do? Well losing data is generally bad so lets' truncate
+            $pValue = CRM_Utils_String::ellipsify($pValue, $maxLength);
+          }
           $this->$dbName = $pValue;
           $allNull = FALSE;
         }
@@ -882,7 +890,6 @@ class CRM_Core_DAO extends DB_DataObject {
     while ($dao->fetch()) {
       $values[] = $dao->TABLE_NAME;
     }
-    $dao->free();
     return $values;
   }
 
@@ -900,6 +907,7 @@ class CRM_Core_DAO extends DB_DataObject {
          AND TABLE_NAME LIKE 'civicrm_%'
          AND TABLE_NAME NOT LIKE 'civicrm_import_job_%'
          AND TABLE_NAME NOT LIKE '%_temp%'
+         AND TABLE_NAME NOT LIKE 'civicrm_tmp_%'
       ");
   }
 
@@ -933,7 +941,6 @@ class CRM_Core_DAO extends DB_DataObject {
         CRM_Core_Error::fatal();
       }
 
-      $dao->free();
       $show[$tableName] = $dao->Create_Table;
     }
 
@@ -961,7 +968,6 @@ class CRM_Core_DAO extends DB_DataObject {
           CRM_Core_Error::fatal();
         }
 
-        $dao->free();
         $show[$tableName] = $dao->Create_Table;
       }
 
@@ -997,7 +1003,6 @@ class CRM_Core_DAO extends DB_DataObject {
         CRM_Core_Error::fatal();
       }
 
-      $dao->free();
       $show[$tableName] = $dao->Create_Table;
     }
     $constraint = "`FK_{$tableName}_{$columnName}`";
@@ -1019,7 +1024,6 @@ class CRM_Core_DAO extends DB_DataObject {
     $query = "SELECT * FROM $tableName WHERE $columnName != '$columnValue'";
     $dao = CRM_Core_DAO::executeQuery($query);
     $result = $dao->fetch() ? FALSE : TRUE;
-    $dao->free();
     return $result;
   }
 
@@ -1036,7 +1040,6 @@ class CRM_Core_DAO extends DB_DataObject {
     $query = "SELECT * FROM $tableName WHERE $columnName IS NOT NULL";
     $dao = CRM_Core_DAO::executeQuery($query);
     $result = $dao->fetch() ? FALSE : TRUE;
-    $dao->free();
     return $result;
   }
 
@@ -1057,7 +1060,6 @@ LIKE %1
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $result = $dao->fetch() ? TRUE : FALSE;
-    $dao->free();
     return $result;
   }
 
@@ -1424,7 +1426,6 @@ FROM   civicrm_domain
     ) {
       // we typically do this for insert/update/delete statements OR if explicitly asked to
       // free the dao
-      $dao->free();
     }
     return $dao;
   }
@@ -1664,13 +1665,13 @@ FROM   civicrm_domain
         }
 
         if ($newData) {
-          foreach ($newData as $k => $v) {
-            $newObject->$k = $v;
-          }
+          $newObject->copyValues($newData);
         }
       }
       $newObject->save();
+      CRM_Utils_Hook::post('create', CRM_Core_DAO_AllCoreTables::getBriefName($daoName), $newObject->id, $newObject);
     }
+
     return $newObject;
   }
 
@@ -2807,6 +2808,24 @@ SELECT contact_id
       default:
         throw new Exception('Unknown serialization method for field.');
     }
+  }
+
+  /**
+   * Get exportable fields with pseudoconstants rendered as an extra field.
+   *
+   * @param string $baoClass
+   *
+   * @return array
+   */
+  public static function getExportableFieldsWithPseudoConstants($baoClass) {
+    if (method_exists($baoClass, 'exportableFields')) {
+      $fields = $baoClass::exportableFields();
+    }
+    else {
+      $fields = $baoClass::export();
+    }
+    CRM_Core_DAO::appendPseudoConstantsToFields($fields);
+    return $fields;
   }
 
 }

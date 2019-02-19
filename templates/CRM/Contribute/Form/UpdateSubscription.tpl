@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
     <div class="help">
       {$changeHelpText}
       {if $recurMembership}
-        <br/><strong> {ts}'WARNING: This recurring contribution is linked to membership:{/ts}
+        <br/><strong> {ts}WARNING: This recurring contribution is linked to membership:{/ts}
         <a class="crm-hover-button" href='{crmURL p="civicrm/contact/view/membership" q="action=view&reset=1&cid=`$contactId`&id=`$recurMembership.membership_id`&context=membership&selectedChild=member"}'>{$recurMembership.membership_name}</a>
         </strong>
       {/if}

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -55,6 +55,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $this->_profileBottomNumAdd = CRM_Utils_Array::value('addProfileNumAdd', $_GET, 0);
 
     parent::preProcess();
+    $this->assign('selectedChild', 'registration');
 
     $this->assign('addProfileBottom', $this->_addProfileBottom);
     $this->assign('profileBottomNum', $this->_profileBottomNum);
@@ -178,16 +179,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $defaults['thankyou_title'] = CRM_Utils_Array::value('thankyou_title', $defaults, ts('Thank You for Registering'));
     $defaults['approval_req_text'] = CRM_Utils_Array::value('approval_req_text', $defaults, ts('Participation in this event requires approval. Submit your registration request here. Once approved, you will receive an email with a link to a web page where you can complete the registration process.'));
 
-    if (!empty($defaults['registration_start_date'])) {
-      list($defaults['registration_start_date'], $defaults['registration_start_date_time'])
-        = CRM_Utils_Date::setDateDefaults($defaults['registration_start_date'], 'activityDateTime');
-    }
-
-    if (!empty($defaults['registration_end_date'])) {
-      list($defaults['registration_end_date'], $defaults['registration_end_date_time'])
-        = CRM_Utils_Date::setDateDefaults($defaults['registration_end_date'], 'activityDateTime');
-    }
-
     return $defaults;
   }
 
@@ -250,8 +241,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $this->add('text', 'registration_link_text', ts('Registration Link Text'));
 
     if (!$this->_isTemplate) {
-      $this->addDateTime('registration_start_date', ts('Registration Start Date'), FALSE, array('formatType' => 'activityDateTime'));
-      $this->addDateTime('registration_end_date', ts('Registration End Date'), FALSE, array('formatType' => 'activityDateTime'));
+      $this->add('datepicker', 'registration_start_date', ts('Registration Start Date'), [], FALSE, array('time' => TRUE));
+      $this->add('datepicker', 'registration_end_date', ts('Registration End Date'), [], FALSE, array('time' => TRUE));
     }
 
     $params = array(
@@ -482,13 +473,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         }
       }
 
-      if (
-        isset($values['registration_start_date']) &&
-        isset($values['registration_end_date'])
-      ) {
-        $start = CRM_Utils_Date::processDate($values['registration_start_date']);
-        $end = CRM_Utils_Date::processDate($values['registration_end_date']);
-        if ($end < $start) {
+      if (isset($values['registration_start_date']) && isset($values['registration_end_date'])) {
+        if ($values['registration_end_date'] < $values['registration_start_date']) {
           $errorMsg['registration_end_date'] = ts('Registration end date should be after Registration start date');
         }
       }
@@ -819,17 +805,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     }
     if (!empty($params['allow_selfcancelxfer'])) {
       $params['selfcancelxfer_time'] = !empty($params['selfcancelxfer_time']) ? $params['selfcancelxfer_time'] : 0;
-    }
-
-    if (!$this->_isTemplate) {
-      $params['registration_start_date'] = CRM_Utils_Date::processDate($params['registration_start_date'],
-        $params['registration_start_date_time'],
-        TRUE
-      );
-      $params['registration_end_date'] = CRM_Utils_Date::processDate($params['registration_end_date'],
-        $params['registration_end_date_time'],
-        TRUE
-      );
     }
 
     CRM_Event_BAO_Event::add($params);

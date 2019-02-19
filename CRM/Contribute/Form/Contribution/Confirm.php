@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -1968,8 +1968,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $capabilities[] = (ucfirst($form->_mode) . 'Mode');
     }
     $form->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors($capabilities);
-    $form->_params['payment_processor_id'] = !empty($params['payment_processor_id']) ? $params['payment_processor_id'] : 0;
-    $form->_paymentProcessor = $form->_paymentProcessors[$form->_params['payment_processor_id']];
+    $form->_params['payment_processor_id'] = isset($params['payment_processor_id']) ? $params['payment_processor_id'] : 0;
+    if ($form->_params['payment_processor_id'] !== '') {
+      // It can be blank with a $0 transaction - then no processor needs to be selected
+      $form->_paymentProcessor = $form->_paymentProcessors[$form->_params['payment_processor_id']];
+    }
     if (!empty($params['payment_processor_id'])) {
       // The concept of contributeMode is deprecated as is the billing_mode concept.
       if ($form->_paymentProcessor['billing_mode'] == 1) {
@@ -2014,7 +2017,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (!empty($params['payment_processor_id'])) {
         $params['is_pay_later'] = 0;
       }
-      else {
+      elseif ($params['amount'] !== 0) {
         $params['is_pay_later'] = civicrm_api3('contribution_page', 'getvalue', array(
           'id' => $id,
           'return' => 'is_pay_later',
@@ -2334,7 +2337,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $this->postProcessPremium($premiumParams, $result['contribution']);
       }
       if (!empty($result['contribution'])) {
-        // Not quite sure why it would be empty at this stage but tests show it can be ... at least in tests.
+        // It seems this line is hit when there is a zero dollar transaction & in tests, not sure when else.
         $this->completeTransaction($result, $result['contribution']->id);
       }
       return $result;
@@ -2467,7 +2470,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         civicrm_api3('contribution', 'completetransaction', array(
           'id' => $contributionID,
           'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
-          'payment_processor_id' => $this->_paymentProcessor['id'],
+          'payment_processor_id' => CRM_Utils_Array::value('payment_processor_id', $result, $this->_paymentProcessor['id']),
           'is_transactional' => FALSE,
           'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
           'receive_date' => CRM_Utils_Array::value('receive_date', $result),

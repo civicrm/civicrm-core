@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -77,12 +77,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     $this->_printButtonName = $this->getButtonName('next', 'print');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
-    //we allow the controller to set force/reset externally,
-    //useful when we are being driven by the wizard framework
-    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
-    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'search');
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
+    $this->loadStandardSearchOptionsFromUrl();
 
     //operation for state machine.
     $this->_operation = CRM_Utils_Request::retrieve('op', 'String', $this, FALSE, 'reserve');

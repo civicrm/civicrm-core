@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -399,10 +399,14 @@ AND      c.receive_date < {$this->start_date_1}
   }
 
   /**
-   * Format saved search fields for this custom group
+   * Format saved search fields for this custom group.
+   *
+   * Note this is a function to facilitate the transition to jcalendar for
+   * saved search groups. In time it can be stripped out again.
    *
    * @param array $formValues
    *
+   * @return array
    */
   public static function formatSavedSearchFields($formValues) {
     $dateFields = array(

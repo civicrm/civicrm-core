@@ -25,6 +25,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
 
   public function preProcess() {
     parent::preProcess();
+    $this->assign('selectedChild', 'repeat');
     $this->assign('currentEventId', $this->_id);
 
     $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
@@ -109,7 +110,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       unset($params['id']);
 
       $url = 'civicrm/event/manage/repeat';
-      $urlParams = "action=update&reset=1&id={$this->_id}";
+      $urlParams = "action=update&reset=1&id={$this->_id}&selectedChild=repeat";
 
       $linkedEntities = array(
         array(

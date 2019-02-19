@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 require_once 'HTML/QuickForm/Rule/Email.php';
@@ -120,8 +120,12 @@ class CRM_Utils_String {
     $fragments = explode('_', $string);
     foreach ($fragments as & $fragment) {
       $fragment = ucfirst($fragment);
+      // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in without underscores)
+      if (strpos($fragment, 'Uf') === 0 && strlen($string) > 2) {
+        $fragment = 'UF' . ucfirst(substr($fragment, 2));
+      }
     }
-    // Special case: UFGroup, UFJoin, UFMatch, UFField
+    // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in underscore-separated)
     if ($fragments[0] === 'Uf') {
       $fragments[0] = 'UF';
     }
@@ -657,18 +661,10 @@ class CRM_Utils_String {
    * @return string
    */
   public static function ellipsify($string, $maxLen) {
-    $len = mb_strlen($string, 'UTF-8');
-    if ($len <= $maxLen) {
+    if (mb_strlen($string, 'UTF-8') <= $maxLen) {
       return $string;
     }
-    else {
-      $end = $maxLen - 3;
-      while (mb_strlen($string, 'UTF-8') > $maxLen - 3) {
-        $string = mb_substr($string, 0, $end, 'UTF-8');
-        $end = $end - 1;
-      }
-      return $string . '...';
-    }
+    return mb_substr($string, 0, $maxLen - 3, 'UTF-8') . '...';
   }
 
   /**

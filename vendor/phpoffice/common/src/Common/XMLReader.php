@@ -58,9 +58,9 @@ class XMLReader
 
         if ($content === false) {
             return false;
-        } else {
-            return $this->getDomFromString($content);
         }
+
+        return $this->getDomFromString($content);
     }
 
     /**
@@ -71,6 +71,7 @@ class XMLReader
      */
     public function getDomFromString($content)
     {
+        libxml_disable_entity_loader(true);
         $this->dom = new \DOMDocument();
         $this->dom->loadXML($content);
 
@@ -95,9 +96,28 @@ class XMLReader
 
         if (is_null($contextNode)) {
             return $this->xpath->query($path);
-        } else {
-            return $this->xpath->query($path, $contextNode);
         }
+
+        return $this->xpath->query($path, $contextNode);
+    }
+
+    /**
+     * Registers the namespace with the DOMXPath object
+     *
+     * @param string $prefix The prefix
+     * @param string $namespaceURI The URI of the namespace
+     * @return bool true on success or false on failure
+     * @throws \InvalidArgumentException If called before having loaded the DOM document
+     */
+    public function registerNamespace($prefix, $namespaceURI)
+    {
+        if ($this->dom === null) {
+            throw new \InvalidArgumentException('Dom needs to be loaded before registering a namespace');
+        }
+        if ($this->xpath === null) {
+            $this->xpath = new \DOMXpath($this->dom);
+        }
+        return $this->xpath->registerNamespace($prefix, $namespaceURI);
     }
 
     /**
@@ -112,9 +132,9 @@ class XMLReader
         $elements = $this->getElements($path, $contextNode);
         if ($elements->length > 0) {
             return $elements->item(0);
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -156,9 +176,9 @@ class XMLReader
         $elements = $this->getElements($path, $contextNode);
         if ($elements->length > 0) {
             return $elements->item(0)->nodeValue;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

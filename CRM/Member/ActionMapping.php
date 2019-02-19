@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -97,7 +97,15 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
     $query['casContactIdField'] = 'e.contact_id';
     $query['casEntityIdField'] = 'e.id';
     $query['casContactTableAlias'] = NULL;
+
+    // Leaving this in case of legacy databases
     $query['casDateField'] = str_replace('membership_', 'e.', $schedule->start_action_date);
+
+    // Options currently are just 'join_date', 'start_date', and 'end_date':
+    // they need an alias
+    if (strpos($query['casDateField'], 'e.') !== 0) {
+      $query['casDateField'] = 'e.' . $query['casDateField'];
+    }
 
     // FIXME: Numbers should be constants.
     if (in_array(2, $selectedStatuses)) {
@@ -113,11 +121,28 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
         ->param('memberTypeValues', $selectedValues);
     }
     else {
+      // FIXME: The membership type is never null, so nobody will ever get a
+      // reminder if no membership types are selected.  Either this should be a
+      // validation on the reminder form or all types should get a reminder if
+      // no types are selected.
       $query->where("e.membership_type_id IS NULL");
     }
 
+    // FIXME: This makes a lot of sense for renewal reminders, but a user
+    // scheduling another kind of reminder might not expect members to be
+    // excluded if they have status overrides.  Ideally there would be some kind
+    // of setting per reminder.
     $query->where("( e.is_override IS NULL OR e.is_override = 0 )");
+
+    // FIXME: Similarly to overrides, excluding contacts who can't edit the
+    // primary member makes sense in the context of renewals (see CRM-11342) but
+    // would be a surprise for other use cases.
     $query->merge($this->prepareMembershipPermissionsFilter());
+
+    // FIXME: A lot of undocumented stuff happens with regard to
+    // `is_current_member`, and this is no exception.  Ideally there would be an
+    // opportunity to pick statuses when setting up the scheduled reminder
+    // rather than making the assumptions here.
     $query->where("e.status_id IN (#memberStatus)")
       ->param('memberStatus', \CRM_Member_PseudoConstant::membershipStatus(NULL, "(is_current_member = 1 OR name = 'Expired')", 'id'));
 
@@ -130,39 +155,22 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
   }
 
   /**
-   * @return array
+   * Filter out the memberships that are inherited from a contact that the
+   * recipient cannot edit.
+   *
+   * @return CRM_Utils_SQL_Select
    */
   protected function prepareMembershipPermissionsFilter() {
-    $query = '
-SELECT    cm.id AS owner_id, cm.contact_id AS owner_contact, m.id AS slave_id, m.contact_id AS slave_contact, cmt.relationship_type_id AS relation_type, rel.contact_id_a, rel.contact_id_b, rel.is_permission_a_b, rel.is_permission_b_a
-FROM      civicrm_membership m
-LEFT JOIN civicrm_membership cm ON cm.id = m.owner_membership_id
-LEFT JOIN civicrm_membership_type cmt ON cmt.id = m.membership_type_id
-LEFT JOIN civicrm_relationship rel ON ( ( rel.contact_id_a = m.contact_id AND rel.contact_id_b = cm.contact_id AND rel.relationship_type_id = cmt.relationship_type_id )
-                                        OR ( rel.contact_id_a = cm.contact_id AND rel.contact_id_b = m.contact_id AND rel.relationship_type_id = cmt.relationship_type_id ) )
-WHERE     m.owner_membership_id IS NOT NULL AND
-          ( rel.is_permission_a_b = 0 OR rel.is_permission_b_a = 0)
+    $joins = [
+      'cm' => 'LEFT JOIN civicrm_membership cm ON cm.id = e.owner_membership_id',
+      'rela' => 'LEFT JOIN civicrm_relationship rela ON rela.contact_id_a = e.contact_id AND rela.contact_id_b = cm.contact_id AND rela.is_permission_a_b = #editPerm',
+      'relb' => 'LEFT JOIN civicrm_relationship relb ON relb.contact_id_a = cm.contact_id AND relb.contact_id_b = e.contact_id AND relb.is_permission_b_a = #editPerm',
+    ];
 
-';
-    $excludeIds = array();
-    $dao = \CRM_Core_DAO::executeQuery($query, array());
-    while ($dao->fetch()) {
-      if ($dao->slave_contact == $dao->contact_id_a && $dao->is_permission_a_b == 0) {
-        $excludeIds[] = $dao->slave_contact;
-      }
-      elseif ($dao->slave_contact == $dao->contact_id_b && $dao->is_permission_b_a == 0) {
-        $excludeIds[] = $dao->slave_contact;
-      }
-    }
-
-    if (!empty($excludeIds)) {
-      return \CRM_Utils_SQL_Select::fragment()
-        ->where("!casContactIdField NOT IN (#excludeMemberIds)")
-        ->param(array(
-          '#excludeMemberIds' => $excludeIds,
-        ));
-    }
-    return NULL;
+    return \CRM_Utils_SQL_Select::fragment()
+      ->join(NULL, $joins)
+      ->param('#editPerm', CRM_Contact_BAO_Relationship::EDIT)
+      ->where('!( e.owner_membership_id IS NOT NULL AND rela.id IS NULL and relb.id IS NULL )');
   }
 
 }

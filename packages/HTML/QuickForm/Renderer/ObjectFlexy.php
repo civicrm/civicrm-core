@@ -15,9 +15,9 @@
  * @category    HTML
  * @package     HTML_QuickForm
  * @author      Ron McClain <ron@humaniq.com>
- * @copyright   2001-2009 The PHP Group
+ * @copyright   2001-2011 The PHP Group
  * @license     http://www.php.net/license/3_01.txt PHP License 3.01
- * @version     CVS: $Id: ObjectFlexy.php,v 1.10 2009/04/04 21:34:04 avb Exp $
+ * @version     CVS: $Id$
  * @link        http://pear.php.net/package/HTML_QuickForm
  */
 
@@ -50,7 +50,7 @@ require_once 'HTML/QuickForm/Renderer/Object.php';
  * @category    HTML
  * @package     HTML_QuickForm
  * @author      Ron McClain <ron@humaniq.com>
- * @version     Release: 3.2.11
+ * @version     Release: 3.2.16
  * @since       3.1.1
  */
 class HTML_QuickForm_Renderer_ObjectFlexy extends HTML_QuickForm_Renderer_Object

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -44,6 +44,7 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
    * Fields may have keys
    *  - name (required to show in tpl from the array)
    *  - description (optional, will appear below the field)
+   *     Auto-added by setEntityFieldsMetadata unless specified here (use description => '' to hide)
    *  - not-auto-addable - this class will not attempt to add the field using addField.
    *    (this will be automatically set if the field does not have html in it's metadata
    *    or is not a core field on the form's entity).
@@ -70,11 +71,16 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
         'name' => 'label_b_a',
         'description' => ts("Label for the relationship from Contact B to Contact A. EXAMPLE: Contact B is 'Child of' Contact A. You may leave this blank for relationships where the name is the same in both directions (e.g. Spouse).")
       ],
-      'description' => ['name' => 'description'],
+      'description' => [
+        'name' => 'description',
+        'description' => ''
+      ],
       'contact_types_a' => ['name' => 'contact_types_a', 'not-auto-addable' => TRUE],
       'contact_types_b' => ['name' => 'contact_types_b', 'not-auto-addable' => TRUE],
       'is_active' => ['name' => 'is_active'],
     ];
+
+    self::setEntityFieldsMetadata();
   }
 
   /**

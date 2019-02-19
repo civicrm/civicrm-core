@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -62,6 +62,14 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    */
   protected $_prefix = "contribute_";
 
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Contribution';
+  }
+
   /**
    * Processing needed for buildForm and later.
    */
@@ -75,17 +83,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     // @todo - is this an error - $this->_defaults is used.
     $this->defaults = array();
 
-    /*
-     * we allow the controller to set force/reset externally, useful when we are being
-     * driven by the wizard framework
-     */
-
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
-    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'search');
-
-    $this->assign("context", $this->_context);
+    $this->loadStandardSearchOptionsFromUrl();
 
     // get user submitted values
     // get it from controller only if form has been submitted, else preProcess has set this
@@ -165,10 +163,12 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * Build the form object.
    */
   public function buildQuickForm() {
-    parent::buildQuickForm();
-    $this->addContactSearchFields();
+    if ($this->isFormInViewOrEditMode()) {
+      parent::buildQuickForm();
+      $this->addContactSearchFields();
 
-    CRM_Contribute_BAO_Query::buildSearchForm($this);
+      CRM_Contribute_BAO_Query::buildSearchForm($this);
+    }
 
     $rows = $this->get('rows');
     if (is_array($rows)) {
@@ -377,9 +377,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     if ($this->_context == 'user') {
       $query->setSkipPermission(TRUE);
     }
-    $summary = &$query->summaryContribution($this->_context);
-    $this->set('summary', $summary);
-    $this->assign('contributionSummary', $summary);
+
     $controller->run();
   }
 

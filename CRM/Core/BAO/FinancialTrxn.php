@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
   /**
@@ -466,26 +466,10 @@ WHERE ceft.entity_id = %1";
     $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'financial_type_id');
 
     if ($contributionId && $financialTypeId) {
-      $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-      $refundStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
 
-      if (empty($lineItemTotal)) {
-        $lineItemTotal = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
-      }
-      $sqlFtTotalAmt = "
-SELECT SUM(ft.total_amount)
-FROM civicrm_financial_trxn ft
-  INNER JOIN civicrm_entity_financial_trxn eft ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution' AND eft.entity_id = {$contributionId})
-WHERE ft.is_payment = 1
-  AND ft.status_id IN ({$statusId}, {$refundStatusId})
-";
+      $value = CRM_Contribute_BAO_Contribution::getContributionBalance($contributionId, $lineItemTotal);
 
-      $ftTotalAmt = CRM_Core_DAO::singleValueQuery($sqlFtTotalAmt);
-      if (!$ftTotalAmt) {
-        $ftTotalAmt = 0;
-      }
-      $currency = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'currency');
-      $value = $paymentVal = CRM_Utils_Money::subtractCurrencies($lineItemTotal, $ftTotalAmt, $currency);
+      $paymentVal = $value;
       if ($returnType) {
         $value = array();
         if ($paymentVal < 0) {
@@ -493,9 +477,6 @@ WHERE ft.is_payment = 1
         }
         elseif ($paymentVal > 0) {
           $value['amount_owed'] = $paymentVal;
-        }
-        elseif ($lineItemTotal == $ftTotalAmt) {
-          $value['full_paid'] = $ftTotalAmt;
         }
       }
     }

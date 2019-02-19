@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -145,7 +145,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           'price_field_id' => $priceField->id,
           'label' => trim($params['option_label'][$index]),
           'name' => CRM_Utils_String::munge($params['option_label'][$index], '_', 64),
-          'amount' => CRM_Utils_Rule::cleanMoney(trim($params['option_amount'][$index])),
+          'amount' => trim($params['option_amount'][$index]),
           'count' => CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_count', $params), NULL),
           'max_value' => CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_max_value', $params), NULL),
           'description' => CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_description', $params), NULL),

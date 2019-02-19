@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -131,7 +131,6 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
     if (!$cid && $this->_context != 'standalone') {
       parent::preProcess();
     }
-    CRM_Contact_Form_Task_EmailCommon::bounceIfSimpleMailLimitExceeded(count($this->_contactIds));
 
     $this->assign('single', $this->_single);
     if (CRM_Core_Permission::check('administer CiviCRM')) {

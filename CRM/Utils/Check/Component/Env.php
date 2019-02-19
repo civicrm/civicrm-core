@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
@@ -155,8 +155,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    * @return array<CRM_Utils_Check_Message> an empty array, or a list of warnings
    */
   public function checkMysqlTime() {
-    //CRM-19115 - Always set MySQL time before checking it.
-    CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
     $messages = array();
 
     $phpNow = date('Y-m-d H:i');
@@ -572,7 +570,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ts('Your extensions directory (%1) is read-only. If you would like to perform downloads or upgrades, then change the file permissions.',
           array(1 => $basedir)),
         ts('Read-Only Extensions'),
-        \Psr\Log\LogLevel::WARNING,
+        \Psr\Log\LogLevel::NOTICE,
         'fa-plug'
       );
     }

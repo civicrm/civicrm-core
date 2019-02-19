@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -107,3 +107,4 @@ CRM.$(function($) {
 </script>
 {/literal}
 {include file="CRM/Event/Form/ManageEvent/ConfirmRepeatMode.tpl" entityID=$id entityTable="civicrm_event"}
+{include file="CRM/common/TabSelected.tpl" defaultTab="settings"}

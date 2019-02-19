@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -61,10 +61,10 @@ CRM.$(function($) {
     <th class="right">{ts}Balance{/ts}</th>
   </tr>
   <tr>
-    <td>{$paymentInfo.total|crmMoney}</td>
+    <td>{$paymentInfo.total|crmMoney:$paymentInfo.currency}</td>
     <td class='right'>
       {if $paymentInfo.paid > 0}
-        {$paymentInfo.paid|crmMoney}
+        {$paymentInfo.paid|crmMoney:$paymentInfo.currency}
         {if !$hideButtonLinks}
           <br/>
           <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>
@@ -74,7 +74,7 @@ CRM.$(function($) {
         {/if}
       {/if}
     </td>
-    <td class="right" id="payment-info-balance" data-balance="{$paymentInfo.balance}">{$paymentInfo.balance|crmMoney}</td>
+    <td class="right" id="payment-info-balance" data-balance="{$paymentInfo.balance}">{$paymentInfo.balance|crmMoney:$paymentInfo.currency}</td>
   </tr>
 </table>
 {if $paymentInfo.balance and !$paymentInfo.payLater && !$hideButtonLinks}

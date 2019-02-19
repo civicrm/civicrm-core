@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Class for constructing the payment processor block.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_Payment_Form {
 
@@ -115,6 +115,7 @@ class CRM_Core_Payment_Form {
   protected static function addCommonFields(&$form, $paymentFields) {
     $requiredPaymentFields = $paymentFieldsMetadata = [];
     foreach ($paymentFields as $name => $field) {
+      $field['extra'] = isset($field['extra']) ? $field['extra'] : NULL;
       if ($field['htmlType'] == 'chainSelect') {
         $form->addChainSelect($field['name'], array('required' => FALSE));
       }
@@ -123,7 +124,8 @@ class CRM_Core_Payment_Form {
           $field['name'],
           $field['title'],
           $field['attributes'],
-          FALSE
+          FALSE,
+          $field['extra']
         );
       }
       // This will cause the fields to be marked as required - but it is up to the payment processor to
@@ -279,27 +281,6 @@ class CRM_Core_Payment_Form {
     $payment = Civi\Payment\System::singleton()->getById($payment_processor_id);
     $payment->setBillingProfile($billing_profile_id);
     $payment->validatePaymentInstrument($values, $errors);
-  }
-
-  /**
-   * The credit card pseudo constant results only the CC label, not the key ID
-   * So we normalize the name to use it as a CSS class.
-   */
-  public static function getCreditCardCSSNames($creditCards = array()) {
-    $creditCardTypes = array();
-    if (empty($creditCards)) {
-      $creditCards = CRM_Contribute_PseudoConstant::creditCard();
-    }
-    foreach ($creditCards as $key => $name) {
-      // Replace anything not css-friendly by an underscore
-      // Non-latin names will not like this, but so many things are wrong with
-      // the credit-card type configurations already.
-      $key = str_replace(' ', '', $key);
-      $key = preg_replace('/[^a-zA-Z0-9]/', '_', $key);
-      $key = strtolower($key);
-      $creditCardTypes[$key] = $name;
-    }
-    return $creditCardTypes;
   }
 
   /**

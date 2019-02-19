@@ -133,6 +133,7 @@
     <comment>Date on which given case starts.</comment>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
     <add>1.8</add>
   </field>
@@ -145,6 +146,7 @@
     <comment>Date on which given case ends.</comment>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
     <add>1.8</add>
   </field>

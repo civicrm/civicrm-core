@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_Mail_Incoming {
   const
@@ -42,7 +42,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @return string
    */
-  public function formatMail($mail, &$attachments) {
+  public static function formatMail($mail, &$attachments) {
     $t = '';
     $t .= "From:      " . self::formatAddress($mail->from) . "\n";
     $t .= "To:        " . self::formatAddresses($mail->to) . "\n";
@@ -101,7 +101,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @throws Exception
    */
-  public function formatMailMultipart($part, &$attachments) {
+  public static function formatMailMultipart($part, &$attachments) {
     if ($part instanceof ezcMailMultiPartAlternative) {
       return self::formatMailMultipartAlternative($part, $attachments);
     }
@@ -135,7 +135,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @return string
    */
-  public function formatMailMultipartMixed($part, &$attachments) {
+  public static function formatMailMultipartMixed($part, &$attachments) {
     $t = '';
     foreach ($part->getParts() as $key => $alternativePart) {
       $t .= self::formatMailPart($alternativePart, $attachments);
@@ -149,7 +149,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @return string
    */
-  public function formatMailMultipartRelated($part, &$attachments) {
+  public static function formatMailMultipartRelated($part, &$attachments) {
     $t = '';
     $t .= "-RELATED MAIN PART-\n";
     $t .= self::formatMailPart($part->getMainPart(), $attachments);
@@ -167,7 +167,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @return string
    */
-  public function formatMailMultipartDigest($part, &$attachments) {
+  public static function formatMailMultipartDigest($part, &$attachments) {
     $t = '';
     foreach ($part->getParts() as $key => $alternativePart) {
       $t .= "-DIGEST-$key-\n";
@@ -183,7 +183,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @return string
    */
-  public function formatMailRfc822Digest($part, &$attachments) {
+  public static function formatMailRfc822Digest($part, &$attachments) {
     $t = '';
     $t .= "-DIGEST-ITEM-\n";
     $t .= "Item:\n\n";
@@ -198,7 +198,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @return string
    */
-  public function formatMailMultipartAlternative($part, &$attachments) {
+  public static function formatMailMultipartAlternative($part, &$attachments) {
     $t = '';
     foreach ($part->getParts() as $key => $alternativePart) {
       $t .= "-ALTERNATIVE ITEM $key-\n";
@@ -225,7 +225,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @return string
    */
-  public function formatMailMultipartReport($part, &$attachments) {
+  public static function formatMailMultipartReport($part, &$attachments) {
     $t = '';
     foreach ($part->getParts() as $key => $reportPart) {
       $t .= "-REPORT-$key-\n";
@@ -240,7 +240,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @return string
    */
-  public function formatMailDeliveryStatus($part) {
+  public static function formatMailDeliveryStatus($part) {
     $t = '';
     $t .= "-DELIVERY STATUS BEGIN-\n";
     $t .= $part->generateBody();
@@ -264,7 +264,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @return null
    */
-  public function formatMailFile($part, &$attachments) {
+  public static function formatMailFile($part, &$attachments) {
     $attachments[] = array(
       'dispositionType' => $part->dispositionType,
       'contentType' => $part->contentType,
@@ -280,7 +280,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @return string
    */
-  public function formatAddresses($addresses) {
+  public static function formatAddresses($addresses) {
     $fa = array();
     foreach ($addresses as $address) {
       $fa[] = self::formatAddress($address);
@@ -293,7 +293,7 @@ class CRM_Utils_Mail_Incoming {
    *
    * @return string
    */
-  public function formatAddress($address) {
+  public static function formatAddress($address) {
     $name = '';
     if (!empty($address->name)) {
       $name = "{$address->name} ";

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -607,7 +607,7 @@ AND    u.status = 1
     //need to get back for windows.
     $firstVar = array_shift($pathVars);
 
-    //lets remove sript name to reduce one iteration.
+    // Remove the script name to remove an necessary iteration of the loop.
     array_pop($pathVars);
 
     // CRM-7429 -- do check for uppermost 'includes' dir, which would

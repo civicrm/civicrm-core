@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
@@ -96,7 +96,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       $config = CRM_Core_Config::singleton();
       $recurring->currency = $config->defaultCurrency;
     }
-    $result = $recurring->save();
+    $recurring->save();
 
     if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'ContributionRecur', $recurring->id, $recurring);
@@ -111,7 +111,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution_recur', $recurring->id);
     }
 
-    return $result;
+    return $recurring;
   }
 
   /**
@@ -762,6 +762,14 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       }
     }
 
+    // If values have been supplied for recurring contribution fields, open the recurring contributions pane.
+    foreach (array('contribution_status_id', 'payment_processor_id', 'processor_id', 'trxn_id') as $fieldName) {
+      if (!empty($form->_formValues['contribution_recur_' . $fieldName])) {
+        $form->assign('contribution_recur_pane_open', TRUE);
+        break;
+      }
+    }
+
     // Add field to check if payment is made for recurring contribution
     $recurringPaymentOptions = array(
       1 => ts('All recurring contributions'),
@@ -782,6 +790,16 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
 
     $form->addElement('text', 'contribution_recur_processor_id', ts('Processor ID'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur', 'processor_id'));
     $form->addElement('text', 'contribution_recur_trxn_id', ts('Transaction ID'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur', 'trxn_id'));
+
+    $paymentProcessorParams = [
+      'return' => ["id", "name", 'is_test'],
+    ];
+    $paymentProcessors = civicrm_api3('PaymentProcessor', 'get', $paymentProcessorParams);
+    $paymentProcessorOpts = [];
+    foreach ($paymentProcessors['values'] as $key => $value) {
+      $paymentProcessorOpts[$key] = $value['name'] . ($value['is_test'] ? ' (Test)' : '');
+    }
+    $form->add('select', 'contribution_recur_payment_processor_id', ts('Payment Processor ID'), $paymentProcessorOpts, FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple']);
 
     CRM_Core_BAO_Query::addCustomFormFields($form, array('ContributionRecur'));
 

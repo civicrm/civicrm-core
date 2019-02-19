@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -246,7 +246,8 @@ function _civicrm_api3_custom_value_get_spec(&$params) {
  * CustomValue.gettree API specification
  *
  * @param array $spec description of fields supported by this API call
- * @return void
+ *
+ * @throws \CiviCRM_API3_Exception
  */
 function _civicrm_api3_custom_value_gettree_spec(&$spec) {
   $spec['entity_id'] = array(
@@ -294,8 +295,11 @@ function _civicrm_api3_custom_value_gettree_spec(&$spec) {
  * CustomValue.gettree API
  *
  * @param array $params
+ *
  * @return array API result
- * @throws API_Exception
+ * @throws \API_Exception
+ * @throws \CRM_Core_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_custom_value_gettree($params) {
   $ret = array();

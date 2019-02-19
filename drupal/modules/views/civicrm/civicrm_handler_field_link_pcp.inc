@@ -107,7 +107,7 @@ class civicrm_handler_field_link_pcp extends views_handler_field {
   }
 
   public function render($values) {
-    return $this->render_link(check_plain($values->{$this->field_alias}), $values);
+    return $this->render_link(NULL, $values);
   }
 
 }

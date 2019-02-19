@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -435,8 +435,9 @@ function _civicrm_api3_attachment_format_result($fileDao, $entityFileDao, $retur
     'icon' => CRM_Utils_File::getIconFromMimeType($fileDao->mime_type),
     'created_id' => $fileDao->created_id,
   );
+  $fileHash = CRM_Core_BAO_File::generateFileHash($result['entity_id'], $result['id']);
   $result['url'] = CRM_Utils_System::url(
-    'civicrm/file', 'reset=1&id=' . $result['id'] . '&eid=' . $result['entity_id'],
+    'civicrm/file', 'reset=1&id=' . $result['id'] . '&eid=' . $result['entity_id'] . '&fcs=' . $fileHash,
     TRUE,
     NULL,
     FALSE,

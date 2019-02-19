@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -314,7 +314,7 @@ class RecipientBuilder {
 
     $addlCheck = \CRM_Utils_SQL_Select::from($query['casAddlCheckFrom'])
       ->select('*')
-      ->merge($query, array('params', 'wheres'))// why only where? why not the joins?
+      ->merge($query, array('params', 'wheres', 'joins'))
       ->merge($this->prepareRepetitionEndFilter($query['casDateField']))
       ->limit(1)
       ->strict()

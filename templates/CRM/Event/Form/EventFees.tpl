@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -87,7 +87,7 @@
                 <tr class="crm-event-eventfees-form-block-total_amount"><td class="label">{$form.total_amount.label}</td><td>{$form.total_amount.html|crmMoney:$currency}</td></tr>
                 <tr>
                     <td class="label" >{$form.receive_date.label}</td>
-                    <td>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}</td>
+                    <td>{$form.receive_date.html}</td>
                 </tr>
                 {if $showTransactionId }
                     <tr class="crm-event-eventfees-form-block-trxn_id"><td class="label">{$form.trxn_id.label}</td><td>{$form.trxn_id.html}</td></tr>

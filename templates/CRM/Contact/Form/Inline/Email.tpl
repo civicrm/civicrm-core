@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -51,11 +51,7 @@
     <tr id="Email_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
       <td>{$form.email.$blockId.email.html|crmAddClass:email}&nbsp;{$form.email.$blockId.location_type_id.html}</td>
       <td align="center">{$form.email.$blockId.on_hold.html}</td>
-      {if $multipleBulk}
-        <td align="center">{$form.email.$blockId.is_bulkmail.html}</td>
-      {else}
-        <td align="center" class="crm-email-bulkmail">{$form.email.$blockId.is_bulkmail.1.html}</td>
-      {/if}
+      <td align="center" {if !$multipleBulk}class="crm-email-bulkmail"{/if}>{$form.email.$blockId.is_bulkmail.html}</td>
       <td align="center" class="crm-email-is_primary">{$form.email.$blockId.is_primary.1.html}</td>
       <td>
         {if $blockId gt 1}
