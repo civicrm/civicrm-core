@@ -110,9 +110,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   public function testPaymentEmailReceipt() {
     $mut = new CiviMailUtils($this);
     list($lineItems, $contribution) = $this->createParticipantWithContribution();
+    $event = $this->callAPISuccess('Event', 'get', []);
+    $this->addLocationToEvent($event['id']);
     $params = array(
       'contribution_id' => $contribution['id'],
       'total_amount' => 50,
+      'check_number' => '345',
+      'trxn_date' => '2018-08-13 17:57:56',
     );
     $payment = $this->callAPISuccess('payment', 'create', $params);
     $this->checkPaymentResult($payment, [
@@ -133,6 +137,11 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'This Payment Amount: $ 50.00',
       'Balance Owed: $ 100.00', //150 was paid in the 1st payment.
       'Event Information and Location',
+      'Paid By: Check',
+      'Check Number: 345',
+      'Transaction Date: August 13th, 2018  5:57 PM',
+      'event place',
+      'streety street',
     ));
     $mut->stop();
   }
@@ -623,6 +632,29 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
+  }
+
+  /**
+   * Add a location to our event.
+   *
+   * @param int $eventID
+   */
+  protected function addLocationToEvent($eventID) {
+    $addressParams = [
+      'name' => 'event place',
+      'street_address' => 'streety street',
+      'location_type_id' => 1,
+      'is_primary' => 1,
+    ];
+    // api requires contact_id - perhaps incorrectly but use add to get past that.
+    $address = CRM_Core_BAO_Address::add($addressParams);
+
+    $location = $this->callAPISuccess('LocBlock', 'create', ['address_id' => $address->id]);
+    $this->callAPISuccess('Event', 'create', [
+      'id' => $eventID,
+      'loc_block_id' => $location['id'],
+      'is_show_location' => TRUE,
+    ]);
   }
 
 }

@@ -177,6 +177,13 @@ class CRM_Financial_BAO_Payment {
     ])['values'];
     if (!empty($participantRecords)) {
       $entities['event'] = civicrm_api3('Event', 'getsingle', ['id' => $participantRecords[0]['api.Participant.get']['values'][0]['event_id']]);
+      if (!empty($entities['event']['is_show_location'])) {
+        $locationParams = [
+          'entity_id' => $entities['event']['id'],
+          'entity_table' => 'civicrm_event',
+        ];
+        $entities['location'] = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
+      }
     }
 
     return $entities;
@@ -210,13 +217,14 @@ class CRM_Financial_BAO_Payment {
       'totalAmount' => $entities['payment']['total'],
       'amountOwed' => $entities['payment']['balance'],
       'paymentAmount' => $entities['payment']['total_amount'],
-      'event' => NULL,
-      'component' => 'contribution',
+      'checkNumber' => CRM_Utils_Array::value('check_number', $entities['payment']),
+      'receive_date' => $entities['payment']['trxn_date'],
+      'paidBy' => CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $entities['payment']['payment_instrument_id']),
+      'isShowLocation' => (!empty($entities['event']) ? $entities['event']['is_show_location'] : FALSE),
+      'location' => CRM_Utils_Array::value('location', $entities),
+      'event' => CRM_Utils_Array::value('event', $entities),
+      'component' => (!empty($entities['event']) ? 'event' : 'contribution'),
     ];
-    if (!empty($entities['event'])) {
-      $templateVariables['component'] = 'event';
-      $templateVariables['event'] = $entities['event'];
-    }
 
     return self::filterUntestedTemplateVariables($templateVariables);
   }
@@ -240,6 +248,11 @@ class CRM_Financial_BAO_Payment {
       'paymentAmount',
       'event',
       'component',
+      'checkNumber',
+      'receive_date',
+      'paidBy',
+      'isShowLocation',
+      'location',
     ];
     // Need to do these before switching the form over...
     $todoParams = [
@@ -247,9 +260,6 @@ class CRM_Financial_BAO_Payment {
       'totalPaid',
       'refundAmount',
       'paymentsComplete',
-      'receive_date',
-      'paidBy',
-      'checkNumber',
       'contributeMode',
       'isAmountzero',
       'billingName',
@@ -257,8 +267,6 @@ class CRM_Financial_BAO_Payment {
       'credit_card_type',
       'credit_card_number',
       'credit_card_exp_date',
-      'isShowLocation',
-      'location',
       'eventEmail',
       '$event.participant_role',
     ];
