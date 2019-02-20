@@ -216,6 +216,7 @@ class CRM_Financial_BAO_Payment {
       'contactDisplayName' => $entities['contact']['display_name'],
       'totalAmount' => $entities['payment']['total'],
       'amountOwed' => $entities['payment']['balance'],
+      'totalPaid' => $entities['payment']['paid'],
       'paymentAmount' => $entities['payment']['total_amount'],
       'checkNumber' => CRM_Utils_Array::value('check_number', $entities['payment']),
       'receive_date' => $entities['payment']['trxn_date'],
@@ -224,6 +225,10 @@ class CRM_Financial_BAO_Payment {
       'location' => CRM_Utils_Array::value('location', $entities),
       'event' => CRM_Utils_Array::value('event', $entities),
       'component' => (!empty($entities['event']) ? 'event' : 'contribution'),
+      'isRefund' => $entities['payment']['total_amount'] < 0,
+      'isAmountzero' => $entities['payment']['total_amount'] === 0,
+      'refundAmount' => ($entities['payment']['total_amount'] < 0 ? $entities['payment']['total_amount'] : NULL),
+      'paymentsComplete' => ($entities['payment']['balance'] == 0),
     ];
 
     return self::filterUntestedTemplateVariables($templateVariables);
@@ -253,22 +258,23 @@ class CRM_Financial_BAO_Payment {
       'paidBy',
       'isShowLocation',
       'location',
-    ];
-    // Need to do these before switching the form over...
-    $todoParams = [
       'isRefund',
-      'totalPaid',
-      'refundAmount',
-      'paymentsComplete',
-      'contributeMode',
       'isAmountzero',
+      'refundAmount',
+      'totalPaid',
+      'paymentsComplete',
+    ];
+    // These are assigned by the payment form - they still 'get through' from the
+    // form for now without being in here but we should ideally load
+    // and assign. Note we should update the tpl to use {if $billingName}
+    // and ditch contributeMode - although it might need to be deprecated rather than removed.
+    $todoParams = [
+      'contributeMode',
       'billingName',
       'address',
       'credit_card_type',
       'credit_card_number',
       'credit_card_exp_date',
-      'eventEmail',
-      '$event.participant_role',
     ];
     $filteredParams = [];
     foreach ($testedTemplateVariables as $templateVariable) {
