@@ -377,6 +377,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    */
   public static function buildPermissionedClause(&$whereClauses, $component = NULL, $alias = NULL) {
+    // @todo the relevant addSelectWhere clause should be called.
     if (!self::isACLFinancialTypeStatus()) {
       return FALSE;
     }
