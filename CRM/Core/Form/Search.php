@@ -173,6 +173,30 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   }
 
   /**
+   * Format some special form values including date fields
+   *
+   * @param string $name
+   * @param string $value
+   * @param string $dataType
+   *
+   * @return string|array
+   */
+  public function formatSpecialFormValue($name, $value, $dataType) {
+    if ($dataType == 'Date') {
+      // @todo we should pick up searchDate format here
+      $value = date('d/m/Y', strtotime($value));
+    }
+    elseif (in_array($name, [
+      'privacy_options',
+      'activity_tags',
+    ])) {
+      $value = explode(',', $value);
+    }
+
+    return $value;
+  }
+
+  /**
    * Get the validation rule to apply to a function.
    *
    * Alphanumeric is designed to always be safe & for now we just return
@@ -352,20 +376,24 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       return;
     }
 
-    $enabledComponents = CRM_Core_Component::getEnabledComponents();
+    $enabledComponents = array_merge(CRM_Core_Component::getEnabledComponents(), [
+      'CiviActivity' => ['namespace' => 'CRM_Activity'],
+    ]);
     if (!$this->_component) {
       if (method_exists('CRM_Contact_Form_Search', 'setSearchParamFromUrl')) {
         CRM_Contact_Form_Search::setSearchParamFromUrl($this);
       }
       foreach ($enabledComponents as $component) {
-        $searchClass = $component->namespace . '_Form_Search';
+        $component = (array) $component;
+        $searchClass = $component['namespace'] . '_Form_Search';
         if (method_exists($searchClass, 'setSearchParamFromUrl')) {
           $searchClass::setSearchParamFromUrl($this);
         }
       }
     }
     elseif (array_key_exists($this->_component, $enabledComponents)) {
-      $searchClass = $enabledComponents[$this->_component]->namespace . '_Form_Search';
+      $component = (array) $enabledComponents[$this->_component];
+      $searchClass = $component['namespace'] . '_Form_Search';
       if (method_exists($searchClass, 'setSearchParamFromUrl')) {
         $searchClass::setSearchParamFromUrl($this);
       }
