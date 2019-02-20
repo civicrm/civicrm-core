@@ -6390,30 +6390,9 @@ AND   displayRelType.is_active = 1
             $this->_select = array_merge($this->_select, $this->_customQuery->_select);
             $this->_tables = array_merge($this->_tables, $this->_customQuery->_tables);
           }
-          foreach ($this->_pseudoConstantsSelect as $key => $pseudoConstantMetadata) {
-            // By replacing the join to the option value table with the mysql construct
-            // ORDER BY field('contribution_status_id', 2,1,4)
-            // we can remove a join. In the case of the option value join it is
-            /// a join known to cause slow queries.
-            // @todo cover other pseudoconstant types. Limited to option group ones in the
-            // first instance for scope reasons. They require slightly different handling as the column (label)
-            // is not declared for them.
-            // @todo so far only integer fields are being handled. If we add string fields we need to look at
-            // escaping.
-            if (isset($pseudoConstantMetadata['pseudoconstant'])
-              && isset($pseudoConstantMetadata['pseudoconstant']['optionGroupName'])
-              && $field === CRM_Utils_Array::value('optionGroupName', $pseudoConstantMetadata['pseudoconstant'])
-            ) {
-              $sortedOptions = $pseudoConstantMetadata['bao']::buildOptions($pseudoConstantMetadata['pseudoField'], NULL, array(
-                'orderColumn' => 'label',
-              ));
-              $order = str_replace("$field $direction", "field({$pseudoConstantMetadata['pseudoField']}," . implode(',', array_keys($sortedOptions)) . ") $direction", $order);
-            }
-            //CRM-12565 add "`" around $field if it is a pseudo constant
-            // This appears to be for 'special' fields like locations with appended numbers or hyphens .. maybe.
-            if (!empty($pseudoConstantMetadata['element']) && $pseudoConstantMetadata['element'] == $field) {
-              $order = str_replace($field, "`{$field}`", $order);
-            }
+          $extraClause = $this->getOrderByForPseudoConstantFields($field, $direction);
+          if ($extraClause) {
+            $order = $extraClause . ', ' . $order;
           }
       }
     }
@@ -6499,7 +6478,7 @@ AND   displayRelType.is_active = 1
       return TRUE;
     }
     // Is this still required - the above goes off the unique name. Test with things like
-    // communication_prefferences & prefix_id.
+    // communication_preferences & prefix_id.
     if (CRM_Utils_Array::value($field['name'], $this->_returnProperties)) {
       return TRUE;
     }
@@ -6644,6 +6623,45 @@ AND   displayRelType.is_active = 1
       $summary['cancel']['amount'] = implode(',&nbsp;', $summary['cancel']['amount']);
       $summary['cancel']['avg'] = implode(',&nbsp;', $summary['cancel']['avg']);
     }
+  }
+
+  /**
+   * Get order by clause for pseudoconstant fields.
+   *
+   *
+   * @param array $field
+   * @param string $direction
+   *
+   * @return string
+   */
+  protected function getOrderByForPseudoConstantFields($field, $direction) {
+    $order = [];
+    foreach ($this->_pseudoConstantsSelect as $key => $pseudoConstantMetadata) {
+      // By replacing the join to the option value table with the mysql construct
+      // ORDER BY field('contribution_status_id', 2,1,4)
+      // we can remove a join. In the case of the option value join it is
+      /// a join known to cause slow queries.
+      // @todo cover other pseudoconstant types. Limited to option group ones in the
+      // first instance for scope reasons. They require slightly different handling as the column (label)
+      // is not declared for them.
+      // @todo so far only integer fields are being handled. If we add string fields we need to look at
+      // escaping.
+      if (isset($pseudoConstantMetadata['pseudoconstant'])
+        && isset($pseudoConstantMetadata['pseudoconstant']['optionGroupName'])
+        && $field === CRM_Utils_Array::value('optionGroupName', $pseudoConstantMetadata['pseudoconstant'])
+      ) {
+        $sortedOptions = $pseudoConstantMetadata['bao']::buildOptions($pseudoConstantMetadata['pseudoField'], NULL, [
+          'orderColumn' => 'label',
+        ]);
+        $order[] = str_replace("$field $direction", "field({$pseudoConstantMetadata['pseudoField']}," . implode(',', array_keys($sortedOptions)) . ") $direction");
+      }
+      //CRM-12565 add "`" around $field if it is a pseudo constant
+      // This appears to be for 'special' fields like locations with appended numbers or hyphens .. maybe.
+      if (!empty($pseudoConstantMetadata['element']) && $pseudoConstantMetadata['element'] == $field) {
+        $order[] = str_replace($field, "`{$field}`");
+      }
+    }
+    return implode(',', $order);
   }
 
 }
