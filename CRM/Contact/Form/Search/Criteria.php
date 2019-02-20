@@ -266,7 +266,6 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * Return list of basic contact fields that can be displayed for the basic search section.
    *
-   * @param array
    */
   public static function getBasicSearchFields() {
     return [
@@ -298,6 +297,10 @@ class CRM_Contact_Form_Search_Criteria {
         'help' => ['id' => 'id-all-tag-types'],
         'data_type' => 'String',
       ],
+      'deleted_contacts' => [
+        'name' => 'deleted_contacts',
+        'data_type' => 'Positive',
+      ],
       'phone_numeric' => [
         'name' => 'phone_numeric',
         'description' => ts('Punctuation and spaces are ignored.'),
@@ -310,6 +313,14 @@ class CRM_Contact_Form_Search_Criteria {
         'class' => 'search-field__span-2',
         'template' => 'CRM/Contact/Form/Search/Criteria/Fields/privacy_toggle.tpl',
         'data_type' => 'Integer',
+      ],
+      'privacy_options' => [
+        'name' => 'privacy_options',
+        'data_type' => 'String',
+      ],
+      'privacy_operator' => [
+        'name' => 'privacy_operator',
+        'data_type' => 'String',
       ],
       'preferred_communication_method' => [
         'name' => 'preferred_communication_method',
@@ -343,8 +354,6 @@ class CRM_Contact_Form_Search_Criteria {
 
   /**
    * Return list of location fields that can be displayed for the Address search section.
-   *
-   * @param array
    */
   public static function getLocationSearchFields() {
     return array(
@@ -366,8 +375,6 @@ class CRM_Contact_Form_Search_Criteria {
 
   /**
    * Return list of demographic fields that can be displayed for the Demographics search section.
-   *
-   * @param array
    */
   public static function getDemographicsSearchFields() {
     return [
@@ -384,6 +391,8 @@ class CRM_Contact_Form_Search_Criteria {
     return [
       'changed_by' => ['title' => ts('Modified By'), 'data_type' => 'String'],
       'log_date' => ['title' => NULL, 'data_type' => 'Positive'],
+      'log_date_low' => ['title' => NULL, 'data_type' => 'Date'],
+      'log_date_high' => ['title' => NULL, 'data_type' => 'Date'],
       'log_date_relative' => ['data_type' => 'String'],
     ];
   }
@@ -391,10 +400,12 @@ class CRM_Contact_Form_Search_Criteria {
   /**
    * Return list of custom fields that can be displayed for the Custom Fields search section.
    *
-   * @param array
+   * @param array $extends
+   *
+   * return array
    */
-  public static function getCustomSearchFields() {
-    $extends = array_merge(array('Contact', 'Individual', 'Household', 'Organization', 'Address'),
+  public static function getCustomSearchFields($extends = NULL) {
+    $extends = $extends ?: array_merge(array('Contact', 'Individual', 'Household', 'Organization', 'Address'),
       CRM_Contact_BAO_ContactType::subTypes()
     );
     $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE,
