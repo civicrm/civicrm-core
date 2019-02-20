@@ -83,11 +83,9 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
     $recurRow = array();
     $recurIDs = array();
     while ($recur->fetch()) {
-      $mode = $recur->is_test ? 'test' : 'live';
-      $paymentProcessor = CRM_Contribute_BAO_ContributionRecur::getPaymentProcessor($recur->id,
-        $mode
-      );
-      if (!$paymentProcessor) {
+      if (empty($recur->payment_processor_id)) {
+        // it's not clear why we continue here as any without a processor id would likely
+        // be imported from another system & still seem valid.
         continue;
       }
 
@@ -121,10 +119,6 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       );
 
       $recurIDs[] = $values['id'];
-
-      //reset $paymentObject for checking other paymenet processor
-      //recurring url
-      $paymentObject = NULL;
     }
     if (is_array($recurIDs) && !empty($recurIDs)) {
       $getCount = CRM_Contribute_BAO_ContributionRecur::getCount($recurIDs);
