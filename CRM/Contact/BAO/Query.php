@@ -6297,10 +6297,10 @@ AND   displayRelType.is_active = 1
    *   list(string $orderByClause, string $additionalFromClause).
    */
   protected function prepareOrderBy($sort, $sortByChar, $sortOrder, $additionalFromClause) {
-    $order = NULL;
-    $orderByArray = array();
-    $config = CRM_Core_Config::singleton();
-    if ($config->includeOrderByClause ||
+    $orderByArray = [];
+    $orderBy = '';
+
+    if (CRM_Core_Config::singleton()->includeOrderByClause ||
       isset($this->_distinctComponentClause)
     ) {
       if ($sort) {
@@ -6321,16 +6321,14 @@ AND   displayRelType.is_active = 1
             $orderBy = str_replace('sort_name', 'contact_a.sort_name', $orderBy);
           }
 
-          $order = " ORDER BY $orderBy";
-
           if ($sortOrder) {
-            $order .= " $sortOrder";
+            $orderBy .= " $sortOrder";
           }
 
           // always add contact_a.id to the ORDER clause
           // so the order is deterministic
-          if (strpos('contact_a.id', $order) === FALSE) {
-            $order .= ", contact_a.id";
+          if (strpos('contact_a.id', $orderBy) === FALSE) {
+            $orderBy .= ", contact_a.id";
           }
         }
       }
@@ -6338,14 +6336,14 @@ AND   displayRelType.is_active = 1
         $orderByArray = array("UPPER(LEFT(contact_a.sort_name, 1)) asc");
       }
       else {
-        $order = " ORDER BY contact_a.sort_name ASC, contact_a.id";
+        $orderBy = " contact_a.sort_name ASC, contact_a.id";
       }
     }
-    if (!$order && empty($orderByArray)) {
-      return array($order, $additionalFromClause);
+    if (!$orderBy && empty($orderByArray)) {
+      return [NULL, $additionalFromClause];
     }
     // Remove this here & add it at the end for simplicity.
-    $order = trim(str_replace('ORDER BY', '', $order));
+    $order = trim($orderBy);
 
     // hack for order clause
     if (!empty($orderByArray)) {
