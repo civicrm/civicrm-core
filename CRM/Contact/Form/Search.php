@@ -101,7 +101,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    *
    * @var array
    */
-  protected $_params;
+  public $_params;
 
   /**
    * The return properties used for search.
@@ -774,6 +774,11 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     );
     foreach ($searchFields as $name => $type) {
       if ($value = CRM_Utils_Request::retrieve($name, $type)) {
+        $value = $form->formatSpecialFormValue($name, $value, $type);
+        if (strstr($name, '_date_relative')) {
+          $fieldName = str_replace('_relative', '', $name);
+          list($form->_formValues[$fieldName . '_low'], $form->_formValues[$fieldName . '_high']) = CRM_Utils_Date::getFromTo($value, NULL, NULL);
+        }
         $form->_formValues[$name] = $value;
       }
     }

@@ -201,10 +201,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       $this->_ssID = $this->get('ssID');
     }
 
-    $defaults = array_merge($this->_formValues, [
-      'privacy_toggle' => 1,
-      'operator' => 'AND',
-    ], $defaults);
+    $defaults = array_merge(['privacy_toggle' => 1, 'operator' => 'AND'], $this->_formValues);
     $this->normalizeDefaultValues($defaults);
 
     if ($this->_context === 'amtg') {

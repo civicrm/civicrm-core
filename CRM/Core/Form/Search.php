@@ -221,7 +221,6 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
 
   /**
    * Global validation rules for the form.
-   *
    * @param array $fields
    *   Posted values of the form.
    * @param array $files
@@ -237,6 +236,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       // advanced search, but a NULL object when doing a pledge search.
       return $errors;
     }
+
     foreach ($form->getSearchFieldMetadata() as $entity => $spec) {
       foreach ($spec as $fieldName => $fieldSpec) {
         if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || $fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
@@ -248,7 +248,32 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
         }
       }
     }
+
     return $errors;
+  }
+
+  /**
+   * Format some special form values including date fields
+   *
+   * @param string $name
+   * @param string $value
+   * @param string $dataType
+   *
+   * @return string|array
+   */
+  public function formatSpecialFormValue($name, $value, $dataType) {
+    if ($dataType == 'Date') {
+      // @todo we should pick up searchDate format here
+      $value = date('d/m/Y', strtotime($value));
+    }
+    elseif (in_array($name, [
+      'privacy_options',
+      'activity_tags',
+    ])) {
+      $value = explode(',', $value);
+    }
+
+    return $value;
   }
 
   /**
@@ -473,20 +498,24 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       return;
     }
 
-    $enabledComponents = CRM_Core_Component::getEnabledComponents();
+    $enabledComponents = array_merge(CRM_Core_Component::getEnabledComponents(), [
+      'CiviActivity' => ['namespace' => 'CRM_Activity'],
+    ]);
     if (!$this->_component) {
       if (method_exists('CRM_Contact_Form_Search', 'setSearchParamFromUrl')) {
         CRM_Contact_Form_Search::setSearchParamFromUrl($this);
       }
       foreach ($enabledComponents as $component) {
-        $searchClass = $component->namespace . '_Form_Search';
+        $component = (array) $component;
+        $searchClass = $component['namespace'] . '_Form_Search';
         if (method_exists($searchClass, 'setSearchParamFromUrl')) {
           $searchClass::setSearchParamFromUrl($this);
         }
       }
     }
     elseif (array_key_exists($this->_component, $enabledComponents)) {
-      $searchClass = $enabledComponents[$this->_component]->namespace . '_Form_Search';
+      $component = (array) $enabledComponents[$this->_component];
+      $searchClass = $component['namespace'] . '_Form_Search';
       if (method_exists($searchClass, 'setSearchParamFromUrl')) {
         $searchClass::setSearchParamFromUrl($this);
       }
