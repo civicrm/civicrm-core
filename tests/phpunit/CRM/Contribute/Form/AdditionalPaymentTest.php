@@ -183,16 +183,28 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    * Test the submit function that completes the partially paid Contribution with multiple payments.
    */
   public function testMultiplePaymentForPartiallyPaidContributionWithOneCreditCardPayment() {
+    $mut = new CiviMailUtils($this, TRUE);
     $this->createContribution('Partially paid');
 
     // pay additional amount
-    $this->submitPayment(50);
+    $this->submitPayment(50, NULL, TRUE);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('id' => $this->_contributionId));
     $this->assertEquals('Partially paid', $contribution['contribution_status']);
 
     // pay additional amount by using credit card
     $this->submitPayment(20, 'live');
     $this->checkResults(array(30, 50, 20), 3);
+    $mut->assertSubjects(array('Payment Receipt -'));
+    $mut->checkMailLog(array(
+      'Dear Anthony Anderson',
+      'A payment has been received',
+      'Total Fees: $ 100.00',
+      'This Payment Amount: $ 50.00',
+      'Balance Owed: $ 20.00 ',
+      'Paid By: Check',
+      'Check Number: check-12345',
+    ));
+    $mut->stop();
   }
 
   /**
