@@ -149,6 +149,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         'grouping' => 'contri-fields',
         'filters' => array(
           'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
+          'thankyou_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,

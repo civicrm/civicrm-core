@@ -156,6 +156,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'trxn_id' => NULL,
           'receive_date' => array('default' => TRUE),
           'receipt_date' => NULL,
+          'thankyou_date' => NULL,
           'total_amount' => array(
             'title' => ts('Amount'),
             'required' => TRUE,
@@ -192,6 +193,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             ),
           ),
           'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
+          'thankyou_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
           'contribution_source' => array(
             'title' => ts('Source'),
             'name' => 'source',
@@ -239,6 +241,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'contribution_status_id' => array('title' => ts('Contribution Status')),
           'payment_instrument_id' => array('title' => ts('Payment Method')),
           'receive_date' => array('title' => ts('Date Received')),
+          'thankyou_date' => array('title' => ts('Thank-you Date')),
         ),
         'group_bys' => array(
           'contribution_id' => array(
