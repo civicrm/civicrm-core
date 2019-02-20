@@ -702,6 +702,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $tokens = array_merge(CRM_Core_SelectValues::eventTokens(), $tokens);
     $tokens = array_merge(CRM_Core_SelectValues::membershipTokens(), $tokens);
     $tokens = array_merge(CRM_Core_SelectValues::contributionTokens(), $tokens);
+    $tokens = array_merge(CRM_Core_SelectValues::caseTokens(), $tokens);
     return $tokens;
   }
 

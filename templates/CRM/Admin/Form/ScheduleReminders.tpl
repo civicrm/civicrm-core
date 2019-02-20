@@ -211,6 +211,42 @@
         showHideLimitTo();
       }
 
+      function caseRolesFilter() {
+        if(!$("#entity_1", $form).val()){
+          //alert('Select a case type');
+          return;
+        }
+        var caseType = $("#entity_1", $form).val();
+        CRM.api3('CaseType', 'get', {
+          "id": {"IN":caseType}
+        }).done(function(result) {
+          if (!CRM._.isEmpty(result.values)) {
+            var values = [];
+            CRM._.each(result.values, function(v, i) {
+              CRM._.each(v.definition.caseRoles, function(v2, j) {
+                values.push(v2.name);
+              });
+            });
+            // filter options
+            $("#recipient_listing > option").each(function(i, val) {
+              var text = $(val).text();//$("#recipient_listing option:[text='" + this + "']");
+              if ($.inArray(text, values) == -1) {
+                //alert(text);
+                $(this).remove();
+              }
+            });
+          }
+          $("#recipientList", $form).show();
+        });
+      }
+
+      $('#entity_1', $form).change(function () {
+        var recipient = $("#recipient", $form).val();
+        if (recipient == 'case_roles') {
+          populateRecipient();
+        }
+      });
+	  
       // CRM-14070 Hide limit-to when entity is activity
       function showHideLimitTo() {
         $('#limit_to', $form).toggle(!($('#entity_0', $form).val() == '1'));

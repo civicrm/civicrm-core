@@ -298,6 +298,8 @@ abstract class Mapping implements MappingInterface {
       $valueLabelMap['auto_renew_options'] = \CRM_Core_OptionGroup::values('auto_renew_options');
       $valueLabelMap['contact_date_reminder_options'] = \CRM_Core_OptionGroup::values('contact_date_reminder_options');
       $valueLabelMap['civicrm_membership_type'] = \CRM_Member_PseudoConstant::membershipType();
+      $valueLabelMap['case_type'] = \CRM_Case_PseudoConstant::caseType();
+      $valueLabelMap['case_status'] = \CRM_Case_PseudoConstant::caseStatus();
 
       $allCustomFields = \CRM_Core_BAO_CustomField::getFields('');
       $dateFields = array(
