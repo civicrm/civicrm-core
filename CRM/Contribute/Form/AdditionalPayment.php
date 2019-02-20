@@ -336,20 +336,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if ($this->_component == 'event') {
       $participantId = $this->_id;
     }
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution',
-      'contribution_status_id',
-      array('labelColumn' => 'name')
-    );
-    $contributionStatusID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'contribution_status_id');
-    if ($contributionStatuses[$contributionStatusID] == 'Pending') {
-      civicrm_api3('Contribution', 'create',
-        array(
-          'id' => $this->_contributionId,
-          'contribution_status_id' => array_search('Partially paid', $contributionStatuses),
-          'is_pay_later' => 0,
-        )
-      );
-    }
 
     if ($this->_mode) {
       // process credit card
@@ -357,17 +343,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->processCreditCard();
     }
 
-    $defaults = array();
-    $contribution = civicrm_api3('Contribution', 'getsingle', array(
-      'return' => array("contribution_status_id"),
-      'id' => $this->_contributionId,
-    ));
-    $contributionStatusId = CRM_Utils_Array::value('contribution_status_id', $contribution);
-    $result = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $this->_params, $this->_paymentType, $participantId);
-    // Fetch the contribution & do proportional line item assignment
-    $params = array('id' => $this->_contributionId);
-    $contribution = CRM_Contribute_BAO_Contribution::retrieve($params, $defaults, $params);
-    CRM_Contribute_BAO_Contribution::addPayments(array($contribution), $contributionStatusId);
+    $payment = civicrm_api3('Payment', 'create', array_merge([
+      'contribution_id' => $this->_contributionId,
+      'total_amount' => $this->_params['total_amount'],
+    ], $this->_params));
     if ($this->_contributionId && CRM_Core_Permission::access('CiviMember')) {
       $membershipPaymentCount = civicrm_api3('MembershipPayment', 'getCount', array('contribution_id' => $this->_contributionId));
       if ($membershipPaymentCount) {
