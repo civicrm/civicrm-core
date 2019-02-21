@@ -97,8 +97,8 @@ class CRM_Utils_SQL_TempTable {
     $t->id = md5(uniqid('', TRUE));
     // The constant CIVICRM_TEMP_FORCE_DURABLE is for local debugging.
     $t->durable = CRM_Utils_Constant::value('CIVICRM_TEMP_FORCE_DURABLE', FALSE);
-    // I suspect it would be better to just say utf8=true, but a lot of existing queries don't do the utf8 bit.
-    $t->utf8 = CRM_Utils_Constant::value('CIVICRM_TEMP_FORCE_UTF8', FALSE);
+    // @deprecated This constant is deprecated and will be removed.
+    $t->utf8 = CRM_Utils_Constant::value('CIVICRM_TEMP_FORCE_UTF8', TRUE);
     $t->autodrop = FALSE;
     $t->memory = FALSE;
     return $t;
