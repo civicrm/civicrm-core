@@ -1035,7 +1035,7 @@ GROUP BY contribution2.{$this->contributionJoinTableColumn}, currency";
 CREATE TEMPORARY TABLE $this->tempTableRepeat1 (
 {$create}
 {$this->contributionJoinTableColumn} int unsigned,
-total_amount_sum int,
+total_amount_sum decimal(20,2),
 total_amount_count int
 ) ENGINE=HEAP {$this->_databaseAttributes}";
     $this->executeReportQuery($sql);
@@ -1050,7 +1050,7 @@ total_amount_count int
 CREATE TEMPORARY TABLE  $this->tempTableRepeat2 (
 {$create}
 {$this->contributionJoinTableColumn} int unsigned,
-total_amount_sum int,
+total_amount_sum decimal(20,2),
 total_amount_count int,
 currency varchar(3)
 ) ENGINE=HEAP {$this->_databaseAttributes}";
