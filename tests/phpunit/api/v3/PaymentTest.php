@@ -132,7 +132,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
     $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet']);
     $mut->checkMailLog(array(
-      'Dear Mr. Anthony Anderson II',
+      'Dear Anthony,',
       'Total Fees: $ 300.00',
       'This Payment Amount: $ 50.00',
       'Balance Owed: $ 100.00', //150 was paid in the 1st payment.
@@ -163,7 +163,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
     $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet']);
     $mut->checkMailLog(array(
-      'Dear Mr. Anthony Anderson II',
+      'Dear Anthony,',
       'A payment has been received.',
       'Total Fees: $ 300.00',
       'This Payment Amount: $ 150.00',
@@ -212,7 +212,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
     $mut->assertSubjects(['Refund Notification - Annual CiviCRM meet']);
     $mut->checkMailLog(array(
-      'Dear Mr. Anthony Anderson II',
+      'Dear Anthony,',
       'A refund has been issued based on changes in your registration selections.',
       'Total Fees: $ 300' . $decimalSeparator . '00',
       'Refund Amount: $ -30' . $decimalSeparator . '00',

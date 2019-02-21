@@ -387,6 +387,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_params['contact_id'] = $this->_contactId;
       $this->_params['contribution_id'] = $this->_contributionId;
 
+      // These 2 rows are temporarily added for sequencing of adding commits. They won't be needed when we
+      // switch to Payment.send_confirmation api
+      $contact = civicrm_api3('Contact', 'getsingle', ['id' => $this->_contactId, 'return' => 'email_greeting']);
+      $this->assign('emailGreeting', $contact['email_greeting_display']);
+
       $sendReceipt = $this->emailReceipt($this->_params);
       if ($sendReceipt) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');

@@ -137,11 +137,16 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->checkResults(array(30, 70), 2);
     $mut->assertSubjects(['Payment Receipt -']);
     $mut->checkMailLog([
-      'Dear Anthony Anderson',
+      'Dear Anthony,',
       'Payment Details',
       'Total Fees: $ 100.00',
       'This Payment Amount: $ 70.00',
       'Balance Owed: $ 0.00 ',
+      'Billing Name and Address',
+      'Vancouver, AE 1321312',
+      'Visa',
+      '***********1111',
+      'Expires: May 2025',
     ]);
 
     $mut->stop();
