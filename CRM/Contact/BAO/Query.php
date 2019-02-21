@@ -4889,7 +4889,6 @@ civicrm_relationship.start_date > {$today}
     $groupBy = $groupByCols = NULL;
     if (!$count) {
       if (isset($this->_groupByComponentClause)) {
-        $groupBy = $this->_groupByComponentClause;
         $groupByCols = preg_replace('/^GROUP BY /', '', trim($this->_groupByComponentClause));
         $groupByCols = explode(', ', $groupByCols);
       }
@@ -4899,6 +4898,9 @@ civicrm_relationship.start_date > {$today}
     }
     if ($this->_mode & CRM_Contact_BAO_Query::MODE_ACTIVITY && (!$count)) {
       $groupByCols = array('civicrm_activity.id');
+    }
+    if (!empty($groupByCols)) {
+      $groupBy = " GROUP BY " . implode(', ', $groupByCols);
     }
 
     $order = $orderBy = $limit = '';
@@ -4916,7 +4918,7 @@ civicrm_relationship.start_date > {$today}
     //      MySQL expect the columns present in GROUP BY, must be present in SELECT clause and that results into error, needless to have other columns.
     //   2. When GROUP BY columns are present then disable FGB otherwise it demands to add ORDER BY columns in GROUP BY and eventually in SELECT
     //     clause. This will impact the search query output.
-    $disableFullGroupByMode = ($sortByChar || !empty($groupByCols) || $groupContacts);
+    $disableFullGroupByMode = ($sortByChar || !empty($groupBy) || $groupContacts);
 
     if ($disableFullGroupByMode) {
       CRM_Core_DAO::disableFullGroupByMode();
@@ -4929,10 +4931,6 @@ civicrm_relationship.start_date > {$today}
     $this->includePseudoFieldsJoin($sort);
 
     list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
-
-    if (!empty($groupByCols)) {
-      $groupBy = " GROUP BY " . implode(', ', $groupByCols);
-    }
 
     if ($additionalWhereClause) {
       $where = $where . ' AND ' . $additionalWhereClause;
