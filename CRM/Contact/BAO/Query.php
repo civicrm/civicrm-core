@@ -3038,7 +3038,7 @@ class CRM_Contact_BAO_Query {
     //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
     $groupContactCacheClause = '';
     if (count($smartGroupIDs) || empty($value)) {
-	  $gccUnique = uniqid();
+      $gccUnique = uniqid();
       $gccTableAlias = "civicrm_group_contact_cache_{$gccUnique}";
       $groupContactCacheClause = $this->addGroupContactCache($smartGroupIDs, $gccTableAlias, "contact_a", $op);
       if (!empty($groupContactCacheClause)) {
@@ -4869,7 +4869,7 @@ civicrm_relationship.start_date > {$today}
 
     $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $this->_params);
 
-    // if weâ€™re explicitly looking for a certain contactâ€™s contribs, events, etc.
+    // if we’re explicitly looking for a certain contact’s contribs, events, etc.
     // and that contact happens to be deleted, set $onlyDeleted to true
     foreach ($this->_params as $values) {
       $name = CRM_Utils_Array::value(0, $values);
