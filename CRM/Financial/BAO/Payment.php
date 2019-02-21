@@ -169,6 +169,8 @@ class CRM_Financial_BAO_Payment {
     $contactID = self::getPaymentContactID($contributionID);
     list($displayName, $email)  = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
     $entities['contact'] = ['id' => $contactID, 'display_name' => $displayName, 'email' => $email];
+    $contact = civicrm_api3('Contact', 'getsingle', ['id' => $contactID, 'return' => 'email_greeting']);
+    $entities['contact']['email_greeting'] = $contact['email_greeting_display'];
 
     $participantRecords = civicrm_api3('ParticipantPayment', 'get', [
       'contribution_id' => $contributionID,
@@ -214,6 +216,7 @@ class CRM_Financial_BAO_Payment {
   public static function getConfirmationTemplateParameters($entities) {
     $templateVariables = [
       'contactDisplayName' => $entities['contact']['display_name'],
+      'emailGreeting' => $entities['contact']['email_greeting'],
       'totalAmount' => $entities['payment']['total'],
       'amountOwed' => $entities['payment']['balance'],
       'totalPaid' => $entities['payment']['paid'],
@@ -263,6 +266,7 @@ class CRM_Financial_BAO_Payment {
       'refundAmount',
       'totalPaid',
       'paymentsComplete',
+      'emailGreeting'
     ];
     // These are assigned by the payment form - they still 'get through' from the
     // form for now without being in here but we should ideally load

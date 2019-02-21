@@ -102,7 +102,16 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'membership_online_receipt', 'type' => 'text'],
           ['name' => 'membership_online_receipt', 'type' => 'html'],
         ]
-      ]
+      ],
+      [
+        'version' => '5.12.alpha1',
+        'upgrade_descriptor' => ts('Update payment notification to remove print text, use email greeting'),
+        'label' => ts('Payment notification'),
+        'templates' => [
+          ['name' => 'payment_or_refund_notification', 'type' => 'text'],
+          ['name' => 'payment_or_refund_notification', 'type' => 'html'],
+        ]
+      ],
     ];
   }
 
