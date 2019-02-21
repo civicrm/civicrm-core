@@ -3038,12 +3038,13 @@ class CRM_Contact_BAO_Query {
     //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
     $groupContactCacheClause = '';
     if (count($smartGroupIDs) || empty($value)) {
-      $gccTableAlias = "civicrm_group_contact_cache";
+	  $gccUnique = uniqid();
+      $gccTableAlias = "civicrm_group_contact_cache_{$gccUnique}";
       $groupContactCacheClause = $this->addGroupContactCache($smartGroupIDs, $gccTableAlias, "contact_a", $op);
       if (!empty($groupContactCacheClause)) {
         if ($isNotOp) {
           $groupIds = implode(',', (array) $smartGroupIDs);
-          $gcTable = "civicrm_group_contact";
+          $gcTable = "civicrm_group_contact_{$gccUnique}";
           $joinClause = array("contact_a.id = {$gcTable}.contact_id");
           $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
           if (strpos($op, 'IN') !== FALSE) {
