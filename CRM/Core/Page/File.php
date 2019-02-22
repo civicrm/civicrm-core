@@ -42,15 +42,24 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     $download = CRM_Utils_Request::retrieve('download', 'Integer', $this, FALSE, 1);
     $disposition = $download == 0 ? 'inline' : 'download';
 
-    $entityId = CRM_Utils_Request::retrieve('eid', 'Positive', $this, TRUE); // Entity ID (e.g. Contact ID)
+    $entityId = CRM_Utils_Request::retrieve('eid', 'Positive', $this, FALSE); // Entity ID (e.g. Contact ID)
     $fieldId = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE); // Field ID
-    $fileId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE); // File ID
+    $fileId = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE); // File ID
+    $fileName = CRM_Utils_Request::retrieve('filename', 'String', $this, FALSE);
+    if (empty($fileName) && (empty($entityId) || empty($fileId))) {
+      CRM_Core_Error::statusBounce("Either FIlename or Entity ID and FIle Id need to be passed in to retrieve files");
+    }
     $hash = CRM_Utils_Request::retrieve('fcs', 'Alphanumeric', $this);
-    if (!CRM_Core_BAO_File::validateFileHash($hash, $entityId, $fileId)) {
+    if (!CRM_Core_BAO_File::validateFileHash($hash, $entityId, $fileId) && empty($fileName)) {
       CRM_Core_Error::statusBounce('URL for file is not valid');
     }
-
-    list($path, $mimeType) = CRM_Core_BAO_File::path($fileId, $entityId);
+    if (!empty($fileName)) {
+      $mimeType = '';
+      $path = CRM_Core_Config::singleton()->customFileUploadDir . $fileName;
+    }
+    else {
+      list($path, $mimeType) = CRM_Core_BAO_File::path($fileId, $entityId);
+    }
     $mimeType = CRM_Utils_Request::retrieveValue('mime-type', 'String', $mimeType, FALSE);
 
     if (!$path) {
