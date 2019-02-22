@@ -372,7 +372,9 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         }
       }
       else {
-        $statusMsg = ts("Selected Activity cannot be deleted.");
+        CRM_Core_Session::setStatus('', ts("Selected Activity cannot be deleted."), 'warning');
+        $transaction->rollback();
+        return;
       }
 
       $tagParams = array(
@@ -382,6 +384,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       CRM_Core_BAO_EntityTag::del($tagParams);
 
       CRM_Core_Session::setStatus('', $statusMsg, 'info');
+      $transaction->commit();
       return;
     }
 
@@ -393,6 +396,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         $statusMsg = ts('The selected activity has been restored.<br />');
       }
       CRM_Core_Session::setStatus('', $statusMsg, 'info');
+      $transaction->commit();
       return;
     }
 
@@ -440,15 +444,12 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
       // build custom data getFields array
       $customFields = CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE, $this->_activityTypeId);
-      $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
+      CRM_Utils_Array::crmArrayMerge($customFields,
         CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE,
           NULL, NULL, TRUE
         )
       );
-      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-        $this->_activityId,
-        'Activity'
-      );
+      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->_activityId, 'Activity');
     }
 
     // assigning formatted value
@@ -581,6 +582,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       );
       CRM_Case_BAO_Case::processCaseActivity($caseParams);
     }
+    $transaction->commit();
 
     // send copy to selected contacts.
     $mailStatus = '';
