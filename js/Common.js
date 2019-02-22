@@ -1547,4 +1547,11 @@ if (!CRM.vars) CRM.vars = {};
     return (yiq >= 128) ? 'black' : 'white';
   };
 
+  // CVE-2015-9251 - Prevent auto-execution of scripts when no explicit dataType was provided
+  $.ajaxPrefilter(function(s) {
+    if (s.crossDomain) {
+      s.contents.script = false;
+    }
+  });
+
 })(jQuery, _);
