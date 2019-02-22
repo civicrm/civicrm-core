@@ -1061,7 +1061,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $caseCount = CRM_Core_DAO::singleValueQuery('SELECT FOUND_ROWS()');
 
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
-    $activityStatuses = CRM_Core_PseudoConstant::activityStatus();
 
     $url = CRM_Utils_System::url("civicrm/case/activity",
       "reset=1&cid={$contactID}&caseid={$caseID}", FALSE, NULL, FALSE
@@ -1096,7 +1095,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $caseActivities = array();
 
     while ($dao->fetch()) {
-      $caseActivity = array();
       $caseActivityId = $dao->id;
 
       $allowView = self::checkPermission($caseActivityId, 'view', $dao->activity_type_id, $userID);
@@ -1175,8 +1173,8 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         }
       }
 
-      //Activity Status
-      $caseActivities[$caseActivityId]['status_id'] = $activityStatuses[$dao->status];
+      // Activity Status Label for Case activities list
+      $caseActivities[$caseActivityId]['status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_status_id', $dao->status);
 
       // FIXME: Why are we not using CRM_Core_Action for these links? This is too much manual work and likely to get out-of-sync with core markup.
       $url = "";
@@ -1977,9 +1975,7 @@ SELECT civicrm_contact.id as casemanager_id,
       return array();
     }
 
-    $linkActType = array_search('Link Cases',
-      CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name')
-    );
+    $linkActType = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Link Cases');
     if (!$linkActType) {
       return array();
     }
@@ -2138,8 +2134,8 @@ SELECT civicrm_contact.id as casemanager_id,
       return $mainCaseIds;
     }
 
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name');
-    $activityStatuses = CRM_Core_PseudoConstant::activityStatus('name');
+    $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
+    $completedActivityStatus = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
@@ -2471,11 +2467,11 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         }
       }
 
-      //Create merge activity record. Source for merge activity is the logged in user's contact ID ($currentUserId).
+      // Create merge activity record. Source for merge activity is the logged in user's contact ID ($currentUserId).
       $activityParams = array(
         'subject' => $mergeActSubject,
         'details' => $mergeActSubjectDetails,
-        'status_id' => array_search('Completed', $activityStatuses),
+        'status_id' => $completedActivityStatus,
         'activity_type_id' => $mergeActType,
         'source_contact_id' => $currentUserId,
         'activity_date_time' => date('YmdHis'),
@@ -2720,10 +2716,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
     //do further only when operation is granted.
     if ($allow) {
-      $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name');
-
-      //get the activity type name.
-      $actTypeName = CRM_Utils_Array::value($actTypeId, $activityTypes);
+      $actTypeName = CRM_Core_PseudoConstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $actTypeId);
 
       //do not allow multiple copy / edit action.
       $singletonNames = array(
