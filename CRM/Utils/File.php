@@ -1046,4 +1046,23 @@ HTACCESS;
     return $iconClasses['*'];
   }
 
+  /**
+   * Is the filename a safe and valid filename passed in from URL
+   *
+   * @param string $fileName
+   * @return bool
+   */
+  public static function isValidFileName($fileName = NULL) {
+    if ($fileName) {
+      $check = $fileName !== basename($fileName) ? FALSE : TRUE;
+      if ($check) {
+        if (substr($fileName, 0, 1) == '/' || substr($fileName, 0, 1) == '.' || substr($fileName, 0, 1) == DIRECTORY_SEPARATOR) {
+          $check = FALSE;
+        }
+      }
+      return $check;
+    }
+    return FALSE;
+  }
+
 }
