@@ -472,9 +472,10 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
    *
    * @return string
    */
-  public function buildQuery($applyLimit = TRUE) {
+  public function buildQuery($applyLimit = FALSE) {
     if ($this->isTempTableBuilt) {
-      return "SELECT * FROM civireport_contribution_detail_temp3 $this->_orderBy";
+      $this->limit();
+      return "SELECT SQL_CALC_FOUND_ROWS * FROM civireport_contribution_detail_temp3 $this->_orderBy $this->_limit";
     }
     return parent::buildQuery($applyLimit);
   }
@@ -509,7 +510,6 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     // 1. use main contribution query to build temp table 1
     $sql = $this->buildQuery();
     $this->createTemporaryTable('civireport_contribution_detail_temp1', $sql);
-    $this->setPager();
 
     // 2. customize main contribution query for soft credit, and build temp table 2 with soft credit contributions only
     $this->queryMode = 'SoftCredit';
