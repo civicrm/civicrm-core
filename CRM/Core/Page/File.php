@@ -59,6 +59,9 @@ class CRM_Core_Page_File extends CRM_Core_Page {
       list($path, $mimeType) = CRM_Core_BAO_File::path($fileId, $entityId);
     }
     else {
+      if ($fileName !== basename($fileName)) {
+        throw new CRM_Core_Exception("Malformed filename");
+      }
       $mimeType = '';
       $path = CRM_Core_Config::singleton()->customFileUploadDir . $fileName;
     }
