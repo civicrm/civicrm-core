@@ -6315,24 +6315,25 @@ AND   displayRelType.is_active = 1
             $this->_select = array_merge($this->_select, $this->_customQuery->_select);
             $this->_tables = array_merge($this->_tables, $this->_customQuery->_tables);
           }
-          foreach ($this->_pseudoConstantsSelect as $key => $pseudoConstantMetadata) {
-            // By replacing the join to the option value table with the mysql construct
-            // ORDER BY field('contribution_status_id', 2,1,4)
-            // we can remove a join. In the case of the option value join it is
-            /// a join known to cause slow queries.
-            // @todo cover other pseudoconstant types. Limited to option group ones in the
-            // first instance for scope reasons. They require slightly different handling as the column (label)
-            // is not declared for them.
-            // @todo so far only integer fields are being handled. If we add string fields we need to look at
-            // escaping.
-            if (isset($pseudoConstantMetadata['pseudoconstant'])
-              && isset($pseudoConstantMetadata['pseudoconstant']['optionGroupName'])
-              && $field === CRM_Utils_Array::value('optionGroupName', $pseudoConstantMetadata['pseudoconstant'])
-            ) {
-              $sortedOptions = $pseudoConstantMetadata['bao']::buildOptions($pseudoConstantMetadata['pseudoField'], NULL, array(
+
+          // By replacing the join to the option value table with the mysql construct
+          // ORDER BY field('contribution_status_id', 2,1,4)
+          // we can remove a join. In the case of the option value join it is
+          /// a join known to cause slow queries.
+          // @todo cover other pseudoconstant types. Limited to option group ones in the
+          // first instance for scope reasons. They require slightly different handling as the column (label)
+          // is not declared for them.
+          // @todo so far only integer fields are being handled. If we add string fields we need to look at
+          // escaping.
+          $fieldSpec = $this->getMetadataForRealField($field);
+          $pseudoConstantMetadata = CRM_Utils_Array::value('pseudoconstant', $fieldSpec, FALSE);
+          if (!empty($pseudoConstantMetadata)
+          ) {
+            if (!empty($pseudoConstantMetadata['optionGroupName'])) {
+              $sortedOptions = $fieldSpec['bao']::buildOptions($fieldSpec['name'], NULL, [
                 'orderColumn' => 'label',
-              ));
-              $order = str_replace("$field $direction", "field({$pseudoConstantMetadata['pseudoField']}," . implode(',', array_keys($sortedOptions)) . ") $direction", $order);
+              ]);
+              $order = str_replace("$field", "field({$fieldSpec['name']}," . implode(',', array_keys($sortedOptions)) . ")", $order);
             }
             //CRM-12565 add "`" around $field if it is a pseudo constant
             // This appears to be for 'special' fields like locations with appended numbers or hyphens .. maybe.
@@ -6572,7 +6573,6 @@ AND   displayRelType.is_active = 1
   }
 
   /**
-   * /**
    * Create the sql query for an contact search.
    *
    * @param int $offset
@@ -6700,6 +6700,41 @@ AND   displayRelType.is_active = 1
       $query = "$select $from $where $having $groupBy $order $limit";
     }
     return $query;
+  }
+
+  /**
+   * Get the metadata for a given field.
+   *
+   * @param string $fieldName
+   *
+   * @return array
+   */
+  protected function getMetadataForField($fieldName) {
+    if ($fieldName === 'contact_a.id') {
+      // This seems to be the only anomaly.
+      $fieldName = 'id';
+    }
+    $pseudoField = isset($this->_pseudoConstantsSelect[$fieldName]) ? $this->_pseudoConstantsSelect[$fieldName] : [];
+    $field = isset($this->_fields[$fieldName]) ? $this->_fields[$fieldName] : $pseudoField;
+    $field = array_merge($field, $pseudoField);
+    if (!empty($field) && empty($field['name'])) {
+      // standardising field formatting here - over time we can phase out variants.
+      // all paths using this currently unit tested
+      $field['name'] = CRM_Utils_Array::value('field_name', $field, $field['idCol']);
+    }
+    return $field;
+  }
+
+  /**
+   * Get the metadata for a given field, returning the 'real field' if it is a pseudofield.
+   *
+   * @param string $fieldName
+   *
+   * @return array
+   */
+  protected function getMetadataForRealField($fieldName) {
+    $field = $this->getMetadataForField($fieldName);
+    return empty($field['is_pseudofield_for']) ? $field : $this->getMetadataForField($field['is_pseudofield_for']);
   }
 
 }

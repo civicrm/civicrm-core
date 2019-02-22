@@ -48,7 +48,8 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    */
   public static function getFields($checkPermission = TRUE) {
     if (!isset(\Civi::$statics[__CLASS__]) || !isset(\Civi::$statics[__CLASS__]['fields']) || !isset(\Civi::$statics[__CLASS__]['contribution'])) {
-      $fields  = CRM_Contribute_BAO_Contribution::exportableFields($checkPermission);
+      $fields = CRM_Contribute_BAO_Contribution::exportableFields($checkPermission);
+      CRM_Contribute_BAO_Contribution::appendPseudoConstantsToFields($fields);
       unset($fields['contribution_contact_id']);
       \Civi::$statics[__CLASS__]['fields']['contribution'] = $fields;
     }
