@@ -858,7 +858,11 @@ COLS;
       foreach ($columns as $column) {
         $tableExceptions = array_key_exists('exceptions', $this->logTableSpec[$table]) ? $this->logTableSpec[$table]['exceptions'] : array();
         // ignore modified_date changes
-        if ($column != 'modified_date' && !in_array($column, $tableExceptions)) {
+        $tableExceptions[] = 'modified_date';
+        // exceptions may be provided with or without backticks
+        $excludeColumn = in_array($column, $tableExceptions) ||
+          in_array(str_replace('`', '', $column), $tableExceptions);
+        if (!$excludeColumn) {
           $cond[] = "IFNULL(OLD.$column,'') <> IFNULL(NEW.$column,'')";
         }
       }
