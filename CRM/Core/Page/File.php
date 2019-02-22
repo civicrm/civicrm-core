@@ -47,7 +47,7 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     $fileId = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE); // File ID
     $fileName = CRM_Utils_Request::retrieve('filename', 'String', $this, FALSE);
     if (empty($fileName) && (empty($entityId) || empty($fileId))) {
-      CRM_Core_Error::statusBounce("Either FIlename or Entity ID and FIle Id need to be passed in to retrieve files");
+      CRM_Core_Error::statusBounce("Cannot access file: Must pass either \"Filename\" or the combination of \"Entity ID\" + \"File ID\"");
     }
     $hash = CRM_Utils_Request::retrieve('fcs', 'Alphanumeric', $this);
     if (!CRM_Core_BAO_File::validateFileHash($hash, $entityId, $fileId) && empty($fileName)) {
