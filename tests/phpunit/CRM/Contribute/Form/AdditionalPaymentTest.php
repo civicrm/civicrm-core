@@ -122,6 +122,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_spool ORDER BY id DESC');
     parent::tearDown();
   }
 
@@ -150,6 +151,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     ]);
 
     $mut->stop();
+    $mut->clearMessages();
   }
 
   /**
@@ -183,16 +185,41 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    * Test the submit function that completes the partially paid Contribution with multiple payments.
    */
   public function testMultiplePaymentForPartiallyPaidContributionWithOneCreditCardPayment() {
+    $mut = new CiviMailUtils($this, TRUE);
     $this->createContribution('Partially paid');
+    // In general when there is tpl leakage we try to fix. At the moment, however,
+    // the tpl leakage on credit card related things is kind of 'by-design' - or
+    // at least we haven't found a way to replace the way in with Payment.send_confirmation
+    // picks them up from the form process so we will just clear templates here to stop leakage
+    // from previous tests causing a fail.
+    // The reason this is hard to fix is that we save a billing address per contribution not
+    // per payment so it's a problem with the data model
+    CRM_Core_Smarty::singleton()->clearTemplateVars();
 
     // pay additional amount
-    $this->submitPayment(50);
+    $this->submitPayment(50, NULL, TRUE);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('id' => $this->_contributionId));
     $this->assertEquals('Partially paid', $contribution['contribution_status']);
 
     // pay additional amount by using credit card
     $this->submitPayment(20, 'live');
     $this->checkResults(array(30, 50, 20), 3);
+    $mut->assertSubjects(array('Payment Receipt -'));
+    $mut->checkMailLog([
+      'Dear Anthony,',
+      'A payment has been received',
+      'Total Fees: $ 100.00',
+      'This Payment Amount: $ 50.00',
+      'Balance Owed: $ 20.00 ',
+      'Paid By: Check',
+      'Check Number: check-12345',
+    ],
+    [
+      'Billing Name and Address',
+      'Visa',
+    ]);
+    $mut->stop();
+    $mut->clearMessages();
   }
 
   /**
