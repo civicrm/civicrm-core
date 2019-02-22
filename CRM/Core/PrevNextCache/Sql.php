@@ -38,14 +38,19 @@ class CRM_Core_PrevNextCache_Sql implements CRM_Core_PrevNextCache_Interface {
    * @param string $sql
    *   A SQL query. The query *MUST* be a SELECT statement which yields
    *   the following columns (in order): cacheKey, entity_id1, data
+   * @param array $sqlParams
+   *   An array of parameters to be used with $sql.
+   *   Use the same interpolation format as CRM_Core_DAO (composeQuery/executeQuery).
+   *   Ex: [1 => ['foo', 'String']]
    * @return bool
    * @throws CRM_Core_Exception
+   * @see CRM_Core_DAO::composeQuery
    */
-  public function fillWithSql($cacheKey, $sql) {
+  public function fillWithSql($cacheKey, $sql, $sqlParams = []) {
     $insertSQL = "
 INSERT INTO civicrm_prevnext_cache (cacheKey, entity_id1, data)
 ";
-    $result = CRM_Core_DAO::executeQuery($insertSQL . $sql, [], FALSE, NULL, FALSE, TRUE, TRUE);
+    $result = CRM_Core_DAO::executeQuery($insertSQL . $sql, $sqlParams, FALSE, NULL, FALSE, TRUE, TRUE);
     if (is_a($result, 'DB_Error')) {
       throw new CRM_Core_Exception($result->message);
     }
