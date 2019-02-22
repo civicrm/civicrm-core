@@ -49,16 +49,18 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     if (empty($fileName) && (empty($entityId) || empty($fileId))) {
       CRM_Core_Error::statusBounce("Cannot access file: Must pass either \"Filename\" or the combination of \"Entity ID\" + \"File ID\"");
     }
-    $hash = CRM_Utils_Request::retrieve('fcs', 'Alphanumeric', $this);
-    if (!CRM_Core_BAO_File::validateFileHash($hash, $entityId, $fileId) && empty($fileName)) {
-      CRM_Core_Error::statusBounce('URL for file is not valid');
-    }
-    if (!empty($fileName)) {
-      $mimeType = '';
-      $path = CRM_Core_Config::singleton()->customFileUploadDir . $fileName;
+
+    if (empty($fileName)) {
+      $hash = CRM_Utils_Request::retrieve('fcs', 'Alphanumeric', $this);
+      if (!CRM_Core_BAO_File::validateFileHash($hash, $entityId, $fileId)) {
+        CRM_Core_Error::statusBounce('URL for file is not valid');
+      }
+
+      list($path, $mimeType) = CRM_Core_BAO_File::path($fileId, $entityId);
     }
     else {
-      list($path, $mimeType) = CRM_Core_BAO_File::path($fileId, $entityId);
+      $mimeType = '';
+      $path = CRM_Core_Config::singleton()->customFileUploadDir . $fileName;
     }
     $mimeType = CRM_Utils_Request::retrieveValue('mime-type', 'String', $mimeType, FALSE);
 
