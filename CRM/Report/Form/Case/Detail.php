@@ -142,10 +142,15 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           'status_id' => [
             'title' => ts('Status'),
           ],
-          'case_type_name' => [
-            'title' => 'Case Type',
-          ],
         ],
+      ],
+      'civicrm_case_type' => [
+        'dao' => 'CRM_Case_DAO_Case',
+        'order_bys' => [
+          'case_type_title' => [
+            'title' => 'Case Type',
+            'name' => 'title',
+        ]]
       ],
       'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -339,6 +344,8 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
   }
 
   public function select() {
+    // @todo - get rid of this function & use parent. Use selectWhere to setthe clause for the
+    // few fields that need custom handling.
     $select = [];
     $this->_columnHeaders = [];
     foreach ($this->_columns as $tableName => $table) {
@@ -371,15 +378,6 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
           }
-        }
-      }
-    }
-
-    if ($orderBys = $this->_params['order_bys']) {
-      foreach ($orderBys as $orderBy) {
-        if ($orderBy['column'] == 'case_type_name') {
-          $select[] = "civireport_case_types.title as case_type_name";
-          $this->_caseTypeNameOrderBy = TRUE;
         }
       }
     }
@@ -427,11 +425,10 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
       $this->_from .= " LEFT JOIN civicrm_activity {$this->_aliases['civicrm_activity_last_completed']} ON ( {$this->_aliases['civicrm_activity_last_completed']}.id = ( SELECT max(activity_id) FROM civicrm_case_activity cca, civicrm_activity ca WHERE ca.id = cca.activity_id AND cca.case_id = {$case}.id AND ca.status_id = 2 ) )";
     }
 
-    //include case type name
-    if ($this->_caseTypeNameOrderBy) {
+    if ($this->isTableSelected('civicrm_case_type')) {
       $this->_from .= "
-        LEFT JOIN civicrm_case_type civireport_case_types
-          ON {$case}.case_type_id = civireport_case_types.id
+        LEFT JOIN civicrm_case_type {$this->_aliases['civicrm_case_type']}
+          ON {$this->_aliases['civicrm_case']}.case_type_id = {$this->_aliases['civicrm_case_type']}.id
       ";
     }
   }
@@ -519,17 +516,6 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     ];
 
     return $statistics;
-  }
-
-  public function orderBy() {
-    parent::orderBy();
-
-    if ($this->_caseTypeNameOrderBy) {
-      $this->_orderBy = str_replace('case_civireport.case_type_name', 'civireport_case_types.title', $this->_orderBy);
-      if (isset($this->_sections['civicrm_case_case_type_name'])) {
-        $this->_sections['civicrm_case_case_type_name']['dbAlias'] = 'civireport_case_types.title';
-      }
-    }
   }
 
   public function caseDetailSpecialColumnProcess() {
