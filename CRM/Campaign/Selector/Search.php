@@ -273,10 +273,10 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
       $cacheKey = "civicrm search {$this->_key}";
       Civi::service('prevnext')->deleteItem(NULL, $cacheKey, 'civicrm_contact');
 
-      $sql = $this->_query->searchQuery(0, 0, $sort,
+      $sql = $this->_query->getSearchSQL(0, 0, $sort,
         FALSE, FALSE,
         FALSE, FALSE,
-        TRUE, $this->_campaignWhereClause,
+        $this->_campaignWhereClause,
         NULL,
         $this->_campaignFromClause
       );
