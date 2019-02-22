@@ -38,22 +38,20 @@ class CRM_Core_Page_File extends CRM_Core_Page {
    * Run page.
    */
   public function run() {
-    $fileName = CRM_Utils_Request::retrieve('filename', 'String', $this);
-    $path = CRM_Core_Config::singleton()->customFileUploadDir . $fileName;
-    $mimeType = CRM_Utils_Request::retrieve('mime-type', 'String', $this);
     $action = CRM_Utils_Request::retrieve('action', 'String', $this);
     $download = CRM_Utils_Request::retrieve('download', 'Integer', $this, FALSE, 1);
     $disposition = $download == 0 ? 'inline' : 'download';
 
-    // if we are not providing essential parameter needed for file preview then
-    if (empty($fileName) && empty($mimeType)) {
-      $eid = CRM_Utils_Request::retrieve('eid', 'Positive', $this, TRUE);
-      $fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE);
-      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
-      $quest = CRM_Utils_Request::retrieve('quest', 'String', $this);
-
-      list($path, $mimeType) = CRM_Core_BAO_File::path($id, $eid, NULL, $quest);
+    $entityId = CRM_Utils_Request::retrieve('eid', 'Positive', $this, TRUE); // Entity ID (e.g. Contact ID)
+    $fieldId = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE); // Field ID
+    $fileId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE); // File ID
+    $hash = CRM_Utils_Request::retrieve('fcs', 'Alphanumeric', $this);
+    if (!CRM_Core_BAO_File::validateFileHash($hash, $entityId, $fileId)) {
+      CRM_Core_Error::statusBounce('URL for file is not valid');
     }
+
+    list($path, $mimeType) = CRM_Core_BAO_File::path($fileId, $entityId);
+    $mimeType = CRM_Utils_Request::retrieveValue('mime-type', 'String', $mimeType, FALSE);
 
     if (!$path) {
       CRM_Core_Error::statusBounce('Could not retrieve the file');
@@ -66,7 +64,7 @@ class CRM_Core_Page_File extends CRM_Core_Page {
 
     if ($action & CRM_Core_Action::DELETE) {
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
-        CRM_Core_BAO_File::deleteFileReferences($id, $eid, $fid);
+        CRM_Core_BAO_File::deleteFileReferences($fileId, $entityId, $fieldId);
         CRM_Core_Session::setStatus(ts('The attached file has been deleted.'), ts('Complete'), 'success');
 
         $session = CRM_Core_Session::singleton();

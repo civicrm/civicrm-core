@@ -202,8 +202,9 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     if (!empty($entityFile)) {
       $fileInfo = reset($entityFile);
       $fileId = $fileInfo['fileID'];
+      $fileHash = CRM_Core_BAO_File::generateFileHash($this->_id, $fileId);
       $image = '<img src="' . CRM_Utils_System::url('civicrm/file',
-          "reset=1&id=$fileId&eid={$this->_id}"
+          "reset=1&id=$fileId&eid={$this->_id}&fcs={$fileHash}"
         ) . '" />';
       $this->assign('image', $image);
     }

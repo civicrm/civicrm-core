@@ -71,15 +71,11 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   /**
    * @param int $fileID
    * @param int $entityID
-   * @param null $entityTable
    *
    * @return array
    */
-  public static function path($fileID, $entityID, $entityTable = NULL) {
+  public static function path($fileID, $entityID) {
     $entityFileDAO = new CRM_Core_DAO_EntityFile();
-    if ($entityTable) {
-      $entityFileDAO->entity_table = $entityTable;
-    }
     $entityFileDAO->entity_id = $entityID;
     $entityFileDAO->file_id = $fileID;
 
@@ -337,6 +333,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     $results = array();
     while ($dao->fetch()) {
+      $fileHash = self::generateFileHash($dao->entity_id, $dao->cfID);
       $result['fileID'] = $dao->cfID;
       $result['entityID'] = $dao->cefID;
       $result['mime_type'] = $dao->mime_type;
@@ -344,7 +341,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
       $result['description'] = $dao->description;
       $result['cleanName'] = CRM_Utils_File::cleanFileName($dao->uri);
       $result['fullPath'] = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $dao->uri;
-      $result['url'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$dao->cfID}&eid={$dao->entity_id}");
+      $result['url'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$dao->cfID}&eid={$dao->entity_id}&fcs={$fileHash}");
       $result['href'] = "<a href=\"{$result['url']}\">{$result['cleanName']}</a>";
       $result['tag'] = CRM_Core_BAO_EntityTag::getTag($dao->cfID, 'civicrm_file');
       $result['icon'] = CRM_Utils_File::getIconFromMimeType($dao->mime_type);
@@ -768,6 +765,58 @@ AND       CEF.entity_id    = %2";
       return $fileSearch;
     }
     return NULL;
+  }
+
+  /**
+   * Generates an access-token for downloading a specific file.
+   *
+   * @param int $entityId entity id the file is attached to
+   * @param int $fileId file ID
+   * @return string
+   */
+  public static function generateFileHash($entityId = NULL, $fileId = NULL, $genTs = NULL, $life = NULL) {
+    // Use multiple (but stable) inputs for hash information.
+    $siteKey = CRM_Utils_Constant::value('CIVICRM_SITE_KEY');
+    if (!$siteKey) {
+      throw new \CRM_Core_Exception("Cannot generate file access token. Please set CIVICRM_SITE_KEY.");
+    }
+
+    if (!$genTs) {
+      $genTs = time();
+    }
+    if (!$life) {
+      $days = Civi::settings()->get('checksum_timeout');
+      $life = 24 * $days;
+    }
+    // Trim 8 chars off the string, make it slightly easier to find
+    // but reveals less information from the hash.
+    $cs = hash_hmac('sha256', "entity={$entityId}&file={$fileId}&life={$life}", $siteKey);
+    return "{$cs}_{$genTs}_{$life}";
+  }
+
+  /**
+   * Validate a file access token.
+   *
+   * @param string $hash
+   * @param int $entityId Entity Id the file is attached to
+   * @param int $fileId File Id
+   * @return bool
+   */
+  public static function validateFileHash($hash, $entityId, $fileId) {
+    $input = CRM_Utils_System::explode('_', $hash, 3);
+    $inputTs = CRM_Utils_Array::value(1, $input);
+    $inputLF = CRM_Utils_Array::value(2, $input);
+    $testHash = CRM_Core_BAO_File::generateFileHash($entityId, $fileId, $inputTs, $inputLF);
+    if (hash_equals($testHash, $hash)) {
+      $now = time();
+      if ($inputTs + ($inputLF * 60 * 60) >= $now) {
+        return TRUE;
+      }
+      else {
+        return FALSE;
+      }
+    }
+    return FALSE;
   }
 
 }
