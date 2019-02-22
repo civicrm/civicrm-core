@@ -939,6 +939,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       return $messages;
     }
 
+    // Force utf8mb4 query to throw exception as the check expects.
+    $errorScope = CRM_Core_TemporaryErrorScope::useException();
     try {
       // Create a temporary table to avoid implicit commit.
       CRM_Core_DAO::executeQuery('CREATE TEMPORARY TABLE civicrm_utf8mb4_test (id VARCHAR(255), PRIMARY KEY(id(255))) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC ENGINE=INNODB');
