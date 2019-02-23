@@ -413,6 +413,7 @@ class CRM_Contact_BAO_Query {
   public $_pseudoConstantsSelect = array();
 
   public $_groupUniqueKey = NULL;
+  public $_groupKeys = [];
 
   /**
    * Class constructor which also does all the work.
@@ -3053,6 +3054,7 @@ class CRM_Contact_BAO_Query {
     $groupContactCacheClause = '';
     if (count($smartGroupIDs) || empty($value)) {
       $this->_groupUniqueKey = uniqid();
+      $this->_groupKeys[] = $this->_groupUniqueKey;
       $gccTableAlias = "civicrm_group_contact_cache_{$this->_groupUniqueKey}";
       $groupContactCacheClause = $this->addGroupContactCache($smartGroupIDs, $gccTableAlias, "contact_a", $op);
       if (!empty($groupContactCacheClause)) {
@@ -3084,8 +3086,8 @@ class CRM_Contact_BAO_Query {
     }
   }
 
-  public function getGroupCacheTableKey() {
-    return $this->_groupUniqueKey;
+  public function getGroupCacheTableKeys() {
+    return $this->_groupKeys;
   }
 
   /**
