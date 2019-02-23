@@ -1,0 +1,51 @@
+From 27ee4bef48def2e3b966b6d5ff8cc8c56b1fac2c Mon Sep 17 00:00:00 2001
+From: Seamus Lee <seamuslee001@gmail.com>
+Date: Sun, 24 Feb 2019 09:06:51 +1100
+Subject: [PATCH] Ensure that entity_loader disable variable is re-set back to
+ the original setting
+
+---
+ src/PhpWord/Shared/Html.php             | 2 ++
+ src/PhpWord/TemplateProcessor.php       | 2 ++
+ 3 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/PhpWord/Shared/Html.php b/src/PhpWord/Shared/Html.php
+index 89881822ca..f25cf5f4a6 100644
+--- a/src/PhpWord/Shared/Html.php
++++ b/src/PhpWord/Shared/Html.php
+@@ -72,6 +72,7 @@ public static function addHtml($element, $html, $fullHTML = false, $preserveWhit
+         }
+ 
+         // Load DOM
++        $orignalLibEntityLoader = libxml_disable_entity_loader();
+         libxml_disable_entity_loader(true);
+         $dom = new \DOMDocument();
+         $dom->preserveWhiteSpace = $preserveWhiteSpace;
+@@ -80,6 +81,7 @@ public static function addHtml($element, $html, $fullHTML = false, $preserveWhit
+         $node = $dom->getElementsByTagName('body');
+ 
+         self::parseNode($node->item(0), $element);
++        libxml_disable_entity_loader($orignalLibEntityLoader);
+     }
+ 
+     /**
+diff --git a/src/PhpWord/TemplateProcessor.php b/src/PhpWord/TemplateProcessor.php
+index 0f685bc45b..fa605b19c5 100644
+--- a/src/PhpWord/TemplateProcessor.php
++++ b/src/PhpWord/TemplateProcessor.php
+@@ -170,6 +170,7 @@ protected function readPartWithRels($fileName)
+      */
+     protected function transformSingleXml($xml, $xsltProcessor)
+     {
++        $orignalLibEntityLoader = libxml_disable_entity_loader();
+         libxml_disable_entity_loader(true);
+         $domDocument = new \DOMDocument();
+         if (false === $domDocument->loadXML($xml)) {
+@@ -180,6 +181,7 @@ protected function transformSingleXml($xml, $xsltProcessor)
+         if (false === $transformedXml) {
+             throw new Exception('Could not transform the given XML document.');
+         }
++        libxml_disable_entity_loader($orignalLibEntityLoader);
+ 
+         return $transformedXml;
+     }
