@@ -584,10 +584,10 @@ function civicrm_form_data($edit, &$user, $category, $reset, $doNotProcess = FAL
     // do not allow edit for anon users in joomla frontend, CRM-4668, unless u have checksum CRM-5228
     $config = CRM_Core_Config::singleton();
     if ($config->userFrameworkFrontend) {
-      CRM_Contact_BAO_Contact_Permission::validateOnlyChecksum($userID, $this);
+      CRM_Contact_BAO_Contact_Permission::validateOnlyChecksum($userID, $edit);
     }
     else {
-      CRM_Contact_BAO_Contact_Permission::validateChecksumContact($userID, $this);
+      CRM_Contact_BAO_Contact_Permission::validateChecksumContact($userID, $edit);
     }
   }
   $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userID, 'contact_type');

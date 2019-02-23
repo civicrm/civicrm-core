@@ -1497,7 +1497,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           list($path) = CRM_Core_BAO_File::path($fileID, $entityId);
           $fileHash = CRM_Core_BAO_File::generateFileHash($entityId, $fileID);
           $url = CRM_Utils_System::url('civicrm/file',
-            "reset=1&id=$fileID&eid=$contactID&fcs=$fileHash",
+            "reset=1&id=$fileID&eid=$entityId&fcs=$fileHash",
             $absolute, NULL, TRUE, TRUE
           );
           $result['file_url'] = CRM_Utils_File::getFileURL($path, $fileType, $url);
@@ -1508,7 +1508,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             $fileID,
             'uri'
           );
-          $fileHash = CRM_Core_BAO_File::generateFileHash($entityId, $fileID);
+          $fileHash = CRM_Core_BAO_File::generateFileHash($contactID, $fileID);
           $url = CRM_Utils_System::url('civicrm/file',
             "reset=1&id=$fileID&eid=$contactID&fcs=$fileHash",
             $absolute, NULL, TRUE, TRUE
