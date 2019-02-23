@@ -100,4 +100,27 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertTrue(empty($diffs['OBSOLETE']));
   }
 
+  /**
+   * Test logging trigger definition
+   */
+  public function testTriggerInfo() {
+    $info = [];
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+    $schema->triggerInfo($info, 'civicrm_group');
+    // should have 3 triggers (insert/update/delete)
+    $this->assertCount(3, $info);
+    foreach ($info as $trigger) {
+      // table for trigger should be civicrm_group
+      $this->assertEquals('civicrm_group', $trigger['table'][0]);
+      if ($trigger['event'][0] == 'UPDATE') {
+        // civicrm_group.cache_date should be an exception, i.e. not logged
+        $this->assertNotContains(
+          "IFNULL(OLD.`cache_date`,'') <> IFNULL(NEW.`cache_date`,'')",
+          $trigger['sql']
+        );
+      }
+    }
+  }
+
 }
