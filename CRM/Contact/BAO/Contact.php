@@ -1201,6 +1201,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
     $contact->copyValues($updateParams);
     $contact->save();
+    CRM_Core_BAO_Log::register($contact->id, 'civicrm_contact', $contact->id);
 
     CRM_Utils_Hook::post('update', $contact->contact_type, $contact->id, $contact);
 
