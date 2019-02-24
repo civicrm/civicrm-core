@@ -1981,6 +1981,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'defaultValue' => 'Default Value',
       'lowercasevalue' => 'Lowercase Value',
       1 => 'Integer Value',
+      'NULL' => 'NULL',
     ];
     $custom_field_params = ['sequential' => 1, 'id' => $customField['id']];
     $custom_field_api_result = $this->callAPISuccess('custom_field', 'get', $custom_field_params);
