@@ -631,7 +631,9 @@ function civicrm_api3_mailing_send_test($params) {
   $testEmailParams['is_test'] = 1;
   $testEmailParams['status'] = 'Scheduled';
   $testEmailParams['scheduled_date'] = CRM_Utils_Date::processDate(date('Y-m-d'), date('H:i:s'));
+  $testEmailParams['is_calling_function_updated_to_reflect_deprecation'] = TRUE;
   $job = civicrm_api3('MailingJob', 'create', $testEmailParams);
+  CRM_Mailing_BAO_Mailing::getRecipients($testEmailParams['mailing_id']);
   $testEmailParams['job_id'] = $job['id'];
   $testEmailParams['emails'] = array_key_exists('test_email', $testEmailParams) ? explode(',', strtolower($testEmailParams['test_email'])) : NULL;
   if (!empty($params['test_email'])) {
