@@ -63,11 +63,18 @@ class CRM_Custom_Form_CustomData {
       $entitySubType = $form->getEntitySubTypeId($subType);
     }
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      self::preProcess($form, $subName, $entitySubType, $groupCount, $entityName, $entityID);
-      self::buildQuickForm($form);
-      self::setDefaultValues($form);
+    if ($form->getAction() == CRM_Core_Action::VIEW) {
+      // Viewing custom data (Use with {include file="CRM/Custom/Page/CustomDataView.tpl"} in template)
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityName, NULL, $entityID, 0, $entitySubType);
+      CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, FALSE, NULL, NULL, NULL, $entityID);
+    }
+    else {
+      // Editing custom data (Use with {include file="CRM/common/customDataBlock.tpl"} in template)
+      if (!empty($_POST['hidden_custom'])) {
+        self::preProcess($form, $subName, $entitySubType, $groupCount, $entityName, $entityID);
+        self::buildQuickForm($form);
+        self::setDefaultValues($form);
+      }
     }
     // need to assign custom data type and subtype to the template
     $form->assign('customDataType', $entityName);
