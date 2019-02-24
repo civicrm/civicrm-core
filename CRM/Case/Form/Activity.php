@@ -70,7 +70,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     $this->_crmDir = 'Case';
     $this->assign('context', $this->_context);
 
-    $result = parent::preProcess();
+    parent::preProcess();
 
     $scheduleStatusId = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Scheduled');
     $this->assign('scheduleStatusId', $scheduleStatusId);
@@ -573,7 +573,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       unset($caseParams['subject'], $caseParams['details'],
         $caseParams['status_id'], $caseParams['custom']
       );
-      $case = CRM_Case_BAO_Case::create($caseParams);
+      CRM_Case_BAO_Case::create($caseParams);
       // create case activity record
       $caseParams = array(
         'activity_id' => $vval['actId'],
@@ -582,10 +582,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       CRM_Case_BAO_Case::processCaseActivity($caseParams);
     }
 
-    // Insert civicrm_log record for the activity (e.g. store the
-    // created / edited by contact id and date for the activity)
-    // Note - civicrm_log is already created by CRM_Activity_BAO_Activity::create()
-
     // send copy to selected contacts.
     $mailStatus = '';
     $mailToContacts = array();
@@ -593,8 +589,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     //CRM-5695
     //check for notification settings for assignee contacts
     $selectedContacts = array('contact_check');
-    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     if (Civi::settings()->get('activity_assignee_notification')) {
       $selectedContacts[] = 'assignee_contact_id';
     }
