@@ -4758,7 +4758,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
 
   /**
    * Get a standard set of contact fields.
-   *
+   * @deprecated - use getColumns('Contact') instead
    * @return array
    */
   public function getBasicContactFields() {
@@ -5398,7 +5398,45 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_filters' => TRUE,
         'is_group_bys' => FALSE,
       ),
+      $options['prefix'] . 'external_identifier' => array(
+        'title' => $options['prefix_label'] . ts('Contact identifier from external system'),
+        'name' => 'external_identifier',
+        'is_fields' => TRUE,
+        'is_filters' => FALSE,
+        'is_group_bys' => FALSE,
+        'is_order_bys' => TRUE,
+      ),
+      $options['prefix'] . 'preferred_language' => array(
+        'title' => $options['prefix_label'] . ts('Preferred Language'),
+        'name' => 'preferred_language',
+        'is_fields' => TRUE,
+        'is_filters' => TRUE,
+        'is_group_bys' => TRUE,
+        'is_order_bys' => TRUE,
+      ),
     );
+    foreach ([
+      'postal_greeting_display' => 'Postal Greeting',
+      'email_greeting_display' => 'Email Greeting',
+      'addressee_display' => 'Addressee',
+    ] as $field => $title) {
+      $spec[$options['prefix'] . $field] = array(
+        'title' => $options['prefix_label'] . ts($title),
+        'name' => $field,
+        'is_fields' => TRUE,
+        'is_filters' => FALSE,
+        'is_group_bys' => FALSE,
+      );
+    }
+    foreach (['do_not_email', 'do_not_phone', 'do_not_mail', 'do_not_sms', 'is_opt_out'] as $field) {
+      $spec[$options['prefix'] . $field] = [
+        'name' => $field,
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'is_fields' => TRUE,
+        'is_filters' => TRUE,
+        'is_group_bys' => FALSE,
+      ];
+    }
     $individualFields = array(
       $options['prefix'] . 'first_name' => array(
         'name' => 'first_name',
@@ -5467,6 +5505,20 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_fields' => FALSE,
         'is_filters' => TRUE,
         'is_group_bys' => FALSE,
+      ),
+      $options['prefix'] . 'job_title' => array(
+        'name' => 'job_title',
+        'is_fields' => TRUE,
+        'is_filters' => FALSE,
+        'is_group_bys' => FALSE,
+      ),
+      $options['prefix'] . 'employer_id' => array(
+        'title' => $options['prefix_label'] . ts('Current Employer'),
+        'type' => CRM_Utils_Type::T_INT,
+        'name' => 'employer_id',
+        'is_fields' => TRUE,
+        'is_filters' => FALSE,
+        'is_group_bys' => TRUE,
       ),
     );
     if (!$options['contact_type'] || $options['contact_type'] === 'Individual') {
