@@ -16,6 +16,9 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $schema->disableLogging();
     $schema->dropAllLogTables();
     CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS civicrm_test_table");
+    CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS civicrm_test_column_info");
+    CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS civicrm_test_length_change");
+    CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS civicrm_test_enum_change");
   }
 
   public function queryExamples() {
@@ -121,6 +124,113 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
         );
       }
     }
+  }
+
+  public function testColumnInfo() {
+    CRM_Core_DAO::executeQuery("CREATE TABLE `civicrm_test_column_info` (
+      test_id  int(10) unsigned NOT NULL AUTO_INCREMENT,
+      test_varchar varchar(42) NOT NULL,
+      test_integer int(8) NULL,
+      test_decimal decimal(20,2),
+      test_enum enum('A','B','C'),
+      test_integer_default int(8) DEFAULT 42,
+      test_date date DEFAULT NULL,
+      PRIMARY KEY (`test_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+    $schema->updateLogTableSchema();
+    $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs']['civicrm_test_column_info'];
+
+    $this->assertEquals('test_id', $ci['test_id']['COLUMN_NAME']);
+    $this->assertEquals('int', $ci['test_id']['DATA_TYPE']);
+    $this->assertEquals('NO', $ci['test_id']['IS_NULLABLE']);
+    $this->assertEquals('auto_increment', $ci['test_id']['EXTRA']);
+    $this->assertEquals('10', $ci['test_id']['LENGTH']);
+
+    $this->assertEquals('varchar', $ci['test_varchar']['DATA_TYPE']);
+    $this->assertEquals('42', $ci['test_varchar']['LENGTH']);
+
+    $this->assertEquals('int', $ci['test_integer']['DATA_TYPE']);
+    $this->assertEquals('8', $ci['test_integer']['LENGTH']);
+    $this->assertEquals('YES', $ci['test_integer']['IS_NULLABLE']);
+
+    $this->assertEquals('decimal', $ci['test_decimal']['DATA_TYPE']);
+    $this->assertEquals('20,2', $ci['test_decimal']['LENGTH']);
+
+    $this->assertEquals('enum', $ci['test_enum']['DATA_TYPE']);
+    $this->assertEquals("'A','B','C'", $ci['test_enum']['ENUM_VALUES']);
+    $this->assertArrayNotHasKey('LENGTH', $ci['test_enum']);
+
+    $this->assertEquals('42', $ci['test_integer_default']['COLUMN_DEFAULT']);
+
+    $this->assertEquals('date', $ci['test_date']['DATA_TYPE']);
+  }
+
+  public function testIndexes() {
+    $schema = new CRM_Logging_Schema();
+    $indexes = $schema->getIndexesForTable('civicrm_contact');
+    $this->assertContains('PRIMARY', $indexes);
+    $this->assertContains('UI_external_identifier', $indexes);
+    $this->assertContains('FK_civicrm_contact_employer_id', $indexes);
+    $this->assertContains('index_sort_name', $indexes);
+  }
+
+  public function testLengthChange() {
+    CRM_Core_DAO::executeQuery("CREATE TABLE `civicrm_test_length_change` (
+      test_id int(10) unsigned NOT NULL AUTO_INCREMENT,
+      test_integer int(4) NULL,
+      test_decimal decimal(20,2) NULL,
+      PRIMARY KEY (`test_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+    CRM_Core_DAO::executeQuery(
+      "ALTER TABLE civicrm_test_length_change
+      CHANGE COLUMN test_integer test_integer int(6) NULL,
+      CHANGE COLUMN test_decimal test_decimal decimal(22,2) NULL"
+    );
+    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
+    $schema->fixSchemaDifferences();
+    // need to do it twice so the columnSpecs static is refreshed
+    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
+    $schema->fixSchemaDifferences();
+    $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
+    // length should increase
+    $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+    $this->assertEquals('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
+    CRM_Core_DAO::executeQuery(
+      "ALTER TABLE civicrm_test_length_change
+      CHANGE COLUMN test_integer test_integer int(4) NULL,
+      CHANGE COLUMN test_decimal test_decimal decimal(20,2) NULL"
+    );
+    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
+    $schema->fixSchemaDifferences();
+    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
+    $schema->fixSchemaDifferences();
+    $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
+    // length should not decrease
+    $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+    $this->assertEquals('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
+  }
+
+  public function testEnumChange() {
+    CRM_Core_DAO::executeQuery("CREATE TABLE `civicrm_test_enum_change` (
+      test_id int(10) unsigned NOT NULL AUTO_INCREMENT,
+      test_enum enum('A','B','C') NULL,
+      PRIMARY KEY (`test_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_test_enum_change CHANGE COLUMN test_enum test_enum enum('A','B','C','D') NULL");
+    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
+    $schema->fixSchemaDifferences();
+    // need to do it twice so the columnSpecs static is refreshed
+    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
+    $schema->fixSchemaDifferences();
+    $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
+    // new enum value should be included
+    $this->assertEquals("'A','B','C','D'", $ci['civicrm_test_enum_change']['test_enum']['ENUM_VALUES']);
   }
 
 }
