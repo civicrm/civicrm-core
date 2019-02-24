@@ -652,14 +652,12 @@ VALUES $sqlValueString
    */
   public static function createTempTable($sqlColumns) {
     //creating a temporary table for the search result that need be exported
-    $exportTempTable = CRM_Utils_SQL_TempTable::build()->setDurable()->setCategory('export')->getName();
+    $exportTempTable = CRM_Utils_SQL_TempTable::build()->setDurable()->setCategory('export')->setUtf8();
 
     // also create the sql table
-    $sql = "DROP TABLE IF EXISTS {$exportTempTable}";
-    CRM_Core_DAO::executeQuery($sql);
+    $exportTempTable->drop();
 
     $sql = "
-CREATE TABLE {$exportTempTable} (
      id int unsigned NOT NULL AUTO_INCREMENT,
 ";
     $sql .= implode(",\n", array_values($sqlColumns));
@@ -682,12 +680,8 @@ CREATE TABLE {$exportTempTable} (
       }
     }
 
-    $sql .= "
-) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
-";
-
-    CRM_Core_DAO::executeQuery($sql);
-    return $exportTempTable;
+    $exportTempTable->createWithColumns($sql);
+    return $exportTempTable->getName();
   }
 
   /**
