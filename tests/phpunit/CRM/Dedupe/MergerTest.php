@@ -484,6 +484,44 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test migration of Membership.
+   */
+  public function testMergeMembership() {
+    // Contacts setup
+    $this->setupMatchData();
+    $originalContactID = $this->contacts[0]['id'];
+    $duplicateContactID = $this->contacts[1]['id'];
+
+    //Add Membership for the duplicate contact.
+    $memTypeId = $this->membershipTypeCreate();
+    $membership = $this->callAPISuccess('Membership', 'create', [
+      'membership_type_id' => $memTypeId,
+      'contact_id' => $duplicateContactID,
+    ]);
+    //Assert if 'add new' checkbox is enabled on the merge form.
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($originalContactID, $duplicateContactID);
+    foreach ($rowsElementsAndInfo['elements'] as $element) {
+      if (!empty($element[3]) && $element[3] == 'add new') {
+        $checkedAttr = ['checked' => 'checked'];
+        $this->checkArrayEquals($element[4], $checkedAttr);
+      }
+    }
+
+    //Merge and move the mem to the main contact.
+    $this->mergeContacts($originalContactID, $duplicateContactID, [
+      'move_rel_table_memberships' => 1,
+      'operation' => ['move_rel_table_memberships' => ['add' => 1]]
+    ]);
+
+    //Check if membership is correctly transferred to original contact.
+    $originalContactMembership = $this->callAPISuccess('Membership', 'get', [
+      'membership_type_id' => $memTypeId,
+      'contact_id' => $originalContactID,
+    ]);
+    $this->assertEquals(1, $originalContactMembership['count']);
+  }
+
+  /**
    * CRM-19653 : Test that custom field data should/shouldn't be overriden on
    *   selecting/not selecting option to migrate data respectively
    */
