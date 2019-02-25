@@ -146,7 +146,25 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->callAPISuccess('relationship', 'getcount', array(
       'contact_id_a' => $individualID,
       'contact_id_b' => $this->_contactID,
-    ));
+    ), 1);
+  }
+
+  /**
+   * Create an address with a master ID and relationship creation disabled.
+   */
+  public function testCreateAddressWithoutMasterRelationshipOrganization() {
+    $address = $this->callAPISuccess('address', 'create', $this->_params);
+    $individualID = $this->individualCreate();
+    $individualParams = array(
+      'contact_id' => $individualID,
+      'master_id' => $address['id'],
+      'update_current_employer' => 0,
+    );
+    $this->callAPISuccess('address', 'create', array_merge($this->_params, $individualParams));
+    $this->callAPISuccess('relationship', 'getcount', array(
+      'contact_id_a' => $individualID,
+      'contact_id_b' => $this->_contactID,
+    ), 0);
   }
 
   /**

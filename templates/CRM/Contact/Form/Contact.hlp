@@ -76,6 +76,13 @@
 <p>{ts}You can use an address belonging to an existing contact or create a new contact by selecting the desired contact type from the select field. If you link an individual's address to an organization, an employee-employer relationship will be automatically created. If you link an individual's address to a household, a household member relationship is created.{/ts}</p>
 {/htxt}
 
+{htxt id="id-sharedAddress-updateRelationships-title"}
+  {ts}Update Employer{/ts}
+{/htxt}
+{htxt id="id-sharedAddress-updateRelationships"}
+<p>{ts}Set this organization as the current employer for this individual. Note: will disable any existing employer relationship for this individual.{/ts}</p>
+{/htxt}
+
 {htxt id="id-communication_style-title"}
   {ts}Communication Style{/ts}
 {/htxt}
