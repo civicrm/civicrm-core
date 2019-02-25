@@ -289,4 +289,61 @@ class CRM_Financial_BAO_Payment {
     return $filteredParams;
   }
 
+  /**
+   * @param $contributionId
+   * @param $trxnData
+   * @param $updateStatus
+   *   - deprecate this param
+   *
+   * @todo  - make this protected once recordAdditionalPayment no longer calls it.
+   *
+   * @return CRM_Financial_DAO_FinancialTrxn
+   */
+  public static function recordRefundPayment($contributionId, $trxnData, $updateStatus) {
+    $contributionDAO = new CRM_Contribute_BAO_Contribution();
+    $contributionDAO->id = $contributionId;
+    $contributionDAO->find(TRUE);
+
+    $paidStatus = CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialItem', 'status_id', 'Paid');
+    $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionDAO->financial_type_id, 'Accounts Receivable Account is');
+    $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+
+    $trxnData['total_amount'] = $trxnData['net_amount'] = -$trxnData['total_amount'];
+    $trxnData['from_financial_account_id'] = $arAccountId;
+    $trxnData['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
+    // record the entry
+    $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnData);
+
+    // note : not using the self::add method,
+    // the reason because it performs 'status change' related code execution for financial records
+    // which in 'Pending Refund' => 'Completed' is not useful, instead specific financial record updates
+    // are coded below i.e. just updating financial_item status to 'Paid'
+    if ($updateStatus) {
+      CRM_Core_DAO::setFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'contribution_status_id', $completedStatusId);
+    }
+    // add financial item entry
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionDAO->id);
+    if (!empty($lineItems)) {
+      foreach ($lineItems as $lineItemId => $lineItemValue) {
+        // don't record financial item for cancelled line-item
+        if ($lineItemValue['qty'] == 0) {
+          continue;
+        }
+        $paid = $lineItemValue['line_total'] * ($financialTrxn->total_amount / $contributionDAO->total_amount);
+        $addFinancialEntry = [
+          'transaction_date' => $financialTrxn->trxn_date,
+          'contact_id' => $contributionDAO->contact_id,
+          'amount' => round($paid, 2),
+          'currency' => $contributionDAO->currency,
+          'status_id' => $paidStatus,
+          'entity_id' => $lineItemId,
+          'entity_table' => 'civicrm_line_item',
+        ];
+        $trxnIds = ['id' => $financialTrxn->id];
+        CRM_Financial_BAO_FinancialItem::create($addFinancialEntry, NULL, $trxnIds);
+      }
+    }
+    return $financialTrxn;
+  }
+
 }
