@@ -553,6 +553,23 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test no fatal on order by per https://lab.civicrm.org/dev/core/issues/739
+   */
+  public function testCaseDetailsCaseTypeHeader() {
+    $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'case/detail',
+      'fields' => ['subject' => 1, 'client_sort_name' => 1],
+       'order_bys' => [
+         1 => [
+          'column' => 'case_type_title',
+          'order' => 'ASC',
+          'section' => '1',
+        ],
+      ],
+    ]);
+  }
+
+  /**
    * Test the group filter works on the contribution summary.
    */
   public function testContributionDetailSoftCredits() {
