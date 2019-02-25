@@ -187,10 +187,10 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
 
       //participant note
       if (!empty($query->_returnProperties['participant_note'])) {
-        $query->_select['participant_note'] = "civicrm_note.note as participant_note";
+        $query->_select['participant_note'] = "participant_note.note as participant_note";
         $query->_element['participant_note'] = 1;
         $query->_tables['participant_note'] = 1;
-        $query->_whereTables['civicrm_note'] = 1;
+        $query->_whereTables['participant_note'] = 1;
       }
 
       if (!empty($query->_returnProperties['participant_is_pay_later'])) {
@@ -465,6 +465,13 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Event_DAO_Event', $name, $value, $op, array('check_permission' => $checkPermission));
         $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
         return;
+
+      case 'participant_note':
+        $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
+        $query->_tables['participant_note'] = $query->_whereTables['participant_note'] = 1;
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('participant_note.note', $op, $value, 'String');
+        $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$name]['title'], 2 => $op, 3 => $value));
+        break;
     }
   }
 
@@ -493,8 +500,8 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         break;
 
       case 'participant_note':
-        $from .= " $side JOIN civicrm_note ON ( civicrm_note.entity_table = 'civicrm_participant' AND
-                                                        civicrm_participant.id = civicrm_note.entity_id )";
+        $from .= " $side JOIN civicrm_note participant_note ON ( participant_note.entity_table = 'civicrm_participant' AND
+                                                        civicrm_participant.id = participant_note.entity_id )";
         break;
 
       case 'participant_status':
