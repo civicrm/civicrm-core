@@ -204,7 +204,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'from_financial_account_id' => 7,
       'to_financial_account_id' => 6,
       'total_amount' => -30,
-      'status_id' => 1,
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Refunded'),
       'is_payment' => 1,
     ];
     foreach ($expected as $key => $value) {
@@ -317,7 +317,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function checkPaymentResult($payment, $expectedResult) {
     foreach ($expectedResult[$payment['id']] as $key => $value) {
-      $this->assertEquals($payment['values'][$payment['id']][$key], $value);
+      $this->assertEquals($payment['values'][$payment['id']][$key], $value, 'mismatch on ' . $key);
     }
   }
 

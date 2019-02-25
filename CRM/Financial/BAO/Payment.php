@@ -63,7 +63,7 @@ class CRM_Financial_BAO_Payment {
     // should be handled through Payment.create.
     $isSkipRecordingPaymentHereForLegacyHandlingReasons = ($contributionStatus == 'Pending' && $isPaymentCompletesContribution);
 
-    if (!$isSkipRecordingPaymentHereForLegacyHandlingReasons) {
+    if (!$isSkipRecordingPaymentHereForLegacyHandlingReasons && $params['total_amount'] > 0) {
       $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
 
       if (CRM_Utils_Array::value('line_item', $params) && !empty($trxn)) {
@@ -98,6 +98,9 @@ class CRM_Financial_BAO_Payment {
       elseif (!empty($trxn)) {
         CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution['total_amount']);
       }
+    }
+    elseif ($params['total_amount'] < 0) {
+      $trxn = self::recordRefundPayment($params['contribution_id'], $params, FALSE);
     }
 
     if ($isPaymentCompletesContribution) {
@@ -310,7 +313,7 @@ class CRM_Financial_BAO_Payment {
     $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionDAO->financial_type_id, 'Accounts Receivable Account is');
     $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
 
-    $trxnData['total_amount'] = $trxnData['net_amount'] = -$trxnData['total_amount'];
+    $trxnData['total_amount'] = $trxnData['net_amount'] = $trxnData['total_amount'];
     $trxnData['from_financial_account_id'] = $arAccountId;
     $trxnData['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
     // record the entry

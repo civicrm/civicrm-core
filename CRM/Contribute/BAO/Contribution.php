@@ -3339,6 +3339,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'net_amount' => CRM_Utils_Array::value('net_amount', $params, $totalAmount),
         'currency' => $params['contribution']->currency,
         'trxn_id' => $params['contribution']->trxn_id,
+        // @todo - this is getting the status id from the contribution - that is BAD - ie the contribution could be partially
+        // paid but each payment is completed. The work around is to pass in the status_id in the trxn_params but
+        // this should really default to completed (after discussion).
         'status_id' => $statusId,
         'payment_instrument_id' => CRM_Utils_Array::value('payment_instrument_id', $params, $params['contribution']->payment_instrument_id),
         'check_number' => CRM_Utils_Array::value('check_number', $params),
@@ -3893,6 +3896,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $financialTrxn = CRM_Financial_BAO_Payment::recordPayment($contributionId, $trxnsData, $participantId);
     }
     elseif ($paymentType == 'refund') {
+      $trxnsData['total_amount'] = -$trxnsData['total_amount'];
       $financialTrxn = CRM_Financial_BAO_Payment::recordRefundPayment($contributionId, $trxnsData, $updateStatus);
       if ($participantId) {
         // update participant status
