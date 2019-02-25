@@ -345,6 +345,14 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($parsedStreetAddress['street_number'], '54');
     $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'A');
 
+    // Out-of-range street number to be parsed.
+    $street_address = "505050505050 Main St";
+    $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address);
+    $this->assertEquals($parsedStreetAddress['street_name'], '');
+    $this->assertEquals($parsedStreetAddress['street_unit'], '');
+    $this->assertEquals($parsedStreetAddress['street_number'], '');
+    $this->assertEquals($parsedStreetAddress['street_number_suffix'], '');
+
     // valid Street address to be parsed ( $locale = 'en_US' )
     $street_address = "54A Excelsior Ave. Apt 1C";
     $locale = 'en_US';
