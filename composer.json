@@ -55,6 +55,7 @@
     "pear/Auth_SASL": "1.1.0",
     "pear/Net_SMTP": "1.6.*",
     "pear/Net_socket": "1.0.*",
+    "pear/mail": "^1.4",
     "civicrm/civicrm-setup": "~0.2.0",
     "guzzlehttp/guzzle": "^6.3",
     "psr/simple-cache": "~1.0.1"
@@ -71,6 +72,7 @@
       "bash tools/scripts/composer/tcpdf-cleanup.sh",
       "bash tools/scripts/composer/pear-exception-fix.sh",
       "bash tools/scripts/composer/net-smtp-fix.sh",
+      "bash tools/scripts/composer/pear-mail-fix.sh",
       "bash tools/scripts/composer/phpword-jquery.sh"
     ],
     "post-update-cmd": [
@@ -78,6 +80,7 @@
       "bash tools/scripts/composer/tcpdf-cleanup.sh",
       "bash tools/scripts/composer/pear-exception-fix.sh",
       "bash tools/scripts/composer/net-smtp-fix.sh",
+      "bash tools/scripts/composer/pear-mail-fix.sh",
       "bash tools/scripts/composer/phpword-jquery.sh"
     ]
   }
