@@ -633,9 +633,9 @@
      <weight>9000</weight>
   </item>
   <item>
-     <path>civicrm/ajax/menujs</path>
-     <page_callback>CRM_Admin_Page_AJAX::getNavigationMenu</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
+    <path>civicrm/ajax/navmenu</path>
+    <page_callback>CRM_Admin_Page_AJAX::navMenu</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
      <path>civicrm/ajax/menutree</path>

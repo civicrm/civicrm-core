@@ -30,6 +30,7 @@
     "font-awesome": "~4",
     "angular-bootstrap": "^2.5.0",
     "angular-sanitize": "~1.5.0",
+    "smartmenus": "~1.1",
     "phantomjs-polyfill": "^0.0.2"
   },
   "resolutions": {
