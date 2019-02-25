@@ -35,56 +35,12 @@
 class CRM_Upgrade_Incremental_SmartGroups {
 
   /**
-   * Version we are upgrading to.
-   *
-   * @var string
+   * Perform updates specified by upgrade function.
    */
-  protected $upgradeVersion;
-
-  /**
-   * @return string
-   */
-  public function getUpgradeVersion() {
-    return $this->upgradeVersion;
-  }
-
-  /**
-   * @param string $upgradeVersion
-   */
-  public function setUpgradeVersion($upgradeVersion) {
-    $this->upgradeVersion = $upgradeVersion;
-  }
-
-  /**
-   * CRM_Upgrade_Incremental_MessageTemplates constructor.
-   *
-   * @param string $upgradeVersion
-   */
-  public function __construct($upgradeVersion) {
-    $this->setUpgradeVersion($upgradeVersion);
-  }
-
-  /**
-   * Get any conversions required for saved smart groups.
-   *
-   * @return array
-   */
-  public function getSmartGroupConversions() {
-    return [
-      [
-        'version' => '5.11.alpha1',
-        'upgrade_descriptors' => [ts('Upgrade grant smart groups to datepicker format')],
-        'actions' => [
-          'function' => 'datepickerConversion',
-          'fields' => [
-            'grant_application_received_date',
-            'grant_decision_date',
-            'grant_money_transfer_date',
-            'grant_due_date'
-          ]
-        ]
-      ]
-    ];
+  public function updateGroups($actions) {
+    foreach ($actions as $func => $fields) {
+      $this->{$func}($fields);
+    }
   }
 
   /**
@@ -116,33 +72,6 @@ class CRM_Upgrade_Incremental_SmartGroups {
         }
       }
     }
-  }
-
-  /**
-   * Update message templates.
-   */
-  public function updateGroups() {
-    $conversions = $this->getSmartGroupConversionsToApply();
-    foreach ($conversions as $conversion) {
-      $function = $conversion['function'];
-      $this->{$function}($conversion['fields']);
-    }
-  }
-
-  /**
-   * Get any required template updates.
-   *
-   * @return array
-   */
-  public function getSmartGroupConversionsToApply() {
-    $conversions = $this->getSmartGroupConversions();
-    $return = [];
-    foreach ($conversions as $conversion) {
-      if ($conversion['version'] === $this->getUpgradeVersion()) {
-        $return[] = $conversion['actions'];
-      }
-    }
-    return $return;
   }
 
   /**
