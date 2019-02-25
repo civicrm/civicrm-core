@@ -88,6 +88,8 @@ class CRM_Utils_SQL_TempTable {
 
   protected $memory;
 
+  protected $createSql;
+
   /**
    * @return CRM_Utils_SQL_TempTable
    */
@@ -138,6 +140,7 @@ class CRM_Utils_SQL_TempTable {
       ($selectQuery instanceof CRM_Utils_SQL_Select ? $selectQuery->toSQL() : $selectQuery)
     );
     CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE, FALSE);
+    $this->createSql = $sql;
     return $this;
   }
 
@@ -157,6 +160,7 @@ class CRM_Utils_SQL_TempTable {
       $this->utf8 ? self::UTF8 : ''
     );
     CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE, FALSE);
+    $this->createSql = $sql;
     return $this;
   }
 
@@ -206,6 +210,13 @@ class CRM_Utils_SQL_TempTable {
    */
   public function getId() {
     return $this->id;
+  }
+
+  /**
+   * @return string|NULL
+   */
+  public function getCreateSql() {
+    return $this->createSql;
   }
 
   /**
