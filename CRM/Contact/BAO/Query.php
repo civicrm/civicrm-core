@@ -4882,95 +4882,7 @@ civicrm_relationship.start_date > {$today}
     $additionalFromClause = NULL, $skipOrderAndLimit = FALSE
   ) {
 
-    if ($includeContactIds) {
-      $this->_includeContactIds = TRUE;
-      $this->_whereClause = $this->whereClause();
-    }
-
-    $onlyDeleted = in_array(array('deleted_contacts', '=', '1', '0', '0'), $this->_params);
-
-    // if we’re explicitly looking for a certain contact’s contribs, events, etc.
-    // and that contact happens to be deleted, set $onlyDeleted to true
-    foreach ($this->_params as $values) {
-      $name = CRM_Utils_Array::value(0, $values);
-      $op = CRM_Utils_Array::value(1, $values);
-      $value = CRM_Utils_Array::value(2, $values);
-      if ($name == 'contact_id' and $op == '=') {
-        if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'is_deleted')) {
-          $onlyDeleted = TRUE;
-        }
-        break;
-      }
-    }
-
-    // building the query string
-    $groupBy = $groupByCols = NULL;
-    if (!$count) {
-      if (isset($this->_groupByComponentClause)) {
-        $groupByCols = preg_replace('/^GROUP BY /', '', trim($this->_groupByComponentClause));
-        $groupByCols = explode(', ', $groupByCols);
-      }
-      elseif ($this->_useGroupBy) {
-        $groupByCols = array('contact_a.id');
-      }
-    }
-    if ($this->_mode & CRM_Contact_BAO_Query::MODE_ACTIVITY && (!$count)) {
-      $groupByCols = array('civicrm_activity.id');
-    }
-    if (!empty($groupByCols)) {
-      $groupBy = " GROUP BY " . implode(', ', $groupByCols);
-    }
-
-    $order = $orderBy = $limit = '';
-    if (!$count) {
-      list($order, $additionalFromClause) = $this->prepareOrderBy($sort, $sortByChar, $sortOrder, $additionalFromClause);
-
-      if ($rowCount > 0 && $offset >= 0) {
-        $offset = CRM_Utils_Type::escape($offset, 'Int');
-        $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
-        $limit = " LIMIT $offset, $rowCount ";
-      }
-    }
-    // Two cases where we are disabling FGB (FULL_GROUP_BY_MODE):
-    //   1. Expecting the search query to return all the first single letter characters of contacts ONLY, but when FGB is enabled
-    //      MySQL expect the columns present in GROUP BY, must be present in SELECT clause and that results into error, needless to have other columns.
-    //   2. When GROUP BY columns are present then disable FGB otherwise it demands to add ORDER BY columns in GROUP BY and eventually in SELECT
-    //     clause. This will impact the search query output.
-    $disableFullGroupByMode = ($sortByChar || !empty($groupBy) || $groupContacts);
-
-    if ($disableFullGroupByMode) {
-      CRM_Core_DAO::disableFullGroupByMode();
-    }
-
-    // CRM-15231
-    $this->_sort = $sort;
-
-    //CRM-15967
-    $this->includePseudoFieldsJoin($sort);
-
-    list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
-
-    if ($additionalWhereClause) {
-      $where = $where . ' AND ' . $additionalWhereClause;
-    }
-
-    //additional from clause should be w/ proper joins.
-    if ($additionalFromClause) {
-      $from .= "\n" . $additionalFromClause;
-    }
-
-    // if we are doing a transform, do it here
-    // use the $from, $where and $having to get the contact ID
-    if ($this->_displayRelationshipType) {
-      $this->filterRelatedContacts($from, $where, $having);
-    }
-
-    if ($skipOrderAndLimit) {
-      $query = "$select $from $where $having $groupBy";
-    }
-    else {
-      $query = "$select $from $where $having $groupBy $order $limit";
-    }
+    $query = $this->getSearchSQL($offset, $rowCount, $sort, $count, $includeContactIds, $sortByChar, $groupContacts, $additionalWhereClause, $sortOrder, $additionalFromClause, $skipOrderAndLimit);
 
     if ($returnQuery) {
       return $query;
@@ -4981,9 +4893,8 @@ civicrm_relationship.start_date > {$today}
 
     $dao = CRM_Core_DAO::executeQuery($query);
 
-    if ($disableFullGroupByMode) {
-      CRM_Core_DAO::reenableFullGroupByMode();
-    }
+    // We can always call this - it will only re-enable if it was originally enabled.
+    CRM_Core_DAO::reenableFullGroupByMode();
 
     if ($groupContacts) {
       $ids = array();
@@ -6658,6 +6569,137 @@ AND   displayRelType.is_active = 1
       $summary['cancel']['amount'] = implode(',&nbsp;', $summary['cancel']['amount']);
       $summary['cancel']['avg'] = implode(',&nbsp;', $summary['cancel']['avg']);
     }
+  }
+
+  /**
+   * /**
+   * Create the sql query for an contact search.
+   *
+   * @param int $offset
+   *   The offset for the query.
+   * @param int $rowCount
+   *   The number of rows to return.
+   * @param string|CRM_Utils_Sort $sort
+   *   The order by string.
+   * @param bool $count
+   *   Is this a count only query ?.
+   * @param bool $includeContactIds
+   *   Should we include contact ids?.
+   * @param bool $sortByChar
+   *   If true returns the distinct array of first characters for search results.
+   * @param bool $groupContacts
+   *   If true, return only the contact ids.
+   * @param string $additionalWhereClause
+   *   If the caller wants to further restrict the search (used for components).
+   * @param null $sortOrder
+   * @param string $additionalFromClause
+   *   Should be clause with proper joins, effective to reduce where clause load.
+   *
+   * @param bool $skipOrderAndLimit
+   * @return string
+   */
+  public function getSearchSQL(
+    $offset = 0, $rowCount = 0, $sort = NULL,
+    $count = FALSE, $includeContactIds = FALSE,
+    $sortByChar = FALSE, $groupContacts = FALSE,
+    $additionalWhereClause = NULL, $sortOrder = NULL,
+    $additionalFromClause = NULL, $skipOrderAndLimit = FALSE) {
+    if ($includeContactIds) {
+      $this->_includeContactIds = TRUE;
+      $this->_whereClause = $this->whereClause();
+    }
+
+    $onlyDeleted = in_array([
+      'deleted_contacts',
+      '=',
+      '1',
+      '0',
+      '0'
+    ], $this->_params);
+
+    // if we’re explicitly looking for a certain contact’s contribs, events, etc.
+    // and that contact happens to be deleted, set $onlyDeleted to true
+    foreach ($this->_params as $values) {
+      $name = CRM_Utils_Array::value(0, $values);
+      $op = CRM_Utils_Array::value(1, $values);
+      $value = CRM_Utils_Array::value(2, $values);
+      if ($name == 'contact_id' and $op == '=') {
+        if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'is_deleted')) {
+          $onlyDeleted = TRUE;
+        }
+        break;
+      }
+    }
+
+    // building the query string
+    $groupBy = $groupByCols = NULL;
+    if (!$count) {
+      if (isset($this->_groupByComponentClause)) {
+        $groupByCols = preg_replace('/^GROUP BY /', '', trim($this->_groupByComponentClause));
+        $groupByCols = explode(', ', $groupByCols);
+      }
+      elseif ($this->_useGroupBy) {
+        $groupByCols = ['contact_a.id'];
+      }
+    }
+    if ($this->_mode & CRM_Contact_BAO_Query::MODE_ACTIVITY && (!$count)) {
+      $groupByCols = ['civicrm_activity.id'];
+    }
+    if (!empty($groupByCols)) {
+      $groupBy = " GROUP BY " . implode(', ', $groupByCols);
+    }
+
+    $order = $orderBy = $limit = '';
+    if (!$count) {
+      list($order, $additionalFromClause) = $this->prepareOrderBy($sort, $sortByChar, $sortOrder, $additionalFromClause);
+
+      if ($rowCount > 0 && $offset >= 0) {
+        $offset = CRM_Utils_Type::escape($offset, 'Int');
+        $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
+        $limit = " LIMIT $offset, $rowCount ";
+      }
+    }
+    // Two cases where we are disabling FGB (FULL_GROUP_BY_MODE):
+    //   1. Expecting the search query to return all the first single letter characters of contacts ONLY, but when FGB is enabled
+    //      MySQL expect the columns present in GROUP BY, must be present in SELECT clause and that results into error, needless to have other columns.
+    //   2. When GROUP BY columns are present then disable FGB otherwise it demands to add ORDER BY columns in GROUP BY and eventually in SELECT
+    //     clause. This will impact the search query output.
+    $disableFullGroupByMode = ($sortByChar || !empty($groupBy) || $groupContacts);
+
+    if ($disableFullGroupByMode) {
+      CRM_Core_DAO::disableFullGroupByMode();
+    }
+
+    // CRM-15231
+    $this->_sort = $sort;
+
+    //CRM-15967
+    $this->includePseudoFieldsJoin($sort);
+
+    list($select, $from, $where, $having) = $this->query($count, $sortByChar, $groupContacts, $onlyDeleted);
+
+    if ($additionalWhereClause) {
+      $where = $where . ' AND ' . $additionalWhereClause;
+    }
+
+    //additional from clause should be w/ proper joins.
+    if ($additionalFromClause) {
+      $from .= "\n" . $additionalFromClause;
+    }
+
+    // if we are doing a transform, do it here
+    // use the $from, $where and $having to get the contact ID
+    if ($this->_displayRelationshipType) {
+      $this->filterRelatedContacts($from, $where, $having);
+    }
+
+    if ($skipOrderAndLimit) {
+      $query = "$select $from $where $having $groupBy";
+    }
+    else {
+      $query = "$select $from $where $having $groupBy $order $limit";
+    }
+    return $query;
   }
 
 }
