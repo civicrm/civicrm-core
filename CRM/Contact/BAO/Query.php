@@ -539,6 +539,7 @@ class CRM_Contact_BAO_Query {
       $component = 'membership';
     }
     if (isset($component)) {
+      // @todo should be if (isset($component && !$this->_skipPermission)
       CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClause, $component);
     }
 

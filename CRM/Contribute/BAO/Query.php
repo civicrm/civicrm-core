@@ -238,9 +238,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'financial_type_id':
-        // @todo we need to make this resemble a hook approach.
-        CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.$name", 'IN', array_keys($financialTypes), 'String');
       case 'invoice_id':
       case 'invoice_number':
       case 'payment_instrument_id':
