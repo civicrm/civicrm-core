@@ -2367,13 +2367,14 @@ SELECT contact_id
    *
    * @param array $fields
    */
-  protected static function appendPseudoConstantsToFields(&$fields) {
+  public static function appendPseudoConstantsToFields(&$fields) {
     foreach ($fields as $field) {
       if (!empty($field['pseudoconstant']) && !empty($field['pseudoconstant']['optionGroupName'])) {
         $fields[$field['pseudoconstant']['optionGroupName']] = array(
           'title' => CRM_Core_BAO_OptionGroup::getTitleByName($field['pseudoconstant']['optionGroupName']),
           'name' => $field['pseudoconstant']['optionGroupName'],
           'data_type' => CRM_Utils_Type::T_STRING,
+          'is_pseudofield_for' => $field['name'],
         );
       }
     }
