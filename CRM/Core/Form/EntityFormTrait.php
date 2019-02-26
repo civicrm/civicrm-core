@@ -162,7 +162,8 @@ trait CRM_Core_Form_EntityFormTrait {
    * Get the defaults for the entity.
    */
   protected function getEntityDefaults() {
-    $defaults = [];
+    $defaults = $moneyFields = [];
+
     if (!$this->isDeleteContext() &&
       $this->getEntityId()
     ) {
@@ -170,17 +171,23 @@ trait CRM_Core_Form_EntityFormTrait {
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $defaults);
     }
-    foreach ($this->entityFields as &$fieldSpec) {
+    foreach ($this->entityFields as $entityFieldName => $fieldSpec) {
       $value = CRM_Utils_Request::retrieveValue($fieldSpec['name'], $this->getValidationTypeForField($fieldSpec['name']));
       if ($value !== FALSE && $value !== NULL) {
         $defaults[$fieldSpec['name']] = $value;
       }
+      // Store a list of fields with money formatters
       if (CRM_Utils_Array::value('formatter', $fieldSpec) == 'crmMoney') {
-        if (!empty($defaults['currency'])) {
-          $fieldSpec['formatterParam'] = $defaults['currency'];
-        }
+        $moneyFields[] = $entityFieldName;
       }
     }
+    if (!empty($defaults['currency'])) {
+      // If we have a money formatter we need to pass the specified currency or it will render as the default
+      foreach ($moneyFields as $entityFieldName) {
+        $this->entityFields[$entityFieldName]['formatterParam'] = $defaults['currency'];
+      }
+    }
+
     // Assign again as we may have modified above
     $this->assign('entityFields', $this->entityFields);
     return $defaults;
