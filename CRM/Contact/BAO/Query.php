@@ -412,6 +412,8 @@ class CRM_Contact_BAO_Query {
 
   public $_pseudoConstantsSelect = array();
 
+  public $_groupUniqueKey = NULL;
+
   /**
    * Class constructor which also does all the work.
    *
@@ -3038,13 +3040,13 @@ class CRM_Contact_BAO_Query {
     //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
     $groupContactCacheClause = '';
     if (count($smartGroupIDs) || empty($value)) {
-      $gccUnique = uniqid();
-      $gccTableAlias = "civicrm_group_contact_cache_{$gccUnique}";
+      $this->_groupUniqueKey = uniqid();
+      $gccTableAlias = "civicrm_group_contact_cache_{$this->_groupUniqueKey}";
       $groupContactCacheClause = $this->addGroupContactCache($smartGroupIDs, $gccTableAlias, "contact_a", $op);
       if (!empty($groupContactCacheClause)) {
         if ($isNotOp) {
           $groupIds = implode(',', (array) $smartGroupIDs);
-          $gcTable = "civicrm_group_contact_{$gccUnique}";
+          $gcTable = "civicrm_group_contact_{$this->_groupUniqueKey}";
           $joinClause = array("contact_a.id = {$gcTable}.contact_id");
           $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
           if (strpos($op, 'IN') !== FALSE) {
@@ -3068,6 +3070,10 @@ class CRM_Contact_BAO_Query {
     if (strpos($op, 'NULL') === FALSE) {
       $this->_qill[$grouping][] = ts("Group Status %1", array(1 => implode(' ' . ts('or') . ' ', $statii)));
     }
+  }
+
+  public function getGroupCacheTableKey() {
+    return $this->_groupUniqueKey;
   }
 
   /**
