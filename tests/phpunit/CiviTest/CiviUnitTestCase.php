@@ -3396,13 +3396,13 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       ),
       $params
     );
-    $newPaymentInstrument = $this->callAPISuccess('OptionValue', 'create', $params);
+    $newPaymentInstrument = $this->callAPISuccess('OptionValue', 'create', $params)['id'];
 
     $relationTypeID = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
 
     $financialAccountParams = [
       'entity_table' => 'civicrm_option_value',
-      'entity_id' => key($newPaymentInstrument),
+      'entity_id' => $newPaymentInstrument,
       'account_relationship' => $relationTypeID,
       'financial_account_id' => $this->callAPISuccess('FinancialAccount', 'getValue', ['name' => $financialAccountName, 'return' => 'id']),
     ];
