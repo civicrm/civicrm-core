@@ -771,21 +771,31 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       'contribution_status_id' => 1,
       // @todo return this & fix query to do pseudoconstant thing.
       'contribution_status' => 1,
-      // @todo the product field got added because it suited someone's use case.
-      // ideally we would have some configurability here because I think 90% of sites would
-      // disagree this is the right field to show - but they wouldn't agree with each other
-      // on what field to show instead.
-      'contribution_product_id' => 1,
-      'product_name' => 1,
       'currency' => 1,
       'cancel_date' => 1,
       'contribution_recur_id' => 1,
     );
+    if (self::isSiteHasProducts()) {
+      $properties['product_name'] = 1;
+      $properties['contribution_product_id'] = 1;
+    }
     if (self::isSoftCreditOptionEnabled($queryParams)) {
       $properties = array_merge($properties, self::softCreditReturnProperties());
     }
 
     return $properties;
+  }
+
+  /**
+   * Do any products exist in this site's database.
+   *
+   * @return bool
+   */
+  public static function isSiteHasProducts() {
+    if (!isset(\Civi::$statics[__CLASS__]['has_products'])) {
+      \Civi::$statics[__CLASS__]['has_products'] = (bool) CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_contribution_product LIMIT 1');
+    }
+    return \Civi::$statics[__CLASS__]['has_products'];
   }
 
   /**
@@ -852,17 +862,11 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         //every
         'receipt_date' => 1,
         // query
-        'product_name' => 1,
         //whether
-        'sku' => 1,
         // or
-        'product_option' => 1,
         // not
-        'fulfilled_date' => 1,
         // the
-        'contribution_start_date' => 1,
         // field
-        'contribution_end_date' => 1,
         // is
         'is_test' => 1,
         // actually
@@ -884,9 +888,17 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         // on
         'contribution_campaign_id' => 1,
         // calling
-        'contribution_product_id' => 1,
         //function
       );
+      if (self::isSiteHasProducts()) {
+        $properties['fulfilled_date'] = 1;
+        $properties['product_name'] = 1;
+        $properties['contribution_product_id'] = 1;
+        $properties['product_option'] = 1;
+        $properties['sku'] = 1;
+        $properties['contribution_start_date'] = 1;
+        $properties['contribution_end_date'] = 1;
+      }
       if (self::isSoftCreditOptionEnabled()) {
         $properties = array_merge($properties, self::softCreditReturnProperties());
       }
@@ -1012,12 +1024,18 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       'autocomplete' => 'off',
     ));
 
-    // CRM-16713 - contribution search by premiums on 'Find Contribution' form.
-    $form->add('select', 'contribution_product_id',
-      ts('Premium'),
-      CRM_Contribute_PseudoConstant::products(),
-      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -'))
-    );
+    if (CRM_Contribute_BAO_Query::isSiteHasProducts()) {
+      // CRM-16713 - contribution search by premiums on 'Find Contribution' form.
+      $form->add('select', 'contribution_product_id',
+        ts('Premium'),
+        CRM_Contribute_PseudoConstant::products(),
+        FALSE, [
+          'class' => 'crm-select2',
+          'multiple' => 'multiple',
+          'placeholder' => ts('- any -')
+        ]
+      );
+    }
 
     self::addCustomFormFields($form, array('Contribution'));
 
