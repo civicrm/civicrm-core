@@ -61,11 +61,7 @@
           {/if}
       </tr>
       {if $contributionSummary.soft_credit.count}
-      <tr>
-        <th class="contriTotalLeft right">{ts}Total Soft Credit Amount{/ts} &ndash; {$contributionSummary.soft_credit.amount}</th>
-        <th class="right"> &nbsp; {ts}# Completed Soft Credits{/ts} &ndash; {$contributionSummary.soft_credit.count}</th>
-        <th class="right contriTotalRight"> &nbsp; {ts}Avg Soft Credit Amount{/ts} &ndash; {$contributionSummary.soft_credit.avg}</th>
-      </tr>
+        {include file="CRM/Contribute/Page/ContributionSoftTotals.tpl" softCreditTotals=$contributionSummary.soft_credit}
       {/if}
     {/if}
 
