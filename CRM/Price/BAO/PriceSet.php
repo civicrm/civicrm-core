@@ -668,6 +668,19 @@ WHERE  id = %1";
   }
 
   /**
+   * Get number of membership terms from Params.
+   * @param $params
+   * @return int
+   */
+  private static function getMembershipTerms($params) {
+    $numTerms = 1;
+    if (isset($params['num_terms'])) {
+      $numTerms = $params['num_terms'];
+    }
+    return $numTerms;
+  }
+
+  /**
    * Get line item purchase information.
    *
    * This function takes the input parameters and interprets out of it what has been purchased.
@@ -739,7 +752,11 @@ WHERE  id = %1";
           if ($params["price_{$id}"] <= 0) {
             break;
           }
-          $params["price_{$id}"] = array($params["price_{$id}"] => 1);
+          $terms = self::getMembershipTerms($params);
+          if ($amount_override == $params['total_amount']) {
+            $amount_override = NULL;
+          }
+          $params["price_{$id}"] = array($params["price_{$id}"] => $terms);
           $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
 
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, $amount_override);
@@ -762,10 +779,14 @@ WHERE  id = %1";
           break;
 
         case 'Select':
-          $params["price_{$id}"] = array($params["price_{$id}"] => 1);
+          $terms = self::getMembershipTerms($params);
+          if ($amount_override == $params['total_amount']) {
+            $amount_override = NULL;
+          }
+          $params["price_{$id}"] = array($params["price_{$id}"] => $terms);
           $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
 
-          CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, CRM_Utils_Array::value('partial_payment_total', $params));
+          CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, $amount_override);
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
           }

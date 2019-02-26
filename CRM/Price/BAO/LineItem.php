@@ -379,7 +379,7 @@ WHERE li.contribution_id = %1";
         'auto_renew' => CRM_Utils_Array::value('auto_renew', $options[$oid]),
         'html_type' => $fields['html_type'],
         'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $options[$oid]),
-        'tax_amount' => CRM_Utils_Array::value('tax_amount', $options[$oid]),
+        'tax_amount' => (CRM_Utils_Array::value('tax_amount', $options[$oid]) * $qty),
         'non_deductible_amount' => CRM_Utils_Array::value('non_deductible_amount', $options[$oid]),
       );
 
