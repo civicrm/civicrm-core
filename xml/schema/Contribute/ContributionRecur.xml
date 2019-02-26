@@ -316,6 +316,11 @@
     <type>int unsigned</type>
     <comment>Foreign key to civicrm_payment_processor.id</comment>
     <add>3.3</add>
+    <pseudoconstant>
+      <table>civicrm_payment_processor</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <html>
       <type>Select</type>
     </html>
