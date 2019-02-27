@@ -757,7 +757,7 @@ WHERE  id = %1";
             $amount_override = NULL;
           }
           $params["price_{$id}"] = array($params["price_{$id}"] => $terms);
-          $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
+          $optionValueId = CRM_Utils_Array::key($terms, $params["price_{$id}"]);
 
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, $amount_override);
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
@@ -784,7 +784,7 @@ WHERE  id = %1";
             $amount_override = NULL;
           }
           $params["price_{$id}"] = array($params["price_{$id}"] => $terms);
-          $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
+          $optionValueId = CRM_Utils_Array::key($terms, $params["price_{$id}"]);
 
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, $amount_override);
           if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {

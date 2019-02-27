@@ -483,7 +483,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       if (!empty($qty)) {
         $membershipTerms = $qty;
       }
-      else if(empty($numTerms)) {
+      elseif (empty($numTerms)) {
         $membershipTerms = $numTerms;
       }
     }
