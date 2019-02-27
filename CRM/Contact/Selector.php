@@ -1028,8 +1028,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     }
     // For core searches use the searchQuery method
     else {
-      $sql = $this->_query->searchQuery($start, $end, $sort, FALSE, $this->_query->_includeContactIds,
-        FALSE, TRUE, TRUE);
+      $sql = $this->_query->getSearchSQL($start, $end, $sort, FALSE, $this->_query->_includeContactIds,
+        FALSE, TRUE);
     }
 
     // CRM-9096

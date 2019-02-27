@@ -99,10 +99,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
     try {
-      $resultDAO = $queryObj->searchQuery(0, 0, NULL,
-        FALSE, FALSE,
-        FALSE, FALSE,
-        FALSE);
+      $resultDAO = $queryObj->searchQuery();
       $this->assertTrue($resultDAO->fetch());
     }
     catch (PEAR_Exception $e) {
@@ -141,10 +138,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
     try {
-      $resultDAO = $queryObj->searchQuery(0, 0, NULL,
-        FALSE, FALSE,
-        FALSE, FALSE,
-        FALSE);
+      $resultDAO = $queryObj->searchQuery();
       $this->assertFalse($resultDAO->fetch());
     }
     catch (PEAR_Exception $e) {
@@ -189,10 +183,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       );
 
       $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
-      $resultDAO = $queryObj->searchQuery(0, 0, NULL,
-        FALSE, FALSE,
-        FALSE, FALSE,
-        FALSE);
+      $resultDAO = $queryObj->searchQuery();
 
       if ($searchPrimary) {
         $this->assertEquals($resultDAO->N, 0);
@@ -247,10 +238,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
 
-    $resultDAO = $queryObj->searchQuery(0, 0, NULL,
-      FALSE, FALSE,
-      FALSE, FALSE,
-      FALSE);
+    $resultDAO = $queryObj->searchQuery();
     $resultDAO->fetch();
   }
 
@@ -282,10 +270,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $expectedSQL = "SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, civicrm_address.id as address_id, " . $selectClause . "  FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 ) WHERE  (  ( " . $whereClause . " )  )  AND (contact_a.is_deleted = 0)    ORDER BY `contact_a`.`sort_name` ASC, `contact_a`.`id` ";
     $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
     try {
-      $this->assertEquals($expectedSQL, $queryObj->searchQuery(0, 0, NULL,
-        FALSE, FALSE,
-        FALSE, FALSE,
-        TRUE));
+      $this->assertEquals($expectedSQL, $queryObj->getSearchSQL());
       list($select, $from, $where, $having) = $queryObj->query();
       $dao = CRM_Core_DAO::executeQuery("$select $from $where $having");
       $dao->fetch();
