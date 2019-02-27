@@ -1396,7 +1396,7 @@ class CRM_Contact_BAO_Query {
       }
     }
     elseif ($sortByChar) {
-      $select = 'SELECT DISTINCT UPPER(LEFT(contact_a.sort_name, 1)) as sort_name';
+      $select = 'SELECT DISTINCT LEFT(contact_a.sort_name, 1) as sort_name';
       $from = $this->_simpleFromClause;
     }
     elseif ($groupContacts) {
@@ -1460,6 +1460,24 @@ class CRM_Contact_BAO_Query {
       $from = $this->_fromClause;
     }
 
+    $where = $this->generateWhereClause();
+    $having = $this->generateHavingClause();
+
+    // if we are doing a transform, do it here
+    // use the $from, $where and $having to get the contact ID
+    if ($this->_displayRelationshipType) {
+      $this->filterRelatedContacts($from, $where, $having);
+    }
+
+    return array($select, $from, $where, $having);
+  }
+
+  /**
+   * Generate the WHERE query clause
+   *
+   * @return string where clause
+   */
+  protected function generateWhereClause() {
     $where = '';
     if (!empty($this->_whereClause)) {
       $where = "WHERE {$this->_whereClause}";
@@ -1473,7 +1491,15 @@ class CRM_Contact_BAO_Query {
         $where = "$where AND $this->_permissionWhereClause";
       }
     }
+    return $where;
+  }
 
+  /**
+   * Generate the HAVING query clause
+   *
+   * @return string having clause
+   */
+  protected function generateHavingClause() {
     $having = '';
     if (!empty($this->_having)) {
       foreach ($this->_having as $havingSets) {
@@ -1483,14 +1509,7 @@ class CRM_Contact_BAO_Query {
       }
       $having = ' HAVING ' . implode(' AND ', $havingValue);
     }
-
-    // if we are doing a transform, do it here
-    // use the $from, $where and $having to get the contact ID
-    if ($this->_displayRelationshipType) {
-      $this->filterRelatedContacts($from, $where, $having);
-    }
-
-    return array($select, $from, $where, $having);
+    return $having;
   }
 
   /**
@@ -3031,7 +3050,7 @@ class CRM_Contact_BAO_Query {
         implode(',', (array) $regularGroupIDs),
         'CommaSeparatedIntegers'
       );
-      $gcTable = "`civicrm_group_contact-" . uniqid() . "`";
+      $gcTable = "`civicrm_group_contact-added`";
       $joinClause = array("contact_a.id = {$gcTable}.contact_id");
 
       if (strpos($op, 'IN') !== FALSE) {
@@ -3052,7 +3071,6 @@ class CRM_Contact_BAO_Query {
     }
 
     //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
-    $groupContactCacheClause = '';
     if (count($smartGroupIDs) || empty($value)) {
       $this->_groupUniqueKey = uniqid();
       $this->_groupKeys[] = $this->_groupUniqueKey;
@@ -4886,13 +4904,16 @@ civicrm_relationship.start_date > {$today}
     $query = $this->getSearchSQL($offset, $rowCount, $sort, $count, $includeContactIds, $sortByChar, $groupContacts, $additionalWhereClause, $sortOrder, $additionalFromClause, $skipOrderAndLimit);
 
     if ($returnQuery) {
+      \Civi::log()->debug('returnQuery: ' . $query);
       return $query;
     }
     if ($count) {
-      return CRM_Core_DAO::singleValueQuery($query);
+      //return CRM_Core_DAO::singleValueQuery($query);
+      return $this->singleValueQueryDebug($query);
     }
 
-    $dao = CRM_Core_DAO::executeQuery($query);
+    //$dao = CRM_Core_DAO::executeQuery($query);
+    $dao = $this->executeQueryDebug($query);
 
     // We can always call this - it will only re-enable if it was originally enabled.
     CRM_Core_DAO::reenableFullGroupByMode();
@@ -4904,6 +4925,24 @@ civicrm_relationship.start_date > {$today}
       }
       return implode(',', $ids);
     }
+
+    return $dao;
+  }
+
+  /**
+   * Create and query the db for a contact search.
+   *
+   * @return CRM_Core_DAO
+   */
+  public function alphabetQuery() {
+    $query = $this->getSearchSQL(NULL, NULL, NULL, FALSE, FALSE, TRUE,
+      FALSE, NULL, NULL, NULL, FALSE);
+
+    //$dao = CRM_Core_DAO::executeQuery($query);
+    $dao = $this->executeQueryDebug($query);
+
+    // We can always call this - it will only re-enable if it was originally enabled.
+    CRM_Core_DAO::reenableFullGroupByMode();
 
     return $dao;
   }
@@ -6261,25 +6300,19 @@ AND   displayRelType.is_active = 1
         }
       }
       elseif ($sortByChar) {
-        $orderByArray = array("UPPER(LEFT(contact_a.sort_name, 1)) asc");
+        $orderBy = " sort_name asc";
       }
       else {
         $orderBy = " contact_a.sort_name ASC, contact_a.id";
       }
     }
-    if (!$orderBy && empty($orderByArray)) {
+    if (!$orderBy) {
       return [NULL, $additionalFromClause];
     }
     // Remove this here & add it at the end for simplicity.
     $order = trim($orderBy);
+    $orderByArray = explode(',', $order);
 
-    // hack for order clause
-    if (!empty($orderByArray)) {
-      $order = implode(', ', $orderByArray);
-    }
-    else {
-      $orderByArray = explode(',', $order);
-    }
     foreach ($orderByArray as $orderByClause) {
       $orderByClauseParts = explode(' ', trim($orderByClause));
       $field = $orderByClauseParts[0];
@@ -6633,22 +6666,7 @@ AND   displayRelType.is_active = 1
     }
 
     // building the query string
-    $groupBy = $groupByCols = NULL;
-    if (!$count) {
-      if (isset($this->_groupByComponentClause)) {
-        $groupByCols = preg_replace('/^GROUP BY /', '', trim($this->_groupByComponentClause));
-        $groupByCols = explode(', ', $groupByCols);
-      }
-      elseif ($this->_useGroupBy) {
-        $groupByCols = ['contact_a.id'];
-      }
-    }
-    if ($this->_mode & CRM_Contact_BAO_Query::MODE_ACTIVITY && (!$count)) {
-      $groupByCols = ['civicrm_activity.id'];
-    }
-    if (!empty($groupByCols)) {
-      $groupBy = " GROUP BY " . implode(', ', $groupByCols);
-    }
+    $groupBy = $this->generateGroupByClause($count, $sortByChar);
 
     $order = $orderBy = $limit = '';
     if (!$count) {
@@ -6665,7 +6683,7 @@ AND   displayRelType.is_active = 1
     //      MySQL expect the columns present in GROUP BY, must be present in SELECT clause and that results into error, needless to have other columns.
     //   2. When GROUP BY columns are present then disable FGB otherwise it demands to add ORDER BY columns in GROUP BY and eventually in SELECT
     //     clause. This will impact the search query output.
-    $disableFullGroupByMode = ($sortByChar || !empty($groupBy) || $groupContacts);
+    $disableFullGroupByMode = (!empty($groupBy) || $groupContacts);
 
     if ($disableFullGroupByMode) {
       CRM_Core_DAO::disableFullGroupByMode();
@@ -6736,6 +6754,53 @@ AND   displayRelType.is_active = 1
   protected function getMetadataForRealField($fieldName) {
     $field = $this->getMetadataForField($fieldName);
     return empty($field['is_pseudofield_for']) ? $field : $this->getMetadataForField($field['is_pseudofield_for']);
+  }
+
+  /**
+   * Generate the Group By clause for the query
+   *
+   * @param bool $count
+   * @param bool $sortByChar
+   *
+   * @return string|null
+   */
+  protected function generateGroupByClause($count = FALSE, $sortByChar = FALSE) {
+    $groupBy = $groupByCols = NULL;
+    if (!$count) {
+      if (isset($this->_groupByComponentClause)) {
+        $groupByCols = preg_replace('/^GROUP BY /', '', trim($this->_groupByComponentClause));
+        $groupByCols = explode(', ', $groupByCols);
+      }
+      elseif ($this->_useGroupBy) {
+        $groupByCols = ['contact_a.id'];
+      }
+    }
+    if ($this->_mode & CRM_Contact_BAO_Query::MODE_ACTIVITY && (!$count)) {
+      $groupByCols = ['civicrm_activity.id'];
+    }
+    if ($sortByChar) {
+      $groupByCols = ['sort_name'];
+    }
+    if (!empty($groupByCols)) {
+      $groupBy = " GROUP BY " . implode(', ', $groupByCols);
+    }
+    return $groupBy;
+  }
+
+  protected function executeQueryDebug($query) {
+    \Civi::log()->debug('execquery: ' . $query);
+    \Civi::log()->debug('execStart: ' . date('YmdHis'));
+    $dao = CRM_Core_DAO::executeQuery($query);
+    \Civi::log()->debug('execEnd: ' . date('YmdHis'));
+    return $dao;
+  }
+
+  protected function singleValueQueryDebug($query) {
+    \Civi::log()->debug('svalquery: ' . $query);
+    \Civi::log()->debug('svalStart: ' . date('YmdHis'));
+    $value = CRM_Core_DAO::singleValueQuery($query);
+    \Civi::log()->debug('svalEnd: ' . date('YmdHis'));
+    return $value;
   }
 
 }
