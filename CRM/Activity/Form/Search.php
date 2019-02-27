@@ -71,6 +71,11 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   protected $_ssID;
 
   /**
+   * The compoent name of Activity, later used to filter and format filters on forced search
+   */
+  protected $_component = 'CiviActivity';
+
+  /**
    * @return string
    */
   public function getDefaultEntity() {
@@ -212,7 +217,9 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
       CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams, $changeNames);
     }
-    $this->fixFormValues();
+
+    // construct formValues on forced search
+    $this->loadSearchParamsFromUrl();
 
     if (isset($this->_ssID) && empty($_POST)) {
       // if we are editing / running a saved search and the form has not been posted
@@ -226,10 +233,13 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
-    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
+    // we already processing the formvalues on force search so no need to do that again
+    if (!$this->_force) {
+      $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
-    $this->set('formValues', $this->_formValues);
-    $this->set('queryParams', $this->_queryParams);
+      $this->set('formValues', $this->_formValues);
+      $this->set('queryParams', $this->_queryParams);
+    }
 
     $buttonName = $this->controller->getButtonName();
     if ($buttonName == $this->_actionButtonName) {
@@ -281,71 +291,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     $controller->run();
   }
 
-  public function fixFormValues() {
-    if (!$this->_force) {
-      return;
-    }
-
-    $status = CRM_Utils_Request::retrieve('status', 'String', $this);
-    if ($status) {
-      $this->_formValues['activity_status_id'] = $status;
-      $this->_defaults['activity_status_id'] = $status;
-    }
-
-    $survey = CRM_Utils_Request::retrieve('survey', 'Positive');
-
-    if ($survey) {
-      $this->_formValues['activity_survey_id'] = $this->_defaults['activity_survey_id'] = $survey;
-      $sid = CRM_Utils_Array::value('activity_survey_id', $this->_formValues);
-      $activity_type_id = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $sid, 'activity_type_id');
-
-      // since checkbox are replaced by multiple select option
-      $this->_formValues['activity_type_id'] = $activity_type_id;
-      $this->_defaults['activity_type_id'] = $activity_type_id;
-    }
-    $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-
-    if ($cid) {
-      $cid = CRM_Utils_Type::escape($cid, 'Integer');
-      if ($cid > 0) {
-        $this->_formValues['contact_id'] = $cid;
-
-        $activity_role = CRM_Utils_Request::retrieve('activity_role', 'Positive', $this);
-
-        if ($activity_role) {
-          $this->_formValues['activity_role'] = $activity_role;
-        }
-        else {
-          $this->_defaults['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'sort_name');
-        }
-        // also assign individual mode to the template
-        $this->_single = TRUE;
-      }
-    }
-
-    // Enable search activity by custom value
-    // @todo this is not good security practice. Instead define entity fields in metadata &
-    // use getEntity Defaults
-    $requestParams = CRM_Utils_Request::exportValues();
-    foreach (array_keys($requestParams) as $key) {
-      if (substr($key, 0, 7) != 'custom_') {
-        continue;
-      }
-      elseif (empty($requestParams[$key])) {
-        continue;
-      }
-      $customValue = CRM_Utils_Request::retrieve($key, 'String', $this);
-      if ($customValue) {
-        $this->_formValues[$key] = $customValue;
-        $this->_defaults[$key] = $customValue;
-      }
-    }
-
-    if (!empty($this->_defaults)) {
-      $this->setDefaults($this->_defaults);
-    }
-  }
-
   /**
    * @return null
    */
@@ -374,6 +319,71 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   protected function getEntityMetadata() {
     return CRM_Activity_BAO_Query::getSearchFieldMetadata();
+  }
+
+  /**
+   * Responsible to set search params found as url arguments
+   */
+  public static function setSearchParamFromUrl(&$form) {
+    $searchFields = array_merge(
+      self::getActivitySearchFields(),
+      CRM_Contact_Form_Search_Criteria::getCustomSearchFields(array('Activity'))
+    );
+    foreach ($searchFields as $name => $info) {
+      if ($value = CRM_Utils_Request::retrieve($name, $info['data_type'])) {
+        $value = $form->formatSpecialFormValue($name, $value, $info['data_type']);
+        $form->_formValues[$info['name']] = $form->_defaults[$info['name']] = $value;
+        if ($name == 'survey') {
+          $activity_type_id = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $value, 'activity_type_id');
+          // since checkbox are replaced by multiple select option
+          $form->_formValues['activity_type_id'] = $activity_type_id;
+          $form->_defaults['activity_type_id'] = $activity_type_id;
+        }
+        elseif ($name == 'cid') {
+          if (empty($form->_formValues['activity_role'])) {
+            $form->_defaults['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'sort_name');
+          }
+          $form->_single = TRUE;
+        }
+        elseif (in_array($name, ['dateLow', 'dateHigh'])) {
+          $form->_formValues['activity_date_relative'] = 0;
+          $form->_defaults['activity_date_relative'] = 0;
+        }
+      }
+    }
+
+    if (!empty($form->_defaults)) {
+      $form->setDefaults($form->_defaults);
+    }
+
+    $form->_params = CRM_Contact_BAO_Query::convertFormValues($form->_formValues);
+    $form->set('formValues', $form->_formValues);
+    $form->set('queryParams', $form->_params);
+  }
+
+  public static function getActivitySearchFields() {
+    return [
+      'activity_role' => ['name' => 'activity_role', 'data_type' => 'Integer'],
+      'status' => ['name' => 'activity_status_id', 'data_type' => 'CommaSeparatedIntegers'],
+      'activity_status_id' => ['name' => 'activity_status_id', 'data_type' => 'CommaSeparatedIntegers'],
+      'activity_type_id' => ['name' => 'activity_type_id', 'data_type' => 'CommaSeparatedIntegers'],
+      'survey' => ['name' => 'activity_survey_id', 'data_type' => 'Integer'],
+      'activity_survey_id' => ['name' => 'activity_survey_id', 'data_type' => 'Integer'],
+      'cid' => ['name' => 'contact_id', 'data_type' => 'Integer'],
+      'sort_name' => ['name' => 'sort_name', 'data_type' => 'String'],
+      'activity_date_relative' => ['name' => 'activity_date_relative', 'data_type' => 'String'],
+      'dateLow' => ['name' => 'activity_date_low', 'data_type' => 'Date'],
+      'dateHigh' => ['name' => 'activity_date_high', 'data_type' => 'Date'],
+      'activity_date_low' => ['name' => 'activity_date_low', 'data_type' => 'Date'],
+      'activity_date_high' => ['name' => 'activity_date_high', 'data_type' => 'Date'],
+      'parent_id' => ['name' => 'parent_id', 'data_type' => 'Positive'],
+      'followup_parent_id' => ['name' => 'parent_id', 'data_type' => 'Positive'],
+      'activity_text' => ['name' => 'activity_text', 'data_type' => 'String'],
+      'activity_option' => ['name' => 'activity_option', 'data_type' => 'Integer'],
+      'activity_test' => ['name' => 'activity_test', 'data_type' => 'Positive'],
+      'activity_tags' => ['name' => 'activity_tags', 'data_type' => 'CommaSeparatedIntegers'],
+      'activity_engagement_level' => ['name' => 'activity_engagement_level', 'data_type' => 'Integer'],
+    ];
   }
 
 }

@@ -325,14 +325,12 @@ class CRM_Activity_BAO_Query {
         }
 
       case 'activity_tags':
-        $value = array_keys($value);
-        $activityTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+        $value = (array) $value;
+        $activityTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
 
-        $names = [];
-        if (is_array($value)) {
-          foreach ($value as $k => $v) {
-            $names[] = $activityTags[$v];
-          }
+        $names = array();
+        foreach ($value as $k => $v) {
+          $names[] = $activityTags[$v];
         }
         $query->_where[$grouping][] = "civicrm_activity_tag.tag_id IN (" . implode(",", $value) . ")";
         $query->_qill[$grouping][] = ts('Activity Tag %1', [1 => $op]) . ' ' . implode(' ' . ts('OR') . ' ', $names);
