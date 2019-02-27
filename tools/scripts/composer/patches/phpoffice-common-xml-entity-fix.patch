@@ -1,0 +1,15 @@
+--- src/Common/XMLReader.php	2019-02-24 13:35:42.895637978 +1100
++++ src/Common/XMLReader.php	2019-02-24 11:41:29.462449569 +1100
+@@ -71,10 +71,11 @@
+      */
+     public function getDomFromString($content)
+     {
++        $original = libxml_disable_entity_loader();
+         libxml_disable_entity_loader(true);
+         $this->dom = new \DOMDocument();
+         $this->dom->loadXML($content);
+-
++        libxml_disable_entity_loader($original);
+         return $this->dom;
+     }
+ 

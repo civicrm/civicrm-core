@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d87e8c07e37c51a65ff849235d04e3dc",
+    "content-hash": "55c8f835d55c424d93e0e9dad1efc729",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -81,6 +81,50 @@
             "time": "2018-01-23T06:26:55+00:00"
         },
         {
+            "name": "cweagans/composer-patches",
+            "version": "1.6.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cweagans/composer-patches.git",
+                "reference": "2ec4f00ff5fb64de584c8c4aea53bf9053ecb0b3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cweagans/composer-patches/zipball/2ec4f00ff5fb64de584c8c4aea53bf9053ecb0b3",
+                "reference": "2ec4f00ff5fb64de584c8c4aea53bf9053ecb0b3",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.0",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "composer/composer": "~1.0",
+                "phpunit/phpunit": "~4.6"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "cweagans\\Composer\\Patches"
+            },
+            "autoload": {
+                "psr-4": {
+                    "cweagans\\Composer\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Cameron Eagans",
+                    "email": "me@cweagans.net"
+                }
+            ],
+            "description": "Provides a way to patch Composer packages.",
+            "time": "2018-05-11T18:00:16+00:00"
+        },
+        {
             "name": "dompdf/dompdf",
             "version": "v0.8.0",
             "source": {
@@ -110,9 +154,6 @@
             "extra": {
                 "branch-alias": {
                     "dev-develop": "0.7-dev"
-                },
-                "patches_applied": {
-                    "Fix Fatal error: Uncaught Dompdf Exception: No block-level parent found.": "tools/scripts/composer/patches/dompdf_no_block_level_parent_fix.patch"
                 }
             },
             "autoload": {
@@ -634,14 +675,6 @@
                 "pear/auth_sasl": "Install optionally via your project's composer.json"
             },
             "type": "library",
-            "extra": {
-                "patches_applied": {
-                    "CRM-8744 Display CiviCRM Specific error message": "tools/scripts/composer/patches/net-smtp-patch.patch",
-                    "Fix PHP7 Compliance": "tools/scripts/composer/patches/net-smtp-php7-patch.patch",
-                    "Fix Pass by reference issues": "tools/scripts/composer/patches/net-smtp-ref-patch.patch",
-                    "Fix TLS support issue in PHP5.6": "tools/scripts/composer/patches/net-smtp-tls-patch.patch"
-                }
-            },
             "autoload": {
                 "psr-0": {
                     "Net": "./"
@@ -948,16 +981,16 @@
         },
         {
             "name": "phpoffice/common",
-            "version": "v0.2.6",
+            "version": "0.2.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPOffice/Common.git",
-                "reference": "c9be70c80637c28c728be78e66aad4878a34f8dd"
+                "reference": "edb5d32b1e3400a35a5c91e2539ed6f6ce925e4d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPOffice/Common/zipball/c9be70c80637c28c728be78e66aad4878a34f8dd",
-                "reference": "c9be70c80637c28c728be78e66aad4878a34f8dd",
+                "url": "https://api.github.com/repos/PHPOffice/Common/zipball/edb5d32b1e3400a35a5c91e2539ed6f6ce925e4d",
+                "reference": "edb5d32b1e3400a35a5c91e2539ed6f6ce925e4d",
                 "shasum": ""
             },
             "require": {
@@ -968,11 +1001,16 @@
                 "phpdocumentor/phpdocumentor": "2.*",
                 "phploc/phploc": "2.*",
                 "phpmd/phpmd": "2.*",
-                "phpunit/phpunit": "3.7.*",
+                "phpunit/phpunit": "^4.8.36 || ^7.0",
                 "sebastian/phpcpd": "2.*",
                 "squizlabs/php_codesniffer": "2.*"
             },
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "Fix handling of libxml_disable_entity_loader": "tools/scripts/composer/patches/phpoffice-common-xml-entity-fix.patch"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "PhpOffice\\Common\\": "src/Common/"
@@ -999,38 +1037,39 @@
                 "office",
                 "php"
             ],
-            "time": "2016-07-07T17:26:55+00:00"
+            "time": "2018-07-13T14:12:34+00:00"
         },
         {
             "name": "phpoffice/phpword",
-            "version": "v0.14.0",
+            "version": "0.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPOffice/PHPWord.git",
-                "reference": "b614497ae6dd44280be1c2dda56772198bcd25ae"
+                "reference": "dfa2f36cad2b632b7ab1c56473e4f5db9a7caf7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPOffice/PHPWord/zipball/b614497ae6dd44280be1c2dda56772198bcd25ae",
-                "reference": "b614497ae6dd44280be1c2dda56772198bcd25ae",
+                "url": "https://api.github.com/repos/PHPOffice/PHPWord/zipball/dfa2f36cad2b632b7ab1c56473e4f5db9a7caf7f",
+                "reference": "dfa2f36cad2b632b7ab1c56473e4f5db9a7caf7f",
                 "shasum": ""
             },
             "require": {
                 "ext-xml": "*",
                 "php": "^5.3.3 || ^7.0",
-                "phpoffice/common": "^0.2",
-                "zendframework/zend-escaper": "^2.2",
-                "zendframework/zend-stdlib": "^2.2 || ^3.0"
+                "phpoffice/common": "^0.2.9",
+                "zendframework/zend-escaper": "^2.2"
             },
             "require-dev": {
                 "dompdf/dompdf": "0.8.*",
-                "friendsofphp/php-cs-fixer": "^2.0",
-                "mpdf/mpdf": "5.* || 6.* || 7.*",
-                "phpdocumentor/phpdocumentor": "2.*",
+                "ext-gd": "*",
+                "ext-zip": "*",
+                "friendsofphp/php-cs-fixer": "^2.2",
+                "mpdf/mpdf": "5.7.4 || 6.* || 7.*",
+                "php-coveralls/php-coveralls": "1.1.0 || ^2.0",
                 "phploc/phploc": "2.* || 3.* || 4.*",
                 "phpmd/phpmd": "2.*",
-                "phpunit/phpunit": "^4.8.36 || ^5.0",
-                "squizlabs/php_codesniffer": "^2.7",
+                "phpunit/phpunit": "^4.8.36 || ^7.0",
+                "squizlabs/php_codesniffer": "^2.9",
                 "tecnickcom/tcpdf": "6.*"
             },
             "suggest": {
@@ -1041,6 +1080,14 @@
                 "ext-zip": "Allows writing OOXML and ODF"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-develop": "0.16-dev"
+                },
+                "patches_applied": {
+                    "Fix handling of libxml_disable_entity_loader": "tools/scripts/composer/patches/phpword-libxml-fix-global-handling.patch"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "PhpOffice\\PhpWord\\": "src/PhpWord"
@@ -1102,7 +1149,7 @@
                 "word",
                 "writer"
             ],
-            "time": "2017-12-29T01:30:53+00:00"
+            "time": "2018-07-14T16:59:43+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
