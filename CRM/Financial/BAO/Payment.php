@@ -300,14 +300,8 @@ class CRM_Financial_BAO_Payment {
    * @return CRM_Financial_DAO_FinancialTrxn
    */
   public static function recordRefundPayment($contributionId, $trxnData, $updateStatus) {
-    $getInfoOf['id'] = $contributionId;
-    $defaults = array();
-    $contributionDAO = CRM_Contribute_BAO_Contribution::retrieve($getInfoOf, $defaults, CRM_Core_DAO::$_nullArray);
+    list($contributionDAO, $params) = self::getContributionAndParamsInFormatForRecordFinancialTransaction($contributionId);
 
-    // build params for recording financial trxn entry
-    $params['contribution'] = $contributionDAO;
-    $params = array_merge($defaults, $params);
-    $params['skipLineItem'] = TRUE;
     $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $trxnData, CRM_Utils_Array::value('payment_instrument_id', $params));
 
     $paidStatus = CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialItem', 'status_id', 'Paid');
@@ -350,6 +344,143 @@ class CRM_Financial_BAO_Payment {
       }
     }
     return $financialTrxn;
+  }
+
+  /**
+   * @param int $contributionId
+   * @param array $trxnData
+   * @param int $participantId
+   *
+   * @return \CRM_Core_BAO_FinancialTrxn
+   */
+  public static function recordPayment($contributionId, $trxnData, $participantId) {
+    list($contributionDAO, $params) = self::getContributionAndParamsInFormatForRecordFinancialTransaction($contributionId);
+    // load related memberships on basis of $contributionDAO object
+    // @todo - this is done in the function that completes payments so it's being done twice.
+    // test & remove.
+    $contributionDAO->loadRelatedMembershipObjects();
+
+    if (!$participantId) {
+      $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $contributionId, 'participant_id', 'contribution_id');
+    }
+
+    $trxnData['trxn_date'] = !empty($trxnData['trxn_date']) ? $trxnData['trxn_date'] : date('YmdHis');
+    $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $trxnData, CRM_Utils_Array::value('payment_instrument_id', $params));
+
+    $paidStatus = CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialItem', 'status_id', 'Paid');
+    $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionDAO->financial_type_id, 'Accounts Receivable Account is');
+    $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+
+    $params['partial_payment_total'] = $contributionDAO->total_amount;
+    $params['partial_amount_to_pay'] = $trxnData['total_amount'];
+    $trxnData['net_amount'] = !empty($trxnData['net_amount']) ? $trxnData['net_amount'] : $trxnData['total_amount'];
+    $params['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $trxnData);
+    $params['card_type_id'] = CRM_Utils_Array::value('card_type_id', $trxnData);
+    $params['check_number'] = CRM_Utils_Array::value('check_number', $trxnData);
+
+    // record the entry
+    $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnData);
+    $toFinancialAccount = $arAccountId;
+    $trxnId = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId, $contributionDAO->financial_type_id);
+    if (!empty($trxnId)) {
+      $trxnId = $trxnId['trxn_id'];
+    }
+    elseif (!empty($contributionDAO->payment_instrument_id)) {
+      $trxnId = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($contributionDAO->payment_instrument_id);
+    }
+    else {
+      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
+      $queryParams = [1 => [$relationTypeId, 'Integer']];
+      $trxnId = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = %1", $queryParams);
+    }
+
+    // update statuses
+    // criteria for updates contribution total_amount == financial_trxns of partial_payments
+    $sql = "SELECT SUM(ft.total_amount) as sum_of_payments, SUM(ft.net_amount) as net_amount_total
+FROM civicrm_financial_trxn ft
+LEFT JOIN civicrm_entity_financial_trxn eft
+  ON (ft.id = eft.financial_trxn_id)
+WHERE eft.entity_table = 'civicrm_contribution'
+  AND eft.entity_id = {$contributionId}
+  AND ft.to_financial_account_id != {$toFinancialAccount}
+  AND ft.status_id = {$completedStatusId}
+";
+    $query = CRM_Core_DAO::executeQuery($sql);
+    $query->fetch();
+    $sumOfPayments = $query->sum_of_payments;
+
+    // update statuses
+    if ($contributionDAO->total_amount == $sumOfPayments) {
+      // update contribution status and
+      // clean cancel info (if any) if prev. contribution was updated in case of 'Refunded' => 'Completed'
+      $contributionDAO->contribution_status_id = $completedStatusId;
+      $contributionDAO->cancel_date = 'null';
+      $contributionDAO->cancel_reason = NULL;
+      $netAmount = !empty($trxnData['net_amount']) ? NULL : $trxnData['total_amount'];
+      $contributionDAO->net_amount = $query->net_amount_total + $netAmount;
+      $contributionDAO->fee_amount = $contributionDAO->total_amount - $contributionDAO->net_amount;
+      $contributionDAO->save();
+
+      //Change status of financial record too
+      $financialTrxn->status_id = $completedStatusId;
+      $financialTrxn->save();
+
+      // note : not using the self::add method,
+      // the reason because it performs 'status change' related code execution for financial records
+      // which in 'Partial Paid' => 'Completed' is not useful, instead specific financial record updates
+      // are coded below i.e. just updating financial_item status to 'Paid'
+
+      if ($participantId) {
+        // update participant status
+        $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
+        $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
+        foreach ($ids as $val) {
+          $participantUpdate['id'] = $val;
+          $participantUpdate['status_id'] = array_search('Registered', $participantStatuses);
+          CRM_Event_BAO_Participant::add($participantUpdate);
+        }
+      }
+
+      // Remove this - completeOrder does it.
+      CRM_Contribute_BAO_Contribution::updateMembershipBasedOnCompletionOfContribution(
+        $contributionDAO,
+        $contributionId,
+        $trxnData['trxn_date']
+      );
+
+      // update financial item statuses
+      $baseTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId);
+      $sqlFinancialItemUpdate = "
+UPDATE civicrm_financial_item fi
+  LEFT JOIN civicrm_entity_financial_trxn eft
+    ON (eft.entity_id = fi.id AND eft.entity_table = 'civicrm_financial_item')
+SET status_id = {$paidStatus}
+WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
+";
+      CRM_Core_DAO::executeQuery($sqlFinancialItemUpdate);
+    }
+    return $financialTrxn;
+  }
+
+  /**
+   * The recordFinancialTransactions function has capricious requirements for input parameters - load them.
+   *
+   * The function needs rework but for now we need to give it what it wants.
+   *
+   * @param int $contributionId
+   *
+   * @return array
+   */
+  protected static function getContributionAndParamsInFormatForRecordFinancialTransaction($contributionId) {
+    $getInfoOf['id'] = $contributionId;
+    $defaults = [];
+    $contributionDAO = CRM_Contribute_BAO_Contribution::retrieve($getInfoOf, $defaults, CRM_Core_DAO::$_nullArray);
+
+    // build params for recording financial trxn entry
+    $params['contribution'] = $contributionDAO;
+    $params = array_merge($defaults, $params);
+    $params['skipLineItem'] = TRUE;
+    return [$contributionDAO, $params];
   }
 
 }
