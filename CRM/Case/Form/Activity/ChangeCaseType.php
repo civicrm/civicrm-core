@@ -61,8 +61,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
 
     $defaults['is_reset_timeline'] = 1;
 
-    $defaults['reset_date_time'] = array();
-    list($defaults['reset_date_time'], $defaults['reset_date_time_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+    $defaults['reset_date_time'] = date('Y-m-d H:i:s');
     $defaults['case_type_id'] = $form->_caseTypeId;
 
     return $defaults;
@@ -88,8 +87,8 @@ class CRM_Case_Form_Activity_ChangeCaseType {
     $form->addField('case_type_id', array('context' => 'create', 'entity' => 'Case'));
 
     // timeline
-    $form->addYesNo('is_reset_timeline', ts('Reset Case Timeline?'), NULL, TRUE, array('onclick' => "return showHideByValue('is_reset_timeline','','resetTimeline','table-row','radio',false);"));
-    $form->addDateTime('reset_date_time', ts('Reset Start Date'), FALSE, array('formatType' => 'activityDateTime'));
+    $form->addYesNo('is_reset_timeline', ts('Reset Case Timeline?'), NULL, TRUE);
+    $form->add('datepicker', 'reset_date_time', ts('Reset Start Date'), NULL, FALSE, ['allowClear' => FALSE]);
   }
 
   /**
@@ -122,10 +121,6 @@ class CRM_Case_Form_Activity_ChangeCaseType {
 
     if (CRM_Utils_Array::value('is_reset_timeline', $params) == 0) {
       unset($params['reset_date_time']);
-    }
-    else {
-      // store the date with proper format
-      $params['reset_date_time'] = CRM_Utils_Date::processDate($params['reset_date_time'], $params['reset_date_time_time']);
     }
   }
 

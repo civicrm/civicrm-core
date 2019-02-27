@@ -33,17 +33,18 @@
   <td class="label">{$form.is_reset_timeline.label}</td>
   <td>{$form.is_reset_timeline.html}</td>
     </tr>
-    <tr class="crm-case-changecasetype-form-block-reset_date_time" id="resetTimeline">
-        <td class="label">{$form.reset_date_time.label}</td>
-        <td>{include file="CRM/common/jcalendar.tpl" elementName=reset_date_time}</td>
+    <tr class="crm-case-changecasetype-form-block-reset_date_time">
+        <td class="label">{$form.reset_date_time.label} <span class="crm-marker">*</span></td>
+        <td>{$form.reset_date_time.html}</td>
     </tr>
-
-{include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    ="is_reset_timeline"
-trigger_value       = true
-target_element_id   ="resetTimeline"
-target_element_type ="table-row"
-field_type          ="radio"
-invert              = 0
-}
   </div>
+{literal}
+  <script type="text/javascript">
+    CRM.$(function($) {
+      var $form = $('form.{/literal}{$form.formClass}{literal}');
+      $('input[name=is_reset_timeline]', $form).click(function() {
+        $('.crm-case-changecasetype-form-block-reset_date_time').toggle($(this).val() === '1');
+      })
+    })
+  </script>
+{/literal}
