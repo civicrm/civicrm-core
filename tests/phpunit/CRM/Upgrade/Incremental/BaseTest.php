@@ -90,8 +90,15 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
          ['grant_due_date_low', '=', '01/22/2019'],
        ]
     ]);
-    $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups('5.11.alpha1');
-    $smartGroupConversionObject->updateGroups();
+    $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups();
+    $smartGroupConversionObject->updateGroups([
+      'datepickerConversion' => [
+        'grant_application_received_date',
+        'grant_decision_date',
+        'grant_money_transfer_date',
+        'grant_due_date'
+      ]
+    ]);
     $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', []);
     $this->assertEquals('grant_application_received_date_high', $savedSearch['form_values'][0][0]);
     $this->assertEquals('2019-01-20 00:00:00', $savedSearch['form_values'][0][2]);
