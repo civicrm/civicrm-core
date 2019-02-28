@@ -1192,7 +1192,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @return CRM_Contact_DAO_Contact
    */
   public function alphabetQuery() {
-    return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
+    return $this->_query->alphabetQuery();
   }
 
   /**

@@ -1384,7 +1384,7 @@ class CRM_Contact_BAO_Query {
       }
     }
     elseif ($sortByChar) {
-      $select = 'SELECT DISTINCT UPPER(LEFT(contact_a.sort_name, 1)) as sort_name';
+      $select = 'SELECT DISTINCT LEFT(contact_a.sort_name, 1) as sort_name';
       $from = $this->_simpleFromClause;
     }
     elseif ($groupContacts) {
@@ -4897,6 +4897,22 @@ civicrm_relationship.start_date > {$today}
   }
 
   /**
+   * Create and query the db for a contact search.
+   *
+   * @return CRM_Core_DAO
+   */
+  public function alphabetQuery() {
+    $query = $this->getSearchSQL(NULL, NULL, NULL, FALSE, FALSE, TRUE);
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+
+    // We can always call this - it will only re-enable if it was originally enabled.
+    CRM_Core_DAO::reenableFullGroupByMode();
+
+    return $dao;
+  }
+
+  /**
    * Fetch a list of contacts for displaying a search results page
    *
    * @param array $cids
@@ -6249,25 +6265,19 @@ AND   displayRelType.is_active = 1
         }
       }
       elseif ($sortByChar) {
-        $orderByArray = array("UPPER(LEFT(contact_a.sort_name, 1)) asc");
+        $orderBy = " sort_name asc";
       }
       else {
         $orderBy = " contact_a.sort_name ASC, contact_a.id";
       }
     }
-    if (!$orderBy && empty($orderByArray)) {
+    if (!$orderBy) {
       return [NULL, $additionalFromClause];
     }
     // Remove this here & add it at the end for simplicity.
     $order = trim($orderBy);
+    $orderByArray = explode(',', $order);
 
-    // hack for order clause
-    if (!empty($orderByArray)) {
-      $order = implode(', ', $orderByArray);
-    }
-    else {
-      $orderByArray = explode(',', $order);
-    }
     foreach ($orderByArray as $orderByClause) {
       $orderByClauseParts = explode(' ', trim($orderByClause));
       $field = $orderByClauseParts[0];
