@@ -56,11 +56,7 @@ class CRM_Upgrade_Incremental_SmartGroups {
     }
 
     foreach ($fields as $field) {
-      $savedSearches = civicrm_api3('SavedSearch', 'get', [
-        'options' => ['limit' => 0],
-        'form_values' => ['LIKE' => "%{$field}%"],
-      ])['values'];
-      foreach ($savedSearches as $savedSearch) {
+      foreach ($this->getSearchesWithField($field) as $savedSearch) {
         $formValues = $savedSearch['form_values'];
         foreach ($formValues as $index => $formValue) {
           if (in_array($formValue[0], $fieldPossibilities)) {
@@ -70,6 +66,30 @@ class CRM_Upgrade_Incremental_SmartGroups {
         if ($formValues !== $savedSearch['form_values']) {
           civicrm_api3('SavedSearch', 'create', ['id' => $savedSearch['id'], 'form_values' => $formValues]);
         }
+      }
+    }
+  }
+
+  /**
+   * Conversion routine for a form change change from = string to IN array.
+   *
+   * For example a checkbox expected [$fieldName, '=', 1]
+   * whereas select expects [$fieldName, 'IN', [1]]
+   *
+   * @param string $field
+   */
+  public function convertEqualsStringToInArray($field) {
+    foreach ($this->getSearchesWithField($field) as $savedSearch) {
+      $formValues = $savedSearch['form_values'];
+      foreach ($formValues as $index => $formValue) {
+        if ($formValue[0] === $field && !is_array($formValue[2]) && $formValue[1] === '=') {
+          $formValues[$index][1] = 'IN';
+          $formValues[$index][2] = [$formValue[2]];
+        }
+      }
+
+      if ($formValues !== $savedSearch['form_values']) {
+        civicrm_api3('SavedSearch', 'create', ['id' => $savedSearch['id'], 'form_values' => $formValues]);
       }
     }
   }
@@ -89,6 +109,18 @@ class CRM_Upgrade_Incremental_SmartGroups {
       $dateValue = date('Y-m-d H:i:s', strtotime(CRM_Utils_Date::processDate($dateValue)));
     }
     return $dateValue;
+  }
+
+  /**
+   * @param $field
+   * @return mixed
+   */
+  protected function getSearchesWithField($field) {
+    $savedSearches = civicrm_api3('SavedSearch', 'get', [
+      'options' => ['limit' => 0],
+      'form_values' => ['LIKE' => "%{$field}%"],
+    ])['values'];
+    return $savedSearches;
   }
 
 }
