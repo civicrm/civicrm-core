@@ -178,6 +178,12 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'title' => ts('Soft Credit For'),
             'dbAlias' => "NULL",
           ),
+          'cancel_date' => array(
+            'title' => ts('Cancelled / Refunded Date'),
+          ),
+          'cancel_reason' => array(
+            'title' => ts('Cancellation / Refund Reason'),
+          ),
         ),
         'filters' => array(
           'contribution_or_soft' => array(
@@ -233,6 +239,13 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
           ),
           'total_amount' => array('title' => ts('Contribution Amount')),
+          'cancel_date' => array(
+            'title' => ts('Cancelled / Refunded Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+          'cancel_reason' => array(
+            'title' => ts('Cancellation / Refund Reason'),
+          ),
         ),
         'order_bys' => array(
           'financial_type_id' => array('title' => ts('Financial Type')),
