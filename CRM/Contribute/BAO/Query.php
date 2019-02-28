@@ -173,8 +173,12 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       'contribution_payment_instrument' => 'contribution_payment_instrument_id',
       'contribution_status' => 'contribution_status_id',
     );
+
     $name = isset($fieldAliases[$name]) ? $fieldAliases[$name] : $name;
     $qillName = $name;
+    if (in_array($name, $fieldAliases)) {
+      $qillName = array_search($name, $fieldAliases);
+    }
     $pseudoExtraParam = array();
 
     switch ($name) {
