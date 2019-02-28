@@ -753,9 +753,6 @@ WHERE  id = %1";
             break;
           }
           $terms = self::getMembershipTerms($params);
-          if ($amount_override == $params['total_amount']) {
-            $amount_override = NULL;
-          }
           $params["price_{$id}"] = array($params["price_{$id}"] => $terms);
           $optionValueId = CRM_Utils_Array::key($terms, $params["price_{$id}"]);
 
@@ -780,7 +777,7 @@ WHERE  id = %1";
 
         case 'Select':
           $terms = self::getMembershipTerms($params);
-          if ($amount_override == $params['total_amount']) {
+          if (isset($params['total_amount']) && ($amount_override == $params['total_amount'])) {
             $amount_override = NULL;
           }
           $params["price_{$id}"] = array($params["price_{$id}"] => $terms);
@@ -1623,12 +1620,7 @@ WHERE       ps.id = %1
    */
   public static function setLineItem($field, $lineItem, $optionValueId, &$totalTax) {
     // Here we round - i.e. after multiplying by quantity
-    if ($field['html_type'] == 'Text') {
-      $taxAmount = round($field['options'][$optionValueId]['tax_amount'] * $lineItem[$optionValueId]['qty'], 2);
-    }
-    else {
-      $taxAmount = round($field['options'][$optionValueId]['tax_amount'], 2);
-    }
+    $taxAmount = round($field['options'][$optionValueId]['tax_amount'] * $lineItem[$optionValueId]['qty'], 2);
     $taxRate = $field['options'][$optionValueId]['tax_rate'];
     $lineItem[$optionValueId]['tax_amount'] = $taxAmount;
     $lineItem[$optionValueId]['tax_rate'] = $taxRate;

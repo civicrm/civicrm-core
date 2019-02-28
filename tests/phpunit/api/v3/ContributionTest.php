@@ -3236,7 +3236,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->setUpPendingContribution($this->_ids['price_field_value'][1]);
     $this->callAPISuccess('contribution', 'completetransaction', array('id' => $this->_ids['contribution']));
     $membership = $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
-    $this->assertEquals(date('Y-m-d', strtotime('yesterday + 2 years')), $membership['end_date']);
+
+    $membershipEndDate = new DateTime(date("Y-m-d", strtotime($membership['start_date'])));
+    $membershipEndDate->modify("+2 years")->format("-1 day");
+
+    $this->assertEquals($membershipEndDate->format("Y-m-d"), $membership['end_date']);
     $this->cleanUpAfterPriceSets();
   }
 

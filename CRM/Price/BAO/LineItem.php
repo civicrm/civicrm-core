@@ -360,6 +360,7 @@ WHERE li.contribution_id = %1";
 
     foreach ($params["price_{$fid}"] as $oid => $qty) {
       $price = $amount_override === NULL ? $options[$oid]['amount'] : $amount_override;
+      $lineTotal = $amount_override === NULL ? ($price * $qty) : $price;
 
       $participantsPerField = CRM_Utils_Array::value('count', $options[$oid], 0);
 
@@ -371,7 +372,7 @@ WHERE li.contribution_id = %1";
         'description' => CRM_Utils_Array::value('description', $options[$oid]),
         'qty' => $qty,
         'unit_price' => $price,
-        'line_total' => $qty * $price,
+        'line_total' => $lineTotal,
         'participant_count' => $qty * $participantsPerField,
         'max_value' => CRM_Utils_Array::value('max_value', $options[$oid]),
         'membership_type_id' => CRM_Utils_Array::value('membership_type_id', $options[$oid]),
@@ -379,7 +380,7 @@ WHERE li.contribution_id = %1";
         'auto_renew' => CRM_Utils_Array::value('auto_renew', $options[$oid]),
         'html_type' => $fields['html_type'],
         'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $options[$oid]),
-        'tax_amount' => (CRM_Utils_Array::value('tax_amount', $options[$oid]) * $qty),
+        'tax_amount' => (CRM_Utils_Array::value('tax_amount', $options[$oid])),
         'non_deductible_amount' => CRM_Utils_Array::value('non_deductible_amount', $options[$oid]),
       );
 
