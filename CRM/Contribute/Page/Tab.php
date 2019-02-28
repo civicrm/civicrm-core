@@ -153,10 +153,11 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     if (!empty($softCreditList)) {
       $softCreditTotals = array();
 
-      list($softCreditTotals['amount'],
+      list($softCreditTotals['count'],
+        $softCreditTotals['cancel']['count'],
+        $softCreditTotals['amount'],
         $softCreditTotals['avg'],
-        $softCreditTotals['currency'],
-        $softCreditTotals['cancelAmount'] // to get cancel amount
+        $softCreditTotals['cancel']['amount'] // to get cancel amount
         ) = CRM_Contribute_BAO_ContributionSoft::getSoftContributionTotals($this->_contactId, $isTest);
 
       $this->assign('softCredit', TRUE);
