@@ -2365,20 +2365,47 @@ SELECT contact_id
    * This is relevant where we want to offer both the ID field and the label field
    * as an option, e.g. search builder.
    *
-   * It is currently limited for optionGroupName for purposes keeping the scope of the
+   * It is currently limited for optionGroupName & id+ name+ FK combos for purposes keeping the scope of the
    * change small, but is appropriate for other sorts of pseudoconstants.
    *
    * @param array $fields
    */
   public static function appendPseudoConstantsToFields(&$fields) {
     foreach ($fields as $field) {
-      if (!empty($field['pseudoconstant']) && !empty($field['pseudoconstant']['optionGroupName'])) {
-        $fields[$field['pseudoconstant']['optionGroupName']] = array(
-          'title' => CRM_Core_BAO_OptionGroup::getTitleByName($field['pseudoconstant']['optionGroupName']),
-          'name' => $field['pseudoconstant']['optionGroupName'],
-          'data_type' => CRM_Utils_Type::T_STRING,
-          'is_pseudofield_for' => $field['name'],
-        );
+      if (!empty($field['pseudoconstant'])) {
+        $pseudoConstant = $field['pseudoconstant'];
+        if (!empty($pseudoConstant['optionGroupName'])) {
+          $fields[$pseudoConstant['optionGroupName']] = [
+            'title' => CRM_Core_BAO_OptionGroup::getTitleByName($pseudoConstant['optionGroupName']),
+            'name' => $pseudoConstant['optionGroupName'],
+            'data_type' => CRM_Utils_Type::T_STRING,
+            'is_pseudofield_for' => $field['name'],
+          ];
+        }
+        // We restrict to id + name + FK as we are extending this a bit, but cautiously.
+        elseif (
+          !empty($field['FKClassName'])
+          && CRM_Utils_Array::value('keyColumn', $pseudoConstant) === 'id'
+          && CRM_Utils_Array::value('labelColumn', $pseudoConstant) === 'name'
+        ) {
+          $pseudoFieldName = str_replace('_' . $pseudoConstant['keyColumn'], '', $field['name']);
+          // This if is just an extra caution when adding change.
+          if (!isset($fields[$pseudoFieldName])) {
+            $daoName = $field['FKClassName'];
+            $fkFields = $daoName::fields();
+            foreach ($fkFields as $fkField) {
+              if ($fkField['name'] === $pseudoConstant['labelColumn']) {
+                $fields[$pseudoFieldName] = [
+                  'name' => $pseudoFieldName,
+                  'is_pseudofield_for' => $field['name'],
+                  'title' => $fkField['title'],
+                  'data_type' => $fkField['type'],
+                  'where' => $field['where'],
+                ];
+              }
+            }
+          }
+        }
       }
     }
   }
