@@ -75,6 +75,29 @@ class CRM_Upgrade_Incremental_php_FiveEleven extends CRM_Upgrade_Incremental_Bas
   public function upgrade_5_11_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', $rev);
+    if (Civi::settings()->get('civimail_multiple_bulk_emails')) {
+      $this->addTask('Update any on hold groups to reflect field change', 'updateOnHold', $rev);
+    }
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_11_beta1($rev) {
+    if (Civi::settings()->get('civimail_multiple_bulk_emails')) {
+      $this->addTask('Update any on hold groups to reflect field change', 'updateOnHold', $rev);
+    }
+  }
+
+  /**
+   * Update on hold groups -note the core function layout for this sort of upgrade changed in 5.12 - don't copy this.
+   */
+  public function updateOnHold($ctx, $version) {
+    $groupUpdateObject = new CRM_Upgrade_Incremental_SmartGroups($version);
+    $groupUpdateObject->convertEqualsStringToInArray('on_hold');
+    return TRUE;
   }
 
 }
