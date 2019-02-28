@@ -6414,7 +6414,7 @@ AND   displayRelType.is_active = 1
       return TRUE;
     }
     // Is this still required - the above goes off the unique name. Test with things like
-    // communication_prefferences & prefix_id.
+    // communication_preferences & prefix_id.
     if (CRM_Utils_Array::value($field['name'], $this->_returnProperties)) {
       return TRUE;
     }
