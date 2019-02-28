@@ -3027,10 +3027,13 @@ class CRM_Contact_BAO_Query {
       if (count($regularGroupIDs) > 1) {
         $op = strpos($op, 'IN') ? $op : ($op == '!=') ? 'NOT IN' : 'IN';
       }
-      $groupIds = CRM_Utils_Type::validate(
-        implode(',', (array) $regularGroupIDs),
-        'CommaSeparatedIntegers'
-      );
+      $groupIds = '';
+      if (!empty($regularGroupIDs)) {
+        $groupIds = CRM_Utils_Type::validate(
+          implode(',', (array) $regularGroupIDs),
+          'CommaSeparatedIntegers'
+        );
+      }
       $gcTable = "`civicrm_group_contact-" . uniqid() . "`";
       $joinClause = array("contact_a.id = {$gcTable}.contact_id");
 
@@ -6546,7 +6549,7 @@ AND   displayRelType.is_active = 1
         FROM (
       SELECT civicrm_contribution.total_amount, civicrm_contribution.currency
       $from
-      $where  AND civicrm_contribution.cancel_date IS NOT NULL 
+      $where  AND civicrm_contribution.cancel_date IS NOT NULL
       GROUP BY civicrm_contribution.id
     ) as conts
     GROUP BY currency";
