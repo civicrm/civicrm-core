@@ -544,7 +544,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
    */
   public function postProcess() {
     $eventTitle = '';
-    $params = $this->exportValues();
+    $params = $this->cleanMoneyFields($this->exportValues());
 
     $this->set('discountSection', 0);
 
@@ -600,7 +600,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
             if (!empty($labels[$i]) && !CRM_Utils_System::isNull($values[$i])) {
               $options[] = array(
                 'label' => trim($labels[$i]),
-                'value' => CRM_Utils_Rule::cleanMoney(trim($values[$i])),
+                'value' => $values[$i],
                 'weight' => $i,
                 'is_active' => 1,
                 'is_default' => $default == $i,
@@ -681,7 +681,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                 ) {
                   $discountOptions[] = array(
                     'label' => trim($labels[$i]),
-                    'value' => CRM_Utils_Rule::cleanMoney(trim($values[$i][$j])),
+                    'value' => $values[$i][$j],
                     'weight' => $i,
                     'is_active' => 1,
                     'is_default' => $default == $i,
@@ -806,6 +806,38 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
    */
   public function getTitle() {
     return ts('Event Fees');
+  }
+
+  /**
+   * Clean money fields in submitted params to remove formatting.
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  protected function cleanMoneyFields($params) {
+    foreach ($params['value'] as $index => $value) {
+      if (CRM_Utils_System::isNull($value)) {
+        unset($params['value'][$index]);
+      }
+      else {
+        $params['value'][$index] = CRM_Utils_Rule::cleanMoney(trim($value));
+      }
+    }
+    foreach ($params['discounted_value'] as $index => $discountedValueSet) {
+      foreach ($discountedValueSet as $innerIndex => $value) {
+        if (CRM_Utils_System::isNull($value)) {
+          unset($params['discounted_value'][$index][$innerIndex]);
+        }
+        else {
+          $params['discounted_value'][$index][$innerIndex] = CRM_Utils_Rule::cleanMoney(trim($value));
+        }
+      }
+      if (empty($params['discounted_value'][$index])) {
+        unset($params['discounted_value'][$index]);
+      }
+    }
+    return $params;
   }
 
 }

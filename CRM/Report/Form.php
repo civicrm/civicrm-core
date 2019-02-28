@@ -4493,8 +4493,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
             $rows[$rowNum]["{$fieldName}_link"] = $url;
             $rows[$rowNum]["{$fieldName}_hover"] = ts("%1 for this %2.", array(1 => $linkText, 2 => $addressField));
           }
-          $entryFound = TRUE;
         }
+        $entryFound = TRUE;
       }
     }
 
