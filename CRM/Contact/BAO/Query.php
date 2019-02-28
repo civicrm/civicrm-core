@@ -871,20 +871,8 @@ class CRM_Contact_BAO_Query {
                 }
               }
               else {
-                // If we have an option group defined then rather than joining the option value table in
-                // (which is an unindexed join) we render the option value on output.
-                // @todo - extend this to other pseudoconstants.
                 if ($this->pseudoConstantNameIsInReturnProperties($field, $name)) {
-                  $pseudoFieldName = $field['pseudoconstant']['optionGroupName'];
-                  $this->_pseudoConstantsSelect[$pseudoFieldName] = array(
-                    'pseudoField' => $field['name'],
-                    'idCol' => $name,
-                    'field_name' => $field['name'],
-                    'bao' => $field['bao'],
-                    'pseudoconstant' => $field['pseudoconstant'],
-                  );
-                  $this->_tables[$tableName] = 1;
-                  $this->_element[$pseudoFieldName] = 1;
+                  $this->addPseudoconstantFieldToSelect($field, $name, $tableName);
                 }
                 $this->_select[$name] = str_replace('civicrm_contact.', 'contact_a.', "{$field['where']} as `$name`");
               }
@@ -6736,6 +6724,31 @@ AND   displayRelType.is_active = 1
   protected function getMetadataForRealField($fieldName) {
     $field = $this->getMetadataForField($fieldName);
     return empty($field['is_pseudofield_for']) ? $field : $this->getMetadataForField($field['is_pseudofield_for']);
+  }
+
+  /**
+   * If we have a field that is better rendered via the pseudoconstant handled them here.
+   *
+   * Rather than joining in the additional table we render the option value on output.
+   *
+   * @todo - so far this applies to a narrow range of pseudocontants. We are adding them
+   * carefully with test coverage but aim to extend.
+   *
+   * @param array $field
+   * @param string $name
+   * @param string $tableName
+   */
+  protected function addPseudoconstantFieldToSelect($field, $name, $tableName) {
+    $pseudoFieldName = $field['pseudoconstant']['optionGroupName'];
+    $this->_pseudoConstantsSelect[$pseudoFieldName] = [
+      'pseudoField' => $field['name'],
+      'idCol' => $name,
+      'field_name' => $field['name'],
+      'bao' => $field['bao'],
+      'pseudoconstant' => $field['pseudoconstant'],
+    ];
+    $this->_tables[$tableName] = 1;
+    $this->_element[$pseudoFieldName] = 1;
   }
 
 }
