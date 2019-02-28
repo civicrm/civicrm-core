@@ -1448,6 +1448,24 @@ class CRM_Contact_BAO_Query {
       $from = $this->_fromClause;
     }
 
+    $where = $this->generateWhereClause();
+    $having = $this->generateHavingClause();
+
+    // if we are doing a transform, do it here
+    // use the $from, $where and $having to get the contact ID
+    if ($this->_displayRelationshipType) {
+      $this->filterRelatedContacts($from, $where, $having);
+    }
+
+    return array($select, $from, $where, $having);
+  }
+
+  /**
+   * Generate the WHERE query clause
+   *
+   * @return string where clause
+   */
+  protected function generateWhereClause() {
     $where = '';
     if (!empty($this->_whereClause)) {
       $where = "WHERE {$this->_whereClause}";
@@ -1461,7 +1479,15 @@ class CRM_Contact_BAO_Query {
         $where = "$where AND $this->_permissionWhereClause";
       }
     }
+    return $where;
+  }
 
+  /**
+   * Generate the HAVING query clause
+   *
+   * @return string having clause
+   */
+  protected function generateHavingClause() {
     $having = '';
     if (!empty($this->_having)) {
       foreach ($this->_having as $havingSets) {
@@ -1471,14 +1497,7 @@ class CRM_Contact_BAO_Query {
       }
       $having = ' HAVING ' . implode(' AND ', $havingValue);
     }
-
-    // if we are doing a transform, do it here
-    // use the $from, $where and $having to get the contact ID
-    if ($this->_displayRelationshipType) {
-      $this->filterRelatedContacts($from, $where, $having);
-    }
-
-    return array($select, $from, $where, $having);
+    return $having;
   }
 
   /**
@@ -3040,7 +3059,6 @@ class CRM_Contact_BAO_Query {
     }
 
     //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
-    $groupContactCacheClause = '';
     if (count($smartGroupIDs) || empty($value)) {
       $this->_groupUniqueKey = uniqid();
       $this->_groupKeys[] = $this->_groupUniqueKey;
@@ -6621,22 +6639,7 @@ AND   displayRelType.is_active = 1
     }
 
     // building the query string
-    $groupBy = $groupByCols = NULL;
-    if (!$count) {
-      if (isset($this->_groupByComponentClause)) {
-        $groupByCols = preg_replace('/^GROUP BY /', '', trim($this->_groupByComponentClause));
-        $groupByCols = explode(', ', $groupByCols);
-      }
-      elseif ($this->_useGroupBy) {
-        $groupByCols = ['contact_a.id'];
-      }
-    }
-    if ($this->_mode & CRM_Contact_BAO_Query::MODE_ACTIVITY && (!$count)) {
-      $groupByCols = ['civicrm_activity.id'];
-    }
-    if (!empty($groupByCols)) {
-      $groupBy = " GROUP BY " . implode(', ', $groupByCols);
-    }
+    $groupBy = $this->generateGroupByClause($count, $sortByChar);
 
     $order = $orderBy = $limit = '';
     if (!$count) {
@@ -6653,7 +6656,7 @@ AND   displayRelType.is_active = 1
     //      MySQL expect the columns present in GROUP BY, must be present in SELECT clause and that results into error, needless to have other columns.
     //   2. When GROUP BY columns are present then disable FGB otherwise it demands to add ORDER BY columns in GROUP BY and eventually in SELECT
     //     clause. This will impact the search query output.
-    $disableFullGroupByMode = ($sortByChar || !empty($groupBy) || $groupContacts);
+    $disableFullGroupByMode = (!empty($groupBy) || $groupContacts);
 
     if ($disableFullGroupByMode) {
       CRM_Core_DAO::disableFullGroupByMode();
@@ -6749,6 +6752,37 @@ AND   displayRelType.is_active = 1
     ];
     $this->_tables[$tableName] = 1;
     $this->_element[$pseudoFieldName] = 1;
+  }
+
+  /**
+   * Generate the Group By clause for the query
+   *
+   * @param bool $count
+   * @param bool $sortByChar
+   *
+   * @return string|null
+   */
+  protected function generateGroupByClause($count = FALSE, $sortByChar = FALSE) {
+    $groupBy = $groupByCols = NULL;
+    if (!$count) {
+      if (isset($this->_groupByComponentClause)) {
+        $groupByCols = preg_replace('/^GROUP BY /', '', trim($this->_groupByComponentClause));
+        $groupByCols = explode(', ', $groupByCols);
+      }
+      elseif ($this->_useGroupBy) {
+        $groupByCols = ['contact_a.id'];
+      }
+    }
+    if ($this->_mode & CRM_Contact_BAO_Query::MODE_ACTIVITY && (!$count)) {
+      $groupByCols = ['civicrm_activity.id'];
+    }
+    if ($sortByChar) {
+      $groupByCols = ['sort_name'];
+    }
+    if (!empty($groupByCols)) {
+      $groupBy = " GROUP BY " . implode(', ', $groupByCols);
+    }
+    return $groupBy;
   }
 
 }
