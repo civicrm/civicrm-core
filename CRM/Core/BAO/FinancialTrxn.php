@@ -507,26 +507,6 @@ WHERE ceft.entity_id = %1";
   }
 
   /**
-   * Function records partial payment, complete's contribution if payment is fully paid
-   * and returns latest payment ie financial trxn
-   *
-   * @param array $contribution
-   * @param array $params
-   *
-   * @return \CRM_Financial_DAO_FinancialTrxn
-   */
-  public static function getPartialPaymentTrxn($contribution, $params) {
-    $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
-    $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
-    $total = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
-    $cmp = bccomp($total, $paid, 5);
-    if ($cmp == 0 || $cmp == -1) {// If paid amount is greater or equal to total amount
-      civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
-    }
-    return $trxn;
-  }
-
-  /**
    * Get revenue amount for membership.
    *
    * @param array $lineItem
