@@ -6638,11 +6638,53 @@ AND   displayRelType.is_active = 1
     $sortByChar = FALSE, $groupContacts = FALSE,
     $additionalWhereClause = NULL, $sortOrder = NULL,
     $additionalFromClause = NULL, $skipOrderAndLimit = FALSE) {
+
+    $sqlParts = $this->getSearchSQLParts($offset, $rowCount, $sort, $count, $includeContactIds, $sortByChar, $groupContacts, $additionalWhereClause, $sortOrder, $additionalFromClause);
+
+    if ($skipOrderAndLimit) {
+      CRM_Core_Error::deprecatedFunctionWarning('skipOrderAndLimit is deprected - call getSearchSQLParts & construct it in the calling function');
+      $query = "{$sqlParts['select']} {$sqlParts['from']} {$sqlParts['where']} {$sqlParts['having']} {$sqlParts['group_by']}";
+    }
+    else {
+      $query = "{$sqlParts['select']} {$sqlParts['from']} {$sqlParts['where']} {$sqlParts['having']} {$sqlParts['group_by']} {$sqlParts['order_by']} {$sqlParts['limit']}";
+    }
+    return $query;
+  }
+
+  /**
+   * Get the component parts of the search query as an array.
+   *
+   * @param int $offset
+   *   The offset for the query.
+   * @param int $rowCount
+   *   The number of rows to return.
+   * @param string|CRM_Utils_Sort $sort
+   *   The order by string.
+   * @param bool $count
+   *   Is this a count only query ?.
+   * @param bool $includeContactIds
+   *   Should we include contact ids?.
+   * @param bool $sortByChar
+   *   If true returns the distinct array of first characters for search results.
+   * @param bool $groupContacts
+   *   If true, return only the contact ids.
+   * @param string $additionalWhereClause
+   *   If the caller wants to further restrict the search (used for components).
+   * @param null $sortOrder
+   * @param string $additionalFromClause
+   *   Should be clause with proper joins, effective to reduce where clause load.
+   *
+   * @return array
+   */
+  public function getSearchSQLParts($offset = 0, $rowCount = 0, $sort = NULL,
+    $count = FALSE, $includeContactIds = FALSE,
+    $sortByChar = FALSE, $groupContacts = FALSE,
+    $additionalWhereClause = NULL, $sortOrder = NULL,
+    $additionalFromClause = NULL) {
     if ($includeContactIds) {
       $this->_includeContactIds = TRUE;
       $this->_whereClause = $this->whereClause();
     }
-
     $onlyDeleted = in_array([
       'deleted_contacts',
       '=',
@@ -6683,15 +6725,9 @@ AND   displayRelType.is_active = 1
       $groupBy = " GROUP BY " . implode(', ', $groupByCols);
     }
 
-    $order = $orderBy = $limit = '';
+    $order = $orderBy = '';
     if (!$count) {
       list($order, $additionalFromClause) = $this->prepareOrderBy($sort, $sortByChar, $sortOrder, $additionalFromClause);
-
-      if ($rowCount > 0 && $offset >= 0) {
-        $offset = CRM_Utils_Type::escape($offset, 'Int');
-        $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
-        $limit = " LIMIT $offset, $rowCount ";
-      }
     }
     // Two cases where we are disabling FGB (FULL_GROUP_BY_MODE):
     //   1. Expecting the search query to return all the first single letter characters of contacts ONLY, but when FGB is enabled
@@ -6726,14 +6762,17 @@ AND   displayRelType.is_active = 1
     if ($this->_displayRelationshipType) {
       $this->filterRelatedContacts($from, $where, $having);
     }
+    $limit = (!$count && $rowCount) ? " LIMIT " . CRM_Utils_Type::escape($offset, 'Int') . ", " . CRM_Utils_Type::escape($rowCount, 'Int') : '';
 
-    if ($skipOrderAndLimit) {
-      $query = "$select $from $where $having $groupBy";
-    }
-    else {
-      $query = "$select $from $where $having $groupBy $order $limit";
-    }
-    return $query;
+    return [
+      'select' => $select,
+      'from' => $from,
+      'where' => $where,
+      'order_by' => $order,
+      'group_by' => $groupBy,
+      'having' => $having,
+      'limit' => $limit,
+    ];
   }
 
   /**
