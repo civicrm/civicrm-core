@@ -14,10 +14,14 @@ class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
    *  - financial_type.
    *
    * @param string $sort
+   * @param bool $isUseKeySort
+   *   Does the order by use a key sort. A key sort uses the mysql 'field' function to
+   *   order by a passed in list. It makes sense for option groups & small sets
+   *   but may not do for long lists like states - performance testing not done on that yet.
    *
    * @dataProvider getSortFields
    */
-  public function testSearchPseudoReturnProperties($sort) {
+  public function testSearchPseudoReturnProperties($sort, $isUseKeySort) {
     $contactID = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $contactID, 'financial_type_id' => 'Campaign Contribution']);
     $this->contributionCreate(['contact_id' => $contactID, 'financial_type_id' => 'Donation']);
@@ -28,8 +32,12 @@ class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
     ];
 
     $queryObj = new CRM_Contact_BAO_Query($params);
+    $sql = $queryObj->getSearchSQL(0, 0, $sort . ' asc');
+    if ($isUseKeySort) {
+      $this->assertContains('field(', $sql);
+    }
     try {
-      $resultDAO = $queryObj->searchQuery(0, 0, $sort . ' asc');
+      $resultDAO = CRM_Core_DAO::executeQuery($sql);
       $this->assertTrue($resultDAO->fetch());
       $this->assertEquals(1, $resultDAO->N);
     }
@@ -45,12 +53,13 @@ class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
    */
   public function getSortFields() {
     return [
-      ['payment_instrument'],
-      ['individual_prefix'],
-      ['communication_style'],
-      ['gender'],
-      ['state_province'],
-      ['country'],
+      ['financial_type', TRUE],
+      ['payment_instrument', TRUE],
+      ['individual_prefix', TRUE],
+      ['communication_style', TRUE],
+      ['gender', TRUE],
+      ['state_province', FALSE],
+      ['country', FALSE],
     ];
   }
 

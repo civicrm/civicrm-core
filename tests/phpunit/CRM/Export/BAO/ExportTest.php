@@ -2579,7 +2579,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'world_region' => 'world_region varchar(128)',
       'url' => 'url varchar(128)',
       'phone_type_id' => 'phone_type_id varchar(16)',
-      'financial_type' => 'financial_type varchar(64)',
+      'financial_type' => 'financial_type varchar(255)',
       'contribution_source' => 'contribution_source varchar(255)',
       'receive_date' => 'receive_date varchar(32)',
       'thankyou_date' => 'thankyou_date varchar(32)',

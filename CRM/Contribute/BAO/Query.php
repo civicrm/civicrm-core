@@ -69,14 +69,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
     }
 
-    // get financial_type
-    if (!empty($query->_returnProperties['financial_type'])) {
-      $query->_select['financial_type'] = "civicrm_financial_type.name as financial_type";
-      $query->_element['financial_type'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['civicrm_financial_type'] = 1;
-    }
-
     // get accounting code
     if (!empty($query->_returnProperties['accounting_code'])) {
       $query->_select['accounting_code'] = "civicrm_financial_account.accounting_code as accounting_code";
