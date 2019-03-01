@@ -104,6 +104,10 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'title' => ts('End Date'),
             'default' => TRUE,
           ),
+          'owner_membership_id' => array(
+            'title' => ts('Primary/Inherited?'),
+            'default' => TRUE,
+          ),
           'join_date' => array(
             'title' => ts('Join Date'),
             'default' => TRUE,
@@ -360,6 +364,12 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
       }
       if ($value = CRM_Utils_Array::value('civicrm_contribution_payment_instrument_id', $row)) {
         $rows[$rowNum]['civicrm_contribution_payment_instrument_id'] = $paymentInstruments[$value];
+        $entryFound = TRUE;
+      }
+
+      if (array_key_exists('civicrm_membership_owner_membership_id', $row)) {
+        $value = $row['civicrm_membership_owner_membership_id'];
+        $rows[$rowNum]['civicrm_membership_owner_membership_id'] = ($value != '') ? 'Inherited' : 'Primary';
         $entryFound = TRUE;
       }
 
