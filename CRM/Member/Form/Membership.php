@@ -417,7 +417,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     //setting default join date if there is no join date
     if (empty($defaults['join_date'])) {
-      $defaults['join_date'] = date('Y-m-d H:i:s');
+      $defaults['join_date'] = date('Y-m-d');
     }
 
     if (!empty($defaults['membership_end_date'])) {
