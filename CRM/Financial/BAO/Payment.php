@@ -79,7 +79,14 @@ class CRM_Financial_BAO_Payment {
       }
     }
     if (!$fullyPaidPayLater) {
-      $trxn = CRM_Core_BAO_FinancialTrxn::getPartialPaymentTrxn($contribution, $params);
+      $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
+      $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
+      $total = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
+      $cmp = bccomp($total, $paid, 5);
+      if ($cmp == 0 || $cmp == -1) {// If paid amount is greater or equal to total amount
+        civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
+      }
+
       if (CRM_Utils_Array::value('line_item', $params) && !empty($trxn)) {
         foreach ($params['line_item'] as $values) {
           foreach ($values as $id => $amount) {
