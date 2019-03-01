@@ -3909,7 +3909,21 @@ WHERE  $smartGroupClause
     $name = $targetName[4] ? "%$name%" : $name;
     $this->_where[$grouping][] = "contact_b_log.sort_name LIKE '%$name%'";
     $this->_tables['civicrm_log'] = $this->_whereTables['civicrm_log'] = 1;
-    $this->_qill[$grouping][] = ts('Modified By') . " $name";
+    $fieldTitle = ts('Added By');
+    foreach ($this->_params as $params) {
+      if ($params[0] == 'log_date') {
+        if ($params[2] == 2) {
+          $fieldTitle = ts('Modified By');
+        }
+        break;
+      }
+    }
+    list($qillop, $qillVal) = self::buildQillForFieldValue(NULL, 'changed_by', $name, 'LIKE');
+    $this->_qill[$grouping][] = ts("%1 %2 '%3'", [
+      1 => $fieldTitle,
+      2 => $qillop,
+      3 => $qillVal,
+    ]);
   }
 
   /**
