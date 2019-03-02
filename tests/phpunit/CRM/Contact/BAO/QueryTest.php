@@ -696,6 +696,32 @@ civicrm_relationship.is_active = 1 AND
     $this->fail('Test failed for some reason which is not good');
   }
 
+  /**
+   * Test the sorting on the contact ID query works.
+   *
+   * Checking for lack of fatal.
+   *
+   * @param string $sortOrder
+   *   Param reflecting how sort is passed in.
+   *   - 1_d is column 1 descending.
+   *
+   * @dataProvider getSortOptions
+   */
+  public function testContactIDQuery($sortOrder) {
+    $selector = new CRM_Contact_Selector(NULL, ['radio_ts' => 'ts_all'], NULL, ['sort_name' => 1]);
+    $selector->contactIDQuery([], $sortOrder);
+  }
+
+  public function getSortOptions() {
+    return [
+      ['1_d'],
+      ['2_d'],
+      ['3_d'],
+      ['4_d'],
+      ['5_d'],
+      ['6_d'],
+    ];
+  }
 
   /**
    * Test the summary query does not add an acl clause when acls not enabled..

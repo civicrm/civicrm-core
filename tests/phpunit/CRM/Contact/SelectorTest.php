@@ -550,10 +550,11 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
    */
   public function getDefaultFromString() {
     return ' FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 )'
+    . ' LEFT JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id ) '
     . ' LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1)'
     . ' LEFT JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id AND civicrm_phone.is_primary = 1)'
     . ' LEFT JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id AND civicrm_im.is_primary = 1) '
-    . 'LEFT JOIN civicrm_country ON civicrm_address.country_id = civicrm_country.id LEFT JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ';
+    . 'LEFT JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ';
   }
 
   /**

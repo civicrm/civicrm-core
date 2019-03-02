@@ -2680,6 +2680,18 @@ class CRM_Contact_BAO_Query {
         //CRM-14263 further handling of address joins further down...
         return " $side JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id {$limitToPrimaryClause} )";
 
+      case 'civicrm_state_province':
+        // This is encountered when doing an export after having applied a 'sort' - it pretty much implies primary
+        // but that will have been implied-in by the calling function.
+        // test cover in testContactIDQuery
+        return " $side JOIN civicrm_state_province ON ( civicrm_address.state_province_id = civicrm_state_province.id )";
+
+      case 'civicrm_country':
+        // This is encountered when doing an export after having applied a 'sort' - it pretty much implies primary
+        // but that will have been implied-in by the calling function.
+        // test cover in testContactIDQuery
+        return " $side JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id )";
+
       case 'civicrm_phone':
         return " $side JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id {$limitToPrimaryClause}) ";
 
@@ -2699,8 +2711,9 @@ class CRM_Contact_BAO_Query {
         return " $side JOIN civicrm_openid ON ( civicrm_openid.contact_id = contact_a.id {$limitToPrimaryClause} )";
 
       case 'civicrm_worldregion':
-        $from = " $side JOIN civicrm_country ON civicrm_address.country_id = civicrm_country.id ";
-        return "$from $side JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ";
+        // We can be sure from the calling function that country will already be joined in.
+        // we really don't need world_region - we could use a pseudoconstant for it.
+        return "$side JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ";
 
       case 'civicrm_location_type':
         return " $side JOIN civicrm_location_type ON civicrm_address.location_type_id = civicrm_location_type.id ";
@@ -6320,26 +6333,18 @@ AND   displayRelType.is_active = 1
       $orderByClauseParts = explode(' ', trim($orderByClause));
       $field = $orderByClauseParts[0];
       $direction = isset($orderByClauseParts[1]) ? $orderByClauseParts[1] : 'asc';
+      $fieldSpec = $this->getMetadataForRealField($field);
 
+      if ($this->_returnProperties === []) {
+        if (!empty($fieldSpec['table_name']) && !isset($this->_tables[$fieldSpec['table_name']])) {
+          $this->_tables[$fieldSpec['table_name']] = 1;
+          $order = $fieldSpec['where'] . ' ' . $direction;
+        }
+
+      }
       switch ($field) {
-        case 'city':
-        case 'postal_code':
-          $this->_tables["civicrm_address"] = $this->_whereTables["civicrm_address"] = 1;
-          $order = str_replace($field, "civicrm_address.{$field}", $order);
-          break;
 
-        case 'country':
-        case 'state_province':
-          $this->_tables["civicrm_{$field}"] = $this->_whereTables["civicrm_{$field}"] = 1;
-          if (is_array($this->_returnProperties) && empty($this->_returnProperties)) {
-            $additionalFromClause .= " LEFT JOIN civicrm_{$field} ON civicrm_{$field}.id = civicrm_address.{$field}_id";
-          }
-          $order = str_replace($field, "civicrm_{$field}.name", $order);
-          break;
-
-        case 'email':
-          $this->_tables["civicrm_email"] = $this->_whereTables["civicrm_email"] = 1;
-          $order = str_replace($field, "civicrm_email.{$field}", $order);
+        case 'placeholder-will-remove-next-pr-but-jenkins-will-not-accept-without-and-removing-switch-will-make-hard-to-read':
           break;
 
         default:
@@ -6363,7 +6368,6 @@ AND   displayRelType.is_active = 1
           // is not declared for them.
           // @todo so far only integer fields are being handled. If we add string fields we need to look at
           // escaping.
-          $fieldSpec = $this->getMetadataForRealField($field);
           $pseudoConstantMetadata = CRM_Utils_Array::value('pseudoconstant', $fieldSpec, FALSE);
           if (!empty($pseudoConstantMetadata)
           ) {
