@@ -89,10 +89,9 @@
 </tr>
 
 <tr>
-  <td><label>{ts}Activity Dates{/ts}</label></td>
-</tr>
-<tr>
-  {include file="CRM/Core/DateRange.tpl" fieldName="activity_date" from='_low' to='_high'}
+  <td>
+    {include file="CRM/Core/DatePickerRange.tpl" fieldName="activity_date_time" from='_low' to='_high'}
+  </td>
 </tr>
 <tr>
   <td>

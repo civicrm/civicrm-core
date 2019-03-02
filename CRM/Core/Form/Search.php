@@ -154,9 +154,8 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     $this->_action = CRM_Core_Action::ADVANCED;
     foreach ($this->getSearchFieldMetadata() as $entity => $fields) {
       foreach ($fields as $fieldName => $fieldSpec) {
-        if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE) {
-          // Assuming time is false for now as we are not checking for date-time fields as yet.
-          $this->addDatePickerRange($fieldName, $fieldSpec['title'], FALSE);
+        if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || $fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
+          $this->addDatePickerRange($fieldName, $fieldSpec['title'], ($fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)));
         }
         else {
           $this->addField($fieldName, ['entity' => $entity]);
@@ -184,6 +183,10 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       case CRM_Utils_Type::T_INT:
         return 'CommaSeparatedIntegers';
 
+      case CRM_Utils_Type::T_DATE:
+      case CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME:
+        return 'Timestamp';
+
       default:
         return 'Alphanumeric';
     }
@@ -203,6 +206,15 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
         $value = CRM_Utils_Request::retrieveValue($fieldSpec['name'], $this->getValidationTypeForField($entity, $fieldSpec['name']), FALSE, NULL, 'GET');
         if ($value !== FALSE) {
           $defaults[$fieldSpec['name']] = $value;
+        }
+        if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || ($fieldSpec['type'] === CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
+          $low = CRM_Utils_Request::retrieveValue($fieldSpec['name'] . '_low', 'Timestamp', FALSE, NULL, 'GET');
+          $high = CRM_Utils_Request::retrieveValue($fieldSpec['name'] . '_high', 'Timestamp', FALSE, NULL, 'GET');
+          if ($low !== FALSE || $high !== FALSE) {
+            $defaults[$fieldSpec['name'] . '_relative'] = 0;
+            $defaults[$fieldSpec['name'] . '_low'] = $low ? date('Y-m-d H:i:s', strtotime($low)) : NULL;
+            $defaults[$fieldSpec['name'] . '_high'] = $high ? date('Y-m-d H:i:s', strtotime($high)) : NULL;
+          }
         }
       }
     }
