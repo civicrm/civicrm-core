@@ -290,6 +290,7 @@ class CRM_Activity_BAO_Query {
       case 'activity_date_high':
       case 'activity_date_time_low':
       case 'activity_date_time_high':
+        CRM_Core_Error::deprecatedFunctionWarning('activity');
         $query->dateQueryBuilder($values,
           'civicrm_activity', str_replace(['_high', '_low'], '', $name), 'activity_date_time', ts('Activity Date')
         );
