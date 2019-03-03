@@ -74,6 +74,11 @@ class CRM_Core_Page_File extends CRM_Core_Page {
       CRM_Core_Error::statusBounce('Could not retrieve the file');
     }
 
+    $testMimeType = CRM_Utils_File::getMimeType($path);
+    if ($testMimeType != $mimeType) {
+      throw new CRM_Core_Exception("Supplied Mime Type does not match file Mime Type");
+    }
+
     $buffer = file_get_contents($path);
     if (!$buffer) {
       CRM_Core_Error::statusBounce('The file is either empty or you do not have permission to retrieve the file');
