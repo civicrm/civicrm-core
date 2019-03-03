@@ -105,9 +105,16 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     ]);
     $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', []);
     $this->assertEquals('grant_application_received_date_high', $savedSearch['form_values'][0][0]);
-    $this->assertEquals('2019-01-20 00:00:00', $savedSearch['form_values'][0][2]);
+    $this->assertEquals('2019-01-20 23:59:59', $savedSearch['form_values'][0][2]);
     $this->assertEquals('grant_due_date_low', $savedSearch['form_values'][1][0]);
     $this->assertEquals('2019-01-22 00:00:00', $savedSearch['form_values'][1][2]);
+    $hasRelative = FALSE;
+    foreach ($savedSearch['form_values'] as $form_value) {
+      if ($form_value[0] === 'grant_due_date_relative') {
+        $hasRelative = TRUE;
+      }
+    }
+    $this->assertEquals(TRUE, $hasRelative);
   }
 
   /**

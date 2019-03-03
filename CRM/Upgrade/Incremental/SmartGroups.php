@@ -48,19 +48,42 @@ class CRM_Upgrade_Incremental_SmartGroups {
    * @param array $fields
    */
   public function datePickerConversion($fields) {
-    $fieldPossibilities = [];
+    $fieldPossibilities = $relativeFieldNames = [];
     foreach ($fields as $field) {
       $fieldPossibilities[] = $field;
       $fieldPossibilities[] = $field . '_high';
       $fieldPossibilities[] = $field . '_low';
     }
+    $relativeDateMappings = ['activity_date_time' => 'activity'];
 
     foreach ($fields as $field) {
       foreach ($this->getSearchesWithField($field) as $savedSearch) {
         $formValues = $savedSearch['form_values'];
+        $isRelative = $hasRelative = FALSE;
+        $relativeFieldName = $field . '_relative';
+
+        if (!empty($relativeDateMappings[$field]) && isset($formValues['relative_dates'])) {
+          if (!empty($formValues['relative_dates'][$relativeDateMappings[$field]])) {
+            $formValues[] = [$relativeFieldName, '=', $savedSearch['form_values']['relative_dates'][$relativeDateMappings[$field]]];
+            unset($formValues['relative_dates'][$relativeDateMappings[$field]]);
+            $isRelative = TRUE;
+          }
+        }
         foreach ($formValues as $index => $formValue) {
           if (in_array($formValue[0], $fieldPossibilities)) {
-            $formValues[$index][2] = $this->getConvertedDateValue($formValue[2]);
+            if ($isRelative) {
+              unset($formValues[$index]);
+            }
+            else {
+              $isHigh = substr($formValue[0], -5, 5) === '_high';
+              $formValues[$index][2] = $this->getConvertedDateValue($formValue[2], $isHigh);
+            }
+          }
+        }
+        if (!$isRelative) {
+          if (!in_array($relativeFieldName, $relativeFieldNames)) {
+            $relativeFieldNames[] = $relativeFieldName;
+            $formValues[] = [$relativeFieldName, '=', 0];
           }
         }
         if ($formValues !== $savedSearch['form_values']) {
@@ -98,15 +121,21 @@ class CRM_Upgrade_Incremental_SmartGroups {
    * Get converted date value.
    *
    * @param string $dateValue
+   * @param bool $isEndOfDay
+   *   Is this the upper value in a search range? If so alter the time to
+   *   get the end of day if none set.
    *
    * @return string
    *   $dateValue
    */
-  protected function getConvertedDateValue($dateValue) {
+  protected function getConvertedDateValue($dateValue, $isEndOfDay) {
     if (date('Y-m-d', strtotime($dateValue)) !== $dateValue
       && date('Y-m-d H:i:s', strtotime($dateValue)) !== $dateValue
     ) {
       $dateValue = date('Y-m-d H:i:s', strtotime(CRM_Utils_Date::processDate($dateValue)));
+      if ($isEndOfDay) {
+        $dateValue = str_replace('00:00:00', '23:59:59', $dateValue);
+      }
     }
     return $dateValue;
   }
