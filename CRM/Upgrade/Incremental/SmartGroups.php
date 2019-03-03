@@ -112,6 +112,45 @@ class CRM_Upgrade_Incremental_SmartGroups {
   }
 
   /**
+   * Rename a smartgroup field.
+   *
+   * @param string $oldName
+   * @param string $newName
+   */
+  public function renameField($oldName, $newName) {
+    foreach ($this->getSearchesWithField($oldName) as $savedSearch) {
+      $formValues = $savedSearch['form_values'];
+      foreach ($formValues as $index => $formValue) {
+        if ($formValue[0] === $oldName) {
+          $formValues[$index][0] = $newName;
+        }
+      }
+
+      if ($formValues !== $savedSearch['form_values']) {
+        civicrm_api3('SavedSearch', 'create', ['id' => $savedSearch['id'], 'form_values' => $formValues]);
+      }
+    }
+  }
+
+  /**
+   * Rename pairs of fields
+   *
+   * @param array $pairs
+   *  Array or arrays of pairs - e.g
+   *  [
+   *    ['old' => 'activity_date', 'new' => 'activity_date_time'],
+   *    ['old' => 'activity_date_low', 'new' => 'activity_date_time_low'],
+   *    ['old' => 'activity_date_high', 'new' => 'activity_date_time_high'],
+   *    ['old' => 'activity_date_relative', 'new' => 'activity_date_time_relative'],
+   *  ]
+   */
+  public function renameFields($pairs) {
+    foreach ($pairs as $pair) {
+      $this->renameField($pair['old'], $pair['new']);
+    }
+  }
+
+  /**
    * @param $field
    * @return mixed
    */
@@ -121,6 +160,7 @@ class CRM_Upgrade_Incremental_SmartGroups {
       'form_values' => ['LIKE' => "%{$field}%"],
     ])['values'];
     return $savedSearches;
+
   }
 
 }

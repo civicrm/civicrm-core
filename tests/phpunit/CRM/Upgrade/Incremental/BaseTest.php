@@ -124,6 +124,42 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', []);
     $this->assertEquals('IN', $savedSearch['form_values'][0][1]);
     $this->assertEquals(['1'], $savedSearch['form_values'][0][2]);
+
+  }
+
+  /**
+   * Test renaming a field.
+   */
+  public function testRenameField() {
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        ['activity_date_low', '=', '01/22/2019'],
+      ]
+    ]);
+    $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups();
+    $smartGroupConversionObject->renameField('activity_date_low', 'activity_date_time_low');
+    $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', []);
+    $this->assertEquals('activity_date_time_low', $savedSearch['form_values'][0][0]);
+  }
+
+  /**
+   * Test renaming multiple fields.
+   */
+  public function testRenameFields() {
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        ['activity_date_low', '=', '01/22/2019'],
+        ['activity_date_relative', '=', 0],
+      ]
+    ]);
+    $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups();
+    $smartGroupConversionObject->renameFields([
+      ['old' => 'activity_date_low', 'new' => 'activity_date_time_low'],
+      ['old' => 'activity_date_relative', 'new' => 'activity_date_time_relative'],
+    ]);
+    $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', []);
+    $this->assertEquals('activity_date_time_low', $savedSearch['form_values'][0][0]);
+    $this->assertEquals('activity_date_time_relative', $savedSearch['form_values'][1][0]);
   }
 
 }
