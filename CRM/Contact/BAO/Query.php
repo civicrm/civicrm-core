@@ -3262,11 +3262,14 @@ WHERE  $smartGroupClause
       }
     }
 
-    // implode array, then remove all spaces and validate CommaSeparatedIntegers
-    $value = CRM_Utils_Type::validate(
-      str_replace(' ', '', implode(',', (array) $value)),
-      'CommaSeparatedIntegers'
-    );
+    // implode array, then remove all spaces
+    $value = str_replace(' ', '', implode(',', (array) $value));
+    if (!empty($value)) {
+      $value = CRM_Utils_Type::validate(
+        $value,
+        'CommaSeparatedIntegers'
+      );
+    }
 
     $useAllTagTypes = $this->getWhereValues('all_tag_types', $grouping);
     $tagTypesText = $this->getWhereValues('tag_types_text', $grouping);

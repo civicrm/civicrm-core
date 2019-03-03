@@ -82,6 +82,29 @@ class CRM_Upgrade_Incremental_php_FiveEleven extends CRM_Upgrade_Incremental_Bas
         'grant_due_date'
       ]
     ]);
+    if (Civi::settings()->get('civimail_multiple_bulk_emails')) {
+      $this->addTask('Update any on hold groups to reflect field change', 'updateOnHold', $rev);
+    }
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_11_beta1($rev) {
+    if (Civi::settings()->get('civimail_multiple_bulk_emails')) {
+      $this->addTask('Update any on hold groups to reflect field change', 'updateOnHold', $rev);
+    }
+  }
+
+  /**
+   * Update on hold groups -note the core function layout for this sort of upgrade changed in 5.12 - don't copy this.
+   */
+  public function updateOnHold($ctx, $version) {
+    $groupUpdateObject = new CRM_Upgrade_Incremental_SmartGroups($version);
+    $groupUpdateObject->convertEqualsStringToInArray('on_hold');
+    return TRUE;
   }
 
 }

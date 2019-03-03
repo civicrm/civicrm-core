@@ -6,6 +6,10 @@
  */
 class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
 
+  public function tearDown() {
+    $this->quickCleanup(['civicrm_saved_search']);
+  }
+
   /**
    * Test message upgrade process.
    */
@@ -104,6 +108,22 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     $this->assertEquals('2019-01-20 00:00:00', $savedSearch['form_values'][0][2]);
     $this->assertEquals('grant_due_date_low', $savedSearch['form_values'][1][0]);
     $this->assertEquals('2019-01-22 00:00:00', $savedSearch['form_values'][1][2]);
+  }
+
+  /**
+   * Test conversion of on hold group.
+   */
+  public function testOnHoldConversion() {
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        ['on_hold', '=', '1'],
+      ]
+    ]);
+    $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups('5.11.alpha1');
+    $smartGroupConversionObject->convertEqualsStringToInArray('on_hold');
+    $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', []);
+    $this->assertEquals('IN', $savedSearch['form_values'][0][1]);
+    $this->assertEquals(['1'], $savedSearch['form_values'][0][2]);
   }
 
 }
