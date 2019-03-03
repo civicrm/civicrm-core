@@ -56,18 +56,17 @@ class CRM_Financial_BAO_Payment {
     $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $params['contribution_id']]);
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($contribution['contribution_status_id'], 'name');
 
+    $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount']);
+
     // Check if pending contribution
-    $fullyPaidPayLater = FALSE;
+    $fullyPaidPayLater = ($contributionStatus == 'Pending' && $isPaymentCompletesContribution);
     if ($contributionStatus == 'Pending') {
-      $cmp = bccomp($contribution['total_amount'], $params['total_amount'], 5);
-      // Total payment amount is the whole amount paid against pending contribution
-      if ($cmp == 0 || $cmp == -1) {
+      if ($isPaymentCompletesContribution) {
         civicrm_api3('Contribution', 'completetransaction', ['id' => $contribution['id']]);
         // Get the trxn
         $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
         $ftParams = ['id' => $trxnId['financialTrxnId']];
         $trxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams, CRM_Core_DAO::$_nullArray);
-        $fullyPaidPayLater = TRUE;
       }
       else {
         civicrm_api3('Contribution', 'create',
@@ -80,10 +79,7 @@ class CRM_Financial_BAO_Payment {
     }
     if (!$fullyPaidPayLater) {
       $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
-      $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
-      $total = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
-      $cmp = bccomp($total, $paid, 5);
-      if ($cmp == 0 || $cmp == -1) {// If paid amount is greater or equal to total amount
+      if ($isPaymentCompletesContribution) {
         civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
       }
 
@@ -488,6 +484,20 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     $params = array_merge($defaults, $params);
     $params['skipLineItem'] = TRUE;
     return [$contributionDAO, $params];
+  }
+
+  /**
+   * Does this payment complete the contribution
+   *
+   * @param int $contributionID
+   * @param float $paymentAmount
+   *
+   * @return bool
+   */
+  protected static function isPaymentCompletesContribution($contributionID, $paymentAmount) {
+    $outstandingBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($contributionID);
+    $cmp = bccomp($paymentAmount, $outstandingBalance, 5);
+    return ($cmp == 0 || $cmp == 1);
   }
 
 }
