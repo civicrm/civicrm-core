@@ -1669,6 +1669,9 @@ FROM   civicrm_domain
         }
       }
       $newObject->save();
+      if (!empty($newData['custom'])) {
+        CRM_Core_BAO_CustomValueTable::store($newData['custom'], $newObject::getTableName(), $newObject->id);
+      }
       CRM_Utils_Hook::post('create', CRM_Core_DAO_AllCoreTables::getBriefName($daoName), $newObject->id, $newObject);
     }
 
