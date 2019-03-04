@@ -455,17 +455,16 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * View all activities is enough regardless of contact ACLs.
    */
-  public function testGetActivityViewAllActivitiesEnoughWithOrWithoutID() {
+  public function testGetActivityViewAllActivitiesDoesntCutItAnymore() {
     $activity = $this->activityCreate();
     $this->setPermissions(array('view all activities', 'access CiviCRM'));
-    $this->callAPISuccess('Activity', 'getsingle', array('check_permissions' => 1, 'id' => $activity['id']));
-    $this->callAPISuccess('Activity', 'getsingle', array('check_permissions' => 1));
+    $this->callAPISuccessGetCount('Activity', ['check_permissions' => 1, 'id' => $activity['id']], 0);
   }
 
   /**
    * View all activities is required unless id is passed in.
    */
-  public function testGetActivityViewAllContactsEnoughWIthoutID() {
+  public function testGetActivityViewAllContactsEnoughWithoutID() {
     $this->setPermissions(array('view all contacts', 'access CiviCRM'));
     $this->callAPISuccess('Activity', 'get', array('check_permissions' => 1));
   }
@@ -531,20 +530,49 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $activity = $this->activityCreate();
 
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
-    $this->callAPISuccess('Activity', 'getsingle', array('check_permissions' => 1, 'id' => $activity['id']));
+    $this->callAPISuccessGetSingle('Activity', ['check_permissions' => 1, 'id' => $activity['id']]);
+    $this->callAPISuccessGetCount('Activity', ['check_permissions' => 1, 'id' => $activity['id']]);
   }
 
   /**
-   * To leverage ACL permission to view an activity you must be able to see all of the contacts.
+   * To leverage ACL permission to view an activity you must be able to see any of the contacts.
    */
   public function testGetActivityByAclCannotViewAllContacts() {
+    $activity = $this->activityCreate(['assignee_contact_id' => $this->individualCreate()]);
+    $contacts = $this->getActivityContacts($activity);
+    $this->setPermissions(['access CiviCRM']);
+
+    foreach ($contacts as $role => $contact_id) {
+      $this->allowedContactId = $contact_id;
+      $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlyOne'));
+      $this->cleanupCachedPermissions();
+      $result = $this->callAPISuccessGetSingle('Activity', [
+        'check_permissions' => 1,
+        'id' => $activity['id'],
+        'return' => ['source_contact_id', 'target_contact_id', 'assignee_contact_id'],
+      ]);
+      foreach (['source_contact', 'target_contact', 'assignee_contact'] as $roleName) {
+        $roleKey = $roleName . '_id';
+        if ($role !== $roleKey) {
+          $this->assertTrue(empty($result[$roleKey]), "Only contact in $role is permissioned to be returned, not $roleKey");
+        }
+        else {
+          $this->assertEquals([$contact_id], (array) $result[$roleKey]);
+          $this->assertTrue(!empty($result[$roleName . '_name']));
+        }
+      }
+    }
+  }
+
+  /**
+   * To leverage ACL permission to view an activity you must be able to see any of the contacts.
+   */
+  public function testGetActivityByAclCannotViewAnyContacts() {
     $activity = $this->activityCreate();
     $contacts = $this->getActivityContacts($activity);
     $this->setPermissions(array('access CiviCRM'));
 
     foreach ($contacts as $contact_id) {
-      $this->allowedContactId = $contact_id;
-      $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereOnlyOne'));
       $this->callAPIFailure('Activity', 'getsingle', array('check_permissions' => 1, 'id' => $activity['id']));
     }
   }
