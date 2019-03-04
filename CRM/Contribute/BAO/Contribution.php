@@ -885,8 +885,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
   /**
    * @param $contributionId
-   * @param $paymentType
    * @param $participantId
+   * @param array $financialTrxn
    *
    * @param $financialTrxn
    */
@@ -908,6 +908,37 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
 
     self::addActivityForPayment($entityObj, $financialTrxn, $activityType, $component, $contributionId);
+  }
+
+  /**
+   * Get the value for the To Financial Account.
+   *
+   * @param $contribution
+   * @param $params
+   *
+   * @return int
+   */
+  protected static function getToFinancialAccount($contribution, $params) {
+    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $pendingStatus = [
+      array_search('Pending', $contributionStatuses),
+      array_search('In Progress', $contributionStatuses),
+    ];
+    if (in_array(CRM_Utils_Array::value('contribution_status_id', $contribution), $pendingStatus)) {
+      return CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contribution['financial_type_id'], 'Accounts Receivable Account is');
+    }
+    elseif (!empty($params['payment_processor'])) {
+      return CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contribution['payment_processor'], NULL, 'civicrm_payment_processor');
+    }
+    elseif (!empty($params['payment_instrument_id'])) {
+      return CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($contribution['payment_instrument_id']);
+    }
+    else {
+      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
+      $queryParams = [1 => [$relationTypeId, 'Integer']];
+      return CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = %1", $queryParams);
+    }
   }
 
   /**
@@ -4659,26 +4690,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @return CRM_Financial_DAO_FinancialTrxn
    */
   public static function recordPartialPayment($contribution, $params) {
-    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $pendingStatus = array(
-      array_search('Pending', $contributionStatuses),
-      array_search('In Progress', $contributionStatuses),
-    );
-    $statusId = array_search('Completed', $contributionStatuses);
-    if (in_array(CRM_Utils_Array::value('contribution_status_id', $contribution), $pendingStatus)) {
-      $balanceTrxnParams['to_financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contribution['financial_type_id'], 'Accounts Receivable Account is');
-    }
-    elseif (!empty($params['payment_processor'])) {
-      $balanceTrxnParams['to_financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contribution['payment_processor'], NULL, 'civicrm_payment_processor');
-    }
-    elseif (!empty($params['payment_instrument_id'])) {
-      $balanceTrxnParams['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($contribution['payment_instrument_id']);
-    }
-    else {
-      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
-      $queryParams = array(1 => array($relationTypeId, 'Integer'));
-      $balanceTrxnParams['to_financial_account_id'] = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = %1", $queryParams);
-    }
+
+    $balanceTrxnParams['to_financial_account_id'] = self::getToFinancialAccount($contribution, $params);
     $fromFinancialAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contribution['financial_type_id'], 'Accounts Receivable Account is');
     $balanceTrxnParams['from_financial_account_id'] = $fromFinancialAccountId;
     $balanceTrxnParams['total_amount'] = $params['total_amount'];
@@ -4688,14 +4701,20 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $balanceTrxnParams['net_amount'] = CRM_Utils_Array::value('total_amount', $params);
     $balanceTrxnParams['currency'] = $contribution['currency'];
     $balanceTrxnParams['trxn_id'] = CRM_Utils_Array::value('contribution_trxn_id', $params, NULL);
-    $balanceTrxnParams['status_id'] = $statusId;
+    $balanceTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Completed');
     $balanceTrxnParams['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $params, $contribution['payment_instrument_id']);
     $balanceTrxnParams['check_number'] = CRM_Utils_Array::value('check_number', $params);
+
+    // @todo the logic of this section seems very wrong. This code is ONLY reached from the Payment.create
+    // routine so is_payment should ALWAYS be true
+    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $statusId = array_search('Completed', $contributionStatuses);
     if ($fromFinancialAccountId != NULL &&
       ($statusId == array_search('Completed', $contributionStatuses) || $statusId == array_search('Partially paid', $contributionStatuses))
     ) {
       $balanceTrxnParams['is_payment'] = 1;
     }
+
     if (!empty($params['payment_processor'])) {
       $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
     }
