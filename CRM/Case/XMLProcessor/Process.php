@@ -181,7 +181,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @return array|mixed
    */
   public function &caseRoles($caseRolesXML, $isCaseManager = FALSE) {
-    $relationshipTypes = &$this->allRelationshipTypes();
+    $relationshipTypes = &$this->allRelationshipTypes('name');
 
     $result = array();
     foreach ($caseRolesXML as $caseRoleXML) {
@@ -213,7 +213,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @throws Exception
    */
   public function createRelationships($relationshipTypeName, &$params) {
-    $relationshipTypes = &$this->allRelationshipTypes();
+    $relationshipTypes = &$this->allRelationshipTypes('name');
     // get the relationship id
     $relationshipTypeID = array_search($relationshipTypeName, $relationshipTypes);
 

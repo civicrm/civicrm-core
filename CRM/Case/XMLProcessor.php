@@ -109,9 +109,9 @@ class CRM_Case_XMLProcessor {
   /**
    * @return array
    */
-  public function &allRelationshipTypes() {
+  public function &allRelationshipTypes($type = 'label') {
     if (self::$relationshipTypes === NULL) {
-      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE);
+      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType($type, TRUE);
 
       self::$relationshipTypes = array();
       foreach ($relationshipInfo as $id => $info) {
