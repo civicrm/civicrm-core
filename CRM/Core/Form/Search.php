@@ -151,6 +151,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * than existing ad hoc handling.
    */
   public function addFormFieldsFromMetadata() {
+    $this->addFormRule(['CRM_Core_Form_Search', 'formRule'], $this);
     $this->_action = CRM_Core_Action::ADVANCED;
     foreach ($this->getSearchFieldMetadata() as $entity => $fields) {
       foreach ($fields as $fieldName => $fieldSpec) {
@@ -162,6 +163,31 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
         }
       }
     }
+  }
+
+  /**
+   * Global validation rules for the form.
+   *
+   * @param array $fields
+   *   Posted values of the form.
+   *
+   * @return array
+   *   list of errors to be posted back to the form
+   */
+  public static function formRule($fields, $files, $form) {
+    $errors = [];
+    foreach ($form->getSearchFieldMetadata() as $entity => $spec) {
+      foreach ($spec as $fieldName => $fieldSpec) {
+        if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || $fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
+          if (isset($fields[$fieldName . '_high']) && isset($fields[$fieldName . '_low']) && empty($fields[$fieldName . '_relative'])) {
+            if (strtotime($fields[$fieldName . '_low']) > strtotime($fields[$fieldName . '_high'])) {
+              $errors[$fieldName . '_low'] = ts('%1: Please check that your date range is in correct chronological order.', [1 => $fieldSpec['title']]);
+            }
+          }
+        }
+      }
+    }
+    return $errors;
   }
 
   /**
