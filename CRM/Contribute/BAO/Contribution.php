@@ -884,6 +884,33 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
+   * @param $contributionId
+   * @param $paymentType
+   * @param $participantId
+   *
+   * @param $financialTrxn
+   */
+  protected static function recordPaymentActivity($contributionId, $participantId, $financialTrxn) {
+    $activityType = ($financialTrxn->total_amount < 0) ? 'Refund' : 'Payment';
+    if ($participantId) {
+      $inputParams['id'] = $participantId;
+      $values = [];
+      $ids = [];
+      $component = 'event';
+      $entityObj = CRM_Event_BAO_Participant::getValues($inputParams, $values, $ids);
+      $entityObj = $entityObj[$participantId];
+    }
+    else {
+      $entityObj = new CRM_Contribute_BAO_Contribution();
+      $entityObj->id = $contributionId;
+      $entityObj->find(TRUE);
+      $component = 'contribution';
+    }
+
+    self::addActivityForPayment($entityObj, $financialTrxn, $activityType, $component, $contributionId);
+  }
+
+  /**
    * @inheritDoc
    */
   public function addSelectWhereClause() {
@@ -3815,25 +3842,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    // activity creation
     if (!empty($financialTrxn)) {
-      if ($participantId) {
-        $inputParams['id'] = $participantId;
-        $values = array();
-        $ids = array();
-        $component = 'event';
-        $entityObj = CRM_Event_BAO_Participant::getValues($inputParams, $values, $ids);
-        $entityObj = $entityObj[$participantId];
-      }
-      else {
-        $entityObj = new CRM_Contribute_BAO_Contribution();
-        $entityObj->id = $contributionId;
-        $entityObj->find(TRUE);
-        $component = 'contribution';
-      }
-      $activityType = ($paymentType == 'refund') ? 'Refund' : 'Payment';
-
-      self::addActivityForPayment($entityObj, $financialTrxn, $activityType, $component, $contributionId);
+      self::recordPaymentActivity($contributionId, $participantId, $financialTrxn);
       return $financialTrxn;
     }
 
