@@ -358,10 +358,6 @@ class CRM_Financial_BAO_Payment {
    */
   public static function recordPayment($contributionId, $trxnData, $participantId) {
     list($contributionDAO, $params) = self::getContributionAndParamsInFormatForRecordFinancialTransaction($contributionId);
-    // load related memberships on basis of $contributionDAO object
-    // @todo - this is done in the function that completes payments so it's being done twice.
-    // test & remove.
-    $contributionDAO->loadRelatedMembershipObjects();
 
     if (!$participantId) {
       $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $contributionId, 'participant_id', 'contribution_id');
