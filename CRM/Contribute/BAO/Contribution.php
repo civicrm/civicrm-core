@@ -804,7 +804,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           ]
         );
       }
-      $typeField = CRM_Financial_DAO_FinancialType::export();
+
       $financialAccount = CRM_Financial_DAO_FinancialAccount::export();
 
       $contributionPage = array(
@@ -872,7 +872,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         ),
       );
 
-      $fields = array_merge($fields, $typeField, $contributionPage,
+      $fields = array_merge($fields, $contributionPage,
         $contributionNote, $extraFields, $softCreditFields, $financialAccount, $campaignTitle,
         CRM_Core_BAO_CustomField::getFieldsForImport('Contribution', FALSE, FALSE, FALSE, $checkPermission)
       );
