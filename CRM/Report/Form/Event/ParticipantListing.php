@@ -732,19 +732,6 @@ ORDER BY  cv.label
         $entryFound = TRUE;
       }
 
-      // Handle employer id
-      if (array_key_exists('civicrm_contact_employer_id', $row)) {
-        $employerId = $row['civicrm_contact_employer_id'];
-        if ($employerId) {
-          $rows[$rowNum]['civicrm_contact_employer_id'] = CRM_Contact_BAO_Contact::displayName($employerId);
-          $url = CRM_Utils_System::url('civicrm/contact/view',
-            'reset=1&cid=' . $employerId, $this->_absoluteUrl
-          );
-          $rows[$rowNum]['civicrm_contact_employer_id_link'] = $url;
-          $rows[$rowNum]['civicrm_contact_employer_id_hover'] = ts('View Contact Summary for this Contact.');
-        }
-      }
-
       // Convert campaign_id to campaign title
       $this->_initBasicRow($rows, $entryFound, $row, 'civicrm_participant_campaign_id', $rowNum, $this->campaigns);
 
