@@ -70,6 +70,10 @@ class CRM_Upgrade_Incremental_SmartGroups {
           }
         }
         foreach ($formValues as $index => $formValue) {
+          if (!isset($formValue[0])) {
+            // Any actual criteria will have this key set but skip any weird lines
+            continue;
+          }
           if (in_array($formValue[0], $fieldPossibilities)) {
             if ($isRelative) {
               unset($formValues[$index]);
