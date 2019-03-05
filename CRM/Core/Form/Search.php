@@ -151,18 +151,43 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * than existing ad hoc handling.
    */
   public function addFormFieldsFromMetadata() {
+    $this->addFormRule(['CRM_Core_Form_Search', 'formRule'], $this);
     $this->_action = CRM_Core_Action::ADVANCED;
     foreach ($this->getSearchFieldMetadata() as $entity => $fields) {
       foreach ($fields as $fieldName => $fieldSpec) {
-        if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE) {
-          // Assuming time is false for now as we are not checking for date-time fields as yet.
-          $this->addDatePickerRange($fieldName, $fieldSpec['title'], FALSE);
+        if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || $fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
+          $this->addDatePickerRange($fieldName, $fieldSpec['title'], ($fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)));
         }
         else {
           $this->addField($fieldName, ['entity' => $entity]);
         }
       }
     }
+  }
+
+  /**
+   * Global validation rules for the form.
+   *
+   * @param array $fields
+   *   Posted values of the form.
+   *
+   * @return array
+   *   list of errors to be posted back to the form
+   */
+  public static function formRule($fields, $files, $form) {
+    $errors = [];
+    foreach ($form->getSearchFieldMetadata() as $entity => $spec) {
+      foreach ($spec as $fieldName => $fieldSpec) {
+        if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || $fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
+          if (isset($fields[$fieldName . '_high']) && isset($fields[$fieldName . '_low']) && empty($fields[$fieldName . '_relative'])) {
+            if (strtotime($fields[$fieldName . '_low']) > strtotime($fields[$fieldName . '_high'])) {
+              $errors[$fieldName . '_low'] = ts('%1: Please check that your date range is in correct chronological order.', [1 => $fieldSpec['title']]);
+            }
+          }
+        }
+      }
+    }
+    return $errors;
   }
 
   /**
@@ -184,6 +209,10 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       case CRM_Utils_Type::T_INT:
         return 'CommaSeparatedIntegers';
 
+      case CRM_Utils_Type::T_DATE:
+      case CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME:
+        return 'Timestamp';
+
       default:
         return 'Alphanumeric';
     }
@@ -203,6 +232,15 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
         $value = CRM_Utils_Request::retrieveValue($fieldSpec['name'], $this->getValidationTypeForField($entity, $fieldSpec['name']), FALSE, NULL, 'GET');
         if ($value !== FALSE) {
           $defaults[$fieldSpec['name']] = $value;
+        }
+        if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || ($fieldSpec['type'] === CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
+          $low = CRM_Utils_Request::retrieveValue($fieldSpec['name'] . '_low', 'Timestamp', FALSE, NULL, 'GET');
+          $high = CRM_Utils_Request::retrieveValue($fieldSpec['name'] . '_high', 'Timestamp', FALSE, NULL, 'GET');
+          if ($low !== FALSE || $high !== FALSE) {
+            $defaults[$fieldSpec['name'] . '_relative'] = 0;
+            $defaults[$fieldSpec['name'] . '_low'] = $low ? date('Y-m-d H:i:s', strtotime($low)) : NULL;
+            $defaults[$fieldSpec['name'] . '_high'] = $high ? date('Y-m-d H:i:s', strtotime($high)) : NULL;
+          }
         }
       }
     }

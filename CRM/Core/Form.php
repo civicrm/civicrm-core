@@ -1295,11 +1295,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param string $fieldName
    * @param string $label
+   * @param bool $isDateTime
+   *   Is this a date-time field (not just date).
    * @param bool $required
    * @param string $fromLabel
    * @param string $toLabel
    */
-  public function addDatePickerRange($fieldName, $label, $required = FALSE, $fromLabel = 'From', $toLabel = 'To') {
+  public function addDatePickerRange($fieldName, $label, $isDateTime = FALSE, $required = FALSE, $fromLabel = 'From', $toLabel = 'To') {
 
     $options = array(
       '' => ts('- any -'),
@@ -1314,7 +1316,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       NULL
     );
     $attributes = ['format' => 'searchDate'];
-    $extra = ['time' => FALSE];
+    $extra = ['time' => $isDateTime];
     $this->add('datepicker', $fieldName . '_low', ts($fromLabel), $attributes, $required, $extra);
     $this->add('datepicker', $fieldName . '_high', ts($toLabel), $attributes, $required, $extra);
   }

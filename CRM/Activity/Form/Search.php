@@ -322,31 +322,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       }
     }
 
-    $dateLow = CRM_Utils_Request::retrieve('dateLow', 'String');
-
-    if ($dateLow) {
-      $dateLow = date('m/d/Y', strtotime($dateLow));
-      $this->_formValues['activity_date_relative'] = 0;
-      $this->_defaults['activity_date_relative'] = 0;
-      $this->_formValues['activity_date_low'] = $dateLow;
-      $this->_defaults['activity_date_low'] = $dateLow;
-    }
-
-    $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'String');
-
-    if ($dateHigh) {
-      // Activity date time assumes midnight at the beginning of the date
-      // This sets it to almost midnight at the end of the date
-      /*   if ($dateHigh <= 99999999) {
-      $dateHigh = 1000000 * $dateHigh + 235959;
-      } */
-      $dateHigh = date('m/d/Y', strtotime($dateHigh));
-      $this->_formValues['activity_date_relative'] = 0;
-      $this->_defaults['activity_date_relative'] = 0;
-      $this->_formValues['activity_date_high'] = $dateHigh;
-      $this->_defaults['activity_date_high'] = $dateHigh;
-    }
-
     // Enable search activity by custom value
     // @todo this is not good security practice. Instead define entity fields in metadata &
     // use getEntity Defaults

@@ -1899,6 +1899,8 @@ class CRM_Contact_BAO_Query {
       case 'activity_date':
       case 'activity_date_low':
       case 'activity_date_high':
+      case 'activity_date_time_low':
+      case 'activity_date_time_high':
       case 'activity_role':
       case 'activity_status_id':
       case 'activity_status':

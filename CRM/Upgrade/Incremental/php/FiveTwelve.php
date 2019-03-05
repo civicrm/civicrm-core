@@ -73,10 +73,19 @@ class CRM_Upgrade_Incremental_php_FiveTwelve extends CRM_Upgrade_Incremental_Bas
    * @param string $rev
    */
   public function upgrade_5_12_alpha1($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Update smart groups to rename filters on activity_date to activity_date_time', 'updateSmartGroups', [
+      'renameFields' => [
+        ['old' => 'activity_date', 'new' => 'activity_date_time'],
+        ['old' => 'activity_date_low', 'new' => 'activity_date_time_low'],
+        ['old' => 'activity_date_high', 'new' => 'activity_date_time_high'],
+        ['old' => 'activity_date_relative', 'new' => 'activity_date_time_relative'],
+      ],
+    ]);
     $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', [
       'datepickerConversion' => [
         'age_asof_date',
+        'activity_date_time'
       ]
     ]);
   }
