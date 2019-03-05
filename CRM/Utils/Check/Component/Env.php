@@ -121,35 +121,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return array
-   */
-  public function checkPhpEcrypt() {
-    $messages = array();
-    $mailingBackend = Civi::settings()->get('mailing_backend');
-    if (!is_array($mailingBackend)
-      || !isset($mailingBackend['outBound_option'])
-      || $mailingBackend['outBound_option'] != CRM_Mailing_Config::OUTBOUND_OPTION_SMTP
-      || !CRM_Utils_Array::value('smtpAuth', $mailingBackend)
-    ) {
-      return $messages;
-    }
-
-    $test_pass = 'iAmARandomString';
-    $encrypted_test_pass = CRM_Utils_Crypt::encrypt($test_pass);
-    if ($encrypted_test_pass == base64_encode($test_pass)) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Your PHP does not include the mcrypt encryption functions. Your SMTP password will not be stored encrypted, and if you have recently upgraded from a PHP that stored it with encryption, it will not be decrypted correctly.'
-        ),
-        ts('PHP Missing Extension "mcrypt"'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-server'
-      );
-    }
-    return $messages;
-  }
-
-  /**
    * Check that the MySQL time settings match the PHP time settings.
    *
    * @return array<CRM_Utils_Check_Message> an empty array, or a list of warnings
