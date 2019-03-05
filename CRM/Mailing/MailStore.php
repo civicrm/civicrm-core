@@ -57,12 +57,15 @@ class CRM_Mailing_MailStore {
       throw new Exception("Empty mail protocol");
     }
 
+    // Addcslashes here makes passwords with spaces, quotes, and backslashes work.
+    $password = addcslashes($dao->password, '"\ ');
+
     switch ($protocols[$dao->protocol]) {
       case 'IMAP':
-        return new CRM_Mailing_MailStore_Imap($dao->server, $dao->username, $dao->password, (bool) $dao->is_ssl, $dao->source);
+        return new CRM_Mailing_MailStore_Imap($dao->server, $dao->username, $password, (bool) $dao->is_ssl, $dao->source);
 
       case 'POP3':
-        return new CRM_Mailing_MailStore_Pop3($dao->server, $dao->username, $dao->password, (bool) $dao->is_ssl);
+        return new CRM_Mailing_MailStore_Pop3($dao->server, $dao->username, $password, (bool) $dao->is_ssl);
 
       case 'Maildir':
         return new CRM_Mailing_MailStore_Maildir($dao->source);
