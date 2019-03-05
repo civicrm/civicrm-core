@@ -2170,4 +2170,41 @@ class CRM_Utils_Date {
     return $month;
   }
 
+
+  /**
+   * Convert a relative date format to an api field.
+   *
+   * @param array $params
+   * @param string $dateField
+   * @param bool $isDatePicker
+   *   Non datepicker fields are deprecated. Exterminate Exterminate.
+   *   (but for now handle them).
+   */
+  public static function convertFormDateToApiFormat(&$params, $dateField, $isDatePicker = TRUE) {
+    if (!empty($params[$dateField . '_relative'])) {
+      $dates = CRM_Utils_Date::getFromTo($params[$dateField . '_relative'], NULL, NULL);
+      unset($params[$dateField . '_relative']);
+    }
+    if (!empty($params[$dateField . '_low'])) {
+      $dates[0] = $isDatePicker ? $params[$dateField . '_low'] : date('Y-m-d H:i:s', strtotime($params[$dateField . '_low']));
+      unset($params[$dateField . '_low']);
+    }
+    if (!empty($params[$dateField . '_high'])) {
+      $dates[1] = $isDatePicker ? $params[$dateField . '_high'] : date('Y-m-d 23:59:59', strtotime($params[$dateField . '_high']));
+      unset($params[$dateField . '_high']);
+    }
+    if (empty($dates)) {
+      return;
+    }
+    if (empty($dates[0])) {
+      $params[$dateField] = ['<=' => $dates[1]];
+    }
+    elseif (empty($dates[1])) {
+      $params[$dateField] = ['>=' => $dates[0]];
+    }
+    else {
+      $params[$dateField] = ['BETWEEN' => $dates];
+    }
+  }
+
 }

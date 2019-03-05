@@ -71,9 +71,9 @@
               var status_id = $('.crm-activity-selector-' + context + ' select#status_id').val() || [];
               d.activity_type_id = $('.crm-activity-selector-' + context + ' select#activity_type_filter_id').val(),
               d.activity_type_exclude_id = $('.crm-activity-selector-' + context + ' select#activity_type_exclude_filter_id').val(),
-              d.activity_date_relative = $('select#activity_date_relative').val(),
-              d.activity_date_low = $('#activity_date_low').val(),
-              d.activity_date_high = $('#activity_date_high').val(),
+              d.activity_date_time_relative = $('select#activity_date_relative').val(),
+              d.activity_date_time_low = $('#activity_date_low').val(),
+              d.activity_date_time_high = $('#activity_date_high').val(),
               d.activity_status_id = status_id.join(',')
             }
           }
