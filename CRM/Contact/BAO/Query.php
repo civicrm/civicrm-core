@@ -1384,6 +1384,8 @@ class CRM_Contact_BAO_Query {
       }
     }
     elseif ($sortByChar) {
+      // @fixme add the deprecated warning back in (it breaks CRM_Contact_SelectorTest::testSelectorQuery)
+      // CRM_Core_Error::deprecatedFunctionWarning('sort by char is deprecated - use alphabetQuery method');
       $select = 'SELECT DISTINCT LEFT(contact_a.sort_name, 1) as sort_name';
       $from = $this->_simpleFromClause;
     }
@@ -4948,18 +4950,19 @@ civicrm_relationship.start_date > {$today}
   }
 
   /**
-   * Create and query the db for a contact search.
+   * Create and query the db for the list of all first letters used by contacts
    *
    * @return CRM_Core_DAO
    */
   public function alphabetQuery() {
-    $query = $this->getSearchSQL(NULL, NULL, NULL, FALSE, FALSE, TRUE);
-
+    $sqlParts = $this->getSearchSQLParts(NULL, NULL, NULL, FALSE, FALSE, TRUE);
+    $query = "SELECT DISTINCT LEFT(contact_a.sort_name, 1) as sort_name
+      {$this->_simpleFromClause}
+      {$sqlParts['where']}
+      {$sqlParts['having']}
+      GROUP BY sort_name
+      ORDER BY sort_name asc";
     $dao = CRM_Core_DAO::executeQuery($query);
-
-    // We can always call this - it will only re-enable if it was originally enabled.
-    CRM_Core_DAO::reenableFullGroupByMode();
-
     return $dao;
   }
 
@@ -6270,8 +6273,6 @@ AND   displayRelType.is_active = 1
    *
    * @param string|CRM_Utils_Sort $sort
    *   The order by string.
-   * @param bool $sortByChar
-   *   If true returns the distinct array of first characters for search results.
    * @param null $sortOrder
    *   Who knows? Hu knows. He who knows Hu knows who.
    * @param string $additionalFromClause
@@ -6279,7 +6280,7 @@ AND   displayRelType.is_active = 1
    * @return array
    *   list(string $orderByClause, string $additionalFromClause).
    */
-  protected function prepareOrderBy($sort, $sortByChar, $sortOrder, $additionalFromClause) {
+  protected function prepareOrderBy($sort, $sortOrder, $additionalFromClause) {
     $orderByArray = [];
     $orderBy = '';
 
@@ -6314,9 +6315,6 @@ AND   displayRelType.is_active = 1
             $orderBy .= ", contact_a.id";
           }
         }
-      }
-      elseif ($sortByChar) {
-        $orderBy = " sort_name asc";
       }
       else {
         $orderBy = " contact_a.sort_name ASC, contact_a.id";
@@ -6397,10 +6395,6 @@ AND   displayRelType.is_active = 1
 
     // The above code relies on crazy brittle string manipulation of a peculiarly-encoded ORDER BY
     // clause. But this magic helper which forgivingly reescapes ORDER BY.
-    // Note: $sortByChar implies that $order was hard-coded/trusted, so it can do funky things.
-    if ($sortByChar) {
-      return array(' ORDER BY ' . $order, $additionalFromClause);
-    }
     if ($order) {
       $order = CRM_Utils_Type::escape($order, 'MysqlOrderBy');
       return array(' ORDER BY ' . $order, $additionalFromClause);
@@ -6663,6 +6657,11 @@ AND   displayRelType.is_active = 1
 
     $sqlParts = $this->getSearchSQLParts($offset, $rowCount, $sort, $count, $includeContactIds, $sortByChar, $groupContacts, $additionalWhereClause, $sortOrder, $additionalFromClause);
 
+    if ($sortByChar) {
+      CRM_Core_Error::deprecatedFunctionWarning('sort by char is deprecated - use alphabetQuery method');
+      $sqlParts['order_by'] = 'ORDER BY sort_name asc';
+    }
+
     if ($skipOrderAndLimit) {
       CRM_Core_Error::deprecatedFunctionWarning('skipOrderAndLimit is deprected - call getSearchSQLParts & construct it in the calling function');
       $query = "{$sqlParts['select']} {$sqlParts['from']} {$sqlParts['where']} {$sqlParts['having']} {$sqlParts['group_by']}";
@@ -6749,14 +6748,14 @@ AND   displayRelType.is_active = 1
 
     $order = $orderBy = '';
     if (!$count) {
-      list($order, $additionalFromClause) = $this->prepareOrderBy($sort, $sortByChar, $sortOrder, $additionalFromClause);
+      if (!$sortByChar) {
+        list($order, $additionalFromClause) = $this->prepareOrderBy($sort, $sortOrder, $additionalFromClause);
+      }
     }
-    // Two cases where we are disabling FGB (FULL_GROUP_BY_MODE):
-    //   1. Expecting the search query to return all the first single letter characters of contacts ONLY, but when FGB is enabled
-    //      MySQL expect the columns present in GROUP BY, must be present in SELECT clause and that results into error, needless to have other columns.
-    //   2. When GROUP BY columns are present then disable FGB otherwise it demands to add ORDER BY columns in GROUP BY and eventually in SELECT
+    // Cases where we are disabling FGB (FULL_GROUP_BY_MODE):
+    //   1. When GROUP BY columns are present then disable FGB otherwise it demands to add ORDER BY columns in GROUP BY and eventually in SELECT
     //     clause. This will impact the search query output.
-    $disableFullGroupByMode = ($sortByChar || !empty($groupBy) || $groupContacts);
+    $disableFullGroupByMode = (!empty($groupBy) || $groupContacts);
 
     if ($disableFullGroupByMode) {
       CRM_Core_DAO::disableFullGroupByMode();
