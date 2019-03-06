@@ -1643,8 +1643,8 @@ class CRM_Contact_BAO_Query {
           // https://lab.civicrm.org/dev/core/issues/745
           // @todo this renaming of email_on_hold to on_hold needs revisiting
           // it preceeds recent changes but causes the default not to reload.
-          if (is_numeric($onHoldValue) || is_array($onHoldValue)) {
-            $onHoldValue = (array) $onHoldValue;
+          $onHoldValue = array_filter((array) $onHoldValue, 'is_numeric');
+          if (!empty($onHoldValue)) {
             $params[] = ['on_hold', 'IN', $onHoldValue, 0, 0];
           }
         }
