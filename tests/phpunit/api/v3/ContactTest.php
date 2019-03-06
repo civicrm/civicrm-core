@@ -1017,7 +1017,26 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'last_name' => "O'Connor",
       'sequential' => 1,
     ));
-    $this->assertEquals("O'Connor", $result['last_name'], 'in line' . __LINE__);
+    $this->assertEquals("O'Connor", $result['last_name']);
+  }
+
+  /**
+   * Test between accepts zero.
+   *
+   * In the past it incorrectly required !empty.
+   */
+  public function testGetBetweenZeroWorks() {
+    $this->callAPISuccess($this->_entity, 'get', [
+      'contact_id' => ['BETWEEN' => [0, 9]],
+    ]);
+    $this->callAPISuccess($this->_entity, 'get', [
+      'contact_id' => [
+        'BETWEEN' => [
+          (0 - 9),
+          0,
+        ],
+      ],
+    ]);
   }
 
   /**
