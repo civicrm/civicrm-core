@@ -58,30 +58,13 @@ class CRM_Financial_BAO_Payment {
 
     $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount']);
 
-    // Check if pending contribution
-    $fullyPaidPayLater = ($contributionStatus == 'Pending' && $isPaymentCompletesContribution);
-    if ($contributionStatus == 'Pending') {
-      if ($isPaymentCompletesContribution) {
-        civicrm_api3('Contribution', 'completetransaction', ['id' => $contribution['id']]);
-        // Get the trxn
-        $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
-        $ftParams = ['id' => $trxnId['financialTrxnId']];
-        $trxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams, CRM_Core_DAO::$_nullArray);
-      }
-      else {
-        civicrm_api3('Contribution', 'create',
-          [
-            'id' => $contribution['id'],
-            'contribution_status_id' => 'Partially paid',
-          ]
-        );
-      }
-    }
-    if (!$fullyPaidPayLater) {
+    // For legacy reasons Pending payments are completed through completetransaction.
+    // @todo completetransaction should transition components but financial transactions
+    // should be handled through Payment.create.
+    $isSkipRecordingPaymentHereForLegacyHandlingReasons = ($contributionStatus == 'Pending' && $isPaymentCompletesContribution);
+
+    if (!$isSkipRecordingPaymentHereForLegacyHandlingReasons) {
       $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
-      if ($isPaymentCompletesContribution) {
-        civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
-      }
 
       if (CRM_Utils_Array::value('line_item', $params) && !empty($trxn)) {
         foreach ($params['line_item'] as $values) {
@@ -115,6 +98,22 @@ class CRM_Financial_BAO_Payment {
       elseif (!empty($trxn)) {
         CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution['total_amount']);
       }
+    }
+
+    if ($isPaymentCompletesContribution) {
+      civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
+      // Get the trxn
+      $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+      $ftParams = ['id' => $trxnId['financialTrxnId']];
+      $trxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams, CRM_Core_DAO::$_nullArray);
+    }
+    elseif ($contributionStatus === 'Pending') {
+      civicrm_api3('Contribution', 'create',
+        [
+          'id' => $contribution['id'],
+          'contribution_status_id' => 'Partially paid',
+        ]
+      );
     }
 
     return $trxn;
