@@ -244,13 +244,13 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $optionValue->save();
     CRM_Core_PseudoConstant::flush();
 
-    // Create relationship for payment intrument options
+    // Create relationship for payment instrument options
     if (!empty($params['financial_account_id'])) {
       $optionName = civicrm_api3('OptionGroup', 'getvalue', [
         'return' => 'name',
         'id' => $params['option_group_id'],
       ]);
-      // Only create relationship for payment intrument options
+      // Only create relationship for payment instrument options
       if ($optionName == 'payment_instrument') {
         $relationTypeId = civicrm_api3('OptionValue', 'getvalue', [
           'return' => 'value',
