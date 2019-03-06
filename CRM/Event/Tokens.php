@@ -60,6 +60,7 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         'contact_email' => ts('Event Contact (Email)'),
         'contact_phone' => ts('Event Contact (Phone)'),
         'balance' => ts('Event Balance'),
+        'participant_id' => ts('Participant ID'),
       ),
       CRM_Utils_Token::getCustomFieldTokens('Event')
     ));
@@ -86,7 +87,7 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     }
 
     $e->query->select('e.*'); // FIXME: seems too broad.
-    $e->query->select('ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone');
+    $e->query->select('e.id as participant_id, ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone');
     $e->query->join('participant_stuff', "
 !casMailingJoinType civicrm_event ev ON e.event_id = ev.id
 !casMailingJoinType civicrm_option_group og ON og.name = 'event_type'
