@@ -358,10 +358,6 @@ class CRM_Financial_BAO_Payment {
   public static function recordPayment($contributionId, $trxnData, $participantId) {
     list($contributionDAO, $params) = self::getContributionAndParamsInFormatForRecordFinancialTransaction($contributionId);
 
-    if (!$participantId) {
-      $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $contributionId, 'participant_id', 'contribution_id');
-    }
-
     $trxnData['trxn_date'] = !empty($trxnData['trxn_date']) ? $trxnData['trxn_date'] : date('YmdHis');
     $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $trxnData, CRM_Utils_Array::value('payment_instrument_id', $params));
 
@@ -428,6 +424,9 @@ WHERE eft.entity_table = 'civicrm_contribution'
       // which in 'Partial Paid' => 'Completed' is not useful, instead specific financial record updates
       // are coded below i.e. just updating financial_item status to 'Paid'
 
+      if (!$participantId) {
+        $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $contributionId, 'participant_id', 'contribution_id');
+      }
       if ($participantId) {
         // update participant status
         $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
