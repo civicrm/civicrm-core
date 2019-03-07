@@ -629,6 +629,10 @@
   name        : Jérôme Lebleu
   jira        : jlebleu
 
+- github      : jgillmanjr
+  name        : Jason Gillman Jr.
+  organization: Liquid Web, Inc.
+
 - github      : jitendrapurohit
   name        : Jitendra Purohit
   organization: Fuzion
@@ -869,6 +873,10 @@
   organization: MJW Consulting
   jira        : mattwire
 
+- github      : martinh-pw
+  name        : Martin Hansen
+  organization: PeaceWorks Technology Solutions
+
 - github      : mc0e
   name        : Andrew McNaughton
   jira        : mc0e
@@ -1024,6 +1032,10 @@
 
 - name        : Peter Bull
   jira        : peter39
+
+- github      : pfigel
+  name        : Patrick Figel
+  organization: GreenPeace Central and Eastern Europe
 
 - github      : philmck
   name        : Phil McKerracher
@@ -1234,6 +1246,10 @@
   name        : Sharique Ahmed Farooqui
   jira        : sharique
 
+- github      : shitijg
+  name        : Shitij Gugnani
+  organization: CompuCorp
+
 - name        : James van der Hoven
   jira        : sixfootjames
 
@@ -1286,6 +1302,10 @@
   name        : Sunil Pawar
   organization: CiviDesk
   jira        : sunil
+
+- github      : swastikpareek
+  name        : Swastik Pareek
+  organization: QED42
 
 - github      : systopia
   name        : Björn Endres
@@ -1377,6 +1397,9 @@
   name        : Allen Shaw
   organization: Joinery
   jira        : allenshaw
+
+- github      : universalhandle
+  name        : Frank J. Gómez
 
 - github      : upperholme
   name        : Graham Mitchell
