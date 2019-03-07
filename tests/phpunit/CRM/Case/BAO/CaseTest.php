@@ -171,6 +171,64 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that all custom files are migrated to new case when case is assigned to new client.
+   */
+  public function testCaseReassignForCustomFiles() {
+    $individual = $this->individualCreate();
+    $customGroup = $this->customGroupCreate(array(
+      'extends' => 'Case',
+    ));
+    $customGroup = $customGroup['values'][$customGroup['id']];
+    $customFileFieldA = $this->customFieldCreate(array(
+      'custom_group_id' => $customGroup['id'],
+      'html_type'       => 'File',
+      'is_active'       => 1,
+      'default_value'   => 'null',
+      'label'           => 'Custom File A',
+      'data_type'       => 'File',
+    ));
+    $customFileFieldB = $this->customFieldCreate(array(
+      'custom_group_id' => $customGroup['id'],
+      'html_type'       => 'File',
+      'is_active'       => 1,
+      'default_value'   => 'null',
+      'label'           => 'Custom File B',
+      'data_type'       => 'File',
+    ));
+
+    $fileA = $this->callAPISuccess('File', 'create', array(
+      'uri' => 'test_file_uri',
+    ));
+    $fileB = $this->callAPISuccess('File', 'create', array(
+      'uri' => 'test_file_uri_2',
+    ));
+
+    $caseObj = $this->createCase($individual);
+
+    $this->callAPISuccess('Case', 'create', array(
+      'id'                                => $caseObj->id,
+      'custom_' . $customFileFieldA['id'] => $fileA['id'],
+      'custom_' . $customFileFieldB['id'] => $fileB['id'],
+    ));
+
+    $reassignIndividual = $this->individualCreate();
+    $this->createLoggedInUser();
+    $newCase = CRM_Case_BAO_Case::mergeCases($reassignIndividual, $caseObj->id, $individual, NULL, TRUE);
+
+    $entityFiles = new CRM_Core_DAO_EntityFile();
+    $entityFiles->entity_id = $newCase[0];
+    $entityFiles->entity_table = $customGroup['table_name'];
+    $entityFiles->find();
+
+    $totalEntityFiles = 0;
+    while ($entityFiles->fetch()) {
+      $totalEntityFiles++;
+    }
+
+    $this->assertEquals(2, $totalEntityFiles, 'Two files should be attached with new case.');
+  }
+
+  /**
    * FIXME: need to create an activity to run this test
    * function testGetCases() {
    *   $cases = CRM_Case_BAO_Case::getCases(TRUE, 3);
