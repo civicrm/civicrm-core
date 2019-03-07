@@ -596,20 +596,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // the is_monetary concept probably should be too as it can be calculated from
     // the existence of 'amount' & seems fragile.
     if ($this->_contributeMode == 'notify' ||
-      $this->_amount < 0.0 || $this->_params['is_pay_later'] ||
-      ($this->_separateMembershipPayment && $this->_amount <= 0.0)
+      $this->_amount <= 0.0 || $this->_params['is_pay_later']
     ) {
       $contribButton = ts('Continue');
-      $this->assign('button', ts('Continue'));
     }
     elseif (!empty($this->_ccid)) {
       $contribButton = ts('Make Payment');
-      $this->assign('button', ts('Make Payment'));
     }
     else {
       $contribButton = ts('Make Contribution');
-      $this->assign('button', ts('Make Contribution'));
     }
+    $this->assign('button', $contribButton);
     $this->addButtons(array(
         array(
           'type' => 'next',
