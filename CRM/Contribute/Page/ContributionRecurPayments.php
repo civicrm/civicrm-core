@@ -45,6 +45,7 @@ class CRM_Contribute_Page_ContributionRecurPayments extends CRM_Core_Page {
       'contribution_recur_id' => $this->id,
       'contact_id' => $this->contactId,
       'options' => array('limit' => 0),
+      'contribution_test' => '',
     ));
 
     foreach ($relatedContributionsResult['values'] as $contribution) {
