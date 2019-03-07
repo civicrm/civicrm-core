@@ -67,8 +67,7 @@ class CRM_Core_BAO_SchemaHandler {
   public static function createTable(&$params) {
     $sql = self::buildTableSQL($params);
     // do not i18n-rewrite
-    $dao = CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, FALSE, FALSE);
-    $dao->free();
+    CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, FALSE, FALSE);
 
     $config = CRM_Core_Config::singleton();
     if ($config->logging) {
@@ -253,15 +252,13 @@ class CRM_Core_BAO_SchemaHandler {
 ALTER TABLE {$tableName}
       DROP FOREIGN KEY `FK_{$fkName}`;";
 
-    $dao = CRM_Core_DAO::executeQuery($dropFKSql);
-    $dao->free();
+    CRM_Core_DAO::executeQuery($dropFKSql);
 
     $addFKSql = "
 ALTER TABLE {$tableName}
       ADD CONSTRAINT `FK_{$fkName}` FOREIGN KEY (`entity_id`) REFERENCES {$fkTableName} (`id`) ON DELETE CASCADE;";
     // CRM-7007: do not i18n-rewrite this query
-    $dao = CRM_Core_DAO::executeQuery($addFKSql, array(), TRUE, NULL, FALSE, FALSE);
-    $dao->free();
+    CRM_Core_DAO::executeQuery($addFKSql, array(), TRUE, NULL, FALSE, FALSE);
 
     return TRUE;
   }
@@ -336,8 +333,7 @@ ALTER TABLE {$tableName}
     }
 
     // CRM-7007: do not i18n-rewrite this query
-    $dao = CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, FALSE, FALSE);
-    $dao->free();
+    CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, FALSE, FALSE);
 
     $config = CRM_Core_Config::singleton();
     if ($config->logging) {
@@ -529,7 +525,6 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
         $tableIndexes[$dao->Key_name]['unique'] = ($dao->Non_unique == 0 ? 1 : 0);
       }
       $indexes[$table] = $tableIndexes;
-      $dao->free();
     }
     return $indexes;
   }
@@ -636,7 +631,6 @@ MODIFY      {$columnName} varchar( $length )
     $query = "SHOW COLUMNS FROM $tableName LIKE '%1'";
     $dao = CRM_Core_DAO::executeQuery($query, [1 => [$columnName, 'Alphanumeric']], TRUE, NULL, FALSE, $i18nRewrite);
     $result = $dao->fetch() ? TRUE : FALSE;
-    $dao->free();
     return $result;
   }
 
@@ -783,7 +777,6 @@ MODIFY      {$columnName} varchar( $length )
     foreach ($queries as $query) {
       $dao->query($query, FALSE);
     }
-    $dao->free();
   }
 
 }
