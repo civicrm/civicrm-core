@@ -42,11 +42,7 @@
         <div class="help">
         {ts}Please verify the information below. Click the <strong>Go Back</strong> button below if you need to make changes.{/ts}
         {if $contributeMode EQ 'notify' and !$is_pay_later and ! $isAmountzero }
-            {if $paymentProcessor.payment_processor_type EQ 'Google_Checkout'}
-                {ts 1=$paymentProcessor.name}Click the <strong>%1</strong> button to checkout to Google, where you will select your payment method and complete the registration.{/ts}
-            {else}
-                {ts 1=$paymentProcessor.name}Click the <strong>Continue</strong> button to checkout to %1, where you will select your payment method and complete the registration.{/ts}
-            {/if }
+          {ts 1=$paymentProcessor.name}Click the <strong>Continue</strong> button to checkout to %1, where you will select your payment method and complete the registration.{/ts}
         {else}
             {ts}Otherwise, click the <strong>Continue</strong> button below to complete your registration.{/ts}
         {/if}
