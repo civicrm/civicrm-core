@@ -76,7 +76,6 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
       $this->redis->hSet($dataKey, $entity_id, $data);
     }
 
-    $dao->free();
     return TRUE;
   }
 

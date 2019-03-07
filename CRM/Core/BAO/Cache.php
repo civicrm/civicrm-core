@@ -132,7 +132,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         while ($dao->fetch()) {
           $result[$dao->path] = self::decode($dao->data);
         }
-        $dao->free();
 
         self::$_cache[$argString] = $result;
         $cache->set($cleanKey, self::$_cache[$argString]);
@@ -201,8 +200,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     }
 
     $lock->release();
-
-    $dao->free();
 
     // cache coherency - refresh or remove dependent caches
 

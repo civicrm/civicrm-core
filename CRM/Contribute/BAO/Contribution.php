@@ -1652,7 +1652,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         strpos($dao->source, $source) !== FALSE
       ) {
         $contributionId = $dao->contribution_id;
-        $dao->free();
       }
     }
 
@@ -1928,8 +1927,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               }
             }
             // else fall back to using current membership type
-            $dao->free();
-
             // Figure out number of terms
             $numterms = 1;
             $lineitems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contributionId);
@@ -3102,7 +3099,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             'amount' => $additional->fee_amount,
           );
           $additional->save();
-          $additional->free();
           $template->assign('amount', $amount);
           CRM_Event_BAO_Event::sendMail($cId, $values, $pId, $isTest, $returnMessageText);
         }
@@ -4697,7 +4693,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $membership->start_date = CRM_Utils_Date::isoToMysql($membership->start_date);
           $membership->end_date = CRM_Utils_Date::isoToMysql($membership->end_date);
           $this->_relatedObjects['membership'][$membership->membership_type_id] = $membership;
-          $membership->free();
         }
       }
     }
@@ -5287,7 +5282,6 @@ LIMIT 1;";
           $membershipParams['membership_type_id'] = $dao->membership_type_id;
         }
       }
-      $dao->free();
 
       $membershipParams['num_terms'] = $contribution->getNumTermsByContributionAndMembershipType(
         $membershipParams['membership_type_id'],
