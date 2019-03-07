@@ -752,6 +752,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function setTitle($title) {
     $this->_title = $title;
+    CRM_Utils_System::setTitle($title);
   }
 
   /**
