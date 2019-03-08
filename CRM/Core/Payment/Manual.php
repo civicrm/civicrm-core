@@ -231,4 +231,30 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
     return TRUE;
   }
 
+  /**
+   * Get help text information (help, description, etc.) about this payment,
+   * to display to the user.
+   *
+   * @param string $context
+   *   Context of the text.
+   *   Only explicitly supported contexts are handled without error.
+   *   Currently supported:
+   *   - contributionPageRecurringHelp (params: is_recur_installments, is_email_receipt)
+   *
+   * @param array $params
+   *   Parameters for the field, context specific.
+   *
+   * @return string
+   */
+  public function getText($context, $params) {
+    switch ($context) {
+      case 'contributionPageContinueText':
+        if ($params['amount'] <= 0) {
+          return ts('To complete this transaction, click the <strong>Continue</strong> button below.');
+        }
+        return ts('To complete your contribution, click the <strong>Continue</strong> button below.');
+
+    }
+  }
+
 }
