@@ -81,7 +81,14 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
     ) {
       $dsnArray = DB::parseDSN($config->dsn);
       $tableNames = CRM_Core_DAO::getTableNames();
-      $tablePrefixes = '$databases[\'default\'][\'default\'][\'prefix\']= array(';
+      $tablePrefixes = '';
+      if ($config->userFramework === 'Backdrop') {
+        // Pre-empt Backdrop's DSN translation so that it doesn't clobber our table prefixes.
+        $tablePrefixes .= $this->exportStaticFunction('normalizeBackdropDsn', '_settings_db_array');
+        $tablePrefixes .= 'if (!empty($database)) { $databases[\'default\'][\'default\'] = _settings_db_array($database); unset($database); }';
+        $tablePrefixes .= "\n\n";
+      }
+      $tablePrefixes .= '$databases[\'default\'][\'default\'][\'prefix\']= array(';
       $tablePrefixes .= "\n  'default' => '$drupal_prefix',"; // add default prefix: the drupal database prefix
       $prefix = "";
       if ($config->dsn != $config->userFrameworkDSN) {
@@ -95,6 +102,45 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
     }
 
     parent::buildQuickForm();
+  }
+
+  /**
+   * @param string $staticName
+   *   Name of an existing static function.
+   * @param string $globalName
+   *   Name of the new global function.
+   * @return string
+   *   PHP code of the global function
+   */
+  public function exportStaticFunction($staticName, $globalName) {
+    $func = new ReflectionMethod(__CLASS__, $staticName);
+    $filename = $func->getFileName();
+    $startLine = $func->getStartLine() - 1;
+    $endLine = $func->getEndLine();
+    $lines = file($filename);
+    $lines[$startLine] = preg_replace('/^\s*(public\s*|private\s*|final\s*|static\s*)*\s*function\s+(\w+)/', 'function ' . $globalName, $lines[$startLine]);
+    return implode("", array_slice($lines, $startLine, $endLine - $startLine));
+  }
+
+  /**
+   * By default, Backdrop's settings.php sets a global string `$database`, which
+   * is later converted to array `$databases`. However, that will trample any
+   * tablePrefixes that we set. We need it converted sooner.
+   */
+  public static function normalizeBackdropDsn($database) {
+    $database_parts = parse_url($database);
+    if (!$database_parts) {
+      trigger_error('The database setting could not be parsed. Please check the $database setting in settings.php.', E_USER_ERROR);
+    }
+    return array(
+      'driver' => $database_parts['scheme'],
+      'database' => rawurldecode(substr($database_parts['path'], 1)),
+      'username' => isset($database_parts['user']) ? rawurldecode($database_parts['user']) : '',
+      'password' => isset($database_parts['pass']) ? rawurldecode($database_parts['pass']) : '',
+      'host' => $database_parts['host'],
+      'port' => isset($database_parts['port']) ? $database_parts['port'] : NULL,
+      'prefix' => !empty($database_prefix) ? $database_prefix : '',
+    );
   }
 
 }
