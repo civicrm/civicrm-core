@@ -384,12 +384,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $statusMsg = ts('The payment record has been processed.');
     // send email
     if (!empty($result) && !empty($this->_params['is_email_receipt'])) {
-      $this->_params['contact_id'] = $this->_contactId;
-      $this->_params['contribution_id'] = $this->_contributionId;
-      // to get 'from email id' for send receipt
-      $this->fromEmailId = $this->_params['from_email_address'];
-      $sendReceipt = $this->emailReceipt($this->_params);
-      if ($sendReceipt) {
+      $sendResult = civicrm_api3('Payment', 'sendconfirmation', ['id' => $result->id])['values'][$result->id];
+      if ($sendResult['is_sent']) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
       }
     }
@@ -497,90 +493,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       );
       $this->_params['source'] = ts('Submit Credit Card Payment by: %1', array(1 => $userSortName));
     }
-  }
-
-  /**
-   * Function to send email receipt.
-   *
-   * @param array $params
-   *
-   * @return bool
-   */
-  public function emailReceipt(&$params) {
-    // email receipt sending
-    // send message template
-    if ($this->_component == 'event') {
-
-      // fetch event information from participant ID using API
-      $eventId = civicrm_api3('Participant', 'getvalue', array(
-        'return' => "event_id",
-        'id' => $this->_id,
-      ));
-      $event = civicrm_api3('Event', 'getsingle', array('id' => $eventId));
-
-      $this->assign('event', $event);
-      $this->assign('isShowLocation', $event['is_show_location']);
-      if (CRM_Utils_Array::value('is_show_location', $event) == 1) {
-        $locationParams = array(
-          'entity_id' => $eventId,
-          'entity_table' => 'civicrm_event',
-        );
-        $location = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
-        $this->assign('location', $location);
-      }
-    }
-
-    // assign payment info here
-    $paymentConfig['confirm_email_text'] = CRM_Utils_Array::value('confirm_email_text', $params);
-    $this->assign('paymentConfig', $paymentConfig);
-
-    $this->assign('totalAmount', $this->_amtTotal);
-
-    $isRefund = ($this->_paymentType == 'refund') ? TRUE : FALSE;
-    $this->assign('isRefund', $isRefund);
-    if ($isRefund) {
-      $this->assign('totalPaid', $this->_amtPaid);
-      $this->assign('refundAmount', $params['total_amount']);
-    }
-    else {
-      $balance = $this->_amtTotal - ($this->_amtPaid + $params['total_amount']);
-      $paymentsComplete = ($balance == 0) ? 1 : 0;
-      $this->assign('amountOwed', $balance);
-      $this->assign('paymentAmount', $params['total_amount']);
-      $this->assign('paymentsComplete', $paymentsComplete);
-    }
-    $this->assign('contactDisplayName', $this->_contributorDisplayName);
-
-    // assign trxn details
-    $this->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $params));
-    $this->assign('receive_date', CRM_Utils_Array::value('trxn_date', $params));
-    $this->assign('paidBy', CRM_Core_PseudoConstant::getLabel(
-      'CRM_Contribute_BAO_Contribution',
-      'payment_instrument_id',
-      $params['payment_instrument_id']
-    ));
-    $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
-
-    $sendTemplateParams = array(
-      'groupName' => 'msg_tpl_workflow_contribution',
-      'valueName' => 'payment_or_refund_notification',
-      'contactId' => $this->_contactId,
-      'PDFFilename' => ts('notification') . '.pdf',
-    );
-
-    // try to send emails only if email id is present
-    // and the do-not-email option is not checked for that contact
-    if ($this->_contributorEmail && !$this->_toDoNotEmail) {
-      if (array_key_exists($params['from_email_address'], $this->_fromEmails['from_email_id'])) {
-        $receiptFrom = $params['from_email_address'];
-      }
-
-      $sendTemplateParams['from'] = $receiptFrom;
-      $sendTemplateParams['toName'] = $this->_contributorDisplayName;
-      $sendTemplateParams['toEmail'] = $this->_contributorEmail;
-    }
-    list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
-    return $mailSent;
   }
 
   /**

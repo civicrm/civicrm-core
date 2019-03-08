@@ -284,15 +284,15 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @return CRM_Contact_BAO_Relationship
    */
-  public static function add(&$params, $ids = array(), $contactId = NULL) {
-    $relationshipId = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
+  public static function add($params, $ids = array(), $contactId = NULL) {
+    $params['id'] = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
 
     $hook = 'create';
-    if ($relationshipId) {
+    if ($params['id']) {
       $hook = 'edit';
     }
     //@todo hook are called from create and add - remove one
-    CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
+    CRM_Utils_Hook::pre($hook, 'Relationship', $params['id'], $params);
 
     $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
 
@@ -306,7 +306,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     if ($type == 6) {
       CRM_Contact_BAO_Household::updatePrimaryContact($params['contact_id_b'], $params['contact_id_a']);
     }
-    if (!empty($relationshipId) && self::isCurrentEmployerNeedingToBeCleared($params, $relationshipId, $type)) {
+    if (!empty($params['id']) && self::isCurrentEmployerNeedingToBeCleared($params, $params['id'], $type)) {
       CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($params['contact_id_a']);
     }
     $relationship = new CRM_Contact_BAO_Relationship();
@@ -316,7 +316,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $relationship->contact_id_b = $params['contact_id_b'];
     $relationship->contact_id_a = $params['contact_id_a'];
     $relationship->relationship_type_id = $type;
-    $relationship->id = $relationshipId;
+    $relationship->id = $params['id'];
 
     $dateFields = array('end_date', 'start_date');
 
@@ -332,7 +332,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $relationship->$defaultField = $params[$defaultField];
         }
       }
-      elseif (!$relationshipId) {
+      elseif (empty($params['id'])) {
         $relationship->$defaultField = $defaultValue;
       }
     }

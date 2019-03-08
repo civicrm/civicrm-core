@@ -158,6 +158,7 @@ class CRM_Utils_Address_BatchUpdate {
                a.street_address,
                a.city,
                a.postal_code,
+               a.country_id,
                s.name as state,
                o.name as country
     FROM       civicrm_contact  c
@@ -181,6 +182,7 @@ class CRM_Utils_Address_BatchUpdate {
         'city' => $dao->city,
         'state_province' => $dao->state,
         'country' => $dao->country,
+        'country_id' => $dao->country_id,
       );
 
       $addressParams = array();
@@ -287,7 +289,18 @@ class CRM_Utils_Address_BatchUpdate {
   public function returnResult() {
     $result = array();
     $result['is_error'] = $this->returnError;
-    $result['messages'] = implode("", $this->returnMessages);
+    $result['messages'] = '';
+    // Pad message size to allow for prefix added by CRM_Core_JobManager.
+    $messageSize = 255;
+    // Ensure that each message can fit in the civicrm_job_log.data column.
+    foreach ($this->returnMessages as $message) {
+      $messageSize += strlen($message);
+      if ($messageSize > CRM_Utils_Type::BLOB_SIZE) {
+        $result['messages'] .= '...';
+        break;
+      }
+      $result['messages'] .= $message;
+    }
     return $result;
   }
 

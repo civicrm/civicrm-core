@@ -61,7 +61,7 @@
             {if $recur.campaign}<tr><td class="label">{ts}Campaign{/ts}</td><td>{$recur.campaign}</td></tr>{/if}
             {if $recur.membership_id}<tr>
               <td class="label">{ts}Membership{/ts}</td>
-              <td><a class="crm-hover-button" href='{crmURL p="civicrm/contact/view/membership" q="action=view&reset=1&cid=`$contactId`&id=`$recur.membership_id`&context=membership&selectedChild=member"}'>{$recur.membership_name}</a></td>
+              <td><a class="crm-hover-button action-item" href='{crmURL p="civicrm/contact/view/membership" q="action=view&reset=1&cid=`$contactId`&id=`$recur.membership_id`&context=membership&selectedChild=member"}'>{$recur.membership_name}</a></td>
               </tr>
             {/if}
             {include file="CRM/Custom/Page/CustomDataView.tpl"}

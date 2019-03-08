@@ -51,7 +51,7 @@ class SequenceListener implements CaseChangeListener {
       return;
     }
 
-    $actTypes = array_flip(\CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name'));
+    $actTypes = array_flip(\CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate'));
     $actStatuses = array_flip(\CRM_Activity_BAO_Activity::getStatusesByType(\CRM_Activity_BAO_Activity::COMPLETED));
 
     $actIndex = $analyzer->getActivityIndex(array('activity_type_id', 'status_id'));

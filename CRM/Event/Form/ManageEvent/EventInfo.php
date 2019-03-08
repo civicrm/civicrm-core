@@ -177,7 +177,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $this->add('datepicker', 'start_date', ts('Start'), [], !$this->_isTemplate, ['time' => TRUE]);
     $this->add('datepicker', 'end_date', ts('End'), [], FALSE, ['time' => TRUE]);
 
-    $this->add('text', 'max_participants', ts('Max Number of Participants'),
+    $this->add('number', 'max_participants', ts('Max Number of Participants'),
       array('onchange' => "if (this.value != '') {cj('#id-waitlist').show(); showHideByValue('has_waitlist','0','id-waitlist-text','table-row','radio',false); showHideByValue('has_waitlist','0','id-event_full','table-row','radio',true); return;} else {cj('#id-event_full, #id-waitlist, #id-waitlist-text').hide(); return;}")
     );
     $this->addRule('max_participants', ts('Max participants should be a positive number'), 'positiveInteger');
@@ -255,7 +255,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     // now that we have the event’s id, do some more template-based stuff
     if (!empty($params['template_id'])) {
-      $event = CRM_Event_BAO_Event::copy($params['template_id']);
+      $event = CRM_Event_BAO_Event::copy($params['template_id'], $params);
     }
     else {
       $event = CRM_Event_BAO_Event::create($params);

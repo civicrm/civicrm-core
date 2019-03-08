@@ -993,8 +993,10 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
     $details = $query->searchQuery(0, 0, NULL, FALSE, FALSE,
       FALSE, FALSE, FALSE, $additionalWhereClause);
-    if (!$details->fetch()) {
-      return;
+    while ($details->fetch()) {
+      if (!$details) {
+        return;
+      }
     }
     $query->convertToPseudoNames($details);
     $config = CRM_Core_Config::singleton();
@@ -3318,48 +3320,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $defaults[$fldName] = $values[$fldName];
       }
     }
-  }
-
-  /**
-   * @param array|string $profiles - name of profile(s) to create links for
-   * @param array $appendProfiles
-   *   Name of profile(s) to append to each link.
-   *
-   * @return array
-   */
-  public static function getCreateLinks($profiles = '', $appendProfiles = array()) {
-    // Default to contact profiles
-    if (!$profiles) {
-      $profiles = array('new_individual', 'new_organization', 'new_household');
-    }
-    $profiles = (array) $profiles;
-    $toGet = array_merge($profiles, (array) $appendProfiles);
-    $retrieved = civicrm_api3('uf_group', 'get', array(
-      'name' => array('IN' => $toGet),
-      'is_active' => 1,
-    ));
-    $links = $append = array();
-    if (!empty($retrieved['values'])) {
-      foreach ($retrieved['values'] as $id => $profile) {
-        if (in_array($profile['name'], $profiles)) {
-          $links[] = array(
-            'label' => $profile['title'],
-            'url' => CRM_Utils_System::url('civicrm/profile/create', "reset=1&context=dialog&gid=$id",
-              NULL, NULL, FALSE, FALSE, TRUE),
-            'type' => ucfirst(str_replace('new_', '', $profile['name'])),
-          );
-        }
-        else {
-          $append[] = $id;
-        }
-      }
-      foreach ($append as $id) {
-        foreach ($links as &$link) {
-          $link['url'] .= ",$id";
-        }
-      }
-    }
-    return $links;
   }
 
   /**

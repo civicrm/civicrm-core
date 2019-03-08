@@ -28,3 +28,9 @@
     padding: .5rem;
   }
 }
+
+/* Backdrop main navigation icon */
+#admin-bar #admin-bar-menu > li > .dropdown > li > a.civicrm {
+  background: transparent url(../i/logo_sm.png) 5% center no-repeat;
+  background-size: 16px;
+}

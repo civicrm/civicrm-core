@@ -379,9 +379,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       }
       else {
         $contactId = $contact->id;
-        if (isset($note['contact_id'])) {
-          $contactId = $note['contact_id'];
-        }
         //if logged in user, overwrite contactId
         if ($userID) {
           $contactId = $userID;
@@ -1204,6 +1201,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
     $contact->copyValues($updateParams);
     $contact->save();
+    CRM_Core_BAO_Log::register($contact->id, 'civicrm_contact', $contact->id);
 
     CRM_Utils_Hook::post('update', $contact->contact_type, $contact->id, $contact);
 
@@ -2124,11 +2122,17 @@ ORDER BY civicrm_email.is_primary DESC";
     ) {
       // if profile was used, and had any subtype, we obtain it from there
       //CRM-13596 - add to existing contact types, rather than overwriting
-      $data_contact_sub_type_arr = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
-      if (!in_array($params['contact_sub_type_hidden'], $data_contact_sub_type_arr)) {
-        //CRM-20517 - make sure contact_sub_type gets the correct delimiters
-        $data['contact_sub_type'] = trim($data['contact_sub_type'], CRM_Core_DAO::VALUE_SEPARATOR);
-        $data['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $data['contact_sub_type'] . CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
+      if (empty($data['contact_sub_type'])) {
+        // If we don't have a contact ID the $data['contact_sub_type'] will not be defined...
+        $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
+      }
+      else {
+        $data_contact_sub_type_arr = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
+        if (!in_array($params['contact_sub_type_hidden'], $data_contact_sub_type_arr)) {
+          //CRM-20517 - make sure contact_sub_type gets the correct delimiters
+          $data['contact_sub_type'] = trim($data['contact_sub_type'], CRM_Core_DAO::VALUE_SEPARATOR);
+          $data['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $data['contact_sub_type'] . CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
+        }
       }
     }
 
@@ -3643,6 +3647,74 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
       }
     }
     return FALSE;
+  }
+
+  /**
+   * @param array $appendProfiles
+   *   Name of profile(s) to append to each link.
+   *
+   * @return array
+   */
+  public static function getEntityRefCreateLinks($appendProfiles = []) {
+    // You'd think that "create contacts" would be the permission to check,
+    // But new contact popups are profile forms and those use their own permissions.
+    if (!CRM_Core_Permission::check([['profile create', 'profile listings and forms']])) {
+      return FALSE;
+    }
+    $profiles = [];
+    foreach (CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
+      $profiles[] = 'new_' . strtolower($contactType);
+    }
+    $retrieved = civicrm_api3('uf_group', 'get', [
+      'name' => ['IN' => array_merge($profiles, (array) $appendProfiles)],
+      'is_active' => 1,
+    ]);
+    $links = $append = [];
+    if (!empty($retrieved['values'])) {
+      $icons = [
+        'individual' => 'fa-user',
+        'organization' => 'fa-building',
+        'household' => 'fa-home',
+      ];
+      foreach ($retrieved['values'] as $id => $profile) {
+        if (in_array($profile['name'], $profiles)) {
+          $links[] = array(
+            'label' => $profile['title'],
+            'url' => CRM_Utils_System::url('civicrm/profile/create', "reset=1&context=dialog&gid=$id",
+              NULL, NULL, FALSE, FALSE, TRUE),
+            'type' => ucfirst(str_replace('new_', '', $profile['name'])),
+            'icon' => CRM_Utils_Array::value(str_replace('new_', '', $profile['name']), $icons),
+          );
+        }
+        else {
+          $append[] = $id;
+        }
+      }
+      foreach ($append as $id) {
+        foreach ($links as &$link) {
+          $link['url'] .= ",$id";
+        }
+      }
+    }
+    return $links;
+  }
+
+  /**
+   * @return array
+   */
+  public static function getEntityRefFilters() {
+    return [
+      ['key' => 'contact_type', 'value' => ts('Contact Type')],
+      ['key' => 'group', 'value' => ts('Group'), 'entity' => 'GroupContact'],
+      ['key' => 'tag', 'value' => ts('Tag'), 'entity' => 'EntityTag'],
+      ['key' => 'state_province', 'value' => ts('State/Province'), 'entity' => 'Address'],
+      ['key' => 'country', 'value' => ts('Country'), 'entity' => 'Address'],
+      ['key' => 'gender_id', 'value' => ts('Gender'), 'condition' => ['contact_type' => 'Individual']],
+      ['key' => 'is_deceased', 'value' => ts('Deceased'), 'condition' => ['contact_type' => 'Individual']],
+      ['key' => 'contact_id', 'value' => ts('Contact ID'), 'type' => 'text'],
+      ['key' => 'external_identifier', 'value' => ts('External ID'), 'type' => 'text'],
+      ['key' => 'source', 'value' => ts('Contact Source'), 'type' => 'text'],
+    ];
   }
 
 }

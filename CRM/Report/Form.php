@@ -1577,7 +1577,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     // CRM-16274 Determine if user has 'edit all contacts' or equivalent
     $permission = CRM_Core_Permission::getPermission();
-    if ($permission == CRM_Core_Permission::EDIT &&
+    if ($this->_instanceForm && $permission == CRM_Core_Permission::EDIT &&
       $this->_add2groupSupported
     ) {
       $this->addElement('select', 'groups', ts('Group'),
@@ -1633,6 +1633,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           )),
         ),
       );
+      unset($actions['report_instance.delete']);
     }
 
     if (!$this->_csvSupported) {
@@ -2864,7 +2865,16 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     $this->storeGroupByArray();
 
     if (!empty($this->_groupByArray)) {
-      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $this->_groupByArray);
+      if ($this->optimisedForOnlyFullGroupBy) {
+        // We should probably deprecate this code path. What happens here is that
+        // the group by is amended to reflect the select columns. This often breaks the
+        // results. Retrofitting group strict group by onto existing report classes
+        // went badly.
+        $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $this->_groupByArray);
+      }
+      else {
+        $this->_groupBy = ' GROUP BY ' . implode($this->_groupByArray);
+      }
     }
   }
 
@@ -4483,8 +4493,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
             $rows[$rowNum]["{$fieldName}_link"] = $url;
             $rows[$rowNum]["{$fieldName}_hover"] = ts("%1 for this %2.", array(1 => $linkText, 2 => $addressField));
           }
-          $entryFound = TRUE;
         }
+        $entryFound = TRUE;
       }
     }
 
@@ -4748,7 +4758,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
 
   /**
    * Get a standard set of contact fields.
-   *
+   * @deprecated - use getColumns('Contact') instead
    * @return array
    */
   public function getBasicContactFields() {
@@ -4824,9 +4834,11 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   /**
    * Get a standard set of contact filters.
    *
+   * @param array $defaults
+   *
    * @return array
    */
-  public function getBasicContactFilters() {
+  public function getBasicContactFilters($defaults = array()) {
     return array(
       'sort_name' => array(
         'title' => ts('Contact Name'),
@@ -4862,7 +4874,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'is_deceased' => array(
         'title' => ts('Deceased'),
         'type' => CRM_Utils_Type::T_BOOLEAN,
-        'default' => 0,
+        'default' => CRM_Utils_Array::value('deceased', $defaults, 0),
       ),
       'do_not_email' => array(
         'title' => ts('Do not email'),
@@ -5386,7 +5398,45 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_filters' => TRUE,
         'is_group_bys' => FALSE,
       ),
+      $options['prefix'] . 'external_identifier' => array(
+        'title' => $options['prefix_label'] . ts('Contact identifier from external system'),
+        'name' => 'external_identifier',
+        'is_fields' => TRUE,
+        'is_filters' => FALSE,
+        'is_group_bys' => FALSE,
+        'is_order_bys' => TRUE,
+      ),
+      $options['prefix'] . 'preferred_language' => array(
+        'title' => $options['prefix_label'] . ts('Preferred Language'),
+        'name' => 'preferred_language',
+        'is_fields' => TRUE,
+        'is_filters' => TRUE,
+        'is_group_bys' => TRUE,
+        'is_order_bys' => TRUE,
+      ),
     );
+    foreach ([
+      'postal_greeting_display' => 'Postal Greeting',
+      'email_greeting_display' => 'Email Greeting',
+      'addressee_display' => 'Addressee',
+    ] as $field => $title) {
+      $spec[$options['prefix'] . $field] = array(
+        'title' => $options['prefix_label'] . ts($title),
+        'name' => $field,
+        'is_fields' => TRUE,
+        'is_filters' => FALSE,
+        'is_group_bys' => FALSE,
+      );
+    }
+    foreach (['do_not_email', 'do_not_phone', 'do_not_mail', 'do_not_sms', 'is_opt_out'] as $field) {
+      $spec[$options['prefix'] . $field] = [
+        'name' => $field,
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'is_fields' => TRUE,
+        'is_filters' => TRUE,
+        'is_group_bys' => FALSE,
+      ];
+    }
     $individualFields = array(
       $options['prefix'] . 'first_name' => array(
         'name' => 'first_name',
@@ -5455,6 +5505,20 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_fields' => FALSE,
         'is_filters' => TRUE,
         'is_group_bys' => FALSE,
+      ),
+      $options['prefix'] . 'job_title' => array(
+        'name' => 'job_title',
+        'is_fields' => TRUE,
+        'is_filters' => FALSE,
+        'is_group_bys' => FALSE,
+      ),
+      $options['prefix'] . 'employer_id' => array(
+        'title' => $options['prefix_label'] . ts('Current Employer'),
+        'type' => CRM_Utils_Type::T_INT,
+        'name' => 'employer_id',
+        'is_fields' => TRUE,
+        'is_filters' => FALSE,
+        'is_group_bys' => TRUE,
       ),
     );
     if (!$options['contact_type'] || $options['contact_type'] === 'Individual') {

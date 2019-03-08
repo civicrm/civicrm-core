@@ -58,7 +58,7 @@ return array(
     'title' => ts('Multisite Domain Group'),
     'type' => 'Integer',
     'html_type' => 'entity_reference',
-    'entity_reference_options' => ['entity' => 'group', 'select' => array('minimumInputLength' => 0)],
+    'entity_reference_options' => ['entity' => 'Group', 'select' => array('minimumInputLength' => 0)],
     'default' => '0',
     'add' => '4.1',
     'is_domain' => 1,

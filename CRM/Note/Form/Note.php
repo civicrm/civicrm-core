@@ -113,6 +113,20 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
   }
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Note';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
    * Build the form object.
    *
    * @return void
@@ -134,10 +148,9 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
       return;
     }
 
-    $this->add('text', 'subject', ts('Subject:'), array('size' => 20));
-    $this->add('textarea', 'note', ts('Note:'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Note', 'note'), TRUE);
-    $this->add('select', 'privacy', ts('Privacy:'), CRM_Core_OptionGroup::values('note_privacy'));
-
+    $this->addField('subject');
+    $this->addField('note', [], TRUE);
+    $this->addField('privacy');
     $this->add('hidden', 'parent_id');
 
     // add attachments part

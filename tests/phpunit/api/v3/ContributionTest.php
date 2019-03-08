@@ -1117,6 +1117,19 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(1, $contribution['contribution_status_id']);
     $this->assertEquals('Check', $contribution['payment_instrument']);
+    $this->callAPISuccessGetCount('Contribution', ['id' => $contribution['id']], 0);
+  }
+
+  /**
+   * Test that getsingle can be chained with delete.
+   */
+  public function testDeleteChainedGetSingle() {
+    $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array(
+      'id' => $contribution['id'],
+      'api.contribution.delete' => 1,
+    ));
+    $this->callAPISuccessGetCount('Contribution', ['id' => $contribution['id']], 0);
   }
 
   /**

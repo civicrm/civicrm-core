@@ -134,7 +134,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
       'receive_date' => '2018-11-21 00:00:00',
       'contribution_status' => 'Completed',
       'currency' => 'USD',
-      //'receipt_date' => '2018-11-22 00:00:00',
+      'receipt_date' => '2018-11-22 00:00:00',
     ]);
 
   }

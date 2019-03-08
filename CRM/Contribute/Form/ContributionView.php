@@ -256,7 +256,6 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-
     $this->addButtons(array(
       array(
         'type' => 'cancel',

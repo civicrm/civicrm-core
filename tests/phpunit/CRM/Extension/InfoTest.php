@@ -81,4 +81,12 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->assertTrue(is_object($exc));
   }
 
+  public function test_requirements() {
+    // Quicksearch requirement should get filtered out per extension-compatibility.json
+    $data = "<extension key='test.foo' type='module'><file>foo</file><requires><ext>example.test</ext><ext>com.ixiam.modules.quicksearch</ext></requires></extension>";
+
+    $info = CRM_Extension_Info::loadFromString($data);
+    $this->assertEquals(['example.test'], $info->requires);
+  }
+
 }

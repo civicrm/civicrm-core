@@ -165,11 +165,7 @@ class CRM_Contact_Form_Edit_Address {
       $form->addElement('checkbox', "address[$blockId][use_shared_address]", NULL, ts('Use another contact\'s address'));
 
       // Override the default profile links to add address form
-      $profileLinks = CRM_Core_BAO_UFGroup::getCreateLinks(array(
-          'new_individual',
-          'new_organization',
-          'new_household',
-        ), 'shared_address');
+      $profileLinks = CRM_Contact_BAO_Contact::getEntityRefCreateLinks('shared_address');
       $form->addEntityRef("address[$blockId][master_contact_id]", ts('Share With'), array('create' => $profileLinks));
     }
   }
@@ -413,7 +409,7 @@ class CRM_Contact_Form_Edit_Address {
       // since we change element name for address custom data, we need to format the setdefault values
       $addressDefaults = array();
       foreach ($defaults as $key => $val) {
-        if (empty($val)) {
+        if (!isset($val)) {
           continue;
         }
 

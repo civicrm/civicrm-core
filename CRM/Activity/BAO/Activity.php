@@ -706,7 +706,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       'source_contact_name',
       'assignee_contact_id',
       'target_contact_id',
-      'target_contact_name',
       'assignee_contact_name',
       'status_id',
       'subject',
@@ -740,7 +739,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       'subject' => 'subject',
       'campaign_id' => 'campaign_id',
       'assignee_contact_name' => 'assignee_contact_name',
-      'target_contact_name' => 'target_contact_name',
       'source_contact_id' => 'source_contact_id',
       'source_contact_name' => 'source_contact_name',
       'case_id' => 'case_id',
@@ -751,13 +749,19 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $activities[$id] = array();
 
       $isBulkActivity = (!$bulkActivityTypeID || ($bulkActivityTypeID === $activity['activity_type_id']));
-
+      $activities[$id]['target_contact_counter'] = count($activity['target_contact_id']);
+      if ($activities[$id]['target_contact_counter']) {
+        try {
+          $activities[$id]['target_contact_name'][$activity['target_contact_id'][0]] = civicrm_api3('Contact', 'getvalue', ['id' => $activity['target_contact_id'][0], 'return' => 'sort_name']);
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          // Really they should have names but a fatal here feels wrong.
+          $activities[$id]['target_contact_name'] = '';
+        }
+      }
       foreach ($mappingParams as $apiKey => $expectedName) {
         if (in_array($apiKey, array('assignee_contact_name', 'target_contact_name'))) {
           $activities[$id][$expectedName] = CRM_Utils_Array::value($apiKey, $activity, array());
-          if ($apiKey == 'target_contact_name' && count($activity['target_contact_name'])) {
-            $activities[$id]['target_contact_counter'] = count($activity['target_contact_name']);
-          }
 
           if ($isBulkActivity) {
             $activities[$id]['recipients'] = ts('(%1 recipients)', array(1 => count($activity['target_contact_name'])));
@@ -1115,6 +1119,27 @@ ORDER BY    fixed_sort_order
     }
 
     return $values;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function addSelectWhereClause() {
+    $clauses = [];
+    $permittedActivityTypeIDs = self::getPermittedActivityTypes();
+    if (empty($permittedActivityTypeIDs)) {
+      // This just prevents a mysql fail if they have no access - should be extremely edge case.
+      $permittedActivityTypeIDs = [0];
+    }
+    $clauses['activity_type_id'] = ('IN (' . implode(', ', $permittedActivityTypeIDs) . ')');
+
+    $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
+    if ($contactClause) {
+      $contactClause = implode(' AND contact_id ', $contactClause);
+      $clauses['id'][] = "IN (SELECT activity_id FROM civicrm_activity_contact WHERE contact_id $contactClause)";
+    }
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
   }
 
   /**
@@ -2341,7 +2366,6 @@ AND cl.modified_id  = c.id
           $priorActivities[$index][$dao->activityID]['name'] = $dao->name;
           $priorActivities[$index][$dao->activityID]['date'] = $dao->date;
         }
-        $dao->free();
       }
     }
     return $priorActivities[$index];
@@ -2409,9 +2433,7 @@ AND cl.modified_id  = c.id
       $followupParams['target_contact_id'] = $params['target_contact_id'];
     }
 
-    $followupParams['activity_date_time'] = CRM_Utils_Date::processDate($params['followup_date'],
-      $params['followup_date_time']
-    );
+    $followupParams['activity_date_time'] = $params['followup_date'];
     $followupActivity = self::create($followupParams);
 
     return $followupActivity;
@@ -2660,10 +2682,8 @@ AND cl.modified_id  = c.id
         $result = self::deleteActivity($activityParams);
       }
 
-      $activityContactOther->free();
     }
 
-    $activityContact->free();
     $transaction->commit();
 
     return $result;
@@ -2694,6 +2714,8 @@ AND cl.modified_id  = c.id
     }
 
     if (!self::hasPermissionForActivityType($activity->activity_type_id)) {
+      // this check is redundant for api access / anything that calls the selectWhereClause
+      // to determine ACLs.
       return FALSE;
     }
     // Return early when it is case activity.
@@ -2799,7 +2821,7 @@ AND cl.modified_id  = c.id
    *
    * @return array
    */
-  public static function getPermittedActivityTypes() {
+  protected static function getPermittedActivityTypes() {
     $userID = (int) CRM_Core_Session::getLoggedInContactID();
     if (!isset(Civi::$statics[__CLASS__]['permitted_activity_types'][$userID])) {
       $permittedActivityTypes = [];
@@ -2813,7 +2835,7 @@ AND cl.modified_id  = c.id
 INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name = 'activity_type')
      WHERE  component_id IS NULL $componentClause")->fetchAll();
       foreach ($types as $type) {
-        $permittedActivityTypes[$type['activity_type_id']] = $type['activity_type_id'];
+        $permittedActivityTypes[$type['activity_type_id']] = (int) $type['activity_type_id'];
       }
       Civi::$statics[__CLASS__]['permitted_activity_types'][$userID] = $permittedActivityTypes;
     }
@@ -3111,7 +3133,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
             $fileValues = CRM_Core_BAO_File::path($value, $params['activityID']);
             $customParams["custom_{$key}_-1"] = array(
               'name' => $fileValues[0],
-              'path' => $fileValues[1],
+              'type' => $fileValues[1],
             );
           }
           else {
@@ -3209,6 +3231,16 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
       return $result;
     }
     return FALSE;
+  }
+
+  /**
+   * @return array
+   */
+  public static function getEntityRefFilters() {
+    return [
+      ['key' => 'activity_type_id', 'value' => ts('Activity Type')],
+      ['key' => 'status_id', 'value' => ts('Activity Status')],
+    ];
   }
 
 }

@@ -650,4 +650,60 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     }
   }
 
+  public function testEditAllGroupsACL() {
+    $this->setupEditAllGroupsACL();
+    $params = $this->_params;
+    $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
+    $this->assertNotEmpty($groups, 'If Edit All Groups is granted, at least one group should be visible');
+  }
+
+  /**
+   * Set up an acl allowing Authenticated contacts to Edit All Groups
+   *
+   *  You need to have pre-created these groups & created the user e.g
+   *  $this->createLoggedInUser();
+   *
+   */
+  public function setupEditAllGroupsACL() {
+    global $_REQUEST;
+    $_REQUEST = $this->_params;
+
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
+    $optionGroupID = $this->callAPISuccessGetValue('option_group', array('return' => 'id', 'name' => 'acl_role'));
+    $ov = new CRM_Core_DAO_OptionValue();
+    $ov->option_group_id = $optionGroupID;
+    $ov->value = 55;
+    if ($ov->find(TRUE)) {
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_option_value WHERE id = {$ov->id}");
+    }
+    $optionValue = $this->callAPISuccess('option_value', 'create', array(
+      'option_group_id' => $optionGroupID,
+      'label' => 'groupmaster',
+      'value' => 55,
+    ));
+    $groupId = $this->groupCreate(['name' => 'groupmaster group']);
+    // Assign groupmaster to groupmaster group in civicrm_acl_entity_role
+    CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_acl_entity_role (
+      `acl_role_id`, `entity_table`, `entity_id`, `is_active`
+      ) VALUES (55, 'civicrm_group', $groupId, 1);
+    ");
+    // Put the user into this group
+    $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
+    $this->callAPISuccess('group_contact', 'create', array(
+      'group_id' => $groupId,
+      'contact_id' => $this->_loggedInUser,
+    ));
+    // Add the ACL
+    CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_acl (
+      `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
+      )
+      VALUES (
+      'core-580', 'civicrm_acl_role', 55, 'Edit', 'civicrm_saved_search', 0, 1
+      );
+      ");
+
+  }
+
 }

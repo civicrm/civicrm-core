@@ -61,8 +61,8 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     $this->prefix .= \CRM_Utils_Cache::DELIMITER . 'prevnext' . \CRM_Utils_Cache::DELIMITER;
   }
 
-  public function fillWithSql($cacheKey, $sql) {
-    $dao = CRM_Core_DAO::executeQuery($sql, [], FALSE, NULL, FALSE, TRUE, TRUE);
+  public function fillWithSql($cacheKey, $sql, $sqlParams = []) {
+    $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams, FALSE, NULL, FALSE, TRUE, TRUE);
     if (is_a($dao, 'DB_Error')) {
       throw new CRM_Core_Exception($dao->message);
     }
@@ -76,7 +76,6 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
       $this->redis->hSet($dataKey, $entity_id, $data);
     }
 
-    $dao->free();
     return TRUE;
   }
 

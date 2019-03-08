@@ -256,7 +256,7 @@ if (!CRM.vars) CRM.vars = {};
         CRM.CMSjQuery = window.jQuery;
         window.jQuery = CRM.$;
       }
-      script.src = url;
+      script.src = url + (_.includes(url, '?') ? '&r=' : '?r=') + CRM.config.resourceCacheCode;
       document.getElementsByTagName("head")[0].appendChild(script);
     }
     return scriptsLoaded[url];
@@ -466,7 +466,7 @@ if (!CRM.vars) CRM.vars = {};
         var entity = $(this).data('api-entity') || '';
         $(this)
           .off('.crmEntity')
-          .removeClass('crm-form-entityref crm-' + entity.toLowerCase() + '-ref')
+          .removeClass('crm-form-entityref crm-' + _.kebabCase(entity) + '-ref')
           .crmSelect2('destroy');
       });
     }
@@ -475,13 +475,17 @@ if (!CRM.vars) CRM.vars = {};
     return $(this).each(function() {
       var
         $el = $(this).off('.crmEntity'),
-        entity = options.entity || $el.data('api-entity') || 'contact',
+        entity = options.entity || $el.data('api-entity') || 'Contact',
         selectParams = {};
+      // Legacy: fix entity name if passed in as snake case
+      if (entity.charAt(0).toUpperCase() !== entity.charAt(0)) {
+        entity = _.capitalize(_.camelCase(entity));
+      }
       $el.data('api-entity', entity);
       $el.data('select-params', $.extend({}, $el.data('select-params') || {}, options.select));
       $el.data('api-params', $.extend(true, {}, $el.data('api-params') || {}, options.api));
       $el.data('create-links', options.create || $el.data('create-links'));
-      $el.addClass('crm-form-entityref crm-' + entity.toLowerCase() + '-ref');
+      $el.addClass('crm-form-entityref crm-' + _.kebabCase(entity) + '-ref');
       var settings = {
         // Use select2 ajax helper instead of CRM.api3 because it provides more value
         ajax: {
@@ -527,7 +531,7 @@ if (!CRM.vars) CRM.vars = {};
         }
       };
       // Create new items inline - works for tags
-      if ($el.data('create-links') && entity.toLowerCase() === 'tag') {
+      if ($el.data('create-links') && entity === 'Tag') {
         selectParams.createSearchChoice = function(term, data) {
           if (!_.findKey(data, {label: term})) {
             return {id: "0", term: term, label: term + ' (' + ts('new tag') + ')'};
@@ -578,11 +582,13 @@ if (!CRM.vars) CRM.vars = {};
                 formUrl = $(this).attr('href') + '&returnExtra=display_name,sort_name' + (extra ? (',' + extra) : '');
               $el.select2('close');
               CRM.loadForm(formUrl, {
-                dialog: {width: 500, height: 220}
+                dialog: {width: '50%', height: 220}
               }).on('crmFormSuccess', function(e, data) {
                 if (data.status === 'success' && data.id) {
-                  data.label = data.extra.sort_name;
-                  CRM.status(ts('%1 Created', {1: data.extra.display_name}));
+                  if (!data.crmMessages) {
+                    CRM.status(ts('%1 Created', {1: data.label || data.extra.display_name}));
+                  }
+                  data.label = data.label || data.extra.sort_name;
                   if ($el.select2('container').hasClass('select2-container-multi')) {
                     var selection = $el.select2('data');
                     selection.push(data);
@@ -683,33 +689,18 @@ if (!CRM.vars) CRM.vars = {};
     var
       createLinks = $el.data('create-links'),
       params = getEntityRefApiParams($el).params,
+      entity = $el.data('api-entity'),
       markup = '<div class="crm-entityref-links">';
-    if (!createLinks || $el.data('api-entity').toLowerCase() !== 'contact') {
+    if (!createLinks || (createLinks === true && !CRM.config.entityRef.links[entity])) {
       return '';
     }
     if (createLinks === true) {
-      createLinks = params.contact_type ? _.where(CRM.config.entityRef.contactCreate, {type: params.contact_type}) : CRM.config.entityRef.contactCreate;
+      createLinks = params.contact_type ? _.where(CRM.config.entityRef.links[entity], {type: params.contact_type}) : CRM.config.entityRef.links[entity];
     }
     _.each(createLinks, function(link) {
-      var icon;
-      switch (link.type) {
-        case 'Individual':
-          icon = 'fa-user';
-          break;
-
-        case 'Organization':
-          icon = 'fa-building';
-          break;
-
-        case 'Household':
-          icon = 'fa-home';
-          break;
-      }
-      markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">';
-      if (icon) {
-        markup += '<i class="crm-i ' + icon + '"></i> ';
-      }
-      markup += _.escape(link.label) + '</a>';
+      markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">' +
+        '<i class="crm-i ' + (link.icon || 'fa-plus-circle') + '"></i> ' +
+        _.escape(link.label) + '</a>';
     });
     markup += '</div>';
     return markup;
@@ -717,19 +708,20 @@ if (!CRM.vars) CRM.vars = {};
 
   function getEntityRefFilters($el) {
     var
-      entity = $el.data('api-entity').toLowerCase(),
-      filters = $.extend([], CRM.config.entityRef.filters[entity] || []),
+      entity = $el.data('api-entity'),
+      filters = CRM.config.entityRef.filters[entity] || [],
       params = $.extend({params: {}}, $el.data('api-params') || {}).params,
       result = [];
-    $.each(filters, function() {
-      var filter = $.extend({type: 'select', 'attributes': {}, entity: entity}, this);
-      if (typeof params[filter.key] === 'undefined') {
+    _.each(filters, function(filter) {
+      _.defaults(filter, {type: 'select', 'attributes': {}, entity: entity});
+      if (!params[filter.key]) {
+        // Filter out options if params don't match its condition
+        if (filter.condition && !_.isMatch(params, _.pick(filter.condition, _.keys(params)))) {
+          return;
+        }
         result.push(filter);
       }
       else if (filter.key == 'contact_type' && typeof params.contact_sub_type === 'undefined') {
-        filter.options = _.remove(filter.options, function(option) {
-          return option.key.indexOf(params.contact_type + '__') === 0;
-        });
         result.push(filter);
       }
     });
@@ -772,11 +764,7 @@ if (!CRM.vars) CRM.vars = {};
         attrs += ' ' + attr + '="' + val + '"';
       });
       if (filterSpec.type === 'select') {
-        markup = '<select' + attrs + '><option value="">' + _.escape(ts('- select -')) + '</option>';
-        if (filterSpec.options) {
-          markup += CRM.utils.renderOptions(filterSpec.options, filter.value);
-        }
-        markup += '</select>';
+        markup = '<select' + attrs + '><option value="">' + _.escape(ts('- select -')) + '</option></select>';
       } else {
         markup = '<input' + attrs + '/>';
       }
@@ -797,7 +785,7 @@ if (!CRM.vars) CRM.vars = {};
       $('.crm-entityref-filter-value', '#select2-drop').remove();
       $valField = $(entityRefFilterValueMarkup(filter, filterSpec));
       $keyField.after($valField);
-      if (filterSpec.type === 'select' && !filterSpec.options) {
+      if (filterSpec.type === 'select') {
         loadEntityRefFilterOptions(filter, filterSpec, $valField, $el);
       }
     } else {
@@ -806,22 +794,36 @@ if (!CRM.vars) CRM.vars = {};
   }
 
   /**
-   * Fetch options for a filter via ajax api
+   * Fetch options for a filter from cache or ajax api
    */
   function loadEntityRefFilterOptions(filter, filterSpec, $valField, $el) {
-    $valField.prop('disabled', true);
     // Fieldname may be prefixed with joins - strip those out
-    var fieldName = _.last(filter.key.split('.'));
+    var fieldName = _.last(filter.key.split('.')),
+      params = $.extend({params: {}}, $el.data('api-params') || {}).params;
+    if (filterSpec.options) {
+      setEntityRefFilterOptions($valField, fieldName, params, filterSpec);
+      return;
+    }
+    $('.crm-entityref-filters select', '#select2-drop').prop('disabled', true);
     CRM.api3(filterSpec.entity, 'getoptions', {field: fieldName, context: 'search', sequential: 1})
       .done(function(result) {
-        var entity = $el.data('api-entity').toLowerCase(),
-          globalFilterSpec = _.find(CRM.config.entityRef.filters[entity], {key: filter.key}) || {};
+        var entity = $el.data('api-entity').toLowerCase();
         // Store options globally so we don't have to look them up again
-        globalFilterSpec.options = result.values;
-        $valField.prop('disabled', false);
-        CRM.utils.setOptions($valField, result.values);
+        filterSpec.options = result.values;
+        $('.crm-entityref-filters select', '#select2-drop').prop('disabled', false);
+        setEntityRefFilterOptions($valField, fieldName, params, filterSpec);
         $valField.val(filter.value || '');
       });
+  }
+
+  function setEntityRefFilterOptions($valField, fieldName, params, filterSpec) {
+    var values = _.cloneDeep(filterSpec.options);
+    if (fieldName === 'contact_type' && params.contact_type) {
+      values = _.remove(values, function(option) {
+        return option.key.indexOf(params.contact_type + '__') === 0;
+      });
+    }
+    CRM.utils.setOptions($valField, values);
   }
 
   //CRM-15598 - Override url validator method to allow relative url's (e.g. /index.htm)
@@ -1498,7 +1500,7 @@ if (!CRM.vars) CRM.vars = {};
   // Determine if a user has a given permission.
   // @see CRM_Core_Resources::addPermissions
   CRM.checkPerm = function(perm) {
-    return CRM.permissions[perm];
+    return CRM.permissions && CRM.permissions[perm];
   };
 
   // Round while preserving sigfigs
@@ -1544,5 +1546,12 @@ if (!CRM.vars) CRM.vars = {};
      yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
     return (yiq >= 128) ? 'black' : 'white';
   };
+
+  // CVE-2015-9251 - Prevent auto-execution of scripts when no explicit dataType was provided
+  $.ajaxPrefilter(function(s) {
+    if (s.crossDomain) {
+      s.contents.script = false;
+    }
+  });
 
 })(jQuery, _);

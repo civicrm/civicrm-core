@@ -346,4 +346,16 @@
     };
   });
 
+  angular.module('crmUtil').factory('crmLoadScript', function($q) {
+    return function(url) {
+      var deferred = $q.defer();
+
+      CRM.loadScript(url).done(function() {
+        deferred.resolve(true);
+      });
+
+      return deferred.promise;
+    };
+  });
+
 })(angular, CRM.$, CRM._);

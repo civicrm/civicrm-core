@@ -159,7 +159,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         'type' => 'text',
         'label' => ts('Subject'),
         'attributes' => CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity',
-          'subject'
+          'activity_subject'
         ),
       ),
       'duration' => array(
@@ -542,7 +542,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $url = CRM_Utils_System::url(implode("/", $this->urlPath), "reset=1&id={$this->_activityId}&action=view&cid={$this->_values['source_contact_id']}");
-      CRM_Utils_Recent::add($this->_values['subject'],
+      CRM_Utils_Recent::add(CRM_Utils_Array::value('subject', $this->_values, ts('(no subject)')),
         $url,
         $this->_values['id'],
         'Activity',
@@ -757,7 +757,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     );
 
     // Add followup date.
-    $this->addDateTime('followup_date', ts('in'), FALSE, array('formatType' => 'activityDateTime'));
+    $this->add('datepicker', 'followup_date', ts('in'));
 
     // Only admins and case-workers can change the activity source
     if (!CRM_Core_Permission::check('administer CiviCRM') && $this->_context != 'caseActivity') {
@@ -792,31 +792,26 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       // form should be frozen for view mode
       $this->freeze();
 
-      $buttons = array();
-      $buttons[] = array(
-        'type' => 'cancel',
-        'name' => ts('Done'),
-      );
-      $this->addButtons($buttons);
+      $this->addButtons([
+        [
+          'type' => 'cancel',
+          'name' => ts('Done'),
+        ],
+      ]);
     }
     else {
-      $message = array(
-        'completed' => ts('Are you sure? This is a COMPLETED activity with the DATE in the FUTURE. Click Cancel to change the date / status. Otherwise, click OK to save.'),
-        'scheduled' => ts('Are you sure? This is a SCHEDULED activity with the DATE in the PAST. Click Cancel to change the date / status. Otherwise, click OK to save.'),
-      );
-      $js = array('onclick' => "return activityStatus(" . json_encode($message) . ");");
-      $this->addButtons(array(
-        array(
+      $this->addButtons([
+        [
           'type' => 'upload',
           'name' => ts('Save'),
-          'js' => $js,
           'isDefault' => TRUE,
-        ),
-        array(
+          'submitOnce' => TRUE,
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      ));
+        ],
+      ]);
     }
 
     if ($this->_activityTypeFile) {
@@ -872,7 +867,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     if (!empty($fields['followup_activity_type_id']) && empty($fields['followup_date'])) {
-      $errors['followup_date_time'] = ts('Followup date is a required field.');
+      $errors['followup_date'] = ts('Followup date is a required field.');
     }
     // Activity type is mandatory if subject or follow-up date is specified for an Follow-up activity, CRM-4515.
     if ((!empty($fields['followup_activity_subject']) || !empty($fields['followup_date'])) && empty($fields['followup_activity_type_id'])) {
@@ -1066,9 +1061,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       if (!is_array($params['tag'])) {
         $params['tag'] = explode(',', $params['tag']);
       }
-      foreach ($params['tag'] as $tag) {
-        $tagParams[$tag] = 1;
-      }
+
+      $tagParams = array_fill_keys($params['tag'], 1);
     }
 
     // Save static tags.

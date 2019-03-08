@@ -56,7 +56,7 @@ function civicrm_api3_contribution_create(&$params) {
   }
   $params['skipCleanMoney'] = TRUE;
 
-  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+  if (!empty($params['check_permissions']) && CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
     if (empty($params['id'])) {
       $op = CRM_Core_Action::ADD;
     }
@@ -68,7 +68,7 @@ function civicrm_api3_contribution_create(&$params) {
     }
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
     if (!in_array($params['financial_type_id'], array_keys($types))) {
-      return civicrm_api3_create_error('You do not have permission to create this contribution');
+      throw new API_Exception('You do not have permission to create this contribution');
     }
   }
   if (!empty($params['id']) && !empty($params['contribution_status_id'])) {
@@ -106,6 +106,7 @@ function _civicrm_api3_contribution_create_spec(&$params) {
   $params['total_amount']['api.required'] = 1;
   $params['payment_instrument_id']['api.aliases'] = array('payment_instrument');
   $params['receive_date']['api.default'] = 'now';
+  $params['receive_date']['api.required'] = TRUE;
   $params['payment_processor'] = array(
     'name' => 'payment_processor',
     'title' => 'Payment Processor ID',
@@ -214,6 +215,7 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
  *   Input parameters.
  *
  * @return array
+ * @throws \API_Exception
  */
 function civicrm_api3_contribution_delete($params) {
 
@@ -221,17 +223,19 @@ function civicrm_api3_contribution_delete($params) {
   // First check contribution financial type
   $financialType = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionID, 'financial_type_id');
   // Now check permissioned lineitems & permissioned contribution
-  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
-    && !CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($financialType)) ||
-      !CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributionID, 'delete', FALSE)
+  if (!empty($params['check_permissions']) && CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() &&
+    (
+      !CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($financialType))
+      || !CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributionID, 'delete', FALSE)
+    )
   ) {
-    return civicrm_api3_create_error('You do not have permission to delete this contribution');
+    throw new API_Exception('You do not have permission to delete this contribution');
   }
   if (CRM_Contribute_BAO_Contribution::deleteContribution($contributionID)) {
     return civicrm_api3_create_success(array($contributionID => 1));
   }
   else {
-    return civicrm_api3_create_error('Could not delete contribution');
+    throw new API_Exception('Could not delete contribution');
   }
 }
 

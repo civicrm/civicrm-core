@@ -179,6 +179,9 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
       }
 
       if (isset($apiRequest['params']['entity_table'])) {
+        if (!\CRM_Core_DAO_AllCoreTables::isCoreTable($apiRequest['params']['entity_table'])) {
+          throw new \API_Exception("Unrecognized target entity table {$apiRequest['params']['entity_table']}");
+        }
         $this->authorizeDelegate(
           $apiRequest['action'],
           $apiRequest['params']['entity_table'],
@@ -206,16 +209,16 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function authorizeDelegate($action, $entityTable, $entityId, $apiRequest) {
+    if ($this->isTrusted($apiRequest)) {
+      return;
+    }
+
     $entity = $this->getDelegatedEntityName($entityTable);
     if (!$entity) {
       throw new \API_Exception("Failed to run permission check: Unrecognized target entity table ($entityTable)");
     }
     if (!$entityId) {
       throw new \Civi\API\Exception\UnauthorizedException("Authorization failed on ($entity): Missing entity_id");
-    }
-
-    if ($this->isTrusted($apiRequest)) {
-      return;
     }
 
     /**

@@ -416,7 +416,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       );
 
       // weight
-      $this->add('text', "option_weight[$i]", ts('Order'),
+      $this->add('number', "option_weight[$i]", ts('Order'),
         $optionAttributes['weight']
       );
 

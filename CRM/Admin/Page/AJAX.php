@@ -37,35 +37,76 @@
 class CRM_Admin_Page_AJAX {
 
   /**
-   * CRM-12337 Output navigation menu as executable javascript.
-   *
-   * @see smarty_function_crmNavigationMenu
+   * Outputs menubar data (json format) for the current user.
    */
-  public static function getNavigationMenu() {
-    $contactID = CRM_Core_Session::singleton()->get('userID');
-    if ($contactID) {
-      CRM_Core_Page_AJAX::setJsHeaders();
-      $smarty = CRM_Core_Smarty::singleton();
-      $smarty->assign('quicksearchOptions', self::getSearchOptions());
-      print $smarty->fetchWith('CRM/common/navigation.js.tpl', array(
-        'navigation' => CRM_Core_BAO_Navigation::createNavigation(),
-      ));
+  public static function navMenu() {
+    if (CRM_Core_Session::getLoggedInContactID()) {
+
+      $menu = CRM_Core_BAO_Navigation::buildNavigationTree();
+      CRM_Core_BAO_Navigation::buildHomeMenu($menu);
+      CRM_Utils_Hook::navigationMenu($menu);
+      CRM_Core_BAO_Navigation::fixNavigationMenu($menu);
+      CRM_Core_BAO_Navigation::orderByWeight($menu);
+      CRM_Core_BAO_Navigation::filterByPermission($menu);
+      self::formatMenuItems($menu);
+
+      $output = [
+        'menu' => $menu,
+        'search' => CRM_Utils_Array::makeNonAssociative(self::getSearchOptions()),
+      ];
+      // Encourage browsers to cache for a long time - 1 year
+      $ttl = 60 * 60 * 24 * 364;
+      CRM_Utils_System::setHttpHeader('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + $ttl));
+      CRM_Utils_System::setHttpHeader('Cache-Control', "max-age=$ttl, public");
+      CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
+      print (json_encode($output));
     }
     CRM_Utils_System::civiExit();
   }
 
-  public static function getSearchOptions() {
-    $searchOptions = Civi::settings()->get('quicksearch_options');
-    $searchOptions[] = 'sort_name';
-    $searchOptions = array_intersect_key(CRM_Core_SelectValues::quicksearchOptions(), array_flip($searchOptions));
-    foreach ($searchOptions as $key => $label) {
-      if (strpos($key, 'custom_') === 0) {
-        unset($searchOptions[$key]);
-        $id = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', substr($key, 7), 'id', 'name');
-        $searchOptions["custom_$id"] = $label;
+  /**
+   * @param array $menu
+   */
+  public static function formatMenuItems(&$menu) {
+    foreach ($menu as $key => &$item) {
+      $props = $item['attributes'];
+      unset($item['attributes']);
+      if (!empty($props['separator'])) {
+        $item['separator'] = ($props['separator'] == 1 ? 'bottom' : 'top');
+      }
+      if (!empty($props['icon'])) {
+        $item['icon'] = $props['icon'];
+      }
+      if (!empty($props['attr'])) {
+        $item['attr'] = $props['attr'];
+      }
+      if (!empty($props['url'])) {
+        $item['url'] = CRM_Utils_System::evalUrl(CRM_Core_BAO_Navigation::makeFullyFormedUrl($props['url']));
+      }
+      if (!empty($props['label'])) {
+        $item['label'] = ts($props['label'], ['context' => 'menu']);
+      }
+      $item['name'] = !empty($props['name']) ? $props['name'] : CRM_Utils_String::munge(CRM_Utils_Array::value('label', $props));
+      if (!empty($item['child'])) {
+        self::formatMenuItems($item['child']);
       }
     }
-    return $searchOptions;
+    $menu = array_values($menu);
+  }
+
+  public static function getSearchOptions() {
+    $searchOptions = array_merge(['sort_name'], Civi::settings()->get('quicksearch_options'));
+    $labels = CRM_Core_SelectValues::quicksearchOptions();
+    $result = [];
+    foreach ($searchOptions as $key) {
+      $label = $labels[$key];
+      if (strpos($key, 'custom_') === 0) {
+        $key = 'custom_' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', substr($key, 7), 'id', 'name');
+        $label = array_slice(explode(': ', $label, 2), -1);
+      }
+      $result[$key] = $label;
+    }
+    return $result;
   }
 
   /**

@@ -499,7 +499,7 @@ class CRM_Core_PseudoConstant {
   }
 
   /**
-   * DEPRECATED generic populate method.
+   * @deprecated generic populate method.
    * All pseudoconstant functions that use this method are also @deprecated
    *
    * The static array $var is populated from the db

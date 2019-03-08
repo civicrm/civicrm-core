@@ -48,8 +48,9 @@ class CRM_Activity_Page_AJAX {
       'status_id' => 'Integer',
       'activity_deleted' => 'Boolean',
       'activity_type_id' => 'Integer',
-      'activity_date_low' => 'Date',
-      'activity_date_high' => 'Date',
+      // "Date" validation fails because it expects only numbers with no hyphens
+      'activity_date_low' => 'Alphanumeric',
+      'activity_date_high' => 'Alphanumeric',
     );
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
@@ -308,7 +309,6 @@ class CRM_Activity_Page_AJAX {
     $mainActivity->save();
     $mainActivityId = $mainActivity->id;
     CRM_Activity_BAO_Activity::logActivityAction($mainActivity);
-    $mainActivity->free();
 
     // Mark previous activity as deleted. If it was a non-case activity
     // then just change the subject.
@@ -329,9 +329,7 @@ class CRM_Activity_Page_AJAX {
       }
       $otherActivity->save();
 
-      $caseActivity->free();
     }
-    $otherActivity->free();
 
     $targetContacts = array();
     if (!empty($params['targetContactIds'])) {
@@ -384,7 +382,6 @@ class CRM_Activity_Page_AJAX {
     $params['mainActivityId'] = $mainActivityId;
     CRM_Activity_BAO_Activity::copyExtendedActivityData($params);
     CRM_Utils_Hook::post('create', 'CaseActivity', $caseActivity->id, $caseActivity);
-    $caseActivity->free();
 
     return (array('error_msg' => $error_msg, 'newId' => $mainActivity->id));
   }

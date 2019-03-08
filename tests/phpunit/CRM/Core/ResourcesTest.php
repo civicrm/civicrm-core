@@ -397,4 +397,28 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * return array
+   */
+  public function urlsToCheckIfFullyFormed() {
+    return [
+      ['civicrm/test/page', FALSE],
+      ['#', FALSE],
+      ['', FALSE],
+      ['/civicrm/test/page', TRUE],
+      ['http://test.com/civicrm/test/page', TRUE],
+      ['https://test.com/civicrm/test/page', TRUE],
+    ];
+  }
+
+  /**
+   * @param string $url
+   * @param string $expected
+   *
+   * @dataProvider urlsToCheckIfFullyFormed
+   */
+  public function testIsFullyFormedUrl($url, $expected) {
+    $this->assertEquals($expected, CRM_Core_Resources::isFullyFormedUrl($url));
+  }
+
 }

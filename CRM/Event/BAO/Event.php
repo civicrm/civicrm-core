@@ -924,7 +924,7 @@ WHERE civicrm_event.is_active = 1
    * @return CRM_Event_DAO_Event
    * @throws \CRM_Core_Exception
    */
-  public static function copy($id) {
+  public static function copy($id, $params = []) {
     $eventValues = array();
 
     //get the require event values.
@@ -947,7 +947,7 @@ WHERE civicrm_event.is_active = 1
     $copyEvent = CRM_Core_DAO::copyGeneric('CRM_Event_DAO_Event',
       array('id' => $id),
       // since the location is sharable, lets use the same loc_block_id.
-      array('loc_block_id' => CRM_Utils_Array::value('loc_block_id', $eventValues)),
+      array('loc_block_id' => CRM_Utils_Array::value('loc_block_id', $eventValues)) + $params,
       $fieldsFix
     );
     CRM_Price_BAO_PriceSet::copyPriceSet('civicrm_event', $id, $copyEvent->id);
@@ -2368,6 +2368,34 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
       break;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+  }
+
+  /**
+   * @return array
+   */
+  public static function getEntityRefFilters() {
+    return [
+      ['key' => 'event_type_id', 'value' => ts('Event Type')],
+      [
+        'key' => 'start_date',
+        'value' => ts('Start Date'),
+        'options' => [
+          ['key' => '{">":"now"}', 'value' => ts('Upcoming')],
+          [
+            'key' => '{"BETWEEN":["now - 3 month","now"]}',
+            'value' => ts('Past 3 Months'),
+          ],
+          [
+            'key' => '{"BETWEEN":["now - 6 month","now"]}',
+            'value' => ts('Past 6 Months'),
+          ],
+          [
+            'key' => '{"BETWEEN":["now - 1 year","now"]}',
+            'value' => ts('Past Year'),
+          ],
+        ],
+      ],
+    ];
   }
 
 }

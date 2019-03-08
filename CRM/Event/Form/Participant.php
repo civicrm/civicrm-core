@@ -635,7 +635,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     $eventFieldParams = array(
-      'entity' => 'event',
+      'entity' => 'Event',
       'select' => array('minimumInputLength' => 0),
       'api' => array(
         'extra' => array('campaign_id', 'default_role_id', 'event_type_id'),
@@ -1719,7 +1719,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         );
         $prefixValue = Civi::settings()->get('contribution_invoice_settings');
         $invoicing = CRM_Utils_Array::value('invoicing', $prefixValue);
-        if (count($taxAmt) > 0 && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
+        if (!empty($taxAmt) && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
           $sendTemplateParams['isEmailPdf'] = TRUE;
           $sendTemplateParams['contributionId'] = $contributionId;
         }

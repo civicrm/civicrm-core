@@ -484,6 +484,44 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test migration of Membership.
+   */
+  public function testMergeMembership() {
+    // Contacts setup
+    $this->setupMatchData();
+    $originalContactID = $this->contacts[0]['id'];
+    $duplicateContactID = $this->contacts[1]['id'];
+
+    //Add Membership for the duplicate contact.
+    $memTypeId = $this->membershipTypeCreate();
+    $membership = $this->callAPISuccess('Membership', 'create', [
+      'membership_type_id' => $memTypeId,
+      'contact_id' => $duplicateContactID,
+    ]);
+    //Assert if 'add new' checkbox is enabled on the merge form.
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($originalContactID, $duplicateContactID);
+    foreach ($rowsElementsAndInfo['elements'] as $element) {
+      if (!empty($element[3]) && $element[3] == 'add new') {
+        $checkedAttr = ['checked' => 'checked'];
+        $this->checkArrayEquals($element[4], $checkedAttr);
+      }
+    }
+
+    //Merge and move the mem to the main contact.
+    $this->mergeContacts($originalContactID, $duplicateContactID, [
+      'move_rel_table_memberships' => 1,
+      'operation' => ['move_rel_table_memberships' => ['add' => 1]]
+    ]);
+
+    //Check if membership is correctly transferred to original contact.
+    $originalContactMembership = $this->callAPISuccess('Membership', 'get', [
+      'membership_type_id' => $memTypeId,
+      'contact_id' => $originalContactID,
+    ]);
+    $this->assertEquals(1, $originalContactMembership['count']);
+  }
+
+  /**
    * CRM-19653 : Test that custom field data should/shouldn't be overriden on
    *   selecting/not selecting option to migrate data respectively
    */
@@ -795,8 +833,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         0 => 'contact_id',
       ),
       'civicrm_acl_contact_cache' => array(
-        0 => 'user_id',
-        1 => 'contact_id',
+        0 => 'contact_id',
       ),
       'civicrm_action_log' => array(
         0 => 'contact_id',
@@ -1002,8 +1039,7 @@ WHERE
     // There might be cleverer ways to do this but it shouldn't change much.
     $cidRefs['civicrm_contact'][0] = 'primary_contact_id';
     $cidRefs['civicrm_contact'][1] = 'employer_id';
-    $cidRefs['civicrm_acl_contact_cache'][0] = 'user_id';
-    $cidRefs['civicrm_acl_contact_cache'][1] = 'contact_id';
+    $cidRefs['civicrm_acl_contact_cache'][0] = 'contact_id';
     $cidRefs['civicrm_mailing'][0] = 'created_id';
     $cidRefs['civicrm_mailing'][1] = 'scheduled_id';
     $cidRefs['civicrm_mailing'][2] = 'approver_id';

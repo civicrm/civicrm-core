@@ -31,6 +31,21 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   protected $priceSetFieldID;
 
   /**
+   * @var int
+   */
+  private $_contactId;
+
+  /**
+   * @var int
+   */
+  private $_eventId;
+
+  /**
+   * @var array
+   */
+  private $_feeBlock;
+
+  /**
    * Set up for test.
    */
   public function setUp() {
@@ -234,6 +249,8 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $lineItemVal[$this->_priceSetID] = $lineItems;
     CRM_Price_BAO_LineItem::processPriceSet($participant['id'], $lineItemVal, $this->getContributionObject($contribution['id']), 'civicrm_participant');
     $this->balanceCheck($this->_expensiveFee);
+    $this->assertEquals(($this->_expensiveFee - $actualPaidAmt), CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId));
+
   }
 
   public function testCRM19273() {
@@ -276,15 +293,20 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    */
   public function testCRM20611() {
     $this->registerParticipantAndPay();
+    $actualPaidAmount = 100;
     $priceSetParams['price_' . $this->priceSetFieldID] = $this->expensiveFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $this->balanceCheck($this->_expensiveFee);
+    $contributionBalance = ($this->_expensiveFee - $actualPaidAmount);
+    $this->assertEquals($contributionBalance, CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId));
 
     $priceSetParams['price_' . $this->priceSetFieldID] = $this->cheapFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $this->balanceCheck($this->_cheapFee);
+    $contributionBalance = ($this->_cheapFee - $actualPaidAmount);
+    $this->assertEquals($contributionBalance, CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId));
 
     //Complete the refund payment.
     $submittedValues = array(
@@ -292,6 +314,8 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       'payment_instrument_id' => 3,
     );
     CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $submittedValues, 'refund', $this->_participantId);
+    $contributionBalance += 120;
+    $this->assertEquals($contributionBalance, CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId));
 
     // retrieve the cancelled line-item information
     $cancelledLineItem = $this->callAPISuccessGetSingle('LineItem', array(

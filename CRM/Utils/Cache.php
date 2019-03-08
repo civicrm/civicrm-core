@@ -165,6 +165,16 @@ class CRM_Utils_Cache {
    *     should function correctly, but it can be harder to inspect/debug.
    *   - type: array|string, list of acceptable cache types, in order of preference.
    *   - prefetch: bool, whether to prefetch all data in cache (if possible).
+   *   - withArray: bool|null|'fast', whether to setup a thread-local array-cache in front of the cache driver.
+   *     Note that cache-values may be passed to the underlying driver with extra metadata,
+   *     so this will slightly change/enlarge the on-disk format.
+   *     Support varies by driver:
+   *       - For most memory backed caches, this option is meaningful.
+   *       - For SqlGroup, this option is ignored. SqlGroup has equivalent behavior built-in.
+   *       - For Arraycache, this option is ignored. It's redundant.
+   *      If this is a short-lived process in which TTL's don't matter, you might
+   *      use 'fast' mode. It sacrifices some PSR-16 compliance and cache-coherency
+   *      protections to improve performance.
    * @return CRM_Utils_Cache_Interface
    * @throws CRM_Core_Exception
    * @see Civi::cache()
@@ -183,7 +193,11 @@ class CRM_Utils_Cache {
             $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
             $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
             $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . $params['name'] . self::DELIMITER;
-            return new $dbCacheClass($settings);
+            $cache = new $dbCacheClass($settings);
+            if (!empty($params['withArray'])) {
+              $cache = $params['withArray'] === 'fast' ? new CRM_Utils_Cache_FastArrayDecorator($cache) : new CRM_Utils_Cache_ArrayDecorator($cache);
+            }
+            return $cache;
           }
           break;
 
@@ -256,6 +270,35 @@ class CRM_Utils_Cache {
       return $className;
     }
     return $className;
+  }
+
+  /**
+   * Generate a unique negative-acknowledgement token (NACK).
+   *
+   * When using PSR-16 to read a value, the `$cahce->get()` will a return a default
+   * value on cache-miss, so it's hard to know if you've gotten a geniune value
+   * from the cache or just a default. If you're in an edge-case where it matters
+   * (and you want to do has()+get() in a single roundtrip), use the nack() as
+   * the default:
+   *
+   *   $nack = CRM_Utils_Cache::nack();
+   *   $value = $cache->get('foo', $nack);
+   *   echo ($value === $nack) ? "Cache has a value, and we got it" : "Cache has no value".
+   *
+   * The value should be unique to avoid accidental matches.
+   *
+   * @return string
+   *   Unique nonce value indicating a "negative acknowledgement" (failed read).
+   *   If we need to accurately perform has($key)+get($key), we can
+   *   use `get($key,$nack)`.
+   */
+  public static function nack() {
+    $st =& Civi::$statics[__CLASS__];
+    if (!isset($st['nack-c'])) {
+      $st['nack-c'] = md5(CRM_Utils_Request::id() . CIVICRM_SITE_KEY . CIVICRM_DSN . mt_rand(0, 10000));
+      $st['nack-i'] = 0;
+    }
+    return 'NACK:' . $st['nack-c'] . $st['nack-i']++;
   }
 
 }

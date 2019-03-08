@@ -32,7 +32,7 @@
  * $Id$
  *
  */
-class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
+class CRM_Report_Form_Event_Income extends CRM_Report_Form {
   const ROW_COUNT_LIMIT = 2;
 
   protected $_summary = NULL;

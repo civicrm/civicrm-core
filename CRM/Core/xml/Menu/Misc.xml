@@ -203,7 +203,7 @@
   <item>
      <path>civicrm/recurringentity/preview</path>
      <page_callback>CRM_Core_Page_RecurringEntityPreview</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <access_arguments>access CiviCRM</access_arguments>
      <title>Confirm dates</title>
   </item>
   <item>

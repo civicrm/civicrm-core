@@ -125,6 +125,7 @@ class CRM_Dedupe_Finder {
     if (!$params) {
       return array();
     }
+    $checkPermission = CRM_Utils_Array::value('check_permission', $params, TRUE);
     // This may no longer be required - see https://github.com/civicrm/civicrm-core/pull/13176
     $params = array_filter($params);
 
@@ -146,7 +147,6 @@ class CRM_Dedupe_Finder {
         CRM_Core_Error::fatal("$used rule for $ctype does not exist");
       }
     }
-    $params['check_permission'] = CRM_Utils_Array::value('check_permission', $params, TRUE);
 
     if (isset($params['civicrm_phone']['phone_numeric'])) {
       $orig = $params['civicrm_phone']['phone_numeric'];
@@ -155,7 +155,7 @@ class CRM_Dedupe_Finder {
     $rgBao->params = $params;
     $rgBao->fillTable();
     $dao = new CRM_Core_DAO();
-    $dao->query($rgBao->thresholdQuery($params['check_permission']));
+    $dao->query($rgBao->thresholdQuery($checkPermission));
     $dupes = array();
     while ($dao->fetch()) {
       if (isset($dao->id) && $dao->id) {

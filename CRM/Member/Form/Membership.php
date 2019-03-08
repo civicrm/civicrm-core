@@ -417,7 +417,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     //setting default join date if there is no join date
     if (empty($defaults['join_date'])) {
-      $defaults['join_date'] = date('Y-m-d H:i:s');
+      $defaults['join_date'] = date('Y-m-d');
     }
 
     if (!empty($defaults['membership_end_date'])) {
@@ -581,7 +581,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     );
 
     if (!empty($this->_recurPaymentProcessors)) {
-      $memTypeJs['onChange'] = "" . $memTypeJs['onChange'] . "buildAutoRenew(this.value, null, '{$this->_mode}');";
+      $memTypeJs['onChange'] = "" . $memTypeJs['onChange'] . " buildAutoRenew(this.value, null, '{$this->_mode}');";
     }
 
     $this->add('text', 'max_related', ts('Max related'),
@@ -600,7 +600,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     if ($this->_action & CRM_Core_Action::ADD) {
-      $this->add('text', 'num_terms', ts('Number of Terms'), array('size' => 6));
+      $this->add('number', 'num_terms', ts('Number of Terms'), array('size' => 6));
     }
 
     $this->add('text', 'source', ts('Source'),

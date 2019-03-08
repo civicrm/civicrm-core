@@ -173,19 +173,29 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @return array|null
    */
   public static function getPaymentProcessor($id, $mode = NULL) {
-    $sql = "
-SELECT r.payment_processor_id
-  FROM civicrm_contribution_recur r
- WHERE r.id = %1";
-    $params = array(1 => array($id, 'Integer'));
-    $paymentProcessorID = CRM_Core_DAO::singleValueQuery($sql,
-      $params
-    );
+    $paymentProcessorID = self::getPaymentProcessorID($id);
     if (!$paymentProcessorID) {
       return NULL;
     }
 
     return CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID, $mode);
+  }
+
+  /**
+   * Get the payment processor for the given recurring contribution.
+   *
+   * @param int $recurID
+   *
+   * @return int
+   *   Payment processor id. If none found return 0 which represents the
+   *   pseudo processor used for pay-later.
+   */
+  public static function getPaymentProcessorID($recurID) {
+    $recur = civicrm_api3('ContributionRecur', 'getsingle', [
+      'id' => $recurID,
+      'return' => ['payment_processor_id']
+    ]);
+    return (int) CRM_Utils_Array::value('payment_processor_id', $recur, 0);
   }
 
   /**
@@ -954,7 +964,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
 
   /**
    * Returns array with statuses that are considered to make a recurring
-   * contribution inacteve.
+   * contribution inactive.
    *
    * @return array
    */

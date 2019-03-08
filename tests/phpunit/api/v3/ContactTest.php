@@ -1017,7 +1017,26 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'last_name' => "O'Connor",
       'sequential' => 1,
     ));
-    $this->assertEquals("O'Connor", $result['last_name'], 'in line' . __LINE__);
+    $this->assertEquals("O'Connor", $result['last_name']);
+  }
+
+  /**
+   * Test between accepts zero.
+   *
+   * In the past it incorrectly required !empty.
+   */
+  public function testGetBetweenZeroWorks() {
+    $this->callAPISuccess($this->_entity, 'get', [
+      'contact_id' => ['BETWEEN' => [0, 9]],
+    ]);
+    $this->callAPISuccess($this->_entity, 'get', [
+      'contact_id' => [
+        'BETWEEN' => [
+          (0 - 9),
+          0,
+        ],
+      ],
+    ]);
   }
 
   /**
@@ -3842,6 +3861,31 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(array('external_identifier'), $result['values']['UI_external_identifier']);
   }
 
+  /**
+   * API test to retrieve contact from group having different group title and name.
+   */
+  public function testContactGetFromGroup() {
+    $groupId = $this->groupCreate([
+      'name' => 'Test_Group',
+      'domain_id' => 1,
+      'title' => 'New Test Group Created',
+      'description' => 'New Test Group Created',
+      'is_active' => 1,
+      'visibility' => 'User and User Admin Only',
+    ]);
+    $contact = $this->callAPISuccess('contact', 'create', $this->_params);
+    $groupContactCreateParams = array(
+      'contact_id' => $contact['id'],
+      'group_id' => $groupId,
+      'status' => 'Pending',
+    );
+    $groupContact = $this->callAPISuccess('groupContact', 'create', $groupContactCreateParams);
+    $groupGetContact = $this->CallAPISuccess('groupContact', 'get', $groupContactCreateParams);
+    $this->CallAPISuccess('Contact', 'getcount', [
+      'group' => "Test_Group",
+    ]);
+  }
+
   public function testSmartGroupsForRelatedContacts() {
     $rtype1 = $this->callAPISuccess('relationship_type', 'create', array(
       "name_a_b" => uniqid() . " Child of",
@@ -3900,6 +3944,98 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertTrue($g1Contacts['count'] == 1);
     $this->assertTrue($g2Contacts['count'] == 2);
     $this->assertTrue($g3Contacts['count'] == 1);
+  }
+
+  /**
+   * Test creating a note from the contact.create API call when only passing the note as a string.
+   */
+  public function testCreateNoteinCreate() {
+    $loggedInContactID = $this->createLoggedInUser();
+    $this->_params['note'] = "Test note created by API Call as a String";
+    $contact = $this->callAPISuccess('Contact', 'create', $this->_params);
+    $note = $this->callAPISuccess('Note', 'get', ['contact_id' => $loggedInContactID]);
+    $this->assertEquals($note['values'][$note['id']]['note'], "Test note created by API Call as a String");
+    $note = $this->callAPISuccess('Note', 'get', ['entity_id' => $contact['id']]);
+    $this->assertEquals($note['values'][$note['id']]['note'], "Test note created by API Call as a String");
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contact['id'], 'skip_undelete' => TRUE]);
+  }
+
+  /**
+   * Test Creating a note from the contact.create api call when passing the note params as an array.
+   */
+  public function testCreateNoteinCreateArrayFormat() {
+    $contact1 = $this->callAPISuccess('Contact', 'create', array('first_name' => 'Alan', 'last_name' => 'MouseMouse', 'contact_type' => 'Individual'));
+    $this->_params['note'] = [['note' => "Test note created by API Call as array", 'contact_id' => $contact1['id']]];
+    $contact2 = $this->callAPISuccess('Contact', 'create', $this->_params);
+    $note = $this->callAPISuccess('Note', 'get', ['contact_id' => $contact1['id']]);
+    $this->assertEquals($note['values'][$note['id']]['note'], "Test note created by API Call as array");
+    $note = $this->callAPISuccess('Note', 'get', ['entity_id' => $contact2['id']]);
+    $this->assertEquals($note['values'][$note['id']]['note'], "Test note created by API Call as array");
+  }
+
+  /**
+   * Verify that passing tag IDs to Contact.get works
+   *
+   * Tests the following formats
+   * - Contact.get tag='id1'
+   * - Contact.get tag='id1,id2'
+   * - Contact.get tag='id1, id2'
+   */
+  public function testContactGetWithTag() {
+    $contact = $this->callApiSuccess('Contact', 'create', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Test',
+      'last_name' => 'Tagged',
+      'email' => 'test@example.org',
+    ]);
+    $tags = [];
+    foreach (['Tag A', 'Tag B'] as $name) {
+      $tags[] = $this->callApiSuccess('Tag', 'create', [
+        'name' => $name
+      ]);
+    }
+
+    // assign contact to "Tag B"
+    $this->callApiSuccess('EntityTag', 'create', [
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $contact['id'],
+      'tag_id' => $tags[1]['id'],
+    ]);
+
+    // test format Contact.get tag='id1'
+    $contact_get = $this->callAPISuccess('Contact', 'get', [
+      'tag' => $tags[1]['id'],
+      'return' => 'tag',
+    ]);
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($contact['id'], $contact_get['id']);
+    $this->assertEquals('Tag B', $contact_get['values'][$contact['id']]['tags']);
+
+    // test format Contact.get tag='id1,id2'
+    $contact_get = $this->callAPISuccess('Contact', 'get', [
+      'tag' => $tags[0]['id'] . ',' . $tags[1]['id'],
+      'return' => 'tag',
+    ]);
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($contact['id'], $contact_get['id']);
+    $this->assertEquals('Tag B', $contact_get['values'][$contact['id']]['tags']);
+
+    // test format Contact.get tag='id1, id2'
+    $contact_get = $this->callAPISuccess('Contact', 'get', [
+      'tag' => $tags[0]['id'] . ', ' . $tags[1]['id'],
+      'return' => 'tag',
+    ]);
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($contact['id'], $contact_get['id']);
+    $this->assertEquals('Tag B', $contact_get['values'][$contact['id']]['tags']);
+
+    foreach ($tags as $tag) {
+      $this->callAPISuccess('Tag', 'delete', ['id' => $tag['id']]);
+    }
+    $this->callAPISuccess('Contact', 'delete', [
+      'id' => $contact['id'],
+      'skip_undelete' => TRUE
+    ]);
   }
 
 }

@@ -200,7 +200,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    *
    * @return array|bool
    */
-  public static function formRule($fields) {
+  public static function formRule($fields, $files, $form) {
     // check actionName and if next, then do not repeat a search, since we are going to the next page
     if (array_key_exists('_qf_Search_next', $fields)) {
       if (empty($fields['task'])) {

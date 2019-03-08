@@ -153,7 +153,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
     );
     $this->add('checkbox', 'is_current_member', ts('Current Membership?'));
 
-    $this->add('text', 'weight', ts('Order'),
+    $this->add('number', 'weight', ts('Order'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipStatus', 'weight')
     );
     $this->add('checkbox', 'is_default', ts('Default?'));

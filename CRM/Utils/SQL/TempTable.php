@@ -72,6 +72,8 @@ class CRM_Utils_SQL_TempTable {
   const CATEGORY_REGEXP = ';^[a-zA-Z0-9]+$;';
   const ID_LENGTH = 37; // MAX{64} - CATEGORY_LENGTH{12} - CONST_LENGHTH{15} = 37
   const ID_REGEXP = ';^[a-zA-Z0-9_]+$;';
+  const INNODB = 'ENGINE=InnoDB';
+  const MEMORY = 'ENGINE=MEMORY';
 
   /**
    * @var bool
@@ -84,6 +86,8 @@ class CRM_Utils_SQL_TempTable {
 
   protected $autodrop;
 
+  protected $memory;
+
   /**
    * @return CRM_Utils_SQL_TempTable
    */
@@ -93,9 +97,10 @@ class CRM_Utils_SQL_TempTable {
     $t->id = md5(uniqid('', TRUE));
     // The constant CIVICRM_TEMP_FORCE_DURABLE is for local debugging.
     $t->durable = CRM_Utils_Constant::value('CIVICRM_TEMP_FORCE_DURABLE', FALSE);
-    // I suspect it would be better to just say utf8=true, but a lot of existing queries don't do the utf8 bit.
-    $t->utf8 = CRM_Utils_Constant::value('CIVICRM_TEMP_FORCE_UTF8', FALSE);
+    // @deprecated This constant is deprecated and will be removed.
+    $t->utf8 = CRM_Utils_Constant::value('CIVICRM_TEMP_FORCE_UTF8', TRUE);
     $t->autodrop = FALSE;
+    $t->memory = FALSE;
     return $t;
   }
 
@@ -126,8 +131,9 @@ class CRM_Utils_SQL_TempTable {
    * @return CRM_Utils_SQL_TempTable
    */
   public function createWithQuery($selectQuery) {
-    $sql = sprintf('%s %s AS %s',
+    $sql = sprintf('%s %s %s AS %s',
       $this->toSQL('CREATE'),
+      $this->memory ? self::MEMORY : self::INNODB,
       $this->utf8 ? self::UTF8 : '',
       ($selectQuery instanceof CRM_Utils_SQL_Select ? $selectQuery->toSQL() : $selectQuery)
     );
@@ -144,9 +150,10 @@ class CRM_Utils_SQL_TempTable {
    * @return CRM_Utils_SQL_TempTable
    */
   public function createWithColumns($columns) {
-    $sql = sprintf('%s (%s) %s',
+    $sql = sprintf('%s (%s) %s %s',
       $this->toSQL('CREATE'),
       $columns,
+      $this->memory ? self::MEMORY : self::INNODB,
       $this->utf8 ? self::UTF8 : ''
     );
     CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE, FALSE);
@@ -218,6 +225,13 @@ class CRM_Utils_SQL_TempTable {
   /**
    * @return bool
    */
+  public function isMemory() {
+    return $this->memory;
+  }
+
+  /**
+   * @return bool
+   */
   public function isUtf8() {
     return $this->utf8;
   }
@@ -270,6 +284,18 @@ class CRM_Utils_SQL_TempTable {
       throw new \RuntimeException("Malformed temp table id");
     }
     $this->id = $id;
+    return $this;
+  }
+
+  /**
+   * Set table engine to MEMORY.
+   *
+   * @param bool $value
+   *
+   * @return $this
+   */
+  public function setMemory($value = TRUE) {
+    $this->memory = $value;
     return $this;
   }
 

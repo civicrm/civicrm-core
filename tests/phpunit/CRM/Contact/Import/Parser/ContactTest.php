@@ -509,6 +509,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * CRM-19888 default country should be used if ambigous.
    */
   public function testImportAmbiguousStateCountry() {
+    $this->callAPISuccess('Setting', 'create', ['defaultContactCountry' => 1228]);
     $countries = CRM_Core_PseudoConstant::country(FALSE, FALSE);
     $this->callAPISuccess('Setting', 'create', array('countryLimit' => array(array_search('United States', $countries), array_search('Guyana', $countries), array_search('Netherlands', $countries))));
     $this->callAPISuccess('Setting', 'create', array('provinceLimit' => array(array_search('United States', $countries), array_search('Guyana', $countries), array_search('Netherlands', $countries))));

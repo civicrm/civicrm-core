@@ -118,7 +118,25 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
   }
 
   private function reobjectify($value) {
-    return is_object($value) ? unserialize(serialize($value)) : $value;
+    if (is_object($value)) {
+      return unserialize(serialize($value));
+    }
+    if (is_array($value)) {
+      foreach ($value as $p) {
+        if (is_object($p)) {
+          return unserialize(serialize($value));
+        }
+      }
+    }
+    return $value;
+  }
+
+  /**
+   * @param string $key
+   * @return int|null
+   */
+  public function getExpires($key) {
+    return $this->_expires[$key] ?: NULL;
   }
 
 }

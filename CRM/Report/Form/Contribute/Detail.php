@@ -156,6 +156,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'trxn_id' => NULL,
           'receive_date' => array('default' => TRUE),
           'receipt_date' => NULL,
+          'thankyou_date' => NULL,
           'total_amount' => array(
             'title' => ts('Amount'),
             'required' => TRUE,
@@ -178,6 +179,12 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'title' => ts('Soft Credit For'),
             'dbAlias' => "NULL",
           ),
+          'cancel_date' => array(
+            'title' => ts('Cancelled / Refunded Date'),
+          ),
+          'cancel_reason' => array(
+            'title' => ts('Cancellation / Refund Reason'),
+          ),
         ),
         'filters' => array(
           'contribution_or_soft' => array(
@@ -192,6 +199,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             ),
           ),
           'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
+          'thankyou_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
           'contribution_source' => array(
             'title' => ts('Source'),
             'name' => 'source',
@@ -233,12 +241,20 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_INT,
           ),
           'total_amount' => array('title' => ts('Contribution Amount')),
+          'cancel_date' => array(
+            'title' => ts('Cancelled / Refunded Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
+          ),
+          'cancel_reason' => array(
+            'title' => ts('Cancellation / Refund Reason'),
+          ),
         ),
         'order_bys' => array(
           'financial_type_id' => array('title' => ts('Financial Type')),
           'contribution_status_id' => array('title' => ts('Contribution Status')),
           'payment_instrument_id' => array('title' => ts('Payment Method')),
           'receive_date' => array('title' => ts('Date Received')),
+          'thankyou_date' => array('title' => ts('Thank-you Date')),
         ),
         'group_bys' => array(
           'contribution_id' => array(
@@ -472,9 +488,10 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
    *
    * @return string
    */
-  public function buildQuery($applyLimit = TRUE) {
+  public function buildQuery($applyLimit = FALSE) {
     if ($this->isTempTableBuilt) {
-      return "SELECT * FROM civireport_contribution_detail_temp3 $this->_orderBy";
+      $this->limit();
+      return "SELECT SQL_CALC_FOUND_ROWS * FROM civireport_contribution_detail_temp3 $this->_orderBy $this->_limit";
     }
     return parent::buildQuery($applyLimit);
   }
@@ -509,7 +526,6 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     // 1. use main contribution query to build temp table 1
     $sql = $this->buildQuery();
     $this->createTemporaryTable('civireport_contribution_detail_temp1', $sql);
-    $this->setPager();
 
     // 2. customize main contribution query for soft credit, and build temp table 2 with soft credit contributions only
     $this->queryMode = 'SoftCredit';

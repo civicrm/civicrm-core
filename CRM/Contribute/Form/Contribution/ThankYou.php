@@ -301,6 +301,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $contributionStatusID = civicrm_api3('Contribution', 'getvalue', array(
         'id' => CRM_Utils_Array::value('contributionID', $params),
         'return' => 'contribution_status_id',
+        'is_test'   => ($this->_mode == 'test') ? 1 : 0,
         'invoice_id' => CRM_Utils_Array::value('invoiceID', $params),
       ));
       if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatusID) === 'Pending'

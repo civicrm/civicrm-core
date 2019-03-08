@@ -209,6 +209,13 @@
       <td>&nbsp;</td>
       <td class="description">{$settings_fields.sort_name_format.description}</td>
     </tr>
+    <tr class="crm-preferences-display-form-block_menubar_position">
+      <td class="label">{$form.menubar_position.label}</td>
+      <td>
+        {$form.menubar_position.html}
+        <div class="description">{ts}Default position for the CiviCRM menubar.{/ts}</div>
+      </td>
+    </tr>
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

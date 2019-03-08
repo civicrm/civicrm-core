@@ -46,7 +46,6 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
     $membershipLog = new CRM_Member_DAO_MembershipLog();
     $membershipLog->copyValues($params);
     $membershipLog->save();
-    $membershipLog->free();
 
     return $membershipLog;
   }

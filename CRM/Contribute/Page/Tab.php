@@ -153,10 +153,11 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     if (!empty($softCreditList)) {
       $softCreditTotals = array();
 
-      list($softCreditTotals['amount'],
+      list($softCreditTotals['count'],
+        $softCreditTotals['cancel']['count'],
+        $softCreditTotals['amount'],
         $softCreditTotals['avg'],
-        $softCreditTotals['currency'],
-        $softCreditTotals['cancelAmount'] // to get cancel amount
+        $softCreditTotals['cancel']['amount'] // to get cancel amount
         ) = CRM_Contribute_BAO_ContributionSoft::getSoftContributionTotals($this->_contactId, $isTest);
 
       $this->assign('softCredit', TRUE);
@@ -242,9 +243,14 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   private function buildRecurringContributionsArray($recurContributions) {
     $liveRecurringContributionCount = 0;
     foreach ($recurContributions as $recurId => $recurDetail) {
-      $action = array_sum(array_keys($this->recurLinks($recurId)));
-      // no action allowed if it's not active
-      $recurContributions[$recurId]['is_active'] = (!CRM_Contribute_BAO_Contribution::isContributionStatusNegative($recurDetail['contribution_status_id']));
+      // Is recurring contribution active?
+      $recurContributions[$recurId]['is_active'] = !in_array(CRM_Contribute_PseudoConstant::contributionStatus($recurDetail['contribution_status_id'], 'name'), CRM_Contribute_BAO_ContributionRecur::getInactiveStatuses());
+      if ($recurContributions[$recurId]['is_active']) {
+        $actionMask = array_sum(array_keys(self::recurLinks($recurId)));
+      }
+      else {
+        $actionMask = CRM_Core_Action::mask([CRM_Core_Permission::VIEW]);
+      }
 
       if (empty($recurDetail['is_test'])) {
         $liveRecurringContributionCount++;
@@ -259,20 +265,18 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         $recurContributions[$recurId]['contribution_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $recurDetail['contribution_status_id']);
       }
 
-      if ($recurContributions[$recurId]['is_active']) {
-        $recurContributions[$recurId]['action'] = CRM_Core_Action::formLink(self::recurLinks($recurId), $action,
-          array(
-            'cid' => $this->_contactId,
-            'crid' => $recurId,
-            'cxt' => 'contribution',
-          ),
-          ts('more'),
-          FALSE,
-          'contribution.selector.recurring',
-          'Contribution',
-          $recurId
-        );
-      }
+      $recurContributions[$recurId]['action'] = CRM_Core_Action::formLink(self::recurLinks($recurId), $actionMask,
+        array(
+          'cid' => $this->_contactId,
+          'crid' => $recurId,
+          'cxt' => 'contribution',
+        ),
+        ts('more'),
+        FALSE,
+        'contribution.selector.recurring',
+        'Contribution',
+        $recurId
+      );
     }
 
     return [$recurContributions, $liveRecurringContributionCount];

@@ -158,7 +158,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param array $params
    * @param int $financialTypeID
-   * @param bool $pending
    * @param array $paymentProcessorOutcome
    * @param string $receiptDate
    * @param int $recurringContributionID
@@ -166,7 +165,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return array
    */
   public static function getContributionParams(
-    $params, $financialTypeID, $pending,
+    $params, $financialTypeID,
     $paymentProcessorOutcome, $receiptDate, $recurringContributionID) {
     $contributionParams = array(
       'financial_type_id' => $financialTypeID,
@@ -193,22 +192,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         'receipt_date' => $receiptDate,
       );
     }
-    if (!$pending && $paymentProcessorOutcome) {
-      $contributionParams += array(
-        'fee_amount' => CRM_Utils_Array::value('fee_amount', $paymentProcessorOutcome),
-        'net_amount' => CRM_Utils_Array::value('net_amount', $paymentProcessorOutcome, $params['amount']),
-        'trxn_id' => $paymentProcessorOutcome['trxn_id'],
-        'receipt_date' => $receiptDate,
-        // also add financial_trxn details as part of fix for CRM-4724
-        'trxn_result_code' => CRM_Utils_Array::value('trxn_result_code', $paymentProcessorOutcome),
-      );
-    }
 
     if ($recurringContributionID) {
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
     }
 
-    $contributionParams['contribution_status_id'] = $pending ? 2 : 1;
+    $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     if (isset($contributionParams['invoice_id'])) {
       $contributionParams['id'] = CRM_Core_DAO::getFieldValue(
         'CRM_Contribute_DAO_Contribution',
@@ -957,7 +946,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     if (isset($params['amount'])) {
       $contributionParams = array_merge(self::getContributionParams(
-        $params, $financialType->id, TRUE,
+        $params, $financialType->id,
         $result, $receiptDate,
         $recurringContributionID), $contributionParams
       );

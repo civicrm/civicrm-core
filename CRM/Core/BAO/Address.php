@@ -771,6 +771,11 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
       $streetAddress = trim($streetAddress);
     }
 
+    // If street number is too large, we cannot store it.
+    if ($parseFields['street_number'] > CRM_Utils_Type::INT_MAX) {
+      return $emptyParseFields;
+    }
+
     // suffix might be like 1/2
     $matches = array();
     if (preg_match('/^\d\/\d/', $streetAddress, $matches)) {

@@ -71,10 +71,10 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
       $participantPayment->find(TRUE);
     }
     if ($id) {
-      CRM_Utils_Hook::post('edit', 'ParticipantPayment', $id, $participantPayment);
+      CRM_Utils_Hook::post('edit', 'ParticipantPayment', $participantPayment->id, $participantPayment);
     }
     else {
-      CRM_Utils_Hook::post('create', 'ParticipantPayment', NULL, $participantPayment);
+      CRM_Utils_Hook::post('create', 'ParticipantPayment', $participantPayment->id, $participantPayment);
     }
 
     //generally if people are creating participant_payments via the api they won't be setting the line item correctly - we can't help them if they are doing complex transactions

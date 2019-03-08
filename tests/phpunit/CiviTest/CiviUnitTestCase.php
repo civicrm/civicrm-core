@@ -1981,6 +1981,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'defaultValue' => 'Default Value',
       'lowercasevalue' => 'Lowercase Value',
       1 => 'Integer Value',
+      'NULL' => 'NULL',
     ];
     $custom_field_params = ['sequential' => 1, 'id' => $customField['id']];
     $custom_field_api_result = $this->callAPISuccess('custom_field', 'get', $custom_field_params);
@@ -2727,7 +2728,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     if (!$isProfile) {
       //flush cache
       CRM_ACL_BAO_Cache::resetCache();
-      CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL, TRUE);
+      CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL);
     }
   }
 
@@ -3133,7 +3134,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 7);
     $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
     $paramsSet['is_active'] = TRUE;
-    $paramsSet['financial_type_id'] = 4;
+    $paramsSet['financial_type_id'] = 'Event Fee';
     $paramsSet['extends'] = 1;
     $priceSet = $this->callAPISuccess('price_set', 'create', $paramsSet);
     $priceSetId = $priceSet['id'];
@@ -3395,13 +3396,13 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       ),
       $params
     );
-    $newPaymentInstrument = $this->callAPISuccess('OptionValue', 'create', $params);
+    $newPaymentInstrument = $this->callAPISuccess('OptionValue', 'create', $params)['id'];
 
     $relationTypeID = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
 
     $financialAccountParams = [
       'entity_table' => 'civicrm_option_value',
-      'entity_id' => key($newPaymentInstrument),
+      'entity_id' => $newPaymentInstrument,
       'account_relationship' => $relationTypeID,
       'financial_account_id' => $this->callAPISuccess('FinancialAccount', 'getValue', ['name' => $financialAccountName, 'return' => 'id']),
     ];

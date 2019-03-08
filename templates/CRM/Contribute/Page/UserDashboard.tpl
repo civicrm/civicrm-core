@@ -58,6 +58,7 @@
                         <td>{$row.contribution_status}</td>
                         {if $invoicing && $invoices}
                           <td>
+                            {* @todo Instead of this tpl handling assign actions as an array attached the row, iterate through - will better accomodate extension overrides and competition for scarce real estate on this page*}
                             {assign var='id' value=$row.contribution_id}
                             {assign var='contact_id' value=$row.contact_id}
                             {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id"}
@@ -75,6 +76,7 @@
                           </td>
                         {/if}
                         {if $defaultInvoicePage && $row.contribution_status_name == 'Pending' }
+                          {* @todo Instead of this tpl handling assign actions as an array attached the row, iterate through - will better accomodate extension overrides and competition for scarce real estate on this page*}
                           <td>
                             {assign var='checksum_url' value=""}
                             {if $userChecksum}

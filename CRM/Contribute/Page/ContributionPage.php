@@ -215,6 +215,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'title' => ts('Test-drive'),
           'url' => $urlString,
           'qs' => $urlParams . '&action=preview',
+          'fe' => TRUE, // Addresses https://lab.civicrm.org/dev/core/issues/658
           'uniqueName' => 'test_drive',
         ),
       );
@@ -419,8 +420,10 @@ AND         cp.page_type = 'contribute'
     $params = array();
 
     $whereClause = $this->whereClause($params, FALSE);
-    $this->pagerAToZ($whereClause, $params);
-
+    $config = CRM_Core_Config::singleton();
+    if ($config->includeAlphabeticalPager) {
+      $this->pagerAToZ($whereClause, $params);
+    }
     $params = array();
     $whereClause = $this->whereClause($params, TRUE);
     $this->pager($whereClause, $params);

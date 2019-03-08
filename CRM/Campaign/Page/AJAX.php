@@ -494,39 +494,6 @@ class CRM_Campaign_Page_AJAX {
     CRM_Utils_JSON::output(array('status' => $status));
   }
 
-  public function allActiveCampaigns() {
-    $currentCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns();
-    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, TRUE, FALSE, TRUE);
-    $options = array(
-      array(
-        'value' => '',
-        'title' => ts('- select -'),
-      ),
-    );
-    foreach ($campaigns as $value => $title) {
-      $class = NULL;
-      if (!array_key_exists($value, $currentCampaigns)) {
-        $class = 'status-past';
-      }
-      $options[] = array(
-        'value' => $value,
-        'title' => $title,
-        'class' => $class,
-      );
-    }
-    $status = 'fail';
-    if (count($options) > 1) {
-      $status = 'success';
-    }
-
-    $results = array(
-      'status' => $status,
-      'campaigns' => $options,
-    );
-
-    CRM_Utils_JSON::output($results);
-  }
-
   public function campaignGroups() {
     $surveyId = CRM_Utils_Request::retrieve('survey_id', 'Positive',
       CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST'

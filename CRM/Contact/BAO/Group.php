@@ -695,7 +695,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     //create/update saved search record.
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $savedSearch->id = $ssId;
-    $savedSearch->form_values = serialize($params['form_values']);
+    $savedSearch->form_values = serialize(CRM_Contact_BAO_Query::convertFormValues($params['form_values']));
     $savedSearch->mapping_id = $mappingId;
     $savedSearch->search_custom_id = CRM_Utils_Array::value('search_custom_id', $params);
     $savedSearch->save();
@@ -966,18 +966,20 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         }
         $values[$object->id]['group_type'] = implode(', ', $types);
       }
-      $values[$object->id]['action'] = CRM_Core_Action::formLink($newLinks,
-        $action,
-        array(
-          'id' => $object->id,
-          'ssid' => $object->saved_search_id,
-        ),
-        ts('more'),
-        FALSE,
-        'group.selector.row',
-        'Group',
-        $object->id
-      );
+      if ($action) {
+        $values[$object->id]['action'] = CRM_Core_Action::formLink($newLinks,
+          $action,
+          array(
+            'id' => $object->id,
+            'ssid' => $object->saved_search_id,
+          ),
+          ts('more'),
+          FALSE,
+          'group.selector.row',
+          'Group',
+          $object->id
+        );
+      }
 
       // If group has children, add class for link to view children
       $values[$object->id]['is_parent'] = FALSE;
