@@ -38,7 +38,7 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
    * @param bool $modal
    */
   public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
-
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Export_StateMachine_Standalone seems to be never used.... if it truly is ... document');
     parent::__construct($title, $modal);
 
     $entity = ucfirst(CRM_Utils_Request::retrieve('entity', 'String', $this, TRUE));

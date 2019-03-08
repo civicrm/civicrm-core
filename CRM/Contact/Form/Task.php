@@ -102,6 +102,9 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     $form->_contactTypes = array();
 
     $useTable = (CRM_Utils_System::getClassName($form->controller->getStateMachine()) == 'CRM_Export_StateMachine_Standalone');
+    if ($useTable) {
+      CRM_Core_Error::deprecatedFunctionWarning('CRM_Export_StateMachine_Standalone seems to be never used.... if it truly is ... document');
+    }
 
     $isStandAlone = in_array('task', $form->urlPath) || in_array('standalone', $form->urlPath);
     if ($isStandAlone) {

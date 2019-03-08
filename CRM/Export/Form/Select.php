@@ -140,6 +140,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
         $formName = CRM_Utils_System::getClassName($this->controller->getStateMachine());
         $componentName = explode('_', $formName);
         if ($formName == 'CRM_Export_StateMachine_Standalone') {
+          CRM_Core_Error::deprecatedFunctionWarning('CRM_Export_StateMachine_Standalone seems to be never used.... if it truly is ... document');
           $componentName = array('CRM', $this->controller->get('entity'));
         }
         $entityShortname = $componentName[1]; // Contact

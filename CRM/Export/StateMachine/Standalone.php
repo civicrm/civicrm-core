@@ -39,6 +39,7 @@ class CRM_Export_StateMachine_Standalone extends CRM_Core_StateMachine {
    * @param \const|int $action
    */
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
+    CRM_Core_Error::deprecatedFunctionWarning('This function seems to be never used.... if it truly is ... document');
     parent::__construct($controller, $action);
 
     $this->_pages = array(
