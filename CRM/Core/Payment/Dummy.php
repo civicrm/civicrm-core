@@ -138,6 +138,25 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
+   * Does this payment processor support refund?
+   *
+   * @return bool
+   */
+  public function supportsRefund() {
+    return TRUE;
+  }
+
+  /**
+   * Submit a refund payment
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   *
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
+   */
+  public function doRefund(&$params) {}
+
+  /**
    * Generate error object.
    *
    * Throwing exceptions is preferred over this.
