@@ -115,3 +115,44 @@ function _civicrm_api3_payment_processor_getlist_defaults(&$request) {
     ),
   );
 }
+
+/**
+ * Action refund.
+ *
+ * @param array $params
+ *
+ * @return array
+ *   API result array.
+ * @throws CiviCRM_API3_Exception
+ */
+function civicrm_api3_payment_processor_refund($params) {
+  $processor = Civi\Payment\System::singleton()->getById($params['payment_processor_id']);
+  $processor->setPaymentProcessor(civicrm_api3('PaymentProcessor', 'getsingle', array('id' => $params['payment_processor_id'])));
+  if (!$processor->supportsRefund()) {
+    throw API_Exception('Payment Processor does not support refund');
+  }
+  $result = $processor->doRefund($params);
+  if (is_a($result, 'CRM_Core_Error')) {
+    throw API_Exception('Payment failed');
+  }
+  return civicrm_api3_create_success(array($result), $params);
+}
+
+/**
+ * Action Refund.
+ *
+ * @param array $params
+ *
+ */
+function _civicrm_api3_payment_processor_refund_spec(&$params) {
+  $params['payment_processor_id']['api.required'] = 1;
+  $params['trxn_id'] = [
+    'title' => ts('Transaction ID'),
+    'api.required' => 1,
+  ];
+  $params['trxn_date']['title'] = ts('Refund Date');
+  $params['amount']['api.required'] = 1;
+  $params['payment_action'] = array(
+    'api.default' => 'refund',
+  );
+}

@@ -337,6 +337,15 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Does this payment processor support refund?
+   *
+   * @return bool
+   */
+  public function supportsRefund() {
+    return FALSE;
+  }
+
+  /**
    * Should the first payment date be configurable when setting up back office recurring payments.
    *
    * We set this to false for historical consistency but in fact most new processors use tokens for recurring and can support this
@@ -1168,6 +1177,19 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Submit a refund payment using Advanced Integration Method.
+   *
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
+   *
+   * @return array
+   *   the result in a nice formatted array (or an error object)
+   */
+  protected function doRefundPayment(&$params) {
+    return $params;
+  }
+
+  /**
    * Process payment - this function wraps around both doTransferCheckout and doDirectPayment.
    *
    * The function ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms
@@ -1226,6 +1248,45 @@ abstract class CRM_Core_Payment {
         }
         else {
           $result['payment_status_id'] = array_search('Completed', $statuses);
+        }
+      }
+    }
+    if (is_a($result, 'CRM_Core_Error')) {
+      throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
+    }
+    return $result;
+  }
+
+  /**
+   * Refunds payment - this function wraps around doRefundPayment but first it checks wether the calling payment processor
+   *  supports refund with the help of supportsRefund()
+   *
+   * The function ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms
+   * more agnostic.
+   *
+   * Payment processors should set payment_status_id if it set the status to Refunded in case the transaction is successful
+   *
+   * @param array $params
+   *
+   * @param string $component
+   *
+   * @return array
+   *   Result array
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function doRefund(&$params, $component = 'contribute') {
+    $this->_component = $component;
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
+    if ($this->supportsRefund()) {
+      $result = $this->doRefundPayment($params, $component);
+      if (is_array($result) && !isset($result['payment_status_id'])) {
+        if (!empty($params['is_recur'])) {
+          // See comment block.
+          $result['payment_status_id'] = array_search('Pending', $statuses);
+        }
+        else {
+          $result['payment_status_id'] = array_search('Refunded', $statuses);
         }
       }
     }
