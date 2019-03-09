@@ -1288,14 +1288,23 @@ abstract class CRM_Core_Payment {
    * Page callback for civicrm/payment/ipn
    */
   public static function handleIPN() {
-    self::handlePaymentMethod(
-      'PaymentNotification',
-      array(
-        'processor_name' => @$_GET['processor_name'],
-        'processor_id' => @$_GET['processor_id'],
-        'mode' => @$_GET['mode'],
-      )
-    );
+    try {
+      self::handlePaymentMethod(
+        'PaymentNotification',
+        [
+          'processor_name' => CRM_Utils_Request::retrieveValue('processor_name', 'String'),
+          'processor_id' => CRM_Utils_Request::retrieveValue('processor_id', 'Integer'),
+          'mode' => CRM_Utils_Request::retrieveValue('mode', 'Alphanumeric'),
+        ]
+      );
+    }
+    catch (CRM_Core_Exception $e) {
+      Civi::log()->error('ipn_payment_callback_exception', [
+        'context' => [
+          'backtrace' => CRM_Core_Error::formatBacktrace(debug_backtrace()),
+        ]
+      ]);
+    }
     CRM_Utils_System::civiExit();
   }
 
@@ -1357,7 +1366,7 @@ abstract class CRM_Core_Payment {
 
     // Check whether we found anything at all.
     if (!$dao->N) {
-      CRM_Core_Error::fatal($notFound);
+      throw new CRM_Core_Exception($notFound);
     }
 
     $method = 'handle' . $method;
@@ -1401,7 +1410,7 @@ abstract class CRM_Core_Payment {
     if (!$extension_instance_found) {
       $message = "No extension instances of the '%1' payment processor were found.<br />" .
         "%2 method is unsupported in legacy payment processors.";
-      CRM_Core_Error::fatal(ts($message, array(1 => $params['processor_name'], 2 => $method)));
+      throw new CRM_Core_Exception(ts($message, [1 => $params['processor_name'], 2 => $method]));
     }
   }
 
