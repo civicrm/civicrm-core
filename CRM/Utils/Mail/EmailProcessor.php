@@ -290,6 +290,9 @@ class CRM_Utils_Mail_EmailProcessor {
               elseif ($mail->body instanceof ezcMailMultipart) {
                 $text = self::getTextFromMultipart($mail->body);
               }
+              elseif ($mail->body instanceof ezcMailFile) {
+                $text = file_get_contents($mail->body->__get('fileName'));
+              }
 
               if (
                 empty($text) &&
