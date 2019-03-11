@@ -30,6 +30,11 @@
     <div id="shared-address-{$blockId}" class="form-layout-compressed">
       {$form.address.$blockId.master_contact_id.label}
       {$form.address.$blockId.master_contact_id.html}
+      <div class="shared-address-update-employer" style="display: none;">
+        {$form.address.$blockId.update_current_employer.html}
+        {$form.address.$blockId.update_current_employer.label}
+        {help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact"}
+      </div>
       <div class="shared-address-list">
         {if !empty($sharedAddresses.$blockId.shared_address_display)}
           {foreach item='sa' from=$sharedAddresses.$blockId.shared_address_display.options}
@@ -49,6 +54,8 @@
 <script type="text/javascript">
   CRM.$(function($) {
     var blockNo = {/literal}{$blockId}{literal},
+      contactType = {/literal}{$contactType|@json_encode}{literal},
+      $employerSection = $('#shared-address-' + blockNo + ' .shared-address-update-employer'),
       $contentArea = $('#shared-address-' + blockNo + ' .shared-address-list'),
       $masterElement = $('input[name="address[' + blockNo + '][master_id]"]');
 
@@ -76,8 +83,12 @@
       $masterElement.val('');
 
       if (!sharedContactId || isNaN(sharedContactId)) {
+        $employerSection.hide();
         return;
       }
+
+      var otherContactType = $el.select2('data').extra.contact_type;
+      $employerSection.toggle(contactType === 'Individual' && otherContactType === 'Organization');
 
       $.post(CRM.url('civicrm/ajax/inline'), {
           'contact_id': sharedContactId,

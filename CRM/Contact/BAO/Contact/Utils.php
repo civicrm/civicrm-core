@@ -825,7 +825,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
     // Normal update process will automatically create new address with submitted values
 
     // 1. loop through entire submitted address array
-    $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'master_id');
+    $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'master_id', 'update_current_employer');
     foreach ($address as & $values) {
       // 2. check if "Use another contact's address" is checked, if not continue
       // Additionally, if master_id is set (address was shared), set master_id to empty value.
@@ -835,6 +835,9 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
         }
         continue;
       }
+
+      // Set update_current_employer checkbox value
+      $values['update_current_employer'] = !empty($values['update_current_employer']);
 
       // 3. get the address details for master_id
       $masterAddress = new CRM_Core_BAO_Address();
