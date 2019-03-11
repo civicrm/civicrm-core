@@ -1936,6 +1936,21 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->setUpContributionPage();
     $errors = $this->callAPISuccess('ContributionPage', 'validate', array_merge($this->getBasicSubmitParams(), ['action' => 'submit']))['values'];
     $this->assertEmpty($errors);
+    unset($_SERVER['REQUEST_METHOD']);
+  }
+
+  /**
+   * Test that an error is generated if required fields are not submitted.
+   */
+  public function testValidateOutputOnMissingRecurFields() {
+    $this->params['is_recur_interval'] = 1;
+    $this->setUpContributionPage(TRUE);
+    $submitParams = array_merge($this->getBasicSubmitParams(), ['action' => 'submit']);
+    $submitParams['is_recur'] = 1;
+    $submitParams['frequency_interval'] = '';
+    $submitParams['frequency_unit'] = '';
+    $errors = $this->callAPISuccess('ContributionPage', 'validate', $submitParams)['values'];
+    $this->assertEquals('Please enter a number for how often you want to make this recurring contribution (EXAMPLE: Every 3 months).', $errors['frequency_interval']);
   }
 
   /**
