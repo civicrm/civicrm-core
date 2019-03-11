@@ -147,26 +147,20 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
-   * Submit a refund payment using Advanced Integration Method.
+   * Submit a refund payment
    *
    * @param array $params
    *   Assoc array of input parameters for this transaction.
-   *
-   * @return array
-   *   the result in a nice formatted array (or an error object)
    */
-  public function doRefundPayment(&$params) {
+  public function doRefund(&$params) {
     if (empty($params['trxn_id'])) {
-      $error = new CRM_Core_Error(ts('Refund failed'));
-      return $error;
+      throw new PaymentProcessorException('Refund failed');
     }
     else {
       $params['payment_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
       $params['trxn_date'] = date('YmdHis');
     }
     $params['gross_amount'] = $params['amount'];
-
-    return $params;
   }
 
   /**

@@ -132,9 +132,6 @@ function civicrm_api3_payment_processor_refund($params) {
     throw API_Exception('Payment Processor does not support refund');
   }
   $result = $processor->doRefund($params);
-  if (is_a($result, 'CRM_Core_Error')) {
-    throw API_Exception('Payment failed');
-  }
   return civicrm_api3_create_success(array($result), $params);
 }
 
