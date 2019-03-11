@@ -42,15 +42,15 @@ Content-Transfer-Encoding: quoted-printable
 There was a problem delivering your message to bob@example.com. See the te=
 chnical details below, or try resending in a few minutes.
 
-Learn more here: https://checkspam.secureserver.net/?sid=xxxxxxxxxxxx=
-1&mid=xxxxxxxxxxxxxxxx
+Learn more here: https://checkspam.secureserver.net/?sid=3Dxxxxxxxxxxxx=
+1&mid=3Dxxxxxxxxxxxxxxxx
 (Warning: This link will take you to a third-party site)
 
 The response from the remote server was:
 552 5.2.0 aaaaaaaaaaaaaaaa - bbbbbbbbbbbbbbbb This message has been =
 rejected due to content judged to be spam by the internet community IB212 -=
 If you feel this is in error, please submit a request using the following =
-page. <https://checkspam.secureserver.net/?sid=xxxxxxxxxxxx&mid=xxxxx=
+page. <https://checkspam.secureserver.net/?sid=3Dxxxxxxxxxxxx&mid=3Dxxxxx=
 xxxxxxxx>
 
 --f403043ae60413e7eb055f6de972
@@ -89,7 +89,7 @@ below, or try resending in a few minutes.
 <tr><td style=3D"padding-top:24px;color:#4285F4;font-size:14px;font-weight:=
 bold;text-align:left">
 <a style=3D"text-decoration:none" href=3D"https://checkspam.secureserver.ne=
-t/?sid=xxxxxxxxxxxxxxxxxxx&mid=xxxxxxxxxxxxxxxx">LEARN MORE</a>
+t/?sid=3Dxxxxxxxxxxxxxxxxxxx&mid=3Dxxxxxxxxxxxxxxxx">LEARN MORE</a>
 </td></tr>
 <tr><td style=3D"margin-top:8px;font-style:italic;font-size:12px;color:#757=
 575">
@@ -108,8 +108,8 @@ The response from the remote server was:<br/>
 552 5.2.0 aaaaaaaaaaaaaaaa - bbbbbbbbbbbbbbbbbbb This message has been =
 rejected due to content judged to be spam by the internet community IB212 -=
 If you feel this is in error, please submit a request using the following =
-page. &lt;https://checkspam.secureserver.net/?sid=xxxxxxxx&amp;m=
-id=xxxxxxxxxxxxxxxx&gt;
+page. &lt;https://checkspam.secureserver.net/?sid=3Dxxxxxxxx&amp;m=
+id=3Dxxxxxxxxxxxxxxxx&gt;
 </p>
 </td>
 </tr>
