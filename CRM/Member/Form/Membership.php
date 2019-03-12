@@ -1108,17 +1108,16 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $isTest = ($this->_mode == 'test') ? 1 : 0;
     $this->storeContactFields($this->_params);
     $this->beginPostProcess();
-    $formValues = $this->_params;
     $joinDate = $startDate = $endDate = NULL;
     $membershipTypes = $membership = $calcDate = array();
     $membershipType = NULL;
     $paymentInstrumentID = $this->_paymentProcessor['object']->getPaymentInstrumentID();
-
-    $mailSend = FALSE;
-    $formValues = $this->setPriceSetParameters($formValues);
     $params = $softParams = $ids = array();
 
+    $mailSend = FALSE;
     $this->processBillingAddress();
+    $formValues = $this->_params;
+    $formValues = $this->setPriceSetParameters($formValues);
 
     if ($this->_id) {
       $ids['membership'] = $params['id'] = $this->_id;
@@ -1369,11 +1368,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $params['register_date'] = date('YmdHis');
 
       // add all the additional payment params we need
-      // @todo the country & state values should be set by the call to $this->assignBillingAddress.
-      $formValues["state_province-{$this->_bltID}"] = $formValues["billing_state_province-{$this->_bltID}"]
-        = CRM_Core_PseudoConstant::stateProvinceAbbreviation($formValues["billing_state_province_id-{$this->_bltID}"]);
-      $formValues["country-{$this->_bltID}"] = $formValues["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($formValues["billing_country_id-{$this->_bltID}"]);
-
       $formValues['amount'] = $params['total_amount'];
       // @todo this is a candidate for beginPostProcessFunction.
       $formValues['currencyID'] = $config->defaultCurrency;
@@ -1399,6 +1393,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
 
       // This is a candidate for shared beginPostProcess function.
+      // @todo Do we need this now we have $this->formatParamsForPaymentProcessor() ?
       CRM_Core_Payment_Form::mapParams($this->_bltID, $formValues, $paymentParams, TRUE);
       // CRM-7137 -for recurring membership,
       // we do need contribution and recurring records.
