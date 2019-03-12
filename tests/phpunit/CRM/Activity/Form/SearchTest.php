@@ -9,14 +9,17 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->individualID = $this->individualCreate();
-    $this->contributionCreate(array('contact_id' => $this->individualID, 'receive_date' => '2017-01-30'));
+    $this->contributionCreate([
+      'contact_id' => $this->individualID,
+      'receive_date' => '2017-01-30',
+    ]);
   }
 
   public function tearDown() {
-    $tablesToTruncate = array(
+    $tablesToTruncate = [
       'civicrm_activity',
       'civicrm_activity_contact',
-    );
+    ];
     $this->quickCleanup($tablesToTruncate);
   }
 
@@ -32,7 +35,8 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
     $form->postProcess();
     $qfKey = $form->controller->_key;
     $rows = $form->controller->get('rows');
-    $this->assertEquals(array(array(
+    $this->assertEquals([
+      [
         'contact_id' => '3',
         'contact_type' => '<a href="/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4" class="crm-summary-link"><div class="icon crm-icon Individual-icon"></div></a>',
         'sort_name' => 'Anderson, Anthony',
@@ -46,8 +50,8 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
         'activity_type_id' => '6',
         'activity_type' => 'Contribution',
         'activity_is_test' => '0',
-        'target_contact_name' => array(),
-        'assignee_contact_name' => array(),
+        'target_contact_name' => [],
+        'assignee_contact_name' => [],
         'source_contact_id' => '3',
         'source_contact_name' => 'Anderson, Anthony',
         'checkbox' => 'mark_x_1',
@@ -56,7 +60,8 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
         'campaign' => NULL,
         'campaign_id' => NULL,
         'repeat' => '',
-    )), $rows);
+      ],
+    ], $rows);
   }
 
 }
