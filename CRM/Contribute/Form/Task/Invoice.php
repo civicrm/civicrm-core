@@ -443,6 +443,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'domain_country' => $countryDomain,
         'domain_email' => CRM_Utils_Array::value('email', CRM_Utils_Array::value('1', $locationDefaults['email'])),
         'domain_phone' => CRM_Utils_Array::value('phone', CRM_Utils_Array::value('1', $locationDefaults['phone'])),
+        'domain_address_name' => CRM_Utils_Array::value('address_name', CRM_Utils_Array::value('1', $locationDefaults['address'])),
       );
 
       if (isset($creditNoteId)) {
