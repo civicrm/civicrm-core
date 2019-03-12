@@ -472,15 +472,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       CRM_Utils_Array::value('cancelSubscriptionUrl', $this->_values)
     );
 
-    // assigning title to template in case someone wants to use it, also setting CMS page title
-    if ($this->_pcpId) {
-      $this->assign('title', $this->_pcpInfo['title']);
-      CRM_Utils_System::setTitle($this->_pcpInfo['title']);
-    }
-    else {
-      $this->assign('title', $this->_values['title']);
-      CRM_Utils_System::setTitle($this->_values['title']);
-    }
+    $this->setTitle(($this->_pcpId ? $this->_pcpInfo['title'] : $this->_values['title']));
     $this->_defaults = array();
 
     $this->_amount = $this->get('amount');
