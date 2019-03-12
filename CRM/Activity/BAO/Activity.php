@@ -2882,7 +2882,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
    *
    * @return bool
    */
-  public function checkEditInboundEmailsPermissions() {
+  public static function checkEditInboundEmailsPermissions() {
     if (CRM_Core_Permission::check('edit inbound email basic information')
       || CRM_Core_Permission::check('edit inbound email basic information and content')
     ) {
