@@ -150,7 +150,8 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     \Civi::service('asset_builder')->setCacheEnabled(FALSE);
     $url = \Civi::service('asset_builder')->getUrl($asset, $params);
     $this->assertEquals(0, $this->fired['hook_civicrm_buildAsset']);
-    $this->assertRegExp(';^https?:.*civicrm/asset/builder.*square.(txt|js);', $url);
+    // Ex: Traditional URLs on D7 have "/". Traditional URLs on WP have "%2F".
+    $this->assertRegExp(';^https?:.*civicrm(/|%2F)asset(/|%2F)builder.*square.(txt|js);', $url);
 
     // Simulate a request. Our fake hook won't fire in a real request.
     parse_str(parse_url($url, PHP_URL_QUERY), $get);
