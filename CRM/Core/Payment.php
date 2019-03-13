@@ -1183,6 +1183,13 @@ abstract class CRM_Core_Payment {
    * Once this function is fully rolled out then it will be preferred for processors to throw exceptions than to
    * return Error objects
    *
+   * Usage:
+   * Payment processors should override this function directly instead of using doDirectPayment/doTransferCheckout which are deprecated.
+   * Payment processors should set and return payment_status_id (Pending if the IPN will complete it, Completed if successful).
+   * @fixme For the contribution workflow we have a contributionID, but for the event and membership workflow the contribution has not yet been created
+   *  so we can't update params directly on the contribution.  However if you return trxn_id, fee_amount, net_amount they will be set on the contribution
+   *  by those workflows.  Ideally all workflows would create a pending contribution BEFORE calling doPayment (eg. https://github.com/civicrm/civicrm-core/pull/13763 for events)
+   *
    * @param array $params
    *
    * @param string $component
