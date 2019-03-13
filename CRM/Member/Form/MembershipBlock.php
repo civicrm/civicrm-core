@@ -135,10 +135,10 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         $this->_id, 'payment_processor'
       );
       $paymentProcessorId = explode(CRM_Core_DAO::VALUE_SEPARATOR, $paymentProcessorIds);
-      $isRecur = TRUE;
+      $isRecur = FALSE;
       foreach ($paymentProcessorId as $dontCare => $id) {
-        if (!array_key_exists($id, $paymentProcessor)) {
-          $isRecur = FALSE;
+        if (array_key_exists($id, $paymentProcessor)) {
+          $isRecur = TRUE;
           continue;
         }
       }

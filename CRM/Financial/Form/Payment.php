@@ -81,6 +81,10 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
     self::addCreditCardJs($this->_paymentProcessorID);
 
+    $paymentProcessorCapabilities = [
+      'isrecur' => $this->_paymentProcessor['is_recur'],
+    ];
+    $this->assign('paymentProcessorCapabilities', $paymentProcessorCapabilities);
     $this->assign('paymentProcessorID', $this->_paymentProcessorID);
     $this->assign('currency', $this->currency);
 

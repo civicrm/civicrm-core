@@ -79,27 +79,6 @@
       </div>
     {/if}
   </div>
-{literal}
-  <script type="text/javascript">
-    CRM.$(function($) {
-      //if price set is set we use below below code to show for showing auto renew
-      var autoRenewOption =  {/literal}'{$autoRenewOption}'{literal};
-      var autoRenew = $("#auto_renew_section");
-      var autoRenewCheckbox = $("#auto_renew");
-      var forceRenew = $("#force_renew");
-      autoRenew.hide();
-      forceRenew.hide();
-      if ( autoRenewOption == 1 ) {
-        autoRenew.show();
-      } else if ( autoRenewOption == 2 ) {
-        autoRenewCheckbox.prop('checked',  true );
-        autoRenewCheckbox.attr( 'readonly', true );
-        autoRenew.hide();
-        forceRenew.show();
-      }
-    });
-  </script>
-{/literal}
 {elseif $membershipBlock AND !$is_quick_config}
   <div id="membership" class="crm-group membership-group">
     {if $context EQ "makeContribution"}
@@ -285,6 +264,9 @@
 
       autoRenewC.attr( 'readonly', readOnly );
       autoRenewC.prop('checked',  isChecked );
+
+      // We need to trigger the change handler as it won't by default when the element is hidden
+      autoRenewC.trigger('change');
     }
 
     {/literal}{if $allowAutoRenewMembership}{literal}

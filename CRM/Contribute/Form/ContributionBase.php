@@ -1158,7 +1158,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $membershipTypeIds = $membershipTypes = $radio = array();
       $membershipPriceset = (!empty($this->_priceSetId) && $this->_useForMember) ? TRUE : FALSE;
 
-      $allowAutoRenewMembership = $autoRenewOption = FALSE;
+      $autoRenewOption = FALSE;
       $autoRenewMembershipTypeOptions = array();
 
       $separateMembershipPayment = CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock);
@@ -1231,16 +1231,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             }
           }
           elseif ($memType['is_active']) {
-
-            if ($allowAutoRenewOpt) {
-              $javascriptMethod = array('onclick' => "return showHideAutoRenew( this.value );");
-              $allowAutoRenewMembership = TRUE;
-              $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = $memType['auto_renew'];
-            }
-            else {
-              $javascriptMethod = NULL;
-              $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = 0;
-            }
+            $javascriptMethod = ['onclick' => "return showHideAutoRenew( this.value );"];
+            $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"]
+              = CRM_Utils_Array::value($value, CRM_Utils_Array::value('auto_renew', $this->_membershipBlock));
 
             //add membership type.
             $radio[$memType['id']] = $this->createElement('radio', NULL, NULL, NULL,
@@ -1289,7 +1282,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->assign('membershipBlock', $this->_membershipBlock);
       $this->assign('showRadio', $isContributionMainPage);
       $this->assign('membershipTypes', $membershipTypes);
-      $this->assign('allowAutoRenewMembership', $allowAutoRenewMembership);
+      $this->assign('allowAutoRenewMembership', TRUE);
       $this->assign('autoRenewMembershipTypeOptions', json_encode($autoRenewMembershipTypeOptions));
       //give preference to user submitted auto_renew value.
       $takeUserSubmittedAutoRenew = (!empty($_POST) || $this->isSubmitted()) ? TRUE : FALSE;
@@ -1326,7 +1319,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           $this->addRule('selectMembership', ts('Please select one of the memberships.'), 'required');
         }
 
-        if ((!$this->_values['is_pay_later'] || is_array($this->_paymentProcessors)) && ($allowAutoRenewMembership || $autoRenewOption)) {
+        if ((!$this->_values['is_pay_later'] || is_array($this->_paymentProcessors)) && $autoRenewOption) {
           if ($autoRenewOption == 2) {
             $this->addElement('hidden', 'auto_renew', ts('Please renew my membership automatically.'));
           }

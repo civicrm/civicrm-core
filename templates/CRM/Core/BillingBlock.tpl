@@ -24,6 +24,30 @@
  +--------------------------------------------------------------------+
 *}
 {crmRegion name="billing-block"}
+{literal}
+  <script type="text/javascript">
+    CRM.$(function($) {
+      // Unbind first so we don't add another handler every time we switch payment processors
+      $('input[name="payment_processor_id"]').on('change', function() { $('input#auto_renew').unbind(showHidePaymentProcessorCapabilities()); });
+
+      // Trigger check for capabilities every time we change the payment processor
+      $('input#auto_renew').on('change', showHidePaymentProcessorCapabilities);
+      showHidePaymentProcessorCapabilities();
+
+      // Display a warning to the user if the selected payment processor does not support recurring payments
+      function showHidePaymentProcessorCapabilities() {
+        var isAutoRenew = $('input#auto_renew:checked').prop('checked');
+        var isRecurSupported = {/literal}{if $paymentProcessorCapabilities.isrecur}true{else}false{/if}{literal}
+        var isPaymentProcessorSelected = $('input[name="payment_processor_id"]:checked').length;
+        $('div#payment_processor_capabilities_warning').remove();
+        if (isAutoRenew && !isRecurSupported && isPaymentProcessorSelected) {
+          $('div#billing-payment-block:first').prepend(
+            '<div id="payment_processor_capabilities_warning" class="messages status crm-warning">This payment method does not support automatic renewals</div>');
+        }
+      }
+    });
+  </script>
+{/literal}
 <div id="payment_information">
   {if $paymentFields|@count}
     <fieldset class="billing_mode-group {$paymentTypeName}_info-group">
