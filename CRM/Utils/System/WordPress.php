@@ -338,7 +338,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $config = CRM_Core_Config::singleton();
 
     if ($loadCMSBootstrap) {
-      $config->userSystem->loadBootStrap($name, $password);
+      $config->userSystem->loadBootStrap([
+        'name' => $name,
+        'pass' => $password,
+      ]);
     }
 
     $user = wp_authenticate($name, $password);
@@ -453,15 +456,21 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Load wordpress bootstrap.
    *
-   * @param string $name
-   *   optional username for login.
-   * @param string $pass
-   *   optional password for login.
+   * @param array $params
+   *   Optional credentials
+   *   - name: string, cms username
+   *   - pass: string, cms password
    *
    * @return bool
    */
-  public function loadBootStrap($name = NULL, $pass = NULL) {
+  public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     global $wp, $wp_rewrite, $wp_the_query, $wp_query, $wpdb, $current_site, $current_blog, $current_user;
+
+    $name = CRM_Utils_Array::value('name', $params);
+    $pass = CRM_Utils_Array::value('pass', $params);
+    if (isset($params['uid'])) {
+      throw new \RuntimeException("Not implemented WordPress::loadBootStrap([uid=>\$num]))");
+    }
 
     if (!defined('WP_USE_THEMES')) {
       define('WP_USE_THEMES', FALSE);
