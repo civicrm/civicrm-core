@@ -342,7 +342,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->clickLink("_qf_Search_refresh", "participantSearch");
 
     //verifying the registered participants
-    $status = "Registered (test)";
+    $status = CRM_Core_TestEntity::appendTestText("Registered");
 
     foreach ($contacts as $contact) {
       $this->verifyText("xpath=//div[@id='participantSearch']//table//tbody//tr/td[@class='crm-participant-sort_name']/a[text()='{$contact['sort_name']}']/../../td[9]", preg_quote($status));

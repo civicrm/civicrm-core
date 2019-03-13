@@ -326,7 +326,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
       }
       // append (test) to status label
       if (!empty($row['pledge_is_test'])) {
-        $row['pledge_status'] .= ' (test)';
+        $row['pledge_status'] = CRM_Core_TestEntity::appendTestText($row['pledge_status']);
       }
 
       $hideOption = array();
