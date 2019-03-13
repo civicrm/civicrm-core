@@ -255,7 +255,7 @@
 
       var readOnly = false;
       var isChecked  = false;
-      if ( currentOption == 0 ) {
+      if ( currentOption == 0 || (typeof currentOption === "undefined")) {
         isChecked = false;
         forceRenew.hide();
         autoRenew.hide();
