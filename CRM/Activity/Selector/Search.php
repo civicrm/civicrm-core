@@ -310,7 +310,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
       $accessMailingReport = FALSE;
       $activityTypeId = $row['activity_type_id'];
       if ($row['activity_is_test']) {
-        $row['activity_type'] = $row['activity_type'] . " (test)";
+        $row['activity_type'] = CRM_Core_TestEntity::appendTestText($row['activity_type']);
       }
       $row['mailingId'] = '';
       if (

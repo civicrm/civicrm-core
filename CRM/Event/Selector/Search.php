@@ -363,7 +363,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
       $row['showConfirmUrl'] = ($statusClass == 'Pending') ? TRUE : FALSE;
 
       if (!empty($row['participant_is_test'])) {
-        $row['participant_status'] .= ' (' . ts('test') . ')';
+        $row['participant_status'] = CRM_Core_TestEntity::appendTestText($row['participant_status']);
       }
 
       $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->participant_id;

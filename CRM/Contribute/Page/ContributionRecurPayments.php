@@ -53,6 +53,9 @@ class CRM_Contribute_Page_ContributionRecurPayments extends CRM_Core_Page {
       $this->insertStatusLabels($contribution);
       $this->insertContributionActions($contribution);
 
+      if ($contribution['is_test']) {
+        $contribution['financial_type'] = CRM_Core_TestEntity::appendTestText($contribution['financial_type']);
+      }
       $relatedContributions[] = $contribution;
     }
 
