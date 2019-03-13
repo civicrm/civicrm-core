@@ -3597,7 +3597,6 @@ span.crm-status-icon {
 }
 .crm-container.crm-public .select2-container .select2-choice {
   padding: 5px 5px 5px 8px;
-  height: auto;
 }
 .crm-container.crm-public .select2-container-multi .select2-choices {
   padding: 4px;
