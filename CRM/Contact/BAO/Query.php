@@ -1784,6 +1784,11 @@ class CRM_Contact_BAO_Query {
    * @param string $apiEntity
    */
   public function whereClauseSingle(&$values, $apiEntity = NULL) {
+    if ($this->isARelativeDateField($values[0])) {
+      $this->buildRelativeDateQuery($values);
+      return;
+    }
+
     // do not process custom fields or prefixed contact ids or component params
     if (CRM_Core_BAO_CustomField::getKeyID($values[0]) ||
       (substr($values[0], 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) ||
@@ -6884,6 +6889,64 @@ AND   displayRelType.is_active = 1
       return FALSE;
     }
     return TRUE;
+  }
+
+  /**
+   * Is the field a relative date field.
+   *
+   * @param string $fieldName
+   *
+   * @return bool
+   */
+  protected function isARelativeDateField($fieldName) {
+    if (substr($fieldName, -9, 9) !== '_relative') {
+      return FALSE;
+    }
+    $realField = substr($fieldName, 0, strlen($fieldName) - 9);
+    return isset($this->_fields[$realField]);
+  }
+
+  /**
+   * @param $values
+   */
+  protected function buildRelativeDateQuery(&$values) {
+    $value = CRM_Utils_Array::value(2, $values);
+    if (empty($value)) {
+      return;
+    }
+    $fieldName = substr($values[0], 0, strlen($values[0]) - 9);
+    $fieldSpec = $this->_fields[$fieldName];
+    $tableName = $fieldSpec['table_name'];
+    $filters = CRM_Core_OptionGroup::values('relative_date_filters');
+    $grouping = CRM_Utils_Array::value(3, $values);
+    $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
+
+    $dates = CRM_Utils_Date::getFromTo($value, NULL, NULL);
+    if (empty($dates[0])) {
+      // ie. no start date we only have end date
+      $this->_where[$grouping][] = $fieldSpec['where'] . " <= '{$dates[1]}'";
+
+      $this->_qill[$grouping][] = ts('%1 is ', [$fieldSpec['title']]) . $filters[$value] . ' (' . ts("to %1", [
+          CRM_Utils_Date::customFormat($dates[1]),
+        ]) . ')';
+    }
+    elseif (empty($dates[1])) {
+      // ie. no end date we only have start date
+      $this->_where[$grouping][] = $fieldSpec['where'] . " >= '{$dates[1]}'";
+
+      $this->_qill[$grouping][] = ts('%1 is ', [$fieldSpec['title']]) . $filters[$value] . ' (' . ts("from %1", [
+          CRM_Utils_Date::customFormat($dates[0]),
+        ]) . ')';
+    }
+    else {
+      // we have start and end dates.
+      $this->_where[$grouping][] = $fieldSpec['where'] . " BETWEEN '{$dates[0]}' AND '{$dates[1]}'";
+
+      $this->_qill[$grouping][] = ts('%1 is ', [$fieldSpec['title']]) . $filters[$value] . ' (' . ts("between %1 and %2", [
+          CRM_Utils_Date::customFormat($dates[0]),
+          CRM_Utils_Date::customFormat($dates[1]),
+        ]) . ')';
+    }
   }
 
 }
