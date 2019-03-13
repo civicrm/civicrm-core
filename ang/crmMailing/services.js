@@ -276,7 +276,6 @@
         }
         else {
           var params = angular.extend({}, mailing);
-          delete params.id;
           return backend('Mailing', 'preview', params).then(function(result) {
             // changes rolled back, so we don't care about updating mailing
             return result.values;
