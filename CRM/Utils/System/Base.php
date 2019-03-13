@@ -56,6 +56,8 @@ abstract class CRM_Utils_System_Base {
     }
   }
 
+  public abstract function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL);
+
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb.
    *
