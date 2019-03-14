@@ -532,9 +532,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
     CRM_Utils_Hook::alterReportVar('sql', $this, $this);
 
-    // store the duration count in temp table
-    $this->_tempTableName = CRM_Core_DAO::createTempTableName('civicrm_activity');
-
     // build temporary table column names base on column headers of result
     $dbColumns = array();
     foreach ($this->_columnHeaders as $fieldName => $dontCare) {
@@ -542,10 +539,9 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
 
     // create temp table to store main result
-    $tempQuery = "CREATE TEMPORARY TABLE {$this->_tempTableName} (
-      id int unsigned NOT NULL AUTO_INCREMENT, " . implode(', ', $dbColumns) . ' , PRIMARY KEY (id))'
-      . $this->_databaseAttributes;
-    CRM_Core_DAO::executeQuery($tempQuery);
+    $this->_tempTableName = $this->createTemporaryTable('tempTable', "
+      id int unsigned NOT NULL AUTO_INCREMENT, " . implode(', ', $dbColumns) . ' , PRIMARY KEY (id)',
+    TRUE);
 
     // build main report query
     $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
@@ -565,11 +561,9 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $sql = "SELECT SUM(activity_civireport.duration) as civicrm_activity_duration_total {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
 
     // create temp table to store duration
-    $this->_tempDurationSumTableName = CRM_Core_DAO::createTempTableName('civicrm_activity');
-    $tempQuery = "CREATE TEMPORARY TABLE {$this->_tempDurationSumTableName} (
-      id int unsigned NOT NULL AUTO_INCREMENT, civicrm_activity_duration_total VARCHAR(128), PRIMARY KEY (id))"
-      . $this->_databaseAttributes;
-    CRM_Core_DAO::executeQuery($tempQuery);
+    $this->_tempDurationSumTableName = $this->createTemporaryTable('tempDurationSumTable', "
+      id int unsigned NOT NULL AUTO_INCREMENT, civicrm_activity_duration_total VARCHAR(128), PRIMARY KEY (id)",
+    TRUE);
 
     // store the result in temporary table
     $insertQuery = "INSERT INTO {$this->_tempDurationSumTableName} (civicrm_activity_duration_total)

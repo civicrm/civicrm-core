@@ -53,6 +53,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
    */
   protected $groupFilterNotOptimised = TRUE;
 
+  protected $tableName;
+
   /**
    * Class constructor.
    */
@@ -441,13 +443,13 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
   public function from() {
     $this->_from = "
-              FROM civireport_membership_contribution_detail
+              FROM {$this->tableName}
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                      ON (civireport_membership_contribution_detail.contribution_id = {$this->_aliases['civicrm_contribution']}.id)
+                      ON ({$this->tableName}.contribution_id = {$this->_aliases['civicrm_contribution']}.id)
               LEFT JOIN civicrm_membership {$this->_aliases['civicrm_membership']}
-                      ON (civireport_membership_contribution_detail.membership_id = {$this->_aliases['civicrm_membership']}.id)
+                      ON ({$this->tableName}.membership_id = {$this->_aliases['civicrm_membership']}.id)
               INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                      ON (civireport_membership_contribution_detail.contact_id = {$this->_aliases['civicrm_contact']}.id)
+                      ON ({$this->tableName}.contact_id = {$this->_aliases['civicrm_contact']}.id)
               LEFT  JOIN civicrm_membership_status {$this->_aliases['civicrm_membership_status']}
                           ON {$this->_aliases['civicrm_membership_status']}.id =
                              {$this->_aliases['civicrm_membership']}.status_id
@@ -505,16 +507,12 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
    */
   public function tempTable($applyLimit = TRUE) {
     // create temp table with contact ids,contribtuion id,membership id
-    $dropTempTable = 'DROP TEMPORARY TABLE IF EXISTS civireport_membership_contribution_detail';
-    CRM_Core_DAO::executeQuery($dropTempTable);
-
-    $sql = 'CREATE TEMPORARY TABLE civireport_membership_contribution_detail
-            (contribution_id int, INDEX USING HASH(contribution_id), contact_id int, INDEX USING HASH(contact_id),
-            membership_id int, INDEX USING HASH(membership_id), payment_id int, INDEX USING HASH(payment_id)) ENGINE=MEMORY' . $this->_databaseAttributes;
-    CRM_Core_DAO::executeQuery($sql);
+    $this->tableName = $this->createTemporaryTable('table', '
+            contribution_id int, INDEX USING HASH(contribution_id), contact_id int, INDEX USING HASH(contact_id),
+            membership_id int, INDEX USING HASH(membership_id), payment_id int, INDEX USING HASH(payment_id)', TRUE, TRUE);
 
     $fillTemp = "
-          INSERT INTO civireport_membership_contribution_detail (contribution_id, contact_id, membership_id)
+          INSERT INTO {$this->tableName} (contribution_id, contact_id, membership_id)
           SELECT contribution.id, {$this->_aliases['civicrm_contact']}.id, m.id
           FROM civicrm_contribution contribution
           INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
