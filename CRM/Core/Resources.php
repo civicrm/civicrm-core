@@ -750,9 +750,17 @@ class CRM_Core_Resources {
     $contactID = CRM_Core_Session::getLoggedInContactID();
 
     // Menubar
-    $position = $contactID && CRM_Core_Permission::check('access CiviCRM') ? Civi::settings()->get('menubar_position') : 'none';
-    if ($position !== 'none' && !@constant('CIVICRM_DISABLE_DEFAULT_MENU') && !CRM_Core_Config::isUpgradeMode()) {
-      $cms = strtolower(CRM_Core_Config::singleton()->userFramework);
+    $position = 'none';
+    if (
+      $contactID && !$config->userFrameworkFrontend
+      && CRM_Core_Permission::check('access CiviCRM')
+      && !@constant('CIVICRM_DISABLE_DEFAULT_MENU')
+      && !CRM_Core_Config::isUpgradeMode()
+    ) {
+      $position = Civi::settings()->get('menubar_position') ?: 'over-cms-menu';
+    }
+    if ($position !== 'none') {
+      $cms = strtolower($config->userFramework);
       $cms = $cms === 'drupal' ? 'drupal7' : $cms;
       $items[] = 'bower_components/smartmenus/dist/jquery.smartmenus.min.js';
       $items[] = 'bower_components/smartmenus/dist/addons/keyboard/jquery.smartmenus.keyboard.min.js';
@@ -762,7 +770,7 @@ class CRM_Core_Resources {
       $items[] = "css/menubar-$cms.css";
       $items[] = [
         'menubar' => [
-          'position' => $position ?: 'over-cms-menu',
+          'position' => $position,
           'qfKey' => CRM_Core_Key::get('CRM_Contact_Controller_Search', TRUE),
           'cacheCode' => CRM_Core_BAO_Navigation::getCacheKey($contactID),
         ],
