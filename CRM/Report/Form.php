@@ -1146,18 +1146,31 @@ class CRM_Report_Form extends CRM_Core_Form {
    * This function creates a table AND adds the details to the developer tab & $this->>temporary tables.
    *
    * @param string $identifier
-   * @param $sql
+   *   This is the key that will be used for the table in the temporaryTables property.
+   * @param string $sql
+   *   Sql select statement or column description (the latter requires the columns flag)
+   * @param bool $isColumns
+   *   Is the sql describing columns to create (rather than using a select query).
+   * @param bool $isMemory
+   *   Create a memory table rather than a normal INNODB table.
    *
    * @return string
    */
-  public function createTemporaryTable($identifier, $sql) {
-    $tempTable = CRM_Utils_SQL_TempTable::build()->setUtf8(TRUE)->createWithQuery($sql);
+  public function createTemporaryTable($identifier, $sql, $isColumns = FALSE, $isMemory = FALSE) {
+    $tempTable = CRM_Utils_SQL_TempTable::build()->setUtf8();
+    if ($isMemory) {
+      $tempTable->setMemory();
+    }
+    if ($isColumns) {
+      $tempTable->createWithColumns($sql);
+    }
+    else {
+      $tempTable->createWithQuery($sql);
+    }
     $name = $tempTable->getName();
     // Developers may force tables to be durable to assist in debugging so lets check.
     $isNotTrueTemporary = $tempTable->isDurable();
-    // The TempTable build routine adds the next line - we output it to help developers see what has happened.
-    $sql = 'CREATE ' . ($isNotTrueTemporary ? '' : 'TEMPORARY ') . "TABLE $name DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci " . $sql;
-    $this->addToDeveloperTab($sql);
+    $this->addToDeveloperTab($tempTable->getCreateSql());
     $this->temporaryTables[$identifier] = ['temporary' => !$isNotTrueTemporary, 'name' => $name];
     return $name;
   }

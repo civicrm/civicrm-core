@@ -1030,31 +1030,25 @@ SELECT {$subSelect2} contribution2.{$this->contributionJoinTableColumn},
 {$from}
 {$subWhere}
 GROUP BY contribution2.{$this->contributionJoinTableColumn}, currency";
-    $this->tempTableRepeat1 = 'civicrm_temp_civireport_repeat1' . uniqid();
-    $sql = "
-CREATE TEMPORARY TABLE $this->tempTableRepeat1 (
+    $this->tempTableRepeat1 = $this->createTemporaryTable('tempTableRepeat1', "
 {$create}
 {$this->contributionJoinTableColumn} int unsigned,
 total_amount_sum decimal(20,2),
 total_amount_count int
-) ENGINE=HEAP {$this->_databaseAttributes}";
-    $this->executeReportQuery($sql);
+", TRUE, TRUE);
     $this->executeReportQuery("INSERT INTO $this->tempTableRepeat1 {$subContributionQuery1}");
 
     $this->executeReportQuery("
       ALTER TABLE $this->tempTableRepeat1 ADD INDEX ({$this->contributionJoinTableColumn})
     ");
 
-    $this->tempTableRepeat2 = 'civicrm_temp_civireport_repeat2' . uniqid();
-    $sql = "
-CREATE TEMPORARY TABLE  $this->tempTableRepeat2 (
+    $this->tempTableRepeat2 = $this->createTemporaryTable('tempTableRepeat2', "
 {$create}
 {$this->contributionJoinTableColumn} int unsigned,
 total_amount_sum decimal(20,2),
 total_amount_count int,
 currency varchar(3)
-) ENGINE=HEAP {$this->_databaseAttributes}";
-    $this->executeReportQuery($sql);
+", TRUE, TRUE);
     $sql = "INSERT INTO $this->tempTableRepeat2 {$subContributionQuery2}";
     $this->executeReportQuery($sql);
 
