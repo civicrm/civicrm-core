@@ -100,18 +100,18 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $getTaxDetails = FALSE;
-    $taxAmount = 0;
 
-    $lineItemForTemplate = array();
+    $tplLineItems = array();
     if (!empty($this->_lineItem) && is_array($this->_lineItem)) {
       foreach ($this->_lineItem as $key => $value) {
         if (!empty($value) && $value != 'skip') {
-          $lineItemForTemplate[$key] = $value;
+          $tplLineItems[$key] = $value;
           if ($invoicing) {
-            foreach ($value as $v) {
-              if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
-                $taxAmount += $v['tax_amount'];
+            foreach ($value as $k => $v) {
+              if (!empty($v['tax_rate'])) {
                 $getTaxDetails = TRUE;
+                // Cast to float to display without trailing zero decimals
+                $tplLineItems[$key][$k]['tax_rate'] = (float) $v['tax_rate'];
               }
             }
           }
@@ -121,14 +121,14 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
 
     if ($this->_priceSetId &&
       !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config') &&
-      !empty($lineItemForTemplate)
+      !empty($tplLineItems)
     ) {
-      $this->assign('lineItem', $lineItemForTemplate);
+      $this->assign('lineItem', $tplLineItems);
     }
 
     if ($invoicing) {
       $this->assign('getTaxDetails', $getTaxDetails);
-      $this->assign('totalTaxAmount', $taxAmount);
+      $this->assign('totalTaxAmount', $this->_params['tax_amount']);
       $this->assign('taxTerm', $taxTerm);
     }
     $this->assign('totalAmount', $this->_totalAmount);

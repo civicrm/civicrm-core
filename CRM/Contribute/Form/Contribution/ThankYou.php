@@ -116,12 +116,10 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
       foreach ($this->_lineItem as $key => $value) {
         foreach ($value as $k => $v) {
-          if (isset($v['tax_rate'])) {
-            if ($v['tax_rate'] != '') {
-              $getTaxDetails = TRUE;
-              // Cast to float to display without trailing zero decimals
-              $tplLineItems[$key][$k]['tax_rate'] = (float) $v['tax_rate'];
-            }
+          if (!empty($v['tax_rate'])) {
+            $getTaxDetails = TRUE;
+            // Cast to float to display without trailing zero decimals
+            $tplLineItems[$key][$k]['tax_rate'] = (float) $v['tax_rate'];
           }
         }
       }

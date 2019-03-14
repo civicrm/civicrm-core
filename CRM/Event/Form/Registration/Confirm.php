@@ -285,24 +285,26 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
-      $lineItemForTemplate = array();
+      $tplLineItems = array();
       $getTaxDetails = FALSE;
       if (!empty($this->_lineItem) && is_array($this->_lineItem)) {
         foreach ($this->_lineItem as $key => $value) {
           if (!empty($value)) {
-            $lineItemForTemplate[$key] = $value;
+            $tplLineItems[$key] = $value;
           }
           if ($invoicing) {
-            foreach ($value as $v) {
-              if (isset($v['tax_rate'])) {
+            foreach ($value as $k => $v) {
+              if (!empty($v['tax_rate'])) {
                 $getTaxDetails = TRUE;
+                // Cast to float to display without trailing zero decimals
+                $tplLineItems[$key][$k]['tax_rate'] = (float) $v['tax_rate'];
               }
             }
           }
         }
       }
-      if (!empty($lineItemForTemplate)) {
-        $this->assign('lineItem', $lineItemForTemplate);
+      if (!empty($tplLineItems)) {
+        $this->assign('lineItem', $tplLineItems);
       }
       $this->assign('getTaxDetails', $getTaxDetails);
     }
