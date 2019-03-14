@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "55c8f835d55c424d93e0e9dad1efc729",
+    "content-hash": "0f9eab6b0bf1c120dace5cf229223605",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -2144,17 +2144,21 @@
         },
         {
             "name": "zetacomponents/base",
-            "version": "1.7",
+            "version": "1.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zetacomponents/Base.git",
-                "reference": "2612ee3ce88902632d45b93e379277e9d46b70a7"
+                "reference": "489e20235989ddc97fdd793af31ac803972454f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zetacomponents/Base/zipball/2612ee3ce88902632d45b93e379277e9d46b70a7",
-                "reference": "2612ee3ce88902632d45b93e379277e9d46b70a7",
+                "url": "https://api.github.com/repos/zetacomponents/Base/zipball/489e20235989ddc97fdd793af31ac803972454f1",
+                "reference": "489e20235989ddc97fdd793af31ac803972454f1",
                 "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~5.7",
+                "zetacomponents/unit-test": "*"
             },
             "type": "library",
             "autoload": {
@@ -2164,7 +2168,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "apache2"
+                "Apache-2.0"
             ],
             "authors": [
                 {
@@ -2200,15 +2204,21 @@
             ],
             "description": "The Base package provides the basic infrastructure that all packages rely on. Therefore every component relies on this package.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2009-06-29T10:47:39+00:00"
+            "time": "2017-11-28T11:30:00+00:00"
         },
         {
             "name": "zetacomponents/mail",
-            "version": "dev-1.7-civi",
+            "version": "dev-1.8-civi",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/zetacomponents-mail.git",
-                "reference": "e0feff0e1860f16fa2b3c42795c0351db58120a0"
+                "reference": "b60e9a543f6c3d9a9ec74452d4ff5736a1c63a77"
+            },
+            "require": {
+                "zetacomponents/base": "~1.8"
+            },
+            "require-dev": {
+                "zetacomponents/unit-test": "*"
             },
             "type": "library",
             "autoload": {
@@ -2217,7 +2227,7 @@
                 ]
             },
             "license": [
-                "apache2"
+                "Apache-2.0"
             ],
             "authors": [
                 {
@@ -2262,7 +2272,7 @@
             ],
             "description": "The component allows you construct and/or parse Mail messages conforming to  the mail standard. It has support for attachments, multipart messages and HTML  mail. It also interfaces with SMTP to send mail or IMAP, POP3 or mbox to  retrieve e-mail.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2017-03-14T06:51:24+00:00"
+            "time": "2019-02-13T11:33:09+00:00"
         }
     ],
     "packages-dev": [],
