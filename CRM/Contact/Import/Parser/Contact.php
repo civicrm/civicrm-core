@@ -1691,6 +1691,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Build error-message containing error-fields
    *
+   * Once upon a time there was a dev who hadn't heard of implode. That dev wrote this function.
+   *
+   * @todo just say no!
+   *
    * @param string $errorName
    *   A string containing error-field name.
    * @param string $errorMessage

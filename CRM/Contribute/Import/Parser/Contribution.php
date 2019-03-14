@@ -177,7 +177,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     $errorMessage = NULL;
 
     //for date-Formats
-    $errorMessage = $this->formatDateFields($params);
+    $errorMessage = implode('; ', $this->formatDateFields($params));
     //date-Format part ends
 
     $params['contact_type'] = 'Contribution';
@@ -539,7 +539,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    *   Error messages, if any.
    */
   public function formatDateFields(&$params) {
-    $errorMessage = NULL;
+    $errorMessage = [];
     $dateType = CRM_Core_Session::singleton()->get('dateTypes');
     foreach ($params as $key => $val) {
       if ($val) {
@@ -549,7 +549,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
               $params[$key] = $dateValue;
             }
             else {
-              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Receive Date', $errorMessage);
+              $errorMessage[] = ts('Receive Date');
             }
             break;
 
@@ -558,7 +558,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
               $params[$key] = $dateValue;
             }
             else {
-              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Cancel Date', $errorMessage);
+              $errorMessage[] = ts('Cancel Date');
             }
             break;
 
@@ -567,7 +567,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
               $params[$key] = $dateValue;
             }
             else {
-              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Receipt date', $errorMessage);
+              $errorMessage[] = ts('Receipt date');
             }
             break;
 
@@ -576,7 +576,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
               $params[$key] = $dateValue;
             }
             else {
-              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Thankyou Date', $errorMessage);
+              $errorMessage[] = ts('Thankyou Date');
             }
             break;
         }
