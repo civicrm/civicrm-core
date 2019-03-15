@@ -60,7 +60,8 @@
     "guzzlehttp/guzzle": "^6.3",
     "psr/simple-cache": "~1.0.1",
     "cweagans/composer-patches": "~1.0",
-    "pear/log": "1.13.1"
+    "pear/log": "1.13.1",
+    "ezyang/htmlpurifier": "4.10"
   },
   "repositories": [
     {
