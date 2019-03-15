@@ -69,6 +69,24 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('ContributionSoft', 'Delete', ['id' => $contributionsOfSoftContact->id]);
     $this->callAPISuccess('Contribution', 'Delete', ['id' => $contributionsOfMainContact->id]);
   }
+
+  /**
+   * Test dates are parsed
+   */
+  public function testParsedDates() {
+    $mapperKeys = [];
+    $form = new CRM_Contribute_Import_Parser_Contribution($mapperKeys);
+    $params = ['receive_date' => '20/10/2019'];
+    CRM_Core_Session::singleton()->set('dateTypes', 32);
+    $form->formatDateFields($params);
+    $this->assertEquals('20191020', $params['receive_date']);
+
+    $params = ['receive_date' => '20/10/2019'];
+    CRM_Core_Session::singleton()->set('dateTypes', 32);
+    $form->formatInput($params);
+    $this->assertEquals('20191020', $params['receive_date']);
+  }
+
   /**
    * Run the import parser.
    *
