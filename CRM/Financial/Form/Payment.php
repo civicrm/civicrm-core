@@ -35,7 +35,6 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   /**
    * @var int
    */
-  protected $_paymentProcessorID;
   protected $currency;
 
   public $_values = array();
@@ -78,15 +77,6 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
     $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_paymentProcessorID);
 
     CRM_Core_Payment_ProcessorForm::preProcess($this);
-
-    self::addCreditCardJs($this->_paymentProcessorID);
-
-    $paymentProcessorCapabilities = [
-      'isrecur' => $this->_paymentProcessor['is_recur'],
-    ];
-    $this->assign('paymentProcessorCapabilities', $paymentProcessorCapabilities);
-    $this->assign('paymentProcessorID', $this->_paymentProcessorID);
-    $this->assign('currency', $this->currency);
 
     $this->assign('suppressForm', TRUE);
     $this->controller->_generateQFKey = FALSE;

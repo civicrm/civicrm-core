@@ -36,7 +36,7 @@
 
       // Display a warning to the user if the selected payment processor does not support recurring payments
       function showHidePaymentProcessorCapabilities() {
-        var isAutoRenew = $('input#auto_renew:checked').prop('checked');
+        var isAutoRenew = $('input[name="auto_renew"]').prop('checked');
         var isRecurSupported = {/literal}{if $paymentProcessorCapabilities.isrecur}true{else}false{/if}{literal}
         var isPaymentProcessorSelected = $('input[name="payment_processor_id"]:checked').length;
         $('div#payment_processor_capabilities_warning').remove();
