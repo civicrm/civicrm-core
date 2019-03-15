@@ -868,7 +868,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
        AND con.is_deleted = 0';
 
     if ($activeOnly) {
-      $query .= ' AND rel.is_active = 1 AND (rel.end_date IS NULL OR rel.end_date > NOW())';
+      $query .= ' AND rel.is_active = 1';
     }
 
     $params = array(
