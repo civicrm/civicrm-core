@@ -238,9 +238,13 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   var scriptsLoaded = {};
-  CRM.loadScript = function(url) {
+  CRM.loadScript = function(url, appendCacheCode) {
     if (!scriptsLoaded[url]) {
-      var script = document.createElement('script');
+      var script = document.createElement('script'),
+        src = url;
+      if (appendCacheCode !== false) {
+        src += (_.includes(url, '?') ? '&r=' : '?r=') + CRM.config.resourceCacheCode;
+      }
       scriptsLoaded[url] = $.Deferred();
       script.onload = function () {
         // Give the script time to execute
@@ -256,7 +260,7 @@ if (!CRM.vars) CRM.vars = {};
         CRM.CMSjQuery = window.jQuery;
         window.jQuery = CRM.$;
       }
-      script.src = url + (_.includes(url, '?') ? '&r=' : '?r=') + CRM.config.resourceCacheCode;
+      script.src = src;
       document.getElementsByTagName("head")[0].appendChild(script);
     }
     return scriptsLoaded[url];
