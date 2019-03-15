@@ -295,6 +295,9 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   public function testRevertNoDate() {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+    // Pause for one second here to ensure the timestamps between the first create action
+    // and the second differ.
+    sleep(1);
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'Wot woot'");
     $this->callAPISuccess('Contact', 'create', array(
         'id' => $contactId,
