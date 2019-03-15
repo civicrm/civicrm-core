@@ -443,7 +443,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
         return TRUE;
       }
     }
-    throw new CRM_Core_Exception("No match found for key : $expectKey with value : $expectValue");
+    throw new CRM_Core_Exception("No match found for key : $expectKey with value : $expectValue" . print_r($diffs, 1));
   }
 
   /**
