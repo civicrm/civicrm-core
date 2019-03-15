@@ -412,6 +412,9 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'wooty wop wop'");
+    // Perhaps if initialize & create are exactly the same time it can't cope.
+    // 1 second delay
+    sleep(1);
     $this->callAPISuccess('Contact', 'create', array(
         'id' => $contactId,
         'first_name' => 'Dopey',
@@ -443,7 +446,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
         return TRUE;
       }
     }
-    throw new CRM_Core_Exception("No match found for key : $expectKey with value : $expectValue");
+    throw new CRM_Core_Exception("No match found for key : $expectKey with value : $expectValue" . print_r($diffs, 1));
   }
 
   /**
