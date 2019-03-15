@@ -412,6 +412,9 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'wooty wop wop'");
+    // Perhaps if initialize & create are exactly the same time it can't cope.
+    // 1 second delay
+    sleep(1);
     $this->callAPISuccess('Contact', 'create', array(
         'id' => $contactId,
         'first_name' => 'Dopey',
