@@ -1016,19 +1016,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $contribParams['is_test'] = 1;
     }
 
-    $contribID = NULL;
     if (!empty($contribParams['invoice_id'])) {
-      $contribID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
+      $contribParams['id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
         $contribParams['invoice_id'],
         'id',
         'invoice_id'
       );
-    }
-
-    $ids = array();
-    if ($contribID) {
-      $ids['contribution'] = $contribID;
-      $contribParams['id'] = $contribID;
     }
 
     if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
