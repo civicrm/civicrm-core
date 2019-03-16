@@ -527,8 +527,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // transactions etc
       // for things like tell a friend
       if (!$this->getContactID() && !empty($value['is_primary'])) {
-        $session = CRM_Core_Session::singleton();
-        $session->set('transaction.userID', $contactID);
+        CRM_Core_Session::singleton()->set('transaction.userID', $contactID);
       }
 
       $value['description'] = ts('Online Event Registration') . ': ' . $this->_values['event']['title'];
