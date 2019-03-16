@@ -35,6 +35,7 @@
  * form to process actions on the group aspect of Custom Data
  */
 class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_ContributionBase {
+  use CRM_Financial_Form_FrontEndPaymentFormTrait;
 
   /**
    * The id of the contact associated with this contribution.
@@ -514,17 +515,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if ($invoicing) {
       $getTaxDetails = FALSE;
       $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-      foreach ($this->_lineItem as $key => $value) {
-        foreach ($value as $k => $v) {
-          if (isset($v['tax_rate'])) {
-            if ($v['tax_rate'] != '') {
-              $getTaxDetails = TRUE;
-              // Cast to float to display without trailing zero decimals
-              $tplLineItems[$key][$k]['tax_rate'] = (float) $v['tax_rate'];
-            }
-          }
-        }
-      }
+      list($getTaxDetails, $tplLineItems) = $this->alterLineItemsForTemplate($tplLineItems);
       $this->assign('getTaxDetails', $getTaxDetails);
       $this->assign('taxTerm', $taxTerm);
       $this->assign('totalTaxAmount', $params['tax_amount']);
