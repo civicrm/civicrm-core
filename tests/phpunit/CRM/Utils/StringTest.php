@@ -353,4 +353,21 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     );
   }
 
+  public function purifyHTMLProvider() {
+    $tests = [];
+    $tests[] = ['<span onmouseover=alert(0)>HOVER</span>', '<span>HOVER</span>'];
+    $tests[] = ['<a href="https://civicrm.org" target="_blank" class="button-purple">hello</a>', '<a href="https://civicrm.org" target="_blank" class="button-purple">hello</a>'];
+    return $tests;
+  }
+
+  /**
+   * Test ouput of purifyHTML
+   * @param string $testString
+   * @param string $expectedString
+   * @dataProvider purifyHTMLProvider
+   */
+  public function testPurifyHTML($testString, $expectedString) {
+    $this->assertEquals($expectedString, CRM_Utils_String::purifyHTML($testString));
+  }
+
 }
