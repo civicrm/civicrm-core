@@ -51,6 +51,24 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
     $files[] = '[civicrm.vendor]/pear/net_smtp/phpdoc.sh';
     $files[] = '[civicrm.vendor]/phpoffice/phpword/samples';
     $files[] = '[civicrm.root]/templates/CRM/common/version.tpl';
+    $files[] = '[civicrm.packages]/Log.php';
+    $files[] = '[civicrm.packages]/_ORIGINAL_/Log.php';
+    $files[] = '[civicrm.packages]/Log/composite.php';
+    $files[] = '[civicrm.packages]/Log/console.php';
+    $files[] = '[civicrm.packages]/Log/daemon.php';
+    $files[] = '[civicrm.packages]/Log/display.php';
+    $files[] = '[civicrm.packages]/Log/error_log.php';
+    $files[] = '[civicrm.packages]/Log/file.php';
+    $files[] = '[civicrm.packages]/Log/firebug.php';
+    $files[] = '[civicrm.packages]/Log/mail.php';
+    $files[] = '[civicrm.packages]/Log/mcal.php';
+    $files[] = '[civicrm.packages]/Log/mdb2.php';
+    $files[] = '[civicrm.packages]/Log/null.php';
+    $files[] = '[civicrm.packages]/Log/observer.php';
+    $files[] = '[civicrm.packages]/Log/sql.php';
+    $files[] = '[civicrm.packages]/Log/sqlite.php';
+    $files[] = '[civicrm.packages]/Log/syslog.php';
+    $files[] = '[civicrm.packages]/Log/win.php';
 
     return $files;
   }

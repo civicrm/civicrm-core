@@ -35,7 +35,6 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 
-require_once 'Log.php';
 require_once 'Mail.php';
 
 require_once 'api/api.php';
