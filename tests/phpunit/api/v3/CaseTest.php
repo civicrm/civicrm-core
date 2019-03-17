@@ -408,7 +408,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $activeCaseRelationships = CRM_Case_BAO_Case::getCaseRoles($this->_params['contact_id'], $case['id'], NULL, FALSE);
     $this->assertEquals(count($activeCaseRelationships), 3, "Checking for empty array");
 
-    // But -1 if only active relationships are selected makes total 3
+    // But -1 if only active relationships are selected makes total 2
     $activeCaseRelationships = CRM_Case_BAO_Case::getCaseRoles($this->_params['contact_id'], $case['id'], NULL, TRUE);
     $this->assertEquals(count($activeCaseRelationships), 2, "Checking for empty array");
   }
