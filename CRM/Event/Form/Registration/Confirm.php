@@ -215,7 +215,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       $taxAmount = 0;
       foreach ($this->_params as $k => $v) {
-        $this->cleanMoneyFields($v);
         if ($v == 'skip') {
           continue;
         }
@@ -223,6 +222,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         //display tax amount on confirmation page
         $taxAmount += $v['tax_amount'];
         if (is_array($v)) {
+          $this->cleanMoneyFields($v);
           foreach (array(
                      'first_name',
                      'last_name',
