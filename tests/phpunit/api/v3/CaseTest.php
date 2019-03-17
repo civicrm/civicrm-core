@@ -355,6 +355,62 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'contact_id' => $relContact,
       'activity_id' => $activity['id'],
     ));
+
+    // test scenario :replace a caserole (create a new relationship with the same type)
+    //   expected - old relationship is deactivated
+    //            - old relationship has an end_data
+    //            - new relationship is active
+
+    $oldRelationShipId = $relationship['id'];
+    $sndRelContact = $this->individualCreate(array('first_name' => 'Second', 'last_name' => 'the very Last'));
+
+    $_REQUEST = array(
+      'rel_type' => "{$relType}_b_a",
+      'rel_contact' => $sndRelContact,
+      'case_id' => $case['id'],
+      'rel_id'  => $oldRelationShipId,
+      'cid' => $relContact,
+      'is_unit_test' => TRUE,
+    );
+
+    CRM_Contact_Page_AJAX::relationship();
+
+    // Reload the oldRelationShip
+    $oldRelationship = $this->callAPISuccess('Relationship', 'get', array(
+      'sequential' => 1,
+      'id' => $oldRelationShipId,
+    ));
+    // Recheck the old values - nothing should be changed
+    $this->assertEquals($relContact, $oldRelationship['values'][0]['contact_id_a']);
+    $this->assertEquals($this->_params['contact_id'], $oldRelationship['values'][0]['contact_id_b']);
+    // What is changed is the enddate and the active flag
+    $this->assertEquals(0, $oldRelationship['values'][0]['is_active']);
+    $this->assertNotEmpty($oldRelationship['values'][0]['end_date']);
+
+    // the new relationship can be identified with the active flag
+    $newRelationship = $this->callAPISuccess('Relationship', 'get', array(
+      'sequential' => 1,
+      'relationship_type_id' => $relType,
+      'case_id' => $case['id'],
+      'is_active' => 1,
+    ));
+
+    // check the old values - nothing should be changed
+    $this->assertEquals($sndRelContact, $newRelationship['values'][0]['contact_id_a']);
+    $this->assertEquals($this->_params['contact_id'], $newRelationship['values'][0]['contact_id_b']);
+    // What is changed is the enddate and the active flag
+    $this->assertEquals(1, $newRelationship['values'][0]['is_active']);
+    $this->assertFalse(isset($newRelationship['values'][0]['end_date']));
+    // and it has a start date
+    $this->assertNotEmpty($oldRelationship['values'][0]['start_date']);
+
+    // Case role counting +1 for the case ownder +1 for the first relationship +1 for the snd relationship total = 3
+    $activeCaseRelationships = CRM_Case_BAO_Case::getCaseRoles($this->_params['contact_id'], $case['id'], NULL, FALSE);
+    $this->assertEquals(count($activeCaseRelationships), 3, "Checking for empty array");
+
+    // But -1 if only active relationships are selected makes total 3
+    $activeCaseRelationships = CRM_Case_BAO_Case::getCaseRoles($this->_params['contact_id'], $case['id'], NULL, TRUE);
+    $this->assertEquals(count($activeCaseRelationships), 2, "Checking for empty array");
   }
 
   /**
