@@ -491,7 +491,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
   public function buildQuery($applyLimit = FALSE) {
     if ($this->isTempTableBuilt) {
       $this->limit();
-      return "SELECT SQL_CALC_FOUND_ROWS * FROM civireport_contribution_detail_temp3 $this->_orderBy $this->_limit";
+      return "SELECT SQL_CALC_FOUND_ROWS * FROM {$this->temporaryTables['civireport_contribution_detail_temp3']['name']} $this->_orderBy $this->_limit";
     }
     return parent::buildQuery($applyLimit);
   }
@@ -544,9 +544,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     // we inner join with temp1 to restrict soft contributions to those in temp1 table.
     // no group by here as we want to display as many soft credit rows as actually exist.
     $sql = "{$select} {$this->_from} {$this->_where} $this->_groupBy";
-    $tempQuery = "CREATE TEMPORARY TABLE civireport_contribution_detail_temp2 {$this->_databaseAttributes} AS {$sql}";
-    $this->executeReportQuery($tempQuery);
-    $this->temporaryTables['civireport_contribution_detail_temp2'] = ['name' => 'civireport_contribution_detail_temp2', 'temporary' => TRUE];
+    $this->createTemporaryTable('civireport_contribution_detail_temp2', $sql);
 
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'soft_credits_only'
@@ -568,24 +566,23 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     // 3. Decide where to populate temp3 table from
     if ($this->isContributionBaseMode
     ) {
-      $this->executeReportQuery(
-        "CREATE TEMPORARY TABLE civireport_contribution_detail_temp3 {$this->_databaseAttributes} AS (SELECT * FROM {$this->temporaryTables['civireport_contribution_detail_temp1']['name']})"
+      $this->createTemporaryTable('civireport_contribution_detail_temp3',
+        "(SELECT * FROM {$this->temporaryTables['civireport_contribution_detail_temp1']['name']})"
       );
     }
     elseif (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) ==
       'soft_credits_only'
     ) {
-      $this->executeReportQuery(
-        "CREATE TEMPORARY TABLE civireport_contribution_detail_temp3 {$this->_databaseAttributes} AS (SELECT * FROM civireport_contribution_detail_temp2)"
+      $this->createTemporaryTable('civireport_contribution_detail_temp3',
+        "(SELECT * FROM {$this->temporaryTables['civireport_contribution_detail_temp2']['name']})"
       );
     }
     else {
-      $this->executeReportQuery("CREATE TEMPORARY TABLE civireport_contribution_detail_temp3 {$this->_databaseAttributes}
+      $this->createTemporaryTable('civireport_contribution_detail_temp3', "
 (SELECT * FROM {$this->temporaryTables['civireport_contribution_detail_temp1']['name']})
 UNION ALL
-(SELECT * FROM civireport_contribution_detail_temp2)");
+(SELECT * FROM {$this->temporaryTables['civireport_contribution_detail_temp2']['name']})");
     }
-    $this->temporaryTables['civireport_contribution_detail_temp3'] = ['name' => 'civireport_contribution_detail_temp3', 'temporary' => TRUE];
     $this->isTempTableBuilt = TRUE;
   }
 
@@ -730,7 +727,7 @@ UNION ALL
       ) {
         $query = "
 SELECT civicrm_contact_id, civicrm_contact_sort_name, civicrm_contribution_total_amount_sum, civicrm_contribution_currency
-FROM   civireport_contribution_detail_temp2
+FROM   {$this->temporaryTables['civireport_contribution_detail_temp2']['name']}
 WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribution_id']}";
         $dao = CRM_Core_DAO::executeQuery($query);
         $string = '';
@@ -834,7 +831,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       }
 
       $query = $this->_select .
-        "$addtotals, count(*) as ct from civireport_contribution_detail_temp3 group by " .
+        "$addtotals, count(*) as ct from {$this->temporaryTables['civireport_contribution_detail_temp3']['name']} group by " .
         implode(", ", $sectionAliases);
       // initialize array of total counts
       $sumcontribs = $totals = array();
