@@ -181,14 +181,6 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     foreach ($relationships['values'] as $key => $values) {
       $this->assertEquals($values['end_date'], date('Y-m-d'));
     }
-
-    //Verify there are no active relationships.
-    $activeCaseRelationships = CRM_Case_BAO_Case::getCaseRoles($result['values'][$id]['client_id'][1], $id);
-    $this->assertEquals(count($activeCaseRelationships), 0, "Checking for empty array");
-
-    //Check if getCaseRoles() is able to return inactive relationships.
-    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($result['values'][$id]['client_id'][1], $id, NULL, FALSE);
-    $this->assertEquals(count($caseRelationships), 1);
   }
 
   /**
