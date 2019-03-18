@@ -43,7 +43,7 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
     $this->add('select', 'activity_type_filter_id', ts('Include'), array('' => ts('- all activity type(s) -')) + $activityOptions);
     $this->add('select', 'activity_type_exclude_filter_id', ts('Exclude'), array('' => ts('- select activity type -')) + $activityOptions);
     CRM_Core_Form_Date::buildDateRange(
-      $this, 'activity_date', 1,
+      $this, 'activity_date_time', 1,
       '_low', '_high', ts('From:'),
       FALSE, array(), 'searchDate',
       FALSE, array('class' => 'crm-select2 medium')
