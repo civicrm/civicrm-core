@@ -51,7 +51,8 @@ function smarty_function_crmSetting($params, &$smarty) {
   require_once 'api/api.php';
   $result = civicrm_api('setting', 'getvalue', $params);
   unset($errorScope);
-  if ($result === FALSE) {
+  // Core-688 FALSE is returned by Boolean settings, thus giving false errors.
+  if ($result === NULL) {
     $smarty->trigger_error("Unknown error");
     return NULL;
   }
