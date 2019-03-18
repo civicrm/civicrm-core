@@ -133,6 +133,14 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
   public function testExpiredDisabled() {
     $result = civicrm_api3('MembershipStatus', 'get', [
       'name' => "Expired",
+      'api.MembershipStatus.create' => ['label' => 'Expiiiired'],
+    ]);
+
+    // Calling it 'Expiiiired' is OK.
+    $result = $this->callAPISuccess('job', 'process_membership', []);
+
+    $result = civicrm_api3('MembershipStatus', 'get', [
+      'name' => "Expired",
       'api.MembershipStatus.create' => ['is_active' => 0],
     ]);
 
