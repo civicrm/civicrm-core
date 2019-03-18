@@ -2229,7 +2229,11 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     // Tests for this function are in api_v3_JobTest. Please add tests for all updates.
 
     $updateCount = $processCount = self::updateDeceasedMembersStatuses();
-    $allStatus = CRM_Member_PseudoConstant::membershipStatus();
+
+    // We want all of the statuses as id => name, even the disabled ones (cf.
+    // CRM-15475), to identify which are Pending, Deceased, Cancelled, and
+    // Expired.
+    $allStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'validate');
     $allTypes = CRM_Member_PseudoConstant::membershipType();
 
     // This query retrieves ALL memberships of active types.
@@ -2250,17 +2254,14 @@ FROM       civicrm_membership
 INNER JOIN civicrm_contact ON ( civicrm_membership.contact_id = civicrm_contact.id )
 INNER JOIN civicrm_membership_type ON
   (civicrm_membership.membership_type_id = civicrm_membership_type.id AND civicrm_membership_type.is_active = 1)
-WHERE      civicrm_membership.is_test = 0 
+WHERE      civicrm_membership.is_test = 0
            AND civicrm_contact.is_deceased = 0 ";
 
     $deceaseStatusId = array_search('Deceased', $allStatus);
     $pendingStatusId = array_search('Pending', $allStatus);
-    // CRM-15475
-    $cancelledStatusId = array_search(
-      'Cancelled',
-      CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)
-    );
-    $expiredStatusId = array_search('Expired', $allStatus);
+    $cancelledStatusId = array_search('Cancelled', $allStatus);
+    // Expired is not reserved so might not exist.  A value of `0` won't break.
+    $expiredStatusId = array_search('Expired', $allStatus) ?: 0;
 
     $query = $baseQuery . " AND civicrm_membership.is_override IS NOT NULL AND civicrm_membership.status_override_end_date IS NOT NULL";
     $dao1 = CRM_Core_DAO::executeQuery($query);
