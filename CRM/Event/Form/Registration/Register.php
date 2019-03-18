@@ -1147,7 +1147,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $this->handlePreApproval($params);
       }
       elseif ($this->_paymentProcessor &&
-        $this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_NOTIFY
+        (int) $this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_NOTIFY
       ) {
         // The concept of contributeMode is deprecated - but still needs removal from the message templates.
         $this->set('contributeMode', 'notify');
