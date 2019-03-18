@@ -4299,4 +4299,31 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(array('invoice_id'), $result['values']['UI_contrib_invoice_id']);
   }
 
+  /**
+   * Test Repeat Transaction Contribution with Tax amount.
+   * https://lab.civicrm.org/dev/core/issues/806
+   */
+  public function testRepeatContributionWithTaxAmount() {
+    $this->enableTaxAndInvoicing();
+    $financialType = $this->callAPISuccess('financial_type', 'create', [
+      'name' => 'Test taxable financial Type',
+      'is_reserved' => 0,
+      'is_active' => 1,
+    ]);
+    $this->relationForFinancialTypeWithFinancialAccount($financialType['id']);
+    $contribution = $this->setUpRepeatTransaction(
+      [],
+      'single',
+      [
+        'financial_type_id' => $financialType['id'],
+      ]
+    );
+    $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'original_contribution_id' => $contribution['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
+    ));
+    $this->callAPISuccessGetCount('Contribution', [], 2);
+  }
+
 }
