@@ -336,6 +336,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     //flush component settings
     CRM_Core_Component::getEnabledComponents(TRUE);
 
+    $_REQUEST = $_GET = $_POST = [];
     error_reporting(E_ALL);
 
     $this->_sethtmlGlobals();
