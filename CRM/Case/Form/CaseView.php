@@ -467,7 +467,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
    *   To include acivities related to current case id $form->_caseID.
    */
   public static function activityForm($form, $aTypes = array()) {
-    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($form->_contactID, $form->_caseID);
+    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($form->_contactID, $form->_caseID, NULL, FALSE);
     //build reporter select
     $reporters = array("" => ts(' - any reporter - '));
     foreach ($caseRelationships as $key => & $value) {
