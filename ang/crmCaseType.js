@@ -436,8 +436,7 @@
         } else {
           CRM.loadForm(CRM.url('civicrm/admin/reltype', {action: 'add', reset: 1, label_a_b: roleName, label_b_a: roleName}))
             .on('crmFormSuccess', function(e, data) {
-              var newTypes = _.values(data.relationshipType);
-              var newType = newTypes[0];
+              var newType = _.values(data.relationshipType)[0];
               roles.push({name: newType[REL_TYPE_CNAME]});
               $scope.relationshipTypeOptions.push({id: newType[REL_TYPE_CNAME], text: newType.label_b_a});
               $scope.$digest();
