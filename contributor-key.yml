@@ -56,6 +56,9 @@
 - github      : alexmarketaccess
   name        : Alex Block
 
+- github      : alexymik
+  name        : Alexy Mikhailichenko
+
 - github      : alifrumin
   name        : Alice Frumin
   organization: AGH Strategies
@@ -130,6 +133,10 @@
 - github      : autarch
   name        : Dave Rolsky
   jira        : autarch
+
+- github      : awasson
+  name        : Andrew Wasson
+  organization: Luna Design
 
 - github      : awzilkie
   name        : Adam Zilkie
