@@ -237,7 +237,7 @@
     };
   });
 
-  crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls) {
+  crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls, crmUiHelp) {
     var REL_TYPE_CNAME, defaultAssigneeDefaultValue, ts;
 
     (function init () {
@@ -245,6 +245,7 @@
       REL_TYPE_CNAME = CRM.crmCaseType.REL_TYPE_CNAME;
 
       ts = $scope.ts = CRM.ts(null);
+      $scope.hs = crmUiHelp({file: 'CRM/Case/CaseType'});
       $scope.locks = { caseTypeName: true, activitySetName: true };
       $scope.workflows = { timeline: 'Timeline', sequence: 'Sequence' };
       defaultAssigneeDefaultValue = _.find(apiCalls.defaultAssigneeTypes.values, { is_default: '1' }) || {};
