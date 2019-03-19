@@ -2429,7 +2429,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
         $activityIcons[$type['value']] = $type['icon'];
       }
     }
-    CRM_Utils_Date::convertFormDateToApiFormat($params, 'activity_date_time', FALSE);
+    CRM_Utils_Date::convertFormDateToApiFormat($params, 'activity_date_time');
 
     // Get contact activities.
     $activities = CRM_Activity_BAO_Activity::getActivities($params);

@@ -29,6 +29,7 @@
     {ts}Filter by Activity{/ts}</a>
     </div><!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
+      <form><!-- form element is here to fool the datepicker widget -->
       <table class="no-border form-layout-compressed activity-search-options">
         <tr>
           <td class="crm-contact-form-block-activity_type_filter_id crm-inline-edit-field">
@@ -37,12 +38,15 @@
           <td class="crm-contact-form-block-activity_type_exclude_filter_id crm-inline-edit-field">
             {$form.activity_type_exclude_filter_id.label}<br /> {$form.activity_type_exclude_filter_id.html|crmAddClass:medium}
           </td>
-          {include file="CRM/Core/DateRange.tpl" fieldName="activity_date_time" from='_low' to='_high' label='<label>Date</label>'}
+          <td>
+            {include file="CRM/Core/DatePickerRange.tpl" fieldName="activity_date_time"}
+          </td>
           <td class="crm-contact-form-block-activity_status_filter_id crm-inline-edit-field">
             <label>{ts}Status{/ts}</label><br /> {$form.status_id.html|crmAddClass:medium}
           </td>
         </tr>
       </table>
+      </form>
     </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
   <table class="contact-activity-selector-{$context} crm-ajax-table" style="width: 100%;">
