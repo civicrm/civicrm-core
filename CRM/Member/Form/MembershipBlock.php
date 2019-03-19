@@ -52,7 +52,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
     //parent::setDefaultValues();
     $defaults = array();
     if (isset($this->_id)) {
-      $defaults = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
+      $defaults = civicrm_api3('MembershipBlock', 'getsingle', ['entity_id' => $this->_id]);
     }
     $defaults['member_is_active'] = $defaults['is_active'];
 
@@ -143,33 +143,37 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         }
       }
 
+      $membershipBlock = civicrm_api3('MembershipBlock', 'getsingle', ['entity_id' => $this->_id]);
+      $membershipRequired = unserialize($membershipBlock['membership_types']);
       $membership = $membershipDefault = $params = array();
+      $membershipRequiredChanged = FALSE;
+      $autoRenewOptions = [0 => ts('Not offered'), 1 => ts('Give option'), 2 => ts('Required')];
       foreach ($membershipTypes as $k => $v) {
         $membership[] = $this->createElement('advcheckbox', $k, NULL, $v);
         $membershipDefault[] = $this->createElement('radio', NULL, NULL, NULL, $k);
-        $membershipRequired[$k] = NULL;
         if ($isRecur) {
           $autoRenew = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $k, 'auto_renew');
-          $membershipRequired[$k] = $autoRenew;
-          $autoRenewOptions = array();
+          if (($autoRenew == 2) && ($autoRenew > $membershipRequired[$k])) {
+            $membershipRequired[$k] = $autoRenew;
+            $membershipRequiredChanged = TRUE;
+          }
           if ($autoRenew) {
-            $autoRenewOptions = array(ts('Not offered'), ts('Give option'), ts('Required'));
             $this->addElement('select', "auto_renew_$k", ts('Auto-renew'), $autoRenewOptions);
             //CRM-15573
             if ($autoRenew == 2) {
               $this->freeze("auto_renew_$k");
-              $params['id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipBlock', $this->_id, 'id', 'entity_id');
             }
             $this->_renewOption[$k] = $autoRenew;
           }
         }
       }
-
-      //CRM-15573
-      if (!empty($params['id'])) {
-        $params['membership_types'] = serialize($membershipRequired);
-        CRM_Member_BAO_MembershipBlock::create($params);
+      // We set the minimum "level" for membership renewal to that configured on the membership type.
+      // If we had to change an option, save it now on the membershipblock
+      if ($membershipRequiredChanged) {
+        $membershipBlock['membership_types'] = serialize($membershipRequired);
+        civicrm_api3('MembershipBlock', 'create', $membershipBlock);
       }
+
       $this->add('hidden', "mem_price_field_id", '', array('id' => "mem_price_field_id"));
       $this->assign('is_recur', $isRecur);
       if (isset($this->_renewOption)) {
