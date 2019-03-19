@@ -124,7 +124,6 @@ class CRM_Core_BAO_CustomValueTable {
 
             case 'Country':
               $type = 'Integer';
-              $mulValues = explode(',', $value);
               if (is_array($value)) {
                 $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $value) . CRM_Core_DAO::VALUE_SEPARATOR;
                 $type = 'String';
