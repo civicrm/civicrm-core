@@ -561,11 +561,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $preOperationSqls = self::operationSql($mainId, $otherId, $table, $tableOperations);
           $sqls = array_merge($sqls, $preOperationSqls);
 
-          if ($customTableToCopyFrom !== NULL && in_array($table, $customTableToCopyFrom) && !self::customRecordExists($mainId, $table, $field)) {
-            $sqls[] = "INSERT INTO $table ($field) VALUES ($mainId)";
-          }
-          $sqls[] = "UPDATE IGNORE $table SET $field = $mainId WHERE $field = $otherId";
-          $sqls[] = "DELETE FROM $table WHERE $field = $otherId";
+          $sqls[] = "DELETE FROM $table WHERE $field = $mainId";
+          $sqls[] = "UPDATE $table SET $field = $mainId WHERE $field = $otherId";
         }
       }
 
@@ -1834,30 +1831,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $dao->free();
 
       // move the other contact's file to main contact
-      //NYSS need to INSERT or UPDATE depending on whether main contact has an existing record
-      if (CRM_Core_DAO::singleValueQuery("SELECT id FROM {$tableName} WHERE entity_id = {$mainId}")) {
-        $sql = "UPDATE {$tableName} SET {$columnName} = {$fileIds[$otherId]} WHERE entity_id = {$mainId}";
-      }
-      else {
-        $sql = "INSERT INTO {$tableName} ( entity_id, {$columnName} ) VALUES ( {$mainId}, {$fileIds[$otherId]} )";
-      }
-      CRM_Core_DAO::executeQuery($sql);
-
-      if (CRM_Core_DAO::singleValueQuery("
-        SELECT id
-        FROM civicrm_entity_file
-        WHERE entity_table = '{$tableName}' AND file_id = {$fileIds[$otherId]}")
-      ) {
-        $sql = "
-          UPDATE civicrm_entity_file
-          SET entity_id = {$mainId}
-          WHERE entity_table = '{$tableName}' AND file_id = {$fileIds[$otherId]}";
-      }
-      else {
-        $sql = "
-          INSERT INTO civicrm_entity_file ( entity_table, entity_id, file_id )
-          VALUES ( '{$tableName}', {$mainId}, {$fileIds[$otherId]} )";
-      }
+      $sql = "
+        UPDATE civicrm_entity_file
+        SET entity_id = {$mainId}
+        WHERE entity_table = '{$tableName}' AND entity_id = {$otherId}";
       CRM_Core_DAO::executeQuery($sql);
     }
 
