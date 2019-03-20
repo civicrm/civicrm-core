@@ -2533,6 +2533,38 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that we can set the sort name via the api or alter it via a hook.
+   *
+   * As of writing this is being fixed for Organization & Household but it makes sense to do for individuals too.
+   */
+  public function testCreateAlterSortName() {
+    $organizationID = $this->organizationCreate(['organization_name' => 'The Justice League', 'sort_name' => 'Justice League, The']);
+    $organization = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name'], 'id' => $organizationID]);
+    $this->assertEquals('Justice League, The', $organization['sort_name']);
+    $this->assertEquals('The Justice League', $organization['display_name']);
+    $this->hookClass->setHook('civicrm_pre', array($this, 'killTheJusticeLeague'));
+    $this->organizationCreate(['id' => $organizationID, 'sort_name' => 'Justice League, The']);
+    $organization = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name', 'is_deceased'], 'id' => $organizationID]);
+    $this->assertEquals('Steppenwolf wuz here', $organization['display_name']);
+    $this->assertEquals('Steppenwolf wuz here', $organization['sort_name']);
+    $this->assertEquals(1, $organization['is_deceased']);
+
+    $householdID = $this->householdCreate();
+    $household = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name'], 'id' => $householdID]);
+    $this->assertEquals('Steppenwolf wuz here', $household['display_name']);
+    $this->assertEquals('Steppenwolf wuz here', $household['sort_name']);
+  }
+
+  /**
+   * Implements hook_pre().
+   */
+  public function killTheJusticeLeague($op, $entity, $id, &$params) {
+    $params['sort_name'] = 'Steppenwolf wuz here';
+    $params['display_name'] = 'Steppenwolf wuz here';
+    $params['is_deceased'] = 1;
+  }
+
+  /**
    * Test Single Entity format.
    */
   public function testContactGetSingleEntityArray() {
