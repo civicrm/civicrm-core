@@ -883,7 +883,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => 0,
     ]);
     $this->assertEquals(2, $dupes['count']);
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM'];
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
 
     $dupes = $this->callAPISuccess('Contact', 'duplicatecheck', [
       'match' => [
