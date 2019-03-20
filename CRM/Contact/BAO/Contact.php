@@ -3595,14 +3595,25 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * @param bool $checkPermissions
    * @param int $ruleGroupID
    *   ID of the rule group to be used if an override is desirable.
+   * @param array $contextParams
+   *   The context if relevant, eg. ['event_id' => X]
    *
    * @return array
    */
-  public static function getDuplicateContacts($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = array(), $checkPermissions = TRUE, $ruleGroupID = NULL) {
+  public static function getDuplicateContacts($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = [], $checkPermissions = TRUE, $ruleGroupID = NULL, $contextParams = []) {
     $dedupeParams = CRM_Dedupe_Finder::formatParams($input, $contactType);
     $dedupeParams['check_permission'] = $checkPermissions;
-    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $contactType, $rule, $excludedContactIDs, $ruleGroupID);
-    return $ids;
+    $dedupeParams['contact_type'] = $contactType;
+    $dedupeParams['rule'] = $rule;
+    $dedupeParams['rule_group_id'] = $ruleGroupID;
+    $dedupeParams['excluded_contact_ids'] = $excludedContactIDs;
+    $dedupeResults['ids'] = [];
+    $dedupeResults['handled'] = FALSE;
+    CRM_Utils_Hook::findDuplicates($dedupeParams, $dedupeResults, $contextParams);
+    if (!$dedupeResults['handled']) {
+      $dedupeResults['ids'] = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $contactType, $rule, $excludedContactIDs, $ruleGroupID);
+    }
+    return $dedupeResults['ids'];
   }
 
   /**
@@ -3619,11 +3630,13 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * @param bool $checkPermissions
    * @param int $ruleGroupID
    *   ID of the rule group to be used if an override is desirable.
+   * @param array $contextParams
+   *   The context if relevant, eg. ['event_id' => X]
    *
    * @return int|NULL
    */
-  public static function getFirstDuplicateContact($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = array(), $checkPermissions = TRUE, $ruleGroupID = NULL) {
-    $ids = self::getDuplicateContacts($input, $contactType, $rule, $excludedContactIDs, $checkPermissions, $ruleGroupID);
+  public static function getFirstDuplicateContact($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = [], $checkPermissions = TRUE, $ruleGroupID = NULL, $contextParams = []) {
+    $ids = self::getDuplicateContacts($input, $contactType, $rule, $excludedContactIDs, $checkPermissions, $ruleGroupID, $contextParams);
     if (empty($ids)) {
       return NULL;
     }
