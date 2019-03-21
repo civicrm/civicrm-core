@@ -6275,12 +6275,11 @@ AND   displayRelType.is_active = 1
    *   The order by string.
    * @param null $sortOrder
    *   Who knows? Hu knows. He who knows Hu knows who.
-   * @param string $additionalFromClause
-   *   Should be clause with proper joins, effective to reduce where clause load.
+   *
    * @return array
    *   list(string $orderByClause, string $additionalFromClause).
    */
-  protected function prepareOrderBy($sort, $sortOrder, $additionalFromClause) {
+  protected function prepareOrderBy($sort, $sortOrder) {
     $orderByArray = [];
     $orderBy = '';
 
@@ -6321,7 +6320,7 @@ AND   displayRelType.is_active = 1
       }
     }
     if (!$orderBy) {
-      return [NULL, $additionalFromClause];
+      return NULL;
     }
     // Remove this here & add it at the end for simplicity.
     $order = trim($orderBy);
@@ -6397,7 +6396,7 @@ AND   displayRelType.is_active = 1
     // clause. But this magic helper which forgivingly reescapes ORDER BY.
     if ($order) {
       $order = CRM_Utils_Type::escape($order, 'MysqlOrderBy');
-      return array(' ORDER BY ' . $order, $additionalFromClause);
+      return ' ORDER BY ' . $order;
     }
   }
 
@@ -6749,7 +6748,7 @@ AND   displayRelType.is_active = 1
     $order = $orderBy = '';
     if (!$count) {
       if (!$sortByChar) {
-        list($order, $additionalFromClause) = $this->prepareOrderBy($sort, $sortOrder, $additionalFromClause);
+        $order = $this->prepareOrderBy($sort, $sortOrder);
       }
     }
     // Cases where we are disabling FGB (FULL_GROUP_BY_MODE):
