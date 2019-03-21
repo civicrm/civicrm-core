@@ -270,7 +270,14 @@ class CRM_Core_Page_AJAX {
 
     foreach ($optionalParams as $param => $type) {
       if (CRM_Utils_Array::value($param, $_GET)) {
-        $params[$param] = CRM_Utils_Type::validate(CRM_Utils_Array::value($param, $_GET), $type);
+        if (!is_array($_GET[$param])) {
+          $params[$param] = CRM_Utils_Type::validate(CRM_Utils_Array::value($param, $_GET), $type);
+        }
+        else {
+          foreach ($_GET[$param] as $index => $value) {
+            $params[$param][$index] = CRM_Utils_Type::validate($value, $type);
+          }
+        }
       }
     }
 
