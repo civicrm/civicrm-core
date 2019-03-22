@@ -281,32 +281,6 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
     }
   }
 
-  public function groupBy() {
-    // @todo this function appears to do nothing more than parent, test & remove
-    $this->_groupBy = "";
-    if (!empty($this->_params['group_bys']) &&
-      is_array($this->_params['group_bys']) &&
-      !empty($this->_params['group_bys'])
-    ) {
-      foreach ($this->_columns as $tableName => $table) {
-        if (array_key_exists('group_bys', $table)) {
-          foreach ($table['group_bys'] as $fieldName => $field) {
-            if (!empty($this->_params['group_bys'][$fieldName])) {
-              $this->_groupBy[] = $field['dbAlias'];
-            }
-          }
-        }
-      }
-    }
-    if (!empty($this->_groupBy)) {
-      $this->_groupBy = "ORDER BY " . implode(', ', $this->_groupBy) .
-        ", {$this->_aliases['civicrm_contact']}.sort_name";
-    }
-    else {
-      $this->_groupBy = "ORDER BY {$this->_aliases['civicrm_contact']}.sort_name";
-    }
-  }
-
   /**
    * Alter display of rows.
    *
