@@ -37,16 +37,16 @@
 class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
   /**
-   * The default variable defined.
+   * Cases this activity belongs to.
    *
-   * @var int
+   * @var []int
    */
   public $_caseId;
 
   /**
    * The default case type variable defined.
    *
-   * @var int
+   * @var []int
    */
   public $_caseType;
 
@@ -58,11 +58,19 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   public $_relatedContacts;
 
   /**
+   * The case type definition column info
+   * for the caseId;
+   *
+   * @var array
+   */
+  public $_caseTypeDefinition;
+
+  /**
    * Build the form object.
    */
   public function preProcess() {
-    $caseIds = CRM_Utils_Request::retrieve('caseid', 'String', $this);
-    $this->_caseId = explode(',', $caseIds);
+    $caseIds = CRM_Utils_Request::retrieve('caseid', 'CommaSeparatedIntegers', $this);
+    $this->_caseId = $caseIds ? explode(',', $caseIds) : [];
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     if (!$this->_context) {
       $this->_context = 'caseActivity';
@@ -76,7 +84,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     $this->assign('scheduleStatusId', $scheduleStatusId);
 
     if (!$this->_caseId && $this->_activityId) {
-      $this->_caseId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseActivity', $this->_activityId,
+      $this->_caseId = (array) CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseActivity', $this->_activityId,
         'case_id', 'activity_id'
       );
     }
@@ -123,6 +131,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $this->_caseType[$casePos] = CRM_Case_BAO_Case::getCaseType($caseId, 'name');
     }
     $this->assign('caseType', $this->_caseType);
+
+    $this->_caseTypeDefinition = $this->getCaseTypeDefinition();
 
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();
     $isMultiClient = $xmlProcessorProcess->getAllowMultipleCaseClients();
@@ -248,10 +258,31 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     $this->_fields['source_contact_id']['label'] = ts('Reported By');
     unset($this->_fields['status_id']['attributes']['required']);
 
+    if ($this->restrictAssignmentByUserAccount()) {
+      $assigneeParameters['uf_user'] = 1;
+    }
+
+    $activityAssignmentGroups = $this->getActivityAssignmentGroups();
+    if (!empty($activityAssignmentGroups)) {
+      $assigneeParameters['group'] = ['IN' => $activityAssignmentGroups];
+    }
+
+    if (!empty($assigneeParameters)) {
+      $this->_fields['assignee_contact_id']['attributes']['api']['params']
+        = array_merge($this->_fields['assignee_contact_id']['attributes']['api']['params'], $assigneeParameters);
+
+      $this->_fields['followup_assignee_contact_id']['attributes']['api']['params']
+        = array_merge($this->_fields['followup_assignee_contact_id']['attributes']['api']['params'], $assigneeParameters);
+
+      //Disallow creating a contact from the assignee field UI.
+      $this->_fields['assignee_contact_id']['attributes']['create'] = FALSE;
+      $this->_fields['followup_assignee_contact_id']['attributes']['create'] = FALSE;
+    }
+
     if ($this->_caseType) {
       $xmlProcessor = new CRM_Case_XMLProcessor_Process();
       $aTypes = array();
-      foreach ($this->_caseType as $key => $val) {
+      foreach (array_unique($this->_caseType) as $val) {
         $activityTypes = $xmlProcessor->get($val, 'ActivityTypes', TRUE);
         $aTypes = $aTypes + $activityTypes;
       }
@@ -649,6 +680,66 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $title = ts("%1 Saved", array(1 => $this->_activityTypeName));
       CRM_Core_Session::setStatus($followupStatus . $mailStatus, $title, 'success');
     }
+  }
+
+  /**
+   * Returns the groups that contacts must belong to in order to be assigned
+   * an activity for this case. It returns an empty array if no groups are found for
+   * the case type linked to the caseId.
+   *
+   * @return array
+   */
+  private function getActivityAssignmentGroups() {
+    if (!$this->_caseTypeDefinition) {
+      return [];
+    }
+
+    $assignmentGroups = [];
+    foreach ($this->_caseTypeDefinition as $caseId => $definition) {
+      if (!empty($definition['activityAsgmtGrps'])) {
+        $assignmentGroups = array_merge($assignmentGroups, $definition['activityAsgmtGrps']);
+      }
+    }
+
+    return $assignmentGroups;
+  }
+
+  /**
+   * Returns whether contacts must have a user account in order to be
+   * assigned an activity for this case.
+   *
+   * @return bool
+   */
+  private function restrictAssignmentByUserAccount() {
+    if (!$this->_caseTypeDefinition) {
+      return FALSE;
+    }
+
+    foreach ($this->_caseTypeDefinition as $caseId => $definition) {
+      if (!empty($definition['restrictActivityAsgmtToCmsUser'])) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * Returns the case type definition column value for the case type linked to the caseId.
+   *
+   * @return array
+   */
+  private function getCaseTypeDefinition() {
+    if (!$this->_caseId) {
+      return [];
+    }
+
+    $definitions = civicrm_api3('CaseType', 'get', [
+      'return' => ['name', 'definition'],
+      'name' => ['IN' => array_unique($this->_caseType)],
+    ]);
+
+    return array_column($definitions['values'], 'definition', 'name');
   }
 
 }

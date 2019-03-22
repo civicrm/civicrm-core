@@ -237,7 +237,7 @@
     };
   });
 
-  crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls) {
+  crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls, crmUiHelp) {
     var REL_TYPE_CNAME, defaultAssigneeDefaultValue, ts;
 
     (function init () {
@@ -245,6 +245,7 @@
       REL_TYPE_CNAME = CRM.crmCaseType.REL_TYPE_CNAME;
 
       ts = $scope.ts = CRM.ts(null);
+      $scope.hs = crmUiHelp({file: 'CRM/Case/CaseType'});
       $scope.locks = { caseTypeName: true, activitySetName: true };
       $scope.workflows = { timeline: 'Timeline', sequence: 'Sequence' };
       defaultAssigneeDefaultValue = _.find(apiCalls.defaultAssigneeTypes.values, { is_default: '1' }) || {};
@@ -312,6 +313,8 @@
       $scope.caseType.definition.caseRoles = $scope.caseType.definition.caseRoles || [];
       $scope.caseType.definition.statuses = $scope.caseType.definition.statuses || [];
       $scope.caseType.definition.timelineActivityTypes = $scope.caseType.definition.timelineActivityTypes || [];
+      $scope.caseType.definition.restrictActivityAsgmtToCmsUser = $scope.caseType.definition.restrictActivityAsgmtToCmsUser || 0;
+      $scope.caseType.definition.activityAsgmtGrps = $scope.caseType.definition.activityAsgmtGrps || [];
 
       _.each($scope.caseType.definition.activitySets, function (set) {
         _.each(set.activityTypes, function (type, name) {
@@ -525,6 +528,11 @@
       });
       // Ignore if ALL or NONE selected
       $scope.caseType.definition.statuses = selectedStatuses.length == _.size($scope.selectedStatuses) ? [] : selectedStatuses;
+
+      if ($scope.caseType.definition.activityAsgmtGrps) {
+        $scope.caseType.definition.activityAsgmtGrps = $scope.caseType.definition.activityAsgmtGrps.toString().split(",");
+      }
+
       var result = crmApi('CaseType', 'create', $scope.caseType, true);
       result.then(function(data) {
         if (data.is_error === 0 || data.is_error == '0') {
