@@ -33,6 +33,10 @@
 class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
 
   protected $_customGroupExtends = array(
+    'Contact',
+    'Individual',
+    'Household',
+    'Organization',
     'Grant',
   );
 
@@ -47,6 +51,24 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
       'no_field_disambiguation' => TRUE,
     ));
     $specificCols = array(
+      'civicrm_email' => array(
+        'dao' => 'CRM_Core_DAO_Email',
+        'fields' => array(
+          'email' => array(
+            'title' => ts('Email'),
+          ),
+        ),
+        'grouping' => 'contact-fields',
+      ),
+      'civicrm_phone' => array(
+        'dao' => 'CRM_Core_DAO_Phone',
+        'fields' => array(
+          'phone' => array(
+            'title' => ts('Phone'),
+          ),
+        ),
+        'grouping' => 'contact-fields',
+      ),
       'civicrm_grant' => array(
         'dao' => 'CRM_Grant_DAO_Grant',
         'fields' => array(
@@ -213,10 +235,14 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
   }
 
   public function from() {
-    $this->_from = "
-        FROM civicrm_grant {$this->_aliases['civicrm_grant']}
-                        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                    ON ({$this->_aliases['civicrm_grant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  ) ";
+    $this->setFromBase('civicrm_contact');
+    $this->_from .= <<<HERESQL
+    INNER JOIN civicrm_grant {$this->_aliases['civicrm_grant']}
+      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_grant']}.contact_id
+HERESQL;
+
+    $this->joinEmailFromContact();
+    $this->joinPhoneFromContact();
     $this->joinAddressFromContact();
   }
 
