@@ -1923,6 +1923,37 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test validating a contribution page submit in POST context.
+   *
+   * A likely use case for the validation is when the is being submitted and some handling is
+   * to be done before processing but the validity of input needs to be checked first.
+   *
+   * For example Paypal Checkout will replace the confirm button with it's own but we are able to validate
+   * before paypal launches it's modal. In this case the $_REQUEST is post but we need validation to succeed.
+   */
+  public function testValidatePost() {
+    $_SERVER['REQUEST_METHOD'] = 'POST';
+    $this->setUpContributionPage();
+    $errors = $this->callAPISuccess('ContributionPage', 'validate', array_merge($this->getBasicSubmitParams(), ['action' => 'submit']))['values'];
+    $this->assertEmpty($errors);
+    unset($_SERVER['REQUEST_METHOD']);
+  }
+
+  /**
+   * Test that an error is generated if required fields are not submitted.
+   */
+  public function testValidateOutputOnMissingRecurFields() {
+    $this->params['is_recur_interval'] = 1;
+    $this->setUpContributionPage(TRUE);
+    $submitParams = array_merge($this->getBasicSubmitParams(), ['action' => 'submit']);
+    $submitParams['is_recur'] = 1;
+    $submitParams['frequency_interval'] = '';
+    $submitParams['frequency_unit'] = '';
+    $errors = $this->callAPISuccess('ContributionPage', 'validate', $submitParams)['values'];
+    $this->assertEquals('Please enter a number for how often you want to make this recurring contribution (EXAMPLE: Every 3 months).', $errors['frequency_interval']);
+  }
+
+  /**
    * Implements hook_civicrm_alterPaymentProcessorParams().
    *
    * @throws \Exception
