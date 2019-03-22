@@ -47,6 +47,8 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
     $contactCols = $this->getColumns('Contact', array(
       'order_bys_defaults' => array('sort_name' => 'ASC '),
       'fields_defaults' => ['sort_name'],
+      'fields_excluded' => ['id'],
+      'fields_required' => ['id'],
       'filters_defaults' => array('is_deleted' => 0),
       'no_field_disambiguation' => TRUE,
     ));
@@ -243,7 +245,7 @@ HERESQL;
           $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View contact details for this record.");
+        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contact Summary for this Contact.");
         $entryFound = TRUE;
       }
 
@@ -256,18 +258,6 @@ HERESQL;
       if (array_key_exists('civicrm_grant_status_id', $row)) {
         if ($value = $row['civicrm_grant_status_id']) {
           $rows[$rowNum]['civicrm_grant_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Grant_DAO_Grant', 'status_id', $value);
-        }
-        $entryFound = TRUE;
-      }
-      if (array_key_exists('civicrm_grant_grant_report_received', $row)) {
-        if ($value = $row['civicrm_grant_grant_report_received']) {
-          if ($value == 1) {
-            $value = 'Yes';
-          }
-          else {
-            $value = 'No';
-          }
-          $rows[$rowNum]['civicrm_grant_grant_report_received'] = $value;
         }
         $entryFound = TRUE;
       }
