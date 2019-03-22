@@ -40,54 +40,13 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
-    $this->_columns = array(
-      'civicrm_contact' => array(
-        'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
-            'title' => ts('Contact Name'),
-            'required' => TRUE,
-            'no_repeat' => TRUE,
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-        ),
-        'grouping' => 'contact-fields',
-        'filters' => array(
-          'sort_name' => array(
-            'title' => ts('Contact Name'),
-            'operator' => 'like',
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ),
-          'id' => array(
-            'title' => ts('Contact ID'),
-            'no_display' => TRUE,
-          ),
-        ),
-      ),
-      'civicrm_address' => array(
-        'dao' => 'CRM_Core_DAO_Address',
-        'filters' => array(
-          'country_id' => array(
-            'title' => ts('Country'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::country(),
-          ),
-          'state_province_id' => array(
-            'title' => ts('State/Province'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::stateProvince(),
-          ),
-        ),
-      ),
+    $contactCols = $this->getColumns('Contact', array(
+      'order_bys_defaults' => array('sort_name' => 'ASC '),
+      'fields_defaults' => ['sort_name'],
+      'filters_defaults' => array('is_deleted' => 0),
+      'no_field_disambiguation' => TRUE,
+    ));
+    $specificCols = array(
       'civicrm_grant' => array(
         'dao' => 'CRM_Grant_DAO_Grant',
         'fields' => array(
@@ -112,6 +71,7 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
             'name' => 'application_received_date',
             'title' => ts('Application Received'),
             'default' => TRUE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
           'money_transfer_date' => array(
             'name' => 'money_transfer_date',
@@ -187,6 +147,23 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
           'status_id' => array(
             'title' => ts('Grant Status'),
           ),
+          'application_received_date' => array(
+            'title' => ts('Application Received Date'),
+          ),
+          'money_transfer_date' => array(
+            'title' => ts('Money Transfer Date'),
+          ),
+          'decision_date' => array(
+            'title' => ts('Grant Decision Date'),
+          ),
+        ),
+        'order_bys' => array(
+          'grant_type_id' => array(
+            'title' => ts('Grant Type'),
+          ),
+          'status_id' => array(
+            'title' => ts('Grant Status'),
+          ),
           'amount_total' => array(
             'title' => ts('Amount Requested'),
           ),
@@ -205,6 +182,8 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
         ),
       ),
     );
+
+    $this->_columns = array_merge($contactCols, $specificCols, $this->addAddressFields(FALSE));
 
     parent::__construct();
   }
