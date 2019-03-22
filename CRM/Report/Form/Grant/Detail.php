@@ -210,30 +210,6 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
     parent::__construct();
   }
 
-  public function select() {
-    // @todo remove this override - seems to do nothing parent doesn't.
-    $select = array();
-
-    $this->_columnHeaders = array();
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('fields', $table)) {
-        foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) ||
-            !empty($this->_params['fields'][$fieldName])
-          ) {
-
-            $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-          }
-        }
-      }
-    }
-
-    $this->_select = "SELECT " . implode(', ', $select) . " ";
-  }
-
   public function from() {
     $this->setFromBase('civicrm_contact');
     $this->_from .= <<<HERESQL
@@ -244,46 +220,6 @@ HERESQL;
     $this->joinEmailFromContact();
     $this->joinPhoneFromContact();
     $this->joinAddressFromContact();
-  }
-
-  public function where() {
-    // @todo this function appears to do nothing more than parent, test & remove
-    $clauses = array();
-    $this->_where = '';
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('filters', $table)) {
-        foreach ($table['filters'] as $fieldName => $field) {
-
-          $clause = NULL;
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
-
-            if ($relative || $from || $to) {
-              $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
-            }
-          }
-          else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-            if ($op) {
-              $clause = $this->whereClause($field,
-                $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-              );
-            }
-          }
-          if (!empty($clause)) {
-            $clauses[] = $clause;
-          }
-        }
-      }
-    }
-    if (!empty($clauses)) {
-      $this->_where = "WHERE " . implode(' AND ', $clauses);
-    }
   }
 
   /**
