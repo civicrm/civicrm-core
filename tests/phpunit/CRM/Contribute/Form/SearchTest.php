@@ -373,6 +373,34 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
   }
 
   /**
+   *  Test contact contributions.
+   */
+  public function testContributionSearchWithContactID() {
+    $contactID = $this->individualCreate([], 1);
+    $fv = ['contact_id' => $contactID];
+    $queryParams = CRM_Contact_BAO_Query::convertFormValues($fv);
+    $selector = new CRM_Contribute_Selector_Search($queryParams, CRM_Core_Action::ADD);
+    list($select, $from, $where) = $selector->getQuery()->query();
+
+    // get and assert contribution count
+    $contributions = CRM_Core_DAO::executeQuery("{$select} {$from} {$where}")->fetchAll();
+    $this->assertEquals(count($contributions), 0);
+
+    $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => "Donation",
+      'receive_date' => date('Y-m-d'),
+      'total_amount' => 10,
+      'contact_id' => $contactID,
+    ]);
+    $selector = new CRM_Contribute_Selector_Search($queryParams, CRM_Core_Action::ADD);
+    list($select, $from, $where) = $selector->getQuery()->query();
+
+    // get and assert contribution count
+    $contributions = CRM_Core_DAO::executeQuery("{$select} {$from} {$where}")->fetchAll();
+    $this->assertEquals(count($contributions), 1);
+  }
+
+  /**
    *  Test CRM_Contribute_Form_Search Recurring Contribution Status Id filters
    */
   public function testContributionRecurStatusFilter() {

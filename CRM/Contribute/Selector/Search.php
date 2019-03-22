@@ -181,6 +181,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     $this->_action = $action;
     $returnProperties = CRM_Contribute_BAO_Query::selectorReturnProperties($this->_queryParams);
     $this->_includeSoftCredits = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($this->_queryParams);
+    $this->_queryParams[] = ['contribution_id', '!=', 0, 0, 0];
     $this->_query = new CRM_Contact_BAO_Query(
       $this->_queryParams,
       $returnProperties,
