@@ -89,7 +89,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     }
     if (!CRM_Core_Permission::check('edit contributions')) {
       if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
-        CRM_Core_Error::fatal(ts('You do not have permission to cancel subscription.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to cancel subscription.'));
       }
       $this->_selfService = TRUE;
     }
