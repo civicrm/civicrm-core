@@ -134,8 +134,9 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
     while ($dao->fetch()) {
       $paymentProcessor[$dao->id] = array();
       CRM_Core_DAO::storeValues($dao, $paymentProcessor[$dao->id]);
-      $paymentProcessor[$dao->id]['payment_processor_type'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
-        $paymentProcessor[$dao->id]['payment_processor_type_id']);
+      $paymentProcessor[$dao->id]['payment_processor_type'] = CRM_Core_PseudoConstant::getLabel(
+        'CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', $dao->payment_processor_type_id
+      );
 
       // form all action links
       $action = array_sum(array_keys($this->links()));
