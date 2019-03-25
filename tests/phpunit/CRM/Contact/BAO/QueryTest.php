@@ -712,6 +712,31 @@ civicrm_relationship.is_active = 1 AND
     $selector->contactIDQuery([], $sortOrder);
   }
 
+  /**
+   * Test the sorting on the contact ID query works with a profile search.
+   *
+   * Checking for lack of fatal.
+   */
+  public function testContactIDQueryProfileSearchResults() {
+    $profile = $this->callAPISuccess('UFGroup', 'create', ['group_type' => 'Contact', 'name' => 'search', 'title' => 'search']);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $profile['id'],
+      'field_name' => 'postal_code',
+      'field_type' => 'Contact',
+      'in_selector' => TRUE,
+      'is_searchable' => TRUE,
+      'label' => 'postal code',
+      'visibility' => 'Public Pages and Listings',
+    ]);
+    $selector = new CRM_Contact_Selector(NULL, ['radio_ts' => 'ts_all', 'uf_group_id' => $profile['id']], NULL, ['sort_name' => 1]);
+    $selector->contactIDQuery([], '2_d');
+  }
+
+  /**
+   * Get search options to reflect how a UI search would look.
+   *
+   * @return array
+   */
   public function getSortOptions() {
     return [
       ['1_d'],

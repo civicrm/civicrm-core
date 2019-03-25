@@ -1014,9 +1014,9 @@ class CRM_Contact_BAO_Query {
 
     foreach ($this->_returnProperties['location'] as $name => $elements) {
       $lCond = self::getPrimaryCondition($name);
+      $locationTypeId = is_numeric($name) ? NULL : array_search($name, $locationTypes);
 
       if (!$lCond) {
-        $locationTypeId = array_search($name, $locationTypes);
         if ($locationTypeId === FALSE) {
           continue;
         }
@@ -1028,7 +1028,6 @@ class CRM_Contact_BAO_Query {
       }
 
       $name = str_replace(' ', '_', $name);
-
       $tName = "$name-location_type";
       $ltName = "`$name-location_type`";
       $this->_select["{$tName}_id"] = "`$tName`.id as `{$tName}_id`";
@@ -1039,7 +1038,6 @@ class CRM_Contact_BAO_Query {
       $locationTypeName = $tName;
       $locationTypeJoin = array();
 
-      $addAddress = FALSE;
       $addWhereCount = 0;
       foreach ($elements as $elementFullName => $dontCare) {
         $index++;
@@ -1054,20 +1052,14 @@ class CRM_Contact_BAO_Query {
             $addressCustomFieldIds[$cfID][$name] = 1;
           }
         }
-        //add address table only once
+        // add address table - doesn't matter if we do it mutliple times - it's the same data
+        // @todo ditch the double processing of addressJoin
         if ((in_array($elementCmpName, self::$_locationSpecificFields) || !empty($addressCustomFieldIds))
-          && !$addAddress
           && !in_array($elementCmpName, array('email', 'phone', 'im', 'openid'))
         ) {
-          $tName = "$name-address";
-          $aName = "`$name-address`";
-          $this->_select["{$tName}_id"] = "`$tName`.id as `{$tName}_id`";
-          $this->_element["{$tName}_id"] = 1;
-          $addressJoin = "\nLEFT JOIN civicrm_address $aName ON ($aName.contact_id = contact_a.id AND $aName.$lCond)";
-          $this->_tables[$tName] = $addressJoin;
+          list($aName, $addressJoin) = $this->addAddressTable($name, $lCond);
           $locationTypeJoin[$tName] = " ( $aName.location_type_id = $ltName.id ) ";
           $processed[$aName] = 1;
-          $addAddress = TRUE;
         }
 
         $cond = $elementType = '';
@@ -6332,6 +6324,14 @@ AND   displayRelType.is_active = 1
       $direction = isset($orderByClauseParts[1]) ? $orderByClauseParts[1] : 'asc';
       $fieldSpec = $this->getMetadataForRealField($field);
 
+      // This is a hacky add-in for primary address joins. Feel free to iterate as it is unit tested.
+      // @todo much more cleanup on location handling in addHierarchical elements. Potentially
+      // add keys to $this->fields to represent the actual keys for locations.
+      if (empty($fieldSpec) && substr($field, 0, 2) === '1-') {
+        $fieldSpec = $this->getMetadataForField(substr($field, 2));
+        $this->addAddressTable('1-' . str_replace('civicrm_', '', $fieldSpec['table_name']), 'is_primary = 1');
+      }
+
       if ($this->_returnProperties === []) {
         if (!empty($fieldSpec['table_name']) && !isset($this->_tables[$fieldSpec['table_name']])) {
           $this->_tables[$fieldSpec['table_name']] = 1;
@@ -6953,6 +6953,30 @@ AND   displayRelType.is_active = 1
           CRM_Utils_Date::customFormat($dates[1]),
         ]) . ')';
     }
+  }
+
+  /**
+   * Add the address table into the query.
+   *
+   * @param string $tableKey
+   * @param string $joinCondition
+   *
+   * @return array
+   *   - alias name
+   *   - address join.
+   */
+  protected function addAddressTable($tableKey, $joinCondition) {
+    $tName = "$tableKey-address";
+    $aName = "`$tableKey-address`";
+    $this->_select["{$tName}_id"] = "`$tName`.id as `{$tName}_id`";
+    $this->_element["{$tName}_id"] = 1;
+    $addressJoin = "\nLEFT JOIN civicrm_address $aName ON ($aName.contact_id = contact_a.id AND $aName.$joinCondition)";
+    $this->_tables[$tName] = $addressJoin;
+
+    return [
+      $aName,
+      $addressJoin
+    ];
   }
 
 }
