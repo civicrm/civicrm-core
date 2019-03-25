@@ -77,6 +77,12 @@ function civicrm_api3_generic_update($apiRequest) {
   }
 
   $existing = array_pop($existing['values']);
+  // Per Unit test testUpdateHouseholdWithAll we don't want to load these from the DB
+  // if they are not passed in then we'd rather they are calculated.
+  // Note update is not recomended anyway...
+  foreach (['sort_name', 'display_name'] as $fieldToNotSet) {
+    unset($existing[$fieldToNotSet]);
+  }
   $p = array_merge($existing, $apiRequest['params']);
   return civicrm_api($apiRequest['entity'], 'create', $p);
 }
