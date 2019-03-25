@@ -50,12 +50,10 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
     $getTaxDetails = FALSE;
     foreach ($tplLineItems as $key => $value) {
       foreach ($value as $k => $v) {
-        if (isset($v['tax_rate'])) {
-          if ($v['tax_rate'] != '') {
-            $getTaxDetails = TRUE;
-            // Cast to float to display without trailing zero decimals
-            $tplLineItems[$key][$k]['tax_rate'] = (float) $v['tax_rate'];
-          }
+        if (isset($v['tax_rate']) && $v['tax_rate'] != '') {
+          $getTaxDetails = TRUE;
+          // Cast to float to display without trailing zero decimals
+          $tplLineItems[$key][$k]['tax_rate'] = (float) $v['tax_rate'];
         }
       }
     }

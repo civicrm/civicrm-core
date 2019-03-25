@@ -508,18 +508,22 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $amount_block_is_active = $this->get('amount_block_is_active');
     $this->assign('amount_block_is_active', $amount_block_is_active);
 
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     // Make a copy of line items array to use for display only
     $tplLineItems = $this->_lineItem;
-    if ($invoicing) {
-      $getTaxDetails = FALSE;
-      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+    if (CRM_Invoicing_Utils::isInvoicingEnabled()) {
       list($getTaxDetails, $tplLineItems) = $this->alterLineItemsForTemplate($tplLineItems);
       $this->assign('getTaxDetails', $getTaxDetails);
-      $this->assign('taxTerm', $taxTerm);
+      $this->assign('taxTerm', CRM_Invoicing_Utils::getTaxTerm());
       $this->assign('totalTaxAmount', $params['tax_amount']);
     }
+    if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
+      $this->assign('lineItem', $tplLineItems);
+    }
+    else {
+      $this->assign('is_quick_config', 1);
+      $this->_params['is_quick_config'] = 1;
+    }
+
     if (!empty($params['selectProduct']) && $params['selectProduct'] != 'no_thanks') {
       $option = CRM_Utils_Array::value('options_' . $params['selectProduct'], $params);
       $productID = $params['selectProduct'];
@@ -574,13 +578,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $this->_separateMembershipPayment = $this->get('separateMembershipPayment');
     $this->assign('is_separate_payment', $this->_separateMembershipPayment);
-    if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
-      $this->assign('lineItem', $tplLineItems);
-    }
-    else {
-      $this->assign('is_quick_config', 1);
-      $this->_params['is_quick_config'] = 1;
-    }
+
     $this->assign('priceSetID', $this->_priceSetId);
 
     // The concept of contributeMode is deprecated.
