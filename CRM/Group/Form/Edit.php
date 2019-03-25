@@ -36,6 +36,8 @@
  */
 class CRM_Group_Form_Edit extends CRM_Core_Form {
 
+  use CRM_Core_Form_EntityFormTrait;
+
   /**
    * The group id, used when editing a group
    *
@@ -77,6 +79,35 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * @var int
    */
   protected $_groupOrganizationID;
+
+  /**
+   * Set entity fields to be assigned to the form.
+   */
+  protected function setEntityFields() {
+    $this->entityFields = [
+      'title' => [
+        'name' => 'title',
+        'required' => TRUE,
+      ],
+      'description' => ['name' => 'description'],
+    ];
+  }
+
+  /**
+   * Set the delete message.
+   *
+   * We do this from the constructor in order to do a translation.
+   */
+  public function setDeleteMessage() {
+    $this->deleteMessage = '';
+  }
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Group';
+  }
 
   /**
    * Set up variables to build the form.
@@ -213,18 +244,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    if ($this->_action == CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Delete Group'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      ));
+    self::buildQuickEntityForm();
+    if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
 
@@ -232,15 +253,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     if ($this->_action == CRM_Core_Action::ADD) {
       $this->preventAjaxSubmit();
     }
-
-    $this->applyFilter('__ALL__', 'trim');
-    $this->add('text', 'title', ts('Name') . ' ',
-      CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'title'), TRUE
-    );
-
-    $this->add('textarea', 'description', ts('Description') . ' ',
-      CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'description')
-    );
 
     $groupTypes = CRM_Core_OptionGroup::values('group_type', TRUE);
 
@@ -271,18 +283,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
 
     //build custom data
     CRM_Custom_Form_CustomData::buildQuickForm($this);
-
-    $this->addButtons(array(
-      array(
-        'type' => 'upload',
-        'name' => ($this->_action == CRM_Core_Action::ADD) ? ts('Continue') : ts('Save'),
-        'isDefault' => TRUE,
-      ),
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ),
-    ));
 
     $doParentCheck = FALSE;
     if (CRM_Core_Permission::isMultisiteEnabled()) {
