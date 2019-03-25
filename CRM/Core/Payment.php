@@ -522,9 +522,23 @@ abstract class CRM_Core_Payment {
             $gotText .= ' ' . ts('You will receive an email receipt for each recurring contribution.');
           }
         }
-        break;
+        return $gotText;
+
+      case 'contributionPageContinueText':
+        if ($params['amount'] <= 0) {
+          return ts('To complete this transaction, click the <strong>Continue</strong> button below.');
+        }
+        if ($this->_paymentProcessor['billing_mode'] == 4) {
+          return ts('Click the <strong>Continue</strong> button to go to %1, where you will select your payment method and complete the contribution.', [$this->_paymentProcessor['payment_processor_type']]);
+        }
+        if ($params['is_payment_to_existing']) {
+          return ts('To complete this transaction, click the <strong>Make Payment</strong> button below.');
+        }
+        return ts('To complete your contribution, click the <strong>Continue</strong> button below.');
+
     }
-    return $gotText;
+    CRM_Core_Error::deprecatedFunctionWarning('Calls to getText must use a supported method');
+    return '';
   }
 
   /**

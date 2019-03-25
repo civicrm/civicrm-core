@@ -31,16 +31,8 @@
 
 <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-confirm-form-block">
   <div class="help">
-    <p>{ts}Please verify the information below carefully. Click<strong>Go Back</strong>if you need to make changes.{/ts}
-      {if $contributeMode EQ 'notify' and ! $is_pay_later}
-        {ts 1=$paymentProcessor.name 2=$button}Click the
-          <strong>%2</strong>
-          button to go to %1, where you will select your payment method and complete the contribution.{/ts}
-      {elseif ! $is_monetary or $amount LE 0.0 or $is_pay_later}
-        {ts 1=$button}To complete this transaction, click the<strong>%1</strong>button below.{/ts}
-      {else}
-        {ts 1=$button}To complete your contribution, click the<strong>%1</strong>button below.{/ts}
-      {/if}
+    <p>{ts}Please verify the information below carefully. Click <strong>Go Back</strong> if you need to make changes.{/ts}
+      {$continueText}
     </p>
   </div>
   <div id="crm-submit-buttons" class="crm-submit-buttons">

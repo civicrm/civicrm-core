@@ -596,6 +596,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $contribButton = ts('Make Contribution');
     }
     $this->assign('button', $contribButton);
+
+    $this->assign('continueText',
+      $this->getPaymentProcessorObject()->getText('contributionPageContinueText', [
+        'is_payment_to_existing' => !empty($this->_ccid),
+        'amount' => $this->_amount,
+        ]
+      )
+    );
+
     $this->addButtons(array(
         array(
           'type' => 'next',

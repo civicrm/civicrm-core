@@ -1390,4 +1390,17 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
   }
 
+
+  /**
+   * Get the payment processor object for the submission, returning the manual one for offline payments.
+   *
+   * @return CRM_Core_Payment
+   */
+  protected function getPaymentProcessorObject() {
+    if (!empty($this->_paymentProcessor)) {
+      return $this->_paymentProcessor['object'];
+    }
+    return new CRM_Core_Payment_Manual();
+  }
+
 }
