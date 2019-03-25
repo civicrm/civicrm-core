@@ -454,6 +454,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $instance->login($params);
     }
 
+    // Save details in Joomla session
+    $user = JFactory::getUser($uid);
+    $jsession = JFactory::getSession();
+    $jsession->set('user', $user);
+
+    // Save details in Civi session
     $session = CRM_Core_Session::singleton();
     $session->set('ufID', $uid);
     $session->set('userID', $contactID);
