@@ -6339,53 +6339,46 @@ AND   displayRelType.is_active = 1
         }
 
       }
-      switch ($field) {
+      $cfID = CRM_Core_BAO_CustomField::getKeyID($field);
+      // add to cfIDs array if not present
+      if (!empty($cfID) && !array_key_exists($cfID, $this->_cfIDs)) {
+        $this->_cfIDs[$cfID] = array();
+        $this->_customQuery = new CRM_Core_BAO_CustomQuery($this->_cfIDs, TRUE, $this->_locationSpecificCustomFields);
+        $this->_customQuery->query();
+        $this->_select = array_merge($this->_select, $this->_customQuery->_select);
+        $this->_tables = array_merge($this->_tables, $this->_customQuery->_tables);
+      }
 
-        case 'placeholder-will-remove-next-pr-but-jenkins-will-not-accept-without-and-removing-switch-will-make-hard-to-read':
-          break;
-
-        default:
-          $cfID = CRM_Core_BAO_CustomField::getKeyID($field);
-          // add to cfIDs array if not present
-          if (!empty($cfID) && !array_key_exists($cfID, $this->_cfIDs)) {
-            $this->_cfIDs[$cfID] = array();
-            $this->_customQuery = new CRM_Core_BAO_CustomQuery($this->_cfIDs, TRUE, $this->_locationSpecificCustomFields);
-            $this->_customQuery->query();
-            $this->_select = array_merge($this->_select, $this->_customQuery->_select);
-            $this->_tables = array_merge($this->_tables, $this->_customQuery->_tables);
-          }
-
-          // By replacing the join to the option value table with the mysql construct
-          // ORDER BY field('contribution_status_id', 2,1,4)
-          // we can remove a join. In the case of the option value join it is
-          /// a join known to cause slow queries.
-          // @todo cover other pseudoconstant types. Limited to option group ones  & Foreign keys
-          // matching an id+name parrern in the
-          // first instance for scope reasons. They require slightly different handling as the column (label)
-          // is not declared for them.
-          // @todo so far only integer fields are being handled. If we add string fields we need to look at
-          // escaping.
-          $pseudoConstantMetadata = CRM_Utils_Array::value('pseudoconstant', $fieldSpec, FALSE);
-          if (!empty($pseudoConstantMetadata)
-          ) {
-            if (!empty($pseudoConstantMetadata['optionGroupName'])
-              || $this->isPseudoFieldAnFK($fieldSpec)
-            ) {
-              $sortedOptions = $fieldSpec['bao']::buildOptions($fieldSpec['name'], NULL, [
-                'orderColumn' => CRM_Utils_Array::value('labelColumn', $pseudoConstantMetadata, 'label'),
-              ]);
-              $fieldIDsInOrder = implode(',', array_keys($sortedOptions));
-              // Pretty sure this validation ALSO happens in the order clause & this can't be reached but...
-              // this might give some early warning.
-              CRM_Utils_Type::validate($fieldIDsInOrder, 'CommaSeparatedIntegers');
-              $order = str_replace("$field", "field({$fieldSpec['name']},$fieldIDsInOrder)", $order);
-            }
-            //CRM-12565 add "`" around $field if it is a pseudo constant
-            // This appears to be for 'special' fields like locations with appended numbers or hyphens .. maybe.
-            if (!empty($pseudoConstantMetadata['element']) && $pseudoConstantMetadata['element'] == $field) {
-              $order = str_replace($field, "`{$field}`", $order);
-            }
-          }
+      // By replacing the join to the option value table with the mysql construct
+      // ORDER BY field('contribution_status_id', 2,1,4)
+      // we can remove a join. In the case of the option value join it is
+      /// a join known to cause slow queries.
+      // @todo cover other pseudoconstant types. Limited to option group ones  & Foreign keys
+      // matching an id+name parrern in the
+      // first instance for scope reasons. They require slightly different handling as the column (label)
+      // is not declared for them.
+      // @todo so far only integer fields are being handled. If we add string fields we need to look at
+      // escaping.
+      $pseudoConstantMetadata = CRM_Utils_Array::value('pseudoconstant', $fieldSpec, FALSE);
+      if (!empty($pseudoConstantMetadata)
+      ) {
+        if (!empty($pseudoConstantMetadata['optionGroupName'])
+          || $this->isPseudoFieldAnFK($fieldSpec)
+        ) {
+          $sortedOptions = $fieldSpec['bao']::buildOptions($fieldSpec['name'], NULL, [
+            'orderColumn' => CRM_Utils_Array::value('labelColumn', $pseudoConstantMetadata, 'label'),
+          ]);
+          $fieldIDsInOrder = implode(',', array_keys($sortedOptions));
+          // Pretty sure this validation ALSO happens in the order clause & this can't be reached but...
+          // this might give some early warning.
+          CRM_Utils_Type::validate($fieldIDsInOrder, 'CommaSeparatedIntegers');
+          $order = str_replace("$field", "field({$fieldSpec['name']},$fieldIDsInOrder)", $order);
+        }
+        //CRM-12565 add "`" around $field if it is a pseudo constant
+        // This appears to be for 'special' fields like locations with appended numbers or hyphens .. maybe.
+        if (!empty($pseudoConstantMetadata['element']) && $pseudoConstantMetadata['element'] == $field) {
+          $order = str_replace($field, "`{$field}`", $order);
+        }
       }
     }
 
