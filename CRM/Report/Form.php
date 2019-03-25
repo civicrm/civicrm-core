@@ -2114,12 +2114,10 @@ class CRM_Report_Form extends CRM_Core_Form {
     list($from, $to) = $this->getFromTo($relative, $from, $to, $fromTime, $toTime);
 
     if ($from) {
-      $from = ($type == CRM_Utils_Type::T_DATE) ? substr($from, 0, 8) : $from;
       $clauses[] = "( {$fieldName} >= $from )";
     }
 
     if ($to) {
-      $to = ($type == CRM_Utils_Type::T_DATE) ? substr($to, 0, 8) : $to;
       $clauses[] = "( {$fieldName} <= {$to} )";
     }
 
