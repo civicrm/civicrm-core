@@ -432,7 +432,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
   // Validate 'context' from params
   $context = CRM_Utils_Array::value('context', $apiRequest['params']);
   CRM_Core_DAO::buildOptionsContext($context);
-  unset($apiRequest['params']['context'], $apiRequest['params']['field']);
+  unset($apiRequest['params']['context'], $apiRequest['params']['field'], $apiRequest['params']['condition']);
 
   $baoName = _civicrm_api3_get_BAO($apiRequest['entity']);
   $options = $baoName::buildOptions($fieldName, $context, $apiRequest['params']);
