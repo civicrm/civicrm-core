@@ -332,7 +332,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
   SELECT *
     FROM civicrm_event
    WHERE $whereClause
-ORDER BY start_date desc
+ORDER BY start_date asc
    LIMIT $offset, $rowCount";
 
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Event_DAO_Event');
