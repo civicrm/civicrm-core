@@ -81,6 +81,13 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $contactDetails = CRM_Contact_BAO_Contact_Utils::contactDetails($this->_participantIds,
       'CiviEvent', $returnProperties
     );
+
+    // Sort participants by sort_name
+    uasort($contactDetails, function ($a, $b) {
+      return strcasecmp($a['sort_name'], $b['sort_name']);
+    });
+    $this->_participantIds = array_keys($contactDetails);
+
     $this->assign('contactDetails', $contactDetails);
     $this->assign('readOnlyFields', $readOnlyFields);
   }
