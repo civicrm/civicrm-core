@@ -274,6 +274,7 @@ class CRM_Financial_Page_AJAX {
     $search = isset($_REQUEST['search']) ? TRUE : FALSE;
 
     $params = $_POST;
+    self::formatBatchTransactionParams($params);
     if ($sort && $sortOrder) {
       $params['sortBy'] = $sort . ' ' . $sortOrder;
     }
@@ -348,7 +349,7 @@ class CRM_Financial_Page_AJAX {
 
     $financialitems = [];
     if ($statusID) {
-      $batchStatus = CRM_Core_PseudoConstant::getLabel(
+      $batchStatus = CRM_Core_PseudoConstant::getName(
         'CRM_Batch_DAO_Batch',
         'status_id',
         $statusID
@@ -464,6 +465,25 @@ class CRM_Financial_Page_AJAX {
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($financialitems, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * This function removes unwanted params specially date fields
+   * created by datepicker or select2 autogen fields.
+   *
+   * @param $params array
+   *
+   */
+  public static function formatBatchTransactionParams(&$params) {
+    foreach ($params as $key => $ignore) {
+      if (preg_match('/date_high_display_/', $key)
+        || preg_match('/s2id_autogen/', $key)
+        || preg_match('/^CIVICRM_QFID_/s', $key)
+        || preg_match('/date_low_display_/', $key)
+      ) {
+        unset($params[$key]);
+      }
+    }
   }
 
   public static function bulkAssignRemove() {

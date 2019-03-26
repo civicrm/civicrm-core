@@ -234,16 +234,14 @@ function buildTransactionSelectorAssign(filterSearch) {
   "fnServerData": function ( sSource, aoData, fnCallback ) {
     if ( filterSearch ) {
       CRM.$('#searchForm :input').each(function() {
-        if (CRM.$(this).val()) {
-          aoData.push(
-            {name:CRM.$(this).attr('id'), value: CRM.$(this).val()}
-          );
-          CRM.$(':radio, :checkbox').each(function() {
-            if (CRM.$(this).is(':checked')) {
-              aoData.push( { name: CRM.$(this).attr('name'), value: CRM.$(this).val() } );
-            }
-          });
-        }
+        aoData.push(
+          {name:CRM.$(this).attr('id'), value: CRM.$(this).val()}
+        );
+        CRM.$(':radio, :checkbox').each(function() {
+          if (CRM.$(this).is(':checked')) {
+            aoData.push( { name: CRM.$(this).attr('name'), value: CRM.$(this).val() } );
+          }
+        });
       });
     }
     CRM.$.ajax({
@@ -258,7 +256,7 @@ function buildTransactionSelectorAssign(filterSearch) {
     });
   }
 });
-	
+
 }
 
 function buildTransactionSelectorRemove( ) {
