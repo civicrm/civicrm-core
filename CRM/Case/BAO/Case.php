@@ -1297,13 +1297,20 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
         $caseRoles = CRM_Utils_Array::rekey($caseInfo['case_type_id.definition']['caseRoles'], 'name');
       }
     }
+    // Hack to use list of case roles in an `IN`
+    $relTypeLabels = [];
+    foreach ($caseRoles as $caseRole) {
+     $relTypeLabels[] = CRM_Utils_Type::validate($caseRole['name'], 'String');
+    }
+    $relTypeLabelList = '"' . implode('", "', $relTypeLabels) . '"';
+
     $values = array();
-    $query = '
+    $query = <<<HERESQL
     SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_b_a as role, crt.name_b_a as role_name, ce.email, cp.phone
     FROM civicrm_relationship cr
     JOIN civicrm_relationship_type crt
      ON crt.id = cr.relationship_type_id
-     AND crt.label_b_a IN (%2)
+     AND crt.label_b_a IN ($relTypeLabelList)
     JOIN civicrm_contact cc
      ON cc.id = cr.contact_id_a
      AND cc.is_deleted <> 1
@@ -1315,12 +1322,13 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
      AND cp.is_primary= 1
     WHERE cr.case_id =  %1
      AND cr.is_active
-     AND cc.id NOT IN (%3)
+     AND cc.id NOT IN (%2)
     UNION
     SELECT cc.display_name as name, cc.sort_name as sort_name, cc.id, cr.relationship_type_id, crt.label_a_b as role, crt.name_a_b as role_name, ce.email, cp.phone
     FROM civicrm_relationship cr
     JOIN civicrm_relationship_type crt
      ON crt.id = cr.relationship_type_id
+     AND crt.label_a_b IN ($relTypeLabelList)
     JOIN civicrm_contact cc
      ON cc.id = cr.contact_id_b
      AND cc.is_deleted <> 1
@@ -1332,13 +1340,11 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
      AND cp.is_primary= 1
     WHERE cr.case_id =  %1
      AND cr.is_active
-     AND crt.label_b_a IN (%2)
-     AND cc.id NOT IN (%3)
-    ';
+     AND cc.id NOT IN (%2)
+HERESQL;
     $params = array(
       1 => array($caseID, 'Integer'),
-      2 => array(implode(',', CRM_Utils_Array::collect('name', $caseRoles)), 'String'),
-      3 => array(implode(',', $caseInfo['client_id']), 'String')
+      2 => array(implode(',', $caseInfo['client_id']), 'String')
     );
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
