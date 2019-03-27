@@ -87,7 +87,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
       $contacts = civicrm_api3('Contact', 'get', [
         'id' => ['IN' => [$this->_cid, $this->_oid]],
-        'return' => ['contact_type', 'modified_date', 'created_date'],
+        'return' => ['contact_type', 'modified_date', 'created_date', 'contact_sub_type'],
       ])['values'];
 
       $this->_contactType = $contacts[$this->_cid]['contact_type'];
@@ -183,6 +183,22 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
       $this->assign('mainLocBlock', json_encode($rowsElementsAndInfo['main_details']['location_blocks']));
       $this->assign('locationBlockInfo', json_encode(CRM_Dedupe_Merger::getLocationBlockInfo()));
+      $this->assign('mainContactTypeIcon', CRM_Contact_BAO_Contact_Utils::getImage($contacts[$this->_cid]['contact_sub_type'] ? $contacts[$this->_cid]['contact_sub_type'] : $contacts[$this->_cid]['contact_type'],
+        FALSE,
+        $this->_cid
+      ));
+      $this->assign('otherContactTypeIcon', CRM_Contact_BAO_Contact_Utils::getImage($contacts[$this->_oid]['contact_sub_type'] ? $contacts[$this->_oid]['contact_sub_type'] : $contacts[$this->_oid]['contact_type'],
+        FALSE,
+        $this->_oid
+      ));
+
+      if (isset($rowsElementsAndInfo['rows']['move_contact_type'])) {
+        // We don't permit merging contacts of different types so this is just clutter - putting
+        // the icon next to the contact name is consistent with elsewhere and permits hover-info
+        // https://lab.civicrm.org/dev/core/issues/824
+        unset($rowsElementsAndInfo['rows']['move_contact_type']);
+      }
+
       $this->assign('rows', $rowsElementsAndInfo['rows']);
 
       // add elements
