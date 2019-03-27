@@ -160,7 +160,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'total_amount' => array(
             'title' => ts('Amount'),
             'required' => TRUE,
-            'statistics' => array('sum' => ts('Amount')),
           ),
           'non_deductible_amount' => array(
             'title' => ts('Non-deductible Amount'),
@@ -697,7 +696,7 @@ UNION ALL
       }
 
       // Contribution amount links to viewing contribution
-      if (($value = CRM_Utils_Array::value('civicrm_contribution_total_amount_sum', $row)) &&
+      if (($value = CRM_Utils_Array::value('civicrm_contribution_total_amount', $row)) &&
         CRM_Core_Permission::check('access CiviContribute')
       ) {
         $url = CRM_Utils_System::url("civicrm/contact/view/contribution",
@@ -706,8 +705,8 @@ UNION ALL
           "&action=view&context=contribution&selectedChild=contribute",
           $this->_absoluteUrl
         );
-        $rows[$rowNum]['civicrm_contribution_total_amount_sum_link'] = $url;
-        $rows[$rowNum]['civicrm_contribution_total_amount_sum_hover'] = ts("View Details of this Contribution.");
+        $rows[$rowNum]['civicrm_contribution_total_amount_link'] = $url;
+        $rows[$rowNum]['civicrm_contribution_total_amount_hover'] = ts("View Details of this Contribution.");
         $entryFound = TRUE;
       }
 
@@ -726,7 +725,7 @@ UNION ALL
         array_key_exists('civicrm_contribution_contribution_id', $row)
       ) {
         $query = "
-SELECT civicrm_contact_id, civicrm_contact_sort_name, civicrm_contribution_total_amount_sum, civicrm_contribution_currency
+SELECT civicrm_contact_id, civicrm_contact_sort_name, civicrm_contribution_total_amount, civicrm_contribution_currency
 FROM   {$this->temporaryTables['civireport_contribution_detail_temp2']['name']}
 WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribution_id']}";
         $dao = CRM_Core_DAO::executeQuery($query);
@@ -737,7 +736,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
             $dao->civicrm_contact_id);
           $string = $string . ($string ? $separator : '') .
             "<a href='{$url}'>{$dao->civicrm_contact_sort_name}</a> " .
-            CRM_Utils_Money::format($dao->civicrm_contribution_total_amount_sum, $dao->civicrm_contribution_currency);
+            CRM_Utils_Money::format($dao->civicrm_contribution_total_amount, $dao->civicrm_contribution_currency);
         }
         $rows[$rowNum]['civicrm_contribution_soft_credits'] = $string;
       }
@@ -803,12 +802,6 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       // pull section aliases out of $this->_sections
       $sectionAliases = array_keys($this->_sections);
 
-      // hack alert - but it's tested so go forth & make pretty, or whack the new mole that popped up with gay abandon.
-      if (in_array('civicrm_contribution_total_amount', $this->_selectAliases)) {
-        $keyToHack = array_search('civicrm_contribution_total_amount', $this->_selectAliases);
-        $this->_selectAliases[$keyToHack] = 'civicrm_contribution_total_amount_sum';
-      }
-
       $ifnulls = array();
       foreach (array_merge($sectionAliases, $this->_selectAliases) as $alias) {
         $ifnulls[] = "ifnull($alias, '') as $alias";
@@ -823,10 +816,10 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
 
       $addtotals = '';
 
-      if (array_search("civicrm_contribution_total_amount_sum", $this->_selectAliases) !==
+      if (array_search("civicrm_contribution_total_amount", $this->_selectAliases) !==
         FALSE
       ) {
-        $addtotals = ", sum(civicrm_contribution_total_amount_sum) as sumcontribs";
+        $addtotals = ", sum(civicrm_contribution_total_amount) as sumcontribs";
         $showsumcontribs = TRUE;
       }
 
