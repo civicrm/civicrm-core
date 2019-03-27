@@ -1690,6 +1690,18 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test exported with data entry mis-fire.
+   *
+   * Not fatal error if data incomplete.
+   *
+   * https://lab.civicrm.org/dev/core/issues/819
+   */
+  public function testExportIncompleteSubmission() {
+    $this->setUpContactExportData();
+    $this->doExport([['Individual', '']], $this->contactIDs[1]);
+  }
+
+  /**
    * Test exported with fields to output specified.
    *
    * @dataProvider getAllSpecifiableReturnFields
