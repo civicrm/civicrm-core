@@ -37,7 +37,10 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
    */
   public function listContribution() {
     $rows = civicrm_api3('Contribution', 'get', [
-      'options' => ['limit' => 12],
+      'options' => [
+        'limit' => 12,
+        'sort' => 'receive_date DESC',
+      ],
       'sequential' => 1,
       'contact_id' => $this->_contactId,
       'return' => [
@@ -53,6 +56,9 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
         'contribution_source',
       ],
     ])['values'];
+
+    // We want oldest first, just among the most recent contributions
+    $rows = array_reverse($rows);
 
     foreach ($rows as $index => $row) {
       // This is required for tpl logic. We should move away from hard-code this to adding an array of actions to the row

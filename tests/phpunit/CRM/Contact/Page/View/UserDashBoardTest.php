@@ -97,8 +97,8 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     ]);
     $this->contributions[] = $this->contributionCreate([
       'contact_id' => $this->contactID,
-      'receive_date' => '2018-11-21',
-      'receipt_date' => '2018-11-22',
+      'receive_date' => '2018-11-22',
+      'receipt_date' => '2018-11-23',
       'trxn_id' => '',
       'invoice_id' => '',
     ]);
@@ -109,7 +109,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     ]);
     $this->contributions[] = $this->contributionCreate([
       'contact_id' => $this->contactID,
-      'receive_date' => '2018-11-21',
+      'receive_date' => '2018-11-20',
       'amount_level' => 'high',
       'contribution_status_id' => 'Cancelled',
       'invoice_id' => NULL,
@@ -125,7 +125,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     ];
 
     $this->assertPageContains($expectedStrings);
-    $this->assertSmartyVariableArrayIncludes('contribute_rows', 0, [
+    $this->assertSmartyVariableArrayIncludes('contribute_rows', 1, [
       'contact_id' => $this->contactID,
       'contribution_id' => '1',
       'total_amount' => '100.00',
