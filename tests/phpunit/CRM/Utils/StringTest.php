@@ -356,7 +356,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   public function purifyHTMLProvider() {
     $tests = [];
     $tests[] = ['<span onmouseover=alert(0)>HOVER</span>', '<span>HOVER</span>'];
-    $tests[] = ['<a href="https://civicrm.org" target="_blank" class="button-purple">hello</a>', '<a href="https://civicrm.org" target="_blank" class="button-purple">hello</a>'];
+    $tests[] = ['<a href="https://civicrm.org" target="_blank" class="button-purple">hello</a>', '<a href="https://civicrm.org" target="_blank" class="button-purple" rel="noreferrer noopener">hello</a>'];
     return $tests;
   }
 
