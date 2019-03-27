@@ -411,7 +411,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         FALSE,
         FALSE,
         FALSE,
-        'label',
+        $context == 'validate' ? 'value' : 'label',
         !($context == 'validate' || $context == 'get')
       );
     }

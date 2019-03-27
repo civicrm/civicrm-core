@@ -1058,6 +1058,18 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         // Ensure count of optionValues is not extraordinarily high.
         $max = CRM_Utils_Array::value('max', $field, 20);
         $this->assertLessThanOrEqual($max, count($optionValues), $message);
+
+        // Test validate and match contexts
+        $validateContext = $daoName::buildOptions($field['fieldName'], 'validate');
+        $this->assertNotEmpty($validateContext, $message);
+        $matchContext = $daoName::buildOptions($field['fieldName'], 'match');
+        $this->assertNotEmpty($matchContext, $message);
+        // Check that "match" options key == "validate" options value
+        foreach ($matchContext as $name => $label) {
+          $id = array_search($name, $validateContext);
+          $this->assertNotFalse($id, $message);
+          $this->assertEquals($label, $optionValues[$id], $message);
+        }
       }
     }
   }
