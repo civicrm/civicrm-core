@@ -43,25 +43,40 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
    * CRM_Invoicing_Utils class with a potential end goal of moving this handling to an extension.
    *
    * @param $tplLineItems
-   *
-   * @return array
    */
-  protected function alterLineItemsForTemplate($tplLineItems) {
-    $getTaxDetails = FALSE;
+  protected function alterLineItemsForTemplate(&$tplLineItems) {
+    if (!CRM_Invoicing_Utils::isInvoicingEnabled()) {
+      return;
+    }
+    // @todo this should really be the first time we are determining
+    // the tax rates - we can calculate them from the financial_type_id
+    // & amount here so we didn't need a deeper function to semi-get
+    // them but not be able to 'format them right' because they are
+    // potentially being used for 'something else'.
+    // @todo invoicing code - please feel the hate. Also move this 'hook-like-bit'
+    // to the CRM_Invoicing_Utils class.
     foreach ($tplLineItems as $key => $value) {
       foreach ($value as $k => $v) {
         if (isset($v['tax_rate']) && $v['tax_rate'] != '') {
-          $getTaxDetails = TRUE;
+          // These only need assigning once, but code is more readable with them here
+          $this->assign('getTaxDetails', TRUE);
+          $this->assign('taxTerm', CRM_Invoicing_Utils::getTaxTerm());
           // Cast to float to display without trailing zero decimals
           $tplLineItems[$key][$k]['tax_rate'] = (float) $v['tax_rate'];
         }
       }
     }
-    // @todo fix this to only return $tplLineItems. Calling function can check for tax rate and
-    // do all invoicing related assigns
-    // another discrete function (it's just one more iteration through a an array with only a handful of
-    // lines so the separation of concerns is more important than 'efficiency'
-    return [$getTaxDetails, $tplLineItems];
+  }
+
+  /**
+   * Assign line items to the template.
+   *
+   * @param $tplLineItems
+   */
+  protected function assignLineItemsToTemplate($tplLineItems) {
+    // @todo this should be a hook that invoicing code hooks into rather than a call to it.
+    $this->alterLineItemsForTemplate($tplLineItems);
+    $this->assign('lineItem', $tplLineItems);
   }
 
 }
