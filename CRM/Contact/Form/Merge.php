@@ -85,10 +85,12 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
       $this->bounceIfInvalid($this->_cid, $this->_oid);
 
-      $this->_contactType = civicrm_api3('Contact', 'getvalue', array(
-        'id' => $this->_cid,
-        'return' => 'contact_type',
-      ));
+      $contacts = civicrm_api3('Contact', 'get', [
+        'id' => ['IN' => [$this->_cid, $this->_oid]],
+        'return' => ['contact_type', 'modified_date', 'created_date'],
+      ])['values'];
+
+      $this->_contactType = $contacts[$this->_cid]['contact_type'];
 
       $browseUrl = CRM_Utils_System::url('civicrm/contact/dedupefind', array_merge($urlParams, ['action' => 'browse']));
 
@@ -175,6 +177,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $this->assign('main_cid', $main['contact_id']);
       $this->assign('other_cid', $other['contact_id']);
       $this->assign('rgid', $this->_rgid);
+      $this->assignSummaryRowsToTemplate($contacts);
 
       $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows'));
 
@@ -363,6 +366,36 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       );
       CRM_Core_Error::statusBounce($message);
     }
+  }
+
+  /**
+   * Assign the summary_rows variable to the tpl.
+   *
+   * This adds rows to the beginning of the block that will help in making merge choices.
+   *
+   * It can be modified by a hook by altering what is assigned. Although not technically supported this
+   * is an easy tweak with no earth-shattering impacts if later changes stop if from working.
+   *
+   * https://lab.civicrm.org/dev/core/issues/824
+   *
+   * @param array $contacts
+   */
+  protected function assignSummaryRowsToTemplate($contacts) {
+    $mostRecent = ($contacts[$this->_cid]['modified_date'] < $contacts[$this->_oid]['modified_date']) ? $this->_oid : $this->_cid;
+    $this->assign('summary_rows', [
+      [
+        'name' => 'created_date',
+        'label' => ts('Created'),
+        'main_contact_value' => CRM_Utils_Date::customFormat($contacts[$this->_cid]['created_date']),
+        'other_contact_value' => CRM_Utils_Date::customFormat($contacts[$this->_oid]['created_date']),
+      ],
+      [
+        'name' => 'modified_date',
+        'label' => ts('Last Modified'),
+        'main_contact_value' => CRM_Utils_Date::customFormat($contacts[$this->_cid]['modified_date']) . ($mostRecent == $this->_cid ? ' (' . ts('Most Recent') . ')' : ''),
+        'other_contact_value' => CRM_Utils_Date::customFormat($contacts[$this->_oid]['modified_date']) . ($mostRecent == $this->_oid ? ' (' . ts('Most Recent') . ')' : ''),
+      ],
+    ]);
   }
 
 }

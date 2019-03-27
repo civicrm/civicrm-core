@@ -78,17 +78,16 @@
       <th width="300">Add/overwrite?</th>
     </tr>
 
-    {crmAPI var='other_result' entity='Contact' action='get' return="modified_date" id=$other_cid}
 
-    {crmAPI var='main_result' entity='Contact' action='get' return="modified_date" id=$main_cid}
-
-    <tr>
-      <td>Last modified</td>
-      <td>{$other_result.values.0.modified_date|crmDate} {if $other_result.values.0.modified_date gt $main_result.values.0.modified_date} (Most recent) {/if}</td>
-      <td></td>
-      <td>{$main_result.values.0.modified_date|crmDate} {if $main_result.values.0.modified_date gt $other_result.values.0.modified_date} (Most recent) {/if}</td>
-      <td></td>
-    </tr>
+    {foreach from=$summary_rows item=summaryRow}
+      <tr>
+        <td>{$summaryRow.label}</td>
+        <td>{$summaryRow.other_contact_value}</td>
+        <td></td>
+        <td>{$summaryRow.main_contact_value}</td>
+        <td></td>
+      </tr>
+    {/foreach}
 
     {foreach from=$rows item=row key=field}
 
