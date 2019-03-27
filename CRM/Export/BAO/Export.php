@@ -633,8 +633,8 @@ FROM   $tableName
       }
       $sqlClause[] = '(' . implode(',', $valueString) . ')';
     }
-
-    $sqlColumnString = '(id, ' . implode(',', array_keys($sqlColumns)) . ')';
+    $sqlColumns = array_merge(['id' => 1], $sqlColumns);
+    $sqlColumnString = '(' . implode(',', array_keys($sqlColumns)) . ')';
 
     $sqlValueString = implode(",\n", $sqlClause);
 
@@ -657,14 +657,13 @@ VALUES $sqlValueString
     // also create the sql table
     $exportTempTable->drop();
 
-    $sql = "
-     id int unsigned NOT NULL AUTO_INCREMENT,
-";
-    $sql .= implode(",\n", array_values($sqlColumns));
+    $sql = " id int unsigned NOT NULL AUTO_INCREMENT, ";
+    if (!empty($sqlColumns)) {
+      $sql .= implode(",\n", array_values($sqlColumns)) . ',';
+    }
 
-    $sql .= ",
-  PRIMARY KEY ( id )
-";
+    $sql .= "\n PRIMARY KEY ( id )";
+
     // add indexes for street_address and household_name if present
     $addIndices = array(
       'street_address',
