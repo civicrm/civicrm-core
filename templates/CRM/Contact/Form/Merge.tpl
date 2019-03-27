@@ -114,8 +114,8 @@
 
           <td>
             {* @TODO check if this is ever an array or a fileName? *}
-            {if $row.title|substr:0:5 == "Email"   OR
-                $row.title|substr:0:7 == "Address"}
+            {if $row.location_entity == "email"   OR
+                $row.location_entity == "address"}
               <span style="white-space: pre">
             {else}
               <span>
@@ -135,16 +135,12 @@
           </td>
 
           {* For location blocks *}
-          {if $row.title|substr:0:5 == "Email"   OR
-              $row.title|substr:0:7 == "Address" OR
-              $row.title|substr:0:2 == "IM"      OR
-              $row.title|substr:0:7 == "Website" OR
-              $row.title|substr:0:5 == "Phone"}
+          {if $row.location_entity}
 
             <td>
               {strip}
-                {if $row.title|substr:0:5 == "Email"   OR
-                    $row.title|substr:0:7 == "Address"}
+                {if $row.location_entity == "email"   OR
+                    $row.location_entity == "address"}
                   <span style="white-space: pre" id="main_{$blockName|escape}_{$blockId|escape}">
                 {else}
                   <span id="main_{$blockName|escape}_{$blockId|escape}">
