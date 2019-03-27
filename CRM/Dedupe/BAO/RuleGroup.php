@@ -74,7 +74,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    * @return array
    *   a table-keyed array of field-keyed arrays holding supported fields' titles
    */
-  public static function &supportedFields($requestedType) {
+  public static function supportedFields($requestedType) {
     static $fields = NULL;
     if (!$fields) {
       // this is needed, as we're piggy-backing importableFields() below
@@ -116,6 +116,13 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
             $fields[$ctype][$table][$field] = $iField['title'];
           }
         }
+        // Note that most of the fields available come from 'importable fields' -
+        // I thought about making this field 'importable' but it felt like there might be unknown consequences
+        // so I opted for just adding it in & securing it with a unit test.
+        // Example usage of sort_name - It is possible to alter sort name via hook so 2 organization names might differ as in
+        // Justice League vs The Justice League but these could have the same sort_name if 'the the'
+        // exension is installed (https://github.com/eileenmcnaughton/org.wikimedia.thethe)
+        $fields[$ctype]['civicrm_contact']['sort_name'] = ts('Sort Name');
         // add custom data fields
         foreach (CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1) as $key => $cg) {
           if (!is_int($key)) {
@@ -128,7 +135,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
       }
     }
     CRM_Utils_Hook::dupeQuery(CRM_Core_DAO::$_nullObject, 'supportedFields', $fields);
-    return $fields[$requestedType];
+    return !empty($fields[$requestedType]) ? $fields[$requestedType] : [];
   }
 
   /**
