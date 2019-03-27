@@ -33,6 +33,10 @@
 class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
 
   protected $_customGroupExtends = array(
+    'Contact',
+    'Individual',
+    'Household',
+    'Organization',
     'Grant',
   );
 
@@ -40,53 +44,32 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
-    $this->_columns = array(
-      'civicrm_contact' => array(
-        'dao' => 'CRM_Contact_DAO_Contact',
+    $contactCols = $this->getColumns('Contact', array(
+      'order_bys_defaults' => array('sort_name' => 'ASC '),
+      'fields_defaults' => ['sort_name'],
+      'fields_excluded' => ['id'],
+      'fields_required' => ['id'],
+      'filters_defaults' => array('is_deleted' => 0),
+      'no_field_disambiguation' => TRUE,
+    ));
+    $specificCols = array(
+      'civicrm_email' => array(
+        'dao' => 'CRM_Core_DAO_Email',
         'fields' => array(
-          'sort_name' => array(
-            'title' => ts('Contact Name'),
-            'required' => TRUE,
-            'no_repeat' => TRUE,
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
+          'email' => array(
+            'title' => ts('Email'),
           ),
         ),
         'grouping' => 'contact-fields',
-        'filters' => array(
-          'sort_name' => array(
-            'title' => ts('Contact Name'),
-            'operator' => 'like',
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ),
-          'id' => array(
-            'title' => ts('Contact ID'),
-            'no_display' => TRUE,
-          ),
-        ),
       ),
-      'civicrm_address' => array(
-        'dao' => 'CRM_Core_DAO_Address',
-        'filters' => array(
-          'country_id' => array(
-            'title' => ts('Country'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::country(),
-          ),
-          'state_province_id' => array(
-            'title' => ts('State/Province'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::stateProvince(),
+      'civicrm_phone' => array(
+        'dao' => 'CRM_Core_DAO_Phone',
+        'fields' => array(
+          'phone' => array(
+            'title' => ts('Phone'),
           ),
         ),
+        'grouping' => 'contact-fields',
       ),
       'civicrm_grant' => array(
         'dao' => 'CRM_Grant_DAO_Grant',
@@ -112,6 +95,7 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
             'name' => 'application_received_date',
             'title' => ts('Application Received'),
             'default' => TRUE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
           'money_transfer_date' => array(
             'name' => 'money_transfer_date',
@@ -187,6 +171,23 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
           'status_id' => array(
             'title' => ts('Grant Status'),
           ),
+          'application_received_date' => array(
+            'title' => ts('Application Received Date'),
+          ),
+          'money_transfer_date' => array(
+            'title' => ts('Money Transfer Date'),
+          ),
+          'decision_date' => array(
+            'title' => ts('Grant Decision Date'),
+          ),
+        ),
+        'order_bys' => array(
+          'grant_type_id' => array(
+            'title' => ts('Grant Type'),
+          ),
+          'status_id' => array(
+            'title' => ts('Grant Status'),
+          ),
           'amount_total' => array(
             'title' => ts('Amount Requested'),
           ),
@@ -206,105 +207,21 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
       ),
     );
 
+    $this->_columns = array_merge($contactCols, $specificCols, $this->addAddressFields(FALSE));
+
     parent::__construct();
   }
 
-  public function select() {
-    // @todo remove this override - seems to do nothing parent doesn't.
-    $select = array();
-
-    $this->_columnHeaders = array();
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('fields', $table)) {
-        foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) ||
-            !empty($this->_params['fields'][$fieldName])
-          ) {
-
-            $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-          }
-        }
-      }
-    }
-
-    $this->_select = "SELECT " . implode(', ', $select) . " ";
-  }
-
   public function from() {
-    $this->_from = "
-        FROM civicrm_grant {$this->_aliases['civicrm_grant']}
-                        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                    ON ({$this->_aliases['civicrm_grant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  ) ";
+    $this->setFromBase('civicrm_contact');
+    $this->_from .= <<<HERESQL
+    INNER JOIN civicrm_grant {$this->_aliases['civicrm_grant']}
+      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_grant']}.contact_id
+HERESQL;
+
+    $this->joinEmailFromContact();
+    $this->joinPhoneFromContact();
     $this->joinAddressFromContact();
-  }
-
-  public function where() {
-    // @todo this function appears to do nothing more than parent, test & remove
-    $clauses = array();
-    $this->_where = '';
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('filters', $table)) {
-        foreach ($table['filters'] as $fieldName => $field) {
-
-          $clause = NULL;
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
-
-            if ($relative || $from || $to) {
-              $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
-            }
-          }
-          else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-            if ($op) {
-              $clause = $this->whereClause($field,
-                $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-              );
-            }
-          }
-          if (!empty($clause)) {
-            $clauses[] = $clause;
-          }
-        }
-      }
-    }
-    if (!empty($clauses)) {
-      $this->_where = "WHERE " . implode(' AND ', $clauses);
-    }
-  }
-
-  public function groupBy() {
-    // @todo this function appears to do nothing more than parent, test & remove
-    $this->_groupBy = "";
-    if (!empty($this->_params['group_bys']) &&
-      is_array($this->_params['group_bys']) &&
-      !empty($this->_params['group_bys'])
-    ) {
-      foreach ($this->_columns as $tableName => $table) {
-        if (array_key_exists('group_bys', $table)) {
-          foreach ($table['group_bys'] as $fieldName => $field) {
-            if (!empty($this->_params['group_bys'][$fieldName])) {
-              $this->_groupBy[] = $field['dbAlias'];
-            }
-          }
-        }
-      }
-    }
-    if (!empty($this->_groupBy)) {
-      $this->_groupBy = "ORDER BY " . implode(', ', $this->_groupBy) .
-        ", {$this->_aliases['civicrm_contact']}.sort_name";
-    }
-    else {
-      $this->_groupBy = "ORDER BY {$this->_aliases['civicrm_contact']}.sort_name";
-    }
   }
 
   /**
@@ -328,7 +245,7 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
           $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View contact details for this record.");
+        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contact Summary for this Contact.");
         $entryFound = TRUE;
       }
 
@@ -341,18 +258,6 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
       if (array_key_exists('civicrm_grant_status_id', $row)) {
         if ($value = $row['civicrm_grant_status_id']) {
           $rows[$rowNum]['civicrm_grant_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Grant_DAO_Grant', 'status_id', $value);
-        }
-        $entryFound = TRUE;
-      }
-      if (array_key_exists('civicrm_grant_grant_report_received', $row)) {
-        if ($value = $row['civicrm_grant_grant_report_received']) {
-          if ($value == 1) {
-            $value = 'Yes';
-          }
-          else {
-            $value = 'No';
-          }
-          $rows[$rowNum]['civicrm_grant_grant_report_received'] = $value;
         }
         $entryFound = TRUE;
       }
