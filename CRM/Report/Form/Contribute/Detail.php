@@ -368,6 +368,25 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   }
 
   /**
+   * Validate incompatible report settings.
+   *
+   * @return bool
+   *   true if no error found
+   */
+  public function validate() {
+    // If you're displaying Contributions Only, you can't group by soft credit.
+    $contributionOrSoftVal = $this->getElementValue('contribution_or_soft_value');
+    if ($contributionOrSoftVal[0] == 'contributions_only') {
+      $groupBySoft = $this->getElementValue('group_bys');
+      if (CRM_Utils_Array::value('soft_credit_id', $groupBySoft)) {
+        $this->setElementError('group_bys', ts('You cannot group by soft credit when displaying contributions only.  Please uncheck "Soft Credit" in the Grouping tab.'));
+      }
+    }
+
+    return parent::validate();
+  }
+
+  /**
    * Set the FROM clause for the report.
    */
   public function from() {
