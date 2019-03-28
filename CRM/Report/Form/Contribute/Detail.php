@@ -961,7 +961,8 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
    * Add join to the soft credit table.
    */
   protected function joinContributionToSoftCredit() {
-    if (!CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) && !$this->isTableSelected('civicrm_contribution_soft')) {
+    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'contributions_only'
+      && !$this->isTableSelected('civicrm_contribution_soft')) {
       return;
     }
     $joinType = ' LEFT ';
