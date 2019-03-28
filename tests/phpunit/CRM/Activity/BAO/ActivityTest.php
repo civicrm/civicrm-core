@@ -403,7 +403,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     );
     $expectedFilters = array(
       'activity_type_filter_id' => 1,
-      'activity_type_exclude_filter_id' => '',
     );
 
     list($activities, $activityFilter) = CRM_Activity_Page_AJAX::getContactActivity();
@@ -414,11 +413,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $this->assertContains('Meeting', $value['activity_type']);
     }
     unset($_GET['activity_type_id']);
-    $expectedFilters['activity_type_filter_id'] = '';
 
     $_GET['activity_type_exclude_id'] = $expectedFilters['activity_type_exclude_filter_id'] = 1;
     list($activities, $activityFilter) = CRM_Activity_Page_AJAX::getContactActivity();
-    $this->checkArrayEquals($expectedFilters, $activityFilter);
+    $this->assertEquals(['activity_type_exclude_filter_id' => 1], $activityFilter);
     // None of the activities should be of type Meeting.
     foreach ($activities['data'] as $value) {
       $this->assertNotContains('Meeting', $value['activity_type']);

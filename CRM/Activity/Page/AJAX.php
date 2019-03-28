@@ -437,16 +437,13 @@ class CRM_Activity_Page_AJAX {
           $formSearchField = 'activity_type_exclude_filter_id';
         }
         if (!empty($params[$searchField])) {
-          $activityFilter[$formSearchField] = CRM_Utils_Type::escape($params[$searchField], $dataType);
+          $activityFilter[$formSearchField] = $params[$searchField];
           if (in_array($searchField, array('activity_date_time_low', 'activity_date_time_high'))) {
             $activityFilter['activity_date_time_relative'] = 0;
           }
           elseif ($searchField == 'activity_status_id') {
             $activityFilter['status_id'] = explode(',', $activityFilter[$searchField]);
           }
-        }
-        elseif (in_array($searchField, array('activity_type_id', 'activity_type_exclude_id'))) {
-          $activityFilter[$formSearchField] = '';
         }
       }
 
