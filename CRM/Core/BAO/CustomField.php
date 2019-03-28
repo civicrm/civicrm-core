@@ -2249,42 +2249,43 @@ ORDER BY html_type";
    * Get custom field ID from field/group name/title.
    *
    * @param string $fieldName Field name or label
-   * @param string|null $groupTitle (Optional) Group name or label
+   * @param string|null $groupName (Optional) Group name or label
    * @param bool $fullString Whether to return "custom_123" or "123"
    *
    * @return string|int|null
    * @throws \CiviCRM_API3_Exception
    */
-  public static function getCustomFieldID($fieldName, $groupTitle = NULL, $fullString = FALSE) {
-    if (!isset(Civi::$statics['CRM_Core_BAO_CustomField'][$fieldName])) {
+  public static function getCustomFieldID($fieldName, $groupName = NULL, $fullString = FALSE) {
+    $cacheKey = $groupName . '.' . $fieldName;
+    if (!isset(Civi::$statics['CRM_Core_BAO_CustomField'][$cacheKey])) {
       $customFieldParams = [
         'name' => $fieldName,
         'label' => $fieldName,
         'options' => ['or' => [["name", "label"]]],
       ];
 
-      if ($groupTitle) {
-        $customFieldParams['custom_group_id.name'] = $groupTitle;
-        $customFieldParams['custom_group_id.title'] = $groupTitle;
+      if ($groupName) {
+        $customFieldParams['custom_group_id.name'] = $groupName;
+        $customFieldParams['custom_group_id.title'] = $groupName;
         $customFieldParams['options'] = ['or' => [["name", "label"], ["custom_group_id.name", "custom_group_id.title"]]];
       }
 
       $field = civicrm_api3('CustomField', 'get', $customFieldParams);
 
       if (empty($field['id'])) {
-        Civi::$statics['CRM_Core_BAO_CustomField'][$fieldName]['id'] = NULL;
-        Civi::$statics['CRM_Core_BAO_CustomField'][$fieldName]['string'] = NULL;
+        Civi::$statics['CRM_Core_BAO_CustomField'][$cacheKey]['id'] = NULL;
+        Civi::$statics['CRM_Core_BAO_CustomField'][$cacheKey]['string'] = NULL;
       }
       else {
-        Civi::$statics['CRM_Core_BAO_CustomField'][$fieldName]['id'] = $field['id'];
-        Civi::$statics['CRM_Core_BAO_CustomField'][$fieldName]['string'] = 'custom_' . $field['id'];
+        Civi::$statics['CRM_Core_BAO_CustomField'][$cacheKey]['id'] = $field['id'];
+        Civi::$statics['CRM_Core_BAO_CustomField'][$cacheKey]['string'] = 'custom_' . $field['id'];
       }
     }
 
     if ($fullString) {
-      return Civi::$statics['CRM_Core_BAO_CustomField'][$fieldName]['string'];
+      return Civi::$statics['CRM_Core_BAO_CustomField'][$cacheKey]['string'];
     }
-    return Civi::$statics['CRM_Core_BAO_CustomField'][$fieldName]['id'];
+    return Civi::$statics['CRM_Core_BAO_CustomField'][$cacheKey]['id'];
   }
 
   /**
