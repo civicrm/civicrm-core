@@ -1090,6 +1090,22 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test contact subtype filter on grant report.
+   */
+  public function testGrantReportSeparatedFilter() {
+    $contactID = $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
+    $contactID2 = $this->individualCreate();
+    $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1]);
+    $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID2, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1]);
+    $rows = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'grant/detail',
+      'contact_sub_type_op' => 'in',
+      'contact_sub_type_value' => ['Student'],
+    ]);
+    $this->assertEquals(1, $rows['count']);
+  }
+
+  /**
    * Test PCP report to ensure total donors and total committed is accurate.
    */
   public function testPcpReportTotals() {
