@@ -696,17 +696,24 @@ UNION ALL
       }
 
       // Contribution amount links to viewing contribution
-      if (($value = CRM_Utils_Array::value('civicrm_contribution_total_amount', $row)) &&
-        CRM_Core_Permission::check('access CiviContribute')
-      ) {
-        $url = CRM_Utils_System::url("civicrm/contact/view/contribution",
-          "reset=1&id=" . $row['civicrm_contribution_contribution_id'] .
-          "&cid=" . $row['civicrm_contact_id'] .
-          "&action=view&context=contribution&selectedChild=contribute",
-          $this->_absoluteUrl
-        );
-        $rows[$rowNum]['civicrm_contribution_total_amount_link'] = $url;
-        $rows[$rowNum]['civicrm_contribution_total_amount_hover'] = ts("View Details of this Contribution.");
+      if ($value = CRM_Utils_Array::value('civicrm_contribution_total_amount', $row)) {
+        $rows[$rowNum]['civicrm_contribution_total_amount'] = CRM_Utils_Money::format($value, $row['civicrm_contribution_currency']);
+        if (CRM_Core_Permission::check('access CiviContribute')) {
+          $url = CRM_Utils_System::url(
+            "civicrm/contact/view/contribution",
+            [
+              'reset' => 1,
+              'id' => $row['civicrm_contribution_contribution_id'],
+              'cid' => $row['civicrm_contact_id'],
+              'action' => 'view',
+              'context' => 'contribution',
+              'selectedChild' => 'contribute',
+            ],
+            $this->_absoluteUrl
+          );
+          $rows[$rowNum]['civicrm_contribution_total_amount_link'] = $url;
+          $rows[$rowNum]['civicrm_contribution_total_amount_hover'] = ts("View Details of this Contribution.");
+        }
         $entryFound = TRUE;
       }
 
