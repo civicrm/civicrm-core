@@ -2070,6 +2070,10 @@ class CRM_Report_Form extends CRM_Core_Form {
         break;
     }
 
+    //dev/core/544 Add report support for multiple contact subTypes
+    if ($field['name'] == 'contact_sub_type' && $clause) {
+      $clause = $this->whereSubtypeClause($field, $value, $op);
+    }
     if (!empty($field['group']) && $clause) {
       $clause = $this->whereGroupClause($field, $value, $op);
     }
@@ -2085,6 +2089,27 @@ class CRM_Report_Form extends CRM_Core_Form {
     elseif (!empty($field['membership_type']) && $clause) {
       $clause = $this->whereMembershipTypeClause($value, $op);
     }
+    return $clause;
+  }
+
+  /**
+   * Get SQL where clause for contact subtypes
+   * @param string $field
+   * @param mixed $value
+   * @param string $op SQL Operator
+   *
+   * @return string
+   */
+  public function whereSubtypeClause($field, $value, $op) {
+    $clause = '( ';
+    $subtypeFilters = count($value);
+    for ($i = 0; $i < $subtypeFilters; $i++) {
+      $clause .= "{$field['dbAlias']} LIKE '%$value[$i]%'";
+      if ($i !== ($subtypeFilters - 1)) {
+        $clause .= " OR ";
+      }
+    }
+    $clause .= ' )';
     return $clause;
   }
 
