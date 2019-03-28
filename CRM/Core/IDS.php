@@ -125,7 +125,7 @@ class CRM_Core_IDS {
         'filter_type' => 'xml',
         'filter_path' => "{$civicrm_root}/packages/IDS/default_filter.xml",
         'tmp_path' => $tmpDir,
-        'HTML_Purifier_Path' => 'IDS/vendors/htmlpurifier/HTMLPurifier.auto.php',
+        'HTML_Purifier_Path' => $civicrm_root . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.auto.php',
         'HTML_Purifier_Cache' => $tmpDir,
         'scan_keys' => '',
         'exceptions' => array('__utmz', '__utmc'),
