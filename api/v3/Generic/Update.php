@@ -64,7 +64,7 @@ function civicrm_api3_generic_update($apiRequest) {
   if (strtolower($apiRequest['entity']) == 'contribution') {
     return civicrm_api($apiRequest['entity'], 'create', $apiRequest['params']);
   }
-  $seek = array($key_id => $apiRequest['params'][$key_id], 'version' => $apiRequest['version']);
+  $seek = [$key_id => $apiRequest['params'][$key_id], 'version' => $apiRequest['version']];
   $existing = civicrm_api($apiRequest['entity'], 'get', $seek);
   if ($existing['is_error']) {
     return $existing;

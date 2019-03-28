@@ -45,19 +45,19 @@ function civicrm_api3_generic_setValue($apiRequest) {
   $params = $apiRequest['params'];
   $id = $params['id'];
   if (!is_numeric($id)) {
-    return civicrm_api3_create_error(ts('Please enter a number'), array(
+    return civicrm_api3_create_error(ts('Please enter a number'), [
       'error_code' => 'NaN',
       'field' => "id",
-    ));
+    ]);
   }
 
   $field = CRM_Utils_String::munge($params['field']);
   $value = $params['value'];
 
-  $fields = civicrm_api($entity, 'getFields', array(
+  $fields = civicrm_api($entity, 'getFields', [
     'version' => 3,
     'action' => 'create',
-    "sequential")
+    "sequential"]
   );
   // getfields error, shouldn't happen.
   if ($fields['is_error']) {
@@ -69,7 +69,7 @@ function civicrm_api3_generic_setValue($apiRequest) {
   // Trim off the id portion of a multivalued custom field name
   $fieldKey = $isCustom && substr_count($field, '_') > 1 ? rtrim(rtrim($field, '1234567890'), '_') : $field;
   if (!array_key_exists($fieldKey, $fields)) {
-    return civicrm_api3_create_error("Param 'field' ($field) is invalid. must be an existing field", array("error_code" => "invalid_field", "fields" => array_keys($fields)));
+    return civicrm_api3_create_error("Param 'field' ($field) is invalid. must be an existing field", ["error_code" => "invalid_field", "fields" => array_keys($fields)]);
   }
 
   $def = $fields[$fieldKey];
@@ -78,27 +78,27 @@ function civicrm_api3_generic_setValue($apiRequest) {
   // TODO: create a utility for this since it's needed in many places
   if (!empty($def['required']) || !empty($def['is_required'])) {
     if ((empty($value) || $value === 'null') && $value !== '0' && $value !== 0) {
-      return civicrm_api3_create_error(ts('%1 is a required field.', array(1 => $title)), array("error_code" => "required", "field" => $field));
+      return civicrm_api3_create_error(ts('%1 is a required field.', [1 => $title]), ["error_code" => "required", "field" => $field]);
     }
   }
 
   switch ($def['type']) {
     case CRM_Utils_Type::T_FLOAT:
       if (!is_numeric($value) && !empty($value) && $value !== 'null') {
-        return civicrm_api3_create_error(ts('%1 must be a number.', array(1 => $title)), array('error_code' => 'NaN'));
+        return civicrm_api3_create_error(ts('%1 must be a number.', [1 => $title]), ['error_code' => 'NaN']);
       }
       break;
 
     case CRM_Utils_Type::T_INT:
       if (!CRM_Utils_Rule::integer($value) && !empty($value) && $value !== 'null') {
-        return civicrm_api3_create_error(ts('%1 must be a number.', array(1 => $title)), array('error_code' => 'NaN'));
+        return civicrm_api3_create_error(ts('%1 must be a number.', [1 => $title]), ['error_code' => 'NaN']);
       }
       break;
 
     case CRM_Utils_Type::T_STRING:
     case CRM_Utils_Type::T_TEXT:
       if (!CRM_Utils_Rule::xssString($value)) {
-        return civicrm_api3_create_error(ts('Illegal characters in input (potential scripting attack)'), array('error_code' => 'XSS'));
+        return civicrm_api3_create_error(ts('Illegal characters in input (potential scripting attack)'), ['error_code' => 'XSS']);
       }
       if (array_key_exists('maxlength', $def)) {
         $value = substr($value, 0, $def['maxlength']);
@@ -123,11 +123,11 @@ function civicrm_api3_generic_setValue($apiRequest) {
       break;
 
     default:
-      return civicrm_api3_create_error("Param '$field' is of a type not managed yet (" . $def['type'] . "). Join the API team and help us implement it", array('error_code' => 'NOT_IMPLEMENTED'));
+      return civicrm_api3_create_error("Param '$field' is of a type not managed yet (" . $def['type'] . "). Join the API team and help us implement it", ['error_code' => 'NOT_IMPLEMENTED']);
   }
 
   $dao_name = _civicrm_api3_get_DAO($entity);
-  $params = array('id' => $id, $field => $value);
+  $params = ['id' => $id, $field => $value];
 
   if ((!empty($def['pseudoconstant']) || !empty($def['option_group_id'])) && $value !== '' && $value !== 'null') {
     _civicrm_api3_api_match_pseudoconstant($params[$field], $entity, $field, $def);

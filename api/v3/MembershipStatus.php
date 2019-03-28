@@ -86,7 +86,7 @@ function civicrm_api3_membership_status_get($params) {
  */
 function civicrm_api3_membership_status_update($params) {
 
-  civicrm_api3_verify_mandatory($params, NULL, array('id'));
+  civicrm_api3_verify_mandatory($params, NULL, ['id']);
   //don't allow duplicate names.
   $name = CRM_Utils_Array::value('name', $params);
   if ($name) {
@@ -108,7 +108,7 @@ function civicrm_api3_membership_status_update($params) {
     }
     $membershipStatusBAO->save();
   }
-  $membershipStatus = array();
+  $membershipStatus = [];
   $cloneBAO = clone($membershipStatusBAO);
   _civicrm_api3_object_to_array($cloneBAO, $membershipStatus);
   $membershipStatus['is_error'] = 0;
@@ -162,7 +162,7 @@ SELECT start_date, end_date, join_date, membership_type_id
  WHERE id = %1
 ";
 
-  $params = array(1 => array($membershipID, 'Integer'));
+  $params = [1 => [$membershipID, 'Integer']];
   $dao = CRM_Core_DAO::executeQuery($query, $params);
   if ($dao->fetch()) {
     $membershipTypeID = empty($membershipParams['membership_type_id']) ? $dao->membership_type_id : $membershipParams['membership_type_id'];

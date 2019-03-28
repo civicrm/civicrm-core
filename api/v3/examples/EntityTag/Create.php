@@ -6,10 +6,10 @@
  *   API result array
  */
 function entity_tag_create_example() {
-  $params = array(
+  $params = [
     'contact_id' => 3,
     'tag_id' => '6',
-  );
+  ];
 
   try{
     $result = civicrm_api3('EntityTag', 'create', $params);
@@ -19,11 +19,11 @@ function entity_tag_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'error' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,12 +37,12 @@ function entity_tag_create_example() {
  */
 function entity_tag_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'not_added' => 0,
     'added' => 1,
     'total_count' => 1,
-  );
+  ];
 
   return $expectedResult;
 }

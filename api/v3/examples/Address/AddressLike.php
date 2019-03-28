@@ -8,12 +8,12 @@
  *   API result array
  */
 function address_get_example() {
-  $params = array(
-    'street_address' => array(
+  $params = [
+    'street_address' => [
       'LIKE' => '%mb%',
-    ),
+    ],
     'sequential' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Address', 'get', $params);
@@ -23,12 +23,12 @@ function address_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -42,13 +42,13 @@ function address_get_example() {
  */
 function address_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '0' => array(
+    'values' => [
+      '0' => [
         'id' => '1',
         'contact_id' => '20',
         'location_type_id' => '18',
@@ -61,9 +61,9 @@ function address_get_expectedresult() {
         'postal_code' => '6971 BN',
         'country_id' => '1152',
         'manual_geo_code' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

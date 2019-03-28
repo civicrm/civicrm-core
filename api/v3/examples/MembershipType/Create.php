@@ -6,7 +6,7 @@
  *   API result array
  */
 function membership_type_create_example() {
-  $params = array(
+  $params = [
     'name' => '40+ Membership',
     'description' => 'people above 40 are given health instructions',
     'member_of_contact_id' => 7,
@@ -17,7 +17,7 @@ function membership_type_create_example() {
     'duration_interval' => '10',
     'period_type' => 'rolling',
     'visibility' => 'public',
-  );
+  ];
 
   try{
     $result = civicrm_api3('MembershipType', 'create', $params);
@@ -27,12 +27,12 @@ function membership_type_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -46,13 +46,13 @@ function membership_type_create_example() {
  */
 function membership_type_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 2,
-    'values' => array(
-      '2' => array(
+    'values' => [
+      '2' => [
         'id' => '2',
         'domain_id' => '1',
         'name' => '40+ Membership',
@@ -75,9 +75,9 @@ function membership_type_create_expectedresult() {
         'auto_renew' => '',
         'is_active' => '1',
         'contribution_type_id' => '1',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

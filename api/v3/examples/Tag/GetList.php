@@ -8,12 +8,12 @@
  *   API result array
  */
 function tag_getlist_example() {
-  $params = array(
+  $params = [
     'input' => 'New Tag3',
-    'extra' => array(
+    'extra' => [
       '0' => 'used_for',
-    ),
-  );
+    ],
+  ];
 
   try{
     $result = civicrm_api3('Tag', 'getlist', $params);
@@ -23,12 +23,12 @@ function tag_getlist_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -42,26 +42,26 @@ function tag_getlist_example() {
  */
 function tag_getlist_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 0,
-    'values' => array(
-      '0' => array(
+    'values' => [
+      '0' => [
         'id' => '19',
         'label' => 'New Tag3',
-        'description' => array(
+        'description' => [
           '0' => 'This is description for Our New Tag ',
-        ),
-        'extra' => array(
+        ],
+        'extra' => [
           'used_for' => 'civicrm_contact',
-        ),
-      ),
-    ),
+        ],
+      ],
+    ],
     'page_num' => 1,
     'more_results' => '',
-  );
+  ];
 
   return $expectedResult;
 }

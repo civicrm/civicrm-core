@@ -6,10 +6,10 @@
  *   API result array
  */
 function membership_payment_get_example() {
-  $params = array(
+  $params = [
     'contribution_id' => 4,
     'membership_id' => 2,
-  );
+  ];
 
   try{
     $result = civicrm_api3('MembershipPayment', 'get', $params);
@@ -19,12 +19,12 @@ function membership_payment_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -38,19 +38,19 @@ function membership_payment_get_example() {
  */
 function membership_payment_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 2,
-    'values' => array(
-      '2' => array(
+    'values' => [
+      '2' => [
         'id' => '2',
         'membership_id' => '2',
         'contribution_id' => '4',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

@@ -41,12 +41,12 @@
  */
 function _civicrm_api3_mailing_group_deprecation() {
   $message = 'This action is deprecated. Use the mailing_event API instead.';
-  return array(
+  return [
     'event_unsubscribe' => $message,
     'event_domain_unsubscribe' => $message,
     'event_resubscribe' => $message,
     'event_subscribe' => $message,
-  );
+  ];
 }
 
 /**

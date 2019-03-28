@@ -8,38 +8,38 @@
  *   API result array
  */
 function contact_get_example() {
-  $params = array(
+  $params = [
     'id' => 10,
-    'api.email.replace' => array(
-      'values' => array(
-        '0' => array(
+    'api.email.replace' => [
+      'values' => [
+        '0' => [
           'location_type_id' => 20,
           'email' => '1-1@example.com',
           'is_primary' => 1,
-        ),
-        '1' => array(
+        ],
+        '1' => [
           'location_type_id' => 20,
           'email' => '1-2@example.com',
           'is_primary' => 0,
-        ),
-        '2' => array(
+        ],
+        '2' => [
           'location_type_id' => 20,
           'email' => '1-3@example.com',
           'is_primary' => 0,
-        ),
-        '3' => array(
+        ],
+        '3' => [
           'location_type_id' => 21,
           'email' => '2-1@example.com',
           'is_primary' => 0,
-        ),
-        '4' => array(
+        ],
+        '4' => [
           'location_type_id' => 21,
           'email' => '2-2@example.com',
           'is_primary' => 0,
-        ),
-      ),
-    ),
-  );
+        ],
+      ],
+    ],
+  ];
 
   try{
     $result = civicrm_api3('Contact', 'get', $params);
@@ -49,12 +49,12 @@ function contact_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -68,13 +68,13 @@ function contact_get_example() {
  */
 function contact_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 10,
-    'values' => array(
-      '10' => array(
+    'values' => [
+      '10' => [
         'contact_id' => '10',
         'contact_type' => 'Organization',
         'contact_sub_type' => '',
@@ -142,12 +142,12 @@ function contact_get_expectedresult() {
         'state_province' => '',
         'country' => '',
         'id' => '10',
-        'api.email.replace' => array(
+        'api.email.replace' => [
           'is_error' => 0,
           'version' => 3,
           'count' => 5,
-          'values' => array(
-            '0' => array(
+          'values' => [
+            '0' => [
               'id' => '18',
               'contact_id' => '10',
               'location_type_id' => '20',
@@ -160,8 +160,8 @@ function contact_get_expectedresult() {
               'reset_date' => '',
               'signature_text' => '',
               'signature_html' => '',
-            ),
-            '1' => array(
+            ],
+            '1' => [
               'id' => '19',
               'contact_id' => '10',
               'location_type_id' => '20',
@@ -174,8 +174,8 @@ function contact_get_expectedresult() {
               'reset_date' => '',
               'signature_text' => '',
               'signature_html' => '',
-            ),
-            '2' => array(
+            ],
+            '2' => [
               'id' => '20',
               'contact_id' => '10',
               'location_type_id' => '20',
@@ -188,8 +188,8 @@ function contact_get_expectedresult() {
               'reset_date' => '',
               'signature_text' => '',
               'signature_html' => '',
-            ),
-            '3' => array(
+            ],
+            '3' => [
               'id' => '21',
               'contact_id' => '10',
               'location_type_id' => '21',
@@ -202,8 +202,8 @@ function contact_get_expectedresult() {
               'reset_date' => '',
               'signature_text' => '',
               'signature_html' => '',
-            ),
-            '4' => array(
+            ],
+            '4' => [
               'id' => '22',
               'contact_id' => '10',
               'location_type_id' => '21',
@@ -216,12 +216,12 @@ function contact_get_expectedresult() {
               'reset_date' => '',
               'signature_text' => '',
               'signature_html' => '',
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
+            ],
+          ],
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

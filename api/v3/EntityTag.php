@@ -54,7 +54,7 @@ function civicrm_api3_entity_tag_get($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_entity_tag_get_spec(&$params) {
-  $params['entity_id']['api.aliases'] = array('contact_id');
+  $params['entity_id']['api.aliases'] = ['contact_id'];
   $params['entity_table']['api.default'] = 'civicrm_contact';
 }
 
@@ -101,7 +101,7 @@ function _civicrm_api3_entity_tag_delete_spec(&$params) {
  */
 function _civicrm_api3_entity_tag_common($params, $op = 'add') {
 
-  $entityIDs = $tagIDs = array();
+  $entityIDs = $tagIDs = [];
   $entityTable = 'civicrm_contact';
   if (is_array($params)) {
     foreach ($params as $n => $v) {
@@ -135,7 +135,7 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
     }
   }
 
-  $values = array('is_error' => 0);
+  $values = ['is_error' => 0];
   if ($op == 'add') {
     $values['total_count'] = $values['added'] = $values['not_added'] = 0;
     foreach ($tagIDs as $tagID) {

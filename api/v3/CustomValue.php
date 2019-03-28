@@ -69,7 +69,7 @@ function civicrm_api3_custom_value_create($params) {
   if (!empty($params['entity_table']) && substr($params['entity_table'], 0, 7) == 'civicrm') {
     $params['entity_table'] = substr($params['entity_table'], 8, 7);
   }
-  $create = array('entityID' => $params['entity_id']);
+  $create = ['entityID' => $params['entity_id']];
   // Translate names and
   //Convert arrays to multi-value strings
   $sp = CRM_Core_DAO::VALUE_SEPARATOR;
@@ -135,10 +135,10 @@ function _civicrm_api3_custom_value_create_spec(&$params) {
  */
 function civicrm_api3_custom_value_get($params) {
 
-  $getParams = array(
+  $getParams = [
     'entityID' => $params['entity_id'],
     'entityType' => CRM_Utils_Array::value('entity_table', $params, ''),
-  );
+  ];
   if (strstr($getParams['entityType'], 'civicrm_')) {
     $getParams['entityType'] = ucfirst(substr($getParams['entityType'], 8));
   }
@@ -176,7 +176,7 @@ function civicrm_api3_custom_value_get($params) {
 
   if ($result['is_error']) {
     if ($result['error_message'] == "No values found for the specified entity ID and custom field(s).") {
-      $values = array();
+      $values = [];
       return civicrm_api3_create_success($values, $params, 'CustomValue');
     }
     else {
@@ -250,45 +250,45 @@ function _civicrm_api3_custom_value_get_spec(&$params) {
  * @throws \CiviCRM_API3_Exception
  */
 function _civicrm_api3_custom_value_gettree_spec(&$spec) {
-  $spec['entity_id'] = array(
+  $spec['entity_id'] = [
     'title' => 'Entity Id',
     'description' => 'Id of entity',
     'type' => CRM_Utils_Type::T_INT,
     'api.required' => 1,
-  );
+  ];
   $entities = civicrm_api3('Entity', 'get');
   $entities = array_diff($entities['values'], $entities['deprecated']);
-  $spec['entity_type'] = array(
+  $spec['entity_type'] = [
     'title' => 'Entity Type',
     'description' => 'API name of entity type, e.g. "Contact"',
     'type' => CRM_Utils_Type::T_STRING,
     'api.required' => 1,
     'options' => array_combine($entities, $entities),
-  );
+  ];
   // Return params for custom group, field & value
   foreach (CRM_Core_DAO_CustomGroup::fields() as $field) {
     $name = 'custom_group.' . $field['name'];
-    $spec[$name] = array('name' => $name) + $field;
+    $spec[$name] = ['name' => $name] + $field;
   }
   foreach (CRM_Core_DAO_CustomField::fields() as $field) {
     $name = 'custom_field.' . $field['name'];
-    $spec[$name] = array('name' => $name) + $field;
+    $spec[$name] = ['name' => $name] + $field;
   }
-  $spec['custom_value.id'] = array(
+  $spec['custom_value.id'] = [
     'title' => 'Custom Value Id',
     'description' => 'Id of record in custom value table',
     'type' => CRM_Utils_Type::T_INT,
-  );
-  $spec['custom_value.data'] = array(
+  ];
+  $spec['custom_value.data'] = [
     'title' => 'Custom Value (Raw)',
     'description' => 'Raw value as stored in the database',
     'type' => CRM_Utils_Type::T_STRING,
-  );
-  $spec['custom_value.display'] = array(
+  ];
+  $spec['custom_value.display'] = [
     'title' => 'Custom Value (Formatted)',
     'description' => 'Custom value formatted for display',
     'type' => CRM_Utils_Type::T_STRING,
-  );
+  ];
 }
 
 /**
@@ -302,13 +302,13 @@ function _civicrm_api3_custom_value_gettree_spec(&$spec) {
  * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_custom_value_gettree($params) {
-  $ret = array();
+  $ret = [];
   $options = _civicrm_api3_get_options_from_params($params);
-  $toReturn = array(
-    'custom_group' => array(),
-    'custom_field' => array(),
-    'custom_value' => array(),
-  );
+  $toReturn = [
+    'custom_group' => [],
+    'custom_field' => [],
+    'custom_value' => [],
+  ];
   foreach (array_keys($options['return']) as $r) {
     list($type, $field) = explode('.', $r);
     if (isset($toReturn[$type])) {
@@ -321,7 +321,7 @@ function civicrm_api3_custom_value_gettree($params) {
   }
   switch ($params['entity_type']) {
     case 'Contact':
-      $ret = array('entityType' => 'contact_type', 'subTypes' => 'contact_sub_type');
+      $ret = ['entityType' => 'contact_type', 'subTypes' => 'contact_sub_type'];
       break;
 
     case 'Activity':
@@ -332,25 +332,25 @@ function civicrm_api3_custom_value_gettree($params) {
     case 'Grant':
     case 'Membership':
     case 'Relationship':
-      $ret = array('subTypes' => strtolower($params['entity_type']) . '_type_id');
+      $ret = ['subTypes' => strtolower($params['entity_type']) . '_type_id'];
       break;
 
     case 'Participant':
       // todo
   }
-  $treeParams = array(
+  $treeParams = [
     'entityType' => $params['entity_type'],
-    'subTypes' => array(),
+    'subTypes' => [],
     'subName' => NULL,
-  );
+  ];
   // Fetch entity data for custom group type/sub-type
   // Also verify access permissions (api3 will throw an exception if permission denied)
   if ($ret || !empty($params['check_permissions'])) {
-    $entityData = civicrm_api3($params['entity_type'], 'getsingle', array(
+    $entityData = civicrm_api3($params['entity_type'], 'getsingle', [
       'id' => $params['entity_id'],
       'check_permissions' => !empty($params['check_permissions']),
-      'return' => array_merge(array('id'), array_values($ret)),
-    ));
+      'return' => array_merge(['id'], array_values($ret)),
+    ]);
     foreach ($ret as $param => $key) {
       if (isset($entityData[$key])) {
         $treeParams[$param] = $entityData[$key];
@@ -359,16 +359,16 @@ function civicrm_api3_custom_value_gettree($params) {
   }
   $tree = CRM_Core_BAO_CustomGroup::getTree($treeParams['entityType'], $toReturn, $params['entity_id'], NULL, $treeParams['subTypes'], $treeParams['subName'], TRUE, NULL, FALSE, CRM_Utils_Array::value('check_permissions', $params, TRUE));
   unset($tree['info']);
-  $result = array();
+  $result = [];
   foreach ($tree as $group) {
-    $result[$group['name']] = array();
+    $result[$group['name']] = [];
     $groupToReturn = $toReturn['custom_group'] ? $toReturn['custom_group'] : array_keys($group);
     foreach ($groupToReturn as $item) {
       $result[$group['name']][$item] = CRM_Utils_Array::value($item, $group);
     }
-    $result[$group['name']]['fields'] = array();
+    $result[$group['name']]['fields'] = [];
     foreach ($group['fields'] as $fieldInfo) {
-      $field = array('value' => NULL);
+      $field = ['value' => NULL];
       $fieldToReturn = $toReturn['custom_field'] ? $toReturn['custom_field'] : array_keys($fieldInfo);
       foreach ($fieldToReturn as $item) {
         $field[$item] = CRM_Utils_Array::value($item, $fieldInfo);

@@ -52,12 +52,12 @@ function civicrm_api3_custom_field_create($params) {
     foreach ($params['option_values'] as $key => $value) {
       // Translate simple key/value pairs into full-blown option values
       if (!is_array($value)) {
-        $value = array(
+        $value = [
           'label' => $value,
           'value' => $key,
           'is_active' => 1,
           'weight' => $weight,
-        );
+        ];
         $key = $weight++;
       }
       $params['option_label'][$key] = $value['label'];
@@ -66,7 +66,7 @@ function civicrm_api3_custom_field_create($params) {
       $params['option_weight'][$key] = $value['weight'];
     }
   }
-  $values = array();
+  $values = [];
   $customField = CRM_Core_BAO_CustomField::create($params);
   _civicrm_api3_object_to_array_unique_fields($customField, $values[$customField->id]);
   _civicrm_api3_custom_field_flush_static_caches();
@@ -77,7 +77,7 @@ function civicrm_api3_custom_field_create($params) {
  * Flush static caches in functions that might have stored available custom fields.
  */
 function _civicrm_api3_custom_field_flush_static_caches() {
-  civicrm_api('CustomField', 'getfields', array('version' => 3, 'cache_clear' => 1));
+  civicrm_api('CustomField', 'getfields', ['version' => 3, 'cache_clear' => 1]);
   CRM_Core_BAO_UFField::getAvailableFieldsFlat(TRUE);
 }
 
@@ -91,17 +91,17 @@ function _civicrm_api3_custom_field_create_spec(&$params) {
   $params['label']['api.required'] = 1;
   $params['custom_group_id']['api.required'] = 1;
   $params['is_active']['api.default'] = 1;
-  $params['option_values'] = array(
+  $params['option_values'] = [
     'title' => 'Option Values',
     'description' => "Pass an array of options (value => label) to create this field's option values",
-  );
+  ];
   // TODO: Why expose this to the api at all?
-  $params['option_type'] = array(
+  $params['option_type'] = [
     'title' => 'Option Type',
     'description' => 'This (boolean) field tells the BAO to create an option group for the field if the field type is appropriate',
     'api.default' => 1,
     'type' => CRM_Utils_Type::T_BOOLEAN,
-  );
+  ];
   $params['data_type']['api.default'] = 'String';
   $params['is_active']['api.default'] = 1;
 }
@@ -119,7 +119,7 @@ function civicrm_api3_custom_field_delete($params) {
   $field->id = $params['id'];
   $field->find(TRUE);
   $customFieldDelete = CRM_Core_BAO_CustomField::deleteField($field);
-  civicrm_api('CustomField', 'getfields', array('version' => 3, 'cache_clear' => 1));
+  civicrm_api('CustomField', 'getfields', ['version' => 3, 'cache_clear' => 1]);
   return $customFieldDelete ? civicrm_api3_create_error('Error while deleting custom field') : civicrm_api3_create_success();
 }
 
@@ -154,7 +154,7 @@ function civicrm_api3_custom_field_get($params) {
  * @todo remove this function - not in use but need to review functionality before
  * removing as it might be useful in wrapper layer
  */
-function _civicrm_api3_custom_field_validate_field($fieldName, $value, $fieldDetails, &$errors = array()) {
+function _civicrm_api3_custom_field_validate_field($fieldName, $value, $fieldDetails, &$errors = []) {
   return NULL;
   //see comment block
   if (!$value) {
@@ -205,7 +205,7 @@ function _civicrm_api3_custom_field_validate_field($fieldName, $value, $fieldDet
       }
 
       if (!is_array($value)) {
-        $value = array($value);
+        $value = [$value];
       }
 
       $query = "SELECT count(*) FROM civicrm_country WHERE id IN (" . implode(',', $value) . ")";
@@ -225,7 +225,7 @@ function _civicrm_api3_custom_field_validate_field($fieldName, $value, $fieldDet
       }
 
       if (!is_array($value)) {
-        $value = array($value);
+        $value = [$value];
       }
 
       $query = "
@@ -242,13 +242,13 @@ SELECT count(*)
       break;
   }
 
-  if (in_array($htmlType, array(
-    'Select', 'Multi-Select', 'CheckBox', 'Radio')) &&
+  if (in_array($htmlType, [
+    'Select', 'Multi-Select', 'CheckBox', 'Radio']) &&
     !isset($errors[$fieldName])
   ) {
     $options = CRM_Core_OptionGroup::valuesByID($fieldDetails['option_group_id']);
     if (!is_array($value)) {
-      $value = array($value);
+      $value = [$value];
     }
 
     $invalidOptions = array_diff($value, array_keys($options));
@@ -270,7 +270,7 @@ SELECT count(*)
  */
 function civicrm_api3_custom_field_setvalue($params) {
   require_once 'api/v3/Generic/Setvalue.php';
-  $result = civicrm_api3_generic_setValue(array("entity" => 'CustomField', 'params' => $params));
+  $result = civicrm_api3_generic_setValue(["entity" => 'CustomField', 'params' => $params]);
   if (empty($result['is_error'])) {
     CRM_Utils_System::flushCache();
   }

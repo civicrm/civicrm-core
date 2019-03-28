@@ -8,12 +8,12 @@
  *   API result array
  */
 function address_create_example() {
-  $params = array(
+  $params = [
     'street_parsing' => 1,
     'street_address' => '54A Excelsior Ave. Apt 1C',
     'location_type_id' => 7,
     'contact_id' => 4,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Address', 'create', $params);
@@ -23,12 +23,12 @@ function address_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -42,13 +42,13 @@ function address_create_example() {
  */
 function address_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'contact_id' => '4',
         'location_type_id' => '7',
@@ -60,9 +60,9 @@ function address_create_expectedresult() {
         'street_name' => 'Excelsior Ave.',
         'street_unit' => 'Apt 1C',
         'manual_geo_code' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

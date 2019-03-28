@@ -6,9 +6,9 @@
  *   API result array
  */
 function country_get_example() {
-  $params = array(
+  $params = [
     'iso_code' => 'ZZ',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Country', 'get', $params);
@@ -18,12 +18,12 @@ function country_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,21 +37,21 @@ function country_get_example() {
  */
 function country_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1256,
-    'values' => array(
-      '1256' => array(
+    'values' => [
+      '1256' => [
         'id' => '1256',
         'name' => 'Made Up Land',
         'iso_code' => 'ZZ',
         'region_id' => '1',
         'is_province_abbreviated' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

@@ -54,7 +54,7 @@ function civicrm_api3_option_value_get($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_option_value_get_spec(&$params) {
-  $params['option_group_id']['api.aliases'] = array('option_group_name');
+  $params['option_group_id']['api.aliases'] = ['option_group_name'];
 }
 
 /**
@@ -77,7 +77,7 @@ function civicrm_api3_option_value_create($params) {
     $groupId = $params['option_group_id'];
   }
 
-  civicrm_api('option_value', 'getfields', array('version' => 3, 'cache_clear' => 1, 'option_group_id' => $groupId));
+  civicrm_api('option_value', 'getfields', ['version' => 3, 'cache_clear' => 1, 'option_group_id' => $groupId]);
   return $result;
 }
 
@@ -92,7 +92,7 @@ function civicrm_api3_option_value_create($params) {
 function _civicrm_api3_option_value_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
   //continue to support component
-  $params['component_id']['api.aliases'] = array('component');
+  $params['component_id']['api.aliases'] = ['component'];
   //  $params['name']['api.aliases'] = array('label');
   $params['option_group_id']['api.required'] = TRUE;
 }
@@ -106,10 +106,10 @@ function _civicrm_api3_option_value_create_spec(&$params) {
  */
 function civicrm_api3_option_value_delete($params) {
   // We will get the option group id before deleting so we can flush pseudoconstants.
-  $optionGroupID = civicrm_api('option_value', 'getvalue', array('version' => 3, 'id' => $params['id'], 'return' => 'option_group_id'));
+  $optionGroupID = civicrm_api('option_value', 'getvalue', ['version' => 3, 'id' => $params['id'], 'return' => 'option_group_id']);
   $result = CRM_Core_BAO_OptionValue::del($params['id']);
   if ($result) {
-    civicrm_api('option_value', 'getfields', array('version' => 3, 'cache_clear' => 1, 'option_group_id' => $optionGroupID));
+    civicrm_api('option_value', 'getfields', ['version' => 3, 'cache_clear' => 1, 'option_group_id' => $optionGroupID]);
     return civicrm_api3_create_success();
   }
   else {

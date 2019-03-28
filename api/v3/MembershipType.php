@@ -42,7 +42,7 @@
  */
 function civicrm_api3_membership_type_create($params) {
   // Workaround for fields using nonstandard serialization
-  foreach (array('relationship_type_id', 'relationship_direction') as $field) {
+  foreach (['relationship_type_id', 'relationship_direction'] as $field) {
     if (isset($params[$field]) && is_array($params[$field])) {
       $params[$field] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params[$field]);
     }
@@ -85,7 +85,7 @@ function civicrm_api3_membership_type_get($params) {
   if (!empty($results['values']) && is_array($results['values'])) {
     foreach ($results['values'] as &$item) {
       // Workaround for fields using nonstandard serialization
-      foreach (array('relationship_type_id', 'relationship_direction') as $field) {
+      foreach (['relationship_type_id', 'relationship_direction'] as $field) {
         if (isset($item[$field]) && !is_array($item[$field])) {
           $item[$field] = (array) $item[$field];
         }

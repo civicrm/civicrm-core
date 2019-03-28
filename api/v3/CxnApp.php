@@ -48,34 +48,34 @@ use \Civi\Cxn\Rpc\Message\GarbledMessage;
  *   List of fields.
  */
 function _civicrm_api3_cxn_app_get_spec(&$spec) {
-  $spec['appCert'] = array(
+  $spec['appCert'] = [
     'name' => 'appCert',
     'type' => CRM_Utils_Type::T_TEXT,
     'title' => ts('Certificate'),
     'description' => 'PEM-encoded certificate',
-  );
-  $spec['appId'] = array(
+  ];
+  $spec['appId'] = [
     'name' => 'appId',
     'type' => CRM_Utils_Type::T_STRING,
     'title' => ts('Application GUID'),
     'description' => 'Application GUID',
     'maxlength' => 128,
     'size' => CRM_Utils_Type::HUGE,
-  );
-  $spec['appUrl'] = array(
+  ];
+  $spec['appUrl'] = [
     'name' => 'appUrl',
     'type' => CRM_Utils_Type::T_STRING,
     'title' => ts('Registration URL'),
     'description' => 'An endpoint to notify when performing registration',
     'maxlength' => 255,
     'size' => CRM_Utils_Type::HUGE,
-  );
-  $spec['desc'] = array(
+  ];
+  $spec['desc'] = [
     'name' => 'desc',
     'type' => CRM_Utils_Type::T_TEXT,
     'title' => ts('Description'),
     'description' => 'Description',
-  );
+  ];
   //$spec['perm'] = array(
   //  'name' => 'perm',
   //  'type' => CRM_Utils_Type::T_TEXT,
@@ -104,16 +104,16 @@ function civicrm_api3_cxn_app_get($params) {
 
   $agent = new \Civi\Cxn\Rpc\Agent(NULL, NULL);
   $agent->setCertValidator(CRM_Cxn_BAO_Cxn::createCertificateValidator());
-  $message = $agent->decode(array(AppMetasMessage::NAME, GarbledMessage::NAME), $blob);
+  $message = $agent->decode([AppMetasMessage::NAME, GarbledMessage::NAME], $blob);
 
   if ($message instanceof AppMetasMessage) {
     return _civicrm_api3_basic_array_get('CxnApp', $params, $message->getData(), 'appId',
-      array('appId', 'appUrl', 'desc', 'appCert', 'perm'));
+      ['appId', 'appUrl', 'desc', 'appCert', 'perm']);
   }
   elseif ($message instanceof GarbledMessage) {
-    return civicrm_api3_create_error('Received garbled response', array(
+    return civicrm_api3_create_error('Received garbled response', [
       'garbled_message' => $message->getData(),
-    ));
+    ]);
   }
   else {
     return civicrm_api3_create_error("Unrecognized message");

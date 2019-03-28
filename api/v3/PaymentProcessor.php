@@ -41,10 +41,10 @@
  */
 function civicrm_api3_payment_processor_create($params) {
   if (empty($params['id']) && empty($params['payment_instrument_id'])) {
-    $params['payment_instrument_id'] = civicrm_api3('PaymentProcessorType', 'getvalue', array(
+    $params['payment_instrument_id'] = civicrm_api3('PaymentProcessorType', 'getvalue', [
       'id' => $params['payment_processor_type_id'],
       'return' => 'payment_instrument_id',
-    ));
+    ]);
   }
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'PaymentProcessor');
 }
@@ -104,14 +104,14 @@ function civicrm_api3_payment_processor_get($params) {
  * @return array
  */
 function _civicrm_api3_payment_processor_getlist_defaults(&$request) {
-  return array(
-    'description_field' => array(
+  return [
+    'description_field' => [
       'payment_processor_type_id',
       'description',
-    ),
-    'params' => array(
+    ],
+    'params' => [
       'is_test' => 0,
       'is_active' => 1,
-    ),
-  );
+    ],
+  ];
 }

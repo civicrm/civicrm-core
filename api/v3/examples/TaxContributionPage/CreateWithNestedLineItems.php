@@ -8,7 +8,7 @@
  *   API result array
  */
 function tax_contribution_page_create_example() {
-  $params = array(
+  $params = [
     'contact_id' => 1,
     'receive_date' => '20120511',
     'total_amount' => '400',
@@ -18,27 +18,27 @@ function tax_contribution_page_create_example() {
     'source' => 'SSF',
     'contribution_status_id' => 1,
     'skipLineItem' => 1,
-    'api.line_item.create' => array(
-      '0' => array(
-        'price_field_id' => array(
+    'api.line_item.create' => [
+      '0' => [
+        'price_field_id' => [
           '0' => 3,
-        ),
+        ],
         'qty' => 1,
         'line_total' => '100',
         'unit_price' => '100',
         'financial_type_id' => 7,
-      ),
-      '1' => array(
-        'price_field_id' => array(
+      ],
+      '1' => [
+        'price_field_id' => [
           '0' => 3,
-        ),
+        ],
         'qty' => 1,
         'line_total' => '300',
         'unit_price' => '300',
         'financial_type_id' => 8,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   try{
     $result = civicrm_api3('tax_contribution_page', 'create', $params);
@@ -48,11 +48,11 @@ function tax_contribution_page_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'error' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -66,13 +66,13 @@ function tax_contribution_page_create_example() {
  */
 function tax_contribution_page_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'contact_id' => '1',
         'financial_type_id' => '7',
@@ -102,21 +102,21 @@ function tax_contribution_page_create_expectedresult() {
         'creditnote_id' => '',
         'tax_amount' => '35',
         'contribution_type_id' => '7',
-        'api.line_item.create' => array(
-          '0' => array(
+        'api.line_item.create' => [
+          '0' => [
             'is_error' => 0,
             'version' => 3,
             'count' => 1,
             'id' => 1,
-            'values' => array(
-              '0' => array(
+            'values' => [
+              '0' => [
                 'id' => '1',
                 'entity_table' => 'civicrm_contribution',
                 'entity_id' => '1',
                 'contribution_id' => '1',
-                'price_field_id' => array(
+                'price_field_id' => [
                   '0' => '3',
-                ),
+                ],
                 'label' => 'line item',
                 'qty' => '1',
                 'unit_price' => '100',
@@ -126,23 +126,23 @@ function tax_contribution_page_create_expectedresult() {
                 'financial_type_id' => '7',
                 'deductible_amount' => '',
                 'tax_amount' => '20',
-              ),
-            ),
-          ),
-          '1' => array(
+              ],
+            ],
+          ],
+          '1' => [
             'is_error' => 0,
             'version' => 3,
             'count' => 1,
             'id' => 2,
-            'values' => array(
-              '0' => array(
+            'values' => [
+              '0' => [
                 'id' => '2',
                 'entity_table' => 'civicrm_contribution',
                 'entity_id' => '1',
                 'contribution_id' => '1',
-                'price_field_id' => array(
+                'price_field_id' => [
                   '0' => '3',
-                ),
+                ],
                 'label' => 'line item',
                 'qty' => '1',
                 'unit_price' => '300',
@@ -152,13 +152,13 @@ function tax_contribution_page_create_expectedresult() {
                 'financial_type_id' => '8',
                 'deductible_amount' => '',
                 'tax_amount' => '15',
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
+              ],
+            ],
+          ],
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

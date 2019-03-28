@@ -9,18 +9,18 @@
  *   API result array
  */
 function contact_create_example() {
-  $params = array(
+  $params = [
     'display_name' => 'batman',
     'contact_type' => 'Individual',
-    'api.tag.create' => array(
+    'api.tag.create' => [
       'name' => '$value.id',
       'description' => '$value.display_name',
       'format.only_id' => 1,
-    ),
-    'api.entity_tag.create' => array(
+    ],
+    'api.entity_tag.create' => [
       'tag_id' => '$value.api.tag.create',
-    ),
-  );
+    ],
+  ];
 
   try{
     $result = civicrm_api3('Contact', 'create', $params);
@@ -30,12 +30,12 @@ function contact_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -49,13 +49,13 @@ function contact_create_example() {
  */
 function contact_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 3,
-    'values' => array(
-      '3' => array(
+    'values' => [
+      '3' => [
         'id' => '3',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
@@ -106,15 +106,15 @@ function contact_create_expectedresult() {
         'created_date' => '2013-07-28 08:49:19',
         'modified_date' => '2012-11-14 16:02:35',
         'api.tag.create' => 6,
-        'api.entity_tag.create' => array(
+        'api.entity_tag.create' => [
           'is_error' => 0,
           'not_added' => 1,
           'added' => 1,
           'total_count' => 2,
-        ),
-      ),
-    ),
-  );
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

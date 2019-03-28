@@ -9,9 +9,9 @@
  *   API result array
  */
 function contact_getcount_example() {
-  $params = array(
+  $params = [
     'id' => 17,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Contact', 'getcount', $params);
@@ -21,12 +21,12 @@ function contact_getcount_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
