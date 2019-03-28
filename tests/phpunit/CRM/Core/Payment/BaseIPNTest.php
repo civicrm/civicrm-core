@@ -411,82 +411,63 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertFalse(is_array($result));
   }
 
-  /* @codingStandardsIgnoreStart
-     * Test calls main functions in sequence per 'main' - I had hoped to test the functions more
-     * fully but the calls to the POST happen in more than one function
-     * keeping this as good example of data to bring back to life later
+  public function testThatCancellingEventPaymentWillCancelAllAdditionalPendingParticipantsAndCreateCancellationActivities() {
+    $this->_setUpParticipantObjects('Pending from incomplete transaction');
+    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
+    $additionalParticipantId = $this->participantCreate(array(
+      'event_id' => $this->_eventId,
+      'registered_by_id' => $this->_participantId,
+      'status_id' => 'Pending from incomplete transaction',
+    ));
 
-    public function testMainFunctionActions() {
-      $ids                = $objects = array( );
-     $input['component'] = 'Contribute';
-    $postedParams       = array(
-      'x_response_code' => 1,
-      'x_response_reason_code' => 1,
-      'x_response_reason_text' => 'This transaction has been approved.',
-      'x_avs_code' => 'Y',
-      'x_auth_code' => 140454,
-      'x_trans_id' => 4353599599,
-      'x_method' => 'CC',
-      'x_card_type' => 'American Express',
-      'x_account_number' => 'XXXX2701',
-      'x_first_name' => 'Arthur',
-      'x_last_name' => 'Jacobs',
-      'x_company' => null,
-      'x_address' => '866 2166th St SN',
-      'x_city' => 'Edwardstown',
-      'x_state' => 'WA',
-      'x_zip' => 98026,
-      'x_country' => 'US',
-      'x_phone' => null,
-      'x_fax' => null,
-      'x_email' => null,
-      'x_invoice_num' => 'a9fb56c24576lk4c9490f6',
-      'x_description' => 'my desc',
-      'x_type' => 'auth_capture',
-      'x_cust_id' => 5191,
-      'x_ship_to_first_name' => null,
-      'x_ship_to_last_name' => null,
-      'x_ship_to_company' => null,
-      'x_ship_to_address' => null,
-      'x_ship_to_city' => null,
-      'x_ship_to_state' => null,
-      'x_ship_to_zip' => null,
-      'x_ship_to_country' => null,
-      'x_amount' => 60.00,
-      'x_tax' => 0.00,
-      'x_duty' => 0.00,
-      'x_freight' => 0.00,
-      'x_tax_exempt' => FALSE,
-      'x_po_num' => null,
-      'x_MD5_Hash' => '069ECAD13C8E15AC205CDF92B8B58CC7',
-      'x_cvv2_resp_code' => null,
-      'x_cavv_response' => null,
-      'x_test_request' => false,
-      'description' => 'my description'
-    );
-      $this->IPN->getInput( $input, $ids );
-      $this->IPN->getIDs( $ids, $input );
+    $transaction = new CRM_Core_Transaction();
+    $this->IPN->cancelled($this->objects, $transaction);
 
-            CRM_Core_Error::debug_var( '$ids', $ids );
-            CRM_Core_Error::debug_var( '$input', $input );
+    $cancelledParticipantsCount = civicrm_api3('Participant', 'get', [
+      'sequential' => 1,
+      'id' => ['IN' => [$this->_participantId, $additionalParticipantId]],
+      'status_id' => 'Cancelled',
+    ])['count'];
+    $this->assertEquals(2, $cancelledParticipantsCount);
 
-            $paymentProcessorID = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_PaymentProcessorType',
-                                                               'AuthNet', 'id', 'name' );
+    $cancelledActivatesCount = civicrm_api3('Activity', 'get', [
+      'sequential' => 1,
+      'activity_type_id' => 'Event Registration',
+      'subject' => ['LIKE' => '%Cancelled%'],
+      'source_record_id' => ['IN' => [$this->_participantId, $additionalParticipantId]],
+    ]);
 
-            if ( ! $this->IPN->validateData( $input, $ids, $objects, true, $paymentProcessorID ) ) {
-                return false;
-            }
+    $this->assertEquals(2, $cancelledActivatesCount['count']);
+  }
 
-            if ( $component == 'contribute' && $ids['contributionRecur'] ) {
-                // check if first contribution is completed, else complete first contribution
-                $first = true;
-                if ( $objects['contribution']->contribution_status_id == 1 ) {
-                    $first = false;
-                }
-                return $this->IPN->recur( $input, $ids, $objects, $first );
-            }
-    }
-   @codingStandardsIgnoreEnd */
+  public function testThatFailedEventPaymentWillCancelAllAdditionalPendingParticipantsAndCreateCancellationActivities() {
+    $this->_setUpParticipantObjects('Pending from incomplete transaction');
+    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
+    $additionalParticipantId = $this->participantCreate(array(
+      'event_id' => $this->_eventId,
+      'registered_by_id' => $this->_participantId,
+      'status_id' => 'Pending from incomplete transaction',
+    ));
+
+    $transaction = new CRM_Core_Transaction();
+    $this->IPN->failed($this->objects, $transaction);
+
+    $cancelledParticipantsCount = civicrm_api3('Participant', 'get', [
+      'sequential' => 1,
+      'id' => ['IN' => [$this->_participantId, $additionalParticipantId]],
+      'status_id' => 'Cancelled',
+    ])['count'];
+    $this->assertEquals(2, $cancelledParticipantsCount);
+
+    $cancelledActivatesCount = civicrm_api3('Activity', 'get', [
+      'sequential' => 1,
+      'activity_type_id' => 'Event Registration',
+      'subject' => ['LIKE' => '%Cancelled%'],
+      'source_record_id' => ['IN' => [$this->_participantId, $additionalParticipantId]],
+    ]);
+
+    $this->assertEquals(2, $cancelledActivatesCount['count']);
+  }
 
   /**
    * Prepare for contribution Test - involving only contribution objects
@@ -606,14 +587,18 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 
   /**
    * Set up participant requirements for test.
+   *
+   * @param string $participantStatus
+   *   The participant to create status
    */
-  public function _setUpParticipantObjects() {
+  public function _setUpParticipantObjects($participantStatus = 'Attended') {
     $event = $this->eventCreate(array('is_email_confirm' => 1));
 
     $this->_eventId = $event['id'];
     $this->_participantId = $this->participantCreate(array(
       'event_id' => $this->_eventId,
       'contact_id' => $this->_contactId,
+      'status_id' => $participantStatus,
     ));
 
     $this->callAPISuccess('participant_payment', 'create', array(
