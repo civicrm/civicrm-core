@@ -801,14 +801,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     $form->addElement('text', 'contribution_recur_processor_id', ts('Processor ID'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur', 'processor_id'));
     $form->addElement('text', 'contribution_recur_trxn_id', ts('Transaction ID'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur', 'trxn_id'));
 
-    $paymentProcessorParams = [
-      'return' => ["id", "name", 'is_test'],
-    ];
-    $paymentProcessors = civicrm_api3('PaymentProcessor', 'get', $paymentProcessorParams);
-    $paymentProcessorOpts = [];
-    foreach ($paymentProcessors['values'] as $key => $value) {
-      $paymentProcessorOpts[$key] = $value['name'] . ($value['is_test'] ? ' (Test)' : '');
-    }
+    $paymentProcessorOpts = CRM_Contribute_BAO_ContributionRecur::buildOptions('payment_processor_id', 'get');
     $form->add('select', 'contribution_recur_payment_processor_id', ts('Payment Processor ID'), $paymentProcessorOpts, FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple']);
 
     CRM_Core_BAO_Query::addCustomFormFields($form, array('ContributionRecur'));
@@ -970,6 +963,50 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    */
   public static function getInactiveStatuses() {
     return self::$inactiveStatuses;
+  }
+
+  /**
+   * Get options for the called BAO object's field.
+   *
+   * This function can be overridden by each BAO to add more logic related to context.
+   * The overriding function will generally call the lower-level CRM_Core_PseudoConstant::get
+   *
+   * @param string $fieldName
+   * @param string $context
+   * @see CRM_Core_DAO::buildOptionsContext
+   * @param array $props
+   *   whatever is known about this bao object.
+   *
+   * @return array|bool
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+
+    switch ($fieldName) {
+      case 'payment_processor_id':
+        if (isset(\Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'])) {
+          return \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'];
+        }
+        $baoName = 'CRM_Contribute_BAO_ContributionRecur';
+        $props['condition']['test'] = "is_test = 0";
+        $liveProcessors = CRM_Core_PseudoConstant::get($baoName, $fieldName, $props, $context);
+        $props['condition']['test'] = "is_test != 0";
+        $testProcessors = CRM_Core_PseudoConstant::get($baoName, $fieldName, $props, $context);
+        foreach ($testProcessors as $key => $value) {
+          if ($context === 'validate') {
+            // @fixme: Ideally the names would be different in the civicrm_payment_processor table but they are not.
+            //     So we append '_test' to the test one so that we can select the correct processor by name using the ContributionRecur.create API.
+            $testProcessors[$key] = $value . '_test';
+          }
+          else {
+            $testProcessors[$key] = CRM_Core_TestEntity::appendTestText($value);
+          }
+        }
+        $allProcessors = $liveProcessors + $testProcessors;
+        ksort($allProcessors);
+        \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'] = $allProcessors;
+        return $allProcessors;
+    }
+    return parent::buildOptions($fieldName, $context, $props);
   }
 
 }
