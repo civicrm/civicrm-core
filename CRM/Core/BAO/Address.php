@@ -1321,7 +1321,7 @@ SELECT is_primary,
       case 'state_province':
         // change $fieldName to DB specific names.
         $fieldName = 'state_province_id';
-        if (empty($props['country_id'])) {
+        if (empty($props['country_id']) && $context !== 'validate') {
           $config = CRM_Core_Config::singleton();
           if (!empty($config->provinceLimit)) {
             $props['country_id'] = $config->provinceLimit;
@@ -1330,7 +1330,7 @@ SELECT is_primary,
             $props['country_id'] = $config->defaultContactCountry;
           }
         }
-        if (!empty($props['country_id']) && $context !== 'validate') {
+        if (!empty($props['country_id'])) {
           $params['condition'] = 'country_id IN (' . implode(',', (array) $props['country_id']) . ')';
         }
         break;
