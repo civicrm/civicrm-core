@@ -25,6 +25,8 @@
 *}
 {*this is included inside a table row*}
 {assign var=relativeName   value=$fieldName|cat:"_relative"}
+{assign var='from' value=$from|default:'_low'}
+{assign var='to' value=$to|default:'_high'}
 
   {$form.$relativeName.label}<br />
   {$form.$relativeName.html}<br />

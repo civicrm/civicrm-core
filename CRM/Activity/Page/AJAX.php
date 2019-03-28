@@ -438,8 +438,8 @@ class CRM_Activity_Page_AJAX {
         }
         if (!empty($params[$searchField])) {
           $activityFilter[$formSearchField] = CRM_Utils_Type::escape($params[$searchField], $dataType);
-          if (in_array($searchField, array('activity_date_low', 'activity_date_high'))) {
-            $activityFilter['activity_date_relative'] = 0;
+          if (in_array($searchField, array('activity_date_time_low', 'activity_date_time_high'))) {
+            $activityFilter['activity_date_time_relative'] = 0;
           }
           elseif ($searchField == 'activity_status_id') {
             $activityFilter['status_id'] = explode(',', $activityFilter[$searchField]);
