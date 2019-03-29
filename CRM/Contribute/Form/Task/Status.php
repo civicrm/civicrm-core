@@ -118,7 +118,7 @@ AND    co.id IN ( $contribIDs )";
     $this->_rows = array();
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
     $defaults = array();
-    $now = date("m/d/Y");
+    $now = date("Y-m-d");
     $paidByOptions = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument();
 
     while ($dao->fetch()) {
@@ -140,8 +140,8 @@ AND    co.id IN ( $contribIDs )";
       $this->addRule("fee_amount_{$row['contribution_id']}", ts('Please enter a valid amount.'), 'money');
       $defaults["fee_amount_{$row['contribution_id']}"] = 0.0;
 
-      $row['trxn_date'] = $this->addDate("trxn_date_{$row['contribution_id']}", FALSE,
-        ts('Receipt Date'), array('formatType' => 'activityDate')
+      $row['trxn_date'] = $this->add('datepicker', "trxn_date_{$row['contribution_id']}", [], FALSE,
+        ts('Receipt Date'), array('time' => FALSE)
       );
       $defaults["trxn_date_{$row['contribution_id']}"] = $now;
 
