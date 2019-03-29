@@ -894,7 +894,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    */
   protected static function isComplete($recurringContributionID, $installments) {
     $paidInstallments = CRM_Core_DAO::singleValueQuery(
-      'SELECT count(*) FROM civicrm_contribution 
+      'SELECT count(*) FROM civicrm_contribution
         WHERE contribution_recur_id = %1
         AND contribution_status_id = ' . CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       array(1 => array($recurringContributionID, 'Integer'))
@@ -942,13 +942,13 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
         $priceField = new CRM_Price_DAO_PriceField();
         $priceField->id = $lineItem['price_field_id'];
         $priceField->find(TRUE);
-        $lineSets[$priceField->price_set_id][] = $lineItem;
+        $lineSets[$priceField->price_set_id][$lineItem['price_field_id']] = $lineItem;
       }
     }
     // CRM-19309 if more than one then just pass them through:
     elseif (count($lineItems) > 1) {
       foreach ($lineItems as $index => $lineItem) {
-        $lineSets[$index][] = $lineItem;
+        $lineSets[$index][$lineItem['price_field_id']] = $lineItem;
       }
     }
 
