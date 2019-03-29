@@ -45,7 +45,7 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
    */
   public function run() {
     if (!preg_match('/^[^\/]+\.(jpg|jpeg|png|gif)$/i', $_GET['photo'])) {
-      CRM_Core_Error::fatal('Malformed photo name');
+      throw new CRM_Core_Exception(ts('Malformed photo name'));
     }
 
     // FIXME Optimize performance of image_url query
@@ -69,7 +69,7 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
       CRM_Utils_System::civiExit();
     }
     else {
-      CRM_Core_Error::fatal('Photo does not exist');
+      throw new CRM_Core_Exception(ts('Photo does not exist'));
     }
   }
 
