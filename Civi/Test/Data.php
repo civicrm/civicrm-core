@@ -38,16 +38,16 @@ class Data {
     \Civi\Test::schema()->setStrict(TRUE);
 
     // Rebuild triggers
-    civicrm_api('system', 'flush', array('version' => 3, 'triggers' => 1));
+    civicrm_api('system', 'flush', ['version' => 3, 'triggers' => 1]);
 
-    \CRM_Core_BAO_ConfigSetting::setEnabledComponents(array(
+    \CRM_Core_BAO_ConfigSetting::setEnabledComponents([
       'CiviEvent',
       'CiviContribute',
       'CiviMember',
       'CiviMail',
       'CiviReport',
       'CiviPledge',
-    ));
+    ]);
 
     return TRUE;
   }

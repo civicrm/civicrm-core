@@ -39,12 +39,12 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::PREPARE => array(
-        array('onApiPrepare', Events::W_MIDDLE),
-        array('onApiPrepare_validate', Events::W_LATE),
-      ),
-    );
+    return [
+      Events::PREPARE => [
+        ['onApiPrepare', Events::W_MIDDLE],
+        ['onApiPrepare_validate', Events::W_LATE],
+      ],
+    ];
   }
 
   /**
@@ -96,7 +96,7 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
    * @return array
    */
   public function getDefaults($fields) {
-    $defaults = array();
+    $defaults = [];
 
     foreach ($fields as $field => $values) {
       if (isset($values['api.default'])) {
@@ -112,7 +112,7 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
    * @return array
    */
   public function getRequired($fields) {
-    $required = array('version');
+    $required = ['version'];
 
     foreach ($fields as $field => $values) {
       if (!empty($values['api.required'])) {

@@ -24,10 +24,10 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    * @inheritDoc
    */
   public static function getSubscribedEvents() {
-    return array(
+    return [
       Events::TOKEN_EVALUATE => 'onEvaluate',
       Events::TOKEN_RENDER => 'onRender',
-    );
+    ];
   }
 
   /**
@@ -41,7 +41,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     // hook *categories* (aka entities aka namespaces). We'll cache
     // this in the TokenProcessor's context.
 
-    $hookTokens = array();
+    $hookTokens = [];
     \CRM_Utils_Hook::tokens($hookTokens);
     $categories = array_keys($hookTokens);
     $e->getTokenProcessor()->context['hookTokenCategories'] = $categories;
@@ -55,9 +55,9 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       /** @var int $contactId */
       $contactId = $row->context['contactId'];
       if (empty($row->context['contact'])) {
-        $params = array(
-          array('contact_id', '=', $contactId, 0, 0),
-        );
+        $params = [
+          ['contact_id', '=', $contactId, 0, 0],
+        ];
         list($contact, $_) = \CRM_Contact_BAO_Query::apiQuery($params);
         $contact = reset($contact); //CRM-4524
         if (!$contact || is_a($contact, 'CRM_Core_Error')) {
@@ -69,10 +69,10 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         if (!empty($messageTokens['contact'])) {
           foreach ($messageTokens['contact'] as $token) {
             if (\CRM_Core_BAO_CustomField::getKeyID($token)) {
-              $contact[$token] = civicrm_api3('Contact', 'getvalue', array(
+              $contact[$token] = civicrm_api3('Contact', 'getvalue', [
                 'return' => $token,
                 'id' => $contactId,
-              ));
+              ]);
             }
           }
         }
@@ -87,7 +87,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         $contact = array_merge($contact, $row->context['tmpTokenParams']);
       }
 
-      $contactArray = !is_array($contactId) ? array($contactId => $contact) : $contact;
+      $contactArray = !is_array($contactId) ? [$contactId => $contact] : $contact;
 
       // Note: This is a small contract change from the past; data should be missing
       // less randomly.

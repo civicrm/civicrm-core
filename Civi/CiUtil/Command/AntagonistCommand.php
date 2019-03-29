@@ -17,7 +17,7 @@ class AntagonistCommand {
     }
     list ($program, $target, $suite) = $argv;
 
-    $candidateTests = \Civi\CiUtil\PHPUnitScanner::findTestsByPath(array($suite));
+    $candidateTests = \Civi\CiUtil\PHPUnitScanner::findTestsByPath([$suite]);
     //    $candidateTests = array(
     //      array('class' => 'CRM_Core_RegionTest', 'method' => 'testBlank'),
     //      array('class' => 'CRM_Core_RegionTest', 'method' => 'testDefault'),
@@ -26,10 +26,10 @@ class AntagonistCommand {
     //    );
     $antagonist = self::findAntagonist($target, $candidateTests);
     if ($antagonist) {
-      print_r(array('found an antagonist' => $antagonist));
+      print_r(['found an antagonist' => $antagonist]);
     }
     else {
-      print_r(array('found no antagonists'));
+      print_r(['found no antagonists']);
     }
   }
 
@@ -50,26 +50,26 @@ class AntagonistCommand {
   public static function findAntagonist($target, $candidateTests) {
     //$phpUnit = new \Civi\CiUtil\EnvTestRunner('./scripts/phpunit', 'EnvTests');
     $phpUnit = new \Civi\CiUtil\EnvTestRunner('phpunit', 'tests/phpunit/EnvTests.php');
-    $expectedResults = $phpUnit->run(array($target));
-    print_r(array('$expectedResults' => $expectedResults));
+    $expectedResults = $phpUnit->run([$target]);
+    print_r(['$expectedResults' => $expectedResults]);
 
     foreach ($candidateTests as $candidateTest) {
       $candidateTestName = $candidateTest['class'] . '::' . $candidateTest['method'];
       if ($candidateTestName == $target) {
         continue;
       }
-      $actualResults = $phpUnit->run(array(
+      $actualResults = $phpUnit->run([
         $candidateTestName,
         $target,
-      ));
-      print_r(array('$actualResults' => $actualResults));
+      ]);
+      print_r(['$actualResults' => $actualResults]);
       foreach ($expectedResults as $testName => $expectedResult) {
         if ($actualResults[$testName] != $expectedResult) {
-          return array(
+          return [
             'antagonist' => $candidateTest,
             'expectedResults' => $expectedResults,
             'actualResults' => $actualResults,
-          );
+          ];
         }
       }
     }

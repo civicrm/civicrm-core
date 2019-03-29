@@ -39,9 +39,9 @@ class I18nSubscriber implements EventSubscriberInterface {
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::PREPARE => array('onApiPrepare', Events::W_MIDDLE),
-    );
+    return [
+      Events::PREPARE => ['onApiPrepare', Events::W_MIDDLE],
+    ];
   }
 
   /**
@@ -80,7 +80,7 @@ class I18nSubscriber implements EventSubscriberInterface {
     // on multi-lang sites based on request and civicrm_uf_match
     if ($multiLang) {
       $config = \CRM_Core_Config::singleton();
-      $languageLimit = array();
+      $languageLimit = [];
       if (isset($config->languageLimit) and $config->languageLimit) {
         $languageLimit = $config->languageLimit;
       }
@@ -89,7 +89,7 @@ class I18nSubscriber implements EventSubscriberInterface {
         $lcMessages = $lcMessagesRequest;
       }
       else {
-        throw new \API_Exception(ts('Language not enabled: %1', array(1 => $lcMessagesRequest)));
+        throw new \API_Exception(ts('Language not enabled: %1', [1 => $lcMessagesRequest]));
       }
     }
 

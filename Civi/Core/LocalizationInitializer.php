@@ -56,7 +56,7 @@ class LocalizationInitializer {
     $fileName = $localeDir . $seedLanguage . DIRECTORY_SEPARATOR . 'settings.default.json';
 
     // initalization
-    $settingsParams = array();
+    $settingsParams = [];
 
     if (file_exists($fileName)) {
 
@@ -66,7 +66,7 @@ class LocalizationInitializer {
 
       if (!empty($settings)) {
         // get all valid settings
-        $results = civicrm_api3('Setting', 'getfields', array());
+        $results = civicrm_api3('Setting', 'getfields', []);
         $validSettings = array_keys($results['values']);
         // add valid settings to params to send to api
         foreach ($settings as $setting => $value) {
@@ -86,7 +86,7 @@ class LocalizationInitializer {
 
         // set default currency in currencies_enabled (option group)
         if (isset($settings['defaultCurrency'])) {
-          \CRM_Admin_Form_Setting_Localization::updateEnabledCurrencies(array($settings['defaultCurrency']), $settings['defaultCurrency']);
+          \CRM_Admin_Form_Setting_Localization::updateEnabledCurrencies([$settings['defaultCurrency']], $settings['defaultCurrency']);
         }
 
       }

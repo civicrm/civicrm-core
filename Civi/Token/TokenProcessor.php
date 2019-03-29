@@ -105,11 +105,11 @@ class TokenProcessor {
    * @return TokenProcessor
    */
   public function addMessage($name, $value, $format) {
-    $this->messages[$name] = array(
+    $this->messages[$name] = [
       'string' => $value,
       'format' => $format,
       'tokens' => \CRM_Utils_Token::getTokens($value),
-    );
+    ];
     return $this;
   }
 
@@ -120,11 +120,11 @@ class TokenProcessor {
    */
   public function addRow() {
     $key = $this->next++;
-    $this->rowContexts[$key] = array();
-    $this->rowValues[$key] = array(
-      'text/plain' => array(),
-      'text/html' => array(),
-    );
+    $this->rowContexts[$key] = [];
+    $this->rowValues[$key] = [
+      'text/plain' => [],
+      'text/html' => [],
+    ];
 
     return new TokenRow($this, $key);
   }
@@ -160,7 +160,7 @@ class TokenProcessor {
    * @return array
    */
   public function getMessageTokens() {
-    $tokens = array();
+    $tokens = [];
     foreach ($this->messages as $message) {
       $tokens = \CRM_Utils_Array::crmArrayMerge($tokens, $message['tokens']);
     }
@@ -227,8 +227,8 @@ class TokenProcessor {
    */
   public function getTokens() {
     if ($this->tokens === NULL) {
-      $this->tokens = array();
-      $event = new TokenRegisterEvent($this, array('entity' => 'undefined'));
+      $this->tokens = [];
+      $event = new TokenRegisterEvent($this, ['entity' => 'undefined']);
       $this->dispatcher->dispatch(Events::TOKEN_REGISTER, $event);
     }
     return $this->tokens;
@@ -242,7 +242,7 @@ class TokenProcessor {
    */
   public function listTokens() {
     if ($this->listTokens === NULL) {
-      $this->listTokens = array();
+      $this->listTokens = [];
       foreach ($this->getTokens() as $token => $values) {
         $this->listTokens['{' . $token . '}'] = $values['label'];
       }
@@ -280,9 +280,9 @@ class TokenProcessor {
 
     // FIXME preg_callback.
     $tokens = $this->rowValues[$row->tokenRow][$message['format']];
-    $flatTokens = array();
+    $flatTokens = [];
     \CRM_Utils_Array::flatten($tokens, $flatTokens, '', '.');
-    $filteredTokens = array();
+    $filteredTokens = [];
     foreach ($flatTokens as $k => $v) {
       $filteredTokens['{' . $k . '}'] = ($useSmarty ? \CRM_Utils_Token::tokenEscapeSmarty($v) : $v);
     }

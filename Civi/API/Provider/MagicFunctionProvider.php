@@ -39,11 +39,11 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::RESOLVE => array(
-        array('onApiResolve', Events::W_MIDDLE),
-      ),
-    );
+    return [
+      Events::RESOLVE => [
+        ['onApiResolve', Events::W_MIDDLE],
+      ],
+    ];
   }
 
   /**
@@ -54,7 +54,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
   /**
    */
   public function __construct() {
-    $this->cache = array();
+    $this->cache = [];
   }
 
   /**
@@ -108,12 +108,12 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
    * @return array
    */
   public function getEntityNames($version) {
-    $entities = array();
+    $entities = [];
     $include_dirs = array_unique(explode(PATH_SEPARATOR, get_include_path()));
     #$include_dirs = array(dirname(__FILE__). '/../../');
     foreach ($include_dirs as $include_dir) {
       $api_dir = implode(DIRECTORY_SEPARATOR,
-        array($include_dir, 'api', 'v' . $version));
+        [$include_dir, 'api', 'v' . $version]);
       if (!is_dir($api_dir)) {
         continue;
       }
@@ -137,7 +137,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
         }
       }
     }
-    $entities = array_diff($entities, array('Generic'));
+    $entities = array_diff($entities, ['Generic']);
     $entities = array_unique($entities);
     sort($entities);
 
@@ -154,12 +154,12 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
     $entity = _civicrm_api_get_camel_name($entity);
     $entities = $this->getEntityNames($version);
     if (!in_array($entity, $entities)) {
-      return array();
+      return [];
     }
     $this->loadEntity($entity, $version);
 
     $functions = get_defined_functions();
-    $actions = array();
+    $actions = [];
     $prefix = 'civicrm_api' . $version . '_' . _civicrm_api_get_entity_name_from_camel($entity) . '_';
     $prefixGeneric = 'civicrm_api' . $version . '_generic_';
     foreach ($functions['user'] as $fct) {
@@ -203,21 +203,21 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
       // someone already loaded the appropriate file
       // FIXME: This has the affect of masking bugs in load order; this is
       // included to provide bug-compatibility.
-      $this->cache[$cachekey] = array('function' => $stdFunction, 'is_generic' => FALSE);
+      $this->cache[$cachekey] = ['function' => $stdFunction, 'is_generic' => FALSE];
       return $this->cache[$cachekey];
     }
 
-    $stdFiles = array(
+    $stdFiles = [
       // By convention, the $camelName.php is more likely to contain the
       // function, so test it first
       'api/v' . $apiRequest['version'] . '/' . $camelName . '.php',
       'api/v' . $apiRequest['version'] . '/' . $camelName . '/' . $actionCamelName . '.php',
-    );
+    ];
     foreach ($stdFiles as $stdFile) {
       if (\CRM_Utils_File::isIncludable($stdFile)) {
         require_once $stdFile;
         if (function_exists($stdFunction)) {
-          $this->cache[$cachekey] = array('function' => $stdFunction, 'is_generic' => FALSE);
+          $this->cache[$cachekey] = ['function' => $stdFunction, 'is_generic' => FALSE];
           return $this->cache[$cachekey];
         }
       }
@@ -227,23 +227,23 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
     require_once 'api/v3/Generic.php';
     # $genericFunction = 'civicrm_api3_generic_' . $apiRequest['action'];
     $genericFunction = $this->getFunctionName('generic', $apiRequest['action'], $apiRequest['version']);
-    $genericFiles = array(
+    $genericFiles = [
       // By convention, the Generic.php is more likely to contain the
       // function, so test it first
       'api/v' . $apiRequest['version'] . '/Generic.php',
       'api/v' . $apiRequest['version'] . '/Generic/' . $actionCamelName . '.php',
-    );
+    ];
     foreach ($genericFiles as $genericFile) {
       if (\CRM_Utils_File::isIncludable($genericFile)) {
         require_once $genericFile;
         if (function_exists($genericFunction)) {
-          $this->cache[$cachekey] = array('function' => $genericFunction, 'is_generic' => TRUE);
+          $this->cache[$cachekey] = ['function' => $genericFunction, 'is_generic' => TRUE];
           return $this->cache[$cachekey];
         }
       }
     }
 
-    $this->cache[$cachekey] = array('function' => FALSE, 'is_generic' => FALSE);
+    $this->cache[$cachekey] = ['function' => FALSE, 'is_generic' => FALSE];
     return $this->cache[$cachekey];
   }
 
@@ -285,12 +285,12 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
     }
 
     // Check for standalone action files; to match _civicrm_api_resolve(), only load the first one
-    $loaded_files = array(); // array($relativeFilePath => TRUE)
+    $loaded_files = []; // array($relativeFilePath => TRUE)
     $include_dirs = array_unique(explode(PATH_SEPARATOR, get_include_path()));
     foreach ($include_dirs as $include_dir) {
-      foreach (array($camelName, 'Generic') as $name) {
+      foreach ([$camelName, 'Generic'] as $name) {
         $action_dir = implode(DIRECTORY_SEPARATOR,
-          array($include_dir, 'api', "v${version}", $name));
+          [$include_dir, 'api', "v${version}", $name]);
         if (!is_dir($action_dir)) {
           continue;
         }

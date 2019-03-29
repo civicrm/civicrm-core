@@ -16,7 +16,7 @@ class System {
   /**
    * @var array cache
    */
-  private $cache = array();
+  private $cache = [];
 
   /**
    * @return \Civi\Payment\System
@@ -111,7 +111,7 @@ class System {
     if ($id == 0) {
       return new \CRM_Core_Payment_Manual();
     }
-    $processor = civicrm_api3('payment_processor', 'getsingle', array('id' => $id, 'is_test' => NULL));
+    $processor = civicrm_api3('payment_processor', 'getsingle', ['id' => $id, 'is_test' => NULL]);
     return self::getByProcessor($processor);
   }
 
@@ -123,7 +123,7 @@ class System {
    * @throws \CiviCRM_API3_Exception
    */
   public function getByName($name, $is_test) {
-    $processor = civicrm_api3('payment_processor', 'getsingle', array('name' => $name, 'is_test' => $is_test));
+    $processor = civicrm_api3('payment_processor', 'getsingle', ['name' => $name, 'is_test' => $is_test]);
     return self::getByProcessor($processor);
   }
 
@@ -133,7 +133,7 @@ class System {
    * This is particularly used for tests.
    */
   public function flushProcessors() {
-    $this->cache = array();
+    $this->cache = [];
     \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('all', TRUE);
     \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('live', TRUE);
     \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('test', TRUE);
@@ -151,11 +151,11 @@ class System {
    * @throws \CiviCRM_API3_Exception
    */
   public function getByClass($className) {
-    return $this->getByProcessor(array(
+    return $this->getByProcessor([
       'class_name' => $className,
       'id' => 0,
       'is_test' => 0,
-    ),
+    ],
     TRUE);
   }
 

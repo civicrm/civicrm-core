@@ -51,11 +51,11 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::AUTHORIZE => array(
-        array('onApiAuthorize', Events::W_EARLY),
-      ),
-    );
+    return [
+      Events::AUTHORIZE => [
+        ['onApiAuthorize', Events::W_EARLY],
+      ],
+    ];
   }
 
   /**
@@ -146,7 +146,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
     $apiRequest = $event->getApiRequest();
     if ($apiRequest['version'] == 3 && \CRM_Utils_String::convertStringToCamel($apiRequest['entity']) == $this->entityName && in_array(strtolower($apiRequest['action']), $this->actions)) {
       if (isset($apiRequest['params']['field_name'])) {
-        $fldIdx = \CRM_Utils_Array::index(array('field_name'), $this->getCustomFields());
+        $fldIdx = \CRM_Utils_Array::index(['field_name'], $this->getCustomFields());
         if (empty($fldIdx[$apiRequest['params']['field_name']])) {
           throw new \Exception("Failed to map custom field to entity table");
         }
@@ -229,17 +229,17 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
     \CRM_Core_Transaction::create(TRUE)->run(function($tx) use ($entity, $action, $entityId, &$exception, $self) {
       $tx->rollback(); // Just to be safe.
 
-      $params = array(
+      $params = [
         'version' => 3,
         'check_permissions' => 1,
         'id' => $entityId,
-      );
+      ];
 
       $result = $self->kernel->run($entity, $self->getDelegatedAction($action), $params);
       if ($result['is_error'] || empty($result['values'])) {
-        $exception = new \Civi\API\Exception\UnauthorizedException("Authorization failed on ($entity,$entityId)", array(
+        $exception = new \Civi\API\Exception\UnauthorizedException("Authorization failed on ($entity,$entityId)", [
           'cause' => $result,
-        ));
+        ]);
       }
     });
 
@@ -325,25 +325,25 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    * @throws \Exception
    */
   public function getDelegate($id) {
-    $query = \CRM_Core_DAO::executeQuery($this->lookupDelegateSql, array(
-      1 => array($id, 'Positive'),
-    ));
+    $query = \CRM_Core_DAO::executeQuery($this->lookupDelegateSql, [
+      1 => [$id, 'Positive'],
+    ]);
     if ($query->fetch()) {
       if (!preg_match('/^civicrm_value_/', $query->entity_table)) {
         // A normal attachment directly on its entity.
-        return array($query->is_valid, $query->entity_table, $query->entity_id);
+        return [$query->is_valid, $query->entity_table, $query->entity_id];
       }
 
       // Ex: Translate custom-field table ("civicrm_value_foo_4") to
       // entity table ("civicrm_activity").
-      $tblIdx = \CRM_Utils_Array::index(array('table_name'), $this->getCustomFields());
+      $tblIdx = \CRM_Utils_Array::index(['table_name'], $this->getCustomFields());
       if (isset($tblIdx[$query->entity_table])) {
-        return array($query->is_valid, $tblIdx[$query->entity_table]['entity_table'], $query->entity_id);
+        return [$query->is_valid, $tblIdx[$query->entity_table]['entity_table'], $query->entity_id];
       }
       throw new \Exception('Failed to lookup entity table for custom field.');
     }
     else {
-      return array(FALSE, NULL, NULL);
+      return [FALSE, NULL, NULL];
     }
   }
 
@@ -363,14 +363,14 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    */
   public function getCustomFields() {
     $query = \CRM_Core_DAO::executeQuery($this->lookupCustomFieldSql);
-    $rows = array();
+    $rows = [];
     while ($query->fetch()) {
-      $rows[] = array(
+      $rows[] = [
         'field_name' => $query->field_name,
         'table_name' => $query->table_name,
         'extends' => $query->extends,
         'entity_table' => \CRM_Core_BAO_CustomGroup::getTableNameByEntityName($query->extends),
-      );
+      ];
     }
     return $rows;
   }

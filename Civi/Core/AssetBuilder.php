@@ -77,11 +77,11 @@ class AssetBuilder {
    *   Array(string $value => string $label).
    */
   public static function getCacheModes() {
-    return array(
+    return [
       '0' => ts('Disable'),
       '1' => ts('Enable'),
       'auto' => ts('Auto'),
-    );
+    ];
   }
 
   protected $cacheEnabled;
@@ -121,7 +121,7 @@ class AssetBuilder {
    *   URL.
    *   Ex: 'http://example.org/files/civicrm/dyn/angular.abcd1234abcd1234.json'.
    */
-  public function getUrl($name, $params = array()) {
+  public function getUrl($name, $params = []) {
     if (!$this->isValidName($name)) {
       throw new \RuntimeException("Invalid dynamic asset name");
     }
@@ -131,11 +131,11 @@ class AssetBuilder {
       return $this->getCacheUrl($fileName);
     }
     else {
-      return \CRM_Utils_System::url('civicrm/asset/builder', array(
+      return \CRM_Utils_System::url('civicrm/asset/builder', [
         'an' => $name,
         'ap' => $this->encode($params),
         'ad' => $this->digest($name, $params),
-      ), TRUE, NULL, FALSE);
+      ], TRUE, NULL, FALSE);
     }
   }
 
@@ -147,7 +147,7 @@ class AssetBuilder {
    *   URL.
    *   Ex: '/var/www/files/civicrm/dyn/angular.abcd1234abcd1234.json'.
    */
-  public function getPath($name, $params = array()) {
+  public function getPath($name, $params = []) {
     if (!$this->isValidName($name)) {
       throw new \RuntimeException("Invalid dynamic asset name");
     }
@@ -174,7 +174,7 @@ class AssetBuilder {
       throw new UnknownAssetException("Asset name is malformed");
     }
     $nameParts = explode('.', $name);
-    array_splice($nameParts, -1, 0, array($this->digest($name, $params)));
+    array_splice($nameParts, -1, 0, [$this->digest($name, $params)]);
     $fileName = implode('.', $nameParts);
     if ($force || !file_exists($this->getCachePath($fileName))) {
       // No file locking, but concurrent writers should produce
@@ -203,7 +203,7 @@ class AssetBuilder {
    *     - content: string, ex: '<body>Hello world</body>'.
    * @throws \CRM_Core_Exception
    */
-  public function render($name, $params = array()) {
+  public function render($name, $params = []) {
     if (!$this->isValidName($name)) {
       throw new UnknownAssetException("Asset name is malformed");
     }
@@ -212,11 +212,11 @@ class AssetBuilder {
       throw new UnknownAssetException("Unrecognized asset name: $name");
     }
     // Beg your pardon, sir. Please may I have an HTTP response class instead?
-    return array(
+    return [
       'statusCode' => 200,
       'mimeType' => $mimeType,
       'content' => $content,
-    );
+    ];
   }
 
   /**
@@ -305,7 +305,7 @@ class AssetBuilder {
    */
   protected function decode($str) {
     if ($str === NULL || $str === FALSE || $str === '') {
-      return array();
+      return [];
     }
 
     $str = base64_decode($str);
@@ -372,11 +372,11 @@ class AssetBuilder {
       return $assets->render($get['an'], $assets->decode($get['ap']));
     }
     catch (UnknownAssetException $e) {
-      return array(
+      return [
         'statusCode' => 404,
         'mimeType' => 'text/plain',
         'content' => $e->getMessage(),
-      );
+      ];
     }
   }
 

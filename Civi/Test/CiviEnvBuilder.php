@@ -19,7 +19,7 @@ use RuntimeException;
 class CiviEnvBuilder {
   protected $name;
 
-  private $steps = array();
+  private $steps = [];
 
   /**
    * @var string|NULL

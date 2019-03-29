@@ -25,7 +25,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
    *  Ex: $cache['Some_Test_Class']['civicrm_foobar'] = 'hook_civicrm_foobar';
    *  Array(string $testClass => Array(string $hookName => string $methodName)).
    */
-  private $cache = array();
+  private $cache = [];
 
   /**
    * @var \CRM_Core_Transaction|NULL
@@ -39,7 +39,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
   }
 
   public function endTestSuite(\PHPUnit_Framework_TestSuite $suite) {
-    $this->cache = array();
+    $this->cache = [];
   }
 
   public function startTest(\PHPUnit_Framework_Test $test) {
@@ -113,7 +113,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
   protected function findTestHooks(HookInterface $test) {
     $class = get_class($test);
     if (!isset($this->cache[$class])) {
-      $funcs = array();
+      $funcs = [];
       foreach (get_class_methods($class) as $func) {
         if (preg_match('/^hook_/', $func)) {
           $funcs[substr($func, 5)] = $func;
@@ -147,7 +147,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     /** @var \CRM_Utils_Hook_UnitTests $hooks */
     $hooks = \CRM_Utils_Hook::singleton();
     foreach ($this->findTestHooks($test) as $hook => $func) {
-      $hooks->setHook($hook, array($test, $func));
+      $hooks->setHook($hook, [$test, $func]);
     }
   }
 
@@ -208,7 +208,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
    */
   protected function cv($cmd, $decode = 'json') {
     $cmd = 'cv ' . $cmd;
-    $descriptorSpec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => STDERR);
+    $descriptorSpec = [0 => ["pipe", "r"], 1 => ["pipe", "w"], 2 => STDERR];
     $oldOutput = getenv('CV_OUTPUT');
     putenv("CV_OUTPUT=json");
     $process = proc_open($cmd, $descriptorSpec, $pipes, __DIR__);
@@ -243,7 +243,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
    * @return array
    */
   protected function indexTestsByInterface($tests) {
-    $byInterface = array('HeadlessInterface' => array(), 'EndToEndInterface' => array());
+    $byInterface = ['HeadlessInterface' => [], 'EndToEndInterface' => []];
     foreach ($tests as $test) {
       /** @var \PHPUnit_Framework_Test $test */
       if ($test instanceof HeadlessInterface) {

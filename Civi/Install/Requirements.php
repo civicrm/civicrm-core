@@ -23,15 +23,15 @@ class Requirements {
    */
   const REQUIREMENT_ERROR = 2;
 
-  protected $system_checks = array(
+  protected $system_checks = [
     'checkMemory',
     'checkServerVariables',
     'checkMysqlConnectExists',
     'checkJsonEncodeExists',
     'checkMultibyteExists',
-  );
+  ];
 
-  protected $database_checks = array(
+  protected $database_checks = [
     'checkMysqlConnection',
     'checkMysqlVersion',
     'checkMysqlInnodb',
@@ -41,7 +41,7 @@ class Requirements {
     'checkMysqlThreadStack',
     'checkMysqlLockTables',
     'checkMysqlUtf8mb4',
-  );
+  ];
 
   /**
    * Run all requirements tests.
@@ -70,7 +70,7 @@ class Requirements {
    * @return array
    */
   public function checkSystem(array $file_paths) {
-    $errors = array();
+    $errors = [];
 
     $errors[] = $this->checkFilepathIsWritable($file_paths);
     foreach ($this->system_checks as $check) {
@@ -94,7 +94,7 @@ class Requirements {
    * @return array
    */
   public function checkDatabase(array $db_config) {
-    $errors = array();
+    $errors = [];
 
     foreach ($this->database_checks as $check) {
       $errors[] = $this->$check($db_config);
@@ -132,11 +132,11 @@ class Requirements {
     $mem = $this->getPHPMemory();
     $mem_string = ini_get('memory_limit');
 
-    $results = array(
+    $results = [
       'title' => 'CiviCRM memory check',
       'severity' => $this::REQUIREMENT_OK,
       'details' => "You have $mem_string allocated (minimum 32Mb, recommended 64Mb)",
-    );
+    ];
 
     if ($mem < $min && $mem > 0) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
@@ -178,14 +178,14 @@ class Requirements {
    * @return array
    */
   public function checkServerVariables() {
-    $results = array(
+    $results = [
       'title' => 'CiviCRM PHP server variables',
       'severity' => $this::REQUIREMENT_OK,
       'details' => 'The required $_SERVER variables are set',
-    );
+    ];
 
-    $required_variables = array('SCRIPT_NAME', 'HTTP_HOST', 'SCRIPT_FILENAME');
-    $missing = array();
+    $required_variables = ['SCRIPT_NAME', 'HTTP_HOST', 'SCRIPT_FILENAME'];
+    $missing = [];
 
     foreach ($required_variables as $required_variable) {
       if (empty($_SERVER[$required_variable])) {
@@ -205,11 +205,11 @@ class Requirements {
    * @return array
    */
   public function checkJsonEncodeExists() {
-    $results = array(
+    $results = [
       'title' => 'CiviCRM JSON encoding support',
       'severity' => $this::REQUIREMENT_OK,
       'details' => 'Function json_encode() found',
-    );
+    ];
     if (!function_exists('json_encode')) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Function json_encode() does not exist';
@@ -223,11 +223,11 @@ class Requirements {
    * @return array
    */
   public function checkMultibyteExists() {
-    $results = array(
+    $results = [
       'title' => 'CiviCRM MultiByte encoding support',
       'severity' => $this::REQUIREMENT_OK,
       'details' => 'PHP Multibyte etension found',
-    );
+    ];
     if (!function_exists('mb_substr')) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'PHP Multibyte extension has not been installed and enabled';
@@ -240,11 +240,11 @@ class Requirements {
    * @return array
    */
   public function checkMysqlConnectExists() {
-    $results = array(
+    $results = [
       'title' => 'CiviCRM MySQL check',
       'severity' => $this::REQUIREMENT_OK,
       'details' => 'Function mysqli_connect() found',
-    );
+    ];
     if (!function_exists('mysqli_connect')) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Function mysqli_connect() does not exist';
@@ -259,11 +259,11 @@ class Requirements {
    * @return array
    */
   public function checkMysqlConnection(array $db_config) {
-    $results = array(
+    $results = [
       'title' => 'CiviCRM MySQL connection',
       'severity' => $this::REQUIREMENT_OK,
       'details' => "Connected",
-    );
+    ];
 
     $conn = $this->connect($db_config);
 
@@ -289,10 +289,10 @@ class Requirements {
    */
   public function checkMysqlVersion(array $db_config) {
     $min = '5.1';
-    $results = array(
+    $results = [
       'title' => 'CiviCRM MySQL Version',
       'severity' => $this::REQUIREMENT_OK,
-    );
+    ];
 
     $conn = $this->connect($db_config);
     if (!$conn || !($info = mysqli_get_server_info($conn))) {
@@ -317,11 +317,11 @@ class Requirements {
    * @return array
    */
   public function checkMysqlInnodb(array $db_config) {
-    $results = array(
+    $results = [
       'title' => 'CiviCRM InnoDB support',
       'severity' => $this::REQUIREMENT_ERROR,
       'details' => 'Could not determine if MySQL has InnoDB support. Assuming none.',
-    );
+    ];
 
     $conn = $this->connect($db_config);
     if (!$conn) {
@@ -352,11 +352,11 @@ class Requirements {
    * @return array
    */
   public function checkMysqlTempTables(array $db_config) {
-    $results = array(
+    $results = [
       'title' => 'CiviCRM MySQL Temp Tables',
       'severity' => $this::REQUIREMENT_OK,
       'details' => 'MySQL server supports temporary tables',
-    );
+    ];
 
     $conn = $this->connect($db_config);
     if (!$conn) {
@@ -388,11 +388,11 @@ class Requirements {
    * @return array
    */
   public function checkMysqlTrigger($db_config) {
-    $results = array(
+    $results = [
       'title' => 'CiviCRM MySQL Trigger',
       'severity' => $this::REQUIREMENT_OK,
       'details' => 'Database supports MySQL triggers',
-    );
+    ];
 
     $conn = $this->connect($db_config);
     if (!$conn) {
@@ -433,11 +433,11 @@ class Requirements {
    * @return array
    */
   public function checkMySQLAutoIncrementIncrementOne(array $db_config) {
-    $results = array(
+    $results = [
       'title' => 'CiviCRM MySQL AutoIncrementIncrement',
       'severity' => $this::REQUIREMENT_OK,
       'details' => 'MySQL server auto_increment_increment is 1',
-    );
+    ];
 
     $conn = $this->connect($db_config);
     if (!$conn) {
@@ -469,11 +469,11 @@ class Requirements {
   public function checkMysqlThreadStack($db_config) {
     $min_thread_stack = 192;
 
-    $results = array(
+    $results = [
       'title' => 'CiviCRM Mysql thread stack',
       'severity' => $this::REQUIREMENT_OK,
       'details' => 'MySQL thread_stack is OK',
-    );
+    ];
 
     $conn = $this->connect($db_config);
     if (!$conn) {
@@ -510,11 +510,11 @@ class Requirements {
    * @return array
    */
   public function checkMysqlLockTables($db_config) {
-    $results = array(
+    $results = [
       'title' => 'CiviCRM MySQL Lock Tables',
       'severity' => $this::REQUIREMENT_OK,
       'details' => 'Can successfully lock and unlock tables',
-    );
+    ];
 
     $conn = $this->connect($db_config);
     if (!$conn) {
@@ -562,13 +562,13 @@ class Requirements {
    * @return array
    */
   public function checkFilepathIsWritable($file_paths) {
-    $results = array(
+    $results = [
       'title' => 'CiviCRM directories are writable',
       'severity' => $this::REQUIREMENT_OK,
       'details' => 'All required directories are writable: ' . implode(', ', $file_paths),
-    );
+    ];
 
-    $unwritable_dirs = array();
+    $unwritable_dirs = [];
     foreach ($file_paths as $path) {
       if (!is_writable($path)) {
         $unwritable_dirs[] = $path;
@@ -589,11 +589,11 @@ class Requirements {
    * @return array
    */
   public function checkMysqlUtf8mb4($db_config) {
-    $results = array(
+    $results = [
       'title' => 'CiviCRM MySQL utf8mb4 Support',
       'severity' => $this::REQUIREMENT_OK,
       'details' => 'Your system supports the MySQL utf8mb4 character set.',
-    );
+    ];
 
     $conn = $this->connect($db_config);
     if (!$conn) {

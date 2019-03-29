@@ -16,7 +16,7 @@ class MappingRegisterEvent extends Event {
    * @var array
    *   Array(scalar $id => Mapping $mapping).
    */
-  protected $mappings = array();
+  protected $mappings = [];
 
   /**
    * Register a new mapping.
