@@ -3,13 +3,13 @@
 // in CiviCRM. See also:
 // http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_angularModules
 
-return array(
+return [
   'ext' => 'civicrm',
-  'js' => array('ang/crmAttachment.js'),
-  'css' => array('ang/crmAttachment.css'),
-  'partials' => array('ang/crmAttachment'),
-  'settings' => array(
+  'js' => ['ang/crmAttachment.js'],
+  'css' => ['ang/crmAttachment.css'],
+  'partials' => ['ang/crmAttachment'],
+  'settings' => [
     'token' => \CRM_Core_Page_AJAX_Attachment::createToken(),
-  ),
-  'requires' => array('angularFileUpload', 'crmResource'),
-);
+  ],
+  'requires' => ['angularFileUpload', 'crmResource'],
+];
