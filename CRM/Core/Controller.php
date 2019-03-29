@@ -214,10 +214,10 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     // only use the civicrm cache if we have a valid key
     // else we clash with other users CRM-7059
     if (!empty($this->_key)) {
-      CRM_Core_Session::registerAndRetrieveSessionObjects(array(
+      CRM_Core_Session::registerAndRetrieveSessionObjects([
         "_{$name}_container",
-        array('CiviCRM', $this->_scope),
-      ));
+        ['CiviCRM', $this->_scope],
+      ]);
     }
 
     parent::__construct($name, $modal);
@@ -239,7 +239,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
         $this->_print = CRM_Core_Smarty::PRINT_NOFORM;
       }
       // Respond with JSON if in AJAX context (also support legacy value '6')
-      elseif (in_array($snippet, array(CRM_Core_Smarty::PRINT_JSON, 6))) {
+      elseif (in_array($snippet, [CRM_Core_Smarty::PRINT_JSON, 6])) {
         $this->_print = CRM_Core_Smarty::PRINT_JSON;
         $this->_QFResponseType = 'json';
       }
@@ -275,10 +275,10 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   public function fini() {
-    CRM_Core_BAO_Cache::storeSessionToCache(array(
+    CRM_Core_BAO_Cache::storeSessionToCache([
         "_{$this->_name}_container",
-        array('CiviCRM', $this->_scope),
-      ),
+        ['CiviCRM', $this->_scope],
+      ],
       TRUE
     );
   }
@@ -382,7 +382,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param array $uploadNames for the various upload buttons (note u can have more than 1 upload)
    */
   public function addActions($uploadDirectory = NULL, $uploadNames = NULL) {
-    $names = array(
+    $names = [
       'display' => 'CRM_Core_QuickForm_Action_Display',
       'next' => 'CRM_Core_QuickForm_Action_Next',
       'back' => 'CRM_Core_QuickForm_Action_Back',
@@ -393,7 +393,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       'done' => 'CRM_Core_QuickForm_Action_Done',
       'jump' => 'CRM_Core_QuickForm_Action_Jump',
       'submit' => 'CRM_Core_QuickForm_Action_Submit',
-    );
+    ];
 
     foreach ($names as $name => $classPath) {
       $action = new $classPath($this->_stateMachine);
@@ -535,12 +535,12 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @return array
    */
   public function wizardHeader($currentPageName) {
-    $wizard = array();
-    $wizard['steps'] = array();
+    $wizard = [];
+    $wizard['steps'] = [];
     $count = 0;
     foreach ($this->_pages as $name => $page) {
       $count++;
-      $wizard['steps'][] = array(
+      $wizard['steps'][] = [
         'name' => $name,
         'title' => $page->getTitle(),
         //'link'      => $page->getLink ( ),
@@ -549,7 +549,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
         'valid' => TRUE,
         'stepNumber' => $count,
         'collapsed' => FALSE,
-      );
+      ];
 
       if ($name == $currentPageName) {
         $wizard['currentStepNumber'] = $count;
@@ -570,7 +570,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param array $wizard
    */
   public function addWizardStyle(&$wizard) {
-    $wizard['style'] = array(
+    $wizard['style'] = [
       'barClass' => '',
       'stepPrefixCurrent' => '&raquo;',
       'stepPrefixPast' => '&#x2714;',
@@ -579,7 +579,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       'subStepPrefixPast' => '&nbsp;&nbsp;',
       'subStepPrefixFuture' => '&nbsp;&nbsp;',
       'showTitle' => 1,
-    );
+    ];
   }
 
   /**

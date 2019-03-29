@@ -9,13 +9,13 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
   }
 
   public function setupCms() {
-    if (!in_array($this->config->cms, array(
+    if (!in_array($this->config->cms, [
       'backdrop',
       'drupal',
       'drupal8',
       'joomla',
       'wordpress',
-    ))) {
+    ])) {
       echo "Config file for '{$this->config->cms}' not known.";
       exit();
     }
@@ -38,7 +38,7 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
    *   path to config template
    */
   public function findConfigTemplate($cms) {
-    $candidates = array();
+    $candidates = [];
     switch ($cms) {
       case 'backdrop':
         // FIXME!!!!

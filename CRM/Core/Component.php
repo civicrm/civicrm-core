@@ -51,8 +51,8 @@ class CRM_Core_Component {
    */
   private static function &_info($force = FALSE) {
     if (!isset(Civi::$statics[__CLASS__]['info'])|| $force) {
-      Civi::$statics[__CLASS__]['info'] = array();
-      $c = array();
+      Civi::$statics[__CLASS__]['info'] = [];
+      $c = [];
 
       $config = CRM_Core_Config::singleton();
       $c = self::getComponents();
@@ -89,7 +89,7 @@ class CRM_Core_Component {
    */
   public static function &getComponents($force = FALSE) {
     if (!isset(Civi::$statics[__CLASS__]['all']) || $force) {
-      Civi::$statics[__CLASS__]['all'] = array();
+      Civi::$statics[__CLASS__]['all'] = [];
 
       $cr = new CRM_Core_DAO_Component();
       $cr->find(FALSE);
@@ -117,7 +117,7 @@ class CRM_Core_Component {
    *   Array(string $name => int $id).
    */
   public static function &getComponentIDs() {
-    $componentIDs = array();
+    $componentIDs = [];
 
     $cr = new CRM_Core_DAO_Component();
     $cr->find(FALSE);
@@ -150,7 +150,7 @@ class CRM_Core_Component {
   public static function &getNames($translated = FALSE) {
     $allComponents = self::getComponents();
 
-    $names = array();
+    $names = [];
     foreach ($allComponents as $name => $comp) {
       if ($translated) {
         $names[$comp->componentID] = $comp->info['translatedName'];
@@ -208,7 +208,7 @@ class CRM_Core_Component {
     // lets build the menu for all components
     $info = self::getComponents(TRUE);
 
-    $files = array();
+    $files = [];
     foreach ($info as $name => $comp) {
       $files = array_merge($files,
         $comp->menuFiles()
@@ -223,7 +223,7 @@ class CRM_Core_Component {
    */
   public static function &menu() {
     $info = self::_info();
-    $items = array();
+    $items = [];
     foreach ($info as $name => $comp) {
       $mnu = $comp->getMenuObject();
 
@@ -275,7 +275,7 @@ class CRM_Core_Component {
    */
   public static function &getQueryFields($checkPermission = TRUE) {
     $info = self::_info();
-    $fields = array();
+    $fields = [];
     foreach ($info as $name => $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
@@ -383,7 +383,7 @@ class CRM_Core_Component {
    */
   public static function &contactSubTypes() {
     if (self::$_contactSubTypes == NULL) {
-      self::$_contactSubTypes = array();
+      self::$_contactSubTypes = [];
     }
     return self::$_contactSubTypes;
   }
@@ -431,7 +431,7 @@ class CRM_Core_Component {
    * @return array
    */
   public static function getComponentsFromFile($crmFolderDir) {
-    $components = array();
+    $components = [];
     //traverse CRM folder and check for Info file
     if (is_dir($crmFolderDir) && $dir = opendir($crmFolderDir)) {
       while ($subDir = readdir($dir)) {

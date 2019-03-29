@@ -69,17 +69,17 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
     }
     else {
       $this->add('select', 'date_format', ts('Format'),
-        array('' => ts('- default input format -')) + CRM_Core_SelectValues::getDatePluginInputFormats()
+        ['' => ts('- default input format -')] + CRM_Core_SelectValues::getDatePluginInputFormats()
       );
       $this->add('select', 'time_format', ts('Time'),
-        array('' => ts('- none -')) + CRM_Core_SelectValues::getTimeFormats()
+        ['' => ts('- none -')] + CRM_Core_SelectValues::getTimeFormats()
       );
     }
     $this->addRule('start', ts('Value must be an integer.'), 'integer');
     $this->addRule('end', ts('Value must be an integer.'), 'integer');
 
     // add a form rule
-    $this->addFormRule(array('CRM_Admin_Form_PreferencesDate', 'formRule'));
+    $this->addFormRule(['CRM_Admin_Form_PreferencesDate', 'formRule']);
   }
 
   /**
@@ -93,7 +93,7 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
    *                  true otherwise
    */
   public static function formRule($fields) {
-    $errors = array();
+    $errors = [];
 
     if ($fields['name'] == 'activityDateTime' && !$fields['time_format']) {
       $errors['time_format'] = ts('Time is required for this format.');
@@ -129,7 +129,7 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
     CRM_Core_Resources::singleton()->resetCacheCode();
 
     CRM_Core_Session::setStatus(ts("The date type '%1' has been saved.",
-      array(1 => $params['name'])
+      [1 => $params['name']]
     ), ts('Saved'), 'success');
   }
 

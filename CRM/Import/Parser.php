@@ -273,7 +273,7 @@ abstract class CRM_Import_Parser {
    *   (reference) associative array of name/value pairs
    */
   public function &getActiveFieldParams() {
-    $params = array();
+    $params = [];
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if (isset($this->_activeFields[$i]->_value)
         && !isset($params[$this->_activeFields[$i]->_name])
@@ -309,7 +309,7 @@ abstract class CRM_Import_Parser {
     if ($startImport) {
       $status = "<div class='description'>&nbsp; " . ts('No processing status reported yet.') . "</div>";
       //do not force the browser to display the save dialog, CRM-7640
-      $contents = json_encode(array(0, $status));
+      $contents = json_encode([0, $status]);
       file_put_contents($statusFile, $contents);
     }
     else {
@@ -331,10 +331,10 @@ abstract class CRM_Import_Parser {
       $timeFormatted .= round($estimatedTime) . ' ' . ts('seconds');
       $processedPercent = (int ) (($rowCount * 100) / $totalRowCount);
       $statusMsg = ts('%1 of %2 records - %3 remaining',
-        array(1 => $rowCount, 2 => $totalRowCount, 3 => $timeFormatted)
+        [1 => $rowCount, 2 => $totalRowCount, 3 => $timeFormatted]
       );
       $status = "<div class=\"description\">&nbsp; <strong>{$statusMsg}</strong></div>";
-      $contents = json_encode(array($processedPercent, $status));
+      $contents = json_encode([$processedPercent, $status]);
 
       file_put_contents($statusFile, $contents);
       return $currTimestamp;
@@ -345,7 +345,7 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   public function getSelectValues() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_title;
     }
@@ -356,7 +356,7 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   public function getSelectTypes() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_hasLocationType)) {
         $values[$name] = $field->_hasLocationType;
@@ -369,7 +369,7 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   public function getHeaderPatterns() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_headerPattern)) {
         $values[$name] = $field->_headerPattern;
@@ -382,7 +382,7 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   public function getDataPatterns() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_dataPattern;
     }

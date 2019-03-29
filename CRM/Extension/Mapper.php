@@ -63,7 +63,7 @@ class CRM_Extension_Mapper {
   /**
    * @var array (key => CRM_Extension_Info)
    */
-  protected $infos = array();
+  protected $infos = [];
 
   /**
    * @var array
@@ -277,7 +277,7 @@ class CRM_Extension_Mapper {
   public function getActiveModuleFiles($fresh = FALSE) {
     $config = CRM_Core_Config::singleton();
     if ($config->isUpgradeMode() || !defined('CIVICRM_DSN')) {
-      return array(); // hmm, ok
+      return []; // hmm, ok
     }
 
     $moduleExtensions = NULL;
@@ -287,7 +287,7 @@ class CRM_Extension_Mapper {
 
     if (!is_array($moduleExtensions)) {
       // Check canonical module list
-      $moduleExtensions = array();
+      $moduleExtensions = [];
       $sql = '
         SELECT full_name, file
         FROM civicrm_extension
@@ -297,20 +297,20 @@ class CRM_Extension_Mapper {
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
         try {
-          $moduleExtensions[] = array(
+          $moduleExtensions[] = [
             'prefix' => $dao->file,
             'filePath' => $this->keyToPath($dao->full_name),
-          );
+          ];
         }
         catch (CRM_Extension_Exception $e) {
           // Putting a stub here provides more consistency
           // in how getActiveModuleFiles when racing between
           // dirty file-removals and cache-clears.
           CRM_Core_Session::setStatus($e->getMessage(), '', 'error');
-          $moduleExtensions[] = array(
+          $moduleExtensions[] = [
             'prefix' => $dao->file,
             'filePath' => NULL,
-          );
+          ];
         }
       }
 
@@ -329,7 +329,7 @@ class CRM_Extension_Mapper {
    */
   public function getActiveModuleUrls() {
     // TODO optimization/caching
-    $urls = array();
+    $urls = [];
     $urls['civicrm'] = $this->keyToUrl('civicrm');
     foreach ($this->getModules() as $module) {
       /** @var $module CRM_Core_Module */
@@ -352,7 +352,7 @@ class CRM_Extension_Mapper {
    *   Ex: array("org.foo.bar").
    */
   public function getKeysByPath($pattern) {
-    $keys = array();
+    $keys = [];
 
     if (CRM_Utils_String::endsWith($pattern, '*')) {
       $prefix = rtrim($pattern, '*');
@@ -410,7 +410,7 @@ class CRM_Extension_Mapper {
    *   CRM_Core_Module
    */
   public function getModules() {
-    $result = array();
+    $result = [];
     $dao = new CRM_Core_DAO_Extension();
     $dao->type = 'module';
     $dao->find();
@@ -458,7 +458,7 @@ class CRM_Extension_Mapper {
   }
 
   public function refresh() {
-    $this->infos = array();
+    $this->infos = [];
     $this->moduleExtensions = NULL;
     if ($this->cache) {
       $this->cache->delete($this->cacheKey . '_moduleFiles');

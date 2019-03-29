@@ -53,13 +53,13 @@ class CRM_Case_Form_Task_Batch extends CRM_Core_Form_Task_Batch {
       return;
     }
 
-    $customFields = array();
-    $dateFields = array(
+    $customFields = [];
+    $dateFields = [
       'case_created_date',
       'case_start_date',
       'case_end_date',
       'case_modified_date',
-    );
+    ];
     foreach ($params['field'] as $key => $value) {
       $value['id'] = $key;
 

@@ -93,7 +93,7 @@ class CRM_Extension_System {
    *   List of configuration values required by the extension system.
    *   Missing values will be guessed based on $config.
    */
-  public function __construct($parameters = array()) {
+  public function __construct($parameters = []) {
     $config = CRM_Core_Config::singleton();
     $parameters['extensionsDir'] = CRM_Utils_Array::value('extensionsDir', $parameters, $config->extensionsDir);
     $parameters['extensionsURL'] = CRM_Utils_Array::value('extensionsURL', $parameters, $config->extensionsURL);
@@ -121,7 +121,7 @@ class CRM_Extension_System {
    */
   public function getFullContainer() {
     if ($this->fullContainer === NULL) {
-      $containers = array();
+      $containers = [];
 
       if ($this->getDefaultContainer()) {
         $containers['default'] = $this->getDefaultContainer();
@@ -205,12 +205,12 @@ class CRM_Extension_System {
    */
   public function getManager() {
     if ($this->manager === NULL) {
-      $typeManagers = array(
+      $typeManagers = [
         'payment' => new CRM_Extension_Manager_Payment($this->getMapper()),
         'report' => new CRM_Extension_Manager_Report(),
         'search' => new CRM_Extension_Manager_Search(),
         'module' => new CRM_Extension_Manager_Module($this->getMapper()),
-      );
+      ];
       $this->manager = new CRM_Extension_Manager($this->getFullContainer(), $this->getDefaultContainer(), $this->getMapper(), $typeManagers);
     }
     return $this->manager;
@@ -254,13 +254,13 @@ class CRM_Extension_System {
    */
   public function getCache() {
     if ($this->cache === NULL) {
-      $cacheGroup = md5(serialize(array('ext', $this->parameters)));
+      $cacheGroup = md5(serialize(['ext', $this->parameters]));
       // Extension system starts before container. Manage our own cache.
-      $this->cache = CRM_Utils_Cache::create(array(
+      $this->cache = CRM_Utils_Cache::create([
         'name' => $cacheGroup,
-        'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
+        'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
         'prefetch' => TRUE,
-      ));
+      ]);
     }
     return $this->cache;
   }

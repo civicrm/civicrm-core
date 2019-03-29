@@ -121,16 +121,16 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
    *
    * @return array|int
    */
-  public static function getSurveySummary($params = array(), $onlyCount = FALSE) {
+  public static function getSurveySummary($params = [], $onlyCount = FALSE) {
     //build the limit and order clause.
     $limitClause = $orderByClause = $lookupTableJoins = NULL;
     if (!$onlyCount) {
-      $sortParams = array(
+      $sortParams = [
         'sort' => 'created_date',
         'offset' => 0,
         'rowCount' => 10,
         'sortOrder' => 'desc',
-      );
+      ];
       foreach ($sortParams as $name => $default) {
         if (!empty($params[$name])) {
           $sortParams[$name] = $params[$name];
@@ -163,23 +163,23 @@ INNER JOIN civicrm_option_group grp ON ( activity_type.option_group_id = grp.id 
     }
 
     //build the where clause.
-    $queryParams = $where = array();
+    $queryParams = $where = [];
 
     //we only have activity type as a
     //difference between survey and petition.
     $petitionTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Petition');
     if ($petitionTypeID) {
       $where[] = "( survey.activity_type_id != %1 )";
-      $queryParams[1] = array($petitionTypeID, 'Positive');
+      $queryParams[1] = [$petitionTypeID, 'Positive'];
     }
 
     if (!empty($params['title'])) {
       $where[] = "( survey.title LIKE %2 )";
-      $queryParams[2] = array('%' . trim($params['title']) . '%', 'String');
+      $queryParams[2] = ['%' . trim($params['title']) . '%', 'String'];
     }
     if (!empty($params['campaign_id'])) {
       $where[] = '( survey.campaign_id = %3 )';
-      $queryParams[3] = array($params['campaign_id'], 'Positive');
+      $queryParams[3] = [$params['campaign_id'], 'Positive'];
     }
     if (!empty($params['activity_type_id'])) {
       $typeId = $params['activity_type_id'];
@@ -216,8 +216,8 @@ SELECT  survey.id                         as id,
       return (int) CRM_Core_DAO::singleValueQuery($query, $queryParams);
     }
 
-    $surveys = array();
-    $properties = array(
+    $surveys = [];
+    $properties = [
       'id',
       'title',
       'campaign_id',
@@ -228,7 +228,7 @@ SELECT  survey.id                         as id,
       'release_frequency',
       'max_number_of_contacts',
       'default_number_of_contacts',
-    );
+    ];
 
     $survey = CRM_Core_DAO::executeQuery($query, $queryParams);
     while ($survey->fetch()) {
@@ -263,7 +263,7 @@ SELECT  survey.id                         as id,
    */
   public static function getSurveys($onlyActive = TRUE, $onlyDefault = FALSE, $forceAll = FALSE, $includePetition = FALSE) {
     $cacheKey = 0;
-    $cacheKeyParams = array('onlyActive', 'onlyDefault', 'forceAll', 'includePetition');
+    $cacheKeyParams = ['onlyActive', 'onlyDefault', 'forceAll', 'includePetition'];
     foreach ($cacheKeyParams as $param) {
       $cacheParam = $$param;
       if (!$cacheParam) {
@@ -280,7 +280,7 @@ SELECT  survey.id                         as id,
         //difference between survey and petition.
         $petitionTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'petition');
 
-        $where = array();
+        $where = [];
         if ($petitionTypeID) {
           $where[] = "( survey.activity_type_id != {$petitionTypeID} )";
         }
@@ -298,7 +298,7 @@ SELECT  survey.id    as id,
         survey.title as title
   FROM  civicrm_survey as survey
  WHERE  {$whereClause}";
-      $surveys[$cacheKey] = array();
+      $surveys[$cacheKey] = [];
       $survey = CRM_Core_DAO::executeQuery($query);
       while ($survey->fetch()) {
         $surveys[$cacheKey][$survey->id] = $survey->title;
@@ -321,7 +321,7 @@ SELECT  survey.id    as id,
     $cacheKey = "{$returnColumn}_{$includePetitionActivityType}";
 
     if (!isset($activityTypes[$cacheKey])) {
-      $activityTypes = array();
+      $activityTypes = [];
       $campaignCompId = CRM_Core_Component::getComponentID('CiviCampaign');
       if ($campaignCompId) {
         $condition = " AND v.component_id={$campaignCompId}";
@@ -351,10 +351,10 @@ SELECT  survey.id    as id,
    *
    * @return array
    */
-  public static function getSurveyCustomGroups($surveyTypes = array()) {
-    $customGroups = array();
+  public static function getSurveyCustomGroups($surveyTypes = []) {
+    $customGroups = [];
     if (!is_array($surveyTypes)) {
-      $surveyTypes = array($surveyTypes);
+      $surveyTypes = [$surveyTypes];
     }
 
     if (!empty($surveyTypes)) {
@@ -429,8 +429,8 @@ SELECT  survey.id    as id,
    * @return array
    *   array of contact info.
    */
-  public static function voterDetails($voterIds, $returnProperties = array()) {
-    $voterDetails = array();
+  public static function voterDetails($voterIds, $returnProperties = []) {
+    $voterDetails = [];
     if (!is_array($voterIds) || empty($voterIds)) {
       return $voterDetails;
     }
@@ -439,21 +439,21 @@ SELECT  survey.id    as id,
       $autocompleteContactSearch = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'contact_autocomplete_options'
       );
-      $returnProperties = array_fill_keys(array_merge(array(
+      $returnProperties = array_fill_keys(array_merge([
           'contact_type',
           'contact_sub_type',
           'sort_name',
-        ),
+        ],
         array_keys($autocompleteContactSearch)
       ), 1);
     }
 
-    $select = $from = array();
+    $select = $from = [];
     foreach ($returnProperties as $property => $ignore) {
-      $value = (in_array($property, array(
+      $value = (in_array($property, [
         'city',
         'street_address',
-      ))) ? 'address' : $property;
+      ])) ? 'address' : $property;
       switch ($property) {
         case 'sort_name':
         case 'contact_type':
@@ -523,8 +523,8 @@ SELECT  survey.id    as id,
    * @return array
    *   array of survey activity.
    */
-  public static function voterActivityDetails($surveyId, $voterIds, $interviewerId = NULL, $statusIds = array()) {
-    $activityDetails = array();
+  public static function voterActivityDetails($surveyId, $voterIds, $interviewerId = NULL, $statusIds = []) {
+    $activityDetails = [];
     if (!$surveyId ||
       !is_array($voterIds) || empty($voterIds)
     ) {
@@ -541,7 +541,7 @@ SELECT  survey.id    as id,
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
-    $params[1] = array($surveyId, 'Integer');
+    $params[1] = [$surveyId, 'Integer'];
     $query = "
     SELECT  activity.id, activity.status_id,
             activityTarget.contact_id as voter_id,
@@ -555,18 +555,18 @@ INNER JOIN  civicrm_activity_contact activityAssignment
      AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 ) ";
     if (!empty($interviewerId)) {
       $query .= "AND activityAssignment.contact_id = %2 ";
-      $params[2] = array($interviewerId, 'Integer');
+      $params[2] = [$interviewerId, 'Integer'];
     }
     $query .= "AND  activityTarget.contact_id IN {$targetContactIds}
             $whereClause";
     $activity = CRM_Core_DAO::executeQuery($query, $params);
     while ($activity->fetch()) {
-      $activityDetails[$activity->voter_id] = array(
+      $activityDetails[$activity->voter_id] = [
         'voter_id' => $activity->voter_id,
         'status_id' => $activity->status_id,
         'activity_id' => $activity->id,
         'interviewer_id' => $activity->interviewer_id,
-      );
+      ];
     }
 
     return $activityDetails;
@@ -591,13 +591,13 @@ INNER JOIN  civicrm_activity_contact activityAssignment
     $voterIds = NULL,
     $onlyCount = FALSE
   ) {
-    $activities = array();
+    $activities = [];
     $surveyActivityCount = 0;
     if (!$surveyId) {
       return ($onlyCount) ? 0 : $activities;
     }
 
-    $where = array();
+    $where = [];
     if (!empty($statusIds)) {
       $where[] = '( activity.status_id IN ( ' . implode(',', array_values($statusIds)) . ' ) )';
     }
@@ -650,10 +650,10 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
        AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 )
             $whereClause";
 
-    $params = array(
-      1 => array($surveyId, 'Integer'),
-      2 => array($actTypeId, 'Integer'),
-    );
+    $params = [
+      1 => [$surveyId, 'Integer'],
+      2 => [$actTypeId, 'Integer'],
+    ];
 
     if ($onlyCount) {
       $dbCount = CRM_Core_DAO::singleValueQuery($query, $params);
@@ -663,7 +663,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
     $activity = CRM_Core_DAO::executeQuery($query, $params);
 
     while ($activity->fetch()) {
-      $activities[$activity->id] = array(
+      $activities[$activity->id] = [
         'id' => $activity->id,
         'voter_id' => $activity->voter_id,
         'voter_name' => $activity->voter_name,
@@ -671,7 +671,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
         'interviewer_id' => $activity->interviewer_id,
         'result' => $activity->result,
         'activity_date_time' => $activity->activity_date_time,
-      );
+      ];
     }
 
     return $activities;
@@ -690,8 +690,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * @return array
    *   Survey related contact ids.
    */
-  public static function getSurveyVoterInfo($surveyId, $interviewerId = NULL, $statusIds = array()) {
-    $voterIds = array();
+  public static function getSurveyVoterInfo($surveyId, $interviewerId = NULL, $statusIds = []) {
+    $voterIds = [];
     if (!$surveyId) {
       return $voterIds;
     }
@@ -704,7 +704,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       $cacheKey = "{$cacheKey}_" . implode('_', $statusIds);
     }
 
-    static $contactIds = array();
+    static $contactIds = [];
     if (!isset($contactIds[$cacheKey])) {
       $activities = self::getSurveyActivities($surveyId, $interviewerId, $statusIds);
       foreach ($activities as $values) {
@@ -724,7 +724,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    *   an array of option groups.
    */
   public static function getResultSets($valueColumnName = 'title') {
-    $resultSets = array();
+    $resultSets = [];
     $valueColumnName = CRM_Utils_Type::escape($valueColumnName, 'String');
 
     $query = "SELECT id, {$valueColumnName} FROM civicrm_option_group WHERE name LIKE 'civicrm_survey_%' AND is_active=1";
@@ -773,7 +773,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    *   an array of option values
    */
   public static function getResponsesOptions($surveyId) {
-    $responseOptions = array();
+    $responseOptions = [];
     if (!$surveyId) {
       return $responseOptions;
     }
@@ -796,12 +796,12 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    *   $url array of permissioned links
    */
   public static function buildPermissionLinks($surveyId, $enclosedInUL = FALSE, $extraULName = 'more') {
-    $menuLinks = array();
+    $menuLinks = [];
     if (!$surveyId) {
       return $menuLinks;
     }
 
-    static $voterLinks = array();
+    static $voterLinks = [];
     if (empty($voterLinks)) {
       $permissioned = FALSE;
       if (CRM_Core_Permission::check('manage campaign') ||
@@ -811,44 +811,44 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       }
 
       if ($permissioned || CRM_Core_Permission::check("reserve campaign contacts")) {
-        $voterLinks['reserve'] = array(
+        $voterLinks['reserve'] = [
           'name' => 'reserve',
           'url' => 'civicrm/survey/search',
           'qs' => 'sid=%%id%%&reset=1&op=reserve',
           'title' => ts('Reserve Respondents'),
-        );
+        ];
       }
       if ($permissioned || CRM_Core_Permission::check("interview campaign contacts")) {
-        $voterLinks['release'] = array(
+        $voterLinks['release'] = [
           'name' => 'interview',
           'url' => 'civicrm/survey/search',
           'qs' => 'sid=%%id%%&reset=1&op=interview&force=1',
           'title' => ts('Interview Respondents'),
-        );
+        ];
       }
       if ($permissioned || CRM_Core_Permission::check("release campaign contacts")) {
-        $voterLinks['interview'] = array(
+        $voterLinks['interview'] = [
           'name' => 'release',
           'url' => 'civicrm/survey/search',
           'qs' => 'sid=%%id%%&reset=1&op=release&force=1',
           'title' => ts('Release Respondents'),
-        );
+        ];
       }
     }
 
     if (CRM_Core_Permission::check('access CiviReport')) {
       $reportID = self::getReportID($surveyId);
       if ($reportID) {
-        $voterLinks['report'] = array(
+        $voterLinks['report'] = [
           'name' => 'report',
           'url' => "civicrm/report/instance/{$reportID}",
           'qs' => 'reset=1',
           'title' => ts('View Survey Report'),
-        );
+        ];
       }
     }
 
-    $ids = array('id' => $surveyId);
+    $ids = ['id' => $surveyId];
     foreach ($voterLinks as $link) {
       if (!empty($link['qs']) &&
         !CRM_Utils_System::isNull($link['qs'])
@@ -886,19 +886,19 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       return NULL;
     }
 
-    static $ufIds = array();
+    static $ufIds = [];
     if (!array_key_exists($surveyId, $ufIds)) {
       //get the profile id.
-      $ufJoinParams = array(
+      $ufJoinParams = [
         'entity_id' => $surveyId,
         'entity_table' => 'civicrm_survey',
         'module' => 'CiviCampaign',
-      );
+      ];
 
       list($first, $second) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
       if ($first) {
-        $ufIds[$surveyId] = array($first);
+        $ufIds[$surveyId] = [$first];
       }
       if ($second) {
         $ufIds[$surveyId][] = array_shift($second);
@@ -914,11 +914,11 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    * @return mixed
    */
   public Static function getReportID($surveyId) {
-    static $reportIds = array();
+    static $reportIds = [];
 
     if (!array_key_exists($surveyId, $reportIds)) {
       $query = "SELECT MAX(id) as id FROM civicrm_report_instance WHERE name = %1";
-      $reportID = CRM_Core_DAO::singleValueQuery($query, array(1 => array("survey_{$surveyId}", 'String')));
+      $reportID = CRM_Core_DAO::singleValueQuery($query, [1 => ["survey_{$surveyId}", 'String']]);
       $reportIds[$surveyId] = $reportID;
     }
     return $reportIds[$surveyId];
@@ -953,8 +953,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
     static $profileTypes;
 
     if (!isset($profileTypes)) {
-      $profileTypes = array_merge(array('Activity', 'Contact'), CRM_Contact_BAO_ContactType::basicTypes());
-      $profileTypes = array_diff($profileTypes, array('Organization', 'Household'));
+      $profileTypes = array_merge(['Activity', 'Contact'], CRM_Contact_BAO_ContactType::basicTypes());
+      $profileTypes = array_diff($profileTypes, ['Organization', 'Household']);
     }
 
     return $profileTypes;
@@ -974,7 +974,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    */
   public static function getSurveyResponseFields($surveyId, $surveyTypeId = NULL) {
     if (empty($surveyId)) {
-      return array();
+      return [];
     }
 
     static $responseFields;
@@ -984,7 +984,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       return $responseFields[$cacheKey];
     }
 
-    $responseFields[$cacheKey] = array();
+    $responseFields[$cacheKey] = [];
 
     $profileId = self::getSurveyProfileId($surveyId);
 
@@ -1001,7 +1001,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
     );
 
     //don't load these fields in grid.
-    $removeFields = array('File', 'RichTextEditor');
+    $removeFields = ['File', 'RichTextEditor'];
 
     $supportableFieldTypes = self::surveyProfileTypes();
 
@@ -1053,7 +1053,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       $whereClause = ' WHERE survey.activity_type_id IN ( ' . implode(' , ', array_keys($activityTypes)) . ' )';
     }
 
-    $interviewers = array();
+    $interviewers = [];
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
 
@@ -1103,8 +1103,8 @@ INNER JOIN  civicrm_survey survey ON ( survey.id = activity.source_record_id )
      WHERE  activity.is_deleted = 0
        AND  activity.status_id = %1
        AND  activity.activity_type_id IN ( ' . implode(', ', $surveyActivityTypesIds) . ' )';
-      $activity = CRM_Core_DAO::executeQuery($query, array(1 => array($reserveStatusId, 'Positive')));
-      $releasedIds = array();
+      $activity = CRM_Core_DAO::executeQuery($query, [1 => [$reserveStatusId, 'Positive']]);
+      $releasedIds = [];
       while ($activity->fetch()) {
         if (!$activity->release_frequency) {
           continue;
@@ -1128,10 +1128,10 @@ UPDATE  civicrm_activity
       }
     }
 
-    $rtnMsg = array(
+    $rtnMsg = [
       'is_error' => 0,
       'messages' => "Number of respondents released = {$releasedCount}",
-    );
+    ];
 
     return $rtnMsg;
   }
@@ -1146,14 +1146,14 @@ UPDATE  civicrm_activity
    *
    * @return array|bool
    */
-  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
-    $params = array();
+  public static function buildOptions($fieldName, $context = NULL, $props = []) {
+    $params = [];
     // Special logic for fields whose options depend on context or properties
     switch ($fieldName) {
       case 'activity_type_id':
         $campaignCompId = CRM_Core_Component::getComponentID('CiviCampaign');
         if ($campaignCompId) {
-          $params['condition'] = array("component_id={$campaignCompId}");
+          $params['condition'] = ["component_id={$campaignCompId}"];
         }
         break;
     }

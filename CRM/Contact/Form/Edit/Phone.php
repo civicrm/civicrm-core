@@ -58,25 +58,25 @@ class CRM_Contact_Form_Edit_Phone {
     $form->applyFilter('__ALL__', 'trim');
 
     //phone type select
-    $form->addField("phone[$blockId][phone_type_id]", array(
+    $form->addField("phone[$blockId][phone_type_id]", [
       'entity' => 'phone',
       'class' => 'eight',
       'placeholder' => NULL,
-    ));
+    ]);
     //main phone number with crm_phone class
-    $form->addField("phone[$blockId][phone]", array('entity' => 'phone', 'class' => 'crm_phone twelve', 'aria-label' => ts('Phone %1', [1 => $blockId])));
-    $form->addField("phone[$blockId][phone_ext]", array('entity' => 'phone', 'aria-label' => ts('Phone Extension %1', [1 => $blockId])));
+    $form->addField("phone[$blockId][phone]", ['entity' => 'phone', 'class' => 'crm_phone twelve', 'aria-label' => ts('Phone %1', [1 => $blockId])]);
+    $form->addField("phone[$blockId][phone_ext]", ['entity' => 'phone', 'aria-label' => ts('Phone Extension %1', [1 => $blockId])]);
     if (isset($form->_contactType) || $blockEdit) {
       //Block type select
-      $form->addField("phone[$blockId][location_type_id]", array(
+      $form->addField("phone[$blockId][location_type_id]", [
         'entity' => 'phone',
           'class' => 'eight',
           'placeholder' => NULL,
           'option_url' => NULL,
-        ));
+        ]);
 
       //is_Primary radio
-      $js = array('id' => 'Phone_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );', 'aria-label' => ts('Phone %1 is primary?', [1 => $blockId]));
+      $js = ['id' => 'Phone_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );', 'aria-label' => ts('Phone %1 is primary?', [1 => $blockId])];
       $form->addElement('radio', "phone[$blockId][is_primary]", '', '', '1', $js);
     }
     // TODO: set this up as a group, we need a valid phone_type_id if we have a  phone number

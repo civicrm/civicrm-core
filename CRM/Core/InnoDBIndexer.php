@@ -43,38 +43,38 @@ class CRM_Core_InnoDBIndexer {
    */
   public static function singleton($fresh = FALSE) {
     if ($fresh || self::$singleton === NULL) {
-      $indices = array(
-        'civicrm_address' => array(
-          array('street_address', 'city', 'postal_code'),
-        ),
-        'civicrm_activity' => array(
-          array('subject', 'details'),
-        ),
-        'civicrm_contact' => array(
-          array('sort_name', 'nick_name', 'display_name'),
-        ),
-        'civicrm_contribution' => array(
-          array('source', 'amount_level', 'trxn_Id', 'invoice_id'),
-        ),
-        'civicrm_email' => array(
-          array('email'),
-        ),
-        'civicrm_membership' => array(
-          array('source'),
-        ),
-        'civicrm_note' => array(
-          array('subject', 'note'),
-        ),
-        'civicrm_participant' => array(
-          array('source', 'fee_level'),
-        ),
-        'civicrm_phone' => array(
-          array('phone'),
-        ),
-        'civicrm_tag' => array(
-          array('name'),
-        ),
-      );
+      $indices = [
+        'civicrm_address' => [
+          ['street_address', 'city', 'postal_code'],
+        ],
+        'civicrm_activity' => [
+          ['subject', 'details'],
+        ],
+        'civicrm_contact' => [
+          ['sort_name', 'nick_name', 'display_name'],
+        ],
+        'civicrm_contribution' => [
+          ['source', 'amount_level', 'trxn_Id', 'invoice_id'],
+        ],
+        'civicrm_email' => [
+          ['email'],
+        ],
+        'civicrm_membership' => [
+          ['source'],
+        ],
+        'civicrm_note' => [
+          ['subject', 'note'],
+        ],
+        'civicrm_participant' => [
+          ['source', 'fee_level'],
+        ],
+        'civicrm_phone' => [
+          ['phone'],
+        ],
+        'civicrm_tag' => [
+          ['name'],
+        ],
+      ];
       $active = Civi::settings()->get('enable_innodb_fts');
       self::$singleton = new self($active, $indices);
     }
@@ -156,7 +156,7 @@ class CRM_Core_InnoDBIndexer {
       foreach ($this->indices[$table] as $idxFields) {
         // TODO determine if $idxFields must be exact match or merely a subset
         // if (sort($fields) == sort($idxFields)) {
-        if (array_diff($fields, $idxFields) == array()) {
+        if (array_diff($fields, $idxFields) == []) {
           return TRUE;
         }
       }
@@ -177,7 +177,7 @@ class CRM_Core_InnoDBIndexer {
     if (version_compare($mysqlVersion, '5.6', '<')) {
       // If we're not on 5.6+, then there cannot be any InnoDB FTS indices!
       // Also: information_schema.innodb_sys_indexes is only available on 5.6+.
-      return array();
+      return [];
     }
 
     // Note: this only works in MySQL 5.6,  but this whole system is intended to only work in MySQL 5.6
@@ -189,7 +189,7 @@ class CRM_Core_InnoDBIndexer {
       AND i.name like '" . self::IDX_PREFIX . "%'
       ";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $indexNames = array();
+    $indexNames = [];
     while ($dao->fetch()) {
       $indexNames[$dao->index_name] = $dao->index_name;
     }
@@ -206,7 +206,7 @@ class CRM_Core_InnoDBIndexer {
    *   (string $indexName => string $sql)
    */
   public function buildIndexSql($table) {
-    $sqls = array(); // array (string $idxName => string $sql)
+    $sqls = []; // array (string $idxName => string $sql)
     if ($this->isActive && isset($this->indices[$table])) {
       foreach ($this->indices[$table] as $fields) {
         $name = self::IDX_PREFIX . md5($table . '::' . implode(',', $fields));
@@ -225,7 +225,7 @@ class CRM_Core_InnoDBIndexer {
    *   (string $idxName => string $sql)
    */
   public function dropIndexSql($table) {
-    $sqls = array();
+    $sqls = [];
     $names = $this->findActualFtsIndexNames($table);
     foreach ($names as $name) {
       $sqls[$name] = sprintf("DROP INDEX %s ON %s", $name, $table);
@@ -250,7 +250,7 @@ class CRM_Core_InnoDBIndexer {
       array_keys($buildIndexSqls)
     ));
 
-    $todoSqls = array();
+    $todoSqls = [];
     foreach ($allIndexNames as $indexName) {
       if (isset($buildIndexSqls[$indexName]) && isset($dropIndexSqls[$indexName])) {
         // already exists
@@ -272,7 +272,7 @@ class CRM_Core_InnoDBIndexer {
    * @return array
    */
   public function normalizeIndices($indices) {
-    $result = array();
+    $result = [];
     foreach ($indices as $table => $indicesByTable) {
       foreach ($indicesByTable as $k => $fields) {
         sort($fields);

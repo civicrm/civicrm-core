@@ -58,20 +58,20 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     $this->assign('entityID', self::$_entityID);
     if (isset(self::$_entityID)) {
       $this->_batchStatusId = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'status_id');
-      $batchStatuses = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name', 'condition' => " v.value={$this->_batchStatusId}"));
+      $batchStatuses = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', ['labelColumn' => 'name', 'condition' => " v.value={$this->_batchStatusId}"]);
       $this->_batchStatus = $batchStatuses[$this->_batchStatusId];
       $this->assign('statusID', $this->_batchStatusId);
       $this->assign('batchStatus', $this->_batchStatus);
       $validStatus = FALSE;
-      if (in_array($this->_batchStatus, array('Open', 'Reopened'))) {
+      if (in_array($this->_batchStatus, ['Open', 'Reopened'])) {
         $validStatus = TRUE;
       }
       $this->assign('validStatus', $validStatus);
-      $this->_values = civicrm_api3('Batch', 'getSingle', array('id' => self::$_entityID));
+      $this->_values = civicrm_api3('Batch', 'getSingle', ['id' => self::$_entityID]);
       $batchTitle = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'title');
-      CRM_Utils_System::setTitle(ts('Accounting Batch - %1', array(1 => $batchTitle)));
+      CRM_Utils_System::setTitle(ts('Accounting Batch - %1', [1 => $batchTitle]));
 
-      $columnHeaders = array(
+      $columnHeaders = [
         'created_by' => ts('Created By'),
         'status' => ts('Status'),
         'description' => ts('Description'),
@@ -81,7 +81,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
         'total' => ts('Expected Total Amount'),
         'assigned_total' => ts('Actual Total Amount'),
         'opened_date' => ts('Opened'),
-      );
+      ];
       $this->assign('columnHeaders', $columnHeaders);
     }
   }
@@ -95,7 +95,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     }
 
     // do not build rest of form unless it is open/reopened batch
-    if (!in_array($this->_batchStatus, array('Open', 'Reopened'))) {
+    if (!in_array($this->_batchStatus, ['Open', 'Reopened'])) {
       return;
     }
 
@@ -121,14 +121,14 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     // multiselect for groups
     if ($this->_group) {
       $this->add('select', 'group', ts('Groups'), $this->_group, FALSE,
-        array('id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2')
+        ['id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2']
       );
     }
     $contactTags = CRM_Core_BAO_Tag::getTags();
 
     if ($contactTags) {
       $this->add('select', 'contact_tags', ts('Tags'), $contactTags, FALSE,
-        array('id' => 'contact_tags', 'multiple' => 'multiple', 'class' => 'crm-select2')
+        ['id' => 'contact_tags', 'multiple' => 'multiple', 'class' => 'crm-select2']
       );
     }
     CRM_Contribute_BAO_Query::buildSearchForm($this);
@@ -137,37 +137,37 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     $this->add('select',
       'trans_remove',
       ts('Task'),
-      array('' => ts('- actions -')) + array('Remove' => ts('Remove from Batch')));
+      ['' => ts('- actions -')] + ['Remove' => ts('Remove from Batch')]);
 
     $this->add('submit', 'rSubmit', ts('Go'),
-      array(
+      [
         'class' => 'crm-form-submit',
         'id' => 'GoRemove',
-      ));
+      ]);
 
     self::$_entityID = CRM_Utils_Request::retrieve('bid', 'Positive');
 
     $this->addButtons(
-      array(
-        array(
+      [
+        [
           'type' => 'submit',
           'name' => ts('Search'),
           'isDefault' => TRUE,
-        ),
-      )
+        ],
+      ]
     );
 
     $this->addElement('checkbox', 'toggleSelect', NULL, NULL);
     $this->add('select',
       'trans_assign',
       ts('Task'),
-      array('' => ts('- actions -')) + array('Assign' => ts('Assign to Batch')));
+      ['' => ts('- actions -')] + ['Assign' => ts('Assign to Batch')]);
 
     $this->add('submit', 'submit', ts('Go'),
-      array(
+      [
         'class' => 'crm-form-submit',
         'id' => 'Go',
-      ));
+      ]);
     $this->applyFilter('__ALL__', 'trim');
 
     $this->addElement('hidden', 'batch_id', self::$_entityID);
@@ -180,7 +180,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
    */
   public function setDefaultValues() {
     // do not setdefault unless it is open/reopened batch
-    if (!in_array($this->_batchStatus, array('Open', 'Reopened'))) {
+    if (!in_array($this->_batchStatus, ['Open', 'Reopened'])) {
       return;
     }
     if (isset(self::$_entityID)) {
@@ -198,20 +198,20 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        'view' => array(
+      self::$_links = [
+        'view' => [
           'name' => ts('View'),
           'url' => 'civicrm/contact/view/contribution',
           'qs' => 'reset=1&id=%%contid%%&cid=%%cid%%&action=view&context=contribution&selectedChild=contribute',
           'title' => ts('View Contribution'),
-        ),
-        'assign' => array(
+        ],
+        'assign' => [
           'name' => ts('Assign'),
           'ref' => 'disable-action',
           'title' => ts('Assign Transaction'),
           'extra' => 'onclick = "assignRemove( %%id%%,\'' . 'assign' . '\' );"',
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }

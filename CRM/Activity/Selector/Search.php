@@ -57,7 +57,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
    * @var array
    */
 
-  static $_properties = array(
+  static $_properties = [
     'contact_id',
     'contact_type',
     'contact_sub_type',
@@ -74,7 +74,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     'activity_is_test',
     'activity_campaign_id',
     'activity_engagement_level',
-  );
+  ];
 
   /**
    * Are we restricting ourselves to a single contact.
@@ -172,7 +172,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
 
     // CRM-12675
     $components = CRM_Core_Component::getNames();
-    $componentClause = array();
+    $componentClause = [];
     foreach ($components as $componentID => $componentName) {
       // CRM-19201: Add support for searching CiviCampaign and CiviCase
       // activities. For CiviCase, "access all cases and activities" is
@@ -261,7 +261,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
       FALSE,
       $this->_activityClause
     );
-    $rows = array();
+    $rows = [];
     $mailingIDs = CRM_Mailing_BAO_Mailing::mailingACLIDs();
     $accessCiviMail = CRM_Core_Permission::check('access CiviMail');
 
@@ -276,7 +276,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
     $bulkActivityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Bulk Email');
 
     while ($result->fetch()) {
-      $row = array();
+      $row = [];
 
       // Ignore rows where we dont have an activity id.
       if (empty($result->activity_id)) {
@@ -335,11 +335,11 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
         $this->_compContext
       );
       $row['action'] = CRM_Core_Action::formLink($actionLinks, NULL,
-        array(
+        [
           'id' => $result->activity_id,
           'cid' => $contactId,
           'cxt' => $this->_context,
-        ),
+        ],
         ts('more'),
         FALSE,
         'activity.selector.row',
@@ -361,7 +361,7 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
       $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($row['activity_id'], 'civicrm_activity');
       $row['repeat'] = '';
       if ($repeat) {
-        $row['repeat'] = ts('Repeating (%1 of %2)', array(1 => $repeat[0], 2 => $repeat[1]));
+        $row['repeat'] = ts('Repeating (%1 of %2)', [1 => $repeat[0], 2 => $repeat[1]]);
       }
       $rows[] = $row;
     }
@@ -391,38 +391,38 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if (!isset(self::$_columnHeaders)) {
-      self::$_columnHeaders = array(
-        array(
+      self::$_columnHeaders = [
+        [
           'name' => ts('Type'),
           'sort' => 'activity_type_id',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Subject'),
           'sort' => 'activity_subject',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Added By'),
           'sort' => 'source_contact',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array('name' => ts('With')),
-        array('name' => ts('Assigned')),
-        array(
+        ],
+        ['name' => ts('With')],
+        ['name' => ts('Assigned')],
+        [
           'name' => ts('Date'),
           'sort' => 'activity_date_time',
           'direction' => CRM_Utils_Sort::DESCENDING,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Status'),
           'sort' => 'activity_status',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'desc' => ts('Actions'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_columnHeaders;
   }

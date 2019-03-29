@@ -83,7 +83,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
       $ids = CRM_Core_PseudoConstant::allGroup();
       $heirGroups = CRM_Contact_BAO_Group::getGroupsHierarchy($ids);
 
-      $allGroups = array();
+      $allGroups = [];
       foreach ($heirGroups as $id => $group) {
         // make sure that this group has public visibility
         if ($onlyPublicGroups && $group['visibility'] == 'User and User Admin Only') {
@@ -111,7 +111,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
       $groupSelect = $groupHierarchy;
     }
 
-    $groupSelect = array('' => ts('- select group -')) + $groupSelect;
+    $groupSelect = ['' => ts('- select group -')] + $groupSelect;
 
     if (count($groupSelect) > 1) {
       $session = CRM_Core_Session::singleton();
@@ -123,15 +123,15 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
         $msg = ts('Add to a group');
       }
 
-      $this->addField('group_id', array('class' => 'crm-action-menu fa-plus', 'placeholder' => $msg, 'options' => $groupSelect));
+      $this->addField('group_id', ['class' => 'crm-action-menu fa-plus', 'placeholder' => $msg, 'options' => $groupSelect]);
 
-      $this->addButtons(array(
-          array(
+      $this->addButtons([
+          [
             'type' => 'next',
             'name' => ts('Add'),
             'isDefault' => TRUE,
-          ),
-        )
+          ],
+        ]
       );
     }
   }
@@ -140,7 +140,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
    * Post process form.
    */
   public function postProcess() {
-    $contactID = array($this->_contactId);
+    $contactID = [$this->_contactId];
     $groupId = $this->controller->exportValue('GroupContact', 'group_id');
     $method = ($this->_context == 'user') ? 'Web' : 'Admin';
 
@@ -154,7 +154,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
 
     if ($groupContact && $this->_context != 'user') {
       $groups = CRM_Core_PseudoConstant::group();
-      CRM_Core_Session::setStatus(ts("Contact has been added to '%1'.", array(1 => $groups[$groupId])), ts('Added to Group'), 'success');
+      CRM_Core_Session::setStatus(ts("Contact has been added to '%1'.", [1 => $groups[$groupId]]), ts('Added to Group'), 'success');
     }
   }
 

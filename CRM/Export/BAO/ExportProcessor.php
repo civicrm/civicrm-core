@@ -516,7 +516,7 @@ class CRM_Export_BAO_ExportProcessor {
     $query->_sort = $order;
     list($select, $from, $where, $having) = $query->query();
     $this->setQueryFields($query->_fields);
-    return array($query, $select, $from, $where . $addressWhere, $having);
+    return [$query, $select, $from, $where . $addressWhere, $having];
   }
 
   /**
@@ -783,11 +783,11 @@ class CRM_Export_BAO_ExportProcessor {
         return CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
       }
 
-      elseif (in_array($field, array(
+      elseif (in_array($field, [
         'email_greeting',
         'postal_greeting',
         'addressee',
-      ))) {
+      ])) {
         //special case for greeting replacement
         $fldValue = "{$field}_display";
         return $iterationDAO->$fldValue;
@@ -797,10 +797,10 @@ class CRM_Export_BAO_ExportProcessor {
         switch ($field) {
           case 'country':
           case 'world_region':
-            return $i18n->crm_translate($fieldValue, array('context' => 'country'));
+            return $i18n->crm_translate($fieldValue, ['context' => 'country']);
 
           case 'state_province':
-            return $i18n->crm_translate($fieldValue, array('context' => 'province'));
+            return $i18n->crm_translate($fieldValue, ['context' => 'province']);
 
           case 'gender':
           case 'preferred_communication_method':
@@ -842,13 +842,13 @@ class CRM_Export_BAO_ExportProcessor {
     elseif ($this->isExportSpecifiedPaymentFields() && array_key_exists($field, $this->getcomponentPaymentFields())) {
       $paymentTableId = $this->getPaymentTableID();
       $paymentData = CRM_Utils_Array::value($iterationDAO->$paymentTableId, $paymentDetails);
-      $payFieldMapper = array(
+      $payFieldMapper = [
         'componentPaymentField_total_amount' => 'total_amount',
         'componentPaymentField_contribution_status' => 'contribution_status',
         'componentPaymentField_payment_instrument' => 'pay_instru',
         'componentPaymentField_transaction_id' => 'trxn_id',
         'componentPaymentField_received_date' => 'receive_date',
-      );
+      ];
       return CRM_Utils_Array::value($payFieldMapper[$field], $paymentData, '');
     }
     else {

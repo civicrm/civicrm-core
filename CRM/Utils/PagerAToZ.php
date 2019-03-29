@@ -60,7 +60,7 @@ class CRM_Utils_PagerAToZ {
    *   is an array of static characters
    */
   public static function getStaticCharacters() {
-    $staticAlphabets = array(
+    $staticAlphabets = [
       'A',
       'B',
       'C',
@@ -87,7 +87,7 @@ class CRM_Utils_PagerAToZ {
       'X',
       'Y',
       'Z',
-    );
+    ];
     return $staticAlphabets;
   }
 
@@ -111,7 +111,7 @@ class CRM_Utils_PagerAToZ {
       return NULL;
     }
 
-    $dynamicAlphabets = array();
+    $dynamicAlphabets = [];
     while ($result->fetch()) {
       $dynamicAlphabets[] = strtoupper($result->sort_name);
     }
@@ -156,13 +156,13 @@ class CRM_Utils_PagerAToZ {
       $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $emptyVariable, FALSE, NULL, $_REQUEST);
     }
 
-    $aToZBar = array();
+    $aToZBar = [];
     foreach ($AToZBar as $key => $link) {
       if ($link === NULL) {
         continue;
       }
 
-      $element = array();
+      $element = [];
       if (in_array($link, $dynamicAlphabets)) {
         $klass = '';
         if ($link == $sortByCharacter) {
@@ -193,7 +193,7 @@ class CRM_Utils_PagerAToZ {
       ),
       ts('All')
     );
-    $aToZBar[] = array('item' => $url);
+    $aToZBar[] = ['item' => $url];
     return $aToZBar;
   }
 

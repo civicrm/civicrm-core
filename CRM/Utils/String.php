@@ -107,12 +107,12 @@ class CRM_Utils_String {
    * @return string
    */
   public static function convertStringToCamel($string) {
-    $map = array(
+    $map = [
       'acl' => 'Acl',
       'ACL' => 'Acl',
       'im' => 'Im',
       'IM' => 'Im',
-    );
+    ];
     if (isset($map[$string])) {
       return $map[$string];
     }
@@ -162,7 +162,7 @@ class CRM_Utils_String {
    *   The last component
    */
   public static function getClassName($string, $char = '_') {
-    $names = array();
+    $names = [];
     if (!is_array($string)) {
       $names = explode($char, $string);
     }
@@ -245,7 +245,7 @@ class CRM_Utils_String {
       return TRUE;
     }
     else {
-      $order = array('ASCII');
+      $order = ['ASCII'];
       if ($utf8) {
         $order[] = 'UTF-8';
       }
@@ -269,7 +269,7 @@ class CRM_Utils_String {
   public static function regex($str, $regexRules) {
     // redact the regular expressions
     if (!empty($regexRules) && isset($str)) {
-      static $matches, $totalMatches, $match = array();
+      static $matches, $totalMatches, $match = [];
       foreach ($regexRules as $pattern => $replacement) {
         preg_match_all($pattern, $str, $matches);
         if (!empty($matches[0])) {
@@ -337,7 +337,7 @@ class CRM_Utils_String {
       // iconv('ISO-8859-1', 'UTF-8', $str);
     }
     else {
-      $enc = mb_detect_encoding($str, array('UTF-8'), TRUE);
+      $enc = mb_detect_encoding($str, ['UTF-8'], TRUE);
       return ($enc !== FALSE);
     }
   }
@@ -517,7 +517,7 @@ class CRM_Utils_String {
     $string = trim($string);
 
     $values = explode("\n", $string);
-    $result = array();
+    $result = [];
     foreach ($values as $value) {
       list($n, $v) = CRM_Utils_System::explode('=', $value, 2);
       if (!empty($v)) {
@@ -538,7 +538,7 @@ class CRM_Utils_String {
    *   only the first alternative found (or the text without alternatives)
    */
   public static function stripAlternatives($full) {
-    $matches = array();
+    $matches = [];
     preg_match('/-ALTERNATIVE ITEM 0-(.*?)-ALTERNATIVE ITEM 1-.*-ALTERNATIVE END-/s', $full, $matches);
 
     if (isset($matches[1]) &&
@@ -592,7 +592,7 @@ class CRM_Utils_String {
     }
 
     if ($_searchChars == NULL) {
-      $_searchChars = array(
+      $_searchChars = [
         '&',
         ';',
         ',',
@@ -610,7 +610,7 @@ class CRM_Utils_String {
         "\r\n",
         "\n",
         "\t",
-      );
+      ];
       $_replaceChar = '_';
     }
 
@@ -700,10 +700,10 @@ class CRM_Utils_String {
   public static function parsePrefix($delim, $string, $defaultPrefix = NULL) {
     $pos = strpos($string, $delim);
     if ($pos === FALSE) {
-      return array($defaultPrefix, $string);
+      return [$defaultPrefix, $string];
     }
     else {
-      return array(substr($string, 0, $pos), substr($string, 1 + $pos));
+      return [substr($string, 0, $pos), substr($string, 1 + $pos)];
     }
   }
 
@@ -854,10 +854,10 @@ class CRM_Utils_String {
     $port = isset($parts['port']) ? ':' . $parts['port'] : '';
     $path = isset($parts['path']) ? $parts['path'] : '';
     $query = isset($parts['query']) ? '?' . $parts['query'] : '';
-    return array(
+    return [
       'host+port' => "$host$port",
       'path+query' => "$path$query",
-    );
+    ];
   }
 
   /**
@@ -918,7 +918,7 @@ class CRM_Utils_String {
    */
   public static function filterByWildcards($patterns, $allStrings, $allowNew = FALSE) {
     $patterns = (array) $patterns;
-    $result = array();
+    $result = [];
     foreach ($patterns as $pattern) {
       if (!\CRM_Utils_String::endsWith($pattern, '*')) {
         if ($allowNew || in_array($pattern, $allStrings)) {

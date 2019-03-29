@@ -80,21 +80,21 @@ class CRM_Contact_Form_Task_LabelCommon {
    */
   public static function getRows($contactIDs, $locationTypeID, $respectDoNotMail, $mergeSameAddress, $mergeSameHousehold) {
     $locName = NULL;
-    $rows = array();
+    $rows = [];
     //get the address format sequence from the config file
     $addressReturnProperties = CRM_Contact_Form_Task_LabelCommon::getAddressReturnProperties();
 
     //build the return properties
-    $returnProperties = array('display_name' => 1, 'contact_type' => 1, 'prefix_id' => 1);
+    $returnProperties = ['display_name' => 1, 'contact_type' => 1, 'prefix_id' => 1];
     $mailingFormat = Civi::settings()->get('mailing_format');
 
-    $mailingFormatProperties = array();
+    $mailingFormatProperties = [];
     if ($mailingFormat) {
       $mailingFormatProperties = CRM_Utils_Token::getReturnProperties($mailingFormat);
       $returnProperties = array_merge($returnProperties, $mailingFormatProperties);
     }
 
-    $customFormatProperties = array();
+    $customFormatProperties = [];
     if (stristr($mailingFormat, 'custom_')) {
       foreach ($mailingFormatProperties as $token => $true) {
         if (substr($token, 0, 7) == 'custom_') {
@@ -113,30 +113,30 @@ class CRM_Contact_Form_Task_LabelCommon {
     }
 
     //get the contacts information
-    $params = $custom = array();
+    $params = $custom = [];
     foreach ($contactIDs as $key => $contactID) {
-      $params[] = array(
+      $params[] = [
         CRM_Core_Form::CB_PREFIX . $contactID,
         '=',
         1,
         0,
         0,
-      );
+      ];
     }
 
     // fix for CRM-2651
     if (!empty($respectDoNotMail['do_not_mail'])) {
-      $params[] = array('do_not_mail', '=', 0, 0, 0);
+      $params[] = ['do_not_mail', '=', 0, 0, 0];
     }
     // fix for CRM-2613
-    $params[] = array('is_deceased', '=', 0, 0, 0);
+    $params[] = ['is_deceased', '=', 0, 0, 0];
 
     if ($locationTypeID) {
       $locType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       $locName = $locType[$locationTypeID];
-      $location = array('location' => array("{$locName}" => $addressReturnProperties));
+      $location = ['location' => ["{$locName}" => $addressReturnProperties]];
       $returnProperties = array_merge($returnProperties, $location);
-      $params[] = array('location_type', '=', array($locationTypeID => 1), 0, 0);
+      $params[] = ['location_type', '=', [$locationTypeID => 1], 0, 0];
     }
     else {
       $returnProperties = array_merge($returnProperties, $addressReturnProperties);
@@ -193,8 +193,8 @@ class CRM_Contact_Form_Task_LabelCommon {
           $rows[$value][$field] = $fieldValue;
         }
 
-        $valuesothers = array();
-        $paramsothers = array('contact_id' => $value);
+        $valuesothers = [];
+        $paramsothers = ['contact_id' => $value];
         $valuesothers = CRM_Core_BAO_Location::getValues($paramsothers, $valuesothers);
         if ($locationTypeID) {
           foreach ($valuesothers as $vals) {
@@ -202,12 +202,12 @@ class CRM_Contact_Form_Task_LabelCommon {
               $locationTypeID
             ) {
               foreach ($vals as $k => $v) {
-                if (in_array($k, array(
+                if (in_array($k, [
                   'email',
                   'phone',
                   'im',
                   'openid',
-                ))) {
+                ])) {
                   if ($k == 'im') {
                     $rows[$value][$k] = $v['1']['name'];
                   }
@@ -240,7 +240,7 @@ class CRM_Contact_Form_Task_LabelCommon {
       }
     }
     // sigh couldn't extract out tokenfields yet
-    return array($rows, $tokenFields);
+    return [$rows, $tokenFields];
   }
 
   /**
@@ -269,7 +269,7 @@ class CRM_Contact_Form_Task_LabelCommon {
    */
   public static function getTokenData(&$contacts) {
     $mailingFormat = Civi::settings()->get('mailing_format');
-    $tokens = $tokenFields = array();
+    $tokens = $tokenFields = [];
     $messageToken = CRM_Utils_Token::getTokens($mailingFormat);
 
     // also get all token values
@@ -298,8 +298,8 @@ class CRM_Contact_Form_Task_LabelCommon {
    */
   public function mergeSameHousehold(&$rows) {
     // group selected contacts by type
-    $individuals = array();
-    $households = array();
+    $individuals = [];
+    $households = [];
     foreach ($rows as $contact_id => $row) {
       if ($row['contact_type'] == 'Household') {
         $households[$contact_id] = $row;

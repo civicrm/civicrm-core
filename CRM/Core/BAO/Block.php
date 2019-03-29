@@ -37,12 +37,12 @@ class CRM_Core_BAO_Block {
   /**
    * Fields that are required for a valid block.
    */
-  static $requiredBlockFields = array(
-    'email' => array('email'),
-    'phone' => array('phone'),
-    'im' => array('name'),
-    'openid' => array('openid'),
-  );
+  static $requiredBlockFields = [
+    'email' => ['email'],
+    'phone' => ['phone'],
+    'im' => ['name'],
+    'openid' => ['openid'],
+  ];
 
   /**
    * Given the list of params in the params array, fetch the object
@@ -63,7 +63,7 @@ class CRM_Core_BAO_Block {
     $BAOString = 'CRM_Core_BAO_' . $blockName;
     $block = new $BAOString();
 
-    $blocks = array();
+    $blocks = [];
     if (!isset($params['entity_table'])) {
       $block->contact_id = $params['contact_id'];
       if (!$block->contact_id) {
@@ -108,7 +108,7 @@ class CRM_Core_BAO_Block {
     $block->find();
 
     $count = 1;
-    $blocks = array();
+    $blocks = [];
     while ($block->fetch()) {
       CRM_Core_DAO::storeValues($block, $blocks[$count]);
       //unset is_primary after first block. Due to some bug in earlier version
@@ -178,7 +178,7 @@ class CRM_Core_BAO_Block {
    *
    */
   public static function getBlockIds($blockName, $contactId = NULL, $entityElements = NULL, $updateBlankLocInfo = FALSE) {
-    $allBlocks = array();
+    $allBlocks = [];
 
     $name = ucfirst($blockName);
     if ($blockName == 'im') {
@@ -226,15 +226,15 @@ class CRM_Core_BAO_Block {
 
     $name = ucfirst($blockName);
     $isPrimary = $isBilling = TRUE;
-    $entityElements = $blocks = array();
+    $entityElements = $blocks = [];
     $resetPrimaryId = NULL;
     $primaryId = FALSE;
 
     if ($entity) {
-      $entityElements = array(
+      $entityElements = [
         'entity_table' => $params['entity_table'],
         'entity_id' => $params['entity_id'],
-      );
+      ];
     }
     else {
       $contactId = $params['contact_id'];
@@ -320,16 +320,16 @@ class CRM_Core_BAO_Block {
       // $updateBlankLocInfo will help take appropriate decision. CRM-5969
       if (!empty($value['id']) && !$dataExists && $updateBlankLocInfo) {
         //delete the existing record
-        self::blockDelete($blockName, array('id' => $value['id']));
+        self::blockDelete($blockName, ['id' => $value['id']]);
         continue;
       }
       elseif (!$dataExists) {
         continue;
       }
-      $contactFields = array(
+      $contactFields = [
         'contact_id' => $contactId,
         'location_type_id' => CRM_Utils_Array::value('location_type_id', $value),
-      );
+      ];
 
       $contactFields['is_primary'] = 0;
       if ($isPrimary && !empty($value['is_primary'])) {
@@ -422,11 +422,11 @@ class CRM_Core_BAO_Block {
     // if is_primary = 1
     if (!empty($params['is_primary'])) {
       $sql = "UPDATE $table SET is_primary = 0 WHERE contact_id = %1";
-      $sqlParams = array(1 => array($contactId, 'Integer'));
+      $sqlParams = [1 => [$contactId, 'Integer']];
       // we don't want to create unnecessary entries in the log_ tables so exclude the one we are working on
       if (!empty($params['id'])) {
         $sql .= " AND id <> %2";
-        $sqlParams[2] = array($params['id'], 'Integer');
+        $sqlParams[2] = [$params['id'], 'Integer'];
       }
       CRM_Core_DAO::executeQuery($sql, $sqlParams);
       return;

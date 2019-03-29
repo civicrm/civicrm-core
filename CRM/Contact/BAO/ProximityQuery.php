@@ -114,7 +114,7 @@ class CRM_Contact_BAO_ProximityQuery {
     $y = ($radius + $height) * $cosLat * $sinLong;
     $z = ($radius * (1 - self::$_earthEccentricitySQ) + $height) * $sinLat;
 
-    return array($x, $y, $z);
+    return [$x, $y, $z];
   }
 
   /**
@@ -154,10 +154,10 @@ class CRM_Contact_BAO_ProximityQuery {
       $maxLong = $maxLong - pi() * 2;
     }
 
-    return array(
+    return [
       rad2deg($minLong),
       rad2deg($maxLong),
-    );
+    ];
   }
 
   /**
@@ -198,10 +198,10 @@ class CRM_Contact_BAO_ProximityQuery {
       $maxLat = $rightangle;
     }
 
-    return array(
+    return [
       rad2deg($minLat),
       rad2deg($maxLat),
-    );
+    ];
   }
 
   /**
@@ -215,15 +215,15 @@ class CRM_Contact_BAO_ProximityQuery {
   public static function where($latitude, $longitude, $distance, $tablePrefix = 'civicrm_address') {
     self::initialize();
 
-    $params = array();
-    $clause = array();
+    $params = [];
+    $clause = [];
 
     list($minLongitude, $maxLongitude) = self::earthLongitudeRange($longitude, $latitude, $distance);
     list($minLatitude, $maxLatitude) = self::earthLatitudeRange($longitude, $latitude, $distance);
 
     // DONT consider NAN values (which is returned by rad2deg php function)
     // for checking BETWEEN geo_code's criteria as it throws obvious 'NAN' field not found DB: Error
-    $geoCodeWhere = array();
+    $geoCodeWhere = [];
     if (!is_nan($minLatitude)) {
       $geoCodeWhere[] = "{$tablePrefix}.geo_code_1  >= $minLatitude ";
     }
@@ -264,7 +264,7 @@ ACOS(
     list($name, $op, $distance, $grouping, $wildcard) = $values;
 
     // also get values array for all address related info
-    $proximityVars = array(
+    $proximityVars = [
       'street_address' => 1,
       'city' => 1,
       'postal_code' => 1,
@@ -275,10 +275,10 @@ ACOS(
       'distance_unit' => 0,
       'geo_code_1' => 0,
       'geo_code_2' => 0,
-    );
+    ];
 
-    $proximityAddress = array();
-    $qill = array();
+    $proximityAddress = [];
+    $qill = [];
     foreach ($proximityVars as $var => $recordQill) {
       $proximityValues = $query->getWhereValues("prox_{$var}", $grouping);
       if (!empty($proximityValues) &&
@@ -329,10 +329,10 @@ ACOS(
     }
 
     $qill = ts('Proximity search to a distance of %1 from %2',
-      array(
+      [
         1 => $qillUnits,
         2 => implode(', ', $qill),
-      )
+      ]
     );
 
     $query->_tables['civicrm_address'] = $query->_whereTables['civicrm_address'] = 1;
@@ -374,7 +374,7 @@ ACOS(
     foreach ($input as $param) {
       if (CRM_Utils_Array::value('0', $param) == 'prox_distance') {
         // add prox_ prefix to these
-        $param_alter = array('street_address', 'city', 'postal_code', 'state_province', 'country');
+        $param_alter = ['street_address', 'city', 'postal_code', 'state_province', 'country'];
 
         foreach ($input as $key => $_param) {
           if (in_array($_param[0], $param_alter)) {

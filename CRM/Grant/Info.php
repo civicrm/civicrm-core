@@ -47,14 +47,14 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getInfo() {
-    return array(
+    return [
       'name' => 'CiviGrant',
       'translatedName' => ts('CiviGrant'),
       'title' => 'CiviCRM Grant Management Engine',
       'path' => 'CRM_Grant_',
       'search' => 1,
       'showActivitiesInCore' => 1,
-    );
+    ];
   }
 
 
@@ -67,20 +67,20 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
-    $permissions = array(
-      'access CiviGrant' => array(
+    $permissions = [
+      'access CiviGrant' => [
         ts('access CiviGrant'),
         ts('View all grants'),
-      ),
-      'edit grants' => array(
+      ],
+      'edit grants' => [
         ts('edit grants'),
         ts('Create and update grants'),
-      ),
-      'delete in CiviGrant' => array(
+      ],
+      'delete in CiviGrant' => [
         ts('delete in CiviGrant'),
         ts('Delete grants'),
-      ),
-    );
+      ],
+    ];
 
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
@@ -114,11 +114,11 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerTab() {
-    return array(
+    return [
       'title' => ts('Grants'),
       'url' => 'grant',
       'weight' => 60,
-    );
+    ];
   }
 
   /**
@@ -134,10 +134,10 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerAdvancedSearchPane() {
-    return array(
+    return [
       'title' => ts('Grants'),
       'weight' => 50,
-    );
+    ];
   }
 
   /**
@@ -156,14 +156,14 @@ class CRM_Grant_Info extends CRM_Core_Component_Info {
     if (CRM_Core_Permission::check('access CiviGrant') &&
       CRM_Core_Permission::check('edit grants')
     ) {
-      $shortCuts = array_merge($shortCuts, array(
-        array(
+      $shortCuts = array_merge($shortCuts, [
+        [
           'path' => 'civicrm/grant/add',
           'query' => "reset=1&action=add&context=standalone",
           'ref' => 'new-grant',
           'title' => ts('Grant'),
-        ),
-      ));
+        ],
+      ]);
     }
   }
 

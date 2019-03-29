@@ -59,15 +59,15 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->applyFilter(array('name', 'subject', 'body_html'), 'trim');
+    $this->applyFilter(['name', 'subject', 'body_html'], 'trim');
 
     $this->add('text', 'name', ts('Name'),
       CRM_Core_DAO::getAttribute('CRM_Mailing_BAO_MailingComponent', 'name'), TRUE
     );
-    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
+    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', [
         'CRM_Mailing_BAO_MailingComponent',
         $this->_id,
-      ));
+      ]);
 
     $this->add('select', 'component_type', ts('Component Type'), CRM_Core_SelectValues::mailingComponents());
 
@@ -85,20 +85,20 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     $this->addYesNo('is_default', ts('Default?'));
     $this->addYesNo('is_active', ts('Enabled?'));
 
-    $this->addFormRule(array('CRM_Mailing_Form_Component', 'formRule'));
-    $this->addFormRule(array('CRM_Mailing_Form_Component', 'dataRule'));
+    $this->addFormRule(['CRM_Mailing_Form_Component', 'formRule']);
+    $this->addFormRule(['CRM_Mailing_Form_Component', 'dataRule']);
 
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Save'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
   }
 
@@ -106,11 +106,11 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    $defaults = array();
-    $params = array();
+    $defaults = [];
+    $params = [];
 
     if (isset($this->_id)) {
-      $params = array('id' => $this->_id);
+      $params = ['id' => $this->_id];
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $defaults);
     }
@@ -133,9 +133,9 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     }
 
     $component = CRM_Mailing_BAO_MailingComponent::add($params);
-    CRM_Core_Session::setStatus(ts('The mailing component \'%1\' has been saved.', array(
+    CRM_Core_Session::setStatus(ts('The mailing component \'%1\' has been saved.', [
         1 => $component->name,
-      )
+      ]
     ), ts('Saved'), 'success');
 
   }
@@ -154,31 +154,31 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    */
   public static function dataRule($params, $files, $options) {
     if ($params['component_type'] == 'Header' || $params['component_type'] == 'Footer') {
-      $InvalidTokens = array();
+      $InvalidTokens = [];
     }
     else {
-      $InvalidTokens = array('action.forward' => ts("This token can only be used in send mailing context (body, header, footer).."));
+      $InvalidTokens = ['action.forward' => ts("This token can only be used in send mailing context (body, header, footer)..")];
     }
-    $errors = array();
-    foreach (array(
+    $errors = [];
+    foreach ([
                'text',
                'html',
-             ) as $type) {
-      $dataErrors = array();
+             ] as $type) {
+      $dataErrors = [];
       foreach ($InvalidTokens as $token => $desc) {
         if ($params['body_' . $type]) {
           if (preg_match('/' . preg_quote('{' . $token . '}') . '/', $params['body_' . $type])) {
-            $dataErrors[] = '<li>' . ts('This message is having a invalid token - %1: %2', array(
+            $dataErrors[] = '<li>' . ts('This message is having a invalid token - %1: %2', [
                 1 => $token,
                 2 => $desc,
-              )) . '</li>';
+              ]) . '</li>';
           }
         }
       }
       if (!empty($dataErrors)) {
-        $errors['body_' . $type] = ts('The following errors were detected in %1 message:', array(
+        $errors['body_' . $type] = ts('The following errors were detected in %1 message:', [
             1 => $type,
-          )) . '<ul>' . implode('', $dataErrors) . '</ul><br /><a href="' . CRM_Utils_System::docURL2('Tokens', TRUE, NULL, NULL, NULL, "wiki") . '">' . ts('More information on tokens...') . '</a>';
+          ]) . '<ul>' . implode('', $dataErrors) . '</ul><br /><a href="' . CRM_Utils_System::docURL2('Tokens', TRUE, NULL, NULL, NULL, "wiki") . '">' . ts('More information on tokens...') . '</a>';
       }
     }
     return empty($errors) ? TRUE : $errors;
@@ -196,7 +196,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    *   mixed true or array of errors
    */
   public static function formRule($params, $files, $options) {
-    $errors = array();
+    $errors = [];
     if (empty($params['body_text']) && empty($params['body_html'])) {
       $errors['body_text'] = ts("Please provide either HTML or TEXT format for the Body.");
       $errors['body_html'] = ts("Please provide either HTML or TEXT format for the Body.");

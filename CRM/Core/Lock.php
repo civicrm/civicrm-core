@@ -182,10 +182,10 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
       }
 
       $query = "SELECT GET_LOCK( %1, %2 )";
-      $params = array(
-        1 => array($this->_id, 'String'),
-        2 => array($timeout ? $timeout : $this->_timeout, 'Integer'),
-      );
+      $params = [
+        1 => [$this->_id, 'String'],
+        2 => [$timeout ? $timeout : $this->_timeout, 'Integer'],
+      ];
       $res = CRM_Core_DAO::singleValueQuery($query, $params);
       if ($res) {
         if (defined('CIVICRM_LOCK_DEBUG')) {
@@ -220,7 +220,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
       }
 
       $query = "SELECT RELEASE_LOCK( %1 )";
-      $params = array(1 => array($this->_id, 'String'));
+      $params = [1 => [$this->_id, 'String']];
       return CRM_Core_DAO::singleValueQuery($query, $params);
     }
   }
@@ -230,7 +230,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
    */
   public function isFree() {
     $query = "SELECT IS_FREE_LOCK( %1 )";
-    $params = array(1 => array($this->_id, 'String'));
+    $params = [1 => [$this->_id, 'String']];
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 

@@ -59,14 +59,14 @@ class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
 
     $this->add('text', 'label', ts('Label'), $attributes['label'], TRUE);
 
-    $this->addSelect('class', array('required' => TRUE));
+    $this->addSelect('class', ['required' => TRUE]);
 
     $this->add('checkbox', 'is_active', ts('Active?'));
     $this->add('checkbox', 'is_counted', ts('Counted?'));
 
     $this->add('number', 'weight', ts('Order'), $attributes['weight'], TRUE);
 
-    $this->addSelect('visibility_id', array('label' => ts('Visibility'), 'required' => TRUE));
+    $this->addSelect('visibility_id', ['label' => ts('Visibility'), 'required' => TRUE]);
 
     $this->assign('id', $this->_id);
   }
@@ -83,7 +83,7 @@ class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
     }
     $this->_isReserved = CRM_Utils_Array::value('is_reserved', $defaults);
     if ($this->_isReserved) {
-      $this->freeze(array('name', 'class', 'is_active'));
+      $this->freeze(['name', 'class', 'is_active']);
     }
     return $defaults;
   }
@@ -101,7 +101,7 @@ class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
 
     $formValues = $this->controller->exportValues($this->_name);
 
-    $params = array(
+    $params = [
       'name' => CRM_Utils_Array::value('name', $formValues),
       'label' => CRM_Utils_Array::value('label', $formValues),
       'class' => CRM_Utils_Array::value('class', $formValues),
@@ -109,7 +109,7 @@ class CRM_Admin_Form_ParticipantStatusType extends CRM_Admin_Form {
       'is_counted' => CRM_Utils_Array::value('is_counted', $formValues, FALSE),
       'weight' => CRM_Utils_Array::value('weight', $formValues),
       'visibility_id' => CRM_Utils_Array::value('visibility_id', $formValues),
-    );
+    ];
 
     // make sure a malicious POST does not change these on reserved statuses
     if ($this->_isReserved) {

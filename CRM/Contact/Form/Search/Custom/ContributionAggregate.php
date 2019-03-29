@@ -46,12 +46,12 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
     $this->_formValues = $formValues;
 
     // Define the columns for search result rows
-    $this->_columns = array(
+    $this->_columns = [
       ts('Contact ID') => 'contact_id',
       ts('Name') => 'sort_name',
       ts('Contribution Count') => 'donation_count',
       ts('Contribution Amount') => 'donation_amount',
-    );
+    ];
 
     // define component access permission needed
     $this->_permissionedComponent = 'CiviContribute';
@@ -86,14 +86,14 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
     CRM_Core_Form_Date::buildDateRange($form, 'contribution_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
 
     $form->addSelect('financial_type_id',
-      array('entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search')
+      ['entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search']
     );
 
     /**
      * If you are using the sample template, this array tells the template fields to render
      * for the search form.
      */
-    $form->assign('elements', array('min_amount', 'max_amount'));
+    $form->assign('elements', ['min_amount', 'max_amount']);
   }
 
   /**
@@ -195,10 +195,10 @@ civicrm_contact AS contact_a {$this->_aclFrom}
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    $clauses = array(
+    $clauses = [
       "contrib.contact_id = contact_a.id",
       "contrib.is_test = 0",
-    );
+    ];
 
     foreach ([
       'contribution_date_relative',
@@ -222,7 +222,7 @@ civicrm_contact AS contact_a {$this->_aclFrom}
     }
 
     if ($includeContactIDs) {
-      $contactIDs = array();
+      $contactIDs = [];
       foreach ($this->_formValues as $id => $value) {
         if ($value &&
           substr($id, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX
@@ -254,7 +254,7 @@ civicrm_contact AS contact_a {$this->_aclFrom}
    * @return string
    */
   public function having($includeContactIDs = FALSE) {
-    $clauses = array();
+    $clauses = [];
     $min = CRM_Utils_Array::value('min_amount', $this->_formValues);
     if ($min) {
       $min = CRM_Utils_Rule::cleanMoney($min);

@@ -74,27 +74,27 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     $fields = CRM_Contribute_BAO_Contribution::importableFields($this->_contactType, FALSE);
 
     $fields = array_merge($fields,
-      array(
-        'soft_credit' => array(
+      [
+        'soft_credit' => [
           'title' => ts('Soft Credit'),
           'softCredit' => TRUE,
           'headerPattern' => '/Soft Credit/i',
-        ),
-      )
+        ],
+      ]
     );
 
     // add pledge fields only if its is enabled
     if (CRM_Core_Permission::access('CiviPledge')) {
-      $pledgeFields = array(
-        'pledge_payment' => array(
+      $pledgeFields = [
+        'pledge_payment' => [
           'title' => ts('Pledge Payment'),
           'headerPattern' => '/Pledge Payment/i',
-        ),
-        'pledge_id' => array(
+        ],
+        'pledge_id' => [
           'title' => ts('Pledge ID'),
           'headerPattern' => '/Pledge ID/i',
-        ),
-      );
+        ],
+      ];
 
       $fields = array_merge($fields, $pledgeFields);
     }
@@ -105,7 +105,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
     }
 
-    $this->_newContributions = array();
+    $this->_newContributions = [];
 
     $this->setActiveFields($this->_mapperKeys);
     $this->setActiveFieldSoftCredit($this->_mapperSoftCredit);
@@ -228,7 +228,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       $indieFields = $tempIndieFields;
     }
 
-    $paramValues = array();
+    $paramValues = [];
     foreach ($params as $key => $field) {
       if ($field == NULL || $field === '') {
         continue;
@@ -282,11 +282,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       //fix for CRM-2219 - Update Contribution
       // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
       if (!empty($paramValues['invoice_id']) || !empty($paramValues['trxn_id']) || !empty($paramValues['contribution_id'])) {
-        $dupeIds = array(
+        $dupeIds = [
           'id' => CRM_Utils_Array::value('contribution_id', $paramValues),
           'trxn_id' => CRM_Utils_Array::value('trxn_id', $paramValues),
           'invoice_id' => CRM_Utils_Array::value('invoice_id', $paramValues),
-        );
+        ];
 
         $ids['contribution'] = CRM_Contribute_BAO_Contribution::checkDuplicateIds($dupeIds);
 
@@ -298,7 +298,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           );
           //process note
           if (!empty($paramValues['note'])) {
-            $noteID = array();
+            $noteID = [];
             $contactID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $ids['contribution'], 'contact_id');
             $daoNote = new CRM_Core_BAO_Note();
             $daoNote->entity_table = 'civicrm_contribution';
@@ -307,32 +307,32 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
               $noteID['id'] = $daoNote->id;
             }
 
-            $noteParams = array(
+            $noteParams = [
               'entity_table' => 'civicrm_contribution',
               'note' => $paramValues['note'],
               'entity_id' => $ids['contribution'],
               'contact_id' => $contactID,
-            );
+            ];
             CRM_Core_BAO_Note::add($noteParams, $noteID);
             unset($formatted['note']);
           }
 
           //need to check existing soft credit contribution, CRM-3968
           if (!empty($formatted['soft_credit'])) {
-            $dupeSoftCredit = array(
+            $dupeSoftCredit = [
               'contact_id' => $formatted['soft_credit'],
               'contribution_id' => $ids['contribution'],
-            );
+            ];
 
             //Delete all existing soft Contribution from contribution_soft table for pcp_id is_null
             $existingSoftCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dupeSoftCredit['contribution_id']);
             if (isset($existingSoftCredit['soft_credit']) && !empty($existingSoftCredit['soft_credit'])) {
               foreach ($existingSoftCredit['soft_credit'] as $key => $existingSoftCreditValues) {
                 if (!empty($existingSoftCreditValues['soft_credit_id'])) {
-                  civicrm_api3('ContributionSoft', 'delete', array(
+                  civicrm_api3('ContributionSoft', 'delete', [
                     'id' => $existingSoftCreditValues['soft_credit_id'],
                     'pcp_id' => NULL,
-                  ));
+                  ]);
                 }
               }
             }
@@ -352,11 +352,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           return CRM_Import_Parser::VALID;
         }
         else {
-          $labels = array(
+          $labels = [
             'id' => 'Contribution ID',
             'trxn_id' => 'Transaction ID',
             'invoice_id' => 'Invoice ID',
-          );
+          ];
           foreach ($dupeIds as $k => $v) {
             if ($v) {
               $errorMsg[] = "$labels[$k] $v";
@@ -417,10 +417,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       }
       else {
         // Using new Dedupe rule.
-        $ruleParams = array(
+        $ruleParams = [
           'contact_type' => $this->_contactType,
           'used' => 'Unsupervised',
-        );
+        ];
         $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
         $disp = NULL;
         foreach ($fieldsArray as $value) {
@@ -505,7 +505,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       );
 
       CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($formatted['pledge_id'],
-        array($formatted['pledge_payment_id']),
+        [$formatted['pledge_payment_id']],
         $completeStatusID,
         NULL,
         $formatted['total_amount']

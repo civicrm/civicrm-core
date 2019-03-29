@@ -57,12 +57,12 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
       if ($log->modified_id) {
         list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($log->modified_id);
       }
-      $result = array(
+      $result = [
         'id' => $log->modified_id,
         'name' => $displayName,
         'image' => $contactImage,
         'date' => $log->modified_date,
-      );
+      ];
     }
     return $result;
   }
@@ -94,7 +94,7 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
     $userID = NULL
   ) {
     if (!self::$_processed) {
-      self::$_processed = array();
+      self::$_processed = [];
     }
 
     if (!$userID) {
@@ -128,7 +128,7 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
       self::$_processed[$contactID][$userID] = 1;
     }
     else {
-      self::$_processed[$contactID] = array($userID => 1);
+      self::$_processed[$contactID] = [$userID => 1];
     }
 
     $logData = "$tableName,$tableID";
@@ -183,8 +183,8 @@ UPDATE civicrm_log
     $loggingSchema = new CRM_Logging_Schema();
 
     if ($loggingSchema->isEnabled()) {
-      $params = array('report_id' => 'logging/contact/summary');
-      $instance = array();
+      $params = ['report_id' => 'logging/contact/summary'];
+      $instance = [];
       CRM_Report_BAO_ReportInstance::retrieve($params, $instance);
 
       if (!empty($instance) &&

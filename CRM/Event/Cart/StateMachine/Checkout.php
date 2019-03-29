@@ -17,7 +17,7 @@ class CRM_Event_Cart_StateMachine_Checkout extends CRM_Core_StateMachine {
       CRM_Core_Error::statusBounce(ts("You don't have any events in you cart. Please add some events."), CRM_Utils_System::url('civicrm/event'));
     }
 
-    $pages = array();
+    $pages = [];
     $is_monetary = FALSE;
     $is_conference = FALSE;
     foreach ($cart->events_in_carts as $event_in_cart) {
@@ -29,10 +29,10 @@ class CRM_Event_Cart_StateMachine_Checkout extends CRM_Core_StateMachine {
     foreach ($cart->events_in_carts as $event_in_cart) {
       if ($event_in_cart->is_parent_event()) {
         foreach ($event_in_cart->participants as $participant) {
-          $pages["CRM_Event_Cart_Form_Checkout_ConferenceEvents_{$event_in_cart->event_id}_{$participant->id}"] = array(
+          $pages["CRM_Event_Cart_Form_Checkout_ConferenceEvents_{$event_in_cart->event_id}_{$participant->id}"] = [
             'className' => 'CRM_Event_Cart_Form_Checkout_ConferenceEvents',
             'title' => "Select {$event_in_cart->event->title} Events For {$participant->email}",
-          );
+          ];
         }
       }
     }

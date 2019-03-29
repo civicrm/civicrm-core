@@ -50,9 +50,9 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
 
     // FIXME Optimize performance of image_url query
     $sql = "SELECT id FROM civicrm_contact WHERE image_url like %1;";
-    $params = array(
-      1 => array("%" . $_GET['photo'], 'String'),
-    );
+    $params = [
+      1 => ["%" . $_GET['photo'], 'String'],
+    ];
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     $cid = NULL;
     while ($dao->fetch()) {

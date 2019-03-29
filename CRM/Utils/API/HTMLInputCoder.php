@@ -63,7 +63,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
    */
   public function getSkipFields() {
     if ($this->skipFields === NULL) {
-      $this->skipFields = array(
+      $this->skipFields = [
         'widget_code',
         'html_message',
         'body_html',
@@ -110,7 +110,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'replyto_email', // e.g. '"Full Name" <user@example.org>'
         'operator',
         'content', // CRM-20468
-      );
+      ];
       $custom = CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_custom_field WHERE html_type = "RichTextEditor"');
       while ($custom->fetch()) {
         $this->skipFields[] = 'custom_' . $custom->id;
@@ -135,7 +135,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
       }
     }
     elseif ($castToString || is_string($values)) {
-      $values = str_replace(array('<', '>'), array('&lt;', '&gt;'), $values);
+      $values = str_replace(['<', '>'], ['&lt;', '&gt;'], $values);
     }
   }
 
@@ -150,7 +150,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
       }
     }
     elseif ($castToString || is_string($values)) {
-      $values = str_replace(array('&lt;', '&gt;'), array('<', '>'), $values);
+      $values = str_replace(['&lt;', '&gt;'], ['<', '>'], $values);
     }
   }
 

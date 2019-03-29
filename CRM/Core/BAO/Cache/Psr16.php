@@ -62,7 +62,7 @@ class CRM_Core_BAO_Cache_Psr16 {
 
       $cache = CRM_Utils_Cache::create([
         'name' => "bao_$group",
-        'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
+        'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
         // We're replacing CRM_Core_BAO_Cache, which traditionally used a front-cache
         // that was not aware of TTLs. So it seems more consistent/performant to
         // use 'fast' here.

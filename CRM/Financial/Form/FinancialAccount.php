@@ -51,9 +51,9 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     parent::preProcess();
 
     if ($this->_id) {
-      $params = array(
+      $params = [
         'id' => $this->_id,
-      );
+      ];
       $financialAccount = CRM_Financial_BAO_FinancialAccount::retrieve($params, CRM_Core_DAO::$_nullArray);
       $financialAccountTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
       if ($financialAccount->financial_account_type_id == $financialAccountTypeId
@@ -84,15 +84,15 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialAccount');
     $this->add('text', 'name', ts('Name'), $attributes['name'], TRUE);
     $this->addRule('name', ts('A financial type with this name already exists. Please select another name.'),
-      'objectExists', array('CRM_Financial_DAO_FinancialAccount', $this->_id));
+      'objectExists', ['CRM_Financial_DAO_FinancialAccount', $this->_id]);
 
     $this->add('text', 'description', ts('Description'), $attributes['description']);
     $this->add('text', 'accounting_code', ts('Accounting Code'), $attributes['accounting_code']);
     $elementAccounting = $this->add('text', 'account_type_code', ts('Account Type Code'), $attributes['account_type_code']);
-    $this->addEntityRef('contact_id', ts('Owner'), array(
-      'api' => array('params' => array('contact_type' => 'Organization')),
+    $this->addEntityRef('contact_id', ts('Owner'), [
+      'api' => ['params' => ['contact_type' => 'Organization']],
       'create' => TRUE,
-    ));
+    ]);
     $this->add('text', 'tax_rate', ts('Tax Rate'), $attributes['tax_rate']);
     $this->add('checkbox', 'is_deductible', ts('Tax-Deductible?'));
     $elementActive = $this->add('checkbox', 'is_active', ts('Enabled?'));
@@ -107,7 +107,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id');
     if (!empty($financialAccountType)) {
       $element = $this->add('select', 'financial_account_type_id', ts('Financial Account Type'),
-        array('' => '- select -') + $financialAccountType, TRUE, array('class' => 'crm-select2 huge'));
+        ['' => '- select -'] + $financialAccountType, TRUE, ['class' => 'crm-select2 huge']);
       if ($this->_isARFlag) {
         $element->freeze();
         $elementAccounting->freeze();
@@ -121,9 +121,9 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     if ($this->_action == CRM_Core_Action::UPDATE &&
       CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $this->_id, 'is_reserved')
     ) {
-      $this->freeze(array('name', 'description', 'is_active'));
+      $this->freeze(['name', 'description', 'is_active']);
     }
-    $this->addFormRule(array('CRM_Financial_Form_FinancialAccount', 'formRule'), $this);
+    $this->addFormRule(['CRM_Financial_Form_FinancialAccount', 'formRule'], $this);
   }
 
   /**
@@ -138,7 +138,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    *   list of errors to be posted back to the form
    */
   public static function formRule($values, $files, $self) {
-    $errorMsg = array();
+    $errorMsg = [];
     $financialAccountTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Liability' "));
     if (isset($values['is_tax'])) {
       if ($values['financial_account_type_id'] != $financialAccountTypeId) {
@@ -156,10 +156,10 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     if ($self->_action & CRM_Core_Action::UPDATE) {
       if (!(isset($values['is_tax']))) {
         $relationshipId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
-        $params = array(
+        $params = [
           'financial_account_id' => $self->_id,
           'account_relationship' => $relationshipId,
-        );
+        ];
         $result = CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $defaults);
         if ($result) {
           $errorMsg['is_tax'] = ts('Is Tax? must be set for this financial account');
@@ -209,7 +209,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
         $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
       }
       $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params);
-      CRM_Core_Session::setStatus(ts('The Financial Account \'%1\' has been saved.', array(1 => $financialAccount->name)), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('The Financial Account \'%1\' has been saved.', [1 => $financialAccount->name]), ts('Saved'), 'success');
     }
   }
 

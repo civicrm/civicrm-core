@@ -101,7 +101,7 @@ class CRM_Financial_BAO_Payment {
     }
 
     if ($isPaymentCompletesContribution) {
-      civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
+      civicrm_api3('Contribution', 'completetransaction', ['id' => $contribution['id']]);
       // Get the trxn
       $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
       $ftParams = ['id' => $trxnId['financialTrxnId']];
@@ -129,7 +129,7 @@ class CRM_Financial_BAO_Payment {
   public static function sendConfirmation($params) {
 
     $entities = self::loadRelatedEntities($params['id']);
-    $sendTemplateParams = array(
+    $sendTemplateParams = [
       'groupName' => 'msg_tpl_workflow_contribution',
       'valueName' => 'payment_or_refund_notification',
       'PDFFilename' => ts('notification') . '.pdf',
@@ -137,7 +137,7 @@ class CRM_Financial_BAO_Payment {
       'toName' => $entities['contact']['display_name'],
       'toEmail' => $entities['contact']['email'],
       'tplParams' => self::getConfirmationTemplateParameters($entities),
-    );
+    ];
     return CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
   }
 

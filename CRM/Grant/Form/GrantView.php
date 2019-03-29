@@ -50,14 +50,14 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $context);
 
-    $values = array();
+    $values = [];
     $params['id'] = $this->_id;
     CRM_Grant_BAO_Grant::retrieve($params, $values);
     $grantType = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id');
     $grantStatus = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id');
     $this->assign('grantType', $grantType[$values['grant_type_id']]);
     $this->assign('grantStatus', $grantStatus[$values['status_id']]);
-    $grantTokens = array(
+    $grantTokens = [
       'amount_total',
       'amount_requested',
       'amount_granted',
@@ -67,7 +67,7 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
       'decision_date',
       'money_transfer_date',
       'grant_due_date',
-    );
+    ];
 
     foreach ($grantTokens as $token) {
       $this->assign($token, CRM_Utils_Array::value($token, $values));
@@ -93,7 +93,7 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
 
     $title = CRM_Contact_BAO_Contact::displayName($values['contact_id']) . ' - ' . ts('Grant') . ': ' . CRM_Utils_Money::format($values['amount_total']) . ' (' . $grantType[$values['grant_type_id']] . ')';
 
-    $recentOther = array();
+    $recentOther = [];
     if (CRM_Core_Permission::checkActionPermission('CiviGrant', CRM_Core_Action::UPDATE)) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/grant',
         "action=update&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
@@ -131,14 +131,14 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'cancel',
           'name' => ts('Done'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-      )
+        ],
+      ]
     );
   }
 

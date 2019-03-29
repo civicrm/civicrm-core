@@ -54,7 +54,7 @@ class CRM_Custom_Page_AJAX {
     $options = CRM_Core_BAO_CustomOption::getOptionListSelector($params);
 
     $iFilteredTotal = $iTotal = $params['total'];
-    $selectorElements = array(
+    $selectorElements = [
       'label',
       'value',
       'description',
@@ -62,7 +62,7 @@ class CRM_Custom_Page_AJAX {
       'is_active',
       'links',
       'class',
-    );
+    ];
 
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($options, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
@@ -76,11 +76,11 @@ class CRM_Custom_Page_AJAX {
   public static function fixOrdering() {
     $params = $_REQUEST;
 
-    $queryParams = array(
-      1 => array($params['start'], 'Integer'),
-      2 => array($params['end'], 'Integer'),
-      3 => array($params['gid'], 'Integer'),
-    );
+    $queryParams = [
+      1 => [$params['start'], 'Integer'],
+      2 => [$params['end'], 'Integer'],
+      3 => [$params['gid'], 'Integer'],
+    ];
     $dao = "SELECT id FROM civicrm_option_value WHERE weight = %1 AND option_group_id = %3";
     $startid = CRM_Core_DAO::singleValueQuery($dao, $queryParams);
 
@@ -133,12 +133,12 @@ class CRM_Custom_Page_AJAX {
     list($fields, $attributes) = $obj->browse();
 
     // format params and add class attributes
-    $fieldList = array();
+    $fieldList = [];
     foreach ($fields as $id => $value) {
-      $field = array();
+      $field = [];
       foreach ($value as $fieldId => &$fieldName) {
         if (!empty($attributes[$fieldId][$id]['class'])) {
-          $fieldName = array('data' => $fieldName, 'cellClass' => $attributes[$fieldId][$id]['class']);
+          $fieldName = ['data' => $fieldName, 'cellClass' => $attributes[$fieldId][$id]['class']];
         }
         if (is_numeric($fieldId)) {
           $fName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $fieldId, 'column_name');
@@ -150,7 +150,7 @@ class CRM_Custom_Page_AJAX {
     }
     $totalRecords = !empty($obj->_total) ? $obj->_total : 0;
 
-    $multiRecordFields = array();
+    $multiRecordFields = [];
     $multiRecordFields['data'] = $fieldList;
     $multiRecordFields['recordsTotal'] = $totalRecords;
     $multiRecordFields['recordsFiltered'] = $totalRecords;

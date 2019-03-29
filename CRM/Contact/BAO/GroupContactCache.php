@@ -32,7 +32,7 @@
  */
 class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCache {
 
-  static $_alreadyLoaded = array();
+  static $_alreadyLoaded = [];
 
   /**
    * Get a list of caching modes.
@@ -40,13 +40,13 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * @return array
    */
   public static function getModes() {
-    return array(
+    return [
       // Flush expired caches in response to user actions.
       'opportunistic' => ts('Opportunistic Flush'),
 
       // Flush expired caches via background cron jobs.
       'deterministic' => ts('Cron Flush'),
-    );
+    ];
   }
 
   /**
@@ -122,7 +122,7 @@ AND (
    */
   public static function shouldGroupBeRefreshed($groupID, $includeHiddenGroups = FALSE) {
     $query = self::groupRefreshedClause("g.id = %1", $includeHiddenGroups);
-    $params = array(1 => array($groupID, 'Integer'));
+    $params = [1 => [$groupID, 'Integer']];
 
     // if the query returns the group ID, it means the group is a valid candidate for refreshing
     return CRM_Core_DAO::singleValueQuery($query, $params);
@@ -146,11 +146,11 @@ AND (
     // this function is expensive and should be sparingly used if groupIDs is empty
     if (empty($groupIDs)) {
       $groupIDClause = NULL;
-      $groupIDs = array();
+      $groupIDs = [];
     }
     else {
       if (!is_array($groupIDs)) {
-        $groupIDs = array($groupIDs);
+        $groupIDs = [$groupIDs];
       }
 
       // note escapeString is a must here and we can't send the imploded value as second argument to
@@ -175,7 +175,7 @@ AND (
 ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
-    $processGroupIDs = array();
+    $processGroupIDs = [];
     $refreshGroupIDs = $groupIDs;
     while ($dao->fetch()) {
       $processGroupIDs[] = $dao->id;
@@ -221,9 +221,9 @@ AND    g.refresh_date IS NULL
     foreach ($groupIDs as $groupID) {
       // first delete the current cache
       self::clearGroupContactCache($groupID);
-      $params = array(array('group', 'IN', array($groupID), 0, 0));
+      $params = [['group', 'IN', [$groupID], 0, 0]];
       // the below call updates the cache table as a byproduct of the query
-      CRM_Contact_BAO_Query::apiQuery($params, array('contact_id'), NULL, NULL, 0, 0, FALSE);
+      CRM_Contact_BAO_Query::apiQuery($params, ['contact_id'], NULL, NULL, 0, 0, FALSE);
     }
   }
 
@@ -295,7 +295,7 @@ WHERE  id IN ( $groupIDs )
    */
   public static function remove() {
     Civi::log()
-      ->warning('Deprecated code. This function should not be called without groupIDs. Extensions can use the api job.group_cache_flush for a hard flush or add an api option for soft flush', array('civi.tag' => 'deprecated'));
+      ->warning('Deprecated code. This function should not be called without groupIDs. Extensions can use the api job.group_cache_flush for a hard flush or add an api option for soft flush', ['civi.tag' => 'deprecated']);
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
   }
 
@@ -318,9 +318,9 @@ WHERE  id IN ( $groupIDs )
     SET    cache_date = null, refresh_date = null
     WHERE  id = %1 ";
 
-    $params = array(
-      1 => array($groupID, 'Integer'),
-    );
+    $params = [
+      1 => [$groupID, 'Integer'],
+    ];
 
     CRM_Core_DAO::executeQuery($query, $params);
     // also update the cache_date for these groups
@@ -346,7 +346,7 @@ WHERE  id IN ( $groupIDs )
       // Someone else is kindly doing the refresh for us right now.
       return;
     }
-    $params = array(1 => array(self::getCacheInvalidDateTime(), 'String'));
+    $params = [1 => [self::getCacheInvalidDateTime(), 'String']];
     // @todo this is consistent with previous behaviour but as the first query could take several seconds the second
     // could become inaccurate. It seems to make more sense to fetch them first & delete from an array (which would
     // also reduce joins). If we do this we should also consider how best to iterate the groups. If we do them one at
@@ -394,7 +394,7 @@ WHERE  id IN ( $groupIDs )
    */
   protected static function getLockForRefresh() {
     if (!isset(Civi::$statics[__CLASS__]['is_refresh_init'])) {
-      Civi::$statics[__CLASS__] = array('is_refresh_init' => FALSE);
+      Civi::$statics[__CLASS__] = ['is_refresh_init' => FALSE];
     }
 
     if (Civi::$statics[__CLASS__]['is_refresh_init']) {
@@ -448,7 +448,7 @@ WHERE  id IN ( $groupIDs )
    *   TRUE if successful.
    */
   public static function removeContact($cid, $groupId = NULL) {
-    $cids = array();
+    $cids = [];
     // sanitize input
     foreach ((array) $cid as $c) {
       $cids[] = CRM_Utils_Type::escape($c, 'Integer');
@@ -514,7 +514,7 @@ WHERE  id IN ( $groupIDs )
         CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
       }
 
-      $returnProperties = array();
+      $returnProperties = [];
       if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $savedSearchID, 'mapping_id')) {
         $fv = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
         $returnProperties = CRM_Core_BAO_Mapping::returnProperties($fv);
@@ -585,7 +585,7 @@ WHERE  civicrm_group_contact.status = 'Added'
 
     $processed = FALSE;
     $tempTable = 'civicrm_temp_group_contact_cache' . rand(0, 2000);
-    foreach (array($sql, $sqlB) as $selectSql) {
+    foreach ([$sql, $sqlB] as $selectSql) {
       if (!$selectSql) {
         continue;
       }
@@ -599,7 +599,7 @@ WHERE  civicrm_group_contact.status = 'Added'
       CRM_Core_DAO::executeQuery(" DROP TEMPORARY TABLE $tempTable");
     }
 
-    self::updateCacheTime(array($groupID), $processed);
+    self::updateCacheTime([$groupID], $processed);
 
     if ($group->children) {
 
@@ -610,7 +610,7 @@ FROM civicrm_group_contact
 WHERE  civicrm_group_contact.status = 'Removed'
 AND  civicrm_group_contact.group_id = $groupID ";
       $dao = CRM_Core_DAO::executeQuery($sql);
-      $removed_contacts = array();
+      $removed_contacts = [];
       while ($dao->fetch()) {
         $removed_contacts[] = $dao->contact_id;
       }
@@ -622,12 +622,12 @@ AND  civicrm_group_contact.group_id = $groupID ";
         foreach ($removed_contacts as $removed_contact) {
           unset($contactIDs[$removed_contact]);
         }
-        $values = array();
+        $values = [];
         foreach ($contactIDs as $contactID => $dontCare) {
           $values[] = "({$groupID},{$contactID})";
         }
 
-        self::store(array($groupID), $values);
+        self::store([$groupID], $values);
       }
     }
 
@@ -679,7 +679,7 @@ AND  civicrm_group_contact.group_id = $groupID ";
       $contactIDs = $contactID;
     }
     else {
-      $contactIDs = array($contactID);
+      $contactIDs = [$contactID];
     }
 
     self::loadAll();
@@ -700,7 +700,7 @@ ORDER BY   gc.contact_id, g.children
 ";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $contactGroup = array();
+    $contactGroup = [];
     $prevContactID = NULL;
     while ($dao->fetch()) {
       if (
@@ -712,16 +712,16 @@ ORDER BY   gc.contact_id, g.children
       $prevContactID = $dao->contact_id;
       if (!array_key_exists($dao->contact_id, $contactGroup)) {
         $contactGroup[$dao->contact_id]
-          = array('group' => array(), 'groupTitle' => array());
+          = ['group' => [], 'groupTitle' => []];
       }
 
       $contactGroup[$dao->contact_id]['group'][]
-        = array(
+        = [
           'id' => $dao->group_id,
           'title' => $dao->title,
           'description' => $dao->description,
           'children' => $dao->children,
-        );
+        ];
       $contactGroup[$dao->contact_id]['groupTitle'][] = $dao->title;
     }
 

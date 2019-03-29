@@ -39,7 +39,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
   /**
    * Ims of the contact that is been viewed.
    */
-  private $_ims = array();
+  private $_ims = [];
 
   /**
    * No of im blocks for inline edit.
@@ -88,7 +88,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
       CRM_Contact_Form_Edit_IM::buildQuickForm($this, $blockId, TRUE);
     }
 
-    $this->addFormRule(array('CRM_Contact_Form_Inline_IM', 'formRule'));
+    $this->addFormRule(['CRM_Contact_Form_Inline_IM', 'formRule']);
   }
 
   /**
@@ -102,7 +102,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
    * @return array
    */
   public static function formRule($fields, $errors) {
-    $hasData = $hasPrimary = $errors = array();
+    $hasData = $hasPrimary = $errors = [];
     if (!empty($fields['im']) && is_array($fields['im'])) {
       foreach ($fields['im'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
@@ -135,7 +135,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (!empty($this->_ims)) {
       foreach ($this->_ims as $id => $value) {
         $defaults['im'][$id] = $value;

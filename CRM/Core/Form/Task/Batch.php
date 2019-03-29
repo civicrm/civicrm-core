@@ -67,7 +67,7 @@ class CRM_Core_Form_Task_Batch extends CRM_Core_Form_Task {
     parent::preProcess();
 
     // get the contact read only fields to display.
-    $readOnlyFields = array_merge(array('sort_name' => ts('Name')),
+    $readOnlyFields = array_merge(['sort_name' => ts('Name')],
       CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'contact_autocomplete_options',
         TRUE, NULL, FALSE, 'name', TRUE
@@ -95,7 +95,7 @@ class CRM_Core_Form_Task_Batch extends CRM_Core_Form_Task {
     if (!$ufGroupId) {
       throw new InvalidArgumentException('ufGroupId is missing');
     }
-    $this->_title = ts("Update multiple %1s", array(1 => $this::$entityShortname)) . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
+    $this->_title = ts("Update multiple %1s", [1 => $this::$entityShortname]) . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
     CRM_Utils_System::setTitle($this->_title);
 
     $this->addDefaultButtons(ts('Save'));
@@ -103,7 +103,7 @@ class CRM_Core_Form_Task_Batch extends CRM_Core_Form_Task {
 
     // remove file type field and then limit fields
     $suppressFields = FALSE;
-    $removeHtmlTypes = array('File');
+    $removeHtmlTypes = ['File'];
     foreach ($this->_fields as $name => $field) {
       if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) &&
         in_array($this->_fields[$name]['html_type'], $removeHtmlTypes)
@@ -121,17 +121,17 @@ class CRM_Core_Form_Task_Batch extends CRM_Core_Form_Task {
 
     $this->_fields = array_slice($this->_fields, 0, $this->_maxFields);
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'submit',
         'name' => ts('Update ' . ucfirst($this::$entityShortname) . 's)'),
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    ));
+      ],
+    ]);
 
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_entityIds);
@@ -142,7 +142,7 @@ class CRM_Core_Form_Task_Batch extends CRM_Core_Form_Task {
       foreach ($this->_fields as $name => $field) {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
           $customValue = CRM_Utils_Array::value($customFieldID, $customFields);
-          $entityColumnValue = array();
+          $entityColumnValue = [];
           if (!empty($customValue['extends_entity_column_value'])) {
             $entityColumnValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
               $customValue['extends_entity_column_value']
@@ -166,7 +166,7 @@ class CRM_Core_Form_Task_Batch extends CRM_Core_Form_Task {
     // don't set the status message when form is submitted.
     $buttonName = $this->controller->getButtonName('submit');
     if ($suppressFields && $buttonName != '_qf_Batch_next') {
-      CRM_Core_Session::setStatus(ts("File type field(s) in the selected profile are not supported for Update multiple %1s", array(1 => $this::$entityShortname)), ts('Unsupported Field Type'), 'error');
+      CRM_Core_Session::setStatus(ts("File type field(s) in the selected profile are not supported for Update multiple %1s", [1 => $this::$entityShortname]), ts('Unsupported Field Type'), 'error');
     }
 
     $this->addDefaultButtons(ts('Update ' . ucfirst($this::$entityShortname) . 's'));
@@ -183,10 +183,10 @@ class CRM_Core_Form_Task_Batch extends CRM_Core_Form_Task {
    */
   public function setDefaultValues() {
     if (empty($this->_fields)) {
-      return array();
+      return [];
     }
 
-    $defaults = array();
+    $defaults = [];
     foreach ($this->_entityIds as $entityId) {
       CRM_Core_BAO_UFGroup::setProfileDefaults(NULL, $this->_fields, $defaults, FALSE, $entityId, ucfirst($this::$entityShortname));
     }

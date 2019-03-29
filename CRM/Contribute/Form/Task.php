@@ -49,7 +49,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
    *
    * @var array
    */
-  protected $_contributionContactIds = array();
+  protected $_contributionContactIds = [];
 
   /**
    * The flag to tell if there are soft credits included.
@@ -69,7 +69,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
    * @param CRM_Core_Form $form
    */
   public static function preProcessCommon(&$form) {
-    $form->_contributionIds = array();
+    $form->_contributionIds = [];
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
 
@@ -77,7 +77,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
     $contributeTasks = CRM_Contribute_Task::tasks();
     $form->assign('taskName', CRM_Utils_Array::value($form->_task, $contributeTasks));
 
-    $ids = array();
+    $ids = [];
     if (isset($values['radio_ts']) && $values['radio_ts'] == 'ts_sel') {
       foreach ($values as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
@@ -97,20 +97,20 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
         }
       }
       if (!$isTest) {
-        $queryParams[] = array(
+        $queryParams[] = [
           'contribution_test',
           '=',
           0,
           0,
           0,
-        );
+        ];
       }
-      $returnProperties = array('contribution_id' => 1);
+      $returnProperties = ['contribution_id' => 1];
       $sortOrder = $sortCol = NULL;
       if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {
         $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
         //Include sort column in select clause.
-        $sortCol = trim(str_replace(array('`', 'asc', 'desc'), '', $sortOrder));
+        $sortCol = trim(str_replace(['`', 'asc', 'desc'], '', $sortOrder));
         $returnProperties[$sortCol] = 1;
       }
 
@@ -121,7 +121,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
       // @todo the function CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled should handle this
       // can we remove? if not why not?
       if ($form->_includesSoftCredits) {
-        $contactIds = $contributionContactIds = array();
+        $contactIds = $contributionContactIds = [];
         $query->_rowCountClause = " count(civicrm_contribution.id)";
         $query->_groupByComponentClause = " GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.contact_id, contribution_search_scredit_combined.scredit_id ";
       }
@@ -208,17 +208,17 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
    * @param bool $submitOnce
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => $nextType,
           'name' => $title,
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => $backType,
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
   }
 

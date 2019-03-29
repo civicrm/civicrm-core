@@ -79,19 +79,19 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
 
     //if there are contributions related to Contribution Page
     //then onle cancel button is displayed
-    $buttons = array();
+    $buttons = [];
     if (!$this->_relatedContributions) {
-      $buttons[] = array(
+      $buttons[] = [
         'type' => 'next',
         'name' => ts('Delete Contribution Page'),
         'isDefault' => TRUE,
-      );
+      ];
     }
 
-    $buttons[] = array(
+    $buttons[] = [
       'type' => 'cancel',
       'name' => ts('Cancel'),
-    );
+    ];
 
     $this->addButtons($buttons);
   }
@@ -105,10 +105,10 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
     // first delete the join entries associated with this contribution page
     $dao = new CRM_Core_DAO_UFJoin();
 
-    $params = array(
+    $params = [
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $this->_id,
-    );
+    ];
     $dao->copyValues($params);
     $dao->delete();
 
@@ -137,7 +137,7 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
 
     $transaction->commit();
 
-    CRM_Core_Session::setStatus(ts("The contribution page '%1' has been deleted.", array(1 => $this->_title)), ts('Deleted'), 'success');
+    CRM_Core_Session::setStatus(ts("The contribution page '%1' has been deleted.", [1 => $this->_title]), ts('Deleted'), 'success');
   }
 
 }

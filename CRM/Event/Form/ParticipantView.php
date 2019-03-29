@@ -47,10 +47,10 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
-    $values = $ids = array();
+    $values = $ids = [];
     $participantID = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $params = array('id' => $participantID);
+    $params = ['id' => $participantID];
 
     CRM_Event_BAO_Participant::getValues($params,
       $values,
@@ -103,16 +103,16 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     // CRM-20879: Show 'Transfer or Cancel' option beside 'Change fee selection'
     //  only if logged in user have 'edit event participants' permission and
     //  participant status is not Cancelled or Transferred
-    if (CRM_Core_Permission::check('edit event participants') && !in_array($status, array('Cancelled', 'Transferred'))) {
+    if (CRM_Core_Permission::check('edit event participants') && !in_array($status, ['Cancelled', 'Transferred'])) {
       $this->assign('transferOrCancelLink',
         CRM_Utils_System::url(
           'civicrm/event/selfsvcupdate',
-          array(
+          [
             'reset' => 1,
             'is_backoffice' => 1,
             'pid' => $participantID,
             'cs' => CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, 'inf'),
-          )
+          ]
         )
       );
     }
@@ -155,8 +155,8 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $eventNameCustomDataTypeID = array_search('ParticipantEventName', $customDataType);
     $eventTypeCustomDataTypeID = array_search('ParticipantEventType', $customDataType);
     $allRoleIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $values[$participantID]['role_id']);
-    $groupTree = array();
-    $finalTree = array();
+    $groupTree = [];
+    $finalTree = [];
 
     foreach ($allRoleIDs as $k => $v) {
       $roleGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', NULL, $participantID, NULL, $v, $roleCustomDataTypeID);
@@ -192,7 +192,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       "action=view&reset=1&id={$values[$participantID]['id']}&cid={$values[$participantID]['contact_id']}&context=home"
     );
 
-    $recentOther = array();
+    $recentOther = [];
     if (CRM_Core_Permission::check('edit event participants')) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/participant',
         "action=update&reset=1&id={$values[$participantID]['id']}&cid={$values[$participantID]['contact_id']}&context=home"
@@ -207,7 +207,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $displayName = CRM_Contact_BAO_Contact::displayName($values[$participantID]['contact_id']);
 
-    $participantCount = array();
+    $participantCount = [];
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
     $totalTaxAmount = 0;
@@ -231,7 +231,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $title = $displayName . ' (' . CRM_Utils_Array::value($roleId, $participantRoles) . ' - ' . $eventTitle . ')';
 
     $sep = CRM_Core_DAO::VALUE_SEPARATOR;
-    $viewRoles = array();
+    $viewRoles = [];
     foreach (explode($sep, $values[$participantID]['role_id']) as $k => $v) {
       $viewRoles[] = $participantRoles[$v];
     }
@@ -254,14 +254,14 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'cancel',
           'name' => ts('Done'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-      )
+        ],
+      ]
     );
   }
 

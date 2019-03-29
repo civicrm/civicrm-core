@@ -68,14 +68,14 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     if ($this->_name != 'Petition') {
       $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
-      CRM_Utils_System::appendBreadCrumb(array(array('title' => ts('Survey Dashboard'), 'url' => $url)));
+      CRM_Utils_System::appendBreadCrumb([['title' => ts('Survey Dashboard'), 'url' => $url]]);
     }
 
     $this->_values = $this->get('values');
     if (!is_array($this->_values)) {
-      $this->_values = array();
+      $this->_values = [];
       if ($this->_surveyId) {
-        $params = array('id' => $this->_surveyId);
+        $params = ['id' => $this->_surveyId];
         CRM_Campaign_BAO_Survey::retrieve($params, $this->_values);
       }
       $this->set('values', $this->_values);
@@ -127,7 +127,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'title'), TRUE);
 
     // Activity Type id
-    $this->addSelect('activity_type_id', array('option_url' => 'civicrm/admin/campaign/surveyType'), TRUE);
+    $this->addSelect('activity_type_id', ['option_url' => 'civicrm/admin/campaign/surveyType'], TRUE);
 
     $this->addEntityRef('campaign_id', ts('Campaign'), [
       'entity' => 'Campaign',
@@ -136,7 +136,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     ]);
 
     // script / instructions
-    $this->add('wysiwyg', 'instructions', ts('Instructions for interviewers'), array('rows' => 5, 'cols' => 40));
+    $this->add('wysiwyg', 'instructions', ts('Instructions for interviewers'), ['rows' => 5, 'cols' => 40]);
 
     // release frequency
     $this->add('number', 'release_frequency', ts('Release Frequency'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'release_frequency'));
@@ -191,12 +191,12 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     if (!empty($this->_values['result_id'])) {
       $query = "SELECT COUNT(*) FROM civicrm_survey WHERE result_id = %1";
       $countSurvey = (int) CRM_Core_DAO::singleValueQuery($query,
-        array(
-          1 => array(
+        [
+          1 => [
             $this->_values['result_id'],
             'Positive',
-          ),
-        )
+          ],
+        ]
       );
       // delete option group if no any survey is using it.
       if (!$countSurvey) {

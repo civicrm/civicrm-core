@@ -47,15 +47,15 @@ class CRM_Core_DAO_AllCoreTables {
     if ($init && !$fresh) {
       return;
     }
-    Civi::$statics[__CLASS__] = array();
+    Civi::$statics[__CLASS__] = [];
 
     $file = preg_replace('/\.php$/', '.data.php', __FILE__);
     $entityTypes = require $file;
     CRM_Utils_Hook::entityTypes($entityTypes);
 
-    self::$entityTypes = array();
-    self::$tables = array();
-    self::$daoToClass = array();
+    self::$entityTypes = [];
+    self::$tables = [];
+    self::$daoToClass = [];
     foreach ($entityTypes as $entityType) {
       self::registerEntityType(
         $entityType['name'],
@@ -81,13 +81,13 @@ class CRM_Core_DAO_AllCoreTables {
   public static function registerEntityType($daoName, $className, $tableName, $fields_callback = NULL, $links_callback = NULL) {
     self::$daoToClass[$daoName] = $className;
     self::$tables[$tableName] = $className;
-    self::$entityTypes[$className] = array(
+    self::$entityTypes[$className] = [
       'name' => $daoName,
       'class' => $className,
       'table' => $tableName,
       'fields_callback' => $fields_callback,
       'links_callback' => $links_callback,
-    );
+    ];
   }
 
   /**
@@ -113,10 +113,10 @@ class CRM_Core_DAO_AllCoreTables {
    *   List of indices.
    */
   public static function indices($localize = TRUE) {
-    $indices = array();
+    $indices = [];
     self::init();
     foreach (self::$daoToClass as $class) {
-      if (is_callable(array($class, 'indices'))) {
+      if (is_callable([$class, 'indices'])) {
         $indices[$class::getTableName()] = $class::indices($localize);
       }
     }
@@ -141,13 +141,13 @@ class CRM_Core_DAO_AllCoreTables {
     }
     $classFields = $class::fields();
 
-    $finalIndices = array();
+    $finalIndices = [];
     foreach ($originalIndices as $index) {
       if ($index['localizable']) {
         foreach ($locales as $locale) {
           $localIndex = $index;
           $localIndex['name'] .= "_" . $locale;
-          $fields = array();
+          $fields = [];
           foreach ($localIndex['field'] as $field) {
             $baseField = explode('(', $field);
             if ($classFields[$baseField[0]]['localizable']) {
@@ -296,7 +296,7 @@ class CRM_Core_DAO_AllCoreTables {
     // $cacheKey = $dao . ':' . ($prefix ? 'export-prefix' : 'export');
 
     if (!isset(Civi::$statics[__CLASS__][$cacheKey])) {
-      $exports = array();
+      $exports = [];
       $fields = $dao::fields();
 
       foreach ($fields as $name => $field) {
@@ -336,7 +336,7 @@ class CRM_Core_DAO_AllCoreTables {
     // $cacheKey = $dao . ':' . ($prefix ? 'import-prefix' : 'import');
 
     if (!isset(Civi::$statics[__CLASS__][$cacheKey])) {
-      $imports = array();
+      $imports = [];
       $fields = $dao::fields();
 
       foreach ($fields as $name => $field) {
@@ -372,7 +372,7 @@ class CRM_Core_DAO_AllCoreTables {
     self::init();
     if (isset(self::$entityTypes[$className][$event])) {
       foreach (self::$entityTypes[$className][$event] as $filter) {
-        $args = array($className, &$values);
+        $args = [$className, &$values];
         \Civi\Core\Resolver::singleton()->call($filter, $args);
       }
     }

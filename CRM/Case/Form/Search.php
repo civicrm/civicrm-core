@@ -290,7 +290,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    * @see valid_date
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_Case_Form_Search', 'formRule'));
+    $this->addFormRule(['CRM_Case_Form_Search', 'formRule']);
   }
 
   /**
@@ -302,7 +302,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    * @return array|bool
    */
   public static function formRule($fields) {
-    $errors = array();
+    $errors = [];
 
     if (!empty($errors)) {
       return $errors;
@@ -319,7 +319,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     $defaults = $this->_formValues;
     return $defaults;
   }

@@ -34,124 +34,124 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
-  protected $_charts = array(
+  protected $_charts = [
     '' => 'Tabular',
     'barChart' => 'Bar Chart',
     'pieChart' => 'Pie Chart',
-  );
+  ];
 
   protected $_add2groupSupported = FALSE;
 
-  protected $_customGroupExtends = array(
+  protected $_customGroupExtends = [
     'Event',
-  );
+  ];
 
-  public $_drilldownReport = array('event/participantlist' => 'Link to Detail Report');
+  public $_drilldownReport = ['event/participantlist' => 'Link to Detail Report'];
 
   /**
    * Class constructor.
    */
   public function __construct() {
 
-    $this->_columns = array(
-      'civicrm_event' => array(
+    $this->_columns = [
+      'civicrm_event' => [
         'dao' => 'CRM_Event_DAO_Event',
-        'fields' => array(
-          'title' => array(
+        'fields' => [
+          'title' => [
             'title' => ts('Event'),
             'required' => TRUE,
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'title' => ts('Event ID'),
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'event_type_id' => array(
+          ],
+          'event_type_id' => [
             'title' => ts('Event Type'),
-          ),
-          'fee_label' => array(
+          ],
+          'fee_label' => [
             'title' => ts('Fee Label'),
-          ),
-          'event_start_date' => array(
+          ],
+          'event_start_date' => [
             'title' => ts('Event Start Date'),
-          ),
-          'event_end_date' => array(
+          ],
+          'event_end_date' => [
             'title' => ts('Event End Date'),
-          ),
-          'max_participants' => array(
+          ],
+          'max_participants' => [
             'title' => ts('Capacity'),
             'type' => CRM_Utils_Type::T_INT,
-          ),
-        ),
-        'filters' => array(
-          'id' => array(
+          ],
+        ],
+        'filters' => [
+          'id' => [
             'title' => ts('Event'),
             'operatorType' => CRM_Report_Form::OP_ENTITYREF,
             'type' => CRM_Utils_Type::T_INT,
-            'attributes' => array('select' => array('minimumInputLength' => 0)),
-          ),
-          'event_type_id' => array(
+            'attributes' => ['select' => ['minimumInputLength' => 0]],
+          ],
+          'event_type_id' => [
             'name' => 'event_type_id',
             'title' => ts('Event Type'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('event_type'),
-          ),
-          'event_start_date' => array(
+          ],
+          'event_start_date' => [
             'title' => ts('Event Start Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'event_end_date' => array(
+          ],
+          'event_end_date' => [
             'title' => ts('Event End Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-        ),
-      ),
-      'civicrm_line_item' => array(
+          ],
+        ],
+      ],
+      'civicrm_line_item' => [
         'dao' => 'CRM_Price_DAO_LineItem',
-        'fields' => array(
-          'participant_count' => array(
+        'fields' => [
+          'participant_count' => [
             'title' => ts('Participants'),
             'default' => TRUE,
-            'statistics' => array(
+            'statistics' => [
               'count' => ts('Participants'),
-            ),
-          ),
-          'line_total' => array(
+            ],
+          ],
+          'line_total' => [
             'title' => ts('Income Statistics'),
             'type' => CRM_Utils_Type::T_MONEY,
             'default' => TRUE,
-            'statistics' => array(
+            'statistics' => [
               'sum' => ts('Income'),
               'avg' => ts('Average'),
-            ),
-          ),
-        ),
-      ),
-      'civicrm_participant' => array(
+            ],
+          ],
+        ],
+      ],
+      'civicrm_participant' => [
         'dao' => 'CRM_Event_DAO_Participant',
-        'filters' => array(
-          'sid' => array(
+        'filters' => [
+          'sid' => [
             'name' => 'status_id',
             'title' => ts('Participant Status'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Event_PseudoConstant::participantStatus(NULL, NULL, "label"),
-          ),
-          'rid' => array(
+          ],
+          'rid' => [
             'name' => 'role_id',
             'title' => ts('Participant Role'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Event_PseudoConstant::participantRole(),
-          ),
-          'participant_register_date' => array(
+          ],
+          'participant_register_date' => [
             'title' => ts('Registration Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
     parent::__construct();
   }
 
@@ -160,7 +160,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form {
   }
 
   public function select() {
-    $select = array();
+    $select = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
@@ -219,7 +219,7 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form {
   }
 
   public function where() {
-    $clauses = array();
+    $clauses = [];
     $this->_participantWhere = "";
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -280,21 +280,21 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form {
       if ($dao->count && $dao->amount) {
         $avg = $dao->amount / $dao->count;
       }
-      $statistics['counts']['count'] = array(
+      $statistics['counts']['count'] = [
         'value' => $dao->count,
         'title' => ts('Total Participants'),
         'type' => CRM_Utils_Type::T_INT,
-      );
-      $statistics['counts']['amount'] = array(
+      ];
+      $statistics['counts']['amount'] = [
         'value' => $dao->amount,
         'title' => ts('Total Income'),
         'type' => CRM_Utils_Type::T_MONEY,
-      );
-      $statistics['counts']['avg'] = array(
+      ];
+      $statistics['counts']['avg'] = [
         'value' => $avg,
         'title' => ts('Average'),
         'type' => CRM_Utils_Type::T_MONEY,
-      );
+      ];
     }
     return $statistics;
   }
@@ -317,11 +317,11 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form {
     //set pager before execution of query in function participantInfo()
     $this->setPager();
 
-    $rows = $graphRows = array();
+    $rows = $graphRows = [];
     $count = 0;
 
     while ($dao->fetch()) {
-      $row = array();
+      $row = [];
       foreach ($this->_columnHeaders as $key => $value) {
         if (($key == 'civicrm_event_start_date') ||
           ($key == 'civicrm_event_end_date')
@@ -385,17 +385,17 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form {
       }
 
       if ((!empty($rows)) && $countEvent != 1) {
-        $chartInfo = array(
+        $chartInfo = [
           'legend' => ts('Participants Summary'),
           'xname' => ts('Event'),
           'yname' => ts('Total Participants'),
-        );
+        ];
         if (!empty($graphRows)) {
           foreach ($graphRows[$this->_interval] as $key => $val) {
             $graph[$val] = $graphRows['value'][$key];
           }
           $chartInfo['values'] = $graph;
-          $chartInfo['tip'] = ts('Participants : %1', array(1 => '#val#'));
+          $chartInfo['tip'] = ts('Participants : %1', [1 => '#val#']);
           $chartInfo['xLabelAngle'] = 20;
 
           // build the chart.

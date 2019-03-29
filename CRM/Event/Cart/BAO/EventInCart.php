@@ -8,7 +8,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   public $event;
   public $event_cart;
   public $location = NULL;
-  public $participants = array();
+  public $participants = [];
 
   /**
    * Class constructor.
@@ -55,10 +55,10 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    */
   public function delete($useWhere = FALSE) {
     $this->load_associations();
-    $contacts_to_delete = array();
+    $contacts_to_delete = [];
     foreach ($this->participants as $participant) {
-      $defaults = array();
-      $params = array('id' => $participant->contact_id);
+      $defaults = [];
+      $params = ['id' => $participant->contact_id];
       $temporary_contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
 
       if ($temporary_contact->is_deleted) {
@@ -78,7 +78,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    * @return array
    */
   public static function find_all_by_event_cart_id($event_cart_id) {
-    return self::find_all_by_params(array('event_cart_id' => $event_cart_id));
+    return self::find_all_by_params(['event_cart_id' => $event_cart_id]);
   }
 
   /**
@@ -89,7 +89,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   public static function find_all_by_params($params) {
     $event_in_cart = new CRM_Event_Cart_BAO_EventInCart();
     $event_in_cart->copyValues($params);
-    $result = array();
+    $result = [];
     if ($event_in_cart->find()) {
       while ($event_in_cart->fetch()) {
         $result[$event_in_cart->event_id] = clone($event_in_cart);
@@ -104,7 +104,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    * @return bool|CRM_Event_Cart_BAO_EventInCart
    */
   public static function find_by_id($id) {
-    return self::find_by_params(array('id' => $id));
+    return self::find_by_params(['id' => $id]);
   }
 
   /**
@@ -127,7 +127,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    * @param int $contact_id
    */
   public function remove_participant_by_contact_id($contact_id) {
-    $to_remove = array();
+    $to_remove = [];
     foreach ($this->participants as $participant) {
       if ($participant->contact_id == $contact_id) {
         $to_remove[$participant->id] = 1;
@@ -171,8 +171,8 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
       return;
     }
     $this->assocations_loaded = TRUE;
-    $params = array('id' => $this->event_id);
-    $defaults = array();
+    $params = ['id' => $this->event_id];
+    $defaults = [];
     $this->event = CRM_Event_BAO_Event::retrieve($params, $defaults);
 
     if ($event_cart != NULL) {
@@ -192,7 +192,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
 
   public function load_location() {
     if ($this->location == NULL) {
-      $location_params = array('entity_id' => $this->event_id, 'entity_table' => 'civicrm_event');
+      $location_params = ['entity_id' => $this->event_id, 'entity_table' => 'civicrm_event'];
       $this->location = CRM_Core_BAO_Location::getValues($location_params, TRUE);
     }
   }
@@ -201,7 +201,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    * @return array
    */
   public function not_waiting_participants() {
-    $result = array();
+    $result = [];
     foreach ($this->participants as $participant) {
       if (!$participant->must_wait) {
         $result[] = $participant;
@@ -231,7 +231,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    * @return bool
    */
   public function offsetExists($offset) {
-    return array_key_exists(array_merge($this->fields(), array('main_conference_event_id')), $offset);
+    return array_key_exists(array_merge($this->fields(), ['main_conference_event_id']), $offset);
   }
 
   /**
@@ -270,7 +270,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    * @return array
    */
   public function waiting_participants() {
-    $result = array();
+    $result = [];
     foreach ($this->participants as $participant) {
       if ($participant->must_wait) {
         $result[] = $participant;
@@ -290,18 +290,18 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
     $event_in_cart = $cart->get_event_in_cart_by_event_id($event_id);
 
     if ($event_in_cart) {
-      return array(
+      return [
         'label' => ts("Remove from Cart"),
         'path' => 'civicrm/event/remove_from_cart',
         'query' => "reset=1&id={$event_id}",
-      );
+      ];
     }
     else {
-      return array(
+      return [
         'label' => ts("Add to Cart"),
         'path' => 'civicrm/event/add_to_cart',
         'query' => "reset=1&id={$event_id}",
-      );
+      ];
     }
   }
 

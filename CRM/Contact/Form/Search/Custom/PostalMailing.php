@@ -41,7 +41,7 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
   public function __construct(&$formValues) {
     parent::__construct($formValues);
 
-    $this->_columns = array(
+    $this->_columns = [
       // If possible, don't use aliases for the columns you select.
       // You can prefix columns with table aliases, if needed.
       //
@@ -59,21 +59,21 @@ class CRM_Contact_Form_Search_Custom_PostalMailing extends CRM_Contact_Form_Sear
       // If you don't do this, the patch of CRM-16587 might cause database
       // errors.
       ts('State') => 'state_province.name',
-    );
+    ];
   }
 
   /**
    * @param CRM_Core_Form $form
    */
   public function buildForm(&$form) {
-    $groups = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::nestedGroup(FALSE);
-    $form->addElement('select', 'group_id', ts('Group'), $groups, array('class' => 'crm-select2 huge'));
+    $groups = ['' => ts('- select group -')] + CRM_Core_PseudoConstant::nestedGroup(FALSE);
+    $form->addElement('select', 'group_id', ts('Group'), $groups, ['class' => 'crm-select2 huge']);
 
     /**
      * if you are using the standard template, this array tells the template what elements
      * are part of the search criteria
      */
-    $form->assign('elements', array('group_id'));
+    $form->assign('elements', ['group_id']);
   }
 
   /**
@@ -148,15 +148,15 @@ LEFT JOIN civicrm_state_province state_province ON  state_province.id = address.
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    $params = array();
+    $params = [];
 
     $count = 1;
-    $clause = array();
+    $clause = [];
     $groupID = CRM_Utils_Array::value('group_id',
       $this->_formValues
     );
     if ($groupID) {
-      $params[$count] = array($groupID, 'Integer');
+      $params[$count] = [$groupID, 'Integer'];
       $clause[] = "cgc.group_id = %{$count}";
     }
 

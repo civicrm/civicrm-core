@@ -155,14 +155,14 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @return bool
    */
   public static function &getValues(&$params, &$values) {
-    $websites = array();
+    $websites = [];
     $website = new CRM_Core_DAO_Website();
     $website->contact_id = $params['contact_id'];
     $website->find();
 
     $count = 1;
     while ($website->fetch()) {
-      $values['website'][$count] = array();
+      $values['website'][$count] = [];
       CRM_Core_DAO::storeValues($website, $values['website'][$count]);
 
       $websites[$count] = $values['website'][$count];
@@ -192,16 +192,16 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 SELECT  id, website_type_id
   FROM  civicrm_website
  WHERE  civicrm_website.contact_id = %1';
-    $params = array(1 => array($id, 'Integer'));
+    $params = [1 => [$id, 'Integer']];
 
-    $websites = $values = array();
+    $websites = $values = [];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $count = 1;
     while ($dao->fetch()) {
-      $values = array(
+      $values = [
         'id' => $dao->id,
         'website_type_id' => $dao->website_type_id,
-      );
+      ];
 
       if ($updateBlankLocInfo) {
         $websites[$count++] = $values;

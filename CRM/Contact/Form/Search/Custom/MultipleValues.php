@@ -37,7 +37,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
   protected $_options;
   protected $_aclFrom = NULL;
   protected $_aclWhere = NULL;
-  protected $fieldInfo = array();
+  protected $fieldInfo = [];
 
   /**
    * Class constructor.
@@ -53,11 +53,11 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
 
     $this->_tag = CRM_Utils_Array::value('tag', $this->_formValues);
 
-    $this->_columns = array(
+    $this->_columns = [
       ts('Contact ID') => 'contact_id',
       ts('Contact Type') => 'contact_type',
       ts('Name') => 'sort_name',
-    );
+    ];
 
     $this->_customGroupIDs = CRM_Utils_Array::value('custom_group', $formValues);
 
@@ -70,7 +70,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
    * Add all the fields for chosen groups
    */
   public function addColumns() {
-    $this->_tables = array();
+    $this->_tables = [];
     foreach ($this->_groupTree as $groupID => $group) {
       if (empty($this->_customGroupIDs[$groupID])) {
         continue;
@@ -82,7 +82,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
       foreach ($group['fields'] as $fieldID => $field) {
         $this->_columns[$field['label']] = "custom_{$field['id']}";
         if (!array_key_exists($group['table_name'], $this->_tables)) {
-          $this->_tables[$group['table_name']] = array();
+          $this->_tables[$group['table_name']] = [];
         }
         $this->_tables[$group['table_name']][$field['id']] = $field['column_name'];
       }
@@ -98,16 +98,16 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
 
     $form->add('text', 'sort_name', ts('Contact Name'), TRUE);
 
-    $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements();
-    $form->add('select', 'contact_type', ts('Find...'), $contactTypes, array('class' => 'crm-select2 huge'));
+    $contactTypes = ['' => ts('- any contact type -')] + CRM_Contact_BAO_ContactType::getSelectElements();
+    $form->add('select', 'contact_type', ts('Find...'), $contactTypes, ['class' => 'crm-select2 huge']);
 
     // add select for groups
-    $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::group();
-    $form->addElement('select', 'group', ts('in'), $group, array('class' => 'crm-select2 huge'));
+    $group = ['' => ts('- any group -')] + CRM_Core_PseudoConstant::group();
+    $form->addElement('select', 'group', ts('in'), $group, ['class' => 'crm-select2 huge']);
 
     // add select for tags
-    $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
-    $form->addElement('select', 'tag', ts('Tagged'), $tag, array('class' => 'crm-select2 huge'));
+    $tag = ['' => ts('- any tag -')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+    $form->addElement('select', 'tag', ts('Tagged'), $tag, ['class' => 'crm-select2 huge']);
 
     if (empty($this->_groupTree)) {
       CRM_Core_Error::statusBounce(ts("Atleast one Custom Group must be present, for Custom Group search."),
@@ -178,7 +178,7 @@ contact_a.sort_name    as sort_name,
 ";
     }
 
-    $customClauses = array();
+    $customClauses = [];
     foreach ($this->_tables as $tableName => $fields) {
       foreach ($fields as $fieldID => $fieldName) {
         $customClauses[] = "{$tableName}.{$fieldName} as custom_{$fieldID}";
@@ -198,7 +198,7 @@ contact_a.sort_name    as sort_name,
   public function from() {
     $this->buildACLClause('contact_a');
     $from = "FROM civicrm_contact contact_a {$this->_aclFrom}";
-    $customFrom = array();
+    $customFrom = [];
     // lets do an INNER JOIN so we get only relevant values rather than all values
     if (!empty($this->_tables)) {
       foreach ($this->_tables as $tableName => $fields) {
@@ -228,8 +228,8 @@ contact_a.sort_name    as sort_name,
    */
   public function where($includeContactIDs = FALSE) {
     $count = 1;
-    $clause = array();
-    $params = array();
+    $clause = [];
+    $params = [];
     $name = CRM_Utils_Array::value('sort_name',
       $this->_formValues
     );
@@ -237,7 +237,7 @@ contact_a.sort_name    as sort_name,
       if (strpos($name, '%') === FALSE) {
         $name = "%{$name}%";
       }
-      $params[$count] = array($name, 'String');
+      $params[$count] = [$name, 'String'];
       $clause[] = "contact_a.sort_name LIKE %{$count}";
       $count++;
     }

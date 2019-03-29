@@ -36,7 +36,7 @@
  */
 class CRM_Admin_Form_Setting_Date extends CRM_Admin_Form_Setting {
 
-  public $_settings = array(
+  public $_settings = [
     'dateformatDatetime' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'dateformatFull' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'dateformatPartial' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
@@ -48,7 +48,7 @@ class CRM_Admin_Form_Setting_Date extends CRM_Admin_Form_Setting {
     'dateInputFormat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'timeInputFormat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'fiscalYearStart' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-  );
+  ];
 
   /**
    * Build the form object.

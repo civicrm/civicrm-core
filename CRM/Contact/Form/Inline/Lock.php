@@ -53,8 +53,8 @@ class CRM_Contact_Form_Inline_Lock {
     // - V1:open E1:open E1:submit V1.email:open V1.email:submit
     // - V1:open V1.email:open E1:open E1:submit V1.email:submit V1:lock
     $timestamps = CRM_Contact_BAO_Contact::getTimestamps($contactID);
-    $form->addElement('hidden', 'oplock_ts', $timestamps['modified_date'], array('id' => 'oplock_ts'));
-    $form->addFormRule(array('CRM_Contact_Form_Inline_Lock', 'formRule'), $contactID);
+    $form->addElement('hidden', 'oplock_ts', $timestamps['modified_date'], ['id' => 'oplock_ts']);
+    $form->addFormRule(['CRM_Contact_Form_Inline_Lock', 'formRule'], $contactID);
   }
 
   /**
@@ -70,7 +70,7 @@ class CRM_Contact_Form_Inline_Lock {
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $contactID = NULL) {
-    $errors = array();
+    $errors = [];
 
     $timestamps = CRM_Contact_BAO_Contact::getTimestamps($contactID);
     if ($fields['oplock_ts'] != $timestamps['modified_date']) {
@@ -93,7 +93,7 @@ class CRM_Contact_Form_Inline_Lock {
    */
   public static function getResponse($contactID) {
     $timestamps = CRM_Contact_BAO_Contact::getTimestamps($contactID);
-    return array('oplock_ts' => $timestamps['modified_date']);
+    return ['oplock_ts' => $timestamps['modified_date']];
   }
 
 }

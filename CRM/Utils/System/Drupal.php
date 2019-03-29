@@ -42,15 +42,15 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   public function createUser(&$params, $mail) {
     $form_state = form_state_defaults();
 
-    $form_state['input'] = array(
+    $form_state['input'] = [
       'name' => $params['cms_name'],
       'mail' => $params[$mail],
       'op' => 'Create new account',
-    );
+    ];
 
     $admin = user_access('administer users');
     if (!variable_get('user_email_verification', TRUE) || $admin) {
-      $form_state['input']['pass'] = array('pass1' => $params['cms_pass'], 'pass2' => $params['cms_pass']);
+      $form_state['input']['pass'] = ['pass1' => $params['cms_pass'], 'pass2' => $params['cms_pass']];
     }
 
     if (!empty($params['notify'])) {
@@ -61,7 +61,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     $form_state['programmed'] = TRUE;
     $form_state['complete form'] = FALSE;
     $form_state['method'] = 'post';
-    $form_state['build_info']['args'] = array();
+    $form_state['build_info']['args'] = [];
     /*
      * if we want to submit this form more than once in a process (e.g. create more than one user)
      * we must force it to validate each time for this form. Otherwise it will not validate
@@ -76,7 +76,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     $form = drupal_retrieve_form('user_register_form', $form_state);
     $form_state['process_input'] = 1;
     $form_state['submitted'] = 1;
-    $form['#array_parents'] = array();
+    $form['#array_parents'] = [];
     $form['#tree'] = FALSE;
     drupal_process_form('user_register_form', $form, $form_state);
 
@@ -96,7 +96,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     if (function_exists('user_load')) {
       $user = user_load($ufID);
       if ($user->mail != $ufName) {
-        user_save($user, array('mail' => $ufName));
+        user_save($user, ['mail' => $ufName]);
         $user = user_load($ufID);
       }
     }
@@ -131,10 +131,10 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       else {
         $uid = db_query(
           "SELECT uid FROM {users} WHERE name = :name",
-          array(':name' => $params['name'])
+          [':name' => $params['name']]
         )->fetchField();
         if ((bool) $uid) {
-          $errors['cms_name'] = ts('The username %1 is already taken. Please select another username.', array(1 => $params['name']));
+          $errors['cms_name'] = ts('The username %1 is already taken. Please select another username.', [1 => $params['name']]);
         }
       }
     }
@@ -146,12 +146,12 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       else {
         $uid = db_query(
           "SELECT uid FROM {users} WHERE mail = :mail",
-          array(':mail' => $params['mail'])
+          [':mail' => $params['mail']]
         )->fetchField();
         if ((bool) $uid) {
           $resetUrl = url('user/password');
           $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
-            array(1 => $params['mail'], 2 => $resetUrl)
+            [1 => $params['mail'], 2 => $resetUrl]
           );
         }
       }
@@ -162,7 +162,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function getLoginURL($destination = '') {
-    $query = $destination ? array('destination' => $destination) : NULL;
+    $query = $destination ? ['destination' => $destination] : NULL;
     return CRM_Utils_System::url('user', $query, TRUE);
   }
 
@@ -188,7 +188,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     if (is_array($breadCrumbs)) {
       foreach ($breadCrumbs as $crumbs) {
         if (stripos($crumbs['url'], 'id%%')) {
-          $args = array('cid', 'mid');
+          $args = ['cid', 'mid'];
           foreach ($args as $a) {
             $val = CRM_Utils_Request::retrieve($a, 'Positive', CRM_Core_DAO::$_nullObject,
               FALSE, NULL, $_GET
@@ -208,7 +208,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function resetBreadCrumb() {
-    $bc = array();
+    $bc = [];
     drupal_set_breadcrumb($bc);
   }
 
@@ -219,10 +219,10 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     static $count = 0;
     if (!empty($header)) {
       $key = 'civi_' . ++$count;
-      $data = array(
+      $data = [
         '#type' => 'markup',
         '#markup' => $header,
-      );
+      ];
       drupal_add_html_head($data, $key);
     }
   }
@@ -231,7 +231,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function addScriptUrl($url, $region) {
-    $params = array('group' => JS_LIBRARY, 'weight' => 10);
+    $params = ['group' => JS_LIBRARY, 'weight' => 10];
     switch ($region) {
       case 'html-header':
       case 'page-footer':
@@ -251,7 +251,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function addScript($code, $region) {
-    $params = array('type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10);
+    $params = ['type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10];
     switch ($region) {
       case 'html-header':
       case 'page-footer':
@@ -272,7 +272,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     if ($region != 'html-header') {
       return FALSE;
     }
-    $params = array();
+    $params = [];
     // If the path is within the drupal directory we can use the more efficient 'file' setting
     $params['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
     drupal_add_css($url, $params);
@@ -286,7 +286,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     if ($region != 'html-header') {
       return FALSE;
     }
-    $params = array('type' => 'inline');
+    $params = ['type' => 'inline'];
     drupal_add_css($code, $params);
     return TRUE;
   }
@@ -327,12 +327,12 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
     $account = $userUid = $userMail = NULL;
     if ($loadCMSBootstrap) {
-      $bootStrapParams = array();
+      $bootStrapParams = [];
       if ($name && $password) {
-        $bootStrapParams = array(
+        $bootStrapParams = [
           'name' => $name,
           'pass' => $password,
-        );
+        ];
       }
       CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath);
 
@@ -384,7 +384,7 @@ AND    u.status = 1
       if (!$contactID) {
         return FALSE;
       }
-      return array($contactID, $userUid, mt_rand());
+      return [$contactID, $userUid, mt_rand()];
     }
     return FALSE;
   }
@@ -420,7 +420,7 @@ AND    u.status = 1
    *
    * FIXME: Document values accepted/required by $params
    */
-  public function userLoginFinalize($params = array()) {
+  public function userLoginFinalize($params = []) {
     user_login_finalize($params);
   }
 
@@ -468,7 +468,7 @@ AND    u.status = 1
    *
    * @return bool
    */
-  public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
+  public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     //take the cms root path.
     $cmsPath = $this->cmsRootPath($realPath);
 
@@ -648,7 +648,7 @@ AND    u.status = 1
       user_is_logged_in() &&
       function_exists('user_uid_optional_to_arg')
     ) {
-      $ufID = user_uid_optional_to_arg(array());
+      $ufID = user_uid_optional_to_arg([]);
     }
 
     return $ufID;
@@ -731,7 +731,7 @@ AND    u.status = 1
     $roles = user_roles(FALSE, $oldPerm);
     if (!empty($roles)) {
       foreach (array_keys($roles) as $rid) {
-        user_role_revoke_permissions($rid, array($oldPerm));
+        user_role_revoke_permissions($rid, [$oldPerm]);
         user_role_grant_permissions($rid, $newPerms);
       }
     }
@@ -752,11 +752,11 @@ AND    u.status = 1
       // @TODO Find more solid way to check - try system_get_info('module', 'og').
       //
       // Also, since we don't know how to get the entity type of the // group, we'll assume it's 'node'
-      og_group('node', $ogID, array('entity' => user_load($drupalID)));
+      og_group('node', $ogID, ['entity' => user_load($drupalID)]);
     }
     else {
       // Works for the OG 7.x-1.x branch
-      og_group($ogID, array('entity' => user_load($drupalID)));
+      og_group($ogID, ['entity' => user_load($drupalID)]);
     }
   }
 
@@ -841,11 +841,11 @@ AND    u.status = 1
       }
     }
 
-    return array(
+    return [
       'contactCount' => $contactCount,
       'contactMatching' => $contactMatching,
       'contactCreated' => $contactCreated,
-    );
+    ];
   }
 
   /**

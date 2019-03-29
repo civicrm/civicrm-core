@@ -37,7 +37,7 @@ class CRM_Core_Payment_BaseIPN {
    * the code does not need to keep retrieving from the http request
    * @var array
    */
-  protected $_inputParameters = array();
+  protected $_inputParameters = [];
 
   /**
    * Only used by AuthorizeNetIPN.
@@ -164,10 +164,10 @@ class CRM_Core_Payment_BaseIPN {
       // default options are that we log an error & echo it out
       // note that we should refactor this error handling into error code @ some point
       // but for now setting up enough separation so we can do unit tests
-      $error_handling = array(
+      $error_handling = [
         'log_error' => 1,
         'echo_error' => 1,
-      );
+      ];
     }
     $ids['paymentProcessor'] = $paymentProcessorID;
     if (is_a($objects['contribution'], 'CRM_Contribute_BAO_Contribution')) {
@@ -195,10 +195,10 @@ class CRM_Core_Payment_BaseIPN {
         echo $e->getMessage();
       }
       if (!empty($error_handling['return_error'])) {
-        return array(
+        return [
           'is_error' => 1,
           'error_message' => ($e->getMessage()),
-        );
+        ];
       }
     }
     $objects = array_merge($objects, $contribution->_relatedObjects);
@@ -214,13 +214,13 @@ class CRM_Core_Payment_BaseIPN {
    *
    * @return bool
    */
-  public function failed(&$objects, &$transaction, $input = array()) {
+  public function failed(&$objects, &$transaction, $input = []) {
     $contribution = &$objects['contribution'];
-    $memberships = array();
+    $memberships = [];
     if (!empty($objects['membership'])) {
       $memberships = &$objects['membership'];
       if (is_numeric($memberships)) {
-        $memberships = array($objects['membership']);
+        $memberships = [$objects['membership']];
       }
     }
 
@@ -231,10 +231,10 @@ class CRM_Core_Payment_BaseIPN {
     $participant = &$objects['participant'];
 
     // CRM-15546
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
         'labelColumn' => 'name',
         'flip' => 1,
-      ));
+      ]);
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
     $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
@@ -256,17 +256,17 @@ class CRM_Core_Payment_BaseIPN {
     if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
       if (!empty($memberships)) {
         // if transaction is failed then set "Cancelled" as membership status
-        $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', array(
+        $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', [
             'labelColumn' => 'name',
             'flip' => 1,
-          ));
+          ]);
         foreach ($memberships as $membership) {
           if ($membership) {
             $membership->status_id = $membershipStatuses['Cancelled'];
             $membership->save();
 
             //update related Memberships.
-            $params = array('status_id' => $membershipStatuses['Cancelled']);
+            $params = ['status_id' => $membershipStatuses['Cancelled']];
             CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $params);
           }
         }
@@ -309,11 +309,11 @@ class CRM_Core_Payment_BaseIPN {
    *
    * @return bool
    */
-  public function cancelled(&$objects, &$transaction, $input = array()) {
+  public function cancelled(&$objects, &$transaction, $input = []) {
     $contribution = &$objects['contribution'];
     $memberships = &$objects['membership'];
     if (is_numeric($memberships)) {
-      $memberships = array($objects['membership']);
+      $memberships = [$objects['membership']];
     }
 
     $participant = &$objects['participant'];
@@ -321,10 +321,10 @@ class CRM_Core_Payment_BaseIPN {
     if (empty($contribution->id)) {
       $addLineItems = TRUE;
     }
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', array(
+    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
         'labelColumn' => 'name',
         'flip' => 1,
-      ));
+      ]);
     $contribution->contribution_status_id = $contributionStatuses['Cancelled'];
     $contribution->cancel_date = self::$_now;
     $contribution->cancel_reason = CRM_Utils_Array::value('reasonCode', $input);
@@ -347,10 +347,10 @@ class CRM_Core_Payment_BaseIPN {
 
     if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
       if (!empty($memberships)) {
-        $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', array(
+        $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', [
             'labelColumn' => 'name',
             'flip' => 1,
-          ));
+          ]);
         // Cancel only Pending memberships
         // CRM-18688
         $pendingStatusId = $membershipStatuses['Pending'];
@@ -360,7 +360,7 @@ class CRM_Core_Payment_BaseIPN {
             $membership->save();
 
             //update related Memberships.
-            $params = array('status_id' => $membershipStatuses['Cancelled']);
+            $params = ['status_id' => $membershipStatuses['Cancelled']];
             CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $params);
           }
         }
@@ -464,7 +464,7 @@ class CRM_Core_Payment_BaseIPN {
   public function getBillingID(&$ids) {
     $ids['billing'] = CRM_Core_BAO_LocationType::getBilling();
     if (!$ids['billing']) {
-      CRM_Core_Error::debug_log_message(ts('Please set a location type of %1', array(1 => 'Billing')));
+      CRM_Core_Error::debug_log_message(ts('Please set a location type of %1', [1 => 'Billing']));
       echo "Failure: Could not find billing location type<p>";
       return FALSE;
     }

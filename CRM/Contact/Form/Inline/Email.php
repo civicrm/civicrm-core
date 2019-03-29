@@ -39,7 +39,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
   /**
    * Email addresses of the contact that is been viewed.
    */
-  private $_emails = array();
+  private $_emails = [];
 
   /**
    * No of email blocks for inline edit.
@@ -104,7 +104,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
       CRM_Contact_Form_Edit_Email::buildQuickForm($this, $blockId, TRUE);
     }
 
-    $this->addFormRule(array('CRM_Contact_Form_Inline_Email', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contact_Form_Inline_Email', 'formRule'], $this);
   }
 
   /**
@@ -119,7 +119,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
    * @return array
    */
   public static function formRule($fields, $errors, $form) {
-    $hasData = $hasPrimary = $errors = array();
+    $hasData = $hasPrimary = $errors = [];
     if (!empty($fields['email']) && is_array($fields['email'])) {
       foreach ($fields['email'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
@@ -152,7 +152,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (!empty($this->_emails)) {
       foreach ($this->_emails as $id => $value) {
         $defaults['email'][$id] = $value;
@@ -191,7 +191,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
         if ($email['is_primary']) {
           CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'display_name', $email['email']);
           CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'sort_name', $email['email']);
-          $this->ajaxResponse['reloadBlocks'] = array('#crm-contactname-content');
+          $this->ajaxResponse['reloadBlocks'] = ['#crm-contactname-content'];
           break;
         }
       }

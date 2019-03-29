@@ -64,27 +64,27 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
       // helper variable for nicer formatting
       $deleteExtra = ts('Are you sure you want to remove this product form this page?');
 
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/contribute/addProductToPage',
           'qs' => 'action=update&id=%%id%%&pid=%%pid%%&reset=1',
           'title' => ts('Edit Premium'),
-        ),
-        CRM_Core_Action::PREVIEW => array(
+        ],
+        CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
           'url' => 'civicrm/admin/contribute/addProductToPage',
           'qs' => 'action=preview&id=%%id%%&pid=%%pid%%',
           'title' => ts('Preview Premium'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Remove'),
           'url' => 'civicrm/admin/contribute/addProductToPage',
           'qs' => 'action=delete&id=%%id%%&pid=%%pid%%',
           'extra' => 'onclick = "if (confirm(\'' . $deleteExtra . '\') ) this.href+=\'&amp;confirmed=1\'; else return false;"',
           'title' => ts('Disable Premium'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -126,7 +126,7 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
    */
   public function browse() {
     // get all custom groups sorted by weight
-    $premiums = array();
+    $premiums = [];
     $pageID = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0
     );
@@ -152,14 +152,14 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
       $productDAO->is_active = 1;
 
       if ($productDAO->find(TRUE)) {
-        $premiums[$productDAO->id] = array();
+        $premiums[$productDAO->id] = [];
         $premiums[$productDAO->id]['weight'] = $premiumsProductDao->weight;
         CRM_Core_DAO::storeValues($productDAO, $premiums[$productDAO->id]);
 
         $action = array_sum(array_keys($this->links()));
 
         $premiums[$premiumsProductDao->product_id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-          array('id' => $pageID, 'pid' => $premiumsProductDao->id),
+          ['id' => $pageID, 'pid' => $premiumsProductDao->id],
           ts('more'),
           FALSE,
           'premium.contributionpage.row',

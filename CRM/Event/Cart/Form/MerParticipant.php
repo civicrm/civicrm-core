@@ -19,7 +19,7 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
    * @param CRM_Core_Form $form
    */
   public function appendQuickForm(&$form) {
-    $textarea_size = array('size' => 30, 'maxlength' => 60);
+    $textarea_size = ['size' => 30, 'maxlength' => 60];
     $form->add('text', $this->email_field_name(), ts('Email Address'), $textarea_size, TRUE);
 
     list(
@@ -33,12 +33,12 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
     foreach ($custom_fields_post as $key => $field) {
       CRM_Core_BAO_UFGroup::buildProfile($form, $field, CRM_Profile_Form::MODE_CREATE, $this->participant->id);
     }
-    $custom = CRM_Utils_Array::value('custom', $form->getTemplate()->_tpl_vars, array());
-    $form->assign('custom', array_merge($custom, array(
+    $custom = CRM_Utils_Array::value('custom', $form->getTemplate()->_tpl_vars, []);
+    $form->assign('custom', array_merge($custom, [
       $this->html_field_name('customPre') => $custom_fields_pre,
       $this->html_field_name('customPost') => $custom_fields_post,
       $this->html_field_name('number') => $this->name(),
-    )));
+    ]));
   }
 
   /**
@@ -47,11 +47,11 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
    * @return array
    */
   public static function get_profile_groups($event_id) {
-    $ufJoinParams = array(
+    $ufJoinParams = [
       'entity_table' => 'civicrm_event',
       'module' => 'CiviEvent',
       'entity_id' => $event_id,
-    );
+    ];
     $group_ids = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
     return $group_ids;
   }
@@ -62,7 +62,7 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
   public function get_participant_custom_data_fields() {
     list($custom_pre_id, $custom_post_id) = self::get_profile_groups($this->participant->event_id);
 
-    $pre_fields = $post_fields = array();
+    $pre_fields = $post_fields = [];
     if ($custom_pre_id && CRM_Core_BAO_UFGroup::filterUFGroups($custom_pre_id, $this->participant->contact_id)) {
       $pre_fields = CRM_Core_BAO_UFGroup::getFields($custom_pre_id, FALSE, CRM_Core_Action::ADD);
     }
@@ -70,7 +70,7 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
       $post_fields = CRM_Core_BAO_UFGroup::getFields($custom_post_id, FALSE, CRM_Core_Action::ADD);
     }
 
-    return array($pre_fields, $post_fields);
+    return [$pre_fields, $post_fields];
   }
 
   /**
@@ -121,12 +121,12 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array(
+    $defaults = [
       $this->html_field_name('email') => $this->participant->email,
-    );
+    ];
     list($custom_fields_pre, $custom_fields_post) = $this->get_participant_custom_data_fields($this->participant->event_id);
     $all_fields = $custom_fields_pre + $custom_fields_post;
-    $flat = array();
+    $flat = [];
     CRM_Core_BAO_UFGroup::setProfileDefaults($this->participant->contact_id, $all_fields, $flat);
     foreach ($flat as $name => $field) {
       $defaults["field[{$this->participant->id}][{$name}]"] = $field;

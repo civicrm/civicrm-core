@@ -120,7 +120,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
         return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
 
       case NULL:
-        return array('civicrm.' . CRM_Utils_String::munge(strtolower($name)), 'com_civicrm');
+        return ['civicrm.' . CRM_Utils_String::munge(strtolower($name)), 'com_civicrm'];
 
       default:
         return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
@@ -144,7 +144,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    * @inheritDoc
    */
   public function upgradePermissions($permissions) {
-    $translatedPerms = array();
+    $translatedPerms = [];
 
     // Flipping the $permissions array gives us just the raw names of the
     // permissions. The descriptions, etc., are irrelevant for the purposes of
@@ -188,7 +188,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
 
     // Joomla gotcha: loadObject returns NULL in the case of no matches.
     $result = $db->loadObject();
-    return $result ? json_decode($result->rules) : (object) array();
+    return $result ? json_decode($result->rules) : (object) [];
   }
 
   /**

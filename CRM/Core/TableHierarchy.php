@@ -39,7 +39,7 @@ class CRM_Core_TableHierarchy {
    * This array defines weights for table, which are used to sort array of table in from clause
    * @var array
    */
-  static $info = array(
+  static $info = [
     'civicrm_contact' => '01',
     'civicrm_address' => '09',
     'civicrm_county' => '10',
@@ -75,7 +75,7 @@ class CRM_Core_TableHierarchy {
     'civicrm_mailing_event_opened' => '41',
     'civicrm_mailing_event_reply' => '42',
     'civicrm_mailing_event_trackable_url_open' => '43',
-  );
+  ];
 
   /**
    * @return array

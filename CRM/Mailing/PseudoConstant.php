@@ -89,11 +89,11 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function abStatus() {
     if (!is_array(self::$abStatus)) {
-      self::$abStatus = array(
+      self::$abStatus = [
         'Draft' => ts('Draft'),
         'Testing' => ts('Testing'),
         'Final' => ts('Final'),
-      );
+      ];
     }
     return self::$abStatus;
   }
@@ -103,11 +103,11 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function abTestCriteria() {
     if (!is_array(self::$abTestCriteria)) {
-      self::$abTestCriteria = array(
+      self::$abTestCriteria = [
         'subject' => ts('Test different "Subject" lines'),
         'from' => ts('Test different "From" lines'),
         'full_email' => ts('Test entirely different emails'),
-      );
+      ];
     }
     return self::$abTestCriteria;
   }
@@ -117,11 +117,11 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function abWinnerCriteria() {
     if (!is_array(self::$abWinnerCriteria)) {
-      self::$abWinnerCriteria  = array(
+      self::$abWinnerCriteria  = [
         'open' => ts('Open'),
         'unique_click' => ts('Total Unique Clicks'),
         'link_click' => ts('Total Clicks on a particular link'),
-      );
+      ];
     }
     return self::$abWinnerCriteria;
   }
@@ -131,11 +131,11 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function mailingTypes() {
     if (!is_array(self::$mailingTypes)) {
-      self::$mailingTypes  = array(
+      self::$mailingTypes  = [
         'standalone' => ts('Standalone'),
         'experiment' => ts('Experimental'),
         'winner' => ts('Winner'),
-      );
+      ];
     }
     return self::$mailingTypes;
   }
@@ -154,7 +154,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
 
     if (!self::$component || !array_key_exists($name, self::$component)) {
       if (!self::$component) {
-        self::$component = array();
+        self::$component = [];
       }
       if (!$type) {
         self::$component[$name] = NULL;
@@ -162,7 +162,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
       }
       else {
         // we need to add an additional filter for $type
-        self::$component[$name] = array();
+        self::$component[$name] = [];
 
         $object = new CRM_Mailing_BAO_MailingComponent();
         $object->component_type = $type;
@@ -200,7 +200,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
 
       $dao = CRM_Core_DAO::executeQuery($queryDefaultComponents);
 
-      self::$defaultComponent = array();
+      self::$defaultComponent = [];
       while ($dao->fetch()) {
         self::$defaultComponent[$dao->component_type] = $dao->id;
       }
@@ -258,28 +258,28 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   public static function &yesNoOptions($field) {
     static $options;
     if (!$options) {
-      $options = array(
-        'bounce' => array(
+      $options = [
+        'bounce' => [
           'N' => ts('Successful '),
           'Y' => ts('Bounced '),
-        ),
-        'delivered' => array(
+        ],
+        'delivered' => [
           'Y' => ts('Successful '),
           'N' => ts('Bounced '),
-        ),
-        'open' => array(
+        ],
+        'open' => [
           'Y' => ts('Opened '),
           'N' => ts('Unopened/Hidden '),
-        ),
-        'click' => array(
+        ],
+        'click' => [
           'Y' => ts('Clicked '),
           'N' => ts('Not Clicked '),
-        ),
-        'reply' => array(
+        ],
+        'reply' => [
           'Y' => ts('Replied '),
           'N' => ts('No Reply '),
-        ),
-      );
+        ],
+      ];
     }
     return $options[$field];
   }

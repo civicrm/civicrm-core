@@ -44,7 +44,7 @@ class CRM_Utils_SQL {
     require_once 'api/v3/utils.php';
     $baoName = _civicrm_api3_get_BAO($entity);
     $bao = new $baoName();
-    $clauses = $subclauses = array();
+    $clauses = $subclauses = [];
     foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
       if ($vals && $field == $joinColumn) {
         $clauses = array_merge($clauses, (array) $vals);

@@ -53,26 +53,26 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
    * @access protected
    */
   protected function initializePager() {
-    $params = array();
+    $params = [];
 
     $contactOneQ = CRM_Utils_Request::retrieve('crmContact1Q', 'String');
 
     if ($contactOneQ) {
-      $params['contact_id1.display_name'] = array('LIKE' => '%' . $contactOneQ . '%');
-      $params['contact_id2.display_name'] = array('LIKE' => '%' . $contactOneQ . '%');
+      $params['contact_id1.display_name'] = ['LIKE' => '%' . $contactOneQ . '%'];
+      $params['contact_id2.display_name'] = ['LIKE' => '%' . $contactOneQ . '%'];
 
       $params['options']['or'] = [["contact_id1.display_name", "contact_id2.display_name"]];
     }
 
     $totalitems = civicrm_api3('Exception', "getcount", $params);
-    $params           = array(
+    $params           = [
       'total' => $totalitems,
       'rowCount' => CRM_Utils_Pager::ROWCOUNT,
       'status' => ts('Dedupe Exceptions %%StatusMessage%%'),
       'buttonBottom' => 'PagerBottomButton',
       'buttonTop' => 'PagerTopButton',
       'pageID' => $this->get(CRM_Utils_Pager::PAGE_ID),
-    );
+    ];
     $this->_pager = new CRM_Utils_Pager($params);
     $this->assign_by_ref('pager', $this->_pager);
   }
@@ -93,14 +93,14 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
 
     $this->assign('searchcontact1', $contactOneQ);
 
-    $params = array(
-      "options"     => array('limit' => $limit, 'offset' => $offset),
+    $params = [
+      "options"     => ['limit' => $limit, 'offset' => $offset],
       'return' => ["contact_id1.display_name", "contact_id2.display_name", "contact_id1", "contact_id2"],
-    );
+    ];
 
     if ($contactOneQ != '') {
-      $params['contact_id1.display_name'] = array('LIKE' => '%' . $contactOneQ . '%');
-      $params['contact_id2.display_name'] = array('LIKE' => '%' . $contactOneQ . '%');
+      $params['contact_id1.display_name'] = ['LIKE' => '%' . $contactOneQ . '%'];
+      $params['contact_id2.display_name'] = ['LIKE' => '%' . $contactOneQ . '%'];
 
       $params['options']['or'] = [["contact_id1.display_name", "contact_id2.display_name"]];
     }

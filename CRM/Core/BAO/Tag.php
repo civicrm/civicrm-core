@@ -90,7 +90,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   public function buildTree($usedFor = NULL, $excludeHidden = FALSE) {
     $sql = "SELECT id, parent_id, name, description, is_selectable FROM civicrm_tag";
 
-    $whereClause = array();
+    $whereClause = [];
     if ($usedFor) {
       $whereClause[] = "used_for like '%{$usedFor}%'";
     }
@@ -104,10 +104,10 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
     $sql .= " ORDER BY parent_id,name";
 
-    $dao = CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, FALSE, FALSE);
+    $dao = CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
 
-    $refs = array();
-    $this->tree = array();
+    $refs = [];
+    $this->tree = [];
     while ($dao->fetch()) {
       $thisref = &$refs[$dao->id];
 
@@ -136,18 +136,18 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @return array
    */
   public static function getTagsUsedFor(
-    $usedFor = array('civicrm_contact'),
+    $usedFor = ['civicrm_contact'],
     $buildSelect = TRUE,
     $all = FALSE,
     $parentId = NULL
   ) {
-    $tags = array();
+    $tags = [];
 
     if (empty($usedFor)) {
       return $tags;
     }
     if (!is_array($usedFor)) {
-      $usedFor = array($usedFor);
+      $usedFor = [$usedFor];
     }
 
     if ($parentId === NULL) {
@@ -210,26 +210,26 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    */
   public static function getTags(
     $usedFor = 'civicrm_contact',
-    &$tags = array(),
+    &$tags = [],
     $parentId = NULL,
     $separator = '&nbsp;&nbsp;',
     $formatSelectable = FALSE
   ) {
     if (!is_array($tags)) {
-      $tags = array();
+      $tags = [];
     }
     // We need to build a list of tags ordered by hierarchy and sorted by
     // name. The hierarchy will be communicated by an accumulation of
     // separators in front of the name to give it a visual offset.
     // Instead of recursively making mysql queries, we'll make one big
     // query and build the hierarchy with the algorithm below.
-    $args = array(1 => array('%' . $usedFor . '%', 'String'));
+    $args = [1 => ['%' . $usedFor . '%', 'String']];
     $query = "SELECT id, name, parent_id, is_tagset, is_selectable
                   FROM civicrm_tag
               WHERE used_for LIKE %1";
     if ($parentId) {
       $query .= " AND parent_id = %2";
-      $args[2] = array($parentId, 'Integer');
+      $args[2] = [$parentId, 'Integer'];
     }
     $query .= " ORDER BY name";
     $dao = CRM_Core_DAO::executeQuery($query, $args, TRUE, NULL, FALSE, FALSE);
@@ -239,7 +239,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     // $roots represents the current leaf nodes that need to be checked for
     // children. $rows represents the unplaced nodes, not all of much
     // are necessarily placed.
-    $roots = $rows = array();
+    $roots = $rows = [];
     while ($dao->fetch()) {
       // note that we are prepending id with "crm_disabled_opt" which identifies
       // them as disabled so that they cannot be selected. We do some magic
@@ -252,21 +252,21 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
         $idPrefix = "crm_disabled_opt";
       }
       if ($dao->parent_id == $parentId && $dao->is_tagset == 0) {
-        $roots[] = array(
+        $roots[] = [
           'id' => $dao->id,
           'prefix' => '',
           'name' => $dao->name,
           'idPrefix' => $idPrefix,
-        );
+        ];
       }
       else {
-        $rows[] = array(
+        $rows[] = [
           'id' => $dao->id,
           'prefix' => '',
           'name' => $dao->name,
           'parent_id' => $dao->parent_id,
           'idPrefix' => $idPrefix,
-        );
+        ];
       }
     }
 
@@ -277,14 +277,14 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     // iterate through because we must modify the unplaced nodes list
     // during the loop.
     while (count($roots)) {
-      $new_roots = array();
+      $new_roots = [];
       $current_rows = $rows;
       $root = array_shift($roots);
-      $tags[$root['id']] = array(
+      $tags[$root['id']] = [
         $root['prefix'],
         $root['name'],
         $root['idPrefix'],
-      );
+      ];
 
       // As you find the children, append them to the end of the new set
       // of roots (maintain alphabetical ordering). Also remove the node
@@ -292,12 +292,12 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       if (is_array($current_rows)) {
         foreach ($current_rows as $key => $row) {
           if ($row['parent_id'] == $root['id']) {
-            $new_roots[] = array(
+            $new_roots[] = [
               'id' => $row['id'],
               'prefix' => $tags[$root['id']][0] . $separator,
               'name' => $row['name'],
               'idPrefix' => $row['idPrefix'],
-            );
+            ];
             unset($rows[$key]);
           }
         }
@@ -312,7 +312,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     // appearance of ordering when transformed into HTML in the form layer.
     // here is the actual code that to prepends and set disabled attribute for
     // non-selectable tags
-    $formattedTags = array();
+    $formattedTags = [];
     foreach ($tags as $key => $tag) {
       if (!empty($tag[2])) {
         $key = $tag[2] . "-" . $key;
@@ -332,30 +332,30 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @throws \CiviCRM_API3_Exception
    */
   public static function getColorTags($usedFor = NULL, $allowSelectingNonSelectable = FALSE, $exclude = NULL) {
-    $params = array(
-      'options' => array(
+    $params = [
+      'options' => [
         'limit' => 0,
         'sort' => "name ASC",
-      ),
+      ],
       'is_tagset' => 0,
-      'return' => array('name', 'description', 'parent_id', 'color', 'is_selectable', 'used_for'),
-    );
+      'return' => ['name', 'description', 'parent_id', 'color', 'is_selectable', 'used_for'],
+    ];
     if ($usedFor) {
-      $params['used_for'] = array('LIKE' => "%$usedFor%");
+      $params['used_for'] = ['LIKE' => "%$usedFor%"];
     }
     if ($exclude) {
-      $params['id'] = array('!=' => $exclude);
+      $params['id'] = ['!=' => $exclude];
     }
-    $allTags = array();
+    $allTags = [];
     foreach (CRM_Utils_Array::value('values', civicrm_api3('Tag', 'get', $params)) as $id => $tag) {
-      $allTags[$id] = array(
+      $allTags[$id] = [
         'text' => $tag['name'],
         'id' => $id,
         'description' => CRM_Utils_Array::value('description', $tag),
         'parent_id' => CRM_Utils_Array::value('parent_id', $tag),
         'used_for' => CRM_Utils_Array::value('used_for', $tag),
         'color' => CRM_Utils_Array::value('color', $tag),
-      );
+      ];
       if (!$allowSelectingNonSelectable && empty($tag['is_selectable'])) {
         $allTags[$id]['disabled'] = TRUE;
       }
@@ -410,7 +410,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @return CRM_Core_DAO_Tag|null
    *   object on success, otherwise null
    */
-  public static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = []) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('tag', $ids));
     if (!$id && !self::dataExists($params)) {
       return NULL;
@@ -464,10 +464,10 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     $tag->find(TRUE);
     if (!$tag->parent_id && $tag->used_for) {
       CRM_Core_DAO::executeQuery("UPDATE civicrm_tag SET used_for=%1 WHERE parent_id = %2",
-        array(
-          1 => array($tag->used_for, 'String'),
-          2 => array($tag->id, 'Integer'),
-        )
+        [
+          1 => [$tag->used_for, 'String'],
+          2 => [$tag->id, 'Integer'],
+        ]
       );
     }
 
@@ -502,15 +502,15 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *   array of tag sets
    */
   public static function getTagSet($entityTable) {
-    $tagSets = array();
+    $tagSets = [];
     $query = "SELECT name, id FROM civicrm_tag
               WHERE is_tagset=1 AND parent_id IS NULL and used_for LIKE %1";
-    $dao = CRM_Core_DAO::executeQuery($query, array(
-        1 => array(
+    $dao = CRM_Core_DAO::executeQuery($query, [
+        1 => [
           '%' . $entityTable . '%',
           'String',
-        ),
-      ), TRUE, NULL, FALSE, FALSE);
+        ],
+      ], TRUE, NULL, FALSE, FALSE);
     while ($dao->fetch()) {
       $tagSets[$dao->id] = $dao->name;
     }
@@ -525,7 +525,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *   associated array of tag name and id
    */
   public static function getTagsNotInTagset() {
-    $tags = $tagSets = array();
+    $tags = $tagSets = [];
     // first get all the tag sets
     $query = "SELECT id FROM civicrm_tag WHERE is_tagset=1 AND parent_id IS NULL";
     $dao = CRM_Core_DAO::executeQuery($query);
@@ -557,9 +557,9 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *   associated array of child tags in Array('Parent Tag ID' => Array('Child Tag 1', ...)) format
    */
   public static function getChildTags($searchString = NULL) {
-    $childTagIDs = array();
+    $childTagIDs = [];
 
-    $whereClauses = array('parent.is_tagset <> 1');
+    $whereClauses = ['parent.is_tagset <> 1'];
     if ($searchString) {
       $whereClauses[] = " child.name LIKE '%$searchString%' ";
     }
@@ -579,7 +579,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
         while ($parentID) {
           $newParentID = CRM_Core_DAO::singleValueQuery(" SELECT parent_id FROM civicrm_tag WHERE id = $parentID ");
           if ($newParentID) {
-            $childTagIDs[$newParentID] = array($parentID);
+            $childTagIDs[$newParentID] = [$parentID];
           }
           $parentID = $newParentID;
         }

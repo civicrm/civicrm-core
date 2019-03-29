@@ -39,7 +39,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
   /**
    * Ims of the contact that is been viewed.
    */
-  private $_openids = array();
+  private $_openids = [];
 
   /**
    * No of openid blocks for inline edit.
@@ -88,7 +88,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
       CRM_Contact_Form_Edit_OpenID::buildQuickForm($this, $blockId, TRUE);
     }
 
-    $this->addFormRule(array('CRM_Contact_Form_Inline_OpenID', 'formRule'));
+    $this->addFormRule(['CRM_Contact_Form_Inline_OpenID', 'formRule']);
   }
 
   /**
@@ -102,7 +102,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
    * @return array
    */
   public static function formRule($fields, $errors) {
-    $hasData = $hasPrimary = $errors = array();
+    $hasData = $hasPrimary = $errors = [];
     if (!empty($fields['openid']) && is_array($fields['openid'])) {
       foreach ($fields['openid'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
@@ -135,7 +135,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (!empty($this->_openids)) {
       foreach ($this->_openids as $id => $value) {
         $defaults['openid'][$id] = $value;

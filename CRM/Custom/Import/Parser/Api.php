@@ -6,16 +6,16 @@
 class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
 
   protected $_entity = '';
-  protected $_fields = array();
-  protected $_requiredFields = array();
-  protected $_dateFields = array();
+  protected $_fields = [];
+  protected $_requiredFields = [];
+  protected $_dateFields = [];
   protected $_multipleCustomData = '';
 
   /**
    * Params for the current entity being prepared for the api.
    * @var array
    */
-  protected $_params = array();
+  protected $_params = [];
 
   /**
    * Class constructor.
@@ -32,11 +32,11 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   public function setFields() {
     $customGroupID = $this->_multipleCustomData;
     $importableFields = $this->getGroupFieldsForImport($customGroupID, $this);
-    $this->_fields = array_merge(array(
-        'do_not_import' => array('title' => ts('- do not import -')),
-        'contact_id' => array('title' => ts('Contact ID')),
-        'external_identifier' => array('title' => ts('External Identifier')),
-      ), $importableFields);
+    $this->_fields = array_merge([
+        'do_not_import' => ['title' => ts('- do not import -')],
+        'contact_id' => ['title' => ts('Contact ID')],
+        'external_identifier' => ['title' => ts('External Identifier')],
+      ], $importableFields);
   }
 
   /**
@@ -121,7 +121,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     $errorMessage = NULL;
 
     $contactType = $this->_contactType ? $this->_contactType : 'Organization';
-    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($this->_params + array('contact_type' => $contactType), $errorMessage, $this->_contactSubType, NULL);
+    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($this->_params + ['contact_type' => $contactType], $errorMessage, $this->_contactSubType, NULL);
 
     // pseudoconstants
     if ($errorMessage) {
@@ -147,10 +147,10 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
   public function import($onDuplicate, &$values) {
     $response = $this->summary($values);
     if ($response != CRM_Import_Parser::VALID) {
-      $importRecordParams = array(
+      $importRecordParams = [
         $statusFieldName => 'INVALID',
         "${statusFieldName}Msg" => "Invalid (Error Code: $response)",
-      );
+      ];
       return $response;
     }
 
@@ -159,9 +159,9 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
 
     $params = $this->getActiveFieldParams();
     $contactType = $this->_contactType ? $this->_contactType : 'Organization';
-    $formatted = array(
+    $formatted = [
       'contact_type' => $contactType,
-    );
+    ];
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get('dateTypes');
 
@@ -237,8 +237,8 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
    *
    */
   public function getGroupFieldsForImport($id) {
-    $importableFields = array();
-    $params = array('custom_group_id' => $id);
+    $importableFields = [];
+    $params = ['custom_group_id' => $id];
     $allFields = civicrm_api3('custom_field', 'get', $params);
     $fields = $allFields['values'];
     foreach ($fields as $id => $values) {
@@ -249,7 +249,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
       /* generate the key for the fields array */
       $key = "custom_$id";
       $regexp = preg_replace('/[.,;:!?]/', '', CRM_Utils_Array::value(0, $values));
-      $importableFields[$key] = array(
+      $importableFields[$key] = [
         'name' => $key,
         'title' => CRM_Utils_Array::value('label', $values),
         'headerPattern' => '/' . preg_quote($regexp, '/') . '/',
@@ -259,7 +259,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
         'data_type' => CRM_Utils_Array::value('data_type', $values),
         'html_type' => CRM_Utils_Array::value('html_type', $values),
         'is_search_range' => CRM_Utils_Array::value('is_search_range', $values),
-      );
+      ];
       if (CRM_Utils_Array::value('html_type', $values) == 'Select Date') {
         $importableFields[$key]['date_format'] = CRM_Utils_Array::value('date_format', $values);
         $importableFields[$key]['time_format'] = CRM_Utils_Array::value('time_format', $values);

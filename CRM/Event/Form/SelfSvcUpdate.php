@@ -94,7 +94,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    *
    * @var string
    */
-  protected $_participant = array();
+  protected $_participant = [];
   /**
    * particpant values
    *
@@ -106,7 +106,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    *
    * @var array
    */
-  protected $_details = array();
+  protected $_details = [];
   /**
    * Is backoffice form?
    *
@@ -122,11 +122,11 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
-    $participant = $values = array();
+    $participant = $values = [];
     $this->_participant_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this, FALSE, NULL, 'REQUEST');
     $this->_userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE, NULL, 'REQUEST');
     $this->isBackoffice = CRM_Utils_Request::retrieve('is_backoffice', 'String', $this, FALSE, NULL, 'REQUEST');
-    $params = array('id' => $this->_participant_id);
+    $params = ['id' => $this->_participant_id];
     $this->_participant = CRM_Event_BAO_Participant::getValues($params, $values, $participant);
     $this->_part_values = $values[$this->_participant_id];
     $this->set('values', $this->_part_values);
@@ -142,7 +142,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     if ($this->_participant_id) {
       $this->assign('participantId', $this->_participant_id);
     }
-    $event = array();
+    $event = [];
     $daoName = 'title';
     $this->_event_title = CRM_Event_BAO_Event::getFieldValue('CRM_Event_DAO_Event', $this->_event_id, $daoName);
     $daoName = 'start_date';
@@ -150,7 +150,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contact_id);
     $this->_contact_name = $displayName;
     $this->_contact_email = $email;
-    $details = array();
+    $details = [];
     $details = CRM_Event_BAO_Participant::participantDetails($this->_participant_id);
     $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'participant_role', 'id', 'name');
     $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_participant_id, 'contribution_id', 'participant_id');
@@ -194,7 +194,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
       $days = $interval->format('%d');
       $hours   = $interval->format('%h');
       if ($hours <= $time_limit && $days < 1) {
-        $status = ts("Registration for this event cannot be cancelled or transferred less than %1 hours prior to the event's start time. Contact the event organizer if you have questions.", array(1 => $time_limit));
+        $status = ts("Registration for this event cannot be cancelled or transferred less than %1 hours prior to the event's start time. Contact the event organizer if you have questions.", [1 => $time_limit]);
         CRM_Core_Error::statusBounce($status, $url, ts('Sorry'));
       }
     }
@@ -213,14 +213,14 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    * return @void
    */
   public function buildQuickForm() {
-    $this->add('select', 'action', ts('Transfer or Cancel Registration'), array(ts('-select-'), ts('Transfer'), ts('Cancel')), TRUE);
-    $this->addButtons(array(
-      array(
+    $this->add('select', 'action', ts('Transfer or Cancel Registration'), [ts('-select-'), ts('Transfer'), ts('Cancel')], TRUE);
+    $this->addButtons([
+      [
         'type' => 'submit',
         'name' => ts('Submit'),
-      ),
-    ));
-    $this->addFormRule(array('CRM_Event_Form_SelfSvcUpdate', 'formRule'), $this);
+      ],
+    ]);
+    $this->addFormRule(['CRM_Event_Form_SelfSvcUpdate', 'formRule'], $this);
     parent::buildQuickForm();
   }
 
@@ -230,7 +230,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    * return @void
    */
   public function setDefaultValues() {
-    $this->_defaults = array();
+    $this->_defaults = [];
     $this->_defaults['details'] = $this->_details;
     return $this->_defaults;
   }
@@ -246,7 +246,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
     if (empty($fields['action'])) {
       $errors['action'] = ts("Please select Transfer OR Cancel action.");
     }
@@ -284,12 +284,12 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $isBackOfficeArg = $this->isBackoffice ? '&is_backoffice=1' : '';
     CRM_Utils_System::redirect(CRM_Utils_System::url(
       'civicrm/event/selfsvctransfer',
-      array(
+      [
         'reset' => 1,
         'action' => 'add',
         'pid' => $this->_participant_id,
         'cs' => $this->_userChecksum,
-      )
+      ]
     ));
   }
 
@@ -302,34 +302,34 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
   public function cancelParticipant($params) {
     //set participant record status to Cancelled, refund payment if possible
     // send email to participant and admin, and log Activity
-    $value = array();
+    $value = [];
     $value['id'] = $this->_participant_id;
     $cancelledId = array_search('Cancelled',
     CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'"));
     $value['status_id'] = $cancelledId;
     CRM_Event_BAO_Participant::create($value);
-    $domainValues = array();
+    $domainValues = [];
     $domain = CRM_Core_BAO_Domain::getDomain();
-    $tokens = array(
+    $tokens = [
       'domain' =>
-      array(
+      [
         'name',
         'phone',
         'address',
         'email',
-      ),
+      ],
       'contact' => CRM_Core_SelectValues::contactTokens(),
-    );
+    ];
     foreach ($tokens['domain'] as $token) {
       $domainValues[$token] = CRM_Utils_Token::getDomainTokenReplacement($token, $domain);
     }
-    $participantRoles = array();
+    $participantRoles = [];
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
-    $participantDetails = array();
+    $participantDetails = [];
     $query = "SELECT * FROM civicrm_participant WHERE id = {$this->_participant_id}";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $participantDetails[$dao->id] = array(
+      $participantDetails[$dao->id] = [
         'id' => $dao->id,
         'role' => $participantRoles[$dao->role_id],
         'is_test' => $dao->is_test,
@@ -339,20 +339,20 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
         'contact_id' => $dao->contact_id,
         'register_date' => $dao->register_date,
         'registered_by_id' => $dao->registered_by_id,
-      );
+      ];
     }
-    $eventDetails = array();
-    $eventParams = array('id' => $this->_event_id);
+    $eventDetails = [];
+    $eventParams = ['id' => $this->_event_id];
     CRM_Event_BAO_Event::retrieve($eventParams, $eventDetails[$this->_event_id]);
     //get default participant role.
     $eventDetails[$this->_event_id]['participant_role'] = CRM_Utils_Array::value($eventDetails[$this->_event_id]['default_role_id'], $participantRoles);
     //get the location info
-    $locParams = array('entity_id' => $this->_event_id, 'entity_table' => 'civicrm_event');
+    $locParams = ['entity_id' => $this->_event_id, 'entity_table' => 'civicrm_event'];
     $eventDetails[$this->_event_id]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
     //get contact details
     $contactIds[$this->_contact_id] = $this->_contact_id;
     list($currentContactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, NULL,
-      FALSE, FALSE, NULL, array(),
+      FALSE, FALSE, NULL, [],
       'CRM_Event_BAO_Participant'
     );
     foreach ($currentContactDetails as $contactId => $contactValues) {
@@ -367,8 +367,8 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
       "Cancelled",
       ""
     );
-    $statusMsg = ts('Event registration information for %1 has been updated.', array(1 => $this->_contact_name));
-    $statusMsg .= ' ' . ts('A cancellation email has been sent to %1.', array(1 => $this->_contact_email));
+    $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->_contact_name]);
+    $statusMsg .= ' ' . ts('A cancellation email has been sent to %1.', [1 => $this->_contact_email]);
     CRM_Core_Session::setStatus($statusMsg, ts('Thanks'), 'success');
     if (!empty($this->isBackoffice)) {
       return;

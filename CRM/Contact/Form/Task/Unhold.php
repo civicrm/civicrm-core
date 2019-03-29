@@ -27,15 +27,15 @@ WHERE on_hold = 1 AND hold_date is not null AND contact_id in (" . implode(",", 
       $rowCount = $result->affectedRows();
 
       if ($rowCount) {
-        CRM_Core_Session::setStatus(ts('%count email was found on hold and updated.', array(
+        CRM_Core_Session::setStatus(ts('%count email was found on hold and updated.', [
               'count' => $rowCount,
               'plural' => '%count emails were found on hold and updated.',
-            )), ts('Emails Restored'), 'success');
+            ]), ts('Emails Restored'), 'success');
       }
       else {
-        CRM_Core_Session::setStatus(ts('The selected contact does not have an email on hold.', array(
+        CRM_Core_Session::setStatus(ts('The selected contact does not have an email on hold.', [
               'plural' => 'None of the selected contacts have an email on hold.',
-            )), ts('No Emails to Restore'), 'info');
+            ]), ts('No Emails to Restore'), 'info');
       }
     }
     else {

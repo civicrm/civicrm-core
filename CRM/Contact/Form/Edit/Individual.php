@@ -69,10 +69,10 @@ class CRM_Contact_Form_Edit_Individual {
       }
 
       foreach ($nameFields as $name) {
-        $props = array();
+        $props = [];
         if ($name == 'prefix_id' || $name == 'suffix_id') {
           //override prefix/suffix label name as Prefix/Suffix respectively and adjust select size
-          $props = array('class' => 'eight', 'placeholder' => ' ', 'label' => $name == 'prefix_id' ? ts('Prefix') : ts('Suffix'));
+          $props = ['class' => 'eight', 'placeholder' => ' ', 'label' => $name == 'prefix_id' ? ts('Prefix') : ts('Suffix')];
         }
         $form->addField($name, $props);
       }
@@ -84,25 +84,25 @@ class CRM_Contact_Form_Edit_Individual {
 
       // job title
       // override the size for UI to look better
-      $form->addField('job_title', array('size' => '30'));
+      $form->addField('job_title', ['size' => '30']);
 
       //Current Employer Element
-      $props = array(
-        'api' => array('params' => array('contact_type' => 'Organization')),
+      $props = [
+        'api' => ['params' => ['contact_type' => 'Organization']],
         'create' => TRUE,
-      );
+      ];
       $form->addField('employer_id', $props);
-      $form->addField('contact_source', array('class' => 'big'));
+      $form->addField('contact_source', ['class' => 'big']);
     }
 
     if (!$inlineEditMode) {
       //External Identifier Element
-      $form->addField('external_identifier', array('label' => 'External ID'));
+      $form->addField('external_identifier', ['label' => 'External ID']);
 
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),
         'objectExists',
-        array('CRM_Contact_DAO_Contact', $form->_contactId, 'external_identifier')
+        ['CRM_Contact_DAO_Contact', $form->_contactId, 'external_identifier']
       );
       CRM_Core_ShowHideBlocks::links($form, 'demographics', '', '');
     }
@@ -121,7 +121,7 @@ class CRM_Contact_Form_Edit_Individual {
    *   TRUE if no errors, else array of errors.
    */
   public static function formRule($fields, $files, $contactID = NULL) {
-    $errors = array();
+    $errors = [];
     $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID, 'Individual');
 
     // make sure that firstName and lastName or a primary OpenID is set

@@ -67,10 +67,10 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
     $validate = FALSE;
     //validations
     if (count($this->_contributionIds) > $this->_maxContributions) {
-      CRM_Core_Session::setStatus(ts("The maximum number of contributions you can select for Update multiple contributions is %1. You have selected %2. Please select fewer contributions from your search results and try again.", array(
+      CRM_Core_Session::setStatus(ts("The maximum number of contributions you can select for Update multiple contributions is %1. You have selected %2. Please select fewer contributions from your search results and try again.", [
             1 => $this->_maxContributions,
             2 => count($this->_contributionIds),
-          )), ts('Update multiple records error'), 'error');
+          ]), ts('Update multiple records error'), 'error');
       $validate = TRUE;
     }
 
@@ -85,18 +85,18 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
    */
   public function buildQuickForm() {
 
-    $types = array('Contribution');
+    $types = ['Contribution'];
     $profiles = CRM_Core_BAO_UFGroup::getProfiles($types, TRUE);
 
     if (empty($profiles)) {
-      CRM_Core_Session::setStatus(ts("You will need to create a Profile containing the %1 fields you want to edit before you can use Update multiple contributions. Navigate to Administer CiviCRM > Customize Data and Screens > CiviCRM Profile to configure a Profile. Consult the online Administrator documentation for more information.", array(1 => $types[0])), ts('Profile Required'), 'error');
+      CRM_Core_Session::setStatus(ts("You will need to create a Profile containing the %1 fields you want to edit before you can use Update multiple contributions. Navigate to Administer CiviCRM > Customize Data and Screens > CiviCRM Profile to configure a Profile. Consult the online Administrator documentation for more information.", [1 => $types[0]]), ts('Profile Required'), 'error');
       CRM_Utils_System::redirect($this->_userContext);
     }
 
     $ufGroupElement = $this->add('select', 'uf_group_id', ts('Select Profile'),
-      array(
+      [
         '' => ts('- select profile -'),
-      ) + $profiles, TRUE
+      ] + $profiles, TRUE
     );
     $this->addDefaultButtons(ts('Continue'));
   }
@@ -105,7 +105,7 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
    * Add local and global form rules.
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_Contribute_Form_Task_PickProfile', 'formRule'));
+    $this->addFormRule(['CRM_Contribute_Form_Task_PickProfile', 'formRule']);
   }
 
   /**

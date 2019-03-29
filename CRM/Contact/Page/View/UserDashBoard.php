@@ -101,7 +101,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     $this->set('displayName', $displayName);
     $this->set('contactImage', $contactImage);
 
-    CRM_Utils_System::setTitle(ts('Dashboard - %1', array(1 => $displayName)));
+    CRM_Utils_System::setTitle(ts('Dashboard - %1', [1 => $displayName]));
 
     $this->assign('recentlyViewed', FALSE);
   }
@@ -132,34 +132,34 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
       ) {
 
         $userDashboard = $component->getUserDashboardObject();
-        $dashboardElements[] = array(
+        $dashboardElements[] = [
           'class' => 'crm-dashboard-' . strtolower($component->name),
           'sectionTitle' => $elem['title'],
           'templatePath' => $userDashboard->getTemplateFileName(),
           'weight' => $elem['weight'],
-        );
+        ];
         $userDashboard->run();
       }
     }
 
     // CRM-16512 - Hide related contact table if user lacks permission to view self
     if (!empty($dashboardOptions['Permissioned Orgs']) && CRM_Core_Permission::check('view my contact')) {
-      $dashboardElements[] = array(
+      $dashboardElements[] = [
         'class' => 'crm-dashboard-permissionedOrgs',
         'templatePath' => 'CRM/Contact/Page/View/RelationshipSelector.tpl',
         'sectionTitle' => ts('Your Contacts / Organizations'),
         'weight' => 40,
-      );
+      ];
 
     }
 
     if (!empty($dashboardOptions['PCP'])) {
-      $dashboardElements[] = array(
+      $dashboardElements[] = [
         'class' => 'crm-dashboard-pcp',
         'templatePath' => 'CRM/Contribute/Page/PcpUserDashboard.tpl',
         'sectionTitle' => ts('Personal Campaign Pages'),
         'weight' => 40,
-      );
+      ];
       list($pcpBlock, $pcpInfo) = CRM_PCP_BAO_PCP::getPcpDashboardInfo($this->_contactId);
       $this->assign('pcpBlock', $pcpBlock);
       $this->assign('pcpInfo', $pcpInfo);
@@ -167,17 +167,17 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
 
     if (!empty($dashboardOptions['Assigned Activities']) && empty($this->_isChecksumUser)) {
       // Assigned Activities section
-      $dashboardElements[] = array(
+      $dashboardElements[] = [
         'class' => 'crm-dashboard-assignedActivities',
         'templatePath' => 'CRM/Activity/Page/UserDashboard.tpl',
         'sectionTitle' => ts('Your Assigned Activities'),
         'weight' => 5,
-      );
+      ];
       $userDashboard = new CRM_Activity_Page_UserDashboard();
       $userDashboard->run();
     }
 
-    usort($dashboardElements, array('CRM_Utils_Sort', 'cmpFunc'));
+    usort($dashboardElements, ['CRM_Utils_Sort', 'cmpFunc']);
     $this->assign('dashboardElements', $dashboardElements);
 
     // return true when 'Invoices / Credit Notes' checkbox is checked
@@ -213,32 +213,32 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     if (!(self::$_links)) {
       $disableExtra = ts('Are you sure you want to disable this relationship?');
 
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit Contact Information'),
           'url' => 'civicrm/contact/relatedcontact',
           'qs' => 'action=update&reset=1&cid=%%cbid%%&rcid=%%cid%%',
           'title' => ts('Edit Contact Information'),
-        ),
-        CRM_Core_Action::VIEW => array(
+        ],
+        CRM_Core_Action::VIEW => [
           'name' => ts('Dashboard'),
           'url' => 'civicrm/user',
           'class' => 'no-popup',
           'qs' => 'reset=1&id=%%cbid%%',
           'title' => ts('View Contact Dashboard'),
-        ),
-      );
+        ],
+      ];
 
       if (CRM_Core_Permission::check('access CiviCRM')) {
-        self::$_links += array(
-          CRM_Core_Action::DISABLE => array(
+        self::$_links += [
+          CRM_Core_Action::DISABLE => [
             'name' => ts('Disable'),
             'url' => 'civicrm/contact/view/rel',
             'qs' => 'action=disable&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%&selectedChild=rel&context=dashboard',
             'extra' => 'onclick = "return confirm(\'' . $disableExtra . '\');"',
             'title' => ts('Disable Relationship'),
-          ),
-        );
+          ],
+        ];
       }
     }
 

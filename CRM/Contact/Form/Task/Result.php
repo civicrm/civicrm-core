@@ -46,10 +46,10 @@ class CRM_Contact_Form_Task_Result extends CRM_Contact_Form_Task {
     $this->set('searchRows', '');
 
     $context = $this->get('context');
-    if (in_array($context, array(
+    if (in_array($context, [
       'smog',
       'amtg',
-    ))) {
+    ])) {
       $urlParams = 'reset=1&force=1&context=smog&gid=';
       $urlParams .= ($context == 'smog') ? $this->get('gid') : $this->get('amtgID');
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/group/search', $urlParams));
@@ -94,13 +94,13 @@ class CRM_Contact_Form_Task_Result extends CRM_Contact_Form_Task {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'done',
           'name' => ts('Done'),
           'isDefault' => TRUE,
-        ),
-      )
+        ],
+      ]
     );
   }
 

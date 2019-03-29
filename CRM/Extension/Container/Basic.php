@@ -105,19 +105,19 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
    * @return array
    */
   public function checkRequirements() {
-    $errors = array();
+    $errors = [];
 
     if (empty($this->baseDir) || !is_dir($this->baseDir)) {
-      $errors[] = array(
+      $errors[] = [
         'title' => ts('Invalid Base Directory'),
         'message' => ts('An extension container has been defined with a blank directory.'),
-      );
+      ];
     }
     if (empty($this->baseUrl)) {
-      $errors[] = array(
+      $errors[] = [
         'title' => ts('Invalid Base URL'),
         'message' => ts('An extension container has been defined with a blank URL.'),
-      );
+      ];
     }
 
     return $errors;
@@ -146,10 +146,10 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
     if (!$this->baseUrl) {
       CRM_Core_Session::setStatus(
         ts('Failed to determine URL for extension (%1). Please update <a href="%2">Resource URLs</a>.',
-          array(
+          [
             1 => $key,
             2 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1'),
-          )
+          ]
         )
       );
     }
@@ -202,7 +202,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
         $this->relPaths = $this->cache->get($this->cacheKey);
       }
       if (!is_array($this->relPaths)) {
-        $this->relPaths = array();
+        $this->relPaths = [];
         $infoPaths = CRM_Utils_File::findFiles($this->baseDir, 'info.xml');
         foreach ($infoPaths as $infoPath) {
           $relPath = CRM_Utils_File::relativize(dirname($infoPath), $this->baseDir);
@@ -210,9 +210,9 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
             $info = CRM_Extension_Info::loadFromFile($infoPath);
           }
           catch (CRM_Extension_Exception_ParseException $e) {
-            CRM_Core_Session::setStatus(ts('Parse error in extension: %1', array(
+            CRM_Core_Session::setStatus(ts('Parse error in extension: %1', [
               1 => $e->getMessage(),
-            )), '', 'error');
+            ]), '', 'error');
             CRM_Core_Error::debug_log_message("Parse error in extension: " . $e->getMessage());
             continue;
           }
@@ -272,7 +272,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
    *   Array($key => $relUrl).
    */
   public static function convertPathsToUrls($dirSep, $relPaths) {
-    $relUrls = array();
+    $relUrls = [];
     foreach ($relPaths as $key => $relPath) {
       $relUrls[$key] = str_replace($dirSep, '/', $relPath);
     }

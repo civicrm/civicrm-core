@@ -40,7 +40,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * Activity type
    * @var array
    */
-  static $activityTypeList = array();
+  static $activityTypeList = [];
 
   /**
    * Get all the case statues.
@@ -156,7 +156,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
     $cache = (int) $indexName . '_' . (int) $all;
 
     if (!array_key_exists($cache, self::$activityTypeList)) {
-      self::$activityTypeList[$cache] = array();
+      self::$activityTypeList[$cache] = [];
 
       $query = "
               SELECT  v.label as label ,v.value as value, v.name as name, v.description as description, v.icon
@@ -179,7 +179,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
 
       $dao = CRM_Core_DAO::executeQuery($query);
 
-      $activityTypes = array();
+      $activityTypes = [];
       while ($dao->fetch()) {
         if ($indexName) {
           $index = $dao->name;
@@ -187,7 +187,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
         else {
           $index = $dao->value;
         }
-        $activityTypes[$index] = array();
+        $activityTypes[$index] = [];
         $activityTypes[$index]['id'] = $dao->value;
         $activityTypes[$index]['label'] = $dao->label;
         $activityTypes[$index]['name'] = $dao->name;

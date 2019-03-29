@@ -74,14 +74,14 @@ class CRM_Contact_Form_Search_Custom_FullText_Case extends CRM_Contact_Form_Sear
   public function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
 
-    $contactSQL = array();
+    $contactSQL = [];
 
     $contactSQL[] = "
 SELECT    distinct cc.id
 FROM      civicrm_case cc
 LEFT JOIN civicrm_case_contact ccc ON cc.id = ccc.case_id
 LEFT JOIN civicrm_contact c ON ccc.contact_id = c.id
-WHERE     ({$this->matchText('civicrm_contact c', array('sort_name', 'display_name', 'nick_name'), $queryText)})
+WHERE     ({$this->matchText('civicrm_contact c', ['sort_name', 'display_name', 'nick_name'], $queryText)})
           AND (cc.is_deleted = 0 OR cc.is_deleted IS NULL)
 ";
 
@@ -106,13 +106,13 @@ AND        ({$this->matchText('civicrm_tag t', 'name', $queryText)})
 GROUP BY   et.entity_id
 ";
 
-    $tables = array(
-      'civicrm_case' => array('fields' => array()),
-      'file' => array(
+    $tables = [
+      'civicrm_case' => ['fields' => []],
+      'file' => [
         'xparent_table' => 'civicrm_case',
-      ),
+      ],
       'sql' => $contactSQL,
-    );
+    ];
 
     return $tables;
   }

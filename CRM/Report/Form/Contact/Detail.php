@@ -35,12 +35,12 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
-  protected $_customGroupExtends = array(
+  protected $_customGroupExtends = [
     'Contact',
     'Individual',
     'Household',
     'Organization',
-  );
+  ];
 
   /**
    * This report has not been optimised for group filtering.
@@ -60,310 +60,310 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
    */
   public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
-    $this->_columns = array(
-      'civicrm_contact' => array(
+    $this->_columns = [
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
+        'fields' => [
+          'sort_name' => [
             'title' => ts('Contact Name'),
             'required' => TRUE,
             'no_repeat' => TRUE,
-          ),
-          'first_name' => array(
+          ],
+          'first_name' => [
             'title' => ts('First Name'),
-          ),
-          'middle_name' => array(
+          ],
+          'middle_name' => [
             'title' => ts('Middle Name'),
-          ),
-          'last_name' => array(
+          ],
+          'last_name' => [
             'title' => ts('Last Name'),
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'gender_id' => array(
+          ],
+          'gender_id' => [
             'title' => ts('Gender'),
-          ),
-          'birth_date' => array(
+          ],
+          'birth_date' => [
             'title' => ts('Birth Date'),
-          ),
-          'age' => array(
+          ],
+          'age' => [
             'title' => ts('Age'),
             'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
-          ),
-          'contact_type' => array(
+          ],
+          'contact_type' => [
             'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
+          ],
+          'contact_sub_type' => [
             'title' => ts('Contact Subtype'),
-          ),
-        ),
+          ],
+        ],
         'filters' => $this->getBasicContactFilters(),
         'grouping' => 'contact-fields',
-        'order_bys' => array(
-          'sort_name' => array(
+        'order_bys' => [
+          'sort_name' => [
             'title' => ts('Last Name, First Name'),
             'default' => '1',
             'default_weight' => '0',
             'default_order' => 'ASC',
-          ),
-          'first_name' => array(
+          ],
+          'first_name' => [
             'title' => ts('First Name'),
-          ),
-          'gender_id' => array(
+          ],
+          'gender_id' => [
             'name' => 'gender_id',
             'title' => ts('Gender'),
-          ),
-          'birth_date' => array(
+          ],
+          'birth_date' => [
             'name' => 'birth_date',
             'title' => ts('Birth Date'),
-          ),
-          'contact_type' => array(
+          ],
+          'contact_type' => [
             'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
+          ],
+          'contact_sub_type' => [
             'title' => ts('Contact Subtype'),
-          ),
-        ),
-      ),
-      'civicrm_address' => array(
+          ],
+        ],
+      ],
+      'civicrm_address' => [
         'dao' => 'CRM_Core_DAO_Address',
         'grouping' => 'contact-fields',
-        'fields' => array(
+        'fields' => [
           'street_address' => NULL,
           'city' => NULL,
           'postal_code' => NULL,
-          'state_province_id' => array(
+          'state_province_id' => [
             'title' => ts('State/Province'),
-          ),
-        ),
-        'order_bys' => array(
-          'state_province_id' => array('title' => ts('State/Province')),
-          'city' => array('title' => ts('City')),
-          'postal_code' => array('title' => ts('Postal Code')),
-        ),
-      ),
-      'civicrm_country' => array(
+          ],
+        ],
+        'order_bys' => [
+          'state_province_id' => ['title' => ts('State/Province')],
+          'city' => ['title' => ts('City')],
+          'postal_code' => ['title' => ts('Postal Code')],
+        ],
+      ],
+      'civicrm_country' => [
         'dao' => 'CRM_Core_DAO_Country',
-        'fields' => array(
-          'name' => array('title' => ts('Country'), 'default' => TRUE),
-        ),
-        'order_bys' => array(
-          'name' => array('title' => ts('Country')),
-        ),
+        'fields' => [
+          'name' => ['title' => ts('Country'), 'default' => TRUE],
+        ],
+        'order_bys' => [
+          'name' => ['title' => ts('Country')],
+        ],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_email' => array(
+      ],
+      'civicrm_email' => [
         'dao' => 'CRM_Core_DAO_Email',
-        'fields' => array(
-          'email' => array(
+        'fields' => [
+          'email' => [
             'title' => ts('Email'),
             'no_repeat' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-        'order_bys' => array(
-          'email' => array(
+        'order_bys' => [
+          'email' => [
             'title' => ts('Email'),
-          ),
-        ),
-      ),
-      'civicrm_contribution' => array(
+          ],
+        ],
+      ],
+      'civicrm_contribution' => [
         'dao' => 'CRM_Contribute_DAO_Contribution',
-        'fields' => array(
-          'contact_id' => array(
+        'fields' => [
+          'contact_id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'contribution_id' => array(
+          ],
+          'contribution_id' => [
             'title' => ts('Contribution'),
             'no_repeat' => TRUE,
             'default' => TRUE,
-          ),
-          'total_amount' => array('default' => TRUE),
-          'financial_type_id' => array(
+          ],
+          'total_amount' => ['default' => TRUE],
+          'financial_type_id' => [
             'title' => ts('Financial Type'),
             'default' => TRUE,
-          ),
+          ],
           'trxn_id' => NULL,
-          'receive_date' => array('default' => TRUE),
+          'receive_date' => ['default' => TRUE],
           'receipt_date' => NULL,
-          'contribution_status_id' => array(
+          'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'default' => TRUE,
-          ),
+          ],
           'contribution_source' => NULL,
-        ),
-      ),
-      'civicrm_membership' => array(
+        ],
+      ],
+      'civicrm_membership' => [
         'dao' => 'CRM_Member_DAO_Membership',
-        'fields' => array(
-          'contact_id' => array(
+        'fields' => [
+          'contact_id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'membership_id' => array(
+          ],
+          'membership_id' => [
             'title' => ts('Membership'),
             'no_repeat' => TRUE,
             'default' => TRUE,
-          ),
-          'membership_type_id' => array(
+          ],
+          'membership_type_id' => [
             'title' => ts('Membership Type'),
             'default' => TRUE,
-          ),
+          ],
           'join_date' => NULL,
-          'membership_start_date' => array(
+          'membership_start_date' => [
             'title' => ts('Start Date'),
             'default' => TRUE,
-          ),
-          'membership_end_date' => array(
+          ],
+          'membership_end_date' => [
             'title' => ts('End Date'),
             'default' => TRUE,
-          ),
-          'membership_status_id' => array(
+          ],
+          'membership_status_id' => [
             'name' => 'status_id',
             'title' => ts('Membership Status'),
             'default' => TRUE,
-          ),
-          'source' => array('title' => ts('Membership Source')),
-        ),
-      ),
-      'civicrm_participant' => array(
+          ],
+          'source' => ['title' => ts('Membership Source')],
+        ],
+      ],
+      'civicrm_participant' => [
         'dao' => 'CRM_Event_DAO_Participant',
-        'fields' => array(
-          'contact_id' => array(
+        'fields' => [
+          'contact_id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'participant_id' => array(
+          ],
+          'participant_id' => [
             'title' => ts('Participant'),
             'no_repeat' => TRUE,
             'default' => TRUE,
-          ),
-          'event_id' => array('default' => TRUE),
-          'participant_status_id' => array(
+          ],
+          'event_id' => ['default' => TRUE],
+          'participant_status_id' => [
             'name' => 'status_id',
             'title' => ts('Participant Status'),
             'default' => TRUE,
-          ),
-          'role_id' => array(
+          ],
+          'role_id' => [
             'title' => ts('Role'),
             'default' => TRUE,
-          ),
-          'participant_register_date' => array(
+          ],
+          'participant_register_date' => [
             'title' => ts('Register Date'),
             'default' => TRUE,
-          ),
-          'fee_level' => array(
+          ],
+          'fee_level' => [
             'title' => ts('Fee Level'),
             'default' => TRUE,
-          ),
-          'fee_amount' => array(
+          ],
+          'fee_amount' => [
             'title' => ts('Fee Amount'),
             'default' => TRUE,
-          ),
-        ),
-      ),
-      'civicrm_relationship' => array(
+          ],
+        ],
+      ],
+      'civicrm_relationship' => [
         'dao' => 'CRM_Contact_DAO_Relationship',
-        'fields' => array(
-          'relationship_id' => array(
+        'fields' => [
+          'relationship_id' => [
             'name' => 'id',
             'title' => ts('Relationship'),
             'no_repeat' => TRUE,
             'default' => TRUE,
-          ),
-          'relationship_type_id' => array(
+          ],
+          'relationship_type_id' => [
             'title' => ts('Relationship Type'),
             'default' => TRUE,
-          ),
-          'contact_id_b' => array(
+          ],
+          'contact_id_b' => [
             'title' => ts('Relationship With'),
             'default' => TRUE,
-          ),
-          'start_date' => array(
+          ],
+          'start_date' => [
             'title' => ts('Start Date'),
             'type' => CRM_Report_Form::OP_DATE,
-          ),
-          'end_date' => array(
+          ],
+          'end_date' => [
             'title' => ts('End Date'),
             'type' => CRM_Report_Form::OP_DATE,
-          ),
-        ),
-      ),
-      'civicrm_activity' => array(
+          ],
+        ],
+      ],
+      'civicrm_activity' => [
         'dao' => 'CRM_Activity_DAO_Activity',
-        'fields' => array(
-          'id' => array(
+        'fields' => [
+          'id' => [
             'title' => ts('Activity'),
             'no_repeat' => TRUE,
             'default' => TRUE,
-          ),
-          'activity_type_id' => array(
+          ],
+          'activity_type_id' => [
             'title' => ts('Activity Type'),
             'default' => TRUE,
-          ),
-          'subject' => array(
+          ],
+          'subject' => [
             'title' => ts('Subject'),
             'default' => TRUE,
-          ),
-          'activity_date_time' => array(
+          ],
+          'activity_date_time' => [
             'title' => ts('Activity Date'),
             'default' => TRUE,
-          ),
-          'activity_status_id' => array(
+          ],
+          'activity_status_id' => [
             'name' => 'status_id',
             'title' => ts('Activity Status'),
             'default' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'activity-fields',
-      ),
-      'civicrm_activity_target' => array(
+      ],
+      'civicrm_activity_target' => [
         'dao' => 'CRM_Activity_DAO_ActivityContact',
-        'fields' => array(
-          'target_contact_id' => array(
+        'fields' => [
+          'target_contact_id' => [
             'title' => ts('With Contact'),
             'name' => 'contact_id',
             'default' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'activity-fields',
-      ),
-      'civicrm_activity_assignment' => array(
+      ],
+      'civicrm_activity_assignment' => [
         'dao' => 'CRM_Activity_DAO_ActivityContact',
-        'fields' => array(
-          'assignee_contact_id' => array(
+        'fields' => [
+          'assignee_contact_id' => [
             'title' => ts('Assigned to'),
             'name' => 'contact_id',
             'default' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'activity-fields',
-      ),
-      'civicrm_activity_source' => array(
+      ],
+      'civicrm_activity_source' => [
         'dao' => 'CRM_Activity_DAO_ActivityContact',
-        'fields' => array(
-          'source_contact_id' => array(
+        'fields' => [
+          'source_contact_id' => [
             'title' => ts('Added By'),
             'name' => 'contact_id',
             'default' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'activity-fields',
-      ),
-      'civicrm_phone' => array(
+      ],
+      'civicrm_phone' => [
         'dao' => 'CRM_Core_DAO_Phone',
-        'fields' => array(
+        'fields' => [
           'phone' => NULL,
-          'phone_ext' => array(
+          'phone_ext' => [
             'title' => ts('Phone Extension'),
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-    );
+      ],
+    ];
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
@@ -375,15 +375,15 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   }
 
   public function select() {
-    $select = array();
-    $this->_columnHeaders = array();
-    $this->_component = array(
+    $select = [];
+    $this->_columnHeaders = [];
+    $this->_component = [
       'contribution_civireport',
       'membership_civireport',
       'participant_civireport',
       'relationship_civireport',
       'activity_civireport',
-    );
+    ];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
@@ -448,7 +448,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
    * @return array
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
     return $errors;
   }
 
@@ -537,7 +537,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   }
 
   public function where() {
-    $clauses = array();
+    $clauses = [];
 
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -585,7 +585,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   public function clauseComponent() {
     $selectedContacts = implode(',', $this->_contactSelected);
     $contribution = $membership = $participant = NULL;
-    $eligibleResult = $rows = $tempArray = array();
+    $eligibleResult = $rows = $tempArray = [];
     foreach ($this->_component as $val) {
       if (!empty($this->_selectComponent[$val]) &&
         ($val != 'activity_civireport' && $val != 'relationship_civireport')
@@ -599,7 +599,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           $countRecord = 0;
           $eligibleResult[$val] = $val;
           $CC = 'civicrm_' . substr_replace($val, '', -11, 11) . '_contact_id';
-          $row = array();
+          $row = [];
           foreach ($this->_columnHeadersComponent[$val] as $key => $value) {
             $countRecord++;
             $row[$key] = $dao->$key;
@@ -726,7 +726,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
    * @return array
    */
   public function statistics(&$rows) {
-    $statistics = array();
+    $statistics = [];
 
     $count = count($rows);
     if ($this->_rollup && ($this->_rollup != '')) {
@@ -764,7 +764,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
 
     $sql = $this->buildQuery(TRUE);
 
-    $rows = $graphRows = $this->_contactSelected = array();
+    $rows = $graphRows = $this->_contactSelected = [];
     $this->buildRows($sql, $rows);
     foreach ($rows as $key => $val) {
       $rows[$key]['contactID'] = $val['civicrm_contact_id'];
@@ -903,7 +903,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             }
             if ($val = CRM_Utils_Array::value('civicrm_participant_role_id', $row)) {
               $roles = explode(CRM_Core_DAO::VALUE_SEPARATOR, $val);
-              $value = array();
+              $value = [];
               foreach ($roles as $role) {
                 $value[$role] = CRM_Event_PseudoConstant::participantRole($role, FALSE);
               }

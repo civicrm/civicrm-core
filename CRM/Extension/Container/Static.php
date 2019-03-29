@@ -47,7 +47,7 @@ class CRM_Extension_Container_Static implements CRM_Extension_Container_Interfac
    * @inheritDoc
    */
   public function checkRequirements() {
-    return array();
+    return [];
   }
 
   /**

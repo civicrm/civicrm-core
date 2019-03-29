@@ -68,7 +68,7 @@ class CRM_Utils_Wrapper {
       $ignoreKey = !empty($arguments['ignoreKey']);
     }
     else {
-      $arguments = array();
+      $arguments = [];
       $mode = NULL;
       $addSequence = $ignoreKey = $imageUpload = $attachUpload = FALSE;
     }

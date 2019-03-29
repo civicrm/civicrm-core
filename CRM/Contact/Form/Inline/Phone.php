@@ -39,7 +39,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
   /**
    * Phones of the contact that is been viewed
    */
-  private $_phones = array();
+  private $_phones = [];
 
   /**
    * No of phone blocks for inline edit
@@ -88,7 +88,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
       CRM_Contact_Form_Edit_Phone::buildQuickForm($this, $blockId, TRUE);
     }
 
-    $this->addFormRule(array('CRM_Contact_Form_Inline_Phone', 'formRule'));
+    $this->addFormRule(['CRM_Contact_Form_Inline_Phone', 'formRule']);
   }
 
   /**
@@ -102,7 +102,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
    * @return array
    */
   public static function formRule($fields, $errors) {
-    $hasData = $hasPrimary = $errors = array();
+    $hasData = $hasPrimary = $errors = [];
     if (!empty($fields['phone']) && is_array($fields['phone'])) {
       $primaryID = NULL;
       foreach ($fields['phone'] as $instance => $blockValues) {
@@ -136,7 +136,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (!empty($this->_phones)) {
       foreach ($this->_phones as $id => $value) {
         $defaults['phone'][$id] = $value;

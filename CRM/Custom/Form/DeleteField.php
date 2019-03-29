@@ -61,13 +61,13 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
   public function preProcess() {
     $this->_id = $this->get('id');
 
-    $defaults = array();
-    $params = array('id' => $this->_id);
+    $defaults = [];
+    $params = ['id' => $this->_id];
     CRM_Core_BAO_CustomField::retrieve($params, $defaults);
 
     $this->_title = CRM_Utils_Array::value('label', $defaults);
     $this->assign('title', $this->_title);
-    CRM_Utils_System::setTitle(ts('Delete %1', array(1 => $this->_title)));
+    CRM_Utils_System::setTitle(ts('Delete %1', [1 => $this->_title]));
   }
 
   /**
@@ -77,17 +77,17 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
    */
   public function buildQuickForm() {
 
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Delete Custom Field'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
   }
 
@@ -104,7 +104,7 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
     CRM_Core_BAO_CustomField::deleteField($field);
 
     // also delete any profiles associted with this custom field
-    CRM_Core_Session::setStatus(ts('The custom field \'%1\' has been deleted.', array(1 => $field->label)), '', 'success');
+    CRM_Core_Session::setStatus(ts('The custom field \'%1\' has been deleted.', [1 => $field->label]), '', 'success');
 
   }
 

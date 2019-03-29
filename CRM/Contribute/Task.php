@@ -56,62 +56,62 @@ class CRM_Contribute_Task extends CRM_Core_Task {
    */
   public static function tasks() {
     if (!(self::$_tasks)) {
-      self::$_tasks = array(
-        self::TASK_DELETE => array(
+      self::$_tasks = [
+        self::TASK_DELETE => [
           'title' => ts('Delete contributions'),
           'class' => 'CRM_Contribute_Form_Task_Delete',
           'result' => FALSE,
-        ),
-        self::TASK_PRINT => array(
+        ],
+        self::TASK_PRINT => [
           'title' => ts('Print selected rows'),
           'class' => 'CRM_Contribute_Form_Task_Print',
           'result' => FALSE,
-        ),
-        self::TASK_EXPORT => array(
+        ],
+        self::TASK_EXPORT => [
           'title' => ts('Export contributions'),
-          'class' => array(
+          'class' => [
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
-          ),
+          ],
           'result' => FALSE,
-        ),
-        self::BATCH_UPDATE => array(
+        ],
+        self::BATCH_UPDATE => [
           'title' => ts('Update multiple contributions'),
-          'class' => array(
+          'class' => [
             'CRM_Contribute_Form_Task_PickProfile',
             'CRM_Contribute_Form_Task_Batch',
-          ),
+          ],
           'result' => TRUE,
-        ),
-        self::TASK_EMAIL => array(
-          'title' => ts('Email - send now (to %1 or less)', array(
+        ],
+        self::TASK_EMAIL => [
+          'title' => ts('Email - send now (to %1 or less)', [
             1 => Civi::settings()
               ->get('simple_mail_limit'),
-          )),
+          ]),
           'class' => 'CRM_Contribute_Form_Task_Email',
           'result' => TRUE,
-        ),
-        self::UPDATE_STATUS => array(
+        ],
+        self::UPDATE_STATUS => [
           'title' => ts('Update pending contribution status'),
           'class' => 'CRM_Contribute_Form_Task_Status',
           'result' => TRUE,
-        ),
-        self::PDF_RECEIPT => array(
+        ],
+        self::PDF_RECEIPT => [
           'title' => ts('Receipts - print or email'),
           'class' => 'CRM_Contribute_Form_Task_PDF',
           'result' => FALSE,
-        ),
-        self::PDF_THANKYOU => array(
+        ],
+        self::PDF_THANKYOU => [
           'title' => ts('Thank-you letters - print or email'),
           'class' => 'CRM_Contribute_Form_Task_PDFLetter',
           'result' => FALSE,
-        ),
-        self::PDF_INVOICE => array(
+        ],
+        self::PDF_INVOICE => [
           'title' => ts('Invoices - print or email'),
           'class' => 'CRM_Contribute_Form_Task_Invoice',
           'result' => FALSE,
-        ),
-      );
+        ],
+      ];
 
       //CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete in CiviContribute')) {
@@ -147,7 +147,7 @@ class CRM_Contribute_Task extends CRM_Core_Task {
    * @return array
    *   set of tasks that are valid for the user
    */
-  public static function permissionedTaskTitles($permission, $params = array()) {
+  public static function permissionedTaskTitles($permission, $params = []) {
     if (!isset($params['softCreditFiltering'])) {
       $params['softCreditFiltering'] = FALSE;
     }
@@ -157,11 +157,11 @@ class CRM_Contribute_Task extends CRM_Core_Task {
       $tasks = self::taskTitles();
     }
     else {
-      $tasks = array(
+      $tasks = [
         self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
         self::TASK_EMAIL => self::$_tasks[self::TASK_EMAIL]['title'],
         self::PDF_RECEIPT => self::$_tasks[self::PDF_RECEIPT]['title'],
-      );
+      ];
 
       //CRM-4418,
       if (CRM_Core_Permission::check('delete in CiviContribute')) {

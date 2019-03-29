@@ -85,11 +85,11 @@ abstract class CRM_Core_Form_Task_PickProfile extends CRM_Core_Form_Task {
 
     // validations
     if (count($this->_entityIds) > $this->_maxEntities) {
-      CRM_Core_Session::setStatus(ts("The maximum number of %3 you can select for Update multiple %3 is %1. You have selected %2. Please select fewer %3 from your search results and try again.", array(
+      CRM_Core_Session::setStatus(ts("The maximum number of %3 you can select for Update multiple %3 is %1. You have selected %2. Please select fewer %3 from your search results and try again.", [
         1 => $this->_maxEntities,
         2 => count($this->_entityIds),
         3 => $this::$entityShortname . 's',
-      )), ts('Update multiple records error'), 'error');
+      ]), ts('Update multiple records error'), 'error');
       CRM_Utils_System::redirect($this->_userContext);
     }
   }
@@ -100,16 +100,16 @@ abstract class CRM_Core_Form_Task_PickProfile extends CRM_Core_Form_Task {
    * @return void
    */
   public function buildQuickForm() {
-    $types = array(ucfirst($this::$entityShortname));
+    $types = [ucfirst($this::$entityShortname)];
     $profiles = CRM_Core_BAO_UFGroup::getProfiles($types, TRUE);
 
     if (empty($profiles)) {
       CRM_Core_Session::setStatus(
         ts("You will need to create a Profile containing the %1 fields you want to edit before you can use Update multiple %2. Navigate to Administer > Customize Data and Screens > Profiles to configure a Profile. Consult the online Administrator documentation for more information.",
-          array(
+          [
             1 => $types[0],
             2 => $this::$entityShortname . 's',
-          )),
+          ]),
         ts('Update multiple records error'),
         'error'
       );
@@ -119,9 +119,9 @@ abstract class CRM_Core_Form_Task_PickProfile extends CRM_Core_Form_Task {
     $this->add('select',
       'uf_group_id',
       ts('Select Profile'),
-      array(
+      [
         '' => ts('- select profile -'),
-      ) + $profiles,
+      ] + $profiles,
       TRUE
     );
     $this->addDefaultButtons(ts('Continue'));
@@ -137,7 +137,7 @@ abstract class CRM_Core_Form_Task_PickProfile extends CRM_Core_Form_Task {
    * @return void
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_' . ucfirst($this::$entityShortname) . '_Form_Task_PickProfile', 'formRule'));
+    $this->addFormRule(['CRM_' . ucfirst($this::$entityShortname) . '_Form_Task_PickProfile', 'formRule']);
   }
 
   /**

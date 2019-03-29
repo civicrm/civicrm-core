@@ -81,21 +81,21 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
    *   Files are returned in deletable order (ie children before parents).
    */
   public function findOrphanedFiles() {
-    $orphans = array();
+    $orphans = [];
 
     foreach ($this->getRemovedFiles() as $file) {
       $path = Civi::paths()->getPath($file);
       if (empty($path) || strpos('[civicrm', $path) !== FALSE) {
-        Civi::log()->warning('Failed to resolve path of old file \"{file}\" ({path})', array(
+        Civi::log()->warning('Failed to resolve path of old file \"{file}\" ({path})', [
           'file' => $file,
           'path' => $path,
-        ));
+        ]);
       }
       if (file_exists($path)) {
-        $orphans[] = array(
+        $orphans[] = [
           'name' => $file,
           'path' => $path,
-        );
+        ];
       }
     }
 
@@ -120,16 +120,16 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
   public function checkOrphans() {
     $orphans = $this->findOrphanedFiles();
     if (empty($orphans)) {
-      return array();
+      return [];
     }
 
-    $messages = array();
+    $messages = [];
     $messages[] = new CRM_Utils_Check_Message(
       __FUNCTION__,
       ts('The local system includes old files which should not exist: "%1"',
-        array(
+        [
           1 => implode('", "', CRM_Utils_Array::collect('path', $orphans)),
-        )),
+        ]),
       ts('Old files'),
       \Psr\Log\LogLevel::WARNING,
       'fa-server'

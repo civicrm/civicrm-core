@@ -73,7 +73,7 @@ class CRM_Upgrade_Incremental_php_FiveSix extends CRM_Upgrade_Incremental_Base {
    * @param string $rev
    */
   public function upgrade_5_6_beta2($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('dev/core#107 - Add Activity\'s default assignee options', 'addActivityDefaultAssigneeOptions');
   }
 

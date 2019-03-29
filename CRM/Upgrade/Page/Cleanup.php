@@ -33,7 +33,7 @@ class CRM_Upgrade_Page_Cleanup extends CRM_Core_Page {
     $rows = CRM_Upgrade_Incremental_php_FourTwo::deleteInvalidPairs();
     $template = CRM_Core_Smarty::singleton();
 
-    $columnHeaders = array(
+    $columnHeaders = [
       "Contact ID",
       "ContributionID",
       "Contribution Status",
@@ -43,7 +43,7 @@ class CRM_Upgrade_Page_Cleanup extends CRM_Core_Page {
       "End Date",
       "Membership Status",
       "Action",
-    );
+    ];
     $template->assign('columnHeaders', $columnHeaders);
     $template->assign('rows', $rows);
 
@@ -51,10 +51,10 @@ class CRM_Upgrade_Page_Cleanup extends CRM_Core_Page {
     $template->assign('preMessage', $preMessage);
 
     $postMessage = ts('You can <a href="%1">click here</a> to try running the 4.2 upgrade script again. <a href="%2" target="_blank">(Review upgrade documentation)</a>',
-      array(
+      [
         1 => CRM_Utils_System::url('civicrm/upgrade', 'reset=1'),
         2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Installation+and+Upgrades',
-      ));
+      ]);
     $template->assign('postMessage', $postMessage);
 
     $content = $template->fetch('CRM/common/upgradeCleanup.tpl');

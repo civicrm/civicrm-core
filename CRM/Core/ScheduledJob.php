@@ -40,9 +40,9 @@ class CRM_Core_ScheduledJob {
 
   var $name = NULL;
 
-  var $apiParams = array();
+  var $apiParams = [];
 
-  var $remarks = array();
+  var $remarks = [];
 
   /**
    * @param array $params
@@ -60,7 +60,7 @@ class CRM_Core_ScheduledJob {
     // testing in the cron job setup. To permanenty require
     // hardcoded api version, it's enough to move below line
     // under following if block.
-    $this->apiParams = array('version' => $this->version);
+    $this->apiParams = ['version' => $this->version];
 
     if (!empty($this->parameters)) {
       $lines = explode("\n", $this->parameters);
@@ -91,9 +91,9 @@ class CRM_Core_ScheduledJob {
    */
   public function clearScheduledRunDate() {
     CRM_Core_DAO::executeQuery('UPDATE civicrm_job SET scheduled_run_date = NULL WHERE id = %1',
-      array(
-        '1' => array($this->id, 'Integer'),
-      ));
+      [
+        '1' => [$this->id, 'Integer'],
+      ]);
   }
 
   /**

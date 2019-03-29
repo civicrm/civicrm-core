@@ -108,7 +108,7 @@ SET    time_format = %1
 WHERE  time_format IS NOT NULL
 AND    time_format <> ''
 ";
-    $sqlParams = array(1 => array($newValue, 'String'));
+    $sqlParams = [1 => [$newValue, 'String']];
     CRM_Core_DAO::executeQuery($query, $sqlParams);
   }
 

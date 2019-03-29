@@ -62,36 +62,36 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::BROWSE => array(
+      self::$_links = [
+        CRM_Core_Action::BROWSE => [
           'name' => ts('Accounts'),
           'url' => 'civicrm/admin/financial/financialType/accounts',
           'qs' => 'reset=1&action=browse&aid=%%id%%',
           'title' => ts('Accounts'),
-        ),
-        CRM_Core_Action::UPDATE => array(
+        ],
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/financial/financialType',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Financial Type'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Financial Type'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Financial Type'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/financial/financialType',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Financial Type'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -107,17 +107,17 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
     // get all financial types sorted by weight
-    $financialType = array();
+    $financialType = [];
     $dao = new CRM_Financial_DAO_FinancialType();
     $dao->orderBy('name');
     $dao->find();
 
     while ($dao->fetch()) {
-      $financialType[$dao->id] = array();
+      $financialType[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $financialType[$dao->id]);
-      $defaults = $financialAccountId = array();
+      $defaults = $financialAccountId = [];
       $financialAccounts = CRM_Contribute_PseudoConstant::financialAccount();
-      $financialAccountIds = array();
+      $financialAccountIds = [];
 
       $params['entity_id'] = $dao->id;
       $params['entity_table'] = 'civicrm_financial_type';
@@ -153,7 +153,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
       }
 
       $financialType[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $dao->id),
+        ['id' => $dao->id],
         ts('more'),
         FALSE,
         'financialType.manage.action',

@@ -100,7 +100,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $getTaxDetails = FALSE;
     $taxAmount = 0;
 
-    $lineItemForTemplate = array();
+    $lineItemForTemplate = [];
     if (!empty($this->_lineItem) && is_array($this->_lineItem)) {
       foreach ($this->_lineItem as $key => $value) {
         if (!empty($value) && $value != 'skip') {
@@ -146,8 +146,8 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     if (CRM_Utils_Array::value('defaultRole', $this->_params[0]) == 1) {
       $this->assign('defaultRole', TRUE);
     }
-    $defaults = array();
-    $fields = array();
+    $defaults = [];
+    $fields = [];
     if (!empty($this->_fields)) {
       foreach ($this->_fields as $name => $dontCare) {
         $fields[$name] = 1;
@@ -177,7 +177,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
 
     $params['entity_id'] = $this->_eventId;
     $params['entity_table'] = 'civicrm_event';
-    $data = array();
+    $data = [];
     CRM_Friend_BAO_Friend::retrieve($params, $data);
     if (!empty($data['is_active'])) {
       $friendText = $data['title'];

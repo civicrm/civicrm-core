@@ -55,7 +55,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    * @return object
    *   $mailingab      The new mailingab object
    */
-  public static function create(&$params, $ids = array()) {
+  public static function create(&$params, $ids = []) {
     $transaction = new CRM_Core_Transaction();
 
     $mailingab = self::add($params, $ids);
@@ -79,7 +79,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
    *
    * @return object
    */
-  public static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = []) {
     $id = CRM_Utils_Array::value('mailingab_id', $ids, CRM_Utils_Array::value('id', $params));
 
     if ($id) {
@@ -126,7 +126,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
       $dao = new CRM_Mailing_DAO_MailingAB();
       $dao->id = $id;
       if ($dao->find(TRUE)) {
-        $mailing_ids = array($dao->mailing_id_a, $dao->mailing_id_b, $dao->mailing_id_c);
+        $mailing_ids = [$dao->mailing_id_a, $dao->mailing_id_b, $dao->mailing_id_c];
         $dao->delete();
         foreach ($mailing_ids as $mailing_id) {
           if ($mailing_id) {
@@ -153,10 +153,10 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
     $totalCount = CRM_Mailing_BAO_Recipients::mailingSize($dao->mailing_id_a);
     $totalSelected = max(1, round(($totalCount * $dao->group_percentage) / 100));
 
-    CRM_Mailing_BAO_Recipients::reassign($dao->mailing_id_a, array(
+    CRM_Mailing_BAO_Recipients::reassign($dao->mailing_id_a, [
       $dao->mailing_id_b => (2 * $totalSelected <= $totalCount) ? $totalSelected : $totalCount - $totalSelected,
       $dao->mailing_id_c => max(0, $totalCount - $totalSelected - $totalSelected),
-    ));
+    ]);
 
   }
 
@@ -174,7 +174,7 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
       OR ab.mailing_id_b = %1
       OR ab.mailing_id_c = %1)
       GROUP BY ab.id";
-    $params = array(1 => array($mailingID, 'Integer'));
+    $params = [1 => [$mailingID, 'Integer']];
     $abTest = CRM_Core_DAO::executeQuery($query, $params);
     $abTest->fetch();
     return $abTest;

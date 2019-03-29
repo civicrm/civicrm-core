@@ -46,13 +46,13 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getInfo() {
-    return array(
+    return [
       'name' => 'CiviMail',
       'translatedName' => ts('CiviMail'),
       'title' => ts('CiviCRM Mailing Engine'),
       'search' => 1,
       'showActivitiesInCore' => 1,
-    );
+    ];
   }
 
   /**
@@ -69,21 +69,21 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       && !CRM_Core_Permission::check('schedule mailings')
       && !CRM_Core_Permission::check('approve mailings')
     ) {
-      return array();
+      return [];
     }
     global $civicrm_root;
 
-    $reportIds = array();
-    $reportTypes = array('detail', 'opened', 'bounce', 'clicks');
+    $reportIds = [];
+    $reportTypes = ['detail', 'opened', 'bounce', 'clicks'];
     foreach ($reportTypes as $report) {
-      $result = civicrm_api3('ReportInstance', 'get', array(
+      $result = civicrm_api3('ReportInstance', 'get', [
         'sequential' => 1,
-        'report_id' => 'mailing/' . $report));
+        'report_id' => 'mailing/' . $report]);
       if (!empty($result['values'])) {
         $reportIds[$report] = $result['values'][0]['id'];
       }
     }
-    $result = array();
+    $result = [];
     $result['crmMailing'] = include "$civicrm_root/ang/crmMailing.ang.php";
     $result['crmMailingAB'] = include "$civicrm_root/ang/crmMailingAB.ang.php";
     $result['crmD3'] = include "$civicrm_root/ang/crmD3.ang.php";
@@ -93,51 +93,51 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $contactID = $session->get('userID');
 
     // Generic params.
-    $params = array(
-      'options' => array('limit' => 0),
+    $params = [
+      'options' => ['limit' => 0],
       'sequential' => 1,
-    );
-    $groupNames = civicrm_api3('Group', 'get', $params + array(
+    ];
+    $groupNames = civicrm_api3('Group', 'get', $params + [
       'is_active' => 1,
       'check_permissions' => TRUE,
-      'return' => array('title', 'visibility', 'group_type', 'is_hidden'),
-    ));
-    $headerfooterList = civicrm_api3('MailingComponent', 'get', $params + array(
+      'return' => ['title', 'visibility', 'group_type', 'is_hidden'],
+    ]);
+    $headerfooterList = civicrm_api3('MailingComponent', 'get', $params + [
       'is_active' => 1,
-      'return' => array('name', 'component_type', 'is_default', 'body_html', 'body_text'),
-    ));
+      'return' => ['name', 'component_type', 'is_default', 'body_html', 'body_text'],
+    ]);
 
-    $emailAdd = civicrm_api3('Email', 'get', array(
+    $emailAdd = civicrm_api3('Email', 'get', [
       'sequential' => 1,
       'return' => "email",
       'contact_id' => $contactID,
-    ));
+    ]);
 
-    $mesTemplate = civicrm_api3('MessageTemplate', 'get', $params + array(
+    $mesTemplate = civicrm_api3('MessageTemplate', 'get', $params + [
       'sequential' => 1,
       'is_active' => 1,
-      'return' => array("id", "msg_title"),
-      'workflow_id' => array('IS NULL' => ""),
-    ));
-    $mailTokens = civicrm_api3('Mailing', 'gettokens', array(
-      'entity' => array('contact', 'mailing'),
+      'return' => ["id", "msg_title"],
+      'workflow_id' => ['IS NULL' => ""],
+    ]);
+    $mailTokens = civicrm_api3('Mailing', 'gettokens', [
+      'entity' => ['contact', 'mailing'],
       'sequential' => 1,
-    ));
-    $fromAddress = civicrm_api3('OptionValue', 'get', $params + array(
+    ]);
+    $fromAddress = civicrm_api3('OptionValue', 'get', $params + [
       'option_group_id' => "from_email_address",
       'domain_id' => CRM_Core_Config::domainID(),
-    ));
+    ]);
     $enabledLanguages = CRM_Core_I18n::languages(TRUE);
     $isMultiLingual = (count($enabledLanguages) > 1);
     // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
-    $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS, array()) : CRM_Utils_Token::getRequiredTokens();
+    $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS, []) : CRM_Utils_Token::getRequiredTokens();
     CRM_Core_Resources::singleton()
-      ->addSetting(array(
-        'crmMailing' => array(
+      ->addSetting([
+        'crmMailing' => [
           'templateTypes' => CRM_Mailing_BAO_Mailing::getTemplateTypes(),
-          'civiMails' => array(),
+          'civiMails' => [],
           'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
-          'groupNames' => array(),
+          'groupNames' => [],
           // @todo this is not used in core. Remove once Mosaico no longer depends on it.
           'testGroupNames' => $groupNames['values'],
           'headerfooterList' => $headerfooterList['values'],
@@ -149,18 +149,18 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
           'enableReplyTo' => (int) Civi::settings()->get('replyTo'),
           'disableMandatoryTokensCheck' => (int) Civi::settings()->get('disable_mandatory_tokens_check'),
           'fromAddress' => $fromAddress['values'],
-          'defaultTestEmail' => civicrm_api3('Contact', 'getvalue', array(
+          'defaultTestEmail' => civicrm_api3('Contact', 'getvalue', [
               'id' => 'user_contact_id',
               'return' => 'email',
-            )),
+            ]),
           'visibility' => CRM_Utils_Array::makeNonAssociative(CRM_Core_SelectValues::groupVisibility()),
           'workflowEnabled' => CRM_Mailing_Info::workflowEnabled(),
           'reportIds' => $reportIds,
           'enabledLanguages' => $enabledLanguages,
           'isMultiLingual' => $isMultiLingual,
-        ),
-      ))
-      ->addPermissions(array(
+        ],
+      ])
+      ->addPermissions([
         'view all contacts',
         'edit all contacts',
         'access CiviMail',
@@ -169,7 +169,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
         'approve mailings',
         'delete in CiviMail',
         'edit message templates',
-      ));
+      ]);
 
     return $result;
   }
@@ -207,33 +207,33 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
-    $permissions = array(
-      'access CiviMail' => array(
+    $permissions = [
+      'access CiviMail' => [
         ts('access CiviMail'),
-      ),
-      'access CiviMail subscribe/unsubscribe pages' => array(
+      ],
+      'access CiviMail subscribe/unsubscribe pages' => [
         ts('access CiviMail subscribe/unsubscribe pages'),
         ts('Subscribe/unsubscribe from mailing list group'),
-      ),
-      'delete in CiviMail' => array(
+      ],
+      'delete in CiviMail' => [
         ts('delete in CiviMail'),
         ts('Delete Mailing'),
-      ),
-      'view public CiviMail content' => array(
+      ],
+      'view public CiviMail content' => [
         ts('view public CiviMail content'),
-      ),
-    );
+      ],
+    ];
 
     if (self::workflowEnabled() || $getAllUnconditionally) {
-      $permissions['create mailings'] = array(
+      $permissions['create mailings'] = [
         ts('create mailings'),
-      );
-      $permissions['schedule mailings'] = array(
+      ];
+      $permissions['schedule mailings'] = [
         ts('schedule mailings'),
-      );
-      $permissions['approve mailings'] = array(
+      ];
+      $permissions['approve mailings'] = [
         ts('approve mailings'),
-      );
+      ];
     }
 
     if (!$descriptions) {
@@ -268,12 +268,12 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerTab() {
-    return array(
+    return [
       'title' => ts('Mailings'),
       'id' => 'mailing',
       'url' => 'mailing',
       'weight' => 45,
-    );
+    ];
   }
 
   /**
@@ -289,10 +289,10 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerAdvancedSearchPane() {
-    return array(
+    return [
       'title' => ts('Mailings'),
       'weight' => 20,
-    );
+    ];
   }
 
   /**

@@ -43,7 +43,7 @@ function smarty_function_crmAPI($params, &$smarty) {
     $smarty->trigger_error("assign: missing 'entity' parameter");
     return "crmAPI: missing 'entity' parameter";
   }
-  $errorScope = CRM_Core_TemporaryErrorScope::create(array('CRM_Utils_REST', 'fatal'));
+  $errorScope = CRM_Core_TemporaryErrorScope::create(['CRM_Utils_REST', 'fatal']);
   $entity = $params['entity'];
   $action = CRM_Utils_Array::value('action', $params, 'get');
   $params['sequential'] = CRM_Utils_Array::value('sequential', $params, 1);

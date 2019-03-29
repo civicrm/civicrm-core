@@ -57,7 +57,7 @@ class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact {
 
     $title = CRM_Contact_BAO_Contact::displayName($caseContact->contact_id) . ' - ' . $caseType;
 
-    $recentOther = array();
+    $recentOther = [];
     if (CRM_Core_Permission::checkActionPermission('CiviCase', CRM_Core_Action::DELETE)) {
       $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/case',
         "action=delete&reset=1&id={$caseContact->case_id}&cid={$caseContact->contact_id}&context=home"
@@ -81,12 +81,12 @@ class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact {
    * @inheritDoc
    */
   public function addSelectWhereClause() {
-    return array(
+    return [
       // Reuse case acls
       'case_id' => CRM_Utils_SQL::mergeSubquery('Case'),
       // Case acls already check for contact access so we can just mark contact_id as handled
-      'contact_id' => array(),
-    );
+      'contact_id' => [],
+    ];
     // Don't call hook selectWhereClause, the case query already did
   }
 

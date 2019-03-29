@@ -69,14 +69,14 @@ class CRM_Core_Resources_Strings {
   public function get($bucket, $file, $format) {
     $stringsByFile = $this->cache->get($bucket); // array($file => array(...strings...))
     if (!$stringsByFile) {
-      $stringsByFile = array();
+      $stringsByFile = [];
     }
     if (!isset($stringsByFile[$file])) {
       if ($file && is_readable($file)) {
         $stringsByFile[$file] = $this->extract($file, $format);
       }
       else {
-        $stringsByFile[$file] = array();
+        $stringsByFile[$file] = [];
       }
       $this->cache->set($bucket, $stringsByFile);
     }

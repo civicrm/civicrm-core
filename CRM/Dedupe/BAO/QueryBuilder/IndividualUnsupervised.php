@@ -36,20 +36,20 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised extends CRM_Dedupe_BAO_
    * @return array
    */
   public static function record($rg) {
-    $civicrm_email = CRM_Utils_Array::value('civicrm_email', $rg->params, array());
+    $civicrm_email = CRM_Utils_Array::value('civicrm_email', $rg->params, []);
 
-    $params = array(
-      1 => array(CRM_Utils_Array::value('email', $civicrm_email, ''), 'String'),
-    );
+    $params = [
+      1 => [CRM_Utils_Array::value('email', $civicrm_email, ''), 'String'],
+    ];
 
-    return array(
+    return [
       "civicrm_contact.{$rg->name}.{$rg->threshold}" => CRM_Core_DAO::composeQuery("
                 SELECT contact.id as id1, {$rg->threshold} as weight
                 FROM civicrm_contact as contact
                   JOIN civicrm_email as email ON email.contact_id=contact.id
                 WHERE contact_type = 'Individual'
                   AND email = %1", $params, TRUE),
-    );
+    ];
   }
 
   /**
@@ -68,7 +68,7 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised extends CRM_Dedupe_BAO_
                 email1.email=email2.email
             WHERE contact1.contact_type = 'Individual'
               AND " . self::internalFilters($rg);
-    return array("civicrm_contact.{$rg->name}.{$rg->threshold}" => $query);
+    return ["civicrm_contact.{$rg->name}.{$rg->threshold}" => $query];
   }
 
   /**
@@ -109,7 +109,7 @@ WHERE  contact1.contact_type='Individual'
 AND    contact2.contact_type='Individual'
 AND    " . self::internalFilters($rg);
 
-    return array("civicrm_contact.{$rg->name}.{$rg->threshold}" => $query);
+    return ["civicrm_contact.{$rg->name}.{$rg->threshold}" => $query];
   }
 
 }

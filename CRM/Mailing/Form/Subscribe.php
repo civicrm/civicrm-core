@@ -59,7 +59,7 @@ SELECT   title, description
       $dao = CRM_Core_DAO::executeQuery($query);
       if ($dao->fetch()) {
         $this->assign('groupName', $dao->title);
-        CRM_Utils_System::setTitle(ts('Subscribe to Mailing List - %1', array(1 => $dao->title)));
+        CRM_Utils_System::setTitle(ts('Subscribe to Mailing List - %1', [1 => $dao->title]));
       }
       else {
         CRM_Core_Error::statusBounce("The specified group is not configured for this action OR The group doesn't exist.");
@@ -101,9 +101,9 @@ SELECT   id, title, description
    AND   $groupTypeCondition
 ORDER BY title";
       $dao = CRM_Core_DAO::executeQuery($query);
-      $rows = array();
+      $rows = [];
       while ($dao->fetch()) {
-        $row = array();
+        $row = [];
         $row['id'] = $dao->id;
         $row['title'] = $dao->title;
         $row['description'] = $dao->description;
@@ -118,7 +118,7 @@ ORDER BY title";
         CRM_Core_Error::fatal(ts('There are no public mailing list groups to display.'));
       }
       $this->assign('rows', $rows);
-      $this->addFormRule(array('CRM_Mailing_Form_Subscribe', 'formRule'));
+      $this->addFormRule(['CRM_Mailing_Form_Subscribe', 'formRule']);
     }
 
     $addCaptcha = TRUE;
@@ -153,17 +153,17 @@ ORDER BY title";
       $this->assign('isCaptcha', TRUE);
     }
 
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Subscribe'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
   }
 
@@ -178,13 +178,13 @@ ORDER BY title";
         return TRUE;
       }
     }
-    return array('_qf_default' => 'Please select one or more mailing lists.');
+    return ['_qf_default' => 'Please select one or more mailing lists.'];
   }
 
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
-    $groups = array();
+    $groups = [];
     if ($this->_groupID) {
       $groups[] = $this->_groupID;
     }

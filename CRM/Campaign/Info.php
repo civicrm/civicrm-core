@@ -45,13 +45,13 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getInfo() {
-    return array(
+    return [
       'name' => 'CiviCampaign',
       'translatedName' => ts('CiviCampaign'),
       'title' => ts('CiviCRM Campaign Engine'),
       'search' => 1,
       'showActivitiesInCore' => 1,
-    );
+    ];
   }
 
 
@@ -64,35 +64,35 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
-    $permissions = array(
-      'administer CiviCampaign' => array(
+    $permissions = [
+      'administer CiviCampaign' => [
         ts('administer CiviCampaign'),
         ts('Create new campaign, survey and petition types and their status'),
-      ),
-      'manage campaign' => array(
+      ],
+      'manage campaign' => [
         ts('manage campaign'),
         ts('Create new campaigns, surveys and petitions, reserve respondents'),
-      ),
-      'reserve campaign contacts' => array(
+      ],
+      'reserve campaign contacts' => [
         ts('reserve campaign contacts'),
         ts('Reserve campaign contacts for surveys and petitions'),
-      ),
-      'release campaign contacts' => array(
+      ],
+      'release campaign contacts' => [
         ts('release campaign contacts'),
         ts('Release reserved campaign contacts for surveys and petitions'),
-      ),
-      'interview campaign contacts' => array(
+      ],
+      'interview campaign contacts' => [
         ts('interview campaign contacts'),
         ts('Record survey and petition responses from their reserved contacts'),
-      ),
-      'gotv campaign contacts' => array(
+      ],
+      'gotv campaign contacts' => [
         ts('GOTV campaign contacts'),
         ts('Record that contacts voted'),
-      ),
-      'sign CiviCRM Petition' => array(
+      ],
+      'sign CiviCRM Petition' => [
         ts('sign CiviCRM Petition'),
-      ),
-    );
+      ],
+    ];
 
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
@@ -162,20 +162,20 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
     if (CRM_Core_Permission::check('manage campaign') ||
       CRM_Core_Permission::check('administer CiviCampaign')
     ) {
-      $shortCuts = array_merge($shortCuts, array(
-        array(
+      $shortCuts = array_merge($shortCuts, [
+        [
           'path' => 'civicrm/campaign/add',
           'query' => "reset=1&action=add",
           'ref' => 'new-campaign',
           'title' => ts('Campaign'),
-        ),
-        array(
+        ],
+        [
           'path' => 'civicrm/survey/add',
           'query' => "reset=1&action=add",
           'ref' => 'new-survey',
           'title' => ts('Survey'),
-        ),
-      ));
+        ],
+      ]);
     }
   }
 

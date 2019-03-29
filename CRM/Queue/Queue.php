@@ -99,7 +99,7 @@ abstract class CRM_Queue_Queue {
    *   Queue-dependent options; for example, if this is a
    *   priority-queue, then $options might specify the item's priority.
    */
-  public abstract function createItem($data, $options = array());
+  public abstract function createItem($data, $options = []);
 
   /**
    * Determine number of items remaining in the queue.

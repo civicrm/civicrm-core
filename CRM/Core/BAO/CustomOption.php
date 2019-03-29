@@ -74,18 +74,18 @@ class CRM_Core_BAO_CustomOption {
     $fieldID,
     $inactiveNeeded = FALSE
   ) {
-    $options = array();
+    $options = [];
     if (!$fieldID) {
       return $options;
     }
 
-    $optionValues = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $fieldID, array(), $inactiveNeeded ? 'get' : 'create');
+    $optionValues = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $fieldID, [], $inactiveNeeded ? 'get' : 'create');
 
     foreach ((array) $optionValues as $value => $label) {
-      $options[] = array(
+      $options[] = [
         'label' => $label,
         'value' => $value,
-      );
+      ];
     }
 
     return $options;
@@ -103,7 +103,7 @@ class CRM_Core_BAO_CustomOption {
    *   -page= offset
    */
   static public function getOptionListSelector(&$params) {
-    $options = array();
+    $options = [];
 
     $field = CRM_Core_BAO_CustomField::getFieldObject($params['fid']);
     $defVal = CRM_Utils_Array::explodePadded($field->default_value);
@@ -115,7 +115,7 @@ class CRM_Core_BAO_CustomOption {
     if (!$field->option_group_id) {
       return $options;
     }
-    $queryParams = array(1 => array($field->option_group_id, 'Integer'));
+    $queryParams = [1 => [$field->option_group_id, 'Integer']];
     $total = "SELECT COUNT(*) FROM civicrm_option_value WHERE option_group_id = %1";
     $params['total'] = CRM_Core_DAO::singleValueQuery($total, $queryParams);
 
@@ -126,10 +126,10 @@ class CRM_Core_BAO_CustomOption {
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
     $links = CRM_Custom_Page_Option::actionLinks();
 
-    $fields = array('id', 'label', 'value');
+    $fields = ['id', 'label', 'value'];
     $config = CRM_Core_Config::singleton();
     while ($dao->fetch()) {
-      $options[$dao->id] = array();
+      $options[$dao->id] = [];
       foreach ($fields as $k) {
         $options[$dao->id][$k] = $dao->$k;
       }
@@ -176,11 +176,11 @@ class CRM_Core_BAO_CustomOption {
       $options[$dao->id]['is_active'] = empty($dao->is_active) ? ts('No') : ts('Yes');
       $options[$dao->id]['links'] = CRM_Core_Action::formLink($links,
           $action,
-          array(
+          [
             'id' => $dao->id,
             'fid' => $params['fid'],
             'gid' => $params['gid'],
-          ),
+          ],
           ts('more'),
           FALSE,
           'customOption.row.actions',
@@ -209,22 +209,22 @@ FROM   civicrm_option_value v,
 WHERE  v.id    = %1
 AND    g.id    = f.option_group_id
 AND    g.id    = v.option_group_id";
-    $params = array(1 => array($optionId, 'Integer'));
+    $params = [1 => [$optionId, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     if ($dao->fetch()) {
       if (in_array($dao->dataType,
-        array('Int', 'Float', 'Money', 'Boolean')
+        ['Int', 'Float', 'Money', 'Boolean']
       )) {
         $value = 0;
       }
       else {
         $value = '';
       }
-      $params = array(
+      $params = [
         'optionId' => $optionId,
         'fieldId' => $dao->id,
         'value' => $value,
-      );
+      ];
       // delete this value from the tables
       self::updateCustomValues($params);
 
@@ -233,7 +233,7 @@ AND    g.id    = v.option_group_id";
 DELETE
 FROM   civicrm_option_value
 WHERE  id = %1";
-      $params = array(1 => array($optionId, 'Integer'));
+      $params = [1 => [$optionId, 'Integer']];
       CRM_Core_DAO::executeQuery($query, $params);
     }
   }
@@ -259,7 +259,7 @@ FROM   civicrm_custom_group g,
        civicrm_custom_field f
 WHERE  f.custom_group_id = g.id
   AND  f.id = %1";
-    $queryParams = array(1 => array($params['fieldId'], 'Integer'));
+    $queryParams = [1 => [$params['fieldId'], 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
     if ($dao->fetch()) {
       if ($dao->dataType == 'Money') {
@@ -279,16 +279,16 @@ WHERE  id = %2";
           else {
             $dataType = $dao->dataType;
           }
-          $queryParams = array(
-            1 => array(
+          $queryParams = [
+            1 => [
               $params['value'],
               $dataType,
-            ),
-            2 => array(
+            ],
+            2 => [
               $params['optionId'],
               'Integer',
-            ),
-          );
+            ],
+          ];
           break;
 
         case 'Multi-Select':
@@ -298,10 +298,10 @@ WHERE  id = %2";
           $query = "
 UPDATE {$dao->tableName}
 SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
-          $queryParams = array(
-            1 => array($oldString, 'String'),
-            2 => array($newString, 'String'),
-          );
+          $queryParams = [
+            1 => [$oldString, 'String'],
+            2 => [$newString, 'String'],
+          ];
           break;
 
         default:
@@ -334,18 +334,18 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
       $customGroup->id = $customField->custom_group_id;
       $customGroup->find(TRUE);
       if (CRM_Core_BAO_CustomField::isSerialized($customField)) {
-        $params = array(
-          1 => array(CRM_Utils_Array::implodePadded($oldValue), 'String'),
-          2 => array(CRM_Utils_Array::implodePadded($newValue), 'String'),
-          3 => array('%' . CRM_Utils_Array::implodePadded($oldValue) . '%', 'String'),
-        );
+        $params = [
+          1 => [CRM_Utils_Array::implodePadded($oldValue), 'String'],
+          2 => [CRM_Utils_Array::implodePadded($newValue), 'String'],
+          3 => ['%' . CRM_Utils_Array::implodePadded($oldValue) . '%', 'String'],
+        ];
       }
       else {
-        $params = array(
-          1 => array($oldValue, 'String'),
-          2 => array($newValue, 'String'),
-          3 => array($oldValue, 'String'),
-        );
+        $params = [
+          1 => [$oldValue, 'String'],
+          2 => [$newValue, 'String'],
+          3 => [$oldValue, 'String'],
+        ];
       }
       $sql = "UPDATE `{$customGroup->table_name}` SET `{$customField->column_name}` = REPLACE(`{$customField->column_name}`, %1, %2) WHERE `{$customField->column_name}` LIKE %3";
       $customGroup->free();

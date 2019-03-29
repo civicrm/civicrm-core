@@ -11,11 +11,11 @@ class CRM_Event_Cart_Page_CheckoutAJAX {
 
     $cart = CRM_Event_Cart_BAO_Cart::find_by_id($cart_id);
 
-    $params_array = array(
+    $params_array = [
       'cart_id' => $cart->id,
       'contact_id' => CRM_Event_Cart_Form_Cart::find_or_create_contact(),
       'event_id' => $event_id,
-    );
+    ];
 
     //XXX security?
     $participant = CRM_Event_Cart_BAO_MerParticipant::create($params_array);

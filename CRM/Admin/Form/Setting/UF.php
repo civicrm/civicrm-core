@@ -36,7 +36,7 @@
  */
 class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
 
-  protected $_settings = array();
+  protected $_settings = [];
 
   protected $_uf = NULL;
 
@@ -53,7 +53,7 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
     }
 
     CRM_Utils_System::setTitle(
-      ts('Settings - %1 Integration', array(1 => $this->_uf))
+      ts('Settings - %1 Integration', [1 => $this->_uf])
     );
 
     if ($config->userSystem->is_drupal) {

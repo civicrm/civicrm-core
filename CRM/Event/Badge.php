@@ -46,13 +46,13 @@ class CRM_Event_Badge {
   /**
    */
   public function __construct() {
-    $this->style = array(
+    $this->style = [
       'width' => 0.1,
       'cap' => 'round',
       'join' => 'round',
       'dash' => '2,2',
-      'color' => array(0, 0, 200),
-    );
+      'color' => [0, 0, 200],
+    ];
     $this->format = '5160';
     $this->imgExtension = 'png';
     $this->imgRes = 300;
@@ -123,9 +123,9 @@ class CRM_Event_Badge {
     // CRM-13235 - leverage the Smarty path to get all templates directories
     $template = CRM_Core_Smarty::singleton();
     if (isset($template->template_dir) && $template->template_dir) {
-      $dirs = is_array($template->template_dir) ? $template->template_dir : array($template->template_dir);
+      $dirs = is_array($template->template_dir) ? $template->template_dir : [$template->template_dir];
       foreach ($dirs as $dir) {
-        foreach (array("$dir/$path/$eventID/$img", "$dir/$path/$img") as $imgFile) {
+        foreach (["$dir/$path/$eventID/$img", "$dir/$path/$img"] as $imgFile) {
           if (file_exists($imgFile)) {
             return $imgFile;
           }
@@ -147,15 +147,15 @@ class CRM_Event_Badge {
     $x = $this->pdf->GetAbsX();
     $y = $this->pdf->GetY();
     if ($this->debug) {
-      $this->pdf->Rect($x, $y, $this->pdf->width, $this->pdf->height, 'D', array(
-          'all' => array(
+      $this->pdf->Rect($x, $y, $this->pdf->width, $this->pdf->height, 'D', [
+          'all' => [
             'width' => 1,
             'cap' => 'round',
             'join' => 'round',
             'dash' => '2,10',
-            'color' => array(255, 0, 0),
-          ),
-        ));
+            'color' => [255, 0, 0],
+          ],
+        ]);
     }
     $img = $this->getImageFileName($this->event->id, $img);
     if ($img) {

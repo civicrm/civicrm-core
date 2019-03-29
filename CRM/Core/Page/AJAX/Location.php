@@ -63,8 +63,8 @@ class CRM_Core_Page_AJAX_Location {
       CRM_Utils_System::civiExit();
     }
 
-    $values = array();
-    $entityBlock = array('contact_id' => $cid);
+    $values = [];
+    $entityBlock = ['contact_id' => $cid];
     $location = CRM_Core_BAO_Location::getValues($entityBlock);
 
     $config = CRM_Core_Config::singleton();
@@ -79,30 +79,30 @@ class CRM_Core_Page_AJAX_Location {
       if (is_array($values) && !empty($values)) {
         $locType = $values[1]['location_type_id'];
         if ($fld == 'email') {
-          $elements["onbehalf_{$fld}-{$locType}"] = array(
+          $elements["onbehalf_{$fld}-{$locType}"] = [
             'type' => 'Text',
             'value' => $location[$fld][1][$fld],
-          );
+          ];
           unset($profileFields["{$fld}-{$locType}"]);
         }
         elseif ($fld == 'phone') {
           $phoneTypeId = $values[1]['phone_type_id'];
-          $elements["onbehalf_{$fld}-{$locType}-{$phoneTypeId}"] = array(
+          $elements["onbehalf_{$fld}-{$locType}-{$phoneTypeId}"] = [
             'type' => 'Text',
             'value' => $location[$fld][1][$fld],
-          );
+          ];
           unset($profileFields["{$fld}-{$locType}-{$phoneTypeId}"]);
         }
         elseif ($fld == 'im') {
           $providerId = $values[1]['provider_id'];
-          $elements["onbehalf_{$fld}-{$locType}"] = array(
+          $elements["onbehalf_{$fld}-{$locType}"] = [
             'type' => 'Text',
             'value' => $location[$fld][1][$fld],
-          );
-          $elements["onbehalf_{$fld}-{$locType}provider_id"] = array(
+          ];
+          $elements["onbehalf_{$fld}-{$locType}provider_id"] = [
             'type' => 'Select',
             'value' => $location[$fld][1]['provider_id'],
-          );
+          ];
           unset($profileFields["{$fld}-{$locType}-{$providerId}"]);
         }
       }
@@ -111,20 +111,20 @@ class CRM_Core_Page_AJAX_Location {
     if (!empty($website)) {
       foreach ($website as $key => $val) {
         $websiteTypeId = $values[1]['website_type_id'];
-        $elements["onbehalf_url-1"] = array(
+        $elements["onbehalf_url-1"] = [
           'type' => 'Text',
           'value' => $website[1]['url'],
-        );
-        $elements["onbehalf_url-1-website_type_id"] = array(
+        ];
+        $elements["onbehalf_url-1-website_type_id"] = [
           'type' => 'Select',
           'value' => $website[1]['website_type_id'],
-        );
+        ];
         unset($profileFields["url-1"]);
       }
     }
 
     $locTypeId = isset($location['address'][1]) ? $location['address'][1]['location_type_id'] : NULL;
-    $addressFields = array(
+    $addressFields = [
       'street_address',
       'supplemental_address_1',
       'supplemental_address_2',
@@ -134,27 +134,27 @@ class CRM_Core_Page_AJAX_Location {
       'county',
       'state_province',
       'country',
-    );
+    ];
 
     foreach ($addressFields as $field) {
       if (array_key_exists($field, $addressSequence)) {
         $addField = $field;
         $type = 'Text';
-        if (in_array($field, array('state_province', 'country', 'county'))) {
+        if (in_array($field, ['state_province', 'country', 'county'])) {
           $addField = "{$field}_id";
           $type = 'Select';
         }
-        $elements["onbehalf_{$field}-{$locTypeId}"] = array(
+        $elements["onbehalf_{$field}-{$locTypeId}"] = [
           'type' => $type,
           'value' => isset($location['address'][1]) ? CRM_Utils_Array::value($addField,
             $location['address'][1]) : NULL,
-        );
+        ];
         unset($profileFields["{$field}-{$locTypeId}"]);
       }
     }
 
     //set custom field defaults
-    $defaults = array();
+    $defaults = [];
     CRM_Core_BAO_UFGroup::setProfileDefaults($cid, $profileFields, $defaults, TRUE, NULL, NULL, TRUE);
 
     if (!empty($defaults)) {
@@ -210,32 +210,32 @@ class CRM_Core_Page_AJAX_Location {
     // i wish i could retrieve loc block info based on loc_block_id,
     // Anyway, lets retrieve an event which has loc_block_id set to 'lbid'.
     if ($_REQUEST['lbid']) {
-      $params = array('1' => array($_REQUEST['lbid'], 'Integer'));
+      $params = ['1' => [$_REQUEST['lbid'], 'Integer']];
       $eventId = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_event WHERE loc_block_id=%1 LIMIT 1', $params);
     }
     // now lets use the event-id obtained above, to retrieve loc block information.
     if ($eventId) {
-      $params = array('entity_id' => $eventId, 'entity_table' => 'civicrm_event');
+      $params = ['entity_id' => $eventId, 'entity_table' => 'civicrm_event'];
       // second parameter is of no use, but since required, lets use the same variable.
       $location = CRM_Core_BAO_Location::getValues($params, $params);
     }
 
-    $result = array();
+    $result = [];
     $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'address_options', TRUE, NULL, TRUE
     );
     // lets output only required fields.
     foreach ($addressOptions as $element => $isSet) {
-      if ($isSet && (!in_array($element, array(
+      if ($isSet && (!in_array($element, [
           'im',
           'openid',
-        )))
+        ]))
       ) {
-        if (in_array($element, array(
+        if (in_array($element, [
           'country',
           'state_province',
           'county',
-        ))) {
+        ])) {
           $element .= '_id';
         }
         elseif ($element == 'address_name') {
@@ -244,29 +244,29 @@ class CRM_Core_Page_AJAX_Location {
         $fld = "address[1][{$element}]";
         $value = CRM_Utils_Array::value($element, $location['address'][1]);
         $value = $value ? $value : "";
-        $result[str_replace(array(
+        $result[str_replace([
           '][',
           '[',
           "]",
-        ), array('_', '_', ''), $fld)] = $value;
+        ], ['_', '_', ''], $fld)] = $value;
       }
     }
 
-    foreach (array(
+    foreach ([
                'email',
                'phone_type_id',
                'phone',
-             ) as $element) {
+             ] as $element) {
       $block = ($element == 'phone_type_id') ? 'phone' : $element;
       for ($i = 1; $i < 3; $i++) {
         $fld = "{$block}[{$i}][{$element}]";
         $value = CRM_Utils_Array::value($element, $location[$block][$i]);
         $value = $value ? $value : "";
-        $result[str_replace(array(
+        $result[str_replace([
           '][',
           '[',
           "]",
-        ), array('_', '_', ''), $fld)] = $value;
+        ], ['_', '_', ''], $fld)] = $value;
       }
     }
 

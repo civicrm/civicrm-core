@@ -84,7 +84,7 @@ class CRM_Core_I18n {
    * - native gettext: we cache the value for textdomain()
    * - phpgettext: we cache the file streamer.
    */
-  private $_extensioncache = array();
+  private $_extensioncache = [];
 
   /**
    * @var string
@@ -192,15 +192,15 @@ class CRM_Core_I18n {
       $all = CRM_Contact_BAO_Contact::buildOptions('preferred_language');
 
       // get labels
-      $rows = array();
-      $labels = array();
-      CRM_Core_OptionValue::getValues(array('name' => 'languages'), $rows);
+      $rows = [];
+      $labels = [];
+      CRM_Core_OptionValue::getValues(['name' => 'languages'], $rows);
       foreach ($rows as $id => $row) {
         $labels[$row['name']] = $row['label'];
       }
 
       // check which ones are available; add them to $all if not there already
-      $codes = array();
+      $codes = [];
       if (is_dir(CRM_Core_I18n::getResourceDir()) && $dir = opendir(CRM_Core_I18n::getResourceDir())) {
         while ($filename = readdir($dir)) {
           if (preg_match('/^[a-z][a-z]_[A-Z][A-Z]$/', $filename)) {
@@ -228,7 +228,7 @@ class CRM_Core_I18n {
 
     if ($enabled === NULL) {
       $config = CRM_Core_Config::singleton();
-      $enabled = array();
+      $enabled = [];
       if (isset($config->languageLimit) and $config->languageLimit) {
         foreach ($all as $code => $name) {
           if (in_array($code, array_keys($config->languageLimit))) {
@@ -273,7 +273,7 @@ class CRM_Core_I18n {
    *   modified string
    */
   public function strarg($str) {
-    $tr = array();
+    $tr = [];
     $p = 0;
     for ($i = 1; $i < func_num_args(); $i++) {
       $arg = func_get_arg($i);
@@ -327,7 +327,7 @@ class CRM_Core_I18n {
    * @return string
    *   the translated string
    */
-  public function crm_translate($text, $params = array()) {
+  public function crm_translate($text, $params = []) {
     if (isset($params['escape'])) {
       $escape = $params['escape'];
       unset($params['escape']);
@@ -441,7 +441,7 @@ class CRM_Core_I18n {
         Civi::$statics[__CLASS__][$replacementsLocale] = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($replacementsLocale);
       }
       else {
-        Civi::$statics[__CLASS__][$replacementsLocale] = array();
+        Civi::$statics[__CLASS__][$replacementsLocale] = [];
       }
     }
     $stringTable = Civi::$statics[__CLASS__][$replacementsLocale];
@@ -483,7 +483,7 @@ class CRM_Core_I18n {
         }
 
         // expand %count in translated string to $count
-        $text = strtr($text, array('%count' => $count));
+        $text = strtr($text, ['%count' => $count]);
 
         // if not plural, but the locale's set, translate
       }
@@ -527,7 +527,7 @@ class CRM_Core_I18n {
    */
   public function localizeArray(
     &$array,
-    $params = array()
+    $params = []
   ) {
     $tsLocale = CRM_Core_I18n::getLocale();
 
@@ -555,7 +555,7 @@ class CRM_Core_I18n {
         $array[$key] = $value;
       }
       elseif ((string ) $key == 'title') {
-        $array[$key] = ts($value, array('context' => 'menu'));
+        $array[$key] = ts($value, ['context' => 'menu']);
       }
     }
   }
@@ -686,7 +686,7 @@ class CRM_Core_I18n {
    */
   public static function &singleton() {
     if (!isset(Civi::$statics[__CLASS__]['singleton'])) {
-      Civi::$statics[__CLASS__]['singleton'] = array();
+      Civi::$statics[__CLASS__]['singleton'] = [];
     }
     $tsLocale = CRM_Core_I18n::getLocale();
     if (!isset(Civi::$statics[__CLASS__]['singleton'][$tsLocale])) {
@@ -703,7 +703,7 @@ class CRM_Core_I18n {
    *   the final LC_TIME that got set
    */
   public static function setLcTime() {
-    static $locales = array();
+    static $locales = [];
 
     $tsLocale = CRM_Core_I18n::getLocale();
     if (!isset($locales[$tsLocale])) {
@@ -730,10 +730,10 @@ class CRM_Core_I18n {
       return NULL;
     }
     if (empty($language) || $language === '*default*') {
-      $language = civicrm_api3('setting', 'getvalue', array(
+      $language = civicrm_api3('setting', 'getvalue', [
         'name' => 'lcMessages',
         'group' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
-      ));
+      ]);
     }
     elseif ($language == 'current_site_language') {
       return CRM_Core_I18n::getLocale();
@@ -765,7 +765,7 @@ class CRM_Core_I18n {
  * @return string
  *   the translated string
  */
-function ts($text, $params = array()) {
+function ts($text, $params = []) {
   static $areSettingsAvailable = FALSE;
   static $lastLocale = NULL;
   static $i18n = NULL;

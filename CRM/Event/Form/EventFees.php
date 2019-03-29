@@ -71,12 +71,12 @@ class CRM_Event_Form_EventFees {
    * @return array
    */
   public static function setDefaultValues(&$form) {
-    $defaults = array();
+    $defaults = [];
 
     if ($form->_eventId) {
       //get receipt text and financial type
-      $returnProperities = array('confirm_email_text', 'financial_type_id', 'campaign_id', 'start_date');
-      $details = array();
+      $returnProperities = ['confirm_email_text', 'financial_type_id', 'campaign_id', 'start_date'];
+      $details = [];
       CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $form->_eventId, $details, $returnProperities);
       if (!empty($details[$form->_eventId]['financial_type_id'])) {
         $defaults[$form->_pId]['financial_type_id'] = $details[$form->_eventId]['financial_type_id'];
@@ -84,12 +84,12 @@ class CRM_Event_Form_EventFees {
     }
 
     if ($form->_pId) {
-      $ids = array();
-      $params = array('id' => $form->_pId);
+      $ids = [];
+      $params = ['id' => $form->_pId];
 
       CRM_Event_BAO_Participant::getValues($params, $defaults, $ids);
       if ($form->_action == CRM_Core_Action::UPDATE) {
-        $discounts = array();
+        $discounts = [];
         if (!empty($form->_values['discount'])) {
           foreach ($form->_values['discount'] as $key => $value) {
             $value = current($value);
@@ -173,11 +173,11 @@ class CRM_Event_Form_EventFees {
     if ($priceSetId) {
       // get price set default values, CRM-4090
       if (in_array(get_class($form),
-        array(
+        [
           'CRM_Event_Form_Participant',
           'CRM_Event_Form_Registration_Register',
           'CRM_Event_Form_Registration_AdditionalParticipant',
-        )
+        ]
       )) {
         $priceSetValues = self::setDefaultPriceSet($form->_pId, $form->_eventId);
         if (!empty($priceSetValues)) {
@@ -224,13 +224,13 @@ class CRM_Event_Form_EventFees {
       $contribution = new CRM_Contribute_DAO_Contribution();
       $contribution->id = $contriId;
       $contribution->find(TRUE);
-      foreach (array(
+      foreach ([
                  'financial_type_id',
                  'payment_instrument_id',
                  'contribution_status_id',
                  'receive_date',
                  'total_amount',
-               ) as $f) {
+               ] as $f) {
         $defaults[$form->_pId][$f] = $contribution->$f;
       }
     }
@@ -247,7 +247,7 @@ class CRM_Event_Form_EventFees {
    * @return array
    */
   public static function setDefaultPriceSet($participantID, $eventID = NULL, $includeQtyZero = TRUE) {
-    $defaults = array();
+    $defaults = [];
     if (!$eventID && $participantID) {
       $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantID, 'event_id');
     }
@@ -268,7 +268,7 @@ class CRM_Event_Form_EventFees {
       !CRM_Utils_System::isNull($lineItems[$participantID])
     ) {
 
-      $priceFields = $htmlTypes = $optionValues = array();
+      $priceFields = $htmlTypes = $optionValues = [];
       foreach ($lineItems[$participantID] as $lineId => $items) {
         $priceFieldId = CRM_Utils_Array::value('price_field_id', $items);
         $priceOptionId = CRM_Utils_Array::value('price_field_value_id', $items);
@@ -338,7 +338,7 @@ SELECT  id, html_type
       // make sure this is for backoffice registration.
       if ($form->getName() == 'Participant') {
         $eventfullMsg = CRM_Event_BAO_Participant::eventFullMessage($form->_eventId, $form->_pId);
-        $form->addElement('hidden', 'hidden_eventFullMsg', $eventfullMsg, array('id' => 'hidden_eventFullMsg'));
+        $form->addElement('hidden', 'hidden_eventFullMsg', $eventfullMsg, ['id' => 'hidden_eventFullMsg']);
       }
     }
 
@@ -352,14 +352,14 @@ SELECT  id, html_type
     }
 
     if ($form->_isPaidEvent) {
-      $params = array('id' => $form->_eventId);
+      $params = ['id' => $form->_eventId];
       CRM_Event_BAO_Event::retrieve($params, $event);
 
       //retrieve custom information
-      $form->_values = array();
+      $form->_values = [];
       CRM_Event_Form_Registration::initEventFee($form, $event['id']);
       CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->_discountId);
-      $lineItem = array();
+      $lineItem = [];
       $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
       $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       $totalTaxAmount = 0;
@@ -373,7 +373,7 @@ SELECT  id, html_type
         $form->assign('totalTaxAmount', $totalTaxAmount);
       }
       $form->assign('lineItem', empty($lineItem) ? FALSE : $lineItem);
-      $discounts = array();
+      $discounts = [];
       if (!empty($form->_values['discount'])) {
         foreach ($form->_values['discount'] as $key => $value) {
           $value = current($value);
@@ -382,11 +382,11 @@ SELECT  id, html_type
 
         $element = $form->add('select', 'discount_id',
           ts('Discount Set'),
-          array(
+          [
             0 => ts('- select -'),
-          ) + $discounts,
+          ] + $discounts,
           FALSE,
-          array('class' => "crm-select2")
+          ['class' => "crm-select2"]
         );
 
         if ($form->_online) {
@@ -404,7 +404,7 @@ SELECT  id, html_type
       CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, FALSE, TRUE, self::getDefaultPaymentInstrumentId());
       if (!$form->_mode) {
         $form->addElement('checkbox', 'record_contribution', ts('Record Payment?'), NULL,
-          array('onclick' => "return showHideByValue('record_contribution','','payment_information','table-row','radio',false);")
+          ['onclick' => "return showHideByValue('record_contribution','','payment_information','table-row','radio',false);"]
         );
         // Check permissions for financial type first
         if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
@@ -416,15 +416,15 @@ SELECT  id, html_type
 
         $form->add('select', 'financial_type_id',
           ts('Financial Type'),
-          array('' => ts('- select -')) + $financialTypes
+          ['' => ts('- select -')] + $financialTypes
         );
 
-        $form->add('datepicker', 'receive_date', ts('Received'), array(), FALSE, array('time' => TRUE));
+        $form->add('datepicker', 'receive_date', ts('Received'), [], FALSE, ['time' => TRUE]);
 
         $form->add('select', 'payment_instrument_id',
           ts('Payment Method'),
-          array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
-          FALSE, array('onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);")
+          ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::paymentInstrument(),
+          FALSE, ['onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);"]
         );
         // don't show transaction id in batch update mode
         $path = CRM_Utils_System::currentPath();
@@ -432,7 +432,7 @@ SELECT  id, html_type
         if ($path != 'civicrm/contact/search/basic') {
           $form->add('text', 'trxn_id', ts('Transaction ID'));
           $form->addRule('trxn_id', ts('Transaction ID already exists in Database.'),
-            'objectExists', array('CRM_Contribute_DAO_Contribution', $form->_eventId, 'trxn_id')
+            'objectExists', ['CRM_Contribute_DAO_Contribution', $form->_eventId, 'trxn_id']
           );
           $form->assign('showTransactionId', TRUE);
         }
@@ -460,7 +460,7 @@ SELECT  id, html_type
     $form->addElement('checkbox',
       'send_receipt',
       ts('Send Confirmation?'), NULL,
-      array('onclick' => "showHideByValue('send_receipt','','notice','table-row','radio',false); showHideByValue('send_receipt','','from-email','table-row','radio',false);")
+      ['onclick' => "showHideByValue('send_receipt','','notice','table-row','radio',false); showHideByValue('send_receipt','','from-email','table-row','radio',false);"]
     );
 
     $form->add('select', 'from_email_address', ts('Receipt From'), $form->_fromEmails['from_email_id']);

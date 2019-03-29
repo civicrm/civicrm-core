@@ -67,7 +67,7 @@ class CRM_Core_QuickForm_NestedAdvMultiSelect extends HTML_QuickForm_advmultisel
   ) {
     switch (TRUE) {
       case ($options instanceof Iterator):
-        $arr = array();
+        $arr = [];
         foreach ($options as $key => $val) {
           $arr[$key] = $val;
         }

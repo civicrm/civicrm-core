@@ -143,7 +143,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     $returnProperties = $this->_mailing->getReturnProperties();
     if (isset($this->_contactID)) {
       // get details of contact with token value including Custom Field Token Values.CRM-3734
-      $params = array('contact_id' => $this->_contactID);
+      $params = ['contact_id' => $this->_contactID];
       $details = CRM_Utils_Token::getTokenDetails($params,
         $returnProperties,
         FALSE, TRUE, NULL,
@@ -155,7 +155,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     }
     else {
       // get tokens that are not contact specific resolved
-      $params = array('contact_id' => 0);
+      $params = ['contact_id' => 0];
       $details = CRM_Utils_Token::getAnonymousTokenDetails($params,
         $returnProperties,
         TRUE, TRUE, NULL,

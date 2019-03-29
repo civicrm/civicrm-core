@@ -59,7 +59,7 @@ class CRM_Utils_SQL_Insert {
    */
   public static function dao(CRM_Core_DAO $dao) {
     $table = CRM_Core_DAO::getLocaleTableName($dao->getTableName());
-    $row = array();
+    $row = [];
     foreach ((array) $dao as $key => $value) {
       if ($value === 'null') {
         $value = NULL; // Blerg!!!
@@ -80,7 +80,7 @@ class CRM_Utils_SQL_Insert {
    */
   public function __construct($table) {
     $this->table = $table;
-    $this->rows = array();
+    $this->rows = [];
   }
 
   /**
@@ -128,11 +128,11 @@ class CRM_Utils_SQL_Insert {
       sort($columns);
       $this->columns = $columns;
     }
-    elseif (array_diff($this->columns, $columns) !== array()) {
+    elseif (array_diff($this->columns, $columns) !== []) {
       throw new CRM_Core_Exception("Inconsistent column names");
     }
 
-    $escapedRow = array();
+    $escapedRow = [];
     foreach ($this->columns as $column) {
       $escapedRow[$column] = $this->escapeString($row[$column]);
     }

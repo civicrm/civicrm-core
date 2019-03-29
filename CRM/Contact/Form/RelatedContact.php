@@ -80,7 +80,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
       $contact = new CRM_Contact_DAO_Contact();
       $contact->id = $this->_contactId;
       if (!$contact->find(TRUE)) {
-        CRM_Core_Error::statusBounce(ts('contact does not exist: %1', array(1 => $this->_contactId)));
+        CRM_Core_Error::statusBounce(ts('contact does not exist: %1', [1 => $this->_contactId]));
       }
       $this->_contactType = $contact->contact_type;
 
@@ -111,7 +111,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $params = array();
+    $params = [];
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $contact = CRM_Contact_BAO_Contact::retrieve($params, $this->_defaults);
 
@@ -132,17 +132,17 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
       ts('Contact Information')
     );
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'next',
         'name' => ts('Save'),
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    ));
+      ],
+    ]);
   }
 
   /**
@@ -153,11 +153,11 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
 
     $locType = CRM_Core_BAO_LocationType::getDefault();
-    foreach (array(
+    foreach ([
                'phone',
                'email',
                'address',
-             ) as $locFld) {
+             ] as $locFld) {
       if (!empty($this->_defaults[$locFld]) && $this->_defaults[$locFld][1]['location_type_id']) {
         $params[$locFld][1]['is_primary'] = $this->_defaults[$locFld][1]['is_primary'];
         $params[$locFld][1]['location_type_id'] = $this->_defaults[$locFld][1]['location_type_id'];
@@ -179,10 +179,10 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
 
     // set status message.
     if ($this->_contactId) {
-      $message = ts('%1 has been updated.', array(1 => $contact->display_name));
+      $message = ts('%1 has been updated.', [1 => $contact->display_name]);
     }
     else {
-      $message = ts('%1 has been created.', array(1 => $contact->display_name));
+      $message = ts('%1 has been created.', [1 => $contact->display_name]);
     }
     CRM_Core_Session::setStatus($message, ts('Contact Saved'), 'success');
   }

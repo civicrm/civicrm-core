@@ -45,19 +45,19 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
    */
   public function __construct() {
 
-    $this->_columns = array(
-      'civicrm_event' => array(
+    $this->_columns = [
+      'civicrm_event' => [
         'dao' => 'CRM_Event_DAO_Event',
-        'filters' => array(
-          'id' => array(
+        'filters' => [
+          'id' => [
             'title' => ts('Event'),
             'operatorType' => CRM_Report_Form::OP_ENTITYREF,
             'type' => CRM_Utils_Type::T_INT,
-            'attributes' => array('select' => array('minimumInputLength' => 0)),
-          ),
-        ),
-      ),
-    );
+            'attributes' => ['select' => ['minimumInputLength' => 0]],
+          ],
+        ],
+      ],
+    ];
 
     parent::__construct();
   }
@@ -82,7 +82,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
     $participantRole = CRM_Event_PseudoConstant::participantRole();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
-    $rows = $eventSummary = $roleRows = $statusRows = $instrumentRows = $count = array();
+    $rows = $eventSummary = $roleRows = $statusRows = $instrumentRows = $count = [];
 
     $optionGroupDAO = new CRM_Core_DAO_OptionGroup();
     $optionGroupDAO->name = 'event_type';
@@ -91,7 +91,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
       $optionGroupId = $optionGroupDAO->id;
     }
     //show the income of active participant status (Counted = filter = 1)
-    $activeParticipantStatusIDArray = $activeParticipantStatusLabelArray = array();
+    $activeParticipantStatusIDArray = $activeParticipantStatusLabelArray = [];
     foreach ($participantStatus as $id => $label) {
       $activeParticipantStatusIDArray[] = $id;
       $activeParticipantStatusLabelArray[] = $label;
@@ -99,7 +99,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
     $activeParticipantStatus = implode(',', $activeParticipantStatusIDArray);
     $activeparticipnatStutusLabel = implode(', ', $activeParticipantStatusLabelArray);
     $activeParticipantClause = " AND civicrm_participant.status_id IN ( $activeParticipantStatus ) ";
-    $select = array(
+    $select = [
       "civicrm_event.id as event_id",
       "civicrm_event.title as event_title",
       "civicrm_event.max_participants as max_participants",
@@ -107,7 +107,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
       "civicrm_event.end_date as end_date",
       "civicrm_option_value.label as event_type",
       "civicrm_participant.fee_currency as currency",
-    );
+    ];
 
     $groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($select, 'civicrm_event.id');
     $sql = "
@@ -125,7 +125,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
             WHERE      civicrm_event.id IN( {$eventID}) {$groupBy}";
 
     $eventDAO = $this->executeReportQuery($sql);
-    $currency = array();
+    $currency = [];
     while ($eventDAO->fetch()) {
       $eventSummary[$eventDAO->event_id][ts('Title')] = $eventDAO->event_title;
       $eventSummary[$eventDAO->event_id][ts('Max Participants')] = $eventDAO->max_participants;
@@ -269,7 +269,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
    * @return array
    */
   public function statistics(&$eventIDs) {
-    $statistics = array();
+    $statistics = [];
     $count = count($eventIDs);
     $this->countStat($statistics, $count);
     if ($this->_setVariable) {
@@ -300,14 +300,14 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
    * @param int $rowCount
    */
   public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
-    $params = array(
+    $params = [
       'total' => $this->_rowsFound,
       'rowCount' => self::ROW_COUNT_LIMIT,
       'status' => ts('Records %%StatusMessage%%'),
       'buttonBottom' => 'PagerBottomButton',
       'buttonTop' => 'PagerTopButton',
       'pageID' => $this->get(CRM_Utils_Pager::PAGE_ID),
-    );
+    ];
 
     $pager = new CRM_Utils_Pager($params);
     $this->assign_by_ref('pager', $pager);
@@ -324,7 +324,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
 
     $noSelection = FALSE;
     if (empty($this->_params['id_value'])) {
-      $this->_params['id_value'] = array();
+      $this->_params['id_value'] = [];
       $this->_setVariable = FALSE;
 
       $events = CRM_Event_PseudoConstant::event(NULL, NULL,
@@ -349,7 +349,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
       $this->limit();
       $this->setPager();
 
-      $showEvents = array();
+      $showEvents = [];
       $count = 0;
       $numRows = $this->_limit;
 

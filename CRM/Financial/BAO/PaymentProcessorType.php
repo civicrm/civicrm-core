@@ -89,8 +89,8 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    */
   public static function &getDefault() {
     if (self::$_defaultPaymentProcessorType == NULL) {
-      $params = array('is_default' => 1);
-      $defaults = array();
+      $params = ['is_default' => 1];
+      $defaults = [];
       self::$_defaultPaymentProcessorType = self::retrieve($params, $defaults);
     }
     return self::$_defaultPaymentProcessorType;
@@ -178,7 +178,7 @@ SELECT pp.id processor_id
 FROM civicrm_payment_processor pp, civicrm_payment_processor_type ppt
 WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
 
-    $params = array(1 => array($paymentProcessorTypeId, 'Integer'));
+    $params = [1 => [$paymentProcessorTypeId, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     if ($dao->fetch()) {
@@ -200,7 +200,7 @@ WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
    * @return array
    */
   static private function getAllPaymentProcessorTypes($attr) {
-    $ppt = array();
+    $ppt = [];
     $dao = new CRM_Financial_DAO_PaymentProcessorType();
     $dao->find();
     while ($dao->fetch()) {

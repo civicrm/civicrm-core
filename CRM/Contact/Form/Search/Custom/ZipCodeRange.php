@@ -41,7 +41,7 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
   public function __construct(&$formValues) {
     parent::__construct($formValues);
 
-    $this->_columns = array(
+    $this->_columns = [
       // If possible, don't use aliases for the columns you select.
       // You can prefix columns with table aliases, if needed.
       //
@@ -53,7 +53,7 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
       ts('Name') => 'sort_name',
       ts('Email') => 'email',
       ts('Zip') => 'postal_code',
-    );
+    ];
   }
 
   /**
@@ -81,14 +81,14 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
      * if you are using the standard template, this array tells the template what elements
      * are part of the search criteria
      */
-    $form->assign('elements', array('postal_code_low', 'postal_code_high'));
+    $form->assign('elements', ['postal_code_low', 'postal_code_high']);
   }
 
   /**
    * @return array
    */
   public function summary() {
-    $summary = array();
+    $summary = [];
     return $summary;
   }
 
@@ -161,7 +161,7 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    $params = array();
+    $params = [];
 
     $low = CRM_Utils_Array::value('postal_code_low',
       $this->_formValues
@@ -179,10 +179,10 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
     }
 
     $where = "ROUND(address.postal_code) >= %1 AND ROUND(address.postal_code) <= %2";
-    $params = array(
-      1 => array(trim($low), 'Integer'),
-      2 => array(trim($high), 'Integer'),
-    );
+    $params = [
+      1 => [trim($low), 'Integer'],
+      2 => [trim($high), 'Integer'],
+    ];
 
     if ($this->_aclWhere) {
       $where .= " AND {$this->_aclWhere} ";

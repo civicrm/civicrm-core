@@ -86,8 +86,8 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
 
     $recurStatus = CRM_Contribute_PseudoConstant::contributionStatus();
 
-    $recurRow = array();
-    $recurIDs = array();
+    $recurRow = [];
+    $recurIDs = [];
     while ($recur->fetch()) {
       if (empty($recur->payment_processor_id)) {
         // it's not clear why we continue here as any without a processor id would likely
@@ -112,11 +112,11 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       }
 
       $recurRow[$values['id']]['action'] = CRM_Core_Action::formLink(CRM_Contribute_Page_Tab::recurLinks($recur->id, 'dashboard'),
-        $action, array(
+        $action, [
           'cid' => $this->_contactId,
           'crid' => $values['id'],
           'cxt' => 'contribution',
-        ),
+        ],
         ts('more'),
         FALSE,
         'contribution.dashboard.recurring',

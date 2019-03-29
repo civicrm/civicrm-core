@@ -28,9 +28,9 @@ SELECT sub_event.* FROM civicrm_participant main_participant
       slot.weight,
       sub_event.start_date
 EOS;
-    $sql_args = array(1 => array($main_event_participant_id, 'Integer'));
+    $sql_args = [1 => [$main_event_participant_id, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($sql, $sql_args);
-    $smarty_sessions = array();
+    $smarty_sessions = [];
     while ($dao->fetch()) {
       $smarty_sessions[] = get_object_vars($dao);
     }

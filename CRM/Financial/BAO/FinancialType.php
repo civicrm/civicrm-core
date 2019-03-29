@@ -35,11 +35,11 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   /**
    * Static cache holder of available financial types for this session
    */
-  static $_availableFinancialTypes = array();
+  static $_availableFinancialTypes = [];
   /**
    * Static cache holder of status of ACL-FT enabled/disabled for this session
    */
-  static $_statusACLFt = array();
+  static $_statusACLFt = [];
 
   /**
    * Class constructor.
@@ -92,7 +92,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @return object
    */
-  public static function add(&$params, &$ids = array()) {
+  public static function add(&$params, &$ids = []) {
     if (empty($params['id'])) {
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
       $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
@@ -135,14 +135,14 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     $financialType->id = $financialTypeId;
     $financialType->find(TRUE);
     // tables to ignore checks for financial_type_id
-    $ignoreTables = array('CRM_Financial_DAO_EntityFinancialAccount');
+    $ignoreTables = ['CRM_Financial_DAO_EntityFinancialAccount'];
 
     // TODO: if (!$financialType->find(true)) {
 
     // ensure that we have no objects that have an FK to this financial type id TODO: that cannot be null
     $occurrences = $financialType->findReferences();
     if ($occurrences) {
-      $tables = array();
+      $tables = [];
       foreach ($occurrences as $occurrence) {
         $className = get_class($occurrence);
         if (!in_array($className, $tables) && !in_array($className, $ignoreTables)) {
@@ -150,9 +150,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
         }
       }
       if (!empty($tables)) {
-        $message = ts('The following tables have an entry for this financial type: %1', array('%1' => implode(', ', $tables)));
+        $message = ts('The following tables have an entry for this financial type: %1', ['%1' => implode(', ', $tables)]);
 
-        $errors = array();
+        $errors = [];
         $errors['is_error'] = 1;
         $errors['error_message'] = $message;
         return $errors;
@@ -179,7 +179,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   public static function getIncomeFinancialType() {
     // Financial Type
     $financialType = CRM_Contribute_PseudoConstant::financialType();
-    $revenueFinancialType = array();
+    $revenueFinancialType = [];
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
     CRM_Core_PseudoConstant::populate(
       $revenueFinancialType,
@@ -215,14 +215,14 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
     $financialTypes = CRM_Contribute_PseudoConstant::financialType();
     $prefix = ts('CiviCRM') . ': ';
-    $actions = array('add', 'view', 'edit', 'delete');
+    $actions = ['add', 'view', 'edit', 'delete'];
     foreach ($financialTypes as $id => $type) {
       foreach ($actions as $action) {
         if ($descriptions) {
-          $permissions[$action . ' contributions of type ' . $type] = array(
+          $permissions[$action . ' contributions of type ' . $type] = [
             $prefix . ts($action . ' contributions of type ') . $type,
             ts(ucfirst($action) . ' contributions of type ') . $type,
-          );
+          ];
         }
         else {
           $permissions[$action . ' contributions of type ' . $type] = $prefix . ts($action . ' contributions of type ') . $type;
@@ -233,10 +233,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       $permissions['administer CiviCRM Financial Types'] = $prefix . ts('administer CiviCRM Financial Types');
     }
     else {
-      $permissions['administer CiviCRM Financial Types'] = array(
+      $permissions['administer CiviCRM Financial Types'] = [
         $prefix . ts('administer CiviCRM Financial Types'),
         ts('Administer access to Financial Types'),
-      );
+      ];
     }
   }
 
@@ -293,12 +293,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     if (!self::isACLFinancialTypeStatus()) {
       return $financialTypes;
     }
-    $actions = array(
+    $actions = [
       CRM_Core_Action::VIEW => 'view',
       CRM_Core_Action::UPDATE => 'edit',
       CRM_Core_Action::ADD => 'add',
       CRM_Core_Action::DELETE => 'delete',
-    );
+    ];
 
     if (!isset(\Civi::$statics[__CLASS__]['available_types_' . $action])) {
       foreach ($financialTypes as $finTypeId => $type) {
@@ -329,12 +329,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     if (!self::isACLFinancialTypeStatus()) {
       return $membershipTypes;
     }
-    $actions = array(
+    $actions = [
       CRM_Core_Action::VIEW => 'view',
       CRM_Core_Action::UPDATE => 'edit',
       CRM_Core_Action::ADD => 'add',
       CRM_Core_Action::DELETE => 'delete',
-    );
+    ];
     foreach ($membershipTypes as $memTypeId => $type) {
       $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $memTypeId, 'financial_type_id');
       $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);

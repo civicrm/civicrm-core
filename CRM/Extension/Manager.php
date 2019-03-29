@@ -141,10 +141,10 @@ class CRM_Extension_Manager {
           // force installation in the default-container
           $oldPath = $tgtPath;
           $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
-          CRM_Core_Session::setStatus(ts('A copy of the extension (%1) is in a system folder (%2). The system copy will be preserved, but the new copy will be used.', array(
+          CRM_Core_Session::setStatus(ts('A copy of the extension (%1) is in a system folder (%2). The system copy will be preserved, but the new copy will be used.', [
             1 => $newInfo->key,
             2 => $oldPath,
-          )));
+          ]));
         }
         break;
 
@@ -418,7 +418,7 @@ class CRM_Extension_Manager {
    */
   public function getStatuses() {
     if (!is_array($this->statuses)) {
-      $this->statuses = array();
+      $this->statuses = [];
 
       foreach ($this->fullContainer->getKeys() as $key) {
         $this->statuses[$key] = self::STATUS_UNINSTALLED;
@@ -468,7 +468,7 @@ class CRM_Extension_Manager {
   private function _getInfoTypeHandler($key) {
     $info = $this->mapper->keyToInfo($key); // throws Exception
     if (array_key_exists($info->type, $this->typeManagers)) {
-      return array($info, $this->typeManagers[$info->type]);
+      return [$info, $this->typeManagers[$info->type]];
     }
     else {
       throw new CRM_Extension_Exception("Unrecognized extension type: " . $info->type);
@@ -488,7 +488,7 @@ class CRM_Extension_Manager {
     $info = $this->createInfoFromDB($key);
     if ($info) {
       if (array_key_exists($info->type, $this->typeManagers)) {
-        return array($info, $this->typeManagers[$info->type]);
+        return [$info, $this->typeManagers[$info->type]];
       }
       else {
         throw new CRM_Extension_Exception("Unrecognized extension type: " . $info->type);
@@ -560,10 +560,10 @@ class CRM_Extension_Manager {
    * @param $isActive
    */
   private function _setExtensionActive(CRM_Extension_Info $info, $isActive) {
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_extension SET is_active = %1 where full_name = %2', array(
-      1 => array($isActive, 'Integer'),
-      2 => array($info->key, 'String'),
-    ));
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_extension SET is_active = %1 where full_name = %2', [
+      1 => [$isActive, 'Integer'],
+      2 => [$info->key, 'String'],
+    ]);
   }
 
   /**
@@ -596,7 +596,7 @@ class CRM_Extension_Manager {
   public function findInstallRequirements($keys) {
     $infos = $this->mapper->getAllInfos();
     $todoKeys = array_unique($keys); // array(string $key).
-    $doneKeys = array(); // array(string $key => 1);
+    $doneKeys = []; // array(string $key => 1);
     $sorter = new \MJS\TopSort\Implementations\FixedArraySort();
 
     while (!empty($todoKeys)) {
@@ -610,14 +610,14 @@ class CRM_Extension_Manager {
       $info = @$infos[$key];
 
       if ($this->getStatus($key) === self::STATUS_INSTALLED) {
-        $sorter->add($key, array());
+        $sorter->add($key, []);
       }
       elseif ($info && $info->requires) {
         $sorter->add($key, $info->requires);
         $todoKeys = array_merge($todoKeys, $info->requires);
       }
       else {
-        $sorter->add($key, array());
+        $sorter->add($key, []);
       }
     }
     return $sorter->sort();
@@ -632,14 +632,14 @@ class CRM_Extension_Manager {
    *   List of extension keys, including dependencies, in order of removal.
    */
   public function findDisableRequirements($keys) {
-    $INSTALLED = array(
+    $INSTALLED = [
       self::STATUS_INSTALLED,
       self::STATUS_INSTALLED_MISSING,
-    );
+    ];
     $installedInfos = $this->filterInfosByStatus($this->mapper->getAllInfos(), $INSTALLED);
     $revMap = CRM_Extension_Info::buildReverseMap($installedInfos);
     $todoKeys = array_unique($keys);
-    $doneKeys = array();
+    $doneKeys = [];
     $sorter = new \MJS\TopSort\Implementations\FixedArraySort();
 
     while (!empty($todoKeys)) {
@@ -656,7 +656,7 @@ class CRM_Extension_Manager {
         $todoKeys = array_merge($todoKeys, $requiredBys);
       }
       else {
-        $sorter->add($key, array());
+        $sorter->add($key, []);
       }
     }
     return $sorter->sort();
@@ -668,7 +668,7 @@ class CRM_Extension_Manager {
    * @return array
    */
   protected function filterInfosByStatus($infos, $filterStatuses) {
-    $matches = array();
+    $matches = [];
     foreach ($infos as $k => $v) {
       if (in_array($this->getStatus($v->key), $filterStatuses)) {
         $matches[$k] = $v;

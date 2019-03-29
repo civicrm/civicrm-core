@@ -180,7 +180,7 @@ class CRM_Utils_Mail_EmailProcessor {
       foreach ($mails as $key => $mail) {
 
         // for every addressee: match address elements if it's to CiviMail
-        $matches = array();
+        $matches = [];
         $action = NULL;
 
         if ($usedfor == 1) {
@@ -326,7 +326,7 @@ class CRM_Utils_Mail_EmailProcessor {
                 }
               }
 
-              $params = array(
+              $params = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
                 'hash' => $hash,
@@ -340,37 +340,37 @@ class CRM_Utils_Mail_EmailProcessor {
                 // most consistent way to address this - but this is
                 // a quick hack.
                 'is_transactional' => 1,
-              );
+              ];
               $result = civicrm_api('Mailing', 'event_bounce', $params);
               break;
 
             case 'c':
             case 'confirm':
               // CRM-7921
-              $params = array(
+              $params = [
                 'contact_id' => $job,
                 'subscribe_id' => $queue,
                 'hash' => $hash,
                 'version' => 3,
-              );
+              ];
               $result = civicrm_api('Mailing', 'event_confirm', $params);
               break;
 
             case 'o':
             case 'optOut':
-              $params = array(
+              $params = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
                 'hash' => $hash,
                 'version' => 3,
-              );
+              ];
               $result = civicrm_api('MailingGroup', 'event_domain_unsubscribe', $params);
               break;
 
             case 'r':
             case 'reply':
               // instead of text and HTML parts (4th and 6th params) send the whole email as the last param
-              $params = array(
+              $params = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
                 'hash' => $hash,
@@ -379,40 +379,40 @@ class CRM_Utils_Mail_EmailProcessor {
                 'bodyHTML' => NULL,
                 'fullEmail' => $mail->generate(),
                 'version' => 3,
-              );
+              ];
               $result = civicrm_api('Mailing', 'event_reply', $params);
               break;
 
             case 'e':
             case 're':
             case 'resubscribe':
-              $params = array(
+              $params = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
                 'hash' => $hash,
                 'version' => 3,
-              );
+              ];
               $result = civicrm_api('MailingGroup', 'event_resubscribe', $params);
               break;
 
             case 's':
             case 'subscribe':
-              $params = array(
+              $params = [
                 'email' => $mail->from->email,
                 'group_id' => $job,
                 'version' => 3,
-              );
+              ];
               $result = civicrm_api('MailingGroup', 'event_subscribe', $params);
               break;
 
             case 'u':
             case 'unsubscribe':
-              $params = array(
+              $params = [
                 'job_id' => $job,
                 'event_queue_id' => $queue,
                 'hash' => $hash,
                 'version' => 3,
-              );
+              ];
               $result = civicrm_api('MailingGroup', 'event_unsubscribe', $params);
               break;
           }

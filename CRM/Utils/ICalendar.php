@@ -52,7 +52,7 @@ class CRM_Utils_ICalendar {
     $text = str_replace("\\", "\\\\", $text);
     $text = str_replace(',', '\,', $text);
     $text = str_replace(';', '\;', $text);
-    $text = str_replace(array("\r\n", "\n", "\r"), "\\n ", $text);
+    $text = str_replace(["\r\n", "\n", "\r"], "\\n ", $text);
     $text = implode("\n ", str_split($text, 50));
     return $text;
   }

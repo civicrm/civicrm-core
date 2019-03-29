@@ -59,7 +59,7 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    * Properties of contact we're interested in displaying
    * @var array
    */
-  static $_properties = array(
+  static $_properties = [
     'contact_id',
     'contact_type',
     'sort_name',
@@ -74,7 +74,7 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     'grant_application_received_date',
     'grant_report_received',
     'grant_money_transfer_date',
-  );
+  ];
 
   /**
    * Are we restricting ourselves to a single contact.
@@ -186,30 +186,30 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     $extraParams = ($key) ? "&key={$key}" : NULL;
 
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::VIEW => array(
+      self::$_links = [
+        CRM_Core_Action::VIEW => [
           'name' => ts('View'),
           'url' => 'civicrm/contact/view/grant',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=view&context=%%cxt%%&selectedChild=grant' . $extraParams,
           'title' => ts('View Grant'),
-        ),
-        CRM_Core_Action::UPDATE => array(
+        ],
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/contact/view/grant',
           'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Edit Grant'),
-        ),
-      );
+        ],
+      ];
 
       if ($cid) {
-        $delLink = array(
-          CRM_Core_Action::DELETE => array(
+        $delLink = [
+          CRM_Core_Action::DELETE => [
             'name' => ts('Delete'),
             'url' => 'civicrm/contact/view/grant',
             'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=grant' . $extraParams,
             'title' => ts('Delete Grant'),
-          ),
-        );
+          ],
+        ];
         self::$_links = self::$_links + $delLink;
       }
     }
@@ -279,10 +279,10 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     );
 
     // process the result of the query
-    $rows = array();
+    $rows = [];
 
     //CRM-4418 check for view, edit, delete
-    $permissions = array(CRM_Core_Permission::VIEW);
+    $permissions = [CRM_Core_Permission::VIEW];
     if (CRM_Core_Permission::check('edit grants')) {
       $permissions[] = CRM_Core_Permission::EDIT;
     }
@@ -292,7 +292,7 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     $mask = CRM_Core_Action::mask($permissions);
 
     while ($result->fetch()) {
-      $row = array();
+      $row = [];
       // the columns we are interested in
       foreach (self::$_properties as $property) {
         if (isset($result->$property)) {
@@ -306,11 +306,11 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
       $row['action'] = CRM_Core_Action::formLink(self::links($this->_key),
         $mask,
-        array(
+        [
           'id' => $result->grant_id,
           'cid' => $result->contact_id,
           'cxt' => $this->_context,
-        ),
+        ],
         ts('more'),
         FALSE,
         'grant.selector.row',
@@ -348,54 +348,54 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if (!isset(self::$_columnHeaders)) {
-      self::$_columnHeaders = array(
-        array(
+      self::$_columnHeaders = [
+        [
           'name' => ts('Status'),
           'sort' => 'grant_status',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Type'),
           'sort' => 'grant_type_id',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Requested'),
           'sort' => 'grant_amount_total',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Granted'),
           'sort' => 'grant_amount_granted',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Application Received'),
           'sort' => 'grant_application_received_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Report Received'),
           'sort' => 'grant_report_received',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Money Transferred'),
           'sort' => 'money_transfer_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array('desc' => ts('Actions')),
-      );
+        ],
+        ['desc' => ts('Actions')],
+      ];
 
       if (!$this->_single) {
-        $pre = array(
-          array('desc' => ts('Contact Type')),
-          array(
+        $pre = [
+          ['desc' => ts('Contact Type')],
+          [
             'name' => ts('Name'),
             'sort' => 'sort_name',
             'direction' => CRM_Utils_Sort::ASCENDING,
-          ),
-        );
+          ],
+        ];
         self::$_columnHeaders = array_merge($pre, self::$_columnHeaders);
       }
     }

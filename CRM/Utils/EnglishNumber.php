@@ -38,7 +38,7 @@
  */
 class CRM_Utils_EnglishNumber {
 
-  protected static $lowNumbers = array(
+  protected static $lowNumbers = [
     'Zero',
     'One',
     'Two',
@@ -59,9 +59,9 @@ class CRM_Utils_EnglishNumber {
     'Seventeen',
     'Eighteen',
     'Nineteen',
-  );
+  ];
 
-  protected static $intervalsOfTen = array(
+  protected static $intervalsOfTen = [
     9 => 'Ninety',
     8 => 'Eighty',
     7 => 'Seventy',
@@ -70,7 +70,7 @@ class CRM_Utils_EnglishNumber {
     4 => 'Forty',
     3 => 'Thirty',
     2 => 'Twenty',
-  );
+  ];
 
   /**
    * @param int $num

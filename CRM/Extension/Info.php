@@ -49,13 +49,13 @@ class CRM_Extension_Info {
    *   Each item is a specification like:
    *   array('type'=>'psr4', 'namespace'=>'Foo\Bar', 'path'=>'/foo/bar').
    */
-  public $classloader = array();
+  public $classloader = [];
 
   /**
    * @var array
    *   Each item is they key-name of an extension required by this extension.
    */
-  public $requires = array();
+  public $requires = [];
 
   /**
    * Load extension info an XML file.
@@ -108,7 +108,7 @@ class CRM_Extension_Info {
    *   Array(string $key => array $requiredBys).
    */
   public static function buildReverseMap($infos) {
-    $revMap = array();
+    $revMap = [];
     foreach ($infos as $info) {
       foreach ($info->requires as $key) {
         $revMap[$key][] = $info;
@@ -151,7 +151,7 @@ class CRM_Extension_Info {
         $this->$attr = (string) $val;
       }
       elseif ($attr === 'urls') {
-        $this->urls = array();
+        $this->urls = [];
         foreach ($val->url as $url) {
           $urlAttr = (string) $url->attributes()->desc;
           $this->urls[$urlAttr] = (string) $url;
@@ -159,13 +159,13 @@ class CRM_Extension_Info {
         ksort($this->urls);
       }
       elseif ($attr === 'classloader') {
-        $this->classloader = array();
+        $this->classloader = [];
         foreach ($val->psr4 as $psr4) {
-          $this->classloader[] = array(
+          $this->classloader[] = [
             'type' => 'psr4',
             'prefix' => (string) $psr4->attributes()->prefix,
             'path' => (string) $psr4->attributes()->path,
-          );
+          ];
         }
       }
       elseif ($attr === 'requires') {

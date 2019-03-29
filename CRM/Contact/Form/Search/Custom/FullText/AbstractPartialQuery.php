@@ -121,10 +121,10 @@ AND        cf.html_type IN ( 'Text', 'TextArea', 'RichTextEditor' )
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       if (!array_key_exists($dao->table_name, $tables)) {
-        $tables[$dao->table_name] = array(
+        $tables[$dao->table_name] = [
           'id' => 'entity_id',
-          'fields' => array(),
-        );
+          'fields' => [],
+        ];
       }
       $tables[$dao->table_name]['fields'][$dao->column_name] = NULL;
     }
@@ -175,15 +175,15 @@ $sqlStatement
             continue;
           }
 
-          $query = $tableValues + array(
+          $query = $tableValues + [
             'text' => CRM_Utils_QueryFormatter::singleton()
             ->format($queryText, CRM_Utils_QueryFormatter::LANG_SOLR),
-          );
+          ];
           list($intLimit, $intOffset) = $this->parseLimitOffset($limit);
           $files = $searcher->search($query, $intLimit, $intOffset);
-          $matches = array();
+          $matches = [];
           foreach ($files as $file) {
-            $matches[] = array('entity_id' => $file['xparent_id']);
+            $matches[] = ['entity_id' => $file['xparent_id']];
           }
           if ($matches) {
             $insertSql = CRM_Utils_SQL_Insert::into($entityIDTableName)->usingReplace()->rows($matches)->toSQL();
@@ -191,8 +191,8 @@ $sqlStatement
           }
         }
         else {
-          $fullTextFields = array(); // array (string $sqlColumnName)
-          $clauses = array(); // array (string $sqlExpression)
+          $fullTextFields = []; // array (string $sqlColumnName)
+          $clauses = []; // array (string $sqlExpression)
 
           foreach ($tableValues['fields'] as $fieldName => $fieldType) {
             if ($fieldType == 'Int') {
@@ -242,10 +242,10 @@ GROUP BY {$tableValues['id']}
       }
     }
 
-    return array(
+    return [
       'count' => CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM {$entityIDTableName}"),
       'files' => $files,
-    );
+    ];
   }
 
   /**
@@ -277,16 +277,16 @@ GROUP BY {$tableValues['id']}
       return;
     }
 
-    $filesIndex = CRM_Utils_Array::index(array('xparent_id', 'file_id'), $files);
+    $filesIndex = CRM_Utils_Array::index(['xparent_id', 'file_id'], $files);
     // ex: $filesIndex[$xparent_id][$file_id] = array(...the file record...);
 
     $dao = CRM_Core_DAO::executeQuery("
       SELECT distinct {$parentIdColumn}
       FROM {$toTable}
       WHERE table_name = %1
-    ", array(
-      1 => array($this->getName(), 'String'),
-    ));
+    ", [
+      1 => [$this->getName(), 'String'],
+    ]);
     while ($dao->fetch()) {
       if (empty($filesIndex[$dao->{$parentIdColumn}])) {
         continue;
@@ -295,11 +295,11 @@ GROUP BY {$tableValues['id']}
       CRM_Core_DAO::executeQuery("UPDATE {$toTable}
         SET file_ids = %1
         WHERE table_name = %2 AND {$parentIdColumn} = %3
-      ", array(
-        1 => array(implode(',', array_keys($filesIndex[$dao->{$parentIdColumn}])), 'String'),
-        2 => array($this->getName(), 'String'),
-        3 => array($dao->{$parentIdColumn}, 'Int'),
-      ));
+      ", [
+        1 => [implode(',', array_keys($filesIndex[$dao->{$parentIdColumn}])), 'String'],
+        2 => [$this->getName(), 'String'],
+        3 => [$dao->{$parentIdColumn}, 'Int'],
+      ]);
     }
   }
 
@@ -338,7 +338,7 @@ GROUP BY {$tableValues['id']}
     if (!$intOffset) {
       $intOffset = 0;
     }
-    return array($intLimit, $intOffset);
+    return [$intLimit, $intOffset];
   }
 
 }

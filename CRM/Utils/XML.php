@@ -60,7 +60,7 @@ class CRM_Utils_XML {
       libxml_use_internal_errors($oldLibXMLErrors);
     }
 
-    return array($xml, $error);
+    return [$xml, $error];
   }
 
   /**
@@ -87,7 +87,7 @@ class CRM_Utils_XML {
 
     libxml_use_internal_errors($oldLibXMLErrors);
 
-    return array($xml, $error);
+    return [$xml, $error];
   }
 
   /**
@@ -96,14 +96,14 @@ class CRM_Utils_XML {
    * @return string
    */
   protected static function formatErrors($errors) {
-    $messages = array();
+    $messages = [];
 
     foreach ($errors as $error) {
       if ($error->level != LIBXML_ERR_ERROR && $error->level != LIBXML_ERR_FATAL) {
         continue;
       }
 
-      $parts = array();
+      $parts = [];
       if ($error->file) {
         $parts[] = "File=$error->file";
       }
@@ -126,7 +126,7 @@ class CRM_Utils_XML {
    * @return array
    */
   public static function xmlObjToArray($obj) {
-    $arr = array();
+    $arr = [];
     if (is_object($obj)) {
       $obj = get_object_vars($obj);
     }

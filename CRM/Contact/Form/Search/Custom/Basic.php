@@ -44,7 +44,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
   public function __construct(&$formValues) {
     parent::__construct($formValues);
 
-    $this->_columns = array(
+    $this->_columns = [
       '' => 'contact_type',
       ts('Name') => 'sort_name',
       ts('Address') => 'street_address',
@@ -54,10 +54,10 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
       ts('Country') => 'country',
       ts('Email') => 'email',
       ts('Phone') => 'phone',
-    );
+    ];
 
     $params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
-    $returnProperties = array();
+    $returnProperties = [];
     $returnProperties['contact_sub_type'] = 1;
 
     $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -65,13 +65,13 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
     );
 
     foreach ($this->_columns as $name => $field) {
-      if (in_array($field, array(
+      if (in_array($field, [
           'street_address',
           'city',
           'state_province',
           'postal_code',
           'country',
-        )) && empty($addressOptions[$field])
+        ]) && empty($addressOptions[$field])
       ) {
         unset($this->_columns[$name]);
         continue;
@@ -88,21 +88,21 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
    * @param CRM_Core_Form $form
    */
   public function buildForm(&$form) {
-    $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements();
-    $form->add('select', 'contact_type', ts('Find...'), $contactTypes, FALSE, array('class' => 'crm-select2 huge'));
+    $contactTypes = ['' => ts('- any contact type -')] + CRM_Contact_BAO_ContactType::getSelectElements();
+    $form->add('select', 'contact_type', ts('Find...'), $contactTypes, FALSE, ['class' => 'crm-select2 huge']);
 
     // add select for groups
-    $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::nestedGroup();
-    $form->addElement('select', 'group', ts('in'), $group, array('class' => 'crm-select2 huge'));
+    $group = ['' => ts('- any group -')] + CRM_Core_PseudoConstant::nestedGroup();
+    $form->addElement('select', 'group', ts('in'), $group, ['class' => 'crm-select2 huge']);
 
     // add select for categories
-    $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
-    $form->addElement('select', 'tag', ts('Tagged'), $tag, array('class' => 'crm-select2 huge'));
+    $tag = ['' => ts('- any tag -')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+    $form->addElement('select', 'tag', ts('Tagged'), $tag, ['class' => 'crm-select2 huge']);
 
     // text for sort_name
     $form->add('text', 'sort_name', ts('Name'));
 
-    $form->assign('elements', array('sort_name', 'contact_type', 'group', 'tag'));
+    $form->assign('elements', ['sort_name', 'contact_type', 'group', 'tag']);
   }
 
   /**

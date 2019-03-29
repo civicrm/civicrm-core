@@ -98,7 +98,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
     $defaults = parent::setDefaultValues();
 
     if (!isset($defaults['weight']) || !$defaults['weight']) {
-      $fieldValues = array('option_group_id' => $this->_gid);
+      $fieldValues = ['option_group_id' => $this->_gid];
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue', $fieldValues);
     }
 
@@ -127,7 +127,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
     if ($this->_action == CRM_Core_Action::UPDATE &&
       CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $this->_id, 'is_reserved')
     ) {
-      $this->freeze(array('label', 'is_active'));
+      $this->freeze(['label', 'is_active']);
     }
     $this->add('number', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'weight'), TRUE);
 
@@ -140,7 +140,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
   public function postProcess() {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $fieldValues = array('option_group_id' => $this->_gid);
+      $fieldValues = ['option_group_id' => $this->_gid];
       $wt = CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $this->_id, $fieldValues);
 
       if (CRM_Core_BAO_OptionValue::del($this->_id)) {
@@ -148,7 +148,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
       }
     }
     else {
-      $params = $ids = array();
+      $params = $ids = [];
       $params = $this->exportValues();
 
       // set db value of filter in params if filter is non editable
@@ -159,7 +159,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
       $params['component_id'] = CRM_Core_Component::getComponentID('CiviCampaign');
       $optionValue = CRM_Core_OptionValue::addOptionValue($params, $this->_gName, $this->_action, $this->_id);
 
-      CRM_Core_Session::setStatus(ts('The Survey type \'%1\' has been saved.', array(1 => $optionValue->label)), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('The Survey type \'%1\' has been saved.', [1 => $optionValue->label]), ts('Saved'), 'success');
     }
   }
 

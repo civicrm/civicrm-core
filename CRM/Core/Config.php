@@ -102,8 +102,8 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    */
   public static function &singleton($loadFromDB = TRUE, $force = FALSE) {
     if (self::$_singleton === NULL || $force) {
-      $GLOBALS['civicrm_default_error_scope'] = CRM_Core_TemporaryErrorScope::create(array('CRM_Core_Error', 'handle'));
-      $errorScope = CRM_Core_TemporaryErrorScope::create(array('CRM_Core_Error', 'simpleHandler'));
+      $GLOBALS['civicrm_default_error_scope'] = CRM_Core_TemporaryErrorScope::create(['CRM_Core_Error', 'handle']);
+      $errorScope = CRM_Core_TemporaryErrorScope::create(['CRM_Core_Error', 'simpleHandler']);
 
       if (defined('E_DEPRECATED')) {
         error_reporting(error_reporting() & ~E_DEPRECATED);
@@ -180,12 +180,12 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
     // Whether we delete/create or simply preserve directories, we should
     // certainly make sure the restrictions are enforced.
-    foreach (array(
+    foreach ([
                $this->templateCompileDir,
                $this->uploadDir,
                $this->configAndLogDir,
                $this->customFileUploadDir,
-             ) as $dir) {
+             ] as $dir) {
       if ($dir && is_dir($dir)) {
         CRM_Utils_File::restrictAccess($dir);
       }
@@ -229,7 +229,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     $userID = $session->get('userID');
     if ($userID) {
       CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
-        array(1 => array($userID, 'Integer'))
+        [1 => [$userID, 'Integer']]
       );
     }
 
@@ -316,7 +316,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     }
     else {
       // Cannot store permissions -- warn if any modules require them
-      $modules_with_perms = array();
+      $modules_with_perms = [];
       foreach ($module_files as $module_file) {
         $perms = $this->userPermissionClass->getModulePermissions($module_file['prefix']);
         if (!empty($perms)) {
@@ -325,7 +325,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       }
       if (!empty($modules_with_perms)) {
         CRM_Core_Session::setStatus(
-          ts('Some modules define permissions, but the CMS cannot store them: %1', array(1 => implode(', ', $modules_with_perms))),
+          ts('Some modules define permissions, but the CMS cannot store them: %1', [1 => implode(', ', $modules_with_perms)]),
           ts('Permission Error'),
           'error'
         );
@@ -347,7 +347,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * Clear db cache.
    */
   public static function clearDBCache() {
-    $queries = array(
+    $queries = [
       'TRUNCATE TABLE civicrm_acl_cache',
       'TRUNCATE TABLE civicrm_acl_contact_cache',
       'TRUNCATE TABLE civicrm_cache',
@@ -356,7 +356,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       'TRUNCATE TABLE civicrm_group_contact_cache',
       'TRUNCATE TABLE civicrm_menu',
       'UPDATE civicrm_setting SET value = NULL WHERE name="navigation" AND contact_id IS NOT NULL',
-    );
+    ];
 
     foreach ($queries as $query) {
       CRM_Core_DAO::executeQuery($query);
@@ -402,8 +402,8 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       $query .= " AND CREATE_TIME < DATE_SUB(NOW(), INTERVAL {$timeInterval})";
     }
 
-    $tableDAO = CRM_Core_DAO::executeQuery($query, array(1 => array($dao->database(), 'String')));
-    $tables = array();
+    $tableDAO = CRM_Core_DAO::executeQuery($query, [1 => [$dao->database(), 'String']]);
+    $tables = [];
     while ($tableDAO->fetch()) {
       $tables[] = $tableDAO->tableName;
     }
@@ -464,7 +464,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @return bool
    */
   public static function isEnabledBackOfficeCreditCardPayments() {
-    return CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('BackOffice'));
+    return CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(['BackOffice']);
   }
 
   /**

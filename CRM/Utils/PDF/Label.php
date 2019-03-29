@@ -175,7 +175,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
     $paperSize = CRM_Core_BAO_PaperSize::getByName($this->paperSize);
     $w = CRM_Utils_PDF_Utils::convertMetric($paperSize['width'], $paperSize['metric'], $this->metricDoc);
     $h = CRM_Utils_PDF_Utils::convertMetric($paperSize['height'], $paperSize['metric'], $this->metricDoc);
-    $this->paper_dimensions = array($w, $h);
+    $this->paper_dimensions = [$w, $h];
   }
 
   /**
@@ -186,7 +186,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   public function generateLabel($text) {
     // paddingLeft is used for both left & right padding so needs to be
     // subtracted twice from width to get the width that is available for text
-    $args = array(
+    $args = [
       'w' => $this->width - 2 * $this->paddingLeft,
       'h' => 0,
       'txt' => $text,
@@ -201,7 +201,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
       'ishtml' => FALSE,
       'autopadding' => FALSE,
       'maxh' => $this->height,
-    );
+    ];
 
     CRM_Utils_Hook::alterMailingLabelParams($args);
 
@@ -243,7 +243,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
     $posY = $this->marginTop + ($this->countY * ($this->height + $this->ySpace));
     $this->SetXY($posX + $this->paddingLeft, $posY + $this->paddingTop);
     if ($this->generatorMethod) {
-      call_user_func_array(array($this->generatorObject, $this->generatorMethod), array($texte));
+      call_user_func_array([$this->generatorObject, $this->generatorMethod], [$texte]);
     }
     else {
       $this->generateLabel($texte);
@@ -264,12 +264,12 @@ class CRM_Utils_PDF_Label extends TCPDF {
    */
   public function getFontNames() {
     // Define labels for TCPDF core fonts
-    $fontLabel = array(
+    $fontLabel = [
       'courier' => ts('Courier'),
       'helvetica' => ts('Helvetica'),
       'times' => ts('Times New Roman'),
       'dejavusans' => ts('Deja Vu Sans (UTF-8)'),
-    );
+    ];
 
     // Check to see if we have any additional fonts to add. You can specify more fonts in
     // civicrm.settings.php via: $config['CiviCRM Preferences']['additional_fonts']

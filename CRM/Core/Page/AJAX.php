@@ -50,7 +50,7 @@ class CRM_Core_Page_AJAX {
     }
 
     if (!$className) {
-      CRM_Core_Error::fatal(ts('Invalid className: %1', array(1 => $className)));
+      CRM_Core_Error::fatal(ts('Invalid className: %1', [1 => $className]));
     }
 
     $fnName = NULL;
@@ -64,7 +64,7 @@ class CRM_Core_Page_AJAX {
 
     switch ($type) {
       case 'method':
-        call_user_func(array($className, $fnName));
+        call_user_func([$className, $fnName]);
         break;
 
       case 'page':
@@ -102,7 +102,7 @@ class CRM_Core_Page_AJAX {
 
     // return false if $id is null and
     // $context is not civicrm_event or civicrm_contribution_page
-    if (!$id || !in_array($context, array('civicrm_event', 'civicrm_contribution_page'))) {
+    if (!$id || !in_array($context, ['civicrm_event', 'civicrm_contribution_page'])) {
       return FALSE;
     }
     $priceSetId = CRM_Price_BAO_PriceSet::getFor($context, $id, NULL);
@@ -113,7 +113,7 @@ class CRM_Core_Page_AJAX {
        INNER JOIN {$context} ce ON cpse.entity_id = ce.id AND ce.id = %1
        SET cps.is_quick_config = 0, cps.financial_type_id = IF(cps.financial_type_id IS NULL, ce.financial_type_id, cps.financial_type_id)
       ";
-      CRM_Core_DAO::executeQuery($sql, array(1 => array($id, 'Integer')));
+      CRM_Core_DAO::executeQuery($sql, [1 => [$id, 'Integer']]);
 
       if ($context == 'civicrm_event') {
         CRM_Core_BAO_Discount::del($id, $context);
@@ -168,15 +168,15 @@ class CRM_Core_Page_AJAX {
   public static function returnJsonResponse($response) {
     // Allow lazy callers to not wrap content in an array
     if (is_string($response)) {
-      $response = array('content' => $response);
+      $response = ['content' => $response];
     }
     // Add session variables to response
     $session = CRM_Core_Session::singleton();
-    $response += array(
+    $response += [
       'status' => 'success',
       'userContext' => htmlspecialchars_decode($session->readUserContext()),
       'title' => CRM_Utils_System::$title,
-    );
+    ];
     // crmMessages will be automatically handled by our ajax preprocessor
     // @see js/Common.js
     if ($session->getStatus(FALSE)) {
@@ -222,11 +222,11 @@ class CRM_Core_Page_AJAX {
    * @return array
    */
   public static function defaultSortAndPagerParams($defaultOffset = 0, $defaultRowCount = 25, $defaultSort = NULL, $defaultsortOrder = 'asc') {
-    $params = array(
-      '_raw_values' => array(),
-    );
+    $params = [
+      '_raw_values' => [],
+    ];
 
-    $sortMapper = array();
+    $sortMapper = [];
     if (isset($_GET['columns'])) {
       foreach ($_GET['columns'] as $key => $value) {
         $sortMapper[$key] = CRM_Utils_Type::validate($value['data'], 'MysqlColumnNameOrAlias');
@@ -261,8 +261,8 @@ class CRM_Core_Page_AJAX {
    *
    * @return array
    */
-  public static function validateParams($requiredParams = array(), $optionalParams = array()) {
-    $params = array();
+  public static function validateParams($requiredParams = [], $optionalParams = []) {
+    $params = [];
 
     foreach ($requiredParams as $param => $type) {
       $params[$param] = CRM_Utils_Type::validate(CRM_Utils_Array::value($param, $_GET), $type);

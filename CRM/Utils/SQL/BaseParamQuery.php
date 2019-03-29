@@ -38,7 +38,7 @@ class CRM_Utils_SQL_BaseParamQuery implements ArrayAccess {
 
   protected $mode = NULL;
 
-  protected $params = array();
+  protected $params = [];
 
   // Public to work-around PHP 5.3 limit.
   public $strict = NULL;
@@ -100,10 +100,10 @@ class CRM_Utils_SQL_BaseParamQuery implements ArrayAccess {
           // Unrecognized variables are ignored. Mitigate risk of accidents.
           return $m[0];
         }
-        $values = is_array($values) ? $values : array($values);
+        $values = is_array($values) ? $values : [$values];
         switch ($m[1]) {
           case '@':
-            $parts = array_map(array($select, 'escapeString'), $values);
+            $parts = array_map([$select, 'escapeString'], $values);
             return implode(', ', $parts);
 
           // TODO: ensure all uses of this un-escaped literal are safe

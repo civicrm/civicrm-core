@@ -56,7 +56,7 @@ class CRM_Core_Config_MagicMerge {
 
   private $locals, $settings;
 
-  private $cache = array();
+  private $cache = [];
 
   /**
    * CRM_Core_Config_MagicMerge constructor.
@@ -87,130 +87,130 @@ class CRM_Core_Config_MagicMerge {
     // Each mapping: $propertyName => Array(0 => $type, 1 => $foreignName|NULL, ...).
     // If $foreignName is omitted/null, then it's assumed to match the $propertyName.
     // Other parameters may be specified, depending on the type.
-    return array(
+    return [
       // "local" properties are unique to each instance of CRM_Core_Config (each request).
-      'doNotResetCache' => array('local'),
-      'inCiviCRM' => array('local'),
-      'keyDisable' => array('local'),
-      'userFrameworkFrontend' => array('local'),
-      'userPermissionTemp' => array('local'),
+      'doNotResetCache' => ['local'],
+      'inCiviCRM' => ['local'],
+      'keyDisable' => ['local'],
+      'userFrameworkFrontend' => ['local'],
+      'userPermissionTemp' => ['local'],
 
       // "runtime" properties are computed from define()s, $_ENV, etc.
       // See also: CRM_Core_Config_Runtime.
-      'dsn' => array('runtime'),
-      'initialized' => array('runtime'),
-      'userFramework' => array('runtime'),
-      'userFrameworkClass' => array('runtime'),
-      'userFrameworkDSN' => array('runtime'),
-      'userFrameworkURLVar' => array('runtime'),
-      'userHookClass' => array('runtime'),
-      'cleanURL' => array('runtime'),
-      'configAndLogDir' => array('runtime'),
-      'templateCompileDir' => array('runtime'),
-      'templateDir' => array('runtime'),
+      'dsn' => ['runtime'],
+      'initialized' => ['runtime'],
+      'userFramework' => ['runtime'],
+      'userFrameworkClass' => ['runtime'],
+      'userFrameworkDSN' => ['runtime'],
+      'userFrameworkURLVar' => ['runtime'],
+      'userHookClass' => ['runtime'],
+      'cleanURL' => ['runtime'],
+      'configAndLogDir' => ['runtime'],
+      'templateCompileDir' => ['runtime'],
+      'templateDir' => ['runtime'],
 
       // "boot-svc" properties are critical services needed during init.
       // See also: Civi\Core\Container::getBootService().
-      'userSystem' => array('boot-svc'),
-      'userPermissionClass' => array('boot-svc'),
+      'userSystem' => ['boot-svc'],
+      'userPermissionClass' => ['boot-svc'],
 
-      'userFrameworkBaseURL' => array('user-system', 'getAbsoluteBaseURL'),
-      'userFrameworkVersion' => array('user-system', 'getVersion'),
-      'useFrameworkRelativeBase' => array('user-system', 'getRelativeBaseURL'), // ugh typo.
+      'userFrameworkBaseURL' => ['user-system', 'getAbsoluteBaseURL'],
+      'userFrameworkVersion' => ['user-system', 'getVersion'],
+      'useFrameworkRelativeBase' => ['user-system', 'getRelativeBaseURL'], // ugh typo.
 
       // "setting" properties are loaded through the setting layer, esp
       // table "civicrm_setting" and global $civicrm_setting.
       // See also: Civi::settings().
-      'backtrace' => array('setting'),
-      'contact_default_language' => array('setting'),
-      'countryLimit' => array('setting'),
-      'customTranslateFunction' => array('setting'),
-      'dateInputFormat' => array('setting'),
-      'dateformatDatetime' => array('setting'),
-      'dateformatFull' => array('setting'),
-      'dateformatPartial' => array('setting'),
-      'dateformatTime' => array('setting'),
-      'dateformatYear' => array('setting'),
-      'dateformatFinancialBatch' => array('setting'),
-      'dateformatshortdate' => array('setting'),
-      'debug' => array('setting', 'debug_enabled'), // renamed.
-      'defaultContactCountry' => array('setting'),
-      'defaultContactStateProvince' => array('setting'),
-      'defaultCurrency' => array('setting'),
-      'defaultSearchProfileID' => array('setting'),
-      'doNotAttachPDFReceipt' => array('setting'),
-      'empoweredBy' => array('setting'),
-      'enableComponents' => array('setting', 'enable_components'), // renamed.
-      'enableSSL' => array('setting'),
-      'fatalErrorHandler' => array('setting'),
-      'fieldSeparator' => array('setting'),
-      'fiscalYearStart' => array('setting'),
-      'geoAPIKey' => array('setting'),
-      'geoProvider' => array('setting'),
-      'includeAlphabeticalPager' => array('setting'),
-      'includeEmailInName' => array('setting'),
-      'includeNickNameInName' => array('setting'),
-      'includeOrderByClause' => array('setting'),
-      'includeWildCardInName' => array('setting'),
-      'inheritLocale' => array('setting'),
-      'languageLimit' => array('setting'),
-      'lcMessages' => array('setting'),
-      'legacyEncoding' => array('setting'),
-      'logging' => array('setting'),
-      'mailThrottleTime' => array('setting'),
-      'mailerBatchLimit' => array('setting'),
-      'mailerJobSize' => array('setting'),
-      'mailerJobsMax' => array('setting'),
-      'mapAPIKey' => array('setting'),
-      'mapProvider' => array('setting'),
-      'maxFileSize' => array('setting'),
-      'maxAttachments' => array('setting', 'max_attachments'), // renamed.
-      'monetaryDecimalPoint' => array('setting'),
-      'monetaryThousandSeparator' => array('setting'),
-      'moneyformat' => array('setting'),
-      'moneyvalueformat' => array('setting'),
-      'provinceLimit' => array('setting'),
-      'recaptchaOptions' => array('setting'),
-      'recaptchaPublicKey' => array('setting'),
-      'recaptchaPrivateKey' => array('setting'),
-      'forceRecaptcha' => array('setting'),
-      'replyTo' => array('setting'),
-      'secondDegRelPermissions' => array('setting'),
-      'smartGroupCacheTimeout' => array('setting'),
-      'timeInputFormat' => array('setting'),
-      'userFrameworkLogging' => array('setting'),
-      'userFrameworkUsersTableName' => array('setting'),
-      'verpSeparator' => array('setting'),
-      'wkhtmltopdfPath' => array('setting'),
-      'wpBasePage' => array('setting'),
-      'wpLoadPhp' => array('setting'),
+      'backtrace' => ['setting'],
+      'contact_default_language' => ['setting'],
+      'countryLimit' => ['setting'],
+      'customTranslateFunction' => ['setting'],
+      'dateInputFormat' => ['setting'],
+      'dateformatDatetime' => ['setting'],
+      'dateformatFull' => ['setting'],
+      'dateformatPartial' => ['setting'],
+      'dateformatTime' => ['setting'],
+      'dateformatYear' => ['setting'],
+      'dateformatFinancialBatch' => ['setting'],
+      'dateformatshortdate' => ['setting'],
+      'debug' => ['setting', 'debug_enabled'], // renamed.
+      'defaultContactCountry' => ['setting'],
+      'defaultContactStateProvince' => ['setting'],
+      'defaultCurrency' => ['setting'],
+      'defaultSearchProfileID' => ['setting'],
+      'doNotAttachPDFReceipt' => ['setting'],
+      'empoweredBy' => ['setting'],
+      'enableComponents' => ['setting', 'enable_components'], // renamed.
+      'enableSSL' => ['setting'],
+      'fatalErrorHandler' => ['setting'],
+      'fieldSeparator' => ['setting'],
+      'fiscalYearStart' => ['setting'],
+      'geoAPIKey' => ['setting'],
+      'geoProvider' => ['setting'],
+      'includeAlphabeticalPager' => ['setting'],
+      'includeEmailInName' => ['setting'],
+      'includeNickNameInName' => ['setting'],
+      'includeOrderByClause' => ['setting'],
+      'includeWildCardInName' => ['setting'],
+      'inheritLocale' => ['setting'],
+      'languageLimit' => ['setting'],
+      'lcMessages' => ['setting'],
+      'legacyEncoding' => ['setting'],
+      'logging' => ['setting'],
+      'mailThrottleTime' => ['setting'],
+      'mailerBatchLimit' => ['setting'],
+      'mailerJobSize' => ['setting'],
+      'mailerJobsMax' => ['setting'],
+      'mapAPIKey' => ['setting'],
+      'mapProvider' => ['setting'],
+      'maxFileSize' => ['setting'],
+      'maxAttachments' => ['setting', 'max_attachments'], // renamed.
+      'monetaryDecimalPoint' => ['setting'],
+      'monetaryThousandSeparator' => ['setting'],
+      'moneyformat' => ['setting'],
+      'moneyvalueformat' => ['setting'],
+      'provinceLimit' => ['setting'],
+      'recaptchaOptions' => ['setting'],
+      'recaptchaPublicKey' => ['setting'],
+      'recaptchaPrivateKey' => ['setting'],
+      'forceRecaptcha' => ['setting'],
+      'replyTo' => ['setting'],
+      'secondDegRelPermissions' => ['setting'],
+      'smartGroupCacheTimeout' => ['setting'],
+      'timeInputFormat' => ['setting'],
+      'userFrameworkLogging' => ['setting'],
+      'userFrameworkUsersTableName' => ['setting'],
+      'verpSeparator' => ['setting'],
+      'wkhtmltopdfPath' => ['setting'],
+      'wpBasePage' => ['setting'],
+      'wpLoadPhp' => ['setting'],
 
       // "setting-path" properties are settings with special filtering
       // to return normalized file paths.
       // Option: `mkdir` - auto-create dir
       // Option: `restrict` - auto-restrict remote access
-      'customFileUploadDir' => array('setting-path', NULL, array('mkdir', 'restrict')),
-      'customPHPPathDir' => array('setting-path'),
-      'customTemplateDir' => array('setting-path'),
-      'extensionsDir' => array('setting-path', NULL, array('mkdir')),
-      'imageUploadDir' => array('setting-path', NULL, array('mkdir')),
-      'uploadDir' => array('setting-path', NULL, array('mkdir', 'restrict')),
+      'customFileUploadDir' => ['setting-path', NULL, ['mkdir', 'restrict']],
+      'customPHPPathDir' => ['setting-path'],
+      'customTemplateDir' => ['setting-path'],
+      'extensionsDir' => ['setting-path', NULL, ['mkdir']],
+      'imageUploadDir' => ['setting-path', NULL, ['mkdir']],
+      'uploadDir' => ['setting-path', NULL, ['mkdir', 'restrict']],
 
       // "setting-url" properties are settings with special filtering
       // to return normalized URLs.
       // Option: `noslash` - don't append trailing slash
       // Option: `rel` - convert to relative URL (if possible)
-      'customCSSURL' => array('setting-url', NULL, array('noslash')),
-      'extensionsURL' => array('setting-url'),
-      'imageUploadURL' => array('setting-url'),
-      'resourceBase' => array('setting-url', 'userFrameworkResourceURL', array('rel')),
-      'userFrameworkResourceURL' => array('setting-url'),
+      'customCSSURL' => ['setting-url', NULL, ['noslash']],
+      'extensionsURL' => ['setting-url'],
+      'imageUploadURL' => ['setting-url'],
+      'resourceBase' => ['setting-url', 'userFrameworkResourceURL', ['rel']],
+      'userFrameworkResourceURL' => ['setting-url'],
 
       // "callback" properties are generated on-demand by calling a function.
       // @todo remove geocodeMethod. As of Feb 2018, $config->geocodeMethod works but gives a deprecation warning.
-      'geocodeMethod' => array('callback', 'CRM_Utils_Geocode', 'getProviderClass'),
-      'defaultCurrencySymbol' => array('callback', 'CRM_Core_BAO_Country', 'getDefaultCurrencySymbol'),
-    );
+      'geocodeMethod' => ['callback', 'CRM_Utils_Geocode', 'getProviderClass'],
+      'defaultCurrencySymbol' => ['callback', 'CRM_Core_BAO_Country', 'getDefaultCurrencySymbol'],
+    ];
   }
 
   /**
@@ -244,10 +244,10 @@ class CRM_Core_Config_MagicMerge {
           $value = CRM_Utils_File::addTrailingSlash($value);
           if (isset($this->map[$k][2]) && in_array('mkdir', $this->map[$k][2])) {
             if (!is_dir($value) && !CRM_Utils_File::createDir($value, FALSE)) {
-              CRM_Core_Session::setStatus(ts('Failed to make directory (%1) at "%2". Please update the settings or file permissions.', array(
+              CRM_Core_Session::setStatus(ts('Failed to make directory (%1) at "%2". Please update the settings or file permissions.', [
                 1 => $k,
                 2 => $value,
-              )));
+              ]));
             }
           }
           if (isset($this->map[$k][2]) && in_array('restrict', $this->map[$k][2])) {
@@ -258,7 +258,7 @@ class CRM_Core_Config_MagicMerge {
         return $value;
 
       case 'setting-url':
-        $options = !empty($this->map[$k][2]) ? $this->map[$k][2] : array();
+        $options = !empty($this->map[$k][2]) ? $this->map[$k][2] : [];
         $value = $this->getSettings()->get($name);
         if ($value && !(in_array('noslash', $options))) {
           $value = CRM_Utils_File::addTrailingSlash($value, '/');
@@ -280,7 +280,7 @@ class CRM_Core_Config_MagicMerge {
 
       case 'user-system':
         $userSystem = \Civi\Core\Container::getBootService('userSystem');
-        $this->cache[$k] = call_user_func(array($userSystem, $name));
+        $this->cache[$k] = call_user_func([$userSystem, $name]);
         return $this->cache[$k];
 
       case 'service':
@@ -291,7 +291,7 @@ class CRM_Core_Config_MagicMerge {
         if (!isset($this->map[$k][1], $this->map[$k][2])) {
           throw new \CRM_Core_Exception("Cannot find getter for property CRM_Core_Config::\${$k}");
         }
-        return \Civi\Core\Resolver::singleton()->call(array($this->map[$k][1], $this->map[$k][2]), array($k));
+        return \Civi\Core\Resolver::singleton()->call([$this->map[$k][1], $this->map[$k][2]], [$k]);
 
       default:
         throw new \CRM_Core_Exception("Cannot read property CRM_Core_Config::\${$k} ($type)");
@@ -382,7 +382,7 @@ class CRM_Core_Config_MagicMerge {
         if (!isset($this->map[$k][1], $this->map[$k][4])) {
           throw new \CRM_Core_Exception("Cannot find unsetter for property CRM_Core_Config::\${$k}");
         }
-        \Civi\Core\Resolver::singleton()->call(array($this->map[$k][1], $this->map[$k][4]), array($k));
+        \Civi\Core\Resolver::singleton()->call([$this->map[$k][1], $this->map[$k][4]], [$k]);
         return;
 
       default:
@@ -405,14 +405,14 @@ class CRM_Core_Config_MagicMerge {
    */
   private function initLocals() {
     if ($this->locals === NULL) {
-      $this->locals = array(
+      $this->locals = [
         'inCiviCRM' => FALSE,
         'doNotResetCache' => 0,
         'keyDisable' => FALSE,
         'initialized' => FALSE,
         'userFrameworkFrontend' => FALSE,
         'userPermissionTemp' => NULL,
-      );
+      ];
     }
   }
 

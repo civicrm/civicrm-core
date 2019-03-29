@@ -36,12 +36,12 @@
  */
 class CRM_Admin_Form_Setting_Case extends CRM_Admin_Form_Setting {
 
-  protected $_settings = array(
+  protected $_settings = [
     'civicaseRedactActivityEmail' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'civicaseAllowMultipleClients' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'civicaseNaturalActivityTypeSort' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'civicaseActivityRevisions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-  );
+  ];
 
   /**
    * Build the form object.
