@@ -423,6 +423,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         // reset primary-email in the template
         $tplParams['email'] = $ccEmail;
 
+        $tplParams['related_contact'] = $values['related_contact'];
         $tplParams['onBehalfName'] = $displayName;
         $tplParams['onBehalfEmail'] = $email;
 
