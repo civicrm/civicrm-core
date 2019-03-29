@@ -117,11 +117,13 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
           'Note',
           $note->id
         );
-        $contact = new CRM_Contact_DAO_Contact();
-        $contact->id = $note->contact_id;
-        $contact->find();
-        $contact->fetch();
-        $values[$note->id]['createdBy'] = $contact->display_name;
+        if (!empty($note->contact_id)) {
+          $contact = new CRM_Contact_DAO_Contact();
+          $contact->id = $note->contact_id;
+          $contact->find();
+          $contact->fetch();
+          $values[$note->id]['createdBy'] = $contact->display_name;
+        }
         $values[$note->id]['comment_count'] = CRM_Core_BAO_Note::getChildCount($note->id);
 
         // paper icon view for attachments part
