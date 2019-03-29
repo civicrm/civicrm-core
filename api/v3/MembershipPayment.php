@@ -56,11 +56,11 @@ function civicrm_api3_membership_payment_create($params) {
 function _civicrm_api3_membership_payment_create_spec(&$params) {
   $params['membership_id']['api.required'] = 1;
   $params['contribution_id']['api.required'] = 1;
-  $params['membership_type_id'] = array(
+  $params['membership_type_id'] = [
     'title' => 'Membership type id',
     'description' => 'The id of the membership type',
     'type' => CRM_Utils_Type::T_INT,
-  );
+  ];
 }
 
 /**

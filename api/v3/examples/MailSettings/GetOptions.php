@@ -6,9 +6,9 @@
  *   API result array
  */
 function mail_settings_getoptions_example() {
-  $params = array(
+  $params = [
     'field' => 'protocol',
-  );
+  ];
 
   try{
     $result = civicrm_api3('MailSettings', 'getoptions', $params);
@@ -18,12 +18,12 @@ function mail_settings_getoptions_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,17 +37,17 @@ function mail_settings_getoptions_example() {
  */
 function mail_settings_getoptions_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 4,
-    'values' => array(
+    'values' => [
       '1' => 'IMAP',
       '2' => 'Maildir',
       '3' => 'POP3',
       '4' => 'Localdir',
-    ),
-  );
+    ],
+  ];
 
   return $expectedResult;
 }

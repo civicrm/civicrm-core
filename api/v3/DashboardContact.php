@@ -42,9 +42,9 @@ function civicrm_api3_dashboard_contact_create($params) {
   if (empty($params['id'])) {
     civicrm_api3_verify_one_mandatory($params,
       NULL,
-      array(
+      [
         'dashboard_id',
-      )
+      ]
     );
   }
   $errors = _civicrm_api3_dashboard_contact_check_params($params);

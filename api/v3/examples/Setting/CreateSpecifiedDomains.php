@@ -8,13 +8,13 @@
  *   API result array
  */
 function setting_create_example() {
-  $params = array(
-    'domain_id' => array(
+  $params = [
+    'domain_id' => [
       '0' => 1,
       '1' => 3,
-    ),
+    ],
     'uniq_email_per_site' => 0,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Setting', 'create', $params);
@@ -24,12 +24,12 @@ function setting_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -43,19 +43,19 @@ function setting_create_example() {
  */
 function setting_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 2,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'uniq_email_per_site' => 0,
-      ),
-      '3' => array(
+      ],
+      '3' => [
         'uniq_email_per_site' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

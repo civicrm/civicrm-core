@@ -6,9 +6,9 @@
  *   API result array
  */
 function activity_getfields_example() {
-  $params = array(
+  $params = [
     'action' => 'create',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Activity', 'getfields', $params);
@@ -18,12 +18,12 @@ function activity_getfields_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,12 +37,12 @@ function activity_getfields_example() {
  */
 function activity_getfields_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 29,
-    'values' => array(
-      'source_record_id' => array(
+    'values' => [
+      'source_record_id' => [
         'name' => 'source_record_id',
         'type' => 1,
         'title' => 'Source Record',
@@ -50,8 +50,8 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-      ),
-      'activity_type_id' => array(
+      ],
+      'activity_type_id' => [
         'name' => 'activity_type_id',
         'type' => 1,
         'title' => 'Activity Type ID',
@@ -65,17 +65,17 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'size' => 6,
           'maxlength' => 14,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'optionGroupName' => 'activity_type',
           'optionEditPath' => 'civicrm/admin/options/activity_type',
-        ),
-      ),
-      'activity_date_time' => array(
+        ],
+      ],
+      'activity_date_time' => [
         'name' => 'activity_date_time',
         'type' => 12,
         'title' => 'Activity Date',
@@ -87,12 +87,12 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'Select Date',
           'format' => 'activityDateTime',
-        ),
-      ),
-      'phone_id' => array(
+        ],
+      ],
+      'phone_id' => [
         'name' => 'phone_id',
         'type' => 1,
         'title' => 'Phone (called) ID',
@@ -101,14 +101,14 @@ function activity_getfields_expectedresult() {
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
         'FKClassName' => 'CRM_Core_DAO_Phone',
-        'html' => array(
+        'html' => [
           'type' => 'EntityRef',
           'size' => 6,
           'maxlength' => 14,
-        ),
+        ],
         'FKApiName' => 'Phone',
-      ),
-      'phone_number' => array(
+      ],
+      'phone_number' => [
         'name' => 'phone_number',
         'type' => 2,
         'title' => 'Phone (called) Number',
@@ -118,13 +118,13 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 64,
           'size' => 30,
-        ),
-      ),
-      'priority_id' => array(
+        ],
+      ],
+      'priority_id' => [
         'name' => 'priority_id',
         'type' => 1,
         'title' => 'Priority',
@@ -132,17 +132,17 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'size' => 6,
           'maxlength' => 14,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'optionGroupName' => 'priority',
           'optionEditPath' => 'civicrm/admin/options/priority',
-        ),
-      ),
-      'parent_id' => array(
+        ],
+      ],
+      'parent_id' => [
         'name' => 'parent_id',
         'type' => 1,
         'title' => 'Parent Activity Id',
@@ -152,16 +152,16 @@ function activity_getfields_expectedresult() {
         'bao' => 'CRM_Activity_BAO_Activity',
         'FKClassName' => 'CRM_Activity_DAO_Activity',
         'FKApiName' => 'Activity',
-      ),
-      'is_auto' => array(
+      ],
+      'is_auto' => [
         'name' => 'is_auto',
         'type' => 16,
         'title' => 'Auto',
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-      ),
-      'relationship_id' => array(
+      ],
+      'relationship_id' => [
         'name' => 'relationship_id',
         'type' => 1,
         'title' => 'Relationship Id',
@@ -172,8 +172,8 @@ function activity_getfields_expectedresult() {
         'bao' => 'CRM_Activity_BAO_Activity',
         'FKClassName' => 'CRM_Contact_DAO_Relationship',
         'FKApiName' => 'Relationship',
-      ),
-      'is_current_revision' => array(
+      ],
+      'is_current_revision' => [
         'name' => 'is_current_revision',
         'type' => 16,
         'title' => 'Is this activity a current revision in versioning chain?',
@@ -185,11 +185,11 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'CheckBox',
-        ),
-      ),
-      'original_id' => array(
+        ],
+      ],
+      'original_id' => [
         'name' => 'original_id',
         'type' => 1,
         'title' => 'Original Activity ID ',
@@ -199,21 +199,21 @@ function activity_getfields_expectedresult() {
         'bao' => 'CRM_Activity_BAO_Activity',
         'FKClassName' => 'CRM_Activity_DAO_Activity',
         'FKApiName' => 'Activity',
-      ),
-      'weight' => array(
+      ],
+      'weight' => [
         'name' => 'weight',
         'type' => 1,
         'title' => 'Order',
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'size' => 6,
           'maxlength' => 14,
-        ),
-      ),
-      'is_star' => array(
+        ],
+      ],
+      'is_star' => [
         'name' => 'is_star',
         'type' => 16,
         'title' => 'Is Starred',
@@ -225,8 +225,8 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-      ),
-      'id' => array(
+      ],
+      'id' => [
         'name' => 'id',
         'type' => 1,
         'title' => 'Activity ID',
@@ -239,11 +239,11 @@ function activity_getfields_expectedresult() {
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
         'uniqueName' => 'activity_id',
-        'api.aliases' => array(
+        'api.aliases' => [
           '0' => 'activity_id',
-        ),
-      ),
-      'subject' => array(
+        ],
+      ],
+      'subject' => [
         'name' => 'subject',
         'type' => 2,
         'title' => 'Subject',
@@ -257,14 +257,14 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 255,
           'size' => 45,
-        ),
+        ],
         'uniqueName' => 'activity_subject',
-      ),
-      'duration' => array(
+      ],
+      'duration' => [
         'name' => 'duration',
         'type' => 1,
         'title' => 'Duration',
@@ -276,14 +276,14 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'size' => 6,
           'maxlength' => 14,
-        ),
+        ],
         'uniqueName' => 'activity_duration',
-      ),
-      'location' => array(
+      ],
+      'location' => [
         'name' => 'location',
         'type' => 2,
         'title' => 'Location',
@@ -297,14 +297,14 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 255,
           'size' => 45,
-        ),
+        ],
         'uniqueName' => 'activity_location',
-      ),
-      'details' => array(
+      ],
+      'details' => [
         'name' => 'details',
         'type' => 32,
         'title' => 'Details',
@@ -316,14 +316,14 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'RichTextEditor',
           'rows' => 2,
           'cols' => 80,
-        ),
+        ],
         'uniqueName' => 'activity_details',
-      ),
-      'status_id' => array(
+      ],
+      'status_id' => [
         'name' => 'status_id',
         'type' => 1,
         'title' => 'Activity Status',
@@ -334,21 +334,21 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'size' => 6,
           'maxlength' => 14,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'optionGroupName' => 'activity_status',
           'optionEditPath' => 'civicrm/admin/options/activity_status',
-        ),
+        ],
         'uniqueName' => 'activity_status_id',
-        'api.aliases' => array(
+        'api.aliases' => [
           '0' => 'activity_status',
-        ),
-      ),
-      'is_test' => array(
+        ],
+      ],
+      'is_test' => [
         'name' => 'is_test',
         'type' => 16,
         'title' => 'Test',
@@ -359,12 +359,12 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
-        ),
+        ],
         'uniqueName' => 'activity_is_test',
-      ),
-      'medium_id' => array(
+      ],
+      'medium_id' => [
         'name' => 'medium_id',
         'type' => 1,
         'title' => 'Activity Medium',
@@ -373,18 +373,18 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'size' => 6,
           'maxlength' => 14,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'optionGroupName' => 'encounter_medium',
           'optionEditPath' => 'civicrm/admin/options/encounter_medium',
-        ),
+        ],
         'uniqueName' => 'activity_medium_id',
-      ),
-      'result' => array(
+      ],
+      'result' => [
         'name' => 'result',
         'type' => 2,
         'title' => 'Result',
@@ -394,14 +394,14 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 255,
           'size' => 45,
-        ),
+        ],
         'uniqueName' => 'activity_result',
-      ),
-      'is_deleted' => array(
+      ],
+      'is_deleted' => [
         'name' => 'is_deleted',
         'type' => 16,
         'title' => 'Activity is in the Trash',
@@ -412,12 +412,12 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
-        ),
+        ],
         'uniqueName' => 'activity_is_deleted',
-      ),
-      'campaign_id' => array(
+      ],
+      'campaign_id' => [
         'name' => 'campaign_id',
         'type' => 1,
         'title' => 'Campaign',
@@ -429,20 +429,20 @@ function activity_getfields_expectedresult() {
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
         'FKClassName' => 'CRM_Campaign_DAO_Campaign',
-        'html' => array(
+        'html' => [
           'type' => 'CheckBox',
           'size' => 6,
           'maxlength' => 14,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'table' => 'civicrm_campaign',
           'keyColumn' => 'id',
           'labelColumn' => 'title',
-        ),
+        ],
         'uniqueName' => 'activity_campaign_id',
         'FKApiName' => 'Campaign',
-      ),
-      'engagement_level' => array(
+      ],
+      'engagement_level' => [
         'name' => 'engagement_level',
         'type' => 1,
         'title' => 'Engagement Index',
@@ -453,18 +453,18 @@ function activity_getfields_expectedresult() {
         'table_name' => 'civicrm_activity',
         'entity' => 'Activity',
         'bao' => 'CRM_Activity_BAO_Activity',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'size' => 6,
           'maxlength' => 14,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'optionGroupName' => 'engagement_index',
           'optionEditPath' => 'civicrm/admin/options/engagement_index',
-        ),
+        ],
         'uniqueName' => 'activity_engagement_level',
-      ),
-      'source_contact_id' => array(
+      ],
+      'source_contact_id' => [
         'name' => 'source_contact_id',
         'title' => 'Activity Source Contact',
         'description' => 'Person who created this activity. Defaults to current user.',
@@ -472,33 +472,33 @@ function activity_getfields_expectedresult() {
         'FKClassName' => 'CRM_Contact_DAO_Contact',
         'api.default' => 'user_contact_id',
         'FKApiName' => 'Contact',
-      ),
-      'assignee_contact_id' => array(
+      ],
+      'assignee_contact_id' => [
         'name' => 'assignee_id',
         'title' => 'Activity Assignee',
         'description' => 'Contact(s) assigned to this activity.',
         'type' => 1,
         'FKClassName' => 'CRM_Contact_DAO_Contact',
         'FKApiName' => 'Contact',
-      ),
-      'target_contact_id' => array(
+      ],
+      'target_contact_id' => [
         'name' => 'target_id',
         'title' => 'Activity Target',
         'description' => 'Contact(s) participating in this activity.',
         'type' => 1,
         'FKClassName' => 'CRM_Contact_DAO_Contact',
         'FKApiName' => 'Contact',
-      ),
-      'case_id' => array(
+      ],
+      'case_id' => [
         'name' => 'case_id',
         'title' => 'Case ID',
         'description' => 'For creating an activity as part of a case.',
         'type' => 1,
         'FKClassName' => 'CRM_Case_DAO_Case',
         'FKApiName' => 'Case',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

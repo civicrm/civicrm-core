@@ -6,10 +6,10 @@
  *   API result array
  */
 function note_get_example() {
-  $params = array(
+  $params = [
     'entity_table' => 'civicrm_contact',
     'entity_id' => 3,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Note', 'get', $params);
@@ -19,12 +19,12 @@ function note_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -38,12 +38,12 @@ function note_get_example() {
  */
 function note_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 0,
-    'values' => array(),
-  );
+    'values' => [],
+  ];
 
   return $expectedResult;
 }

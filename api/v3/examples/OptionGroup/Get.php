@@ -6,9 +6,9 @@
  *   API result array
  */
 function option_group_get_example() {
-  $params = array(
+  $params = [
     'name' => 'preferred_communication_method',
-  );
+  ];
 
   try{
     $result = civicrm_api3('OptionGroup', 'get', $params);
@@ -18,12 +18,12 @@ function option_group_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,22 +37,22 @@ function option_group_get_example() {
  */
 function option_group_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'name' => 'preferred_communication_method',
         'title' => 'Preferred Communication Method',
         'is_reserved' => '1',
         'is_active' => '1',
         'is_locked' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

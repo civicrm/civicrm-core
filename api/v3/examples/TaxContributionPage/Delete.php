@@ -6,9 +6,9 @@
  *   API result array
  */
 function tax_contribution_page_delete_example() {
-  $params = array(
+  $params = [
     'id' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('tax_contribution_page', 'delete', $params);
@@ -18,11 +18,11 @@ function tax_contribution_page_delete_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'error' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -36,15 +36,15 @@ function tax_contribution_page_delete_example() {
  */
 function tax_contribution_page_delete_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
+    'values' => [
       '1' => 1,
-    ),
-  );
+    ],
+  ];
 
   return $expectedResult;
 }

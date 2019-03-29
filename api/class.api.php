@@ -85,8 +85,8 @@ class civicrm_api3 {
    */
   public function __construct($config = NULL) {
     $this->local      = TRUE;
-    $this->input      = array();
-    $this->lastResult = array();
+    $this->input      = [];
+    $this->lastResult = [];
     if (isset($config) && isset($config['server'])) {
       // we are calling a remote server via REST
       $this->local = FALSE;
@@ -164,13 +164,13 @@ class civicrm_api3 {
    *
    * @return \stdClass
    */
-  private function remoteCall($entity, $action, $params = array()) {
+  private function remoteCall($entity, $action, $params = []) {
     $query = $this->uri . "?entity=$entity&action=$action";
-    $fields = http_build_query(array(
+    $fields = http_build_query([
       'key' => $this->key,
       'api_key' => $this->api_key,
       'json' => json_encode($params),
-    ));
+    ]);
 
     if (function_exists('curl_init')) {
       // To facilitate debugging without leaking info, entity & action
@@ -187,7 +187,7 @@ class civicrm_api3 {
         $res->is_error = 1;
         $res->error_message = curl_error($ch);
         $res->level = "cURL";
-        $res->error = array('cURL error' => curl_error($ch));
+        $res->error = ['cURL error' => curl_error($ch)];
         return $res;
       }
       curl_close($ch);
@@ -202,7 +202,7 @@ class civicrm_api3 {
       $res->is_error = 1;
       $res->error_message = 'Unable to parse returned JSON';
       $res->level = 'json_decode';
-      $res->error = array('Unable to parse returned JSON' => $result);
+      $res->error = ['Unable to parse returned JSON' => $result];
       $res->row_result = $result;
     }
     return $res;
@@ -217,9 +217,9 @@ class civicrm_api3 {
    *
    * @return bool
    */
-  private function call($entity, $action = 'Get', $params = array()) {
+  private function call($entity, $action = 'Get', $params = []) {
     if (is_int($params)) {
-      $params = array('id' => $params);
+      $params = ['id' => $params];
     }
     elseif (is_string($params)) {
       $params = json_decode($params);
@@ -240,7 +240,7 @@ class civicrm_api3 {
       $this->lastResult = json_decode(json_encode(civicrm_api($entity, $action, $params)));
     }
     // Reset the input to be ready for a new call.
-    $this->input = array();
+    $this->input = [];
     if (property_exists($this->lastResult, 'is_error')) {
       return !$this->lastResult->is_error;
     }

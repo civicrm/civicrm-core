@@ -6,13 +6,13 @@
  *   API result array
  */
 function contribution_soft_create_example() {
-  $params = array(
+  $params = [
     'contribution_id' => 6,
     'contact_id' => 19,
     'amount' => '10',
     'currency' => 'USD',
     'soft_credit_type_id' => 5,
-  );
+  ];
 
   try{
     $result = civicrm_api3('ContributionSoft', 'create', $params);
@@ -22,12 +22,12 @@ function contribution_soft_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -41,13 +41,13 @@ function contribution_soft_create_example() {
  */
 function contribution_soft_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 5,
-    'values' => array(
-      '5' => array(
+    'values' => [
+      '5' => [
         'id' => '5',
         'contribution_id' => '6',
         'contact_id' => '19',
@@ -58,9 +58,9 @@ function contribution_soft_create_expectedresult() {
         'pcp_roll_nickname' => '',
         'pcp_personal_note' => '',
         'soft_credit_type_id' => '5',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

@@ -8,9 +8,9 @@
  *   API result array
  */
 function contact_getoptions_example() {
-  $params = array(
+  $params = [
     'field' => 'custom_1',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Contact', 'getoptions', $params);
@@ -20,12 +20,12 @@ function contact_getoptions_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,15 +39,15 @@ function contact_getoptions_example() {
  */
 function contact_getoptions_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 2,
-    'values' => array(
+    'values' => [
       '1' => 'Label1',
       '2' => 'Label2',
-    ),
-  );
+    ],
+  ];
 
   return $expectedResult;
 }

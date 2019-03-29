@@ -6,10 +6,10 @@
  *   API result array
  */
 function contribution_page_get_example() {
-  $params = array(
+  $params = [
     'currency' => 'NZD',
     'financial_type_id' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('ContributionPage', 'get', $params);
@@ -19,12 +19,12 @@ function contribution_page_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -38,13 +38,13 @@ function contribution_page_get_example() {
  */
 function contribution_page_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'title' => 'Test Contribution Page',
         'financial_type_id' => '1',
@@ -68,9 +68,9 @@ function contribution_page_get_expectedresult() {
         'is_share' => '1',
         'is_billing_required' => 0,
         'contribution_type_id' => '1',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

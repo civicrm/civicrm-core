@@ -81,7 +81,7 @@ function _civicrm_api3_custom_search_create_spec(&$params) {
   $params['option_group_id']['api.default'] = CRM_Core_DAO::getFieldValue(
     'CRM_Core_DAO_OptionGroup', 'custom_search', 'id', 'name'
   );
-  $params['name']['api.aliases'] = array('class_name');
+  $params['name']['api.aliases'] = ['class_name'];
 }
 
 /**

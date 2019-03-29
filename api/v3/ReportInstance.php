@@ -71,10 +71,10 @@ function _civicrm_api3_report_instance_create_spec(&$params) {
   $params['view_mode']['api.default'] = 'view';
   $params['view_mode']['title'] = ts('View Mode for Navigation URL');
   $params['view_mode']['type'] = CRM_Utils_Type::T_STRING;
-  $params['view_mode']['options'] = array(
+  $params['view_mode']['options'] = [
     'view' => ts('View'),
     'criteria' => ts('Show Criteria'),
-  );
+  ];
 }
 
 /**

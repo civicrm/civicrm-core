@@ -6,9 +6,9 @@
  *   API result array
  */
 function case_contact_get_example() {
-  $params = array(
+  $params = [
     'contact_id' => 19,
-  );
+  ];
 
   try{
     $result = civicrm_api3('CaseContact', 'get', $params);
@@ -18,12 +18,12 @@ function case_contact_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,19 +37,19 @@ function case_contact_get_example() {
  */
 function case_contact_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 2,
-    'values' => array(
-      '2' => array(
+    'values' => [
+      '2' => [
         'id' => '2',
         'case_id' => '2',
         'contact_id' => '19',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

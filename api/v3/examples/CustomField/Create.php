@@ -6,7 +6,7 @@
  *   API result array
  */
 function custom_field_create_example() {
-  $params = array(
+  $params = [
     'custom_group_id' => 1,
     'name' => 'test_textfield2',
     'label' => 'Name1',
@@ -17,7 +17,7 @@ function custom_field_create_example() {
     'is_required' => 1,
     'is_searchable' => 0,
     'is_active' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('CustomField', 'create', $params);
@@ -27,12 +27,12 @@ function custom_field_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -46,13 +46,13 @@ function custom_field_create_example() {
  */
 function custom_field_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'custom_group_id' => '1',
         'name' => 'test_textfield2',
@@ -83,9 +83,9 @@ function custom_field_create_expectedresult() {
         'option_group_id' => '',
         'filter' => '',
         'in_selector' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

@@ -8,10 +8,10 @@
  *   API result array
  */
 function participant_get_example() {
-  $params = array(
+  $params = [
     'contact_id' => 4,
     'api.participant.delete' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Participant', 'get', $params);
@@ -21,12 +21,12 @@ function participant_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -40,12 +40,12 @@ function participant_get_example() {
  */
 function participant_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 2,
-    'values' => array(
-      '2' => array(
+    'values' => [
+      '2' => [
         'contact_id' => '4',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
@@ -73,14 +73,14 @@ function participant_get_expectedresult() {
         'participant_discount_name' => '',
         'participant_campaign_id' => '',
         'id' => '2',
-        'api.participant.delete' => array(
+        'api.participant.delete' => [
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
           'values' => 1,
-        ),
-      ),
-      '3' => array(
+        ],
+      ],
+      '3' => [
         'contact_id' => '4',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
@@ -108,15 +108,15 @@ function participant_get_expectedresult() {
         'participant_discount_name' => '',
         'participant_campaign_id' => '',
         'id' => '3',
-        'api.participant.delete' => array(
+        'api.participant.delete' => [
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
           'values' => 1,
-        ),
-      ),
-    ),
-  );
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

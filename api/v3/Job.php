@@ -93,7 +93,7 @@ function civicrm_api3_job_clone($params) {
   $params['last_run'] = 'null';
   $params['scheduled_run_date'] = 'null';
   $newJobDAO = CRM_Core_BAO_Job::copy($id, $params);
-  return civicrm_api3('Job', 'get', array('id' => $newJobDAO->id));
+  return civicrm_api3('Job', 'get', ['id' => $newJobDAO->id]);
 }
 
 /**
@@ -174,27 +174,27 @@ function civicrm_api3_job_geocode($params) {
  * @param array $params
  */
 function _civicrm_api3_job_geocode_spec(&$params) {
-  $params['start'] = array(
+  $params['start'] = [
     'title' => 'Starting Contact ID',
     'type' => CRM_Utils_Type::T_INT,
-  );
-  $params['end'] = array(
+  ];
+  $params['end'] = [
     'title' => 'Ending Contact ID',
     'type' => CRM_Utils_Type::T_INT,
-  );
-  $params['geocoding'] = array(
+  ];
+  $params['geocoding'] = [
     'title' => 'Geocode address?',
     'type' => CRM_Utils_Type::T_BOOLEAN,
-  );
-  $params['parse'] = array(
+  ];
+  $params['parse'] = [
     'title' => 'Parse street address?',
     'type' => CRM_Utils_Type::T_BOOLEAN,
-  );
-  $params['throttle'] = array(
+  ];
+  $params['throttle'] = [
     'title' => 'Throttle?',
     'description' => 'If enabled, geo-codes at a slow rate',
     'type' => CRM_Utils_Type::T_BOOLEAN,
-  );
+  ];
 }
 
 /**
@@ -239,10 +239,10 @@ function civicrm_api3_job_send_reminder($params) {
 function _civicrm_api3_job_send_reminder(&$params) {
   //@todo this function will now take all fields in action_schedule as params
   // as it is calling the api fn to set the filters - update getfields to reflect
-  $params['id'] = array(
+  $params['id'] = [
     'type' => CRM_Utils_Type::T_INT,
     'title' => 'Action Schedule ID',
-  );
+  ];
 }
 /**
  * Execute a specific report instance and send the output via email.
@@ -306,16 +306,16 @@ function civicrm_api3_job_update_greeting($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_job_update_greeting_spec(&$params) {
-  $params['ct'] = array(
+  $params['ct'] = [
     'api.required' => 1,
     'title' => 'Contact Type',
     'type' => CRM_Utils_Type::T_STRING,
-  );
-  $params['gt'] = array(
+  ];
+  $params['gt'] = [
     'api.required' => 1,
     'title' => 'Greeting Type',
     'type' => CRM_Utils_Type::T_STRING,
-  );
+  ];
 }
 
 /**
@@ -360,9 +360,9 @@ function civicrm_api3_job_process_mailing($params) {
     return civicrm_api3_create_error('Process Queue failed');
   }
   else {
-    $values = array(
+    $values = [
       'processed' => CRM_Mailing_BAO_MailingJob::$mailsProcessed - $mailsProcessedOrig,
-    );
+    ];
     return civicrm_api3_create_success($values, $params, 'Job', 'process_mailing');
   }
 }
@@ -381,9 +381,9 @@ function civicrm_api3_job_process_sms($params) {
     return civicrm_api3_create_error('Process Queue failed');
   }
   else {
-    $values = array(
+    $values = [
       'processed' => CRM_Mailing_BAO_MailingJob::$mailsProcessed - $mailsProcessedOrig,
-    );
+    ];
     return civicrm_api3_create_success($values, $params, 'Job', 'process_sms');
   }
 }
@@ -412,11 +412,11 @@ function civicrm_api3_job_fetch_bounces($params) {
  * @param array $params
  */
 function _civicrm_api3_job_fetch_bounces_spec(&$params) {
-  $params['is_create_activities'] = array(
+  $params['is_create_activities'] = [
     'api.default' => 0,
     'type' => CRM_Utils_Type::T_BOOLEAN,
     'title' => ts('Create activities for replies?'),
-  );
+  ];
 }
 
 /**
@@ -434,7 +434,7 @@ function civicrm_api3_job_fetch_activities($params) {
 
   try {
     CRM_Utils_Mail_EmailProcessor::processActivities();
-    $values = array();
+    $values = [];
     $lock->release();
     return civicrm_api3_create_success($values, $params, 'Job', 'fetch_activities');
   }
@@ -529,18 +529,18 @@ function civicrm_api3_job_process_respondent($params) {
 function civicrm_api3_job_process_batch_merge($params) {
   $rule_group_id = CRM_Utils_Array::value('rule_group_id', $params);
   if (!$rule_group_id) {
-    $rule_group_id = civicrm_api3('RuleGroup', 'getvalue', array(
+    $rule_group_id = civicrm_api3('RuleGroup', 'getvalue', [
       'contact_type' => 'Individual',
       'used' => 'Unsupervised',
       'return' => 'id',
-      'options' => array('limit' => 1),
-    ));
+      'options' => ['limit' => 1],
+    ]);
   }
   $rgid = CRM_Utils_Array::value('rgid', $params);
   $gid = CRM_Utils_Array::value('gid', $params);
   $mode = CRM_Utils_Array::value('mode', $params, 'safe');
 
-  $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, 1, 2, CRM_Utils_Array::value('criteria', $params, array()), CRM_Utils_Array::value('check_permissions', $params));
+  $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, 1, 2, CRM_Utils_Array::value('criteria', $params, []), CRM_Utils_Array::value('check_permissions', $params));
 
   return civicrm_api3_create_success($result, $params);
 }
@@ -551,25 +551,25 @@ function civicrm_api3_job_process_batch_merge($params) {
  * @param $params
  */
 function _civicrm_api3_job_process_batch_merge_spec(&$params) {
-  $params['rule_group_id'] = array(
+  $params['rule_group_id'] = [
     'title' => 'Dedupe rule group id, defaults to Contact Unsupervised rule',
     'type' => CRM_Utils_Type::T_INT,
-    'api.aliases' => array('rgid'),
-  );
-  $params['gid'] = array(
+    'api.aliases' => ['rgid'],
+  ];
+  $params['gid'] = [
     'title' => 'group id',
     'type' => CRM_Utils_Type::T_INT,
-  );
-  $params['mode'] = array(
+  ];
+  $params['mode'] = [
     'title' => 'Mode',
     'description' => 'helps decide how to behave when there are conflicts. A \'safe\' value skips the merge if there are no conflicts. Does a force merge otherwise.',
     'type' => CRM_Utils_Type::T_STRING,
-  );
-  $params['auto_flip'] = array(
+  ];
+  $params['auto_flip'] = [
     'title' => 'Auto Flip',
     'description' => 'let the api decide which contact to retain and which to delete?',
     'type' => CRM_Utils_Type::T_BOOLEAN,
-  );
+  ];
 }
 
 /**
@@ -589,9 +589,9 @@ function civicrm_api3_job_run_payment_cron($params) {
     'PaymentCron',
     array_merge(
       $params,
-      array(
+      [
         'caller' => 'api',
-      )
+      ]
     )
   );
 
@@ -600,9 +600,9 @@ function civicrm_api3_job_run_payment_cron($params) {
     'PaymentCron',
     array_merge(
       $params,
-      array(
+      [
         'mode' => 'test',
-      )
+      ]
     )
   );
 }

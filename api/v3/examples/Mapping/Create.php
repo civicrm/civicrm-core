@@ -6,11 +6,11 @@
  *   API result array
  */
 function mapping_create_example() {
-  $params = array(
+  $params = [
     'name' => 'Mapping name',
     'description' => 'Mapping description',
     'mapping_type_id' => 7,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Mapping', 'create', $params);
@@ -20,12 +20,12 @@ function mapping_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,20 +39,20 @@ function mapping_create_example() {
  */
 function mapping_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'name' => 'Mapping name',
         'description' => 'Mapping description',
         'mapping_type_id' => '7',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

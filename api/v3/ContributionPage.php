@@ -58,7 +58,7 @@ function civicrm_api3_contribution_page_create($params) {
  */
 function _civicrm_api3_contribution_page_create_spec(&$params) {
   $params['financial_type_id']['api.required'] = 1;
-  $params['payment_processor']['api.aliases'] = array('payment_processor_id');
+  $params['payment_processor']['api.aliases'] = ['payment_processor_id'];
   $params['is_active']['api.default'] = 1;
 }
 
@@ -157,12 +157,12 @@ function _civicrm_api3_contribution_page_validate_spec(&$params) {
  * @return array
  */
 function _civicrm_api3_contribution_page_getlist_defaults(&$request) {
-  return array(
-    'description_field' => array(
+  return [
+    'description_field' => [
       'intro_text',
-    ),
-    'params' => array(
+    ],
+    'params' => [
       'is_active' => 1,
-    ),
-  );
+    ],
+  ];
 }

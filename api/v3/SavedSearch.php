@@ -43,7 +43,7 @@
  * @access public
  */
 function civicrm_api3_saved_search_create($params) {
-  civicrm_api3_verify_one_mandatory($params, NULL, array('form_values', 'where_clause'));
+  civicrm_api3_verify_one_mandatory($params, NULL, ['form_values', 'where_clause']);
   // The create function of the dao expects a 'formValues' that is
   // not serialized. The get function returns form_values, that is
   // serialized.

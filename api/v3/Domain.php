@@ -58,23 +58,23 @@ function civicrm_api3_domain_get($params) {
 
   foreach ($domains as $domain) {
     if (!empty($domain['contact_id'])) {
-      $values = array();
-      $locparams = array(
+      $values = [];
+      $locparams = [
         'contact_id' => $domain['contact_id'],
-      );
+      ];
       $values['location'] = CRM_Core_BAO_Location::getValues($locparams, TRUE);
-      $address_array = array(
+      $address_array = [
         'street_address', 'supplemental_address_1', 'supplemental_address_2', 'supplemental_address_3',
         'city', 'state_province_id', 'postal_code', 'country_id',
         'geo_code_1', 'geo_code_2',
-      );
+      ];
 
       if (!empty($values['location']['email'])) {
         $domain['domain_email'] = CRM_Utils_Array::value('email', $values['location']['email'][1]);
       }
 
       if (!empty($values['location']['phone'])) {
-        $domain['domain_phone'] = array(
+        $domain['domain_phone'] = [
           'phone_type' => CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id',
             CRM_Utils_Array::value(
               'phone_type_id',
@@ -85,7 +85,7 @@ function civicrm_api3_domain_get($params) {
             'phone',
             $values['location']['phone'][1]
           ),
-        );
+        ];
       }
 
       if (!empty($values['location']['address'])) {
@@ -119,10 +119,10 @@ function civicrm_api3_domain_get($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_domain_get_spec(&$params) {
-  $params['current_domain'] = array(
+  $params['current_domain'] = [
     'title' => "Current Domain",
     'description' => "get loaded domain",
-  );
+  ];
 }
 
 /**
@@ -160,11 +160,11 @@ function civicrm_api3_domain_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_domain_create_spec(&$params) {
-  $params['domain_version'] = array(
+  $params['domain_version'] = [
     'title' => "CiviCRM Version",
     'description' => "The civicrm version this instance is running",
     'type' => CRM_Utils_Type::T_STRING,
-  );
+  ];
   $params['domain_version']['api.required'] = 1;
   unset($params['version']);
   $params['name']['api.required'] = 1;

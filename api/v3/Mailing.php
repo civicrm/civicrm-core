@@ -44,7 +44,7 @@
  */
 function civicrm_api3_mailing_create($params) {
   if (isset($params['template_options']) && is_array($params['template_options'])) {
-    $params['template_options'] = ($params['template_options'] === array()) ? '{}' : json_encode($params['template_options']);
+    $params['template_options'] = ($params['template_options'] === []) ? '{}' : json_encode($params['template_options']);
   }
   if (CRM_Mailing_Info::workflowEnabled()) {
     // Note: 'schedule mailings' and 'approve mailings' can update certain fields, but can't create.
@@ -55,7 +55,7 @@ function civicrm_api3_mailing_create($params) {
       }
     }
 
-    $safeParams = array();
+    $safeParams = [];
     $fieldPerms = CRM_Mailing_BAO_Mailing::getWorkflowFieldPerms();
     foreach (array_keys($params) as $field) {
       if (CRM_Core_Permission::check($fieldPerms[$field])) {
@@ -94,7 +94,7 @@ function civicrm_api3_mailing_create($params) {
  * @throws \API_Exception
  */
 function civicrm_api3_mailing_gettokens($params) {
-  $tokens = array();
+  $tokens = [];
   foreach ((array) $params['entity'] as $ent) {
     $func = lcfirst($ent) . 'Tokens';
     if (!method_exists('CRM_Core_SelectValues', $func)) {
@@ -117,13 +117,13 @@ function civicrm_api3_mailing_gettokens($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_gettokens_spec(&$params) {
-  $params['entity'] = array(
-    'api.default' => array('contact'),
+  $params['entity'] = [
+    'api.default' => ['contact'],
     'api.required' => 1,
     'api.multiple' => 1,
     'title' => 'Entity',
-    'options' => array(),
-  );
+    'options' => [],
+  ];
   // Fetch a list of token functions and format to look like entity names
   foreach (get_class_methods('CRM_Core_SelectValues') as $func) {
     if (strpos($func, 'Tokens')) {
@@ -189,7 +189,7 @@ function _civicrm_api3_mailing_clone_spec(&$spec) {
  * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_mailing_clone($params) {
-  $BLACKLIST = array(
+  $BLACKLIST = [
     'id',
     'is_completed',
     'created_id',
@@ -203,16 +203,16 @@ function civicrm_api3_mailing_clone($params) {
     'is_archived',
     'hash',
     'mailing_type',
-  );
+  ];
 
-  $get = civicrm_api3('Mailing', 'getsingle', array('id' => $params['id']));
+  $get = civicrm_api3('Mailing', 'getsingle', ['id' => $params['id']]);
 
-  $newParams = array();
+  $newParams = [];
   $newParams['debug'] = CRM_Utils_Array::value('debug', $params);
-  $newParams['groups']['include'] = array();
-  $newParams['groups']['exclude'] = array();
-  $newParams['mailings']['include'] = array();
-  $newParams['mailings']['exclude'] = array();
+  $newParams['groups']['include'] = [];
+  $newParams['groups']['exclude'] = [];
+  $newParams['mailings']['include'] = [];
+  $newParams['mailings']['exclude'] = [];
   foreach ($get as $field => $value) {
     if (!in_array($field, $BLACKLIST)) {
       $newParams[$field] = $value;
@@ -298,7 +298,7 @@ function _civicrm_api3_mailing_submit_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_mailing_submit($params) {
-  civicrm_api3_verify_mandatory($params, 'CRM_Mailing_DAO_Mailing', array('id'));
+  civicrm_api3_verify_mandatory($params, 'CRM_Mailing_DAO_Mailing', ['id']);
 
   if (!isset($params['scheduled_date']) && !isset($updateParams['approval_date'])) {
     throw new API_Exception("Missing parameter scheduled_date and/or approval_date");
@@ -307,7 +307,7 @@ function civicrm_api3_mailing_submit($params) {
     throw new API_Exception("Failed to determine current user");
   }
 
-  $updateParams = array();
+  $updateParams = [];
   $updateParams['id'] = $params['id'];
 
   // Note: we'll pass along scheduling/approval fields, but they may get ignored
@@ -394,7 +394,7 @@ function civicrm_api3_mailing_event_confirm($params) {
  *   Array of deprecated actions
  */
 function _civicrm_api3_mailing_deprecation() {
-  return array('event_confirm' => 'Mailing api "event_confirm" action is deprecated. Use the mailing_event_confirm api instead.');
+  return ['event_confirm' => 'Mailing api "event_confirm" action is deprecated. Use the mailing_event_confirm api instead.'];
 }
 
 /**
@@ -496,7 +496,7 @@ function _civicrm_api3_mailing_event_forward_spec(&$params) {
 function civicrm_api3_mailing_event_click($params) {
   civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_Event_DAO_TrackableURLOpen',
-    array('event_queue_id', 'url_id'),
+    ['event_queue_id', 'url_id'],
     FALSE
   );
 
@@ -505,7 +505,7 @@ function civicrm_api3_mailing_event_click($params) {
 
   $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($queue, $url_id);
 
-  $values             = array();
+  $values             = [];
   $values['url']      = $url;
   $values['is_error'] = 0;
 
@@ -523,7 +523,7 @@ function civicrm_api3_mailing_event_open($params) {
 
   civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_Event_DAO_Opened',
-    array('event_queue_id'),
+    ['event_queue_id'],
     FALSE
   );
 
@@ -574,7 +574,7 @@ function civicrm_api3_mailing_preview($params) {
   if (!$contactID) {
     $contactID = $session->get('userID');
   }
-  $mailingParams = array('contact_id' => $contactID);
+  $mailingParams = ['contact_id' => $contactID];
 
   $details = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
 
@@ -582,13 +582,13 @@ function civicrm_api3_mailing_preview($params) {
     TRUE, $details[0][$contactID], $attachments
   );
 
-  return civicrm_api3_create_success(array(
+  return civicrm_api3_create_success([
     'id' => $params['id'],
     'contact_id' => $contactID,
     'subject' => $mime->headers()['Subject'],
     'body_html' => $mime->getHTMLBody(),
     'body_text' => $mime->getTXTBody(),
-  ));
+  ]);
 }
 
 /**
@@ -618,7 +618,7 @@ function civicrm_api3_mailing_send_test($params) {
   }
   civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_DAO_MailingJob',
-    array('mailing_id'),
+    ['mailing_id'],
     FALSE
   );
 
@@ -635,25 +635,25 @@ function civicrm_api3_mailing_send_test($params) {
   $testEmailParams['emails'] = array_key_exists('test_email', $testEmailParams) ? explode(',', strtolower($testEmailParams['test_email'])) : NULL;
   if (!empty($params['test_email'])) {
     $query = CRM_Utils_SQL_Select::from('civicrm_email e')
-        ->select(array('e.id', 'e.contact_id', 'e.email'))
+        ->select(['e.id', 'e.contact_id', 'e.email'])
         ->join('c', 'INNER JOIN civicrm_contact c ON e.contact_id = c.id')
-        ->where('e.email IN (@emails)', array('@emails' => $testEmailParams['emails']))
+        ->where('e.email IN (@emails)', ['@emails' => $testEmailParams['emails']])
         ->where('e.on_hold = 0')
         ->where('c.is_opt_out = 0')
         ->where('c.do_not_email = 0')
         ->where('c.is_deceased = 0')
         ->where('c.is_deleted = 0')
         ->groupBy('e.id')
-        ->orderBy(array('e.is_bulkmail DESC', 'e.is_primary DESC'))
+        ->orderBy(['e.is_bulkmail DESC', 'e.is_primary DESC'])
         ->toSQL();
     $dao = CRM_Core_DAO::executeQuery($query);
-    $emailDetail = array();
+    $emailDetail = [];
     // fetch contact_id and email id for all existing emails
     while ($dao->fetch()) {
-      $emailDetail[strtolower($dao->email)] = array(
+      $emailDetail[strtolower($dao->email)] = [
         'contact_id' => $dao->contact_id,
         'email_id' => $dao->id,
-      );
+      ];
     }
     foreach ($testEmailParams['emails'] as $key => $email) {
       $email = trim($email);
@@ -665,21 +665,21 @@ function civicrm_api3_mailing_send_test($params) {
       if (!$contactId) {
         //create new contact.
         $contact   = civicrm_api3('Contact', 'create',
-          array(
+          [
             'contact_type' => 'Individual',
             'email' => $email,
-            'api.Email.get' => array('return' => 'id'),
-          )
+            'api.Email.get' => ['return' => 'id'],
+          ]
         );
         $contactId = $contact['id'];
         $emailId   = $contact['values'][$contactId]['api.Email.get']['id'];
       }
       civicrm_api3('MailingEventQueue', 'create',
-        array(
+        [
           'job_id' => $job['id'],
           'email_id' => $emailId,
           'contact_id' => $contactId,
-        )
+        ]
       );
     }
   }
@@ -726,7 +726,7 @@ function _civicrm_api3_mailing_stats_spec(&$params) {
 function civicrm_api3_mailing_stats($params) {
   civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_DAO_MailingJob',
-    array('mailing_id'),
+    ['mailing_id'],
     FALSE
   );
 
@@ -737,40 +737,40 @@ function civicrm_api3_mailing_stats($params) {
     $params['date'] = CRM_Utils_Date::processDate($params['date'] . ' ' . $params['date_time']);
   }
 
-  $stats[$params['mailing_id']] = array();
+  $stats[$params['mailing_id']] = [];
   if (empty($params['job_id'])) {
     $params['job_id'] = NULL;
   }
-  foreach (array('Delivered', 'Bounces', 'Unsubscribers', 'Unique Clicks', 'Opened') as $detail) {
+  foreach (['Delivered', 'Bounces', 'Unsubscribers', 'Unique Clicks', 'Opened'] as $detail) {
     switch ($detail) {
       case 'Delivered':
-        $stats[$params['mailing_id']] += array(
+        $stats[$params['mailing_id']] += [
           $detail => CRM_Mailing_Event_BAO_Delivered::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], $params['date']),
-        );
+        ];
         break;
 
       case 'Bounces':
-        $stats[$params['mailing_id']] += array(
+        $stats[$params['mailing_id']] += [
           $detail => CRM_Mailing_Event_BAO_Bounce::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], $params['date']),
-        );
+        ];
         break;
 
       case 'Unsubscribers':
-        $stats[$params['mailing_id']] += array(
+        $stats[$params['mailing_id']] += [
           $detail => CRM_Mailing_Event_BAO_Unsubscribe::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], NULL, $params['date']),
-        );
+        ];
         break;
 
       case 'Unique Clicks':
-        $stats[$params['mailing_id']] += array(
+        $stats[$params['mailing_id']] += [
           $detail => CRM_Mailing_Event_BAO_TrackableURLOpen::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], NULL, $params['date']),
-        );
+        ];
         break;
 
       case 'Opened':
-        $stats[$params['mailing_id']] += array(
+        $stats[$params['mailing_id']] += [
           $detail => CRM_Mailing_Event_BAO_Opened::getTotalCount($params['mailing_id'], $params['job_id'], (bool) $params['is_distinct'], $params['date']),
-        );
+        ];
         break;
     }
   }

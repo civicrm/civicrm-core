@@ -20,7 +20,7 @@ class API_Exception extends Exception {
   const UNAUTHORIZED = 'unauthorized';
   const NOT_IMPLEMENTED = 'not-found';
 
-  private $extraParams = array();
+  private $extraParams = [];
 
   /**
    * Class constructor.
@@ -37,7 +37,7 @@ class API_Exception extends Exception {
    * @param Exception|NULL $previous
    *   A previous exception which caused this new exception.
    */
-  public function __construct($message, $error_code = 0, $extraParams = array(), Exception $previous = NULL) {
+  public function __construct($message, $error_code = 0, $extraParams = [], Exception $previous = NULL) {
     // Using int for error code "old way") ?
     if (is_numeric($error_code)) {
       $code = $error_code;
@@ -46,7 +46,7 @@ class API_Exception extends Exception {
       $code = 0;
     }
     parent::__construct(ts($message), $code, $previous);
-    $this->extraParams = $extraParams + array('error_code' => $error_code);
+    $this->extraParams = $extraParams + ['error_code' => $error_code];
   }
 
   /**
@@ -73,13 +73,13 @@ class API_Exception extends Exception {
    * @return array
    */
   public function getErrorCodes() {
-    return array(
+    return [
       2000 => '$params was not an array',
       2001 => 'Invalid Value for Date field',
       2100 => 'String value is longer than permitted length',
       self::UNAUTHORIZED => 'Unauthorized',
       self::NOT_IMPLEMENTED => 'Entity or method is not implemented',
-    );
+    ];
   }
 
 }
@@ -89,7 +89,7 @@ class API_Exception extends Exception {
  * API_Exception from the api wrapper as the namespace is more generic
  */
 class CiviCRM_API3_Exception extends Exception {
-  private $extraParams = array();
+  private $extraParams = [];
 
   /**
    * Class constructor.
@@ -106,9 +106,9 @@ class CiviCRM_API3_Exception extends Exception {
    * @param Exception|NULL $previous
    *   A previous exception which caused this new exception.
    */
-  public function __construct($message, $error_code = 0, $extraParams = array(), Exception $previous = NULL) {
+  public function __construct($message, $error_code = 0, $extraParams = [], Exception $previous = NULL) {
     parent::__construct(ts($message));
-    $this->extraParams = $extraParams + array('error_code' => $error_code);
+    $this->extraParams = $extraParams + ['error_code' => $error_code];
   }
 
   /**

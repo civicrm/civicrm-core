@@ -60,16 +60,16 @@ function civicrm_api3_system_flush($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_system_flush_spec(&$params) {
-  $params['triggers'] = array(
+  $params['triggers'] = [
     'title' => 'Triggers',
     'description' => 'rebuild triggers (boolean)',
     'type' => CRM_Utils_Type::T_BOOLEAN,
-  );
-  $params['session'] = array(
+  ];
+  $params['session'] = [
     'title' => 'Sessions',
     'description' => 'refresh sessions (boolean)',
     'type' => CRM_Utils_Type::T_BOOLEAN,
-  );
+  ];
 }
 
 /**
@@ -83,53 +83,53 @@ function _civicrm_api3_system_flush_spec(&$params) {
  * @see http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
  */
 function _civicrm_api3_system_check_spec(&$spec) {
-  $spec['id'] = array(
+  $spec['id'] = [
     'title' => 'ID',
     'description' => 'Not a real identifier - do not use',
     'type' => CRM_Utils_Type::T_INT,
-  );
-  $spec['name'] = array(
+  ];
+  $spec['name'] = [
     'title' => 'Name',
     'description' => 'Unique identifier',
     'type' => CRM_Utils_Type::T_STRING,
-  );
-  $spec['title'] = array(
+  ];
+  $spec['title'] = [
     'title' => 'Title',
     'description' => 'Short title text',
     'type' => CRM_Utils_Type::T_STRING,
-  );
-  $spec['message'] = array(
+  ];
+  $spec['message'] = [
     'title' => 'Message',
     'description' => 'Long description html',
     'type' => CRM_Utils_Type::T_STRING,
-  );
-  $spec['help'] = array(
+  ];
+  $spec['help'] = [
     'title' => 'Help',
     'description' => 'Optional extra help (html string)',
     'type' => CRM_Utils_Type::T_STRING,
-  );
-  $spec['severity'] = array(
+  ];
+  $spec['severity'] = [
     'title' => 'Severity',
     'description' => 'Psr\Log\LogLevel string',
     'type' => CRM_Utils_Type::T_STRING,
     'options' => array_combine(CRM_Utils_Check::getSeverityList(), CRM_Utils_Check::getSeverityList()),
-  );
-  $spec['severity_id'] = array(
+  ];
+  $spec['severity_id'] = [
     'title' => 'Severity ID',
     'description' => 'Integer representation of Psr\Log\LogLevel',
     'type' => CRM_Utils_Type::T_INT,
     'options' => CRM_Utils_Check::getSeverityList(),
-  );
-  $spec['is_visible'] = array(
+  ];
+  $spec['is_visible'] = [
     'title' => 'is visible',
     'description' => '0 if message has been hidden by the user',
     'type' => CRM_Utils_Type::T_BOOLEAN,
-  );
-  $spec['hidden_until'] = array(
+  ];
+  $spec['hidden_until'] = [
     'title' => 'Hidden_until',
     'description' => 'When will hidden message be visible again?',
     'type' => CRM_Utils_Type::T_DATE,
-  );
+  ];
 }
 
 /**
@@ -146,14 +146,14 @@ function _civicrm_api3_system_check_spec(&$spec) {
 function civicrm_api3_system_check($params) {
   // array(array('name'=> $, 'severity'=>$, ...))
   $id = 1;
-  $returnValues = $fields = array();
+  $returnValues = $fields = [];
   _civicrm_api3_system_check_spec($fields);
 
   // array(CRM_Utils_Check_Message)
   $messages = CRM_Utils_Check::checkAll();
 
   foreach ($messages as $msg) {
-    $returnValues[] = $msg->toArray() + array('id' => $id++);
+    $returnValues[] = $msg->toArray() + ['id' => $id++];
   }
 
   return _civicrm_api3_basic_array_get('systemCheck', $params, $returnValues, "id", array_keys($fields));
@@ -171,9 +171,9 @@ function civicrm_api3_system_log($params) {
   // This part means fields with separate db storage are accepted as params which kind of seems more intuitive to me
   // because I felt like not doing this required a bunch of explanation in the spec function - but perhaps other won't see it as helpful?
   if (!isset($params['context'])) {
-    $params['context'] = array();
+    $params['context'] = [];
   }
-  $specialFields = array('contact_id', 'hostname');
+  $specialFields = ['contact_id', 'hostname'];
   foreach ($specialFields as $specialField) {
     if (isset($params[$specialField]) && !isset($params['context'])) {
       $params['context'][$specialField] = $params[$specialField];
@@ -189,34 +189,34 @@ function civicrm_api3_system_log($params) {
  * @param array $params
  */
 function _civicrm_api3_system_log_spec(&$params) {
-  $params['level'] = array(
+  $params['level'] = [
     'title' => 'Log Level',
     'description' => 'Log level as described in PSR3 (info, debug, warning etc)',
     'type' => CRM_Utils_Type::T_STRING,
     'api.required' => TRUE,
-  );
-  $params['message'] = array(
+  ];
+  $params['message'] = [
     'title' => 'Log Message',
     'description' => 'Standardised message string, you can also ',
     'type' => CRM_Utils_Type::T_STRING,
     'api.required' => TRUE,
-  );
-  $params['context'] = array(
+  ];
+  $params['context'] = [
     'title' => 'Log Context',
     'description' => 'An array of additional data to store.',
     'type' => CRM_Utils_Type::T_LONGTEXT,
-    'api.default' => array(),
-  );
-  $params['contact_id'] = array(
+    'api.default' => [],
+  ];
+  $params['contact_id'] = [
     'title' => 'Log Contact ID',
     'description' => 'Optional ID of relevant contact',
     'type' => CRM_Utils_Type::T_INT,
-  );
-  $params['hostname'] = array(
+  ];
+  $params['hostname'] = [
     'title' => 'Log Hostname',
     'description' => 'Optional name of host',
     'type' => CRM_Utils_Type::T_STRING,
-  );
+  ];
 }
 
 /**
@@ -228,29 +228,29 @@ function _civicrm_api3_system_log_spec(&$params) {
  */
 function civicrm_api3_system_get($params) {
   $config = CRM_Core_Config::singleton();
-  $returnValues = array(
-    array(
+  $returnValues = [
+    [
       'version' => CRM_Utils_System::version(), // deprecated in favor of civi.version
       'uf' => CIVICRM_UF, // deprecated in favor of cms.type
-      'php' => array(
+      'php' => [
         'version' => phpversion(),
         'time' => time(),
         'tz' => date_default_timezone_get(),
         'sapi' => php_sapi_name(),
         'extensions' => get_loaded_extensions(),
         'ini' => _civicrm_api3_system_get_redacted_ini(),
-      ),
-      'mysql' => array(
+      ],
+      'mysql' => [
         'version' => CRM_Core_DAO::singleValueQuery('SELECT @@version'),
         'time' => CRM_Core_DAO::singleValueQuery('SELECT unix_timestamp()'),
         'vars' => _civicrm_api3_system_get_redacted_mysql(),
-      ),
-      'cms' => array(
+      ],
+      'cms' => [
         'version' => $config->userSystem->getVersion(),
         'type' => CIVICRM_UF,
         'modules' => CRM_Core_Module::collectStatuses($config->userSystem->getModules()),
-      ),
-      'civi' => array(
+      ],
+      'civi' => [
         'version' => CRM_Utils_System::version(),
         'dev' => (bool) CRM_Utils_System::isDevelopment(),
         'components' => array_keys(CRM_Core_Component::getEnabledComponents()),
@@ -262,20 +262,20 @@ function civicrm_api3_system_get($params) {
         'multidomain' => CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_domain') > 1,
         'settings' => _civicrm_api3_system_get_redacted_settings(),
         'exampleUrl' => CRM_Utils_System::url('civicrm/example', NULL, TRUE, NULL, FALSE),
-      ),
-      'http' => array(
+      ],
+      'http' => [
         'software' => CRM_Utils_Array::value('SERVER_SOFTWARE', $_SERVER),
         'forwarded' => !empty($_SERVER['HTTP_X_FORWARDED_FOR']) || !empty($_SERVER['X_FORWARDED_PROTO']),
         'port' => (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == 80 || $_SERVER['SERVER_PORT'] == 443) ? 'Standard' : 'Nonstandard',
-      ),
-      'os' => array(
+      ],
+      'os' => [
         'type' => php_uname('s'),
         'release' => php_uname('r'),
         'version' => php_uname('v'),
         'machine' => php_uname('m'),
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return civicrm_api3_create_success($returnValues, $params, 'System', 'get');
 }
@@ -308,7 +308,7 @@ function _civicrm_api3_system_get_redacted_ini() {
   }
 
   $inis = ini_get_all(NULL, FALSE);
-  $result = array();
+  $result = [];
   foreach ($inis as $k => $v) {
     if (empty($v) || in_array($k, $whitelist)) {
       $result[$k] = $v;
@@ -334,7 +334,7 @@ function _civicrm_api3_system_get_redacted_mysql() {
   }
 
   $inis = ini_get_all(NULL, FALSE);
-  $result = array();
+  $result = [];
   $dao = CRM_Core_DAO::executeQuery('SHOW VARIABLES');
   while ($dao->fetch()) {
     if (empty($dao->Variable_name) || in_array($dao->Variable_name, $whitelist)) {
@@ -360,8 +360,8 @@ function _civicrm_api3_system_get_redacted_settings() {
     $whitelist = _civicrm_api3_system_get_whitelist(__DIR__ . '/System/setting-whitelist.txt');
   }
 
-  $apiResult = civicrm_api3('Setting', 'get', array());
-  $result = array();
+  $apiResult = civicrm_api3('Setting', 'get', []);
+  $result = [];
   foreach ($apiResult['values'] as $settings) {
     foreach ($settings as $key => $value) {
       if (in_array($key, $whitelist)) {
